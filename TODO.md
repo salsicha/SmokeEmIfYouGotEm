@@ -2,7 +2,7 @@
 
 ## Rough First Draft Outline
 
-This project is starting as a 3D white water raft guide game built in Unreal Engine with a bird's-eye camera and multi-platform goals. The first playable milestone should prove that guiding a raft through current is fun before the project expands into campaign, progression, or large river systems.
+This project is starting as a 3D white water raft guide game built in Unreal Engine with a first-person camera from the guide's position in the back of the raft and multi-platform goals. The first playable milestone should prove that guiding a raft through current feels physical, readable, and fun before the project expands into campaign, progression, or large river systems.
 
 ## Milestone 0: Project Foundation
 
@@ -14,14 +14,17 @@ This project is starting as a 3D white water raft guide game built in Unreal Eng
 - [ ] Add basic build targets for desktop platforms.
 - [ ] Add initial README with setup and build instructions.
 
-## Milestone 1: Bird's-Eye Raft Prototype
+## Milestone 1: First-Person Guide Prototype
 
 - [ ] Create a simple test river map.
 - [ ] Add a raft pawn or actor with basic movement.
-- [ ] Add a bird's-eye camera with follow, zoom, and downstream framing.
+- [ ] Add a first-person guide camera anchored to the stern of the raft.
+- [ ] Add mouse, keyboard, and gamepad look controls.
+- [ ] Keep the raft bow, tubes, guide hands, paddle, and passengers visible enough to ground the player.
 - [ ] Implement forward, back, left, right, and brace commands.
 - [ ] Make current push the raft downstream.
 - [ ] Add simple raft rotation from paddle force and current.
+- [ ] Add restrained camera motion for waves, drops, and collisions.
 - [ ] Add restart and reset controls for rapid iteration.
 
 ## Milestone 2: River Readability
@@ -31,7 +34,8 @@ This project is starting as a 3D white water raft guide game built in Unreal Eng
 - [ ] Add eddies or slower current zones.
 - [ ] Add wave or hydraulic hazard placeholders.
 - [ ] Establish a visual language for safe water, risky water, and danger water.
-- [ ] Test camera height, tilt, and zoom at multiple screen sizes.
+- [ ] Test first-person camera height, field of view, motion, and obstruction at multiple screen sizes.
+- [ ] Make foam lines, surface streaks, debris, and wave shapes communicate current direction from inside the raft.
 
 ## Milestone 3: Scoring And Game Loop
 
@@ -45,6 +49,7 @@ This project is starting as a 3D white water raft guide game built in Unreal Eng
 ## Milestone 4: Crew And Passenger Layer
 
 - [ ] Add placeholder passenger characters.
+- [ ] Place passengers in front of the guide so their paddle timing and panic states are readable from first person.
 - [ ] Make passengers paddle in response to guide commands.
 - [ ] Add passenger brace state.
 - [ ] Add simple trust or panic meter.
@@ -83,4 +88,4 @@ This project is starting as a 3D white water raft guide game built in Unreal Eng
 - [ ] Add initial source control ignores and project README.
 - [ ] Prototype raft movement on a flat plane before adding complex water.
 - [ ] Add a single downstream current volume.
-- [ ] Tune the bird's-eye camera until the raft, line, and hazards are readable.
+- [ ] Tune the first-person guide camera until the raft, line, passengers, and hazards are readable.
