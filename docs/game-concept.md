@@ -2,9 +2,9 @@
 
 ## Elevator Pitch
 
-SmokeEmIfYouGotEm is a 3D white water raft guide game built in Unreal Engine. The player takes the role of the river guide, reading rapids from a bird's-eye tactical view, steering a raft through dangerous currents, giving paddle commands, managing passenger safety, and chasing clean lines through increasingly technical river sections.
+SmokeEmIfYouGotEm is a 3D white water raft guide game built in Unreal Engine. The player takes the role of the river guide seated in the back of the boat, reading rapids from a first-person perspective, steering a raft through dangerous currents, giving paddle commands, managing passenger safety, and chasing clean lines through increasingly technical river sections.
 
-The initial camera goal is a bird's-eye view: clear enough to read river shape, obstacles, eddies, waves, and raft angle at a glance, but still close enough that water, impact, and passenger reactions feel immediate.
+The initial camera goal is first-person from the guide's stern position: low and physical enough to feel the raft buck under the player, but readable enough to judge current, obstacles, eddies, waves, passenger timing, and raft angle before each decision matters.
 
 ## Core Fantasy
 
@@ -31,21 +31,23 @@ Possible later experiment:
 
 - Mobile or tablet, only if the controls can be simplified without weakening the core game
 
-## Camera And View
+## First-Person Camera And View
 
 Initial prototype camera:
 
-- Bird's-eye 3D camera with a slight forward tilt
-- Camera follows the raft while preserving downstream visibility
-- Player can zoom between tactical and close action ranges
-- Camera should rotate only if it improves readability; fixed downstream framing is the safer first prototype
+- First-person camera anchored to the guide position at the back of the raft
+- Player can freely look left, right, forward, and slightly behind without losing the sense of being seated in the boat
+- Camera motion should communicate raft hits, drops, and waves without causing discomfort
+- The guide's paddle, hands, nearby passengers, raft tubes, and bow should remain visible as grounding references
+- Optional quick-look or lean actions can help players check obstacles and passenger state without needing a third-person view
 
 Design goals:
 
-- Read river flow before entering a rapid
-- See raft angle, passenger positions, and nearby hazards
-- Keep the water visually alive without hiding gameplay-critical information
-- Avoid motion sickness and camera overcorrection
+- Read river flow from inside the boat before entering a rapid
+- See raft angle through the bow direction, passenger positions, paddle timing, and nearby hazards
+- Make water height, splash, foam, and rocks feel close and dangerous without hiding gameplay-critical information
+- Avoid motion sickness from camera shake, forced rotation, or overcorrection
+- Preserve downstream visibility even when passengers, spray, or the raft bow fill the frame
 
 ## Player Role
 
@@ -61,9 +63,9 @@ Primary responsibilities:
 
 ## Core Gameplay Loop
 
-1. Scout the next river feature from the bird's-eye view.
+1. Read the next river feature from the guide's first-person seat in the stern.
 2. Position the raft before the rapid.
-3. Call paddle commands and guide strokes to enter the line.
+3. Call paddle commands and use guide strokes to enter the line.
 4. Adjust in real time as current, waves, rocks, and crew timing affect the raft.
 5. Recover from mistakes or capitalize on clean execution.
 6. Finish the section and receive feedback on safety, speed, control, and style.
@@ -84,6 +86,8 @@ Possible guide inputs:
 - Rescue command when a passenger falls out
 
 The player should feel like they are commanding a crew rather than directly moving a vehicle with arcade thrusters. The raft can still be responsive, but the response should come through paddle force, water current, and raft momentum.
+
+The first-person view should make inputs feel like physical guide actions. Paddle strokes, command calls, brace warnings, and rescue actions should be readable through the player's hands, paddle, voice, and the crew's response.
 
 ## River Systems
 
@@ -119,7 +123,7 @@ Prototype physics priorities:
 
 ## Passengers And Crew
 
-Passengers should be readable from the bird's-eye view as small but expressive characters.
+Passengers should be readable from the guide's seat as expressive crew members in front of the player.
 
 First draft behaviors:
 
@@ -170,9 +174,10 @@ The game should feel energetic, outdoorsy, risky, and a little scrappy. It shoul
 Visual direction:
 
 - Bright daylight river environments
-- Clear water direction indicators
+- Clear diegetic water direction indicators through foam lines, bubbles, surface streaks, waves, and debris
 - Strong silhouettes for rocks, raft, waves, and hazards
-- Practical UI inspired by guide maps, safety checklists, and river notes
+- Minimal first-person UI inspired by guide maps, safety checklists, and river notes
+- Visible raft bow, tubes, paddle, hands, and passenger silhouettes to ground the player in the stern
 
 Audio direction:
 
@@ -198,12 +203,13 @@ Prototype map:
 - One raft
 - One guide input set
 - A few rocks and wave hazards
-- Start, finish, scoring, restart, and basic camera controls
+- Start, finish, scoring, restart, and first-person look controls
 
 ## Open Questions
 
 - Should the first playable prototype be realistic simulation, arcade tactics, or a middle ground?
 - Should passengers be individual characters with traits, or mostly a visual representation of crew state?
 - Should raft control be direct, command-based, or a hybrid?
-- How much should the bird's-eye camera prioritize downstream planning versus close physical impact?
+- How much should the first-person camera prioritize downstream planning versus close physical impact?
+- Should there be any optional third-person or scout camera, or should the game stay fully committed to the guide's viewpoint?
 - Is the long-term fantasy a campaign, a roguelite river runner, a sports sim, or a creative river sandbox?
