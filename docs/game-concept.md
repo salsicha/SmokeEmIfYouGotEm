@@ -1,35 +1,50 @@
-# SmokeEmIfYouGotEm Game Concept
+# SmokeEmIfYouGotEm Simulator Concept
 
 ## Elevator Pitch
 
-SmokeEmIfYouGotEm is a 3D white water raft guide game built in Unreal Engine. The player takes the role of the river guide seated in the back of the boat, reading rapids from a first-person perspective, steering a raft through dangerous currents, giving paddle commands, managing passenger safety, and chasing clean lines through increasingly technical river sections.
+SmokeEmIfYouGotEm is a photo-realistic, physically accurate 3D white water rafting simulator built in Unreal Engine with first-class VR support. The player takes the role of the river guide seated in the back of the boat, reading rapids from a first-person perspective, steering a raft through dangerous currents, giving paddle commands, managing passenger safety, and chasing clean lines through increasingly technical river sections.
 
-The initial camera goal is first-person from the guide's stern position: low and physical enough to feel the raft buck under the player, but readable enough to judge current, obstacles, eddies, waves, passenger timing, and raft angle before each decision matters.
+The initial camera goal is first-person from the guide's stern position in both VR and flat-screen play: low and physical enough to feel the raft buck under the player, but readable enough to judge current, obstacles, eddies, waves, passenger timing, and raft angle before each decision matters.
 
 ## Core Fantasy
 
-The game should make the player feel like a skilled guide threading a raft through controlled chaos. The best moments should come from spotting the right line early, setting the raft angle, calling the right paddle rhythm, and barely sliding past a rock or hydraulic with everyone still aboard.
+The simulator should make the player feel like a skilled guide threading a raft through controlled chaos. The best moments should come from spotting the right line early, setting the raft angle, calling the right paddle rhythm, and barely sliding past a rock or hydraulic with everyone still aboard.
+
+## Simulation North Star
+
+The project should prioritize realism over arcade readability whenever the two conflict, then solve readability through better first-person cues, training tools, and environment design.
+
+Core simulation goals:
+
+- Photo-real river canyons, water, raft materials, paddles, spray, lighting, and weather
+- Physically grounded raft buoyancy, drag, collision response, flex, and passenger weight transfer
+- Water behavior that represents current, eddies, standing waves, hydraulics, holes, pour-overs, and turbulent seams
+- Paddle strokes that produce plausible force and torque based on blade position, angle, depth, and timing
+- VR presence that makes the player feel seated in the stern, holding a paddle, calling commands, and reacting with their body
+- Training-grade feedback that explains why the raft moved, flipped, pinned, surfed, or missed a line
 
 ## Target Platforms
 
-The project should be designed as a multi-platform Unreal Engine game from day one.
+The project should be designed as a multi-platform Unreal Engine simulator from day one, with VR as a core design constraint rather than an optional late port.
 
 Primary targets:
 
-- Windows PC
-- macOS
-- Linux / Steam Deck
+- Windows PC flat-screen
+- PC VR through OpenXR-compatible headsets
+- macOS flat-screen
+- Linux / Steam Deck flat-screen
 
 Future targets:
 
-- PlayStation
+- PlayStation and PlayStation VR2, if platform access and performance budgets allow
 - Xbox
 - Nintendo hardware, if performance and certification constraints are realistic
-- Cloud streaming builds
+- High-end cloud streaming builds
+- Standalone VR headsets only if physics, water, and visual quality can survive the performance budget
 
 Possible later experiment:
 
-- Mobile or tablet, only if the controls can be simplified without weakening the core game
+- Mobile or tablet, only if the controls can be simplified without weakening the core simulator
 
 ## First-Person Camera And View
 
@@ -40,6 +55,8 @@ Initial prototype camera:
 - Camera motion should communicate raft hits, drops, and waves without causing discomfort
 - The guide's paddle, hands, nearby passengers, raft tubes, and bow should remain visible as grounding references
 - Optional quick-look or lean actions can help players check obstacles and passenger state without needing a third-person view
+- VR uses tracked head pose with comfort options for motion intensity, horizon stabilization, vignette, and seated recentering
+- Flat-screen mode uses mouse/gamepad look while preserving the same stern guide viewpoint
 
 Design goals:
 
@@ -60,20 +77,21 @@ Primary responsibilities:
 - Call paddle commands to the crew
 - React to hazards, passengers falling out, stuck rafts, and changing river conditions
 - Balance safety, speed, style, and score
+- In VR, physically perform guide strokes and rescue gestures when hardware allows
 
 ## Core Gameplay Loop
 
 1. Read the next river feature from the guide's first-person seat in the stern.
 2. Position the raft before the rapid.
-3. Call paddle commands and use guide strokes to enter the line.
-4. Adjust in real time as current, waves, rocks, and crew timing affect the raft.
+3. Call paddle commands and use physically modeled guide strokes to enter the line.
+4. Adjust in real time as current, waves, rocks, paddle blade forces, raft flex, and crew timing affect the raft.
 5. Recover from mistakes or capitalize on clean execution.
-6. Finish the section and receive feedback on safety, speed, control, and style.
-7. Upgrade guide skills, raft handling, crew trust, or unlock harder river routes.
+6. Finish the section and receive feedback on safety, line choice, physical efficiency, control, and style.
+7. Review telemetry, improve technique, upgrade gear, or unlock harder river routes.
 
 ## Raft Controls
 
-First prototype controls should be readable and gamepad-friendly.
+First prototype controls should support VR motion controllers, mouse and keyboard, and gamepad without changing the core stern-guide role.
 
 Possible guide inputs:
 
@@ -84,8 +102,10 @@ Possible guide inputs:
 - Hard left / hard right guide stroke
 - Hold on / brace command
 - Rescue command when a passenger falls out
+- VR paddle grip, blade angle, stroke depth, and pull path
+- Flat-screen analog paddle stroke controls for non-VR play
 
-The player should feel like they are commanding a crew rather than directly moving a vehicle with arcade thrusters. The raft can still be responsive, but the response should come through paddle force, water current, and raft momentum.
+The player should feel like they are commanding a crew rather than directly moving a vehicle through abstract input. The raft can still be responsive, but the response should come through paddle force, water current, and raft momentum.
 
 The first-person view should make inputs feel like physical guide actions. Paddle strokes, command calls, brace warnings, and rescue actions should be readable through the player's hands, paddle, voice, and the crew's response.
 
@@ -100,6 +120,7 @@ Prototype systems:
 - Surface waves and visual flow cues
 - Rocks, strainers, holes, ledges, pour-overs, eddies, and calm pools
 - Checkpoint gates for optional training and scoring
+- Recorded telemetry for current velocity, raft velocity, paddle impulse, collisions, and passenger events
 
 Longer-term systems:
 
@@ -108,18 +129,21 @@ Longer-term systems:
 - Weather and visibility changes
 - River difficulty classes inspired by real white water ratings
 - Rescue scenarios and guide certification challenges
+- Validation against reference footage, guide feedback, and measured river behavior when available
 
-## Physics Feel
+## Physical Accuracy
 
-The raft should feel buoyant, heavy enough to matter, and vulnerable to bad angles. The game does not need full simulation accuracy in the first draft, but the forces should be consistent and learnable.
+The raft should behave like a real inflatable raft within the limits of real-time simulation. The first draft can use simplified models, but every simplification should be chosen deliberately, documented, and tested against the physical behavior the simulator is trying to approximate.
 
 Prototype physics priorities:
 
-- Current pushes raft downstream
-- Paddle calls add directional force and torque
-- Rocks deflect, pin, or slow the raft
-- Waves can lift, shove, or spin the raft
-- Passenger weight distribution can slightly affect handling
+- Current applies spatially varying force to the raft hull, tubes, passengers, and paddle blades
+- Paddle strokes add directional force and torque based on blade interaction with water
+- Rocks deflect, pin, slow, or flip the raft based on contact point, velocity, current, and raft angle
+- Waves can lift, shove, surf, swamp, or spin the raft
+- Passenger weight distribution changes trim, stability, and recovery behavior
+- Raft material properties represent buoyancy, drag, flex, friction, and collision softness
+- Every major force has debug visualization and telemetry for tuning and validation
 
 ## Passengers And Crew
 
@@ -141,7 +165,7 @@ Prototype mode:
 
 - Single rapid time trial with safety scoring
 
-Early game modes:
+Early simulator modes:
 
 - River run campaign
 - Challenge rapids
@@ -169,15 +193,17 @@ Possible progression tracks:
 
 ## Tone
 
-The game should feel energetic, outdoorsy, risky, and a little scrappy. It should respect real river guiding while still being playable and readable as a game.
+The simulator should feel energetic, outdoorsy, risky, and a little scrappy. It should respect real river guiding while still being playable and readable.
 
 Visual direction:
 
-- Bright daylight river environments
+- Photo-real river environments based on real canyon, forest, desert, and mountain reference
 - Clear diegetic water direction indicators through foam lines, bubbles, surface streaks, waves, and debris
-- Strong silhouettes for rocks, raft, waves, and hazards
+- Physically plausible materials for raft rubber, wet rock, water, spray, foam, ropes, helmets, PFDs, and paddles
+- Strong silhouettes for rocks, raft, waves, and hazards without stylizing away realism
 - Minimal first-person UI inspired by guide maps, safety checklists, and river notes
 - Visible raft bow, tubes, paddle, hands, and passenger silhouettes to ground the player in the stern
+- Realistic exposure, reflections, shadows, mist, splash particles, and wetness effects
 
 Audio direction:
 
@@ -185,6 +211,7 @@ Audio direction:
 - Paddle thumps and raft rubber creaks
 - Guide calls with short, punchy voice lines
 - Passenger reactions that communicate risk without becoming noise
+- Spatial audio for VR so current, impacts, passengers, and rescue cues are locatable
 
 ## Unreal Engine Direction
 
@@ -192,24 +219,29 @@ Recommended starting approach:
 
 - Unreal Engine 5.x project
 - C++ core systems with Blueprint-facing tuning where useful
-- Enhanced Input for keyboard, mouse, and controller
+- OpenXR-based VR support with flat-screen input parity
+- Enhanced Input for VR controllers, keyboard, mouse, and gamepad
 - Common UI or a similarly portable UI approach for multi-platform menus
 - World Partition only when the river scope grows large enough to need it
-- Data assets for river sections, hazards, raft tuning, and scoring rules
+- Data assets for river sections, hazards, raft tuning, water tuning, paddle forces, and scoring rules
+- High-fidelity lighting, material, terrain, water, and particle pipelines aimed at photo-realism
+- Debug modes for force vectors, current fields, collision impulses, and raft stability metrics
 
 Prototype map:
 
 - One short river section
 - One raft
-- One guide input set
-- A few rocks and wave hazards
-- Start, finish, scoring, restart, and first-person look controls
+- One VR guide input set and one flat-screen input set
+- A few rocks, eddies, and wave/hydraulic hazards
+- Start, finish, scoring, restart, first-person look controls, and VR recenter controls
+- A basic telemetry overlay for physical forces and line quality
 
 ## Open Questions
 
-- Should the first playable prototype be realistic simulation, arcade tactics, or a middle ground?
+- What measurable accuracy targets define "physically accurate" for the first vertical slice?
 - Should passengers be individual characters with traits, or mostly a visual representation of crew state?
-- Should raft control be direct, command-based, or a hybrid?
+- Should flat-screen raft control be direct, command-based, or a hybrid while VR remains physical?
 - How much should the first-person camera prioritize downstream planning versus close physical impact?
-- Should there be any optional third-person or scout camera, or should the game stay fully committed to the guide's viewpoint?
-- Is the long-term fantasy a campaign, a roguelite river runner, a sports sim, or a creative river sandbox?
+- Should there be any optional third-person or scout camera, or should the simulator stay fully committed to the guide's viewpoint?
+- Which VR headsets are required for the first public build?
+- Is the long-term fantasy a professional-grade simulator, a consumer outdoor sports sim, or both?
