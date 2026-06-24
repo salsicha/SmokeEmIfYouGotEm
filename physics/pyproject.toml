@@ -11,7 +11,9 @@ requires-python = ">=3.11"
 authors = [
   { name = "SmokeEmIfYouGotEm contributors" }
 ]
-dependencies = []
+dependencies = [
+  "numpy>=1.26",
+]
 
 [project.optional-dependencies]
 dev = [

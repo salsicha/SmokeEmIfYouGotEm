@@ -34,16 +34,16 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 
 ## Milestone 1: Shared 2.5D Scenario Schema
 
-- [ ] Define solver-neutral scenario metadata.
-- [ ] Define grid bounds, resolution, timestep policy, and duration.
-- [ ] Define bed elevation, initial depth/surface, initial velocity/momentum, and wet/dry masks.
-- [ ] Define boundary conditions: inflow, outflow, wall/bank, and optional time-varying hydrographs.
-- [ ] Define feature encoding for rocks, ledges, constrictions, holes, laterals, boils, shallows, strainers, and wave trains.
-- [ ] Define optional real-world provenance fields: river id, section id, source manifest, coordinate reference system, gauge source, season preset, flow percentile, difficulty preset, and confidence scores.
-- [ ] Define raft physical parameters and probe/sample sets.
-- [ ] Export `scenario.json`, bed grid, initial state, feature metadata, probes, and diagnostic plots.
-- [ ] Add schema validation tests.
-- [ ] Generate deterministic fixture scenarios.
+- [x] Define solver-neutral scenario metadata.
+- [x] Define grid bounds, resolution, timestep policy, and duration.
+- [x] Define bed elevation, initial depth/surface, initial velocity/momentum, and wet/dry masks.
+- [x] Define boundary conditions: inflow, outflow, wall/bank, and optional time-varying hydrographs.
+- [x] Define feature encoding for rocks, ledges, constrictions, holes, laterals, boils, shallows, strainers, and wave trains.
+- [x] Define optional real-world provenance fields: river id, section id, source manifest, coordinate reference system, gauge source, season preset, flow percentile, difficulty preset, and confidence scores.
+- [x] Define raft physical parameters and probe/sample sets.
+- [x] Export `scenario.json`, bed grid, initial state, feature metadata, probes, and diagnostic plots.
+- [x] Add schema validation tests.
+- [x] Generate deterministic fixture scenarios.
 - [ ] Generate deterministic procedural rafting scenarios from seed.
 
 ## Milestone 2: PyClaw 2.5D Reference Solver
@@ -241,8 +241,8 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 ## Immediate Next Steps
 
 - [x] Remove 2D-first assumptions from active docs.
-- [ ] Define the shared 2.5D scenario schema.
-- [ ] Add fixture scenario generation for flat pool, channel flow, dam-break/bore, bed step, constriction, and wet/dry shoreline.
+- [x] Define the shared 2.5D scenario schema.
+- [x] Add fixture scenario generation for flat pool, channel flow, dam-break/bore, bed step, constriction, and wet/dry shoreline.
 - [ ] Add a PyClaw availability check and first reference runner.
 - [ ] Add a C++ solver directory and build skeleton.
 - [ ] Add the first PyClaw-vs-C++ comparison report format.

@@ -18,6 +18,22 @@ from .river2d import (
     RiverValidation2D,
     generate_river_2d,
 )
+from .scenario2_5d import (
+    BoundaryCondition2_5D,
+    BoundaryHydrographSample2_5D,
+    Feature2_5D,
+    FixtureScenario2_5DParameters,
+    GridSpec2_5D,
+    InitialWaterState2_5D,
+    Probe2_5D,
+    RaftParameters2_5D,
+    Scenario2_5D,
+    ScenarioMetadata2_5D,
+    ScenarioValidation2_5D,
+    ValidationCheck2_5D,
+    generate_fixture_scenario2_5d,
+    read_scenario2_5d_package,
+)
 from .sim import Simulation, SimulationConfig, SimulationSystem
 from .state import BodyState
 from .telemetry import ForceContribution, TelemetryFrame, TelemetryRecorder
@@ -62,9 +78,23 @@ __all__ = [
     "RiverFeature2D",
     "RiverSample2D",
     "RiverValidation2D",
+    "BoundaryCondition2_5D",
+    "BoundaryHydrographSample2_5D",
+    "Feature2_5D",
+    "FixtureScenario2_5DParameters",
+    "GridSpec2_5D",
+    "InitialWaterState2_5D",
+    "Probe2_5D",
+    "RaftParameters2_5D",
+    "Scenario2_5D",
+    "ScenarioMetadata2_5D",
+    "ScenarioValidation2_5D",
+    "ValidationCheck2_5D",
     "backend_statuses",
     "create_backend",
     "default_forward_paddle_commands",
+    "generate_fixture_scenario2_5d",
     "generate_river_2d",
+    "read_scenario2_5d_package",
     "select_backend",
 ]
