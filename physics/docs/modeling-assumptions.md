@@ -7,12 +7,14 @@ The first engine is based on these modeling directions:
 - Project Chrono is the selected external physics backend for long-term raft/fluid-solid interaction work and full Unreal runtime physics.
 - PyClaw is the offline Python reference for depth-averaged shallow-water modeling.
 - A custom C++ reduced shallow-water / height-field solver is the runtime water candidate.
+- Real-world river sections must remain solver-neutral scenario packages with source manifests, geospatial transforms, rapid annotations, seasonal flow presets, difficulty presets, and confidence metadata.
 - 6-DoF marine craft dynamics for raft position, orientation, velocity, and angular velocity.
 - Stateless fluid-force approximations for early buoyancy, drag, lift, and added-mass terms.
 - XPBD-style compliant constraints for later inflatable tube and floor deformation.
 - Python-first orchestration with optional acceleration after correctness and telemetry are established.
 
 See the repository-level [Physics Engine Plan](../../docs/physics-engine-plan.md) for the full research summary.
+See the repository-level [Real-World River Content And Seasonal Flow Plan](../../docs/real-world-river-content-plan.md) for the geospatial and seasonal-flow scenario pipeline.
 See the repository-level [Chrono And Unreal Integration Plan](../../docs/chrono-unreal-integration.md) for the full game runtime path.
 See [Backend Evaluation](backend-evaluation.md) for the external backend comparison and selection.
 
@@ -24,7 +26,7 @@ See [Backend Evaluation](backend-evaluation.md) for the external backend compari
 - The active first raft model is 6-DoF over 2.5D water fields.
 - The legacy top-down 2D prototype is not an active validation target.
 - Every force contribution must be recorded separately before tuning coefficients.
-- PyClaw and the custom C++ solver must consume the same generated scenario package.
+- PyClaw and the custom C++ solver must consume the same generated or real-world scenario package.
 - The custom C++ solver is accepted by matching PyClaw reference outputs, not by matching the legacy 2D prototype.
 - "Looks plausible" is not enough; each feature needs an explicit regression scenario.
 
@@ -46,6 +48,7 @@ See [Backend Evaluation](backend-evaluation.md) for the external backend compari
 ### Current And River Features
 
 - Procedural 2.5D scenarios must be deterministic for a fixed seed and parameter set.
+- Real-world 2.5D scenarios must preserve source provenance, coordinate transforms, selected season/flow/difficulty, and confidence scores.
 - PyClaw and C++ must load equivalent bed, water, boundary, feature, and probe definitions.
 - Water fields must be deterministic functions of scenario state and simulation time.
 - Eddy-line scenarios must report lateral shear and yaw torque separately.

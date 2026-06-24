@@ -17,6 +17,7 @@ The project should prioritize realism over arcade readability whenever the two c
 Core simulation goals:
 
 - Photo-real river canyons, water, raft materials, paddles, spray, lighting, and weather
+- Playable real-world river sections built from geospatial terrain, hydrography, imagery, and seasonal flow data
 - Physically grounded raft buoyancy, drag, collision response, flex, and passenger weight transfer
 - Water behavior that represents current, eddies, standing waves, hydraulics, holes, pour-overs, and turbulent seams
 - Paddle strokes that produce plausible force and torque based on blade position, angle, depth, and timing
@@ -32,12 +33,13 @@ The first active physics slice should build:
 - A deterministic 2.5D procedural scenario generator
 - A PyClaw shallow-water reference model
 - A custom C++ reduced shallow-water / height-field solver
-- A comparison and tuning harness that runs both solvers on the same generated scenario
+- A comparison and tuning harness that runs both solvers on the same scenario package
 - A solver-neutral 6-DoF raft coupling layer for buoyancy, drag, grounding, wave climb, surf/flush, and paddle forces
 - Telemetry for water fields, solver error, raft forces, and scenario outcomes
 
 See [Physics Engine Plan](physics-engine-plan.md) for the detailed implementation strategy.
 See [2.5D Dual-Solver Simulation Plan](2.5d-simulation-plan.md) for the PyClaw/C++ validation workflow.
+See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the real river, geospatial, imagery, season, flow, difficulty, and Unreal photoreal content pipeline.
 
 ## Full Engine Physics Runtime
 
@@ -141,7 +143,7 @@ The river is the main level design language.
 Prototype systems:
 
 - Headless Python simulation before Unreal integration
-- 2.5D procedural scenario package with bed, surface, depth, velocity, wet/dry state, features, and raft parameters
+- 2.5D procedural and real-world scenario packages with bed, surface, depth, velocity, wet/dry state, features, source manifests, seasonal flow presets, and raft parameters
 - PyClaw reference simulation for shallow-water behavior
 - Custom C++ reduced shallow-water / height-field solver tuned against PyClaw
 - Solver-neutral raft hull/contact sampling for buoyancy, drag, grounding, wave, hole, and paddle forces
@@ -150,8 +152,13 @@ Prototype systems:
 Longer-term systems:
 
 - Unreal visualization driven by validated simulation output
-- Procedural rapid generation from authored river chunks
-- Dynamic water levels
+- Real-world river course and elevation extraction from geospatial sources
+- Rapid identification from aerial/satellite imagery, DEM gradient, constrictions, boulder gardens, foam/whitewater texture, and guide review
+- User-selectable river, section, season, flow level, difficulty, and raft/crew setup
+- Seasonal flow levels from gauge history, modeled flow, snowmelt/rain/reservoir context, and local references
+- Adaptive fluid parameters driven by season, flow percentile, channel geometry, roughness, and selected difficulty
+- Procedural rapid generation from authored or extracted river chunks
+- Dynamic water levels tied to validated seasonal presets
 - Weather and visibility changes
 - River difficulty classes inspired by real white water ratings
 - Rescue scenarios and guide certification challenges
@@ -224,13 +231,14 @@ The simulator should feel energetic, outdoorsy, risky, and a little scrappy. It 
 
 Visual direction:
 
-- Photo-real river environments based on real canyon, forest, desert, and mountain reference
+- Photo-real river environments based on real canyon, forest, desert, and mountain reference, with the highest-value sections grounded in geospatial course/elevation data
 - Clear diegetic water direction indicators through foam lines, bubbles, surface streaks, waves, and debris
 - Physically plausible materials for raft rubber, wet rock, water, spray, foam, ropes, helmets, PFDs, and paddles
 - Strong silhouettes for rocks, raft, waves, and hazards without stylizing away realism
 - Minimal first-person UI inspired by guide maps, safety checklists, and river notes
 - Visible raft bow, tubes, paddle, hands, and passenger silhouettes to ground the player in the stern
 - Realistic exposure, reflections, shadows, mist, splash particles, and wetness effects
+- Latest stable UE5 photoreal rendering features where supported, including Nanite rocks/terrain detail, Nanite foliage, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara spray/foam, and advanced material layering
 
 Audio direction:
 
@@ -247,16 +255,16 @@ The real Unreal Engine game project should start after the Python modeling and p
 Recommended starting approach:
 
 - Headless 2.5D Python/PyClaw reference model first, with a custom C++ reduced water solver tuned against it before Unreal runtime work
-- Unreal Engine 5.x project
+- Latest stable Unreal Engine 5.x project chosen at the readiness gate after re-checking current feature support
 - Custom C++ reduced shallow-water / height-field solver as the primary runtime water candidate
 - Project Chrono or custom C++ as the authoritative raft/contact runtime after the readiness report selects the split
 - C++ core systems with Blueprint-facing tuning where useful
 - OpenXR-based VR support with flat-screen input parity
 - Enhanced Input for VR controllers, keyboard, mouse, and gamepad
 - Common UI or a similarly portable UI approach for multi-platform menus
-- World Partition only when the river scope grows large enough to need it
-- Data assets for river sections, hazards, raft tuning, water tuning, paddle forces, and scoring rules
-- High-fidelity lighting, material, terrain, water, and particle pipelines aimed at photo-realism
+- World Partition for long real-world river corridors once the content scope requires streaming
+- Data assets for river sections, source manifests, gauges, seasons, flow levels, difficulty presets, hazards, raft tuning, water tuning, paddle forces, and scoring rules
+- High-fidelity lighting, material, terrain, foliage, water, and particle pipelines aimed at photo-realism, including Nanite foliage and geospatial corridor import when practical
 - Debug modes for Chrono force vectors, current fields, collision impulses, FSI state, and raft stability metrics
 
 Prototype scenario:
@@ -266,6 +274,7 @@ Prototype scenario:
 - One custom C++ run tuned against the PyClaw output
 - One 6-DoF raft coupling test against both water outputs
 - One telemetry output showing water fields, solver error, hull forces, paddle forces, and contact components
+- One real-world river section scenario with source manifest, extracted terrain/course, rapid annotations, seasonal flow presets, and low/median/high runnable flow validation
 - Later Unreal visualization, VR input, scoring, restart, first-person look controls, and VR recenter controls
 
 ## Open Questions
@@ -274,6 +283,9 @@ Prototype scenario:
 - What PyClaw-vs-C++ tolerances are acceptable for water fields and raft outcomes?
 - Which physics features must be validated in PyClaw and C++ before Unreal integration starts?
 - Which Chrono modules and build configuration are required for each target platform?
+- Which candidate rivers have the best combination of data quality, iconic white water, licensing clarity, and practical first-slice scope?
+- How much rapid identification can be automated from terrain/imagery before manual river-domain review is required?
+- Which gauge or modeled-flow sources are accurate enough for each selected river section and season?
 - Should passengers be individual characters with traits, or mostly a visual representation of crew state?
 - Should flat-screen raft control be direct, command-based, or a hybrid while VR remains physical?
 - How much should the first-person camera prioritize downstream planning versus close physical impact?

@@ -2,7 +2,7 @@
 
 `raftsim` is the headless Python simulation foundation for the white water rafting simulator.
 
-The repository currently includes a legacy top-down 2D prototype, but the active plan has moved to a 2.5D dual-solver program: PyClaw as the Python shallow-water reference model and a custom C++ reduced shallow-water / height-field solver as the runtime candidate. The same generated scenario will be applied to both, and the C++ model will be tuned to match PyClaw.
+The repository currently includes a legacy top-down 2D prototype, but the active plan has moved to a 2.5D dual-solver program: PyClaw as the Python shallow-water reference model and a custom C++ reduced shallow-water / height-field solver as the runtime candidate. The same generated or real-world geospatial scenario will be applied to both, and the C++ model will be tuned to match PyClaw.
 
 ## Run Tests
 
@@ -40,6 +40,7 @@ physics/
 - Planned PyClaw 2.5D reference model
 - Planned custom C++ reduced shallow-water / height-field runtime solver
 - Planned dual-solver comparison and tuning harness
+- Planned real-world river scenario packages with source manifests, course/elevation extraction, rapid annotations, seasonal flow presets, and difficulty-adaptive parameters
 
 ## Physics Backend
 
@@ -79,4 +80,4 @@ Outputs are written under `outputs/river2d` and `outputs/rapid2d` by default.
 
 ## Next Milestone
 
-The next milestone should start the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): define the shared scenario schema, add a PyClaw reference runner, add the custom C++ solver skeleton, and build the first PyClaw-vs-C++ comparison report.
+The next milestone should start the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): define the shared scenario schema, add a PyClaw reference runner, add the custom C++ solver skeleton, and build the first PyClaw-vs-C++ comparison report. After the procedural fixtures are stable, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.

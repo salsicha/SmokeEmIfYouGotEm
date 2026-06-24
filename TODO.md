@@ -2,17 +2,19 @@
 
 ## Rough First Draft Outline
 
-This project is a photo-realistic, physically accurate white water rafting simulator, but the active implementation target is now a headless 2.5D dual-solver modeling system.
+This project is a photo-realistic, physically accurate white water rafting simulator, but the active implementation target is now a headless 2.5D dual-solver modeling system that can later ingest real river data.
 
 The old 2D river/raft path is retired. Future physics work starts with:
 
 - PyClaw as the Python 2.5D shallow-water reference model.
 - A custom C++ reduced shallow-water / height-field solver as the runtime candidate.
-- Identical procedurally generated scenarios applied to both solvers.
+- Identical procedurally generated and real-world geospatial scenarios applied to both solvers.
 - A comparison and tuning harness that makes the C++ model match PyClaw before Unreal production begins.
+- Real river course, elevation, imagery, gauge, season, and difficulty presets that become validated scenario packages.
 
 See [Physics Engine Plan](docs/physics-engine-plan.md) for the overall physics architecture.
 See [2.5D Dual-Solver Simulation Plan](docs/2.5d-simulation-plan.md) for the PyClaw/C++ validation workflow.
+See [Real-World River Content And Seasonal Flow Plan](docs/real-world-river-content-plan.md) for geospatial extraction, rapid identification, seasonal flow research, adaptive parameters, and the future river/season/difficulty picker.
 See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full game roadmap after Python modeling and profiling are complete.
 
 ## Milestone 0: Python Physics Research Foundation
@@ -36,6 +38,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [ ] Define bed elevation, initial depth/surface, initial velocity/momentum, and wet/dry masks.
 - [ ] Define boundary conditions: inflow, outflow, wall/bank, and optional time-varying hydrographs.
 - [ ] Define feature encoding for rocks, ledges, constrictions, holes, laterals, boils, shallows, strainers, and wave trains.
+- [ ] Define optional real-world provenance fields: river id, section id, source manifest, coordinate reference system, gauge source, season preset, flow percentile, difficulty preset, and confidence scores.
 - [ ] Define raft physical parameters and probe/sample sets.
 - [ ] Export `scenario.json`, bed grid, initial state, feature metadata, probes, and diagnostic plots.
 - [ ] Add schema validation tests.
@@ -124,21 +127,42 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [ ] Keep Chrono::FSI as an optional experiment/reference path, not the baseline runtime dependency.
 - [ ] Preserve the custom C++ reduced water solver as the primary Unreal runtime candidate.
 
-## Milestone 9: Python-To-Unreal Readiness Gate
+## Milestone 9: Real-World River Data And Seasonal Flow Pipeline
+
+- [ ] Create a candidate river/region inventory for the first playable sections.
+- [ ] Record source availability and licensing/attribution notes for elevation, hydrography, imagery, gauges, guide references, and field media.
+- [ ] Pull 3DEP/state lidar terrain and 3DHP/NHD/OSM hydrography for one representative river section.
+- [ ] Extract centerline, downstream stationing, banks, cross sections, channel width, gradient, constrictions, and roughness indicators.
+- [ ] Build a `source_manifest.json` format for geospatial, hydrology, imagery, and review provenance.
+- [ ] Identify candidate rapids from DEM slope, constrictions, boulder density, foam/whitewater imagery texture, bends, eddies, ledges, guide notes, and access points.
+- [ ] Define manual rapid-review labels for pools, riffles, wave trains, holes, ledges, laterals, strainers, portages, and access points.
+- [ ] Pull USGS/NWIS gauge history, NOAA/NWPS/National Water Model context, StreamStats estimates, and local seasonal references where available.
+- [ ] Derive runnable season windows, flow percentile bands, gauge-to-section transfer functions, stage/depth/width estimates, and data confidence scores.
+- [ ] Map river + season + flow level + difficulty into solver parameters: boundary inflow/outflow, depth, momentum, roughness, aeration/turbulence, hole retention, wave trains, eddy-line shear, boil strength, shallows, hazards, raft drag, paddle catch, and damping.
+- [ ] Build the player-facing data model for region, river, section, season, flow level, difficulty, and raft/crew setup.
+- [ ] Convert at least one real-world river/season/difficulty selection into a shared scenario package that both PyClaw and the custom C++ solver can load.
+- [ ] Validate low, median, and high runnable flow presets against PyClaw and tune the C++ solver to match.
+- [ ] Export an Unreal-ready real-world corridor package for later visualization: terrain, imagery masks, centerline, banks, rapids, hazards, flow presets, and confidence metadata.
+
+## Milestone 10: Python-To-Unreal Readiness Gate
 
 - [ ] Complete PyClaw reference scenarios.
 - [ ] Complete custom C++ solver scenarios.
 - [ ] Complete dual-solver comparison and tuning reports.
 - [ ] Complete 2.5D raft coupling validation against both solvers.
+- [ ] Complete the first real-world river section scenario with season, flow, difficulty, gauge, imagery, terrain, and source-manifest data.
+- [ ] Validate adaptive fluid parameters across low, medium, and high runnable flows for at least one real-world section.
 - [ ] Complete profiling and runtime budget reports.
 - [ ] Export representative telemetry/replay files for Unreal visualization.
+- [ ] Export at least one real-world corridor package for Unreal preproduction.
 - [ ] Write a Python-to-Unreal readiness report with risks, budgets, runtime choices, and accepted model limitations.
 - [ ] Explicitly approve starting the production Unreal project only after this gate is complete.
 
-## Milestone 10: Unreal Engine Full Game Production
+## Milestone 11: Unreal Engine Full Game Production
 
-- [ ] Choose the exact Unreal Engine 5.x version for visualization and VR.
+- [ ] Re-check the latest stable Unreal Engine 5.x feature set, then choose the exact version for visualization and VR.
 - [ ] Create the Unreal project only after the readiness gate is complete.
+- [ ] Enable the current UE5 photoreal open-world stack where supported: Nanite, Nanite foliage, Nanite landscapes/splines/tessellation, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, Substrate/material layering, and OpenXR.
 - [ ] Create the Unreal module/plugin skeleton: core, physics bridge, river, raft, input, UI, and debug modules.
 - [ ] Integrate the custom C++ water solver as the runtime water field candidate.
 - [ ] Integrate Chrono/custom raft dynamics as selected by the readiness report.
@@ -148,6 +172,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [ ] Define fixed-step water/raft scheduling and Unreal render interpolation.
 - [ ] Set up Enhanced Input actions for VR controllers, keyboard, mouse, and gamepad.
 - [ ] Build the first-person guide camera with flat-screen and VR comfort options.
+- [ ] Build river, season, flow, difficulty, and raft/crew selection UI from validated data assets.
 - [ ] Build the first rapid vertical slice with training, scoring, restart, replay, and debug force visualization.
 
 ## Technical Notes To Revisit
@@ -158,7 +183,9 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [ ] Decide whether the C++ solver starts as CPU-only or gets a GPU path after correctness is established.
 - [ ] Decide how much authored feature forcing is acceptable versus pure shallow-water dynamics.
 - [ ] Evaluate Chrono::FSI only after the PyClaw/custom-C++ solver comparison path is stable.
-- [ ] Identify reference footage, river data, and expert guide feedback needed for validation.
+- [ ] Identify reference footage, river data, aerial/satellite imagery, flow history, and expert guide feedback needed for validation.
+- [ ] Decide which geospatial formats become canonical for source data, generated scenarios, and Unreal corridor packages.
+- [ ] Re-check latest UE5 rendering/geospatial plugin capabilities at the Python-to-Unreal readiness gate.
 - [ ] Investigate multiplayer feasibility only after the single-player guide experience feels good.
 
 ## Immediate Next Steps
@@ -169,3 +196,6 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [ ] Add a PyClaw availability check and first reference runner.
 - [ ] Add a C++ solver directory and build skeleton.
 - [ ] Add the first PyClaw-vs-C++ comparison report format.
+- [ ] Draft the first candidate river inventory and source manifest.
+- [ ] Prototype course/elevation extraction for one river section.
+- [ ] Define the first rapid-review labels and seasonal flow/difficulty parameter mapping.

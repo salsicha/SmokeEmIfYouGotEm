@@ -8,7 +8,8 @@ Unreal Engine should own rendering, VR input, audio, UI, asset streaming, and pl
 
 The Python `raftsim` package remains the research harness and validation layer. PyClaw should produce the 2.5D shallow-water reference outputs, and the custom C++ reduced shallow-water / height-field solver should be tuned against those outputs before Unreal runtime work depends on it.
 
-See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the production roadmap. The production Unreal project should begin only after PyClaw reference modeling, custom C++ solver matching, profiling, telemetry schema stabilization, and a standalone native Chrono smoke test are complete.
+See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial and seasonal-flow pipeline that feeds validated river scenarios.
+See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the production roadmap. The production Unreal project should begin only after PyClaw reference modeling, custom C++ solver matching, real-world river scenario validation, profiling, telemetry schema stabilization, and a standalone native Chrono smoke test are complete.
 
 ## Runtime Ownership
 
@@ -38,7 +39,7 @@ See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the productio
 
 The boundary between Unreal and Chrono should be a narrow C++ integration layer:
 
-- Unreal sends player input, paddle/controller pose, level collision geometry, and authored water-field data.
+- Unreal sends player input, paddle/controller pose, level collision geometry, selected river/season/flow/difficulty data, and authored water-field data.
 - The custom C++ water solver advances or samples the runtime water field.
 - Chrono advances the authoritative physics state on a fixed timestep.
 - Unreal receives raft transforms, passenger attachment transforms, contact events, force telemetry, and debug vectors.
@@ -61,7 +62,7 @@ If Chrono::FSI becomes too expensive at the target timestep, the first fallback 
 ## Data Flow
 
 1. Unreal gathers input and controller poses.
-2. Unreal converts level-authored river features into Chrono-ready field/query data.
+2. Unreal converts validated river scenario data into Chrono-ready field/query data: geospatial corridor transform, river features, season/flow/difficulty preset, solver fields, rocks, banks, bed contacts, and adaptive raft/water parameters.
 3. The Chrono bridge advances zero or more fixed physics substeps.
 4. Chrono records per-force telemetry.
 5. Unreal interpolates or extrapolates the latest Chrono state for render.
@@ -84,6 +85,7 @@ Mitigations:
 - Add a small C++ Chrono smoke test before any Unreal plugin work.
 - Keep water/raft model parameters in versioned data files shared by Python and Unreal.
 - Keep PyClaw reference scenarios available for C++ water-solver regression.
+- Keep river source manifests, flow presets, and difficulty-to-fluid parameter mappings versioned with the scenario packages that Chrono consumes.
 - Preserve a reduced force-field mode for platforms where full FSI is too expensive.
 
 ## Implementation Phases
@@ -92,6 +94,7 @@ Mitigations:
 
 - Keep using `raftsim` for scenario generation, PyClaw reference runs, and comparison tests.
 - Validate PyClaw and custom C++ against the same flat current, buoyancy, standing wave, eddy-line, upwelling, and rock-contact scenarios.
+- Validate one real-world river section across low, median, and high runnable season/difficulty presets before Unreal relies on those parameters.
 - Export telemetry and parameter files.
 - Profile the PyClaw reference and custom C++ solver and identify the runtime budget for each force component.
 - Freeze the first shared parameter and telemetry schemas before native runtime work.
