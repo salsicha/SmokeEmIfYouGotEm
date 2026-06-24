@@ -21,6 +21,8 @@ Core simulation goals:
 - Physically grounded raft buoyancy, drag, collision response, flex, and passenger weight transfer
 - Water behavior that represents current, eddies, standing waves, hydraulics, holes, pour-overs, and turbulent seams
 - Paddle strokes that produce plausible force and torque based on blade position, angle, depth, and timing
+- Local AI voice interaction so the guide can speak paddle, brace, rescue, and safety commands to the crew
+- Crew conversation that reacts to river state, trust, fear, fatigue, skill, scenery, weather, and the guide's recent decisions
 - VR presence that makes the player feel seated in the stern, holding a paddle, calling commands, and reacting with their body
 - Training-grade feedback that explains why the raft moved, flipped, pinned, surfed, or missed a line
 
@@ -126,6 +128,7 @@ Possible guide inputs:
 - Back paddle command
 - Left side paddle
 - Right side paddle
+- Spoken commands through local speech recognition and constrained intent parsing
 - Hard left / hard right guide stroke
 - Hold on / brace command
 - Rescue command when a passenger falls out
@@ -135,6 +138,8 @@ Possible guide inputs:
 The player should feel like they are commanding a crew rather than directly moving a vehicle through abstract input. The raft can still be responsive, but the response should come through paddle force, water current, and raft momentum.
 
 The first-person view should make inputs feel like physical guide actions. Paddle strokes, command calls, brace warnings, and rescue actions should be readable through the player's hands, paddle, voice, and the crew's response.
+
+Voice commands should be local/offline for privacy, latency, and platform control. Gameplay-critical commands should resolve to explicit deterministic intents before affecting the crew, with confidence thresholds, subtitles, accessibility fallbacks, and manual input parity.
 
 ## River Systems
 
@@ -190,8 +195,13 @@ First draft behaviors:
 - Panic or miss strokes when trust is low
 - Fall out after heavy impacts or bad wave hits
 - Require rescue before the score or safety rating collapses
+- Respond to spoken guide commands with short acknowledgments, hesitation, confusion, or urgency based on command clarity and crew state
+- Hold lightweight conversations in calm water, eddies, scouting moments, loading screens, and recovery pools
+- Keep conversation short and functional inside active rapids so it never hides urgent river audio or command feedback
 
 Crew trust can become a core progression system. Clean guiding builds trust; repeated bad calls make passengers slower, more scared, and more likely to fail under pressure.
+
+The full UE5 version should include a local AI crew layer with passenger personas, relationship memory, fatigue, fear, competence, and river knowledge. The AI can generate or select conversation and reactions, but it should not directly override the deterministic command executor that drives paddle timing, bracing, rescue behavior, and safety-critical outcomes.
 
 ## Modes
 
@@ -245,7 +255,8 @@ Audio direction:
 - Loud water near hazards
 - Paddle thumps and raft rubber creaks
 - Guide calls with short, punchy voice lines
-- Passenger reactions that communicate risk without becoming noise
+- Passenger reactions and conversations that communicate risk, morale, trust, fatigue, and personality without becoming noise
+- Local speech recognition for guide commands with clear acknowledgments, misrecognition handling, and subtitle feedback
 - Spatial audio for VR so current, impacts, passengers, and rescue cues are locatable
 
 ## Unreal Engine Direction
@@ -261,6 +272,7 @@ Recommended starting approach:
 - C++ core systems with Blueprint-facing tuning where useful
 - OpenXR-based VR support with flat-screen input parity
 - Enhanced Input for VR controllers, keyboard, mouse, and gamepad
+- Local AI integration for voice commands, crew dialogue, passenger persona state, optional local speech synthesis, and privacy-preserving offline play
 - Common UI or a similarly portable UI approach for multi-platform menus
 - World Partition for long real-world river corridors once the content scope requires streaming
 - Data assets for river sections, source manifests, gauges, seasons, flow levels, difficulty presets, hazards, raft tuning, water tuning, paddle forces, and scoring rules
@@ -275,7 +287,7 @@ Prototype scenario:
 - One 6-DoF raft coupling test against both water outputs
 - One telemetry output showing water fields, solver error, hull forces, paddle forces, and contact components
 - One real-world river section scenario with source manifest, extracted terrain/course, rapid annotations, seasonal flow presets, and low/median/high runnable flow validation
-- Later Unreal visualization, VR input, scoring, restart, first-person look controls, and VR recenter controls
+- Later Unreal visualization, VR input, local voice commands, AI crew dialogue, scoring, restart, first-person look controls, and VR recenter controls
 
 ## Open Questions
 
@@ -287,6 +299,9 @@ Prototype scenario:
 - How much rapid identification can be automated from terrain/imagery before manual river-domain review is required?
 - Which gauge or modeled-flow sources are accurate enough for each selected river section and season?
 - Should passengers be individual characters with traits, or mostly a visual representation of crew state?
+- Which local AI runtime should power speech recognition, command parsing, crew conversation, and optional speech synthesis on each target platform?
+- How strict should voice-command confidence be before the crew acts, especially in loud water and VR microphone conditions?
+- How much crew conversation should be generated locally versus authored, recorded, or template-driven?
 - Should flat-screen raft control be direct, command-based, or a hybrid while VR remains physical?
 - How much should the first-person camera prioritize downstream planning versus close physical impact?
 - Should there be any optional third-person or scout camera, or should the simulator stay fully committed to the guide's viewpoint?
