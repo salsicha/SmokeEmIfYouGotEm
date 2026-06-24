@@ -2,7 +2,7 @@
 
 `raftsim` is the headless Python simulation foundation for the white water rafting simulator.
 
-The current slice includes the Milestone 0 foundation plus a runnable top-down 2D river/raft simulator: deterministic river generation, rocks, eddies, standing waves, holes, laterals, boils, hypoviscous patches, shallows, strainers, bank/rock contact, paddle forces, telemetry, plots, and a pure Python or optional PyChrono planar integrator.
+The repository currently includes a legacy top-down 2D prototype, but the active plan has moved to a 2.5D dual-solver program: PyClaw as the Python shallow-water reference model and a custom C++ reduced shallow-water / height-field solver as the runtime candidate. The same generated scenario will be applied to both, and the C++ model will be tuned to match PyClaw.
 
 ## Run Tests
 
@@ -18,12 +18,8 @@ physics/
   pyproject.toml
   src/raftsim/
     backends/
-    examples/
-    math2d.py
     math3d.py
     plotting.py
-    raft2d.py
-    river2d.py
     sim.py
     state.py
     telemetry.py
@@ -37,13 +33,13 @@ physics/
 - Pluggable simulation systems
 - Force and torque telemetry per frame
 - CSV telemetry export
-- Pure Python 2D vector helpers
 - Pure Python 3D vector and quaternion helpers
 - Matplotlib plotting helpers with lazy imports
 - Optional Project Chrono backend integration
-- Procedural 2D river generation
-- Top-down 2D raft simulation with pure Python and optional PyChrono planar integration
-- River/rapid examples that write JSON, telemetry CSV, and plots
+- Legacy procedural 2D prototype code
+- Planned PyClaw 2.5D reference model
+- Planned custom C++ reduced shallow-water / height-field runtime solver
+- Planned dual-solver comparison and tuning harness
 
 ## Physics Backend
 
@@ -69,9 +65,9 @@ simulation = chrono.create_simulation()  # raises if PyChrono is not installed
 
 Install PyChrono from the Project Chrono distribution when using the Python Chrono backend. The pure Python backend remains available without native dependencies. The full Unreal game should use native C++ Chrono integration rather than PyChrono.
 
-## 2D Examples
+## Legacy 2D Examples
 
-Run from this directory after installing the package in editable mode, or with `PYTHONPATH=src` during local development:
+The existing 2D examples are legacy scratch artifacts. They are useful only as historical smoke tests until the 2.5D scenario/solver harness replaces them.
 
 ```bash
 cd physics
@@ -83,4 +79,4 @@ Outputs are written under `outputs/river2d` and `outputs/rapid2d` by default.
 
 ## Next Milestone
 
-The next milestone should start the [2.5D Raft Simulation Plan](../docs/2.5d-simulation-plan.md): bed elevation, water surface height, depth, surface normals, 6-DoF rigid raft state, buoyancy, gravity, pitch/roll, wave climb, hole surf/flush behavior, grounding, and paddle blade depth. It should also keep strengthening scenario-level validation for the existing 2D simulator.
+The next milestone should start the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): define the shared scenario schema, add a PyClaw reference runner, add the custom C++ solver skeleton, and build the first PyClaw-vs-C++ comparison report.
