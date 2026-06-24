@@ -2,9 +2,9 @@
 
 ## Decision
 
-Project Chrono is the selected external backend for raftsim's long-term boat and moving-water simulation path.
+Project Chrono is the selected external backend for raftsim's long-term boat and moving-water simulation path and for the full Unreal Engine game runtime.
 
-The integration is optional. `raftsim` still runs with its pure Python backend when PyChrono is not installed, but `select_backend()` now prefers Chrono and falls back to the pure Python backend.
+The Python integration is optional. `raftsim` still runs with its pure Python backend when PyChrono is not installed, but `select_backend()` now prefers Chrono and falls back to the pure Python backend. The full game should use a native C++ Chrono integration rather than relying on PyChrono at runtime.
 
 ## Why Chrono Wins
 
@@ -29,6 +29,7 @@ Project Chrono is the only investigated option that directly covers the full sha
 - Chrono::FSI supports SPH-based FSI and time-dependent potential-flow FSI.
 - Heavier install path than pure Python libraries, so raftsim integrates it lazily as an optional backend.
 - The first integrated adapter only creates and steps a core Chrono system. Raft geometry and Chrono::FSI mapping still need to be implemented and verified against the installed Chrono build.
+- For the full Unreal game, Chrono should be linked through a native C++ plugin/module and own authoritative raft physics.
 
 ### MuJoCo
 
@@ -68,3 +69,10 @@ Current code integration:
 - `raftsim.backends.backend_statuses`
 
 When PyChrono is installed, the Chrono backend can create a minimal Chrono system and advance it with raftsim's fixed timestep configuration. The next integration step is to map raft bodies, collision geometry, and water/FSI state into Chrono objects.
+
+Full game integration target:
+
+- Unreal owns rendering, VR input, UI, audio, asset streaming, and platform packaging.
+- Chrono owns raft dynamics, compliant structure, rock/contact response, paddle forces, and water/raft force exchange.
+- Unreal Chaos may still be used for incidental non-authoritative effects, but not for raft authority.
+- See the repository-level [Chrono And Unreal Integration Plan](../../docs/chrono-unreal-integration.md).

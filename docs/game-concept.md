@@ -39,6 +39,14 @@ The physics engine should simulate:
 
 See [Physics Engine Plan](physics-engine-plan.md) for the detailed implementation strategy.
 
+## Full Engine Physics Runtime
+
+Project Chrono is the planned authoritative physics runtime for the full Unreal Engine simulator. The Python `raftsim` package remains the research and validation harness, but the shipped game should use Chrono for raft dynamics, rock/contact response, compliant raft behavior, paddle force transfer, and fluid-solid interaction experiments.
+
+Unreal should own rendering, VR input, audio, UI, asset streaming, and platform packaging. Chrono should own the physical raft state and expose transforms, contacts, force telemetry, and debug vectors back to Unreal.
+
+See [Chrono And Unreal Integration Plan](chrono-unreal-integration.md) for the runtime architecture.
+
 ## Target Platforms
 
 The shipped simulator should be designed as a multi-platform Unreal Engine product, with VR as a core design constraint rather than an optional late port. The first implementation work still starts in Python so the physics model can be validated before rendering and input complexity are added.
@@ -235,8 +243,9 @@ Audio direction:
 
 Recommended starting approach:
 
-- Headless Python physics engine first, with Unreal consuming validated simulation behavior later
+- Headless Python physics engine first, with Chrono-backed Unreal runtime consuming validated simulation behavior later
 - Unreal Engine 5.x project
+- Project Chrono as the authoritative raft/water physics runtime inside the full game engine
 - C++ core systems with Blueprint-facing tuning where useful
 - OpenXR-based VR support with flat-screen input parity
 - Enhanced Input for VR controllers, keyboard, mouse, and gamepad
@@ -244,7 +253,7 @@ Recommended starting approach:
 - World Partition only when the river scope grows large enough to need it
 - Data assets for river sections, hazards, raft tuning, water tuning, paddle forces, and scoring rules
 - High-fidelity lighting, material, terrain, water, and particle pipelines aimed at photo-realism
-- Debug modes for force vectors, current fields, collision impulses, and raft stability metrics
+- Debug modes for Chrono force vectors, current fields, collision impulses, FSI state, and raft stability metrics
 
 Prototype scenario:
 
@@ -259,6 +268,7 @@ Prototype scenario:
 
 - What measurable accuracy targets define "physically accurate" for the first vertical slice?
 - Which physics features must be validated in Python before Unreal integration starts?
+- Which Chrono modules and build configuration are required for each target platform?
 - Should passengers be individual characters with traits, or mostly a visual representation of crew state?
 - Should flat-screen raft control be direct, command-based, or a hybrid while VR remains physical?
 - How much should the first-person camera prioritize downstream planning versus close physical impact?
