@@ -23,9 +23,25 @@ Core simulation goals:
 - VR presence that makes the player feel seated in the stern, holding a paddle, calling commands, and reacting with their body
 - Training-grade feedback that explains why the raft moved, flipped, pinned, surfed, or missed a line
 
+## First Technical Milestone
+
+The first implementation milestone is not Unreal, rendering, or VR. It is a headless Python physics engine that can model a rubber raft moving across dynamic white water features.
+
+The physics engine should simulate:
+
+- A raft body moving over a 2.5D river surface and velocity field
+- Buoyancy, drag, lift, added mass, and paddle impulses
+- Rocks with impact, deflection, friction, and pinning behavior
+- Standing waves that act as energy barriers
+- Eddy lines that apply lateral shear and yaw torque
+- Upwellings and low-damping turbulent surface regions
+- Telemetry for every major force contribution
+
+See [Physics Engine Plan](physics-engine-plan.md) for the detailed implementation strategy.
+
 ## Target Platforms
 
-The project should be designed as a multi-platform Unreal Engine simulator from day one, with VR as a core design constraint rather than an optional late port.
+The shipped simulator should be designed as a multi-platform Unreal Engine product, with VR as a core design constraint rather than an optional late port. The first implementation work still starts in Python so the physics model can be validated before rendering and input complexity are added.
 
 Primary targets:
 
@@ -115,15 +131,16 @@ The river is the main level design language.
 
 Prototype systems:
 
-- Spline-based river path
-- Directional current volumes
-- Surface waves and visual flow cues
-- Rocks, strainers, holes, ledges, pour-overs, eddies, and calm pools
-- Checkpoint gates for optional training and scoring
-- Recorded telemetry for current velocity, raft velocity, paddle impulse, collisions, and passenger events
+- Headless Python simulation before Unreal integration
+- 2.5D river field with surface height, velocity, shear, upwelling, damping, and feature tags
+- Sampled raft hull/contact points for force accumulation
+- Directional current fields, eddy lines, standing waves, holes, pour-overs, eddies, and calm pools
+- Rock contact, deflection, pinning, and rubber contact softness
+- Recorded telemetry for current velocity, raft velocity, paddle impulse, hull forces, collisions, and passenger events
 
 Longer-term systems:
 
+- Unreal visualization driven by validated simulation output
 - Procedural rapid generation from authored river chunks
 - Dynamic water levels
 - Weather and visibility changes
@@ -133,7 +150,7 @@ Longer-term systems:
 
 ## Physical Accuracy
 
-The raft should behave like a real inflatable raft within the limits of real-time simulation. The first draft can use simplified models, but every simplification should be chosen deliberately, documented, and tested against the physical behavior the simulator is trying to approximate.
+The raft should behave like a real inflatable raft within the limits of real-time simulation. The first draft can use simplified Python models, but every simplification should be chosen deliberately, documented, and tested against the physical behavior the simulator is trying to approximate.
 
 Prototype physics priorities:
 
@@ -144,6 +161,7 @@ Prototype physics priorities:
 - Passenger weight distribution changes trim, stability, and recovery behavior
 - Raft material properties represent buoyancy, drag, flex, friction, and collision softness
 - Every major force has debug visualization and telemetry for tuning and validation
+- The initial raft can be rigid, but the architecture must support later XPBD-style compliant tubes and floor constraints
 
 ## Passengers And Crew
 
@@ -217,6 +235,7 @@ Audio direction:
 
 Recommended starting approach:
 
+- Headless Python physics engine first, with Unreal consuming validated simulation behavior later
 - Unreal Engine 5.x project
 - C++ core systems with Blueprint-facing tuning where useful
 - OpenXR-based VR support with flat-screen input parity
@@ -227,18 +246,19 @@ Recommended starting approach:
 - High-fidelity lighting, material, terrain, water, and particle pipelines aimed at photo-realism
 - Debug modes for force vectors, current fields, collision impulses, and raft stability metrics
 
-Prototype map:
+Prototype scenario:
 
-- One short river section
-- One raft
-- One VR guide input set and one flat-screen input set
-- A few rocks, eddies, and wave/hydraulic hazards
-- Start, finish, scoring, restart, first-person look controls, and VR recenter controls
-- A basic telemetry overlay for physical forces and line quality
+- One headless Python standing-wave test
+- One rigid raft with sampled hull forces
+- One eddy-line test with measurable yaw torque
+- One rock contact test with deflection and pinning detection
+- One telemetry output showing water, hull, paddle, and collision force components
+- Later Unreal visualization, VR input, scoring, restart, first-person look controls, and VR recenter controls
 
 ## Open Questions
 
 - What measurable accuracy targets define "physically accurate" for the first vertical slice?
+- Which physics features must be validated in Python before Unreal integration starts?
 - Should passengers be individual characters with traits, or mostly a visual representation of crew state?
 - Should flat-screen raft control be direct, command-based, or a hybrid while VR remains physical?
 - How much should the first-person camera prioritize downstream planning versus close physical impact?
