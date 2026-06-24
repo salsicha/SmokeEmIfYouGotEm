@@ -2,9 +2,10 @@
 
 ## Rough First Draft Outline
 
-This project is starting as a photo-realistic, physically accurate white water rafting simulator, but the first implementation target is a headless Python physics engine. The engine must model a rubber raft moving over dynamic river surfaces before Unreal, VR, or 3D graphics work begins.
+This project is starting as a photo-realistic, physically accurate white water rafting simulator, but the first implementation target is a headless 2D Python physics engine. The engine must procedurally generate rivers and model a top-down rubber raft moving through dynamic 2D current, obstacle, and hazard fields before 2.5D, 3D, Unreal, VR, or Chrono runtime work begins.
 
 See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research and implementation plan.
+See [Procedural 2D River Generation Plan](docs/2d-river-generation-plan.md) for the first river-generation plan and boat interaction effects.
 
 ## Milestone 0: Python Physics Research Foundation
 
@@ -18,28 +19,43 @@ See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research
 - [x] Define the first physical accuracy targets for raft, paddle, current, and collision behavior.
 - [x] Evaluate candidate physics backends and integrate Project Chrono as the optional selected backend.
 
-## Milestone 1: Minimal Rigid Raft Sandbox
+## Milestone 1: Procedural 2D River Generator
 
-- [ ] Implement 6-DoF rigid raft state: position, orientation, linear velocity, and angular velocity.
-- [ ] Represent the raft using sampled hull/contact points.
-- [ ] Implement still-water buoyancy and trim equilibrium.
-- [ ] Implement spatially varying current fields.
+- [ ] Define deterministic 2D river parameter schema.
+- [ ] Generate seedable river centerlines.
+- [ ] Generate left and right bank boundaries from width profiles.
+- [ ] Generate depth proxy, gradient proxy, and base current fields.
+- [ ] Place rocks, eddies, eddy lines, standing waves, holes, laterals, shallows, and strainers.
+- [ ] Compose feature effects into flow, shear, damping, turbulence, collision, and hazard fields.
+- [ ] Add difficulty scoring and rejection/retuning for invalid generated rivers.
+- [ ] Add generated river plots and flow-vector plots.
+- [ ] Add validation checks for bank intersections, navigable line, bounded speed, and feature counts.
+
+## Milestone 2: Minimal 2D Rigid Raft Sandbox
+
+- [ ] Implement 2D rigid raft state: position, yaw, linear velocity, and angular velocity.
+- [ ] Represent the raft using top-down sampled hull/contact points.
+- [ ] Implement calm-water drift and damping.
+- [ ] Sample spatially varying procedural current fields at hull points.
 - [ ] Implement quadratic drag and linear damping from relative water velocity.
 - [ ] Implement paddle impulses as force applied through blade-water interaction.
 - [ ] Add a flat-current drift scenario.
-- [ ] Add a still-water float-equilibrium scenario.
+- [ ] Add a calm-water no-force stability scenario.
 
-## Milestone 2: Dynamic River Feature Forces
+## Milestone 3: 2D River Feature Forces
 
-- [ ] Add analytic standing wave surfaces that behave as potential energy barriers.
+- [ ] Add 2D standing wave zones that behave as potential energy barriers.
 - [ ] Add wave climb, stall, surf, and flip classification.
 - [ ] Add eddy-line shear fields that apply lateral force and yaw torque.
-- [ ] Add vertical upwelling fields.
+- [ ] Add hole/hydraulic retention fields.
+- [ ] Add lateral wave impulse fields.
+- [ ] Add boil/upwelling proxy fields.
+- [ ] Add shallow shelf grounding drag.
 - [ ] Add local effective damping / hypoviscous surface regions.
 - [ ] Add turbulence noise with deterministic seeding.
-- [ ] Log current velocity, raft velocity, paddle impulse, collision impulse, shear force, upwelling force, and line outcome.
+- [ ] Log current velocity, raft velocity, paddle impulse, collision impulse, shear force, retention force, grounding drag, and line outcome.
 
-## Milestone 3: Rock Contact And Pinning
+## Milestone 4: 2D Rock Contact And Pinning
 
 - [ ] Add convex rock collision shapes.
 - [ ] Implement non-penetration contact resolution.
@@ -48,17 +64,18 @@ See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research
 - [ ] Add rock bump, deflection, and pinning regression scenarios.
 - [ ] Add contact telemetry by hull sample.
 
-## Milestone 4: Validation Harness
+## Milestone 5: 2D Validation Harness
 
 - [ ] Add pytest regression tests for every canonical scenario.
-- [ ] Add bounded-energy tests for passive water.
+- [ ] Add deterministic generation tests for fixed seeds.
+- [ ] Add bounded-energy tests for passive current and damping.
 - [ ] Add no-unbounded-spin tests for steady flow.
 - [ ] Add timestep sensitivity tests.
-- [ ] Add parameter sweep scripts for drag, buoyancy, wave height, eddy shear, and contact friction.
+- [ ] Add parameter sweep scripts for drag, wave retention, eddy shear, grounding drag, and contact friction.
 - [ ] Add pass/fail summaries for cleared, stalled, surfed, flipped, or pinned outcomes.
 - [ ] Add CSV or Parquet telemetry export.
 
-## Milestone 5: River Solver Upgrade
+## Milestone 6: River Solver Upgrade
 
 - [ ] Evaluate a finite-volume shallow-water solver.
 - [ ] Evaluate PyClaw/GeoClaw integration versus a custom minimal solver.
@@ -67,7 +84,7 @@ See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research
 - [ ] Add hydraulic jump handling.
 - [ ] Keep analytic authored features available for controlled raft tests.
 
-## Milestone 6: Compliant Rubber Raft Upgrade
+## Milestone 7: Compliant Rubber Raft Upgrade
 
 - [ ] Add XPBD-style tube and floor constraints.
 - [ ] Add raft modes: rigid, rigid plus compliant shell, and full compliant raft.
@@ -76,7 +93,7 @@ See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research
 - [ ] Compare rigid and compliant behavior in identical scenarios.
 - [ ] Add deformation telemetry.
 
-## Milestone 7: Acceleration And Parameter Fitting
+## Milestone 8: Acceleration And Parameter Fitting
 
 - [ ] Vectorize hot loops with NumPy.
 - [ ] Evaluate Numba, JAX, and Taichi for acceleration.
@@ -85,7 +102,7 @@ See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research
 - [x] Evaluate PyChrono as a reference/backend, not as the first implementation.
 - [x] Select Project Chrono as the external backend for long-term boat/water simulation.
 
-## Milestone 8: Unreal And VR Readiness
+## Milestone 9: Unreal And VR Readiness
 
 - [ ] Choose the exact Unreal Engine 5.x version for visualization and VR.
 - [ ] Create the Unreal project only after the Python physics sandbox has validated core raft behavior.
@@ -117,9 +134,10 @@ See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research
 ## Immediate Next Steps
 
 - [x] Create the Python package skeleton.
-- [ ] Add a standing-wave example command.
-- [ ] Implement rigid raft state and fixed-step integration.
-- [ ] Implement still-water buoyancy.
-- [ ] Implement one downstream current field.
-- [ ] Implement one standing wave field.
+- [ ] Add a `generate_river_2d` example command.
+- [ ] Implement deterministic 2D river centerline and bank generation.
+- [ ] Implement one downstream 2D current field.
+- [ ] Implement one generated rock plus eddy feature.
+- [ ] Implement one 2D standing wave field.
+- [ ] Implement top-down 2D raft state and fixed-step integration.
 - [ ] Add telemetry and Matplotlib trajectory output.

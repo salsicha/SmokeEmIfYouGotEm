@@ -20,7 +20,7 @@ See [Backend Evaluation](backend-evaluation.md) for the external backend compari
 - The first engine is headless and deterministic.
 - Fixed timesteps are required for reproducible regression scenarios.
 - Full 3D CFD is explicitly out of scope for the first implementation.
-- The first raft model may be rigid, but the API must not block later compliant raft modes.
+- The first raft model is top-down 2D and may be rigid, but the API must not block later 2.5D, 3D, or compliant raft modes.
 - Every force contribution must be recorded separately before tuning coefficients.
 - Analytic river features are acceptable before a finite-volume river solver exists.
 - "Looks plausible" is not enough; each feature needs an explicit regression scenario.
@@ -29,9 +29,9 @@ See [Backend Evaluation](backend-evaluation.md) for the external backend compari
 
 ### Raft
 
-- Stable float equilibrium in still water with bounded oscillation once buoyancy is implemented.
-- No unbounded linear or angular energy growth in passive water.
-- Orientation updates remain normalized within `1e-9` after fixed-step integration.
+- Stable top-down drift in calm water with no uncommanded acceleration.
+- No unbounded linear or angular energy growth in passive 2D current/damping fields.
+- Yaw and later quaternion orientation updates remain normalized/stable within `1e-9` after fixed-step integration.
 - Hull-force telemetry must identify which sampled point generated each contribution.
 
 ### Paddle
@@ -42,10 +42,12 @@ See [Backend Evaluation](backend-evaluation.md) for the external backend compari
 
 ### Current And River Features
 
+- Procedural 2D rivers must be deterministic for a fixed seed and parameter set.
+- Generated banks must not self-intersect or remove every navigable route.
 - Current fields must be deterministic functions of position and simulation time.
 - Eddy-line scenarios must report lateral shear and yaw torque separately.
 - Standing-wave scenarios must classify cleared, stalled, surfed, flipped, or pinned outcomes.
-- Upwelling and low-damping regions must be explicit field values, not hidden random perturbations.
+- Boil/upwelling proxy and low-damping regions must be explicit field values, not hidden random perturbations.
 
 ### Contact And Rocks
 
@@ -55,4 +57,4 @@ See [Backend Evaluation](backend-evaluation.md) for the external backend compari
 
 ## Current Milestone 0 Status
 
-Milestone 0 provides the infrastructure required to start validating those targets. It does not yet implement raft buoyancy, river fields, paddle physics, or rock contact.
+Milestone 0 provides the infrastructure required to start validating those targets. It does not yet implement procedural 2D rivers, raft motion, paddle physics, or rock contact.

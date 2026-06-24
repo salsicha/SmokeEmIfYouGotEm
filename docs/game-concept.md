@@ -25,19 +25,19 @@ Core simulation goals:
 
 ## First Technical Milestone
 
-The first implementation milestone is not Unreal, rendering, or VR. It is a headless Python physics engine that can model a rubber raft moving across dynamic white water features.
+The first implementation milestone is not Unreal, rendering, VR, or full 3D physics. It is a headless 2D Python simulation that can generate rivers and model a top-down raft moving across dynamic white water features.
 
-The physics engine should simulate:
+The first physics engine slice should simulate:
 
-- A raft body moving over a 2.5D river surface and velocity field
-- Buoyancy, drag, lift, added mass, and paddle impulses
+- Procedurally generated 2D river centerlines, banks, flow fields, obstacles, and features
+- A top-down rigid raft body with position, yaw, velocity, angular velocity, and hull sample points
+- Current push, drag, shear, rock contact, standing waves, holes, eddies, shallow shelves, and paddle impulses
 - Rocks with impact, deflection, friction, and pinning behavior
-- Standing waves that act as energy barriers
 - Eddy lines that apply lateral shear and yaw torque
-- Upwellings and low-damping turbulent surface regions
 - Telemetry for every major force contribution
 
 See [Physics Engine Plan](physics-engine-plan.md) for the detailed implementation strategy.
+See [Procedural 2D River Generation Plan](2d-river-generation-plan.md) for the river generator and boat interaction effects.
 
 ## Full Engine Physics Runtime
 
@@ -140,7 +140,7 @@ The river is the main level design language.
 Prototype systems:
 
 - Headless Python simulation before Unreal integration
-- 2.5D river field with surface height, velocity, shear, upwelling, damping, and feature tags
+- 2D procedural river field with centerline, banks, current velocity, shear, damping, depth proxy, and feature tags
 - Sampled raft hull/contact points for force accumulation
 - Directional current fields, eddy lines, standing waves, holes, pour-overs, eddies, and calm pools
 - Rock contact, deflection, pinning, and rubber contact softness
@@ -158,18 +158,18 @@ Longer-term systems:
 
 ## Physical Accuracy
 
-The raft should behave like a real inflatable raft within the limits of real-time simulation. The first draft can use simplified Python models, but every simplification should be chosen deliberately, documented, and tested against the physical behavior the simulator is trying to approximate.
+The raft should behave like a real inflatable raft within the limits of real-time simulation. The first draft can use simplified 2D Python models, but every simplification should be chosen deliberately, documented, and tested against the physical behavior the simulator is trying to approximate.
 
 Prototype physics priorities:
 
-- Current applies spatially varying force to the raft hull, tubes, passengers, and paddle blades
+- Current applies spatially varying 2D force to hull sample points and paddle blades
 - Paddle strokes add directional force and torque based on blade interaction with water
 - Rocks deflect, pin, slow, or flip the raft based on contact point, velocity, current, and raft angle
-- Waves can lift, shove, surf, swamp, or spin the raft
-- Passenger weight distribution changes trim, stability, and recovery behavior
-- Raft material properties represent buoyancy, drag, flex, friction, and collision softness
+- Waves can shove, surf, stall, destabilize, or spin the raft in the 2D model
+- Shallows, aerated patches, and eddy lines alter drag, damping, and steering authority
+- Raft material properties initially represent drag, friction, collision softness, and pinning tendency
 - Every major force has debug visualization and telemetry for tuning and validation
-- The initial raft can be rigid, but the architecture must support later XPBD-style compliant tubes and floor constraints
+- The initial raft can be a 2D rigid body, but the architecture must support later 2.5D/3D motion and XPBD-style compliant tubes and floor constraints
 
 ## Passengers And Crew
 
@@ -257,9 +257,9 @@ Recommended starting approach:
 
 Prototype scenario:
 
-- One headless Python standing-wave test
-- One rigid raft with sampled hull forces
-- One eddy-line test with measurable yaw torque
+- One generated 2D river with banks, current, rocks, eddies, and waves
+- One top-down rigid raft with sampled hull forces
+- One eddy-line crossing test with measurable yaw torque
 - One rock contact test with deflection and pinning detection
 - One telemetry output showing water, hull, paddle, and collision force components
 - Later Unreal visualization, VR input, scoring, restart, first-person look controls, and VR recenter controls
@@ -267,6 +267,7 @@ Prototype scenario:
 ## Open Questions
 
 - What measurable accuracy targets define "physically accurate" for the first vertical slice?
+- Which 2D river features are required before moving to 2.5D surface modeling?
 - Which physics features must be validated in Python before Unreal integration starts?
 - Which Chrono modules and build configuration are required for each target platform?
 - Should passengers be individual characters with traits, or mostly a visual representation of crew state?
