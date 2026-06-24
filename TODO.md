@@ -7,6 +7,7 @@ This project is starting as a photo-realistic, physically accurate white water r
 See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research and implementation plan.
 See [Procedural 2D River Generation Plan](docs/2d-river-generation-plan.md) for the first river-generation plan and boat interaction effects.
 See [2.5D Raft Simulation Plan](docs/2.5d-simulation-plan.md) for the height-field, buoyancy, pitch/roll, and wave/hole transition plan.
+See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full game roadmap after Python modeling and profiling are complete.
 
 ## Milestone 0: Python Physics Research Foundation
 
@@ -152,24 +153,44 @@ See [2.5D Raft Simulation Plan](docs/2.5d-simulation-plan.md) for the height-fie
 - [ ] Evaluate Numba, JAX, and Taichi for acceleration.
 - [ ] Keep a pure Python/NumPy reference implementation for correctness.
 - [ ] Add coefficient fitting against reference trajectories.
+- [ ] Profile 2D and 2.5D scenarios for timestep cost, memory cost, force-component cost, plotting/export cost, and parameter sweep cost.
+- [ ] Produce baseline performance reports for flat pool, calm current, standing wave, hole, eddy line, shallow shelf, submerged rock, and generated rapid scenarios.
+- [ ] Define desktop, VR, and handheld physics budgets before any production Unreal project begins.
+- [ ] Decide which Python models migrate to native C++/Chrono and which remain offline validation tools.
 - [x] Evaluate PyChrono as a reference/backend, not as the first implementation.
 - [x] Select Project Chrono as the external backend for long-term boat/water simulation.
 
-## Milestone 14: Unreal And VR Readiness
+## Milestone 14: Python-To-Unreal Readiness Gate
+
+- [ ] Complete the 2D validation harness with deterministic canonical scenarios.
+- [ ] Complete the first 2.5D raft/water validation harness.
+- [ ] Complete Python profiling and coefficient fitting reports.
+- [ ] Freeze the first shared raft, river, water, paddle, scoring, telemetry, and replay schemas.
+- [ ] Export representative Python telemetry/replay files for Unreal visualization.
+- [ ] Create a standalone native C++ Chrono smoke test outside Unreal.
+- [ ] Compare native Chrono smoke-test telemetry against Python reference scenarios.
+- [ ] Write a Python-to-Unreal readiness report with risks, budgets, runtime choices, and accepted model limitations.
+- [ ] Explicitly approve starting the production Unreal project only after this gate is complete.
+
+## Milestone 15: Unreal Engine Full Game Production
 
 - [ ] Choose the exact Unreal Engine 5.x version for visualization and VR.
-- [ ] Create the Unreal project only after the Python physics sandbox has validated core raft behavior.
-- [ ] Create a standalone native C++ Chrono smoke test before Unreal plugin work.
+- [ ] Create the Unreal project only after Python modeling, validation, profiling, and the readiness report are complete.
+- [ ] Create the Unreal module/plugin skeleton: core, physics bridge, river, raft, input, UI, and debug modules.
 - [ ] Design the Unreal plugin/module boundary for Chrono.
 - [ ] Link Chrono into Unreal as the authoritative raft/water physics runtime.
 - [ ] Keep Unreal Chaos available only for incidental non-authoritative effects.
 - [ ] Enable OpenXR-based VR support.
+- [ ] Implement telemetry/replay playback in Unreal before live native physics.
 - [ ] Define the data bridge from Python validation output to Chrono/Unreal playback and debug visualization.
 - [ ] Define fixed-step Chrono scheduling and Unreal render interpolation.
 - [ ] Set up Enhanced Input actions for VR controllers, keyboard, mouse, and gamepad.
 - [ ] Define performance budgets for desktop, VR, and handheld targets.
 - [ ] Verify Chrono module availability and build process for each target platform.
 - [ ] Gather reference for raft materials, river canyons, wet rocks, water, foam, spray, PFDs, helmets, ropes, and paddles.
+- [ ] Build the first-person guide camera with flat-screen and VR comfort options.
+- [ ] Build the first rapid vertical slice with training, scoring, restart, replay, and debug force visualization.
+- [ ] Add content, platform, QA, accessibility, and release-readiness phases from the Unreal game plan.
 
 ## Technical Notes To Revisit
 

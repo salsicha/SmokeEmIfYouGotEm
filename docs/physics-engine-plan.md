@@ -40,6 +40,7 @@ See [Backend Evaluation](../physics/docs/backend-evaluation.md) for the comparis
 See [Chrono And Unreal Integration Plan](chrono-unreal-integration.md) for the full game runtime path.
 See [Procedural 2D River Generation Plan](2d-river-generation-plan.md) for the first river-generation milestone.
 See [2.5D Raft Simulation Plan](2.5d-simulation-plan.md) for the next height-field, buoyancy, pitch/roll, and wave/hole simulation step.
+See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the full game production roadmap after Python modeling, validation, and profiling.
 
 ## Current First Slice
 
@@ -53,6 +54,8 @@ The initial 2D raft simulator is implemented under `physics/src/raftsim`:
 This is an analytic 2D feature-field prototype, not yet a free-surface fluid solver or compliant raft model.
 
 The next planned slice is 2.5D: a height-aware water/bed field sampled by a 6-DoF rigid raft. It should introduce bed elevation, water surface elevation, depth, surface normals, buoyancy, gravity, pitch, roll, vertical damping, wave climb, hole surf/flush behavior, grounding, and paddle blade depth while staying deterministic and testable in Python.
+
+Unreal production should wait until the Python engine has completed the 2D/2.5D validation suite, performance profiling, coefficient tuning, telemetry schema stabilization, and native Chrono smoke testing. Until then, the Python package remains the source of truth for physics behavior.
 
 ## Simulation State
 

@@ -8,6 +8,8 @@ Unreal Engine should own rendering, VR input, audio, UI, asset streaming, and pl
 
 The Python `raftsim` package remains the research harness and validation layer. It should prototype reduced models, generate regression scenarios, tune coefficients, and prove behavior before that behavior is moved into the Chrono-backed game runtime.
 
+See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the production roadmap. The production Unreal project should begin only after Python modeling, validation, profiling, telemetry schema stabilization, and a standalone native Chrono smoke test are complete.
+
 ## Runtime Ownership
 
 ### Chrono Owns
@@ -88,8 +90,12 @@ Mitigations:
 - Keep using `raftsim` for reduced models and scenario tests.
 - Validate flat current, buoyancy, standing waves, eddy-line yaw, upwellings, and rock contact.
 - Export telemetry and parameter files.
+- Profile the 2D/2.5D models and identify the runtime budget for each force component.
+- Freeze the first shared parameter and telemetry schemas before native runtime work.
 
 ### Phase 2: Native Chrono Prototype
+
+Start after the Python modeling/profiling exit gate.
 
 - Add a minimal standalone C++ Chrono executable outside Unreal.
 - Create a rigid raft body and simple rock contact.
@@ -97,6 +103,8 @@ Mitigations:
 - Export the same telemetry categories as Python.
 
 ### Phase 3: Unreal Plugin Skeleton
+
+Start after the native Chrono smoke test succeeds.
 
 - Add an Unreal plugin or module that links Chrono.
 - Run a headless Chrono world from Unreal.
