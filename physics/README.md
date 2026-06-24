@@ -39,6 +39,7 @@ physics/
 - Legacy procedural 2D prototype code
 - Solver-neutral 2.5D scenario package schema
 - Deterministic 2.5D fixture generator for flat pool, uniform channel, dam-break, bed step, constriction, and wet/dry shoreline cases
+- Deterministic 2.5D procedural rapid generator with bends, width/depth variation, dry banks, flow vectors, and whitewater feature metadata
 - Planned PyClaw 2.5D reference model
 - Planned custom C++ reduced shallow-water / height-field runtime solver
 - Planned dual-solver comparison and tuning harness
@@ -80,13 +81,13 @@ PYTHONPATH=src python -m raftsim.examples.run_2d_rapid --seed 1 --backend auto
 
 Outputs are written under `outputs/river2d` and `outputs/rapid2d` by default.
 
-## 2.5D Scenario Fixtures
+## 2.5D Scenario Packages
 
 The first 2.5D milestone is a solver-neutral scenario package, not a live water solver yet. Generate a deterministic fixture package with:
 
 ```bash
 cd physics
-PYTHONPATH=src python -m raftsim.examples.generate_scenario2_5d --fixture uniform_channel --seed 1
+PYTHONPATH=src python -m raftsim.examples.generate_scenario2_5d --mode fixture --fixture uniform_channel --seed 1
 ```
 
 Available fixtures:
@@ -98,7 +99,16 @@ Available fixtures:
 - `constriction`
 - `wet_dry_shoreline`
 
-The generator writes one package under `outputs/scenarios2_5d/<fixture>_seed_<seed>/`:
+Generate a deterministic procedural rafting rapid with:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.generate_scenario2_5d --mode procedural --seed 1 --difficulty 0.6
+```
+
+Procedural scenarios include a seeded bending channel, variable width/depth, dry banks, initial flow vectors, and metadata for rocks, ledges, constrictions, holes, laterals, boils, shallows, strainers, and wave trains.
+
+The generator writes one package under `outputs/scenarios2_5d/<scenario_id>/`:
 
 ```text
 scenario.json
@@ -116,4 +126,4 @@ speed.png
 
 ## Next Milestone
 
-The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): add a PyClaw availability check and first reference runner, add the custom C++ solver skeleton, and build the first PyClaw-vs-C++ comparison report. After the procedural fixtures are stable, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
+The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): add a PyClaw availability check and first reference runner, add the custom C++ solver skeleton, and build the first PyClaw-vs-C++ comparison report. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
