@@ -180,6 +180,21 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [ ] Add telemetry for recognized phrase, intent, confidence, command latency, crew response, conversation state, and command outcome.
 - [ ] Build the first rapid vertical slice with training, scoring, restart, replay, and debug force visualization.
 
+## Milestone 12: Networked Human Crew Multiplayer
+
+- [ ] Plan network play after the single-player guide experience, physics runtime, local voice commands, and AI crew systems are stable.
+- [ ] Support a full human raft crew where every boat seat can be occupied by a human player.
+- [ ] Define player roles: stern guide, left/right paddlers, bow paddlers, safety/rescue responsibilities, and optional spectator/scout roles.
+- [ ] Add integrated voice communication for everyone on the boat, with push-to-talk/open-mic, mute, volume, subtitles/transcription options, moderation hooks, and privacy settings.
+- [ ] Decide networking architecture: listen server, dedicated server, relay/session service, LAN/offline co-op experiments, authoritative host, or hybrid rollback/prediction.
+- [ ] Replicate guide commands, human paddle strokes, brace/hold-on actions, rescue actions, crew animation state, passenger/seat state, raft contacts, and outcome telemetry.
+- [ ] Keep authoritative raft/water physics deterministic enough for multiplayer replay, debugging, and desync detection.
+- [ ] Add latency compensation and prediction for paddle strokes, raft impacts, rescue grabs, swimmer state, and VR/controller poses.
+- [ ] Add seat assignment, lobby/invite flow, ready checks, reconnect, host migration or session recovery, and AI takeover for dropped players.
+- [ ] Add multiplayer-specific scoring for crew coordination, command clarity, safety, line execution, rescue timing, and communication.
+- [ ] Add network voice and gameplay telemetry for debugging: packet loss, ping, jitter, command latency, voice activity, paddle timing, and raft-state divergence.
+- [ ] Validate desktop/VR mixed crews, accessibility fallbacks, and comfort settings for each connected player.
+
 ## Technical Notes To Revisit
 
 - [ ] Decide when to physically remove legacy 2D code, tests, examples, and videos from the repo.
@@ -194,7 +209,8 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [ ] Decide local AI model/runtime strategy for desktop, VR, handheld, and future console targets.
 - [ ] Decide how much crew dialogue is generated locally versus authored as recorded barks, constrained templates, or designer-approved lines.
 - [ ] Decide latency, privacy, profanity/safety, save-data, and deterministic replay requirements for voice and conversation systems.
-- [ ] Investigate multiplayer feasibility only after the single-player guide experience feels good.
+- [ ] Decide multiplayer network architecture, voice communication stack, session backend, crossplay scope, moderation requirements, and host/dropout recovery.
+- [ ] Investigate multiplayer feasibility only after the single-player guide experience feels good enough to preserve under network latency.
 
 ## Immediate Next Steps
 
