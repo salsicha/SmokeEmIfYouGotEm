@@ -44,7 +44,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Export `scenario.json`, bed grid, initial state, feature metadata, probes, and diagnostic plots.
 - [x] Add schema validation tests.
 - [x] Generate deterministic fixture scenarios.
-- [ ] Generate deterministic procedural rafting scenarios from seed.
+- [x] Generate deterministic procedural rafting scenarios from seed.
 
 ## Milestone 2: PyClaw 2.5D Reference Solver
 
@@ -243,6 +243,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Remove 2D-first assumptions from active docs.
 - [x] Define the shared 2.5D scenario schema.
 - [x] Add fixture scenario generation for flat pool, channel flow, dam-break/bore, bed step, constriction, and wet/dry shoreline.
+- [x] Add deterministic procedural 2.5D rafting scenario generation from seed.
 - [ ] Add a PyClaw availability check and first reference runner.
 - [ ] Add a C++ solver directory and build skeleton.
 - [ ] Add the first PyClaw-vs-C++ comparison report format.

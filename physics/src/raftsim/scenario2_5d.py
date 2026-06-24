@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import math
+import random
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Literal
@@ -652,6 +654,45 @@ class FixtureScenario2_5DParameters:
             raise ValueError("high_depth must be greater than low_depth.")
 
 
+@dataclass(frozen=True, slots=True)
+class ProceduralScenario2_5DParameters:
+    seed: int = 1
+    nx: int = 96
+    ny: int = 48
+    dx: float = 1.0
+    dy: float = 1.0
+    average_width: float = 18.0
+    width_variance: float = 5.0
+    bend_amplitude: float = 7.0
+    bend_frequency: float = 1.35
+    base_depth: float = 1.2
+    depth_variance: float = 0.35
+    inflow_speed: float = 1.7
+    downstream_slope: float = 0.018
+    difficulty: float = 0.45
+    feature_count: int | None = None
+    fixed_dt: float = 1.0 / 60.0
+    duration: float = 12.0
+
+    def __post_init__(self) -> None:
+        if self.nx < 16:
+            raise ValueError("nx must be at least 16 for procedural scenarios.")
+        if self.ny < 12:
+            raise ValueError("ny must be at least 12 for procedural scenarios.")
+        if self.dx <= 0.0 or self.dy <= 0.0:
+            raise ValueError("dx and dy must be positive.")
+        if self.average_width <= 0.0:
+            raise ValueError("average_width must be positive.")
+        if self.width_variance < 0.0:
+            raise ValueError("width_variance must be non-negative.")
+        if self.base_depth <= 0.0:
+            raise ValueError("base_depth must be positive.")
+        if not 0.0 <= self.difficulty <= 1.0:
+            raise ValueError("difficulty must be between 0 and 1.")
+        if self.feature_count is not None and self.feature_count < 1:
+            raise ValueError("feature_count must be positive when provided.")
+
+
 def generate_fixture_scenario2_5d(parameters: FixtureScenario2_5DParameters | None = None) -> Scenario2_5D:
     """Generate a deterministic 2.5D fixture scenario package in memory."""
 
@@ -782,6 +823,129 @@ def generate_fixture_scenario2_5d(parameters: FixtureScenario2_5DParameters | No
     )
 
 
+def generate_procedural_scenario2_5d(parameters: ProceduralScenario2_5DParameters | None = None) -> Scenario2_5D:
+    """Generate a deterministic solver-neutral 2.5D rafting scenario from a seed."""
+
+    params = parameters or ProceduralScenario2_5DParameters()
+    rng = random.Random(params.seed)
+    y_margin = max(6.0, params.average_width * 0.5 + params.bend_amplitude + params.width_variance)
+    origin_y = -0.5 * (params.ny - 1) * params.dy
+    grid = GridSpec2_5D(nx=params.nx, ny=params.ny, dx=params.dx, dy=params.dy, origin_x=0.0, origin_y=origin_y)
+    x, y = grid.meshgrid()
+    xs = grid.x_coordinates()
+    x_span = max(float(xs[-1] - xs[0]), params.dx)
+    t = (xs - xs[0]) / x_span
+
+    phase_a = rng.uniform(0.0, math.tau)
+    phase_b = rng.uniform(0.0, math.tau)
+    phase_c = rng.uniform(0.0, math.tau)
+
+    bend_amplitude = min(params.bend_amplitude, max(0.0, (params.ny - 1) * params.dy * 0.5 - y_margin))
+    centerline = bend_amplitude * np.sin(params.bend_frequency * math.tau * t + phase_a)
+    centerline += bend_amplitude * 0.35 * np.sin(params.bend_frequency * 2.2 * math.tau * t + phase_b)
+    width_wave = np.sin(2.0 * math.tau * t + phase_b) + 0.45 * np.sin(5.0 * math.tau * t + phase_c)
+    channel_width = np.maximum(params.average_width + params.width_variance * width_wave, params.average_width * 0.48)
+
+    feature_specs = _generate_procedural_features(params, rng, grid, xs, centerline, channel_width)
+    for feature in feature_specs:
+        if feature.kind != "constriction":
+            continue
+        influence = np.exp(-((xs - feature.center[0]) ** 2) / max((feature.length * 0.5) ** 2, 1.0e-6))
+        channel_width = np.maximum(channel_width * (1.0 - 0.28 * feature.strength * influence), params.average_width * 0.35)
+
+    centerline_grid = centerline[np.newaxis, :]
+    width_grid = channel_width[np.newaxis, :]
+    lateral = y - centerline_grid
+    half_width = width_grid * 0.5
+    wet_channel = np.abs(lateral) <= half_width
+
+    eta_surface = params.base_depth - params.downstream_slope * x
+    center_depth = params.base_depth + params.depth_variance * (
+        0.55 * np.sin(3.1 * math.tau * t + phase_a) + 0.45 * np.sin(6.4 * math.tau * t + phase_c)
+    )
+    center_depth = np.maximum(center_depth, params.base_depth * 0.45)
+    lateral_fraction = np.abs(lateral) / np.maximum(half_width, 1.0e-6)
+    depth = np.where(wet_channel, center_depth[np.newaxis, :] * np.maximum(0.22, 1.0 - 0.46 * lateral_fraction**2), 0.0)
+
+    centerline_slope = np.gradient(centerline, params.dx)
+    tangent_scale = np.sqrt(1.0 + centerline_slope**2)
+    tangent_x = (1.0 / tangent_scale)[np.newaxis, :]
+    tangent_y = (centerline_slope / tangent_scale)[np.newaxis, :]
+    constriction_speedup = params.average_width / np.maximum(channel_width, 1.0)
+    speed = params.inflow_speed * (0.85 + 0.45 * params.difficulty) * np.sqrt(constriction_speedup)[np.newaxis, :]
+    bank_slowdown = np.maximum(0.25, 1.0 - 0.58 * lateral_fraction**2)
+    u = np.where(wet_channel, tangent_x * speed * bank_slowdown, 0.0)
+    v = np.where(wet_channel, tangent_y * speed * bank_slowdown, 0.0)
+
+    obstacle_mask = np.zeros(grid.shape, dtype=np.bool_)
+    feature_modifier = np.zeros(grid.shape, dtype=np.float64)
+    for feature in feature_specs:
+        scale_x = max(feature.length * 0.5, feature.radius, params.dx)
+        scale_y = max(feature.width * 0.5, feature.radius, params.dy)
+        dx_norm = (x - feature.center[0]) / scale_x
+        dy_norm = (y - feature.center[1]) / scale_y
+        influence = np.exp(-(dx_norm**2 + dy_norm**2))
+
+        if feature.kind in {"rock", "strainer"}:
+            obstacle = (dx_norm**2 + dy_norm**2) <= 1.0
+            obstacle_mask |= obstacle
+            u = np.where(obstacle, 0.0, u)
+            v = np.where(obstacle, 0.0, v)
+        elif feature.kind == "ledge":
+            feature_modifier += 0.22 * feature.strength * influence
+            u *= 1.0 + 0.10 * feature.strength * influence
+        elif feature.kind == "hole":
+            depth += 0.20 * feature.strength * influence
+            u -= tangent_x * 0.45 * params.inflow_speed * feature.strength * influence
+        elif feature.kind == "lateral":
+            side = -1.0 if feature.center[1] >= np.interp(feature.center[0], xs, centerline) else 1.0
+            v += side * 0.55 * params.inflow_speed * feature.strength * influence
+        elif feature.kind == "boil":
+            depth += 0.08 * feature.strength * influence
+            u += 0.20 * params.inflow_speed * feature.strength * dx_norm * influence
+            v += 0.20 * params.inflow_speed * feature.strength * dy_norm * influence
+        elif feature.kind == "shallow":
+            depth *= np.maximum(0.25, 1.0 - 0.42 * feature.strength * influence)
+        elif feature.kind == "wave_train":
+            wave = np.sin((x - feature.center[0]) * 1.35)
+            depth += 0.08 * feature.strength * wave * influence
+            u *= 1.0 + 0.12 * feature.strength * np.abs(wave) * influence
+        elif feature.kind == "constriction":
+            u *= 1.0 + 0.18 * feature.strength * influence
+
+    depth = np.maximum(depth - feature_modifier, 0.0)
+    depth = np.where(wet_channel & ~obstacle_mask, depth, 0.0)
+    bank_lift = params.base_depth + 0.75 + 0.25 * np.maximum(lateral_fraction - 1.0, 0.0)
+    bed = np.where(depth > 1.0e-6, eta_surface - depth, eta_surface + bank_lift)
+    u = np.where(depth > 1.0e-6, u, 0.0)
+    v = np.where(depth > 1.0e-6, v, 0.0)
+
+    state = InitialWaterState2_5D.from_depth_velocity(bed, depth, u, v)
+    metadata = ScenarioMetadata2_5D(
+        scenario_id=f"procedural_rapid_seed_{params.seed}",
+        scenario_type="procedural",
+        seed=params.seed,
+        description="Seeded synthetic rafting rapid with bends, dry banks, rocks, constrictions, hydraulics, laterals, boils, shallows, strainers, and wave trains.",
+        difficulty_preset=f"procedural_{params.difficulty:.2f}",
+        flow_band="synthetic_medium",
+        confidence_score=0.5,
+        provenance={"source": "deterministic_procedural_generator", "feature_count": len(feature_specs)},
+    )
+    return Scenario2_5D(
+        metadata=metadata,
+        grid=grid,
+        fixed_dt=params.fixed_dt,
+        duration=params.duration,
+        bed=bed,
+        initial_state=state,
+        boundaries=_channel_boundaries(float(depth[:, 0].mean()), params.inflow_speed),
+        features=tuple(feature_specs),
+        probes=_procedural_probes(grid, feature_specs),
+        raft=RaftParameters2_5D(),
+        roughness=0.035 + 0.02 * params.difficulty,
+    )
+
+
 def read_scenario2_5d_package(path: str | Path) -> Scenario2_5D:
     root = Path(path)
     scenario_path = root if root.name == "scenario.json" else root / "scenario.json"
@@ -858,6 +1022,85 @@ def _default_probes(grid: GridSpec2_5D) -> tuple[Probe2_5D, ...]:
             length=float((grid.ny - 1) * grid.dy),
         ),
     )
+
+
+def _generate_procedural_features(
+    params: ProceduralScenario2_5DParameters,
+    rng: random.Random,
+    grid: GridSpec2_5D,
+    xs: FloatGrid,
+    centerline: FloatGrid,
+    channel_width: FloatGrid,
+) -> list[Feature2_5D]:
+    feature_count = params.feature_count or max(8, int((params.nx * params.dx / 18.0) * (0.7 + params.difficulty)))
+    feature_cycle: list[FeatureKind2_5D] = [
+        "rock",
+        "constriction",
+        "wave_train",
+        "hole",
+        "lateral",
+        "boil",
+        "shallow",
+        "ledge",
+        "strainer",
+    ]
+    rng.shuffle(feature_cycle)
+    y_min = float(grid.y_coordinates()[0])
+    y_max = float(grid.y_coordinates()[-1])
+    features: list[Feature2_5D] = []
+
+    for index in range(feature_count):
+        kind = feature_cycle[index % len(feature_cycle)]
+        station = (index + 1) / (feature_count + 1)
+        station += rng.uniform(-0.035, 0.035)
+        station = max(0.08, min(0.92, station))
+        column = max(0, min(grid.nx - 1, int(round(station * (grid.nx - 1)))))
+        center_x = float(xs[column])
+        center_y = float(centerline[column])
+        width_at_feature = float(channel_width[column])
+
+        if kind in {"hole", "wave_train", "ledge", "constriction"}:
+            lateral = rng.uniform(-0.12, 0.12) * width_at_feature
+        elif kind in {"lateral", "shallow", "strainer"}:
+            lateral = rng.choice((-1.0, 1.0)) * rng.uniform(0.18, 0.38) * width_at_feature
+        else:
+            lateral = rng.uniform(-0.34, 0.34) * width_at_feature
+
+        center = (center_x, max(y_min, min(y_max, center_y + lateral)))
+        radius = max(params.dx, rng.uniform(0.08, 0.18) * width_at_feature)
+        strength = rng.uniform(0.55, 1.25) * (0.65 + params.difficulty)
+        length = radius * rng.uniform(1.6, 3.8)
+        feature_width = radius * rng.uniform(1.4, 3.1)
+        angle = math.atan2(
+            float(np.gradient(centerline, params.dx)[column]),
+            1.0,
+        )
+        features.append(
+            Feature2_5D(
+                kind=kind,
+                center=center,
+                radius=radius,
+                strength=strength,
+                length=length,
+                width=feature_width,
+                angle=angle,
+                metadata={"source_index": index, "station_fraction": station, "generated": True},
+            )
+        )
+    return features
+
+
+def _procedural_probes(grid: GridSpec2_5D, features: list[Feature2_5D]) -> tuple[Probe2_5D, ...]:
+    probes = list(_default_probes(grid))
+    for index, feature in enumerate(features[:6]):
+        probes.append(
+            Probe2_5D(
+                f"feature_{index}_{feature.kind}",
+                feature.center,
+                metadata={"feature_kind": feature.kind, "source_index": index},
+            )
+        )
+    return tuple(probes)
 
 
 def _write_json(path: Path, data: dict[str, object]) -> None:

@@ -41,3 +41,32 @@ def test_generate_scenario2_5d_example_writes_package(tmp_path):
     assert (output_dir / "bed.png").exists()
     assert (output_dir / "depth.png").exists()
     assert (output_dir / "speed.png").exists()
+
+
+def test_generate_procedural_scenario2_5d_example_writes_package(tmp_path):
+    exit_code = scenario2_5d_main(
+        [
+            "--mode",
+            "procedural",
+            "--seed",
+            "12",
+            "--nx",
+            "32",
+            "--ny",
+            "18",
+            "--feature-count",
+            "9",
+            "--no-plots",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    output_dir = tmp_path / "procedural_rapid_seed_12"
+    assert (output_dir / "scenario.json").exists()
+    assert (output_dir / "bed.npy").exists()
+    assert (output_dir / "initial_state.npz").exists()
+    assert (output_dir / "features.json").exists()
+    assert (output_dir / "probes.json").exists()
+    assert (output_dir / "validation.txt").exists()

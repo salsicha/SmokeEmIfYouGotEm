@@ -1,4 +1,4 @@
-"""Generate a deterministic solver-neutral 2.5D fixture scenario package."""
+"""Generate a deterministic solver-neutral 2.5D scenario package."""
 
 from __future__ import annotations
 
@@ -6,7 +6,12 @@ import argparse
 from pathlib import Path
 
 from ..plotting import plot_scenario2_5d_field
-from ..scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
+from ..scenario2_5d import (
+    FixtureScenario2_5DParameters,
+    ProceduralScenario2_5DParameters,
+    generate_fixture_scenario2_5d,
+    generate_procedural_scenario2_5d,
+)
 
 FIXTURE_CHOICES = (
     "flat_pool",
@@ -20,6 +25,7 @@ FIXTURE_CHOICES = (
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--mode", choices=("fixture", "procedural"), default="fixture")
     parser.add_argument("--fixture", choices=FIXTURE_CHOICES, default="uniform_channel")
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--output-dir", type=Path, default=Path("outputs/scenarios2_5d"))
@@ -29,21 +35,39 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dy", type=float, default=1.0)
     parser.add_argument("--duration", type=float, default=6.0)
     parser.add_argument("--fixed-dt", type=float, default=1.0 / 60.0)
+    parser.add_argument("--difficulty", type=float, default=0.45)
+    parser.add_argument("--feature-count", type=int, default=None)
     parser.add_argument("--no-plots", action="store_true")
     args = parser.parse_args(argv)
 
-    scenario = generate_fixture_scenario2_5d(
-        FixtureScenario2_5DParameters(
-            fixture=args.fixture,
-            seed=args.seed,
-            nx=args.nx,
-            ny=args.ny,
-            dx=args.dx,
-            dy=args.dy,
-            duration=args.duration,
-            fixed_dt=args.fixed_dt,
+    if args.mode == "fixture":
+        scenario = generate_fixture_scenario2_5d(
+            FixtureScenario2_5DParameters(
+                fixture=args.fixture,
+                seed=args.seed,
+                nx=args.nx,
+                ny=args.ny,
+                dx=args.dx,
+                dy=args.dy,
+                duration=args.duration,
+                fixed_dt=args.fixed_dt,
+            )
         )
-    )
+    else:
+        scenario = generate_procedural_scenario2_5d(
+            ProceduralScenario2_5DParameters(
+                seed=args.seed,
+                nx=args.nx,
+                ny=args.ny,
+                dx=args.dx,
+                dy=args.dy,
+                duration=args.duration,
+                fixed_dt=args.fixed_dt,
+                difficulty=args.difficulty,
+                feature_count=args.feature_count,
+            )
+        )
+
     output_dir = args.output_dir / scenario.metadata.scenario_id
     scenario.write_package(output_dir)
     validation = scenario.validate()
