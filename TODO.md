@@ -8,14 +8,14 @@ See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research
 
 ## Milestone 0: Python Physics Research Foundation
 
-- [ ] Create a Python package for the physics engine.
-- [ ] Add pytest-based test infrastructure.
-- [ ] Add deterministic fixed-timestep simulation loop.
-- [ ] Add vector and quaternion math helpers.
-- [ ] Add telemetry output for every force contribution.
-- [ ] Add simple plotting for trajectories, force vectors, and raft orientation.
-- [ ] Document reference papers, validation assumptions, and model limitations.
-- [ ] Define the first physical accuracy targets for raft, paddle, current, and collision behavior.
+- [x] Create a Python package for the physics engine.
+- [x] Add pytest-based test infrastructure.
+- [x] Add deterministic fixed-timestep simulation loop.
+- [x] Add vector and quaternion math helpers.
+- [x] Add telemetry output for every force contribution.
+- [x] Add simple plotting for trajectories, force vectors, and raft orientation.
+- [x] Document reference papers, validation assumptions, and model limitations.
+- [x] Define the first physical accuracy targets for raft, paddle, current, and collision behavior.
 
 ## Milestone 1: Minimal Rigid Raft Sandbox
 
@@ -107,7 +107,7 @@ See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research
 
 ## Immediate Next Steps
 
-- [ ] Create the Python package skeleton.
+- [x] Create the Python package skeleton.
 - [ ] Add a standing-wave example command.
 - [ ] Implement rigid raft state and fixed-step integration.
 - [ ] Implement still-water buoyancy.
