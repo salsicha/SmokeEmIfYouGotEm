@@ -2,7 +2,9 @@
 
 ## Decision
 
-Project Chrono is the selected external backend for raftsim's long-term boat and moving-water simulation path and for the full Unreal Engine game runtime.
+Project Chrono is the selected external backend for long-term raft/contact/compliance experiments and possible full game raft dynamics.
+
+For moving-water modeling, the active plan now uses PyClaw as the offline Python 2.5D shallow-water reference and a custom C++ reduced shallow-water / height-field solver as the Unreal runtime water candidate. The C++ solver must be validated against PyClaw on identical generated scenarios.
 
 The Python integration is optional. `raftsim` still runs with its pure Python backend when PyChrono is not installed, but `select_backend()` now prefers Chrono and falls back to the pure Python backend. The full game should use a native C++ Chrono integration rather than relying on PyChrono at runtime.
 
@@ -73,6 +75,8 @@ When PyChrono is installed, the Chrono backend can create a minimal Chrono syste
 Full game integration target:
 
 - Unreal owns rendering, VR input, UI, audio, asset streaming, and platform packaging.
-- Chrono owns raft dynamics, compliant structure, rock/contact response, paddle forces, and water/raft force exchange.
+- The custom C++ reduced shallow-water / height-field solver owns runtime water fields.
+- Chrono or custom C++ owns raft dynamics, compliant structure, rock/contact response, paddle forces, and water/raft force exchange depending on the readiness report.
+- PyClaw remains offline reference and validation infrastructure.
 - Unreal Chaos may still be used for incidental non-authoritative effects, but not for raft authority.
 - See the repository-level [Chrono And Unreal Integration Plan](../../docs/chrono-unreal-integration.md).

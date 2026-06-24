@@ -6,9 +6,9 @@ Project Chrono should be the authoritative physics runtime for the full simulato
 
 Unreal Engine should own rendering, VR input, audio, UI, asset streaming, and platform packaging. Chrono should own raft dynamics, rock/contact response, compliant raft structure, paddle-water force transfer, and fluid-solid interaction where available.
 
-The Python `raftsim` package remains the research harness and validation layer. It should prototype reduced models, generate regression scenarios, tune coefficients, and prove behavior before that behavior is moved into the Chrono-backed game runtime.
+The Python `raftsim` package remains the research harness and validation layer. PyClaw should produce the 2.5D shallow-water reference outputs, and the custom C++ reduced shallow-water / height-field solver should be tuned against those outputs before Unreal runtime work depends on it.
 
-See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the production roadmap. The production Unreal project should begin only after Python modeling, validation, profiling, telemetry schema stabilization, and a standalone native Chrono smoke test are complete.
+See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the production roadmap. The production Unreal project should begin only after PyClaw reference modeling, custom C++ solver matching, profiling, telemetry schema stabilization, and a standalone native Chrono smoke test are complete.
 
 ## Runtime Ownership
 
@@ -20,6 +20,7 @@ See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the productio
 - Pinning and obstacle force state
 - Paddle blade force application
 - Water/raft force exchange
+- Coupling to the custom C++ water field
 - Chrono::FSI or equivalent water-coupling experiments
 - Physics telemetry and force breakdowns
 
@@ -38,6 +39,7 @@ See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the productio
 The boundary between Unreal and Chrono should be a narrow C++ integration layer:
 
 - Unreal sends player input, paddle/controller pose, level collision geometry, and authored water-field data.
+- The custom C++ water solver advances or samples the runtime water field.
 - Chrono advances the authoritative physics state on a fixed timestep.
 - Unreal receives raft transforms, passenger attachment transforms, contact events, force telemetry, and debug vectors.
 
@@ -81,16 +83,17 @@ Mitigations:
 - Keep Python tests as behavior-level validation, not byte-for-byte runtime equivalence.
 - Add a small C++ Chrono smoke test before any Unreal plugin work.
 - Keep water/raft model parameters in versioned data files shared by Python and Unreal.
+- Keep PyClaw reference scenarios available for C++ water-solver regression.
 - Preserve a reduced force-field mode for platforms where full FSI is too expensive.
 
 ## Implementation Phases
 
 ### Phase 1: Python Validation
 
-- Keep using `raftsim` for reduced models and scenario tests.
-- Validate flat current, buoyancy, standing waves, eddy-line yaw, upwellings, and rock contact.
+- Keep using `raftsim` for scenario generation, PyClaw reference runs, and comparison tests.
+- Validate PyClaw and custom C++ against the same flat current, buoyancy, standing wave, eddy-line, upwelling, and rock-contact scenarios.
 - Export telemetry and parameter files.
-- Profile the 2D/2.5D models and identify the runtime budget for each force component.
+- Profile the PyClaw reference and custom C++ solver and identify the runtime budget for each force component.
 - Freeze the first shared parameter and telemetry schemas before native runtime work.
 
 ### Phase 2: Native Chrono Prototype
@@ -113,7 +116,8 @@ Start after the native Chrono smoke test succeeds.
 
 ### Phase 4: Water And Contact Integration
 
-- Map authored river features into Chrono/reduced water-force queries.
+- Map authored river features into the custom C++ reduced shallow-water / height-field solver.
+- Couple Chrono/custom raft dynamics to the custom C++ water-field queries.
 - Add rock collision geometry.
 - Add paddle/controller pose input.
 - Add force/debug vector rendering in Unreal.

@@ -12,11 +12,12 @@ Do not start the production Unreal Engine project until the Python physics progr
 
 Required before Unreal production begins:
 
-- 2D river/raft simulation has deterministic validation scenarios.
-- 2.5D height-field model has bed, surface, depth, buoyancy, pitch, roll, wave, hole, shallow, and rock-contact behavior.
+- PyClaw 2.5D reference scenarios run deterministically.
+- Custom C++ reduced shallow-water / height-field scenarios run from the same generated scenario packages.
+- C++ water fields, probe traces, raft force samples, and scenario outcomes match PyClaw within accepted tolerances.
 - Python profiling identifies hot loops, memory costs, timestep sensitivity, and per-scenario runtime budgets.
 - Parameter files and telemetry schemas are stable enough to share with C++/Unreal tooling.
-- Force model choices are documented: which effects stay reduced/analytic, which move into Chrono, and which are visual-only.
+- Force model choices are documented: which effects come from PyClaw reference, which live in the C++ water solver, which move into Chrono/custom raft dynamics, and which are visual-only.
 - Project Chrono runtime path is validated by a standalone C++ smoke test.
 - Unreal readiness report exists with performance budgets for desktop, VR, and handheld/portable targets.
 
@@ -77,8 +78,10 @@ Unreal Chaos may be used for incidental non-authoritative physics such as loose 
 
 Finish before Unreal production:
 
-- Complete 2D validation harness.
-- Complete first 2.5D raft/water model.
+- Complete PyClaw 2.5D reference harness.
+- Complete custom C++ reduced shallow-water / height-field solver harness.
+- Complete PyClaw-vs-C++ comparison and tuning reports.
+- Complete first 2.5D raft/water coupling model against both solver outputs.
 - Profile Python models and decide acceleration strategy.
 - Validate representative scenarios: flat pool, calm current, standing wave, hole, eddy line, lateral wave, shallow shelf, submerged rock, boil, and pinning.
 - Produce shared parameter files for raft, water, paddle, rock, and scoring coefficients.

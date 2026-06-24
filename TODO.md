@@ -2,11 +2,17 @@
 
 ## Rough First Draft Outline
 
-This project is starting as a photo-realistic, physically accurate white water rafting simulator, but the first implementation target is a headless 2D Python physics engine. The engine must procedurally generate rivers and model a top-down rubber raft moving through dynamic 2D current, obstacle, and hazard fields before 2.5D, 3D, Unreal, VR, or Chrono runtime work begins.
+This project is a photo-realistic, physically accurate white water rafting simulator, but the active implementation target is now a headless 2.5D dual-solver modeling system.
 
-See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research and implementation plan.
-See [Procedural 2D River Generation Plan](docs/2d-river-generation-plan.md) for the first river-generation plan and boat interaction effects.
-See [2.5D Raft Simulation Plan](docs/2.5d-simulation-plan.md) for the height-field, buoyancy, pitch/roll, and wave/hole transition plan.
+The old 2D river/raft path is retired. Future physics work starts with:
+
+- PyClaw as the Python 2.5D shallow-water reference model.
+- A custom C++ reduced shallow-water / height-field solver as the runtime candidate.
+- Identical procedurally generated scenarios applied to both solvers.
+- A comparison and tuning harness that makes the C++ model match PyClaw before Unreal production begins.
+
+See [Physics Engine Plan](docs/physics-engine-plan.md) for the overall physics architecture.
+See [2.5D Dual-Solver Simulation Plan](docs/2.5d-simulation-plan.md) for the PyClaw/C++ validation workflow.
 See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full game roadmap after Python modeling and profiling are complete.
 
 ## Milestone 0: Python Physics Research Foundation
@@ -19,201 +25,147 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Add simple plotting for trajectories, force vectors, and raft orientation.
 - [x] Document reference papers, validation assumptions, and model limitations.
 - [x] Define the first physical accuracy targets for raft, paddle, current, and collision behavior.
-- [x] Evaluate candidate physics backends and integrate Project Chrono as the optional selected backend.
+- [x] Evaluate candidate physics backends and integrate Project Chrono as an optional backend.
+- [x] Build a legacy 2D prototype.
+- [ ] Delete or replace legacy 2D code and examples after the 2.5D scenario/solver harness exists.
 
-## Milestone 1: Procedural 2D River Generator
+## Milestone 1: Shared 2.5D Scenario Schema
 
-- [x] Define deterministic 2D river parameter schema.
-- [x] Generate seedable river centerlines.
-- [x] Generate left and right bank boundaries from width profiles.
-- [x] Generate depth proxy, gradient proxy, and base current fields.
-- [x] Place rocks, eddies, standing waves, holes, laterals, boils, hypoviscous patches, shallows, and strainers.
-- [x] Compose feature effects into flow, shear, damping, turbulence, collision, and hazard fields.
-- [ ] Add difficulty scoring and rejection/retuning for invalid generated rivers.
-- [x] Add generated river plots and flow-vector plots.
-- [x] Add first validation checks for positive width, monotonic sections, centerline rock clearance, bounded speed, and feature counts.
+- [ ] Define solver-neutral scenario metadata.
+- [ ] Define grid bounds, resolution, timestep policy, and duration.
+- [ ] Define bed elevation, initial depth/surface, initial velocity/momentum, and wet/dry masks.
+- [ ] Define boundary conditions: inflow, outflow, wall/bank, and optional time-varying hydrographs.
+- [ ] Define feature encoding for rocks, ledges, constrictions, holes, laterals, boils, shallows, strainers, and wave trains.
+- [ ] Define raft physical parameters and probe/sample sets.
+- [ ] Export `scenario.json`, bed grid, initial state, feature metadata, probes, and diagnostic plots.
+- [ ] Add schema validation tests.
+- [ ] Generate deterministic fixture scenarios.
+- [ ] Generate deterministic procedural rafting scenarios from seed.
 
-## Milestone 2: Minimal 2D Rigid Raft Sandbox
+## Milestone 2: PyClaw 2.5D Reference Solver
 
-- [x] Implement 2D rigid raft state: position, yaw, linear velocity, and angular velocity.
-- [x] Represent the raft using top-down sampled hull/contact points.
-- [x] Implement calm-water drift and damping.
-- [x] Sample spatially varying procedural current fields at hull points.
-- [x] Implement relative-velocity water drag and linear damping.
-- [x] Implement paddle impulses as force applied at guide/passenger sample points.
-- [x] Add a generated-current drift scenario.
-- [ ] Add a calm-water no-force stability scenario.
-- [x] Add optional PyChrono-backed planar integration for the 2D raft body.
+- [ ] Add PyClaw as an optional research dependency.
+- [ ] Add an environment/setup check for PyClaw availability.
+- [ ] Implement a PyClaw scenario loader for the shared 2.5D scenario package.
+- [ ] Run canonical shallow-water fixtures: flat pool, uniform channel, dam-break/bore, bed step, constriction, and wet/dry shoreline.
+- [ ] Export PyClaw frames for `h`, `eta`, `u`, `v`, `hu`, `hv`, wet/dry masks, surface normals, and Froude number.
+- [ ] Export probe time series and cross sections.
+- [ ] Validate mass conservation and bounded velocities.
+- [ ] Add SWASHES-style analytic validation cases where practical.
+- [ ] Run the first procedurally generated rafting scenario in PyClaw.
 
-## Milestone 3: 2D River Feature Forces
+## Milestone 3: Custom C++ Reduced Shallow-Water / Height-Field Solver
 
-- [x] Add 2D standing wave zones that behave as potential energy barriers.
-- [ ] Add wave climb, stall, surf, and flip classification.
-- [x] Add eddy/shear fields that apply lateral force and yaw torque.
-- [x] Add hole/hydraulic retention fields.
-- [x] Add lateral wave impulse fields.
-- [x] Add boil/upwelling proxy fields.
-- [x] Add shallow shelf grounding drag.
-- [x] Add local effective damping / hypoviscous surface regions.
-- [ ] Add turbulence noise with deterministic seeding.
-- [x] Log current velocity, paddle impulse, collision force, shear force, retention force, grounding drag, and line outcome.
+- [ ] Create a standalone C++ solver library/executable outside Unreal.
+- [ ] Load the same shared 2.5D scenario package used by PyClaw.
+- [ ] Implement deterministic fixed-step stepping.
+- [ ] Implement reduced shallow-water / height-field state for `h`, `eta`, `u`, `v`, `hu`, `hv`, and wet/dry masks.
+- [ ] Implement bed slope, roughness/friction, and boundary source terms.
+- [ ] Implement stable wet/dry handling.
+- [ ] Implement authored feature forcing for holes, laterals, boils, wave trains, ledges, and shallows.
+- [ ] Export the same field, probe, cross-section, and telemetry channels as PyClaw.
+- [ ] Add C++ unit tests and fixture regression tests.
+- [ ] Add a command that runs one shared scenario and writes comparison-ready output.
 
-## Milestone 4: 2D Rock Contact And Pinning
+## Milestone 4: Dual-Solver Comparison And Tuning Harness
 
-- [ ] Add convex rock collision shapes.
-- [ ] Implement non-penetration contact resolution.
-- [ ] Add restitution, friction, and rubber contact softness.
-- [ ] Detect pinning when current force keeps the raft against an obstacle.
-- [ ] Add rock bump, deflection, and pinning regression scenarios.
-- [ ] Add contact telemetry by hull sample.
+- [ ] Run PyClaw and C++ on identical scenario packages.
+- [ ] Compare `h`, `eta`, `u`, `v`, `hu`, `hv`, wet/dry masks, surface normals, and slopes.
+- [ ] Compare probe time series and cross sections.
+- [ ] Compare mass conservation, energy trends, Froude number, hydraulic jump location, wave crest/trough location, and hole retention geometry.
+- [ ] Add L1/L2/Linf field-error summaries.
+- [ ] Add feature-location and feature-strength error summaries.
+- [ ] Add runtime cost per simulated second for both solvers.
+- [ ] Add scenario pass/fail thresholds.
+- [ ] Tune C++ numerical coefficients, friction, roughness, and authored feature forcing against PyClaw.
+- [ ] Promote passing scenarios to regression fixtures.
 
-## Milestone 5: 2D Validation Harness
-
-- [ ] Add pytest regression tests for every canonical scenario.
-- [ ] Add deterministic generation tests for fixed seeds.
-- [ ] Add bounded-energy tests for passive current and damping.
-- [ ] Add no-unbounded-spin tests for steady flow.
-- [ ] Add timestep sensitivity tests.
-- [ ] Add parameter sweep scripts for drag, wave retention, eddy shear, grounding drag, and contact friction.
-- [ ] Add pass/fail summaries for cleared, stalled, surfed, flipped, or pinned outcomes.
-- [ ] Add CSV or Parquet telemetry export.
-
-## Milestone 6: 2.5D River Field Layer
-
-- [ ] Add a `River25D` query API layered on top of generated 2D rivers.
-- [ ] Generate bed elevation from gradient, constrictions, rocks, ledges, and shallow shelves.
-- [ ] Generate water surface elevation from mean depth plus analytic waves, holes, laterals, and boils.
-- [ ] Compute depth, surface normals, slope, vertical/upwelling proxy, damping, and turbulence fields.
-- [ ] Add surface and bed diagnostic plots.
-- [ ] Add cross-section plots for bed, surface, velocity, and feature tags.
-- [ ] Add validation checks for bounded depth, bounded slope, surface continuity, and dry/wet consistency.
-- [ ] Add deterministic fixture rivers for flat pool, single standing wave, hole, lateral wave, shallow shelf, and submerged rock.
-
-## Milestone 7: 2.5D Rigid Raft Dynamics
+## Milestone 5: 2.5D Raft Coupling Against Both Solvers
 
 - [ ] Add 6-DoF raft state with position, orientation quaternion, linear velocity, and angular velocity.
-- [ ] Add mass, inertia tensor, gravity, and crew/guide mass offsets.
-- [ ] Add sampled tube and floor buoyancy/contact patches.
+- [ ] Add raft mass, inertia tensor, gravity, guide/passenger mass offsets, and sampled tube/floor patches.
+- [ ] Define a solver-neutral water query API for surface height, normal, depth, velocity, wet/dry state, bed height, roughness, and feature tags.
 - [ ] Apply buoyancy from submerged sample depth and local surface normal.
 - [ ] Apply vertical damping, horizontal water drag, surface-slope forces, and added-mass approximation.
-- [ ] Add bed, rock, ledge, and shallow grounding contact against height-aware geometry.
-- [ ] Add pitch, roll, surf, flush, grounding, pinning, and flip outcome classification.
-- [ ] Add flat-pool draft/trim stability and calm-current pitch/roll regression tests.
-
-## Milestone 8: 2.5D River Feature Dynamics
-
-- [ ] Convert standing waves from planar barriers to surface-height barriers with crest/trough sampling.
-- [ ] Add wave clear, stall, surf, and flush regression scenarios.
-- [ ] Convert holes to depression, upstream retention, aerated damping, and downstream boil/upwelling systems.
-- [ ] Convert lateral waves to height plus sideways impulse and roll torque fields.
-- [ ] Add eddy-line roll coupling when only one tube crosses high shear.
-- [ ] Add shallow shelf grounding and pivot tests.
-- [ ] Add submerged rock launch/scrape tests.
-- [ ] Add deterministic boil/upwelling vertical impulse tests.
-
-## Milestone 9: 2.5D Paddle And VR-Ready Input Model
-
+- [ ] Add bed, rock, ledge, and shallow grounding contact.
 - [ ] Add paddle blade pose, depth, and blade-water relative velocity.
-- [ ] Apply paddle forces only while the blade is submerged.
-- [ ] Add guide strokes: forward, back, draw, pry, sweep, rudder, and brace.
-- [ ] Record blade depth, missed/air strokes, force, torque, and local water velocity.
-- [ ] Define the future VR controller-to-paddle mapping.
-- [ ] Export paddle/raft telemetry suitable for Unreal replay.
+- [ ] Run raft-force sampling against PyClaw output fields.
+- [ ] Run raft-force sampling against custom C++ runtime fields.
+- [ ] Compare raft force envelopes, trajectories, and outcomes between the two solvers.
 
-## Milestone 10: 2.5D Validation Harness
+## Milestone 6: 2.5D White Water Feature Validation
 
-- [ ] Add pytest scenarios for flat pool, calm current, standing wave, wave train, hole, eddy line, lateral wave, shallow shelf, submerged rock, and boil.
-- [ ] Add bounded-energy tests for passive floating and passive current.
-- [ ] Add no-unbounded-spin/no-unbounded-launch tests.
-- [ ] Add timestep sensitivity tests for buoyancy, contact, and waves.
-- [ ] Add force-sign and torque-sign checks for each feature.
-- [ ] Add CSV summaries for clear, stalled, surfed, flushed, grounded, pinned, or flipped outcomes.
+- [ ] Validate standing wave clear, stall, surf, and flush cases.
+- [ ] Validate hole depression, upstream retention, aerated damping, and downstream boil/upwelling behavior.
+- [ ] Validate lateral wave side impulse and roll torque.
+- [ ] Validate eddy-line yaw/roll coupling.
+- [ ] Validate shallow shelf grounding and pivot behavior.
+- [ ] Validate submerged rock scrape/launch behavior.
+- [ ] Validate deterministic boil/upwelling vertical impulses.
+- [ ] Add outcome summaries for clear, stalled, surfed, flushed, grounded, pinned, or flipped runs.
 
-## Milestone 11: River Solver Upgrade
+## Milestone 7: Profiling, Parameter Fitting, And Runtime Budgets
 
-- [ ] Evaluate a finite-volume shallow-water solver.
-- [ ] Evaluate PyClaw/GeoClaw integration versus a custom minimal solver.
-- [ ] Use SWASHES analytic cases for validation.
-- [ ] Add wet/dry boundary handling.
-- [ ] Add hydraulic jump handling.
-- [ ] Keep analytic authored features available for controlled raft tests.
+- [ ] Profile PyClaw reference runs for research-loop cost.
+- [ ] Profile the custom C++ solver for target runtime cost.
+- [ ] Profile raft coupling and probe/export cost.
+- [ ] Add parameter sweep scripts for roughness, feature forcing, raft drag, buoyancy, grounding, and contact coefficients.
+- [ ] Fit C++ solver and raft-force parameters to PyClaw reference outputs.
+- [ ] Produce baseline performance reports for canonical and generated scenarios.
+- [ ] Define desktop, VR, and handheld physics budgets before Unreal production begins.
+- [ ] Freeze the first shared scenario, telemetry, replay, and parameter schemas.
 
-## Milestone 12: Compliant Rubber Raft Upgrade
+## Milestone 8: Chrono And Native Runtime Integration
 
-- [ ] Add XPBD-style tube and floor constraints.
-- [ ] Add raft modes: rigid, rigid plus compliant shell, and full compliant raft.
-- [ ] Add pressure/volume constraint for inflatable tubes.
-- [ ] Add rubber stiffness and damping parameter files.
-- [ ] Compare rigid and compliant behavior in identical scenarios.
-- [ ] Add deformation telemetry.
-
-## Milestone 13: Acceleration And Parameter Fitting
-
-- [ ] Vectorize hot loops with NumPy.
-- [ ] Evaluate Numba, JAX, and Taichi for acceleration.
-- [ ] Keep a pure Python/NumPy reference implementation for correctness.
-- [ ] Add coefficient fitting against reference trajectories.
-- [ ] Profile 2D and 2.5D scenarios for timestep cost, memory cost, force-component cost, plotting/export cost, and parameter sweep cost.
-- [ ] Produce baseline performance reports for flat pool, calm current, standing wave, hole, eddy line, shallow shelf, submerged rock, and generated rapid scenarios.
-- [ ] Define desktop, VR, and handheld physics budgets before any production Unreal project begins.
-- [ ] Decide which Python models migrate to native C++/Chrono and which remain offline validation tools.
-- [x] Evaluate PyChrono as a reference/backend, not as the first implementation.
-- [x] Select Project Chrono as the external backend for long-term boat/water simulation.
-
-## Milestone 14: Python-To-Unreal Readiness Gate
-
-- [ ] Complete the 2D validation harness with deterministic canonical scenarios.
-- [ ] Complete the first 2.5D raft/water validation harness.
-- [ ] Complete Python profiling and coefficient fitting reports.
-- [ ] Freeze the first shared raft, river, water, paddle, scoring, telemetry, and replay schemas.
-- [ ] Export representative Python telemetry/replay files for Unreal visualization.
+- [ ] Decide which raft dynamics run in custom C++ versus Project Chrono.
 - [ ] Create a standalone native C++ Chrono smoke test outside Unreal.
-- [ ] Compare native Chrono smoke-test telemetry against Python reference scenarios.
+- [ ] Couple Chrono raft/contact dynamics to the custom C++ water field.
+- [ ] Compare native Chrono/custom-water telemetry against Python/PyClaw reference scenarios.
+- [ ] Keep Chrono::FSI as an optional experiment/reference path, not the baseline runtime dependency.
+- [ ] Preserve the custom C++ reduced water solver as the primary Unreal runtime candidate.
+
+## Milestone 9: Python-To-Unreal Readiness Gate
+
+- [ ] Complete PyClaw reference scenarios.
+- [ ] Complete custom C++ solver scenarios.
+- [ ] Complete dual-solver comparison and tuning reports.
+- [ ] Complete 2.5D raft coupling validation against both solvers.
+- [ ] Complete profiling and runtime budget reports.
+- [ ] Export representative telemetry/replay files for Unreal visualization.
 - [ ] Write a Python-to-Unreal readiness report with risks, budgets, runtime choices, and accepted model limitations.
 - [ ] Explicitly approve starting the production Unreal project only after this gate is complete.
 
-## Milestone 15: Unreal Engine Full Game Production
+## Milestone 10: Unreal Engine Full Game Production
 
 - [ ] Choose the exact Unreal Engine 5.x version for visualization and VR.
-- [ ] Create the Unreal project only after Python modeling, validation, profiling, and the readiness report are complete.
+- [ ] Create the Unreal project only after the readiness gate is complete.
 - [ ] Create the Unreal module/plugin skeleton: core, physics bridge, river, raft, input, UI, and debug modules.
-- [ ] Design the Unreal plugin/module boundary for Chrono.
-- [ ] Link Chrono into Unreal as the authoritative raft/water physics runtime.
+- [ ] Integrate the custom C++ water solver as the runtime water field candidate.
+- [ ] Integrate Chrono/custom raft dynamics as selected by the readiness report.
 - [ ] Keep Unreal Chaos available only for incidental non-authoritative effects.
 - [ ] Enable OpenXR-based VR support.
 - [ ] Implement telemetry/replay playback in Unreal before live native physics.
-- [ ] Define the data bridge from Python validation output to Chrono/Unreal playback and debug visualization.
-- [ ] Define fixed-step Chrono scheduling and Unreal render interpolation.
+- [ ] Define fixed-step water/raft scheduling and Unreal render interpolation.
 - [ ] Set up Enhanced Input actions for VR controllers, keyboard, mouse, and gamepad.
-- [ ] Define performance budgets for desktop, VR, and handheld targets.
-- [ ] Verify Chrono module availability and build process for each target platform.
-- [ ] Gather reference for raft materials, river canyons, wet rocks, water, foam, spray, PFDs, helmets, ropes, and paddles.
 - [ ] Build the first-person guide camera with flat-screen and VR comfort options.
 - [ ] Build the first rapid vertical slice with training, scoring, restart, replay, and debug force visualization.
-- [ ] Add content, platform, QA, accessibility, and release-readiness phases from the Unreal game plan.
 
 ## Technical Notes To Revisit
 
-- [ ] Evaluate Unreal Water plugin, custom water simulation, third-party water systems, or a hybrid.
-- [ ] Evaluate Unreal Chaos only for incidental non-authoritative effects after the Chrono raft model exists.
-- [ ] Decide how river currents are authored: spline fields, volumes, flow maps, computational fluid approximations, or a hybrid.
-- [ ] Define measurable physical accuracy targets for the first vertical slice.
-- [ ] Decide which aspects of the simulation must be physically accurate and which can be perceptual approximations.
+- [ ] Decide when to physically remove legacy 2D code, tests, examples, and videos from the repo.
+- [ ] Decide whether PyClaw is enough or GeoClaw-specific behavior is required for river bathymetry and wet/dry cases.
+- [ ] Decide if SWASHES fixtures should be vendored, regenerated, or manually encoded.
+- [ ] Decide whether the C++ solver starts as CPU-only or gets a GPU path after correctness is established.
+- [ ] Decide how much authored feature forcing is acceptable versus pure shallow-water dynamics.
+- [ ] Evaluate Chrono::FSI only after the PyClaw/custom-C++ solver comparison path is stable.
 - [ ] Identify reference footage, river data, and expert guide feedback needed for validation.
-- [ ] Evaluate VR performance impact before committing to expensive water, lighting, and particle features.
-- [x] Decide that Project Chrono is the planned full game physics runtime.
-- [ ] Decide which Python validation models migrate into native Chrono C++ code.
-- [ ] Investigate multiplayer feasibility only after the single-player raft loop feels good.
+- [ ] Investigate multiplayer feasibility only after the single-player guide experience feels good.
 
 ## Immediate Next Steps
 
-- [x] Create the Python package skeleton.
-- [x] Add a `generate_river_2d` example command.
-- [x] Implement deterministic 2D river centerline and bank generation.
-- [x] Implement one downstream 2D current field.
-- [x] Implement one generated rock plus eddy feature.
-- [x] Implement one 2D standing wave field.
-- [x] Implement top-down 2D raft state and fixed-step integration.
-- [x] Add telemetry and Matplotlib trajectory output.
-- [ ] Start the 2.5D field layer with bed/surface/depth queries and diagnostic plots.
-- [ ] Add a flat-pool 6-DoF raft draft stability test.
+- [x] Remove 2D-first assumptions from active docs.
+- [ ] Define the shared 2.5D scenario schema.
+- [ ] Add fixture scenario generation for flat pool, channel flow, dam-break/bore, bed step, constriction, and wet/dry shoreline.
+- [ ] Add a PyClaw availability check and first reference runner.
+- [ ] Add a C++ solver directory and build skeleton.
+- [ ] Add the first PyClaw-vs-C++ comparison report format.

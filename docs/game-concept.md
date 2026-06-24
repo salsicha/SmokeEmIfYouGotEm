@@ -25,20 +25,19 @@ Core simulation goals:
 
 ## First Technical Milestone
 
-The first implementation milestone is not Unreal, rendering, VR, or full 3D physics. It is a headless 2D Python simulation that can generate rivers and model a top-down raft moving across dynamic white water features.
+The first active implementation milestone is not Unreal, rendering, VR, or full 3D physics. It is a headless 2.5D dual-solver modeling system.
 
-The first physics engine slice should simulate:
+The first active physics slice should build:
 
-- Procedurally generated 2D river centerlines, banks, flow fields, obstacles, and features
-- A top-down rigid raft body with position, yaw, velocity, angular velocity, and hull sample points
-- Current push, drag, shear, rock contact, standing waves, holes, eddies, shallow shelves, and paddle impulses
-- Rocks with impact, deflection, friction, and pinning behavior
-- Eddy lines that apply lateral shear and yaw torque
-- Telemetry for every major force contribution
+- A deterministic 2.5D procedural scenario generator
+- A PyClaw shallow-water reference model
+- A custom C++ reduced shallow-water / height-field solver
+- A comparison and tuning harness that runs both solvers on the same generated scenario
+- A solver-neutral 6-DoF raft coupling layer for buoyancy, drag, grounding, wave climb, surf/flush, and paddle forces
+- Telemetry for water fields, solver error, raft forces, and scenario outcomes
 
 See [Physics Engine Plan](physics-engine-plan.md) for the detailed implementation strategy.
-See [Procedural 2D River Generation Plan](2d-river-generation-plan.md) for the river generator and boat interaction effects.
-See [2.5D Raft Simulation Plan](2.5d-simulation-plan.md) for the height-field and buoyancy bridge from Python modeling to full 3D.
+See [2.5D Dual-Solver Simulation Plan](2.5d-simulation-plan.md) for the PyClaw/C++ validation workflow.
 
 ## Full Engine Physics Runtime
 
@@ -142,11 +141,11 @@ The river is the main level design language.
 Prototype systems:
 
 - Headless Python simulation before Unreal integration
-- 2D procedural river field with centerline, banks, current velocity, shear, damping, depth proxy, and feature tags
-- Sampled raft hull/contact points for force accumulation
-- Directional current fields, eddy lines, standing waves, holes, pour-overs, eddies, and calm pools
-- Rock contact, deflection, pinning, and rubber contact softness
-- Recorded telemetry for current velocity, raft velocity, paddle impulse, hull forces, collisions, and passenger events
+- 2.5D procedural scenario package with bed, surface, depth, velocity, wet/dry state, features, and raft parameters
+- PyClaw reference simulation for shallow-water behavior
+- Custom C++ reduced shallow-water / height-field solver tuned against PyClaw
+- Solver-neutral raft hull/contact sampling for buoyancy, drag, grounding, wave, hole, and paddle forces
+- Recorded telemetry for water fields, solver comparison, raft forces, contacts, and passenger events
 
 Longer-term systems:
 
@@ -160,18 +159,18 @@ Longer-term systems:
 
 ## Physical Accuracy
 
-The raft should behave like a real inflatable raft within the limits of real-time simulation. The first draft can use simplified 2D Python models, but every simplification should be chosen deliberately, documented, and tested against the physical behavior the simulator is trying to approximate.
+The raft should behave like a real inflatable raft within the limits of real-time simulation. The active research model is 2.5D: PyClaw provides the reference water behavior, and the custom C++ reduced solver is tuned to match it before becoming a runtime candidate.
 
 Prototype physics priorities:
 
-- Current applies spatially varying 2D force to hull sample points and paddle blades
+- Depth-averaged water fields apply spatially varying forces to hull sample points and paddle blades
 - Paddle strokes add directional force and torque based on blade interaction with water
 - Rocks deflect, pin, slow, or flip the raft based on contact point, velocity, current, and raft angle
-- Waves can shove, surf, stall, destabilize, or spin the raft in the 2D model
+- Waves can shove, lift, surf, stall, destabilize, or spin the raft in the 2.5D model
 - Shallows, aerated patches, and eddy lines alter drag, damping, and steering authority
 - Raft material properties initially represent drag, friction, collision softness, and pinning tendency
 - Every major force has debug visualization and telemetry for tuning and validation
-- The initial raft can be a 2D rigid body, but the architecture must support later 2.5D/3D motion and XPBD-style compliant tubes and floor constraints
+- The initial active raft model should be 6-DoF over 2.5D water and leave room for XPBD-style compliant tubes and floor constraints
 
 ## Passengers And Crew
 
@@ -247,9 +246,10 @@ The real Unreal Engine game project should start after the Python modeling and p
 
 Recommended starting approach:
 
-- Headless Python physics engine first, with Chrono-backed Unreal runtime consuming validated simulation behavior later
+- Headless 2.5D Python/PyClaw reference model first, with a custom C++ reduced water solver tuned against it before Unreal runtime work
 - Unreal Engine 5.x project
-- Project Chrono as the authoritative raft/water physics runtime inside the full game engine
+- Custom C++ reduced shallow-water / height-field solver as the primary runtime water candidate
+- Project Chrono or custom C++ as the authoritative raft/contact runtime after the readiness report selects the split
 - C++ core systems with Blueprint-facing tuning where useful
 - OpenXR-based VR support with flat-screen input parity
 - Enhanced Input for VR controllers, keyboard, mouse, and gamepad
@@ -261,18 +261,18 @@ Recommended starting approach:
 
 Prototype scenario:
 
-- One generated 2D river with banks, current, rocks, eddies, and waves
-- One top-down rigid raft with sampled hull forces
-- One eddy-line crossing test with measurable yaw torque
-- One rock contact test with deflection and pinning detection
-- One telemetry output showing water, hull, paddle, and collision force components
+- One generated 2.5D scenario package consumed by both PyClaw and C++
+- One PyClaw reference run
+- One custom C++ run tuned against the PyClaw output
+- One 6-DoF raft coupling test against both water outputs
+- One telemetry output showing water fields, solver error, hull forces, paddle forces, and contact components
 - Later Unreal visualization, VR input, scoring, restart, first-person look controls, and VR recenter controls
 
 ## Open Questions
 
 - What measurable accuracy targets define "physically accurate" for the first vertical slice?
-- Which 2D river features are required before moving to 2.5D surface modeling?
-- Which physics features must be validated in Python before Unreal integration starts?
+- What PyClaw-vs-C++ tolerances are acceptable for water fields and raft outcomes?
+- Which physics features must be validated in PyClaw and C++ before Unreal integration starts?
 - Which Chrono modules and build configuration are required for each target platform?
 - Should passengers be individual characters with traits, or mostly a visual representation of crew state?
 - Should flat-screen raft control be direct, command-based, or a hybrid while VR remains physical?
