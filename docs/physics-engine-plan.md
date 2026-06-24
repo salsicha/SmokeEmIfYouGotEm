@@ -23,7 +23,7 @@ Useful starting points from the research pass:
 
 Do not start with full 3D Navier-Stokes CFD. It is too slow, too difficult to validate, and unnecessary for the first raft behavior milestone.
 
-Use Project Chrono as the selected external physics backend for long-term boat/water simulation, but keep the first implementation layered and inspectable:
+Use Project Chrono as the selected external physics backend for long-term boat/water simulation and for the full Unreal game runtime, but keep the first implementation layered and inspectable:
 
 1. A dynamic river field over a 2D domain.
 2. A 6-DoF raft body sampled at many hull contact points.
@@ -31,10 +31,12 @@ Use Project Chrono as the selected external physics backend for long-term boat/w
 4. Telemetry and validation tests for every force contribution.
 5. Optional compliant raft structure once the rigid-body force model is stable.
 6. Chrono-backed multibody/contact/FSI integration once the reduced raft/water model is validated.
+7. Unreal integration through a narrow C++ bridge where Chrono owns authoritative raft physics and Unreal owns rendering, VR input, audio, and platform packaging.
 
 This gives us a controllable research platform in Python while preserving a migration path to Unreal later.
 
 See [Backend Evaluation](../physics/docs/backend-evaluation.md) for the comparison between Project Chrono, MuJoCo, PyBullet, Bullet, Box2D, Taichi, and JAX.
+See [Chrono And Unreal Integration Plan](chrono-unreal-integration.md) for the full game runtime path.
 
 ## Simulation State
 

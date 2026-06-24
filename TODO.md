@@ -89,22 +89,29 @@ See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research
 
 - [ ] Choose the exact Unreal Engine 5.x version for visualization and VR.
 - [ ] Create the Unreal project only after the Python physics sandbox has validated core raft behavior.
+- [ ] Create a standalone native C++ Chrono smoke test before Unreal plugin work.
+- [ ] Design the Unreal plugin/module boundary for Chrono.
+- [ ] Link Chrono into Unreal as the authoritative raft/water physics runtime.
+- [ ] Keep Unreal Chaos available only for incidental non-authoritative effects.
 - [ ] Enable OpenXR-based VR support.
-- [ ] Define the data bridge from Python physics output to Unreal playback/debug visualization.
+- [ ] Define the data bridge from Python validation output to Chrono/Unreal playback and debug visualization.
+- [ ] Define fixed-step Chrono scheduling and Unreal render interpolation.
 - [ ] Set up Enhanced Input actions for VR controllers, keyboard, mouse, and gamepad.
 - [ ] Define performance budgets for desktop, VR, and handheld targets.
+- [ ] Verify Chrono module availability and build process for each target platform.
 - [ ] Gather reference for raft materials, river canyons, wet rocks, water, foam, spray, PFDs, helmets, ropes, and paddles.
 
 ## Technical Notes To Revisit
 
 - [ ] Evaluate Unreal Water plugin, custom water simulation, third-party water systems, or a hybrid.
-- [ ] Evaluate Unreal Chaos buoyancy only after the Python raft model exists.
+- [ ] Evaluate Unreal Chaos only for incidental non-authoritative effects after the Chrono raft model exists.
 - [ ] Decide how river currents are authored: spline fields, volumes, flow maps, computational fluid approximations, or a hybrid.
 - [ ] Define measurable physical accuracy targets for the first vertical slice.
 - [ ] Decide which aspects of the simulation must be physically accurate and which can be perceptual approximations.
 - [ ] Identify reference footage, river data, and expert guide feedback needed for validation.
 - [ ] Evaluate VR performance impact before committing to expensive water, lighting, and particle features.
-- [ ] Decide how much of the Python physics engine migrates to C++, Unreal, JAX, Taichi, or another runtime.
+- [x] Decide that Project Chrono is the planned full game physics runtime.
+- [ ] Decide which Python validation models migrate into native Chrono C++ code.
 - [ ] Investigate multiplayer feasibility only after the single-player raft loop feels good.
 
 ## Immediate Next Steps

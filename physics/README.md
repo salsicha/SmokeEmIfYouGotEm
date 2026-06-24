@@ -39,7 +39,7 @@ physics/
 
 ## Physics Backend
 
-Project Chrono is the selected external backend for long-term raft and moving-water simulation because it combines multibody dynamics, collision/contact, flexible parts, Python bindings, and fluid-solid interaction support. See [Backend Evaluation](docs/backend-evaluation.md).
+Project Chrono is the selected external backend for long-term raft and moving-water simulation, including the full Unreal Engine runtime, because it combines multibody dynamics, collision/contact, flexible parts, Python bindings, and fluid-solid interaction support. See [Backend Evaluation](docs/backend-evaluation.md).
 
 The integration is optional and lazy:
 
@@ -59,7 +59,7 @@ chrono = create_backend("chrono")
 simulation = chrono.create_simulation()  # raises if PyChrono is not installed
 ```
 
-Install PyChrono from the Project Chrono distribution when using the Chrono backend. The pure Python backend remains available without native dependencies.
+Install PyChrono from the Project Chrono distribution when using the Python Chrono backend. The pure Python backend remains available without native dependencies. The full Unreal game should use native C++ Chrono integration rather than PyChrono.
 
 ## Next Milestone
 
