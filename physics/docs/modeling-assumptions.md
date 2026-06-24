@@ -4,6 +4,7 @@
 
 The first engine is based on these modeling directions:
 
+- Project Chrono is the selected external physics backend for long-term raft/fluid-solid interaction work.
 - Depth-averaged shallow water methods for river-surface dynamics.
 - 6-DoF marine craft dynamics for raft position, orientation, velocity, and angular velocity.
 - Stateless fluid-force approximations for early buoyancy, drag, lift, and added-mass terms.
@@ -11,6 +12,7 @@ The first engine is based on these modeling directions:
 - Python-first orchestration with optional acceleration after correctness and telemetry are established.
 
 See the repository-level [Physics Engine Plan](../../docs/physics-engine-plan.md) for the full research summary.
+See [Backend Evaluation](backend-evaluation.md) for the external backend comparison and selection.
 
 ## Initial Validation Assumptions
 
