@@ -2,9 +2,9 @@
 
 ## Goal
 
-Build a high-fidelity audio pipeline for the full Unreal Engine rafting simulator: white water, rapids, raft impacts, paddle strokes, wet rubber, rock scrapes, spray, weather, canyon reflections, passenger barks, guide commands, voice chat, and UI.
+Build a high-fidelity audio pipeline for the full Unreal Engine rafting simulator: white water, rapids, raft impacts, paddle strokes, wet rubber, rock scrapes, spray, weather, canyon reflections, passenger barks, guide commands, voice chat, UI, and 3D spatial audio.
 
-The audio goal is realism first. Audio should help the player read water, locate hazards, judge raft impact, understand crew state, and feel present in VR.
+The audio goal is realism first. Audio should help the player read water, locate hazards, judge raft impact, understand crew state, and feel present in VR. 3D audio is a core immersion and gameplay-readability requirement, not polish.
 
 ## Recommendation
 
@@ -43,6 +43,7 @@ Capture:
 - Real rapids at low, medium, and high runnable flows.
 - Near-field and far-field river perspectives.
 - Guide seat, bow, shore, eddy, underwater/hydrophone, and canyon-wall perspectives.
+- Ambisonic, ORTF/XY, spaced stereo, close mono, and hydrophone perspectives where practical so the mix can support headphones, VR, stereo speakers, surround, and spatial beds.
 - Raft tube impacts, paddle catches, blade slips, rock scrapes, rope pulls, pump sounds, gear handling, PFD/helmet movement, and wet footsteps.
 - Crew calls, exertion, breath, panic, laughter, rescue, and post-rapid reactions with consenting performers.
 
@@ -151,18 +152,33 @@ AI-generated audio is worse for:
 
 ## Unreal Implementation Direction
 
-Start with Unreal-native audio and MetaSounds unless middleware needs become obvious.
+Start with Unreal-native audio and MetaSounds unless middleware needs become obvious. The first implementation should include 3D audio from the beginning.
 
 Recommended path:
 
 - Use Unreal Audio Mixer, Sound Waves, Sound Cues/MetaSounds, attenuation, spatialization, submixes, audio modulation, and Quartz/MetaSound timing where useful.
 - Use MetaSounds for procedural layering: water intensity by flow, raft speed, hull contact, paddle catch, rain, spray, foam, turbulence, and debug meters.
+- Use Sound Attenuation assets for 3D positioning, distance falloff, air absorption, listener focus, reverb sends, and occlusion.
+- Use binaural/HRTF spatialization for headphones and VR where platform support and performance allow.
+- Use panning/surround spatialization for flat-screen speaker playback.
+- Use 3D stereo spread and non-spatialized radius for large water features such as rapids, waterfalls, wave trains, and canyon-scale river roar.
+- Use ambisonic beds for canyon, forest, storm, crowd, and river ambience where fixed directional texture matters.
+- Use audio volumes, reverb zones, occlusion traces, and geometry-aware mix states to make rocks, canyon walls, banks, raft tubes, and player head/body position affect the soundfield.
 - Keep Wwise and FMOD as evaluation options if the project needs deeper interactive authoring, mature mixing workflows, localization, large-team audio tooling, or platform-specific middleware support.
 - Use UCS-style metadata and a source manifest from the start regardless of runtime.
 
 Runtime parameters should drive audio:
 
 - Solver flow speed, depth, turbulence, aeration, Froude number, eddy-line shear, hazard tags, raft impact impulse, paddle blade velocity, raft scrape, weather, season, canyon geometry, player camera, and VR comfort mode.
+
+3D audio validation should cover:
+
+- Headphone/binaural localization in VR.
+- Stereo speaker play.
+- 5.1/7.1 surround where supported.
+- Ambisonic ambience rotation with head movement.
+- Large-source behavior for rapids that should feel enveloping rather than point-like.
+- Occlusion and reverb changes near canyon walls, boulders, shorelines, raft tubes, and underwater/near-water perspectives.
 
 ## Asset Manifest
 
@@ -177,7 +193,7 @@ Every imported or generated asset should have a manifest record:
 - Derivatives allowed.
 - Original sample rate, bit depth, channels, mic setup, location, date, and recordist when known.
 - Processing chain and editor.
-- Loop points, variations, loudness target, category, and UCS metadata.
+- Loop points, variations, loudness target, category, UCS metadata, attenuation preset, spatialization mode, ambisonic format/order, reverb/occlusion behavior, and intended playback contexts.
 - AI tool/model/prompt/seed/license tier if generated.
 - Shipping status: prototype, candidate, approved, rejected, or replaced.
 
@@ -205,7 +221,8 @@ Every imported or generated asset should have a manifest record:
 
 - Build MetaSounds or middleware events driven by solver telemetry.
 - Layer river bed, nearby rapid, spray, paddle, raft contact, rocks, weather, and crew audio.
-- Validate in stereo and VR spatial audio.
+- Add 3D spatialization presets for point sounds, line/area water sources, large rapids, ambisonic beds, occluded rock/bank sounds, and voice/crew sources.
+- Validate in stereo, headphones, VR binaural/HRTF, and surround where supported.
 
 ### Milestone E: AI Audio Policy
 
@@ -218,6 +235,8 @@ Every imported or generated asset should have a manifest record:
 
 - Epic Unreal Engine MetaSounds: https://dev.epicgames.com/documentation/en-us/unreal-engine/metasounds-the-next-generation-sound-sources-in-unreal-engine
 - Epic Unreal Engine Audio documentation: https://dev.epicgames.com/documentation/en-us/unreal-engine/audio-in-unreal-engine
+- Epic Unreal Engine Sound Attenuation: https://dev.epicgames.com/documentation/en-us/unreal-engine/sound-attenuation-in-unreal-engine
+- Epic Unreal Engine Native Soundfield Ambisonics Rendering: https://dev.epicgames.com/documentation/en-us/unreal-engine/native-soundfield-ambisonics-rendering-in-unreal-engine
 - Fab Standard License: https://www.fab.com/eula
 - BOOM Library: https://www.boomlibrary.com/
 - Pro Sound Effects: https://www.prosoundeffects.com/

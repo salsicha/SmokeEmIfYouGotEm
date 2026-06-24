@@ -24,6 +24,7 @@ Core simulation goals:
 - Local AI voice interaction so the guide can speak paddle, brace, rescue, and safety commands to the crew
 - Crew conversation that reacts to river state, trust, fear, fatigue, skill, scenery, weather, and the guide's recent decisions
 - VR presence that makes the player feel seated in the stern, holding a paddle, calling commands, and reacting with their body
+- Fully immersive 3D audio that places rapids, hydraulics, rocks, raft contacts, crew, voice chat, rescue cues, weather, canyon reflections, and shore noise in stable world positions
 - Training-grade feedback that explains why the raft moved, flipped, pinned, surfed, or missed a line
 
 ## First Technical Milestone
@@ -258,7 +259,8 @@ Audio direction:
 - Guide calls with short, punchy voice lines
 - Passenger reactions and conversations that communicate risk, morale, trust, fatigue, and personality without becoming noise
 - Local speech recognition for guide commands with clear acknowledgments, misrecognition handling, and subtitle feedback
-- Spatial audio for VR so current, impacts, passengers, and rescue cues are locatable
+- 3D spatial audio for VR/headphones, stereo speakers, and surround so current, impacts, passengers, rescue cues, multiplayer voice, and hazards are locatable from the stern guide seat
+- Binaural/HRTF playback for VR/headphones where supported, panning/surround playback for speaker setups, ambisonic beds for canyon/forest/storm/river ambience, and occlusion/reverb behavior for rocks, banks, raft tubes, and canyon walls
 - Production audio should be built primarily from professionally recorded/downloaded libraries and custom field recordings.
 - AI-generated audio can support prototyping, ideation, temp dialogue, and non-critical variations, but it should not be the primary source for realistic white water, raft contact, paddle, rock, voice performance, or shipping music without explicit legal/audio approval.
 - Every imported or generated sound should carry source, license, attribution, processing, and approval metadata.
@@ -277,7 +279,7 @@ Recommended starting approach:
 - OpenXR-based VR support with flat-screen input parity
 - Enhanced Input for VR controllers, keyboard, mouse, and gamepad
 - Local AI integration for voice commands, crew dialogue, passenger persona state, optional local speech synthesis, and privacy-preserving offline play
-- Unreal-native audio and MetaSounds first for interactive water/raft/crew sound; evaluate Wwise/FMOD only if production needs outgrow the native toolchain
+- Unreal-native audio and MetaSounds first for interactive water/raft/crew sound, 3D attenuation/spatialization, ambisonic ambience, reverb, occlusion, and voice-chat mix; evaluate Wwise/FMOD only if production needs outgrow the native toolchain
 - Common UI or a similarly portable UI approach for multi-platform menus
 - World Partition for long real-world river corridors once the content scope requires streaming
 - Data assets for river sections, source manifests, gauges, seasons, flow levels, difficulty presets, hazards, raft tuning, water tuning, paddle forces, and scoring rules
@@ -293,6 +295,7 @@ Prototype scenario:
 - One telemetry output showing water fields, solver error, hull forces, paddle forces, and contact components
 - One real-world river section scenario with source manifest, extracted terrain/course, rapid annotations, seasonal flow presets, and low/median/high runnable flow validation
 - One audio source manifest and interactive water-audio prototype driven by solver telemetry
+- One 3D audio validation pass for the guide-seat perspective, including rapids, hazards, crew positions, raft contacts, ambisonic ambience, occlusion/reverb changes, and VR/headphone localization
 - Later Unreal visualization, VR input, local voice commands, AI crew dialogue, scoring, restart, first-person look controls, and VR recenter controls
 
 ## Open Questions
@@ -309,6 +312,7 @@ Prototype scenario:
 - How strict should voice-command confidence be before the crew acts, especially in loud water and VR microphone conditions?
 - How much crew conversation should be generated locally versus authored, recorded, or template-driven?
 - Which professional audio libraries and field-recording sessions form the first shipping sound bed?
+- Which binaural/HRTF plugin, ambisonic format, surround target, reverb/occlusion approach, and spatial-audio QA process are required for the first VR build?
 - Which AI-generated audio use cases, if any, are allowed beyond temporary prototypes?
 - Is Unreal-native audio/MetaSounds enough for full production, or does the project need Wwise/FMOD?
 - Should flat-screen raft control be direct, command-based, or a hybrid while VR remains physical?
