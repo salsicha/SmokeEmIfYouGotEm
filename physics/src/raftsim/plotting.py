@@ -10,6 +10,7 @@ from typing import Sequence
 from .math2d import Vec2
 from .math3d import Quaternion, Vec3
 from .river2d import GeneratedRiver2D
+from .scenario2_5d import Scenario2_5D
 from .telemetry import TelemetryFrame
 
 
@@ -192,6 +193,51 @@ def plot_river2d_flow(
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_aspect("equal", adjustable="box")
+    return _save_or_return(fig, output_path)
+
+
+def plot_scenario2_5d_field(
+    scenario: Scenario2_5D,
+    *,
+    field: str = "depth",
+    output_path: str | Path | None = None,
+    title: str | None = None,
+):
+    """Plot a 2.5D scenario scalar field with probes and feature centers."""
+
+    arrays = {
+        "bed": scenario.bed,
+        "depth": scenario.initial_state.depth,
+        "eta": scenario.initial_state.eta,
+        "u": scenario.initial_state.u,
+        "v": scenario.initial_state.v,
+        "speed": (scenario.initial_state.u**2 + scenario.initial_state.v**2) ** 0.5,
+        "wet": scenario.initial_state.wet.astype(float),
+    }
+    if field not in arrays:
+        raise ValueError(f"Unknown 2.5D scenario field: {field}")
+
+    plt = _pyplot()
+    fig, ax = plt.subplots()
+    image = ax.imshow(
+        arrays[field],
+        origin="lower",
+        extent=scenario.grid.extent,
+        aspect="auto",
+        cmap="viridis" if field != "wet" else "Blues",
+    )
+    fig.colorbar(image, ax=ax, fraction=0.046, pad=0.04, label=field)
+
+    for feature in scenario.features:
+        ax.scatter([feature.center[0]], [feature.center[1]], marker="x", color="white", linewidths=1.2)
+        ax.text(feature.center[0], feature.center[1], feature.kind[:3], color="white", fontsize=7, ha="left", va="bottom")
+
+    for probe in scenario.probes:
+        ax.scatter([probe.position[0]], [probe.position[1]], marker="+", color="black", linewidths=0.9)
+
+    ax.set_title(title or f"{scenario.metadata.scenario_id}: {field}")
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
     return _save_or_return(fig, output_path)
 
 
