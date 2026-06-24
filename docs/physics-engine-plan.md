@@ -4,7 +4,7 @@
 
 Build a headless Python physics engine that can model a rubber white water raft moving over highly dynamic river surfaces before any 3D graphics work begins.
 
-The engine should answer one question first: can we produce stable, inspectable, physically plausible raft motion from river features such as rocks, standing waves, eddy lines, vertical upwellings, local viscosity changes, and paddle forces?
+The engine should answer one question first: can we produce stable, inspectable, physically plausible 2D raft motion from river features such as rocks, standing waves, eddy lines, boil/upwelling proxies, local viscosity changes, and paddle forces?
 
 ## Research Summary
 
@@ -23,26 +23,46 @@ Useful starting points from the research pass:
 
 Do not start with full 3D Navier-Stokes CFD. It is too slow, too difficult to validate, and unnecessary for the first raft behavior milestone.
 
-Use Project Chrono as the selected external physics backend for long-term boat/water simulation and for the full Unreal game runtime, but keep the first implementation layered and inspectable:
+Use Project Chrono as the selected external physics backend for long-term boat/water simulation and for the full Unreal game runtime, but start with a 2D simulation that is easy to generate, inspect, and validate:
 
-1. A dynamic river field over a 2D domain.
-2. A 6-DoF raft body sampled at many hull contact points.
-3. Force laws that convert local water state into buoyancy, drag, lift, shear, collision, and paddle impulses.
+1. A procedurally generated 2D river field with centerline, banks, current vectors, feature tags, and collision geometry.
+2. A top-down 2D raft body with position, yaw, velocity, angular velocity, and sampled hull contact points.
+3. Force laws that convert local river state into current push, drag, shear, collision, wave/hole retention, grounding, and paddle impulses.
 4. Telemetry and validation tests for every force contribution.
-5. Optional compliant raft structure once the rigid-body force model is stable.
-6. Chrono-backed multibody/contact/FSI integration once the reduced raft/water model is validated.
-7. Unreal integration through a narrow C++ bridge where Chrono owns authoritative raft physics and Unreal owns rendering, VR input, audio, and platform packaging.
+5. 2.5D surface, buoyancy, and vertical effects only after the 2D river/boat interaction is stable.
+6. Optional compliant raft structure once the rigid-body force model is stable.
+7. Chrono-backed multibody/contact/FSI integration once the reduced raft/water model is validated.
+8. Unreal integration through a narrow C++ bridge where Chrono owns authoritative raft physics and Unreal owns rendering, VR input, audio, and platform packaging.
 
 This gives us a controllable research platform in Python while preserving a migration path to Unreal later.
 
 See [Backend Evaluation](../physics/docs/backend-evaluation.md) for the comparison between Project Chrono, MuJoCo, PyBullet, Bullet, Box2D, Taichi, and JAX.
 See [Chrono And Unreal Integration Plan](chrono-unreal-integration.md) for the full game runtime path.
+See [Procedural 2D River Generation Plan](2d-river-generation-plan.md) for the first river-generation milestone.
 
 ## Simulation State
 
-### River Field
+### 2D River Field
 
-Represent the river as fields over `(x, y, t)`:
+The first simulation represents the river as top-down fields over `(x, y, t)`:
+
+- Bank membership / navigable water mask
+- Centerline distance `s`
+- Lateral offset `n`
+- Horizontal velocity `u, v`
+- Depth proxy
+- Effective damping / drag coefficient
+- Shear strength
+- Vorticity / rotational flow proxy
+- Turbulence intensity
+- Collision geometry
+- Feature tags such as eddy, eddy-line, standing-wave, hole, rock, pillow, shallow, strainer, and calm pool
+
+This phase does not model vertical boat motion. Standing waves, holes, upwellings, and shallow shelves are represented as 2D force fields and outcome classifiers.
+
+### Later 2.5D River Field
+
+After the 2D model works, extend the river into fields over `(x, y, t)`:
 
 - Surface height `eta`
 - Bed elevation `bed`
@@ -55,22 +75,23 @@ Represent the river as fields over `(x, y, t)`:
 - Turbulence intensity
 - Feature tags such as eddy, eddy-line, wave, hole, pour-over, rock, pillow, and calm pool
 
-The first version can use analytic fields and authored features. A later version can replace or augment those fields with a finite-volume shallow-water solver.
+The first version can use procedural 2D fields and authored validation features. A later version can replace or augment those fields with a finite-volume shallow-water solver.
 
-### Raft Body
+### 2D Raft Body
 
-Start with a single 6-DoF rigid body:
+Start with a top-down rigid body:
 
 - Position
-- Orientation quaternion
+- Yaw angle
 - Linear velocity
-- Angular velocity
+- Angular velocity around vertical axis
 - Mass
-- Inertia tensor
-- Center of gravity
+- Moment of inertia
 - Sampled hull/contact points
 
 The sampled hull points are more important than the initial visual shape. They are where water and rocks apply force.
+
+The later 2.5D/3D raft will add orientation quaternion, full angular velocity, buoyancy, trim, pitch, roll, and center-of-buoyancy effects.
 
 ### Inflatable Structure
 
@@ -91,11 +112,26 @@ The engine should support running the raft in three modes:
 
 ## Force Model
 
-All forces should be computed per hull sample, then accumulated into net force and torque on the raft.
+For the first 2D slice, forces should be computed per hull sample, then accumulated into planar net force and yaw torque on the raft.
 
-### Gravity And Buoyancy
+The first 2D model includes:
 
-For each hull sample:
+- Current push
+- Drag and damping
+- Eddy-line shear
+- Rock, bank, and shallow-shelf contact
+- Standing-wave deceleration and surf/stall classification
+- Hole/hydraulic retention
+- Lateral wave impulse
+- Boil/upwelling proxy disturbance
+- Hypoviscous/aerated damping reduction
+- Paddle impulses
+
+### Later Gravity And Buoyancy
+
+The 2D model does not simulate vertical motion, pitch, roll, submerged volume, or true buoyancy. Those arrive in the later 2.5D/3D model.
+
+For each hull sample in the later model:
 
 - Compare sample height against local water surface.
 - Estimate submerged depth or submerged volume contribution.
@@ -108,15 +144,15 @@ This is the baseline that lets the raft float, pitch, roll, and recover.
 
 Standing waves and wave trains should not be treated as cosmetic height bumps. They are energy barriers.
 
-For each wave feature:
+For each 2D wave feature:
 
-- Surface slope changes the local normal force.
-- Upstream face applies deceleration and upward force.
-- Crest crossing requires sufficient kinetic energy.
-- Downstream face can accelerate, drop, or destabilize the raft.
-- Breaking-wave features can add stochastic impact impulses.
+- The upstream face applies deceleration.
+- The crest zone can surf, stall, or destabilize the boat.
+- The downstream exit can release, yaw, or flush the boat.
+- Bad entry angle increases angular disturbance.
+- Wave trains apply repeated speed loss and yaw disturbance.
 
-The first implementation can model this using analytic heightfields and velocity fields. The validation target is qualitative at first: insufficient speed stalls or surfs, correct speed climbs over, bad angle spins or flips.
+The first implementation can model this using analytic 2D force zones and outcome classifiers. The validation target is qualitative at first: insufficient speed stalls or surfs, correct speed clears, bad angle spins or pins. Later 2.5D work can replace these proxies with actual surface height and slope forces.
 
 ### Hydrodynamic Drag, Lift, And Added Mass
 
@@ -143,16 +179,16 @@ For each hull sample:
 
 This should produce the expected behavior: a raft crossing an eddy line at a bad angle gets grabbed and rotated.
 
-### Upwellings And Hypoviscous Surface Regions
+### Boils, Upwelling Proxies, And Hypoviscous Surface Regions
 
-Treat updrafts/upwellings as localized vertical water velocity and pressure fields. Treat "hypoviscous" regions as authored or simulated regions where effective damping decreases and the raft loses some stabilizing resistance.
+In the 2D model, boils/upwellings are localized radial or rotational disturbance fields. Treat "hypoviscous" regions as authored or simulated regions where effective damping decreases and the raft loses some stabilizing resistance.
 
 For each affected hull sample:
 
-- Add vertical impulse or sustained vertical lift from `w`.
+- Add radial, lateral, or rotational disturbance.
 - Reduce local damping by `mu_eff`.
-- Reduce contact stability when the raft is riding aerated or highly turbulent water.
-- Increase roll/pitch sensitivity if only part of the raft is in the region.
+- Reduce steering authority when the raft is riding aerated or highly turbulent water.
+- Increase yaw sensitivity if only part of the raft is in the region.
 
 This is a modeling layer that needs validation. The engine should keep it explicit rather than hiding it inside generic turbulence.
 
@@ -210,9 +246,9 @@ Start with semi-implicit Euler because it is simple and robust for force-driven 
 - Use Python 3, NumPy, dataclasses, and pytest.
 - Implement vector/quaternion helpers.
 - Implement a deterministic `Simulation.step(dt)` API.
-- Implement analytic river fields: flat current, standing wave, eddy line, vertical upwelling, viscosity patch.
-- Implement a rigid raft with sampled hull points.
-- Implement buoyancy, drag, shear, upwelling, and rock contact forces.
+- Implement procedural 2D river fields: centerline, banks, flat current, standing wave, eddy line, hole, rock, shallow shelf, and damping patch.
+- Implement a 2D rigid raft with sampled hull points.
+- Implement current push, drag, shear, wave/hole retention, grounding, paddle, and rock contact forces.
 - Save telemetry as CSV or Parquet.
 - Plot runs with Matplotlib.
 
@@ -221,12 +257,13 @@ Start with semi-implicit Euler because it is simple and robust for force-driven 
 - Add unit tests for conservation and stability invariants.
 - Add regression tests for canonical scenarios:
   - Flat water drift
-  - Still-water float equilibrium
+  - Calm-water drift
   - Standing wave climb/stall
   - Eddy-line yaw
   - Rock bump and deflection
   - Pinning against a rock
-  - Upwelling roll/pitch disturbance
+  - Hole surf/flush classification
+  - Shallow shelf grounding
   - Low-damping hypoviscous patch
 - Add parameter sweep scripts.
 - Add simple objective functions for fitting coefficients to reference trajectories.
@@ -264,22 +301,22 @@ physics/
     __init__.py
     sim.py
     state.py
-    river.py
-    raft.py
+    river2d.py
+    raft2d.py
     forces.py
     contacts.py
     integrators.py
     telemetry.py
   tests/
-    test_float_equilibrium.py
-    test_flat_current.py
-    test_standing_wave.py
-    test_eddy_line.py
-    test_rock_contact.py
+    test_river2d_generation.py
+    test_raft2d_state.py
+    test_flat_current_2d.py
+    test_standing_wave_2d.py
+    test_eddy_line_2d.py
+    test_rock_contact_2d.py
   examples/
-    run_flat_current.py
-    run_standing_wave.py
-    run_eddy_line.py
+    generate_river_2d.py
+    run_2d_rapid.py
 ```
 
 ## Validation Standards
@@ -289,8 +326,9 @@ The engine should not accept "looks right" as sufficient.
 Minimum validation requirements:
 
 - Deterministic replay with fixed seed and timestep
-- Bounded energy behavior in passive water
-- Stable float equilibrium in still water
+- Deterministic river generation for fixed seeds and parameters
+- Bounded energy behavior in passive 2D current and damping fields
+- Stable calm-water behavior with no uncommanded acceleration
 - No unbounded spin or velocity growth without explicit energy input
 - Contact solver does not tunnel through rocks under target timestep/substep settings
 - Telemetry separates each force contribution
@@ -302,7 +340,20 @@ Minimum validation requirements:
 The first code deliverable should be a non-graphical Python package that runs this command:
 
 ```bash
-python -m raftsim.examples.run_standing_wave
+python -m raftsim.examples.generate_river_2d --seed 1
+```
+
+It should output:
+
+- A generated 2D river plot
+- A sampled flow-vector plot
+- A feature list
+- A validation summary
+
+The first boat deliverable should run:
+
+```bash
+python -m raftsim.examples.run_2d_rapid --seed 1
 ```
 
 It should output:

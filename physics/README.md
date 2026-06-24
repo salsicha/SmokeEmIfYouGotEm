@@ -63,4 +63,4 @@ Install PyChrono from the Project Chrono distribution when using the Python Chro
 
 ## Next Milestone
 
-Milestone 1 should add the minimal rigid raft sandbox: 6-DoF raft state, sampled hull points, still-water buoyancy, current fields, drag/damping, paddle impulses, and baseline scenarios.
+Milestone 1 should add the procedural 2D river generator: deterministic river parameters, centerline generation, banks, base current fields, feature placement, difficulty scoring, validation checks, and diagnostic plots.
