@@ -14,6 +14,19 @@ The first target is a plan-view river map that can answer:
 
 This is intentionally simpler than the full simulator. It should be good enough to generate playable, physically interpretable 2D rapids and regression scenarios.
 
+## Implementation Status
+
+The first runnable slice now exists in `physics/src/raftsim`:
+
+- `river2d.py` generates deterministic centerline sections, banks, width/depth/gradient proxies, base current, rocks, eddies, standing waves, wave trains, holes, lateral waves, boils, hypoviscous patches, shallows, and strainers.
+- `raft2d.py` runs a top-down rigid raft with hull sample points, water drag, damping, shear, bank contact, rock contact, feature forces, paddle force points, telemetry, and a pure Python or optional PyChrono planar integrator.
+- `plotting.py` can render generated river maps, sampled flow vectors, force magnitudes, and trajectories.
+- `raftsim.examples.generate_river_2d` and `raftsim.examples.run_2d_rapid` produce JSON, validation text, telemetry CSV, and PNG plots.
+
+The current model is still an analytic feature-field simulator. It does not yet include a finite-volume shallow-water solver, vertical surface height, true buoyancy, compliant raft deformation, or production-grade Chrono/Unreal integration.
+
+The next planning step is [2.5D Raft Simulation](2.5d-simulation-plan.md), which keeps the current 2D river structure but adds bed elevation, water surface height, depth, surface normals, buoyancy, pitch/roll, grounding, and wave/hole height-field behavior.
+
 ## Core Representation
 
 Use a 2D world coordinate system:
@@ -430,10 +443,12 @@ Each scenario should have regression checks:
 The first 2D river deliverable should run:
 
 ```bash
-python -m raftsim.examples.generate_river_2d --seed 1
+cd physics
+PYTHONPATH=src python -m raftsim.examples.generate_river_2d --seed 1
+PYTHONPATH=src python -m raftsim.examples.run_2d_rapid --seed 1 --backend auto
 ```
 
-It should output:
+The generator outputs:
 
 - A generated river plot
 - A sampled flow-vector plot
@@ -441,4 +456,4 @@ It should output:
 - A feature list
 - A validation summary
 
-The first boat deliverable should run a scripted raft through that generated river and export trajectory plus force telemetry.
+The rapid example runs a scripted raft through that generated river and exports trajectory plots plus force telemetry.

@@ -39,6 +39,20 @@ This gives us a controllable research platform in Python while preserving a migr
 See [Backend Evaluation](../physics/docs/backend-evaluation.md) for the comparison between Project Chrono, MuJoCo, PyBullet, Bullet, Box2D, Taichi, and JAX.
 See [Chrono And Unreal Integration Plan](chrono-unreal-integration.md) for the full game runtime path.
 See [Procedural 2D River Generation Plan](2d-river-generation-plan.md) for the first river-generation milestone.
+See [2.5D Raft Simulation Plan](2.5d-simulation-plan.md) for the next height-field, buoyancy, pitch/roll, and wave/hole simulation step.
+
+## Current First Slice
+
+The initial 2D raft simulator is implemented under `physics/src/raftsim`:
+
+- `river2d.py` provides deterministic procedural river sections, bank offsets, proxy depth/gradient/current fields, river features, field sampling, JSON export, and validation summaries.
+- `raft2d.py` provides a top-down rigid raft state, sampled hull/contact points, water drag, damping, shear, banks, rocks, wave/hole/lateral/boil/shallow/hypoviscous feature forces, paddle forces, simple outcome classification, and telemetry.
+- `raft2d.py` can use a pure Python semi-implicit Euler planar integrator or an optional PyChrono-backed planar integrator when PyChrono is installed.
+- `raftsim.examples.generate_river_2d` and `raftsim.examples.run_2d_rapid` write the first JSON, CSV, and PNG debug outputs.
+
+This is an analytic 2D feature-field prototype, not yet a free-surface fluid solver or compliant raft model.
+
+The next planned slice is 2.5D: a height-aware water/bed field sampled by a 6-DoF rigid raft. It should introduce bed elevation, water surface elevation, depth, surface normals, buoyancy, gravity, pitch, roll, vertical damping, wave climb, hole surf/flush behavior, grounding, and paddle blade depth while staying deterministic and testable in Python.
 
 ## Simulation State
 
