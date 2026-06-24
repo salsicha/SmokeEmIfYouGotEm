@@ -6,6 +6,8 @@ Build the full SmokeEmIfYouGotEm rafting simulator as a multi-platform Unreal En
 
 The Unreal game should deliver the first-person guide fantasy: seated in the stern, reading water, calling commands, steering with physically meaningful paddle strokes, managing passenger safety, and feeling the raft move through a photo-real white water environment.
 
+See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial extraction, rapid identification, seasonal flow, adaptive fluid-parameter, and river-selection work that must feed Unreal content.
+
 ## Hard Dependency Gate
 
 Do not start the production Unreal Engine project until the Python physics program reaches an explicit exit gate.
@@ -13,12 +15,15 @@ Do not start the production Unreal Engine project until the Python physics progr
 Required before Unreal production begins:
 
 - PyClaw 2.5D reference scenarios run deterministically.
-- Custom C++ reduced shallow-water / height-field scenarios run from the same generated scenario packages.
+- Custom C++ reduced shallow-water / height-field scenarios run from the same solver-neutral scenario packages.
 - C++ water fields, probe traces, raft force samples, and scenario outcomes match PyClaw within accepted tolerances.
 - Python profiling identifies hot loops, memory costs, timestep sensitivity, and per-scenario runtime budgets.
 - Parameter files and telemetry schemas are stable enough to share with C++/Unreal tooling.
 - Force model choices are documented: which effects come from PyClaw reference, which live in the C++ water solver, which move into Chrono/custom raft dynamics, and which are visual-only.
 - Project Chrono runtime path is validated by a standalone C++ smoke test.
+- At least one real-world river section has a complete source manifest, terrain/course extraction, rapid annotations, gauge/flow research, season presets, difficulty presets, and low/median/high flow validation through PyClaw and the custom C++ solver.
+- Adaptive fluid parameters are documented for river, season, flow percentile, difficulty, channel geometry, roughness, aeration/turbulence, eddy-line shear, hole retention, wave train strength, boils, shallows, raft drag, paddle catch, and damping.
+- A first real-world corridor package exists for Unreal preproduction: terrain, centerline, banks, imagery masks, rapid boundaries, hazards, flow presets, confidence metadata, and validation telemetry.
 - Unreal readiness report exists with performance budgets for desktop, VR, and handheld/portable targets.
 
 Unreal can still be used earlier for throwaway visual studies, reference capture, or material tests, but the real game project should wait until the modeling and profiling gate is passed.
@@ -55,6 +60,7 @@ Unreal Chaos may be used for incidental non-authoritative physics such as loose 
 - Single raft, single-player guide role as the first production target.
 - Scripted or AI-assisted passenger crew responding to guide commands.
 - Realistic but teachable white water behavior.
+- Data-backed river, section, season, flow level, difficulty, and raft/crew selection.
 - Training-grade feedback and replay tools.
 
 ### Initial Game Modes
@@ -62,6 +68,7 @@ Unreal Chaos may be used for incidental non-authoritative physics such as loose 
 - Training school: calm water, strokes, ferrying, eddy turns, wave approach, rescue basics.
 - Rapid challenge: one rapid, restart quickly, score safety/line/control.
 - River section: linked rapids with scouting, recovery pools, and cumulative crew state.
+- Real river catalog: choose river, section, season, flow level, difficulty, and raft/crew setup from validated scenario data.
 - Daily/generated rapid: later, after procedural generation is stable.
 
 ### Later Modes
@@ -87,10 +94,12 @@ Finish before Unreal production:
 - Produce shared parameter files for raft, water, paddle, rock, and scoring coefficients.
 - Produce replay/telemetry examples that Unreal can visualize.
 - Confirm Chrono C++ viability outside Unreal.
+- Complete one real-world river scenario package with geospatial source manifest, extracted course/elevation, rapid labels, seasonal flow bands, difficulty presets, and PyClaw/custom-C++ validation.
+- Produce one Unreal-ready real-world river corridor package for preproduction review.
 
 Deliverable:
 
-- Python-to-Unreal readiness report.
+- Python-to-Unreal readiness report, including the first real-world river content readiness appendix.
 
 ### Phase 1: Unreal Preproduction
 
@@ -99,11 +108,13 @@ Start only after Phase 0 is accepted.
 Tasks:
 
 - Choose the exact Unreal Engine 5.x version and lock it for the first vertical slice.
+- Re-check the latest stable UE5 feature set before locking the version. As of this planning pass, Epic's public docs are on UE 5.8, so expect Nanite foliage, Nanite landscape/spline/tessellation workflows, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, Substrate/material layering, and OpenXR to be evaluated for the first slice.
 - Define target platforms for the first playable build.
 - Create coding standards for C++, Blueprint exposure, data assets, and content naming.
 - Define plugin/module boundaries: core game, Chrono bridge, water visualization, raft, river, input, UI, debug.
 - Build a small visual prototype with placeholder physics replay data, not gameplay physics.
 - Establish asset scale, coordinate conventions, units, and import/export rules.
+- Define geospatial import rules: coordinate reference systems, WGS84/local transforms, source manifests, terrain tile sizes, imagery masks, river corridor bounds, and confidence metadata.
 - Set up source control rules for large assets, generated files, and LFS.
 
 Deliverable:
@@ -144,16 +155,18 @@ Deliverable:
 
 Tasks:
 
-- Import Python-authored river sections and scenario metadata.
-- Build spline/volume/data-asset representation for river centerline, banks, hazards, and current fields.
-- Create photo-real canyon/forest/desert/mountain river environment pipeline.
-- Add water material, foam lines, bubbles, waves, wet rocks, spray, mist, and debris cues.
-- Add debug view that compares authored flow fields with visible water cues.
-- Define handoff from Python/generated data to Unreal-authored content.
+- Import Python-authored and real-world geospatial river sections with scenario metadata, source manifests, seasonal presets, difficulty presets, and validation confidence.
+- Build spline/volume/data-asset representation for river centerline, banks, cross sections, rapids, hazards, gauges, season/flow presets, and current fields.
+- Convert DEM/lidar, aerial/satellite masks, hydrography, and reviewed rapid annotations into Unreal terrain/corridor assets.
+- Use Cesium for Unreal or equivalent geospatial tooling where it helps with real-world scale, WGS84 positioning, 3D Tiles, terrain, imagery, and georeferenced scene setup.
+- Create photo-real canyon/forest/desert/mountain river environment pipeline using Nanite rocks/canyon walls/terrain details, Nanite foliage, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, and advanced material layering where supported.
+- Add water material, foam lines, bubbles, waves, wet rocks, spray, mist, debris cues, aeration masks, turbulence masks, and seasonal water appearance.
+- Add debug view that compares solver fields and adaptive fluid parameters with visible water cues.
+- Define handoff from Python/geospatial/generated data to Unreal-authored content.
 
 Deliverable:
 
-- One believable rapid rendered with readable current, hazards, and raft motion.
+- One believable real-world rapid corridor rendered with readable current, hazards, seasonal flow variation, and raft motion.
 
 ### Phase 5: Core Gameplay Vertical Slice
 
@@ -165,6 +178,7 @@ Tasks:
 - Add scoring for safety, line, boat angle, paddle efficiency, passenger trust, and completion.
 - Add restart, replay, ghost telemetry, and after-action feedback.
 - Add basic menus and settings.
+- Add river, section, season, flow, difficulty, and raft/crew selection backed by validated data assets.
 
 Deliverable:
 
@@ -190,6 +204,7 @@ Deliverable:
 Tasks:
 
 - Build additional river biomes.
+- Build additional real-world river sections from source manifests and reviewed rapid annotations.
 - Add difficulty progression.
 - Add more raft types and handling profiles.
 - Add passenger archetypes and crew trust progression.
@@ -238,6 +253,7 @@ Recommended modules/plugins:
 - `RaftsimCore`: shared game types, units, data schemas, telemetry types.
 - `RaftsimPhysics`: native physics runtime bridge, Chrono/reduced model integration.
 - `RaftsimRiver`: river data assets, scenario loading, flow visualization, hazard volumes.
+- `RaftsimGeo`: optional geospatial import/conversion tooling for source manifests, coordinate transforms, terrain/corridor packages, imagery masks, and rapid annotations.
 - `RaftsimRaft`: raft actor, passenger attachment points, animation hooks, damage/safety state.
 - `RaftsimInput`: flat-screen, gamepad, VR controller, paddle, command, and accessibility mappings.
 - `RaftsimUI`: menus, HUD, replay, scoring, training feedback.
@@ -248,7 +264,9 @@ Recommended modules/plugins:
 Use Unreal data assets for game-facing tuning while keeping source-of-truth exports traceable to Python:
 
 - River section definitions
+- River catalog, region, section, season, flow, difficulty, gauge, and source-manifest definitions
 - Water field / feature metadata
+- Geospatial corridor metadata, centerlines, banks, cross sections, rapid boundaries, imagery masks, and data confidence scores
 - Raft physical parameters
 - Paddle stroke parameters
 - Passenger archetypes
@@ -278,6 +296,8 @@ Unreal should be able to play a Python-produced run before it can run the native
 The game should be photo-real and readable:
 
 - Water cues must reveal real gameplay information: current direction, eddy lines, holes, shallow shelves, rocks, laterals, boils, and recovery pools.
+- The highest-value playable sections should be grounded in extracted real-world course/elevation data and reviewed aerial/satellite rapid annotations.
+- Use the current UE5 photoreal stack where it fits the target hardware: Nanite for high-detail rocks, canyon walls, terrain details, and dense foliage; Lumen for dynamic seasonal light; Virtual Shadow Maps for high-resolution shadows; World Partition for river corridor streaming; PCG for vegetation, rocks, gravel, driftwood, debris, camps, and access points; Niagara for spray, mist, foam, rain, and paddle splashes.
 - Raft rubber should show wetness, deformation hints, contact scuffs, and tube volume.
 - Rocks should look wet, slick, and dangerous without hiding collision boundaries.
 - Foam, bubbles, debris, and surface streaks should support navigation rather than just decorate.
@@ -312,6 +332,7 @@ The game should always have a reduced physics/water mode available for lower-pow
 The first Unreal vertical slice is successful when:
 
 - It starts from a validated Python scenario.
+- It includes at least one validated real-world river/season/difficulty scenario package.
 - Unreal can replay the scenario with matching raft path and debug telemetry.
 - Native runtime can run the same scenario with comparable qualitative outcome.
 - Player can guide from stern first-person view in flat-screen and VR.
@@ -323,9 +344,11 @@ The first Unreal vertical slice is successful when:
 ## Open Decisions
 
 - Exact Unreal Engine version for the first vertical slice.
+- Exact geospatial import path: Cesium for Unreal, custom GDAL pipeline, Unreal-native landscape tiles, 3D Tiles, or a hybrid.
+- First candidate river/section for the real-world vertical slice.
 - Whether the first live runtime uses Chrono rigid-body integration, reduced native C++ force integration, or both.
 - How much Chrono::FSI is practical for real-time VR.
 - Which platforms are first-class at alpha.
-- Whether generated rivers become a shipping feature or remain internal content tooling.
+- Whether generated rivers become a shipping feature or remain internal content tooling after real-world river sections are proven.
 - How much passenger animation is physical simulation versus animation-driven state.
 - Whether multiplayer is in scope before the single-player guide experience is complete.

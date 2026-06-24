@@ -4,7 +4,7 @@
 
 Project Chrono is the selected external backend for long-term raft/contact/compliance experiments and possible full game raft dynamics.
 
-For moving-water modeling, the active plan now uses PyClaw as the offline Python 2.5D shallow-water reference and a custom C++ reduced shallow-water / height-field solver as the Unreal runtime water candidate. The C++ solver must be validated against PyClaw on identical generated scenarios.
+For moving-water modeling, the active plan now uses PyClaw as the offline Python 2.5D shallow-water reference and a custom C++ reduced shallow-water / height-field solver as the Unreal runtime water candidate. The C++ solver must be validated against PyClaw on identical solver-neutral scenario packages, starting with procedural fixtures and expanding to real-world geospatial river sections.
 
 The Python integration is optional. `raftsim` still runs with its pure Python backend when PyChrono is not installed, but `select_backend()` now prefers Chrono and falls back to the pure Python backend. The full game should use a native C++ Chrono integration rather than relying on PyChrono at runtime.
 

@@ -9,7 +9,7 @@ The active plan is no longer 2D-first. The 2D prototype path is retired. The pro
 - PyClaw reference model in Python.
 - Custom C++ reduced shallow-water / height-field solver for runtime use.
 
-Both solvers must run the same procedurally generated scenarios. The C++ solver is tuned and accepted by matching PyClaw reference outputs.
+Both solvers must run the same solver-neutral scenario packages, starting with procedural fixtures and expanding into real-world geospatial river sections. The C++ solver is tuned and accepted by matching PyClaw reference outputs.
 
 ## Core Decision
 
@@ -22,11 +22,13 @@ Use a staged 2.5D approach:
 3. Run the exact same scenarios through a custom C++ reduced shallow-water / height-field solver.
 4. Compare water fields, probe traces, feature metrics, raft force samples, and eventual raft outcomes.
 5. Tune the C++ model until it matches PyClaw within accepted tolerances.
-6. Use the custom C++ solver as the Unreal runtime candidate.
-7. Keep PyClaw offline for validation, regression fixtures, parameter fitting, and reference telemetry.
-8. Use Project Chrono for raft rigid/compliant dynamics, contact, and possible FSI experiments once the water-field reference/runtime split is validated.
+6. Extend scenario generation from procedural fixtures into real-world river packages built from geospatial course/elevation data, rapid annotations, seasonal flow research, and difficulty presets.
+7. Use the custom C++ solver as the Unreal runtime candidate.
+8. Keep PyClaw offline for validation, regression fixtures, parameter fitting, and reference telemetry.
+9. Use Project Chrono for raft rigid/compliant dynamics, contact, and possible FSI experiments once the water-field reference/runtime split is validated.
 
 See [2.5D Dual-Solver Simulation Plan](2.5d-simulation-plan.md) for the detailed PyClaw/C++ solver workflow.
+See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial, imagery, gauge, seasonal flow, adaptive parameter, and river-selection pipeline.
 See [Chrono And Unreal Integration Plan](chrono-unreal-integration.md) for the full game runtime path.
 See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the full game production roadmap after Python modeling, validation, and profiling.
 
@@ -76,6 +78,7 @@ This state is generated and sampled in the same way for PyClaw and the custom C+
 Every scenario must be solver-neutral:
 
 - Seed and generator version
+- Source manifest, scenario type, river id, section id, coordinate reference system, and processing version when generated from real-world data
 - Grid bounds and resolution
 - Duration and timestep policy
 - Bed elevation
@@ -84,6 +87,7 @@ Every scenario must be solver-neutral:
 - Boundary conditions and inflow/outflow definitions
 - Rocks, shelves, ledges, constrictions, and hazards
 - Authored feature metadata
+- Rapid annotations, gauge metadata, season preset, flow percentile/band, difficulty preset, and confidence scores when available
 - Raft physical parameters
 - Probe points and cross sections
 - Expected telemetry channels
@@ -180,6 +184,8 @@ Unreal production begins only after:
 - Custom C++ scenarios run.
 - Solver comparison and tuning reports pass.
 - Raft-force coupling matches on representative scenarios.
+- At least one real-world river scenario package runs through both solvers with low, median, and high runnable seasonal flow presets.
+- Adaptive fluid parameters for season/flow/difficulty are documented and validated against PyClaw reference output.
 - Profiling proves the C++ path can meet target budgets.
 
 ## Implementation Phases
@@ -224,3 +230,10 @@ Unreal production begins only after:
 - Profile PyClaw reference costs for research workflows.
 - Profile C++ runtime costs for Unreal budgets.
 - Produce readiness report before Unreal production starts.
+
+### Phase 7: Real-World Scenario Readiness
+
+- Convert one selected river section into a solver-neutral scenario package from geospatial terrain/course data, reviewed rapid annotations, and flow research.
+- Run low, median, and high runnable season/difficulty presets in PyClaw and the custom C++ solver.
+- Tune adaptive fluid parameters and raft coupling against PyClaw outputs.
+- Export source manifests, validation telemetry, and an Unreal-ready corridor package before full Unreal production starts.
