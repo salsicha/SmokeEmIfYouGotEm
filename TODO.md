@@ -16,6 +16,7 @@ See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research
 - [x] Add simple plotting for trajectories, force vectors, and raft orientation.
 - [x] Document reference papers, validation assumptions, and model limitations.
 - [x] Define the first physical accuracy targets for raft, paddle, current, and collision behavior.
+- [x] Evaluate candidate physics backends and integrate Project Chrono as the optional selected backend.
 
 ## Milestone 1: Minimal Rigid Raft Sandbox
 
@@ -81,7 +82,8 @@ See [Physics Engine Plan](docs/physics-engine-plan.md) for the detailed research
 - [ ] Evaluate Numba, JAX, and Taichi for acceleration.
 - [ ] Keep a pure Python/NumPy reference implementation for correctness.
 - [ ] Add coefficient fitting against reference trajectories.
-- [ ] Evaluate PyChrono as a reference/backend, not as the first implementation.
+- [x] Evaluate PyChrono as a reference/backend, not as the first implementation.
+- [x] Select Project Chrono as the external backend for long-term boat/water simulation.
 
 ## Milestone 8: Unreal And VR Readiness
 
