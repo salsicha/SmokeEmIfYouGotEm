@@ -36,6 +36,7 @@ Unreal owns:
 
 - First-person and VR camera
 - Input, motion controllers, haptics, and accessibility settings
+- Local speech recognition, command intent routing, crew conversation, passenger persona state, and optional local speech synthesis
 - Visual raft, water, terrain, foliage, spray, foam, lighting, weather, and post-processing
 - Audio, spatial cues, voice lines, UI, menus, scoring, replay presentation, and save data
 - Level authoring, cooked content, build automation, and platform packaging
@@ -59,6 +60,8 @@ Unreal Chaos may be used for incidental non-authoritative physics such as loose 
 - VR and flat-screen support from the start of Unreal production.
 - Single raft, single-player guide role as the first production target.
 - Scripted or AI-assisted passenger crew responding to guide commands.
+- Local AI voice interaction so the guide can speak paddle, brace, high-side, rescue, and recovery commands.
+- Crew members can talk, acknowledge commands, react to hazards, and hold conversations shaped by passenger persona, trust, fear, fatigue, skill, weather, river history, and recent run events.
 - Realistic but teachable white water behavior.
 - Data-backed river, section, season, flow level, difficulty, and raft/crew selection.
 - Training-grade feedback and replay tools.
@@ -111,10 +114,11 @@ Tasks:
 - Re-check the latest stable UE5 feature set before locking the version. As of this planning pass, Epic's public docs are on UE 5.8, so expect Nanite foliage, Nanite landscape/spline/tessellation workflows, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, Substrate/material layering, and OpenXR to be evaluated for the first slice.
 - Define target platforms for the first playable build.
 - Create coding standards for C++, Blueprint exposure, data assets, and content naming.
-- Define plugin/module boundaries: core game, Chrono bridge, water visualization, raft, river, input, UI, debug.
+- Define plugin/module boundaries: core game, Chrono bridge, water visualization, raft, river, input, UI, local AI/voice, crew AI, audio, and debug.
 - Build a small visual prototype with placeholder physics replay data, not gameplay physics.
 - Establish asset scale, coordinate conventions, units, and import/export rules.
 - Define geospatial import rules: coordinate reference systems, WGS84/local transforms, source manifests, terrain tile sizes, imagery masks, river corridor bounds, and confidence metadata.
+- Evaluate local/offline AI runtime options for target platforms: speech-to-text, constrained command parsing, crew dialogue generation/selection, optional local speech synthesis, latency, memory, CPU/GPU cost, licensing, privacy, and console feasibility.
 - Set up source control rules for large assets, generated files, and LFS.
 
 Deliverable:
@@ -145,11 +149,14 @@ Tasks:
 - Add visible hands, paddle, guide seat position, raft bow, tubes, and passenger silhouettes.
 - Implement Enhanced Input actions for keyboard/mouse, gamepad, and VR controllers.
 - Add first paddle interaction model connected to physics runtime.
-- Add guide voice/command inputs for passenger crew.
+- Add guide voice/command inputs for passenger crew using local speech recognition where available.
+- Map recognized speech into deterministic command intents: forward paddle, back paddle, left/right paddle, stop, hold on, brace, high side, rescue, swimmer callout, and recovery commands.
+- Add confidence thresholds, command repeat/confirm behavior for ambiguous recognition, subtitles, accessibility fallbacks, and manual input parity.
+- Add noisy-water and VR microphone test scenes for false-positive and latency tuning.
 
 Deliverable:
 
-- Playable first-person raft control in a simple test river.
+- Playable first-person raft control in a simple test river with manual and local voice command paths.
 
 ### Phase 4: River Visualization And Level Pipeline
 
@@ -174,10 +181,13 @@ Tasks:
 
 - Build one training section and one technical rapid.
 - Add passenger command response: forward, back, left, right, hold on, brace.
+- Add local voice-command path for the same passenger responses, with deterministic command execution after intent recognition.
+- Add crew acknowledgments, missed-command behavior, hesitation, and urgency barks based on command confidence and passenger state.
 - Add safety outcomes: fall out, swim, rescue, pin, surf, flip, flush.
 - Add scoring for safety, line, boat angle, paddle efficiency, passenger trust, and completion.
 - Add restart, replay, ghost telemetry, and after-action feedback.
 - Add basic menus and settings.
+- Add microphone, push-to-talk/open-mic, subtitles, command confirmation, voice sensitivity, privacy/offline, and fallback-control settings.
 - Add river, section, season, flow, difficulty, and raft/crew selection backed by validated data assets.
 
 Deliverable:
@@ -208,6 +218,9 @@ Tasks:
 - Add difficulty progression.
 - Add more raft types and handling profiles.
 - Add passenger archetypes and crew trust progression.
+- Add AI-assisted crew conversations for calm water, eddies, scouting, recovery pools, run starts, run finishes, swims, rescues, and post-rapid debriefs.
+- Add passenger persona data, relationship memory, river knowledge, skill/fear/fatigue state, and conversation pacing rules.
+- Add conversation guardrails so active-rapid dialogue stays short, command acknowledgments take priority, and generated chatter never blocks safety-critical audio.
 - Add challenge variants and generated rapid support if validated.
 - Expand weather, water levels, rescue scenarios, and training lessons.
 
@@ -220,7 +233,9 @@ Deliverable:
 Tasks:
 
 - Profile CPU physics, render thread, game thread, GPU water, particles, shadows, and asset streaming.
+- Profile local AI inference, speech recognition latency, audio capture cost, local speech synthesis, memory footprint, and model loading.
 - Add platform-specific runtime modes for full Chrono, reduced Chrono, replay/debug, and lower-cost visual water.
+- Add platform-specific AI modes: full local conversation, command-only local voice, authored/recorded crew barks, text/manual command fallback, and disabled voice input.
 - Build scalability tiers for desktop, VR, and handheld targets.
 - Add automation for builds, smoke tests, content validation, and telemetry replay checks.
 - Add crash reporting and performance capture tooling.
@@ -256,6 +271,8 @@ Recommended modules/plugins:
 - `RaftsimGeo`: optional geospatial import/conversion tooling for source manifests, coordinate transforms, terrain/corridor packages, imagery masks, and rapid annotations.
 - `RaftsimRaft`: raft actor, passenger attachment points, animation hooks, damage/safety state.
 - `RaftsimInput`: flat-screen, gamepad, VR controller, paddle, command, and accessibility mappings.
+- `RaftsimVoice`: microphone capture, local speech recognition integration, command grammar, intent confidence, push-to-talk/open-mic modes, subtitles, and fallback routing.
+- `RaftsimCrewAI`: passenger persona state, command interpretation, conversation state, crew memory, local dialogue generation/selection, and safety-critical dialogue priority.
 - `RaftsimUI`: menus, HUD, replay, scoring, training feedback.
 - `RaftsimDebug`: force vectors, current fields, contacts, profiling views, replay inspectors.
 
@@ -270,6 +287,8 @@ Use Unreal data assets for game-facing tuning while keeping source-of-truth expo
 - Raft physical parameters
 - Paddle stroke parameters
 - Passenger archetypes
+- Voice command grammar, synonyms, confidence thresholds, locale/accent settings, and fallback command mappings
+- Crew persona definitions, conversation policies, trust/fear/fatigue/skill tuning, relationship memory rules, and dialogue style profiles
 - Scoring rules
 - Camera/comfort profiles
 - Platform scalability profiles
@@ -284,6 +303,9 @@ Replay data should include:
 - Raft pose and velocities
 - Paddle inputs
 - Passenger commands
+- Recognized speech text or redacted transcript policy
+- Voice command intent, confidence, latency, fallback path, and crew acknowledgment
+- Crew conversation state, generated/selected line id, passenger speaker, and gameplay event trigger
 - Force contributions
 - Contact points
 - River sample values
@@ -310,7 +332,28 @@ Audio should carry physical state:
 - Water grows louder near holes, drops, and rocks.
 - Paddle catch, blade slip, raft flex, tube scrape, and rock bump are distinct.
 - Passengers call useful state changes, not constant noise.
+- Guide voice commands should receive clear local feedback through crew acknowledgments, subtitles, and command-state indicators.
+- Crew conversations should feel natural in calmer moments and compress into short barks during rapids.
+- Privacy-sensitive voice capture should default to local processing and clearly expose microphone settings.
 - VR spatial audio should help locate hazards, swimmers, and crew problems.
+
+## Local AI Direction
+
+The full UE5 version should support local AI integration without making cloud services mandatory for core play.
+
+Responsibilities:
+
+- Local speech-to-text for guide commands where the platform budget allows.
+- Constrained command intent parsing that maps spoken language to explicit crew commands before gameplay state changes.
+- Passenger conversation generation or selection grounded in authored persona, trust, fear, fatigue, skill, river, season, recent events, and current danger level.
+- Optional local text-to-speech or hybrid recorded/generative voice playback after voice quality, licensing, latency, and platform costs are understood.
+
+Rules:
+
+- Gameplay-critical paddle, brace, high-side, rescue, and recovery commands must remain deterministic after recognition.
+- The player must always have manual input parity for every voice command.
+- Conversation should never override urgent river audio, command acknowledgments, safety cues, or VR comfort.
+- Replays should capture enough voice/intent/conversation telemetry to explain outcomes without requiring raw microphone audio.
 
 ## Performance Budgets
 
@@ -322,6 +365,7 @@ Initial targets to define during Phase 1:
 - Game thread budget.
 - Render thread budget.
 - GPU budget for water, spray, lighting, and shadows.
+- Local AI inference, speech recognition, audio capture, and optional speech synthesis budgets.
 - VR frametime budget by headset class.
 - Memory and streaming budgets per platform.
 
@@ -336,6 +380,8 @@ The first Unreal vertical slice is successful when:
 - Unreal can replay the scenario with matching raft path and debug telemetry.
 - Native runtime can run the same scenario with comparable qualitative outcome.
 - Player can guide from stern first-person view in flat-screen and VR.
+- Player can issue at least the core crew commands through manual input and local voice input, with visible confidence/fallback behavior.
+- Crew can acknowledge commands and produce state-aware barks or short conversations without disrupting gameplay-critical audio.
 - Water visuals communicate the same hazards represented in the physics data.
 - Force/contact/debug telemetry is visible in-engine.
 - The section can be completed, failed, restarted, replayed, and scored.
@@ -351,4 +397,7 @@ The first Unreal vertical slice is successful when:
 - Which platforms are first-class at alpha.
 - Whether generated rivers become a shipping feature or remain internal content tooling after real-world river sections are proven.
 - How much passenger animation is physical simulation versus animation-driven state.
+- Which local AI runtime powers speech recognition, command intent parsing, crew conversation, and optional speech synthesis per platform.
+- Whether crew conversation uses generated local dialogue, authored lines, recorded barks, or a hybrid.
+- What voice-command latency, confidence, false-positive, privacy, and replay-capture requirements are acceptable.
 - Whether multiplayer is in scope before the single-player guide experience is complete.

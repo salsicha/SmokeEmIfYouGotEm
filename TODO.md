@@ -15,7 +15,7 @@ The old 2D river/raft path is retired. Future physics work starts with:
 See [Physics Engine Plan](docs/physics-engine-plan.md) for the overall physics architecture.
 See [2.5D Dual-Solver Simulation Plan](docs/2.5d-simulation-plan.md) for the PyClaw/C++ validation workflow.
 See [Real-World River Content And Seasonal Flow Plan](docs/real-world-river-content-plan.md) for geospatial extraction, rapid identification, seasonal flow research, adaptive parameters, and the future river/season/difficulty picker.
-See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full game roadmap after Python modeling and profiling are complete.
+See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full game roadmap after Python modeling and profiling are complete, including local AI voice commands and crew conversation systems.
 
 ## Milestone 0: Python Physics Research Foundation
 
@@ -173,6 +173,11 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [ ] Set up Enhanced Input actions for VR controllers, keyboard, mouse, and gamepad.
 - [ ] Build the first-person guide camera with flat-screen and VR comfort options.
 - [ ] Build river, season, flow, difficulty, and raft/crew selection UI from validated data assets.
+- [ ] Add local/offline AI integration layer for speech recognition, command intent parsing, crew dialogue, and optional local speech synthesis.
+- [ ] Implement guide voice commands that map spoken instructions into deterministic crew intents: forward paddle, back paddle, left/right paddle, stop, brace, hold on, high side, rescue, and recovery commands.
+- [ ] Add confidence thresholds, push-to-talk/open-mic settings, noisy-river audio tests, subtitles, accessibility fallbacks, and manual input parity for all voice commands.
+- [ ] Add AI-assisted crew conversation with passenger personas, trust, fear, fatigue, skill, river knowledge, and scenario state, while keeping gameplay-critical paddling under explicit command-state control.
+- [ ] Add telemetry for recognized phrase, intent, confidence, command latency, crew response, conversation state, and command outcome.
 - [ ] Build the first rapid vertical slice with training, scoring, restart, replay, and debug force visualization.
 
 ## Technical Notes To Revisit
@@ -186,6 +191,9 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [ ] Identify reference footage, river data, aerial/satellite imagery, flow history, and expert guide feedback needed for validation.
 - [ ] Decide which geospatial formats become canonical for source data, generated scenarios, and Unreal corridor packages.
 - [ ] Re-check latest UE5 rendering/geospatial plugin capabilities at the Python-to-Unreal readiness gate.
+- [ ] Decide local AI model/runtime strategy for desktop, VR, handheld, and future console targets.
+- [ ] Decide how much crew dialogue is generated locally versus authored as recorded barks, constrained templates, or designer-approved lines.
+- [ ] Decide latency, privacy, profanity/safety, save-data, and deterministic replay requirements for voice and conversation systems.
 - [ ] Investigate multiplayer feasibility only after the single-player guide experience feels good.
 
 ## Immediate Next Steps
