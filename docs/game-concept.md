@@ -38,6 +38,7 @@ The first physics engine slice should simulate:
 
 See [Physics Engine Plan](physics-engine-plan.md) for the detailed implementation strategy.
 See [Procedural 2D River Generation Plan](2d-river-generation-plan.md) for the river generator and boat interaction effects.
+See [2.5D Raft Simulation Plan](2.5d-simulation-plan.md) for the height-field and buoyancy bridge from Python modeling to full 3D.
 
 ## Full Engine Physics Runtime
 
@@ -46,6 +47,7 @@ Project Chrono is the planned authoritative physics runtime for the full Unreal 
 Unreal should own rendering, VR input, audio, UI, asset streaming, and platform packaging. Chrono should own the physical raft state and expose transforms, contacts, force telemetry, and debug vectors back to Unreal.
 
 See [Chrono And Unreal Integration Plan](chrono-unreal-integration.md) for the runtime architecture.
+See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the production roadmap that begins after Python modeling, validation, and profiling are complete.
 
 ## Target Platforms
 
@@ -240,6 +242,8 @@ Audio direction:
 - Spatial audio for VR so current, impacts, passengers, and rescue cues are locatable
 
 ## Unreal Engine Direction
+
+The real Unreal Engine game project should start after the Python modeling and profiling gate is passed. Before then, Unreal work should be limited to disposable visual studies, reference scenes, material experiments, or telemetry playback prototypes that do not define the production architecture.
 
 Recommended starting approach:
 
