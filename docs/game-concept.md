@@ -42,6 +42,7 @@ The first active physics slice should build:
 See [Physics Engine Plan](physics-engine-plan.md) for the detailed implementation strategy.
 See [2.5D Dual-Solver Simulation Plan](2.5d-simulation-plan.md) for the PyClaw/C++ validation workflow.
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the real river, geospatial, imagery, season, flow, difficulty, and Unreal photoreal content pipeline.
+See [Audio Asset Sourcing Plan](audio-asset-sourcing-plan.md) for the production sound-source policy.
 
 ## Full Engine Physics Runtime
 
@@ -258,6 +259,9 @@ Audio direction:
 - Passenger reactions and conversations that communicate risk, morale, trust, fatigue, and personality without becoming noise
 - Local speech recognition for guide commands with clear acknowledgments, misrecognition handling, and subtitle feedback
 - Spatial audio for VR so current, impacts, passengers, and rescue cues are locatable
+- Production audio should be built primarily from professionally recorded/downloaded libraries and custom field recordings.
+- AI-generated audio can support prototyping, ideation, temp dialogue, and non-critical variations, but it should not be the primary source for realistic white water, raft contact, paddle, rock, voice performance, or shipping music without explicit legal/audio approval.
+- Every imported or generated sound should carry source, license, attribution, processing, and approval metadata.
 
 ## Unreal Engine Direction
 
@@ -273,6 +277,7 @@ Recommended starting approach:
 - OpenXR-based VR support with flat-screen input parity
 - Enhanced Input for VR controllers, keyboard, mouse, and gamepad
 - Local AI integration for voice commands, crew dialogue, passenger persona state, optional local speech synthesis, and privacy-preserving offline play
+- Unreal-native audio and MetaSounds first for interactive water/raft/crew sound; evaluate Wwise/FMOD only if production needs outgrow the native toolchain
 - Common UI or a similarly portable UI approach for multi-platform menus
 - World Partition for long real-world river corridors once the content scope requires streaming
 - Data assets for river sections, source manifests, gauges, seasons, flow levels, difficulty presets, hazards, raft tuning, water tuning, paddle forces, and scoring rules
@@ -287,6 +292,7 @@ Prototype scenario:
 - One 6-DoF raft coupling test against both water outputs
 - One telemetry output showing water fields, solver error, hull forces, paddle forces, and contact components
 - One real-world river section scenario with source manifest, extracted terrain/course, rapid annotations, seasonal flow presets, and low/median/high runnable flow validation
+- One audio source manifest and interactive water-audio prototype driven by solver telemetry
 - Later Unreal visualization, VR input, local voice commands, AI crew dialogue, scoring, restart, first-person look controls, and VR recenter controls
 
 ## Open Questions
@@ -302,6 +308,9 @@ Prototype scenario:
 - Which local AI runtime should power speech recognition, command parsing, crew conversation, and optional speech synthesis on each target platform?
 - How strict should voice-command confidence be before the crew acts, especially in loud water and VR microphone conditions?
 - How much crew conversation should be generated locally versus authored, recorded, or template-driven?
+- Which professional audio libraries and field-recording sessions form the first shipping sound bed?
+- Which AI-generated audio use cases, if any, are allowed beyond temporary prototypes?
+- Is Unreal-native audio/MetaSounds enough for full production, or does the project need Wwise/FMOD?
 - Should flat-screen raft control be direct, command-based, or a hybrid while VR remains physical?
 - How much should the first-person camera prioritize downstream planning versus close physical impact?
 - Should there be any optional third-person or scout camera, or should the simulator stay fully committed to the guide's viewpoint?
