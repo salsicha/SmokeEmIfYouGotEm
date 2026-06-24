@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "raftsim"
+version = "0.1.0"
+description = "Headless physics foundation for a white water rafting simulator."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "SmokeEmIfYouGotEm contributors" }
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8"
+]
+plot = [
+  "matplotlib>=3.8"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
