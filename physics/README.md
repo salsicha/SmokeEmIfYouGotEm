@@ -40,8 +40,8 @@ physics/
 - Solver-neutral 2.5D scenario package schema
 - Deterministic 2.5D fixture generator for flat pool, uniform channel, dam-break, bed step, constriction, and wet/dry shoreline cases
 - Deterministic 2.5D procedural rapid generator with bends, width/depth variation, dry banks, flow vectors, and whitewater feature metadata
-- Planned PyClaw 2.5D reference model
-- Planned custom C++ reduced shallow-water / height-field runtime solver
+- PyClaw 2.5D reference model
+- Standalone custom C++ reduced shallow-water / height-field runtime solver
 - Planned dual-solver comparison and tuning harness
 - Planned real-world river scenario packages with source manifests, course/elevation extraction, rapid annotations, seasonal flow presets, and difficulty-adaptive parameters
 
@@ -122,7 +122,7 @@ depth.png
 speed.png
 ```
 
-`scenario.json` is the shared manifest. PyClaw and the future custom C++ solver should both load this same package.
+`scenario.json` is the shared manifest. PyClaw and the custom C++ solver both load this same package.
 
 ## PyClaw Reference Harness
 
@@ -173,6 +173,54 @@ cross_sections/*.npz
 
 Each frame exports `h`, `eta`, `u`, `v`, `hu`, `hv`, `wet`, `normal_x`, `normal_y`, `normal_z`, and `froude`. The first harness uses PyClaw's shallow-water equations with the bed retained for exported `eta` and diagnostics; richer bathymetry source-term handling remains a follow-up once the PyClaw/C++ comparison path is active.
 
+## C++ Reduced Water Solver
+
+Milestone 3 adds a standalone C++17 solver outside Unreal under `physics/cpp/`. It is intentionally small and dependency-light: CMake builds a reusable `raftsim_water` library, a `raftsim_water_solver` command, and a native smoke-test executable. The solver loads the same shared 2.5D scenario package as PyClaw, advances deterministic fixed steps, tracks `h`, `eta`, `u`, `v`, `hu`, `hv`, wet/dry masks, and exports comparison-ready fields, probes, cross sections, and validation telemetry.
+
+Build it with:
+
+```bash
+cd physics
+cmake -S cpp -B /tmp/raftsim-water-build
+cmake --build /tmp/raftsim-water-build
+```
+
+Generate a shared scenario package:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.generate_scenario2_5d --mode procedural --seed 1 --difficulty 0.6
+```
+
+Run the C++ solver on that package:
+
+```bash
+cd physics
+/tmp/raftsim-water-build/raftsim_water_solver \
+  --scenario outputs/scenarios2_5d/procedural_rapid_seed_1 \
+  --output outputs/cpp_solver \
+  --steps 120 \
+  --frame-interval 30
+```
+
+C++ outputs are written under `outputs/cpp_solver/<scenario_id>/`:
+
+```text
+manifest.json
+validation.json
+frames/frame_0000.csv
+probes/*.csv
+cross_sections/*.csv
+```
+
+Run the native smoke test directly with:
+
+```bash
+/tmp/raftsim-water-build/raftsim_water_tests outputs/scenarios2_5d/procedural_rapid_seed_1
+```
+
+The pytest suite also builds the C++ solver against a tiny generated procedural package when CMake and a compiler are available.
+
 ## Next Milestone
 
-The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): add the custom C++ solver skeleton, build the first PyClaw-vs-C++ comparison report, and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
+The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.

@@ -60,16 +60,16 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 
 ## Milestone 3: Custom C++ Reduced Shallow-Water / Height-Field Solver
 
-- [ ] Create a standalone C++ solver library/executable outside Unreal.
-- [ ] Load the same shared 2.5D scenario package used by PyClaw.
-- [ ] Implement deterministic fixed-step stepping.
-- [ ] Implement reduced shallow-water / height-field state for `h`, `eta`, `u`, `v`, `hu`, `hv`, and wet/dry masks.
-- [ ] Implement bed slope, roughness/friction, and boundary source terms.
-- [ ] Implement stable wet/dry handling.
-- [ ] Implement authored feature forcing for holes, laterals, boils, wave trains, ledges, and shallows.
-- [ ] Export the same field, probe, cross-section, and telemetry channels as PyClaw.
-- [ ] Add C++ unit tests and fixture regression tests.
-- [ ] Add a command that runs one shared scenario and writes comparison-ready output.
+- [x] Create a standalone C++ solver library/executable outside Unreal.
+- [x] Load the same shared 2.5D scenario package used by PyClaw.
+- [x] Implement deterministic fixed-step stepping.
+- [x] Implement reduced shallow-water / height-field state for `h`, `eta`, `u`, `v`, `hu`, `hv`, and wet/dry masks.
+- [x] Implement bed slope, roughness/friction, and boundary source terms.
+- [x] Implement stable wet/dry handling.
+- [x] Implement authored feature forcing for holes, laterals, boils, wave trains, ledges, and shallows.
+- [x] Export the same field, probe, cross-section, and telemetry channels as PyClaw.
+- [x] Add C++ unit tests and fixture regression tests.
+- [x] Add a command that runs one shared scenario and writes comparison-ready output.
 
 ## Milestone 4: Dual-Solver Comparison And Tuning Harness
 
@@ -245,7 +245,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Add fixture scenario generation for flat pool, channel flow, dam-break/bore, bed step, constriction, and wet/dry shoreline.
 - [x] Add deterministic procedural 2.5D rafting scenario generation from seed.
 - [x] Add a PyClaw availability check and first reference runner.
-- [ ] Add a C++ solver directory and build skeleton.
+- [x] Add a C++ solver directory and build skeleton.
 - [ ] Add the first PyClaw-vs-C++ comparison report format.
 - [ ] Draft the first candidate river inventory and source manifest.
 - [ ] Prototype course/elevation extraction for one river section.
