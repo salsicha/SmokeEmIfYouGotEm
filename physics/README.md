@@ -124,6 +124,55 @@ speed.png
 
 `scenario.json` is the shared manifest. PyClaw and the future custom C++ solver should both load this same package.
 
+## PyClaw Reference Harness
+
+PyClaw is an optional research dependency. Install it with:
+
+```bash
+cd physics
+python -m pip install -e ".[research,plot]"
+```
+
+Check whether the local environment can import PyClaw:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.run_pyclaw_reference --check
+```
+
+Run one canonical fixture:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.run_pyclaw_reference --fixture flat_pool
+```
+
+Run all canonical fixtures plus one procedural rapid:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.run_pyclaw_reference --all-fixtures
+```
+
+Run a procedural rapid:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.run_pyclaw_reference --procedural --seed 1 --difficulty 0.6
+```
+
+PyClaw outputs are written under `outputs/pyclaw_reference/<scenario_id>/`:
+
+```text
+manifest.json
+validation.json
+frames/frame_0000.npz
+probes/*.csv
+cross_sections/*.npz
+```
+
+Each frame exports `h`, `eta`, `u`, `v`, `hu`, `hv`, `wet`, `normal_x`, `normal_y`, `normal_z`, and `froude`. The first harness uses PyClaw's shallow-water equations with the bed retained for exported `eta` and diagnostics; richer bathymetry source-term handling remains a follow-up once the PyClaw/C++ comparison path is active.
+
 ## Next Milestone
 
-The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): add a PyClaw availability check and first reference runner, add the custom C++ solver skeleton, and build the first PyClaw-vs-C++ comparison report. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
+The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): add the custom C++ solver skeleton, build the first PyClaw-vs-C++ comparison report, and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
