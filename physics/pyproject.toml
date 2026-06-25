@@ -22,6 +22,9 @@ dev = [
 plot = [
   "matplotlib>=3.8"
 ]
+research = [
+  "clawpack>=5.10",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

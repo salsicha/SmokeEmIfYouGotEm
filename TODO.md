@@ -48,15 +48,15 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 
 ## Milestone 2: PyClaw 2.5D Reference Solver
 
-- [ ] Add PyClaw as an optional research dependency.
-- [ ] Add an environment/setup check for PyClaw availability.
-- [ ] Implement a PyClaw scenario loader for the shared 2.5D scenario package.
-- [ ] Run canonical shallow-water fixtures: flat pool, uniform channel, dam-break/bore, bed step, constriction, and wet/dry shoreline.
-- [ ] Export PyClaw frames for `h`, `eta`, `u`, `v`, `hu`, `hv`, wet/dry masks, surface normals, and Froude number.
-- [ ] Export probe time series and cross sections.
-- [ ] Validate mass conservation and bounded velocities.
-- [ ] Add SWASHES-style analytic validation cases where practical.
-- [ ] Run the first procedurally generated rafting scenario in PyClaw.
+- [x] Add PyClaw as an optional research dependency.
+- [x] Add an environment/setup check for PyClaw availability.
+- [x] Implement a PyClaw scenario loader for the shared 2.5D scenario package.
+- [x] Run canonical shallow-water fixtures: flat pool, uniform channel, dam-break/bore, bed step, constriction, and wet/dry shoreline.
+- [x] Export PyClaw frames for `h`, `eta`, `u`, `v`, `hu`, `hv`, wet/dry masks, surface normals, and Froude number.
+- [x] Export probe time series and cross sections.
+- [x] Validate mass conservation and bounded velocities.
+- [x] Add SWASHES-style analytic validation cases where practical.
+- [x] Run the first procedurally generated rafting scenario in PyClaw.
 
 ## Milestone 3: Custom C++ Reduced Shallow-Water / Height-Field Solver
 
@@ -244,7 +244,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Define the shared 2.5D scenario schema.
 - [x] Add fixture scenario generation for flat pool, channel flow, dam-break/bore, bed step, constriction, and wet/dry shoreline.
 - [x] Add deterministic procedural 2.5D rafting scenario generation from seed.
-- [ ] Add a PyClaw availability check and first reference runner.
+- [x] Add a PyClaw availability check and first reference runner.
 - [ ] Add a C++ solver directory and build skeleton.
 - [ ] Add the first PyClaw-vs-C++ comparison report format.
 - [ ] Draft the first candidate river inventory and source manifest.
