@@ -4,6 +4,7 @@ import pytest
 
 from raftsim.math3d import Quaternion, Vec3
 from raftsim.raft_coupling2_5d import (
+    PaddleBladePose2_5D,
     RaftSamplePatch,
     RaftState6DoF,
     WaterField2_5D,
@@ -11,6 +12,7 @@ from raftsim.raft_coupling2_5d import (
     sample_buoyancy_forces,
     sample_grounding_forces,
     sample_hydrodynamic_forces,
+    sample_paddle_blade,
     sum_force_contributions,
 )
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, RaftParameters2_5D, generate_fixture_scenario2_5d
@@ -132,3 +134,18 @@ def test_grounding_forces_push_up_and_apply_friction():
     assert total_force.z > 0.0
     assert total_force.x < 0.0
     assert any("ledge" in contribution.metadata["feature_tags"] for contribution in contributions)
+
+
+def test_paddle_blade_sample_reports_depth_and_relative_velocity():
+    scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="uniform_channel", nx=12, ny=8))
+    water = WaterField2_5D.from_scenario_initial_state(scenario)
+    state = RaftState6DoF(position=Vec3(5.0, 0.0, 1.0), linear_velocity=Vec3(1.0, 0.0, 0.0))
+    blade = PaddleBladePose2_5D(local_position=Vec3(0.0, 0.8, -0.6), local_velocity=Vec3(-1.0, 0.0, -0.5))
+
+    sample = sample_paddle_blade(state, blade, water)
+
+    assert sample.submerged is True
+    assert sample.depth > 0.0
+    assert sample.water_velocity.x > 0.0
+    assert sample.relative_velocity.z < 0.0
+    assert sample.blade_velocity.x == pytest.approx(0.0)

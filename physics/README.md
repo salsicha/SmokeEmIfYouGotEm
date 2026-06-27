@@ -340,6 +340,8 @@ The state tracks position, orientation quaternion, linear velocity, and angular 
 
 `sample_grounding_forces()` adds bed, rock, ledge, shallow, and strainer contact channels with normal force, damping, and friction.
 
+`PaddleBladePose2_5D` and `sample_paddle_blade()` report blade world pose, submerged depth, local water velocity, blade velocity, and blade-water relative velocity for future paddle force models.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
