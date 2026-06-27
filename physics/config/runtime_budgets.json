@@ -1,0 +1,33 @@
+{
+  "schema_version": "raftsim.runtime_budgets.v0",
+  "profiles": {
+    "desktop": {
+      "render_target_hz": 60,
+      "physics_tick_hz": 120,
+      "total_physics_ms": 4.0,
+      "water_solver_ms": 2.4,
+      "raft_coupling_ms": 0.8,
+      "probe_telemetry_ms": 0.4,
+      "max_runtime_multiplier": 2.0
+    },
+    "vr": {
+      "render_target_hz": 90,
+      "physics_tick_hz": 120,
+      "total_physics_ms": 3.0,
+      "water_solver_ms": 1.6,
+      "raft_coupling_ms": 0.6,
+      "probe_telemetry_ms": 0.25,
+      "max_runtime_multiplier": 1.5
+    },
+    "handheld": {
+      "render_target_hz": 60,
+      "physics_tick_hz": 60,
+      "total_physics_ms": 5.0,
+      "water_solver_ms": 2.8,
+      "raft_coupling_ms": 0.9,
+      "probe_telemetry_ms": 0.4,
+      "max_runtime_multiplier": 2.0
+    }
+  },
+  "readiness_rule": "At least one desktop-passing C++ reduced solver and raft-coupling configuration is required before Unreal production begins; VR and handheld misses must be measured and documented."
+}
