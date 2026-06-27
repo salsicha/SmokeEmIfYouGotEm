@@ -123,7 +123,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 
 - [x] Decide which raft dynamics run in custom C++ versus Project Chrono.
 - [x] Create a standalone native C++ Chrono smoke test outside Unreal.
-- [ ] Couple Chrono raft/contact dynamics to the custom C++ water field.
+- [x] Couple Chrono raft/contact dynamics to the custom C++ water field.
 - [ ] Compare native Chrono/custom-water telemetry against Python/PyClaw reference scenarios.
 - [ ] Keep Chrono::FSI as an optional experiment/reference path, not the baseline runtime dependency.
 - [ ] Preserve the custom C++ reduced water solver as the primary Unreal runtime candidate.

@@ -10,6 +10,7 @@ find_package(ZLIB REQUIRED)
 find_package(Chrono QUIET)
 
 add_library(raftsim_water
+  src/chrono_coupling.cpp
   src/json.cpp
   src/numpy_io.cpp
   src/scenario.cpp
