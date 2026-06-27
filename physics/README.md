@@ -358,6 +358,8 @@ Milestone 7 starts with solver profilers that record runtime, seconds per simula
 
 `python -m raftsim.examples.sweep_parameters --fixture uniform_channel --scale-values 0.75,1.0,1.25` writes one-at-a-time parameter sweep reports for roughness, feature forcing, raft drag, buoyancy density, grounding friction, contact stiffness, and contact damping.
 
+`python -m raftsim.examples.fit_parameters --cpp-solver build/raftsim_water_solver --fixture flat_pool --scale-values 0.85,1.0,1.15` runs combined fitting: each candidate is scored against PyClaw water-field thresholds and raft-force envelope agreement sampled from PyClaw and C++ water outputs.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
