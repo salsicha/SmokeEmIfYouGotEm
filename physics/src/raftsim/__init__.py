@@ -91,7 +91,14 @@ from .tuning import (
     tune_cpp_solver_against_pyclaw,
 )
 from .regression import RegressionPromotionResult, promote_passing_dual_solver_run
-from .profiling import ProfiledSolverRun, SolverProfileReport, profile_cpp_solver_runs, profile_pyclaw_reference_runs
+from .profiling import (
+    ProfiledSolverRun,
+    SolverProfileReport,
+    profile_cpp_solver_runs,
+    profile_probe_export_runs,
+    profile_pyclaw_reference_runs,
+    profile_raft_coupling_runs,
+)
 from .raft_coupling2_5d import (
     PaddleBladePose2_5D,
     PaddleBladeSample2_5D,
@@ -259,7 +266,9 @@ __all__ = [
     "read_scenario2_5d_package",
     "promote_passing_dual_solver_run",
     "profile_cpp_solver_runs",
+    "profile_probe_export_runs",
     "profile_pyclaw_reference_runs",
+    "profile_raft_coupling_runs",
     "run_cpp_solver_scenario",
     "run_dual_solver_scenario",
     "run_pyclaw_reference",
