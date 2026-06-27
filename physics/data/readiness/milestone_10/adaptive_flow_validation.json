@@ -1,0 +1,52 @@
+{
+  "checks": {
+    "eddy_line_shear_monotonic": true,
+    "inflow_monotonic": true,
+    "wave_train_strength_monotonic": true
+  },
+  "flow_presets": [
+    {
+      "boundary_inflow_m3s": 25.4851619328,
+      "confidence_score": 0.3,
+      "difficulty": "beginner",
+      "downstream_velocity_mps": 0.7844531826162163,
+      "eddy_line_shear": 0.27674999999999994,
+      "flow_band": "low_runnable",
+      "hole_retention_strength": 0.2536875,
+      "initial_depth_m": 1.1099999999999999,
+      "roughness_manning_n": 0.0379375,
+      "season": "late_summer_low_water",
+      "wave_train_strength": 0.4304999999999999
+    },
+    {
+      "boundary_inflow_m3s": 45.3069545472,
+      "confidence_score": 0.35,
+      "difficulty": "intermediate",
+      "downstream_velocity_mps": 1.5224111070967743,
+      "eddy_line_shear": 0.6,
+      "flow_band": "median_runnable",
+      "hole_retention_strength": 0.55,
+      "initial_depth_m": 1.24,
+      "roughness_manning_n": 0.041,
+      "season": "summer_commercial",
+      "wave_train_strength": 0.7
+    },
+    {
+      "boundary_inflow_m3s": 84.950539776,
+      "confidence_score": 0.25,
+      "difficulty": "advanced",
+      "downstream_velocity_mps": 2.916634201389386,
+      "eddy_line_shear": 1.3275,
+      "flow_band": "high_runnable",
+      "hole_retention_strength": 1.216875,
+      "initial_depth_m": 1.4320393247567158,
+      "roughness_manning_n": 0.045200000000000004,
+      "season": "spring_runoff_or_release",
+      "wave_train_strength": 1.1310470812481679
+    }
+  ],
+  "passed": true,
+  "river_id": "american_south_fork",
+  "section_id": "chili_bar_to_coloma",
+  "validation_version": "raftsim.adaptive_flow_validation.v0"
+}

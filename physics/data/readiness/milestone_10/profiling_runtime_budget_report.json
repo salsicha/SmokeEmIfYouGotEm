@@ -1,0 +1,365 @@
+{
+  "runs": [
+    {
+      "cell_seconds_per_simulated_second": 0.00038506361306644976,
+      "grid_cells": 288,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 14,
+        "last_force_magnitude": 18786.58038432,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.0055449160281568766,
+      "scenario_id": "flat_pool_seed_100",
+      "seconds_per_simulated_second": 0.11089832056313753,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.00039430846097982593,
+      "grid_cells": 288,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 28,
+        "last_force_magnitude": 20679.068991769152,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.005678041838109493,
+      "scenario_id": "uniform_channel_seed_101",
+      "seconds_per_simulated_second": 0.11356083676218987,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.0003956105663544602,
+      "grid_cells": 288,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 28,
+        "last_force_magnitude": 20354.493107888164,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.005696792155504227,
+      "scenario_id": "bed_step_seed_102",
+      "seconds_per_simulated_second": 0.11393584311008453,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.00020788773933115104,
+      "grid_cells": 576,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 28,
+        "last_force_magnitude": 221738.82806296574,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.00598716689273715,
+      "scenario_id": "procedural_rapid_seed_103",
+      "seconds_per_simulated_second": 0.119743337854743,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.0002289437088620616,
+      "grid_cells": 512,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 28,
+        "last_force_magnitude": 19038.980553296497,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.005860958946868777,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner",
+      "seconds_per_simulated_second": 0.11721917893737555,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.0002299235165992286,
+      "grid_cells": 512,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 28,
+        "last_force_magnitude": 20778.919777677904,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.005886042024940252,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate",
+      "seconds_per_simulated_second": 0.11772084049880505,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.00022895347683515865,
+      "grid_cells": 512,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 28,
+        "last_force_magnitude": 33540.871777607936,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.0058612090069800615,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced",
+      "seconds_per_simulated_second": 0.11722418013960123,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 8.575812292595704e-05,
+      "grid_cells": 288,
+      "output_frames": 1,
+      "repetition": 0,
+      "run_status": {
+        "cross_section_count": 1,
+        "output_dir": "not committed; regenerate during validation work",
+        "probe_count": 3
+      },
+      "runtime_seconds": 0.0012349169701337814,
+      "scenario_id": "flat_pool_seed_100",
+      "seconds_per_simulated_second": 0.02469833940267563,
+      "simulated_seconds": 0.05,
+      "solver": "probe_export",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 8.0627861380991e-05,
+      "grid_cells": 288,
+      "output_frames": 1,
+      "repetition": 0,
+      "run_status": {
+        "cross_section_count": 1,
+        "output_dir": "not committed; regenerate during validation work",
+        "probe_count": 3
+      },
+      "runtime_seconds": 0.0011610412038862705,
+      "scenario_id": "uniform_channel_seed_101",
+      "seconds_per_simulated_second": 0.02322082407772541,
+      "simulated_seconds": 0.05,
+      "solver": "probe_export",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 7.67563081656893e-05,
+      "grid_cells": 288,
+      "output_frames": 1,
+      "repetition": 0,
+      "run_status": {
+        "cross_section_count": 1,
+        "output_dir": "not committed; regenerate during validation work",
+        "probe_count": 3
+      },
+      "runtime_seconds": 0.001105290837585926,
+      "scenario_id": "bed_step_seed_102",
+      "seconds_per_simulated_second": 0.02210581675171852,
+      "simulated_seconds": 0.05,
+      "solver": "probe_export",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 9.072194289829995e-05,
+      "grid_cells": 576,
+      "output_frames": 1,
+      "repetition": 0,
+      "run_status": {
+        "cross_section_count": 1,
+        "output_dir": "not committed; regenerate during validation work",
+        "probe_count": 9
+      },
+      "runtime_seconds": 0.002612791955471039,
+      "scenario_id": "procedural_rapid_seed_103",
+      "seconds_per_simulated_second": 0.052255839109420776,
+      "simulated_seconds": 0.05,
+      "solver": "probe_export",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 8.651203643239569e-05,
+      "grid_cells": 512,
+      "output_frames": 1,
+      "repetition": 0,
+      "run_status": {
+        "cross_section_count": 1,
+        "output_dir": "not committed; regenerate during validation work",
+        "probe_count": 7
+      },
+      "runtime_seconds": 0.0022147081326693296,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner",
+      "seconds_per_simulated_second": 0.04429416265338659,
+      "simulated_seconds": 0.05,
+      "solver": "probe_export",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 8.512371096003335e-05,
+      "grid_cells": 512,
+      "output_frames": 1,
+      "repetition": 0,
+      "run_status": {
+        "cross_section_count": 1,
+        "output_dir": "not committed; regenerate during validation work",
+        "probe_count": 7
+      },
+      "runtime_seconds": 0.0021791670005768538,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate",
+      "seconds_per_simulated_second": 0.043583340011537075,
+      "simulated_seconds": 0.05,
+      "solver": "probe_export",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 8.71582051331643e-05,
+      "grid_cells": 512,
+      "output_frames": 1,
+      "repetition": 0,
+      "run_status": {
+        "cross_section_count": 1,
+        "output_dir": "not committed; regenerate during validation work",
+        "probe_count": 7
+      },
+      "runtime_seconds": 0.002231250051409006,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced",
+      "seconds_per_simulated_second": 0.04462500102818012,
+      "simulated_seconds": 0.05,
+      "solver": "probe_export",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.00017971930598529676,
+      "grid_cells": 288,
+      "output_frames": 2,
+      "repetition": 0,
+      "run_status": {
+        "cflmax": 0.1750892629489313,
+        "dtmax": "-inf",
+        "dtmin": "inf",
+        "numsteps": 1
+      },
+      "runtime_seconds": 0.0025879580061882734,
+      "scenario_id": "flat_pool_seed_100",
+      "seconds_per_simulated_second": 0.05175916012376547,
+      "simulated_seconds": 0.05,
+      "solver": "pyclaw",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.00016600914023001678,
+      "grid_cells": 512,
+      "output_frames": 2,
+      "repetition": 0,
+      "run_status": {
+        "cflmax": 0.11293537340422943,
+        "dtmax": "-inf",
+        "dtmin": "inf",
+        "numsteps": 1
+      },
+      "runtime_seconds": 0.00424983398988843,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate",
+      "seconds_per_simulated_second": 0.08499667979776859,
+      "simulated_seconds": 0.05,
+      "solver": "pyclaw",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.00041122103640292253,
+      "grid_cells": 288,
+      "output_frames": 2,
+      "repetition": 0,
+      "run_status": {
+        "manifest": "not committed; regenerate during validation work",
+        "profile_wall_seconds": 0.006610875017940998,
+        "returncode": 0,
+        "validation": "not committed; regenerate during validation work"
+      },
+      "runtime_seconds": 0.0059215829242020845,
+      "scenario_id": "flat_pool_seed_100",
+      "seconds_per_simulated_second": 0.11843165848404169,
+      "simulated_seconds": 0.05,
+      "solver": "cpp_reduced",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.0004014941441710107,
+      "grid_cells": 512,
+      "output_frames": 2,
+      "repetition": 0,
+      "run_status": {
+        "manifest": "not committed; regenerate during validation work",
+        "profile_wall_seconds": 0.011669165920466185,
+        "returncode": 0,
+        "validation": "not committed; regenerate during validation work"
+      },
+      "runtime_seconds": 0.010278250090777874,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate",
+      "seconds_per_simulated_second": 0.20556500181555748,
+      "simulated_seconds": 0.05,
+      "solver": "cpp_reduced",
+      "validation_passed": true
+    }
+  ],
+  "scenario_ids": [
+    "american_south_fork_chili_bar_to_coloma_high_runnable_advanced",
+    "american_south_fork_chili_bar_to_coloma_low_runnable_beginner",
+    "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate",
+    "bed_step_seed_102",
+    "flat_pool_seed_100",
+    "procedural_rapid_seed_103",
+    "uniform_channel_seed_101"
+  ],
+  "summaries": [
+    {
+      "max_runtime_seconds": 0.00598716689273715,
+      "max_seconds_per_simulated_second": 0.119743337854743,
+      "mean_runtime_seconds": 0.005787875270470977,
+      "mean_seconds_per_simulated_second": 0.11575750540941954,
+      "run_count": 7,
+      "scenario_count": 7,
+      "solver": "raft_coupling",
+      "total_runtime_seconds": 0.04051512689329684
+    },
+    {
+      "max_runtime_seconds": 0.002612791955471039,
+      "max_seconds_per_simulated_second": 0.052255839109420776,
+      "mean_runtime_seconds": 0.0018198808788188867,
+      "mean_seconds_per_simulated_second": 0.03639761757637773,
+      "run_count": 7,
+      "scenario_count": 7,
+      "solver": "probe_export",
+      "total_runtime_seconds": 0.012739166151732206
+    },
+    {
+      "max_runtime_seconds": 0.00424983398988843,
+      "max_seconds_per_simulated_second": 0.08499667979776859,
+      "mean_runtime_seconds": 0.0034188959980383515,
+      "mean_seconds_per_simulated_second": 0.06837791996076703,
+      "run_count": 2,
+      "scenario_count": 2,
+      "solver": "pyclaw",
+      "total_runtime_seconds": 0.006837791996076703
+    },
+    {
+      "max_runtime_seconds": 0.010278250090777874,
+      "max_seconds_per_simulated_second": 0.20556500181555748,
+      "mean_runtime_seconds": 0.00809991650748998,
+      "mean_seconds_per_simulated_second": 0.16199833014979959,
+      "run_count": 2,
+      "scenario_count": 2,
+      "solver": "cpp_reduced",
+      "total_runtime_seconds": 0.01619983301497996
+    }
+  ]
+}
