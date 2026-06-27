@@ -246,6 +246,16 @@ cpp_solver/<scenario_id>/
 
 The manifest records the exact shared `scenario.json`, PyClaw output manifest, C++ output manifest, C++ command, and validation paths. Later Milestone 4 tasks add field, probe, feature, runtime, threshold, tuning, and regression promotion reports on top of this shared run directory.
 
+Compare shared field outputs after a run with:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.compare_dual_solver_fields \
+  outputs/dual_solver/flat_pool
+```
+
+This writes `field_comparison.json` with initial/final comparisons for `h`, `eta`, `u`, `v`, `hu`, `hv`, wet/dry mismatch fraction, surface normals, and `eta` slopes.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
