@@ -52,6 +52,13 @@ from .pyclaw_reference import (
     run_pyclaw_reference,
     write_unavailable_report,
 )
+from .dual_solver import (
+    CppSolverRunConfig,
+    CppSolverRunResult,
+    DualSolverRunConfig,
+    DualSolverRunResult,
+    run_dual_solver_scenario,
+)
 from .sim import Simulation, SimulationConfig, SimulationSystem
 from .state import BodyState
 from .telemetry import ForceContribution, TelemetryFrame, TelemetryRecorder
@@ -74,6 +81,10 @@ __all__ = [
     "BackendUnavailableError",
     "BodyState",
     "ChronoSimulation",
+    "CppSolverRunConfig",
+    "CppSolverRunResult",
+    "DualSolverRunConfig",
+    "DualSolverRunResult",
     "ForceContribution",
     "PhysicsBackend",
     "ProjectChronoBackend",
@@ -128,6 +139,7 @@ __all__ = [
     "generate_procedural_scenario2_5d",
     "generate_river_2d",
     "read_scenario2_5d_package",
+    "run_dual_solver_scenario",
     "run_pyclaw_reference",
     "select_backend",
     "write_unavailable_report",
