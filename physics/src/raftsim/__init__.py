@@ -91,6 +91,8 @@ from .tuning import (
 )
 from .regression import RegressionPromotionResult, promote_passing_dual_solver_run
 from .raft_coupling2_5d import (
+    PaddleBladePose2_5D,
+    PaddleBladeSample2_5D,
     RaftMassProperties,
     RaftForceContribution2_5D,
     RaftSamplePatch,
@@ -101,6 +103,7 @@ from .raft_coupling2_5d import (
     sample_buoyancy_forces,
     sample_grounding_forces,
     sample_hydrodynamic_forces,
+    sample_paddle_blade,
     sum_force_contributions,
 )
 from .sim import Simulation, SimulationConfig, SimulationSystem
@@ -170,6 +173,8 @@ __all__ = [
     "ThresholdEvaluationReport",
     "Vec3",
     "Vec2",
+    "PaddleBladePose2_5D",
+    "PaddleBladeSample2_5D",
     "PaddleCommand2D",
     "Raft2DConfig",
     "Raft2DSimulation",
@@ -204,6 +209,7 @@ __all__ = [
     "sample_buoyancy_forces",
     "sample_grounding_forces",
     "sample_hydrodynamic_forces",
+    "sample_paddle_blade",
     "sum_force_contributions",
     "canonical_pyclaw_scenarios",
     "backend_statuses",

@@ -303,6 +303,32 @@ class RaftForceContribution2_5D:
     metadata: dict[str, float | str] | None = None
 
 
+@dataclass(frozen=True, slots=True)
+class PaddleBladePose2_5D:
+    """Paddle blade pose and local stroke velocity relative to the raft."""
+
+    local_position: Vec3
+    local_velocity: Vec3 = Vec3()
+    blade_area_m2: float = 0.075
+
+    def __post_init__(self) -> None:
+        if self.blade_area_m2 <= 0.0:
+            raise ValueError("blade_area_m2 must be positive.")
+
+
+@dataclass(frozen=True, slots=True)
+class PaddleBladeSample2_5D:
+    """Water-relative blade sample for paddle force models."""
+
+    world_position: Vec3
+    blade_velocity: Vec3
+    water_velocity: Vec3
+    relative_velocity: Vec3
+    depth: float
+    submerged: bool
+    feature_tags: tuple[str, ...]
+
+
 def sample_buoyancy_forces(
     state: RaftState6DoF,
     properties: RaftMassProperties,
@@ -337,6 +363,29 @@ def sample_buoyancy_forces(
             )
         )
     return tuple(contributions)
+
+
+def sample_paddle_blade(
+    state: RaftState6DoF,
+    blade: PaddleBladePose2_5D,
+    water: WaterField2_5D,
+) -> PaddleBladeSample2_5D:
+    """Sample paddle blade depth and velocity relative to local water."""
+
+    world_position = state.world_point(blade.local_position)
+    local_blade_velocity = state.orientation.rotate_vector(blade.local_velocity)
+    blade_velocity = state.point_velocity(blade.local_position) + local_blade_velocity
+    water_sample = water.sample(world_position.x, world_position.y)
+    depth = water_sample.surface_height - world_position.z
+    return PaddleBladeSample2_5D(
+        world_position=world_position,
+        blade_velocity=blade_velocity,
+        water_velocity=water_sample.velocity,
+        relative_velocity=blade_velocity - water_sample.velocity,
+        depth=depth,
+        submerged=depth > 0.0 and water_sample.wet,
+        feature_tags=water_sample.feature_tags,
+    )
 
 
 def sum_force_contributions(contributions: tuple[RaftForceContribution2_5D, ...]) -> tuple[Vec3, Vec3]:
