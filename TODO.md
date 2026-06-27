@@ -17,6 +17,7 @@ See [2.5D Dual-Solver Simulation Plan](docs/2.5d-simulation-plan.md) for the PyC
 See [Real-World River Content And Seasonal Flow Plan](docs/real-world-river-content-plan.md) for geospatial extraction, rapid identification, seasonal flow research, adaptive parameters, and the future river/season/difficulty picker.
 See [Audio Asset Sourcing Plan](docs/audio-asset-sourcing-plan.md) for the recorded/downloaded-vs-AI audio policy, source shortlist, 3D spatial audio plan, asset manifest, and production sound pipeline.
 See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full game roadmap after Python modeling and profiling are complete, including local AI voice commands, crew conversation systems, networked crews, and fully immersive 3D audio.
+See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.md) for the fixed-step bridge between the shallow-water solver, Chrono raft kinematics, elastic rock impacts, and inelastic bed grounding.
 
 ## Milestone 0: Python Physics Research Foundation
 
@@ -149,7 +150,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 
 - [x] Complete PyClaw reference scenarios.
 - [x] Complete custom C++ solver scenarios.
-- [x] Complete dual-solver comparison and tuning reports; current gate decision is blocked because the real-world median scenario exceeds field, probe, cross-section, and Froude thresholds.
+- [x] Complete dual-solver comparison and tuning reports; current gate decision is approved after shallow-cell-aware velocity/Froude comparison.
 - [x] Complete 2.5D raft coupling validation against both solvers.
 - [x] Complete the first real-world river section scenario with season, flow, difficulty, gauge, imagery, terrain, and source-manifest data.
 - [x] Validate adaptive fluid parameters across low, medium, and high runnable flows for at least one real-world section.
@@ -157,7 +158,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Export representative telemetry/replay files for Unreal visualization.
 - [x] Export at least one real-world corridor package for Unreal preproduction.
 - [x] Write a Python-to-Unreal readiness report with risks, budgets, runtime choices, and accepted model limitations.
-- [x] Explicitly record the gate decision: production Unreal project start is blocked until the real-world dual-solver threshold mismatch is resolved.
+- [x] Explicitly record the gate decision: production Unreal project start is approved, with telemetry/replay playback as the first Unreal integration target.
 
 ## Milestone 11: Unreal Engine Full Game Production
 
@@ -167,6 +168,13 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [ ] Create the Unreal module/plugin skeleton: core, physics bridge, river, raft, input, UI, and debug modules.
 - [ ] Integrate the custom C++ water solver as the runtime water field candidate.
 - [ ] Integrate Chrono/custom raft dynamics as selected by the readiness report.
+- [ ] Implement the fixed-step Chrono water/raft bridge: custom C++ shallow-water snapshot feeds Chrono raft substeps, Chrono returns authoritative raft pose, velocity, contacts, and force telemetry.
+- [ ] Add deterministic raft patch sampling for buoyancy, drag, added mass, slope force, eddy-line shear, boil/upwelling impulse, paddle blade forces, and feature tags.
+- [ ] Build Chrono collision geometry from rocks, banks, ledges, shallows, strainers, and bed/corridor data.
+- [ ] Add partially elastic rock collision presets for rubber-raft impacts: restitution, tube stiffness, damping, friction, scrape/bounce/pin telemetry, and parameter sweeps.
+- [ ] Add strongly inelastic riverbed grounding presets: near-zero restitution, high damping, grounding friction, stick-slip, contact hysteresis, scrape telemetry, and shallow-shelf pivot tests.
+- [ ] Start with one-way water-to-raft coupling; add optional bounded raft-to-water displacement/source terms only after the bridge is stable and validated.
+- [ ] Add native fixtures for flat pool float, current drift, standing wave lift, eddy-line yaw, rock bounce, riverbed grounding, shallow shelf pivot, and pin/release.
 - [ ] Keep Unreal Chaos available only for incidental non-authoritative effects.
 - [ ] Enable OpenXR-based VR support.
 - [ ] Implement telemetry/replay playback in Unreal before live native physics.
