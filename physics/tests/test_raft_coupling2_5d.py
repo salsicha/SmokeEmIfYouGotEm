@@ -3,6 +3,7 @@ import math
 import pytest
 
 from raftsim.math3d import Quaternion, Vec3
+from raftsim.pyclaw_reference import build_initial_pyclaw_reference_result
 from raftsim.raft_coupling2_5d import (
     PaddleBladePose2_5D,
     RaftSamplePatch,
@@ -13,6 +14,7 @@ from raftsim.raft_coupling2_5d import (
     sample_grounding_forces,
     sample_hydrodynamic_forces,
     sample_paddle_blade,
+    sample_total_raft_forces,
     sum_force_contributions,
 )
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, RaftParameters2_5D, generate_fixture_scenario2_5d
@@ -149,3 +151,19 @@ def test_paddle_blade_sample_reports_depth_and_relative_velocity():
     assert sample.water_velocity.x > 0.0
     assert sample.relative_velocity.z < 0.0
     assert sample.blade_velocity.x == pytest.approx(0.0)
+
+
+def test_raft_forces_sample_from_pyclaw_frame_output(tmp_path):
+    scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="flat_pool", nx=12, ny=8))
+    result = build_initial_pyclaw_reference_result(scenario)
+    output_dir = result.write_output(tmp_path / "pyclaw")
+    water = WaterField2_5D.from_pyclaw_frame_npz(scenario, str(output_dir / "frames" / "frame_0000.npz"))
+    properties = build_default_raft_mass_properties(scenario.raft)
+    state = RaftState6DoF(position=Vec3(5.0, 0.0, 0.8))
+
+    contributions = sample_total_raft_forces(state, properties, water)
+    total_force, _ = sum_force_contributions(contributions)
+
+    assert contributions
+    assert total_force.z > 0.0
+    assert any(contribution.name.startswith("buoyancy") for contribution in contributions)

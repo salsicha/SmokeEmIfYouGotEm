@@ -104,6 +104,7 @@ from .raft_coupling2_5d import (
     sample_grounding_forces,
     sample_hydrodynamic_forces,
     sample_paddle_blade,
+    sample_total_raft_forces,
     sum_force_contributions,
 )
 from .sim import Simulation, SimulationConfig, SimulationSystem
@@ -210,6 +211,7 @@ __all__ = [
     "sample_grounding_forces",
     "sample_hydrodynamic_forces",
     "sample_paddle_blade",
+    "sample_total_raft_forces",
     "sum_force_contributions",
     "canonical_pyclaw_scenarios",
     "backend_statuses",

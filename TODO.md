@@ -93,7 +93,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Apply vertical damping, horizontal water drag, surface-slope forces, and added-mass approximation.
 - [x] Add bed, rock, ledge, and shallow grounding contact.
 - [x] Add paddle blade pose, depth, and blade-water relative velocity.
-- [ ] Run raft-force sampling against PyClaw output fields.
+- [x] Run raft-force sampling against PyClaw output fields.
 - [ ] Run raft-force sampling against custom C++ runtime fields.
 - [ ] Compare raft force envelopes, trajectories, and outcomes between the two solvers.
 

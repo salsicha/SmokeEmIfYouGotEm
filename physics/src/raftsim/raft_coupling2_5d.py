@@ -222,6 +222,29 @@ class WaterField2_5D:
             features=scenario.features,
         )
 
+    @classmethod
+    def from_pyclaw_frame_npz(cls, scenario: Scenario2_5D, frame_path: str) -> WaterField2_5D:
+        with np.load(frame_path) as data:
+            h = np.asarray(data["h"], dtype=np.float64)
+            eta = np.asarray(data["eta"], dtype=np.float64)
+            return cls(
+                origin_x=scenario.grid.origin_x,
+                origin_y=scenario.grid.origin_y,
+                dx=scenario.grid.dx,
+                dy=scenario.grid.dy,
+                bed=eta - h,
+                depth=h,
+                eta=eta,
+                u=np.asarray(data["u"], dtype=np.float64),
+                v=np.asarray(data["v"], dtype=np.float64),
+                wet=np.asarray(data["wet"], dtype=np.bool_),
+                normal_x=np.asarray(data["normal_x"], dtype=np.float64),
+                normal_y=np.asarray(data["normal_y"], dtype=np.float64),
+                normal_z=np.asarray(data["normal_z"], dtype=np.float64),
+                roughness=scenario.roughness,
+                features=scenario.features,
+            )
+
     @property
     def shape(self) -> tuple[int, int]:
         return self.depth.shape
@@ -501,6 +524,20 @@ def sample_grounding_forces(
             )
         )
     return tuple(contributions)
+
+
+def sample_total_raft_forces(
+    state: RaftState6DoF,
+    properties: RaftMassProperties,
+    water: WaterField2_5D,
+) -> tuple[RaftForceContribution2_5D, ...]:
+    """Sample all current raft force channels against one water field."""
+
+    return (
+        *sample_buoyancy_forces(state, properties, water),
+        *sample_hydrodynamic_forces(state, properties, water),
+        *sample_grounding_forces(state, properties, water),
+    )
 
 
 def _has_grounding_feature(tags: tuple[str, ...]) -> bool:
