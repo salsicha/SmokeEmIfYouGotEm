@@ -19,6 +19,8 @@ FIELD_NAMES = ("h", "eta", "u", "v", "hu", "hv", "normal_x", "normal_y", "normal
 SLOPE_FIELD_NAMES = ("slope_x", "slope_y")
 PROBE_FIELD_NAMES = ("h", "eta", "u", "v", "hu", "hv", "wet", "froude")
 CROSS_SECTION_FIELD_NAMES = ("h", "eta", "u", "v", "froude")
+VELOCITY_LIKE_FIELD_NAMES = frozenset({"u", "v", "froude"})
+DEFAULT_VELOCITY_DEPTH_FLOOR = 0.15
 
 
 @dataclass(frozen=True, slots=True)
@@ -31,6 +33,8 @@ class FieldErrorSummary:
     reference_max: float
     candidate_min: float
     candidate_max: float
+    sample_count: int
+    compared_count: int
 
     def to_json_dict(self) -> dict[str, object]:
         return {
@@ -42,6 +46,8 @@ class FieldErrorSummary:
             "reference_max": self.reference_max,
             "candidate_min": self.candidate_min,
             "candidate_max": self.candidate_max,
+            "sample_count": self.sample_count,
+            "compared_count": self.compared_count,
         }
 
 
@@ -331,6 +337,7 @@ class ScenarioThresholds:
     max_froude_delta: float = 0.5
     max_feature_location_delta: float = 5.0
     max_feature_strength_delta: float = 10.0
+    velocity_depth_floor: float = DEFAULT_VELOCITY_DEPTH_FLOOR
 
     def to_json_dict(self) -> dict[str, object]:
         return {
@@ -344,6 +351,7 @@ class ScenarioThresholds:
             "max_froude_delta": self.max_froude_delta,
             "max_feature_location_delta": self.max_feature_location_delta,
             "max_feature_strength_delta": self.max_feature_strength_delta,
+            "velocity_depth_floor": self.velocity_depth_floor,
         }
 
 
@@ -390,6 +398,7 @@ class ThresholdEvaluationReport:
 def compare_dual_solver_fields(
     dual_solver_dir_or_manifest: str | Path,
     *,
+    velocity_depth_floor: float = DEFAULT_VELOCITY_DEPTH_FLOOR,
     output_path: str | Path | None = None,
 ) -> FieldComparisonReport:
     """Compare matching initial/final field frames from a dual-solver run."""
@@ -412,6 +421,7 @@ def compare_dual_solver_fields(
             cpp_frame_path,
             scenario.grid.dx,
             scenario.grid.dy,
+            velocity_depth_floor=velocity_depth_floor,
         )
         for label, pyclaw_frame_path, cpp_frame_path in pairings
     )
@@ -424,6 +434,7 @@ def compare_dual_solver_fields(
 def compare_dual_solver_probes(
     dual_solver_dir_or_manifest: str | Path,
     *,
+    velocity_depth_floor: float = DEFAULT_VELOCITY_DEPTH_FLOOR,
     output_path: str | Path | None = None,
 ) -> ProbeComparisonReport:
     """Compare point probe time series and cross sections from a dual-solver run."""
@@ -437,7 +448,7 @@ def compare_dual_solver_probes(
     cpp_output = root / manifest["cpp"]["output_dir"]
 
     point_probes = tuple(
-        _compare_probe_pair(probe_id, pyclaw_path, cpp_path)
+        _compare_probe_pair(probe_id, pyclaw_path, cpp_path, velocity_depth_floor=velocity_depth_floor)
         for probe_id, pyclaw_path, cpp_path in _matched_files(
             pyclaw_output,
             pyclaw_manifest["probes"],
@@ -446,7 +457,7 @@ def compare_dual_solver_probes(
         )
     )
     cross_sections = tuple(
-        _compare_cross_section_pair(probe_id, pyclaw_path, cpp_path)
+        _compare_cross_section_pair(probe_id, pyclaw_path, cpp_path, velocity_depth_floor=velocity_depth_floor)
         for probe_id, pyclaw_path, cpp_path in _matched_files(
             pyclaw_output,
             pyclaw_manifest["cross_sections"],
@@ -467,6 +478,7 @@ def compare_dual_solver_probes(
 def compare_dual_solver_diagnostics(
     dual_solver_dir_or_manifest: str | Path,
     *,
+    velocity_depth_floor: float = DEFAULT_VELOCITY_DEPTH_FLOOR,
     output_path: str | Path | None = None,
 ) -> PhysicsDiagnosticComparisonReport:
     """Compare mass, energy, Froude, jump, wave, and hole-retention diagnostics."""
@@ -482,8 +494,8 @@ def compare_dual_solver_diagnostics(
     pyclaw_frames = [_load_pyclaw_npz_frame(pyclaw_output / frame) for frame in pyclaw_manifest["frames"]]
     cpp_frames = [_load_cpp_csv_frame(cpp_output / frame) for frame in cpp_manifest["frames"]]
 
-    pyclaw_summary = _diagnostic_summary("pyclaw", pyclaw_frames, scenario)
-    cpp_summary = _diagnostic_summary("cpp", cpp_frames, scenario)
+    pyclaw_summary = _diagnostic_summary("pyclaw", pyclaw_frames, scenario, velocity_depth_floor=velocity_depth_floor)
+    cpp_summary = _diagnostic_summary("cpp", cpp_frames, scenario, velocity_depth_floor=velocity_depth_floor)
     report = PhysicsDiagnosticComparisonReport(
         scenario_id=manifest["scenario_id"],
         pyclaw=pyclaw_summary,
@@ -538,16 +550,25 @@ def evaluate_dual_solver_thresholds(
     """Evaluate one dual-solver scenario against explicit pass/fail thresholds."""
 
     limits = thresholds or ScenarioThresholds()
-    field_report = compare_dual_solver_fields(dual_solver_dir_or_manifest)
-    probe_report = compare_dual_solver_probes(dual_solver_dir_or_manifest)
-    diagnostic_report = compare_dual_solver_diagnostics(dual_solver_dir_or_manifest)
+    field_report = compare_dual_solver_fields(
+        dual_solver_dir_or_manifest,
+        velocity_depth_floor=limits.velocity_depth_floor,
+    )
+    probe_report = compare_dual_solver_probes(
+        dual_solver_dir_or_manifest,
+        velocity_depth_floor=limits.velocity_depth_floor,
+    )
+    diagnostic_report = compare_dual_solver_diagnostics(
+        dual_solver_dir_or_manifest,
+        velocity_depth_floor=limits.velocity_depth_floor,
+    )
     feature_report = compare_dual_solver_features(dual_solver_dir_or_manifest)
     checks = (
         _threshold_check(
             "field_linf",
             _max_linf(field_report.frame_comparisons, "field"),
             limits.max_field_linf,
-            "Max Linf across h/eta/u/v/hu/hv/normals.",
+            f"Max Linf across h/eta/u/v/hu/hv/normals; u/v masked below {limits.velocity_depth_floor:g} m.",
         ),
         _threshold_check(
             "slope_linf",
@@ -565,13 +586,13 @@ def evaluate_dual_solver_thresholds(
             "probe_linf",
             _max_series_linf(probe_report.point_probes),
             limits.max_probe_linf,
-            "Max Linf across point-probe fields.",
+            f"Max Linf across point-probe fields; u/v/Froude masked below {limits.velocity_depth_floor:g} m.",
         ),
         _threshold_check(
             "cross_section_linf",
             _max_series_linf(probe_report.cross_sections),
             limits.max_cross_section_linf,
-            "Max Linf across cross-section fields.",
+            f"Max Linf across cross-section fields; u/v/Froude masked below {limits.velocity_depth_floor:g} m.",
         ),
         _threshold_check(
             "mass_drift_delta",
@@ -589,7 +610,7 @@ def evaluate_dual_solver_thresholds(
             "froude_delta",
             max(abs(diagnostic_report.delta.froude_max_delta), abs(diagnostic_report.delta.froude_mean_wet_delta)),
             limits.max_froude_delta,
-            "Max absolute Froude summary delta.",
+            f"Max absolute Froude summary delta for cells at or above {limits.velocity_depth_floor:g} m.",
         ),
         _threshold_check(
             "feature_location_delta",
@@ -679,10 +700,21 @@ def _compare_frame_pair(
     cpp_frame_path: Path,
     dx: float,
     dy: float,
+    *,
+    velocity_depth_floor: float,
 ) -> FrameFieldComparison:
     pyclaw_frame = _load_pyclaw_npz_frame(pyclaw_frame_path)
     cpp_frame = _load_cpp_csv_frame(cpp_frame_path)
-    field_errors = tuple(_field_error(name, pyclaw_frame[name], cpp_frame[name]) for name in FIELD_NAMES)
+    velocity_mask = _velocity_comparison_mask(pyclaw_frame["h"], cpp_frame["h"], velocity_depth_floor)
+    field_errors = tuple(
+        _field_error(
+            name,
+            pyclaw_frame[name],
+            cpp_frame[name],
+            mask=velocity_mask if name in VELOCITY_LIKE_FIELD_NAMES else None,
+        )
+        for name in FIELD_NAMES
+    )
     pyclaw_slopes = _slopes_from_eta(pyclaw_frame["eta"], dx, dy)
     cpp_slopes = _slopes_from_eta(cpp_frame["eta"], dx, dy)
     slope_errors = tuple(
@@ -751,21 +783,57 @@ def _load_cpp_csv_frame(path: Path) -> dict[str, FloatGrid | BoolGrid]:
     return frame
 
 
-def _field_error(field_name: str, reference: FloatGrid | BoolGrid, candidate: FloatGrid | BoolGrid) -> FieldErrorSummary:
+def _field_error(
+    field_name: str,
+    reference: FloatGrid | BoolGrid,
+    candidate: FloatGrid | BoolGrid,
+    *,
+    mask: BoolGrid | None = None,
+) -> FieldErrorSummary:
     ref = np.asarray(reference, dtype=np.float64)
     cand = np.asarray(candidate, dtype=np.float64)
     if ref.shape != cand.shape:
         raise ValueError(f"Shape mismatch for {field_name}: PyClaw={ref.shape} C++={cand.shape}")
-    delta = cand - ref
+    sample_count = int(ref.size)
+    if mask is None:
+        ref_compared = ref
+        cand_compared = cand
+    else:
+        mask_grid = np.asarray(mask, dtype=np.bool_)
+        if mask_grid.shape != ref.shape:
+            raise ValueError(f"Mask shape mismatch for {field_name}: mask={mask_grid.shape} field={ref.shape}")
+        ref_compared = ref[mask_grid]
+        cand_compared = cand[mask_grid]
+
+    compared_count = int(ref_compared.size)
+    if compared_count == 0:
+        l1 = 0.0
+        l2 = 0.0
+        linf = 0.0
+        ref_min = float(np.min(ref)) if sample_count else 0.0
+        ref_max = float(np.max(ref)) if sample_count else 0.0
+        cand_min = float(np.min(cand)) if sample_count else 0.0
+        cand_max = float(np.max(cand)) if sample_count else 0.0
+    else:
+        delta = cand_compared - ref_compared
+        l1 = float(np.mean(np.abs(delta)))
+        l2 = float(np.sqrt(np.mean(delta**2)))
+        linf = float(np.max(np.abs(delta)))
+        ref_min = float(np.min(ref_compared))
+        ref_max = float(np.max(ref_compared))
+        cand_min = float(np.min(cand_compared))
+        cand_max = float(np.max(cand_compared))
     return FieldErrorSummary(
         field=field_name,
-        l1=float(np.mean(np.abs(delta))),
-        l2=float(np.sqrt(np.mean(delta**2))),
-        linf=float(np.max(np.abs(delta))),
-        reference_min=float(np.min(ref)),
-        reference_max=float(np.max(ref)),
-        candidate_min=float(np.min(cand)),
-        candidate_max=float(np.max(cand)),
+        l1=l1,
+        l2=l2,
+        linf=linf,
+        reference_min=ref_min,
+        reference_max=ref_max,
+        candidate_min=cand_min,
+        candidate_max=cand_max,
+        sample_count=sample_count,
+        compared_count=compared_count,
     )
 
 
@@ -774,16 +842,49 @@ def _slopes_from_eta(eta: FloatGrid, dx: float, dy: float) -> tuple[FloatGrid, F
     return slope_x, slope_y
 
 
-def _compare_probe_pair(probe_id: str, pyclaw_path: Path, cpp_path: Path) -> SeriesComparison:
+def _velocity_comparison_mask(
+    reference_h: FloatGrid | BoolGrid,
+    candidate_h: FloatGrid | BoolGrid,
+    depth_floor: float,
+) -> BoolGrid:
+    ref_h = np.asarray(reference_h, dtype=np.float64)
+    cand_h = np.asarray(candidate_h, dtype=np.float64)
+    if ref_h.shape != cand_h.shape:
+        raise ValueError(f"Depth mask shape mismatch: PyClaw={ref_h.shape} C++={cand_h.shape}")
+    return (ref_h >= depth_floor) & (cand_h >= depth_floor)
+
+
+def _compare_probe_pair(
+    probe_id: str,
+    pyclaw_path: Path,
+    cpp_path: Path,
+    *,
+    velocity_depth_floor: float,
+) -> SeriesComparison:
     reference = _load_probe_csv(pyclaw_path)
     candidate = _load_probe_csv(cpp_path)
     ref_times = reference["time"]
     cand_times = candidate["time"]
     indices, max_time_delta = _nearest_indices(ref_times, cand_times)
+    aligned_candidate = {
+        field: candidate[field][indices]
+        for field in candidate
+        if field != "time"
+    }
+    velocity_mask = _velocity_comparison_mask(
+        reference["h"],
+        aligned_candidate["h"],
+        velocity_depth_floor,
+    )
     field_errors = tuple(
-        _field_error(field, reference[field], candidate[field][indices])
+        _field_error(
+            field,
+            reference[field],
+            aligned_candidate[field],
+            mask=velocity_mask if field in VELOCITY_LIKE_FIELD_NAMES else None,
+        )
         for field in PROBE_FIELD_NAMES
-        if field in reference and field in candidate
+        if field in reference and field in aligned_candidate
     )
     return SeriesComparison(
         sample_id=probe_id,
@@ -795,16 +896,32 @@ def _compare_probe_pair(probe_id: str, pyclaw_path: Path, cpp_path: Path) -> Ser
     )
 
 
-def _compare_cross_section_pair(probe_id: str, pyclaw_path: Path, cpp_path: Path) -> SeriesComparison:
+def _compare_cross_section_pair(
+    probe_id: str,
+    pyclaw_path: Path,
+    cpp_path: Path,
+    *,
+    velocity_depth_floor: float,
+) -> SeriesComparison:
     reference = _load_pyclaw_cross_section_npz(pyclaw_path)
     candidate = _load_cpp_cross_section_csv(cpp_path)
     time_indices, max_time_delta = _nearest_indices(reference["times"], candidate["times"])
     distance_indices, max_distance_delta = _nearest_indices(reference["distance"], candidate["distance"])
+    aligned_candidate = {
+        field: candidate[field][np.ix_(time_indices, distance_indices)]
+        for field in CROSS_SECTION_FIELD_NAMES
+    }
+    velocity_mask = _velocity_comparison_mask(
+        reference["h"],
+        aligned_candidate["h"],
+        velocity_depth_floor,
+    )
     field_errors = tuple(
         _field_error(
             field,
             reference[field],
-            candidate[field][np.ix_(time_indices, distance_indices)],
+            aligned_candidate[field],
+            mask=velocity_mask if field in VELOCITY_LIKE_FIELD_NAMES else None,
         )
         for field in CROSS_SECTION_FIELD_NAMES
     )
@@ -884,18 +1001,22 @@ def _diagnostic_summary(
     solver: str,
     frames: list[dict[str, FloatGrid | BoolGrid]],
     scenario,
+    *,
+    velocity_depth_floor: float,
 ) -> SolverDiagnosticSummary:
     if not frames:
         raise ValueError("Diagnostic comparison requires at least one frame.")
     initial = frames[0]
     final = frames[-1]
+    final_h = np.asarray(final["h"], dtype=np.float64)
     mass_initial = _frame_mass(initial, scenario.grid.dx, scenario.grid.dy)
     mass_final = _frame_mass(final, scenario.grid.dx, scenario.grid.dy)
     energy_initial = _frame_energy(initial, scenario.grid.dx, scenario.grid.dy)
     energy_final = _frame_energy(final, scenario.grid.dx, scenario.grid.dy)
     final_wet = np.asarray(final["wet"], dtype=np.bool_)
     final_froude = np.asarray(final["froude"], dtype=np.float64)
-    wet_froude = final_froude[final_wet]
+    compared_froude_mask = final_wet & (final_h >= velocity_depth_floor)
+    wet_froude = final_froude[compared_froude_mask]
     return SolverDiagnosticSummary(
         solver=solver,
         frame_count=len(frames),
@@ -905,7 +1026,7 @@ def _diagnostic_summary(
         energy_initial=energy_initial,
         energy_final=energy_final,
         energy_relative_change=(energy_final - energy_initial) / max(abs(energy_initial), 1.0),
-        froude_max=float(np.max(final_froude)) if final_froude.size else 0.0,
+        froude_max=float(np.max(wet_froude)) if wet_froude.size else 0.0,
         froude_mean_wet=float(np.mean(wet_froude)) if wet_froude.size else 0.0,
         hydraulic_jump=_hydraulic_jump_metric(final, scenario),
         wave_crest=_wave_extreme_metric(final, scenario, mode="crest"),

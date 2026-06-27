@@ -47,7 +47,17 @@ def test_dual_solver_runs_pyclaw_and_cpp_on_one_shared_package(tmp_path):
         output_dir=tmp_path / "dual",
         config=DualSolverRunConfig(
             pyclaw=PyClawRunConfig(num_output_times=1),
-            cpp=CppSolverRunConfig(executable=cpp_solver, steps=3, frame_interval=1),
+            cpp=CppSolverRunConfig(
+                executable=cpp_solver,
+                steps=3,
+                frame_interval=1,
+                solver_mode="finite_volume",
+                boundary_mode="pyclaw",
+                flux_scheme="roe",
+                feature_strength_scale=0.0,
+                roughness_scale=0.0,
+                bed_slope_source_scale=0.0,
+            ),
         ),
     )
 
@@ -57,6 +67,12 @@ def test_dual_solver_runs_pyclaw_and_cpp_on_one_shared_package(tmp_path):
 
     assert result.scenario_dir.joinpath("scenario.json").exists()
     assert result.cpp.returncode == 0
+    assert "--solver-mode" in result.cpp.command
+    assert "finite_volume" in result.cpp.command
+    assert "--boundary-mode" in result.cpp.command
+    assert "pyclaw" in result.cpp.command
+    assert "--flux-scheme" in result.cpp.command
+    assert "roe" in result.cpp.command
     assert manifest["scenario_id"] == scenario.metadata.scenario_id
     assert manifest["scenario_json"].endswith("scenario.json")
     assert manifest["pyclaw"]["manifest"] == "pyclaw_reference/flat_pool_seed_12/manifest.json"
@@ -224,6 +240,7 @@ def test_threshold_evaluation_reports_scenario_pass_fail(tmp_path):
     assert report.scenario_id == scenario.metadata.scenario_id
     assert report.passed is True
     assert report_data["passed"] is True
+    assert report_data["thresholds"]["velocity_depth_floor"] == 0.15
     assert {check.name for check in report.checks} >= {"field_linf", "probe_linf", "mass_drift_delta"}
 
 
