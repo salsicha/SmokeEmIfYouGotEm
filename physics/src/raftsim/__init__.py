@@ -113,6 +113,7 @@ from .performance import (
     SolverPerformanceSummary,
     build_baseline_performance_report,
 )
+from .chrono_validation import ChronoBridgeTelemetryComparisonReport, compare_chrono_bridge_telemetry
 from .sweeps import (
     ParameterSweepCandidate,
     ParameterSweepReport,
@@ -178,6 +179,7 @@ __all__ = [
     "BaselinePerformanceReport",
     "BodyState",
     "ChronoSimulation",
+    "ChronoBridgeTelemetryComparisonReport",
     "CppSolverRunConfig",
     "CppSolverRunResult",
     "CppTuningCandidate",
@@ -275,6 +277,7 @@ __all__ = [
     "build_baseline_performance_report",
     "build_default_raft_mass_properties",
     "compare_raft_force_samples",
+    "compare_chrono_bridge_telemetry",
     "sample_buoyancy_forces",
     "sample_grounding_forces",
     "sample_hydrodynamic_forces",
