@@ -94,6 +94,8 @@ from .raft_coupling2_5d import (
     RaftMassProperties,
     RaftSamplePatch,
     RaftState6DoF,
+    WaterField2_5D,
+    WaterSample2_5D,
     build_default_raft_mass_properties,
 )
 from .sim import Simulation, SimulationConfig, SimulationSystem
@@ -171,6 +173,8 @@ __all__ = [
     "RaftMassProperties",
     "RaftSamplePatch",
     "RaftState6DoF",
+    "WaterField2_5D",
+    "WaterSample2_5D",
     "GeneratedRiver2D",
     "River2DParameters",
     "RiverFeature2D",

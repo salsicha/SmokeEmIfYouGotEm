@@ -332,6 +332,8 @@ next_state = state.advance(1.0 / 60.0, linear_acceleration=Vec3(0.0, 0.0, -9.81)
 
 The state tracks position, orientation quaternion, linear velocity, and angular velocity, and provides local-to-world point and point-velocity helpers for future tube, floor, paddle, and contact samples. `build_default_raft_mass_properties()` derives total raft/crew mass, diagonal box inertia, gravity, guide/passenger offsets, and deterministic tube/floor sample patches from `RaftParameters2_5D`.
 
+`WaterField2_5D` is the solver-neutral water query API. It returns `WaterSample2_5D` values for surface height, bed height, depth, velocity, wet/dry state, surface normal, roughness, and feature tags at a world-space query point.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
