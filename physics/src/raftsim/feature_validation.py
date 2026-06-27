@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from .math3d import Vec3
 from .raft_coupling2_5d import RaftMassProperties, RaftState6DoF, WaterField2_5D, sample_total_raft_forces, sum_force_contributions
 
 
@@ -69,6 +70,54 @@ def validate_standing_wave_case(
         ),
     )
     return FeatureValidationResult("standing_wave", outcome, checks)
+
+
+def validate_hole_case(
+    water: WaterField2_5D,
+    state: RaftState6DoF,
+    properties: RaftMassProperties,
+    *,
+    depression_threshold: float = 0.08,
+    retention_velocity_threshold: float = 0.15,
+    damping_threshold: float = 0.25,
+    boil_lift_threshold: float = 0.5,
+) -> FeatureValidationResult:
+    """Validate hole depression, retention, aerated damping, and boil/upwelling."""
+
+    sample = water.sample(state.position.x, state.position.y)
+    local_eta = sample.surface_height
+    upstream = water.sample(state.position.x - water.dx, state.position.y)
+    downstream_state = RaftState6DoF(
+        position=state.position + Vec3(water.dx, 0.0, 0.0),
+        orientation=state.orientation,
+        linear_velocity=state.linear_velocity,
+        angular_velocity=state.angular_velocity,
+    )
+    downstream_force, _ = sum_force_contributions(sample_total_raft_forces(downstream_state, properties, water))
+    lift_ratio = downstream_force.z / max(properties.total_mass_kg * abs(properties.gravity.z), 1.0)
+    neighborhood = [
+        water.sample(state.position.x + ox * water.dx, state.position.y + oy * water.dy).surface_height
+        for ox, oy in ((-1, 0), (1, 0), (0, -1), (0, 1))
+    ]
+    depression = max(neighborhood) - local_eta
+    speed = sample.velocity.magnitude
+    damping_proxy = water.roughness + max(0.0, 1.0 - sample.normal.z) + 1.0 / (1.0 + speed)
+    retained = upstream.velocity.x <= retention_velocity_threshold
+    checks = (
+        FeatureValidationCheck("hole_tag", "hole" in sample.feature_tags, 1.0 if "hole" in sample.feature_tags else 0.0, 1.0),
+        FeatureValidationCheck("depression", depression >= depression_threshold, depression, depression_threshold),
+        FeatureValidationCheck(
+            "upstream_retention",
+            retained,
+            upstream.velocity.x,
+            retention_velocity_threshold,
+            "Upstream hole velocity should be slow or reversing.",
+        ),
+        FeatureValidationCheck("aerated_damping", damping_proxy >= damping_threshold, damping_proxy, damping_threshold),
+        FeatureValidationCheck("downstream_boil_lift", lift_ratio >= boil_lift_threshold, lift_ratio, boil_lift_threshold),
+    )
+    outcome = "retentive_hole" if all(check.passed for check in checks[1:]) else "flush"
+    return FeatureValidationResult("hole", outcome, checks)
 
 
 def _standing_wave_outcome(

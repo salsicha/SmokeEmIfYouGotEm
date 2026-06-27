@@ -100,7 +100,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 ## Milestone 6: 2.5D White Water Feature Validation
 
 - [x] Validate standing wave clear, stall, surf, and flush cases.
-- [ ] Validate hole depression, upstream retention, aerated damping, and downstream boil/upwelling behavior.
+- [x] Validate hole depression, upstream retention, aerated damping, and downstream boil/upwelling behavior.
 - [ ] Validate lateral wave side impulse and roll torque.
 - [ ] Validate eddy-line yaw/roll coupling.
 - [ ] Validate shallow shelf grounding and pivot behavior.
