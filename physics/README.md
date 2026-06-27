@@ -342,6 +342,8 @@ The state tracks position, orientation quaternion, linear velocity, and angular 
 
 `PaddleBladePose2_5D` and `sample_paddle_blade()` report blade world pose, submerged depth, local water velocity, blade velocity, and blade-water relative velocity for future paddle force models.
 
+`WaterField2_5D.from_pyclaw_frame_npz()` loads PyClaw frame outputs into the same query API, and `sample_total_raft_forces()` samples all current raft force channels against that field.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
