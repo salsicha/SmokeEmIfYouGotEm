@@ -116,7 +116,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Add parameter sweep scripts for roughness, feature forcing, raft drag, buoyancy, grounding, and contact coefficients.
 - [x] Fit C++ solver and raft-force parameters to PyClaw reference outputs.
 - [x] Produce baseline performance reports for canonical and generated scenarios.
-- [ ] Define desktop, VR, and handheld physics budgets before Unreal production begins.
+- [x] Define desktop, VR, and handheld physics budgets before Unreal production begins.
 - [ ] Freeze the first shared scenario, telemetry, replay, and parameter schemas.
 
 ## Milestone 8: Chrono And Native Runtime Integration
