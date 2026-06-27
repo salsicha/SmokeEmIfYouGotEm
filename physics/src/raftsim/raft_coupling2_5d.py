@@ -290,3 +290,61 @@ def _feature_tags_at(x: float, y: float, features: tuple[Feature2_5D, ...], dx: 
         if distance <= 1.0:
             tags.append(feature.kind)
     return tuple(tags)
+
+
+@dataclass(frozen=True, slots=True)
+class RaftForceContribution2_5D:
+    """One force/torque contribution sampled from a 2.5D water field."""
+
+    name: str
+    force: Vec3
+    torque: Vec3
+    application_point: Vec3
+    metadata: dict[str, float | str] | None = None
+
+
+def sample_buoyancy_forces(
+    state: RaftState6DoF,
+    properties: RaftMassProperties,
+    water: WaterField2_5D,
+    *,
+    water_density_kg_m3: float = 1000.0,
+) -> tuple[RaftForceContribution2_5D, ...]:
+    """Sample buoyancy from submerged raft patches using local water normals."""
+
+    contributions: list[RaftForceContribution2_5D] = []
+    gravity_magnitude = abs(properties.gravity.z) if abs(properties.gravity.z) > 1.0e-9 else 9.81
+    for index, patch in enumerate(properties.sample_patches):
+        point = state.world_point(patch.local_position)
+        sample = water.sample(point.x, point.y)
+        submerged_depth = sample.surface_height - point.z
+        if submerged_depth <= 0.0 or not sample.wet:
+            continue
+        force_magnitude = water_density_kg_m3 * gravity_magnitude * patch.area_m2 * submerged_depth
+        force = sample.normal * force_magnitude
+        torque = (point - state.position).cross(force)
+        contributions.append(
+            RaftForceContribution2_5D(
+                name=f"buoyancy:{patch.kind}:{index}",
+                force=force,
+                torque=torque,
+                application_point=point,
+                metadata={
+                    "kind": patch.kind,
+                    "submerged_depth": submerged_depth,
+                    "area_m2": patch.area_m2,
+                },
+            )
+        )
+    return tuple(contributions)
+
+
+def sum_force_contributions(contributions: tuple[RaftForceContribution2_5D, ...]) -> tuple[Vec3, Vec3]:
+    """Return total force and torque for a tuple of contributions."""
+
+    total_force = Vec3()
+    total_torque = Vec3()
+    for contribution in contributions:
+        total_force += contribution.force
+        total_torque += contribution.torque
+    return total_force, total_torque

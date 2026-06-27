@@ -8,6 +8,8 @@ from raftsim.raft_coupling2_5d import (
     RaftState6DoF,
     WaterField2_5D,
     build_default_raft_mass_properties,
+    sample_buoyancy_forces,
+    sum_force_contributions,
 )
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, RaftParameters2_5D, generate_fixture_scenario2_5d
 
@@ -84,3 +86,18 @@ def test_water_field_samples_solver_neutral_fields_and_feature_tags():
     assert sample.normal.magnitude == pytest.approx(1.0)
     assert sample.roughness == scenario.roughness
     assert "ledge" in sample.feature_tags
+
+
+def test_buoyancy_forces_push_submerged_samples_upward():
+    scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="flat_pool", nx=12, ny=8))
+    water = WaterField2_5D.from_scenario_initial_state(scenario)
+    properties = build_default_raft_mass_properties(scenario.raft)
+    state = RaftState6DoF(position=Vec3(5.0, 0.0, 0.8))
+
+    contributions = sample_buoyancy_forces(state, properties, water)
+    total_force, total_torque = sum_force_contributions(contributions)
+
+    assert contributions
+    assert total_force.z > 0.0
+    assert math.isfinite(total_torque.x)
+    assert all(contribution.metadata["submerged_depth"] > 0.0 for contribution in contributions)

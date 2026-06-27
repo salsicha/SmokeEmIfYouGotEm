@@ -92,11 +92,14 @@ from .tuning import (
 from .regression import RegressionPromotionResult, promote_passing_dual_solver_run
 from .raft_coupling2_5d import (
     RaftMassProperties,
+    RaftForceContribution2_5D,
     RaftSamplePatch,
     RaftState6DoF,
     WaterField2_5D,
     WaterSample2_5D,
     build_default_raft_mass_properties,
+    sample_buoyancy_forces,
+    sum_force_contributions,
 )
 from .sim import Simulation, SimulationConfig, SimulationSystem
 from .state import BodyState
@@ -170,6 +173,7 @@ __all__ = [
     "Raft2DSimulation",
     "Raft2DState",
     "Raft2DStepResult",
+    "RaftForceContribution2_5D",
     "RaftMassProperties",
     "RaftSamplePatch",
     "RaftState6DoF",
@@ -195,6 +199,8 @@ __all__ = [
     "ValidationCheck2_5D",
     "build_initial_pyclaw_reference_result",
     "build_default_raft_mass_properties",
+    "sample_buoyancy_forces",
+    "sum_force_contributions",
     "canonical_pyclaw_scenarios",
     "backend_statuses",
     "check_pyclaw_availability",
