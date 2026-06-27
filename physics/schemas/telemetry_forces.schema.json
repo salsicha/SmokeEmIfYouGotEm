@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raftsim.local/schemas/telemetry_forces.schema.json",
+  "title": "RaftSim Force Telemetry CSV",
+  "schema_version": "raftsim.telemetry_forces.v0",
+  "format": "csv",
+  "columns": [
+    "step_index",
+    "time",
+    "dt",
+    "name",
+    "force_x",
+    "force_y",
+    "force_z",
+    "torque_x",
+    "torque_y",
+    "torque_z",
+    "application_x",
+    "application_y",
+    "application_z",
+    "metadata"
+  ],
+  "row_contract": {
+    "step_index": "integer fixed-step index",
+    "time": "simulation time in seconds",
+    "dt": "fixed-step duration in seconds",
+    "name": "force contribution channel name",
+    "force_x": "world force X in newtons",
+    "force_y": "world force Y in newtons",
+    "force_z": "world force Z in newtons",
+    "torque_x": "world torque X in newton-meters",
+    "torque_y": "world torque Y in newton-meters",
+    "torque_z": "world torque Z in newton-meters",
+    "application_x": "optional world application point X",
+    "application_y": "optional world application point Y",
+    "application_z": "optional world application point Z",
+    "metadata": "JSON object encoded as a string"
+  }
+}

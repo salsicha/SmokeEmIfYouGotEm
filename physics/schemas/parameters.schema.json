@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raftsim.local/schemas/parameters.schema.json",
+  "title": "RaftSim Parameter Candidate",
+  "type": "object",
+  "required": ["schema_version", "candidate"],
+  "properties": {
+    "schema_version": {
+      "const": "raftsim.parameters.v0"
+    },
+    "candidate": {
+      "type": "object",
+      "required": [
+        "label",
+        "roughness_scale",
+        "feature_strength_scale",
+        "raft_drag_scale",
+        "buoyancy_density_scale",
+        "grounding_friction_scale",
+        "contact_stiffness_scale",
+        "contact_damping_scale"
+      ],
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "roughness_scale": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "feature_strength_scale": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "raft_drag_scale": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "buoyancy_density_scale": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "grounding_friction_scale": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "contact_stiffness_scale": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "contact_damping_scale": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raftsim.local/schemas/scenario2_5d.schema.json",
+  "title": "RaftSim 2.5D Scenario Package",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "metadata",
+    "grid",
+    "fixed_dt",
+    "duration",
+    "roughness",
+    "raft",
+    "boundaries",
+    "feature_count",
+    "probe_count",
+    "array_files"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "raftsim.scenario2_5d.v0"
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "scenario_id",
+        "scenario_type",
+        "seed",
+        "description",
+        "difficulty_preset",
+        "flow_band"
+      ]
+    },
+    "grid": {
+      "type": "object",
+      "required": ["nx", "ny", "dx", "dy", "origin_x", "origin_y"]
+    },
+    "fixed_dt": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "duration": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "roughness": {
+      "type": "number",
+      "minimum": 0
+    },
+    "raft": {
+      "type": "object"
+    },
+    "boundaries": {
+      "type": "array",
+      "minItems": 4
+    },
+    "feature_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "probe_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "array_files": {
+      "type": "object",
+      "required": ["bed", "initial_state", "features", "probes"]
+    }
+  }
+}

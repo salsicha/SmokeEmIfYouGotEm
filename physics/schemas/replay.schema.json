@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raftsim.local/schemas/replay.schema.json",
+  "title": "RaftSim Deterministic Replay",
+  "type": "object",
+  "required": ["schema_version", "scenario_id", "fixed_dt", "frames"],
+  "properties": {
+    "schema_version": {
+      "const": "raftsim.replay.v0"
+    },
+    "scenario_id": {
+      "type": "string"
+    },
+    "scenario_schema_version": {
+      "type": "string"
+    },
+    "fixed_dt": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "parameter_profile": {
+      "type": "object"
+    },
+    "frames": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step_index", "time", "raft_state"],
+        "properties": {
+          "step_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "time": {
+            "type": "number",
+            "minimum": 0
+          },
+          "raft_state": {
+            "type": "object",
+            "required": ["position", "orientation", "linear_velocity", "angular_velocity"]
+          },
+          "outcome": {
+            "type": "string"
+          },
+          "force_telemetry_file": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

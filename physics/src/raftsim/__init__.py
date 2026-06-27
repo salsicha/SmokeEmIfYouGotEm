@@ -2,6 +2,12 @@
 
 from .math3d import Quaternion, Vec3
 from .math2d import Vec2
+from .schema_versions import (
+    PARAMETER_SCHEMA_VERSION,
+    REPLAY_SCHEMA_VERSION,
+    SHARED_SCHEMA_SET_VERSION,
+    TELEMETRY_FORCE_SCHEMA_VERSION,
+)
 from .raft2d import (
     PaddleCommand2D,
     Raft2DConfig,
@@ -208,6 +214,7 @@ __all__ = [
     "PyClawValidationSummary",
     "PurePythonBackend",
     "Quaternion",
+    "REPLAY_SCHEMA_VERSION",
     "RegressionPromotionResult",
     "RunOutcomeSummary",
     "Simulation",
@@ -218,6 +225,7 @@ __all__ = [
     "SolverPerformanceSummary",
     "SolverProfileReport",
     "TelemetryFrame",
+    "TELEMETRY_FORCE_SCHEMA_VERSION",
     "TelemetryRecorder",
     "ThresholdCheck",
     "ThresholdEvaluationReport",
@@ -226,6 +234,7 @@ __all__ = [
     "PaddleBladePose2_5D",
     "PaddleBladeSample2_5D",
     "PaddleCommand2D",
+    "PARAMETER_SCHEMA_VERSION",
     "ParameterSweepCandidate",
     "ParameterFitCandidateResult",
     "ParameterFitReport",
@@ -260,6 +269,7 @@ __all__ = [
     "Scenario2_5D",
     "ScenarioMetadata2_5D",
     "ScenarioValidation2_5D",
+    "SHARED_SCHEMA_SET_VERSION",
     "ValidationCheck2_5D",
     "build_initial_pyclaw_reference_result",
     "build_baseline_performance_report",

@@ -1,0 +1,25 @@
+{
+  "schema_set_version": "raftsim.shared_schemas.v0",
+  "schemas": [
+    {
+      "name": "scenario2_5d",
+      "version": "raftsim.scenario2_5d.v0",
+      "file": "scenario2_5d.schema.json"
+    },
+    {
+      "name": "telemetry_forces",
+      "version": "raftsim.telemetry_forces.v0",
+      "file": "telemetry_forces.schema.json"
+    },
+    {
+      "name": "replay",
+      "version": "raftsim.replay.v0",
+      "file": "replay.schema.json"
+    },
+    {
+      "name": "parameters",
+      "version": "raftsim.parameters.v0",
+      "file": "parameters.schema.json"
+    }
+  ]
+}

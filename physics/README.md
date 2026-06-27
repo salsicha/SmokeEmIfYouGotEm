@@ -364,6 +364,8 @@ Milestone 7 starts with solver profilers that record runtime, seconds per simula
 
 Runtime budgets for desktop, VR, and handheld gates are defined in [Physics Runtime Budgets](../docs/physics-runtime-budgets.md) and mirrored in `physics/config/runtime_budgets.json`.
 
+The first shared scenario, telemetry, replay, and parameter schemas are frozen in [Shared Schema Freeze](../docs/shared-schema-freeze.md), with versioned files under `physics/schemas/`.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
