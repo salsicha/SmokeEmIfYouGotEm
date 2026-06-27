@@ -319,6 +319,74 @@ class FeatureComparisonReport:
         return output_path
 
 
+@dataclass(frozen=True, slots=True)
+class ScenarioThresholds:
+    max_field_linf: float = 0.25
+    max_slope_linf: float = 0.25
+    max_wet_mismatch_fraction: float = 0.02
+    max_probe_linf: float = 0.25
+    max_cross_section_linf: float = 0.25
+    max_mass_drift_delta: float = 0.05
+    max_energy_change_delta: float = 0.25
+    max_froude_delta: float = 0.5
+    max_feature_location_delta: float = 5.0
+    max_feature_strength_delta: float = 10.0
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "max_field_linf": self.max_field_linf,
+            "max_slope_linf": self.max_slope_linf,
+            "max_wet_mismatch_fraction": self.max_wet_mismatch_fraction,
+            "max_probe_linf": self.max_probe_linf,
+            "max_cross_section_linf": self.max_cross_section_linf,
+            "max_mass_drift_delta": self.max_mass_drift_delta,
+            "max_energy_change_delta": self.max_energy_change_delta,
+            "max_froude_delta": self.max_froude_delta,
+            "max_feature_location_delta": self.max_feature_location_delta,
+            "max_feature_strength_delta": self.max_feature_strength_delta,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class ThresholdCheck:
+    name: str
+    passed: bool
+    value: float
+    threshold: float
+    details: str = ""
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "name": self.name,
+            "passed": self.passed,
+            "value": self.value,
+            "threshold": self.threshold,
+            "details": self.details,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class ThresholdEvaluationReport:
+    scenario_id: str
+    passed: bool
+    thresholds: ScenarioThresholds
+    checks: tuple[ThresholdCheck, ...]
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "scenario_id": self.scenario_id,
+            "passed": self.passed,
+            "thresholds": self.thresholds.to_json_dict(),
+            "checks": [check.to_json_dict() for check in self.checks],
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+
 def compare_dual_solver_fields(
     dual_solver_dir_or_manifest: str | Path,
     *,
@@ -455,6 +523,92 @@ def compare_dual_solver_features(
         comparisons=comparisons,
         max_location_delta=max((comparison.location_delta for comparison in comparisons), default=0.0),
         max_abs_strength_delta=max((abs(comparison.strength_delta) for comparison in comparisons), default=0.0),
+    )
+    if output_path is not None:
+        report.write_json(output_path)
+    return report
+
+
+def evaluate_dual_solver_thresholds(
+    dual_solver_dir_or_manifest: str | Path,
+    *,
+    thresholds: ScenarioThresholds | None = None,
+    output_path: str | Path | None = None,
+) -> ThresholdEvaluationReport:
+    """Evaluate one dual-solver scenario against explicit pass/fail thresholds."""
+
+    limits = thresholds or ScenarioThresholds()
+    field_report = compare_dual_solver_fields(dual_solver_dir_or_manifest)
+    probe_report = compare_dual_solver_probes(dual_solver_dir_or_manifest)
+    diagnostic_report = compare_dual_solver_diagnostics(dual_solver_dir_or_manifest)
+    feature_report = compare_dual_solver_features(dual_solver_dir_or_manifest)
+    checks = (
+        _threshold_check(
+            "field_linf",
+            _max_linf(field_report.frame_comparisons, "field"),
+            limits.max_field_linf,
+            "Max Linf across h/eta/u/v/hu/hv/normals.",
+        ),
+        _threshold_check(
+            "slope_linf",
+            _max_linf(field_report.frame_comparisons, "slope"),
+            limits.max_slope_linf,
+            "Max Linf across eta slope fields.",
+        ),
+        _threshold_check(
+            "wet_mismatch_fraction",
+            max((comparison.wet_mismatch_fraction for comparison in field_report.frame_comparisons), default=0.0),
+            limits.max_wet_mismatch_fraction,
+            "Max wet/dry mask mismatch fraction across compared frames.",
+        ),
+        _threshold_check(
+            "probe_linf",
+            _max_series_linf(probe_report.point_probes),
+            limits.max_probe_linf,
+            "Max Linf across point-probe fields.",
+        ),
+        _threshold_check(
+            "cross_section_linf",
+            _max_series_linf(probe_report.cross_sections),
+            limits.max_cross_section_linf,
+            "Max Linf across cross-section fields.",
+        ),
+        _threshold_check(
+            "mass_drift_delta",
+            abs(diagnostic_report.delta.mass_relative_drift_delta),
+            limits.max_mass_drift_delta,
+            "Absolute C++ minus PyClaw mass-drift delta.",
+        ),
+        _threshold_check(
+            "energy_change_delta",
+            abs(diagnostic_report.delta.energy_relative_change_delta),
+            limits.max_energy_change_delta,
+            "Absolute C++ minus PyClaw energy-change delta.",
+        ),
+        _threshold_check(
+            "froude_delta",
+            max(abs(diagnostic_report.delta.froude_max_delta), abs(diagnostic_report.delta.froude_mean_wet_delta)),
+            limits.max_froude_delta,
+            "Max absolute Froude summary delta.",
+        ),
+        _threshold_check(
+            "feature_location_delta",
+            feature_report.max_location_delta,
+            limits.max_feature_location_delta,
+            "Max observed feature response location delta.",
+        ),
+        _threshold_check(
+            "feature_strength_delta",
+            feature_report.max_abs_strength_delta,
+            limits.max_feature_strength_delta,
+            "Max observed feature response strength delta.",
+        ),
+    )
+    report = ThresholdEvaluationReport(
+        scenario_id=field_report.scenario_id,
+        passed=all(check.passed for check in checks),
+        thresholds=limits,
+        checks=checks,
     )
     if output_path is not None:
         report.write_json(output_path)
@@ -952,3 +1106,19 @@ def _nearest_cell(x: float, y: float, scenario) -> tuple[int, int]:
     col = int(np.clip(round((x - scenario.grid.origin_x) / scenario.grid.dx), 0, scenario.grid.nx - 1))
     row = int(np.clip(round((y - scenario.grid.origin_y) / scenario.grid.dy), 0, scenario.grid.ny - 1))
     return row, col
+
+
+def _threshold_check(name: str, value: float, threshold: float, details: str) -> ThresholdCheck:
+    return ThresholdCheck(name=name, passed=value <= threshold, value=value, threshold=threshold, details=details)
+
+
+def _max_linf(frame_comparisons: tuple[FrameFieldComparison, ...], kind: str) -> float:
+    values: list[float] = []
+    for comparison in frame_comparisons:
+        summaries = comparison.field_errors if kind == "field" else comparison.slope_errors
+        values.extend(summary.linf for summary in summaries)
+    return max(values, default=0.0)
+
+
+def _max_series_linf(series: tuple[SeriesComparison, ...]) -> float:
+    return max((summary.linf for item in series for summary in item.field_errors), default=0.0)
