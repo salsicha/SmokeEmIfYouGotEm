@@ -1,6 +1,7 @@
 import numpy as np
 
 from raftsim.feature_validation import (
+    validate_boil_upwelling_case,
     validate_eddy_line_case,
     validate_hole_case,
     validate_lateral_wave_case,
@@ -249,4 +250,55 @@ def test_submerged_rock_validation_detects_scrape_and_launch():
 
     assert result.feature == "submerged_rock"
     assert result.outcome == "launched"
+    assert result.passed
+
+
+def test_boil_validation_detects_deterministic_upwelling_impulse():
+    scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="flat_pool", nx=14, ny=10))
+    water = WaterField2_5D.from_scenario_initial_state(scenario)
+    center_x = 7.0
+    center_y = water.origin_y + 5 * water.dy
+    eta = water.eta.copy()
+    depth = water.depth.copy()
+    u = water.u.copy()
+    v = water.v.copy()
+    normal_x = water.normal_x.copy()
+    normal_y = water.normal_y.copy()
+    boil = Feature2_5D("boil", (center_x, center_y), radius=2.2, strength=1.0)
+    x = water.origin_x + np.arange(water.shape[1]) * water.dx
+    y = water.origin_y + np.arange(water.shape[0]) * water.dy
+    grid_x, grid_y = np.meshgrid(x, y)
+    radius_squared = ((grid_x - center_x) / 1.5) ** 2 + ((grid_y - center_y) / 1.5) ** 2
+    influence = np.exp(-radius_squared)
+    eta += 0.24 * influence
+    depth += 0.12 * influence
+    u += 0.25 * ((grid_x - center_x) / 1.5) * influence
+    v += 0.25 * ((grid_y - center_y) / 1.5) * influence
+    normal_x = -0.16 * ((grid_x - center_x) / 1.5) * influence
+    normal_y = -0.16 * ((grid_y - center_y) / 1.5) * influence
+    normal_z = np.sqrt(np.maximum(1.0 - normal_x**2 - normal_y**2, 0.01))
+    water = WaterField2_5D(
+        origin_x=water.origin_x,
+        origin_y=water.origin_y,
+        dx=water.dx,
+        dy=water.dy,
+        bed=eta - depth,
+        depth=depth,
+        eta=eta,
+        u=u,
+        v=v,
+        wet=water.wet,
+        normal_x=normal_x,
+        normal_y=normal_y,
+        normal_z=normal_z,
+        roughness=water.roughness,
+        features=(boil,),
+    )
+    properties = build_default_raft_mass_properties(scenario.raft)
+    state = RaftState6DoF(position=Vec3(center_x, center_y, 1.0), linear_velocity=Vec3(0.0, 0.0, -0.6))
+
+    result = validate_boil_upwelling_case(water, state, properties)
+
+    assert result.feature == "boil"
+    assert result.outcome == "upwelling"
     assert result.passed

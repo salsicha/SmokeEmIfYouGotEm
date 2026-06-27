@@ -359,6 +359,60 @@ def validate_submerged_rock_case(
     return FeatureValidationResult("submerged_rock", outcome, checks)
 
 
+def validate_boil_upwelling_case(
+    water: WaterField2_5D,
+    state: RaftState6DoF,
+    properties: RaftMassProperties,
+    *,
+    surface_dome_threshold: float = 0.03,
+    vertical_acceleration_threshold: float = 2.0,
+    deterministic_tolerance: float = 1.0e-9,
+) -> FeatureValidationResult:
+    """Validate deterministic boil/upwelling vertical impulse response."""
+
+    sample = water.sample(state.position.x, state.position.y)
+    neighbor_heights = [
+        water.sample(state.position.x + ox * water.dx, state.position.y + oy * water.dy).surface_height
+        for ox, oy in ((-1, 0), (1, 0), (0, -1), (0, 1))
+    ]
+    surface_dome = sample.surface_height - min(neighbor_heights)
+    first_force, first_torque = sum_force_contributions(sample_total_raft_forces(state, properties, water))
+    second_force, second_torque = sum_force_contributions(sample_total_raft_forces(state, properties, water))
+    vertical_acceleration = max(0.0, first_force.z / max(properties.total_mass_kg, 1.0e-9) + properties.gravity.z)
+    deterministic_error = max((first_force - second_force).magnitude, (first_torque - second_torque).magnitude)
+    checks = (
+        FeatureValidationCheck(
+            "boil_tag",
+            "boil" in sample.feature_tags,
+            1.0 if "boil" in sample.feature_tags else 0.0,
+            1.0,
+        ),
+        FeatureValidationCheck(
+            "surface_dome",
+            surface_dome >= surface_dome_threshold,
+            surface_dome,
+            surface_dome_threshold,
+            "Boil should form a measurable upwelling dome.",
+        ),
+        FeatureValidationCheck(
+            "vertical_impulse",
+            vertical_acceleration >= vertical_acceleration_threshold,
+            vertical_acceleration,
+            vertical_acceleration_threshold,
+            "Boil should impart upward raft acceleration.",
+        ),
+        FeatureValidationCheck(
+            "deterministic_repeat",
+            deterministic_error <= deterministic_tolerance,
+            deterministic_error,
+            deterministic_tolerance,
+            "Repeated force sampling should return identical boil impulses.",
+        ),
+    )
+    outcome = "upwelling" if all(check.passed for check in checks[1:]) else "flat"
+    return FeatureValidationResult("boil", outcome, checks)
+
+
 def _standing_wave_outcome(
     relative_downstream: float,
     lift_ratio: float,

@@ -105,7 +105,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Validate eddy-line yaw/roll coupling.
 - [x] Validate shallow shelf grounding and pivot behavior.
 - [x] Validate submerged rock scrape/launch behavior.
-- [ ] Validate deterministic boil/upwelling vertical impulses.
+- [x] Validate deterministic boil/upwelling vertical impulses.
 - [ ] Add outcome summaries for clear, stalled, surfed, flushed, grounded, pinned, or flipped runs.
 
 ## Milestone 7: Profiling, Parameter Fitting, And Runtime Budgets
