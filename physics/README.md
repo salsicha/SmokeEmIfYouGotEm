@@ -221,6 +221,31 @@ Run the native smoke test directly with:
 
 The pytest suite also builds the C++ solver against a tiny generated procedural package when CMake and a compiler are available.
 
+## Dual-Solver Runs
+
+Milestone 4 starts with a shared runner that applies one scenario package to both solvers and records the linked outputs:
+
+```bash
+cd physics
+cmake -S cpp -B /tmp/raftsim-water-build
+cmake --build /tmp/raftsim-water-build
+PYTHONPATH=src python -m raftsim.examples.run_dual_solver \
+  --fixture flat_pool \
+  --cpp-solver /tmp/raftsim-water-build/raftsim_water_solver \
+  --output-dir outputs/dual_solver/flat_pool
+```
+
+The runner writes:
+
+```text
+dual_solver_manifest.json
+scenario/<scenario_id>/
+pyclaw_reference/<scenario_id>/
+cpp_solver/<scenario_id>/
+```
+
+The manifest records the exact shared `scenario.json`, PyClaw output manifest, C++ output manifest, C++ command, and validation paths. Later Milestone 4 tasks add field, probe, feature, runtime, threshold, tuning, and regression promotion reports on top of this shared run directory.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
