@@ -9,6 +9,7 @@ from .raft_coupling2_5d import (
     RaftMassProperties,
     RaftState6DoF,
     WaterField2_5D,
+    sample_grounding_forces,
     sample_total_raft_forces,
     sum_force_contributions,
 )
@@ -226,6 +227,65 @@ def validate_eddy_line_case(
     )
     outcome = "eddy_coupled" if all(check.passed for check in checks[1:]) else "crossed"
     return FeatureValidationResult("eddy_line", outcome, checks)
+
+
+def validate_shallow_shelf_case(
+    water: WaterField2_5D,
+    state: RaftState6DoF,
+    properties: RaftMassProperties,
+    *,
+    shallow_depth_threshold: float = 0.35,
+    grounding_support_threshold: float = 0.5,
+    pivot_acceleration_threshold: float = 0.5,
+) -> FeatureValidationResult:
+    """Validate shallow-shelf grounding contact and pivot response."""
+
+    contributions = sample_grounding_forces(state, properties, water)
+    shallow_contacts = tuple(
+        contribution
+        for contribution in contributions
+        if "shallow" in str((contribution.metadata or {}).get("feature_tags", ""))
+    )
+    grounding_force, grounding_torque = sum_force_contributions(contributions)
+    weight = max(properties.total_mass_kg * abs(properties.gravity.z), 1.0)
+    support_ratio = grounding_force.z / weight
+    pivot_acceleration = abs(grounding_torque.z) / max(properties.inertia_diagonal_kg_m2.z, 1.0e-9)
+    shallow_depth = min(
+        (water.sample(contact.application_point.x, contact.application_point.y).depth for contact in shallow_contacts),
+        default=float("inf"),
+    )
+    checks = (
+        FeatureValidationCheck(
+            "shallow_contact",
+            bool(shallow_contacts),
+            float(len(shallow_contacts)),
+            1.0,
+            "Grounding contacts should include a shallow shelf tag.",
+        ),
+        FeatureValidationCheck(
+            "shallow_depth",
+            shallow_depth <= shallow_depth_threshold,
+            shallow_depth,
+            shallow_depth_threshold,
+            "Shelf contact should occur in shallow water.",
+        ),
+        FeatureValidationCheck(
+            "grounding_support",
+            support_ratio >= grounding_support_threshold,
+            support_ratio,
+            grounding_support_threshold,
+            "Grounding force should support a meaningful share of raft weight.",
+        ),
+        FeatureValidationCheck(
+            "pivot_yaw",
+            pivot_acceleration >= pivot_acceleration_threshold,
+            pivot_acceleration,
+            pivot_acceleration_threshold,
+            "Off-center shelf contact should pivot the raft.",
+        ),
+    )
+    outcome = "pivoted" if all(check.passed for check in checks[1:]) and shallow_contacts else "grounded"
+    return FeatureValidationResult("shallow_shelf", outcome, checks)
 
 
 def _standing_wave_outcome(

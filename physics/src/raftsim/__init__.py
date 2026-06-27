@@ -116,6 +116,7 @@ from .feature_validation import (
     validate_eddy_line_case,
     validate_hole_case,
     validate_lateral_wave_case,
+    validate_shallow_shelf_case,
     validate_standing_wave_case,
 )
 from .sim import Simulation, SimulationConfig, SimulationSystem
@@ -252,6 +253,7 @@ __all__ = [
     "validate_eddy_line_case",
     "validate_hole_case",
     "validate_lateral_wave_case",
+    "validate_shallow_shelf_case",
     "validate_standing_wave_case",
     "write_unavailable_report",
 ]

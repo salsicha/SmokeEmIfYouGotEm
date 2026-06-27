@@ -4,6 +4,7 @@ from raftsim.feature_validation import (
     validate_eddy_line_case,
     validate_hole_case,
     validate_lateral_wave_case,
+    validate_shallow_shelf_case,
     validate_standing_wave_case,
 )
 from raftsim.math3d import Vec3
@@ -163,4 +164,46 @@ def test_eddy_line_validation_detects_yaw_and_roll_coupling():
 
     assert result.feature == "eddy_line"
     assert result.outcome == "eddy_coupled"
+    assert result.passed
+
+
+def test_shallow_shelf_validation_detects_grounding_and_pivot():
+    scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="flat_pool", nx=14, ny=10))
+    water = WaterField2_5D.from_scenario_initial_state(scenario)
+    center_x = 7.0
+    center_y = water.origin_y + 5 * water.dy
+    eta = water.eta.copy()
+    depth = water.depth.copy()
+    u = water.u.copy()
+    shelf = Feature2_5D("shallow", (center_x + 1.2, center_y + 0.8), radius=2.3, strength=1.0)
+    x = water.origin_x + np.arange(water.shape[1]) * water.dx
+    y = water.origin_y + np.arange(water.shape[0]) * water.dy
+    grid_x, grid_y = np.meshgrid(x, y)
+    influence = np.exp(-(((grid_x - shelf.center[0]) / 2.0) ** 2 + ((grid_y - shelf.center[1]) / 1.4) ** 2))
+    depth = np.where(influence > 0.25, 0.22, depth)
+    u[:, :] = 0.4
+    water = WaterField2_5D(
+        origin_x=water.origin_x,
+        origin_y=water.origin_y,
+        dx=water.dx,
+        dy=water.dy,
+        bed=eta - depth,
+        depth=depth,
+        eta=eta,
+        u=u,
+        v=water.v,
+        wet=water.wet,
+        normal_x=water.normal_x,
+        normal_y=water.normal_y,
+        normal_z=water.normal_z,
+        roughness=water.roughness,
+        features=(shelf,),
+    )
+    properties = build_default_raft_mass_properties(scenario.raft)
+    state = RaftState6DoF(position=Vec3(center_x, center_y, 1.0), linear_velocity=Vec3(2.0, 0.0, -0.5))
+
+    result = validate_shallow_shelf_case(water, state, properties)
+
+    assert result.feature == "shallow_shelf"
+    assert result.outcome == "pivoted"
     assert result.passed
