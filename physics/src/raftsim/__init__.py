@@ -99,6 +99,7 @@ from .raft_coupling2_5d import (
     WaterSample2_5D,
     build_default_raft_mass_properties,
     sample_buoyancy_forces,
+    sample_hydrodynamic_forces,
     sum_force_contributions,
 )
 from .sim import Simulation, SimulationConfig, SimulationSystem
@@ -200,6 +201,7 @@ __all__ = [
     "build_initial_pyclaw_reference_result",
     "build_default_raft_mass_properties",
     "sample_buoyancy_forces",
+    "sample_hydrodynamic_forces",
     "sum_force_contributions",
     "canonical_pyclaw_scenarios",
     "backend_statuses",

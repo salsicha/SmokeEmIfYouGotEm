@@ -336,6 +336,8 @@ The state tracks position, orientation quaternion, linear velocity, and angular 
 
 `sample_buoyancy_forces()` evaluates raft sample patches against a `WaterField2_5D`, producing per-patch force and torque contributions from submerged depth and local surface normal.
 
+`sample_hydrodynamic_forces()` adds named vertical damping, horizontal drag, surface-slope, and added-mass proxy contributions based on raft point velocity relative to local water velocity.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.

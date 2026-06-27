@@ -348,3 +348,60 @@ def sum_force_contributions(contributions: tuple[RaftForceContribution2_5D, ...]
         total_force += contribution.force
         total_torque += contribution.torque
     return total_force, total_torque
+
+
+def sample_hydrodynamic_forces(
+    state: RaftState6DoF,
+    properties: RaftMassProperties,
+    water: WaterField2_5D,
+    *,
+    water_density_kg_m3: float = 1000.0,
+    vertical_damping: float = 450.0,
+    horizontal_drag_coefficient: float = 1.25,
+    slope_force_scale: float = 1.0,
+    added_mass_coefficient: float = 0.35,
+) -> tuple[RaftForceContribution2_5D, ...]:
+    """Sample damping, drag, surface-slope, and added-mass proxy forces."""
+
+    contributions: list[RaftForceContribution2_5D] = []
+    gravity_magnitude = abs(properties.gravity.z) if abs(properties.gravity.z) > 1.0e-9 else 9.81
+    patch_mass = properties.total_mass_kg / max(len(properties.sample_patches), 1)
+    for index, patch in enumerate(properties.sample_patches):
+        point = state.world_point(patch.local_position)
+        sample = water.sample(point.x, point.y)
+        point_velocity = state.point_velocity(patch.local_position)
+        relative = point_velocity - sample.velocity
+        horizontal_relative = Vec3(relative.x, relative.y, 0.0)
+        horizontal_speed = horizontal_relative.magnitude
+        force = Vec3()
+
+        if sample.wet:
+            force += Vec3(0.0, 0.0, -vertical_damping * relative.z * patch.area_m2)
+            if horizontal_speed > 1.0e-9:
+                drag = horizontal_relative * (
+                    -0.5 * water_density_kg_m3 * horizontal_drag_coefficient * patch.area_m2 * horizontal_speed
+                )
+                added_mass = horizontal_relative * (
+                    -added_mass_coefficient * water_density_kg_m3 * patch.area_m2 * max(sample.depth, 0.05)
+                )
+                force += drag + added_mass
+            slope_force = Vec3(sample.normal.x, sample.normal.y, 0.0) * (patch_mass * gravity_magnitude * slope_force_scale)
+            force += slope_force
+
+        if force.magnitude_squared <= 1.0e-18:
+            continue
+        torque = (point - state.position).cross(force)
+        contributions.append(
+            RaftForceContribution2_5D(
+                name=f"hydrodynamic:{patch.kind}:{index}",
+                force=force,
+                torque=torque,
+                application_point=point,
+                metadata={
+                    "kind": patch.kind,
+                    "relative_speed": horizontal_speed,
+                    "depth": sample.depth,
+                },
+            )
+        )
+    return tuple(contributions)
