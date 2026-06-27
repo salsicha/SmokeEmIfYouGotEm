@@ -17,6 +17,8 @@ BoolGrid = NDArray[np.bool_]
 
 FIELD_NAMES = ("h", "eta", "u", "v", "hu", "hv", "normal_x", "normal_y", "normal_z")
 SLOPE_FIELD_NAMES = ("slope_x", "slope_y")
+PROBE_FIELD_NAMES = ("h", "eta", "u", "v", "hu", "hv", "wet", "froude")
+CROSS_SECTION_FIELD_NAMES = ("h", "eta", "u", "v", "froude")
 
 
 @dataclass(frozen=True, slots=True)
@@ -81,6 +83,48 @@ class FieldComparisonReport:
         return output_path
 
 
+@dataclass(frozen=True, slots=True)
+class SeriesComparison:
+    sample_id: str
+    kind: str
+    field_errors: tuple[FieldErrorSummary, ...]
+    reference_sample_count: int
+    candidate_sample_count: int
+    max_time_delta: float
+    max_distance_delta: float | None = None
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "sample_id": self.sample_id,
+            "kind": self.kind,
+            "field_errors": [summary.to_json_dict() for summary in self.field_errors],
+            "reference_sample_count": self.reference_sample_count,
+            "candidate_sample_count": self.candidate_sample_count,
+            "max_time_delta": self.max_time_delta,
+            "max_distance_delta": self.max_distance_delta,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class ProbeComparisonReport:
+    scenario_id: str
+    point_probes: tuple[SeriesComparison, ...]
+    cross_sections: tuple[SeriesComparison, ...]
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "scenario_id": self.scenario_id,
+            "point_probes": [comparison.to_json_dict() for comparison in self.point_probes],
+            "cross_sections": [comparison.to_json_dict() for comparison in self.cross_sections],
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+
 def compare_dual_solver_fields(
     dual_solver_dir_or_manifest: str | Path,
     *,
@@ -115,6 +159,49 @@ def compare_dual_solver_fields(
     return report
 
 
+def compare_dual_solver_probes(
+    dual_solver_dir_or_manifest: str | Path,
+    *,
+    output_path: str | Path | None = None,
+) -> ProbeComparisonReport:
+    """Compare point probe time series and cross sections from a dual-solver run."""
+
+    manifest_path = _manifest_path(dual_solver_dir_or_manifest)
+    root = manifest_path.parent
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    pyclaw_manifest = _load_manifest(root / manifest["pyclaw"]["manifest"])
+    cpp_manifest = _load_manifest(root / manifest["cpp"]["manifest"])
+    pyclaw_output = root / manifest["pyclaw"]["output_dir"]
+    cpp_output = root / manifest["cpp"]["output_dir"]
+
+    point_probes = tuple(
+        _compare_probe_pair(probe_id, pyclaw_path, cpp_path)
+        for probe_id, pyclaw_path, cpp_path in _matched_files(
+            pyclaw_output,
+            pyclaw_manifest["probes"],
+            cpp_output,
+            cpp_manifest["probes"],
+        )
+    )
+    cross_sections = tuple(
+        _compare_cross_section_pair(probe_id, pyclaw_path, cpp_path)
+        for probe_id, pyclaw_path, cpp_path in _matched_files(
+            pyclaw_output,
+            pyclaw_manifest["cross_sections"],
+            cpp_output,
+            cpp_manifest["cross_sections"],
+        )
+    )
+    report = ProbeComparisonReport(
+        scenario_id=manifest["scenario_id"],
+        point_probes=point_probes,
+        cross_sections=cross_sections,
+    )
+    if output_path is not None:
+        report.write_json(output_path)
+    return report
+
+
 def _manifest_path(path: str | Path) -> Path:
     candidate = Path(path)
     if candidate.name == "dual_solver_manifest.json":
@@ -124,6 +211,22 @@ def _manifest_path(path: str | Path) -> Path:
 
 def _load_manifest(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _matched_files(
+    reference_root: Path,
+    reference_files: list[str],
+    candidate_root: Path,
+    candidate_files: list[str],
+) -> tuple[tuple[str, Path, Path], ...]:
+    candidate_by_id = {Path(path).stem: candidate_root / path for path in candidate_files}
+    matched: list[tuple[str, Path, Path]] = []
+    for path in reference_files:
+        sample_id = Path(path).stem
+        candidate_path = candidate_by_id.get(sample_id)
+        if candidate_path is not None:
+            matched.append((sample_id, reference_root / path, candidate_path))
+    return tuple(matched)
 
 
 def _frame_pairings(pyclaw_frames: list[Path], cpp_frames: list[Path]) -> tuple[tuple[str, Path, Path], ...]:
@@ -234,3 +337,109 @@ def _field_error(field_name: str, reference: FloatGrid | BoolGrid, candidate: Fl
 def _slopes_from_eta(eta: FloatGrid, dx: float, dy: float) -> tuple[FloatGrid, FloatGrid]:
     slope_y, slope_x = np.gradient(np.asarray(eta, dtype=np.float64), dy, dx)
     return slope_x, slope_y
+
+
+def _compare_probe_pair(probe_id: str, pyclaw_path: Path, cpp_path: Path) -> SeriesComparison:
+    reference = _load_probe_csv(pyclaw_path)
+    candidate = _load_probe_csv(cpp_path)
+    ref_times = reference["time"]
+    cand_times = candidate["time"]
+    indices, max_time_delta = _nearest_indices(ref_times, cand_times)
+    field_errors = tuple(
+        _field_error(field, reference[field], candidate[field][indices])
+        for field in PROBE_FIELD_NAMES
+        if field in reference and field in candidate
+    )
+    return SeriesComparison(
+        sample_id=probe_id,
+        kind="point",
+        field_errors=field_errors,
+        reference_sample_count=len(ref_times),
+        candidate_sample_count=len(cand_times),
+        max_time_delta=max_time_delta,
+    )
+
+
+def _compare_cross_section_pair(probe_id: str, pyclaw_path: Path, cpp_path: Path) -> SeriesComparison:
+    reference = _load_pyclaw_cross_section_npz(pyclaw_path)
+    candidate = _load_cpp_cross_section_csv(cpp_path)
+    time_indices, max_time_delta = _nearest_indices(reference["times"], candidate["times"])
+    distance_indices, max_distance_delta = _nearest_indices(reference["distance"], candidate["distance"])
+    field_errors = tuple(
+        _field_error(
+            field,
+            reference[field],
+            candidate[field][np.ix_(time_indices, distance_indices)],
+        )
+        for field in CROSS_SECTION_FIELD_NAMES
+    )
+    return SeriesComparison(
+        sample_id=probe_id,
+        kind="cross_section",
+        field_errors=field_errors,
+        reference_sample_count=int(reference["times"].size * reference["distance"].size),
+        candidate_sample_count=int(candidate["times"].size * candidate["distance"].size),
+        max_time_delta=max_time_delta,
+        max_distance_delta=max_distance_delta,
+    )
+
+
+def _load_probe_csv(path: Path) -> dict[str, FloatGrid]:
+    rows: list[dict[str, str]] = []
+    with path.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            rows.append(row)
+    if not rows:
+        raise ValueError(f"Probe CSV is empty: {path}")
+    columns = rows[0].keys()
+    return {column: np.asarray([float(row[column]) for row in rows], dtype=np.float64) for column in columns}
+
+
+def _load_pyclaw_cross_section_npz(path: Path) -> dict[str, FloatGrid]:
+    with np.load(path) as data:
+        return {
+            "times": np.asarray(data["times"], dtype=np.float64),
+            "distance": np.asarray(data["distance"], dtype=np.float64),
+            "h": np.asarray(data["h"], dtype=np.float64),
+            "eta": np.asarray(data["eta"], dtype=np.float64),
+            "u": np.asarray(data["u"], dtype=np.float64),
+            "v": np.asarray(data["v"], dtype=np.float64),
+            "froude": np.asarray(data["froude"], dtype=np.float64),
+        }
+
+
+def _load_cpp_cross_section_csv(path: Path) -> dict[str, FloatGrid]:
+    rows: list[dict[str, str]] = []
+    with path.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            rows.append(row)
+    if not rows:
+        raise ValueError(f"Cross-section CSV is empty: {path}")
+    times = np.asarray(sorted({float(row["time"]) for row in rows}), dtype=np.float64)
+    distances = np.asarray(sorted({float(row["distance"]) for row in rows}), dtype=np.float64)
+    time_index = {value: index for index, value in enumerate(times)}
+    distance_index = {value: index for index, value in enumerate(distances)}
+    result: dict[str, FloatGrid] = {
+        "times": times,
+        "distance": distances,
+    }
+    for field in CROSS_SECTION_FIELD_NAMES:
+        result[field] = np.zeros((len(times), len(distances)), dtype=np.float64)
+    for row in rows:
+        t = time_index[float(row["time"])]
+        d = distance_index[float(row["distance"])]
+        for field in CROSS_SECTION_FIELD_NAMES:
+            result[field][t, d] = float(row[field])
+    return result
+
+
+def _nearest_indices(reference: FloatGrid, candidate: FloatGrid) -> tuple[NDArray[np.int64], float]:
+    if reference.size == 0 or candidate.size == 0:
+        raise ValueError("Cannot align empty sample arrays.")
+    indices = np.zeros(reference.shape, dtype=np.int64)
+    max_delta = 0.0
+    for index, value in np.ndenumerate(reference):
+        nearest = int(np.argmin(np.abs(candidate - value)))
+        indices[index] = nearest
+        max_delta = max(max_delta, float(abs(candidate[nearest] - value)))
+    return indices, max_delta
