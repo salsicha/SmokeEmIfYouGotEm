@@ -83,6 +83,12 @@ from .comparison import (
     compare_dual_solver_probes,
     evaluate_dual_solver_thresholds,
 )
+from .tuning import (
+    CppTuningCandidate,
+    CppTuningCandidateResult,
+    CppTuningReport,
+    tune_cpp_solver_against_pyclaw,
+)
 from .sim import Simulation, SimulationConfig, SimulationSystem
 from .state import BodyState
 from .telemetry import ForceContribution, TelemetryFrame, TelemetryRecorder
@@ -108,6 +114,9 @@ __all__ = [
     "ChronoSimulation",
     "CppSolverRunConfig",
     "CppSolverRunResult",
+    "CppTuningCandidate",
+    "CppTuningCandidateResult",
+    "CppTuningReport",
     "DualSolverRunConfig",
     "DualSolverRunResult",
     "DiagnosticDeltaSummary",
@@ -188,5 +197,6 @@ __all__ = [
     "run_dual_solver_scenario",
     "run_pyclaw_reference",
     "select_backend",
+    "tune_cpp_solver_against_pyclaw",
     "write_unavailable_report",
 ]

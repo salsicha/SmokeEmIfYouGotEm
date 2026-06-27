@@ -20,6 +20,7 @@ struct CliArgs {
     int steps = -1;
     int frame_interval = 60;
     double feature_strength_scale = 1.0;
+    double roughness_scale = 1.0;
 };
 
 void print_usage(const char* program) {
@@ -31,6 +32,7 @@ void print_usage(const char* program) {
         << "  --steps <n>                    Fixed steps to run (default: scenario duration / fixed_dt)\n"
         << "  --frame-interval <n>           Save every n solver steps (default: 60)\n"
         << "  --feature-strength-scale <x>   Scale authored rapid forcing (default: 1.0)\n"
+        << "  --roughness-scale <x>          Scale scenario roughness/friction (default: 1.0)\n"
         << "  --help                         Show this help\n";
 }
 
@@ -74,6 +76,8 @@ CliArgs parse_args(int argc, char** argv) {
             args.frame_interval = parse_int(require_value(flag), flag);
         } else if (flag == "--feature-strength-scale") {
             args.feature_strength_scale = parse_double(require_value(flag), flag);
+        } else if (flag == "--roughness-scale") {
+            args.roughness_scale = parse_double(require_value(flag), flag);
         } else {
             throw std::runtime_error("Unknown argument: " + flag);
         }
@@ -103,6 +107,7 @@ int main(int argc, char** argv) {
 
         raftsim::SolverConfig config;
         config.feature_strength_scale = args.feature_strength_scale;
+        config.roughness_scale = args.roughness_scale;
         raftsim::ReducedShallowWaterSolver solver(std::move(scenario), config);
         std::vector<raftsim::Frame> frames = solver.run(steps, args.frame_interval);
         raftsim::ValidationSummary validation = raftsim::validate_frames(solver.scenario(), frames, config);

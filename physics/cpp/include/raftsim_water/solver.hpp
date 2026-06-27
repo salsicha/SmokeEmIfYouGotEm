@@ -19,6 +19,7 @@ struct SolverConfig {
     double dry_tolerance = 1.0e-6;
     double max_velocity = 60.0;
     double feature_strength_scale = 1.0;
+    double roughness_scale = 1.0;
 };
 
 struct Frame {
@@ -71,4 +72,3 @@ void write_solver_output(
 );
 
 }  // namespace raftsim
-
