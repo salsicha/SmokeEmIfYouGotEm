@@ -5,7 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from raftsim.comparison import compare_dual_solver_fields, compare_dual_solver_probes
+from raftsim.comparison import (
+    compare_dual_solver_diagnostics,
+    compare_dual_solver_fields,
+    compare_dual_solver_probes,
+)
 from raftsim.dual_solver import CppSolverRunConfig, DualSolverRunConfig, run_dual_solver_scenario
 from raftsim.pyclaw_reference import PyClawRunConfig, check_pyclaw_availability
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
@@ -116,3 +120,36 @@ def test_probe_comparison_reports_time_series_and_cross_sections(tmp_path):
     assert first_probe.max_time_delta <= scenario.fixed_dt
     assert error_by_name["h"].linf == 0.0
     assert report.cross_sections[0].max_distance_delta == 0.0
+
+
+def test_diagnostic_comparison_reports_physical_summaries(tmp_path):
+    availability = check_pyclaw_availability()
+    if not availability.available:
+        pytest.skip(f"PyClaw unavailable: {availability.reason}")
+    cpp_solver = _build_cpp_solver(tmp_path)
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="flat_pool", seed=15, nx=12, ny=8, duration=0.05)
+    )
+    result = run_dual_solver_scenario(
+        scenario,
+        output_dir=tmp_path / "dual",
+        config=DualSolverRunConfig(
+            pyclaw=PyClawRunConfig(num_output_times=1),
+            cpp=CppSolverRunConfig(executable=cpp_solver, steps=3, frame_interval=1),
+        ),
+    )
+
+    report = compare_dual_solver_diagnostics(
+        result.output_dir,
+        output_path=result.output_dir / "diagnostic_comparison.json",
+    )
+    report_data = json.loads((result.output_dir / "diagnostic_comparison.json").read_text(encoding="utf-8"))
+
+    assert report.scenario_id == scenario.metadata.scenario_id
+    assert report_data["scenario_id"] == scenario.metadata.scenario_id
+    assert report.pyclaw.mass_relative_drift == 0.0
+    assert report.cpp.mass_relative_drift == 0.0
+    assert report.pyclaw.froude_max == 0.0
+    assert report.cpp.froude_max == 0.0
+    assert report.pyclaw.hole_retention.hole_count == 0
+    assert report.delta.hole_retained_area_delta == 0.0
