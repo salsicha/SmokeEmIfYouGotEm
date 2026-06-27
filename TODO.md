@@ -91,7 +91,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Define a solver-neutral water query API for surface height, normal, depth, velocity, wet/dry state, bed height, roughness, and feature tags.
 - [x] Apply buoyancy from submerged sample depth and local surface normal.
 - [x] Apply vertical damping, horizontal water drag, surface-slope forces, and added-mass approximation.
-- [ ] Add bed, rock, ledge, and shallow grounding contact.
+- [x] Add bed, rock, ledge, and shallow grounding contact.
 - [ ] Add paddle blade pose, depth, and blade-water relative velocity.
 - [ ] Run raft-force sampling against PyClaw output fields.
 - [ ] Run raft-force sampling against custom C++ runtime fields.
