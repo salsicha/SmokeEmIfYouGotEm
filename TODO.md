@@ -101,7 +101,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 
 - [x] Validate standing wave clear, stall, surf, and flush cases.
 - [x] Validate hole depression, upstream retention, aerated damping, and downstream boil/upwelling behavior.
-- [ ] Validate lateral wave side impulse and roll torque.
+- [x] Validate lateral wave side impulse and roll torque.
 - [ ] Validate eddy-line yaw/roll coupling.
 - [ ] Validate shallow shelf grounding and pivot behavior.
 - [ ] Validate submerged rock scrape/launch behavior.

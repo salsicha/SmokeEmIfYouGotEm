@@ -5,7 +5,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .math3d import Vec3
-from .raft_coupling2_5d import RaftMassProperties, RaftState6DoF, WaterField2_5D, sample_total_raft_forces, sum_force_contributions
+from .raft_coupling2_5d import (
+    RaftMassProperties,
+    RaftState6DoF,
+    WaterField2_5D,
+    sample_total_raft_forces,
+    sum_force_contributions,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -118,6 +124,57 @@ def validate_hole_case(
     )
     outcome = "retentive_hole" if all(check.passed for check in checks[1:]) else "flush"
     return FeatureValidationResult("hole", outcome, checks)
+
+
+def validate_lateral_wave_case(
+    water: WaterField2_5D,
+    state: RaftState6DoF,
+    properties: RaftMassProperties,
+    *,
+    cross_current_threshold: float = 0.25,
+    side_acceleration_threshold: float = 0.12,
+    roll_acceleration_threshold: float = 1.0,
+) -> FeatureValidationResult:
+    """Validate lateral-wave side impulse and roll-torque response."""
+
+    sample = water.sample(state.position.x, state.position.y)
+    left = water.sample(state.position.x, state.position.y - water.dy)
+    right = water.sample(state.position.x, state.position.y + water.dy)
+    total_force, total_torque = sum_force_contributions(sample_total_raft_forces(state, properties, water))
+    cross_current = max(abs(sample.velocity.y), abs(left.velocity.y), abs(right.velocity.y))
+    side_acceleration = abs(total_force.y) / max(properties.total_mass_kg, 1.0e-9)
+    roll_acceleration = abs(total_torque.x) / max(properties.inertia_diagonal_kg_m2.x, 1.0e-9)
+    checks = (
+        FeatureValidationCheck(
+            "lateral_tag",
+            "lateral" in sample.feature_tags,
+            1.0 if "lateral" in sample.feature_tags else 0.0,
+            1.0,
+        ),
+        FeatureValidationCheck(
+            "cross_current",
+            cross_current >= cross_current_threshold,
+            cross_current,
+            cross_current_threshold,
+            "Lateral wave should expose a meaningful cross-current.",
+        ),
+        FeatureValidationCheck(
+            "side_impulse",
+            side_acceleration >= side_acceleration_threshold,
+            side_acceleration,
+            side_acceleration_threshold,
+            "Integrated raft forces should push the raft sideways.",
+        ),
+        FeatureValidationCheck(
+            "roll_torque",
+            roll_acceleration >= roll_acceleration_threshold,
+            roll_acceleration,
+            roll_acceleration_threshold,
+            "Asymmetric water loading should create roll acceleration.",
+        ),
+    )
+    outcome = "side_surf" if all(check.passed for check in checks[1:]) else "clear"
+    return FeatureValidationResult("lateral_wave", outcome, checks)
 
 
 def _standing_wave_outcome(
