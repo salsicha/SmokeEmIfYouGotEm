@@ -276,6 +276,16 @@ PYTHONPATH=src python -m raftsim.examples.compare_dual_solver_diagnostics \
 
 This writes `diagnostic_comparison.json` with mass conservation, total energy change, Froude summaries, hydraulic-jump proxy location, wave crest/trough location, and hole-retention geometry.
 
+Compare authored feature responses with:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.compare_dual_solver_features \
+  outputs/dual_solver/flat_pool
+```
+
+This writes `feature_comparison.json` with per-feature observed response locations, distance from authored center, solver-to-solver location delta, observed strength, and strength delta.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.

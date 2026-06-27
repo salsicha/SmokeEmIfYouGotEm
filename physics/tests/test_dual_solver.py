@@ -7,6 +7,7 @@ import pytest
 
 from raftsim.comparison import (
     compare_dual_solver_diagnostics,
+    compare_dual_solver_features,
     compare_dual_solver_fields,
     compare_dual_solver_probes,
 )
@@ -155,3 +156,33 @@ def test_diagnostic_comparison_reports_physical_summaries(tmp_path):
     assert report.cpp.froude_max == 0.0
     assert report.pyclaw.hole_retention.hole_count == 0
     assert report.delta.hole_retained_area_delta == 0.0
+
+
+def test_feature_comparison_reports_location_and_strength(tmp_path):
+    availability = check_pyclaw_availability()
+    if not availability.available:
+        pytest.skip(f"PyClaw unavailable: {availability.reason}")
+    cpp_solver = _build_cpp_solver(tmp_path)
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="dam_break", seed=16, nx=16, ny=8, duration=0.05)
+    )
+    result = run_dual_solver_scenario(
+        scenario,
+        output_dir=tmp_path / "dual",
+        config=DualSolverRunConfig(
+            pyclaw=PyClawRunConfig(num_output_times=1),
+            cpp=CppSolverRunConfig(executable=cpp_solver, steps=3, frame_interval=1),
+        ),
+    )
+
+    report = compare_dual_solver_features(result.output_dir, output_path=result.output_dir / "feature_comparison.json")
+    report_data = json.loads((result.output_dir / "feature_comparison.json").read_text(encoding="utf-8"))
+    first = report.comparisons[0]
+
+    assert report.scenario_id == scenario.metadata.scenario_id
+    assert report.feature_count == len(scenario.features)
+    assert report_data["feature_count"] == len(scenario.features)
+    assert first.kind == "ledge"
+    assert first.location_delta >= 0.0
+    assert first.pyclaw.strength >= 0.0
+    assert first.cpp.strength >= 0.0
