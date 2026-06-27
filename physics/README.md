@@ -346,6 +346,8 @@ The state tracks position, orientation quaternion, linear velocity, and angular 
 
 `WaterField2_5D.from_cpp_frame_csv()` does the same for C++ solver frame CSVs.
 
+`compare_raft_force_samples()` compares PyClaw-vs-C++ raft force envelopes, one-step trajectory deltas, and coarse outcomes such as `floating`, `grounded`, `forced`, or `freefall`.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.

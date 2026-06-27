@@ -11,6 +11,7 @@ from raftsim.raft_coupling2_5d import (
     RaftState6DoF,
     WaterField2_5D,
     build_default_raft_mass_properties,
+    compare_raft_force_samples,
     sample_buoyancy_forces,
     sample_grounding_forces,
     sample_hydrodynamic_forces,
@@ -193,3 +194,19 @@ def test_raft_forces_sample_from_cpp_frame_csv(tmp_path):
 
     assert contributions
     assert total_force.z > 0.0
+
+
+def test_raft_force_comparison_reports_envelopes_trajectory_and_outcome():
+    scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="flat_pool", nx=12, ny=8))
+    water = WaterField2_5D.from_scenario_initial_state(scenario)
+    properties = build_default_raft_mass_properties(scenario.raft)
+    state = RaftState6DoF(position=Vec3(5.0, 0.0, 0.8))
+
+    comparison = compare_raft_force_samples(water, water, state, properties, dt=1.0 / 60.0)
+
+    assert comparison.outcome_match is True
+    assert comparison.reference.outcome == "floating"
+    assert comparison.force_delta.magnitude == 0.0
+    assert comparison.torque_delta.magnitude == 0.0
+    assert comparison.trajectory_position_delta == 0.0
+    assert comparison.trajectory_velocity_delta == 0.0
