@@ -60,3 +60,15 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert "frames/frame_0000.csv" in manifest["frames"]
     assert manifest["probes"]
     assert manifest["cross_sections"]
+
+
+def test_chrono_smoke_target_is_optional_and_outside_unreal():
+    physics_dir = Path(__file__).resolve().parents[1]
+    cmake_text = (physics_dir / "cpp" / "CMakeLists.txt").read_text(encoding="utf-8")
+    smoke_source = (physics_dir / "cpp" / "tools" / "chrono_smoke_test.cpp").read_text(encoding="utf-8")
+
+    assert "find_package(Chrono QUIET)" in cmake_text
+    assert "add_executable(raftsim_chrono_smoke" in cmake_text
+    assert "Project Chrono not found; skipping raftsim_chrono_smoke target" in cmake_text
+    assert "ChSystemSMC" in smoke_source
+    assert "chrono_smoke=ok" in smoke_source

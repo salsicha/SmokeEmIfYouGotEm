@@ -122,7 +122,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 ## Milestone 8: Chrono And Native Runtime Integration
 
 - [x] Decide which raft dynamics run in custom C++ versus Project Chrono.
-- [ ] Create a standalone native C++ Chrono smoke test outside Unreal.
+- [x] Create a standalone native C++ Chrono smoke test outside Unreal.
 - [ ] Couple Chrono raft/contact dynamics to the custom C++ water field.
 - [ ] Compare native Chrono/custom-water telemetry against Python/PyClaw reference scenarios.
 - [ ] Keep Chrono::FSI as an optional experiment/reference path, not the baseline runtime dependency.
