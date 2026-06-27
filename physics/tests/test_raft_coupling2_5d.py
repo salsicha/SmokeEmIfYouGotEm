@@ -1,4 +1,5 @@
 import math
+import csv
 
 import pytest
 
@@ -167,3 +168,28 @@ def test_raft_forces_sample_from_pyclaw_frame_output(tmp_path):
     assert contributions
     assert total_force.z > 0.0
     assert any(contribution.name.startswith("buoyancy") for contribution in contributions)
+
+
+def test_raft_forces_sample_from_cpp_frame_csv(tmp_path):
+    scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="flat_pool", nx=8, ny=6))
+    frame_path = tmp_path / "frame_0000.csv"
+    with frame_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["row", "col", "x", "y", "h", "eta", "u", "v", "hu", "hv", "wet", "normal_x", "normal_y", "normal_z", "froude"])
+        for row in range(scenario.grid.ny):
+            for col in range(scenario.grid.nx):
+                x = scenario.grid.origin_x + col * scenario.grid.dx
+                y = scenario.grid.origin_y + row * scenario.grid.dy
+                h = scenario.initial_state.depth[row, col]
+                u = scenario.initial_state.u[row, col]
+                v = scenario.initial_state.v[row, col]
+                writer.writerow([row, col, x, y, h, scenario.initial_state.eta[row, col], u, v, h * u, h * v, 1, 0.0, 0.0, 1.0, 0.0])
+    water = WaterField2_5D.from_cpp_frame_csv(scenario, str(frame_path))
+    properties = build_default_raft_mass_properties(scenario.raft)
+    state = RaftState6DoF(position=Vec3(3.0, 0.0, 0.8))
+
+    contributions = sample_total_raft_forces(state, properties, water)
+    total_force, _ = sum_force_contributions(contributions)
+
+    assert contributions
+    assert total_force.z > 0.0

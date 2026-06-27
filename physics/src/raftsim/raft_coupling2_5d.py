@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 from dataclasses import dataclass
 
 import numpy as np
@@ -244,6 +245,55 @@ class WaterField2_5D:
                 roughness=scenario.roughness,
                 features=scenario.features,
             )
+
+    @classmethod
+    def from_cpp_frame_csv(cls, scenario: Scenario2_5D, frame_path: str) -> WaterField2_5D:
+        rows: list[dict[str, str]] = []
+        with open(frame_path, encoding="utf-8", newline="") as handle:
+            rows.extend(csv.DictReader(handle))
+        if not rows:
+            raise ValueError(f"C++ frame CSV is empty: {frame_path}")
+        ny, nx = scenario.grid.shape
+        arrays = {
+            "h": np.zeros((ny, nx), dtype=np.float64),
+            "eta": np.zeros((ny, nx), dtype=np.float64),
+            "u": np.zeros((ny, nx), dtype=np.float64),
+            "v": np.zeros((ny, nx), dtype=np.float64),
+            "wet": np.zeros((ny, nx), dtype=np.bool_),
+            "normal_x": np.zeros((ny, nx), dtype=np.float64),
+            "normal_y": np.zeros((ny, nx), dtype=np.float64),
+            "normal_z": np.zeros((ny, nx), dtype=np.float64),
+        }
+        for row in rows:
+            row_index = int(row["row"])
+            col_index = int(row["col"])
+            arrays["h"][row_index, col_index] = float(row["h"])
+            arrays["eta"][row_index, col_index] = float(row["eta"])
+            arrays["u"][row_index, col_index] = float(row["u"])
+            arrays["v"][row_index, col_index] = float(row["v"])
+            arrays["wet"][row_index, col_index] = bool(int(row["wet"]))
+            arrays["normal_x"][row_index, col_index] = float(row["normal_x"])
+            arrays["normal_y"][row_index, col_index] = float(row["normal_y"])
+            arrays["normal_z"][row_index, col_index] = float(row["normal_z"])
+        h = arrays["h"]
+        eta = arrays["eta"]
+        return cls(
+            origin_x=scenario.grid.origin_x,
+            origin_y=scenario.grid.origin_y,
+            dx=scenario.grid.dx,
+            dy=scenario.grid.dy,
+            bed=eta - h,
+            depth=h,
+            eta=eta,
+            u=arrays["u"],
+            v=arrays["v"],
+            wet=arrays["wet"],
+            normal_x=arrays["normal_x"],
+            normal_y=arrays["normal_y"],
+            normal_z=arrays["normal_z"],
+            roughness=scenario.roughness,
+            features=scenario.features,
+        )
 
     @property
     def shape(self) -> tuple[int, int]:
