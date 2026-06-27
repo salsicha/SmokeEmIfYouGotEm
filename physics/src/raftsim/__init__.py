@@ -102,6 +102,11 @@ from .profiling import (
     profile_pyclaw_reference_runs,
     profile_raft_coupling_runs,
 )
+from .performance import (
+    BaselinePerformanceReport,
+    SolverPerformanceSummary,
+    build_baseline_performance_report,
+)
 from .sweeps import (
     ParameterSweepCandidate,
     ParameterSweepReport,
@@ -164,6 +169,7 @@ __all__ = [
     "BackendCapabilities",
     "BackendStatus",
     "BackendUnavailableError",
+    "BaselinePerformanceReport",
     "BodyState",
     "ChronoSimulation",
     "CppSolverRunConfig",
@@ -209,6 +215,7 @@ __all__ = [
     "SimulationSystem",
     "SeriesComparison",
     "SolverDiagnosticSummary",
+    "SolverPerformanceSummary",
     "SolverProfileReport",
     "TelemetryFrame",
     "TelemetryRecorder",
@@ -255,6 +262,7 @@ __all__ = [
     "ScenarioValidation2_5D",
     "ValidationCheck2_5D",
     "build_initial_pyclaw_reference_result",
+    "build_baseline_performance_report",
     "build_default_raft_mass_properties",
     "compare_raft_force_samples",
     "sample_buoyancy_forces",
