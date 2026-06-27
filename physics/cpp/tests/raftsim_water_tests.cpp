@@ -1,3 +1,4 @@
+#include "raftsim_water/chrono_coupling.hpp"
 #include "raftsim_water/solver.hpp"
 
 #include <algorithm>
@@ -61,6 +62,35 @@ void assert_output_can_be_written(const raftsim::Scenario& scenario, const std::
     expect(std::filesystem::exists(std::filesystem::path(output_dir) / "frames" / "frame_0000.csv"), "frame was not written");
 }
 
+void assert_chrono_coupling_samples_water_and_contact(const raftsim::Scenario& scenario) {
+    raftsim::ReducedShallowWaterSolver solver(scenario);
+    raftsim::Frame frame = solver.make_frame();
+    double x = scenario.grid.origin_x + static_cast<double>(scenario.grid.nx / 2) * scenario.grid.dx;
+    double y = scenario.grid.origin_y + static_cast<double>(scenario.grid.ny / 2) * scenario.grid.dy;
+    raftsim::WaterFieldSample water = raftsim::sample_water_field(scenario, frame, x, y);
+    expect(water.depth >= 0.0, "sampled negative water depth");
+    expect(water.normal.z > 0.0, "sampled invalid water normal");
+
+    raftsim::ChronoRaftPatch floating_patch{
+        raftsim::Vec3d{x, y, water.surface_height - 0.25},
+        raftsim::Vec3d{0.0, 0.0, -0.1},
+        0.5,
+    };
+    raftsim::ChronoForceSample floating = raftsim::sample_chrono_raft_patch(scenario, frame, floating_patch);
+    expect(floating.wet, "floating Chrono patch should be wet");
+    expect(floating.force.z > 0.0, "floating Chrono patch should receive upward force");
+
+    raftsim::ChronoRaftPatch grounded_patch{
+        raftsim::Vec3d{x, y, water.bed_height - 0.05},
+        raftsim::Vec3d{0.0, 0.0, -0.1},
+        0.5,
+    };
+    raftsim::ChronoForceSample grounded = raftsim::sample_chrono_raft_patch(scenario, frame, grounded_patch);
+    expect(grounded.grounded, "grounded Chrono patch should detect bed contact");
+    expect(grounded.bed_penetration > 0.0, "grounded Chrono patch should report penetration");
+    expect(grounded.force.z > floating.force.z, "grounded patch should add contact force");
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -72,6 +102,7 @@ int main(int argc, char** argv) {
         raftsim::Scenario scenario = raftsim::load_scenario_package(argv[1]);
         assert_scenario_loads(scenario);
         assert_solver_is_deterministic(scenario);
+        assert_chrono_coupling_samples_water_and_contact(scenario);
         if (argc == 3) {
             assert_output_can_be_written(scenario, argv[2]);
         }
