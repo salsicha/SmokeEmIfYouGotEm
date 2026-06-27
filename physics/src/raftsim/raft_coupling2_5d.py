@@ -402,6 +402,29 @@ class PaddleBladeSample2_5D:
     feature_tags: tuple[str, ...]
 
 
+@dataclass(frozen=True, slots=True)
+class RaftForceEnvelope2_5D:
+    total_force: Vec3
+    total_torque: Vec3
+    max_contribution_force: float
+    max_contribution_torque: float
+    contribution_count: int
+    outcome: str
+
+
+@dataclass(frozen=True, slots=True)
+class RaftSolverForceComparison2_5D:
+    reference: RaftForceEnvelope2_5D
+    candidate: RaftForceEnvelope2_5D
+    reference_next_state: RaftState6DoF
+    candidate_next_state: RaftState6DoF
+    force_delta: Vec3
+    torque_delta: Vec3
+    trajectory_position_delta: float
+    trajectory_velocity_delta: float
+    outcome_match: bool
+
+
 def sample_buoyancy_forces(
     state: RaftState6DoF,
     properties: RaftMassProperties,
@@ -588,6 +611,72 @@ def sample_total_raft_forces(
         *sample_hydrodynamic_forces(state, properties, water),
         *sample_grounding_forces(state, properties, water),
     )
+
+
+def compare_raft_force_samples(
+    reference_water: WaterField2_5D,
+    candidate_water: WaterField2_5D,
+    state: RaftState6DoF,
+    properties: RaftMassProperties,
+    *,
+    dt: float = 1.0 / 60.0,
+) -> RaftSolverForceComparison2_5D:
+    """Compare force envelope, one-step trajectory, and outcome between solvers."""
+
+    reference_contributions = sample_total_raft_forces(state, properties, reference_water)
+    candidate_contributions = sample_total_raft_forces(state, properties, candidate_water)
+    reference_envelope = _force_envelope(reference_contributions)
+    candidate_envelope = _force_envelope(candidate_contributions)
+    reference_next = _advance_from_force_envelope(state, properties, reference_envelope, dt)
+    candidate_next = _advance_from_force_envelope(state, properties, candidate_envelope, dt)
+    return RaftSolverForceComparison2_5D(
+        reference=reference_envelope,
+        candidate=candidate_envelope,
+        reference_next_state=reference_next,
+        candidate_next_state=candidate_next,
+        force_delta=candidate_envelope.total_force - reference_envelope.total_force,
+        torque_delta=candidate_envelope.total_torque - reference_envelope.total_torque,
+        trajectory_position_delta=(candidate_next.position - reference_next.position).magnitude,
+        trajectory_velocity_delta=(candidate_next.linear_velocity - reference_next.linear_velocity).magnitude,
+        outcome_match=reference_envelope.outcome == candidate_envelope.outcome,
+    )
+
+
+def _force_envelope(contributions: tuple[RaftForceContribution2_5D, ...]) -> RaftForceEnvelope2_5D:
+    total_force, total_torque = sum_force_contributions(contributions)
+    names = [contribution.name for contribution in contributions]
+    if any(name.startswith("grounding") for name in names):
+        outcome = "grounded"
+    elif any(name.startswith("buoyancy") for name in names):
+        outcome = "floating"
+    elif contributions:
+        outcome = "forced"
+    else:
+        outcome = "freefall"
+    return RaftForceEnvelope2_5D(
+        total_force=total_force,
+        total_torque=total_torque,
+        max_contribution_force=max((contribution.force.magnitude for contribution in contributions), default=0.0),
+        max_contribution_torque=max((contribution.torque.magnitude for contribution in contributions), default=0.0),
+        contribution_count=len(contributions),
+        outcome=outcome,
+    )
+
+
+def _advance_from_force_envelope(
+    state: RaftState6DoF,
+    properties: RaftMassProperties,
+    envelope: RaftForceEnvelope2_5D,
+    dt: float,
+) -> RaftState6DoF:
+    linear_acceleration = envelope.total_force * properties.inverse_mass + properties.gravity
+    inertia = properties.inertia_diagonal_kg_m2
+    angular_acceleration = Vec3(
+        envelope.total_torque.x / max(inertia.x, 1.0e-9),
+        envelope.total_torque.y / max(inertia.y, 1.0e-9),
+        envelope.total_torque.z / max(inertia.z, 1.0e-9),
+    )
+    return state.advance(dt, linear_acceleration=linear_acceleration, angular_acceleration=angular_acceleration)
 
 
 def _has_grounding_feature(tags: tuple[str, ...]) -> bool:
