@@ -17,7 +17,7 @@ This decision freezes the first native runtime split before Unreal production wo
 
 ## Integration Rule
 
-The custom C++ water solver remains the primary Unreal runtime candidate. Chrono receives sampled water/contact inputs and returns raft transforms, velocities, contacts, and force telemetry. If Chrono integration misses runtime budgets, the fallback is a reduced custom rigid-body integrator using the same schemas and water query API, not a replacement of the water solver.
+The custom C++ water solver remains the primary Unreal runtime candidate, as frozen in [Custom Water Runtime Baseline](custom-water-runtime-baseline.md). Chrono receives sampled water/contact inputs and returns raft transforms, velocities, contacts, and force telemetry. If Chrono integration misses runtime budgets, the fallback is a reduced custom rigid-body integrator using the same schemas and water query API, not a replacement of the water solver.
 
 ## Near-Term Milestone 8 Work
 

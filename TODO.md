@@ -126,7 +126,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Couple Chrono raft/contact dynamics to the custom C++ water field.
 - [x] Compare native Chrono/custom-water telemetry against Python/PyClaw reference scenarios.
 - [x] Keep Chrono::FSI as an optional experiment/reference path, not the baseline runtime dependency.
-- [ ] Preserve the custom C++ reduced water solver as the primary Unreal runtime candidate.
+- [x] Preserve the custom C++ reduced water solver as the primary Unreal runtime candidate.
 
 ## Milestone 9: Real-World River Data And Seasonal Flow Pipeline
 
