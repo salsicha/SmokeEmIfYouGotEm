@@ -11,6 +11,8 @@ The Python `raftsim` package remains the research harness and validation layer. 
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial and seasonal-flow pipeline that feeds validated river scenarios.
 See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the production roadmap. The production Unreal project should begin only after PyClaw reference modeling, custom C++ solver matching, real-world river scenario validation, profiling, telemetry schema stabilization, and a standalone native Chrono smoke test are complete.
 
+The first native ownership split is frozen in [Chrono Runtime Boundary](chrono-runtime-boundary.md): custom C++ owns the reduced water solver and stable water query API, while Project Chrono owns baseline raft rigid-body dynamics and collision/contact response.
+
 ## Runtime Ownership
 
 ### Chrono Owns
