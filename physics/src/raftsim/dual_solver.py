@@ -20,8 +20,13 @@ class CppSolverRunConfig:
     executable: Path
     steps: int | None = None
     frame_interval: int | None = None
+    solver_mode: str = "reduced"
+    boundary_mode: str = "scenario"
+    flux_scheme: str = "rusanov"
+    cfl: float = 0.45
     feature_strength_scale: float = 1.0
     roughness_scale: float = 1.0
+    bed_slope_source_scale: float = 0.0
     allow_validation_failure: bool = True
 
     def __post_init__(self) -> None:
@@ -29,10 +34,18 @@ class CppSolverRunConfig:
             raise ValueError("steps must be non-negative when provided.")
         if self.frame_interval is not None and self.frame_interval < 1:
             raise ValueError("frame_interval must be at least 1 when provided.")
-        if self.feature_strength_scale <= 0.0:
-            raise ValueError("feature_strength_scale must be positive.")
-        if self.roughness_scale <= 0.0:
-            raise ValueError("roughness_scale must be positive.")
+        if self.solver_mode not in {"reduced", "finite_volume"}:
+            raise ValueError("solver_mode must be 'reduced' or 'finite_volume'.")
+        if self.boundary_mode not in {"scenario", "pyclaw"}:
+            raise ValueError("boundary_mode must be 'scenario' or 'pyclaw'.")
+        if self.flux_scheme not in {"rusanov", "hll", "roe"}:
+            raise ValueError("flux_scheme must be 'rusanov', 'hll', or 'roe'.")
+        if self.cfl <= 0.0:
+            raise ValueError("cfl must be positive.")
+        if self.feature_strength_scale < 0.0:
+            raise ValueError("feature_strength_scale must be non-negative.")
+        if self.roughness_scale < 0.0:
+            raise ValueError("roughness_scale must be non-negative.")
 
     def to_json_dict(self) -> dict[str, object]:
         data = asdict(self)
@@ -216,10 +229,20 @@ def _run_cpp_solver(
         str(steps),
         "--frame-interval",
         str(frame_interval),
+        "--solver-mode",
+        config.solver_mode,
+        "--boundary-mode",
+        config.boundary_mode,
+        "--flux-scheme",
+        config.flux_scheme,
+        "--cfl",
+        str(config.cfl),
         "--feature-strength-scale",
         str(config.feature_strength_scale),
         "--roughness-scale",
         str(config.roughness_scale),
+        "--bed-slope-source-scale",
+        str(config.bed_slope_source_scale),
     )
     start = time.perf_counter()
     completed = subprocess.run(command, check=False, capture_output=True, text=True)

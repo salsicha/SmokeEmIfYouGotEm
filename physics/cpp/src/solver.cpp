@@ -30,6 +30,18 @@ double safe_depth(double h, double dry_tolerance) {
     return std::max(h, dry_tolerance);
 }
 
+struct ConservedState {
+    double h = 0.0;
+    double hu = 0.0;
+    double hv = 0.0;
+};
+
+struct FluxState {
+    double h = 0.0;
+    double hu = 0.0;
+    double hv = 0.0;
+};
+
 double gradient_x(const Array2D& array, const Scenario& scenario, std::size_t row, std::size_t col) {
     if (col == 0) {
         return (array(row, col + 1) - array(row, col)) / scenario.grid.dx;
@@ -68,6 +80,262 @@ double divergence_y(const Array2D& array, const Scenario& scenario, std::size_t 
         return (array(row, col) - array(row - 1, col)) / scenario.grid.dy;
     }
     return (array(row + 1, col) - array(row - 1, col)) / (2.0 * scenario.grid.dy);
+}
+
+const BoundaryCondition* boundary_for_edge(const Scenario& scenario, const std::string& edge) {
+    for (const BoundaryCondition& boundary : scenario.boundaries) {
+        if (boundary.edge == edge) {
+            return &boundary;
+        }
+    }
+    return nullptr;
+}
+
+ConservedState conserved_from_cell(const Scenario& scenario, const WaterState& state, const SolverConfig& config, std::size_t row, std::size_t col) {
+    (void)scenario;
+    double h = std::max(0.0, state.h(row, col));
+    if (h <= config.dry_tolerance) {
+        return {};
+    }
+    return ConservedState{h, h * state.u(row, col), h * state.v(row, col)};
+}
+
+ConservedState boundary_conserved(
+    const Scenario& scenario,
+    const WaterState& state,
+    const SolverConfig& config,
+    std::size_t row,
+    std::size_t col,
+    const std::string& edge
+) {
+    ConservedState interior = conserved_from_cell(scenario, state, config, row, col);
+    const BoundaryCondition* boundary = boundary_for_edge(scenario, edge);
+    if (boundary == nullptr) {
+        return interior;
+    }
+    if (boundary->kind == "wall" || boundary->kind == "bank") {
+        if (edge == "west" || edge == "east") {
+            interior.hu = -interior.hu;
+        } else {
+            interior.hv = -interior.hv;
+        }
+        return interior;
+    }
+    if (config.boundary_mode == "pyclaw") {
+        return interior;
+    }
+    double h = interior.h;
+    if (boundary->has_stage) {
+        h = std::max(0.0, boundary->stage - scenario.bed(row, col));
+    }
+    if (boundary->has_depth) {
+        h = std::max(0.0, boundary->depth);
+    }
+    double u = h > config.dry_tolerance ? interior.hu / safe_depth(interior.h, config.dry_tolerance) : 0.0;
+    double v = h > config.dry_tolerance ? interior.hv / safe_depth(interior.h, config.dry_tolerance) : 0.0;
+    if (boundary->has_velocity) {
+        u = boundary->velocity_x;
+        v = boundary->velocity_y;
+    }
+    if (h <= config.dry_tolerance) {
+        return {};
+    }
+    return ConservedState{h, h * u, h * v};
+}
+
+FluxState flux_x(const ConservedState& q, const SolverConfig& config) {
+    if (q.h <= config.dry_tolerance) {
+        return {};
+    }
+    double u = q.hu / safe_depth(q.h, config.dry_tolerance);
+    double v = q.hv / safe_depth(q.h, config.dry_tolerance);
+    return FluxState{q.hu, q.hu * u + 0.5 * config.gravity * q.h * q.h, q.hu * v};
+}
+
+FluxState flux_y(const ConservedState& q, const SolverConfig& config) {
+    if (q.h <= config.dry_tolerance) {
+        return {};
+    }
+    double v = q.hv / safe_depth(q.h, config.dry_tolerance);
+    return FluxState{q.hv, q.hu * v, q.hv * v + 0.5 * config.gravity * q.h * q.h};
+}
+
+double wave_speed_x(const ConservedState& q, const SolverConfig& config) {
+    if (q.h <= config.dry_tolerance) {
+        return 0.0;
+    }
+    double u = q.hu / safe_depth(q.h, config.dry_tolerance);
+    return std::abs(u) + std::sqrt(config.gravity * q.h);
+}
+
+double wave_speed_y(const ConservedState& q, const SolverConfig& config) {
+    if (q.h <= config.dry_tolerance) {
+        return 0.0;
+    }
+    double v = q.hv / safe_depth(q.h, config.dry_tolerance);
+    return std::abs(v) + std::sqrt(config.gravity * q.h);
+}
+
+FluxState rusanov_flux_x(const ConservedState& left, const ConservedState& right, const SolverConfig& config) {
+    FluxState fl = flux_x(left, config);
+    FluxState fr = flux_x(right, config);
+    double speed = std::max(wave_speed_x(left, config), wave_speed_x(right, config));
+    return FluxState{
+        0.5 * (fl.h + fr.h) - 0.5 * speed * (right.h - left.h),
+        0.5 * (fl.hu + fr.hu) - 0.5 * speed * (right.hu - left.hu),
+        0.5 * (fl.hv + fr.hv) - 0.5 * speed * (right.hv - left.hv),
+    };
+}
+
+FluxState rusanov_flux_y(const ConservedState& south, const ConservedState& north, const SolverConfig& config) {
+    FluxState fs = flux_y(south, config);
+    FluxState fn = flux_y(north, config);
+    double speed = std::max(wave_speed_y(south, config), wave_speed_y(north, config));
+    return FluxState{
+        0.5 * (fs.h + fn.h) - 0.5 * speed * (north.h - south.h),
+        0.5 * (fs.hu + fn.hu) - 0.5 * speed * (north.hu - south.hu),
+        0.5 * (fs.hv + fn.hv) - 0.5 * speed * (north.hv - south.hv),
+    };
+}
+
+double velocity_x(const ConservedState& q, const SolverConfig& config) {
+    return q.h > config.dry_tolerance ? q.hu / safe_depth(q.h, config.dry_tolerance) : 0.0;
+}
+
+double velocity_y(const ConservedState& q, const SolverConfig& config) {
+    return q.h > config.dry_tolerance ? q.hv / safe_depth(q.h, config.dry_tolerance) : 0.0;
+}
+
+FluxState hll_flux_x(const ConservedState& left, const ConservedState& right, const SolverConfig& config) {
+    FluxState fl = flux_x(left, config);
+    FluxState fr = flux_x(right, config);
+    double cl = left.h > config.dry_tolerance ? std::sqrt(config.gravity * left.h) : 0.0;
+    double cr = right.h > config.dry_tolerance ? std::sqrt(config.gravity * right.h) : 0.0;
+    double sl = std::min(velocity_x(left, config) - cl, velocity_x(right, config) - cr);
+    double sr = std::max(velocity_x(left, config) + cl, velocity_x(right, config) + cr);
+    if (sl >= 0.0) {
+        return fl;
+    }
+    if (sr <= 0.0) {
+        return fr;
+    }
+    double denom = std::max(sr - sl, 1.0e-12);
+    return FluxState{
+        (sr * fl.h - sl * fr.h + sl * sr * (right.h - left.h)) / denom,
+        (sr * fl.hu - sl * fr.hu + sl * sr * (right.hu - left.hu)) / denom,
+        (sr * fl.hv - sl * fr.hv + sl * sr * (right.hv - left.hv)) / denom,
+    };
+}
+
+FluxState hll_flux_y(const ConservedState& south, const ConservedState& north, const SolverConfig& config) {
+    FluxState fs = flux_y(south, config);
+    FluxState fn = flux_y(north, config);
+    double cs = south.h > config.dry_tolerance ? std::sqrt(config.gravity * south.h) : 0.0;
+    double cn = north.h > config.dry_tolerance ? std::sqrt(config.gravity * north.h) : 0.0;
+    double ss = std::min(velocity_y(south, config) - cs, velocity_y(north, config) - cn);
+    double sn = std::max(velocity_y(south, config) + cs, velocity_y(north, config) + cn);
+    if (ss >= 0.0) {
+        return fs;
+    }
+    if (sn <= 0.0) {
+        return fn;
+    }
+    double denom = std::max(sn - ss, 1.0e-12);
+    return FluxState{
+        (sn * fs.h - ss * fn.h + ss * sn * (north.h - south.h)) / denom,
+        (sn * fs.hu - ss * fn.hu + ss * sn * (north.hu - south.hu)) / denom,
+        (sn * fs.hv - ss * fn.hv + ss * sn * (north.hv - south.hv)) / denom,
+    };
+}
+
+double entropy_fixed_abs(double lambda, double delta) {
+    double magnitude = std::abs(lambda);
+    if (magnitude >= delta || delta <= 1.0e-12) {
+        return magnitude;
+    }
+    return 0.5 * (lambda * lambda / delta + delta);
+}
+
+FluxState roe_flux_x(const ConservedState& left, const ConservedState& right, const SolverConfig& config) {
+    if (left.h <= config.dry_tolerance || right.h <= config.dry_tolerance) {
+        return hll_flux_x(left, right, config);
+    }
+    FluxState fl = flux_x(left, config);
+    FluxState fr = flux_x(right, config);
+    double sqrt_l = std::sqrt(left.h);
+    double sqrt_r = std::sqrt(right.h);
+    double denom = std::max(sqrt_l + sqrt_r, 1.0e-12);
+    double u = (sqrt_l * velocity_x(left, config) + sqrt_r * velocity_x(right, config)) / denom;
+    double v = (sqrt_l * velocity_y(left, config) + sqrt_r * velocity_y(right, config)) / denom;
+    double c = std::sqrt(0.5 * config.gravity * (left.h + right.h));
+
+    double dh = right.h - left.h;
+    double dhu = right.hu - left.hu;
+    double dhv = right.hv - left.hv;
+    double alpha_1 = ((u + c) * dh - dhu) / std::max(2.0 * c, 1.0e-12);
+    double alpha_3 = (dhu - (u - c) * dh) / std::max(2.0 * c, 1.0e-12);
+    double alpha_2 = dhv - v * dh;
+    double entropy_delta = 0.1 * c;
+    double lambda_1 = entropy_fixed_abs(u - c, entropy_delta);
+    double lambda_2 = entropy_fixed_abs(u, entropy_delta);
+    double lambda_3 = entropy_fixed_abs(u + c, entropy_delta);
+
+    return FluxState{
+        0.5 * (fl.h + fr.h) - 0.5 * (lambda_1 * alpha_1 + lambda_3 * alpha_3),
+        0.5 * (fl.hu + fr.hu) - 0.5 * (lambda_1 * alpha_1 * (u - c) + lambda_3 * alpha_3 * (u + c)),
+        0.5 * (fl.hv + fr.hv) - 0.5 * (lambda_1 * alpha_1 * v + lambda_2 * alpha_2 + lambda_3 * alpha_3 * v),
+    };
+}
+
+FluxState roe_flux_y(const ConservedState& south, const ConservedState& north, const SolverConfig& config) {
+    if (south.h <= config.dry_tolerance || north.h <= config.dry_tolerance) {
+        return hll_flux_y(south, north, config);
+    }
+    FluxState fs = flux_y(south, config);
+    FluxState fn = flux_y(north, config);
+    double sqrt_s = std::sqrt(south.h);
+    double sqrt_n = std::sqrt(north.h);
+    double denom = std::max(sqrt_s + sqrt_n, 1.0e-12);
+    double u = (sqrt_s * velocity_x(south, config) + sqrt_n * velocity_x(north, config)) / denom;
+    double v = (sqrt_s * velocity_y(south, config) + sqrt_n * velocity_y(north, config)) / denom;
+    double c = std::sqrt(0.5 * config.gravity * (south.h + north.h));
+
+    double dh = north.h - south.h;
+    double dhu = north.hu - south.hu;
+    double dhv = north.hv - south.hv;
+    double alpha_1 = ((v + c) * dh - dhv) / std::max(2.0 * c, 1.0e-12);
+    double alpha_3 = (dhv - (v - c) * dh) / std::max(2.0 * c, 1.0e-12);
+    double alpha_2 = dhu - u * dh;
+    double entropy_delta = 0.1 * c;
+    double lambda_1 = entropy_fixed_abs(v - c, entropy_delta);
+    double lambda_2 = entropy_fixed_abs(v, entropy_delta);
+    double lambda_3 = entropy_fixed_abs(v + c, entropy_delta);
+
+    return FluxState{
+        0.5 * (fs.h + fn.h) - 0.5 * (lambda_1 * alpha_1 + lambda_3 * alpha_3),
+        0.5 * (fs.hu + fn.hu) - 0.5 * (lambda_1 * alpha_1 * u + lambda_2 * alpha_2 + lambda_3 * alpha_3 * u),
+        0.5 * (fs.hv + fn.hv) - 0.5 * (lambda_1 * alpha_1 * (v - c) + lambda_3 * alpha_3 * (v + c)),
+    };
+}
+
+FluxState finite_volume_flux_x(const ConservedState& left, const ConservedState& right, const SolverConfig& config) {
+    if (config.flux_scheme == "roe") {
+        return roe_flux_x(left, right, config);
+    }
+    if (config.flux_scheme == "hll") {
+        return hll_flux_x(left, right, config);
+    }
+    return rusanov_flux_x(left, right, config);
+}
+
+FluxState finite_volume_flux_y(const ConservedState& south, const ConservedState& north, const SolverConfig& config) {
+    if (config.flux_scheme == "roe") {
+        return roe_flux_y(south, north, config);
+    }
+    if (config.flux_scheme == "hll") {
+        return hll_flux_y(south, north, config);
+    }
+    return rusanov_flux_y(south, north, config);
 }
 
 std::string json_escape(const std::string& value) {
@@ -165,6 +433,14 @@ Frame ReducedShallowWaterSolver::make_frame() const {
 }
 
 void ReducedShallowWaterSolver::step(double dt) {
+    if (config_.solver_mode == "finite_volume") {
+        step_finite_volume(dt);
+        return;
+    }
+    step_reduced(dt);
+}
+
+void ReducedShallowWaterSolver::step_reduced(double dt) {
     apply_boundaries();
     WaterState next = state_;
     for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
@@ -191,11 +467,101 @@ void ReducedShallowWaterSolver::step(double dt) {
             next.v(row, col) = clamp(v_next * damping, -config_.max_velocity, config_.max_velocity);
         }
     }
-    apply_feature_forcing(dt, next);
+    if (config_.feature_strength_scale > 0.0) {
+        apply_feature_forcing(dt, next);
+    }
     recompute_state(next);
     state_ = std::move(next);
     apply_boundaries();
     time_ += dt;
+}
+
+void ReducedShallowWaterSolver::step_finite_volume(double dt) {
+    if (config_.boundary_mode != "pyclaw") {
+        apply_boundaries();
+    }
+    double stable_dt = finite_volume_stable_dt();
+    int substeps = std::max(1, static_cast<int>(std::ceil(dt / std::max(stable_dt, 1.0e-9))));
+    double sub_dt = dt / static_cast<double>(substeps);
+    for (int i = 0; i < substeps; ++i) {
+        step_finite_volume_once(sub_dt);
+    }
+    if (config_.boundary_mode != "pyclaw") {
+        apply_boundaries();
+    }
+    time_ += dt;
+}
+
+void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
+    WaterState next = state_;
+    for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
+            ConservedState center = conserved_from_cell(scenario_, state_, config_, row, col);
+            ConservedState west = col > 0 ? conserved_from_cell(scenario_, state_, config_, row, col - 1)
+                                          : boundary_conserved(scenario_, state_, config_, row, col, "west");
+            ConservedState east = col + 1 < scenario_.grid.nx ? conserved_from_cell(scenario_, state_, config_, row, col + 1)
+                                                              : boundary_conserved(scenario_, state_, config_, row, col, "east");
+            ConservedState south = row > 0 ? conserved_from_cell(scenario_, state_, config_, row - 1, col)
+                                           : boundary_conserved(scenario_, state_, config_, row, col, "south");
+            ConservedState north = row + 1 < scenario_.grid.ny ? conserved_from_cell(scenario_, state_, config_, row + 1, col)
+                                                               : boundary_conserved(scenario_, state_, config_, row, col, "north");
+
+            FluxState flux_w = finite_volume_flux_x(west, center, config_);
+            FluxState flux_e = finite_volume_flux_x(center, east, config_);
+            FluxState flux_s = finite_volume_flux_y(south, center, config_);
+            FluxState flux_n = finite_volume_flux_y(center, north, config_);
+
+            double h_next = center.h - dt * ((flux_e.h - flux_w.h) / scenario_.grid.dx + (flux_n.h - flux_s.h) / scenario_.grid.dy);
+            double hu_next = center.hu - dt * ((flux_e.hu - flux_w.hu) / scenario_.grid.dx + (flux_n.hu - flux_s.hu) / scenario_.grid.dy);
+            double hv_next = center.hv - dt * ((flux_e.hv - flux_w.hv) / scenario_.grid.dx + (flux_n.hv - flux_s.hv) / scenario_.grid.dy);
+
+            if (config_.bed_slope_source_scale != 0.0 && center.h > config_.dry_tolerance) {
+                double bed_sx = gradient_x(scenario_.bed, scenario_, row, col);
+                double bed_sy = gradient_y(scenario_.bed, scenario_, row, col);
+                hu_next -= dt * config_.bed_slope_source_scale * config_.gravity * center.h * bed_sx;
+                hv_next -= dt * config_.bed_slope_source_scale * config_.gravity * center.h * bed_sy;
+            }
+
+            h_next = std::max(0.0, h_next);
+            if (h_next <= config_.dry_tolerance) {
+                next.h(row, col) = 0.0;
+                next.u(row, col) = 0.0;
+                next.v(row, col) = 0.0;
+                continue;
+            }
+
+            double u_next = hu_next / safe_depth(h_next, config_.dry_tolerance);
+            double v_next = hv_next / safe_depth(h_next, config_.dry_tolerance);
+            double speed = std::hypot(u_next, v_next);
+            double friction = scenario_.roughness * config_.roughness_scale * speed /
+                              std::max(std::pow(safe_depth(h_next, config_.dry_tolerance), 4.0 / 3.0), 1.0e-6);
+            double damping = clamp(1.0 - dt * friction, 0.0, 1.0);
+            next.h(row, col) = h_next;
+            next.u(row, col) = clamp(u_next * damping, -config_.max_velocity, config_.max_velocity);
+            next.v(row, col) = clamp(v_next * damping, -config_.max_velocity, config_.max_velocity);
+        }
+    }
+    if (config_.feature_strength_scale > 0.0) {
+        apply_feature_forcing(dt, next);
+    }
+    recompute_state(next);
+    state_ = std::move(next);
+}
+
+double ReducedShallowWaterSolver::finite_volume_stable_dt() const {
+    double max_speed = 0.0;
+    for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
+            ConservedState q = conserved_from_cell(scenario_, state_, config_, row, col);
+            max_speed = std::max(max_speed, wave_speed_x(q, config_));
+            max_speed = std::max(max_speed, wave_speed_y(q, config_));
+        }
+    }
+    if (max_speed <= 1.0e-9) {
+        return scenario_.fixed_dt;
+    }
+    double spacing = std::min(scenario_.grid.dx, scenario_.grid.dy);
+    return clamp(config_.cfl, 0.05, 0.95) * spacing / max_speed;
 }
 
 std::vector<Frame> ReducedShallowWaterSolver::run(int steps, int frame_interval) {
@@ -227,6 +593,8 @@ void ReducedShallowWaterSolver::apply_boundaries() {
                         state_.u(row, col) = boundary.velocity_x;
                         state_.v(row, col) = boundary.velocity_y;
                     }
+                } else if (boundary.has_stage) {
+                    state_.h(row, col) = std::max(0.0, boundary.stage - scenario_.bed(row, col));
                 } else if (scenario_.grid.nx > 1) {
                     state_.h(row, col) = state_.h(row, col + 1);
                     state_.u(row, col) = state_.u(row, col + 1);
@@ -238,6 +606,8 @@ void ReducedShallowWaterSolver::apply_boundaries() {
             for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
                 if (boundary.kind == "wall" || boundary.kind == "bank") {
                     state_.u(row, col) = 0.0;
+                } else if (boundary.has_stage) {
+                    state_.h(row, col) = std::max(0.0, boundary.stage - scenario_.bed(row, col));
                 } else if (scenario_.grid.nx > 1) {
                     state_.h(row, col) = state_.h(row, col - 1);
                     state_.u(row, col) = state_.u(row, col - 1);
@@ -249,6 +619,8 @@ void ReducedShallowWaterSolver::apply_boundaries() {
             for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
                 if (boundary.kind == "wall" || boundary.kind == "bank") {
                     state_.v(row, col) = 0.0;
+                } else if (boundary.has_stage) {
+                    state_.h(row, col) = std::max(0.0, boundary.stage - scenario_.bed(row, col));
                 } else if (scenario_.grid.ny > 1) {
                     state_.h(row, col) = state_.h(row + 1, col);
                     state_.u(row, col) = state_.u(row + 1, col);
@@ -260,6 +632,8 @@ void ReducedShallowWaterSolver::apply_boundaries() {
             for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
                 if (boundary.kind == "wall" || boundary.kind == "bank") {
                     state_.v(row, col) = 0.0;
+                } else if (boundary.has_stage) {
+                    state_.h(row, col) = std::max(0.0, boundary.stage - scenario_.bed(row, col));
                 } else if (scenario_.grid.ny > 1) {
                     state_.h(row, col) = state_.h(row - 1, col);
                     state_.u(row, col) = state_.u(row - 1, col);
@@ -383,6 +757,7 @@ void write_solver_output(
     const Scenario& scenario,
     const std::vector<Frame>& frames,
     const ValidationSummary& validation,
+    const SolverConfig& config,
     const std::string& output_dir
 ) {
     fs::path root(output_dir);
@@ -428,7 +803,14 @@ void write_solver_output(
     std::ofstream manifest(root / "manifest.json");
     manifest << "{\n"
              << "  \"scenario_id\": \"" << json_escape(scenario.scenario_id) << "\",\n"
-             << "  \"solver\": \"raftsim_water_reduced_cpp_v0\",\n"
+             << "  \"solver\": \"raftsim_water_cpp_v1\",\n"
+             << "  \"solver_mode\": \"" << json_escape(config.solver_mode) << "\",\n"
+             << "  \"boundary_mode\": \"" << json_escape(config.boundary_mode) << "\",\n"
+             << "  \"flux_scheme\": \"" << json_escape(config.flux_scheme) << "\",\n"
+             << "  \"cfl\": " << config.cfl << ",\n"
+             << "  \"feature_strength_scale\": " << config.feature_strength_scale << ",\n"
+             << "  \"roughness_scale\": " << config.roughness_scale << ",\n"
+             << "  \"bed_slope_source_scale\": " << config.bed_slope_source_scale << ",\n"
              << "  \"validation\": \"validation.json\",\n"
              << "  \"frames\": [";
     for (std::size_t i = 0; i < frame_files.size(); ++i) {

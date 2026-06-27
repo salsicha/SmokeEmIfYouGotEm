@@ -21,9 +21,11 @@ struct GridSpec {
 struct BoundaryCondition {
     std::string edge;
     std::string kind;
+    double stage = 0.0;
     double depth = 0.0;
     double velocity_x = 0.0;
     double velocity_y = 0.0;
+    bool has_stage = false;
     bool has_depth = false;
     bool has_velocity = false;
 };
@@ -82,4 +84,3 @@ std::size_t row_from_index(const Scenario& scenario, std::size_t index);
 std::size_t col_from_index(const Scenario& scenario, std::size_t index);
 
 }  // namespace raftsim
-

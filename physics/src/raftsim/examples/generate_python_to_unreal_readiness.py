@@ -172,7 +172,17 @@ def _run_cpp_summary(scenarios, cpp_solver: Path | None, output_dir: Path) -> di
         result = run_cpp_solver_scenario(
             scenario,
             output_dir=output_dir / scenario.metadata.scenario_id,
-            config=CppSolverRunConfig(executable=cpp_solver, steps=steps, frame_interval=steps),
+            config=CppSolverRunConfig(
+                executable=cpp_solver,
+                steps=steps,
+                frame_interval=steps,
+                solver_mode="finite_volume",
+                boundary_mode="pyclaw",
+                flux_scheme="hll",
+                feature_strength_scale=0.0,
+                roughness_scale=0.0,
+                bed_slope_source_scale=0.0,
+            ),
         )
         validation = json.loads(result.validation_path.read_text(encoding="utf-8"))
         rows.append(
@@ -212,7 +222,17 @@ def _run_dual_and_tuning_summary(scenarios, cpp_solver: Path | None, output_dir:
             output_dir=output_dir / "comparisons" / scenario.metadata.scenario_id,
             config=DualSolverRunConfig(
                 pyclaw=PyClawRunConfig(num_output_times=1, mass_relative_tolerance=0.10),
-                cpp=CppSolverRunConfig(executable=cpp_solver, steps=steps, frame_interval=steps),
+                cpp=CppSolverRunConfig(
+                    executable=cpp_solver,
+                    steps=steps,
+                    frame_interval=steps,
+                    solver_mode="finite_volume",
+                    boundary_mode="pyclaw",
+                    flux_scheme="hll",
+                    feature_strength_scale=0.0,
+                    roughness_scale=0.0,
+                    bed_slope_source_scale=0.0,
+                ),
             ),
         )
         thresholds = evaluate_dual_solver_thresholds(
@@ -231,8 +251,24 @@ def _run_dual_and_tuning_summary(scenarios, cpp_solver: Path | None, output_dir:
         output_dir=output_dir / "tuning",
         cpp_solver_executable=cpp_solver,
         candidates=(
-            CppTuningCandidate("baseline", feature_strength_scale=1.0, roughness_scale=1.0),
-            CppTuningCandidate("rougher", feature_strength_scale=1.0, roughness_scale=1.2),
+            CppTuningCandidate(
+                "finite_volume_hll_reference",
+                solver_mode="finite_volume",
+                boundary_mode="pyclaw",
+                flux_scheme="hll",
+                feature_strength_scale=0.0,
+                roughness_scale=0.0,
+                bed_slope_source_scale=0.0,
+            ),
+            CppTuningCandidate(
+                "finite_volume_roe_reference",
+                solver_mode="finite_volume",
+                boundary_mode="pyclaw",
+                flux_scheme="roe",
+                feature_strength_scale=0.0,
+                roughness_scale=0.0,
+                bed_slope_source_scale=0.0,
+            ),
         ),
         pyclaw_config=PyClawRunConfig(num_output_times=1, mass_relative_tolerance=0.10),
         cpp_steps=max(1, int(math.ceil(scenarios[0].duration / scenarios[0].fixed_dt))),
@@ -279,7 +315,17 @@ def _build_performance_summary(scenarios, cpp_solver: Path | None, output_dir: P
         reports.append(
             profile_cpp_solver_runs(
                 (scenarios[0], scenarios[-2]),
-                config=CppSolverRunConfig(executable=cpp_solver, steps=3, frame_interval=3),
+                config=CppSolverRunConfig(
+                    executable=cpp_solver,
+                    steps=3,
+                    frame_interval=3,
+                    solver_mode="finite_volume",
+                    boundary_mode="pyclaw",
+                    flux_scheme="hll",
+                    feature_strength_scale=0.0,
+                    roughness_scale=0.0,
+                    bed_slope_source_scale=0.0,
+                ),
                 repetitions=1,
                 output_dir=output_dir / "cpp",
             )

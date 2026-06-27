@@ -98,6 +98,8 @@ Scenario load_scenario_package(const std::string& scenario_dir) {
         BoundaryCondition boundary;
         boundary.edge = value.at("edge").as_string();
         boundary.kind = value.at("kind").as_string();
+        boundary.has_stage = has_key(value, "stage");
+        boundary.stage = optional_number(value, "stage");
         boundary.has_depth = has_key(value, "depth");
         boundary.depth = optional_number(value, "depth");
         const JsonValue* velocity = value.find("velocity");
@@ -173,8 +175,8 @@ void validate_scenario(const Scenario& scenario) {
 }
 
 std::size_t grid_index_for_position(const Scenario& scenario, double x, double y) {
-    long col = std::lround((x - scenario.grid.origin_x) / scenario.grid.dx);
-    long row = std::lround((y - scenario.grid.origin_y) / scenario.grid.dy);
+    long col = static_cast<long>(std::nearbyint((x - scenario.grid.origin_x) / scenario.grid.dx));
+    long row = static_cast<long>(std::nearbyint((y - scenario.grid.origin_y) / scenario.grid.dy));
     col = std::max<long>(0, std::min<long>(static_cast<long>(scenario.grid.nx) - 1, col));
     row = std::max<long>(0, std::min<long>(static_cast<long>(scenario.grid.ny) - 1, row));
     return static_cast<std::size_t>(row) * scenario.grid.nx + static_cast<std::size_t>(col);
