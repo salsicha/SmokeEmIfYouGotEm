@@ -112,7 +112,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 
 - [x] Profile PyClaw reference runs for research-loop cost.
 - [x] Profile the custom C++ solver for target runtime cost.
-- [ ] Profile raft coupling and probe/export cost.
+- [x] Profile raft coupling and probe/export cost.
 - [ ] Add parameter sweep scripts for roughness, feature forcing, raft drag, buoyancy, grounding, and contact coefficients.
 - [ ] Fit C++ solver and raft-force parameters to PyClaw reference outputs.
 - [ ] Produce baseline performance reports for canonical and generated scenarios.

@@ -3,7 +3,12 @@ import json
 import pytest
 
 from raftsim.dual_solver import CppSolverRunConfig, CppSolverRunResult
-from raftsim.profiling import profile_cpp_solver_runs, profile_pyclaw_reference_runs
+from raftsim.profiling import (
+    profile_cpp_solver_runs,
+    profile_probe_export_runs,
+    profile_pyclaw_reference_runs,
+    profile_raft_coupling_runs,
+)
 from raftsim.pyclaw_reference import PyClawAvailability, PyClawRunConfig, build_initial_pyclaw_reference_result
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
 
@@ -121,3 +126,63 @@ def test_profile_cpp_solver_runs_requires_repetitions(tmp_path):
             config=CppSolverRunConfig(executable=tmp_path / "raftsim_water_solver"),
             repetitions=0,
         )
+
+
+def test_profile_raft_coupling_runs_records_sampling_cost():
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="uniform_channel", nx=8, ny=5, duration=0.25)
+    )
+    clock_values = iter((3.0, 3.3))
+
+    report = profile_raft_coupling_runs(
+        (scenario,),
+        repetitions=1,
+        samples_per_run=3,
+        clock=lambda: next(clock_values),
+    )
+
+    assert report.solver == "raft_coupling"
+    assert len(report.runs) == 1
+    assert report.runs[0].runtime_seconds == pytest.approx(0.3)
+    assert report.runs[0].output_frames == 3
+    assert report.runs[0].validation_passed is True
+    assert report.runs[0].run_status["samples_per_run"] == 3
+    assert report.runs[0].run_status["last_contribution_count"] > 0
+
+
+def test_profile_raft_coupling_runs_requires_positive_samples():
+    scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="flat_pool", nx=6, ny=4))
+
+    with pytest.raises(ValueError):
+        profile_raft_coupling_runs((scenario,), samples_per_run=0)
+
+
+def test_profile_probe_export_runs_records_export_cost(tmp_path):
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="flat_pool", nx=8, ny=5, duration=0.25)
+    )
+    clock_values = iter((4.0, 4.5))
+
+    report = profile_probe_export_runs(
+        (scenario,),
+        config=PyClawRunConfig(num_output_times=1),
+        repetitions=1,
+        output_dir=tmp_path / "exports",
+        clock=lambda: next(clock_values),
+    )
+
+    run_dir = tmp_path / "exports" / scenario.metadata.scenario_id / "rep_00"
+    assert report.solver == "probe_export"
+    assert report.runs[0].runtime_seconds == pytest.approx(0.5)
+    assert report.runs[0].output_frames == 1
+    assert report.runs[0].run_status["probe_count"] > 0
+    assert report.runs[0].run_status["cross_section_count"] > 0
+    assert (run_dir / "manifest.json").exists()
+    assert (run_dir / "probes" / "upstream_center.csv").exists()
+
+
+def test_profile_probe_export_runs_requires_repetitions():
+    scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="flat_pool", nx=6, ny=4))
+
+    with pytest.raises(ValueError):
+        profile_probe_export_runs((scenario,), repetitions=0)
