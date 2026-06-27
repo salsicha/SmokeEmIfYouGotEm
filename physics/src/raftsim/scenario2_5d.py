@@ -32,6 +32,7 @@ FeatureKind2_5D = Literal[
     "constriction",
     "hole",
     "lateral",
+    "eddy_line",
     "boil",
     "shallow",
     "strainer",
