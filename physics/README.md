@@ -350,7 +350,7 @@ The state tracks position, orientation quaternion, linear velocity, and angular 
 
 ## 2.5D Feature Validation
 
-Milestone 6 adds deterministic whitewater feature validators. `validate_standing_wave_case()` starts the suite with clear, stall, surf, and flush outcome classification for standing-wave samples. `validate_hole_case()` checks hole depression, upstream retention, aerated damping proxy, and downstream boil/upwelling lift. `validate_lateral_wave_case()` checks cross-current side impulse and roll acceleration from asymmetric lateral-wave loading. `validate_eddy_line_case()` checks sharp cross-raft shear, yaw acceleration, and coupled roll response.
+Milestone 6 adds deterministic whitewater feature validators. `validate_standing_wave_case()` starts the suite with clear, stall, surf, and flush outcome classification for standing-wave samples. `validate_hole_case()` checks hole depression, upstream retention, aerated damping proxy, and downstream boil/upwelling lift. `validate_lateral_wave_case()` checks cross-current side impulse and roll acceleration from asymmetric lateral-wave loading. `validate_eddy_line_case()` checks sharp cross-raft shear, yaw acceleration, and coupled roll response. `validate_shallow_shelf_case()` checks shallow-tagged grounding contact, support force, and off-center pivot yaw.
 
 ## Next Milestone
 
