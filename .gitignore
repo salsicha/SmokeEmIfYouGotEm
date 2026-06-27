@@ -19,3 +19,4 @@ dist/
 # Local simulation outputs
 outputs/
 *.telemetry.csv
+pyclaw.log
