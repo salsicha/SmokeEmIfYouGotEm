@@ -79,7 +79,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Compare mass conservation, energy trends, Froude number, hydraulic jump location, wave crest/trough location, and hole retention geometry.
 - [x] Add L1/L2/Linf field-error summaries.
 - [x] Add feature-location and feature-strength error summaries.
-- [ ] Add runtime cost per simulated second for both solvers.
+- [x] Add runtime cost per simulated second for both solvers.
 - [ ] Add scenario pass/fail thresholds.
 - [ ] Tune C++ numerical coefficients, friction, roughness, and authored feature forcing against PyClaw.
 - [ ] Promote passing scenarios to regression fixtures.
