@@ -113,6 +113,7 @@ from .raft_coupling2_5d import (
 from .feature_validation import (
     FeatureValidationCheck,
     FeatureValidationResult,
+    validate_boil_upwelling_case,
     validate_eddy_line_case,
     validate_hole_case,
     validate_lateral_wave_case,
@@ -251,6 +252,7 @@ __all__ = [
     "run_pyclaw_reference",
     "select_backend",
     "tune_cpp_solver_against_pyclaw",
+    "validate_boil_upwelling_case",
     "validate_eddy_line_case",
     "validate_hole_case",
     "validate_lateral_wave_case",
