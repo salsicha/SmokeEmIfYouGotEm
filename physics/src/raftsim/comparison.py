@@ -253,6 +253,72 @@ class PhysicsDiagnosticComparisonReport:
         return output_path
 
 
+@dataclass(frozen=True, slots=True)
+class ObservedFeatureMetric:
+    x: float
+    y: float
+    strength: float
+    distance_to_authored: float
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "x": self.x,
+            "y": self.y,
+            "strength": self.strength,
+            "distance_to_authored": self.distance_to_authored,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class FeatureComparison:
+    feature_index: int
+    kind: str
+    authored_x: float
+    authored_y: float
+    authored_strength: float
+    pyclaw: ObservedFeatureMetric
+    cpp: ObservedFeatureMetric
+    location_delta: float
+    strength_delta: float
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "feature_index": self.feature_index,
+            "kind": self.kind,
+            "authored_x": self.authored_x,
+            "authored_y": self.authored_y,
+            "authored_strength": self.authored_strength,
+            "pyclaw": self.pyclaw.to_json_dict(),
+            "cpp": self.cpp.to_json_dict(),
+            "location_delta": self.location_delta,
+            "strength_delta": self.strength_delta,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class FeatureComparisonReport:
+    scenario_id: str
+    feature_count: int
+    comparisons: tuple[FeatureComparison, ...]
+    max_location_delta: float
+    max_abs_strength_delta: float
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "scenario_id": self.scenario_id,
+            "feature_count": self.feature_count,
+            "comparisons": [comparison.to_json_dict() for comparison in self.comparisons],
+            "max_location_delta": self.max_location_delta,
+            "max_abs_strength_delta": self.max_abs_strength_delta,
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+
 def compare_dual_solver_fields(
     dual_solver_dir_or_manifest: str | Path,
     *,
@@ -355,6 +421,40 @@ def compare_dual_solver_diagnostics(
         pyclaw=pyclaw_summary,
         cpp=cpp_summary,
         delta=_diagnostic_delta(pyclaw_summary, cpp_summary),
+    )
+    if output_path is not None:
+        report.write_json(output_path)
+    return report
+
+
+def compare_dual_solver_features(
+    dual_solver_dir_or_manifest: str | Path,
+    *,
+    output_path: str | Path | None = None,
+) -> FeatureComparisonReport:
+    """Compare feature-local response locations and strengths."""
+
+    manifest_path = _manifest_path(dual_solver_dir_or_manifest)
+    root = manifest_path.parent
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    scenario = read_scenario2_5d_package(root / manifest["scenario_package"])
+    pyclaw_manifest = _load_manifest(root / manifest["pyclaw"]["manifest"])
+    cpp_manifest = _load_manifest(root / manifest["cpp"]["manifest"])
+    pyclaw_output = root / manifest["pyclaw"]["output_dir"]
+    cpp_output = root / manifest["cpp"]["output_dir"]
+    pyclaw_final = _load_pyclaw_npz_frame(pyclaw_output / pyclaw_manifest["frames"][-1])
+    cpp_final = _load_cpp_csv_frame(cpp_output / cpp_manifest["frames"][-1])
+
+    comparisons = tuple(
+        _compare_feature(index, feature, pyclaw_final, cpp_final, scenario)
+        for index, feature in enumerate(scenario.features)
+    )
+    report = FeatureComparisonReport(
+        scenario_id=manifest["scenario_id"],
+        feature_count=len(scenario.features),
+        comparisons=comparisons,
+        max_location_delta=max((comparison.location_delta for comparison in comparisons), default=0.0),
+        max_abs_strength_delta=max((abs(comparison.strength_delta) for comparison in comparisons), default=0.0),
     )
     if output_path is not None:
         report.write_json(output_path)
@@ -772,3 +872,83 @@ def _x_at_col(scenario, col: int) -> float:
 
 def _y_at_row(scenario, row: int) -> float:
     return float(scenario.grid.origin_y + row * scenario.grid.dy)
+
+
+def _compare_feature(index: int, feature, pyclaw_frame, cpp_frame, scenario) -> FeatureComparison:
+    pyclaw_metric = _observed_feature_metric(feature, pyclaw_frame, scenario)
+    cpp_metric = _observed_feature_metric(feature, cpp_frame, scenario)
+    return FeatureComparison(
+        feature_index=index,
+        kind=feature.kind,
+        authored_x=float(feature.center[0]),
+        authored_y=float(feature.center[1]),
+        authored_strength=float(feature.strength),
+        pyclaw=pyclaw_metric,
+        cpp=cpp_metric,
+        location_delta=float(np.hypot(cpp_metric.x - pyclaw_metric.x, cpp_metric.y - pyclaw_metric.y)),
+        strength_delta=cpp_metric.strength - pyclaw_metric.strength,
+    )
+
+
+def _observed_feature_metric(feature, frame: dict[str, FloatGrid | BoolGrid], scenario) -> ObservedFeatureMetric:
+    signal = _feature_signal(feature, frame, scenario)
+    mask = _feature_mask(feature, signal.shape, scenario)
+    if not np.any(mask):
+        row, col = _nearest_cell(feature.center[0], feature.center[1], scenario)
+    else:
+        masked_signal = np.where(mask, signal, -np.inf)
+        row, col = np.unravel_index(int(np.argmax(masked_signal)), masked_signal.shape)
+    x = _x_at_col(scenario, int(col))
+    y = _y_at_row(scenario, int(row))
+    return ObservedFeatureMetric(
+        x=x,
+        y=y,
+        strength=float(signal[row, col]),
+        distance_to_authored=float(np.hypot(x - feature.center[0], y - feature.center[1])),
+    )
+
+
+def _feature_signal(feature, frame: dict[str, FloatGrid | BoolGrid], scenario) -> FloatGrid:
+    h = np.asarray(frame["h"], dtype=np.float64)
+    eta = np.asarray(frame["eta"], dtype=np.float64)
+    u = np.asarray(frame["u"], dtype=np.float64)
+    v = np.asarray(frame["v"], dtype=np.float64)
+    wet = np.asarray(frame["wet"], dtype=np.bool_)
+    froude = np.asarray(frame["froude"], dtype=np.float64)
+    speed = np.hypot(u, v)
+    slope_y, slope_x = np.gradient(eta, scenario.grid.dy, scenario.grid.dx)
+    slope = np.hypot(slope_x, slope_y)
+    local_eta = eta - np.nanmean(np.where(wet, eta, np.nan))
+    if feature.kind == "hole":
+        return np.where(wet, np.maximum(0.0, -u) + np.maximum(0.0, 0.9 - froude) + 0.25 * h, 0.0)
+    if feature.kind == "lateral":
+        return np.where(wet, np.abs(v), 0.0)
+    if feature.kind == "boil":
+        return np.where(wet, speed + 0.2 * h, 0.0)
+    if feature.kind == "wave_train":
+        return np.where(wet, np.abs(local_eta) + 0.1 * speed, 0.0)
+    if feature.kind in {"ledge", "shallow"}:
+        return np.where(wet, slope + np.maximum(0.0, np.nanmax(np.where(wet, h, np.nan)) - h), 0.0)
+    if feature.kind in {"constriction", "rock", "strainer"}:
+        return slope + speed + np.where(wet, 0.0, 1.0)
+    return np.where(wet, speed + slope, 0.0)
+
+
+def _feature_mask(feature, shape: tuple[int, int], scenario) -> BoolGrid:
+    xs = scenario.grid.x_coordinates()
+    ys = scenario.grid.y_coordinates()
+    x_grid, y_grid = np.meshgrid(xs, ys)
+    scale_x = max(feature.length * 0.5, feature.radius, scenario.grid.dx)
+    scale_y = max(feature.width * 0.5, feature.radius, scenario.grid.dy)
+    dx = (x_grid - feature.center[0]) / scale_x
+    dy = (y_grid - feature.center[1]) / scale_y
+    mask = (dx**2 + dy**2) <= 1.0
+    if mask.shape != shape:
+        raise ValueError("Feature mask shape does not match frame shape.")
+    return mask
+
+
+def _nearest_cell(x: float, y: float, scenario) -> tuple[int, int]:
+    col = int(np.clip(round((x - scenario.grid.origin_x) / scenario.grid.dx), 0, scenario.grid.nx - 1))
+    row = int(np.clip(round((y - scenario.grid.origin_y) / scenario.grid.dy), 0, scenario.grid.ny - 1))
+    return row, col
