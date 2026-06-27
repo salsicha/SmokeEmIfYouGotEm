@@ -1,0 +1,8 @@
+{
+  "export_version": "raftsim.unreal_visualization_export.v0",
+  "force_row_count": 140,
+  "force_telemetry": "telemetry_forces.csv",
+  "frame_count": 5,
+  "replay": "replay.json",
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate"
+}

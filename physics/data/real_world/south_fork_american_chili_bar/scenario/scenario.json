@@ -74,6 +74,7 @@
     "generator_version": "milestone_9_seed.v0",
     "provenance": {
       "flow_preset_confidence": 0.35,
+      "pyclaw_reference_min_depth_m": 0.01,
       "rapid_candidate_count": 4,
       "source_manifest": "source_manifest.json",
       "source_package": "physics/data/real_world/south_fork_american_chili_bar"

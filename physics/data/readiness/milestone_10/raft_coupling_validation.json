@@ -1,0 +1,132 @@
+{
+  "passed": true,
+  "runs": [
+    {
+      "cell_seconds_per_simulated_second": 0.0003830439527519047,
+      "grid_cells": 288,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 14,
+        "last_force_magnitude": 18786.58038432,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.005515832919627428,
+      "scenario_id": "flat_pool_seed_100",
+      "seconds_per_simulated_second": 0.11031665839254856,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.00039405381863212417,
+      "grid_cells": 288,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 28,
+        "last_force_magnitude": 20679.068991769152,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.0056743749883025885,
+      "scenario_id": "uniform_channel_seed_101",
+      "seconds_per_simulated_second": 0.11348749976605177,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.0003989062517777913,
+      "grid_cells": 288,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 28,
+        "last_force_magnitude": 20354.493107888164,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.005744250025600195,
+      "scenario_id": "bed_step_seed_102",
+      "seconds_per_simulated_second": 0.1148850005120039,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.00020795718430437974,
+      "grid_cells": 576,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 28,
+        "last_force_magnitude": 221738.82806296574,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.005989166907966137,
+      "scenario_id": "procedural_rapid_seed_103",
+      "seconds_per_simulated_second": 0.11978333815932274,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.00022761230866308324,
+      "grid_cells": 512,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 28,
+        "last_force_magnitude": 19038.980553296497,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.005826875101774931,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner",
+      "seconds_per_simulated_second": 0.11653750203549862,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.00022771320800529793,
+      "grid_cells": 512,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 28,
+        "last_force_magnitude": 20778.919777677904,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.005829458124935627,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate",
+      "seconds_per_simulated_second": 0.11658916249871254,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    },
+    {
+      "cell_seconds_per_simulated_second": 0.00022668133169645444,
+      "grid_cells": 512,
+      "output_frames": 3,
+      "repetition": 0,
+      "run_status": {
+        "last_contribution_count": 28,
+        "last_force_magnitude": 33540.871777607936,
+        "samples_per_run": 3
+      },
+      "runtime_seconds": 0.0058030420914292336,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced",
+      "seconds_per_simulated_second": 0.11606084182858467,
+      "simulated_seconds": 0.05,
+      "solver": "raft_coupling",
+      "validation_passed": true
+    }
+  ],
+  "summary": {
+    "max_runtime_seconds": 0.005989166907966137,
+    "mean_runtime_seconds": 0.005769000022805163,
+    "mean_seconds_per_simulated_second": 0.11538000045610326,
+    "run_count": 7,
+    "total_runtime_seconds": 0.04038300015963614
+  },
+  "validation_version": "raftsim.raft_coupling_readiness.v0"
+}

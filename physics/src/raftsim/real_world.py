@@ -866,9 +866,12 @@ def generate_real_world_scenario2_5d(
     dx: float = 4.0,
     dy: float = 2.0,
     duration: float = 8.0,
+    pyclaw_reference_min_depth_m: float = 0.01,
 ) -> Scenario2_5D:
     """Generate a small solver-neutral scenario from the representative real-world package."""
 
+    if pyclaw_reference_min_depth_m < 0.0:
+        raise ValueError("pyclaw_reference_min_depth_m must be non-negative.")
     chosen = selection or default_player_selections()[1]
     centerline = south_fork_american_centerline_stations()
     indicators = extract_channel_indicators(centerline)
@@ -940,6 +943,12 @@ def generate_real_world_scenario2_5d(
             v += 0.22 * feature.strength * influence
 
     bed = np.where(depth > 1.0e-6, bed, surface_eta + bank_lift)
+    if pyclaw_reference_min_depth_m > 0.0:
+        shallow_reference_mask = depth <= pyclaw_reference_min_depth_m
+        depth = np.maximum(depth, pyclaw_reference_min_depth_m)
+        u = np.where(shallow_reference_mask, 0.0, u)
+        v = np.where(shallow_reference_mask, 0.0, v)
+        bed = np.where(shallow_reference_mask, surface_eta - depth, bed)
     state = InitialWaterState2_5D.from_depth_velocity(bed, depth, u, v)
     boundaries = (
         BoundaryCondition2_5D("west", "inflow", depth=preset.initial_depth_m, velocity=(preset.downstream_velocity_mps, 0.0), metadata={"flow_band": chosen.flow_band}),
@@ -969,6 +978,7 @@ def generate_real_world_scenario2_5d(
             "source_package": "physics/data/real_world/south_fork_american_chili_bar",
             "flow_preset_confidence": preset.confidence_score,
             "rapid_candidate_count": len(rapid_candidates),
+            "pyclaw_reference_min_depth_m": pyclaw_reference_min_depth_m,
         },
     )
     return Scenario2_5D(

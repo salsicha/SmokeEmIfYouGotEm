@@ -1,0 +1,132 @@
+{
+  "scenario_suite_version": "raftsim.milestone10_scenarios.v0",
+  "scenarios": [
+    {
+      "difficulty_preset": null,
+      "duration": 0.05,
+      "fixed_dt": 0.016666666666666666,
+      "fixture_kind": "flat_pool",
+      "flow_band": null,
+      "grid_cells": 288,
+      "provenance": {
+        "source": "deterministic_fixture_generator"
+      },
+      "river_id": null,
+      "scenario_id": "flat_pool_seed_100",
+      "scenario_type": "fixture",
+      "season_preset": null,
+      "section_id": null
+    },
+    {
+      "difficulty_preset": null,
+      "duration": 0.05,
+      "fixed_dt": 0.016666666666666666,
+      "fixture_kind": "uniform_channel",
+      "flow_band": null,
+      "grid_cells": 288,
+      "provenance": {
+        "source": "deterministic_fixture_generator"
+      },
+      "river_id": null,
+      "scenario_id": "uniform_channel_seed_101",
+      "scenario_type": "fixture",
+      "season_preset": null,
+      "section_id": null
+    },
+    {
+      "difficulty_preset": null,
+      "duration": 0.05,
+      "fixed_dt": 0.016666666666666666,
+      "fixture_kind": "bed_step",
+      "flow_band": null,
+      "grid_cells": 288,
+      "provenance": {
+        "source": "deterministic_fixture_generator"
+      },
+      "river_id": null,
+      "scenario_id": "bed_step_seed_102",
+      "scenario_type": "fixture",
+      "season_preset": null,
+      "section_id": null
+    },
+    {
+      "difficulty_preset": "procedural_0.45",
+      "duration": 0.05,
+      "fixed_dt": 0.016666666666666666,
+      "fixture_kind": null,
+      "flow_band": "synthetic_medium",
+      "grid_cells": 576,
+      "provenance": {
+        "feature_count": 9,
+        "pyclaw_reference_min_depth_m": 0.01,
+        "pyclaw_reference_transform": "exact dry cells converted to shallow reference shelf",
+        "source": "deterministic_procedural_generator"
+      },
+      "river_id": null,
+      "scenario_id": "procedural_rapid_seed_103",
+      "scenario_type": "procedural",
+      "season_preset": null,
+      "section_id": null
+    },
+    {
+      "difficulty_preset": "beginner",
+      "duration": 0.05,
+      "fixed_dt": 0.016666666666666666,
+      "fixture_kind": null,
+      "flow_band": "low_runnable",
+      "grid_cells": 512,
+      "provenance": {
+        "flow_preset_confidence": 0.3,
+        "pyclaw_reference_min_depth_m": 0.01,
+        "rapid_candidate_count": 4,
+        "source_manifest": "source_manifest.json",
+        "source_package": "physics/data/real_world/south_fork_american_chili_bar"
+      },
+      "river_id": "american_south_fork",
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner",
+      "scenario_type": "real_world",
+      "season_preset": "late_summer_low_water",
+      "section_id": "chili_bar_to_coloma"
+    },
+    {
+      "difficulty_preset": "intermediate",
+      "duration": 0.05,
+      "fixed_dt": 0.016666666666666666,
+      "fixture_kind": null,
+      "flow_band": "median_runnable",
+      "grid_cells": 512,
+      "provenance": {
+        "flow_preset_confidence": 0.35,
+        "pyclaw_reference_min_depth_m": 0.01,
+        "rapid_candidate_count": 4,
+        "source_manifest": "source_manifest.json",
+        "source_package": "physics/data/real_world/south_fork_american_chili_bar"
+      },
+      "river_id": "american_south_fork",
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate",
+      "scenario_type": "real_world",
+      "season_preset": "summer_commercial",
+      "section_id": "chili_bar_to_coloma"
+    },
+    {
+      "difficulty_preset": "advanced",
+      "duration": 0.05,
+      "fixed_dt": 0.016666666666666666,
+      "fixture_kind": null,
+      "flow_band": "high_runnable",
+      "grid_cells": 512,
+      "provenance": {
+        "flow_preset_confidence": 0.25,
+        "pyclaw_reference_min_depth_m": 0.01,
+        "rapid_candidate_count": 4,
+        "source_manifest": "source_manifest.json",
+        "source_package": "physics/data/real_world/south_fork_american_chili_bar"
+      },
+      "river_id": "american_south_fork",
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced",
+      "scenario_type": "real_world",
+      "season_preset": "spring_runoff_or_release",
+      "section_id": "chili_bar_to_coloma"
+    }
+  ]
+}

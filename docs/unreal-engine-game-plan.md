@@ -8,6 +8,7 @@ The Unreal game should deliver the first-person guide fantasy: seated in the ste
 
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial extraction, rapid identification, seasonal flow, adaptive fluid-parameter, and river-selection work that must feed Unreal content.
 See [Audio Asset Sourcing Plan](audio-asset-sourcing-plan.md) for the production audio source policy, library shortlist, field-recording plan, AI-audio limits, and asset manifest.
+See [Python-To-Unreal Readiness Gate](python-to-unreal-readiness-gate.md) for the current Milestone 10 audit. The current gate decision is blocked; production Unreal work should wait until the real-world dual-solver threshold mismatch is resolved.
 
 ## Hard Dependency Gate
 

@@ -1,0 +1,64 @@
+{
+  "available": true,
+  "passed": true,
+  "run_count": 7,
+  "runs": [
+    {
+      "mass_relative_drift": 0,
+      "max_velocity": 0,
+      "min_depth": 1.25,
+      "passed": true,
+      "returncode": 0,
+      "scenario_id": "flat_pool_seed_100"
+    },
+    {
+      "mass_relative_drift": 1.1608258363240666e-06,
+      "max_velocity": 1.403327503445194,
+      "min_depth": 1.2499653103975552,
+      "passed": true,
+      "returncode": 0,
+      "scenario_id": "uniform_channel_seed_101"
+    },
+    {
+      "mass_relative_drift": 0.001216206692326093,
+      "max_velocity": 1.4105723880569698,
+      "min_depth": 0.7993129004031838,
+      "passed": true,
+      "returncode": 0,
+      "scenario_id": "bed_step_seed_102"
+    },
+    {
+      "mass_relative_drift": 0.0032180233159956983,
+      "max_velocity": 2.8093801633367477,
+      "min_depth": 0,
+      "passed": true,
+      "returncode": 0,
+      "scenario_id": "procedural_rapid_seed_103"
+    },
+    {
+      "mass_relative_drift": 0.014112482698309607,
+      "max_velocity": 0.9905382467087605,
+      "min_depth": 0.002375233082264277,
+      "passed": true,
+      "returncode": 0,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner"
+    },
+    {
+      "mass_relative_drift": 0.014260026030407115,
+      "max_velocity": 1.932423300603843,
+      "min_depth": 0,
+      "passed": true,
+      "returncode": 0,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate"
+    },
+    {
+      "mass_relative_drift": 0.014711951919642143,
+      "max_velocity": 3.759077931498345,
+      "min_depth": 0,
+      "passed": true,
+      "returncode": 0,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced"
+    }
+  ],
+  "solver_outputs_committed": false
+}

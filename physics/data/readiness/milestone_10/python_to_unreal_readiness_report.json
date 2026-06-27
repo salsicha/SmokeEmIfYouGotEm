@@ -1,0 +1,125 @@
+{
+  "accepted_model_limitations": [
+    "2.5D shallow-water/height-field flow is the accepted runtime model for the first Unreal bridge; full 3D CFD is out of scope.",
+    "PyClaw reference exports use a shallow shelf for exact dry cells to avoid Roe-solver singularities.",
+    "The first real-world corridor remains a preproduction seed package; heavy lidar, imagery, guide references, and field media are not vendored.",
+    "Real-world C++ matching must pass threshold reports before final river-content production."
+  ],
+  "artifact_manifest": {
+    "adaptive_flow_validation": "adaptive_flow_validation.json",
+    "cpp_solver_summary": "cpp_solver_summary.json",
+    "dual_solver_comparison_summary": "dual_solver_comparison_summary.json",
+    "profiling_runtime_budget_report": "profiling_runtime_budget_report.json",
+    "pyclaw_reference_summary": "pyclaw_reference_summary.json",
+    "raft_coupling_validation": "raft_coupling_validation.json",
+    "scenario_suite": "scenario_suite.json",
+    "unreal_corridor_package_manifest": "unreal_corridor_package_manifest.json",
+    "unreal_visualization": "unreal_visualization/manifest.json"
+  },
+  "checks": [
+    {
+      "artifacts": [
+        "pyclaw_reference_summary.json"
+      ],
+      "check_id": "pyclaw_reference_scenarios",
+      "details": "7 PyClaw scenario runs completed.",
+      "passed": true,
+      "status": "passed",
+      "title": "PyClaw Reference Scenarios"
+    },
+    {
+      "artifacts": [
+        "cpp_solver_summary.json"
+      ],
+      "check_id": "custom_cpp_solver_scenarios",
+      "details": "7 C++ scenario runs completed.",
+      "passed": true,
+      "status": "passed",
+      "title": "Custom C++ Solver Scenarios"
+    },
+    {
+      "artifacts": [
+        "dual_solver_comparison_summary.json"
+      ],
+      "check_id": "dual_solver_comparison_and_tuning",
+      "details": "Dual comparison threshold reports and a tuning report were generated; real-world median currently determines gate status.",
+      "passed": false,
+      "status": "failed",
+      "title": "Dual-Solver Comparison And Tuning"
+    },
+    {
+      "artifacts": [
+        "raft_coupling_validation.json"
+      ],
+      "check_id": "raft_coupling_validation",
+      "details": "Raft coupling sampled force envelopes across the readiness scenario suite.",
+      "passed": true,
+      "status": "passed",
+      "title": "2.5D Raft Coupling Validation"
+    },
+    {
+      "artifacts": [
+        "unreal_corridor_package_manifest.json"
+      ],
+      "check_id": "real_world_section_package",
+      "details": "South Fork American preproduction corridor package is exported with manifest, flow bands, rapid candidates, and confidence metadata.",
+      "passed": true,
+      "status": "passed",
+      "title": "First Real-World River Section Package"
+    },
+    {
+      "artifacts": [
+        "adaptive_flow_validation.json"
+      ],
+      "check_id": "adaptive_flow_parameters",
+      "details": "Low, median, and high runnable flow presets map monotonically into solver parameters.",
+      "passed": true,
+      "status": "passed",
+      "title": "Adaptive Flow Parameters"
+    },
+    {
+      "artifacts": [
+        "profiling_runtime_budget_report.json"
+      ],
+      "check_id": "profiling_runtime_budgets",
+      "details": "18 profiling runs recorded.",
+      "passed": true,
+      "status": "passed",
+      "title": "Profiling And Runtime Budget Reports"
+    },
+    {
+      "artifacts": [
+        "unreal_visualization/replay.json",
+        "unreal_visualization/telemetry_forces.csv"
+      ],
+      "check_id": "unreal_visualization_exports",
+      "details": "Representative replay and force telemetry files are exported for Unreal visualization.",
+      "passed": true,
+      "status": "passed",
+      "title": "Unreal Replay And Telemetry Exports"
+    }
+  ],
+  "decision": {
+    "approved_for_unreal_production_start": false,
+    "reason": "The readiness audit completed, but one or more blocking checks failed; do not start the production Unreal project yet.",
+    "required_next_actions": [
+      "Resolve dual_solver_comparison_and_tuning: Dual comparison threshold reports and a tuning report were generated; real-world median currently determines gate status."
+    ],
+    "status": "blocked"
+  },
+  "gate_version": "raftsim.python_to_unreal_readiness.v0",
+  "passed": false,
+  "risks": [
+    "Real-world hydraulic matching may need additional C++ solver terms or calibrated thresholds.",
+    "Runtime budgets are measured on local smoke scenarios and need target hardware confirmation.",
+    "Geospatial source licensing and attribution must be re-checked when pulling production data.",
+    "Chrono integration is not yet verified inside Unreal or VR frame scheduling."
+  ],
+  "runtime_choices": {
+    "authoritative_water_candidate": "custom C++ reduced shallow-water / height-field solver",
+    "chrono_fsi": "optional research path only, not a baseline runtime dependency",
+    "raft_and_contact_candidate": "Project Chrono bridge over custom water/contact samples, with custom reduced raft fallback if budgets fail",
+    "reference_solver": "PyClaw, with shallow reference shelf for exact dry-cell scenarios until wet/dry reference handling is improved",
+    "unreal_integration_order": "replay/telemetry playback first, then live custom water, then Chrono/custom raft coupling"
+  }
+}
