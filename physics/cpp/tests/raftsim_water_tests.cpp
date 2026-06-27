@@ -52,11 +52,12 @@ void assert_solver_is_deterministic(const raftsim::Scenario& scenario) {
 }
 
 void assert_output_can_be_written(const raftsim::Scenario& scenario, const std::string& output_dir) {
-    raftsim::ReducedShallowWaterSolver solver(scenario);
+    raftsim::SolverConfig config;
+    raftsim::ReducedShallowWaterSolver solver(scenario, config);
     std::vector<raftsim::Frame> frames = solver.run(8, 4);
     raftsim::ValidationSummary validation = raftsim::validate_frames(scenario, frames, {});
     expect(validation.passed, "validation failed for smoke scenario");
-    raftsim::write_solver_output(scenario, frames, validation, output_dir);
+    raftsim::write_solver_output(scenario, frames, validation, config, output_dir);
     expect(std::filesystem::exists(std::filesystem::path(output_dir) / "manifest.json"), "manifest was not written");
     expect(std::filesystem::exists(std::filesystem::path(output_dir) / "validation.json"), "validation was not written");
     expect(std::filesystem::exists(std::filesystem::path(output_dir) / "frames" / "frame_0000.csv"), "frame was not written");

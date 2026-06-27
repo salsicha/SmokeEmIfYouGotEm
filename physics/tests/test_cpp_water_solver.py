@@ -55,11 +55,48 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
     validation = json.loads((run_dir / "validation.json").read_text(encoding="utf-8"))
 
-    assert manifest["solver"] == "raftsim_water_reduced_cpp_v0"
+    assert manifest["solver"] == "raftsim_water_cpp_v1"
+    assert manifest["solver_mode"] == "reduced"
     assert validation["passed"] is True
     assert "frames/frame_0000.csv" in manifest["frames"]
     assert manifest["probes"]
     assert manifest["cross_sections"]
+
+    finite_volume_output_dir = tmp_path / "cpp_finite_volume_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(scenario_dir),
+            "--output",
+            str(finite_volume_output_dir),
+            "--steps",
+            "8",
+            "--frame-interval",
+            "4",
+            "--solver-mode",
+            "finite_volume",
+            "--boundary-mode",
+            "pyclaw",
+            "--flux-scheme",
+            "roe",
+            "--feature-strength-scale",
+            "0",
+            "--roughness-scale",
+            "0",
+            "--bed-slope-source-scale",
+            "0",
+        ],
+        check=True,
+    )
+    finite_volume_manifest = json.loads(
+        (finite_volume_output_dir / scenario.metadata.scenario_id / "manifest.json").read_text(encoding="utf-8")
+    )
+
+    assert finite_volume_manifest["solver"] == "raftsim_water_cpp_v1"
+    assert finite_volume_manifest["solver_mode"] == "finite_volume"
+    assert finite_volume_manifest["boundary_mode"] == "pyclaw"
+    assert finite_volume_manifest["flux_scheme"] == "roe"
 
 
 def test_chrono_smoke_target_is_optional_and_outside_unreal():

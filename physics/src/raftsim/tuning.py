@@ -26,14 +26,24 @@ from .sweeps import ParameterSweepCandidate
 @dataclass(frozen=True, slots=True)
 class CppTuningCandidate:
     label: str
+    solver_mode: str = "reduced"
+    boundary_mode: str = "scenario"
+    flux_scheme: str = "rusanov"
+    cfl: float = 0.45
     feature_strength_scale: float = 1.0
     roughness_scale: float = 1.0
+    bed_slope_source_scale: float = 0.0
 
     def to_json_dict(self) -> dict[str, object]:
         return {
             "label": self.label,
+            "solver_mode": self.solver_mode,
+            "boundary_mode": self.boundary_mode,
+            "flux_scheme": self.flux_scheme,
+            "cfl": self.cfl,
             "feature_strength_scale": self.feature_strength_scale,
             "roughness_scale": self.roughness_scale,
+            "bed_slope_source_scale": self.bed_slope_source_scale,
         }
 
 
@@ -146,8 +156,13 @@ def tune_cpp_solver_against_pyclaw(
                     executable=Path(cpp_solver_executable),
                     steps=cpp_steps,
                     frame_interval=cpp_frame_interval,
+                    solver_mode=candidate.solver_mode,
+                    boundary_mode=candidate.boundary_mode,
+                    flux_scheme=candidate.flux_scheme,
+                    cfl=candidate.cfl,
                     feature_strength_scale=candidate.feature_strength_scale,
                     roughness_scale=candidate.roughness_scale,
+                    bed_slope_source_scale=candidate.bed_slope_source_scale,
                 ),
             ),
         )

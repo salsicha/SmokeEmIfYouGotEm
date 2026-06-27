@@ -17,10 +17,15 @@ namespace {
 struct CliArgs {
     std::string scenario_dir;
     std::string output_dir = "outputs/cpp_solver";
+    std::string solver_mode = "reduced";
+    std::string boundary_mode = "scenario";
+    std::string flux_scheme = "rusanov";
     int steps = -1;
     int frame_interval = 60;
+    double cfl = 0.45;
     double feature_strength_scale = 1.0;
     double roughness_scale = 1.0;
+    double bed_slope_source_scale = 0.0;
 };
 
 void print_usage(const char* program) {
@@ -29,10 +34,15 @@ void print_usage(const char* program) {
         << "\n"
         << "Options:\n"
         << "  --output <dir>                 Output root directory (default: outputs/cpp_solver)\n"
+        << "  --solver-mode <mode>           reduced or finite_volume (default: reduced)\n"
+        << "  --boundary-mode <mode>         scenario or pyclaw (default: scenario)\n"
+        << "  --flux-scheme <scheme>         rusanov, hll, or roe (default: rusanov)\n"
         << "  --steps <n>                    Fixed steps to run (default: scenario duration / fixed_dt)\n"
         << "  --frame-interval <n>           Save every n solver steps (default: 60)\n"
+        << "  --cfl <x>                      Finite-volume CFL target (default: 0.45)\n"
         << "  --feature-strength-scale <x>   Scale authored rapid forcing (default: 1.0)\n"
         << "  --roughness-scale <x>          Scale scenario roughness/friction (default: 1.0)\n"
+        << "  --bed-slope-source-scale <x>   Scale finite-volume bed slope source term (default: 0.0)\n"
         << "  --help                         Show this help\n";
 }
 
@@ -70,14 +80,24 @@ CliArgs parse_args(int argc, char** argv) {
             args.scenario_dir = require_value(flag);
         } else if (flag == "--output") {
             args.output_dir = require_value(flag);
+        } else if (flag == "--solver-mode") {
+            args.solver_mode = require_value(flag);
+        } else if (flag == "--boundary-mode") {
+            args.boundary_mode = require_value(flag);
+        } else if (flag == "--flux-scheme") {
+            args.flux_scheme = require_value(flag);
         } else if (flag == "--steps") {
             args.steps = parse_int(require_value(flag), flag);
         } else if (flag == "--frame-interval") {
             args.frame_interval = parse_int(require_value(flag), flag);
+        } else if (flag == "--cfl") {
+            args.cfl = parse_double(require_value(flag), flag);
         } else if (flag == "--feature-strength-scale") {
             args.feature_strength_scale = parse_double(require_value(flag), flag);
         } else if (flag == "--roughness-scale") {
             args.roughness_scale = parse_double(require_value(flag), flag);
+        } else if (flag == "--bed-slope-source-scale") {
+            args.bed_slope_source_scale = parse_double(require_value(flag), flag);
         } else {
             throw std::runtime_error("Unknown argument: " + flag);
         }
@@ -90,6 +110,18 @@ CliArgs parse_args(int argc, char** argv) {
     }
     if (args.frame_interval < 1) {
         throw std::runtime_error("--frame-interval must be at least 1.");
+    }
+    if (args.solver_mode != "reduced" && args.solver_mode != "finite_volume") {
+        throw std::runtime_error("--solver-mode must be reduced or finite_volume.");
+    }
+    if (args.boundary_mode != "scenario" && args.boundary_mode != "pyclaw") {
+        throw std::runtime_error("--boundary-mode must be scenario or pyclaw.");
+    }
+    if (args.flux_scheme != "rusanov" && args.flux_scheme != "hll" && args.flux_scheme != "roe") {
+        throw std::runtime_error("--flux-scheme must be rusanov, hll, or roe.");
+    }
+    if (args.cfl <= 0.0) {
+        throw std::runtime_error("--cfl must be positive.");
     }
     return args;
 }
@@ -106,18 +138,26 @@ int main(int argc, char** argv) {
         }
 
         raftsim::SolverConfig config;
+        config.solver_mode = args.solver_mode;
+        config.boundary_mode = args.boundary_mode;
+        config.flux_scheme = args.flux_scheme;
+        config.cfl = args.cfl;
         config.feature_strength_scale = args.feature_strength_scale;
         config.roughness_scale = args.roughness_scale;
+        config.bed_slope_source_scale = args.bed_slope_source_scale;
         raftsim::ReducedShallowWaterSolver solver(std::move(scenario), config);
         std::vector<raftsim::Frame> frames = solver.run(steps, args.frame_interval);
         raftsim::ValidationSummary validation = raftsim::validate_frames(solver.scenario(), frames, config);
 
         fs::path output_root(args.output_dir);
         fs::path run_dir = output_root / solver.scenario().scenario_id;
-        raftsim::write_solver_output(solver.scenario(), frames, validation, run_dir.string());
+        raftsim::write_solver_output(solver.scenario(), frames, validation, config, run_dir.string());
 
         std::cout << "scenario_id=" << solver.scenario().scenario_id << "\n";
-        std::cout << "solver=raftsim_water_reduced_cpp_v0\n";
+        std::cout << "solver=raftsim_water_cpp_v1\n";
+        std::cout << "solver_mode=" << config.solver_mode << "\n";
+        std::cout << "boundary_mode=" << config.boundary_mode << "\n";
+        std::cout << "flux_scheme=" << config.flux_scheme << "\n";
         std::cout << "steps=" << steps << "\n";
         std::cout << "frames=" << frames.size() << "\n";
         std::cout << "output=" << run_dir.string() << "\n";

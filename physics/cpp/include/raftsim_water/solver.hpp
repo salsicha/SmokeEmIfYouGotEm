@@ -15,11 +15,16 @@ struct DerivedFields {
 };
 
 struct SolverConfig {
+    std::string solver_mode = "reduced";
+    std::string boundary_mode = "scenario";
+    std::string flux_scheme = "rusanov";
     double gravity = 9.81;
     double dry_tolerance = 1.0e-6;
     double max_velocity = 60.0;
+    double cfl = 0.45;
     double feature_strength_scale = 1.0;
     double roughness_scale = 1.0;
+    double bed_slope_source_scale = 0.0;
 };
 
 struct Frame {
@@ -56,6 +61,10 @@ private:
     double time_ = 0.0;
 
     void apply_boundaries();
+    void step_reduced(double dt);
+    void step_finite_volume(double dt);
+    void step_finite_volume_once(double dt);
+    double finite_volume_stable_dt() const;
     void apply_feature_forcing(double dt, WaterState& next) const;
     void recompute_state(WaterState& next) const;
 };
@@ -68,6 +77,7 @@ void write_solver_output(
     const Scenario& scenario,
     const std::vector<Frame>& frames,
     const ValidationSummary& validation,
+    const SolverConfig& config,
     const std::string& output_dir
 );
 

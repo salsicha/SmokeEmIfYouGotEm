@@ -19,6 +19,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--max-wet-mismatch-fraction", type=float, default=DEFAULT_THRESHOLDS.max_wet_mismatch_fraction)
     parser.add_argument("--max-probe-linf", type=float, default=DEFAULT_THRESHOLDS.max_probe_linf)
     parser.add_argument("--max-cross-section-linf", type=float, default=DEFAULT_THRESHOLDS.max_cross_section_linf)
+    parser.add_argument("--velocity-depth-floor", type=float, default=DEFAULT_THRESHOLDS.velocity_depth_floor)
     args = parser.parse_args(argv)
 
     output = args.output
@@ -34,6 +35,7 @@ def main(argv: list[str] | None = None) -> int:
             max_wet_mismatch_fraction=args.max_wet_mismatch_fraction,
             max_probe_linf=args.max_probe_linf,
             max_cross_section_linf=args.max_cross_section_linf,
+            velocity_depth_floor=args.velocity_depth_floor,
         ),
         output_path=output,
     )
