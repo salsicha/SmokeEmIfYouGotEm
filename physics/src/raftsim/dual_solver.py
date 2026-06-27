@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import math
 import subprocess
+import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -58,6 +59,7 @@ class CppSolverRunResult:
     output_dir: Path
     manifest_path: Path
     validation_path: Path
+    runtime_seconds: float
 
     def to_json_dict(self, root: Path) -> dict[str, object]:
         return {
@@ -68,6 +70,7 @@ class CppSolverRunResult:
             "output_dir": _relative_or_absolute(self.output_dir, root),
             "manifest": _relative_or_absolute(self.manifest_path, root),
             "validation": _relative_or_absolute(self.validation_path, root),
+            "runtime_seconds": self.runtime_seconds,
         }
 
 
@@ -77,6 +80,8 @@ class DualSolverRunResult:
     output_dir: Path
     scenario_dir: Path
     pyclaw_output_dir: Path
+    pyclaw_runtime_seconds: float
+    simulated_duration: float
     cpp: CppSolverRunResult
     manifest_path: Path
 
@@ -90,8 +95,26 @@ class DualSolverRunResult:
                 "output_dir": _relative_or_absolute(self.pyclaw_output_dir, root),
                 "manifest": _relative_or_absolute(self.pyclaw_output_dir / "manifest.json", root),
                 "validation": _relative_or_absolute(self.pyclaw_output_dir / "validation.json", root),
+                "runtime_seconds": self.pyclaw_runtime_seconds,
+                "seconds_per_simulated_second": _seconds_per_simulated_second(
+                    self.pyclaw_runtime_seconds,
+                    self.simulated_duration,
+                ),
             },
             "cpp": self.cpp.to_json_dict(root),
+            "runtime": {
+                "simulated_duration_seconds": self.simulated_duration,
+                "pyclaw_runtime_seconds": self.pyclaw_runtime_seconds,
+                "pyclaw_seconds_per_simulated_second": _seconds_per_simulated_second(
+                    self.pyclaw_runtime_seconds,
+                    self.simulated_duration,
+                ),
+                "cpp_runtime_seconds": self.cpp.runtime_seconds,
+                "cpp_seconds_per_simulated_second": _seconds_per_simulated_second(
+                    self.cpp.runtime_seconds,
+                    self.simulated_duration,
+                ),
+            },
         }
 
 
@@ -109,7 +132,9 @@ def run_dual_solver_scenario(
     scenario, scenario_dir = _materialize_scenario_package(scenario_or_path, root)
 
     pyclaw_output_dir = root / "pyclaw_reference" / scenario.metadata.scenario_id
+    pyclaw_start = time.perf_counter()
     run_pyclaw_reference(scenario_dir, config=config.pyclaw, output_dir=pyclaw_output_dir)
+    pyclaw_runtime_seconds = time.perf_counter() - pyclaw_start
 
     cpp_result = _run_cpp_solver(
         scenario,
@@ -123,6 +148,8 @@ def run_dual_solver_scenario(
         output_dir=root,
         scenario_dir=scenario_dir,
         pyclaw_output_dir=pyclaw_output_dir,
+        pyclaw_runtime_seconds=pyclaw_runtime_seconds,
+        simulated_duration=scenario.duration,
         cpp=cpp_result,
         manifest_path=root / "dual_solver_manifest.json",
     )
@@ -170,7 +197,9 @@ def _run_cpp_solver(
         "--feature-strength-scale",
         str(config.feature_strength_scale),
     )
+    start = time.perf_counter()
     completed = subprocess.run(command, check=False, capture_output=True, text=True)
+    runtime_seconds = time.perf_counter() - start
     if completed.returncode != 0 and not (config.allow_validation_failure and completed.returncode == 2):
         raise RuntimeError(
             "C++ solver run failed with return code "
@@ -186,6 +215,7 @@ def _run_cpp_solver(
         output_dir=run_output,
         manifest_path=run_output / "manifest.json",
         validation_path=run_output / "validation.json",
+        runtime_seconds=runtime_seconds,
     )
 
 
@@ -194,3 +224,7 @@ def _relative_or_absolute(path: Path, root: Path) -> str:
         return str(path.relative_to(root))
     except ValueError:
         return str(path)
+
+
+def _seconds_per_simulated_second(runtime_seconds: float, simulated_duration: float) -> float:
+    return runtime_seconds / max(simulated_duration, 1.0e-12)

@@ -56,6 +56,11 @@ def test_dual_solver_runs_pyclaw_and_cpp_on_one_shared_package(tmp_path):
     assert manifest["scenario_json"].endswith("scenario.json")
     assert manifest["pyclaw"]["manifest"] == "pyclaw_reference/flat_pool_seed_12/manifest.json"
     assert manifest["cpp"]["manifest"] == "cpp_solver/flat_pool_seed_12/manifest.json"
+    assert manifest["runtime"]["simulated_duration_seconds"] == scenario.duration
+    assert manifest["runtime"]["pyclaw_runtime_seconds"] >= 0.0
+    assert manifest["runtime"]["cpp_runtime_seconds"] >= 0.0
+    assert manifest["runtime"]["pyclaw_seconds_per_simulated_second"] >= 0.0
+    assert manifest["runtime"]["cpp_seconds_per_simulated_second"] >= 0.0
     assert cpp_validation["passed"] is True
     assert pyclaw_validation["passed"] is True
 
