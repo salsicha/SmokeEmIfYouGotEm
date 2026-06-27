@@ -110,6 +110,7 @@ from .raft_coupling2_5d import (
     sample_total_raft_forces,
     sum_force_contributions,
 )
+from .feature_validation import FeatureValidationCheck, FeatureValidationResult, validate_standing_wave_case
 from .sim import Simulation, SimulationConfig, SimulationSystem
 from .state import BodyState
 from .telemetry import ForceContribution, TelemetryFrame, TelemetryRecorder
@@ -145,6 +146,8 @@ __all__ = [
     "FieldErrorSummary",
     "FeatureComparison",
     "FeatureComparisonReport",
+    "FeatureValidationCheck",
+    "FeatureValidationResult",
     "ForceContribution",
     "FrameFieldComparison",
     "HoleRetentionMetric",
@@ -239,5 +242,6 @@ __all__ = [
     "run_pyclaw_reference",
     "select_backend",
     "tune_cpp_solver_against_pyclaw",
+    "validate_standing_wave_case",
     "write_unavailable_report",
 ]

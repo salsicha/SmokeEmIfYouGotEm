@@ -348,6 +348,10 @@ The state tracks position, orientation quaternion, linear velocity, and angular 
 
 `compare_raft_force_samples()` compares PyClaw-vs-C++ raft force envelopes, one-step trajectory deltas, and coarse outcomes such as `floating`, `grounded`, `forced`, or `freefall`.
 
+## 2.5D Feature Validation
+
+Milestone 6 adds deterministic whitewater feature validators. `validate_standing_wave_case()` starts the suite with clear, stall, surf, and flush outcome classification for standing-wave samples.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
