@@ -125,6 +125,116 @@ class ProbeComparisonReport:
         return output_path
 
 
+@dataclass(frozen=True, slots=True)
+class PointMetric:
+    x: float | None
+    y: float | None
+    value: float
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {"x": self.x, "y": self.y, "value": self.value}
+
+
+@dataclass(frozen=True, slots=True)
+class HoleRetentionMetric:
+    hole_count: int
+    retained_area: float
+    centroid_x: float | None
+    centroid_y: float | None
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "hole_count": self.hole_count,
+            "retained_area": self.retained_area,
+            "centroid_x": self.centroid_x,
+            "centroid_y": self.centroid_y,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class SolverDiagnosticSummary:
+    solver: str
+    frame_count: int
+    mass_initial: float
+    mass_final: float
+    mass_relative_drift: float
+    energy_initial: float
+    energy_final: float
+    energy_relative_change: float
+    froude_max: float
+    froude_mean_wet: float
+    hydraulic_jump: PointMetric
+    wave_crest: PointMetric
+    wave_trough: PointMetric
+    hole_retention: HoleRetentionMetric
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "solver": self.solver,
+            "frame_count": self.frame_count,
+            "mass_initial": self.mass_initial,
+            "mass_final": self.mass_final,
+            "mass_relative_drift": self.mass_relative_drift,
+            "energy_initial": self.energy_initial,
+            "energy_final": self.energy_final,
+            "energy_relative_change": self.energy_relative_change,
+            "froude_max": self.froude_max,
+            "froude_mean_wet": self.froude_mean_wet,
+            "hydraulic_jump": self.hydraulic_jump.to_json_dict(),
+            "wave_crest": self.wave_crest.to_json_dict(),
+            "wave_trough": self.wave_trough.to_json_dict(),
+            "hole_retention": self.hole_retention.to_json_dict(),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class DiagnosticDeltaSummary:
+    mass_relative_drift_delta: float
+    energy_relative_change_delta: float
+    froude_max_delta: float
+    froude_mean_wet_delta: float
+    hydraulic_jump_distance: float | None
+    wave_crest_distance: float | None
+    wave_trough_distance: float | None
+    hole_retained_area_delta: float
+    hole_centroid_distance: float | None
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "mass_relative_drift_delta": self.mass_relative_drift_delta,
+            "energy_relative_change_delta": self.energy_relative_change_delta,
+            "froude_max_delta": self.froude_max_delta,
+            "froude_mean_wet_delta": self.froude_mean_wet_delta,
+            "hydraulic_jump_distance": self.hydraulic_jump_distance,
+            "wave_crest_distance": self.wave_crest_distance,
+            "wave_trough_distance": self.wave_trough_distance,
+            "hole_retained_area_delta": self.hole_retained_area_delta,
+            "hole_centroid_distance": self.hole_centroid_distance,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class PhysicsDiagnosticComparisonReport:
+    scenario_id: str
+    pyclaw: SolverDiagnosticSummary
+    cpp: SolverDiagnosticSummary
+    delta: DiagnosticDeltaSummary
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "scenario_id": self.scenario_id,
+            "pyclaw": self.pyclaw.to_json_dict(),
+            "cpp": self.cpp.to_json_dict(),
+            "delta": self.delta.to_json_dict(),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+
 def compare_dual_solver_fields(
     dual_solver_dir_or_manifest: str | Path,
     *,
@@ -196,6 +306,37 @@ def compare_dual_solver_probes(
         scenario_id=manifest["scenario_id"],
         point_probes=point_probes,
         cross_sections=cross_sections,
+    )
+    if output_path is not None:
+        report.write_json(output_path)
+    return report
+
+
+def compare_dual_solver_diagnostics(
+    dual_solver_dir_or_manifest: str | Path,
+    *,
+    output_path: str | Path | None = None,
+) -> PhysicsDiagnosticComparisonReport:
+    """Compare mass, energy, Froude, jump, wave, and hole-retention diagnostics."""
+
+    manifest_path = _manifest_path(dual_solver_dir_or_manifest)
+    root = manifest_path.parent
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    scenario = read_scenario2_5d_package(root / manifest["scenario_package"])
+    pyclaw_manifest = _load_manifest(root / manifest["pyclaw"]["manifest"])
+    cpp_manifest = _load_manifest(root / manifest["cpp"]["manifest"])
+    pyclaw_output = root / manifest["pyclaw"]["output_dir"]
+    cpp_output = root / manifest["cpp"]["output_dir"]
+    pyclaw_frames = [_load_pyclaw_npz_frame(pyclaw_output / frame) for frame in pyclaw_manifest["frames"]]
+    cpp_frames = [_load_cpp_csv_frame(cpp_output / frame) for frame in cpp_manifest["frames"]]
+
+    pyclaw_summary = _diagnostic_summary("pyclaw", pyclaw_frames, scenario)
+    cpp_summary = _diagnostic_summary("cpp", cpp_frames, scenario)
+    report = PhysicsDiagnosticComparisonReport(
+        scenario_id=manifest["scenario_id"],
+        pyclaw=pyclaw_summary,
+        cpp=cpp_summary,
+        delta=_diagnostic_delta(pyclaw_summary, cpp_summary),
     )
     if output_path is not None:
         report.write_json(output_path)
@@ -280,6 +421,7 @@ def _load_pyclaw_npz_frame(path: Path) -> dict[str, FloatGrid | BoolGrid]:
             "normal_x": np.asarray(data["normal_x"], dtype=np.float64),
             "normal_y": np.asarray(data["normal_y"], dtype=np.float64),
             "normal_z": np.asarray(data["normal_z"], dtype=np.float64),
+            "froude": np.asarray(data["froude"], dtype=np.float64),
         }
 
 
@@ -304,6 +446,7 @@ def _load_cpp_csv_frame(path: Path) -> dict[str, FloatGrid | BoolGrid]:
         "normal_x": np.zeros((ny, nx), dtype=np.float64),
         "normal_y": np.zeros((ny, nx), dtype=np.float64),
         "normal_z": np.zeros((ny, nx), dtype=np.float64),
+        "froude": np.zeros((ny, nx), dtype=np.float64),
     }
     for row in rows:
         row_index = int(row["row"])
@@ -443,3 +586,151 @@ def _nearest_indices(reference: FloatGrid, candidate: FloatGrid) -> tuple[NDArra
         indices[index] = nearest
         max_delta = max(max_delta, float(abs(candidate[nearest] - value)))
     return indices, max_delta
+
+
+def _diagnostic_summary(
+    solver: str,
+    frames: list[dict[str, FloatGrid | BoolGrid]],
+    scenario,
+) -> SolverDiagnosticSummary:
+    if not frames:
+        raise ValueError("Diagnostic comparison requires at least one frame.")
+    initial = frames[0]
+    final = frames[-1]
+    mass_initial = _frame_mass(initial, scenario.grid.dx, scenario.grid.dy)
+    mass_final = _frame_mass(final, scenario.grid.dx, scenario.grid.dy)
+    energy_initial = _frame_energy(initial, scenario.grid.dx, scenario.grid.dy)
+    energy_final = _frame_energy(final, scenario.grid.dx, scenario.grid.dy)
+    final_wet = np.asarray(final["wet"], dtype=np.bool_)
+    final_froude = np.asarray(final["froude"], dtype=np.float64)
+    wet_froude = final_froude[final_wet]
+    return SolverDiagnosticSummary(
+        solver=solver,
+        frame_count=len(frames),
+        mass_initial=mass_initial,
+        mass_final=mass_final,
+        mass_relative_drift=abs(mass_final - mass_initial) / max(abs(mass_initial), 1.0),
+        energy_initial=energy_initial,
+        energy_final=energy_final,
+        energy_relative_change=(energy_final - energy_initial) / max(abs(energy_initial), 1.0),
+        froude_max=float(np.max(final_froude)) if final_froude.size else 0.0,
+        froude_mean_wet=float(np.mean(wet_froude)) if wet_froude.size else 0.0,
+        hydraulic_jump=_hydraulic_jump_metric(final, scenario),
+        wave_crest=_wave_extreme_metric(final, scenario, mode="crest"),
+        wave_trough=_wave_extreme_metric(final, scenario, mode="trough"),
+        hole_retention=_hole_retention_metric(final, scenario),
+    )
+
+
+def _frame_mass(frame: dict[str, FloatGrid | BoolGrid], dx: float, dy: float) -> float:
+    return float(np.sum(np.asarray(frame["h"], dtype=np.float64)) * dx * dy)
+
+
+def _frame_energy(frame: dict[str, FloatGrid | BoolGrid], dx: float, dy: float, gravity: float = 9.81) -> float:
+    h = np.asarray(frame["h"], dtype=np.float64)
+    eta = np.asarray(frame["eta"], dtype=np.float64)
+    u = np.asarray(frame["u"], dtype=np.float64)
+    v = np.asarray(frame["v"], dtype=np.float64)
+    bed = eta - h
+    kinetic = 0.5 * h * (u**2 + v**2)
+    potential = gravity * h * bed + 0.5 * gravity * h**2
+    return float(np.sum(kinetic + potential) * dx * dy)
+
+
+def _hydraulic_jump_metric(frame: dict[str, FloatGrid | BoolGrid], scenario) -> PointMetric:
+    h = np.asarray(frame["h"], dtype=np.float64)
+    wet = np.asarray(frame["wet"], dtype=np.bool_)
+    masked_h = np.where(wet, h, 0.0)
+    grad_y, grad_x = np.gradient(masked_h, scenario.grid.dy, scenario.grid.dx)
+    strength = np.hypot(grad_x, grad_y)
+    row, col = np.unravel_index(int(np.argmax(strength)), strength.shape)
+    return PointMetric(
+        x=_x_at_col(scenario, col),
+        y=_y_at_row(scenario, row),
+        value=float(strength[row, col]),
+    )
+
+
+def _wave_extreme_metric(frame: dict[str, FloatGrid | BoolGrid], scenario, *, mode: str) -> PointMetric:
+    eta = np.asarray(frame["eta"], dtype=np.float64)
+    wet = np.asarray(frame["wet"], dtype=np.bool_)
+    if not np.any(wet):
+        return PointMetric(x=None, y=None, value=0.0)
+    masked_eta = np.where(wet, eta, -np.inf if mode == "crest" else np.inf)
+    row, col = np.unravel_index(
+        int(np.argmax(masked_eta) if mode == "crest" else np.argmin(masked_eta)),
+        masked_eta.shape,
+    )
+    return PointMetric(
+        x=_x_at_col(scenario, col),
+        y=_y_at_row(scenario, row),
+        value=float(eta[row, col]),
+    )
+
+
+def _hole_retention_metric(frame: dict[str, FloatGrid | BoolGrid], scenario) -> HoleRetentionMetric:
+    holes = [feature for feature in scenario.features if feature.kind == "hole"]
+    if not holes:
+        return HoleRetentionMetric(hole_count=0, retained_area=0.0, centroid_x=None, centroid_y=None)
+
+    h = np.asarray(frame["h"], dtype=np.float64)
+    u = np.asarray(frame["u"], dtype=np.float64)
+    froude = np.asarray(frame["froude"], dtype=np.float64)
+    wet = np.asarray(frame["wet"], dtype=np.bool_)
+    xs = scenario.grid.x_coordinates()
+    ys = scenario.grid.y_coordinates()
+    x_grid, y_grid = np.meshgrid(xs, ys)
+    retained = np.zeros(h.shape, dtype=np.bool_)
+    for hole in holes:
+        scale_x = max(hole.length * 0.5, hole.radius, scenario.grid.dx)
+        scale_y = max(hole.width * 0.5, hole.radius, scenario.grid.dy)
+        influence = ((x_grid - hole.center[0]) / scale_x) ** 2 + ((y_grid - hole.center[1]) / scale_y) ** 2
+        retained |= wet & (influence <= 1.0) & ((u < 0.0) | (froude < 0.9))
+    area = float(np.sum(retained) * scenario.grid.dx * scenario.grid.dy)
+    if not np.any(retained):
+        return HoleRetentionMetric(hole_count=len(holes), retained_area=0.0, centroid_x=None, centroid_y=None)
+    return HoleRetentionMetric(
+        hole_count=len(holes),
+        retained_area=area,
+        centroid_x=float(np.mean(x_grid[retained])),
+        centroid_y=float(np.mean(y_grid[retained])),
+    )
+
+
+def _diagnostic_delta(reference: SolverDiagnosticSummary, candidate: SolverDiagnosticSummary) -> DiagnosticDeltaSummary:
+    return DiagnosticDeltaSummary(
+        mass_relative_drift_delta=candidate.mass_relative_drift - reference.mass_relative_drift,
+        energy_relative_change_delta=candidate.energy_relative_change - reference.energy_relative_change,
+        froude_max_delta=candidate.froude_max - reference.froude_max,
+        froude_mean_wet_delta=candidate.froude_mean_wet - reference.froude_mean_wet,
+        hydraulic_jump_distance=_point_distance(reference.hydraulic_jump, candidate.hydraulic_jump),
+        wave_crest_distance=_point_distance(reference.wave_crest, candidate.wave_crest),
+        wave_trough_distance=_point_distance(reference.wave_trough, candidate.wave_trough),
+        hole_retained_area_delta=candidate.hole_retention.retained_area - reference.hole_retention.retained_area,
+        hole_centroid_distance=_centroid_distance(reference.hole_retention, candidate.hole_retention),
+    )
+
+
+def _point_distance(reference: PointMetric, candidate: PointMetric) -> float | None:
+    if reference.x is None or reference.y is None or candidate.x is None or candidate.y is None:
+        return None
+    return float(np.hypot(candidate.x - reference.x, candidate.y - reference.y))
+
+
+def _centroid_distance(reference: HoleRetentionMetric, candidate: HoleRetentionMetric) -> float | None:
+    if (
+        reference.centroid_x is None
+        or reference.centroid_y is None
+        or candidate.centroid_x is None
+        or candidate.centroid_y is None
+    ):
+        return None
+    return float(np.hypot(candidate.centroid_x - reference.centroid_x, candidate.centroid_y - reference.centroid_y))
+
+
+def _x_at_col(scenario, col: int) -> float:
+    return float(scenario.grid.origin_x + col * scenario.grid.dx)
+
+
+def _y_at_row(scenario, row: int) -> float:
+    return float(scenario.grid.origin_y + row * scenario.grid.dy)
