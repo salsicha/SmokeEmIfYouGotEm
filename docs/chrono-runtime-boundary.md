@@ -19,9 +19,12 @@ This decision freezes the first native runtime split before Unreal production wo
 
 The custom C++ water solver remains the primary Unreal runtime candidate, as frozen in [Custom Water Runtime Baseline](custom-water-runtime-baseline.md). Chrono receives sampled water/contact inputs and returns raft transforms, velocities, contacts, and force telemetry. If Chrono integration misses runtime budgets, the fallback is a reduced custom rigid-body integrator using the same schemas and water query API, not a replacement of the water solver.
 
+The detailed coupling strategy is captured in [Chrono Water And Raft Coupling Plan](chrono-water-raft-coupling-plan.md). Rock contacts should use partially elastic rubber-raft collision presets, while riverbed grounding should use low-restitution, high-damping inelastic contact presets.
+
 ## Near-Term Milestone 8 Work
 
 1. Build a standalone native C++ Chrono smoke test outside Unreal.
 2. Feed the custom C++ water field into a Chrono raft body as buoyancy/contact samples.
-3. Compare Chrono/custom-water telemetry against Python/PyClaw reference scenarios.
-4. Keep Chrono::FSI isolated behind an experiment flag and out of required build/test paths.
+3. Add distinct Chrono material presets for elastic rock impacts and inelastic bed grounding.
+4. Compare Chrono/custom-water telemetry against Python/PyClaw reference scenarios.
+5. Keep Chrono::FSI isolated behind an experiment flag and out of required build/test paths.

@@ -13,6 +13,8 @@ See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the productio
 
 The first native ownership split is frozen in [Chrono Runtime Boundary](chrono-runtime-boundary.md): custom C++ owns the reduced water solver and stable water query API, while Project Chrono owns baseline raft rigid-body dynamics and collision/contact response.
 
+[Chrono Water And Raft Coupling Plan](chrono-water-raft-coupling-plan.md) defines the detailed fixed-step bridge between the shallow-water solver, Chrono raft kinematics, elastic rock impacts, inelastic bed contacts, and Unreal render interpolation.
+
 [Chrono::FSI Policy](chrono-fsi-policy.md) keeps full Chrono fluid-solid interaction as an optional experiment/reference path, not a baseline runtime dependency.
 
 ## Runtime Ownership
@@ -128,7 +130,8 @@ Start after the native Chrono smoke test succeeds.
 
 - Map authored river features into the custom C++ reduced shallow-water / height-field solver.
 - Couple Chrono/custom raft dynamics to the custom C++ water-field queries.
-- Add rock collision geometry.
+- Add rock collision geometry with partially elastic rubber-raft contact presets.
+- Add riverbed grounding as strongly inelastic, high-damping contact.
 - Add paddle/controller pose input.
 - Add force/debug vector rendering in Unreal.
 

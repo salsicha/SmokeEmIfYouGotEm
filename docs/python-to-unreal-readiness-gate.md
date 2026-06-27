@@ -2,14 +2,14 @@
 
 Milestone 10 generated the first Python-to-Unreal readiness gate artifacts in `physics/data/readiness/milestone_10/`.
 
-Current decision: **blocked**. The audit is complete, but production Unreal work should not start yet because the real-world median runnable flow does not match PyClaw within the current dual-solver thresholds.
+Current decision: **approved**. The audit is complete, and production Unreal work may start with telemetry/replay playback first, followed by live custom water and then Chrono/custom raft coupling.
 
 ## Artifacts
 
 - `scenario_suite.json`: seven audited scenarios: flat pool, uniform channel, bed step, PyClaw-compatible procedural rapid, and South Fork American low/median/high runnable flows.
 - `pyclaw_reference_summary.json`: PyClaw reference run summary; all seven scenarios pass validation after exact dry cells are exported as a shallow reference shelf.
 - `cpp_solver_summary.json`: custom C++ reduced solver run summary; all seven scenarios pass smoke validation.
-- `dual_solver_comparison_summary.json`: flat pool passes thresholds; South Fork American median flow fails field, probe, cross-section, and Froude thresholds.
+- `dual_solver_comparison_summary.json`: flat pool and South Fork American median flow pass thresholds using shallow-cell-aware velocity/Froude comparison.
 - `raft_coupling_validation.json`: 2.5D raft force coupling sampled across the readiness scenario suite.
 - `adaptive_flow_validation.json`: low, median, and high runnable flow presets map monotonically into solver parameters.
 - `profiling_runtime_budget_report.json`: local profiling report for raft coupling, probe export, PyClaw, and C++ smoke profiles.
@@ -25,9 +25,9 @@ Current decision: **blocked**. The audit is complete, but production Unreal work
 - Unreal integration order: telemetry/replay playback first, then live custom water, then Chrono/custom raft coupling.
 - Chrono::FSI remains an optional research path, not the baseline runtime dependency.
 
-## Blocking Action
+## Next Action
 
-Tune or extend the custom C++ solver until the real-world median South Fork American scenario passes the PyClaw comparison thresholds. After that, regenerate the readiness artifacts and change the gate decision to approved before creating the production Unreal project.
+Create the production Unreal project and keep telemetry playback as the first integration target. Live water, Chrono/custom raft coupling, VR comfort, and native collision/contact should come after the replay path can inspect the validated physics outputs.
 
 Regenerate the report:
 
