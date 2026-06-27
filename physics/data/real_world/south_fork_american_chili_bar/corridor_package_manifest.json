@@ -1,0 +1,36 @@
+{
+  "confidence": {
+    "hydrography": 0.4,
+    "hydrology": 0.35,
+    "imagery": 0.3,
+    "overall": 0.35,
+    "rapid_labels": 0.25,
+    "terrain": 0.45
+  },
+  "corridor_package_version": "raftsim.real_world_corridor.v0",
+  "flow_presets": [
+    "low_runnable",
+    "median_runnable",
+    "high_runnable"
+  ],
+  "notes": "Seed Unreal corridor handoff; production export must replace placeholder masks and terrain with extracted geospatial assets.",
+  "rapid_candidate_count": 4,
+  "river_id": "american_south_fork",
+  "section_id": "chili_bar_to_coloma",
+  "source_manifest": "source_manifest.json",
+  "unreal_ready_artifacts": {
+    "banks": "hydrography/banks.geojson",
+    "centerline": "hydrography/centerline.geojson",
+    "confidence_metadata": "confidence.json",
+    "flow_presets": "hydrology/flow_presets.json",
+    "hazards": "review/rapid_review_labels.json",
+    "imagery_masks": [
+      "imagery/water_mask.tif",
+      "imagery/foam_texture_mask.tif"
+    ],
+    "rapids": "review/rapid_candidates.geojson",
+    "terrain": "terrain/solver_bed_grid.npy",
+    "validation_matrix": "validation_matrix.json"
+  },
+  "validation_matrix": "validation_matrix.json"
+}
