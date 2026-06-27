@@ -177,6 +177,57 @@ def validate_lateral_wave_case(
     return FeatureValidationResult("lateral_wave", outcome, checks)
 
 
+def validate_eddy_line_case(
+    water: WaterField2_5D,
+    state: RaftState6DoF,
+    properties: RaftMassProperties,
+    *,
+    shear_velocity_threshold: float = 0.6,
+    yaw_acceleration_threshold: float = 0.4,
+    roll_acceleration_threshold: float = 1.0,
+) -> FeatureValidationResult:
+    """Validate eddy-line shear, yaw torque, and coupled roll response."""
+
+    sample = water.sample(state.position.x, state.position.y)
+    left = water.sample(state.position.x, state.position.y - water.dy)
+    right = water.sample(state.position.x, state.position.y + water.dy)
+    total_force, total_torque = sum_force_contributions(sample_total_raft_forces(state, properties, water))
+    shear_velocity = (left.velocity - right.velocity).magnitude
+    yaw_acceleration = abs(total_torque.z) / max(properties.inertia_diagonal_kg_m2.z, 1.0e-9)
+    roll_acceleration = abs(total_torque.x) / max(properties.inertia_diagonal_kg_m2.x, 1.0e-9)
+    checks = (
+        FeatureValidationCheck(
+            "eddy_line_tag",
+            "eddy_line" in sample.feature_tags,
+            1.0 if "eddy_line" in sample.feature_tags else 0.0,
+            1.0,
+        ),
+        FeatureValidationCheck(
+            "shear_velocity",
+            shear_velocity >= shear_velocity_threshold,
+            shear_velocity,
+            shear_velocity_threshold,
+            "Current should change sharply across the raft width.",
+        ),
+        FeatureValidationCheck(
+            "yaw_torque",
+            yaw_acceleration >= yaw_acceleration_threshold,
+            yaw_acceleration,
+            yaw_acceleration_threshold,
+            "Differential current should rotate the raft around vertical.",
+        ),
+        FeatureValidationCheck(
+            "roll_coupling",
+            roll_acceleration >= roll_acceleration_threshold,
+            roll_acceleration,
+            roll_acceleration_threshold,
+            "Eddy-line crossing should also couple into roll.",
+        ),
+    )
+    outcome = "eddy_coupled" if all(check.passed for check in checks[1:]) else "crossed"
+    return FeatureValidationResult("eddy_line", outcome, checks)
+
+
 def _standing_wave_outcome(
     relative_downstream: float,
     lift_ratio: float,
