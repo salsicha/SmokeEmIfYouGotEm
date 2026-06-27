@@ -90,6 +90,7 @@ from .tuning import (
     tune_cpp_solver_against_pyclaw,
 )
 from .regression import RegressionPromotionResult, promote_passing_dual_solver_run
+from .profiling import ProfiledSolverRun, SolverProfileReport, profile_pyclaw_reference_runs
 from .raft_coupling2_5d import (
     PaddleBladePose2_5D,
     PaddleBladeSample2_5D,
@@ -169,6 +170,7 @@ __all__ = [
     "PhysicsDiagnosticComparisonReport",
     "PointMetric",
     "ProbeComparisonReport",
+    "ProfiledSolverRun",
     "ScenarioThresholds",
     "PhysicsBackend",
     "ProjectChronoBackend",
@@ -189,6 +191,7 @@ __all__ = [
     "SimulationSystem",
     "SeriesComparison",
     "SolverDiagnosticSummary",
+    "SolverProfileReport",
     "TelemetryFrame",
     "TelemetryRecorder",
     "ThresholdCheck",
@@ -254,6 +257,7 @@ __all__ = [
     "generate_river_2d",
     "read_scenario2_5d_package",
     "promote_passing_dual_solver_run",
+    "profile_pyclaw_reference_runs",
     "run_dual_solver_scenario",
     "run_pyclaw_reference",
     "select_backend",
