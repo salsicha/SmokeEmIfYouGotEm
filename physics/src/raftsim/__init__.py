@@ -59,6 +59,12 @@ from .dual_solver import (
     DualSolverRunResult,
     run_dual_solver_scenario,
 )
+from .comparison import (
+    FieldComparisonReport,
+    FieldErrorSummary,
+    FrameFieldComparison,
+    compare_dual_solver_fields,
+)
 from .sim import Simulation, SimulationConfig, SimulationSystem
 from .state import BodyState
 from .telemetry import ForceContribution, TelemetryFrame, TelemetryRecorder
@@ -85,7 +91,10 @@ __all__ = [
     "CppSolverRunResult",
     "DualSolverRunConfig",
     "DualSolverRunResult",
+    "FieldComparisonReport",
+    "FieldErrorSummary",
     "ForceContribution",
+    "FrameFieldComparison",
     "PhysicsBackend",
     "ProjectChronoBackend",
     "PyClawAvailability",
@@ -132,6 +141,7 @@ __all__ = [
     "canonical_pyclaw_scenarios",
     "backend_statuses",
     "check_pyclaw_availability",
+    "compare_dual_solver_fields",
     "create_backend",
     "default_forward_paddle_commands",
     "frame_from_scenario_initial_state",

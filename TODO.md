@@ -74,7 +74,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 ## Milestone 4: Dual-Solver Comparison And Tuning Harness
 
 - [x] Run PyClaw and C++ on identical scenario packages.
-- [ ] Compare `h`, `eta`, `u`, `v`, `hu`, `hv`, wet/dry masks, surface normals, and slopes.
+- [x] Compare `h`, `eta`, `u`, `v`, `hu`, `hv`, wet/dry masks, surface normals, and slopes.
 - [ ] Compare probe time series and cross sections.
 - [ ] Compare mass conservation, energy trends, Froude number, hydraulic jump location, wave crest/trough location, and hole retention geometry.
 - [ ] Add L1/L2/Linf field-error summaries.
