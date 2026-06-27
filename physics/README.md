@@ -352,6 +352,10 @@ The state tracks position, orientation quaternion, linear velocity, and angular 
 
 Milestone 6 adds deterministic whitewater feature validators. `validate_standing_wave_case()` starts the suite with clear, stall, surf, and flush outcome classification for standing-wave samples. `validate_hole_case()` checks hole depression, upstream retention, aerated damping proxy, and downstream boil/upwelling lift. `validate_lateral_wave_case()` checks cross-current side impulse and roll acceleration from asymmetric lateral-wave loading. `validate_eddy_line_case()` checks sharp cross-raft shear, yaw acceleration, and coupled roll response. `validate_shallow_shelf_case()` checks shallow-tagged grounding contact, support force, and off-center pivot yaw. `validate_submerged_rock_case()` checks rock-tagged scrape drag, upward launch acceleration, and pitch response. `validate_boil_upwelling_case()` checks boil dome height, upward vertical impulse, and deterministic repeatability. `summarize_run_outcomes()` converts feature-specific outcomes into stable clear, stalled, surfed, flushed, grounded, pinned, and flipped report buckets.
 
+## Profiling
+
+Milestone 7 starts with `profile_pyclaw_reference_runs()`, which records PyClaw research-loop runtime, seconds per simulated second, cell-normalized cost, output frame count, validation status, and run metadata. Use `python -m raftsim.examples.profile_pyclaw_reference --fixture uniform_channel --repetitions 3 --output-dir outputs/profiles/pyclaw` to write run artifacts plus `pyclaw_profile.json`.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
