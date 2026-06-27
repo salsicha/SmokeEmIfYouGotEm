@@ -1,6 +1,8 @@
 import numpy as np
 
 from raftsim.feature_validation import (
+    FeatureValidationCheck,
+    FeatureValidationResult,
     validate_boil_upwelling_case,
     validate_eddy_line_case,
     validate_hole_case,
@@ -8,6 +10,7 @@ from raftsim.feature_validation import (
     validate_shallow_shelf_case,
     validate_standing_wave_case,
     validate_submerged_rock_case,
+    summarize_run_outcomes,
 )
 from raftsim.math3d import Vec3
 from raftsim.raft_coupling2_5d import RaftState6DoF, WaterField2_5D, build_default_raft_mass_properties
@@ -302,3 +305,34 @@ def test_boil_validation_detects_deterministic_upwelling_impulse():
     assert result.feature == "boil"
     assert result.outcome == "upwelling"
     assert result.passed
+
+
+def test_run_outcome_summary_canonicalizes_validation_results():
+    failed_grounding = FeatureValidationResult(
+        "shallow_shelf",
+        "pivoted",
+        (FeatureValidationCheck("grounding_support", False, 0.1, 0.5),),
+    )
+
+    summary = summarize_run_outcomes(
+        (
+            FeatureValidationResult("standing_wave", "surf", ()),
+            FeatureValidationResult("hole", "retentive_hole", ()),
+            failed_grounding,
+            "flush",
+            "flipped",
+            "clear",
+        )
+    )
+
+    counts = summary.counts_by_outcome
+    assert summary.total_runs == 6
+    assert summary.passed_runs == 5
+    assert summary.failed_runs == 1
+    assert counts["clear"] == 1
+    assert counts["surfed"] == 1
+    assert counts["flushed"] == 1
+    assert counts["grounded"] == 1
+    assert counts["pinned"] == 1
+    assert counts["flipped"] == 1
+    assert summary.summary_lines()[0] == "total=6 passed=5 failed=1"

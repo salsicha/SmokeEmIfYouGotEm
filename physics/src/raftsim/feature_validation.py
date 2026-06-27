@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 
 from .math3d import Vec3
@@ -13,6 +14,8 @@ from .raft_coupling2_5d import (
     sample_total_raft_forces,
     sum_force_contributions,
 )
+
+CANONICAL_RUN_OUTCOMES = ("clear", "stalled", "surfed", "flushed", "grounded", "pinned", "flipped")
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,6 +36,59 @@ class FeatureValidationResult:
     @property
     def passed(self) -> bool:
         return all(check.passed for check in self.checks)
+
+
+@dataclass(frozen=True, slots=True)
+class RunOutcomeSummary:
+    counts: tuple[tuple[str, int], ...]
+    total_runs: int
+    passed_runs: int
+    failed_runs: int
+
+    @property
+    def counts_by_outcome(self) -> dict[str, int]:
+        return dict(self.counts)
+
+    @property
+    def dominant_outcome(self) -> str:
+        if self.total_runs == 0:
+            return "clear"
+        return max(self.counts, key=lambda item: item[1])[0]
+
+    def summary_lines(self) -> list[str]:
+        counts = " ".join(f"{label}={count}" for label, count in self.counts)
+        return [
+            f"total={self.total_runs} passed={self.passed_runs} failed={self.failed_runs}",
+            counts,
+            f"dominant={self.dominant_outcome}",
+        ]
+
+
+def summarize_run_outcomes(results: Iterable[FeatureValidationResult | str]) -> RunOutcomeSummary:
+    """Summarize feature or run outcomes into canonical raft outcome buckets."""
+
+    counts = {label: 0 for label in CANONICAL_RUN_OUTCOMES}
+    total_runs = 0
+    passed_runs = 0
+    failed_runs = 0
+    for result in results:
+        total_runs += 1
+        if isinstance(result, FeatureValidationResult):
+            outcome = result.outcome
+            if result.passed:
+                passed_runs += 1
+            else:
+                failed_runs += 1
+        else:
+            outcome = result
+            passed_runs += 1
+        counts[_canonical_run_outcome(outcome)] += 1
+    return RunOutcomeSummary(
+        counts=tuple((label, counts[label]) for label in CANONICAL_RUN_OUTCOMES),
+        total_runs=total_runs,
+        passed_runs=passed_runs,
+        failed_runs=failed_runs,
+    )
 
 
 def validate_standing_wave_case(
@@ -411,6 +467,33 @@ def validate_boil_upwelling_case(
     )
     outcome = "upwelling" if all(check.passed for check in checks[1:]) else "flat"
     return FeatureValidationResult("boil", outcome, checks)
+
+
+def _canonical_run_outcome(outcome: str) -> str:
+    normalized = outcome.strip().lower().replace("-", "_").replace(" ", "_")
+    if normalized in CANONICAL_RUN_OUTCOMES:
+        return normalized
+    aliases = {
+        "stall": "stalled",
+        "surf": "surfed",
+        "side_surf": "surfed",
+        "flush": "flushed",
+        "crossed": "flushed",
+        "retentive_hole": "pinned",
+        "pin": "pinned",
+        "ground": "grounded",
+        "pivoted": "grounded",
+        "scraped": "grounded",
+        "launched": "grounded",
+        "flip": "flipped",
+        "floating": "clear",
+        "forced": "clear",
+        "freefall": "clear",
+        "eddy_coupled": "clear",
+        "upwelling": "clear",
+        "flat": "clear",
+    }
+    return aliases.get(normalized, "clear")
 
 
 def _standing_wave_outcome(
