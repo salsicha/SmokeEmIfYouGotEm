@@ -1,0 +1,299 @@
+{
+  "artifacts": {
+    "elevation": [
+      "terrain/3dep_dem_tiles",
+      "terrain/solver_bed_grid.npy"
+    ],
+    "field_media": [
+      "field_media/README.md"
+    ],
+    "gauges": [
+      "hydrology/usgs_11445500_daily_discharge.json",
+      "hydrology/flow_presets.json"
+    ],
+    "guide_references": [
+      "review/guide_reference_index.json",
+      "review/rapid_review_labels.json"
+    ],
+    "hydrography": [
+      "hydrography/centerline.geojson",
+      "hydrography/banks.geojson",
+      "hydrography/cross_sections.geojson"
+    ],
+    "imagery": [
+      "imagery/naip_tiles",
+      "imagery/water_mask.tif",
+      "imagery/foam_texture_mask.tif"
+    ],
+    "solver": [
+      "scenario/scenario.json",
+      "scenario/bed.npy",
+      "scenario/initial_state.npz"
+    ],
+    "unreal": [
+      "unreal/corridor_package_manifest.json"
+    ],
+    "validation": [
+      "validation_matrix.json"
+    ]
+  },
+  "bounds_wgs84": {
+    "max_lat": 38.83,
+    "max_lon": -120.72,
+    "min_lat": 38.74,
+    "min_lon": -120.9
+  },
+  "confidence": {
+    "hydrography": 0.4,
+    "hydrology": 0.35,
+    "imagery": 0.3,
+    "overall": 0.35,
+    "rapid_labels": 0.25,
+    "terrain": 0.45
+  },
+  "coordinate_reference_systems": {
+    "solver": "local meters: x downstream, y river-left positive",
+    "source": "EPSG:4326",
+    "unreal": "georeferenced corridor transform derived from the working CRS",
+    "working": "local projected CRS selected per section at extraction time"
+  },
+  "manifest_id": "american_south_fork.chili_bar_to_coloma.source_manifest.v0",
+  "provenance": {
+    "generated_by": "raftsim.real_world.build_source_manifest",
+    "processing_version": "milestone_9_seed.v0",
+    "redistribution_notes": "Do not redistribute third-party imagery, guidebook text, or field media unless the manifest records explicit rights.",
+    "review_status": "seed_data_needs_human_geospatial_review"
+  },
+  "remote_fetches": [
+    {
+      "category": "elevation",
+      "fetch_id": "sfa_3dep_dem",
+      "notes": "Representative bounding-box query for DEM discovery; production pull should pick highest-resolution 3DEP/state lidar product with metadata.",
+      "source_id": "usgs_3dep",
+      "status": "metadata_ready",
+      "target_artifact": "terrain/3dep_dem_tiles",
+      "url": "https://apps.nationalmap.gov/tnmaccess/api/products?datasets=Digital%20Elevation%20Model%20(DEM)&bbox=-120.90,38.74,-120.72,38.83"
+    },
+    {
+      "category": "hydrography",
+      "fetch_id": "sfa_3dhp_nhd_flowlines",
+      "notes": "Use 3DHP if available for the bbox; otherwise use NHD/NHDPlus flowlines and catchments.",
+      "source_id": "usgs_3dhp_nhd",
+      "status": "metadata_ready",
+      "target_artifact": "hydrography/nhd_or_3dhp_flowlines",
+      "url": "https://apps.nationalmap.gov/tnmaccess/api/products?datasets=National%20Hydrography%20Dataset%20(NHD)&bbox=-120.90,38.74,-120.72,38.83"
+    },
+    {
+      "category": "hydrography",
+      "fetch_id": "sfa_osm_access",
+      "notes": "Overpass query should fetch river way, roads, trails, bridges, parking/access points, and named nearby features within the bbox.",
+      "source_id": "osm",
+      "status": "planned",
+      "target_artifact": "hydrography/osm_access_bridges_named_features.geojson",
+      "url": "https://overpass-api.de/api/interpreter"
+    },
+    {
+      "category": "imagery",
+      "fetch_id": "sfa_naip_imagery",
+      "notes": "Use most recent leaf-on/low-shadow NAIP where available, then compare with historic imagery at known gauge values.",
+      "source_id": "usda_naip",
+      "status": "planned",
+      "target_artifact": "imagery/naip_tiles",
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=NAIP%20Plus&bbox=-120.90,38.74,-120.72,38.83"
+    },
+    {
+      "category": "gauge",
+      "fetch_id": "sfa_nwis_daily_discharge",
+      "notes": "Daily discharge query for preliminary flow percentiles. Add instantaneous values and stage parameter 00065 when building final presets.",
+      "source_id": "usgs_nwis",
+      "status": "metadata_ready",
+      "target_artifact": "hydrology/usgs_11445500_daily_discharge.json",
+      "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=11445500&parameterCd=00060&startDT=2000-01-01"
+    },
+    {
+      "category": "gauge",
+      "fetch_id": "sfa_nwps_nwm_context",
+      "notes": "Link NOAA/NWPS/NWM reach context after the gauge/COMID mapping is verified.",
+      "source_id": "noaa_nwps_nwm",
+      "status": "planned",
+      "target_artifact": "hydrology/noaa_nwps_nwm_context.json",
+      "url": "https://water.noaa.gov/"
+    },
+    {
+      "category": "gauge",
+      "fetch_id": "sfa_streamstats_context",
+      "notes": "Use for drainage area and transfer-function context; keep lower confidence than direct gauge observations.",
+      "source_id": "usgs_streamstats",
+      "status": "planned",
+      "target_artifact": "hydrology/streamstats_basin_context.json",
+      "url": "https://www.usgs.gov/streamstats"
+    }
+  ],
+  "river_id": "american_south_fork",
+  "schema_version": "raftsim.source_manifest.v0",
+  "section_id": "chili_bar_to_coloma",
+  "section_name": "Chili Bar to Coloma",
+  "sources": [
+    {
+      "access_notes": "Use The National Map, 3DEP services, or state lidar portals for DEM/lidar tiles.",
+      "attribution": "Credit USGS 3D Elevation Program and preserve dataset/product identifiers in source manifests.",
+      "category": "elevation",
+      "license_or_terms": "U.S. federal source; treat as public-domain geospatial data unless a product-specific notice says otherwise.",
+      "provider": "USGS",
+      "source_id": "usgs_3dep",
+      "title": "3D Elevation Program (3DEP)",
+      "url": "https://www.usgs.gov/3d-elevation-program",
+      "use_in_pipeline": [
+        "terrain_dem",
+        "gradient",
+        "banks",
+        "cross_sections",
+        "roughness_indicators"
+      ]
+    },
+    {
+      "access_notes": "Use 3DHP where available; fall back to NHD/NHDPlus flowlines and catchments for older coverage.",
+      "attribution": "Credit USGS 3D Hydrography Program, NHD, or NHDPlus as applicable.",
+      "category": "hydrography",
+      "license_or_terms": "U.S. federal source; preserve attribution and confirm product-specific terms.",
+      "provider": "USGS",
+      "source_id": "usgs_3dhp_nhd",
+      "title": "3D Hydrography Program, NHD, and NHDPlus",
+      "url": "https://www.usgs.gov/3d-hydrography-program",
+      "use_in_pipeline": [
+        "centerline",
+        "drainage_context",
+        "banks_seed",
+        "gauge_transfer_context"
+      ]
+    },
+    {
+      "access_notes": "Inventory and download elevation, hydrography, and base map products by bounding box.",
+      "attribution": "Credit source product providers listed by The National Map download metadata.",
+      "category": "elevation",
+      "license_or_terms": "U.S. federal access portal; individual products keep their own metadata and attribution.",
+      "provider": "USGS",
+      "source_id": "usgs_tnm",
+      "title": "The National Map",
+      "url": "https://apps.nationalmap.gov/tnmaccess/",
+      "use_in_pipeline": [
+        "source_discovery",
+        "download_metadata",
+        "source_manifest"
+      ]
+    },
+    {
+      "access_notes": "Use parameter 00060 for discharge and 00065 for stage when available.",
+      "attribution": "Credit USGS Water Data for the Nation / NWIS and record gauge site, parameter code, and retrieval date.",
+      "category": "gauge",
+      "license_or_terms": "U.S. federal hydrologic data; cite USGS Water Data for the Nation and site IDs.",
+      "provider": "USGS",
+      "source_id": "usgs_nwis",
+      "title": "Water Services and NWIS",
+      "url": "https://waterservices.usgs.gov/",
+      "use_in_pipeline": [
+        "gauge_history",
+        "flow_percentiles",
+        "season_windows",
+        "gauge_transfer_function"
+      ]
+    },
+    {
+      "access_notes": "Use as forecast/model context, not as sole validation truth for historical runnable bands.",
+      "attribution": "Credit NOAA National Water Prediction Service / National Water Model for modeled flow context.",
+      "category": "gauge",
+      "license_or_terms": "Public forecast/model products; cite NOAA/NWS/NWPS and verify service-specific use notes.",
+      "provider": "NOAA/NWS",
+      "source_id": "noaa_nwps_nwm",
+      "title": "National Water Prediction Service and National Water Model context",
+      "url": "https://water.noaa.gov/",
+      "use_in_pipeline": [
+        "forecast_context",
+        "modeled_reach_flow",
+        "seasonal_context"
+      ]
+    },
+    {
+      "access_notes": "Use for ungauged or transfer-function context; flag lower confidence than direct gauge history.",
+      "attribution": "Credit USGS StreamStats for basin characteristics and estimated streamflow statistics.",
+      "category": "gauge",
+      "license_or_terms": "U.S. federal analysis service; cite USGS StreamStats and preserve report metadata.",
+      "provider": "USGS",
+      "source_id": "usgs_streamstats",
+      "title": "StreamStats",
+      "url": "https://www.usgs.gov/streamstats",
+      "use_in_pipeline": [
+        "basin_characteristics",
+        "ungauged_flow_estimates",
+        "confidence_scoring"
+      ]
+    },
+    {
+      "access_notes": "Use for water masks, exposed rocks, banks, access points, vegetation, foam texture, and visual reference.",
+      "attribution": "Credit USDA/FSA NAIP imagery, acquisition year, and tile identifiers.",
+      "category": "imagery",
+      "license_or_terms": "Public U.S. aerial imagery source; verify product year/portal terms and attribution before redistribution.",
+      "provider": "USDA Farm Service Agency",
+      "source_id": "usda_naip",
+      "title": "NAIP aerial imagery",
+      "url": "https://www.fsa.usda.gov/resources/aerial-photography",
+      "use_in_pipeline": [
+        "imagery_masks",
+        "foam_texture",
+        "boulder_density",
+        "banks",
+        "access_points"
+      ]
+    },
+    {
+      "access_notes": "Use mostly for access roads, trails, bridges, named features, land use, and supplemental hydrography.",
+      "attribution": "Credit OpenStreetMap contributors where OSM data is used.",
+      "category": "hydrography",
+      "license_or_terms": "ODbL; requires attribution and care with database derivatives and share-alike obligations.",
+      "provider": "OpenStreetMap contributors",
+      "source_id": "osm",
+      "title": "OpenStreetMap supplemental map data",
+      "url": "https://www.openstreetmap.org/copyright",
+      "use_in_pipeline": [
+        "access_points",
+        "roads_trails",
+        "bridges",
+        "named_features",
+        "review_context"
+      ]
+    },
+    {
+      "access_notes": "Use for named rapids, hazards, portages, access, commercial season, and difficulty calibration.",
+      "attribution": "Credit reference title/author/URL where licenses allow; keep internal notes separate from redistributable assets.",
+      "category": "guide_reference",
+      "license_or_terms": "Do not copy protected guidebook text or photos into the repo; record citations, page/URL pointers, and derived review notes only.",
+      "provider": "Guidebooks, outfitters, public agency pages, and reviewed local references",
+      "source_id": "guide_references",
+      "title": "Human rapid and season references",
+      "url": "source_manifest://guide_references",
+      "use_in_pipeline": [
+        "rapid_names",
+        "hazards",
+        "season_windows",
+        "difficulty_mapping",
+        "review_labels"
+      ]
+    },
+    {
+      "access_notes": "Use for validation and photoreal/audio references after permissions are complete.",
+      "attribution": "Credit capture crew and rights owner according to media release.",
+      "category": "field_media",
+      "license_or_terms": "Require explicit project-owned or licensed rights, model/property releases where applicable, and redistribution notes.",
+      "provider": "Project field capture",
+      "source_id": "field_media",
+      "title": "Field photos, drone video, audio, GPS, and notes",
+      "url": "source_manifest://field_media",
+      "use_in_pipeline": [
+        "visual_reference",
+        "audio_reference",
+        "rapid_review",
+        "validation_media"
+      ]
+    }
+  ]
+}

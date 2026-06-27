@@ -1,0 +1,135 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -120.858,
+          38.7685
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "confidence": 0.8366532909698996,
+        "end_station_m": 920.0,
+        "peak_station_m": 920.0,
+        "rapid_id": "rapid_candidate_01",
+        "score": 0.5575514381270901,
+        "signals": [
+          "boulder_density",
+          "constriction",
+          "dem_slope",
+          "foam_whitewater_texture",
+          "guide_note",
+          "high_score",
+          "roughness"
+        ],
+        "start_station_m": 920.0,
+        "suggested_labels": [
+          "constriction",
+          "boulder_garden",
+          "wave_train",
+          "manual_review_required"
+        ]
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.842,
+          38.7765
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "confidence": 0.7999029999999999,
+        "end_station_m": 1880.0,
+        "peak_station_m": 1880.0,
+        "rapid_id": "rapid_candidate_02",
+        "score": 0.5634599999999998,
+        "signals": [
+          "boulder_density",
+          "constriction",
+          "foam_whitewater_texture",
+          "guide_note",
+          "high_score",
+          "roughness"
+        ],
+        "start_station_m": 1880.0,
+        "suggested_labels": [
+          "constriction",
+          "boulder_garden",
+          "wave_train",
+          "manual_review_required"
+        ]
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.8235,
+          38.785
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "confidence": 0.7696950180180182,
+        "end_station_m": 2920.0,
+        "peak_station_m": 2920.0,
+        "rapid_id": "rapid_candidate_03",
+        "score": 0.5085363963963966,
+        "signals": [
+          "bend_or_lateral_candidate",
+          "boulder_density",
+          "dem_slope",
+          "foam_whitewater_texture",
+          "guide_note",
+          "roughness"
+        ],
+        "start_station_m": 2920.0,
+        "suggested_labels": [
+          "boulder_garden",
+          "wave_train",
+          "lateral",
+          "manual_review_required"
+        ]
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.804,
+          38.796
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "confidence": 0.7751920759897829,
+        "end_station_m": 4050.0,
+        "peak_station_m": 4050.0,
+        "rapid_id": "rapid_candidate_04",
+        "score": 0.5185310472541507,
+        "signals": [
+          "bend_or_lateral_candidate",
+          "boulder_density",
+          "constriction",
+          "foam_whitewater_texture",
+          "guide_note",
+          "roughness"
+        ],
+        "start_station_m": 4050.0,
+        "suggested_labels": [
+          "constriction",
+          "boulder_garden",
+          "wave_train",
+          "lateral",
+          "manual_review_required"
+        ]
+      },
+      "type": "Feature"
+    }
+  ],
+  "type": "FeatureCollection"
+}

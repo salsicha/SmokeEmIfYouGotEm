@@ -7,6 +7,7 @@ from raftsim.schema_versions import (
     PARAMETER_SCHEMA_VERSION,
     REPLAY_SCHEMA_VERSION,
     SHARED_SCHEMA_SET_VERSION,
+    SOURCE_MANIFEST_SCHEMA_VERSION,
     TELEMETRY_FORCE_SCHEMA_VERSION,
 )
 from raftsim.sweeps import ParameterSweepCandidate
@@ -19,7 +20,7 @@ def test_shared_schema_manifest_references_frozen_schema_files():
 
     assert manifest["schema_set_version"] == SHARED_SCHEMA_SET_VERSION
     entries = {entry["name"]: entry for entry in manifest["schemas"]}
-    assert set(entries) == {"scenario2_5d", "telemetry_forces", "replay", "parameters"}
+    assert set(entries) == {"scenario2_5d", "telemetry_forces", "replay", "parameters", "source_manifest"}
     for entry in entries.values():
         assert (schemas_dir / entry["file"]).exists()
 
@@ -53,6 +54,14 @@ def test_frozen_parameter_schema_matches_sweep_candidate_fields():
 
     assert schema["properties"]["schema_version"]["const"] == PARAMETER_SCHEMA_VERSION
     assert candidate_required == candidate_fields
+
+
+def test_frozen_source_manifest_schema_uses_source_manifest_version():
+    schema = _load_schema("source_manifest.schema.json")
+
+    assert schema["properties"]["schema_version"]["const"] == SOURCE_MANIFEST_SCHEMA_VERSION
+    assert "remote_fetches" in schema["required"]
+    assert "field_media" in schema["properties"]["artifacts"]["required"]
 
 
 def _load_schema(name: str) -> dict[str, object]:

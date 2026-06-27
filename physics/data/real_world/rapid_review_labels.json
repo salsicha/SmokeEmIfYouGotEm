@@ -1,0 +1,134 @@
+{
+  "labels": [
+    {
+      "category": "water_state",
+      "description": "Recovery or staging pool with low gradient and lower velocity.",
+      "label": "pool",
+      "requires_human_review": true,
+      "solver_tags": [
+        "pool",
+        "recovery"
+      ]
+    },
+    {
+      "category": "water_state",
+      "description": "Shallow rough water with small waves and moderate roughness.",
+      "label": "riffle",
+      "requires_human_review": true,
+      "solver_tags": [
+        "shallow",
+        "roughness"
+      ]
+    },
+    {
+      "category": "hydraulic",
+      "description": "Series of standing waves aligned with the main tongue.",
+      "label": "wave_train",
+      "requires_human_review": true,
+      "solver_tags": [
+        "wave_train",
+        "aeration"
+      ]
+    },
+    {
+      "category": "hydraulic",
+      "description": "Recirculating hydraulic or keeper-like feature needing raft interaction tuning.",
+      "label": "hole",
+      "requires_human_review": true,
+      "solver_tags": [
+        "hole",
+        "retention"
+      ]
+    },
+    {
+      "category": "bedform",
+      "description": "Abrupt bed drop or shelf that can form a hydraulic or lateral wave.",
+      "label": "ledge",
+      "requires_human_review": true,
+      "solver_tags": [
+        "ledge",
+        "bed_step"
+      ]
+    },
+    {
+      "category": "hydraulic",
+      "description": "Sideways wave or current crossing the main current.",
+      "label": "lateral",
+      "requires_human_review": true,
+      "solver_tags": [
+        "lateral",
+        "cross_current"
+      ]
+    },
+    {
+      "category": "current",
+      "description": "Circulating slack/current reversal area useful for recovery or route choice.",
+      "label": "eddy",
+      "requires_human_review": true,
+      "solver_tags": [
+        "eddy",
+        "recovery"
+      ]
+    },
+    {
+      "category": "current",
+      "description": "High shear boundary between main current and eddy circulation.",
+      "label": "eddy_line",
+      "requires_human_review": true,
+      "solver_tags": [
+        "eddy_line",
+        "shear"
+      ]
+    },
+    {
+      "category": "hazard",
+      "description": "Tree, debris, sieve, or brush hazard that should be avoided.",
+      "label": "strainer",
+      "requires_human_review": true,
+      "solver_tags": [
+        "strainer",
+        "hazard"
+      ]
+    },
+    {
+      "category": "hazard",
+      "description": "Feature or reach that should support scout/portage gameplay and safety warnings.",
+      "label": "portage",
+      "requires_human_review": true,
+      "solver_tags": [
+        "portage",
+        "hazard"
+      ]
+    },
+    {
+      "category": "logistics",
+      "description": "Put-in, take-out, trail, road, or scout access.",
+      "label": "access_point",
+      "requires_human_review": false,
+      "solver_tags": [
+        "access",
+        "logistics"
+      ]
+    },
+    {
+      "category": "bedform",
+      "description": "Cluster of exposed or submerged rocks that drives roughness and collision hazards.",
+      "label": "boulder_garden",
+      "requires_human_review": true,
+      "solver_tags": [
+        "rock",
+        "roughness"
+      ]
+    },
+    {
+      "category": "geometry",
+      "description": "Narrowed channel that accelerates flow and can produce stronger waves or holes.",
+      "label": "constriction",
+      "requires_human_review": true,
+      "solver_tags": [
+        "constriction",
+        "velocity"
+      ]
+    }
+  ]
+}
