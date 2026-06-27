@@ -106,6 +106,7 @@ Mitigations:
 Start after the Python modeling/profiling exit gate.
 
 - Add a minimal standalone C++ Chrono executable outside Unreal.
+- Build `physics/cpp` with the optional `raftsim_chrono_smoke` target when `find_package(Chrono)` succeeds; skip it cleanly when Chrono is unavailable.
 - Create a rigid raft body and simple rock contact.
 - Step Chrono at fixed timestep.
 - Export the same telemetry categories as Python.

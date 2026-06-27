@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(ZLIB REQUIRED)
+find_package(Chrono QUIET)
 
 add_library(raftsim_water
   src/json.cpp
@@ -26,3 +27,18 @@ target_link_libraries(raftsim_water_solver PRIVATE raftsim_water)
 add_executable(raftsim_water_tests tests/raftsim_water_tests.cpp)
 target_link_libraries(raftsim_water_tests PRIVATE raftsim_water)
 
+if(Chrono_FOUND)
+  add_executable(raftsim_chrono_smoke tools/chrono_smoke_test.cpp)
+  if(TARGET Chrono::Chrono)
+    target_link_libraries(raftsim_chrono_smoke PRIVATE Chrono::Chrono)
+  else()
+    target_include_directories(raftsim_chrono_smoke PRIVATE ${CHRONO_INCLUDE_DIRS})
+    target_link_libraries(raftsim_chrono_smoke PRIVATE ${CHRONO_LIBRARIES})
+    if(CHRONO_CXX_FLAGS)
+      separate_arguments(RAFTSIM_CHRONO_CXX_FLAGS NATIVE_COMMAND "${CHRONO_CXX_FLAGS}")
+      target_compile_options(raftsim_chrono_smoke PRIVATE ${RAFTSIM_CHRONO_CXX_FLAGS})
+    endif()
+  endif()
+else()
+  message(STATUS "Project Chrono not found; skipping raftsim_chrono_smoke target")
+endif()
