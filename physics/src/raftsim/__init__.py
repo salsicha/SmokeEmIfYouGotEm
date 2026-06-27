@@ -90,6 +90,7 @@ from .tuning import (
     tune_cpp_solver_against_pyclaw,
 )
 from .regression import RegressionPromotionResult, promote_passing_dual_solver_run
+from .raft_coupling2_5d import RaftState6DoF
 from .sim import Simulation, SimulationConfig, SimulationSystem
 from .state import BodyState
 from .telemetry import ForceContribution, TelemetryFrame, TelemetryRecorder
@@ -162,6 +163,7 @@ __all__ = [
     "Raft2DSimulation",
     "Raft2DState",
     "Raft2DStepResult",
+    "RaftState6DoF",
     "GeneratedRiver2D",
     "River2DParameters",
     "RiverFeature2D",

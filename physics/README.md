@@ -319,6 +319,19 @@ PYTHONPATH=src python -m raftsim.examples.promote_dual_solver_regression \
 
 Promotion requires an existing `threshold_evaluation.json` with `passed: true`. It copies the shared scenario package and accepted threshold report into `regression_fixtures/<scenario_id>/` and updates `regression_fixtures/registry.json`.
 
+## 2.5D Raft Coupling
+
+Milestone 5 starts with a solver-neutral 6-DoF raft state:
+
+```python
+from raftsim import RaftState6DoF, Vec3
+
+state = RaftState6DoF(position=Vec3(0.0, 0.0, 1.0))
+next_state = state.advance(1.0 / 60.0, linear_acceleration=Vec3(0.0, 0.0, -9.81))
+```
+
+The state tracks position, orientation quaternion, linear velocity, and angular velocity, and provides local-to-world point and point-velocity helpers for future tube, floor, paddle, and contact samples.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
