@@ -63,7 +63,10 @@ from .comparison import (
     FieldComparisonReport,
     FieldErrorSummary,
     FrameFieldComparison,
+    ProbeComparisonReport,
+    SeriesComparison,
     compare_dual_solver_fields,
+    compare_dual_solver_probes,
 )
 from .sim import Simulation, SimulationConfig, SimulationSystem
 from .state import BodyState
@@ -95,6 +98,7 @@ __all__ = [
     "FieldErrorSummary",
     "ForceContribution",
     "FrameFieldComparison",
+    "ProbeComparisonReport",
     "PhysicsBackend",
     "ProjectChronoBackend",
     "PyClawAvailability",
@@ -110,6 +114,7 @@ __all__ = [
     "Simulation",
     "SimulationConfig",
     "SimulationSystem",
+    "SeriesComparison",
     "TelemetryFrame",
     "TelemetryRecorder",
     "Vec3",
@@ -142,6 +147,7 @@ __all__ = [
     "backend_statuses",
     "check_pyclaw_availability",
     "compare_dual_solver_fields",
+    "compare_dual_solver_probes",
     "create_backend",
     "default_forward_paddle_commands",
     "frame_from_scenario_initial_state",
