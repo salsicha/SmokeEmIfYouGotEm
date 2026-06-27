@@ -94,7 +94,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Add bed, rock, ledge, and shallow grounding contact.
 - [x] Add paddle blade pose, depth, and blade-water relative velocity.
 - [x] Run raft-force sampling against PyClaw output fields.
-- [ ] Run raft-force sampling against custom C++ runtime fields.
+- [x] Run raft-force sampling against custom C++ runtime fields.
 - [ ] Compare raft force envelopes, trajectories, and outcomes between the two solvers.
 
 ## Milestone 6: 2.5D White Water Feature Validation
