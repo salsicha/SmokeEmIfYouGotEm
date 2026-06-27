@@ -99,6 +99,13 @@ from .profiling import (
     profile_pyclaw_reference_runs,
     profile_raft_coupling_runs,
 )
+from .sweeps import (
+    ParameterSweepCandidate,
+    ParameterSweepReport,
+    ParameterSweepResult,
+    default_parameter_sweep_candidates,
+    run_raft_force_parameter_sweep,
+)
 from .raft_coupling2_5d import (
     PaddleBladePose2_5D,
     PaddleBladeSample2_5D,
@@ -209,6 +216,9 @@ __all__ = [
     "PaddleBladePose2_5D",
     "PaddleBladeSample2_5D",
     "PaddleCommand2D",
+    "ParameterSweepCandidate",
+    "ParameterSweepReport",
+    "ParameterSweepResult",
     "Raft2DConfig",
     "Raft2DSimulation",
     "Raft2DState",
@@ -259,6 +269,7 @@ __all__ = [
     "evaluate_dual_solver_thresholds",
     "create_backend",
     "default_forward_paddle_commands",
+    "default_parameter_sweep_candidates",
     "frame_from_scenario_initial_state",
     "generate_fixture_scenario2_5d",
     "generate_procedural_scenario2_5d",
@@ -271,6 +282,7 @@ __all__ = [
     "profile_raft_coupling_runs",
     "run_cpp_solver_scenario",
     "run_dual_solver_scenario",
+    "run_raft_force_parameter_sweep",
     "run_pyclaw_reference",
     "select_backend",
     "tune_cpp_solver_against_pyclaw",
