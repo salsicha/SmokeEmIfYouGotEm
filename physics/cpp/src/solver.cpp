@@ -183,7 +183,8 @@ void ReducedShallowWaterSolver::step(double dt) {
             double u_next = state_.u(row, col) - dt * config_.gravity * sx;
             double v_next = state_.v(row, col) - dt * config_.gravity * sy;
             double speed = std::hypot(u_next, v_next);
-            double friction = scenario_.roughness * speed / std::max(std::pow(safe_depth(h, config_.dry_tolerance), 4.0 / 3.0), 1.0e-6);
+            double friction = scenario_.roughness * config_.roughness_scale * speed /
+                              std::max(std::pow(safe_depth(h, config_.dry_tolerance), 4.0 / 3.0), 1.0e-6);
             double damping = clamp(1.0 - dt * friction, 0.0, 1.0);
             next.h(row, col) = h_next;
             next.u(row, col) = clamp(u_next * damping, -config_.max_velocity, config_.max_velocity);
