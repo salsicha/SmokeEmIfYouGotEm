@@ -89,6 +89,7 @@ from .tuning import (
     CppTuningReport,
     tune_cpp_solver_against_pyclaw,
 )
+from .regression import RegressionPromotionResult, promote_passing_dual_solver_run
 from .sim import Simulation, SimulationConfig, SimulationSystem
 from .state import BodyState
 from .telemetry import ForceContribution, TelemetryFrame, TelemetryRecorder
@@ -144,6 +145,7 @@ __all__ = [
     "PyClawValidationSummary",
     "PurePythonBackend",
     "Quaternion",
+    "RegressionPromotionResult",
     "Simulation",
     "SimulationConfig",
     "SimulationSystem",
@@ -194,6 +196,7 @@ __all__ = [
     "generate_procedural_scenario2_5d",
     "generate_river_2d",
     "read_scenario2_5d_package",
+    "promote_passing_dual_solver_run",
     "run_dual_solver_scenario",
     "run_pyclaw_reference",
     "select_backend",

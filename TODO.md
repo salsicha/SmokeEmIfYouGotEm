@@ -82,7 +82,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Add runtime cost per simulated second for both solvers.
 - [x] Add scenario pass/fail thresholds.
 - [x] Tune C++ numerical coefficients, friction, roughness, and authored feature forcing against PyClaw.
-- [ ] Promote passing scenarios to regression fixtures.
+- [x] Promote passing scenarios to regression fixtures.
 
 ## Milestone 5: 2.5D Raft Coupling Against Both Solvers
 
