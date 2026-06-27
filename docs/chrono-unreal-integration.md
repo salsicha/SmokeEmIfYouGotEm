@@ -111,6 +111,7 @@ Start after the Python modeling/profiling exit gate.
 - Use `raftsim_water/chrono_coupling.hpp` as the dependency-free bridge from custom C++ water frames to Chrono-applied buoyancy/contact force samples.
 - Step Chrono at fixed timestep.
 - Export the same telemetry categories as Python.
+- Use `python -m raftsim.examples.compare_chrono_bridge_telemetry <dual_solver_run>` to compare the custom-water bridge force envelope against PyClaw/Python reference output.
 
 ### Phase 3: Unreal Plugin Skeleton
 

@@ -12,6 +12,7 @@ from raftsim.comparison import (
     compare_dual_solver_probes,
     evaluate_dual_solver_thresholds,
 )
+from raftsim.chrono_validation import compare_chrono_bridge_telemetry
 from raftsim.dual_solver import CppSolverRunConfig, DualSolverRunConfig, run_dual_solver_scenario
 from raftsim.pyclaw_reference import PyClawRunConfig, check_pyclaw_availability
 from raftsim.regression import promote_passing_dual_solver_run
@@ -310,3 +311,33 @@ def test_parameter_fit_scores_cpp_and_raft_candidates(tmp_path):
     assert report.best_candidate.water_score >= 0.0
     assert report.best_candidate.raft_force_score >= 0.0
     assert report_data["best_candidate"]["candidate"]["label"] == "baseline"
+
+
+def test_chrono_bridge_telemetry_comparison_reports_force_envelope(tmp_path):
+    availability = check_pyclaw_availability()
+    if not availability.available:
+        pytest.skip(f"PyClaw unavailable: {availability.reason}")
+    cpp_solver = _build_cpp_solver(tmp_path)
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="flat_pool", seed=21, nx=10, ny=6, duration=1.0 / 60.0)
+    )
+    run_result = run_dual_solver_scenario(
+        scenario,
+        output_dir=tmp_path / "dual",
+        config=DualSolverRunConfig(
+            pyclaw=PyClawRunConfig(num_output_times=1),
+            cpp=CppSolverRunConfig(executable=cpp_solver, steps=1, frame_interval=1),
+        ),
+    )
+
+    report = compare_chrono_bridge_telemetry(
+        run_result.output_dir,
+        output_path=run_result.output_dir / "chrono_bridge_telemetry_comparison.json",
+    )
+    report_data = json.loads((run_result.output_dir / "chrono_bridge_telemetry_comparison.json").read_text(encoding="utf-8"))
+
+    assert report.scenario_id == scenario.metadata.scenario_id
+    assert report.trajectory_position_delta >= 0.0
+    assert report.trajectory_velocity_delta >= 0.0
+    assert report.reference_outcome in {"floating", "grounded", "forced", "freefall"}
+    assert report_data["scenario_id"] == scenario.metadata.scenario_id
