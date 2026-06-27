@@ -118,6 +118,7 @@ from .feature_validation import (
     validate_lateral_wave_case,
     validate_shallow_shelf_case,
     validate_standing_wave_case,
+    validate_submerged_rock_case,
 )
 from .sim import Simulation, SimulationConfig, SimulationSystem
 from .state import BodyState
@@ -255,5 +256,6 @@ __all__ = [
     "validate_lateral_wave_case",
     "validate_shallow_shelf_case",
     "validate_standing_wave_case",
+    "validate_submerged_rock_case",
     "write_unavailable_report",
 ]

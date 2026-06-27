@@ -6,6 +6,7 @@ from raftsim.feature_validation import (
     validate_lateral_wave_case,
     validate_shallow_shelf_case,
     validate_standing_wave_case,
+    validate_submerged_rock_case,
 )
 from raftsim.math3d import Vec3
 from raftsim.raft_coupling2_5d import RaftState6DoF, WaterField2_5D, build_default_raft_mass_properties
@@ -206,4 +207,46 @@ def test_shallow_shelf_validation_detects_grounding_and_pivot():
 
     assert result.feature == "shallow_shelf"
     assert result.outcome == "pivoted"
+    assert result.passed
+
+
+def test_submerged_rock_validation_detects_scrape_and_launch():
+    scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="flat_pool", nx=14, ny=10))
+    water = WaterField2_5D.from_scenario_initial_state(scenario)
+    center_x = 7.0
+    center_y = water.origin_y + 5 * water.dy
+    eta = water.eta.copy()
+    depth = water.depth.copy()
+    u = water.u.copy()
+    rock = Feature2_5D("rock", (center_x + 1.0, center_y), radius=1.8, strength=1.0)
+    x = water.origin_x + np.arange(water.shape[1]) * water.dx
+    y = water.origin_y + np.arange(water.shape[0]) * water.dy
+    grid_x, grid_y = np.meshgrid(x, y)
+    influence = np.exp(-(((grid_x - rock.center[0]) / 1.2) ** 2 + ((grid_y - rock.center[1]) / 1.0) ** 2))
+    depth = np.where(influence > 0.25, 0.42, depth)
+    u[:, :] = 0.5
+    water = WaterField2_5D(
+        origin_x=water.origin_x,
+        origin_y=water.origin_y,
+        dx=water.dx,
+        dy=water.dy,
+        bed=eta - depth,
+        depth=depth,
+        eta=eta,
+        u=u,
+        v=water.v,
+        wet=water.wet,
+        normal_x=water.normal_x,
+        normal_y=water.normal_y,
+        normal_z=water.normal_z,
+        roughness=water.roughness,
+        features=(rock,),
+    )
+    properties = build_default_raft_mass_properties(scenario.raft)
+    state = RaftState6DoF(position=Vec3(center_x, center_y, 0.75), linear_velocity=Vec3(3.0, 0.0, -0.7))
+
+    result = validate_submerged_rock_case(water, state, properties)
+
+    assert result.feature == "submerged_rock"
+    assert result.outcome == "launched"
     assert result.passed

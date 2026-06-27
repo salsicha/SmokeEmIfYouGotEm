@@ -288,6 +288,77 @@ def validate_shallow_shelf_case(
     return FeatureValidationResult("shallow_shelf", outcome, checks)
 
 
+def validate_submerged_rock_case(
+    water: WaterField2_5D,
+    state: RaftState6DoF,
+    properties: RaftMassProperties,
+    *,
+    submerged_depth_threshold: float = 0.1,
+    scrape_acceleration_threshold: float = 1.0,
+    launch_acceleration_threshold: float = 1.0,
+    pitch_acceleration_threshold: float = 0.3,
+) -> FeatureValidationResult:
+    """Validate submerged-rock scrape drag, upward launch, and pitch response."""
+
+    contributions = sample_grounding_forces(state, properties, water)
+    rock_contacts = tuple(
+        contribution
+        for contribution in contributions
+        if "rock" in str((contribution.metadata or {}).get("feature_tags", ""))
+    )
+    grounding_force, grounding_torque = sum_force_contributions(contributions)
+    travel = Vec3(state.linear_velocity.x, state.linear_velocity.y, 0.0)
+    if travel.magnitude <= 1.0e-9:
+        travel = Vec3(1.0, 0.0, 0.0)
+    travel_direction = travel.normalized()
+    scrape_acceleration = max(0.0, -grounding_force.dot(travel_direction) / max(properties.total_mass_kg, 1.0e-9))
+    launch_acceleration = max(0.0, grounding_force.z / max(properties.total_mass_kg, 1.0e-9) + properties.gravity.z)
+    pitch_acceleration = abs(grounding_torque.y) / max(properties.inertia_diagonal_kg_m2.y, 1.0e-9)
+    submerged_depth = min(
+        (water.sample(contact.application_point.x, contact.application_point.y).depth for contact in rock_contacts),
+        default=0.0,
+    )
+    checks = (
+        FeatureValidationCheck(
+            "rock_contact",
+            bool(rock_contacts),
+            float(len(rock_contacts)),
+            1.0,
+            "Grounding contacts should include a submerged rock tag.",
+        ),
+        FeatureValidationCheck(
+            "submerged_depth",
+            submerged_depth >= submerged_depth_threshold,
+            submerged_depth,
+            submerged_depth_threshold,
+            "Rock contact should happen below the water surface.",
+        ),
+        FeatureValidationCheck(
+            "scrape_drag",
+            scrape_acceleration >= scrape_acceleration_threshold,
+            scrape_acceleration,
+            scrape_acceleration_threshold,
+            "Rock contact should scrape opposite raft travel.",
+        ),
+        FeatureValidationCheck(
+            "launch_acceleration",
+            launch_acceleration >= launch_acceleration_threshold,
+            launch_acceleration,
+            launch_acceleration_threshold,
+            "Rock contact should kick the raft upward.",
+        ),
+        FeatureValidationCheck(
+            "pitch_launch",
+            pitch_acceleration >= pitch_acceleration_threshold,
+            pitch_acceleration,
+            pitch_acceleration_threshold,
+            "Off-center rock contact should pitch the raft during launch.",
+        ),
+    )
+    outcome = "launched" if all(check.passed for check in checks[1:]) and rock_contacts else "scraped"
+    return FeatureValidationResult("submerged_rock", outcome, checks)
+
+
 def _standing_wave_outcome(
     relative_downstream: float,
     lift_ratio: float,
