@@ -13,6 +13,45 @@ Build playable rivers from real geospatial and hydrological data, then present t
 
 Those choices should drive both the visual scene and the 2.5D water/raft physics parameters.
 
+## Milestone 9 Seed Implementation
+
+Milestone 9 now has a committed seed pipeline for the first real-world river content pass. It is intentionally small enough for source control and automated tests, while preserving the provenance and validation shape needed for later production data pulls.
+
+Implemented artifacts:
+
+- `physics/src/raftsim/real_world.py`: candidate river inventory, source catalog, South Fork American representative fetch specs, centerline station samples, channel indicators, rapid candidate clustering, rapid review labels, seasonal flow bands, adaptive solver parameters, player selections, Unreal corridor metadata, and solver-neutral scenario generation.
+- `physics/src/raftsim/examples/generate_real_world_scenario.py`: command-line generator for a selected river/flow/difficulty scenario or the full seed package.
+- `physics/schemas/source_manifest.schema.json`: frozen source-manifest contract for geospatial, hydrology, imagery, guide/reference, field-media, solver, and Unreal provenance.
+- `physics/data/real_world/candidate_rivers.json`: first candidate river/region inventory.
+- `physics/data/real_world/source_catalog.json`: source availability, licensing, attribution, and pipeline-use notes.
+- `physics/data/real_world/rapid_review_labels.json`: manual review taxonomy for pools, riffles, wave trains, holes, ledges, laterals, eddies, eddy lines, strainers, portages, access points, boulder gardens, and constrictions.
+- `physics/data/real_world/player_selection_model.json`: first player-facing region, river, section, season, flow, difficulty, and raft setup model.
+- `physics/data/real_world/south_fork_american_chili_bar/source_manifest.json`: representative source manifest for the South Fork American River, Chili Bar to Coloma seed section.
+- `physics/data/real_world/south_fork_american_chili_bar/river_course.json`: centerline stationing, approximate banks/cross-section offsets, width, gradient, constriction, roughness, and rapid candidate metadata.
+- `physics/data/real_world/south_fork_american_chili_bar/flow_presets.json`: low, median, and high runnable seed bands.
+- `physics/data/real_world/south_fork_american_chili_bar/rapid_candidates.geojson`: candidate rapid points derived from DEM-slope, constriction, roughness, boulder-density, imagery-texture, bend, guide-note, and access signals.
+- `physics/data/real_world/south_fork_american_chili_bar/scenario/`: loadable shared `scenario2_5d` package for PyClaw and the custom C++ solver path.
+- `physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json`: first Unreal-ready corridor package manifest with terrain, imagery mask, centerline, bank, rapid, hazard, flow, and confidence artifact slots.
+- `physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json`: low, median, and high runnable flow smoke matrix. The C++ solver smoke passes for each band. PyClaw is available and runs, but the seed real-world scenarios currently produce non-finite fields in the PyClaw validation frame, so matching/tuning is explicitly carried into Milestone 10.
+
+The seed package records metadata-ready fetch specs for 3DEP/DEM, 3DHP/NHD, OSM, NAIP, USGS/NWIS, NOAA/NWPS/National Water Model, and StreamStats. It does not vendor heavy lidar, imagery, guidebook text, or field media. Production extraction must replace the coarse seed measurements with pulled geospatial/hydrology data, reviewed aerial/satellite labels, and rights-cleared media.
+
+Regenerate the seed source/scenario package:
+
+```bash
+python -m raftsim.examples.generate_real_world_scenario --write-full-package --output-dir outputs/real_world
+```
+
+The validation matrix is a recorded smoke-run result, not a static source-data export. Rebuild it during Milestone 10 with fresh PyClaw and C++ solver outputs before accepting any real-world flow preset.
+
+Generate one selected scenario:
+
+```bash
+python -m raftsim.examples.generate_real_world_scenario --flow-band high_runnable --difficulty advanced --output-dir outputs/real_world
+```
+
+Milestone 10 remains the acceptance gate for full PyClaw/custom-C++ low, median, and high flow validation, solver tuning, profiling, and production-ready Unreal corridor export.
+
 ## Engine And Rendering Direction
 
 Use the latest stable Unreal Engine 5.x release available when Unreal production begins. As of the current planning pass, Epic's public documentation is on UE 5.8, so the Unreal plan should expect modern UE5 features and re-check exact feature support at the Unreal readiness gate.

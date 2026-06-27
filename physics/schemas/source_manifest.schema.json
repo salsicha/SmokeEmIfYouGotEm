@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raftsim.local/schemas/source_manifest.schema.json",
+  "title": "RaftSim Real-World Source Manifest",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "river_id",
+    "section_id",
+    "bounds_wgs84",
+    "coordinate_reference_systems",
+    "sources",
+    "remote_fetches",
+    "artifacts",
+    "provenance",
+    "confidence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "raftsim.source_manifest.v0"
+    },
+    "manifest_id": {
+      "type": "string"
+    },
+    "river_id": {
+      "type": "string"
+    },
+    "section_id": {
+      "type": "string"
+    },
+    "section_name": {
+      "type": "string"
+    },
+    "bounds_wgs84": {
+      "type": "object",
+      "required": ["min_lon", "min_lat", "max_lon", "max_lat"]
+    },
+    "coordinate_reference_systems": {
+      "type": "object",
+      "required": ["source", "working", "solver", "unreal"]
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "source_id",
+          "category",
+          "provider",
+          "title",
+          "url",
+          "license_or_terms",
+          "attribution",
+          "access_notes",
+          "use_in_pipeline"
+        ]
+      }
+    },
+    "remote_fetches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["fetch_id", "category", "source_id", "url", "target_artifact", "status", "notes"]
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "required": ["elevation", "hydrography", "imagery", "gauges", "guide_references", "field_media", "solver", "unreal"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["generated_by", "processing_version", "review_status", "redistribution_notes"]
+    },
+    "confidence": {
+      "type": "object",
+      "required": ["overall", "terrain", "hydrography", "imagery", "hydrology", "rapid_labels"]
+    }
+  }
+}

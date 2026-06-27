@@ -1,0 +1,181 @@
+import json
+
+import numpy as np
+
+from raftsim.real_world import (
+    adaptive_solver_parameters,
+    build_player_selection_model,
+    build_real_world_corridor_package,
+    build_source_manifest,
+    default_candidate_river_inventory,
+    default_manual_rapid_review_labels,
+    default_player_selections,
+    default_source_catalog,
+    extract_channel_indicators,
+    generate_real_world_scenario2_5d,
+    identify_candidate_rapids,
+    south_fork_american_centerline_stations,
+    south_fork_american_fetch_specs,
+    south_fork_american_flow_bands,
+    write_real_world_seed_package,
+)
+from raftsim.examples.generate_real_world_scenario import main as generate_real_world_main
+from raftsim.scenario2_5d import read_scenario2_5d_package
+from raftsim.schema_versions import SOURCE_MANIFEST_SCHEMA_VERSION
+
+
+def test_candidate_inventory_covers_first_playable_sections_and_priorities():
+    sections = default_candidate_river_inventory()
+    first = sections[0]
+
+    assert len(sections) >= 5
+    assert first.river_id == "american_south_fork"
+    assert first.section_id == "chili_bar_to_coloma"
+    assert {"3dep_lidar_dem", "3dhp_nhd_flowlines", "naip_imagery", "nwis_gauge_11445500"}.issubset(
+        set(first.data_priorities)
+    )
+
+
+def test_source_catalog_records_required_categories_and_attribution():
+    sources = default_source_catalog()
+    categories = {source.category for source in sources}
+
+    assert {"elevation", "hydrography", "imagery", "gauge", "guide_reference", "field_media"}.issubset(categories)
+    assert all(source.license_or_terms for source in sources)
+    assert all(source.attribution for source in sources)
+
+
+def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
+    manifest = build_source_manifest()
+
+    assert manifest["schema_version"] == SOURCE_MANIFEST_SCHEMA_VERSION
+    assert manifest["river_id"] == "american_south_fork"
+    assert {fetch.fetch_id for fetch in south_fork_american_fetch_specs()} >= {
+        "sfa_3dep_dem",
+        "sfa_3dhp_nhd_flowlines",
+        "sfa_nwis_daily_discharge",
+    }
+    assert {"elevation", "hydrography", "imagery", "gauges", "guide_references", "field_media"}.issubset(
+        set(manifest["artifacts"])
+    )
+
+
+def test_channel_indicators_and_rapid_candidates_find_complex_water():
+    indicators = extract_channel_indicators(south_fork_american_centerline_stations())
+    candidates = identify_candidate_rapids(indicators)
+
+    assert len(indicators) == len(south_fork_american_centerline_stations())
+    assert max(indicator.gradient for indicator in indicators) > 0.01
+    assert max(indicator.constriction_score for indicator in indicators) > 0.25
+    assert len(candidates) >= 3
+    assert any("boulder_garden" in candidate.suggested_labels for candidate in candidates)
+    assert any("foam_whitewater_texture" in candidate.signals for candidate in candidates)
+
+
+def test_manual_review_labels_cover_required_whitewater_features():
+    labels = {label.label for label in default_manual_rapid_review_labels()}
+
+    assert {
+        "pool",
+        "riffle",
+        "wave_train",
+        "hole",
+        "ledge",
+        "lateral",
+        "strainer",
+        "portage",
+        "access_point",
+    }.issubset(labels)
+
+
+def test_adaptive_parameters_scale_with_flow_and_difficulty():
+    beginner_low = adaptive_solver_parameters(default_player_selections()[0])
+    intermediate_medium = adaptive_solver_parameters(default_player_selections()[1])
+    advanced_high = adaptive_solver_parameters(default_player_selections()[2])
+
+    assert beginner_low.boundary_inflow_m3s < intermediate_medium.boundary_inflow_m3s < advanced_high.boundary_inflow_m3s
+    assert beginner_low.wave_train_strength < intermediate_medium.wave_train_strength < advanced_high.wave_train_strength
+    assert beginner_low.eddy_line_shear < advanced_high.eddy_line_shear
+    assert advanced_high.shallow_hazard_threshold_m < beginner_low.shallow_hazard_threshold_m
+
+
+def test_player_selection_model_exposes_river_season_flow_difficulty_and_raft_setup():
+    model = build_player_selection_model()
+    section = model["regions"][0]["rivers"][0]["sections"][0]
+
+    assert section["section_id"] == "chili_bar_to_coloma"
+    assert {"late_summer_low_water", "summer_commercial", "spring_runoff_or_release"}.issubset(
+        set(section["seasons"])
+    )
+    assert {band["flow_band"] for band in section["flow_bands"]} == {
+        "low_runnable",
+        "median_runnable",
+        "high_runnable",
+    }
+    assert "standard_14ft_paddle_raft" in section["raft_setups"]
+
+
+def test_real_world_corridor_package_collects_unreal_handoff_metadata():
+    package = build_real_world_corridor_package()
+
+    assert package.unreal_ready_artifacts["terrain"] == "terrain/solver_bed_grid.npy"
+    assert len(package.rapid_candidates) >= 3
+    assert {band.flow_band for band in south_fork_american_flow_bands()} == {
+        "low_runnable",
+        "median_runnable",
+        "high_runnable",
+    }
+
+
+def test_real_world_scenario_generates_solver_neutral_package(tmp_path):
+    scenario = generate_real_world_scenario2_5d(nx=40, ny=20, duration=0.5)
+    output_dir = scenario.write_package(tmp_path / "real_world")
+    loaded = read_scenario2_5d_package(output_dir)
+
+    assert loaded.metadata.scenario_type == "real_world"
+    assert loaded.metadata.river_id == "american_south_fork"
+    assert loaded.metadata.source_manifest == "source_manifest.json"
+    assert loaded.metadata.flow_band == "median_runnable"
+    assert loaded.validate().passed
+    np.testing.assert_allclose(loaded.initial_state.depth, scenario.initial_state.depth)
+
+
+def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
+    output_dir = write_real_world_seed_package(tmp_path / "real_world_data")
+
+    assert (output_dir / "source_manifest.json").exists()
+    assert (output_dir / "flow_presets.json").exists()
+    assert (output_dir / "rapid_candidates.geojson").exists()
+    assert (output_dir / "corridor_package_manifest.json").exists()
+    assert (output_dir / "scenario" / "scenario.json").exists()
+
+    manifest = json.loads((output_dir / "source_manifest.json").read_text(encoding="utf-8"))
+    scenario = read_scenario2_5d_package(output_dir / "scenario")
+    assert manifest["schema_version"] == SOURCE_MANIFEST_SCHEMA_VERSION
+    assert scenario.metadata.scenario_type == "real_world"
+
+
+def test_generate_real_world_scenario_example_writes_selected_package(tmp_path):
+    exit_code = generate_real_world_main(
+        [
+            "--output-dir",
+            str(tmp_path),
+            "--flow-band",
+            "high_runnable",
+            "--difficulty",
+            "advanced",
+            "--duration",
+            "0.5",
+            "--nx",
+            "32",
+            "--ny",
+            "16",
+        ]
+    )
+
+    assert exit_code == 0
+    scenario_dirs = list((tmp_path / "scenario").glob("*"))
+    assert len(scenario_dirs) == 1
+    scenario = read_scenario2_5d_package(scenario_dirs[0])
+    assert scenario.metadata.flow_band == "high_runnable"
+    assert scenario.metadata.difficulty_preset == "advanced"

@@ -1,0 +1,853 @@
+{
+  "centerline": [
+    {
+      "access_score": 0.7,
+      "bend_score": 0.12,
+      "boulder_density": 0.18,
+      "channel_width_m": 26.0,
+      "elevation_m": 304.0,
+      "guide_note_score": 0.0,
+      "imagery_whitewater_texture": 0.1,
+      "lat": 38.76,
+      "lon": -120.873,
+      "roughness_indicator": 0.22,
+      "station_m": 0.0
+    },
+    {
+      "access_score": 0.0,
+      "bend_score": 0.28,
+      "boulder_density": 0.25,
+      "channel_width_m": 24.0,
+      "elevation_m": 299.2,
+      "guide_note_score": 0.0,
+      "imagery_whitewater_texture": 0.18,
+      "lat": 38.764,
+      "lon": -120.865,
+      "roughness_indicator": 0.28,
+      "station_m": 450.0
+    },
+    {
+      "access_score": 0.0,
+      "bend_score": 0.44,
+      "boulder_density": 0.55,
+      "channel_width_m": 18.0,
+      "elevation_m": 291.0,
+      "guide_note_score": 0.6,
+      "imagery_whitewater_texture": 0.55,
+      "lat": 38.7685,
+      "lon": -120.858,
+      "roughness_indicator": 0.62,
+      "station_m": 920.0
+    },
+    {
+      "access_score": 0.0,
+      "bend_score": 0.25,
+      "boulder_density": 0.2,
+      "channel_width_m": 30.0,
+      "elevation_m": 286.0,
+      "guide_note_score": 0.0,
+      "imagery_whitewater_texture": 0.16,
+      "lat": 38.773,
+      "lon": -120.85,
+      "roughness_indicator": 0.24,
+      "station_m": 1370.0
+    },
+    {
+      "access_score": 0.0,
+      "bend_score": 0.38,
+      "boulder_density": 0.68,
+      "channel_width_m": 17.0,
+      "elevation_m": 278.0,
+      "guide_note_score": 0.55,
+      "imagery_whitewater_texture": 0.62,
+      "lat": 38.7765,
+      "lon": -120.842,
+      "roughness_indicator": 0.7,
+      "station_m": 1880.0
+    },
+    {
+      "access_score": 0.0,
+      "bend_score": 0.18,
+      "boulder_density": 0.16,
+      "channel_width_m": 33.0,
+      "elevation_m": 274.8,
+      "guide_note_score": 0.0,
+      "imagery_whitewater_texture": 0.12,
+      "lat": 38.78,
+      "lon": -120.833,
+      "roughness_indicator": 0.18,
+      "station_m": 2360.0
+    },
+    {
+      "access_score": 0.0,
+      "bend_score": 0.7,
+      "boulder_density": 0.5,
+      "channel_width_m": 20.0,
+      "elevation_m": 265.2,
+      "guide_note_score": 0.45,
+      "imagery_whitewater_texture": 0.44,
+      "lat": 38.785,
+      "lon": -120.8235,
+      "roughness_indicator": 0.58,
+      "station_m": 2920.0
+    },
+    {
+      "access_score": 0.0,
+      "bend_score": 0.34,
+      "boulder_density": 0.32,
+      "channel_width_m": 23.0,
+      "elevation_m": 258.0,
+      "guide_note_score": 0.0,
+      "imagery_whitewater_texture": 0.28,
+      "lat": 38.79,
+      "lon": -120.814,
+      "roughness_indicator": 0.36,
+      "station_m": 3470.0
+    },
+    {
+      "access_score": 0.0,
+      "bend_score": 0.6,
+      "boulder_density": 0.58,
+      "channel_width_m": 19.0,
+      "elevation_m": 249.0,
+      "guide_note_score": 0.5,
+      "imagery_whitewater_texture": 0.58,
+      "lat": 38.796,
+      "lon": -120.804,
+      "roughness_indicator": 0.66,
+      "station_m": 4050.0
+    },
+    {
+      "access_score": 0.0,
+      "bend_score": 0.2,
+      "boulder_density": 0.22,
+      "channel_width_m": 29.0,
+      "elevation_m": 244.5,
+      "guide_note_score": 0.0,
+      "imagery_whitewater_texture": 0.18,
+      "lat": 38.803,
+      "lon": -120.793,
+      "roughness_indicator": 0.26,
+      "station_m": 4630.0
+    },
+    {
+      "access_score": 0.6,
+      "bend_score": 0.16,
+      "boulder_density": 0.26,
+      "channel_width_m": 27.0,
+      "elevation_m": 238.0,
+      "guide_note_score": 0.0,
+      "imagery_whitewater_texture": 0.2,
+      "lat": 38.81,
+      "lon": -120.782,
+      "roughness_indicator": 0.3,
+      "station_m": 5200.0
+    }
+  ],
+  "flow_bands": [
+    {
+      "confidence": 0.3,
+      "discharge_cfs": 900.0,
+      "discharge_m3s": 25.4851619328,
+      "flow_band": "low_runnable",
+      "notes": "Lower training-oriented flow; expect exposed rocks, shallows, and slower recovery from mistakes.",
+      "percentile_range": [
+        0.1,
+        0.35
+      ],
+      "runnable": true,
+      "season": "late_summer_low_water",
+      "stage_ft": null
+    },
+    {
+      "confidence": 0.35,
+      "discharge_cfs": 1600.0,
+      "discharge_m3s": 45.3069545472,
+      "flow_band": "median_runnable",
+      "notes": "Default validation band for intermediate commercial-style runs.",
+      "percentile_range": [
+        0.35,
+        0.7
+      ],
+      "runnable": true,
+      "season": "summer_commercial",
+      "stage_ft": null
+    },
+    {
+      "confidence": 0.25,
+      "discharge_cfs": 3000.0,
+      "discharge_m3s": 84.950539776,
+      "flow_band": "high_runnable",
+      "notes": "Higher consequence preset with stronger holes, wave trains, eddy-line shear, and faster raft response.",
+      "percentile_range": [
+        0.7,
+        0.9
+      ],
+      "runnable": true,
+      "season": "spring_runoff_or_release",
+      "stage_ft": null
+    }
+  ],
+  "indicators": [
+    {
+      "channel_width_m": 26.0,
+      "constriction_score": 0.0,
+      "elevation_m": 304.0,
+      "gradient": 0.010666666666666692,
+      "lat": 38.76,
+      "left_bank_offset_m": 13.0,
+      "lon": -120.873,
+      "rapid_score": 0.23288000000000045,
+      "right_bank_offset_m": -13.0,
+      "roughness_score": 0.1524,
+      "signals": [
+        "access_point"
+      ],
+      "station_m": 0.0
+    },
+    {
+      "channel_width_m": 24.0,
+      "constriction_score": 0.1111111111111111,
+      "elevation_m": 299.2,
+      "gradient": 0.014130434782608696,
+      "lat": 38.764,
+      "left_bank_offset_m": 12.0,
+      "lon": -120.865,
+      "rapid_score": 0.34415661835748795,
+      "right_bank_offset_m": -12.0,
+      "roughness_score": 0.2248,
+      "signals": [
+        "dem_slope"
+      ],
+      "station_m": 450.0
+    },
+    {
+      "channel_width_m": 18.0,
+      "constriction_score": 0.3076923076923077,
+      "elevation_m": 291.0,
+      "gradient": 0.014347826086956509,
+      "lat": 38.7685,
+      "left_bank_offset_m": 9.0,
+      "lon": -120.858,
+      "rapid_score": 0.5575514381270901,
+      "right_bank_offset_m": -9.0,
+      "roughness_score": 0.5655999999999999,
+      "signals": [
+        "dem_slope",
+        "constriction",
+        "boulder_density",
+        "foam_whitewater_texture",
+        "guide_note",
+        "roughness",
+        "high_score"
+      ],
+      "station_m": 920.0
+    },
+    {
+      "channel_width_m": 30.0,
+      "constriction_score": 0.0,
+      "elevation_m": 286.0,
+      "gradient": 0.013541666666666667,
+      "lat": 38.773,
+      "left_bank_offset_m": 15.0,
+      "lon": -120.85,
+      "rapid_score": 0.29695750000000004,
+      "right_bank_offset_m": -15.0,
+      "roughness_score": 0.1916,
+      "signals": [
+        "dem_slope"
+      ],
+      "station_m": 1370.0
+    },
+    {
+      "channel_width_m": 17.0,
+      "constriction_score": 0.43333333333333335,
+      "elevation_m": 278.0,
+      "gradient": 0.011313131313131301,
+      "lat": 38.7765,
+      "left_bank_offset_m": 8.5,
+      "lon": -120.842,
+      "rapid_score": 0.5634599999999998,
+      "right_bank_offset_m": -8.5,
+      "roughness_score": 0.6258,
+      "signals": [
+        "constriction",
+        "boulder_density",
+        "foam_whitewater_texture",
+        "guide_note",
+        "roughness",
+        "high_score"
+      ],
+      "station_m": 1880.0
+    },
+    {
+      "channel_width_m": 33.0,
+      "constriction_score": 0.0,
+      "elevation_m": 274.8,
+      "gradient": 0.012307692307692318,
+      "lat": 38.78,
+      "left_bank_offset_m": 16.5,
+      "lon": -120.833,
+      "rapid_score": 0.2593169230769232,
+      "right_bank_offset_m": -16.5,
+      "roughness_score": 0.1452,
+      "signals": [
+        "dem_slope"
+      ],
+      "station_m": 2360.0
+    },
+    {
+      "channel_width_m": 20.0,
+      "constriction_score": 0.16666666666666666,
+      "elevation_m": 265.2,
+      "gradient": 0.015135135135135145,
+      "lat": 38.785,
+      "left_bank_offset_m": 10.0,
+      "lon": -120.8235,
+      "rapid_score": 0.5085363963963966,
+      "right_bank_offset_m": -10.0,
+      "roughness_score": 0.5342000000000001,
+      "signals": [
+        "dem_slope",
+        "boulder_density",
+        "foam_whitewater_texture",
+        "bend_or_lateral_candidate",
+        "guide_note",
+        "roughness"
+      ],
+      "station_m": 2920.0
+    },
+    {
+      "channel_width_m": 23.0,
+      "constriction_score": 0.20689655172413793,
+      "elevation_m": 258.0,
+      "gradient": 0.014336283185840699,
+      "lat": 38.79,
+      "left_bank_offset_m": 11.5,
+      "lon": -120.814,
+      "rapid_score": 0.400465913945682,
+      "right_bank_offset_m": -11.5,
+      "roughness_score": 0.296,
+      "signals": [
+        "dem_slope",
+        "constriction"
+      ],
+      "station_m": 3470.0
+    },
+    {
+      "channel_width_m": 19.0,
+      "constriction_score": 0.2962962962962963,
+      "elevation_m": 249.0,
+      "gradient": 0.01163793103448276,
+      "lat": 38.796,
+      "left_bank_offset_m": 9.5,
+      "lon": -120.804,
+      "rapid_score": 0.5185310472541507,
+      "right_bank_offset_m": -9.5,
+      "roughness_score": 0.6016,
+      "signals": [
+        "constriction",
+        "boulder_density",
+        "foam_whitewater_texture",
+        "bend_or_lateral_candidate",
+        "guide_note",
+        "roughness"
+      ],
+      "station_m": 4050.0
+    },
+    {
+      "channel_width_m": 29.0,
+      "constriction_score": 0.0,
+      "elevation_m": 244.5,
+      "gradient": 0.009565217391304347,
+      "lat": 38.803,
+      "left_bank_offset_m": 14.5,
+      "lon": -120.793,
+      "rapid_score": 0.23726608695652174,
+      "right_bank_offset_m": -14.5,
+      "roughness_score": 0.2012,
+      "signals": [],
+      "station_m": 4630.0
+    },
+    {
+      "channel_width_m": 27.0,
+      "constriction_score": 0.03571428571428571,
+      "elevation_m": 238.0,
+      "gradient": 0.011403508771929825,
+      "lat": 38.81,
+      "left_bank_offset_m": 13.5,
+      "lon": -120.782,
+      "rapid_score": 0.28553503759398496,
+      "right_bank_offset_m": -13.5,
+      "roughness_score": 0.2236,
+      "signals": [
+        "access_point"
+      ],
+      "station_m": 5200.0
+    }
+  ],
+  "player_selections": [
+    {
+      "difficulty": "beginner",
+      "flow_band": "low_runnable",
+      "raft_setup": "standard_14ft_paddle_raft",
+      "region": "California Sierra Nevada",
+      "river_id": "american_south_fork",
+      "season": "late_summer_low_water",
+      "section_id": "chili_bar_to_coloma"
+    },
+    {
+      "difficulty": "intermediate",
+      "flow_band": "median_runnable",
+      "raft_setup": "standard_14ft_paddle_raft",
+      "region": "California Sierra Nevada",
+      "river_id": "american_south_fork",
+      "season": "summer_commercial",
+      "section_id": "chili_bar_to_coloma"
+    },
+    {
+      "difficulty": "advanced",
+      "flow_band": "high_runnable",
+      "raft_setup": "standard_14ft_paddle_raft",
+      "region": "California Sierra Nevada",
+      "river_id": "american_south_fork",
+      "season": "spring_runoff_or_release",
+      "section_id": "chili_bar_to_coloma"
+    }
+  ],
+  "rapid_candidates": [
+    {
+      "confidence": 0.8366532909698996,
+      "end_station_m": 920.0,
+      "peak_station_m": 920.0,
+      "rapid_id": "rapid_candidate_01",
+      "score": 0.5575514381270901,
+      "signals": [
+        "boulder_density",
+        "constriction",
+        "dem_slope",
+        "foam_whitewater_texture",
+        "guide_note",
+        "high_score",
+        "roughness"
+      ],
+      "start_station_m": 920.0,
+      "suggested_labels": [
+        "constriction",
+        "boulder_garden",
+        "wave_train",
+        "manual_review_required"
+      ]
+    },
+    {
+      "confidence": 0.7999029999999999,
+      "end_station_m": 1880.0,
+      "peak_station_m": 1880.0,
+      "rapid_id": "rapid_candidate_02",
+      "score": 0.5634599999999998,
+      "signals": [
+        "boulder_density",
+        "constriction",
+        "foam_whitewater_texture",
+        "guide_note",
+        "high_score",
+        "roughness"
+      ],
+      "start_station_m": 1880.0,
+      "suggested_labels": [
+        "constriction",
+        "boulder_garden",
+        "wave_train",
+        "manual_review_required"
+      ]
+    },
+    {
+      "confidence": 0.7696950180180182,
+      "end_station_m": 2920.0,
+      "peak_station_m": 2920.0,
+      "rapid_id": "rapid_candidate_03",
+      "score": 0.5085363963963966,
+      "signals": [
+        "bend_or_lateral_candidate",
+        "boulder_density",
+        "dem_slope",
+        "foam_whitewater_texture",
+        "guide_note",
+        "roughness"
+      ],
+      "start_station_m": 2920.0,
+      "suggested_labels": [
+        "boulder_garden",
+        "wave_train",
+        "lateral",
+        "manual_review_required"
+      ]
+    },
+    {
+      "confidence": 0.7751920759897829,
+      "end_station_m": 4050.0,
+      "peak_station_m": 4050.0,
+      "rapid_id": "rapid_candidate_04",
+      "score": 0.5185310472541507,
+      "signals": [
+        "bend_or_lateral_candidate",
+        "boulder_density",
+        "constriction",
+        "foam_whitewater_texture",
+        "guide_note",
+        "roughness"
+      ],
+      "start_station_m": 4050.0,
+      "suggested_labels": [
+        "constriction",
+        "boulder_garden",
+        "wave_train",
+        "lateral",
+        "manual_review_required"
+      ]
+    }
+  ],
+  "section": {
+    "bounds_wgs84": {
+      "max_lat": 38.83,
+      "max_lon": -120.72,
+      "min_lat": 38.74,
+      "min_lon": -120.9
+    },
+    "country": "US",
+    "data_priorities": [
+      "3dep_lidar_dem",
+      "3dhp_nhd_flowlines",
+      "naip_imagery",
+      "nwis_gauge_11445500",
+      "osm_access"
+    ],
+    "difficulty_range": [
+      "class_ii",
+      "class_iii"
+    ],
+    "gauge_candidates": [
+      "USGS 11445500 South Fork American River near Lotus, CA"
+    ],
+    "notes": "Representative Milestone 9 seed section; coordinates are planning bounds and must be verified before production extraction.",
+    "playable_reason": "Commercially important training-to-intermediate run with clear access, named rapids, gauge context, and varied channel geometry.",
+    "region": "California Sierra Nevada",
+    "river_id": "american_south_fork",
+    "river_name": "South Fork American River",
+    "section_id": "chili_bar_to_coloma",
+    "section_name": "Chili Bar to Coloma"
+  },
+  "source_manifest": {
+    "artifacts": {
+      "elevation": [
+        "terrain/3dep_dem_tiles",
+        "terrain/solver_bed_grid.npy"
+      ],
+      "field_media": [
+        "field_media/README.md"
+      ],
+      "gauges": [
+        "hydrology/usgs_11445500_daily_discharge.json",
+        "hydrology/flow_presets.json"
+      ],
+      "guide_references": [
+        "review/guide_reference_index.json",
+        "review/rapid_review_labels.json"
+      ],
+      "hydrography": [
+        "hydrography/centerline.geojson",
+        "hydrography/banks.geojson",
+        "hydrography/cross_sections.geojson"
+      ],
+      "imagery": [
+        "imagery/naip_tiles",
+        "imagery/water_mask.tif",
+        "imagery/foam_texture_mask.tif"
+      ],
+      "solver": [
+        "scenario/scenario.json",
+        "scenario/bed.npy",
+        "scenario/initial_state.npz"
+      ],
+      "unreal": [
+        "unreal/corridor_package_manifest.json"
+      ],
+      "validation": [
+        "validation_matrix.json"
+      ]
+    },
+    "bounds_wgs84": {
+      "max_lat": 38.83,
+      "max_lon": -120.72,
+      "min_lat": 38.74,
+      "min_lon": -120.9
+    },
+    "confidence": {
+      "hydrography": 0.4,
+      "hydrology": 0.35,
+      "imagery": 0.3,
+      "overall": 0.35,
+      "rapid_labels": 0.25,
+      "terrain": 0.45
+    },
+    "coordinate_reference_systems": {
+      "solver": "local meters: x downstream, y river-left positive",
+      "source": "EPSG:4326",
+      "unreal": "georeferenced corridor transform derived from the working CRS",
+      "working": "local projected CRS selected per section at extraction time"
+    },
+    "manifest_id": "american_south_fork.chili_bar_to_coloma.source_manifest.v0",
+    "provenance": {
+      "generated_by": "raftsim.real_world.build_source_manifest",
+      "processing_version": "milestone_9_seed.v0",
+      "redistribution_notes": "Do not redistribute third-party imagery, guidebook text, or field media unless the manifest records explicit rights.",
+      "review_status": "seed_data_needs_human_geospatial_review"
+    },
+    "remote_fetches": [
+      {
+        "category": "elevation",
+        "fetch_id": "sfa_3dep_dem",
+        "notes": "Representative bounding-box query for DEM discovery; production pull should pick highest-resolution 3DEP/state lidar product with metadata.",
+        "source_id": "usgs_3dep",
+        "status": "metadata_ready",
+        "target_artifact": "terrain/3dep_dem_tiles",
+        "url": "https://apps.nationalmap.gov/tnmaccess/api/products?datasets=Digital%20Elevation%20Model%20(DEM)&bbox=-120.90,38.74,-120.72,38.83"
+      },
+      {
+        "category": "hydrography",
+        "fetch_id": "sfa_3dhp_nhd_flowlines",
+        "notes": "Use 3DHP if available for the bbox; otherwise use NHD/NHDPlus flowlines and catchments.",
+        "source_id": "usgs_3dhp_nhd",
+        "status": "metadata_ready",
+        "target_artifact": "hydrography/nhd_or_3dhp_flowlines",
+        "url": "https://apps.nationalmap.gov/tnmaccess/api/products?datasets=National%20Hydrography%20Dataset%20(NHD)&bbox=-120.90,38.74,-120.72,38.83"
+      },
+      {
+        "category": "hydrography",
+        "fetch_id": "sfa_osm_access",
+        "notes": "Overpass query should fetch river way, roads, trails, bridges, parking/access points, and named nearby features within the bbox.",
+        "source_id": "osm",
+        "status": "planned",
+        "target_artifact": "hydrography/osm_access_bridges_named_features.geojson",
+        "url": "https://overpass-api.de/api/interpreter"
+      },
+      {
+        "category": "imagery",
+        "fetch_id": "sfa_naip_imagery",
+        "notes": "Use most recent leaf-on/low-shadow NAIP where available, then compare with historic imagery at known gauge values.",
+        "source_id": "usda_naip",
+        "status": "planned",
+        "target_artifact": "imagery/naip_tiles",
+        "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=NAIP%20Plus&bbox=-120.90,38.74,-120.72,38.83"
+      },
+      {
+        "category": "gauge",
+        "fetch_id": "sfa_nwis_daily_discharge",
+        "notes": "Daily discharge query for preliminary flow percentiles. Add instantaneous values and stage parameter 00065 when building final presets.",
+        "source_id": "usgs_nwis",
+        "status": "metadata_ready",
+        "target_artifact": "hydrology/usgs_11445500_daily_discharge.json",
+        "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=11445500&parameterCd=00060&startDT=2000-01-01"
+      },
+      {
+        "category": "gauge",
+        "fetch_id": "sfa_nwps_nwm_context",
+        "notes": "Link NOAA/NWPS/NWM reach context after the gauge/COMID mapping is verified.",
+        "source_id": "noaa_nwps_nwm",
+        "status": "planned",
+        "target_artifact": "hydrology/noaa_nwps_nwm_context.json",
+        "url": "https://water.noaa.gov/"
+      },
+      {
+        "category": "gauge",
+        "fetch_id": "sfa_streamstats_context",
+        "notes": "Use for drainage area and transfer-function context; keep lower confidence than direct gauge observations.",
+        "source_id": "usgs_streamstats",
+        "status": "planned",
+        "target_artifact": "hydrology/streamstats_basin_context.json",
+        "url": "https://www.usgs.gov/streamstats"
+      }
+    ],
+    "river_id": "american_south_fork",
+    "schema_version": "raftsim.source_manifest.v0",
+    "section_id": "chili_bar_to_coloma",
+    "section_name": "Chili Bar to Coloma",
+    "sources": [
+      {
+        "access_notes": "Use The National Map, 3DEP services, or state lidar portals for DEM/lidar tiles.",
+        "attribution": "Credit USGS 3D Elevation Program and preserve dataset/product identifiers in source manifests.",
+        "category": "elevation",
+        "license_or_terms": "U.S. federal source; treat as public-domain geospatial data unless a product-specific notice says otherwise.",
+        "provider": "USGS",
+        "source_id": "usgs_3dep",
+        "title": "3D Elevation Program (3DEP)",
+        "url": "https://www.usgs.gov/3d-elevation-program",
+        "use_in_pipeline": [
+          "terrain_dem",
+          "gradient",
+          "banks",
+          "cross_sections",
+          "roughness_indicators"
+        ]
+      },
+      {
+        "access_notes": "Use 3DHP where available; fall back to NHD/NHDPlus flowlines and catchments for older coverage.",
+        "attribution": "Credit USGS 3D Hydrography Program, NHD, or NHDPlus as applicable.",
+        "category": "hydrography",
+        "license_or_terms": "U.S. federal source; preserve attribution and confirm product-specific terms.",
+        "provider": "USGS",
+        "source_id": "usgs_3dhp_nhd",
+        "title": "3D Hydrography Program, NHD, and NHDPlus",
+        "url": "https://www.usgs.gov/3d-hydrography-program",
+        "use_in_pipeline": [
+          "centerline",
+          "drainage_context",
+          "banks_seed",
+          "gauge_transfer_context"
+        ]
+      },
+      {
+        "access_notes": "Inventory and download elevation, hydrography, and base map products by bounding box.",
+        "attribution": "Credit source product providers listed by The National Map download metadata.",
+        "category": "elevation",
+        "license_or_terms": "U.S. federal access portal; individual products keep their own metadata and attribution.",
+        "provider": "USGS",
+        "source_id": "usgs_tnm",
+        "title": "The National Map",
+        "url": "https://apps.nationalmap.gov/tnmaccess/",
+        "use_in_pipeline": [
+          "source_discovery",
+          "download_metadata",
+          "source_manifest"
+        ]
+      },
+      {
+        "access_notes": "Use parameter 00060 for discharge and 00065 for stage when available.",
+        "attribution": "Credit USGS Water Data for the Nation / NWIS and record gauge site, parameter code, and retrieval date.",
+        "category": "gauge",
+        "license_or_terms": "U.S. federal hydrologic data; cite USGS Water Data for the Nation and site IDs.",
+        "provider": "USGS",
+        "source_id": "usgs_nwis",
+        "title": "Water Services and NWIS",
+        "url": "https://waterservices.usgs.gov/",
+        "use_in_pipeline": [
+          "gauge_history",
+          "flow_percentiles",
+          "season_windows",
+          "gauge_transfer_function"
+        ]
+      },
+      {
+        "access_notes": "Use as forecast/model context, not as sole validation truth for historical runnable bands.",
+        "attribution": "Credit NOAA National Water Prediction Service / National Water Model for modeled flow context.",
+        "category": "gauge",
+        "license_or_terms": "Public forecast/model products; cite NOAA/NWS/NWPS and verify service-specific use notes.",
+        "provider": "NOAA/NWS",
+        "source_id": "noaa_nwps_nwm",
+        "title": "National Water Prediction Service and National Water Model context",
+        "url": "https://water.noaa.gov/",
+        "use_in_pipeline": [
+          "forecast_context",
+          "modeled_reach_flow",
+          "seasonal_context"
+        ]
+      },
+      {
+        "access_notes": "Use for ungauged or transfer-function context; flag lower confidence than direct gauge history.",
+        "attribution": "Credit USGS StreamStats for basin characteristics and estimated streamflow statistics.",
+        "category": "gauge",
+        "license_or_terms": "U.S. federal analysis service; cite USGS StreamStats and preserve report metadata.",
+        "provider": "USGS",
+        "source_id": "usgs_streamstats",
+        "title": "StreamStats",
+        "url": "https://www.usgs.gov/streamstats",
+        "use_in_pipeline": [
+          "basin_characteristics",
+          "ungauged_flow_estimates",
+          "confidence_scoring"
+        ]
+      },
+      {
+        "access_notes": "Use for water masks, exposed rocks, banks, access points, vegetation, foam texture, and visual reference.",
+        "attribution": "Credit USDA/FSA NAIP imagery, acquisition year, and tile identifiers.",
+        "category": "imagery",
+        "license_or_terms": "Public U.S. aerial imagery source; verify product year/portal terms and attribution before redistribution.",
+        "provider": "USDA Farm Service Agency",
+        "source_id": "usda_naip",
+        "title": "NAIP aerial imagery",
+        "url": "https://www.fsa.usda.gov/resources/aerial-photography",
+        "use_in_pipeline": [
+          "imagery_masks",
+          "foam_texture",
+          "boulder_density",
+          "banks",
+          "access_points"
+        ]
+      },
+      {
+        "access_notes": "Use mostly for access roads, trails, bridges, named features, land use, and supplemental hydrography.",
+        "attribution": "Credit OpenStreetMap contributors where OSM data is used.",
+        "category": "hydrography",
+        "license_or_terms": "ODbL; requires attribution and care with database derivatives and share-alike obligations.",
+        "provider": "OpenStreetMap contributors",
+        "source_id": "osm",
+        "title": "OpenStreetMap supplemental map data",
+        "url": "https://www.openstreetmap.org/copyright",
+        "use_in_pipeline": [
+          "access_points",
+          "roads_trails",
+          "bridges",
+          "named_features",
+          "review_context"
+        ]
+      },
+      {
+        "access_notes": "Use for named rapids, hazards, portages, access, commercial season, and difficulty calibration.",
+        "attribution": "Credit reference title/author/URL where licenses allow; keep internal notes separate from redistributable assets.",
+        "category": "guide_reference",
+        "license_or_terms": "Do not copy protected guidebook text or photos into the repo; record citations, page/URL pointers, and derived review notes only.",
+        "provider": "Guidebooks, outfitters, public agency pages, and reviewed local references",
+        "source_id": "guide_references",
+        "title": "Human rapid and season references",
+        "url": "source_manifest://guide_references",
+        "use_in_pipeline": [
+          "rapid_names",
+          "hazards",
+          "season_windows",
+          "difficulty_mapping",
+          "review_labels"
+        ]
+      },
+      {
+        "access_notes": "Use for validation and photoreal/audio references after permissions are complete.",
+        "attribution": "Credit capture crew and rights owner according to media release.",
+        "category": "field_media",
+        "license_or_terms": "Require explicit project-owned or licensed rights, model/property releases where applicable, and redistribution notes.",
+        "provider": "Project field capture",
+        "source_id": "field_media",
+        "title": "Field photos, drone video, audio, GPS, and notes",
+        "url": "source_manifest://field_media",
+        "use_in_pipeline": [
+          "visual_reference",
+          "audio_reference",
+          "rapid_review",
+          "validation_media"
+        ]
+      }
+    ]
+  },
+  "unreal_ready_artifacts": {
+    "banks": "hydrography/banks.geojson",
+    "centerline": "hydrography/centerline.geojson",
+    "confidence_metadata": "confidence.json",
+    "flow_presets": "hydrology/flow_presets.json",
+    "hazards": "review/rapid_review_labels.json",
+    "imagery_masks": [
+      "imagery/water_mask.tif",
+      "imagery/foam_texture_mask.tif"
+    ],
+    "rapids": "review/rapid_candidates.geojson",
+    "terrain": "terrain/solver_bed_grid.npy",
+    "validation_matrix": "validation_matrix.json"
+  }
+}

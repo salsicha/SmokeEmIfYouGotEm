@@ -6,6 +6,7 @@ from .schema_versions import (
     PARAMETER_SCHEMA_VERSION,
     REPLAY_SCHEMA_VERSION,
     SHARED_SCHEMA_SET_VERSION,
+    SOURCE_MANIFEST_SCHEMA_VERSION,
     TELEMETRY_FORCE_SCHEMA_VERSION,
 )
 from .raft2d import (
@@ -154,6 +155,36 @@ from .feature_validation import (
     validate_shallow_shelf_case,
     validate_standing_wave_case,
     validate_submerged_rock_case,
+)
+from .real_world import (
+    BoundsWGS84,
+    CandidateRiverSection,
+    CenterlineStation,
+    ChannelIndicator,
+    FlowBand,
+    PlayerSelection,
+    RapidCandidate,
+    RapidReviewLabel,
+    RealWorldCorridorPackage,
+    RemoteFetchSpec,
+    SolverParameterPreset,
+    SourceCatalogEntry,
+    adaptive_solver_parameters,
+    build_player_selection_model,
+    build_real_world_corridor_package,
+    build_source_manifest,
+    default_candidate_river_inventory,
+    default_manual_rapid_review_labels,
+    default_player_selections,
+    default_source_catalog,
+    extract_channel_indicators,
+    generate_real_world_scenario2_5d,
+    identify_candidate_rapids,
+    south_fork_american_centerline_stations,
+    south_fork_american_fetch_specs,
+    south_fork_american_flow_bands,
+    south_fork_american_section,
+    write_real_world_seed_package,
 )
 from .sim import Simulation, SimulationConfig, SimulationSystem
 from .state import BodyState

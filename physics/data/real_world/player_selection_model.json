@@ -1,0 +1,86 @@
+{
+  "regions": [
+    {
+      "region": "California Sierra Nevada",
+      "rivers": [
+        {
+          "river_id": "american_south_fork",
+          "river_name": "South Fork American River",
+          "sections": [
+            {
+              "data_confidence": 0.35,
+              "difficulty_presets": [
+                "beginner",
+                "intermediate",
+                "advanced",
+                "expert"
+              ],
+              "difficulty_range": [
+                "class_ii",
+                "class_iii"
+              ],
+              "flow_bands": [
+                {
+                  "confidence": 0.3,
+                  "discharge_cfs": 900.0,
+                  "discharge_m3s": 25.4851619328,
+                  "flow_band": "low_runnable",
+                  "notes": "Lower training-oriented flow; expect exposed rocks, shallows, and slower recovery from mistakes.",
+                  "percentile_range": [
+                    0.1,
+                    0.35
+                  ],
+                  "runnable": true,
+                  "season": "late_summer_low_water",
+                  "stage_ft": null
+                },
+                {
+                  "confidence": 0.35,
+                  "discharge_cfs": 1600.0,
+                  "discharge_m3s": 45.3069545472,
+                  "flow_band": "median_runnable",
+                  "notes": "Default validation band for intermediate commercial-style runs.",
+                  "percentile_range": [
+                    0.35,
+                    0.7
+                  ],
+                  "runnable": true,
+                  "season": "summer_commercial",
+                  "stage_ft": null
+                },
+                {
+                  "confidence": 0.25,
+                  "discharge_cfs": 3000.0,
+                  "discharge_m3s": 84.950539776,
+                  "flow_band": "high_runnable",
+                  "notes": "Higher consequence preset with stronger holes, wave trains, eddy-line shear, and faster raft response.",
+                  "percentile_range": [
+                    0.7,
+                    0.9
+                  ],
+                  "runnable": true,
+                  "season": "spring_runoff_or_release",
+                  "stage_ft": null
+                }
+              ],
+              "gauge_sources": [
+                "USGS 11445500 South Fork American River near Lotus, CA"
+              ],
+              "raft_setups": [
+                "standard_14ft_paddle_raft",
+                "heavier_training_raft"
+              ],
+              "seasons": [
+                "late_summer_low_water",
+                "spring_runoff_or_release",
+                "summer_commercial"
+              ],
+              "section_id": "chili_bar_to_coloma",
+              "section_name": "Chili Bar to Coloma"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

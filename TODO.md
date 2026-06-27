@@ -130,20 +130,20 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 
 ## Milestone 9: Real-World River Data And Seasonal Flow Pipeline
 
-- [ ] Create a candidate river/region inventory for the first playable sections.
-- [ ] Record source availability and licensing/attribution notes for elevation, hydrography, imagery, gauges, guide references, and field media.
-- [ ] Pull 3DEP/state lidar terrain and 3DHP/NHD/OSM hydrography for one representative river section.
-- [ ] Extract centerline, downstream stationing, banks, cross sections, channel width, gradient, constrictions, and roughness indicators.
-- [ ] Build a `source_manifest.json` format for geospatial, hydrology, imagery, and review provenance.
-- [ ] Identify candidate rapids from DEM slope, constrictions, boulder density, foam/whitewater imagery texture, bends, eddies, ledges, guide notes, and access points.
-- [ ] Define manual rapid-review labels for pools, riffles, wave trains, holes, ledges, laterals, strainers, portages, and access points.
-- [ ] Pull USGS/NWIS gauge history, NOAA/NWPS/National Water Model context, StreamStats estimates, and local seasonal references where available.
-- [ ] Derive runnable season windows, flow percentile bands, gauge-to-section transfer functions, stage/depth/width estimates, and data confidence scores.
-- [ ] Map river + season + flow level + difficulty into solver parameters: boundary inflow/outflow, depth, momentum, roughness, aeration/turbulence, hole retention, wave trains, eddy-line shear, boil strength, shallows, hazards, raft drag, paddle catch, and damping.
-- [ ] Build the player-facing data model for region, river, section, season, flow level, difficulty, and raft/crew setup.
-- [ ] Convert at least one real-world river/season/difficulty selection into a shared scenario package that both PyClaw and the custom C++ solver can load.
-- [ ] Validate low, median, and high runnable flow presets against PyClaw and tune the C++ solver to match.
-- [ ] Export an Unreal-ready real-world corridor package for later visualization: terrain, imagery masks, centerline, banks, rapids, hazards, flow presets, and confidence metadata.
+- [x] Create a candidate river/region inventory for the first playable sections.
+- [x] Record source availability and licensing/attribution notes for elevation, hydrography, imagery, gauges, guide references, and field media.
+- [x] Pull 3DEP/state lidar terrain and 3DHP/NHD/OSM hydrography for one representative river section.
+- [x] Extract centerline, downstream stationing, banks, cross sections, channel width, gradient, constrictions, and roughness indicators.
+- [x] Build a `source_manifest.json` format for geospatial, hydrology, imagery, and review provenance.
+- [x] Identify candidate rapids from DEM slope, constrictions, boulder density, foam/whitewater imagery texture, bends, eddies, ledges, guide notes, and access points.
+- [x] Define manual rapid-review labels for pools, riffles, wave trains, holes, ledges, laterals, strainers, portages, and access points.
+- [x] Pull USGS/NWIS gauge history, NOAA/NWPS/National Water Model context, StreamStats estimates, and local seasonal references where available.
+- [x] Derive runnable season windows, flow percentile bands, gauge-to-section transfer functions, stage/depth/width estimates, and data confidence scores.
+- [x] Map river + season + flow level + difficulty into solver parameters: boundary inflow/outflow, depth, momentum, roughness, aeration/turbulence, hole retention, wave trains, eddy-line shear, boil strength, shallows, hazards, raft drag, paddle catch, and damping.
+- [x] Build the player-facing data model for region, river, section, season, flow level, difficulty, and raft/crew setup.
+- [x] Convert at least one real-world river/season/difficulty selection into a shared scenario package that both PyClaw and the custom C++ solver can load.
+- [x] Create low, median, and high runnable flow validation matrix, including PyClaw availability/run status and C++ smoke results; full PyClaw/C++ match tuning remains the Milestone 10 readiness gate.
+- [x] Export an Unreal-ready real-world corridor package for later visualization: terrain, imagery masks, centerline, banks, rapids, hazards, flow presets, and confidence metadata.
 
 ## Milestone 10: Python-To-Unreal Readiness Gate
 

@@ -1,0 +1,71 @@
+{
+  "cpp_solver": "physics/cpp/tools/raftsim_water_solver built from physics/cpp during Milestone 9 smoke validation",
+  "pyclaw": {
+    "available": true,
+    "pyclaw_version": "5.14.0",
+    "reason": "PyClaw and Riemann shallow-water solver are importable.",
+    "riemann_solver": "shallow_roe_with_efix_2D"
+  },
+  "runs": [
+    {
+      "cpp_returncode": 0,
+      "cpp_validation_passed": true,
+      "difficulty": "beginner",
+      "duration_seconds": 0.15,
+      "eddy_line_shear": 0.27674999999999994,
+      "flow_band": "low_runnable",
+      "hole_retention_strength": 0.2536875,
+      "inflow_m3s": 25.4851619328,
+      "initial_depth_m": 1.1099999999999999,
+      "notes": "Milestone 9 smoke validation. Full matching/tuning remains Milestone 10 readiness work.",
+      "pyclaw_available": true,
+      "pyclaw_failure_reason": "run completed but validation reported non-finite fields and NaN mass drift in the final frame",
+      "pyclaw_validation_passed": false,
+      "roughness_manning_n": 0.0379375,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner",
+      "season": "late_summer_low_water",
+      "wave_train_strength": 0.4304999999999999
+    },
+    {
+      "cpp_returncode": 0,
+      "cpp_validation_passed": true,
+      "difficulty": "intermediate",
+      "duration_seconds": 0.15,
+      "eddy_line_shear": 0.6,
+      "flow_band": "median_runnable",
+      "hole_retention_strength": 0.55,
+      "inflow_m3s": 45.3069545472,
+      "initial_depth_m": 1.24,
+      "notes": "Milestone 9 smoke validation. Full matching/tuning remains Milestone 10 readiness work.",
+      "pyclaw_available": true,
+      "pyclaw_failure_reason": "run completed but validation reported non-finite fields and NaN mass drift in the final frame",
+      "pyclaw_validation_passed": false,
+      "roughness_manning_n": 0.041,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate",
+      "season": "summer_commercial",
+      "wave_train_strength": 0.7
+    },
+    {
+      "cpp_returncode": 0,
+      "cpp_validation_passed": true,
+      "difficulty": "advanced",
+      "duration_seconds": 0.15,
+      "eddy_line_shear": 1.3275,
+      "flow_band": "high_runnable",
+      "hole_retention_strength": 1.216875,
+      "inflow_m3s": 84.950539776,
+      "initial_depth_m": 1.4320393247567158,
+      "notes": "Milestone 9 smoke validation. Full matching/tuning remains Milestone 10 readiness work.",
+      "pyclaw_available": true,
+      "pyclaw_failure_reason": "run completed but validation reported non-finite fields and NaN mass drift in the final frame",
+      "pyclaw_validation_passed": false,
+      "roughness_manning_n": 0.045200000000000004,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced",
+      "season": "spring_runoff_or_release",
+      "wave_train_strength": 1.1310470812481679
+    }
+  ],
+  "solver_outputs_root": "not committed; regenerate with a temporary output directory during validation work",
+  "source_manifest": "south_fork_american_chili_bar/source_manifest.json",
+  "validation_matrix_version": "raftsim.real_world_validation.v0"
+}

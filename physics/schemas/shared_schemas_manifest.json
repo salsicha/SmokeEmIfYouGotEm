@@ -20,6 +20,11 @@
       "name": "parameters",
       "version": "raftsim.parameters.v0",
       "file": "parameters.schema.json"
+    },
+    {
+      "name": "source_manifest",
+      "version": "raftsim.source_manifest.v0",
+      "file": "source_manifest.schema.json"
     }
   ]
 }
