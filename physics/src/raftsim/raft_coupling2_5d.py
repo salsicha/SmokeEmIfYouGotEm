@@ -4,8 +4,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+import numpy as np
+from numpy.typing import NDArray
+
 from .math3d import Quaternion, Vec3
-from .scenario2_5d import RaftParameters2_5D
+from .scenario2_5d import Feature2_5D, RaftParameters2_5D, Scenario2_5D
+
+FloatGrid = NDArray[np.float64]
+BoolGrid = NDArray[np.bool_]
 
 
 @dataclass(frozen=True, slots=True)
@@ -143,3 +149,144 @@ def _sample_patches(params: RaftParameters2_5D) -> tuple[RaftSamplePatch, ...]:
                 )
             )
     return tuple(patches)
+
+
+@dataclass(frozen=True, slots=True)
+class WaterSample2_5D:
+    """Solver-neutral water sample at one world position."""
+
+    x: float
+    y: float
+    surface_height: float
+    bed_height: float
+    depth: float
+    velocity: Vec3
+    normal: Vec3
+    wet: bool
+    roughness: float
+    feature_tags: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class WaterField2_5D:
+    """Queryable 2.5D water field shared by PyClaw and C++ outputs."""
+
+    origin_x: float
+    origin_y: float
+    dx: float
+    dy: float
+    bed: FloatGrid
+    depth: FloatGrid
+    eta: FloatGrid
+    u: FloatGrid
+    v: FloatGrid
+    wet: BoolGrid
+    normal_x: FloatGrid
+    normal_y: FloatGrid
+    normal_z: FloatGrid
+    roughness: float = 0.035
+    features: tuple[Feature2_5D, ...] = ()
+
+    def __post_init__(self) -> None:
+        shape = np.asarray(self.depth).shape
+        for name in ("bed", "eta", "u", "v", "normal_x", "normal_y", "normal_z"):
+            array = np.asarray(getattr(self, name), dtype=np.float64)
+            if array.shape != shape:
+                raise ValueError(f"{name} shape {array.shape} does not match depth shape {shape}.")
+            object.__setattr__(self, name, array.copy())
+        wet = np.asarray(self.wet, dtype=np.bool_)
+        if wet.shape != shape:
+            raise ValueError(f"wet shape {wet.shape} does not match depth shape {shape}.")
+        object.__setattr__(self, "depth", np.asarray(self.depth, dtype=np.float64).copy())
+        object.__setattr__(self, "wet", wet.copy())
+        object.__setattr__(self, "features", tuple(self.features))
+
+    @classmethod
+    def from_scenario_initial_state(cls, scenario: Scenario2_5D) -> WaterField2_5D:
+        normal_x, normal_y, normal_z = _surface_normals(scenario.initial_state.eta, scenario.grid.dx, scenario.grid.dy)
+        return cls(
+            origin_x=scenario.grid.origin_x,
+            origin_y=scenario.grid.origin_y,
+            dx=scenario.grid.dx,
+            dy=scenario.grid.dy,
+            bed=scenario.bed,
+            depth=scenario.initial_state.depth,
+            eta=scenario.initial_state.eta,
+            u=scenario.initial_state.u,
+            v=scenario.initial_state.v,
+            wet=scenario.initial_state.wet,
+            normal_x=normal_x,
+            normal_y=normal_y,
+            normal_z=normal_z,
+            roughness=scenario.roughness,
+            features=scenario.features,
+        )
+
+    @property
+    def shape(self) -> tuple[int, int]:
+        return self.depth.shape
+
+    def sample(self, x: float, y: float) -> WaterSample2_5D:
+        row, col = self._nearest_index(x, y)
+        normal = Vec3(
+            _bilinear(self.normal_x, x, y, self.origin_x, self.origin_y, self.dx, self.dy),
+            _bilinear(self.normal_y, x, y, self.origin_x, self.origin_y, self.dx, self.dy),
+            _bilinear(self.normal_z, x, y, self.origin_x, self.origin_y, self.dx, self.dy),
+        ).normalized()
+        return WaterSample2_5D(
+            x=x,
+            y=y,
+            surface_height=_bilinear(self.eta, x, y, self.origin_x, self.origin_y, self.dx, self.dy),
+            bed_height=_bilinear(self.bed, x, y, self.origin_x, self.origin_y, self.dx, self.dy),
+            depth=max(0.0, _bilinear(self.depth, x, y, self.origin_x, self.origin_y, self.dx, self.dy)),
+            velocity=Vec3(
+                _bilinear(self.u, x, y, self.origin_x, self.origin_y, self.dx, self.dy),
+                _bilinear(self.v, x, y, self.origin_x, self.origin_y, self.dx, self.dy),
+                0.0,
+            ),
+            normal=normal,
+            wet=bool(self.wet[row, col]),
+            roughness=self.roughness,
+            feature_tags=_feature_tags_at(x, y, self.features, self.dx, self.dy),
+        )
+
+    def _nearest_index(self, x: float, y: float) -> tuple[int, int]:
+        ny, nx = self.shape
+        col = int(np.clip(round((x - self.origin_x) / self.dx), 0, nx - 1))
+        row = int(np.clip(round((y - self.origin_y) / self.dy), 0, ny - 1))
+        return row, col
+
+
+def _surface_normals(eta: FloatGrid, dx: float, dy: float) -> tuple[FloatGrid, FloatGrid, FloatGrid]:
+    slope_y, slope_x = np.gradient(np.asarray(eta, dtype=np.float64), dy, dx)
+    normal_x = -slope_x
+    normal_y = -slope_y
+    normal_z = np.ones_like(normal_x)
+    length = np.sqrt(normal_x**2 + normal_y**2 + normal_z**2)
+    return normal_x / length, normal_y / length, normal_z / length
+
+
+def _bilinear(array: FloatGrid, x: float, y: float, origin_x: float, origin_y: float, dx: float, dy: float) -> float:
+    ny, nx = array.shape
+    fx = np.clip((x - origin_x) / dx, 0.0, nx - 1.0)
+    fy = np.clip((y - origin_y) / dy, 0.0, ny - 1.0)
+    x0 = int(np.floor(fx))
+    y0 = int(np.floor(fy))
+    x1 = min(x0 + 1, nx - 1)
+    y1 = min(y0 + 1, ny - 1)
+    tx = fx - x0
+    ty = fy - y0
+    a = array[y0, x0] * (1.0 - tx) + array[y0, x1] * tx
+    b = array[y1, x0] * (1.0 - tx) + array[y1, x1] * tx
+    return float(a * (1.0 - ty) + b * ty)
+
+
+def _feature_tags_at(x: float, y: float, features: tuple[Feature2_5D, ...], dx: float, dy: float) -> tuple[str, ...]:
+    tags: list[str] = []
+    for feature in features:
+        scale_x = max(feature.length * 0.5, feature.radius, dx)
+        scale_y = max(feature.width * 0.5, feature.radius, dy)
+        distance = ((x - feature.center[0]) / scale_x) ** 2 + ((y - feature.center[1]) / scale_y) ** 2
+        if distance <= 1.0:
+            tags.append(feature.kind)
+    return tuple(tags)

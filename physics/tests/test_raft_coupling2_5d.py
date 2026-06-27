@@ -3,8 +3,13 @@ import math
 import pytest
 
 from raftsim.math3d import Quaternion, Vec3
-from raftsim.raft_coupling2_5d import RaftSamplePatch, RaftState6DoF, build_default_raft_mass_properties
-from raftsim.scenario2_5d import RaftParameters2_5D
+from raftsim.raft_coupling2_5d import (
+    RaftSamplePatch,
+    RaftState6DoF,
+    WaterField2_5D,
+    build_default_raft_mass_properties,
+)
+from raftsim.scenario2_5d import FixtureScenario2_5DParameters, RaftParameters2_5D, generate_fixture_scenario2_5d
 
 
 def test_raft_state_advances_linear_and_angular_motion():
@@ -63,3 +68,19 @@ def test_sample_patch_requires_positive_area_and_normalizes_normal():
     assert patch.local_normal == Vec3(0.0, 0.0, 1.0)
     with pytest.raises(ValueError):
         RaftSamplePatch("bad", Vec3(), 0.0)
+
+
+def test_water_field_samples_solver_neutral_fields_and_feature_tags():
+    scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="dam_break", nx=16, ny=8))
+    field = WaterField2_5D.from_scenario_initial_state(scenario)
+    feature = scenario.features[0]
+
+    sample = field.sample(feature.center[0], feature.center[1])
+
+    assert scenario.initial_state.eta.min() <= sample.surface_height <= scenario.initial_state.eta.max()
+    assert sample.depth > 0.0
+    assert sample.wet is True
+    assert sample.velocity.z == 0.0
+    assert sample.normal.magnitude == pytest.approx(1.0)
+    assert sample.roughness == scenario.roughness
+    assert "ledge" in sample.feature_tags
