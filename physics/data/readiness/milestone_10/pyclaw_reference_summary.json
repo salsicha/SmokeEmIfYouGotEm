@@ -1,0 +1,269 @@
+{
+  "available": true,
+  "passed": true,
+  "pyclaw_version": "5.14.0",
+  "run_count": 7,
+  "runs": [
+    {
+      "checks": [
+        {
+          "details": "frames=2",
+          "name": "has_frames",
+          "passed": true
+        },
+        {
+          "details": "frames=2",
+          "name": "finite_fields",
+          "passed": true
+        },
+        {
+          "details": "min_depth=1.250000",
+          "name": "nonnegative_depth",
+          "passed": true
+        },
+        {
+          "details": "max_velocity=0.000000",
+          "name": "bounded_velocity",
+          "passed": true
+        },
+        {
+          "details": "relative_drift=0.000000",
+          "name": "mass_conservation",
+          "passed": true
+        },
+        {
+          "details": "max_speed=0.000000e+00",
+          "name": "still_water_velocity",
+          "passed": true
+        },
+        {
+          "details": "eta_range=0.000000e+00",
+          "name": "still_water_surface",
+          "passed": true
+        }
+      ],
+      "frame_count": 2,
+      "mass_relative_drift": 0.0,
+      "max_velocity": 0.0,
+      "min_depth": 1.25,
+      "passed": true,
+      "scenario_id": "flat_pool_seed_100"
+    },
+    {
+      "checks": [
+        {
+          "details": "frames=2",
+          "name": "has_frames",
+          "passed": true
+        },
+        {
+          "details": "frames=2",
+          "name": "finite_fields",
+          "passed": true
+        },
+        {
+          "details": "min_depth=1.250000",
+          "name": "nonnegative_depth",
+          "passed": true
+        },
+        {
+          "details": "max_velocity=1.400000",
+          "name": "bounded_velocity",
+          "passed": true
+        },
+        {
+          "details": "relative_drift=0.000000",
+          "name": "mass_conservation",
+          "passed": true
+        },
+        {
+          "details": "depth_error=0.000000e+00",
+          "name": "uniform_channel_initial_depth",
+          "passed": true
+        }
+      ],
+      "frame_count": 2,
+      "mass_relative_drift": 0.0,
+      "max_velocity": 1.4,
+      "min_depth": 1.25,
+      "passed": true,
+      "scenario_id": "uniform_channel_seed_101"
+    },
+    {
+      "checks": [
+        {
+          "details": "frames=2",
+          "name": "has_frames",
+          "passed": true
+        },
+        {
+          "details": "frames=2",
+          "name": "finite_fields",
+          "passed": true
+        },
+        {
+          "details": "min_depth=0.800000",
+          "name": "nonnegative_depth",
+          "passed": true
+        },
+        {
+          "details": "max_velocity=1.591520",
+          "name": "bounded_velocity",
+          "passed": true
+        },
+        {
+          "details": "relative_drift=0.001280",
+          "name": "mass_conservation",
+          "passed": true
+        }
+      ],
+      "frame_count": 2,
+      "mass_relative_drift": 0.0012804878048780011,
+      "max_velocity": 1.5915201822751248,
+      "min_depth": 0.8,
+      "passed": true,
+      "scenario_id": "bed_step_seed_102"
+    },
+    {
+      "checks": [
+        {
+          "details": "frames=2",
+          "name": "has_frames",
+          "passed": true
+        },
+        {
+          "details": "frames=2",
+          "name": "finite_fields",
+          "passed": true
+        },
+        {
+          "details": "min_depth=0.010000",
+          "name": "nonnegative_depth",
+          "passed": true
+        },
+        {
+          "details": "max_velocity=3.127215",
+          "name": "bounded_velocity",
+          "passed": true
+        },
+        {
+          "details": "relative_drift=0.000521",
+          "name": "mass_conservation",
+          "passed": true
+        }
+      ],
+      "frame_count": 2,
+      "mass_relative_drift": 0.0005212459727720643,
+      "max_velocity": 3.127214686917199,
+      "min_depth": 0.01,
+      "passed": true,
+      "scenario_id": "procedural_rapid_seed_103"
+    },
+    {
+      "checks": [
+        {
+          "details": "frames=2",
+          "name": "has_frames",
+          "passed": true
+        },
+        {
+          "details": "frames=2",
+          "name": "finite_fields",
+          "passed": true
+        },
+        {
+          "details": "min_depth=0.010000",
+          "name": "nonnegative_depth",
+          "passed": true
+        },
+        {
+          "details": "max_velocity=2.032285",
+          "name": "bounded_velocity",
+          "passed": true
+        },
+        {
+          "details": "relative_drift=0.000032",
+          "name": "mass_conservation",
+          "passed": true
+        }
+      ],
+      "frame_count": 2,
+      "mass_relative_drift": 3.2406552250814314e-05,
+      "max_velocity": 2.0322847869233813,
+      "min_depth": 0.01,
+      "passed": true,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner"
+    },
+    {
+      "checks": [
+        {
+          "details": "frames=2",
+          "name": "has_frames",
+          "passed": true
+        },
+        {
+          "details": "frames=2",
+          "name": "finite_fields",
+          "passed": true
+        },
+        {
+          "details": "min_depth=0.010000",
+          "name": "nonnegative_depth",
+          "passed": true
+        },
+        {
+          "details": "max_velocity=2.785437",
+          "name": "bounded_velocity",
+          "passed": true
+        },
+        {
+          "details": "relative_drift=0.000063",
+          "name": "mass_conservation",
+          "passed": true
+        }
+      ],
+      "frame_count": 2,
+      "mass_relative_drift": 6.29539166385627e-05,
+      "max_velocity": 2.7854365191986896,
+      "min_depth": 0.01,
+      "passed": true,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate"
+    },
+    {
+      "checks": [
+        {
+          "details": "frames=2",
+          "name": "has_frames",
+          "passed": true
+        },
+        {
+          "details": "frames=2",
+          "name": "finite_fields",
+          "passed": true
+        },
+        {
+          "details": "min_depth=0.009996",
+          "name": "nonnegative_depth",
+          "passed": true
+        },
+        {
+          "details": "max_velocity=4.240710",
+          "name": "bounded_velocity",
+          "passed": true
+        },
+        {
+          "details": "relative_drift=0.000121",
+          "name": "mass_conservation",
+          "passed": true
+        }
+      ],
+      "frame_count": 2,
+      "mass_relative_drift": 0.00012081337895564647,
+      "max_velocity": 4.24071002602764,
+      "min_depth": 0.00999560245246949,
+      "passed": true,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced"
+    }
+  ],
+  "solver_outputs_committed": false
+}

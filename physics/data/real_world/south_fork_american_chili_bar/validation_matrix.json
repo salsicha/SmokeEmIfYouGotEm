@@ -1,5 +1,5 @@
 {
-  "cpp_solver": "physics/cpp/tools/raftsim_water_solver built from physics/cpp during Milestone 9 smoke validation",
+  "cpp_solver": "physics/cpp/tools/raftsim_water_solver built from physics/cpp during Milestone 10 smoke validation",
   "pyclaw": {
     "available": true,
     "pyclaw_version": "5.14.0",
@@ -8,6 +8,7 @@
   },
   "runs": [
     {
+      "cpp_mass_relative_drift": 0.014448972855913346,
       "cpp_returncode": 0,
       "cpp_validation_passed": true,
       "difficulty": "beginner",
@@ -17,16 +18,17 @@
       "hole_retention_strength": 0.2536875,
       "inflow_m3s": 25.4851619328,
       "initial_depth_m": 1.1099999999999999,
-      "notes": "Milestone 9 smoke validation. Full matching/tuning remains Milestone 10 readiness work.",
+      "notes": "Milestone 10 smoke validation after PyClaw reference shelf. Full field/probe threshold matching is tracked in the Milestone 10 readiness report.",
       "pyclaw_available": true,
-      "pyclaw_failure_reason": "run completed but validation reported non-finite fields and NaN mass drift in the final frame",
-      "pyclaw_validation_passed": false,
+      "pyclaw_mass_relative_drift": 9.837622465225788e-05,
+      "pyclaw_validation_passed": true,
       "roughness_manning_n": 0.0379375,
       "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner",
       "season": "late_summer_low_water",
       "wave_train_strength": 0.4304999999999999
     },
     {
+      "cpp_mass_relative_drift": 0.015247076535714459,
       "cpp_returncode": 0,
       "cpp_validation_passed": true,
       "difficulty": "intermediate",
@@ -36,16 +38,17 @@
       "hole_retention_strength": 0.55,
       "inflow_m3s": 45.3069545472,
       "initial_depth_m": 1.24,
-      "notes": "Milestone 9 smoke validation. Full matching/tuning remains Milestone 10 readiness work.",
+      "notes": "Milestone 10 smoke validation after PyClaw reference shelf. Full field/probe threshold matching is tracked in the Milestone 10 readiness report.",
       "pyclaw_available": true,
-      "pyclaw_failure_reason": "run completed but validation reported non-finite fields and NaN mass drift in the final frame",
-      "pyclaw_validation_passed": false,
+      "pyclaw_mass_relative_drift": 0.0001906330520161388,
+      "pyclaw_validation_passed": true,
       "roughness_manning_n": 0.041,
       "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate",
       "season": "summer_commercial",
       "wave_train_strength": 0.7
     },
     {
+      "cpp_mass_relative_drift": 0.01704512938548211,
       "cpp_returncode": 0,
       "cpp_validation_passed": true,
       "difficulty": "advanced",
@@ -55,10 +58,10 @@
       "hole_retention_strength": 1.216875,
       "inflow_m3s": 84.950539776,
       "initial_depth_m": 1.4320393247567158,
-      "notes": "Milestone 9 smoke validation. Full matching/tuning remains Milestone 10 readiness work.",
+      "notes": "Milestone 10 smoke validation after PyClaw reference shelf. Full field/probe threshold matching is tracked in the Milestone 10 readiness report.",
       "pyclaw_available": true,
-      "pyclaw_failure_reason": "run completed but validation reported non-finite fields and NaN mass drift in the final frame",
-      "pyclaw_validation_passed": false,
+      "pyclaw_mass_relative_drift": 0.0003661271936209661,
+      "pyclaw_validation_passed": true,
       "roughness_manning_n": 0.045200000000000004,
       "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced",
       "season": "spring_runoff_or_release",
@@ -67,5 +70,5 @@
   ],
   "solver_outputs_root": "not committed; regenerate with a temporary output directory during validation work",
   "source_manifest": "south_fork_american_chili_bar/source_manifest.json",
-  "validation_matrix_version": "raftsim.real_world_validation.v0"
+  "validation_matrix_version": "raftsim.real_world_validation.v1"
 }

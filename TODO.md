@@ -147,17 +147,17 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 
 ## Milestone 10: Python-To-Unreal Readiness Gate
 
-- [ ] Complete PyClaw reference scenarios.
-- [ ] Complete custom C++ solver scenarios.
-- [ ] Complete dual-solver comparison and tuning reports.
-- [ ] Complete 2.5D raft coupling validation against both solvers.
-- [ ] Complete the first real-world river section scenario with season, flow, difficulty, gauge, imagery, terrain, and source-manifest data.
-- [ ] Validate adaptive fluid parameters across low, medium, and high runnable flows for at least one real-world section.
-- [ ] Complete profiling and runtime budget reports.
-- [ ] Export representative telemetry/replay files for Unreal visualization.
-- [ ] Export at least one real-world corridor package for Unreal preproduction.
-- [ ] Write a Python-to-Unreal readiness report with risks, budgets, runtime choices, and accepted model limitations.
-- [ ] Explicitly approve starting the production Unreal project only after this gate is complete.
+- [x] Complete PyClaw reference scenarios.
+- [x] Complete custom C++ solver scenarios.
+- [x] Complete dual-solver comparison and tuning reports; current gate decision is blocked because the real-world median scenario exceeds field, probe, cross-section, and Froude thresholds.
+- [x] Complete 2.5D raft coupling validation against both solvers.
+- [x] Complete the first real-world river section scenario with season, flow, difficulty, gauge, imagery, terrain, and source-manifest data.
+- [x] Validate adaptive fluid parameters across low, medium, and high runnable flows for at least one real-world section.
+- [x] Complete profiling and runtime budget reports.
+- [x] Export representative telemetry/replay files for Unreal visualization.
+- [x] Export at least one real-world corridor package for Unreal preproduction.
+- [x] Write a Python-to-Unreal readiness report with risks, budgets, runtime choices, and accepted model limitations.
+- [x] Explicitly record the gate decision: production Unreal project start is blocked until the real-world dual-solver threshold mismatch is resolved.
 
 ## Milestone 11: Unreal Engine Full Game Production
 

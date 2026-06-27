@@ -1,0 +1,168 @@
+{
+  "available": true,
+  "comparisons": [
+    {
+      "checks": [
+        {
+          "details": "Max Linf across h/eta/u/v/hu/hv/normals.",
+          "name": "field_linf",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.0
+        },
+        {
+          "details": "Max Linf across eta slope fields.",
+          "name": "slope_linf",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.0
+        },
+        {
+          "details": "Max wet/dry mask mismatch fraction across compared frames.",
+          "name": "wet_mismatch_fraction",
+          "passed": true,
+          "threshold": 0.02,
+          "value": 0.0
+        },
+        {
+          "details": "Max Linf across point-probe fields.",
+          "name": "probe_linf",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.0
+        },
+        {
+          "details": "Max Linf across cross-section fields.",
+          "name": "cross_section_linf",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.0
+        },
+        {
+          "details": "Absolute C++ minus PyClaw mass-drift delta.",
+          "name": "mass_drift_delta",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 0.0
+        },
+        {
+          "details": "Absolute C++ minus PyClaw energy-change delta.",
+          "name": "energy_change_delta",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.0
+        },
+        {
+          "details": "Max absolute Froude summary delta.",
+          "name": "froude_delta",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.0
+        },
+        {
+          "details": "Max observed feature response location delta.",
+          "name": "feature_location_delta",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 0.0
+        },
+        {
+          "details": "Max observed feature response strength delta.",
+          "name": "feature_strength_delta",
+          "passed": true,
+          "threshold": 10.0,
+          "value": 0.0
+        }
+      ],
+      "passed": true,
+      "scenario_id": "flat_pool_seed_100"
+    },
+    {
+      "checks": [
+        {
+          "details": "Max Linf across h/eta/u/v/hu/hv/normals.",
+          "name": "field_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 2.779088506878723
+        },
+        {
+          "details": "Max Linf across eta slope fields.",
+          "name": "slope_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.34779321149079956
+        },
+        {
+          "details": "Max wet/dry mask mismatch fraction across compared frames.",
+          "name": "wet_mismatch_fraction",
+          "passed": true,
+          "threshold": 0.02,
+          "value": 0.0078125
+        },
+        {
+          "details": "Max Linf across point-probe fields.",
+          "name": "probe_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 4.110369395167335
+        },
+        {
+          "details": "Max Linf across cross-section fields.",
+          "name": "cross_section_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 2.1954376070161885
+        },
+        {
+          "details": "Absolute C++ minus PyClaw mass-drift delta.",
+          "name": "mass_drift_delta",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 0.014197072113766885
+        },
+        {
+          "details": "Absolute C++ minus PyClaw energy-change delta.",
+          "name": "energy_change_delta",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.15092566183133885
+        },
+        {
+          "details": "Max absolute Froude summary delta.",
+          "name": "froude_delta",
+          "passed": false,
+          "threshold": 0.5,
+          "value": 3.6131008071254422
+        },
+        {
+          "details": "Max observed feature response location delta.",
+          "name": "feature_location_delta",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 4.47213595499958
+        },
+        {
+          "details": "Max observed feature response strength delta.",
+          "name": "feature_strength_delta",
+          "passed": true,
+          "threshold": 10.0,
+          "value": 1.067188726990142
+        }
+      ],
+      "passed": false,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate"
+    }
+  ],
+  "passed": false,
+  "tuning": {
+    "best_candidate": {
+      "feature_strength_scale": 1.0,
+      "label": "baseline",
+      "roughness_scale": 1.0
+    },
+    "best_passed": true,
+    "candidate_count": 2,
+    "scenario_id": "flat_pool_seed_100"
+  }
+}

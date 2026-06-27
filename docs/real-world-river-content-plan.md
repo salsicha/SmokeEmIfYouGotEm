@@ -32,7 +32,7 @@ Implemented artifacts:
 - `physics/data/real_world/south_fork_american_chili_bar/rapid_candidates.geojson`: candidate rapid points derived from DEM-slope, constriction, roughness, boulder-density, imagery-texture, bend, guide-note, and access signals.
 - `physics/data/real_world/south_fork_american_chili_bar/scenario/`: loadable shared `scenario2_5d` package for PyClaw and the custom C++ solver path.
 - `physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json`: first Unreal-ready corridor package manifest with terrain, imagery mask, centerline, bank, rapid, hazard, flow, and confidence artifact slots.
-- `physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json`: low, median, and high runnable flow smoke matrix. The C++ solver smoke passes for each band. PyClaw is available and runs, but the seed real-world scenarios currently produce non-finite fields in the PyClaw validation frame, so matching/tuning is explicitly carried into Milestone 10.
+- `physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json`: low, median, and high runnable flow smoke matrix. PyClaw and the C++ solver both validate each band after the PyClaw reference export adds a 1 cm shallow shelf for exact dry cells. Full field/probe/Froude matching is tracked by the Milestone 10 readiness report.
 
 The seed package records metadata-ready fetch specs for 3DEP/DEM, 3DHP/NHD, OSM, NAIP, USGS/NWIS, NOAA/NWPS/National Water Model, and StreamStats. It does not vendor heavy lidar, imagery, guidebook text, or field media. Production extraction must replace the coarse seed measurements with pulled geospatial/hydrology data, reviewed aerial/satellite labels, and rights-cleared media.
 
@@ -42,7 +42,7 @@ Regenerate the seed source/scenario package:
 python -m raftsim.examples.generate_real_world_scenario --write-full-package --output-dir outputs/real_world
 ```
 
-The validation matrix is a recorded smoke-run result, not a static source-data export. Rebuild it during Milestone 10 with fresh PyClaw and C++ solver outputs before accepting any real-world flow preset.
+The validation matrix is a recorded smoke-run result, not a static source-data export. Rebuild it with fresh PyClaw and C++ solver outputs before accepting any real-world flow preset.
 
 Generate one selected scenario:
 
@@ -50,7 +50,7 @@ Generate one selected scenario:
 python -m raftsim.examples.generate_real_world_scenario --flow-band high_runnable --difficulty advanced --output-dir outputs/real_world
 ```
 
-Milestone 10 remains the acceptance gate for full PyClaw/custom-C++ low, median, and high flow validation, solver tuning, profiling, and production-ready Unreal corridor export.
+Milestone 10 generated the first readiness gate artifacts. Its current decision is blocked: the real-world median dual-solver comparison exceeds field, probe, cross-section, and Froude thresholds, so production Unreal work should wait until that mismatch is resolved.
 
 ## Engine And Rendering Direction
 
