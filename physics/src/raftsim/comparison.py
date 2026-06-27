@@ -74,6 +74,8 @@ class FieldComparisonReport:
         return {
             "scenario_id": self.scenario_id,
             "frame_comparisons": [comparison.to_json_dict() for comparison in self.frame_comparisons],
+            "aggregate_field_errors": [_aggregate.to_json_dict() for _aggregate in _aggregate_errors(self.frame_comparisons, "field")],
+            "aggregate_slope_errors": [_aggregate.to_json_dict() for _aggregate in _aggregate_errors(self.frame_comparisons, "slope")],
         }
 
     def write_json(self, path: str | Path) -> Path:
@@ -102,6 +104,22 @@ class SeriesComparison:
             "candidate_sample_count": self.candidate_sample_count,
             "max_time_delta": self.max_time_delta,
             "max_distance_delta": self.max_distance_delta,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class AggregateErrorSummary:
+    field: str
+    max_l1: float
+    max_l2: float
+    max_linf: float
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "field": self.field,
+            "max_l1": self.max_l1,
+            "max_l2": self.max_l2,
+            "max_linf": self.max_linf,
         }
 
 
@@ -368,6 +386,26 @@ def _matched_files(
         if candidate_path is not None:
             matched.append((sample_id, reference_root / path, candidate_path))
     return tuple(matched)
+
+
+def _aggregate_errors(
+    frame_comparisons: tuple[FrameFieldComparison, ...],
+    kind: str,
+) -> tuple[AggregateErrorSummary, ...]:
+    by_field: dict[str, list[FieldErrorSummary]] = {}
+    for comparison in frame_comparisons:
+        summaries = comparison.field_errors if kind == "field" else comparison.slope_errors
+        for summary in summaries:
+            by_field.setdefault(summary.field, []).append(summary)
+    return tuple(
+        AggregateErrorSummary(
+            field=field,
+            max_l1=max(summary.l1 for summary in summaries),
+            max_l2=max(summary.l2 for summary in summaries),
+            max_linf=max(summary.linf for summary in summaries),
+        )
+        for field, summaries in sorted(by_field.items())
+    )
 
 
 def _frame_pairings(pyclaw_frames: list[Path], cpp_frames: list[Path]) -> tuple[tuple[str, Path, Path], ...]:
