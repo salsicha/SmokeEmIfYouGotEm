@@ -160,6 +160,25 @@ def run_dual_solver_scenario(
     return result
 
 
+def run_cpp_solver_scenario(
+    scenario_or_path: Scenario2_5D | str | Path,
+    *,
+    output_dir: str | Path,
+    config: CppSolverRunConfig,
+) -> CppSolverRunResult:
+    """Run only the standalone C++ reduced water solver on one scenario."""
+
+    root = Path(output_dir)
+    root.mkdir(parents=True, exist_ok=True)
+    scenario, scenario_dir = _materialize_scenario_package(scenario_or_path, root)
+    return _run_cpp_solver(
+        scenario,
+        scenario_dir=scenario_dir,
+        output_root=root / "cpp_solver",
+        config=config,
+    )
+
+
 def _materialize_scenario_package(scenario_or_path: Scenario2_5D | str | Path, root: Path) -> tuple[Scenario2_5D, Path]:
     if isinstance(scenario_or_path, Scenario2_5D):
         scenario = scenario_or_path

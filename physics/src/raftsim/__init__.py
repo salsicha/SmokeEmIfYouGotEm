@@ -57,6 +57,7 @@ from .dual_solver import (
     CppSolverRunResult,
     DualSolverRunConfig,
     DualSolverRunResult,
+    run_cpp_solver_scenario,
     run_dual_solver_scenario,
 )
 from .comparison import (
@@ -90,7 +91,7 @@ from .tuning import (
     tune_cpp_solver_against_pyclaw,
 )
 from .regression import RegressionPromotionResult, promote_passing_dual_solver_run
-from .profiling import ProfiledSolverRun, SolverProfileReport, profile_pyclaw_reference_runs
+from .profiling import ProfiledSolverRun, SolverProfileReport, profile_cpp_solver_runs, profile_pyclaw_reference_runs
 from .raft_coupling2_5d import (
     PaddleBladePose2_5D,
     PaddleBladeSample2_5D,
@@ -257,7 +258,9 @@ __all__ = [
     "generate_river_2d",
     "read_scenario2_5d_package",
     "promote_passing_dual_solver_run",
+    "profile_cpp_solver_runs",
     "profile_pyclaw_reference_runs",
+    "run_cpp_solver_scenario",
     "run_dual_solver_scenario",
     "run_pyclaw_reference",
     "select_backend",

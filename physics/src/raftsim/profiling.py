@@ -8,6 +8,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from time import perf_counter
 
+from .dual_solver import CppSolverRunConfig, CppSolverRunResult, run_cpp_solver_scenario
 from .pyclaw_reference import PyClawReferenceResult, PyClawRunConfig, run_pyclaw_reference
 from .scenario2_5d import Scenario2_5D
 
@@ -76,6 +77,7 @@ class SolverProfileReport:
 
 
 PyClawProfileRunner = Callable[..., PyClawReferenceResult]
+CppProfileRunner = Callable[..., CppSolverRunResult]
 Clock = Callable[[], float]
 
 
@@ -122,3 +124,62 @@ def profile_pyclaw_reference_runs(
                 )
             )
     return SolverProfileReport("pyclaw", tuple(runs))
+
+
+def profile_cpp_solver_runs(
+    scenarios: Iterable[Scenario2_5D],
+    *,
+    config: CppSolverRunConfig,
+    repetitions: int = 1,
+    output_dir: str | Path | None = None,
+    runner: CppProfileRunner = run_cpp_solver_scenario,
+    clock: Clock = perf_counter,
+) -> SolverProfileReport:
+    """Profile the standalone C++ reduced solver for target runtime cost."""
+
+    if repetitions < 1:
+        raise ValueError("repetitions must be at least 1.")
+    output_root = Path(output_dir) if output_dir is not None else None
+    runs: list[ProfiledSolverRun] = []
+    for scenario in scenarios:
+        for repetition in range(repetitions):
+            run_output_dir = Path(f"{scenario.metadata.scenario_id}_rep_{repetition:02d}")
+            if output_root is not None:
+                run_output_dir = output_root / scenario.metadata.scenario_id / f"rep_{repetition:02d}"
+            started = clock()
+            result = runner(scenario, output_dir=run_output_dir, config=config)
+            finished = clock()
+            wall_runtime_seconds = max(0.0, finished - started)
+            runtime_seconds = max(0.0, result.runtime_seconds)
+            simulated_seconds = max(float(scenario.duration), 1.0e-9)
+            grid_cells = scenario.grid.nx * scenario.grid.ny
+            runs.append(
+                ProfiledSolverRun(
+                    solver="cpp_reduced",
+                    scenario_id=scenario.metadata.scenario_id,
+                    repetition=repetition,
+                    grid_cells=grid_cells,
+                    simulated_seconds=float(scenario.duration),
+                    output_frames=_cpp_output_frame_count(result.manifest_path),
+                    runtime_seconds=runtime_seconds,
+                    seconds_per_simulated_second=runtime_seconds / simulated_seconds,
+                    cell_seconds_per_simulated_second=runtime_seconds / (simulated_seconds * max(grid_cells, 1)),
+                    validation_passed=result.returncode == 0,
+                    run_status={
+                        "returncode": result.returncode,
+                        "profile_wall_seconds": wall_runtime_seconds,
+                        "manifest": str(result.manifest_path),
+                        "validation": str(result.validation_path),
+                    },
+                )
+            )
+    return SolverProfileReport("cpp_reduced", tuple(runs))
+
+
+def _cpp_output_frame_count(manifest_path: Path) -> int:
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except OSError:
+        return 0
+    frames = manifest.get("frames", [])
+    return len(frames) if isinstance(frames, list) else 0

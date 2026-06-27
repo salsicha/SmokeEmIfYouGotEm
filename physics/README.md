@@ -354,7 +354,7 @@ Milestone 6 adds deterministic whitewater feature validators. `validate_standing
 
 ## Profiling
 
-Milestone 7 starts with `profile_pyclaw_reference_runs()`, which records PyClaw research-loop runtime, seconds per simulated second, cell-normalized cost, output frame count, validation status, and run metadata. Use `python -m raftsim.examples.profile_pyclaw_reference --fixture uniform_channel --repetitions 3 --output-dir outputs/profiles/pyclaw` to write run artifacts plus `pyclaw_profile.json`.
+Milestone 7 starts with solver profilers that record runtime, seconds per simulated second, cell-normalized cost, output frame count, validation status, and run metadata. Use `python -m raftsim.examples.profile_pyclaw_reference --fixture uniform_channel --repetitions 3 --output-dir outputs/profiles/pyclaw` to write PyClaw run artifacts plus `pyclaw_profile.json`. Use `python -m raftsim.examples.profile_cpp_solver --cpp-solver build/raftsim_water_solver --fixture uniform_channel --repetitions 5 --output-dir outputs/profiles/cpp_solver` to profile the custom C++ reduced solver against target runtime budgets.
 
 ## Next Milestone
 
