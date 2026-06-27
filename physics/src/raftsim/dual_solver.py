@@ -21,6 +21,7 @@ class CppSolverRunConfig:
     steps: int | None = None
     frame_interval: int | None = None
     feature_strength_scale: float = 1.0
+    roughness_scale: float = 1.0
     allow_validation_failure: bool = True
 
     def __post_init__(self) -> None:
@@ -30,6 +31,8 @@ class CppSolverRunConfig:
             raise ValueError("frame_interval must be at least 1 when provided.")
         if self.feature_strength_scale <= 0.0:
             raise ValueError("feature_strength_scale must be positive.")
+        if self.roughness_scale <= 0.0:
+            raise ValueError("roughness_scale must be positive.")
 
     def to_json_dict(self) -> dict[str, object]:
         data = asdict(self)
@@ -196,6 +199,8 @@ def _run_cpp_solver(
         str(frame_interval),
         "--feature-strength-scale",
         str(config.feature_strength_scale),
+        "--roughness-scale",
+        str(config.roughness_scale),
     )
     start = time.perf_counter()
     completed = subprocess.run(command, check=False, capture_output=True, text=True)

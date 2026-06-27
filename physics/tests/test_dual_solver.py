@@ -15,6 +15,7 @@ from raftsim.comparison import (
 from raftsim.dual_solver import CppSolverRunConfig, DualSolverRunConfig, run_dual_solver_scenario
 from raftsim.pyclaw_reference import PyClawRunConfig, check_pyclaw_availability
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
+from raftsim.tuning import CppTuningCandidate, tune_cpp_solver_against_pyclaw
 
 
 def _build_cpp_solver(tmp_path: Path) -> Path:
@@ -221,3 +222,32 @@ def test_threshold_evaluation_reports_scenario_pass_fail(tmp_path):
     assert report.passed is True
     assert report_data["passed"] is True
     assert {check.name for check in report.checks} >= {"field_linf", "probe_linf", "mass_drift_delta"}
+
+
+def test_cpp_tuning_selects_best_candidate(tmp_path):
+    availability = check_pyclaw_availability()
+    if not availability.available:
+        pytest.skip(f"PyClaw unavailable: {availability.reason}")
+    cpp_solver = _build_cpp_solver(tmp_path)
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="flat_pool", seed=18, nx=10, ny=6, duration=1.0 / 60.0)
+    )
+
+    report = tune_cpp_solver_against_pyclaw(
+        scenario,
+        output_dir=tmp_path / "tuning",
+        cpp_solver_executable=cpp_solver,
+        candidates=(
+            CppTuningCandidate("baseline", feature_strength_scale=1.0, roughness_scale=1.0),
+            CppTuningCandidate("rougher", feature_strength_scale=1.0, roughness_scale=1.2),
+        ),
+        pyclaw_config=PyClawRunConfig(num_output_times=1),
+        cpp_steps=1,
+        cpp_frame_interval=1,
+    )
+    report_data = json.loads((tmp_path / "tuning" / "tuning_report.json").read_text(encoding="utf-8"))
+
+    assert report.scenario_id == scenario.metadata.scenario_id
+    assert len(report.candidates) == 2
+    assert report.best_candidate.candidate.label in {"baseline", "rougher"}
+    assert report_data["best_candidate"]["candidate"]["label"] == report.best_candidate.candidate.label
