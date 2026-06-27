@@ -60,6 +60,7 @@ from .dual_solver import (
     run_dual_solver_scenario,
 )
 from .comparison import (
+    AggregateErrorSummary,
     FieldComparisonReport,
     FieldErrorSummary,
     FrameFieldComparison,
@@ -91,6 +92,7 @@ from .backends import (
 )
 
 __all__ = [
+    "AggregateErrorSummary",
     "BackendCapabilities",
     "BackendStatus",
     "BackendUnavailableError",

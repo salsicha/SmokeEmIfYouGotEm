@@ -77,7 +77,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Compare `h`, `eta`, `u`, `v`, `hu`, `hv`, wet/dry masks, surface normals, and slopes.
 - [x] Compare probe time series and cross sections.
 - [x] Compare mass conservation, energy trends, Froude number, hydraulic jump location, wave crest/trough location, and hole retention geometry.
-- [ ] Add L1/L2/Linf field-error summaries.
+- [x] Add L1/L2/Linf field-error summaries.
 - [ ] Add feature-location and feature-strength error summaries.
 - [ ] Add runtime cost per simulated second for both solvers.
 - [ ] Add scenario pass/fail thresholds.

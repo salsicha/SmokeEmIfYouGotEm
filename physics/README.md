@@ -254,7 +254,7 @@ PYTHONPATH=src python -m raftsim.examples.compare_dual_solver_fields \
   outputs/dual_solver/flat_pool
 ```
 
-This writes `field_comparison.json` with initial/final comparisons for `h`, `eta`, `u`, `v`, `hu`, `hv`, wet/dry mismatch fraction, surface normals, and `eta` slopes.
+This writes `field_comparison.json` with initial/final comparisons for `h`, `eta`, `u`, `v`, `hu`, `hv`, wet/dry mismatch fraction, surface normals, and `eta` slopes. It also includes aggregate max L1/L2/Linf summaries across all compared frames for field and slope errors.
 
 Compare probe time series and cross sections with:
 

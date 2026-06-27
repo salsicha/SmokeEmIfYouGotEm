@@ -84,6 +84,8 @@ def test_field_comparison_reports_shared_solver_fields(tmp_path):
 
     assert report.scenario_id == scenario.metadata.scenario_id
     assert report_data["scenario_id"] == scenario.metadata.scenario_id
+    assert {summary["field"] for summary in report_data["aggregate_field_errors"]} >= {"h", "eta", "u", "v", "hu", "hv"}
+    assert {summary["field"] for summary in report_data["aggregate_slope_errors"]} == {"slope_x", "slope_y"}
     assert {"h", "eta", "u", "v", "hu", "hv", "normal_x", "normal_y", "normal_z"}.issubset(error_by_name)
     assert {"slope_x", "slope_y"}.issubset(slope_error_by_name)
     assert initial.wet_mismatch_fraction == 0.0
