@@ -13,6 +13,8 @@ See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the productio
 
 The first native ownership split is frozen in [Chrono Runtime Boundary](chrono-runtime-boundary.md): custom C++ owns the reduced water solver and stable water query API, while Project Chrono owns baseline raft rigid-body dynamics and collision/contact response.
 
+[Chrono::FSI Policy](chrono-fsi-policy.md) keeps full Chrono fluid-solid interaction as an optional experiment/reference path, not a baseline runtime dependency.
+
 ## Runtime Ownership
 
 ### Chrono Owns

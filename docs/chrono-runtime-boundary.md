@@ -13,7 +13,7 @@ This decision freezes the first native runtime split before Unreal production wo
 | Rock/bed/shore collision contacts | Project Chrono with custom water/contact inputs | Chrono owns collision resolution; custom code supplies water heights, bed fields, feature tags, and tuned contact coefficients. |
 | Paddle/crew force intents | Custom gameplay layer feeding Chrono | Voice, network, AI, and player commands become deterministic force/impulse intents applied through the native physics bridge. |
 | Telemetry/replay schemas | Shared custom schemas | Python, C++, Chrono, and Unreal must emit the frozen schema set without depending on engine-specific serialization. |
-| Chrono::FSI | Optional experiment/reference only | Full fluid-particle coupling is not the baseline runtime dependency for UE5; it may be used for research comparisons. |
+| Chrono::FSI | Optional experiment/reference only | Full fluid-particle coupling is governed by [Chrono::FSI Policy](chrono-fsi-policy.md) and is not the baseline runtime dependency for UE5. |
 
 ## Integration Rule
 
