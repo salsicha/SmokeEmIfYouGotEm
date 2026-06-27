@@ -308,6 +308,17 @@ PYTHONPATH=src python -m raftsim.examples.tune_cpp_solver \
 
 This writes `tuning_report.json` and per-candidate dual-solver runs. The first tunable C++ parameters are authored feature forcing scale and roughness/friction scale; more numerical coefficients can be added to the same candidate schema as the reduced solver exposes them.
 
+Promote a passing run into the regression fixture registry with:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.promote_dual_solver_regression \
+  outputs/dual_solver/flat_pool \
+  --regression-root regression_fixtures
+```
+
+Promotion requires an existing `threshold_evaluation.json` with `passed: true`. It copies the shared scenario package and accepted threshold report into `regression_fixtures/<scenario_id>/` and updates `regression_fixtures/registry.json`.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.
