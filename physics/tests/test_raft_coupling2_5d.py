@@ -8,8 +8,9 @@ from raftsim.raft_coupling2_5d import (
     RaftState6DoF,
     WaterField2_5D,
     build_default_raft_mass_properties,
-    sample_hydrodynamic_forces,
     sample_buoyancy_forces,
+    sample_grounding_forces,
+    sample_hydrodynamic_forces,
     sum_force_contributions,
 )
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, RaftParameters2_5D, generate_fixture_scenario2_5d
@@ -116,3 +117,18 @@ def test_hydrodynamic_forces_include_drag_and_vertical_damping():
     assert contributions
     assert total_force.x > 0.0
     assert total_force.z > 0.0
+
+
+def test_grounding_forces_push_up_and_apply_friction():
+    scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="bed_step", nx=12, ny=8))
+    water = WaterField2_5D.from_scenario_initial_state(scenario)
+    properties = build_default_raft_mass_properties(scenario.raft)
+    state = RaftState6DoF(position=Vec3(6.0, 0.0, -0.2), linear_velocity=Vec3(2.0, 0.0, -1.0))
+
+    contributions = sample_grounding_forces(state, properties, water)
+    total_force, _ = sum_force_contributions(contributions)
+
+    assert contributions
+    assert total_force.z > 0.0
+    assert total_force.x < 0.0
+    assert any("ledge" in contribution.metadata["feature_tags"] for contribution in contributions)

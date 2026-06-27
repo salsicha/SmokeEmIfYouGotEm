@@ -405,3 +405,65 @@ def sample_hydrodynamic_forces(
             )
         )
     return tuple(contributions)
+
+
+def sample_grounding_forces(
+    state: RaftState6DoF,
+    properties: RaftMassProperties,
+    water: WaterField2_5D,
+    *,
+    contact_stiffness: float = 12000.0,
+    contact_damping: float = 1200.0,
+    grounding_friction: float = 0.65,
+) -> tuple[RaftForceContribution2_5D, ...]:
+    """Sample bed/rock/ledge/shallow grounding contact forces."""
+
+    contributions: list[RaftForceContribution2_5D] = []
+    for index, patch in enumerate(properties.sample_patches):
+        point = state.world_point(patch.local_position)
+        sample = water.sample(point.x, point.y)
+        penetration = sample.bed_height - point.z
+        if penetration <= 0.0 and not _has_grounding_feature(sample.feature_tags):
+            continue
+        feature_scale = _grounding_feature_scale(sample.feature_tags)
+        effective_penetration = max(penetration, 0.03 if feature_scale > 1.0 and sample.depth < 0.35 else 0.0)
+        if effective_penetration <= 0.0:
+            continue
+        point_velocity = state.point_velocity(patch.local_position)
+        normal_speed = min(point_velocity.z, 0.0)
+        normal_force = contact_stiffness * feature_scale * effective_penetration - contact_damping * normal_speed
+        horizontal_velocity = Vec3(point_velocity.x, point_velocity.y, 0.0)
+        friction = Vec3()
+        if horizontal_velocity.magnitude > 1.0e-9:
+            friction = horizontal_velocity.normalized() * (-grounding_friction * normal_force)
+        force = Vec3(0.0, 0.0, normal_force) + friction
+        torque = (point - state.position).cross(force)
+        contributions.append(
+            RaftForceContribution2_5D(
+                name=f"grounding:{patch.kind}:{index}",
+                force=force,
+                torque=torque,
+                application_point=point,
+                metadata={
+                    "kind": patch.kind,
+                    "penetration": effective_penetration,
+                    "feature_tags": ",".join(sample.feature_tags),
+                },
+            )
+        )
+    return tuple(contributions)
+
+
+def _has_grounding_feature(tags: tuple[str, ...]) -> bool:
+    return bool({"rock", "ledge", "shallow", "strainer"} & set(tags))
+
+
+def _grounding_feature_scale(tags: tuple[str, ...]) -> float:
+    scale = 1.0
+    if "rock" in tags or "strainer" in tags:
+        scale = max(scale, 2.0)
+    if "ledge" in tags:
+        scale = max(scale, 1.5)
+    if "shallow" in tags:
+        scale = max(scale, 1.25)
+    return scale
