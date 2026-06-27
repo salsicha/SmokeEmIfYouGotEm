@@ -110,7 +110,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 
 ## Milestone 7: Profiling, Parameter Fitting, And Runtime Budgets
 
-- [ ] Profile PyClaw reference runs for research-loop cost.
+- [x] Profile PyClaw reference runs for research-loop cost.
 - [ ] Profile the custom C++ solver for target runtime cost.
 - [ ] Profile raft coupling and probe/export cost.
 - [ ] Add parameter sweep scripts for roughness, feature forcing, raft drag, buoyancy, grounding, and contact coefficients.
