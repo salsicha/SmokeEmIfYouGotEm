@@ -244,7 +244,7 @@ pyclaw_reference/<scenario_id>/
 cpp_solver/<scenario_id>/
 ```
 
-The manifest records the exact shared `scenario.json`, PyClaw output manifest, C++ output manifest, C++ command, and validation paths. Later Milestone 4 tasks add field, probe, feature, runtime, threshold, tuning, and regression promotion reports on top of this shared run directory.
+The manifest records the exact shared `scenario.json`, PyClaw output manifest, C++ output manifest, C++ command, validation paths, wall-clock runtime, and seconds-per-simulated-second cost for both solvers. Later Milestone 4 tasks add field, probe, feature, threshold, tuning, and regression promotion reports on top of this shared run directory.
 
 Compare shared field outputs after a run with:
 
