@@ -88,6 +88,9 @@ from .tuning import (
     CppTuningCandidate,
     CppTuningCandidateResult,
     CppTuningReport,
+    ParameterFitCandidateResult,
+    ParameterFitReport,
+    fit_cpp_and_raft_parameters_against_pyclaw,
     tune_cpp_solver_against_pyclaw,
 )
 from .regression import RegressionPromotionResult, promote_passing_dual_solver_run
@@ -217,6 +220,8 @@ __all__ = [
     "PaddleBladeSample2_5D",
     "PaddleCommand2D",
     "ParameterSweepCandidate",
+    "ParameterFitCandidateResult",
+    "ParameterFitReport",
     "ParameterSweepReport",
     "ParameterSweepResult",
     "Raft2DConfig",
@@ -271,6 +276,7 @@ __all__ = [
     "default_forward_paddle_commands",
     "default_parameter_sweep_candidates",
     "frame_from_scenario_initial_state",
+    "fit_cpp_and_raft_parameters_against_pyclaw",
     "generate_fixture_scenario2_5d",
     "generate_procedural_scenario2_5d",
     "generate_river_2d",

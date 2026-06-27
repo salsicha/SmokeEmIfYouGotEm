@@ -16,7 +16,8 @@ from raftsim.dual_solver import CppSolverRunConfig, DualSolverRunConfig, run_dua
 from raftsim.pyclaw_reference import PyClawRunConfig, check_pyclaw_availability
 from raftsim.regression import promote_passing_dual_solver_run
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
-from raftsim.tuning import CppTuningCandidate, tune_cpp_solver_against_pyclaw
+from raftsim.sweeps import ParameterSweepCandidate
+from raftsim.tuning import CppTuningCandidate, fit_cpp_and_raft_parameters_against_pyclaw, tune_cpp_solver_against_pyclaw
 
 
 def _build_cpp_solver(tmp_path: Path) -> Path:
@@ -282,3 +283,30 @@ def test_promote_passing_run_to_regression_fixture(tmp_path):
     assert (promotion.fixture_dir / "scenario" / "scenario.json").exists()
     assert promotion.threshold_report.exists()
     assert registry["fixtures"][0]["scenario_id"] == scenario.metadata.scenario_id
+
+
+def test_parameter_fit_scores_cpp_and_raft_candidates(tmp_path):
+    availability = check_pyclaw_availability()
+    if not availability.available:
+        pytest.skip(f"PyClaw unavailable: {availability.reason}")
+    cpp_solver = _build_cpp_solver(tmp_path)
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="flat_pool", seed=20, nx=10, ny=6, duration=1.0 / 60.0)
+    )
+
+    report = fit_cpp_and_raft_parameters_against_pyclaw(
+        scenario,
+        output_dir=tmp_path / "parameter_fit",
+        cpp_solver_executable=cpp_solver,
+        candidates=(ParameterSweepCandidate("baseline"),),
+        pyclaw_config=PyClawRunConfig(num_output_times=1),
+        cpp_steps=1,
+        cpp_frame_interval=1,
+    )
+    report_data = json.loads((tmp_path / "parameter_fit" / "parameter_fit_report.json").read_text(encoding="utf-8"))
+
+    assert report.scenario_id == scenario.metadata.scenario_id
+    assert report.best_candidate.candidate.label == "baseline"
+    assert report.best_candidate.water_score >= 0.0
+    assert report.best_candidate.raft_force_score >= 0.0
+    assert report_data["best_candidate"]["candidate"]["label"] == "baseline"
