@@ -14,6 +14,7 @@ from raftsim.comparison import (
 )
 from raftsim.dual_solver import CppSolverRunConfig, DualSolverRunConfig, run_dual_solver_scenario
 from raftsim.pyclaw_reference import PyClawRunConfig, check_pyclaw_availability
+from raftsim.regression import promote_passing_dual_solver_run
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
 from raftsim.tuning import CppTuningCandidate, tune_cpp_solver_against_pyclaw
 
@@ -251,3 +252,33 @@ def test_cpp_tuning_selects_best_candidate(tmp_path):
     assert len(report.candidates) == 2
     assert report.best_candidate.candidate.label in {"baseline", "rougher"}
     assert report_data["best_candidate"]["candidate"]["label"] == report.best_candidate.candidate.label
+
+
+def test_promote_passing_run_to_regression_fixture(tmp_path):
+    availability = check_pyclaw_availability()
+    if not availability.available:
+        pytest.skip(f"PyClaw unavailable: {availability.reason}")
+    cpp_solver = _build_cpp_solver(tmp_path)
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="flat_pool", seed=19, nx=10, ny=6, duration=1.0 / 60.0)
+    )
+    run_result = run_dual_solver_scenario(
+        scenario,
+        output_dir=tmp_path / "dual",
+        config=DualSolverRunConfig(
+            pyclaw=PyClawRunConfig(num_output_times=1),
+            cpp=CppSolverRunConfig(executable=cpp_solver, steps=1, frame_interval=1),
+        ),
+    )
+    evaluate_dual_solver_thresholds(run_result.output_dir, output_path=run_result.output_dir / "threshold_evaluation.json")
+
+    promotion = promote_passing_dual_solver_run(
+        run_result.output_dir,
+        regression_root=tmp_path / "regressions",
+    )
+    registry = json.loads(promotion.registry_path.read_text(encoding="utf-8"))
+
+    assert promotion.scenario_id == scenario.metadata.scenario_id
+    assert (promotion.fixture_dir / "scenario" / "scenario.json").exists()
+    assert promotion.threshold_report.exists()
+    assert registry["fixtures"][0]["scenario_id"] == scenario.metadata.scenario_id
