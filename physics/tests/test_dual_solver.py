@@ -10,6 +10,7 @@ from raftsim.comparison import (
     compare_dual_solver_features,
     compare_dual_solver_fields,
     compare_dual_solver_probes,
+    evaluate_dual_solver_thresholds,
 )
 from raftsim.dual_solver import CppSolverRunConfig, DualSolverRunConfig, run_dual_solver_scenario
 from raftsim.pyclaw_reference import PyClawRunConfig, check_pyclaw_availability
@@ -191,3 +192,32 @@ def test_feature_comparison_reports_location_and_strength(tmp_path):
     assert first.location_delta >= 0.0
     assert first.pyclaw.strength >= 0.0
     assert first.cpp.strength >= 0.0
+
+
+def test_threshold_evaluation_reports_scenario_pass_fail(tmp_path):
+    availability = check_pyclaw_availability()
+    if not availability.available:
+        pytest.skip(f"PyClaw unavailable: {availability.reason}")
+    cpp_solver = _build_cpp_solver(tmp_path)
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="flat_pool", seed=17, nx=12, ny=8, duration=0.05)
+    )
+    result = run_dual_solver_scenario(
+        scenario,
+        output_dir=tmp_path / "dual",
+        config=DualSolverRunConfig(
+            pyclaw=PyClawRunConfig(num_output_times=1),
+            cpp=CppSolverRunConfig(executable=cpp_solver, steps=3, frame_interval=1),
+        ),
+    )
+
+    report = evaluate_dual_solver_thresholds(
+        result.output_dir,
+        output_path=result.output_dir / "threshold_evaluation.json",
+    )
+    report_data = json.loads((result.output_dir / "threshold_evaluation.json").read_text(encoding="utf-8"))
+
+    assert report.scenario_id == scenario.metadata.scenario_id
+    assert report.passed is True
+    assert report_data["passed"] is True
+    assert {check.name for check in report.checks} >= {"field_linf", "probe_linf", "mass_drift_delta"}

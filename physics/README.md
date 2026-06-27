@@ -286,6 +286,16 @@ PYTHONPATH=src python -m raftsim.examples.compare_dual_solver_features \
 
 This writes `feature_comparison.json` with per-feature observed response locations, distance from authored center, solver-to-solver location delta, observed strength, and strength delta.
 
+Evaluate a scenario against pass/fail thresholds with:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.evaluate_dual_solver_thresholds \
+  outputs/dual_solver/flat_pool
+```
+
+This writes `threshold_evaluation.json` with named checks for field, slope, wet/dry, probe, cross-section, diagnostic, and feature tolerances plus an overall `passed` flag. Defaults are intentionally permissive for the first reduced solver and should tighten as tuning improves.
+
 ## Next Milestone
 
 The next milestone should continue the [2.5D Dual-Solver Simulation Plan](../docs/2.5d-simulation-plan.md): build the first PyClaw-vs-C++ comparison report and decide whether the PyClaw path needs GeoClaw-style bathymetry/wet-dry source terms before real-world river packages. After procedural scenario packages are stable under both solvers, the plan extends into the [Real-World River Content And Seasonal Flow Plan](../docs/real-world-river-content-plan.md) for geospatial river sections, seasonal flows, and Unreal-ready corridor packages.

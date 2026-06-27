@@ -80,7 +80,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 - [x] Add L1/L2/Linf field-error summaries.
 - [x] Add feature-location and feature-strength error summaries.
 - [x] Add runtime cost per simulated second for both solvers.
-- [ ] Add scenario pass/fail thresholds.
+- [x] Add scenario pass/fail thresholds.
 - [ ] Tune C++ numerical coefficients, friction, roughness, and authored feature forcing against PyClaw.
 - [ ] Promote passing scenarios to regression fixtures.
 
