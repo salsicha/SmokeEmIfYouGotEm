@@ -86,7 +86,7 @@ See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full
 
 ## Milestone 5: 2.5D Raft Coupling Against Both Solvers
 
-- [ ] Add 6-DoF raft state with position, orientation quaternion, linear velocity, and angular velocity.
+- [x] Add 6-DoF raft state with position, orientation quaternion, linear velocity, and angular velocity.
 - [ ] Add raft mass, inertia tensor, gravity, guide/passenger mass offsets, and sampled tube/floor patches.
 - [ ] Define a solver-neutral water query API for surface height, normal, depth, velocity, wet/dry state, bed height, roughness, and feature tags.
 - [ ] Apply buoyancy from submerged sample depth and local surface normal.
