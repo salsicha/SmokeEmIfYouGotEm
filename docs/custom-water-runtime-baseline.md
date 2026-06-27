@@ -1,6 +1,6 @@
 # Custom Water Runtime Baseline
 
-The primary Unreal runtime water candidate is the custom C++ reduced shallow-water / height-field solver: `raftsim_water_reduced_cpp_v0`.
+The primary Unreal runtime water candidate is the custom C++ reduced shallow-water / height-field solver: `raftsim_water_cpp_v1`.
 
 ## Baseline Decision
 
