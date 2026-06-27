@@ -90,7 +90,12 @@ from .tuning import (
     tune_cpp_solver_against_pyclaw,
 )
 from .regression import RegressionPromotionResult, promote_passing_dual_solver_run
-from .raft_coupling2_5d import RaftState6DoF
+from .raft_coupling2_5d import (
+    RaftMassProperties,
+    RaftSamplePatch,
+    RaftState6DoF,
+    build_default_raft_mass_properties,
+)
 from .sim import Simulation, SimulationConfig, SimulationSystem
 from .state import BodyState
 from .telemetry import ForceContribution, TelemetryFrame, TelemetryRecorder
@@ -163,6 +168,8 @@ __all__ = [
     "Raft2DSimulation",
     "Raft2DState",
     "Raft2DStepResult",
+    "RaftMassProperties",
+    "RaftSamplePatch",
     "RaftState6DoF",
     "GeneratedRiver2D",
     "River2DParameters",
@@ -183,6 +190,7 @@ __all__ = [
     "ScenarioValidation2_5D",
     "ValidationCheck2_5D",
     "build_initial_pyclaw_reference_result",
+    "build_default_raft_mass_properties",
     "canonical_pyclaw_scenarios",
     "backend_statuses",
     "check_pyclaw_availability",

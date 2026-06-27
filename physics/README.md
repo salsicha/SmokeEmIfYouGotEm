@@ -330,7 +330,7 @@ state = RaftState6DoF(position=Vec3(0.0, 0.0, 1.0))
 next_state = state.advance(1.0 / 60.0, linear_acceleration=Vec3(0.0, 0.0, -9.81))
 ```
 
-The state tracks position, orientation quaternion, linear velocity, and angular velocity, and provides local-to-world point and point-velocity helpers for future tube, floor, paddle, and contact samples.
+The state tracks position, orientation quaternion, linear velocity, and angular velocity, and provides local-to-world point and point-velocity helpers for future tube, floor, paddle, and contact samples. `build_default_raft_mass_properties()` derives total raft/crew mass, diagonal box inertia, gravity, guide/passenger offsets, and deterministic tube/floor sample patches from `RaftParameters2_5D`.
 
 ## Next Milestone
 
