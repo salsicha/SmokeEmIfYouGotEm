@@ -1,0 +1,91 @@
+{
+  "schema": "raftsim.unreal.audio_storage_lfs_policy.v1",
+  "lfs_tracked_extensions": [
+    ".mp4",
+    ".mov",
+    ".m4v",
+    ".webm",
+    ".wav",
+    ".aif",
+    ".aiff",
+    ".flac",
+    ".amb",
+    ".bwf",
+    ".caf",
+    ".ogg",
+    ".opus",
+    ".mp3",
+    ".m4a",
+    ".aac",
+    ".wem",
+    ".bnk",
+    ".bank",
+    ".uasset",
+    ".umap",
+    ".uexp",
+    ".ubulk",
+    ".zip",
+    ".7z",
+    ".rar"
+  ],
+  "storage_classes": {
+    "raw_recordings": {
+      "examples": [
+        "field_recorder_wav",
+        "hydrophone_bwf",
+        "ambisonic_bed_amb",
+        "shore_perspective_flac"
+      ],
+      "repository_policy": "curated_takes_in_lfs_after_ingest_selection",
+      "external_archive_required": true,
+      "manifest_required": true
+    },
+    "purchased_libraries": {
+      "examples": [
+        "vendor_source_wav",
+        "vendor_metadata",
+        "delivery_archive"
+      ],
+      "repository_policy": "external_storage_by_default",
+      "commit_allowed_only_with_redistribution_approval": true,
+      "license_record_required": true
+    },
+    "edited_masters": {
+      "examples": [
+        "cleaned_loop_wav",
+        "one_shot_flac",
+        "ambisonic_master_amb"
+      ],
+      "repository_policy": "lfs",
+      "manifest_required": true
+    },
+    "generated_prototypes": {
+      "examples": [
+        "ai_temp_dialogue",
+        "debug_tone_variation",
+        "procedural_noise_render"
+      ],
+      "repository_policy": "lfs_when_needed_for_reproducible_review",
+      "ai_manifest_required_when_ai_generated": true
+    },
+    "unreal_ready_exports": {
+      "examples": [
+        "compressed_ogg",
+        "opus_export",
+        "wwise_wem",
+        "fmod_bank",
+        "unreal_uasset"
+      ],
+      "repository_policy": "lfs",
+      "manifest_required": true
+    }
+  },
+  "normal_git_metadata": [
+    "schemas",
+    "manifest_json",
+    "cue_sheets",
+    "recording_notes",
+    "license_summary_docs",
+    "validation_reports"
+  ]
+}
