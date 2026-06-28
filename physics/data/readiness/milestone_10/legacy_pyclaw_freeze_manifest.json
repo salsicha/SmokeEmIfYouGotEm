@@ -1,0 +1,88 @@
+{
+  "active_reference_solver": "GeoClaw",
+  "date": "2026-06-28",
+  "freeze_policy": {
+    "acceptance_target": false,
+    "allowed_uses": [
+      "historical regression comparison",
+      "readiness-gate provenance",
+      "debugging continuity during the GeoClaw transition"
+    ],
+    "blocked_uses": [
+      "new C++ solver acceptance",
+      "live Unreal water approval",
+      "raft-coupling acceptance after the GeoClaw transition"
+    ],
+    "replacement_path": "Milestone 14 regenerates reference, comparison, tuning, raft-coupling, and readiness artifacts with GeoClaw as the approved reference solver."
+  },
+  "frozen_artifacts": [
+    {
+      "path": "adaptive_flow_validation.json",
+      "role": "legacy adaptive flow validation summary",
+      "sha256": "9d3cc96c2919d76ef9cc2c911fe6df50ee8dbd1bf274ab7b2d527223dd103ca1"
+    },
+    {
+      "path": "cpp_solver_summary.json",
+      "role": "legacy custom C++ run summary matched against PyClaw-era fixtures",
+      "sha256": "f5c87792c40731cbb270ec993e413c170c9faccda9ed960446d0c378b0616406"
+    },
+    {
+      "path": "dual_solver_comparison_summary.json",
+      "role": "legacy PyClaw-vs-C++ comparison summary",
+      "sha256": "13dab6846813429590e203297d7abb91ce873a7b013576112b90440e0bbbfe6c"
+    },
+    {
+      "path": "profiling_runtime_budget_report.json",
+      "role": "legacy profiling and runtime budget summary",
+      "sha256": "619ea59fc5c626b75da57a3f44019039ae4f7788ed09963cdcc07367626d281c"
+    },
+    {
+      "path": "pyclaw_reference_summary.json",
+      "role": "legacy PyClaw reference run summary",
+      "sha256": "ec150b59123e121194bb1e999228b234e6c8c7e09a3803eba47cca2b5dcb2354"
+    },
+    {
+      "path": "python_to_unreal_readiness_report.json",
+      "role": "legacy PyClaw-era Python-to-Unreal readiness report",
+      "sha256": "05ee0655d59b99ed6c23a8cf41032a73b0773cd37f053c57c6fbd28fa9546881"
+    },
+    {
+      "path": "python_to_unreal_readiness_report.md",
+      "role": "legacy human-readable PyClaw-era readiness report",
+      "sha256": "1a982ce04cc8f98f6e4b938bf185344372be8f79559fed0db815a1fc1de7d280"
+    },
+    {
+      "path": "raft_coupling_validation.json",
+      "role": "legacy PyClaw/C++ raft coupling validation summary",
+      "sha256": "6c5a41fbf5058f9152d85a1328591378f1dfc6b0bce7a989bf38839d301ddb48"
+    },
+    {
+      "path": "scenario_suite.json",
+      "role": "legacy scenario suite manifest",
+      "sha256": "71bcef8f10b298d7a5a11ab265d559c75c754c03c683dfe0c4f4d427c5ec3df6"
+    },
+    {
+      "path": "unreal_corridor_package_manifest.json",
+      "role": "legacy Unreal corridor package manifest",
+      "sha256": "0c1dc47cb06e87681792ee91cde7d5bed60cfe224a5ac5df671e938fb9f91c7e"
+    },
+    {
+      "path": "unreal_visualization/manifest.json",
+      "role": "legacy Unreal visualization package manifest",
+      "sha256": "e606c9c7745e1315d1197dbf57e3db8d1c7c19d33c8af17bef1edf5b89f9acca"
+    },
+    {
+      "path": "unreal_visualization/replay.json",
+      "role": "legacy Unreal replay sample",
+      "sha256": "db306a451a5f88c6216334ada4d3b9fbba5300cd4f2af46b90e52d1bc98ab754"
+    },
+    {
+      "path": "unreal_visualization/telemetry_forces.csv",
+      "role": "legacy Unreal force telemetry sample",
+      "sha256": "755c315a736e45f083ff7edb551dd454253f3623e73681aa7d915ae969088e7e"
+    }
+  ],
+  "legacy_solver": "PyClaw",
+  "schema": "raftsim.legacy_pyclaw_freeze.v1",
+  "status": "frozen_legacy_regression_artifacts"
+}
