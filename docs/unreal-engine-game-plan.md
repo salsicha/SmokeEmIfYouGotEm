@@ -9,6 +9,7 @@ The Unreal game should deliver the first-person guide fantasy: seated in the ste
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial extraction, rapid identification, seasonal flow, adaptive fluid-parameter, and river-selection work that must feed Unreal content.
 See [Audio Asset Sourcing Plan](audio-asset-sourcing-plan.md) for the production audio source policy, library shortlist, field-recording plan, AI-audio limits, and asset manifest.
 See [Python-To-Unreal Readiness Gate](python-to-unreal-readiness-gate.md) for the current Milestone 10 audit. The current gate decision is approved after shallow-cell-aware velocity/Froude comparison; production Unreal work should start with telemetry/replay playback before live water, Chrono raft coupling, VR, and contact integration.
+See [Unreal Engine Version Lock](unreal-engine-version-lock.md) for the UE 5.8 feature review and version decision.
 
 ## Hard Dependency Gate
 
@@ -115,7 +116,7 @@ Start only after Phase 0 is accepted.
 Tasks:
 
 - Choose the exact Unreal Engine 5.x version and lock it for the first vertical slice.
-- Re-check the latest stable UE5 feature set before locking the version. As of this planning pass, Epic's public docs are on UE 5.8, so expect Nanite foliage, Nanite landscape/spline/tessellation workflows, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, Substrate/material layering, and OpenXR to be evaluated for the first slice.
+- Re-check the latest stable UE5 feature set before locking the version. The current lock is UE 5.8, with Mesh Terrain and Procedural Vegetation Editor treated as experimental evaluation features, and Nanite, Lumen/Lumen Lite, Virtual Shadow Maps, World Partition, PCG, Niagara, Substrate/material layering, and OpenXR evaluated for the first slice.
 - Define target platforms for the first playable build.
 - Create coding standards for C++, Blueprint exposure, data assets, and content naming.
 - Define plugin/module boundaries: core game, Chrono bridge, water visualization, raft, river, input, UI, local AI/voice, crew AI, audio, and debug.
