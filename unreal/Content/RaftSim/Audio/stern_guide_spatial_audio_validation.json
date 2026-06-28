@@ -1,0 +1,67 @@
+{
+  "schema": "raftsim.unreal.stern_guide_spatial_audio_validation.v1",
+  "listener_anchor": "guide_seat_stern",
+  "playback_targets": ["vr_binaural", "headphones", "stereo_speakers", "surround"],
+  "validation_cases": [
+    {
+      "case_id": "nearby_rock_hazard_left",
+      "source_type": "hazard",
+      "expected_readability": "localized_left_forward_before_contact",
+      "metrics": ["azimuth_accuracy", "warning_time", "occlusion_change"]
+    },
+    {
+      "case_id": "rapid_downstream_large_source",
+      "source_type": "rapid",
+      "expected_readability": "large_enveloping_front_source_with_distance_growth",
+      "metrics": ["spread_readability", "distance_curve", "low_frequency_balance"]
+    },
+    {
+      "case_id": "hydraulic_hole_center",
+      "source_type": "hydraulic",
+      "expected_readability": "distinct_center_hazard_above_river_bed",
+      "metrics": ["feature_contrast", "aeration_layer_intensity"]
+    },
+    {
+      "case_id": "crew_positions",
+      "source_type": "crew",
+      "expected_readability": "seat_positions_stable_during_head_turns",
+      "metrics": ["seat_localization", "ducking_under_guide_commands"]
+    },
+    {
+      "case_id": "guide_voice_command_feedback",
+      "source_type": "voice_command",
+      "expected_readability": "recognized_command_feedback_clear_over_river_noise",
+      "metrics": ["speech_intelligibility", "latency", "subtitle_sync"]
+    },
+    {
+      "case_id": "multiplayer_voice_seats",
+      "source_type": "multiplayer_voice",
+      "expected_readability": "human_player_voice_sticks_to_occupied_seat",
+      "metrics": ["voice_position_stability", "mute_volume_controls"]
+    },
+    {
+      "case_id": "canyon_reflection_pass",
+      "source_type": "environment_reflection",
+      "expected_readability": "shore_and_canyon_reflections_change_with_corridor_width",
+      "metrics": ["reverb_transition", "reflection_directionality"]
+    },
+    {
+      "case_id": "raft_contact_scrape",
+      "source_type": "raft_contact",
+      "expected_readability": "scrape_source_tracks_contact_patch",
+      "metrics": ["patch_position_accuracy", "impulse_to_loudness"]
+    },
+    {
+      "case_id": "near_water_underwater_state",
+      "source_type": "perspective_state",
+      "expected_readability": "near_water_filter_and_underwater_lowpass_are_distinct",
+      "metrics": ["filter_transition", "comfort"]
+    },
+    {
+      "case_id": "rescue_cue_swimmer",
+      "source_type": "rescue",
+      "expected_readability": "swimmer_callout_and_rescue_cue_are_priority_mixed",
+      "metrics": ["priority_ducking", "cue_localization", "reaction_time"]
+    }
+  ]
+}
