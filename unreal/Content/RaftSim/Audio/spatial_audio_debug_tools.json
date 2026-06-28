@@ -1,0 +1,81 @@
+{
+  "schema": "raftsim.unreal.spatial_audio_debug_tools.v1",
+  "source_contract": "unreal/Plugins/RaftSim/Source/RaftSimAudio/Public/RaftSimSpatialAudioDebug.h",
+  "debug_overlays": [
+    {
+      "overlay": "emitter_position",
+      "fields": [
+        "emitter_id",
+        "preset_id",
+        "world_location"
+      ],
+      "display": "3d_label_and_axis_gizmo"
+    },
+    {
+      "overlay": "attenuation_and_spread",
+      "fields": [
+        "attenuation_radius_meters",
+        "source_spread_meters"
+      ],
+      "display": "wire_sphere_or_capsule_with_source_spread_arc"
+    },
+    {
+      "overlay": "occlusion_traces",
+      "fields": [
+        "occlusion_trace_blocked",
+        "occlusion_trace_distance_meters"
+      ],
+      "display": "listener_to_source_trace_colored_by_blocked_state"
+    },
+    {
+      "overlay": "reverb_sends",
+      "fields": [
+        "reverb_send_db"
+      ],
+      "display": "numeric_label_and_zone_tint"
+    },
+    {
+      "overlay": "ambisonic_rotation",
+      "fields": [
+        "ambisonic_yaw_degrees"
+      ],
+      "display": "rotated_bed_orientation_ring"
+    },
+    {
+      "overlay": "voice_count_and_priority",
+      "fields": [
+        "active_voice_count",
+        "mix_priority",
+        "virtualized"
+      ],
+      "display": "voice_badge_and_priority_color"
+    },
+    {
+      "overlay": "runtime_cost",
+      "fields": [
+        "estimated_runtime_cost_ms",
+        "audio_render_cost_ms",
+        "spatialization_cost_ms"
+      ],
+      "display": "frame_budget_bar"
+    }
+  ],
+  "console_commands": [
+    "RaftSim.Audio.DebugSpatial 0|1",
+    "RaftSim.Audio.DebugSpatial.FilterPreset <PresetId>",
+    "RaftSim.Audio.DebugSpatial.CaptureFrame",
+    "RaftSim.Audio.DebugSpatial.CaptureValidationRun"
+  ],
+  "capture_outputs": [
+    "json_frame_dump",
+    "csv_voice_and_cost_summary",
+    "optional_screenshot_or_vr_mirror_frame"
+  ],
+  "acceptance_checks": [
+    "every_active_spatial_emitter_has_a_preset_id",
+    "attenuation_radius_and_source_spread_match_selected_preset",
+    "blocked_occlusion_traces_change_filter_state",
+    "ambisonic_beds_report_head_tracked_rotation",
+    "voice_count_and_runtime_cost_are_visible_during_rapid_scenes"
+  ]
+}
