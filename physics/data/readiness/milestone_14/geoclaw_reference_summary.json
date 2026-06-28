@@ -1,0 +1,11 @@
+{
+  "export_count": 1,
+  "exports_passed": true,
+  "has_full_geoclaw_frames": false,
+  "normalized_frame_count": 1,
+  "normalized_mode": "export_initial_state_only",
+  "passed": true,
+  "scenario_id": "uniform_channel_seed_300",
+  "solver_outputs_committed": false,
+  "summary_version": "raftsim.geoclaw_reference_readiness.v1"
+}

@@ -1,8 +1,10 @@
 import json
 
 from raftsim.readiness import (
+    GEOCLAW_READINESS_REPORT_VERSION,
     READINESS_REPORT_VERSION,
     build_adaptive_flow_validation,
+    build_geoclaw_readiness_report,
     build_milestone10_scenario_suite,
     build_readiness_report,
     check_from_summary,
@@ -10,6 +12,7 @@ from raftsim.readiness import (
     make_pyclaw_reference_compatible,
     write_unreal_visualization_exports,
 )
+from raftsim.examples.generate_geoclaw_to_unreal_readiness import main as generate_geoclaw_readiness_main
 from raftsim.scenario2_5d import ProceduralScenario2_5DParameters, generate_procedural_scenario2_5d
 from raftsim.schema_versions import REPLAY_SCHEMA_VERSION
 
@@ -83,3 +86,41 @@ def test_readiness_report_approves_when_all_checks_pass():
     assert report.passed is True
     assert report.decision.status == "approved"
     assert report.decision.approved_for_unreal_production_start is True
+
+
+def test_geoclaw_readiness_report_blocks_without_full_fgout_frames():
+    report = build_geoclaw_readiness_report(
+        geoclaw_reference_summary={
+            "exports_passed": True,
+            "export_count": 1,
+            "normalized_mode": "export_initial_state_only",
+            "has_full_geoclaw_frames": False,
+        },
+        cpp_summary={"passed": True, "run_count": 1},
+        comparison_summary={"passed": True, "comparison_count": 1},
+        tuning_summary={"passed": True, "candidate_count": 1},
+        raft_coupling_summary={"passed": True, "comparison_count": 1},
+        artifact_manifest={},
+    )
+
+    assert report.gate_version == GEOCLAW_READINESS_REPORT_VERSION
+    assert report.passed is False
+    assert report.decision.status == "blocked"
+    assert any(check.check_id == "geoclaw_fixed_grid_outputs" and not check.passed for check in report.checks)
+
+
+def test_generate_geoclaw_readiness_example_writes_blocked_report_without_cpp(tmp_path):
+    exit_code = generate_geoclaw_readiness_main(
+        [
+            "--output-dir",
+            str(tmp_path / "readiness"),
+            "--scratch-dir",
+            str(tmp_path / "scratch"),
+        ]
+    )
+    report = json.loads((tmp_path / "readiness" / "geoclaw_to_unreal_readiness_report.json").read_text(encoding="utf-8"))
+
+    assert exit_code == 0
+    assert report["gate_version"] == GEOCLAW_READINESS_REPORT_VERSION
+    assert report["decision"]["status"] == "blocked"
+    assert (tmp_path / "readiness" / "geoclaw_reference_summary.json").exists()
