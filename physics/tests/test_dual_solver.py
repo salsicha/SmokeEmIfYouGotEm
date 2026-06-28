@@ -18,7 +18,12 @@ from raftsim.pyclaw_reference import PyClawRunConfig, check_pyclaw_availability
 from raftsim.regression import promote_passing_dual_solver_run
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
 from raftsim.sweeps import ParameterSweepCandidate
-from raftsim.tuning import CppTuningCandidate, fit_cpp_and_raft_parameters_against_pyclaw, tune_cpp_solver_against_pyclaw
+from raftsim.tuning import (
+    CppTuningCandidate,
+    fit_cpp_and_raft_parameters_against_pyclaw,
+    tune_cpp_solver_against_geoclaw,
+    tune_cpp_solver_against_pyclaw,
+)
 
 
 def _build_cpp_solver(tmp_path: Path) -> Path:
@@ -271,6 +276,38 @@ def test_cpp_tuning_selects_best_candidate(tmp_path):
     assert len(report.candidates) == 2
     assert report.best_candidate.candidate.label in {"baseline", "rougher"}
     assert report_data["best_candidate"]["candidate"]["label"] == report.best_candidate.candidate.label
+
+
+def test_cpp_tuning_against_geoclaw_selects_best_candidate(tmp_path):
+    cpp_solver = _build_cpp_solver(tmp_path)
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="flat_pool", seed=118, nx=10, ny=6, duration=1.0 / 60.0)
+    )
+
+    report = tune_cpp_solver_against_geoclaw(
+        scenario,
+        output_dir=tmp_path / "geoclaw_tuning",
+        cpp_solver_executable=cpp_solver,
+        candidates=(
+            CppTuningCandidate("baseline", feature_strength_scale=1.0, roughness_scale=1.0),
+            CppTuningCandidate("rougher", feature_strength_scale=1.0, roughness_scale=1.2),
+        ),
+        cpp_steps=1,
+        cpp_frame_interval=1,
+    )
+    report_data = json.loads((tmp_path / "geoclaw_tuning" / "geoclaw_tuning_report.json").read_text(encoding="utf-8"))
+    first_manifest = json.loads(
+        (tmp_path / "geoclaw_tuning" / report.candidates[0].candidate.label / "dual_solver_manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert report.scenario_id == scenario.metadata.scenario_id
+    assert len(report.candidates) == 2
+    assert report.best_candidate.candidate.label in {"baseline", "rougher"}
+    assert report_data["best_candidate"]["candidate"]["label"] == report.best_candidate.candidate.label
+    assert first_manifest["geoclaw"]["solver"] == "geoclaw"
+    assert first_manifest["runtime"]["geoclaw_runtime_seconds"] == 0.0
 
 
 def test_promote_passing_run_to_regression_fixture(tmp_path):
