@@ -1,0 +1,48 @@
+{
+  "schema": "raftsim.unreal.river_selection_catalog.v1",
+  "source_model": "../../physics/data/real_world/player_selection_model.json",
+  "view_model": "URaftSimSelectionViewModel",
+  "sections": [
+    {
+      "river_id": "american_south_fork",
+      "river_name": "South Fork American River",
+      "section_id": "chili_bar_to_coloma",
+      "section_name": "Chili Bar to Coloma",
+      "region": "California Sierra Nevada",
+      "difficulty_presets": ["beginner", "intermediate", "advanced", "expert"],
+      "difficulty_range": ["class_ii", "class_iii"],
+      "seasons": ["late_summer_low_water", "spring_runoff_or_release", "summer_commercial"],
+      "flow_bands": [
+        {
+          "flow_band": "low_runnable",
+          "season": "late_summer_low_water",
+          "discharge_cfs": 900.0,
+          "confidence": 0.3
+        },
+        {
+          "flow_band": "median_runnable",
+          "season": "summer_commercial",
+          "discharge_cfs": 1600.0,
+          "confidence": 0.35
+        },
+        {
+          "flow_band": "high_runnable",
+          "season": "spring_runoff_or_release",
+          "discharge_cfs": 3000.0,
+          "confidence": 0.25
+        }
+      ],
+      "raft_setups": ["standard_14ft_paddle_raft", "heavier_training_raft"],
+      "crew_setups": ["ai_training_crew", "experienced_ai_crew", "empty_debug_raft"]
+    }
+  ],
+  "menu_flow": [
+    "river",
+    "section",
+    "season",
+    "flow_band",
+    "difficulty",
+    "raft_setup",
+    "crew_setup"
+  ]
+}
