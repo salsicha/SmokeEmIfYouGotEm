@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "raftsim.unreal.audio_asset_manifest.v1",
+  "title": "RaftSim Audio Asset Manifest Record",
+  "type": "object",
+  "required": [
+    "asset_id",
+    "filename",
+    "source",
+    "license_or_purchase_record",
+    "commercial_use_status",
+    "allowed_platforms",
+    "sample_rate_hz",
+    "bit_depth",
+    "channels",
+    "intended_playback_context",
+    "approval_status"
+  ],
+  "properties": {
+    "asset_id": { "type": "string" },
+    "filename": { "type": "string" },
+    "source": {
+      "type": "string",
+      "enum": [
+        "field_recording",
+        "purchased_library",
+        "open_library",
+        "ai_generated",
+        "authored_synth",
+        "voice_actor",
+        "middleware_generated",
+        "unreal_generated"
+      ]
+    },
+    "license_or_purchase_record": { "type": "string" },
+    "attribution_requirement": { "type": "string" },
+    "commercial_use_status": {
+      "type": "string",
+      "enum": ["unknown", "prototype_only", "candidate", "approved", "rejected"]
+    },
+    "allowed_platforms": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "derivatives_allowed": { "type": "boolean" },
+    "sample_rate_hz": { "type": "integer", "minimum": 8000 },
+    "bit_depth": { "type": "integer", "enum": [16, 24, 32] },
+    "channels": { "type": "integer", "minimum": 1 },
+    "mic_setup": { "type": "string" },
+    "location": { "type": "string" },
+    "recording_date": { "type": "string" },
+    "recordist": { "type": "string" },
+    "processing_chain": { "type": "array", "items": { "type": "string" } },
+    "editor": { "type": "string" },
+    "loop_points": {
+      "type": "object",
+      "properties": {
+        "start_sample": { "type": "integer", "minimum": 0 },
+        "end_sample": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "variation_group": { "type": "string" },
+    "loudness_target_lufs": { "type": "number" },
+    "category": { "type": "string" },
+    "ucs_metadata": { "type": "object" },
+    "attenuation_preset": { "type": "string" },
+    "spatialization_mode": { "type": "string" },
+    "ambisonic_format_order": { "type": "string" },
+    "reverb_occlusion_behavior": { "type": "string" },
+    "intended_playback_context": { "type": "string" },
+    "approval_status": {
+      "type": "string",
+      "enum": ["prototype", "candidate", "approved", "rejected", "replaced"]
+    },
+    "review_notes": { "type": "string" }
+  }
+}
