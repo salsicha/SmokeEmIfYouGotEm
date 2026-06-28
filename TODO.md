@@ -177,7 +177,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Add native fixtures for flat pool float, current drift, standing wave lift, eddy-line yaw, rock bounce, riverbed grounding, shallow shelf pivot, and pin/release.
 - [x] Keep Unreal Chaos available only for incidental non-authoritative effects.
 - [x] Enable OpenXR-based VR support.
-- [ ] Implement telemetry/replay playback in Unreal before live native physics.
+- [x] Implement telemetry/replay playback in Unreal before live native physics.
 - [ ] Define fixed-step water/raft scheduling and Unreal render interpolation.
 - [ ] Set up Enhanced Input actions for VR controllers, keyboard, mouse, and gamepad.
 - [ ] Build the first-person guide camera with flat-screen and VR comfort options.
