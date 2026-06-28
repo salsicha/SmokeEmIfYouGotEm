@@ -1,0 +1,25 @@
+{
+  "schema": "raftsim.unreal.raft_dynamics_runtime.v1",
+  "selected_runtime": "ProjectChrono",
+  "fallback_runtime": "CustomReducedRigidBody",
+  "unreal_adapter": {
+    "module": "RaftSimPhysics",
+    "class": "URaftSimChronoRuntimeAdapter",
+    "body_config_struct": "FRaftSimRaftBodyConfig",
+    "kinematic_state_struct": "FRaftSimRaftKinematicState"
+  },
+  "default_raft": {
+    "mass_kg": 170.0,
+    "length_m": 4.2,
+    "width_m": 2.0,
+    "tube_radius_m": 0.32,
+    "inertia_tensor_kg_m2": [220.0, 620.0, 700.0],
+    "enable_compliant_contacts": true
+  },
+  "runtime_policy": {
+    "chrono_role": "authoritative_raft_kinematics_and_collision_contacts",
+    "chaos_role": "incidental_non_authoritative_effects_only",
+    "unreal_role": "render_interpolated_state_and_forward_deterministic_inputs"
+  },
+  "status": "source_integrated_pending_chrono_link_and_editor_compile"
+}
