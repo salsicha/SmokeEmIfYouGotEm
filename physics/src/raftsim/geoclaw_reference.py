@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import importlib
+import csv
 import json
+import math
 import shutil
 from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
@@ -83,6 +85,7 @@ GEOCLAW_SYSTEM_DEPENDENCY_HINT = (
     "with make and gfortran before running full reference simulations."
 )
 GEOCLAW_EXPORT_SCHEMA = "raftsim.geoclaw_export.v1"
+GEOCLAW_NORMALIZED_OUTPUT_SCHEMA = "raftsim.geoclaw_normalized_output.v1"
 GEOCLAW_CANONICAL_SUITE_SCHEMA = "raftsim.geoclaw_canonical_suite.v1"
 GEOCLAW_RAFTING_SUITE_SCHEMA = "raftsim.geoclaw_rafting_suite.v1"
 GEOCLAW_CANONICAL_FIXTURES = (
@@ -172,6 +175,151 @@ class GeoClawScenarioSuiteExport:
             "manifest_path": str(self.manifest_path),
             "scenario_count": len(self.results),
             "scenarios": [result.to_json_dict() for result in self.results],
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class GeoClawNormalizedFrame:
+    """Comparison-ready fixed-grid GeoClaw frame."""
+
+    time: float
+    h: FloatGrid
+    eta: FloatGrid
+    u: FloatGrid
+    v: FloatGrid
+    hu: FloatGrid
+    hv: FloatGrid
+    wet: NDArray[np.bool_]
+    normal_x: FloatGrid
+    normal_y: FloatGrid
+    normal_z: FloatGrid
+    froude: FloatGrid
+
+    def __post_init__(self) -> None:
+        expected_shape = np.asarray(self.h).shape
+        for name in ("h", "eta", "u", "v", "hu", "hv", "normal_x", "normal_y", "normal_z", "froude"):
+            array = np.asarray(getattr(self, name), dtype=np.float64)
+            if array.shape != expected_shape:
+                raise ValueError(f"{name} shape {array.shape} does not match h shape {expected_shape}.")
+            object.__setattr__(self, name, array.copy())
+        wet = np.asarray(self.wet, dtype=np.bool_)
+        if wet.shape != expected_shape:
+            raise ValueError(f"wet shape {wet.shape} does not match h shape {expected_shape}.")
+        object.__setattr__(self, "wet", wet.copy())
+
+    def mass(self, scenario: Scenario2_5D) -> float:
+        return float(np.sum(self.h) * scenario.grid.dx * scenario.grid.dy)
+
+    @property
+    def max_velocity(self) -> float:
+        return float(np.max(np.sqrt(self.u**2 + self.v**2)))
+
+    @property
+    def min_depth(self) -> float:
+        return float(np.min(self.h))
+
+    def write_npz(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        np.savez_compressed(
+            output_path,
+            time=np.asarray(self.time, dtype=np.float64),
+            h=self.h,
+            eta=self.eta,
+            u=self.u,
+            v=self.v,
+            hu=self.hu,
+            hv=self.hv,
+            wet=self.wet,
+            normal_x=self.normal_x,
+            normal_y=self.normal_y,
+            normal_z=self.normal_z,
+            froude=self.froude,
+        )
+        return output_path
+
+
+@dataclass(frozen=True, slots=True)
+class GeoClawProbeSeries:
+    probe_id: str
+    kind: str
+    times: tuple[float, ...]
+    values: dict[str, tuple[float, ...]]
+    metadata: dict[str, object] = field(default_factory=dict)
+
+    def write_csv(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        columns = ["time", *self.values.keys()]
+        with output_path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.writer(handle)
+            writer.writerow(columns)
+            for index, time in enumerate(self.times):
+                writer.writerow([time, *[self.values[column][index] for column in self.values]])
+        return output_path
+
+    def to_manifest_dict(self) -> dict[str, object]:
+        return {
+            "probe_id": self.probe_id,
+            "kind": self.kind,
+            "sample_count": len(self.times),
+            "metadata": self.metadata,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class GeoClawCrossSectionSeries:
+    probe_id: str
+    times: tuple[float, ...]
+    distance: tuple[float, ...]
+    h: FloatGrid
+    eta: FloatGrid
+    u: FloatGrid
+    v: FloatGrid
+    froude: FloatGrid
+    metadata: dict[str, object] = field(default_factory=dict)
+
+    def write_npz(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        np.savez_compressed(
+            output_path,
+            times=np.asarray(self.times, dtype=np.float64),
+            distance=np.asarray(self.distance, dtype=np.float64),
+            h=self.h,
+            eta=self.eta,
+            u=self.u,
+            v=self.v,
+            froude=self.froude,
+        )
+        return output_path
+
+    def to_manifest_dict(self) -> dict[str, object]:
+        return {
+            "probe_id": self.probe_id,
+            "time_count": len(self.times),
+            "distance_count": len(self.distance),
+            "metadata": self.metadata,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class GeoClawNormalizedOutputResult:
+    scenario_id: str
+    output_dir: Path
+    manifest_path: Path
+    frame_count: int
+    probe_count: int
+    cross_section_count: int
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "scenario_id": self.scenario_id,
+            "output_dir": str(self.output_dir),
+            "manifest_path": str(self.manifest_path),
+            "frame_count": self.frame_count,
+            "probe_count": self.probe_count,
+            "cross_section_count": self.cross_section_count,
         }
 
 
@@ -427,6 +575,97 @@ def export_rafting_geoclaw_scenarios(
     )
 
 
+def normalize_geoclaw_fixed_grid_output(
+    geoclaw_export_dir: str | Path,
+    output_dir: str | Path | None = None,
+    *,
+    config: GeoClawExportConfig | None = None,
+) -> GeoClawNormalizedOutputResult:
+    """Normalize GeoClaw fixed-grid frames into the frozen telemetry schema."""
+
+    export_root = Path(geoclaw_export_dir)
+    export_manifest_path = export_root / "manifest.json"
+    if not export_manifest_path.exists():
+        raise FileNotFoundError(f"GeoClaw export manifest not found: {export_manifest_path}")
+    export_manifest = json.loads(export_manifest_path.read_text(encoding="utf-8"))
+    scenario = read_scenario2_5d_package(export_root / "shared_scenario")
+    cfg = config or GeoClawExportConfig()
+    frames = _load_geoclaw_fgout_frames(export_root, scenario, cfg)
+    if not frames:
+        frames = (frame_from_geoclaw_initial_state(scenario, config=cfg),)
+
+    probes, cross_sections = _sample_normalized_outputs(scenario, frames)
+    root = Path(output_dir) if output_dir is not None else export_root / "normalized"
+    root.mkdir(parents=True, exist_ok=True)
+
+    frame_files: list[str] = []
+    for index, frame in enumerate(frames):
+        relative = Path("frames") / f"frame_{index:04d}.npz"
+        frame.write_npz(root / relative)
+        frame_files.append(relative.as_posix())
+
+    probe_files: list[str] = []
+    for probe in probes:
+        relative = Path("probes") / f"{probe.probe_id}.csv"
+        probe.write_csv(root / relative)
+        probe_files.append(relative.as_posix())
+
+    cross_section_files: list[str] = []
+    for cross_section in cross_sections:
+        relative = Path("cross_sections") / f"{cross_section.probe_id}.npz"
+        cross_section.write_npz(root / relative)
+        cross_section_files.append(relative.as_posix())
+
+    validation = _normalized_validation(scenario, frames)
+    _write_json(root / "validation.json", validation)
+    manifest = {
+        "schema": GEOCLAW_NORMALIZED_OUTPUT_SCHEMA,
+        "scenario_id": scenario.metadata.scenario_id,
+        "source_export_manifest": str(export_manifest_path),
+        "source_export_schema": export_manifest.get("schema"),
+        "run_status": {
+            "mode": "fgout_npz" if (export_root / "fgout_frames").exists() else "export_initial_state_only",
+            "frame_count": len(frames),
+        },
+        "config": cfg.to_json_dict(),
+        "validation": "validation.json",
+        "frames": frame_files,
+        "probes": probe_files,
+        "cross_sections": cross_section_files,
+        "probe_manifest": [probe.to_manifest_dict() for probe in probes],
+        "cross_section_manifest": [cross_section.to_manifest_dict() for cross_section in cross_sections],
+    }
+    manifest_path = root / "manifest.json"
+    _write_json(manifest_path, manifest)
+    return GeoClawNormalizedOutputResult(
+        scenario_id=scenario.metadata.scenario_id,
+        output_dir=root,
+        manifest_path=manifest_path,
+        frame_count=len(frames),
+        probe_count=len(probes),
+        cross_section_count=len(cross_sections),
+    )
+
+
+def frame_from_geoclaw_initial_state(
+    scenario: Scenario2_5D,
+    *,
+    time: float = 0.0,
+    config: GeoClawExportConfig | None = None,
+) -> GeoClawNormalizedFrame:
+    """Build a normalized GeoClaw frame from a shared scenario initial state."""
+
+    cfg = config or GeoClawExportConfig()
+    return _normalized_frame_from_h_momentum(
+        scenario,
+        h=scenario.initial_state.depth,
+        hu=scenario.initial_state.hu,
+        hv=scenario.initial_state.hv,
+        time=time,
+        config=cfg,
+    )
+
+
 def _rafting_case_scenario(case_id: str, seed: int) -> Scenario2_5D:
     base = generate_procedural_scenario2_5d(
         ProceduralScenario2_5DParameters(
@@ -539,6 +778,182 @@ def _focus_features(scenario: Scenario2_5D, case_id: str) -> tuple[Feature2_5D, 
             ),
         )
     raise ValueError(f"Unknown GeoClaw rafting case: {case_id}")
+
+
+def _load_geoclaw_fgout_frames(
+    export_root: Path,
+    scenario: Scenario2_5D,
+    config: GeoClawExportConfig,
+) -> tuple[GeoClawNormalizedFrame, ...]:
+    frame_dir = export_root / "fgout_frames"
+    if not frame_dir.exists():
+        return ()
+    frames: list[GeoClawNormalizedFrame] = []
+    for frame_path in sorted(frame_dir.glob("*.npz")):
+        with np.load(frame_path) as data:
+            time = float(np.asarray(data["time"])) if "time" in data else float(len(frames))
+            h = np.asarray(data["h"], dtype=np.float64)
+            hu = np.asarray(data["hu"], dtype=np.float64) if "hu" in data else h * np.asarray(data["u"], dtype=np.float64)
+            hv = np.asarray(data["hv"], dtype=np.float64) if "hv" in data else h * np.asarray(data["v"], dtype=np.float64)
+        frames.append(_normalized_frame_from_h_momentum(scenario, h=h, hu=hu, hv=hv, time=time, config=config))
+    return tuple(frames)
+
+
+def _normalized_frame_from_h_momentum(
+    scenario: Scenario2_5D,
+    *,
+    h: FloatGrid,
+    hu: FloatGrid,
+    hv: FloatGrid,
+    time: float,
+    config: GeoClawExportConfig,
+) -> GeoClawNormalizedFrame:
+    h_grid = np.maximum(np.asarray(h, dtype=np.float64), 0.0)
+    hu_grid = np.asarray(hu, dtype=np.float64)
+    hv_grid = np.asarray(hv, dtype=np.float64)
+    wet = h_grid > config.dry_tolerance
+    u = np.where(wet, hu_grid / np.maximum(h_grid, config.dry_tolerance), 0.0)
+    v = np.where(wet, hv_grid / np.maximum(h_grid, config.dry_tolerance), 0.0)
+    eta = scenario.bed + h_grid
+    normal_x, normal_y, normal_z = _surface_normals(eta, scenario.grid.dx, scenario.grid.dy)
+    speed = np.sqrt(u**2 + v**2)
+    froude = np.where(wet, speed / np.sqrt(np.maximum(config.gravity * h_grid, config.dry_tolerance)), 0.0)
+    return GeoClawNormalizedFrame(
+        time=time,
+        h=h_grid,
+        eta=eta,
+        u=u,
+        v=v,
+        hu=hu_grid,
+        hv=hv_grid,
+        wet=wet,
+        normal_x=normal_x,
+        normal_y=normal_y,
+        normal_z=normal_z,
+        froude=froude,
+    )
+
+
+def _sample_normalized_outputs(
+    scenario: Scenario2_5D,
+    frames: tuple[GeoClawNormalizedFrame, ...],
+) -> tuple[tuple[GeoClawProbeSeries, ...], tuple[GeoClawCrossSectionSeries, ...]]:
+    point_probes: list[GeoClawProbeSeries] = []
+    cross_sections: list[GeoClawCrossSectionSeries] = []
+    for probe in scenario.probes:
+        if probe.kind == "cross_section":
+            cross_sections.append(_sample_normalized_cross_section(scenario, frames, probe))
+        else:
+            point_probes.append(_sample_normalized_point_probe(scenario, frames, probe))
+    return tuple(point_probes), tuple(cross_sections)
+
+
+def _sample_normalized_point_probe(
+    scenario: Scenario2_5D,
+    frames: tuple[GeoClawNormalizedFrame, ...],
+    probe,
+) -> GeoClawProbeSeries:
+    row, column = _grid_index_for_position(scenario, probe.position)
+    field_names = ("h", "eta", "u", "v", "hu", "hv", "wet", "froude")
+    values: dict[str, tuple[float, ...]] = {}
+    for name in field_names:
+        values[name] = tuple(float(getattr(frame, name)[row, column]) for frame in frames)
+    return GeoClawProbeSeries(
+        probe_id=probe.probe_id,
+        kind=probe.kind,
+        times=tuple(frame.time for frame in frames),
+        values=values,
+        metadata={"row": row, "column": column, "position": probe.position},
+    )
+
+
+def _sample_normalized_cross_section(
+    scenario: Scenario2_5D,
+    frames: tuple[GeoClawNormalizedFrame, ...],
+    probe,
+) -> GeoClawCrossSectionSeries:
+    normal = probe.normal or (0.0, 1.0)
+    length = probe.length or (scenario.grid.ny - 1) * scenario.grid.dy
+    normal_length = math.hypot(normal[0], normal[1]) or 1.0
+    unit_normal = (normal[0] / normal_length, normal[1] / normal_length)
+    sample_count = max(2, int(length / min(scenario.grid.dx, scenario.grid.dy)) + 1)
+    distance = np.linspace(-length * 0.5, length * 0.5, sample_count, dtype=np.float64)
+    positions = [
+        (
+            probe.position[0] + unit_normal[0] * float(offset),
+            probe.position[1] + unit_normal[1] * float(offset),
+        )
+        for offset in distance
+    ]
+    indices = [_grid_index_for_position(scenario, position) for position in positions]
+
+    def sample_field(field_name: str) -> FloatGrid:
+        data = np.zeros((len(frames), sample_count), dtype=np.float64)
+        for frame_index, frame in enumerate(frames):
+            field = getattr(frame, field_name)
+            for sample_index, (row, column) in enumerate(indices):
+                data[frame_index, sample_index] = float(field[row, column])
+        return data
+
+    return GeoClawCrossSectionSeries(
+        probe_id=probe.probe_id,
+        times=tuple(frame.time for frame in frames),
+        distance=tuple(float(value) for value in distance),
+        h=sample_field("h"),
+        eta=sample_field("eta"),
+        u=sample_field("u"),
+        v=sample_field("v"),
+        froude=sample_field("froude"),
+        metadata={"position": probe.position, "normal": unit_normal, "length": length},
+    )
+
+
+def _normalized_validation(scenario: Scenario2_5D, frames: tuple[GeoClawNormalizedFrame, ...]) -> dict[str, object]:
+    mass_initial = frames[0].mass(scenario)
+    mass_final = frames[-1].mass(scenario)
+    relative_drift = abs(mass_final - mass_initial) / max(abs(mass_initial), 1.0e-9)
+    max_velocity = max(frame.max_velocity for frame in frames)
+    min_depth = min(frame.min_depth for frame in frames)
+    checks = [
+        {
+            "name": "finite_fields",
+            "passed": all(
+                bool(np.isfinite(getattr(frame, name)).all())
+                for frame in frames
+                for name in ("h", "eta", "u", "v", "hu", "hv", "froude")
+            ),
+        },
+        {"name": "nonnegative_depth", "passed": min_depth >= -1.0e-10, "min_depth": min_depth},
+        {"name": "bounded_velocity", "passed": max_velocity <= 120.0, "max_velocity": max_velocity},
+        {"name": "mass_drift_recorded", "passed": math.isfinite(relative_drift), "relative_drift": relative_drift},
+    ]
+    return {
+        "passed": all(bool(check["passed"]) for check in checks),
+        "mass_initial": mass_initial,
+        "mass_final": mass_final,
+        "mass_relative_drift": relative_drift,
+        "max_velocity": max_velocity,
+        "min_depth": min_depth,
+        "checks": checks,
+    }
+
+
+def _surface_normals(eta: FloatGrid, dx: float, dy: float) -> tuple[FloatGrid, FloatGrid, FloatGrid]:
+    d_eta_dy, d_eta_dx = np.gradient(eta, dy, dx)
+    normal_x = -d_eta_dx
+    normal_y = -d_eta_dy
+    normal_z = np.ones_like(eta)
+    length = np.sqrt(normal_x**2 + normal_y**2 + normal_z**2)
+    return normal_x / length, normal_y / length, normal_z / length
+
+
+def _grid_index_for_position(scenario: Scenario2_5D, position: tuple[float, float]) -> tuple[int, int]:
+    x, y = position
+    column = int(round((x - scenario.grid.origin_x) / scenario.grid.dx))
+    row = int(round((y - scenario.grid.origin_y) / scenario.grid.dy))
+    column = max(0, min(scenario.grid.nx - 1, column))
+    row = max(0, min(scenario.grid.ny - 1, row))
+    return row, column
 
 
 def _write_shared_scenario_package(scenario: Scenario2_5D, root: Path) -> list[str]:

@@ -12,6 +12,7 @@ from ..geoclaw_reference import (
     export_canonical_geoclaw_scenarios,
     export_rafting_geoclaw_scenarios,
     export_geoclaw_scenario,
+    normalize_geoclaw_fixed_grid_output,
     write_geoclaw_setup_report,
 )
 from ..scenario2_5d import (
@@ -33,6 +34,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--fixture", choices=FIXTURE_CHOICES, default=None, help="Generate and export one canonical fixture.")
     parser.add_argument("--all-fixtures", action="store_true", help="Generate and export the full canonical GeoClaw fixture suite.")
     parser.add_argument("--rafting-suite", action="store_true", help="Generate and export rafting feature cases plus real-world flow bands.")
+    parser.add_argument("--normalize-export", type=Path, default=None, help="Normalize an existing GeoClaw export directory.")
     parser.add_argument("--procedural", action="store_true", help="Generate and export one procedural rapid.")
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--nx", type=int, default=64)
@@ -51,8 +53,15 @@ def main(argv: list[str] | None = None) -> int:
         write_geoclaw_setup_report(args.output_dir, availability)
         return 0 if availability.available or args.allow_unavailable else 1
 
+    if args.normalize_export is not None:
+        result = normalize_geoclaw_fixed_grid_output(args.normalize_export, args.output_dir)
+        print(f"scenario={result.scenario_id}")
+        print(f"manifest={result.manifest_path}")
+        print(f"frames={result.frame_count}")
+        return 0
+
     if args.all_fixtures:
-        if any((args.scenario_dir, args.fixture, args.rafting_suite, args.procedural)):
+        if any((args.scenario_dir, args.fixture, args.rafting_suite, args.normalize_export, args.procedural)):
             raise SystemExit("Select --all-fixtures by itself, or choose one single scenario source.")
         result = export_canonical_geoclaw_scenarios(
             args.output_dir / f"canonical_geoclaw_seed_{args.seed}",
@@ -68,7 +77,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.rafting_suite:
-        if any((args.scenario_dir, args.fixture, args.procedural)):
+        if any((args.scenario_dir, args.fixture, args.normalize_export, args.procedural)):
             raise SystemExit("Select --rafting-suite by itself, or choose one single scenario source.")
         result = export_rafting_geoclaw_scenarios(
             args.output_dir / f"rafting_geoclaw_seed_{args.seed}",

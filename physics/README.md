@@ -165,6 +165,17 @@ PYTHONPATH=src python -m raftsim.examples.run_geoclaw_reference --rafting-suite 
 
 That suite includes boulder garden, cascading wave train, hydraulic hole/downstream boil, lateral wave, eddy-line shear, shallow shelf, and South Fork American low/median/high runnable flow scenarios.
 
+Normalize a GeoClaw export into comparison-ready frames with:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.run_geoclaw_reference \
+  --normalize-export outputs/geoclaw_reference/canonical_geoclaw_seed_1/uniform_channel_seed_1 \
+  --output-dir outputs/geoclaw_normalized/uniform_channel_seed_1
+```
+
+The normalized schema writes `manifest.json`, `validation.json`, `frames/*.npz`, `probes/*.csv`, and `cross_sections/*.npz`.
+
 ## PyClaw Reference Harness
 
 PyClaw is now a legacy reference path. Its outputs are useful for historical regression checks and provenance, but they are not the active acceptance target for C++ or Unreal water. Install it with the same research extra when you need to inspect old runs:
