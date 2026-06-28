@@ -1,0 +1,32 @@
+{
+  "schema": "raftsim.unreal.voice_command_accessibility_settings.v1",
+  "activation_modes": ["push_to_talk", "open_mic", "disabled_manual_only"],
+  "defaults": {
+    "activation_mode": "push_to_talk",
+    "execute_confidence_threshold": 0.78,
+    "confirm_confidence_threshold": 0.58,
+    "max_command_latency_ms": 240,
+    "subtitles_required": true,
+    "manual_input_parity_required": true
+  },
+  "ambiguous_command_policy": {
+    "below_execute_above_confirm": "ask_for_confirmation_or_require_repeat",
+    "below_confirm": "ignore_and_log_low_confidence",
+    "critical_commands": ["high_side", "rescue", "recovery"],
+    "critical_command_confirmation_allowed": true
+  },
+  "noisy_river_test_cases": [
+    "calm_pool_low_noise",
+    "wave_train_medium_noise",
+    "hydraulic_high_noise",
+    "crew_talking_overlap",
+    "vr_microphone_wind_noise"
+  ],
+  "accessibility_fallbacks": [
+    "button_command_wheel",
+    "keyboard_shortcuts",
+    "gamepad_radial_menu",
+    "vr_controller_radial_menu",
+    "subtitles_and_command_history"
+  ]
+}
