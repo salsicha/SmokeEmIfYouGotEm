@@ -44,6 +44,11 @@
       "Name": "RaftSimDebug",
       "Type": "Runtime",
       "LoadingPhase": "Default"
+    },
+    {
+      "Name": "RaftSimAI",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
     }
   ]
 }

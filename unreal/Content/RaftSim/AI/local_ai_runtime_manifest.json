@@ -1,0 +1,30 @@
+{
+  "schema": "raftsim.unreal.local_ai_runtime.v1",
+  "module": "RaftSimAI",
+  "privacy_policy": "offline_first_no_cloud_required_for_core_gameplay",
+  "layers": [
+    {
+      "layer": "speech_recognition",
+      "interface": "IRaftSimSpeechRecognizer",
+      "purpose": "convert guide speech into transcript and confidence"
+    },
+    {
+      "layer": "command_intent_parser",
+      "purpose": "map transcript into deterministic crew command intents"
+    },
+    {
+      "layer": "crew_dialogue",
+      "interface": "IRaftSimCrewDialogueProvider",
+      "purpose": "select or generate non-critical crew conversation lines"
+    },
+    {
+      "layer": "local_tts_optional",
+      "purpose": "prototype crew voice rendering when approved audio assets are unavailable"
+    }
+  ],
+  "runtime_constraints": {
+    "core_paddling_commands_must_be_deterministic": true,
+    "cloud_ai_not_required": true,
+    "manual_input_parity_required": true
+  }
+}
