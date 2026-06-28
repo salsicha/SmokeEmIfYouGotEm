@@ -1,0 +1,30 @@
+{
+  "schema": "raftsim.unreal.lobby_session_flow.v1",
+  "flow": [
+    "create_or_join_session",
+    "choose_river_section_season_flow_difficulty",
+    "assign_seats",
+    "configure_voice_privacy",
+    "ready_check",
+    "load_replay_or_live_physics",
+    "run_rapid",
+    "score_and_replay"
+  ],
+  "seat_assignment": {
+    "manual_seat_pick": true,
+    "host_can_assign": true,
+    "role_conflicts_block_ready": true,
+    "ai_fills_empty_allowed_seats": true
+  },
+  "session_recovery": {
+    "reconnect_window_seconds": 90,
+    "host_migration": "planned_contract",
+    "session_recovery_snapshot_frames": 300,
+    "ai_takeover_for_dropped_players": true
+  },
+  "ready_check": {
+    "all_human_players_ready_required": true,
+    "voice_privacy_ack_required": true,
+    "vr_comfort_ack_required_for_vr_players": true
+  }
+}

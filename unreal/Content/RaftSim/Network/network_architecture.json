@@ -1,0 +1,33 @@
+{
+  "schema": "raftsim.unreal.network_architecture.v1",
+  "production_gate": "after_single_player_guide_physics_voice_ai_vertical_slice_is_stable",
+  "first_playable_architecture": "listen_server_authoritative_host",
+  "supported_modes": [
+    {
+      "mode": "lan_offline_coop",
+      "priority": 1,
+      "purpose": "local deterministic physics and mixed desktop/VR testing"
+    },
+    {
+      "mode": "listen_server",
+      "priority": 2,
+      "purpose": "first internet-capable prototype with authoritative host"
+    },
+    {
+      "mode": "relay_session_service",
+      "priority": 3,
+      "purpose": "NAT-friendly sessions after account/privacy choices"
+    },
+    {
+      "mode": "dedicated_server",
+      "priority": 4,
+      "purpose": "later competitive or persistent sessions if physics budgets allow"
+    }
+  ],
+  "authority": {
+    "raft_water_physics": "host_or_server_authoritative",
+    "client_prediction": "input_pose_and_intent_only",
+    "raft_transform": "authoritative_state_with_correction",
+    "replay": "fixed_frame_ids_hashes_and_input_events"
+  }
+}

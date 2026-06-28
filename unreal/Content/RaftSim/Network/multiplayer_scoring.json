@@ -1,0 +1,34 @@
+{
+  "schema": "raftsim.unreal.multiplayer_scoring.v1",
+  "score_categories": [
+    {
+      "category": "crew_coordination",
+      "signals": ["synchronized_paddle_timing", "role_coverage", "brace_timing"]
+    },
+    {
+      "category": "command_clarity",
+      "signals": ["guide_command_latency", "command_acknowledgment", "low_confidence_repeats"]
+    },
+    {
+      "category": "safety",
+      "signals": ["falls_prevented", "swimmers_recovered", "high_side_success"]
+    },
+    {
+      "category": "line_execution",
+      "signals": ["target_line_error", "boat_angle", "hazard_avoidance"]
+    },
+    {
+      "category": "rescue_timing",
+      "signals": ["rescue_callout_time", "grab_or_rope_timing", "recovery_completion"]
+    },
+    {
+      "category": "communication",
+      "signals": ["voice_activity_balance", "overlap_events", "critical_callout_readability"]
+    }
+  ],
+  "fairness_policy": {
+    "score_uses_authoritative_physics_frames": true,
+    "late_or_lost_inputs_are_logged": true,
+    "ai_takeover_periods_are_annotated": true
+  }
+}
