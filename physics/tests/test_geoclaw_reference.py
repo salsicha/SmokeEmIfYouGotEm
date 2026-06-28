@@ -1,7 +1,9 @@
 import json
+import csv
 
 import pytest
 
+from raftsim.comparison import compare_dual_solver_diagnostics, compare_dual_solver_fields
 from raftsim.examples.run_geoclaw_reference import main as geoclaw_main
 from raftsim.geoclaw_reference import (
     GEOCLAW_CANONICAL_FIXTURES,
@@ -287,3 +289,97 @@ def test_geoclaw_cli_normalizes_export(tmp_path):
 
     assert exit_code == 0
     assert (tmp_path / "normalized" / "manifest.json").exists()
+
+
+def test_comparison_harness_accepts_geoclaw_reference_manifest(tmp_path):
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="flat_pool", seed=19, nx=12, ny=8)
+    )
+    scenario_dir = scenario.write_package(tmp_path / "scenario" / scenario.metadata.scenario_id)
+    export = export_geoclaw_scenario(scenario, tmp_path / "geoclaw_export")
+    normalized = normalize_geoclaw_fixed_grid_output(export.output_dir, tmp_path / "geoclaw_normalized")
+    frame = frame_from_geoclaw_initial_state(scenario)
+    cpp_dir = tmp_path / "cpp_solver" / scenario.metadata.scenario_id
+    _write_cpp_frame_csv(cpp_dir / "frames" / "frame_0000.csv", frame)
+    _write_json(
+        cpp_dir / "manifest.json",
+        {
+            "frames": ["frames/frame_0000.csv"],
+            "probes": [],
+            "cross_sections": [],
+        },
+    )
+    _write_json(
+        tmp_path / "dual_solver_manifest.json",
+        {
+            "scenario_id": scenario.metadata.scenario_id,
+            "scenario_package": str(scenario_dir.relative_to(tmp_path)),
+            "geoclaw": {
+                "solver": "geoclaw",
+                "output_dir": str(normalized.output_dir.relative_to(tmp_path)),
+                "manifest": str(normalized.manifest_path.relative_to(tmp_path)),
+                "validation": str((normalized.output_dir / "validation.json").relative_to(tmp_path)),
+                "runtime_seconds": 0.0,
+            },
+            "cpp": {
+                "output_dir": str(cpp_dir.relative_to(tmp_path)),
+                "manifest": str((cpp_dir / "manifest.json").relative_to(tmp_path)),
+                "validation": str((cpp_dir / "validation.json").relative_to(tmp_path)),
+                "runtime_seconds": 0.0,
+            },
+        },
+    )
+
+    field_report = compare_dual_solver_fields(tmp_path)
+    diagnostic_report = compare_dual_solver_diagnostics(tmp_path)
+
+    assert field_report.frame_comparisons[0].reference_solver == "geoclaw"
+    assert field_report.frame_comparisons[0].field_errors[0].linf == 0.0
+    assert diagnostic_report.reference_solver == "geoclaw"
+    assert diagnostic_report.pyclaw.solver == "geoclaw"
+
+
+def _write_cpp_frame_csv(path, frame) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    columns = [
+        "row",
+        "col",
+        "h",
+        "eta",
+        "u",
+        "v",
+        "hu",
+        "hv",
+        "wet",
+        "normal_x",
+        "normal_y",
+        "normal_z",
+        "froude",
+    ]
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(columns)
+        for row in range(frame.h.shape[0]):
+            for col in range(frame.h.shape[1]):
+                writer.writerow(
+                    [
+                        row,
+                        col,
+                        frame.h[row, col],
+                        frame.eta[row, col],
+                        frame.u[row, col],
+                        frame.v[row, col],
+                        frame.hu[row, col],
+                        frame.hv[row, col],
+                        int(frame.wet[row, col]),
+                        frame.normal_x[row, col],
+                        frame.normal_y[row, col],
+                        frame.normal_z[row, col],
+                        frame.froude[row, col],
+                    ]
+                )
+
+
+def _write_json(path, data) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
