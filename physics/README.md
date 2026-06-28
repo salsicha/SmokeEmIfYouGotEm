@@ -176,6 +176,17 @@ PYTHONPATH=src python -m raftsim.examples.run_geoclaw_reference \
 
 The normalized schema writes `manifest.json`, `validation.json`, `frames/*.npz`, `probes/*.csv`, and `cross_sections/*.npz`.
 
+Tune C++ candidates against the GeoClaw reference path with:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.tune_cpp_solver \
+  --reference-solver geoclaw \
+  --cpp-solver /tmp/raftsim-water-build/raftsim_water_solver
+```
+
+The legacy PyClaw tuning path remains available with `--reference-solver pyclaw` for historical regression checks.
+
 ## PyClaw Reference Harness
 
 PyClaw is now a legacy reference path. Its outputs are useful for historical regression checks and provenance, but they are not the active acceptance target for C++ or Unreal water. Install it with the same research extra when you need to inspect old runs:

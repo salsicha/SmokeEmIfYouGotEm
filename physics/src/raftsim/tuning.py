@@ -7,7 +7,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .comparison import ScenarioThresholds, ThresholdEvaluationReport, evaluate_dual_solver_thresholds
-from .dual_solver import CppSolverRunConfig, DualSolverRunConfig, run_dual_solver_scenario
+from .dual_solver import CppSolverRunConfig, DualSolverRunConfig, run_cpp_solver_scenario, run_dual_solver_scenario
+from .geoclaw_reference import GeoClawExportConfig, export_geoclaw_scenario, normalize_geoclaw_fixed_grid_output
 from .math3d import Vec3
 from .pyclaw_reference import PyClawRunConfig
 from .raft_coupling2_5d import (
@@ -191,6 +192,84 @@ def tune_cpp_solver_against_pyclaw(
     return report
 
 
+def tune_cpp_solver_against_geoclaw(
+    scenario: Scenario2_5D,
+    *,
+    output_dir: str | Path,
+    cpp_solver_executable: str | Path,
+    candidates: tuple[CppTuningCandidate, ...],
+    geoclaw_config: GeoClawExportConfig | None = None,
+    thresholds: ScenarioThresholds | None = None,
+    cpp_steps: int | None = None,
+    cpp_frame_interval: int | None = None,
+) -> CppTuningReport:
+    """Run C++ parameter candidates against normalized GeoClaw reference output."""
+
+    if not candidates:
+        raise ValueError("At least one tuning candidate is required.")
+    root = Path(output_dir)
+    root.mkdir(parents=True, exist_ok=True)
+    results: list[CppTuningCandidateResult] = []
+    for candidate in candidates:
+        candidate_dir = root / candidate.label
+        candidate_dir.mkdir(parents=True, exist_ok=True)
+        geoclaw_export = export_geoclaw_scenario(
+            scenario,
+            candidate_dir / "geoclaw_export" / scenario.metadata.scenario_id,
+            config=geoclaw_config,
+        )
+        geoclaw_normalized = normalize_geoclaw_fixed_grid_output(
+            geoclaw_export.output_dir,
+            candidate_dir / "geoclaw_reference" / scenario.metadata.scenario_id,
+            config=geoclaw_config,
+        )
+        cpp_result = run_cpp_solver_scenario(
+            scenario,
+            output_dir=candidate_dir,
+            config=CppSolverRunConfig(
+                executable=Path(cpp_solver_executable),
+                steps=cpp_steps,
+                frame_interval=cpp_frame_interval,
+                solver_mode=candidate.solver_mode,
+                boundary_mode=candidate.boundary_mode,
+                flux_scheme=candidate.flux_scheme,
+                cfl=candidate.cfl,
+                feature_strength_scale=candidate.feature_strength_scale,
+                roughness_scale=candidate.roughness_scale,
+                bed_slope_source_scale=candidate.bed_slope_source_scale,
+            ),
+        )
+        manifest_path = _write_geoclaw_dual_solver_manifest(
+            candidate_dir,
+            scenario,
+            geoclaw_normalized,
+            cpp_result,
+        )
+        threshold_path = candidate_dir / "threshold_evaluation.json"
+        threshold_report = evaluate_dual_solver_thresholds(
+            manifest_path,
+            thresholds=thresholds,
+            output_path=threshold_path,
+        )
+        results.append(
+            CppTuningCandidateResult(
+                candidate=candidate,
+                score=_score_threshold_report(threshold_report),
+                passed=threshold_report.passed,
+                dual_solver_dir=candidate_dir,
+                threshold_report=threshold_path,
+            )
+        )
+    best = min(results, key=lambda result: result.score)
+    report = CppTuningReport(
+        scenario_id=scenario.metadata.scenario_id,
+        best_candidate=best,
+        candidates=tuple(results),
+    )
+    report.write_json(root / "geoclaw_tuning_report.json")
+    return report
+
+
 def fit_cpp_and_raft_parameters_against_pyclaw(
     scenario: Scenario2_5D,
     *,
@@ -264,6 +343,40 @@ def _score_threshold_report(report: ThresholdEvaluationReport) -> float:
         if not check.passed:
             score += 10.0 + normalized
     return score
+
+
+def _write_geoclaw_dual_solver_manifest(
+    root: Path,
+    scenario: Scenario2_5D,
+    geoclaw_normalized,
+    cpp_result,
+) -> Path:
+    scenario_dir = root / "scenario" / scenario.metadata.scenario_id
+    scenario.write_package(scenario_dir)
+    manifest = {
+        "scenario_id": scenario.metadata.scenario_id,
+        "scenario_package": _relative_or_absolute(scenario_dir, root),
+        "scenario_json": _relative_or_absolute(scenario_dir / "scenario.json", root),
+        "geoclaw": {
+            "solver": "geoclaw",
+            "output_dir": _relative_or_absolute(geoclaw_normalized.output_dir, root),
+            "manifest": _relative_or_absolute(geoclaw_normalized.manifest_path, root),
+            "validation": _relative_or_absolute(geoclaw_normalized.output_dir / "validation.json", root),
+            "runtime_seconds": 0.0,
+            "seconds_per_simulated_second": 0.0,
+        },
+        "cpp": cpp_result.to_json_dict(root),
+        "runtime": {
+            "simulated_duration_seconds": scenario.duration,
+            "geoclaw_runtime_seconds": 0.0,
+            "geoclaw_seconds_per_simulated_second": 0.0,
+            "cpp_runtime_seconds": cpp_result.runtime_seconds,
+            "cpp_seconds_per_simulated_second": cpp_result.runtime_seconds / max(scenario.duration, 1.0e-12),
+        },
+    }
+    manifest_path = root / "dual_solver_manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
+    return manifest_path
 
 
 def _score_raft_force_fit(

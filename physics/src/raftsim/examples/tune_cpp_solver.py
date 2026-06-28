@@ -1,4 +1,4 @@
-"""Tune C++ reduced solver parameters against a PyClaw reference scenario."""
+"""Tune C++ reduced solver parameters against a reference scenario."""
 
 from __future__ import annotations
 
@@ -7,11 +7,12 @@ from pathlib import Path
 
 from ..pyclaw_reference import PyClawRunConfig
 from ..scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
-from ..tuning import CppTuningCandidate, tune_cpp_solver_against_pyclaw
+from ..tuning import CppTuningCandidate, tune_cpp_solver_against_geoclaw, tune_cpp_solver_against_pyclaw
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--reference-solver", choices=("geoclaw", "pyclaw"), default="geoclaw")
     parser.add_argument("--fixture", default="flat_pool")
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--nx", type=int, default=16)
@@ -34,27 +35,43 @@ def main(argv: list[str] | None = None) -> int:
         )
     )
     candidates = tuple(_parse_candidate(value) for value in args.candidate) if args.candidate else (
-        CppTuningCandidate("baseline", 1.0, 1.0),
-        CppTuningCandidate("lower_forcing", 0.75, 1.0),
-        CppTuningCandidate("higher_roughness", 1.0, 1.25),
+        CppTuningCandidate("baseline", feature_strength_scale=1.0, roughness_scale=1.0),
+        CppTuningCandidate("lower_forcing", feature_strength_scale=0.75, roughness_scale=1.0),
+        CppTuningCandidate("higher_roughness", feature_strength_scale=1.0, roughness_scale=1.25),
     )
-    report = tune_cpp_solver_against_pyclaw(
-        scenario,
-        output_dir=args.output_dir,
-        cpp_solver_executable=args.cpp_solver,
-        candidates=candidates,
-        pyclaw_config=PyClawRunConfig(num_output_times=1),
-        cpp_steps=args.cpp_steps,
-        cpp_frame_interval=args.cpp_frame_interval,
-    )
-    print(f"report={args.output_dir / 'tuning_report.json'}")
+    if args.reference_solver == "pyclaw":
+        report = tune_cpp_solver_against_pyclaw(
+            scenario,
+            output_dir=args.output_dir,
+            cpp_solver_executable=args.cpp_solver,
+            candidates=candidates,
+            pyclaw_config=PyClawRunConfig(num_output_times=1),
+            cpp_steps=args.cpp_steps,
+            cpp_frame_interval=args.cpp_frame_interval,
+        )
+        report_path = args.output_dir / "tuning_report.json"
+    else:
+        report = tune_cpp_solver_against_geoclaw(
+            scenario,
+            output_dir=args.output_dir,
+            cpp_solver_executable=args.cpp_solver,
+            candidates=candidates,
+            cpp_steps=args.cpp_steps,
+            cpp_frame_interval=args.cpp_frame_interval,
+        )
+        report_path = args.output_dir / "geoclaw_tuning_report.json"
+    print(f"report={report_path}")
     print(f"best={report.best_candidate.candidate.label} score={report.best_candidate.score:.6g}")
     return 0
 
 
 def _parse_candidate(value: str) -> CppTuningCandidate:
     label, feature_scale, roughness_scale = value.split(":")
-    return CppTuningCandidate(label, float(feature_scale), float(roughness_scale))
+    return CppTuningCandidate(
+        label,
+        feature_strength_scale=float(feature_scale),
+        roughness_scale=float(roughness_scale),
+    )
 
 
 if __name__ == "__main__":
