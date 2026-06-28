@@ -17,12 +17,14 @@ void URaftSimPhysicsBridgeSubsystem::Deinitialize()
 void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
     const FRaftSimWaterRuntimeConfig& WaterConfig,
     const FRaftSimRaftBodyConfig& RaftConfig,
+    const FRaftSimWaterRaftCouplingPolicy& InCouplingPolicy,
     float InWaterStepSeconds,
     float InChronoSubstepSeconds
 )
 {
     WaterStepSeconds = FMath::Max(InWaterStepSeconds, KINDA_SMALL_NUMBER);
     ChronoSubstepSeconds = FMath::Clamp(InChronoSubstepSeconds, KINDA_SMALL_NUMBER, WaterStepSeconds);
+    CouplingPolicy = InCouplingPolicy;
     AccumulatedSeconds = 0.0f;
     PhysicsFrame = 0;
     LastOutput = FRaftSimPhysicsTickOutput();

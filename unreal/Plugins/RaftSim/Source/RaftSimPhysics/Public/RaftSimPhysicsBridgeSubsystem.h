@@ -7,6 +7,31 @@
 
 #include "RaftSimPhysicsBridgeSubsystem.generated.h"
 
+UENUM(BlueprintType)
+enum class ERaftSimWaterRaftCouplingMode : uint8
+{
+    OneWayWaterToRaft,
+    BoundedTwoWayFeedback
+};
+
+USTRUCT(BlueprintType)
+struct FRaftSimWaterRaftCouplingPolicy
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Physics")
+    ERaftSimWaterRaftCouplingMode Mode = ERaftSimWaterRaftCouplingMode::OneWayWaterToRaft;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Physics")
+    bool bEnableRaftToWaterSourceTerms = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Physics")
+    float MaxDepthSourceMetersPerSecond = 0.04f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Physics")
+    float MaxMomentumSourceMetersPerSecondSquared = 0.2f;
+};
+
 USTRUCT(BlueprintType)
 struct FRaftSimPhysicsTickInput
 {
@@ -56,6 +81,7 @@ public:
     void ConfigureBridge(
         const FRaftSimWaterRuntimeConfig& WaterConfig,
         const FRaftSimRaftBodyConfig& RaftConfig,
+        const FRaftSimWaterRaftCouplingPolicy& InCouplingPolicy,
         float InWaterStepSeconds = 1.0f / 60.0f,
         float InChronoSubstepSeconds = 1.0f / 120.0f
     );
@@ -78,6 +104,7 @@ private:
 
     float WaterStepSeconds = 1.0f / 60.0f;
     float ChronoSubstepSeconds = 1.0f / 120.0f;
+    FRaftSimWaterRaftCouplingPolicy CouplingPolicy;
     float AccumulatedSeconds = 0.0f;
     int32 PhysicsFrame = 0;
 
