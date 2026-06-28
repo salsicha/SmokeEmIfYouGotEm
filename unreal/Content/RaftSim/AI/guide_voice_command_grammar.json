@@ -1,0 +1,57 @@
+{
+  "schema": "raftsim.unreal.guide_voice_command_grammar.v1",
+  "parser": "URaftSimGuideCommandParser",
+  "deterministic_execution": true,
+  "commands": [
+    {
+      "intent": "ForwardPaddle",
+      "phrases": ["forward", "all forward", "paddle forward"],
+      "crew_intent": "crew_forward_paddle"
+    },
+    {
+      "intent": "BackPaddle",
+      "phrases": ["back", "back paddle", "back stroke"],
+      "crew_intent": "crew_back_paddle"
+    },
+    {
+      "intent": "LeftPaddle",
+      "phrases": ["left", "left side", "left forward"],
+      "crew_intent": "crew_left_paddle"
+    },
+    {
+      "intent": "RightPaddle",
+      "phrases": ["right", "right side", "right forward"],
+      "crew_intent": "crew_right_paddle"
+    },
+    {
+      "intent": "Stop",
+      "phrases": ["stop", "rest", "easy"],
+      "crew_intent": "crew_stop"
+    },
+    {
+      "intent": "Brace",
+      "phrases": ["brace"],
+      "crew_intent": "crew_brace"
+    },
+    {
+      "intent": "HoldOn",
+      "phrases": ["hold on", "get down"],
+      "crew_intent": "crew_hold_on"
+    },
+    {
+      "intent": "HighSide",
+      "phrases": ["high side", "highside"],
+      "crew_intent": "crew_high_side"
+    },
+    {
+      "intent": "Rescue",
+      "phrases": ["rescue", "swimmer", "rope"],
+      "crew_intent": "crew_rescue"
+    },
+    {
+      "intent": "Recovery",
+      "phrases": ["recover", "reset", "back in"],
+      "crew_intent": "crew_recovery"
+    }
+  ]
+}
