@@ -1,41 +1,83 @@
 {
-  "schema": "raftsim.unreal.audio_source_manifest.v1",
+  "schema": "raftsim.unreal.audio_source_manifest.v2",
   "production_policy": {
-    "backbone": "professionally_recorded_downloaded_libraries_and_custom_field_recordings",
-    "ai_audio_role": "prototype_only_unless_legal_and_audio_review_approve_shipping_use",
+    "development_backbone": "free_open_first_party_generated_procedural_and_ai_generated_audio",
+    "paid_asset_decision": "defer_until_release_readiness_gate",
+    "buy_paid_assets_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true,
+    "ai_audio_role": "development_allowed_shipping_requires_release_gate_review",
     "manifest_required_for_every_asset": true
   },
   "initial_source_choices": [
     {
       "category": "river_water_beds_and_rapids",
-      "preferred_sources": ["BOOM Library", "Pro Sound Effects", "A Sound Effect", "custom_field_recording"],
-      "shipping_status": "candidate_purchase_or_record"
+      "preferred_sources": [
+        "ai_generated_development_assets",
+        "cc0_or_public_domain_water_sources",
+        "cc_by_sources_with_attribution",
+        "first_party_procedural_water_audio"
+      ],
+      "shipping_status": "development_only_until_release_gate"
     },
     {
       "category": "raft_paddle_rock_impacts",
-      "preferred_sources": ["custom_field_recording", "BOOM Library", "Pro Sound Effects", "Soundly"],
-      "shipping_status": "candidate_purchase_or_record"
+      "preferred_sources": [
+        "ai_generated_development_assets",
+        "first_party_generated_foley",
+        "free_open_foley_sources",
+        "first_party_recordings_without_paid_asset_license"
+      ],
+      "shipping_status": "development_only_until_release_gate"
     },
     {
       "category": "weather_wind_rain_spray",
-      "preferred_sources": ["BOOM Library", "Pro Sound Effects", "A Sound Effect", "Soundly"],
-      "shipping_status": "candidate_purchase"
+      "preferred_sources": [
+        "ai_generated_development_assets",
+        "cc0_or_public_domain_weather_sources",
+        "cc_by_sources_with_attribution",
+        "first_party_procedural_weather_audio"
+      ],
+      "shipping_status": "development_only_until_release_gate"
     },
     {
       "category": "gear_foley_pfd_helmet_rope",
-      "preferred_sources": ["custom_field_recording", "Pro Sound Effects", "A Sound Effect", "Sound Ideas"],
-      "shipping_status": "candidate_purchase_or_record"
+      "preferred_sources": [
+        "ai_generated_development_assets",
+        "first_party_generated_foley",
+        "free_open_foley_sources",
+        "first_party_recordings_without_paid_asset_license"
+      ],
+      "shipping_status": "development_only_until_release_gate"
     },
     {
       "category": "ui_training_debug",
-      "preferred_sources": ["authored_synth", "professional_libraries", "ai_generated_temp"],
-      "shipping_status": "prototype"
+      "preferred_sources": [
+        "authored_synth",
+        "procedural_audio",
+        "ai_generated_development_assets",
+        "free_open_ui_audio"
+      ],
+      "shipping_status": "development_only_until_release_gate"
     },
     {
       "category": "ambisonic_canyon_forest_ambience",
-      "preferred_sources": ["custom_field_recording", "Pro Sound Effects", "A Sound Effect"],
-      "shipping_status": "candidate_purchase_or_record"
+      "preferred_sources": [
+        "ai_generated_development_assets",
+        "free_open_ambience_sources",
+        "first_party_recordings_without_paid_asset_license",
+        "procedural_ambience_beds"
+      ],
+      "shipping_status": "development_only_until_release_gate"
     }
+  ],
+  "paid_research_reference_sources": [
+    "BOOM Library",
+    "Pro Sound Effects",
+    "A Sound Effect",
+    "Soundly",
+    "Fab",
+    "Sound Ideas",
+    "Sounddogs",
+    "BBC Sound Effects"
   ],
   "asset_record_fields": [
     "asset_id",

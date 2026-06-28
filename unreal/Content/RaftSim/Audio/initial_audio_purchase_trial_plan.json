@@ -1,7 +1,15 @@
 {
-  "schema": "raftsim.unreal.initial_audio_purchase_trial_plan.v1",
-  "goal": "small_high_value_starter_set_before_field_recordings_are_complete",
-  "purchase_order": [
+  "schema": "raftsim.unreal.deferred_audio_purchase_plan.v2",
+  "status": "deferred_until_release_readiness_gate",
+  "goal": "preserve_paid_library_research_but_do_not_buy_or_trial_paid_audio_libraries_during_development",
+  "active_development_sources": [
+    "free_open_audio",
+    "first_party_generated_audio",
+    "procedural_audio",
+    "ai_generated_audio"
+  ],
+  "buy_assets_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true,
+  "deferred_purchase_order": [
     {
       "priority": 1,
       "category": "water_and_rapid_beds",
@@ -39,7 +47,8 @@
       "preferred_sources": ["custom_field_recording", "Pro Sound Effects", "A Sound Effect"]
     }
   ],
-  "purchase_gate": {
+  "release_readiness_purchase_gate": {
+    "free_open_and_ai_generated_assets_failed_specific_requirement": false,
     "commercial_game_rights_confirmed": false,
     "team_or_seat_terms_confirmed": false,
     "redistribution_restrictions_confirmed": false,
@@ -47,5 +56,5 @@
     "attribution_requirements_confirmed": false,
     "license_snapshot_recorded": false
   },
-  "status_values": ["trial", "candidate", "approved", "rejected", "replaced"]
+  "status_values": ["deferred", "candidate_after_release_gate", "approved", "rejected", "replaced"]
 }

@@ -1,12 +1,21 @@
 {
-  "schema": "raftsim.unreal.production_audio_backbone_policy.v1",
-  "decision": "professionally_recorded_downloaded_libraries_and_custom_field_recordings_are_the_shipping_backbone",
+  "schema": "raftsim.unreal.development_audio_source_policy.v2",
+  "decision": "use_free_open_first_party_generated_procedural_and_ai_generated_audio_during_development",
+  "paid_asset_decision": "defer_until_release_readiness_gate",
   "priority_order": [
-    "custom_field_recording",
-    "professionally_licensed_libraries",
-    "reviewed_open_assets",
-    "ai_generated_prototype_only"
+    "first_party_procedural_or_generated_audio",
+    "ai_generated_audio_with_manifest_metadata",
+    "free_open_audio_with_clear_license_snapshot",
+    "first_party_recordings_without_third_party_asset_license_purchase",
+    "paid_professional_libraries_only_after_release_gate"
   ],
+  "paid_library_gate": {
+    "buy_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true,
+    "quality_gap_required": true,
+    "rights_or_platform_gap_required": false,
+    "production_risk_reduction_required": true,
+    "preserve_vendor_research_notes": true
+  },
   "shipping_asset_gate": {
     "manifest_record_required": true,
     "commercial_rights_required": true,
@@ -15,9 +24,10 @@
     "attribution_status_required": true,
     "approval_status_required": true,
     "storage_lfs_classification_required": true,
-    "spatialization_intent_required": true
+    "spatialization_intent_required": true,
+    "ai_generated_shipping_approval_required": true
   },
-  "shipping_categories": [
+  "development_categories": [
     "whitewater_beds",
     "rapids_hydraulics_eddies_boils",
     "spray_foam_underwater_nearwater",

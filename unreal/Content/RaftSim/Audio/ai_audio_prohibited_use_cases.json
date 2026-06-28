@@ -10,7 +10,7 @@
     {
       "id": "unlicensed_voice_cloning",
       "description": "Generated voice resembles or is derived from a real person without written consent, performer rights, and legal/audio review.",
-      "required_action": "reject_and_remove_from_production_review"
+      "required_action": "reject_and_remove_from_release_review"
     },
     {
       "id": "recognizably_similar_music",
@@ -28,9 +28,9 @@
       "required_action": "reject"
     },
     {
-      "id": "production_realism_without_recorded_backbone",
-      "description": "Whitewater, raft, paddle, rock, or rescue realism relies on AI output instead of recorded/downloaded or field-captured source material.",
-      "required_action": "replace_with_recorded_or_downloaded_backbone"
+      "id": "release_realism_without_clear_ai_provenance",
+      "description": "Whitewater, raft, paddle, rock, or rescue realism relies on AI output without clear output rights, provenance, reproducibility, and release-gate approval.",
+      "required_action": "keep_development_only_until_release_gate_approval"
     },
     {
       "id": "multiplayer_identity_confusion",
@@ -41,7 +41,7 @@
   "quarantine_rules": {
     "may_remain_in_prototype_storage": true,
     "may_be_exported_to_unreal_ready_content": false,
-    "may_be_layered_under_production_assets": false,
+    "may_be_layered_under_release_candidate_assets": false,
     "manifest_required_even_when_rejected": true
   },
   "review_requirements_for_exception": [
