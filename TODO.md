@@ -210,7 +210,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 
 ## Milestone 13: Production Audio Asset Sourcing And Sound Design
 
-- [ ] Treat professionally recorded/downloaded libraries and custom field recordings as the production backbone for shipping audio.
+- [x] Treat professionally recorded/downloaded libraries and custom field recordings as the production backbone for shipping audio.
 - [ ] Use AI-generated audio only for prototypes, ideation, non-critical variations, abstract UI/debug sounds, or temp dialogue unless legal/audio review explicitly approves shipping use.
 - [ ] Research and compare BOOM Library, Pro Sound Effects, A Sound Effect, Soundly, Fab audio packs, Sound Ideas/Sounddogs-style catalogs, Freesound CC0/CC-BY assets, and BBC Sound Effects licensing.
 - [ ] Purchase or trial the first high-value water, weather, impact, Foley, ambience, UI, and gear libraries.

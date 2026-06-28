@@ -1,0 +1,35 @@
+{
+  "schema": "raftsim.unreal.production_audio_backbone_policy.v1",
+  "decision": "professionally_recorded_downloaded_libraries_and_custom_field_recordings_are_the_shipping_backbone",
+  "priority_order": [
+    "custom_field_recording",
+    "professionally_licensed_libraries",
+    "reviewed_open_assets",
+    "ai_generated_prototype_only"
+  ],
+  "shipping_asset_gate": {
+    "manifest_record_required": true,
+    "commercial_rights_required": true,
+    "source_provenance_required": true,
+    "platform_rights_required": true,
+    "attribution_status_required": true,
+    "approval_status_required": true,
+    "storage_lfs_classification_required": true,
+    "spatialization_intent_required": true
+  },
+  "shipping_categories": [
+    "whitewater_beds",
+    "rapids_hydraulics_eddies_boils",
+    "spray_foam_underwater_nearwater",
+    "raft_tube_impacts",
+    "rock_scrapes",
+    "paddle_catches_and_blade_slips",
+    "ropes_straps_pumps_gear",
+    "weather",
+    "canyon_forest_ambience",
+    "rescue_cues",
+    "ui_training_cues",
+    "crew_barks",
+    "multiplayer_voice_support"
+  ]
+}
