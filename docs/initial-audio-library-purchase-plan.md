@@ -1,10 +1,12 @@
-# Initial Audio Library Purchase And Trial Plan
+# Deferred Audio Library Purchase Plan
 
 ## Goal
 
-Acquire a small, high-value starter set that lets the Unreal slice sound credible before custom field recordings are complete.
+Keep the paid-library research notes, but do not buy or trial paid audio libraries during development.
 
-## Buy / Trial Order
+The current Unreal slice should use free/open, first-party generated, procedural, and AI-generated audio. Revisit this plan only at the release-readiness gate, and buy assets only if free/open and AI-generated assets are not good enough.
+
+## Deferred Buy / Trial Order
 
 1. **Water and rapid beds**: broad river, stream, waterfall, turbulence, foam, and spray material.
 2. **Weather and ambience**: wind, rain, forest/canyon beds, wet vegetation, thunder distance layers.
@@ -18,12 +20,13 @@ Acquire a small, high-value starter set that lets the Unreal slice sound credibl
 - BOOM Library: weather, impacts, cinematic water-adjacent design, and construction kits.
 - Pro Sound Effects: broad SFX, Foley, weather, ambience, and SoundQ workflow.
 - A Sound Effect: specialty river, water, outdoor, rope, paddle, gear, and indie game-audio packs.
-- Soundly: trial as workflow/search layer if team asset volume grows quickly.
+- Soundly: evaluate as a release-gate workflow/search layer if team asset volume grows quickly.
 
-## Purchase Gate
+## Release-Readiness Purchase Gate
 
-Before purchase or trial:
+Before any purchase or trial:
 
+- Confirm free/open and AI-generated assets failed a specific quality, consistency, legal, platform, or production-risk requirement.
 - Confirm commercial game/platform rights.
 - Confirm team/user/seat terms.
 - Confirm raw redistribution restrictions.
@@ -34,7 +37,8 @@ Before purchase or trial:
 
 ## Deferrals
 
+- All paid art/audio asset buying is deferred until release-readiness.
 - Field recording remains the signature-source goal.
-- Fab packs stay prototype-only until each pack's provenance and license are reviewed.
+- Fab packs stay development/reference-only until each pack's provenance and license are reviewed.
 - Freesound stays prototype/texture-only unless CC0 or CC-BY attribution can be tracked cleanly.
-- BBC Sound Effects stays reference/prototype-only unless separately licensed.
+- BBC Sound Effects stays reference/development-only unless separately licensed.

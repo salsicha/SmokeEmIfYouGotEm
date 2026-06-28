@@ -1,6 +1,6 @@
 # AI Audio Manifest Schema
 
-AI-generated audio must carry extra provenance before it can enter the asset review queue. The default assumption is prototype-only, even when the generated output sounds useful.
+AI-generated audio must carry extra provenance before it can enter the asset review queue. The default assumption is development-only, even when the generated output sounds useful.
 
 The schema records:
 

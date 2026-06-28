@@ -7,7 +7,7 @@ Build the full SmokeEmIfYouGotEm rafting simulator as a multi-platform Unreal En
 The Unreal game should deliver the first-person guide fantasy: seated in the stern, reading water, calling commands, steering with physically meaningful paddle strokes, managing passenger safety, and feeling the raft move through a photo-real white water environment with fully immersive 3D audio.
 
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial extraction, rapid identification, seasonal flow, adaptive fluid-parameter, and river-selection work that must feed Unreal content.
-See [Audio Asset Sourcing Plan](audio-asset-sourcing-plan.md) for the production audio source policy, library shortlist, field-recording plan, AI-audio limits, and asset manifest.
+See [Free And AI Asset Policy](free-and-ai-asset-policy.md) for the current art and sound sourcing decision, and [Audio Asset Sourcing Plan](audio-asset-sourcing-plan.md) for audio-specific source research, library shortlist, field-recording plan, AI-audio limits, and asset manifest.
 See [Python-To-Unreal Readiness Gate](python-to-unreal-readiness-gate.md) for the current Milestone 10 audit. The current gate decision is approved after shallow-cell-aware velocity/Froude comparison; production Unreal work should start with telemetry/replay playback before live water, Chrono raft coupling, VR, and contact integration.
 See [Unreal Engine Version Lock](unreal-engine-version-lock.md) for the UE 5.8 feature review and version decision.
 
@@ -124,7 +124,7 @@ Tasks:
 - Establish asset scale, coordinate conventions, units, and import/export rules.
 - Define geospatial import rules: coordinate reference systems, WGS84/local transforms, source manifests, terrain tile sizes, imagery masks, river corridor bounds, and confidence metadata.
 - Evaluate local/offline AI runtime options for target platforms: speech-to-text, constrained command parsing, crew dialogue generation/selection, optional local speech synthesis, latency, memory, CPU/GPU cost, licensing, privacy, and console feasibility.
-- Build the production audio source plan: approved vendors, field-recording needs, license requirements, attribution rules, AI-audio policy, asset manifest, LFS/storage policy, and Unreal import conventions.
+- Build the development asset source plan: free/open art and sound sources, AI-generation provenance, license requirements, attribution rules, AI-audio policy, asset manifest, LFS/storage policy, and Unreal import conventions; keep paid-vendor research for release-readiness only.
 - Start with Unreal-native audio and MetaSounds for interactive water/raft/crew sound; evaluate Wwise/FMOD only if the native toolchain cannot meet authoring, mixing, localization, memory, or platform needs.
 - Define the 3D audio stack: Sound Attenuation presets, spatialization modes, binaural/HRTF path for VR/headphones, panning/surround path for speakers, ambisonic bed format, reverb/occlusion strategy, voice-chat spatialization, and platform QA targets.
 - Set up source control rules for large assets, generated files, and LFS.
@@ -176,7 +176,7 @@ Tasks:
 - Use Cesium for Unreal or equivalent geospatial tooling where it helps with real-world scale, WGS84 positioning, 3D Tiles, terrain, imagery, and georeferenced scene setup.
 - Create photo-real canyon/forest/desert/mountain river environment pipeline using Nanite rocks/canyon walls/terrain details, Nanite foliage, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, and advanced material layering where supported.
 - Add water material, foam lines, bubbles, waves, wet rocks, spray, mist, debris cues, aeration masks, turbulence masks, and seasonal water appearance.
-- Build first interactive 3D water-audio prototype from recorded/downloaded assets: river bed, nearby rapid, hydraulic hole, eddy line, spray, foam, raft scrape, paddle catch, rock impact, weather, and canyon reflections driven by solver telemetry.
+- Build first interactive 3D water-audio prototype from free/open, first-party generated, procedural, and AI-generated development assets: river bed, nearby rapid, hydraulic hole, eddy line, spray, foam, raft scrape, paddle catch, rock impact, weather, and canyon reflections driven by solver telemetry.
 - Validate large water-source behavior, ambisonic ambience rotation, binaural/HRTF localization, reverb zones, occlusion traces, and guide-seat readability for hazards and rescue cues.
 - Add debug view that compares solver fields and adaptive fluid parameters with visible water cues.
 - Define handoff from Python/geospatial/generated data to Unreal-authored content.
@@ -199,8 +199,8 @@ Tasks:
 - Add basic menus and settings.
 - Add microphone, push-to-talk/open-mic, subtitles, command confirmation, voice sensitivity, privacy/offline, and fallback-control settings.
 - Add river, section, season, flow, difficulty, and raft/crew selection backed by validated data assets.
-- Add source-approved audio for the vertical slice: water beds, rapid features, raft/paddle/rock Foley, guide commands, crew acknowledgments, UI, weather, and fail/safety states.
-- Add source-approved 3D audio configuration for the vertical slice: attenuation/spatialization presets, ambisonic beds, reverb/occlusion zones, large rapid spread, crew/voice positions, and VR/headphone validation.
+- Add manifest-approved free/open, first-party generated, procedural, and AI-generated audio for the vertical slice: water beds, rapid features, raft/paddle/rock Foley, guide commands, crew acknowledgments, UI, weather, and fail/safety states.
+- Add manifest-approved 3D audio configuration for the vertical slice: attenuation/spatialization presets, ambisonic beds, reverb/occlusion zones, large rapid spread, crew/voice positions, and VR/headphone validation.
 
 Deliverable:
 
@@ -234,8 +234,8 @@ Tasks:
 - Add AI-assisted crew conversations for calm water, eddies, scouting, recovery pools, run starts, run finishes, swims, rescues, and post-rapid debriefs.
 - Add passenger persona data, relationship memory, river knowledge, skill/fear/fatigue state, and conversation pacing rules.
 - Add conversation guardrails so active-rapid dialogue stays short, command acknowledgments take priority, and generated chatter never blocks safety-critical audio.
-- Expand purchased/downloaded and field-recorded audio libraries for additional rivers, seasons, flow levels, raft types, gear, weather, and biomes.
-- Use AI-generated audio only for approved supplemental variants, temporary dialogue, non-critical UI/debug cues, or ideation after provenance and license review.
+- Expand free/open, first-party generated, procedural, and AI-generated art/audio coverage for additional rivers, seasons, flow levels, raft types, gear, weather, and biomes.
+- Revisit paid asset purchases only at the release-readiness gate if free/open and AI-generated assets are not good enough.
 - Add challenge variants and generated rapid support if validated.
 - Expand weather, water levels, rescue scenarios, and training lessons.
 
@@ -369,10 +369,11 @@ Audio should carry physical state:
 
 Source policy:
 
-- Use professional downloaded libraries and custom field recordings as the shipping backbone.
-- Use custom field recordings for signature real-river identity: guide seat, shore, eddy, rapid, hydrophone, raft contact, paddle, gear, and crew perspectives.
-- Use AI-generated audio only for prototyping, ideation, non-critical variations, abstract UI/debug sounds, or temp dialogue unless legal/audio review approves a shipping use.
-- Avoid AI-generated white water, raft contact, paddle, rock, crew voice performance, and music as primary shipping assets.
+- Use free/open, first-party generated, procedural, and AI-generated art/audio assets during development.
+- Defer paid art packs, paid sound libraries, marketplace packs, and subscription asset services until the release-readiness gate.
+- Keep professional library, marketplace, and field-recording research notes as release-gate reference material.
+- Use AI-generated audio and visuals only when prompt/model/tool metadata, license terms, source references, and approval status are tracked.
+- Do not treat AI-generated or free/open assets as release-ready until legal, quality, attribution, platform, and provenance review clears them.
 - Track every audio asset with source, license, attribution, commercial-use rights, platform rights, processing chain, loudness, loop points, and approval status.
 - Prefer Unreal-native audio and MetaSounds for the first implementation; keep Wwise/FMOD as later evaluation options.
 
@@ -423,7 +424,7 @@ The first Unreal vertical slice is successful when:
 - Player can guide from stern first-person view in flat-screen and VR.
 - Player can issue at least the core crew commands through manual input and local voice input, with visible confidence/fallback behavior.
 - Crew can acknowledge commands and produce state-aware barks or short conversations without disrupting gameplay-critical audio.
-- The vertical slice uses licensed/downloaded or field-recorded audio assets with complete source manifests.
+- The vertical slice uses free/open, first-party generated, procedural, and AI-generated development art/audio assets with complete source manifests.
 - Water, raft, paddle, rock, weather, and crew audio respond to physics/solver telemetry clearly enough to improve river readability.
 - 3D audio helps the player locate rapids, hazards, crew, rescue cues, raft contacts, and voice chat from the stern guide seat in stereo, headphones, and VR.
 - Ambisonic ambience, reverb, occlusion, and large-source spread make the river corridor feel immersive without hiding gameplay-critical cues.
@@ -445,8 +446,8 @@ The first Unreal vertical slice is successful when:
 - Which local AI runtime powers speech recognition, command intent parsing, crew conversation, and optional speech synthesis per platform.
 - Whether crew conversation uses generated local dialogue, authored lines, recorded barks, or a hybrid.
 - What voice-command latency, confidence, false-positive, privacy, and replay-capture requirements are acceptable.
-- Which professional libraries and field-recording sessions become the first approved production audio sources.
-- Which AI-generated audio uses are allowed in shipping builds, if any.
+- Whether free/open and AI-generated art/audio assets are good enough for release, or specific paid/professional libraries should be bought near release.
+- Which AI-generated audio uses are allowed beyond development-only assets, if any.
 - Whether Unreal-native audio/MetaSounds is enough or Wwise/FMOD should be adopted.
 - Which binaural/HRTF plugin/runtime, ambisonic capture/playback format, surround target, reverb/occlusion approach, spatial voice-chat path, and spatial-audio QA process are required for the first VR build.
 - Whether multiplayer is in scope before the single-player guide experience is complete.

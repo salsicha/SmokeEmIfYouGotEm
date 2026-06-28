@@ -1,8 +1,10 @@
-# Production Audio Source Policy
+# Development Audio Source Policy
 
 ## Decision
 
-Professionally recorded/downloaded libraries and custom field recordings are the production backbone for shipping SmokeEmIfYouGotEm audio.
+For the current development phase, use free/open, first-party generated, procedural, and AI-generated audio only.
+
+Do not buy paid sound libraries, marketplace packs, subscription libraries, or trial-to-buy audio services yet. Save that decision for release-readiness, after the team decides whether free/open and AI-generated assets are good enough.
 
 This applies to:
 
@@ -12,10 +14,15 @@ This applies to:
 
 ## Priority Order
 
-1. Custom field recordings for signature river, raft, paddle, rescue, and guide-seat perspective sounds.
-2. Professionally licensed libraries for breadth, schedule, and coverage gaps.
-3. Carefully reviewed open/community assets for prototypes or one-off texture only.
-4. AI-generated audio only under the separate prototype policy.
+1. First-party procedural/generated audio created inside the project.
+2. AI-generated audio with complete manifest metadata and review status.
+3. Free/open audio with clear license snapshots and attribution tracking.
+4. First-party recordings when no third-party asset license purchase is required.
+5. Paid/professional libraries only after the release-readiness gate proves they are needed.
+
+## Paid Library Gate
+
+Existing vendor research stays in the repo as release-gate reference material. Buy assets only if free/open and AI-generated assets cannot meet quality, consistency, legal, platform, or production-risk targets.
 
 ## Shipping Gate
 

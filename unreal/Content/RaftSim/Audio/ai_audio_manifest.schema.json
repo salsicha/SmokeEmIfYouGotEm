@@ -17,7 +17,7 @@
     "output_terms",
     "review_status",
     "similarity_check",
-    "prototype_or_shipping_flag",
+    "development_or_shipping_flag",
     "approved_for_shipping"
   ],
   "properties": {
@@ -69,10 +69,10 @@
     "intended_use": {
       "type": "string"
     },
-    "prototype_or_shipping_flag": {
+    "development_or_shipping_flag": {
       "type": "string",
       "enum": [
-        "prototype",
+        "development",
         "candidate",
         "shipping"
       ]
