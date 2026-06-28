@@ -216,7 +216,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Purchase or trial the first high-value water, weather, impact, Foley, ambience, UI, and gear libraries.
 - [x] Build a custom field-recording plan for real rivers, rapids, flow levels, guide-seat perspective, shore perspective, eddies, raft contacts, paddle strokes, hydrophone captures, ambisonic/spatial beds, surround ambience, and crew reactions.
 - [x] Define audio asset manifest schema: source, license, attribution, platform rights, sample rate, bit depth, channels, mic setup, location/date, processing chain, loop points, UCS metadata, attenuation preset, spatialization mode, ambisonic format/order, reverb/occlusion behavior, intended playback context, and approval status.
-- [ ] Define AI audio manifest fields: tool, model, version, prompt, seed, date, account/license tier, output terms, review status, similarity check, and prototype/shipping flag.
+- [x] Define AI audio manifest fields: tool, model, version, prompt, seed, date, account/license tier, output terms, review status, similarity check, and prototype/shipping flag.
 - [ ] Add LFS/storage rules for raw recordings, purchased libraries, edited masters, generated prototypes, and Unreal-ready compressed exports.
 - [ ] Build an interactive MetaSounds or middleware prototype for river roar, nearby rapids, spray, foam, paddle catch, raft scrape, rock impact, weather, canyon reflections, and crew voice layering.
 - [ ] Build 3D audio presets for point sources, line/area water sources, large rapids, ambisonic ambience, occluded rock/bank sounds, raft contact, underwater/near-water perspective, crew voice, guide commands, and multiplayer voice chat.
