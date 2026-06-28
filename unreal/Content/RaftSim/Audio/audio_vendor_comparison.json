@@ -1,6 +1,9 @@
 {
   "schema": "raftsim.unreal.audio_vendor_comparison.v1",
   "last_reviewed": "2026-06-28",
+  "active_development_decision": "use_free_open_first_party_generated_procedural_and_ai_generated_audio",
+  "paid_vendor_status": "release_gate_research_only",
+  "buy_paid_assets_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true,
   "ranking": [
     "BOOM Library",
     "Pro Sound Effects",

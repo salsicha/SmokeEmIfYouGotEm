@@ -2,7 +2,9 @@
 
 ## Recommendation
 
-Use a blended source stack:
+Use free/open, first-party generated, procedural, and AI-generated audio during development. Do not buy paid libraries yet.
+
+Keep this comparison as release-gate research. If free/open and AI-generated assets are not good enough near release, use the following paid-source ranking to decide what to buy:
 
 1. **BOOM Library** and **Pro Sound Effects** for high-confidence commercial backbone purchases.
 2. **A Sound Effect** for specialized independent libraries after per-pack license/provenance review.
@@ -27,14 +29,14 @@ Use a blended source stack:
 
 ## First-Pass Ranking
 
-For SmokeEmIfYouGotEm, prioritize:
+For a future release-gate purchase review, prioritize:
 
 1. BOOM Library water/weather/impact-relevant packs.
 2. Pro Sound Effects broad water, Foley, weather, and ambience coverage.
 3. A Sound Effect niche river, raft, paddle, rope, gear, and outdoor ambience packs.
 4. Custom field recordings for signature river identity.
 5. Soundly for workflow if the team needs search, audition, and metadata tooling.
-6. Freesound CC0/CC-BY only for prototypes or explicitly approved texture gaps.
+6. Freesound CC0/CC-BY for active development and explicitly approved texture gaps.
 
 ## Sources Checked
 

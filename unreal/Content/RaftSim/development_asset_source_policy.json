@@ -1,0 +1,61 @@
+{
+  "schema": "raftsim.unreal.development_asset_source_policy.v1",
+  "date": "2026-06-28",
+  "decision": "use_free_open_first_party_generated_procedural_and_ai_generated_assets_for_art_and_sound_during_development",
+  "paid_asset_decision": "defer_until_release_readiness_gate",
+  "active_source_order": [
+    "first_party_procedural_or_generated_assets",
+    "ai_generated_assets_with_manifest_metadata",
+    "free_open_assets_with_clear_license_snapshots",
+    "first_party_field_recordings_or_photos_without_third_party_asset_license_purchase",
+    "paid_professional_libraries_only_after_release_gate"
+  ],
+  "applies_to": [
+    "concept_art",
+    "textures",
+    "materials",
+    "decals",
+    "ui_art",
+    "icons",
+    "foliage_rocks_terrain_studies",
+    "water_foam_spray_mist_prototypes",
+    "sound_effects",
+    "ambience",
+    "interactive_water_audio",
+    "ui_audio",
+    "temporary_dialogue",
+    "spatial_audio_prototypes"
+  ],
+  "allowed_during_development": [
+    "cc0_assets",
+    "public_domain_assets",
+    "cc_by_assets_with_attribution_tracking",
+    "permissive_open_source_assets",
+    "ai_generated_assets_with_tool_model_prompt_seed_date_and_terms",
+    "procedural_assets_generated_in_project",
+    "first_party_photos_recordings_and_captures"
+  ],
+  "not_allowed_before_release_gate": [
+    "paid_art_packs",
+    "paid_sound_libraries",
+    "trial_to_buy_asset_services",
+    "marketplace_packs_that_require_purchase",
+    "subscription_libraries",
+    "unclear_or_noncommercial_assets"
+  ],
+  "release_readiness_gate": {
+    "trigger": "release_candidate_or_vertical_slice_quality_review",
+    "buy_assets_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true,
+    "review_checks": [
+      "quality",
+      "style_or_sound_consistency",
+      "commercial_rights",
+      "platform_rights",
+      "attribution_and_derivative_terms",
+      "ai_reproducibility_and_provenance",
+      "unreal_desktop_and_vr_performance",
+      "risk_reduction_from_paid_libraries"
+    ]
+  },
+  "research_notes_status": "preserve_vendor_and_license_research_as_release_gate_reference_material"
+}

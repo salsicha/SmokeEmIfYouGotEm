@@ -1,0 +1,93 @@
+{
+  "schema": "raftsim.unreal.art_asset_source_research.v1",
+  "date": "2026-06-28",
+  "active_development_decision": "use_free_open_first_party_generated_procedural_and_ai_generated_art",
+  "paid_art_decision": "defer_until_release_readiness_gate",
+  "free_open_sources_first": [
+    {
+      "name": "Poly Haven",
+      "url": "https://polyhaven.com/license",
+      "best_for": [
+        "hdri",
+        "textures",
+        "3d_models",
+        "look_development"
+      ],
+      "license_note": "source license page presents assets as CC0",
+      "required_review": [
+        "snapshot_license_url_and_date",
+        "record_asset_url",
+        "verify_imported_asset_matches_source"
+      ]
+    },
+    {
+      "name": "Kenney",
+      "url": "https://kenney.nl/support",
+      "best_for": [
+        "prototype_ui",
+        "icons",
+        "simple_props",
+        "control_debug_art"
+      ],
+      "license_note": "support page says game assets are public domain licensed CC0",
+      "required_review": [
+        "snapshot_license_url_and_date",
+        "record_asset_url"
+      ]
+    },
+    {
+      "name": "OpenGameArt",
+      "url": "https://opengameart.org/content/faq",
+      "best_for": [
+        "prototype_2d_art",
+        "prototype_3d_art",
+        "textures",
+        "reference_assets"
+      ],
+      "license_note": "licenses vary per asset; commercial use and attribution depend on asset license",
+      "required_review": [
+        "record_creator",
+        "record_asset_license",
+        "track_attribution",
+        "avoid_nc_nd_or_unclear_assets"
+      ]
+    },
+    {
+      "name": "Free Fab assets",
+      "url": "https://www.fab.com/eula",
+      "best_for": [
+        "unreal_ready_assets",
+        "materials",
+        "environment_kits",
+        "prototype_meshes"
+      ],
+      "license_note": "review per asset, license tier, source provenance, and redistribution restrictions",
+      "required_review": [
+        "verify_price_is_free",
+        "snapshot_license",
+        "record_asset_page",
+        "verify_collaborator_and_project_sharing_terms"
+      ]
+    }
+  ],
+  "ai_art_requirements": [
+    "tool",
+    "model",
+    "version",
+    "prompt",
+    "negative_prompt",
+    "seed",
+    "generation_date",
+    "account_or_license_tier",
+    "output_terms",
+    "similarity_or_provenance_review",
+    "development_or_shipping_flag"
+  ],
+  "paid_sources_release_gate_only": [
+    "paid_fab_marketplace_packs",
+    "artstation_marketplace",
+    "specialist_photogrammetry_libraries",
+    "outsourced_custom_art_or_photogrammetry"
+  ],
+  "buy_paid_assets_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true
+}

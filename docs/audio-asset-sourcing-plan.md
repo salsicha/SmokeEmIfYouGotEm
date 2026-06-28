@@ -8,19 +8,23 @@ The audio goal is realism first. Audio should help the player read water, locate
 
 ## Recommendation
 
-Use professionally recorded/downloaded libraries and custom field recordings as the production backbone.
+During active development, use only free/open, first-party generated, procedural, and AI-generated audio. Do not buy or trial paid sound libraries yet.
 
-Use AI-generated audio only as a supplement:
+Paid/professional libraries and larger custom recording plans remain useful research, but the buying decision is deferred until release-readiness. At that point, buy assets only for gaps where free/open and AI-generated assets are not good enough for quality, consistency, rights, or production risk.
 
-- Fast placeholder sounds during prototyping.
-- Ideation and mood exploration.
-- Extra non-critical variations after human review.
-- Abstract UI, training, or debug sounds where realism and source authenticity matter less.
-- Optional crew scratch dialogue or temp narration before final casting.
+AI-generated audio is allowed as a development source when it has manifest metadata:
 
-Do not rely on AI-generated audio as the primary source for white water, raft contact, paddle, rock, rescue, crew voice performance, or shipping music unless the model, output license, training-data policy, performer consent, and commercial rights are explicitly cleared.
+- Tool and model version.
+- Prompt, seed, date, account/license tier, and output terms.
+- Human review status.
+- Similarity/plagiarism check for music, voices, melodies, or recognizable style.
+- Clear development-only or shipping-candidate flag.
 
-## Why Recorded Audio Wins For This Game
+Do not ship AI-generated audio unless the model, output license, training-data policy, performer consent where relevant, commercial rights, and review status are explicitly cleared.
+
+See [Free And AI Asset Policy](free-and-ai-asset-policy.md) for the project-wide art and sound decision.
+
+## Why Paid/Recorded Research Still Matters
 
 White water rafting depends on dense, physical, layered sound:
 
@@ -30,11 +34,52 @@ White water rafting depends on dense, physical, layered sound:
 - Perspective shifts from the guide's stern seat, swimmer position, scout view, and replay camera.
 - VR spatial cues that need stable localization and predictable loop behavior.
 
-Recorded material gives the best physical detail, editability, legal clarity, loop quality, and layering control. AI-generated effects are improving quickly, but they still need strict review for artifacts, loop seams, prompt mismatch, legal provenance, and inability to reliably generate physically specific variations on demand.
+High-quality recorded material can still give the best physical detail, editability, legal clarity, loop quality, and layering control. That research stays in the plan so the team knows what to buy later if the free/open and AI-generated development set falls short.
+
+For now, the development target is to push free/open and AI-generated audio as far as practical before spending money.
 
 ## Source Strategy
 
-### 1. Custom Field Recording
+### 1. Free / Open / First-Party Sources
+
+Use first during development.
+
+Use:
+
+- CC0/public-domain audio where the source and license snapshot are clear.
+- CC-BY audio only when attribution can be tracked cleanly in the manifest and credits.
+- First-party procedural or synthesized audio for UI, debug, training, telemetry, and abstract feedback.
+- First-party field recordings only when they do not require buying third-party asset licenses.
+- AI-generated audio for prototypes, temporary dialogue, water/impact studies, ambience studies, and non-critical variations after review.
+
+Avoid:
+
+- Non-commercial licenses.
+- Unclear or legacy licenses.
+- Assets that cannot be traced to a source URL, license file, model/tool record, or first-party capture note.
+
+### 2. AI-Generated Audio
+
+Use aggressively for development, but track it rigorously.
+
+Potentially useful for:
+
+- Early sketches of water beds, UI sounds, tutorial feedback, abstract training tones, and debug cues.
+- Mood boards for menu music or trailer concepts.
+- Additional transient variations after review.
+- Temp crew dialogue before recorded actors or approved voice assets exist.
+- Research into local generation, but not runtime generation for core gameplay without a separate performance and licensing plan.
+
+Risks:
+
+- Legal uncertainty around training data and output rights.
+- Model terms can change.
+- Some models restrict commercial use or require separate commercial licensing.
+- Generated sound may contain artifacts, unstable stereo images, bad loops, or physically wrong details.
+- Voice cloning requires consent, contracts, and performer rights.
+- Generated music is especially sensitive because major AI music tools have faced litigation over training data and sound recording rights.
+
+### 3. Custom Field Recording
 
 Best for the final product's signature sound.
 
@@ -58,9 +103,11 @@ Cons:
 
 - Requires travel, safety planning, permits, weather/flow timing, recordists, gear, metadata discipline, and editing time.
 
-### 2. Professional Sound Libraries
+For now, custom recording is planning/research unless it can be done as first-party capture without buying asset licenses.
 
-Best for production speed and broad coverage.
+### 4. Professional Sound Libraries
+
+Best for release-gate fallback if free/open and AI-generated assets are not good enough.
 
 Shortlist:
 
@@ -71,13 +118,13 @@ Shortlist:
 - Fab audio assets: useful for Unreal-ready packs, but each asset's license, quality, update history, and source provenance must be reviewed.
 - Sound Ideas / Sounddogs-style legacy catalogs: useful as supplemental broad-coverage libraries, especially for generic impacts, Foley, crowds, and weather.
 
-Use these for:
+Keep these notes for future use:
 
 - Baseline water beds, rain, wind, impacts, Foley, UI, gear, ambience, and safety events.
-- Rapid prototyping before field sessions are complete.
+- Release candidate quality gaps after free/open and AI-generated assets are evaluated.
 - Layering and augmentation under custom recordings.
 
-### 3. Open / Community Libraries
+### 5. Open / Community Libraries
 
 Use carefully.
 
@@ -85,38 +132,9 @@ Freesound and similar sources can be useful for prototypes and one-off texture, 
 
 BBC Sound Effects is useful for research, prototyping, and reference, but the public archive is limited to personal/educational use unless licensed separately.
 
-### 4. AI-Generated Audio
-
-Use as a tool, not as the core library.
-
-Potentially useful for:
-
-- Early sketches of UI sounds, tutorial feedback, abstract training tones, and non-realistic debug cues.
-- Mood boards for menu music or trailer concepts.
-- Additional transient variations after a sound designer compares them against recorded material.
-- Temp crew dialogue before recorded actors or approved voice assets exist.
-- Research into local generation, but not runtime generation for core gameplay without a separate performance and licensing plan.
-
-Risks:
-
-- Legal uncertainty around training data and output rights.
-- Model terms can change.
-- Some models restrict commercial use or require separate commercial licensing.
-- Generated sound may contain artifacts, unstable stereo images, bad loops, or physically wrong details.
-- Voice cloning requires consent, contracts, and performer rights.
-- Generated music is especially sensitive because major AI music tools have faced litigation over training data and sound recording rights.
-
-AI-generated audio must have:
-
-- Tool and model version recorded.
-- Prompt, seed, date, account/license tier, and output terms archived.
-- Human review and approval.
-- Similarity/plagiarism check when music, voices, melodies, or recognizable style are involved.
-- Clear "prototype only" flag unless legal and audio directors approve shipping use.
-
 ## Downloaded Vs AI-Generated
 
-Production answer: download/license and record first; generate second.
+Development answer: generate/free/open first; buy later only if needed.
 
 Downloaded/licensed libraries are better for:
 
@@ -141,6 +159,7 @@ AI-generated audio is better for:
 - Creative exploration.
 - Filling small gaps after review.
 - Non-critical or stylized sounds.
+- Testing whether paid libraries are actually needed.
 
 AI-generated audio is worse for:
 
@@ -201,9 +220,9 @@ Every imported or generated asset should have a manifest record:
 
 ### Milestone A: Audio Source Inventory
 
-- Build a candidate library list for water, weather, impacts, Foley, voice, ambience, UI, music, and multiplayer voice chat.
-- Record license terms, costs, platform limits, attribution, and source provenance.
-- Buy or trial a small set of high-value water/river/impact libraries.
+- Build a free/open and AI-generated candidate list for water, weather, impacts, Foley, voice, ambience, UI, music, and multiplayer voice chat.
+- Record license terms, costs, platform limits, attribution, model/tool metadata, and source provenance.
+- Preserve paid library research as release-gate reference material, but do not buy or trial libraries yet.
 
 ### Milestone B: Field Recording Plan
 
@@ -220,7 +239,7 @@ Every imported or generated asset should have a manifest record:
 ### Milestone D: Interactive Water Audio Prototype
 
 - Build MetaSounds or middleware events driven by solver telemetry.
-- Layer river bed, nearby rapid, spray, paddle, raft contact, rocks, weather, and crew audio.
+- Layer river bed, nearby rapid, spray, paddle, raft contact, rocks, weather, and crew audio using free/open and AI-generated development assets first.
 - Add 3D spatialization presets for point sounds, line/area water sources, large rapids, ambisonic beds, occluded rock/bank sounds, and voice/crew sources.
 - Validate in stereo, headphones, VR binaural/HRTF, and surround where supported.
 

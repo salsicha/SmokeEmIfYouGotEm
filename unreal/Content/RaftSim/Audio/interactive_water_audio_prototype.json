@@ -4,7 +4,7 @@
   "prototype_asset": "MS_RaftSim_InteractiveWaterPrototype",
   "implementation_target": "Unreal MetaSounds first; middleware only if authoring or runtime constraints force it",
   "parameter_function": "RaftSimAudio::BuildWaterAudioParameters",
-  "asset_policy": "recorded_or_downloaded_assets_first",
+  "asset_policy": "free_open_first_party_generated_procedural_and_ai_generated_development_assets_first",
   "runtime_inputs": [
     "flow_speed_mps",
     "aeration",
@@ -20,7 +20,7 @@
   "metasound_layers": [
     {
       "name": "river_roar",
-      "source_type": "looping_recorded_bed",
+      "source_type": "looping_free_open_or_ai_generated_bed",
       "driven_by": [
         "RiverRoar",
         "flow_speed_mps"
@@ -29,7 +29,7 @@
     },
     {
       "name": "nearby_rapid_feature",
-      "source_type": "procedural_crossfade_between_recorded_features",
+      "source_type": "procedural_crossfade_between_free_open_or_ai_generated_features",
       "driven_by": [
         "RapidFeatureIntensity",
         "aeration",
@@ -39,7 +39,7 @@
     },
     {
       "name": "spray_and_foam",
-      "source_type": "granular_recorded_spray_variations",
+      "source_type": "granular_free_open_or_ai_generated_spray_variations",
       "driven_by": [
         "SprayAndFoam",
         "aeration"

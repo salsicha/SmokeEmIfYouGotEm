@@ -15,7 +15,7 @@ The old 2D river/raft path is retired. Future physics work starts with:
 See [Physics Engine Plan](docs/physics-engine-plan.md) for the overall physics architecture.
 See [2.5D Dual-Solver Simulation Plan](docs/2.5d-simulation-plan.md) for the PyClaw/C++ validation workflow.
 See [Real-World River Content And Seasonal Flow Plan](docs/real-world-river-content-plan.md) for geospatial extraction, rapid identification, seasonal flow research, adaptive parameters, and the future river/season/difficulty picker.
-See [Audio Asset Sourcing Plan](docs/audio-asset-sourcing-plan.md) for the recorded/downloaded-vs-AI audio policy, source shortlist, 3D spatial audio plan, asset manifest, and production sound pipeline.
+See [Free And AI Asset Policy](docs/free-and-ai-asset-policy.md) for the current art/sound sourcing decision, [Art Asset Source Research](docs/art-asset-source-research.md) for visual asset source notes, and [Audio Asset Sourcing Plan](docs/audio-asset-sourcing-plan.md) for audio source research, 3D spatial audio, manifests, and release-gate vendor notes.
 See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full game roadmap after Python modeling and profiling are complete, including local AI voice commands, crew conversation systems, networked crews, and fully immersive 3D audio.
 See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.md) for the fixed-step bridge between the shallow-water solver, Chrono raft kinematics, elastic rock impacts, and inelastic bed grounding.
 
@@ -187,8 +187,8 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Add confidence thresholds, push-to-talk/open-mic settings, noisy-river audio tests, subtitles, accessibility fallbacks, and manual input parity for all voice commands.
 - [x] Add AI-assisted crew conversation with passenger personas, trust, fear, fatigue, skill, river knowledge, and scenario state, while keeping gameplay-critical paddling under explicit command-state control.
 - [x] Add telemetry for recognized phrase, intent, confidence, command latency, crew response, conversation state, and command outcome.
-- [x] Build the first production audio source manifest and choose initial downloaded/professional library purchases for water, raft, paddle, rocks, weather, Foley, UI, and ambience.
-- [x] Prototype interactive water audio with recorded/downloaded assets first, using solver telemetry for flow speed, aeration, turbulence, raft impacts, paddle catches, rock scrapes, weather, and camera perspective.
+- [x] Build the first development art/audio source policy and defer downloaded/professional library purchases for water, raft, paddle, rocks, weather, Foley, UI, ambience, and visual assets until release-readiness.
+- [x] Prototype interactive water audio with free/open, first-party generated, procedural, and AI-generated development assets first, using solver telemetry for flow speed, aeration, turbulence, raft impacts, paddle catches, rock scrapes, weather, and camera perspective.
 - [x] Add 3D spatial audio as a core roadmap feature for VR/headphones, stereo speakers, and surround: attenuation, spatialization, binaural/HRTF, ambisonic beds, reverb, occlusion, and large-water-source behavior.
 - [x] Validate 3D audio from the stern guide seat for nearby hazards, rapids, hydraulics, crew positions, voice commands, multiplayer voice, shore/canyon reflections, raft contacts, underwater/near-water states, and rescue cues.
 - [x] Build the first rapid vertical slice with training, scoring, restart, replay, and debug force visualization.
@@ -210,14 +210,14 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 
 ## Milestone 13: Production Audio Asset Sourcing And Sound Design
 
-- [x] Treat professionally recorded/downloaded libraries and custom field recordings as the production backbone for shipping audio.
-- [x] Use AI-generated audio only for prototypes, ideation, non-critical variations, abstract UI/debug sounds, or temp dialogue unless legal/audio review explicitly approves shipping use.
+- [x] Treat free/open, first-party generated, procedural, and AI-generated art/audio assets as the active development backbone.
+- [x] Defer paid/professional art and sound asset purchases until release-readiness proves free/open and AI-generated assets are not good enough.
 - [x] Research and compare BOOM Library, Pro Sound Effects, A Sound Effect, Soundly, Fab audio packs, Sound Ideas/Sounddogs-style catalogs, Freesound CC0/CC-BY assets, and BBC Sound Effects licensing.
-- [x] Purchase or trial the first high-value water, weather, impact, Foley, ambience, UI, and gear libraries.
-- [x] Build a custom field-recording plan for real rivers, rapids, flow levels, guide-seat perspective, shore perspective, eddies, raft contacts, paddle strokes, hydrophone captures, ambisonic/spatial beds, surround ambience, and crew reactions.
+- [x] Preserve high-value water, weather, impact, Foley, ambience, UI, gear, and visual-asset vendor research without purchasing or trialing paid libraries yet.
+- [x] Keep a custom field-recording plan as future/reference material for real rivers, rapids, flow levels, guide-seat perspective, shore perspective, eddies, raft contacts, paddle strokes, hydrophone captures, ambisonic/spatial beds, surround ambience, and crew reactions; use only first-party/free captures during development.
 - [x] Define audio asset manifest schema: source, license, attribution, platform rights, sample rate, bit depth, channels, mic setup, location/date, processing chain, loop points, UCS metadata, attenuation preset, spatialization mode, ambisonic format/order, reverb/occlusion behavior, intended playback context, and approval status.
-- [x] Define AI audio manifest fields: tool, model, version, prompt, seed, date, account/license tier, output terms, review status, similarity check, and prototype/shipping flag.
-- [x] Add LFS/storage rules for raw recordings, purchased libraries, edited masters, generated prototypes, and Unreal-ready compressed exports.
+- [x] Define AI audio manifest fields: tool, model, version, prompt, seed, date, account/license tier, output terms, review status, similarity check, and development/shipping flag.
+- [x] Add LFS/storage rules for raw recordings, future purchased libraries, edited masters, generated prototypes, and Unreal-ready compressed exports.
 - [x] Build an interactive MetaSounds or middleware prototype for river roar, nearby rapids, spray, foam, paddle catch, raft scrape, rock impact, weather, canyon reflections, and crew voice layering.
 - [x] Build 3D audio presets for point sources, line/area water sources, large rapids, ambisonic ambience, occluded rock/bank sounds, raft contact, underwater/near-water perspective, crew voice, guide commands, and multiplayer voice chat.
 - [x] Validate spatial audio on stereo speakers, headphones, VR binaural/HRTF, and 5.1/7.1 surround where supported.
@@ -240,7 +240,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [ ] Decide local AI model/runtime strategy for desktop, VR, handheld, and future console targets.
 - [ ] Decide how much crew dialogue is generated locally versus authored as recorded barks, constrained templates, or designer-approved lines.
 - [ ] Decide latency, privacy, profanity/safety, save-data, and deterministic replay requirements for voice and conversation systems.
-- [ ] Decide final audio source policy, approved vendors, AI audio policy, attribution requirements, and asset-manifest format before buying libraries at scale.
+- [ ] Decide whether free/open and AI-generated art/audio assets are good enough for release, and buy paid libraries only for proven gaps.
 - [ ] Decide whether Unreal-native audio/MetaSounds is enough or whether Wwise/FMOD should be adopted for the full UE5 version.
 - [ ] Decide the binaural/HRTF plugin/runtime path, ambisonic capture/playback format, surround targets, reverb/occlusion strategy, and spatial-audio certification requirements for the first VR build.
 - [ ] Decide multiplayer network architecture, voice communication stack, session backend, crossplay scope, moderation requirements, and host/dropout recovery.

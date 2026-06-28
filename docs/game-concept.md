@@ -43,7 +43,7 @@ The first active physics slice should build:
 See [Physics Engine Plan](physics-engine-plan.md) for the detailed implementation strategy.
 See [2.5D Dual-Solver Simulation Plan](2.5d-simulation-plan.md) for the PyClaw/C++ validation workflow.
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the real river, geospatial, imagery, season, flow, difficulty, and Unreal photoreal content pipeline.
-See [Audio Asset Sourcing Plan](audio-asset-sourcing-plan.md) for the production sound-source policy.
+See [Free And AI Asset Policy](free-and-ai-asset-policy.md) for the current art and sound sourcing decision, and [Audio Asset Sourcing Plan](audio-asset-sourcing-plan.md) for audio-specific research notes.
 
 ## Full Engine Physics Runtime
 
@@ -261,8 +261,9 @@ Audio direction:
 - Local speech recognition for guide commands with clear acknowledgments, misrecognition handling, and subtitle feedback
 - 3D spatial audio for VR/headphones, stereo speakers, and surround so current, impacts, passengers, rescue cues, multiplayer voice, and hazards are locatable from the stern guide seat
 - Binaural/HRTF playback for VR/headphones where supported, panning/surround playback for speaker setups, ambisonic beds for canyon/forest/storm/river ambience, and occlusion/reverb behavior for rocks, banks, raft tubes, and canyon walls
-- Production audio should be built primarily from professionally recorded/downloaded libraries and custom field recordings.
-- AI-generated audio can support prototyping, ideation, temp dialogue, and non-critical variations, but it should not be the primary source for realistic white water, raft contact, paddle, rock, voice performance, or shipping music without explicit legal/audio approval.
+- Current development art and sound should use free/open, first-party generated, procedural, and AI-generated assets.
+- Paid art packs, paid sound libraries, marketplace packs, and subscription asset services are deferred until the release-readiness gate decides whether free/open and AI-generated assets are good enough.
+- AI-generated audio can support development water, raft, paddle, rock, weather, ambience, UI, temp dialogue, and non-critical variations, but shipping use still requires explicit legal/audio approval and provenance review.
 - Every imported or generated sound should carry source, license, attribution, processing, and approval metadata.
 
 ## Unreal Engine Direction
@@ -311,9 +312,9 @@ Prototype scenario:
 - Which local AI runtime should power speech recognition, command parsing, crew conversation, and optional speech synthesis on each target platform?
 - How strict should voice-command confidence be before the crew acts, especially in loud water and VR microphone conditions?
 - How much crew conversation should be generated locally versus authored, recorded, or template-driven?
-- Which professional audio libraries and field-recording sessions form the first shipping sound bed?
+- Are free/open and AI-generated art and sound assets good enough for release, or do specific gaps justify buying professional libraries near release?
 - Which binaural/HRTF plugin, ambisonic format, surround target, reverb/occlusion approach, and spatial-audio QA process are required for the first VR build?
-- Which AI-generated audio use cases, if any, are allowed beyond temporary prototypes?
+- Which AI-generated audio use cases, if any, are allowed beyond development-only assets?
 - Is Unreal-native audio/MetaSounds enough for full production, or does the project need Wwise/FMOD?
 - Should flat-screen raft control be direct, command-based, or a hybrid while VR remains physical?
 - How much should the first-person camera prioritize downstream planning versus close physical impact?

@@ -1,9 +1,10 @@
 {
-  "schema": "raftsim.unreal.ai_audio_prototype_policy.v1",
-  "default_status": "prototype_only",
+  "schema": "raftsim.unreal.ai_audio_development_policy.v2",
+  "default_status": "development_only",
   "allowed_uses": [
     "ideation",
     "temporary_ui_or_debug_sounds",
+    "development_water_impact_weather_and_ambience_studies",
     "abstract_training_feedback",
     "temp_dialogue",
     "noncritical_variations_after_human_review",
@@ -24,7 +25,8 @@
     "similarity_review_required": true,
     "commercial_terms_record_required": true,
     "manifest_record_required": true,
-    "shipping_flag_must_be_explicit": true
+    "shipping_flag_must_be_explicit": true,
+    "release_readiness_gate_required": true
   },
   "manifest_fields_required_for_ai_assets": [
     "tool",
@@ -37,6 +39,6 @@
     "output_terms",
     "review_status",
     "similarity_check",
-    "prototype_or_shipping_flag"
+    "development_or_shipping_flag"
   ]
 }
