@@ -1,0 +1,68 @@
+{
+  "schema": "raftsim.unreal.audio_source_manifest.v1",
+  "production_policy": {
+    "backbone": "professionally_recorded_downloaded_libraries_and_custom_field_recordings",
+    "ai_audio_role": "prototype_only_unless_legal_and_audio_review_approve_shipping_use",
+    "manifest_required_for_every_asset": true
+  },
+  "initial_source_choices": [
+    {
+      "category": "river_water_beds_and_rapids",
+      "preferred_sources": ["BOOM Library", "Pro Sound Effects", "A Sound Effect", "custom_field_recording"],
+      "shipping_status": "candidate_purchase_or_record"
+    },
+    {
+      "category": "raft_paddle_rock_impacts",
+      "preferred_sources": ["custom_field_recording", "BOOM Library", "Pro Sound Effects", "Soundly"],
+      "shipping_status": "candidate_purchase_or_record"
+    },
+    {
+      "category": "weather_wind_rain_spray",
+      "preferred_sources": ["BOOM Library", "Pro Sound Effects", "A Sound Effect", "Soundly"],
+      "shipping_status": "candidate_purchase"
+    },
+    {
+      "category": "gear_foley_pfd_helmet_rope",
+      "preferred_sources": ["custom_field_recording", "Pro Sound Effects", "A Sound Effect", "Sound Ideas"],
+      "shipping_status": "candidate_purchase_or_record"
+    },
+    {
+      "category": "ui_training_debug",
+      "preferred_sources": ["authored_synth", "professional_libraries", "ai_generated_temp"],
+      "shipping_status": "prototype"
+    },
+    {
+      "category": "ambisonic_canyon_forest_ambience",
+      "preferred_sources": ["custom_field_recording", "Pro Sound Effects", "A Sound Effect"],
+      "shipping_status": "candidate_purchase_or_record"
+    }
+  ],
+  "asset_record_fields": [
+    "asset_id",
+    "filename",
+    "source",
+    "license_or_purchase_record",
+    "attribution_requirement",
+    "commercial_use_status",
+    "allowed_platforms",
+    "sample_rate",
+    "bit_depth",
+    "channels",
+    "mic_setup",
+    "location_date_recordist",
+    "processing_chain",
+    "loop_points",
+    "ucs_metadata",
+    "attenuation_preset",
+    "spatialization_mode",
+    "ambisonic_format_order",
+    "reverb_occlusion_behavior",
+    "intended_playback_context",
+    "approval_status"
+  ],
+  "unreal_import_defaults": {
+    "sample_rate_hz": 48000,
+    "loudness_target_lufs": -23,
+    "raw_and_master_audio_in_lfs": true
+  }
+}
