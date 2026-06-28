@@ -1,0 +1,63 @@
+{
+  "schema": "raftsim.unreal.crew_seats_roles.v1",
+  "all_boat_seats_can_be_human": true,
+  "ai_fallback_allowed": true,
+  "seats": [
+    {
+      "seat_id": "stern_guide",
+      "role": "stern_guide",
+      "local_position_m": [-1.8, 0.0, 0.45],
+      "can_be_human": true,
+      "can_ai_fill": false,
+      "responsibilities": ["commands", "route_reading", "rescue_calls", "host_authority_optional"]
+    },
+    {
+      "seat_id": "bow_left",
+      "role": "bow_left_paddler",
+      "local_position_m": [1.45, -0.72, 0.35],
+      "can_be_human": true,
+      "can_ai_fill": true,
+      "responsibilities": ["paddle_timing", "hazard_callouts", "rescue_spotting"]
+    },
+    {
+      "seat_id": "bow_right",
+      "role": "bow_right_paddler",
+      "local_position_m": [1.45, 0.72, 0.35],
+      "can_be_human": true,
+      "can_ai_fill": true,
+      "responsibilities": ["paddle_timing", "hazard_callouts", "rescue_spotting"]
+    },
+    {
+      "seat_id": "mid_left",
+      "role": "mid_left_paddler",
+      "local_position_m": [0.15, -0.82, 0.35],
+      "can_be_human": true,
+      "can_ai_fill": true,
+      "responsibilities": ["power", "draw", "brace", "high_side"]
+    },
+    {
+      "seat_id": "mid_right",
+      "role": "mid_right_paddler",
+      "local_position_m": [0.15, 0.82, 0.35],
+      "can_be_human": true,
+      "can_ai_fill": true,
+      "responsibilities": ["power", "draw", "brace", "high_side"]
+    },
+    {
+      "seat_id": "safety_rescue",
+      "role": "safety_rescue",
+      "local_position_m": [-0.85, 0.0, 0.35],
+      "can_be_human": true,
+      "can_ai_fill": true,
+      "responsibilities": ["throw_rope", "swimmer_awareness", "pull_in", "stabilize"]
+    },
+    {
+      "seat_id": "spectator_scout",
+      "role": "spectator_scout",
+      "local_position_m": [0.0, 0.0, 1.8],
+      "can_be_human": true,
+      "can_ai_fill": false,
+      "responsibilities": ["training_observer", "replay_camera", "coach"]
+    }
+  ]
+}

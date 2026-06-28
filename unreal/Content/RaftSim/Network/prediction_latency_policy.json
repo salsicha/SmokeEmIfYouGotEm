@@ -1,0 +1,28 @@
+{
+  "schema": "raftsim.unreal.prediction_latency_policy.v1",
+  "prediction_targets": [
+    "paddle_strokes",
+    "raft_impact_camera_feedback",
+    "rescue_grabs",
+    "swimmer_state",
+    "vr_controller_poses"
+  ],
+  "authoritative_corrections": [
+    "raft_transform",
+    "raft_velocity",
+    "contact_impulses",
+    "score_events",
+    "rescue_outcomes"
+  ],
+  "latency_compensation": {
+    "timestamped_inputs": true,
+    "client_side_pose_smoothing": true,
+    "server_rewind_for_rescue_grabs": "planned",
+    "prediction_error_telemetry": true
+  },
+  "comfort": {
+    "vr_corrections_filtered": true,
+    "no_unbounded_camera_warps": true,
+    "impact_feedback_can_predict_but_authority_must_correct": true
+  }
+}

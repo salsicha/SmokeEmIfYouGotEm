@@ -1,0 +1,26 @@
+{
+  "schema": "raftsim.unreal.replication_contract.v1",
+  "replicate_inputs_first": true,
+  "authoritative_state_corrections": true,
+  "replicated_gameplay": [
+    "guide_commands",
+    "human_paddle_strokes",
+    "vr_controller_paddle_poses",
+    "brace_actions",
+    "hold_on_actions",
+    "high_side_actions",
+    "rescue_actions",
+    "crew_animation_state",
+    "passenger_seat_state",
+    "raft_contacts",
+    "hazard_events",
+    "outcome_telemetry"
+  ],
+  "determinism": {
+    "fixed_physics_frame_ids": true,
+    "input_event_sequence_numbers": true,
+    "state_hashes_for_debug": true,
+    "replay_event_log": true,
+    "raft_water_authority": "host_or_server"
+  }
+}

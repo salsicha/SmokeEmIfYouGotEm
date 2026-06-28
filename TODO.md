@@ -195,18 +195,18 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 
 ## Milestone 12: Networked Human Crew Multiplayer
 
-- [ ] Plan network play after the single-player guide experience, physics runtime, local voice commands, and AI crew systems are stable.
-- [ ] Support a full human raft crew where every boat seat can be occupied by a human player.
-- [ ] Define player roles: stern guide, left/right paddlers, bow paddlers, safety/rescue responsibilities, and optional spectator/scout roles.
-- [ ] Add integrated voice communication for everyone on the boat, with push-to-talk/open-mic, mute, volume, subtitles/transcription options, moderation hooks, and privacy settings.
-- [ ] Decide networking architecture: listen server, dedicated server, relay/session service, LAN/offline co-op experiments, authoritative host, or hybrid rollback/prediction.
-- [ ] Replicate guide commands, human paddle strokes, brace/hold-on actions, rescue actions, crew animation state, passenger/seat state, raft contacts, and outcome telemetry.
-- [ ] Keep authoritative raft/water physics deterministic enough for multiplayer replay, debugging, and desync detection.
-- [ ] Add latency compensation and prediction for paddle strokes, raft impacts, rescue grabs, swimmer state, and VR/controller poses.
-- [ ] Add seat assignment, lobby/invite flow, ready checks, reconnect, host migration or session recovery, and AI takeover for dropped players.
-- [ ] Add multiplayer-specific scoring for crew coordination, command clarity, safety, line execution, rescue timing, and communication.
-- [ ] Add network voice and gameplay telemetry for debugging: packet loss, ping, jitter, command latency, voice activity, paddle timing, and raft-state divergence.
-- [ ] Validate desktop/VR mixed crews, accessibility fallbacks, and comfort settings for each connected player.
+- [x] Plan network play after the single-player guide experience, physics runtime, local voice commands, and AI crew systems are stable.
+- [x] Support a full human raft crew where every boat seat can be occupied by a human player.
+- [x] Define player roles: stern guide, left/right paddlers, bow paddlers, safety/rescue responsibilities, and optional spectator/scout roles.
+- [x] Add integrated voice communication for everyone on the boat, with push-to-talk/open-mic, mute, volume, subtitles/transcription options, moderation hooks, and privacy settings.
+- [x] Decide networking architecture: listen server, dedicated server, relay/session service, LAN/offline co-op experiments, authoritative host, or hybrid rollback/prediction.
+- [x] Replicate guide commands, human paddle strokes, brace/hold-on actions, rescue actions, crew animation state, passenger/seat state, raft contacts, and outcome telemetry.
+- [x] Keep authoritative raft/water physics deterministic enough for multiplayer replay, debugging, and desync detection.
+- [x] Add latency compensation and prediction for paddle strokes, raft impacts, rescue grabs, swimmer state, and VR/controller poses.
+- [x] Add seat assignment, lobby/invite flow, ready checks, reconnect, host migration or session recovery, and AI takeover for dropped players.
+- [x] Add multiplayer-specific scoring for crew coordination, command clarity, safety, line execution, rescue timing, and communication.
+- [x] Add network voice and gameplay telemetry for debugging: packet loss, ping, jitter, command latency, voice activity, paddle timing, and raft-state divergence.
+- [x] Validate desktop/VR mixed crews, accessibility fallbacks, and comfort settings for each connected player.
 
 ## Milestone 13: Production Audio Asset Sourcing And Sound Design
 
