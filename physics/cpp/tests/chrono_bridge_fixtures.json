@@ -1,0 +1,57 @@
+{
+  "schema": "raftsim.native.chrono_bridge_fixtures.v1",
+  "fixed_step_policy": {
+    "water_step_seconds": 0.0166666667,
+    "chrono_substep_seconds": 0.0083333333
+  },
+  "fixtures": [
+    {
+      "fixture_id": "flat_pool_float",
+      "scenario_kind": "flat_pool",
+      "expected_behavior": "raft floats stably without vertical contact jitter",
+      "metrics": ["vertical_position_drift", "roll_pitch_bounds", "buoyancy_force_balance"]
+    },
+    {
+      "fixture_id": "current_drift",
+      "scenario_kind": "uniform_current",
+      "expected_behavior": "raft drifts downstream with bounded yaw drift",
+      "metrics": ["downstream_speed_error", "yaw_rate_bounds"]
+    },
+    {
+      "fixture_id": "standing_wave_lift",
+      "scenario_kind": "standing_wave",
+      "expected_behavior": "bow rises over a wave potential-energy barrier",
+      "metrics": ["bow_vertical_impulse", "pitch_peak", "clearance"]
+    },
+    {
+      "fixture_id": "eddy_line_yaw",
+      "scenario_kind": "eddy_line",
+      "expected_behavior": "cross-raft shear creates measurable yaw torque",
+      "metrics": ["yaw_acceleration", "left_right_patch_velocity_gradient"]
+    },
+    {
+      "fixture_id": "rock_bounce",
+      "scenario_kind": "rock_impact",
+      "expected_behavior": "partially elastic rock contact deflects or bounces the raft",
+      "metrics": ["contact_impulse", "rebound_velocity", "penetration_depth"]
+    },
+    {
+      "fixture_id": "riverbed_grounding",
+      "scenario_kind": "shallow_bed",
+      "expected_behavior": "inelastic bed contact grounds and scrapes without bounce",
+      "metrics": ["grounded_frames", "vertical_rebound", "scrape_distance"]
+    },
+    {
+      "fixture_id": "shallow_shelf_pivot",
+      "scenario_kind": "shallow_shelf",
+      "expected_behavior": "raft pivots around the grounded patch before release",
+      "metrics": ["pivot_patch_id", "yaw_delta", "release_threshold"]
+    },
+    {
+      "fixture_id": "pin_release",
+      "scenario_kind": "strainer_or_rock_pin",
+      "expected_behavior": "pin state is detected and release force threshold is measurable",
+      "metrics": ["pin_duration", "hold_impulse", "release_impulse"]
+    }
+  ]
+}
