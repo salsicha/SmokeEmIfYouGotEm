@@ -1,0 +1,66 @@
+{
+  "schema": "raftsim.unreal.spatial_audio_roadmap.v1",
+  "core_feature": true,
+  "target_playback": ["vr_headphones_binaural", "headphones", "stereo_speakers", "surround_5_1_7_1"],
+  "presets": [
+    {
+      "preset_id": "rapid_large_water_source",
+      "mode": "large_water_source",
+      "attenuation_radius_m": 140.0,
+      "source_spread_m": 45.0,
+      "binaural": true,
+      "ambisonic_support": true,
+      "reverb_occlusion": true
+    },
+    {
+      "preset_id": "rock_impact_point",
+      "mode": "point_source",
+      "attenuation_radius_m": 28.0,
+      "source_spread_m": 0.5,
+      "binaural": true,
+      "reverb_occlusion": true
+    },
+    {
+      "preset_id": "raft_scrape_line",
+      "mode": "large_water_source",
+      "attenuation_radius_m": 18.0,
+      "source_spread_m": 3.5,
+      "binaural": true,
+      "reverb_occlusion": true
+    },
+    {
+      "preset_id": "canyon_ambisonic_bed",
+      "mode": "ambisonic_bed",
+      "attenuation_radius_m": 0.0,
+      "source_spread_m": 0.0,
+      "ambisonic_order": 1,
+      "head_tracked_rotation": true
+    },
+    {
+      "preset_id": "crew_voice_seat",
+      "mode": "crew_voice",
+      "attenuation_radius_m": 16.0,
+      "source_spread_m": 0.3,
+      "binaural": true,
+      "ducking_bus": "guide_command_priority"
+    },
+    {
+      "preset_id": "multiplayer_voice_seat",
+      "mode": "multiplayer_voice",
+      "attenuation_radius_m": 20.0,
+      "source_spread_m": 0.3,
+      "binaural": true,
+      "privacy_mute_controls": true
+    }
+  ],
+  "mix_systems": [
+    "attenuation",
+    "spatialization",
+    "binaural_hrtf",
+    "ambisonic_beds",
+    "reverb_zones",
+    "occlusion_traces",
+    "large_water_source_spread",
+    "speaker_surround_panning"
+  ]
+}

@@ -189,7 +189,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Add telemetry for recognized phrase, intent, confidence, command latency, crew response, conversation state, and command outcome.
 - [x] Build the first production audio source manifest and choose initial downloaded/professional library purchases for water, raft, paddle, rocks, weather, Foley, UI, and ambience.
 - [x] Prototype interactive water audio with recorded/downloaded assets first, using solver telemetry for flow speed, aeration, turbulence, raft impacts, paddle catches, rock scrapes, weather, and camera perspective.
-- [ ] Add 3D spatial audio as a core roadmap feature for VR/headphones, stereo speakers, and surround: attenuation, spatialization, binaural/HRTF, ambisonic beds, reverb, occlusion, and large-water-source behavior.
+- [x] Add 3D spatial audio as a core roadmap feature for VR/headphones, stereo speakers, and surround: attenuation, spatialization, binaural/HRTF, ambisonic beds, reverb, occlusion, and large-water-source behavior.
 - [ ] Validate 3D audio from the stern guide seat for nearby hazards, rapids, hydraulics, crew positions, voice commands, multiplayer voice, shore/canyon reflections, raft contacts, underwater/near-water states, and rescue cues.
 - [ ] Build the first rapid vertical slice with training, scoring, restart, replay, and debug force visualization.
 
