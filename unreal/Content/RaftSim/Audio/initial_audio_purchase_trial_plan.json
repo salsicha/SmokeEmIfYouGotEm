@@ -1,0 +1,51 @@
+{
+  "schema": "raftsim.unreal.initial_audio_purchase_trial_plan.v1",
+  "goal": "small_high_value_starter_set_before_field_recordings_are_complete",
+  "purchase_order": [
+    {
+      "priority": 1,
+      "category": "water_and_rapid_beds",
+      "needed_assets": ["river_beds", "rapids", "waterfalls", "turbulence", "foam", "spray"],
+      "preferred_sources": ["BOOM Library", "Pro Sound Effects", "A Sound Effect"]
+    },
+    {
+      "priority": 2,
+      "category": "weather_and_ambience",
+      "needed_assets": ["wind", "rain", "forest", "canyon", "wet_vegetation", "distant_thunder"],
+      "preferred_sources": ["BOOM Library", "Pro Sound Effects", "A Sound Effect"]
+    },
+    {
+      "priority": 3,
+      "category": "impacts_and_scrapes",
+      "needed_assets": ["rock", "rubber", "wood", "plastic", "gear", "rope", "strap", "boat_contact"],
+      "preferred_sources": ["BOOM Library", "Pro Sound Effects", "custom_field_recording"]
+    },
+    {
+      "priority": 4,
+      "category": "foley_and_gear",
+      "needed_assets": ["pfd", "helmet", "paddle", "wet_footsteps", "pump", "carabiner", "throw_bag", "rope_handling"],
+      "preferred_sources": ["custom_field_recording", "Pro Sound Effects", "A Sound Effect"]
+    },
+    {
+      "priority": 5,
+      "category": "ui_training_debug",
+      "needed_assets": ["nonmusical_feedback", "countdown", "replay_scrub", "debug_tones"],
+      "preferred_sources": ["authored_synth", "professional_libraries"]
+    },
+    {
+      "priority": 6,
+      "category": "ambisonic_spatial_beds",
+      "needed_assets": ["canyon", "forest", "shoreline", "storm", "wide_water"],
+      "preferred_sources": ["custom_field_recording", "Pro Sound Effects", "A Sound Effect"]
+    }
+  ],
+  "purchase_gate": {
+    "commercial_game_rights_confirmed": false,
+    "team_or_seat_terms_confirmed": false,
+    "redistribution_restrictions_confirmed": false,
+    "ai_ml_restrictions_confirmed": false,
+    "attribution_requirements_confirmed": false,
+    "license_snapshot_recorded": false
+  },
+  "status_values": ["trial", "candidate", "approved", "rejected", "replaced"]
+}
