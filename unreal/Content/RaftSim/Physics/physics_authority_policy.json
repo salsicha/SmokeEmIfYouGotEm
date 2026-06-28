@@ -1,0 +1,26 @@
+{
+  "schema": "raftsim.unreal.physics_authority_policy.v1",
+  "authoritative": {
+    "water_state": "custom_cxx_shallow_water_solver",
+    "raft_kinematics": "project_chrono_or_custom_reduced_runtime",
+    "contacts": "project_chrono_or_custom_reduced_runtime",
+    "paddle_forces": "fixed_step_physics_bridge"
+  },
+  "unreal_chaos": {
+    "role": "incidental_non_authoritative_effects_only",
+    "allowed": [
+      "loose_visual_props",
+      "splash_debris",
+      "background_ropes",
+      "shoreline_clutter",
+      "non_scoring_breakables"
+    ],
+    "disallowed": [
+      "raft_transform_authority",
+      "raft_rock_collision_response",
+      "raft_bed_grounding",
+      "water_force_integration",
+      "scoring_critical_rescue_outcomes"
+    ]
+  }
+}
