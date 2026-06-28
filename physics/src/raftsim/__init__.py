@@ -63,6 +63,8 @@ from .geoclaw_reference import (
     GEOCLAW_CANONICAL_FIXTURES,
     GEOCLAW_CANONICAL_SUITE_SCHEMA,
     GEOCLAW_EXPORT_SCHEMA,
+    GEOCLAW_RAFTING_CASES,
+    GEOCLAW_RAFTING_SUITE_SCHEMA,
     GEOCLAW_REFERENCE_DOCS,
     GEOCLAW_RECOMMENDED_EXECUTABLES,
     GEOCLAW_REQUIRED_MODULES,
@@ -76,7 +78,9 @@ from .geoclaw_reference import (
     canonical_geoclaw_scenarios,
     check_geoclaw_availability,
     export_canonical_geoclaw_scenarios,
+    export_rafting_geoclaw_scenarios,
     export_geoclaw_scenario,
+    rafting_geoclaw_scenarios,
     write_geoclaw_setup_report,
 )
 from .dual_solver import (

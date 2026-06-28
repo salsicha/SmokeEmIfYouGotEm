@@ -238,7 +238,7 @@ Conditionally superseded for live water by Milestone 14. Telemetry/replay playba
 - [x] Add GeoClaw availability/setup checks and document system dependencies.
 - [x] Build a shared-scenario-to-GeoClaw exporter for `setrun.py`, topography files, initial water state, roughness, boundaries, hydrographs, AMR regions, and fixed-grid output.
 - [x] Convert canonical fixtures to GeoClaw: flat pool, uniform channel, dam-break/bore, bed step, constriction, wet/dry shoreline, sloping channel with Manning friction, and drop/ledge over variable topography.
-- [ ] Convert rafting fixtures to GeoClaw: boulder garden, cascading wave train, hydraulic hole/downstream boil, lateral wave, eddy-line shear, shallow shelf, and real-world low/median/high flows.
+- [x] Convert rafting fixtures to GeoClaw: boulder garden, cascading wave train, hydraulic hole/downstream boil, lateral wave, eddy-line shear, shallow shelf, and real-world low/median/high flows.
 - [ ] Normalize GeoClaw fixed-grid outputs into the frozen field/probe/cross-section telemetry schema.
 - [ ] Update the comparison harness from PyClaw-vs-C++ to GeoClaw-vs-C++.
 - [ ] Retune C++ wet/dry handling, roughness, damping, feature forcing, velocity/Froude masks, and raft-force parameters against GeoClaw.

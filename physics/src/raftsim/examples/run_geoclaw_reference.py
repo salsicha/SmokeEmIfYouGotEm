@@ -10,6 +10,7 @@ from ..geoclaw_reference import (
     GeoClawExportConfig,
     check_geoclaw_availability,
     export_canonical_geoclaw_scenarios,
+    export_rafting_geoclaw_scenarios,
     export_geoclaw_scenario,
     write_geoclaw_setup_report,
 )
@@ -31,6 +32,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--scenario-dir", type=Path, default=None, help="Existing 2.5D scenario package directory.")
     parser.add_argument("--fixture", choices=FIXTURE_CHOICES, default=None, help="Generate and export one canonical fixture.")
     parser.add_argument("--all-fixtures", action="store_true", help="Generate and export the full canonical GeoClaw fixture suite.")
+    parser.add_argument("--rafting-suite", action="store_true", help="Generate and export rafting feature cases plus real-world flow bands.")
     parser.add_argument("--procedural", action="store_true", help="Generate and export one procedural rapid.")
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--nx", type=int, default=64)
@@ -50,10 +52,26 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if availability.available or args.allow_unavailable else 1
 
     if args.all_fixtures:
-        if any((args.scenario_dir, args.fixture, args.procedural)):
+        if any((args.scenario_dir, args.fixture, args.rafting_suite, args.procedural)):
             raise SystemExit("Select --all-fixtures by itself, or choose one single scenario source.")
         result = export_canonical_geoclaw_scenarios(
             args.output_dir / f"canonical_geoclaw_seed_{args.seed}",
+            seed=args.seed,
+            config=GeoClawExportConfig(num_output_times=args.num_output_times),
+        )
+        print(f"suite={result.suite_id}")
+        print(f"manifest={result.manifest_path}")
+        print(f"scenarios={len(result.results)}")
+        if not availability.available:
+            print(f"GeoClaw unavailable for execution: {availability.reason}")
+            return 0 if args.allow_unavailable else 2
+        return 0
+
+    if args.rafting_suite:
+        if any((args.scenario_dir, args.fixture, args.procedural)):
+            raise SystemExit("Select --rafting-suite by itself, or choose one single scenario source.")
+        result = export_rafting_geoclaw_scenarios(
+            args.output_dir / f"rafting_geoclaw_seed_{args.seed}",
             seed=args.seed,
             config=GeoClawExportConfig(num_output_times=args.num_output_times),
         )
