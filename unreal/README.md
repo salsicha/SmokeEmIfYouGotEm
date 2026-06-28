@@ -1,0 +1,20 @@
+# SmokeEmIfYouGotEm Unreal Project
+
+This directory contains the UE 5.8 source-controlled project shell for the full rafting simulator.
+
+The local workstation used for this scaffolding does not currently have Unreal Editor installed, so this project is text-first: `.uproject`, C++ targets, module build rules, config, manifests, and source skeletons are committed for later editor generation and compilation.
+
+## Open In Unreal
+
+1. Install Unreal Engine 5.8.
+2. Open `SmokeEmIfYouGotEm.uproject`.
+3. Let Unreal generate IDE project files.
+4. Build the editor target.
+5. Create binary map, Blueprint, material, MetaSound, and DataAsset content from the source manifests in this repo.
+
+## Source Policy
+
+- Keep generated build products out of git.
+- Keep editor-created binary assets intentional and reviewed.
+- Prefer JSON manifests and C++ declarations for early pipeline work until workflows are proven.
+- Store large binary assets through Git LFS when they become necessary.
