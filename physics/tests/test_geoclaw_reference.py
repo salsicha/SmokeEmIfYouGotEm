@@ -4,12 +4,16 @@ import pytest
 
 from raftsim.examples.run_geoclaw_reference import main as geoclaw_main
 from raftsim.geoclaw_reference import (
+    GEOCLAW_CANONICAL_FIXTURES,
+    GEOCLAW_CANONICAL_SUITE_SCHEMA,
     GEOCLAW_EXPORT_SCHEMA,
     GEOCLAW_REQUIRED_MODULES,
     GeoClawExportConfig,
     GeoClawAvailability,
     build_geoclaw_setup_report,
+    canonical_geoclaw_scenarios,
     check_geoclaw_availability,
+    export_canonical_geoclaw_scenarios,
     export_geoclaw_scenario,
     write_geoclaw_setup_report,
 )
@@ -130,3 +134,45 @@ def test_geoclaw_cli_exports_fixture(tmp_path):
 
     assert exit_code == 0
     assert (tmp_path / "flat_pool_seed_7" / "manifest.json").exists()
+
+
+def test_canonical_geoclaw_scenarios_include_extended_fixtures():
+    scenarios = canonical_geoclaw_scenarios(seed=6)
+    ids = [scenario.metadata.scenario_id for scenario in scenarios]
+
+    assert len(scenarios) == 8
+    assert tuple(scenario.metadata.fixture_kind for scenario in scenarios) == GEOCLAW_CANONICAL_FIXTURES
+    assert "sloping_manning_channel_seed_6" in ids
+    assert "drop_ledge_seed_6" in ids
+    assert all(scenario.validate().passed for scenario in scenarios)
+
+
+def test_export_canonical_geoclaw_scenarios_writes_suite_manifest(tmp_path):
+    suite = export_canonical_geoclaw_scenarios(
+        tmp_path / "canonical",
+        seed=2,
+        config=GeoClawExportConfig(num_output_times=2),
+    )
+    manifest = json.loads(suite.manifest_path.read_text(encoding="utf-8"))
+
+    assert manifest["schema"] == GEOCLAW_CANONICAL_SUITE_SCHEMA
+    assert manifest["scenario_count"] == 8
+    assert manifest["fixtures"] == list(GEOCLAW_CANONICAL_FIXTURES)
+    assert len(manifest["exports"]) == 8
+    assert all((suite.output_dir / export["manifest"]).exists() for export in manifest["exports"])
+
+
+def test_geoclaw_cli_exports_canonical_fixture_suite(tmp_path):
+    exit_code = geoclaw_main(
+        [
+            "--all-fixtures",
+            "--seed",
+            "3",
+            "--allow-unavailable",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert (tmp_path / "canonical_geoclaw_seed_3" / "canonical_suite_manifest.json").exists()

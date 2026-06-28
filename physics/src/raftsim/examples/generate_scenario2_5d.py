@@ -20,6 +20,8 @@ FIXTURE_CHOICES = (
     "bed_step",
     "constriction",
     "wet_dry_shoreline",
+    "sloping_manning_channel",
+    "drop_ledge",
 )
 
 

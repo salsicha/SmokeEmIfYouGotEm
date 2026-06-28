@@ -60,17 +60,22 @@ from .pyclaw_reference import (
     write_unavailable_report,
 )
 from .geoclaw_reference import (
+    GEOCLAW_CANONICAL_FIXTURES,
+    GEOCLAW_CANONICAL_SUITE_SCHEMA,
+    GEOCLAW_EXPORT_SCHEMA,
     GEOCLAW_REFERENCE_DOCS,
     GEOCLAW_RECOMMENDED_EXECUTABLES,
     GEOCLAW_REQUIRED_MODULES,
-    GEOCLAW_EXPORT_SCHEMA,
     GeoClawAvailability,
     GeoClawExportConfig,
     GeoClawExportResult,
+    GeoClawScenarioSuiteExport,
     GeoClawSetupReport,
     GeoClawUnavailableError,
     build_geoclaw_setup_report,
+    canonical_geoclaw_scenarios,
     check_geoclaw_availability,
+    export_canonical_geoclaw_scenarios,
     export_geoclaw_scenario,
     write_geoclaw_setup_report,
 )

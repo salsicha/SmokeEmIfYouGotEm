@@ -23,6 +23,8 @@ FixtureKind2_5D = Literal[
     "bed_step",
     "constriction",
     "wet_dry_shoreline",
+    "sloping_manning_channel",
+    "drop_ledge",
 ]
 BoundaryEdge2_5D = Literal["west", "east", "south", "north"]
 BoundaryKind2_5D = Literal["wall", "bank", "inflow", "outflow", "open"]
@@ -707,6 +709,7 @@ def generate_fixture_scenario2_5d(parameters: FixtureScenario2_5DParameters | No
     v = np.zeros(grid.shape, dtype=np.float64)
     features: list[Feature2_5D] = []
     description = ""
+    roughness = 0.035
 
     if params.fixture == "flat_pool":
         description = "Flat still-water pool for baseline state and raft float tests."
@@ -798,6 +801,45 @@ def generate_fixture_scenario2_5d(parameters: FixtureScenario2_5DParameters | No
             BoundaryCondition2_5D("south", "wall"),
             BoundaryCondition2_5D("north", "wall"),
         )
+    elif params.fixture == "sloping_manning_channel":
+        description = "Uniform sloping channel with elevated Manning roughness for friction validation."
+        bed = -params.downstream_slope * x
+        u = np.full(grid.shape, params.inflow_speed, dtype=np.float64)
+        roughness = 0.055
+        boundaries = _channel_boundaries(params.base_depth, params.inflow_speed)
+    elif params.fixture == "drop_ledge":
+        description = "Channel flow over a smooth drop ledge with variable downstream topography."
+        drop_x = grid.center[0]
+        transition_width = max(params.dx * 2.0, params.nx * params.dx * 0.035)
+        drop = params.step_height * (0.5 + 0.5 * np.tanh((x - drop_x) / transition_width))
+        downstream_undulation = 0.08 * params.step_height * np.sin((x - drop_x) * 0.45)
+        bed = -params.downstream_slope * x - drop + np.where(x > drop_x, downstream_undulation, 0.0)
+        eta = params.base_depth - params.downstream_slope * x
+        depth = np.maximum(eta - bed, 0.0)
+        u = np.where(depth > 1.0e-6, params.inflow_speed * (1.0 + 0.22 * drop / max(params.step_height, 1.0e-6)), 0.0)
+        features.append(
+            Feature2_5D(
+                kind="ledge",
+                center=(drop_x, grid.center[1]),
+                radius=0.0,
+                strength=params.step_height,
+                length=(params.ny - 1) * params.dy,
+                width=float(transition_width * 2.0),
+                metadata={"fixture_role": "drop_ledge_variable_topography"},
+            )
+        )
+        features.append(
+            Feature2_5D(
+                kind="wave_train",
+                center=(drop_x + params.nx * params.dx * 0.12, grid.center[1]),
+                radius=float(params.ny * params.dy * 0.18),
+                strength=0.65,
+                length=float(params.nx * params.dx * 0.22),
+                width=float(params.ny * params.dy * 0.45),
+                metadata={"fixture_role": "downstream_drop_recovery"},
+            )
+        )
+        boundaries = _channel_boundaries(float(depth[:, 0].mean()), params.inflow_speed)
     else:
         raise ValueError(f"Unknown 2.5D fixture: {params.fixture}")
 
@@ -821,6 +863,7 @@ def generate_fixture_scenario2_5d(parameters: FixtureScenario2_5DParameters | No
         features=tuple(features),
         probes=_default_probes(grid),
         raft=RaftParameters2_5D(),
+        roughness=roughness,
     )
 
 
