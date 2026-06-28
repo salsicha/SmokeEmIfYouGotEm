@@ -1,0 +1,41 @@
+{
+  "schema": "raftsim.unreal.contact_material_presets.v1",
+  "surface_class": "rock",
+  "chrono_contact_model": "compliant_smc",
+  "presets": [
+    {
+      "preset_id": "rock_elastic_default",
+      "restitution": 0.22,
+      "normal_stiffness": 14500.0,
+      "normal_damping": 1150.0,
+      "tangential_friction": 0.58,
+      "rolling_friction": 0.04,
+      "telemetry_tags": ["bounce", "scrape", "pin", "launch"]
+    },
+    {
+      "preset_id": "bank_elastic_scrape",
+      "restitution": 0.12,
+      "normal_stiffness": 12000.0,
+      "normal_damping": 1350.0,
+      "tangential_friction": 0.76,
+      "rolling_friction": 0.08,
+      "telemetry_tags": ["scrape", "deflect", "pin"]
+    },
+    {
+      "preset_id": "ledge_elastic_launch",
+      "restitution": 0.3,
+      "normal_stiffness": 17000.0,
+      "normal_damping": 950.0,
+      "tangential_friction": 0.5,
+      "rolling_friction": 0.03,
+      "telemetry_tags": ["bounce", "launch", "drop"]
+    }
+  ],
+  "sweep_ranges": {
+    "restitution": [0.05, 0.35],
+    "normal_stiffness": [8000.0, 22000.0],
+    "normal_damping": [700.0, 2200.0],
+    "tangential_friction": [0.35, 0.9]
+  },
+  "tuning_goal": "rubber_raft_deflects_or_bounces_from_rocks_without_jitter_or_universal_sticking"
+}
