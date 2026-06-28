@@ -224,7 +224,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Add spatial-audio debug tools for emitter position, attenuation radius, spread, occlusion traces, reverb sends, ambisonic rotation, voice count, mix priority, and runtime cost.
 - [x] Evaluate Wwise and FMOD only if Unreal-native audio/MetaSounds are insufficient for authoring, mixing, localization, memory, or platform workflow.
 - [x] Define AI audio prohibited use cases: unclear commercial rights, unlicensed voice cloning, recognizably similar music, celebrity/style imitation, and any core gameplay cue that cannot be reviewed/reproduced.
-- [ ] Validate audio in stereo, headphones, VR spatial audio, noisy voice-command conditions, and multiplayer voice-chat scenarios.
+- [x] Validate audio in stereo, headphones, VR spatial audio, noisy voice-command conditions, and multiplayer voice-chat scenarios.
 
 ## Technical Notes To Revisit
 

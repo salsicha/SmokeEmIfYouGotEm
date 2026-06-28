@@ -1,0 +1,132 @@
+{
+  "schema": "raftsim.unreal.audio_end_to_end_validation.v1",
+  "status": "planned_until_unreal_audio_slice_and_hardware_lab_are_available",
+  "depends_on": [
+    "unreal/Content/RaftSim/Audio/interactive_water_audio_prototype.json",
+    "unreal/Content/RaftSim/Audio/spatial_audio_presets.json",
+    "unreal/Content/RaftSim/Audio/spatial_audio_platform_validation.json",
+    "unreal/Content/RaftSim/Audio/spatial_audio_debug_tools.json",
+    "unreal/Plugins/RaftSim/Source/RaftSimAI/Public/RaftSimVoiceTelemetry.h",
+    "unreal/Plugins/RaftSim/Source/RaftSimNetwork/Public/RaftSimNetworkTypes.h"
+  ],
+  "test_scenarios": [
+    {
+      "scenario_id": "stereo_speaker_rapid_mix",
+      "playback_target": "StereoSpeakers",
+      "river_class": "III",
+      "crew_mode": "ai_crew",
+      "voice_mode": "guide_commands_only",
+      "checks": [
+        "river_bed_does_not_mask_hazards",
+        "guide_command_feedback_is_clear",
+        "downmix_preserves_paddle_and_contact_detail",
+        "audio_render_cost_inside_budget"
+      ]
+    },
+    {
+      "scenario_id": "headphones_long_run",
+      "playback_target": "Headphones",
+      "river_class": "IV",
+      "crew_mode": "ai_crew_conversation",
+      "voice_mode": "guide_commands_only",
+      "checks": [
+        "crew_seat_positions_are_readable",
+        "rapid_features_have_stable_direction",
+        "near_field_raft_contacts_are_not_fatiguing",
+        "front_back_confusion_rate_inside_threshold"
+      ]
+    },
+    {
+      "scenario_id": "vr_spatial_guide_seat",
+      "playback_target": "VRBinauralHRTF",
+      "river_class": "IV",
+      "crew_mode": "ai_crew_conversation",
+      "voice_mode": "guide_commands_only",
+      "checks": [
+        "head_tracked_hrtf_stays_locked_to_world_sources",
+        "ambisonic_beds_rotate_correctly",
+        "canyon_reflections_transition_without_motion_discomfort",
+        "guide_seat_contact_sounds_remain_near_field"
+      ]
+    },
+    {
+      "scenario_id": "noisy_voice_commands_class_v",
+      "playback_target": "Headphones",
+      "river_class": "V",
+      "crew_mode": "ai_crew_conversation",
+      "voice_mode": "local_guide_microphone",
+      "noise_profiles": [
+        "river_roar_high",
+        "wind_and_rain",
+        "paddle_impacts",
+        "crew_chatter",
+        "raft_scrape_and_rock_impact"
+      ],
+      "checks": [
+        "false_accept_rate_inside_threshold",
+        "false_reject_rate_inside_threshold",
+        "command_latency_inside_budget",
+        "confidence_degrades_gracefully",
+        "safety_commands_keep_priority_ducking"
+      ]
+    },
+    {
+      "scenario_id": "multiplayer_voice_boat_full",
+      "playback_target": "VRBinauralHRTF",
+      "river_class": "IV",
+      "crew_mode": "all_human_players",
+      "voice_mode": "networked_voice_chat",
+      "network_conditions": [
+        "nominal",
+        "100ms_jitter",
+        "3_percent_packet_loss",
+        "seat_swap",
+        "muted_player"
+      ],
+      "checks": [
+        "player_voice_stays_seat_positioned",
+        "push_to_talk_and_mute_are_respected",
+        "guide_commands_duck_player_chat",
+        "packet_loss_does_not_break_command_feedback",
+        "privacy_and_accessibility_controls_remain_available"
+      ]
+    }
+  ],
+  "metrics": {
+    "voice_command": [
+      "latency_ms",
+      "false_accept_rate",
+      "false_reject_rate",
+      "mean_confidence",
+      "minimum_confidence_by_noise_profile"
+    ],
+    "speech_and_chat": [
+      "intelligibility_rating",
+      "ducking_recovery_ms",
+      "voice_position_error_degrees",
+      "packet_loss_recovery",
+      "mute_privacy_state"
+    ],
+    "spatial_audio": [
+      "azimuth_accuracy_degrees",
+      "front_back_confusion_rate",
+      "head_tracked_stability",
+      "ambisonic_rotation_error_degrees",
+      "hazard_warning_lead_time_seconds"
+    ],
+    "runtime": [
+      "audio_render_cost_ms",
+      "spatialization_cost_ms",
+      "active_voice_count",
+      "virtualized_voice_count",
+      "streaming_buffer_underruns"
+    ]
+  },
+  "pass_gate": {
+    "requires_hardware_run": true,
+    "requires_unreal_build": true,
+    "requires_multiplayer_session": true,
+    "requires_vr_headset": true,
+    "blocks_shipping_audio": true
+  }
+}
