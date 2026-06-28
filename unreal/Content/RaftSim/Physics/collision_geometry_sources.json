@@ -1,0 +1,45 @@
+{
+  "schema": "raftsim.unreal.collision_geometry_sources.v1",
+  "source_package": "../../physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json",
+  "builder": "URaftSimCollisionGeometryBuilder",
+  "feature_types": [
+    {
+      "feature_type": "rock",
+      "chrono_body": "static",
+      "primitive": "convex_hull_or_sphere_cluster",
+      "material_preset": "rock_elastic_default"
+    },
+    {
+      "feature_type": "bank",
+      "chrono_body": "static",
+      "primitive": "convex_hull_or_box_strip",
+      "material_preset": "bank_elastic_scrape"
+    },
+    {
+      "feature_type": "ledge",
+      "chrono_body": "static",
+      "primitive": "convex_hull",
+      "material_preset": "ledge_elastic_launch"
+    },
+    {
+      "feature_type": "shallow",
+      "chrono_body": "static",
+      "primitive": "heightfield_tile",
+      "material_preset": "bed_inelastic_shallow_shelf"
+    },
+    {
+      "feature_type": "strainer",
+      "chrono_body": "static",
+      "primitive": "capsule_cluster",
+      "material_preset": "strainer_high_friction_pin"
+    },
+    {
+      "feature_type": "riverbed",
+      "chrono_body": "static",
+      "primitive": "heightfield_tile",
+      "material_preset": "bed_inelastic_default"
+    }
+  ],
+  "ordering_policy": "scenario_feature_order_then_feature_id",
+  "status": "source_integrated_pending_chrono_mesh_generation"
+}
