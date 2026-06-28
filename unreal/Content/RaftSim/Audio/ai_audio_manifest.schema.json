@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "raftsim.unreal.ai_audio_manifest.v1",
+  "title": "RaftSim AI Audio Manifest Record",
+  "type": "object",
+  "required": [
+    "asset_id",
+    "filename",
+    "tool",
+    "provider",
+    "model",
+    "version",
+    "prompt",
+    "seed",
+    "generation_date",
+    "account_or_license_tier",
+    "output_terms",
+    "review_status",
+    "similarity_check",
+    "prototype_or_shipping_flag",
+    "approved_for_shipping"
+  ],
+  "properties": {
+    "asset_id": {
+      "type": "string"
+    },
+    "filename": {
+      "type": "string"
+    },
+    "tool": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "prompt": {
+      "type": "string"
+    },
+    "negative_prompt": {
+      "type": "string"
+    },
+    "seed": {
+      "type": [
+        "integer",
+        "string"
+      ]
+    },
+    "generation_date": {
+      "type": "string"
+    },
+    "generation_settings": {
+      "type": "object"
+    },
+    "account_or_license_tier": {
+      "type": "string"
+    },
+    "output_terms": {
+      "type": "string"
+    },
+    "terms_url": {
+      "type": "string"
+    },
+    "intended_use": {
+      "type": "string"
+    },
+    "prototype_or_shipping_flag": {
+      "type": "string",
+      "enum": [
+        "prototype",
+        "candidate",
+        "shipping"
+      ]
+    },
+    "approved_for_shipping": {
+      "type": "boolean"
+    },
+    "allowed_use": {
+      "type": "string",
+      "enum": [
+        "prototype_only",
+        "internal_review",
+        "temp_dialogue",
+        "abstract_debug",
+        "noncritical_variation",
+        "shipping_candidate",
+        "approved_shipping"
+      ]
+    },
+    "similarity_check": {
+      "type": "object",
+      "required": [
+        "performed",
+        "result"
+      ],
+      "properties": {
+        "performed": {
+          "type": "boolean"
+        },
+        "method": {
+          "type": "string"
+        },
+        "reference_assets_checked": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "result": {
+          "type": "string",
+          "enum": [
+            "not_checked",
+            "clear",
+            "needs_review",
+            "rejected"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "review_status": {
+      "type": "string",
+      "enum": [
+        "unreviewed",
+        "audio_review",
+        "legal_review",
+        "approved",
+        "rejected",
+        "retired"
+      ]
+    },
+    "audio_reviewer": {
+      "type": "string"
+    },
+    "legal_reviewer": {
+      "type": "string"
+    },
+    "review_date": {
+      "type": "string"
+    },
+    "source_asset_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "protected_voice_or_identity_used": {
+      "type": "boolean"
+    },
+    "music_or_lyrics_used": {
+      "type": "boolean"
+    },
+    "brand_or_style_reference_used": {
+      "type": "boolean"
+    },
+    "prohibited_use_reason": {
+      "type": "string"
+    },
+    "reproduction_package_path": {
+      "type": "string"
+    },
+    "review_notes": {
+      "type": "string"
+    }
+  }
+}
