@@ -180,7 +180,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Implement telemetry/replay playback in Unreal before live native physics.
 - [x] Define fixed-step water/raft scheduling and Unreal render interpolation.
 - [x] Set up Enhanced Input actions for VR controllers, keyboard, mouse, and gamepad.
-- [ ] Build the first-person guide camera with flat-screen and VR comfort options.
+- [x] Build the first-person guide camera with flat-screen and VR comfort options.
 - [ ] Build river, season, flow, difficulty, and raft/crew selection UI from validated data assets.
 - [ ] Add local/offline AI integration layer for speech recognition, command intent parsing, crew dialogue, and optional local speech synthesis.
 - [ ] Implement guide voice commands that map spoken instructions into deterministic crew intents: forward paddle, back paddle, left/right paddle, stop, brace, hold on, high side, rescue, and recovery commands.

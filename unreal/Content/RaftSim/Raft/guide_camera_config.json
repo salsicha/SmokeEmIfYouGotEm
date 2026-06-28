@@ -1,0 +1,21 @@
+{
+  "schema": "raftsim.unreal.guide_camera_config.v1",
+  "pawn_class": "ARaftSimGuidePawn",
+  "perspective": "first_person_stern_guide",
+  "anchors": {
+    "guide_seat_local_cm": [-180.0, 0.0, 45.0],
+    "paddle_anchor_local_cm": [25.0, -65.0, -20.0],
+    "camera_local_cm": [0.0, 0.0, 0.0]
+  },
+  "flat_screen": {
+    "mouse_look": true,
+    "gamepad_look": true,
+    "impact_filtering": true
+  },
+  "vr": {
+    "seated_recenter": true,
+    "horizon_stabilization": true,
+    "comfort_vignette": true,
+    "head_locked_ui": false
+  }
+}
