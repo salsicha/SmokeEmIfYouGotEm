@@ -167,7 +167,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Enable the current UE5 photoreal open-world stack where supported: Nanite, Nanite foliage, Nanite landscapes/splines/tessellation, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, Substrate/material layering, and OpenXR.
 - [x] Create the Unreal module/plugin skeleton: core, physics bridge, river, raft, input, UI, and debug modules.
 - [x] Integrate the custom C++ water solver as the runtime water field candidate.
-- [ ] Integrate Chrono/custom raft dynamics as selected by the readiness report.
+- [x] Integrate Chrono/custom raft dynamics as selected by the readiness report.
 - [ ] Implement the fixed-step Chrono water/raft bridge: custom C++ shallow-water snapshot feeds Chrono raft substeps, Chrono returns authoritative raft pose, velocity, contacts, and force telemetry.
 - [ ] Add deterministic raft patch sampling for buoyancy, drag, added mass, slope force, eddy-line shear, boil/upwelling impulse, paddle blade forces, and feature tags.
 - [ ] Build Chrono collision geometry from rocks, banks, ledges, shallows, strainers, and bed/corridor data.
