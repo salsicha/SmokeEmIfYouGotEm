@@ -1,20 +1,10 @@
 {
-  "schema": "raftsim.unreal.interactive_water_audio_prototype.v1",
+  "schema": "raftsim.unreal.interactive_water_audio_prototype.v2",
   "module": "RaftSimAudio",
+  "prototype_asset": "MS_RaftSim_InteractiveWaterPrototype",
+  "implementation_target": "Unreal MetaSounds first; middleware only if authoring or runtime constraints force it",
   "parameter_function": "RaftSimAudio::BuildWaterAudioParameters",
   "asset_policy": "recorded_or_downloaded_assets_first",
-  "metasound_layers": [
-    "river_bed_loop",
-    "nearby_rapid_feature",
-    "hydraulic_hole",
-    "eddy_line_shear",
-    "spray_and_foam",
-    "raft_scrape",
-    "rock_impact",
-    "paddle_catch",
-    "weather",
-    "canyon_reflection"
-  ],
   "runtime_inputs": [
     "flow_speed_mps",
     "aeration",
@@ -23,6 +13,109 @@
     "paddle_catch_strength",
     "rock_scrape_strength",
     "weather_wetness",
+    "canyon_enclosure",
+    "crew_voice_activity",
     "camera_perspective"
+  ],
+  "metasound_layers": [
+    {
+      "name": "river_roar",
+      "source_type": "looping_recorded_bed",
+      "driven_by": [
+        "RiverRoar",
+        "flow_speed_mps"
+      ],
+      "spatial_preset": "large_water_source"
+    },
+    {
+      "name": "nearby_rapid_feature",
+      "source_type": "procedural_crossfade_between_recorded_features",
+      "driven_by": [
+        "RapidFeatureIntensity",
+        "aeration",
+        "turbulence"
+      ],
+      "spatial_preset": "line_or_area_rapid"
+    },
+    {
+      "name": "spray_and_foam",
+      "source_type": "granular_recorded_spray_variations",
+      "driven_by": [
+        "SprayAndFoam",
+        "aeration"
+      ],
+      "spatial_preset": "near_boat_water_detail"
+    },
+    {
+      "name": "paddle_catch",
+      "source_type": "one_shot_variation_pool",
+      "driven_by": [
+        "PaddleLayer",
+        "paddle_catch_strength"
+      ],
+      "spatial_preset": "paddle_point_source"
+    },
+    {
+      "name": "raft_scrape",
+      "source_type": "loop_plus_one_shot_contact",
+      "driven_by": [
+        "ScrapeLayer",
+        "rock_scrape_strength"
+      ],
+      "spatial_preset": "raft_contact_near_field"
+    },
+    {
+      "name": "rock_impact",
+      "source_type": "impact_one_shot_with_impulse_selection",
+      "driven_by": [
+        "ImpactLayer",
+        "raft_impact_impulse"
+      ],
+      "spatial_preset": "rock_contact_point_source"
+    },
+    {
+      "name": "weather",
+      "source_type": "looping_weather_beds_and_drips",
+      "driven_by": [
+        "WeatherLayer",
+        "weather_wetness"
+      ],
+      "spatial_preset": "weather_overhead_bed"
+    },
+    {
+      "name": "canyon_reflection",
+      "source_type": "send_level_control",
+      "driven_by": [
+        "CanyonReflection",
+        "canyon_enclosure"
+      ],
+      "spatial_preset": "environment_reflection_send"
+    },
+    {
+      "name": "crew_voice_layering",
+      "source_type": "ducking_and_priority_bus_control",
+      "driven_by": [
+        "CrewVoiceDuckAmount",
+        "crew_voice_activity"
+      ],
+      "spatial_preset": "crew_voice"
+    }
+  ],
+  "buses": [
+    "river_bed",
+    "water_detail",
+    "raft_contacts",
+    "paddles",
+    "weather",
+    "crew_voice",
+    "vr_head_locked_safety",
+    "reverb_returns"
+  ],
+  "prototype_acceptance_checks": [
+    "all_layers_respond_to_parameter_sweeps",
+    "no_clicks_on_flow_speed_or_aeration_crossfades",
+    "crew_voice_remains_intelligible_during_class_iv_rapid_mix",
+    "VR_binaural_preview_preserves_front_back_localization",
+    "runtime_parameter_update_cost_stays_under_audio_budget"
   ]
 }
