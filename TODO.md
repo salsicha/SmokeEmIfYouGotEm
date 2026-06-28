@@ -171,7 +171,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Implement the fixed-step Chrono water/raft bridge: custom C++ shallow-water snapshot feeds Chrono raft substeps, Chrono returns authoritative raft pose, velocity, contacts, and force telemetry.
 - [x] Add deterministic raft patch sampling for buoyancy, drag, added mass, slope force, eddy-line shear, boil/upwelling impulse, paddle blade forces, and feature tags.
 - [x] Build Chrono collision geometry from rocks, banks, ledges, shallows, strainers, and bed/corridor data.
-- [ ] Add partially elastic rock collision presets for rubber-raft impacts: restitution, tube stiffness, damping, friction, scrape/bounce/pin telemetry, and parameter sweeps.
+- [x] Add partially elastic rock collision presets for rubber-raft impacts: restitution, tube stiffness, damping, friction, scrape/bounce/pin telemetry, and parameter sweeps.
 - [ ] Add strongly inelastic riverbed grounding presets: near-zero restitution, high damping, grounding friction, stick-slip, contact hysteresis, scrape telemetry, and shallow-shelf pivot tests.
 - [ ] Start with one-way water-to-raft coupling; add optional bounded raft-to-water displacement/source terms only after the bridge is stable and validated.
 - [ ] Add native fixtures for flat pool float, current drift, standing wave lift, eddy-line yaw, rock bounce, riverbed grounding, shallow shelf pivot, and pin/release.
