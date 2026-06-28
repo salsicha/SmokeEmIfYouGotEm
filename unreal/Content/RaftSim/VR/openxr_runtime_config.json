@@ -1,0 +1,31 @@
+{
+  "schema": "raftsim.unreal.openxr_runtime_config.v1",
+  "runtime": "OpenXR",
+  "play_space": "seated_stern_guide",
+  "supported_inputs": [
+    "vr_motion_controllers",
+    "keyboard_mouse",
+    "gamepad"
+  ],
+  "comfort_defaults": {
+    "seated_recenter": true,
+    "horizon_stabilization": true,
+    "impact_camera_filter": true,
+    "comfort_vignette": true,
+    "motion_intensity": "medium",
+    "snap_turn_degrees": 30
+  },
+  "tracked_anchors": [
+    "head",
+    "left_hand",
+    "right_hand",
+    "guide_seat",
+    "paddle_grip",
+    "paddle_blade"
+  ],
+  "qa_targets": [
+    "desktop_openxr_headset",
+    "headphones_binaural",
+    "flat_screen_fallback"
+  ]
+}
