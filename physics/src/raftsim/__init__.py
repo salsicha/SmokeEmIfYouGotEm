@@ -129,6 +129,7 @@ from .tuning import (
     ParameterFitCandidateResult,
     ParameterFitReport,
     fit_cpp_and_raft_parameters_against_pyclaw,
+    tune_cpp_solver_against_geoclaw,
     tune_cpp_solver_against_pyclaw,
 )
 from .regression import RegressionPromotionResult, promote_passing_dual_solver_run
