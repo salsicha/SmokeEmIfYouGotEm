@@ -1,0 +1,55 @@
+{
+  "schema": "raftsim.unreal.ai_audio_prohibited_use_cases.v1",
+  "default_decision": "reject_or_quarantine",
+  "prohibited_use_cases": [
+    {
+      "id": "unclear_commercial_rights",
+      "description": "Provider terms, account tier, output ownership, platform rights, or redistribution rights are missing or ambiguous.",
+      "required_action": "reject_until_legal_terms_are_recorded"
+    },
+    {
+      "id": "unlicensed_voice_cloning",
+      "description": "Generated voice resembles or is derived from a real person without written consent, performer rights, and legal/audio review.",
+      "required_action": "reject_and_remove_from_production_review"
+    },
+    {
+      "id": "recognizably_similar_music",
+      "description": "Generated melody, hook, stem, lyric, or music bed resembles protected work or has unclear training/output rights.",
+      "required_action": "reject"
+    },
+    {
+      "id": "celebrity_or_style_imitation",
+      "description": "Prompt or output imitates named performers, celebrities, composers, voice actors, sound designers, brands, or protected signature styles.",
+      "required_action": "reject"
+    },
+    {
+      "id": "unreviewable_core_gameplay_cue",
+      "description": "Hazard, rescue, guide-command, collision, or safety-relevant cue cannot be reproduced, audited, or similarity-checked.",
+      "required_action": "reject"
+    },
+    {
+      "id": "production_realism_without_recorded_backbone",
+      "description": "Whitewater, raft, paddle, rock, or rescue realism relies on AI output instead of recorded/downloaded or field-captured source material.",
+      "required_action": "replace_with_recorded_or_downloaded_backbone"
+    },
+    {
+      "id": "multiplayer_identity_confusion",
+      "description": "Synthetic voice could be mistaken for a human player, guide, streamer, or team member without explicit labeling and permission.",
+      "required_action": "reject_or_relabel_as_nonhuman_debug_audio_only"
+    }
+  ],
+  "quarantine_rules": {
+    "may_remain_in_prototype_storage": true,
+    "may_be_exported_to_unreal_ready_content": false,
+    "may_be_layered_under_production_assets": false,
+    "manifest_required_even_when_rejected": true
+  },
+  "review_requirements_for_exception": [
+    "audio_director_approval",
+    "legal_approval",
+    "similarity_check_clear",
+    "commercial_terms_recorded",
+    "reproduction_package_archived",
+    "explicit_approved_for_shipping_flag"
+  ]
+}
