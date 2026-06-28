@@ -1,0 +1,24 @@
+{
+  "schema": "raftsim.unreal.water_runtime_candidate.v1",
+  "runtime_name": "raftsim_water_cpp_v1",
+  "native_header_root": "../../physics/cpp/include",
+  "native_source_root": "../../physics/cpp/src",
+  "primary_headers": [
+    "raftsim_water/solver.hpp",
+    "raftsim_water/scenario.hpp",
+    "raftsim_water/chrono_coupling.hpp"
+  ],
+  "unreal_adapter": {
+    "module": "RaftSimPhysics",
+    "class": "URaftSimWaterRuntimeAdapter",
+    "config_struct": "FRaftSimWaterRuntimeConfig",
+    "sample_struct": "FRaftSimWaterSample"
+  },
+  "runtime_policy": {
+    "authority": "custom_cxx_shallow_water_solver",
+    "mode": "one_way_water_to_raft_first",
+    "fixed_step_seconds": 0.0166666667,
+    "unreal_water_system_role": "visual_only"
+  },
+  "status": "source_integrated_pending_editor_compile"
+}
