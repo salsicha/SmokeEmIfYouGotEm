@@ -1,0 +1,167 @@
+{
+  "schema": "raftsim.unreal.spatial_audio_presets.v1",
+  "data_asset_class": "URaftSimSpatialAudioPresetSet",
+  "default_target_playback": [
+    "vr_headphones_binaural",
+    "headphones",
+    "stereo_speakers",
+    "surround_5_1_7_1"
+  ],
+  "presets": [
+    {
+      "preset_id": "point_source_close_detail",
+      "mode": "PointSource",
+      "use_cases": [
+        "small_rock_ping",
+        "gear_clip",
+        "minor_paddle_knock"
+      ],
+      "attenuation_radius_m": 18.0,
+      "source_spread_m": 0.15,
+      "near_field_gain_db": 1.5,
+      "mix_bus": "world_detail",
+      "binaural_for_headphones_and_vr": true,
+      "reverb_and_occlusion": true
+    },
+    {
+      "preset_id": "river_line_area_water",
+      "mode": "LineAreaWaterSource",
+      "use_cases": [
+        "eddy_line",
+        "shore_current",
+        "long_pour_over"
+      ],
+      "attenuation_radius_m": 90.0,
+      "source_spread_m": 28.0,
+      "near_field_gain_db": 0.0,
+      "mix_bus": "river_bed",
+      "binaural_for_headphones_and_vr": true,
+      "reverb_and_occlusion": true
+    },
+    {
+      "preset_id": "large_rapid_feature",
+      "mode": "LargeRapid",
+      "use_cases": [
+        "standing_wave_train",
+        "hydraulic_hole",
+        "class_iv_rapid"
+      ],
+      "attenuation_radius_m": 160.0,
+      "source_spread_m": 55.0,
+      "near_field_gain_db": -1.0,
+      "mix_bus": "rapid_features",
+      "binaural_for_headphones_and_vr": true,
+      "reverb_and_occlusion": true
+    },
+    {
+      "preset_id": "ambisonic_canyon_weather_bed",
+      "mode": "AmbisonicBed",
+      "use_cases": [
+        "canyon_reflection",
+        "forest_shore_ambience",
+        "rain_and_wind_bed"
+      ],
+      "attenuation_radius_m": 0.0,
+      "source_spread_m": 0.0,
+      "ambisonic_order": 1,
+      "mix_bus": "ambience",
+      "head_tracked_rotation": true,
+      "binaural_for_headphones_and_vr": true,
+      "reverb_and_occlusion": false
+    },
+    {
+      "preset_id": "occluded_bank_or_rock",
+      "mode": "OccludedBank",
+      "use_cases": [
+        "rapid_around_bend",
+        "water_behind_boulder",
+        "shoreline_hidden_source"
+      ],
+      "attenuation_radius_m": 70.0,
+      "source_spread_m": 12.0,
+      "occlusion_low_pass_hz": 900.0,
+      "mix_bus": "occluded_water",
+      "binaural_for_headphones_and_vr": true,
+      "reverb_and_occlusion": true
+    },
+    {
+      "preset_id": "raft_contact_near_field",
+      "mode": "RaftContact",
+      "use_cases": [
+        "tube_scrape",
+        "floor_slosh",
+        "frame_thump"
+      ],
+      "attenuation_radius_m": 12.0,
+      "source_spread_m": 2.5,
+      "near_field_gain_db": 3.0,
+      "mix_bus": "raft_contacts",
+      "binaural_for_headphones_and_vr": true,
+      "reverb_and_occlusion": false
+    },
+    {
+      "preset_id": "underwater_near_water",
+      "mode": "UnderwaterNearWater",
+      "use_cases": [
+        "camera_dip",
+        "swim_state",
+        "hydrophone_layer"
+      ],
+      "attenuation_radius_m": 35.0,
+      "source_spread_m": 8.0,
+      "occlusion_low_pass_hz": 650.0,
+      "mix_bus": "underwater",
+      "binaural_for_headphones_and_vr": true,
+      "reverb_and_occlusion": false
+    },
+    {
+      "preset_id": "crew_voice_seat",
+      "mode": "CrewVoice",
+      "use_cases": [
+        "crew_bark",
+        "crew_conversation",
+        "guide_heard_response"
+      ],
+      "attenuation_radius_m": 16.0,
+      "source_spread_m": 0.35,
+      "near_field_gain_db": 1.0,
+      "mix_bus": "crew_voice",
+      "binaural_for_headphones_and_vr": true,
+      "reverb_and_occlusion": true
+    },
+    {
+      "preset_id": "guide_command_priority",
+      "mode": "GuideCommand",
+      "use_cases": [
+        "forward_command",
+        "back_command",
+        "high_side_command",
+        "safety_callout"
+      ],
+      "attenuation_radius_m": 22.0,
+      "source_spread_m": 0.25,
+      "near_field_gain_db": 2.0,
+      "mix_bus": "guide_command_priority",
+      "head_locked_in_vr": false,
+      "binaural_for_headphones_and_vr": true,
+      "reverb_and_occlusion": false
+    },
+    {
+      "preset_id": "multiplayer_voice_chat_seat",
+      "mode": "MultiplayerVoice",
+      "use_cases": [
+        "human_crew_voice",
+        "proximity_chat",
+        "boat_team_comms"
+      ],
+      "attenuation_radius_m": 20.0,
+      "source_spread_m": 0.3,
+      "near_field_gain_db": 0.0,
+      "mix_bus": "multiplayer_voice",
+      "privacy_mute_controls": true,
+      "network_priority": "voice_chat",
+      "binaural_for_headphones_and_vr": true,
+      "reverb_and_occlusion": true
+    }
+  ]
+}
