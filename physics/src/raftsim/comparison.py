@@ -1,4 +1,4 @@
-"""Comparison reports for PyClaw and C++ 2.5D solver outputs."""
+"""Comparison reports for reference and C++ 2.5D solver outputs."""
 
 from __future__ import annotations
 
@@ -54,16 +54,19 @@ class FieldErrorSummary:
 @dataclass(frozen=True, slots=True)
 class FrameFieldComparison:
     label: str
-    pyclaw_frame: str
+    reference_frame: str
     cpp_frame: str
     field_errors: tuple[FieldErrorSummary, ...]
     slope_errors: tuple[FieldErrorSummary, ...]
     wet_mismatch_fraction: float
+    reference_solver: str = "pyclaw"
 
     def to_json_dict(self) -> dict[str, object]:
         return {
             "label": self.label,
-            "pyclaw_frame": self.pyclaw_frame,
+            "reference_solver": self.reference_solver,
+            "reference_frame": self.reference_frame,
+            "pyclaw_frame": self.reference_frame,
             "cpp_frame": self.cpp_frame,
             "field_errors": [summary.to_json_dict() for summary in self.field_errors],
             "slope_errors": [summary.to_json_dict() for summary in self.slope_errors],
@@ -243,10 +246,13 @@ class PhysicsDiagnosticComparisonReport:
     pyclaw: SolverDiagnosticSummary
     cpp: SolverDiagnosticSummary
     delta: DiagnosticDeltaSummary
+    reference_solver: str = "pyclaw"
 
     def to_json_dict(self) -> dict[str, object]:
         return {
             "scenario_id": self.scenario_id,
+            "reference_solver": self.reference_solver,
+            "reference": self.pyclaw.to_json_dict(),
             "pyclaw": self.pyclaw.to_json_dict(),
             "cpp": self.cpp.to_json_dict(),
             "delta": self.delta.to_json_dict(),
@@ -286,6 +292,7 @@ class FeatureComparison:
     cpp: ObservedFeatureMetric
     location_delta: float
     strength_delta: float
+    reference_solver: str = "pyclaw"
 
     def to_json_dict(self) -> dict[str, object]:
         return {
@@ -294,6 +301,8 @@ class FeatureComparison:
             "authored_x": self.authored_x,
             "authored_y": self.authored_y,
             "authored_strength": self.authored_strength,
+            "reference_solver": self.reference_solver,
+            "reference": self.pyclaw.to_json_dict(),
             "pyclaw": self.pyclaw.to_json_dict(),
             "cpp": self.cpp.to_json_dict(),
             "location_delta": self.location_delta,
@@ -395,6 +404,13 @@ class ThresholdEvaluationReport:
         return output_path
 
 
+@dataclass(frozen=True, slots=True)
+class ReferenceSolverEntry:
+    solver: str
+    output_dir: Path
+    manifest_path: Path
+
+
 def compare_dual_solver_fields(
     dual_solver_dir_or_manifest: str | Path,
     *,
@@ -407,23 +423,25 @@ def compare_dual_solver_fields(
     root = manifest_path.parent
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     scenario = read_scenario2_5d_package(root / manifest["scenario_package"])
-    pyclaw_manifest = _load_manifest(root / manifest["pyclaw"]["manifest"])
+    reference = _reference_solver_entry(manifest, root)
+    reference_manifest = _load_manifest(reference.manifest_path)
     cpp_manifest = _load_manifest(root / manifest["cpp"]["manifest"])
 
-    pyclaw_frames = [root / manifest["pyclaw"]["output_dir"] / frame for frame in pyclaw_manifest["frames"]]
+    reference_frames = [reference.output_dir / frame for frame in reference_manifest["frames"]]
     cpp_frames = [root / manifest["cpp"]["output_dir"] / frame for frame in cpp_manifest["frames"]]
-    pairings = _frame_pairings(pyclaw_frames, cpp_frames)
+    pairings = _frame_pairings(reference_frames, cpp_frames)
 
     comparisons = tuple(
         _compare_frame_pair(
             label,
-            pyclaw_frame_path,
+            reference_frame_path,
             cpp_frame_path,
             scenario.grid.dx,
             scenario.grid.dy,
+            reference_solver=reference.solver,
             velocity_depth_floor=velocity_depth_floor,
         )
-        for label, pyclaw_frame_path, cpp_frame_path in pairings
+        for label, reference_frame_path, cpp_frame_path in pairings
     )
     report = FieldComparisonReport(scenario_id=manifest["scenario_id"], frame_comparisons=comparisons)
     if output_path is not None:
@@ -442,25 +460,26 @@ def compare_dual_solver_probes(
     manifest_path = _manifest_path(dual_solver_dir_or_manifest)
     root = manifest_path.parent
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    pyclaw_manifest = _load_manifest(root / manifest["pyclaw"]["manifest"])
+    reference = _reference_solver_entry(manifest, root)
+    reference_manifest = _load_manifest(reference.manifest_path)
     cpp_manifest = _load_manifest(root / manifest["cpp"]["manifest"])
-    pyclaw_output = root / manifest["pyclaw"]["output_dir"]
+    reference_output = reference.output_dir
     cpp_output = root / manifest["cpp"]["output_dir"]
 
     point_probes = tuple(
-        _compare_probe_pair(probe_id, pyclaw_path, cpp_path, velocity_depth_floor=velocity_depth_floor)
-        for probe_id, pyclaw_path, cpp_path in _matched_files(
-            pyclaw_output,
-            pyclaw_manifest["probes"],
+        _compare_probe_pair(probe_id, reference_path, cpp_path, velocity_depth_floor=velocity_depth_floor)
+        for probe_id, reference_path, cpp_path in _matched_files(
+            reference_output,
+            reference_manifest["probes"],
             cpp_output,
             cpp_manifest["probes"],
         )
     )
     cross_sections = tuple(
-        _compare_cross_section_pair(probe_id, pyclaw_path, cpp_path, velocity_depth_floor=velocity_depth_floor)
-        for probe_id, pyclaw_path, cpp_path in _matched_files(
-            pyclaw_output,
-            pyclaw_manifest["cross_sections"],
+        _compare_cross_section_pair(probe_id, reference_path, cpp_path, velocity_depth_floor=velocity_depth_floor)
+        for probe_id, reference_path, cpp_path in _matched_files(
+            reference_output,
+            reference_manifest["cross_sections"],
             cpp_output,
             cpp_manifest["cross_sections"],
         )
@@ -487,20 +506,22 @@ def compare_dual_solver_diagnostics(
     root = manifest_path.parent
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     scenario = read_scenario2_5d_package(root / manifest["scenario_package"])
-    pyclaw_manifest = _load_manifest(root / manifest["pyclaw"]["manifest"])
+    reference = _reference_solver_entry(manifest, root)
+    reference_manifest = _load_manifest(reference.manifest_path)
     cpp_manifest = _load_manifest(root / manifest["cpp"]["manifest"])
-    pyclaw_output = root / manifest["pyclaw"]["output_dir"]
+    reference_output = reference.output_dir
     cpp_output = root / manifest["cpp"]["output_dir"]
-    pyclaw_frames = [_load_pyclaw_npz_frame(pyclaw_output / frame) for frame in pyclaw_manifest["frames"]]
+    reference_frames = [_load_reference_npz_frame(reference_output / frame) for frame in reference_manifest["frames"]]
     cpp_frames = [_load_cpp_csv_frame(cpp_output / frame) for frame in cpp_manifest["frames"]]
 
-    pyclaw_summary = _diagnostic_summary("pyclaw", pyclaw_frames, scenario, velocity_depth_floor=velocity_depth_floor)
+    reference_summary = _diagnostic_summary(reference.solver, reference_frames, scenario, velocity_depth_floor=velocity_depth_floor)
     cpp_summary = _diagnostic_summary("cpp", cpp_frames, scenario, velocity_depth_floor=velocity_depth_floor)
     report = PhysicsDiagnosticComparisonReport(
         scenario_id=manifest["scenario_id"],
-        pyclaw=pyclaw_summary,
+        pyclaw=reference_summary,
         cpp=cpp_summary,
-        delta=_diagnostic_delta(pyclaw_summary, cpp_summary),
+        delta=_diagnostic_delta(reference_summary, cpp_summary),
+        reference_solver=reference.solver,
     )
     if output_path is not None:
         report.write_json(output_path)
@@ -518,15 +539,16 @@ def compare_dual_solver_features(
     root = manifest_path.parent
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     scenario = read_scenario2_5d_package(root / manifest["scenario_package"])
-    pyclaw_manifest = _load_manifest(root / manifest["pyclaw"]["manifest"])
+    reference = _reference_solver_entry(manifest, root)
+    reference_manifest = _load_manifest(reference.manifest_path)
     cpp_manifest = _load_manifest(root / manifest["cpp"]["manifest"])
-    pyclaw_output = root / manifest["pyclaw"]["output_dir"]
+    reference_output = reference.output_dir
     cpp_output = root / manifest["cpp"]["output_dir"]
-    pyclaw_final = _load_pyclaw_npz_frame(pyclaw_output / pyclaw_manifest["frames"][-1])
+    reference_final = _load_reference_npz_frame(reference_output / reference_manifest["frames"][-1])
     cpp_final = _load_cpp_csv_frame(cpp_output / cpp_manifest["frames"][-1])
 
     comparisons = tuple(
-        _compare_feature(index, feature, pyclaw_final, cpp_final, scenario)
+        _compare_feature(index, feature, reference_final, cpp_final, scenario, reference_solver=reference.solver)
         for index, feature in enumerate(scenario.features)
     )
     report = FeatureComparisonReport(
@@ -647,6 +669,22 @@ def _load_manifest(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _reference_solver_entry(manifest: dict[str, object], root: Path) -> ReferenceSolverEntry:
+    for solver in ("geoclaw", "reference", "pyclaw"):
+        if solver not in manifest:
+            continue
+        entry = manifest[solver]
+        if not isinstance(entry, dict):
+            raise ValueError(f"{solver} manifest entry must be an object.")
+        solver_name = str(entry.get("solver", "geoclaw" if solver == "reference" else solver))
+        return ReferenceSolverEntry(
+            solver=solver_name,
+            output_dir=root / str(entry["output_dir"]),
+            manifest_path=root / str(entry["manifest"]),
+        )
+    raise ValueError("Comparison manifest must include a geoclaw, reference, or pyclaw entry.")
+
+
 def _matched_files(
     reference_root: Path,
     reference_files: list[str],
@@ -696,43 +734,45 @@ def _frame_pairings(pyclaw_frames: list[Path], cpp_frames: list[Path]) -> tuple[
 
 def _compare_frame_pair(
     label: str,
-    pyclaw_frame_path: Path,
+    reference_frame_path: Path,
     cpp_frame_path: Path,
     dx: float,
     dy: float,
     *,
+    reference_solver: str,
     velocity_depth_floor: float,
 ) -> FrameFieldComparison:
-    pyclaw_frame = _load_pyclaw_npz_frame(pyclaw_frame_path)
+    reference_frame = _load_reference_npz_frame(reference_frame_path)
     cpp_frame = _load_cpp_csv_frame(cpp_frame_path)
-    velocity_mask = _velocity_comparison_mask(pyclaw_frame["h"], cpp_frame["h"], velocity_depth_floor)
+    velocity_mask = _velocity_comparison_mask(reference_frame["h"], cpp_frame["h"], velocity_depth_floor)
     field_errors = tuple(
         _field_error(
             name,
-            pyclaw_frame[name],
+            reference_frame[name],
             cpp_frame[name],
             mask=velocity_mask if name in VELOCITY_LIKE_FIELD_NAMES else None,
         )
         for name in FIELD_NAMES
     )
-    pyclaw_slopes = _slopes_from_eta(pyclaw_frame["eta"], dx, dy)
+    reference_slopes = _slopes_from_eta(reference_frame["eta"], dx, dy)
     cpp_slopes = _slopes_from_eta(cpp_frame["eta"], dx, dy)
     slope_errors = tuple(
-        _field_error(name, pyclaw_slopes[index], cpp_slopes[index])
+        _field_error(name, reference_slopes[index], cpp_slopes[index])
         for index, name in enumerate(SLOPE_FIELD_NAMES)
     )
-    wet_mismatch = float(np.mean(np.asarray(pyclaw_frame["wet"], dtype=np.bool_) != np.asarray(cpp_frame["wet"], dtype=np.bool_)))
+    wet_mismatch = float(np.mean(np.asarray(reference_frame["wet"], dtype=np.bool_) != np.asarray(cpp_frame["wet"], dtype=np.bool_)))
     return FrameFieldComparison(
         label=label,
-        pyclaw_frame=str(pyclaw_frame_path),
+        reference_frame=str(reference_frame_path),
         cpp_frame=str(cpp_frame_path),
         field_errors=field_errors,
         slope_errors=slope_errors,
         wet_mismatch_fraction=wet_mismatch,
+        reference_solver=reference_solver,
     )
 
 
-def _load_pyclaw_npz_frame(path: Path) -> dict[str, FloatGrid | BoolGrid]:
+def _load_reference_npz_frame(path: Path) -> dict[str, FloatGrid | BoolGrid]:
     with np.load(path) as data:
         return {
             "h": np.asarray(data["h"], dtype=np.float64),
@@ -747,6 +787,10 @@ def _load_pyclaw_npz_frame(path: Path) -> dict[str, FloatGrid | BoolGrid]:
             "normal_z": np.asarray(data["normal_z"], dtype=np.float64),
             "froude": np.asarray(data["froude"], dtype=np.float64),
         }
+
+
+def _load_pyclaw_npz_frame(path: Path) -> dict[str, FloatGrid | BoolGrid]:
+    return _load_reference_npz_frame(path)
 
 
 def _load_cpp_csv_frame(path: Path) -> dict[str, FloatGrid | BoolGrid]:
@@ -793,7 +837,7 @@ def _field_error(
     ref = np.asarray(reference, dtype=np.float64)
     cand = np.asarray(candidate, dtype=np.float64)
     if ref.shape != cand.shape:
-        raise ValueError(f"Shape mismatch for {field_name}: PyClaw={ref.shape} C++={cand.shape}")
+        raise ValueError(f"Shape mismatch for {field_name}: reference={ref.shape} C++={cand.shape}")
     sample_count = int(ref.size)
     if mask is None:
         ref_compared = ref
@@ -850,7 +894,7 @@ def _velocity_comparison_mask(
     ref_h = np.asarray(reference_h, dtype=np.float64)
     cand_h = np.asarray(candidate_h, dtype=np.float64)
     if ref_h.shape != cand_h.shape:
-        raise ValueError(f"Depth mask shape mismatch: PyClaw={ref_h.shape} C++={cand_h.shape}")
+        raise ValueError(f"Depth mask shape mismatch: reference={ref_h.shape} C++={cand_h.shape}")
     return (ref_h >= depth_floor) & (cand_h >= depth_floor)
 
 
@@ -1149,8 +1193,8 @@ def _y_at_row(scenario, row: int) -> float:
     return float(scenario.grid.origin_y + row * scenario.grid.dy)
 
 
-def _compare_feature(index: int, feature, pyclaw_frame, cpp_frame, scenario) -> FeatureComparison:
-    pyclaw_metric = _observed_feature_metric(feature, pyclaw_frame, scenario)
+def _compare_feature(index: int, feature, reference_frame, cpp_frame, scenario, *, reference_solver: str) -> FeatureComparison:
+    reference_metric = _observed_feature_metric(feature, reference_frame, scenario)
     cpp_metric = _observed_feature_metric(feature, cpp_frame, scenario)
     return FeatureComparison(
         feature_index=index,
@@ -1158,10 +1202,11 @@ def _compare_feature(index: int, feature, pyclaw_frame, cpp_frame, scenario) -> 
         authored_x=float(feature.center[0]),
         authored_y=float(feature.center[1]),
         authored_strength=float(feature.strength),
-        pyclaw=pyclaw_metric,
+        pyclaw=reference_metric,
         cpp=cpp_metric,
-        location_delta=float(np.hypot(cpp_metric.x - pyclaw_metric.x, cpp_metric.y - pyclaw_metric.y)),
-        strength_delta=cpp_metric.strength - pyclaw_metric.strength,
+        location_delta=float(np.hypot(cpp_metric.x - reference_metric.x, cpp_metric.y - reference_metric.y)),
+        strength_delta=cpp_metric.strength - reference_metric.strength,
+        reference_solver=reference_solver,
     )
 
 
