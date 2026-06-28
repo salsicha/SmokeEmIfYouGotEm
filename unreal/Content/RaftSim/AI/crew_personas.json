@@ -1,0 +1,47 @@
+{
+  "schema": "raftsim.unreal.crew_personas.v1",
+  "conversation_policy": {
+    "ai_assisted_noncritical_conversation": true,
+    "gameplay_critical_paddling_under_explicit_command_state_control": true,
+    "dialogue_can_reference_recent_run_events": true,
+    "dialogue_cannot_override_command_intents": true
+  },
+  "personas": [
+    {
+      "passenger_id": "nervous_first_timer",
+      "display_name": "Nervous First Timer",
+      "trust": 0.35,
+      "fear": 0.7,
+      "fatigue": 0.1,
+      "skill": 0.2,
+      "dialogue_traits": ["asks_questions", "reacts_to_waves", "needs_reassurance"]
+    },
+    {
+      "passenger_id": "steady_returning_paddler",
+      "display_name": "Steady Returning Paddler",
+      "trust": 0.65,
+      "fear": 0.25,
+      "fatigue": 0.15,
+      "skill": 0.65,
+      "dialogue_traits": ["acknowledges_commands", "encourages_crew", "spots_hazards"]
+    },
+    {
+      "passenger_id": "overconfident_friend",
+      "display_name": "Overconfident Friend",
+      "trust": 0.5,
+      "fear": 0.2,
+      "fatigue": 0.05,
+      "skill": 0.35,
+      "dialogue_traits": ["jokes", "talks_over_commands", "learns_after_mistakes"]
+    }
+  ],
+  "conversation_states": [
+    "calm",
+    "anticipating_rapid",
+    "in_rapid",
+    "after_hit",
+    "swimmer_recovery",
+    "celebration",
+    "fatigued"
+  ]
+}
