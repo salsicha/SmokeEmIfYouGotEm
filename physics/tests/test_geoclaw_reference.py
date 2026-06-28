@@ -7,6 +7,7 @@ from raftsim.geoclaw_reference import (
     GEOCLAW_CANONICAL_FIXTURES,
     GEOCLAW_CANONICAL_SUITE_SCHEMA,
     GEOCLAW_EXPORT_SCHEMA,
+    GEOCLAW_NORMALIZED_OUTPUT_SCHEMA,
     GEOCLAW_RAFTING_CASES,
     GEOCLAW_RAFTING_SUITE_SCHEMA,
     GEOCLAW_REQUIRED_MODULES,
@@ -18,6 +19,8 @@ from raftsim.geoclaw_reference import (
     export_canonical_geoclaw_scenarios,
     export_rafting_geoclaw_scenarios,
     export_geoclaw_scenario,
+    frame_from_geoclaw_initial_state,
+    normalize_geoclaw_fixed_grid_output,
     rafting_geoclaw_scenarios,
     write_geoclaw_setup_report,
 )
@@ -226,3 +229,61 @@ def test_geoclaw_cli_exports_rafting_suite(tmp_path):
 
     assert exit_code == 0
     assert (tmp_path / "rafting_geoclaw_seed_5" / "rafting_suite_manifest.json").exists()
+
+
+def test_geoclaw_initial_state_frame_exports_normalized_fields():
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="uniform_channel", seed=15, nx=18, ny=10)
+    )
+    frame = frame_from_geoclaw_initial_state(scenario)
+
+    assert frame.h.shape == scenario.grid.shape
+    assert frame.eta.shape == scenario.grid.shape
+    assert frame.normal_x.shape == scenario.grid.shape
+    assert frame.normal_y.shape == scenario.grid.shape
+    assert frame.normal_z.shape == scenario.grid.shape
+    assert frame.froude.shape == scenario.grid.shape
+    assert frame.mass(scenario) > 0.0
+
+
+def test_normalize_geoclaw_fixed_grid_output_writes_frozen_schema(tmp_path):
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="uniform_channel", seed=16, nx=18, ny=10)
+    )
+    export = export_geoclaw_scenario(scenario, tmp_path / "export")
+    normalized = normalize_geoclaw_fixed_grid_output(export.output_dir, tmp_path / "normalized")
+    manifest = json.loads(normalized.manifest_path.read_text(encoding="utf-8"))
+
+    assert manifest["schema"] == GEOCLAW_NORMALIZED_OUTPUT_SCHEMA
+    assert manifest["frames"] == ["frames/frame_0000.npz"]
+    assert manifest["run_status"]["mode"] == "export_initial_state_only"
+    assert (normalized.output_dir / "validation.json").exists()
+    assert (normalized.output_dir / "probes" / "upstream_center.csv").exists()
+    assert (normalized.output_dir / "cross_sections" / "mid_cross_section.npz").exists()
+
+
+def test_normalize_geoclaw_fixed_grid_output_reads_npz_frames(tmp_path):
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="uniform_channel", seed=17, nx=18, ny=10)
+    )
+    export = export_geoclaw_scenario(scenario, tmp_path / "export")
+    fgout_dir = export.output_dir / "fgout_frames"
+    fgout_dir.mkdir()
+    frame = frame_from_geoclaw_initial_state(scenario, time=1.25)
+    frame.write_npz(fgout_dir / "frame_0001.npz")
+
+    normalized = normalize_geoclaw_fixed_grid_output(export.output_dir, tmp_path / "normalized")
+    manifest = json.loads(normalized.manifest_path.read_text(encoding="utf-8"))
+
+    assert manifest["run_status"]["mode"] == "fgout_npz"
+    assert manifest["frames"] == ["frames/frame_0000.npz"]
+    assert normalized.frame_count == 1
+
+
+def test_geoclaw_cli_normalizes_export(tmp_path):
+    scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="flat_pool", seed=18, nx=14, ny=8))
+    export = export_geoclaw_scenario(scenario, tmp_path / "export")
+    exit_code = geoclaw_main(["--normalize-export", str(export.output_dir), "--output-dir", str(tmp_path / "normalized")])
+
+    assert exit_code == 0
+    assert (tmp_path / "normalized" / "manifest.json").exists()
