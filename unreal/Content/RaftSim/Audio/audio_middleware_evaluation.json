@@ -1,0 +1,102 @@
+{
+  "schema": "raftsim.unreal.audio_middleware_evaluation.v1",
+  "date": "2026-06-28",
+  "default_stack": "unreal_native_audio_mixer_and_metasounds",
+  "decision": "do_not_integrate_wwise_or_fmod_until_a_measured_gate_triggers",
+  "sources": [
+    {
+      "name": "Epic MetaSounds documentation",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/metasounds-in-unreal-engine"
+    },
+    {
+      "name": "Epic Audio Mixer overview",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/audio-mixer-overview-in-unreal-engine"
+    },
+    {
+      "name": "FMOD Unreal integration documentation",
+      "url": "https://www.fmod.com/docs/2.03/unreal/welcome.html",
+      "notes": "FMOD Unreal Integration 2.03 documents support for UE 4.27 and UE 5.3 through 5.7 plus major desktop, mobile, console, and Switch platforms."
+    },
+    {
+      "name": "Wwise Unreal integration documentation",
+      "url": "https://www.audiokinetic.com/en/public-library/2025.1.4_9062/?id=index.html&source=UE4",
+      "notes": "Wwise Unreal Integration 2025.1.4.9062 documentation lists installation, build, project settings, soundbank, localization, external source, optimization, spatial audio, and debugging topics."
+    }
+  ],
+  "middleware_gates": [
+    "metasound_authoring_workflow_breaks_down",
+    "dynamic_mix_or_voice_priority_becomes_brittle",
+    "dialogue_localization_pipeline_needs_mature_soundbank_workflow",
+    "platform_memory_or_streaming_budget_cannot_be_met",
+    "console_vr_or_multiplayer_voice_workflow_needs_middleware",
+    "unreal_profiling_cannot_explain_runtime_cost_or_voice_budget"
+  ],
+  "evaluation_candidates": [
+    {
+      "name": "Wwise",
+      "best_for": [
+        "large_audio_team_pipeline",
+        "complex_states_and_switches",
+        "localization",
+        "soundbank_workflows",
+        "mature_authoring_and_profiling"
+      ],
+      "risks": [
+        "license_and_commercial_review",
+        "integration_complexity",
+        "additional_build_and_asset_pipeline"
+      ],
+      "ranking": 1
+    },
+    {
+      "name": "FMOD",
+      "best_for": [
+        "fast_designer_iteration",
+        "event_authoring",
+        "lighter_middleware_adoption",
+        "broad_unreal_platform_support"
+      ],
+      "risks": [
+        "license_and_commercial_review",
+        "additional_authoring_runtime_stack",
+        "migration_cost_from_metasounds"
+      ],
+      "ranking": 2
+    },
+    {
+      "name": "UnrealNative",
+      "best_for": [
+        "initial_rapid_scene_prototype",
+        "tight_ue5_integration",
+        "metasound_telemetry_driven_water_layers",
+        "small_team_iteration"
+      ],
+      "risks": [
+        "possible_large_project_authoring_limits",
+        "localization_or_memory_workflow_may_need_more_tooling"
+      ],
+      "ranking": 0
+    }
+  ],
+  "required_ab_test_if_gate_triggers": {
+    "scenario": "single_class_iv_rapid_scene",
+    "implementations": [
+      "unreal_native_metasounds",
+      "wwise",
+      "fmod"
+    ],
+    "metrics": [
+      "authoring_time",
+      "runtime_cost_ms",
+      "memory_mb",
+      "streaming_stability",
+      "vr_spatial_quality",
+      "voice_intelligibility",
+      "multiplayer_voice_routing",
+      "localization_workflow",
+      "build_complexity",
+      "license_cost",
+      "team_maintainability"
+    ]
+  }
+}
