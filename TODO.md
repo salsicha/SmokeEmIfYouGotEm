@@ -186,7 +186,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Implement guide voice commands that map spoken instructions into deterministic crew intents: forward paddle, back paddle, left/right paddle, stop, brace, hold on, high side, rescue, and recovery commands.
 - [x] Add confidence thresholds, push-to-talk/open-mic settings, noisy-river audio tests, subtitles, accessibility fallbacks, and manual input parity for all voice commands.
 - [x] Add AI-assisted crew conversation with passenger personas, trust, fear, fatigue, skill, river knowledge, and scenario state, while keeping gameplay-critical paddling under explicit command-state control.
-- [ ] Add telemetry for recognized phrase, intent, confidence, command latency, crew response, conversation state, and command outcome.
+- [x] Add telemetry for recognized phrase, intent, confidence, command latency, crew response, conversation state, and command outcome.
 - [ ] Build the first production audio source manifest and choose initial downloaded/professional library purchases for water, raft, paddle, rocks, weather, Foley, UI, and ambience.
 - [ ] Prototype interactive water audio with recorded/downloaded assets first, using solver telemetry for flow speed, aeration, turbulence, raft impacts, paddle catches, rock scrapes, weather, and camera perspective.
 - [ ] Add 3D spatial audio as a core roadmap feature for VR/headphones, stereo speakers, and surround: attenuation, spatialization, binaural/HRTF, ambisonic beds, reverb, occlusion, and large-water-source behavior.
