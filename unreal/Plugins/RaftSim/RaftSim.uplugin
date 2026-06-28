@@ -1,0 +1,49 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "0.11.0",
+  "FriendlyName": "RaftSim",
+  "Description": "Runtime systems for SmokeEmIfYouGotEm white water rafting simulation.",
+  "Category": "Simulation",
+  "CreatedBy": "SmokeEmIfYouGotEm",
+  "EnabledByDefault": true,
+  "CanContainContent": true,
+  "IsBetaVersion": true,
+  "Modules": [
+    {
+      "Name": "RaftSimCore",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "RaftSimPhysics",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "RaftSimRiver",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "RaftSimRaft",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "RaftSimInput",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "RaftSimUI",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "RaftSimDebug",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ]
+}
