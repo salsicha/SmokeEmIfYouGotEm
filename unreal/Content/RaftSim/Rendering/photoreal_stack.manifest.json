@@ -1,0 +1,64 @@
+{
+  "schema": "raftsim.unreal.photoreal_stack.v1",
+  "engine_version": "5.8",
+  "required_features": [
+    {
+      "name": "Nanite",
+      "purpose": "high-detail rocks, canyon walls, raft hard-surface props, debris, and scanned geometry",
+      "project_setting": "r.Nanite.ProjectEnabled=1"
+    },
+    {
+      "name": "Lumen",
+      "purpose": "dynamic canyon, forest, weather, and time-of-day lighting",
+      "project_setting": "r.DynamicGlobalIlluminationMethod=1"
+    },
+    {
+      "name": "Virtual Shadow Maps",
+      "purpose": "stable high-resolution shadows for water corridors and dense vegetation",
+      "project_setting": "r.Shadow.Virtual.Enable=1"
+    },
+    {
+      "name": "World Partition",
+      "purpose": "stream long river corridors and real-world sections"
+    },
+    {
+      "name": "PCG",
+      "purpose": "author riverbank foliage, rocks, driftwood, gravel bars, foam cues, and hazards"
+    },
+    {
+      "name": "Niagara",
+      "purpose": "spray, mist, foam bursts, paddle splashes, rain, droplets, and rescue effects"
+    },
+    {
+      "name": "SubstrateMaterialLayering",
+      "purpose": "wet rubber, wet rock, aerated water, mud, PFDs, helmets, and seasonal surfaces"
+    },
+    {
+      "name": "OpenXR",
+      "purpose": "VR support across compatible desktop headsets"
+    }
+  ],
+  "evaluate_features": [
+    {
+      "name": "NaniteFoliage",
+      "purpose": "dense riverbank vegetation after GPU, wind, collision, and VR cost checks"
+    },
+    {
+      "name": "MeshTerrain",
+      "purpose": "complex river corridors, overhangs, undercut banks, boulders, and cave-like formations"
+    },
+    {
+      "name": "ProceduralVegetationEditor",
+      "purpose": "large-scale biome authoring for seasonal riverbanks"
+    },
+    {
+      "name": "FastGeometryStreaming",
+      "purpose": "far-field scenery and non-gameplay canyon detail"
+    }
+  ],
+  "notes": [
+    "Water System is enabled for visual surfaces and authoring support; it is not authoritative physics.",
+    "Chaos remains incidental and non-authoritative for raft/water behavior.",
+    "Editor-created binary assets should be generated after this text manifest is reviewed in UE 5.8."
+  ]
+}
