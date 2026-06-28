@@ -173,7 +173,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Build Chrono collision geometry from rocks, banks, ledges, shallows, strainers, and bed/corridor data.
 - [x] Add partially elastic rock collision presets for rubber-raft impacts: restitution, tube stiffness, damping, friction, scrape/bounce/pin telemetry, and parameter sweeps.
 - [x] Add strongly inelastic riverbed grounding presets: near-zero restitution, high damping, grounding friction, stick-slip, contact hysteresis, scrape telemetry, and shallow-shelf pivot tests.
-- [ ] Start with one-way water-to-raft coupling; add optional bounded raft-to-water displacement/source terms only after the bridge is stable and validated.
+- [x] Start with one-way water-to-raft coupling; add optional bounded raft-to-water displacement/source terms only after the bridge is stable and validated.
 - [ ] Add native fixtures for flat pool float, current drift, standing wave lift, eddy-line yaw, rock bounce, riverbed grounding, shallow shelf pivot, and pin/release.
 - [ ] Keep Unreal Chaos available only for incidental non-authoritative effects.
 - [ ] Enable OpenXR-based VR support.

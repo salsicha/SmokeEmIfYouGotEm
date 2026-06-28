@@ -1,0 +1,19 @@
+{
+  "schema": "raftsim.unreal.water_raft_coupling_policy.v1",
+  "default_mode": "one_way_water_to_raft",
+  "one_way": {
+    "enabled": true,
+    "water_drives_raft_forces": true,
+    "raft_disturbs_water": false,
+    "reason": "deterministic validation and stable VR runtime before source-term feedback"
+  },
+  "bounded_two_way_feedback": {
+    "enabled_by_default": false,
+    "activation_gate": "after_one_way_bridge_matches_python_and_native_fixtures",
+    "max_depth_source_mps": 0.04,
+    "max_momentum_source_mps2": 0.2,
+    "smoothing_radius_m": 1.25,
+    "stability_policy": "clamp_sources_and_preserve_replay_determinism"
+  },
+  "unreal_struct": "FRaftSimWaterRaftCouplingPolicy"
+}
