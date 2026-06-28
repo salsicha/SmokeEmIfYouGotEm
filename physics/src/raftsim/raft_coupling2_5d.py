@@ -224,7 +224,7 @@ class WaterField2_5D:
         )
 
     @classmethod
-    def from_pyclaw_frame_npz(cls, scenario: Scenario2_5D, frame_path: str) -> WaterField2_5D:
+    def from_reference_frame_npz(cls, scenario: Scenario2_5D, frame_path: str) -> WaterField2_5D:
         with np.load(frame_path) as data:
             h = np.asarray(data["h"], dtype=np.float64)
             eta = np.asarray(data["eta"], dtype=np.float64)
@@ -245,6 +245,14 @@ class WaterField2_5D:
                 roughness=scenario.roughness,
                 features=scenario.features,
             )
+
+    @classmethod
+    def from_geoclaw_frame_npz(cls, scenario: Scenario2_5D, frame_path: str) -> WaterField2_5D:
+        return cls.from_reference_frame_npz(scenario, frame_path)
+
+    @classmethod
+    def from_pyclaw_frame_npz(cls, scenario: Scenario2_5D, frame_path: str) -> WaterField2_5D:
+        return cls.from_reference_frame_npz(scenario, frame_path)
 
     @classmethod
     def from_cpp_frame_csv(cls, scenario: Scenario2_5D, frame_path: str) -> WaterField2_5D:

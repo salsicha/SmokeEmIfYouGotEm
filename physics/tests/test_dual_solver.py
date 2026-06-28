@@ -309,6 +309,10 @@ def test_cpp_tuning_against_geoclaw_selects_best_candidate(tmp_path):
     assert first_manifest["geoclaw"]["solver"] == "geoclaw"
     assert first_manifest["runtime"]["geoclaw_runtime_seconds"] == 0.0
 
+    coupling_report = compare_chrono_bridge_telemetry(report.candidates[0].dual_solver_dir)
+    assert coupling_report.reference_solver == "geoclaw"
+    assert coupling_report.trajectory_position_delta >= 0.0
+
 
 def test_promote_passing_run_to_regression_fixture(tmp_path):
     availability = check_pyclaw_availability()
@@ -391,6 +395,7 @@ def test_chrono_bridge_telemetry_comparison_reports_force_envelope(tmp_path):
     report_data = json.loads((run_result.output_dir / "chrono_bridge_telemetry_comparison.json").read_text(encoding="utf-8"))
 
     assert report.scenario_id == scenario.metadata.scenario_id
+    assert report.reference_solver == "pyclaw"
     assert report.trajectory_position_delta >= 0.0
     assert report.trajectory_velocity_delta >= 0.0
     assert report.reference_outcome in {"floating", "grounded", "forced", "freefall"}
