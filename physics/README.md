@@ -189,6 +189,15 @@ The legacy PyClaw tuning path remains available with `--reference-solver pyclaw`
 
 Raft force/trajectory comparison now reads the active reference block from `dual_solver_manifest.json`, so GeoClaw-normalized frames and legacy PyClaw frames both feed the same coupling validation path.
 
+Regenerate the GeoClaw readiness gate with:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.generate_geoclaw_to_unreal_readiness
+```
+
+Pass `--cpp-solver /path/to/raftsim_water_solver` when you want the report to run the C++ smoke comparison and GeoClaw tuning path. Without real GeoClaw fixed-grid output, the report is expected to remain blocked.
+
 ## PyClaw Reference Harness
 
 PyClaw is now a legacy reference path. Its outputs are useful for historical regression checks and provenance, but they are not the active acceptance target for C++ or Unreal water. Install it with the same research extra when you need to inspect old runs:

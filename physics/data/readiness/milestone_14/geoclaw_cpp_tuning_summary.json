@@ -1,0 +1,7 @@
+{
+  "available": false,
+  "best_candidate": null,
+  "candidate_count": 0,
+  "passed": false,
+  "reason": "--cpp-solver was not provided."
+}

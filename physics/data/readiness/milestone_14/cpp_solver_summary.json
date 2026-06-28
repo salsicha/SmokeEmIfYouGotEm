@@ -1,0 +1,7 @@
+{
+  "available": false,
+  "passed": false,
+  "reason": "--cpp-solver was not provided.",
+  "run_count": 0,
+  "runs": []
+}
