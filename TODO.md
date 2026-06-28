@@ -212,7 +212,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 
 - [x] Treat professionally recorded/downloaded libraries and custom field recordings as the production backbone for shipping audio.
 - [x] Use AI-generated audio only for prototypes, ideation, non-critical variations, abstract UI/debug sounds, or temp dialogue unless legal/audio review explicitly approves shipping use.
-- [ ] Research and compare BOOM Library, Pro Sound Effects, A Sound Effect, Soundly, Fab audio packs, Sound Ideas/Sounddogs-style catalogs, Freesound CC0/CC-BY assets, and BBC Sound Effects licensing.
+- [x] Research and compare BOOM Library, Pro Sound Effects, A Sound Effect, Soundly, Fab audio packs, Sound Ideas/Sounddogs-style catalogs, Freesound CC0/CC-BY assets, and BBC Sound Effects licensing.
 - [ ] Purchase or trial the first high-value water, weather, impact, Foley, ambience, UI, and gear libraries.
 - [ ] Build a custom field-recording plan for real rivers, rapids, flow levels, guide-seat perspective, shore perspective, eddies, raft contacts, paddle strokes, hydrophone captures, ambisonic/spatial beds, surround ambience, and crew reactions.
 - [ ] Define audio asset manifest schema: source, license, attribution, platform rights, sample rate, bit depth, channels, mic setup, location/date, processing chain, loop points, UCS metadata, attenuation preset, spatialization mode, ambisonic format/order, reverb/occlusion behavior, intended playback context, and approval status.

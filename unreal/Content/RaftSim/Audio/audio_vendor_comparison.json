@@ -1,0 +1,77 @@
+{
+  "schema": "raftsim.unreal.audio_vendor_comparison.v1",
+  "last_reviewed": "2026-06-28",
+  "ranking": [
+    "BOOM Library",
+    "Pro Sound Effects",
+    "A Sound Effect",
+    "custom_field_recording",
+    "Soundly",
+    "Freesound_CC0_CC_BY_only"
+  ],
+  "vendors": [
+    {
+      "name": "BOOM Library",
+      "url": "https://www.boomlibrary.com/terms-conditions/",
+      "best_for": ["weather", "impacts", "cinematic_layers", "construction_kits", "water_adjacent_design"],
+      "primary_role": "commercial_backbone",
+      "review_notes": ["verify_user_count", "verify_subscription_or_buyout_terms", "review_partner_pack_terms", "respect_ai_ml_restrictions"]
+    },
+    {
+      "name": "Pro Sound Effects",
+      "url": "https://www.prosoundeffects.com/licensing/",
+      "best_for": ["broad_sfx", "foley", "weather", "ambience", "workflow"],
+      "primary_role": "commercial_backbone",
+      "review_notes": ["verify_team_license", "verify_third_party_library_terms"]
+    },
+    {
+      "name": "A Sound Effect",
+      "url": "https://www.asoundeffect.com/license-agreement/",
+      "best_for": ["niche_indie_libraries", "water", "nature", "foley", "game_audio"],
+      "primary_role": "specialty_marketplace",
+      "review_notes": ["review_each_product_vendor", "verify_provenance", "verify_metadata_quality"]
+    },
+    {
+      "name": "Soundly",
+      "url": "https://getsoundly.com/",
+      "best_for": ["search", "audition", "team_workflow", "supplemental_library"],
+      "primary_role": "workflow_tool",
+      "review_notes": ["manual_terms_review_required_before_purchase", "verify_team_account_rights"]
+    },
+    {
+      "name": "Fab",
+      "url": "https://www.fab.com/eula",
+      "best_for": ["unreal_ready_audio_packs", "prototype_assets"],
+      "primary_role": "unreal_marketplace_source",
+      "review_notes": ["review_each_pack", "verify_source_provenance", "verify_update_history", "direct_fetch_blocked_during_review"]
+    },
+    {
+      "name": "Sound Ideas",
+      "url": "https://sound-ideas.com/",
+      "best_for": ["legacy_foley", "weather", "crowds", "impacts"],
+      "primary_role": "supplemental_legacy_catalog",
+      "review_notes": ["review_end_user_license_per_product", "verify_modern_platform_rights"]
+    },
+    {
+      "name": "Sounddogs",
+      "url": "https://sounddogs.com/",
+      "best_for": ["legacy_catalog_search", "reference", "supplemental_sfx"],
+      "primary_role": "supplemental_legacy_catalog",
+      "review_notes": ["review_current_checkout_terms", "verify_rights_per_asset"]
+    },
+    {
+      "name": "Freesound",
+      "url": "https://freesound.org/help/faq/",
+      "best_for": ["prototype_textures", "cc0_assets", "cc_by_assets_with_attribution"],
+      "primary_role": "open_community_supplement",
+      "review_notes": ["avoid_noncommercial", "track_attribution", "verify_license_snapshot"]
+    },
+    {
+      "name": "BBC Sound Effects",
+      "url": "https://sound-effects.bbcrewind.co.uk/licensing",
+      "best_for": ["research", "education", "reference", "prototype"],
+      "primary_role": "reference_only_without_separate_license",
+      "review_notes": ["commercial_use_requires_separate_license", "do_not_ship_from_public_archive_by_default"]
+    }
+  ]
+}
