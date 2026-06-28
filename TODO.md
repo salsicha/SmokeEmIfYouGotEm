@@ -243,7 +243,7 @@ Conditionally superseded for live water by Milestone 14. Telemetry/replay playba
 - [x] Update the comparison harness from PyClaw-vs-C++ to GeoClaw-vs-C++.
 - [x] Retune C++ wet/dry handling, roughness, damping, feature forcing, velocity/Froude masks, and raft-force parameters against GeoClaw.
 - [x] Re-run raft coupling against GeoClaw outputs and C++ fields and compare force envelopes, trajectories, and outcomes.
-- [ ] Regenerate the Python-to-Unreal readiness report with GeoClaw as the approved reference solver before live Unreal water depends on the custom C++ solver.
+- [x] Regenerate the Python-to-Unreal readiness report with GeoClaw as the approved reference solver before live Unreal water depends on the custom C++ solver.
 
 ## Technical Notes To Revisit
 

@@ -1,0 +1,7 @@
+{
+  "available": false,
+  "comparison_count": 0,
+  "comparisons": [],
+  "passed": false,
+  "reason": "--cpp-solver was not provided."
+}

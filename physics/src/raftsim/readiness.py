@@ -40,6 +40,7 @@ from .schema_versions import REPLAY_SCHEMA_VERSION
 from .telemetry import TelemetryRecorder
 
 READINESS_REPORT_VERSION = "raftsim.python_to_unreal_readiness.v0"
+GEOCLAW_READINESS_REPORT_VERSION = "raftsim.geoclaw_to_unreal_readiness.v1"
 UNREAL_VISUALIZATION_EXPORT_VERSION = "raftsim.unreal_visualization_export.v0"
 PYCLAW_REFERENCE_MIN_DEPTH_M = 0.01
 
@@ -375,6 +376,112 @@ def build_readiness_report(
             "Runtime budgets are measured on local smoke scenarios and need target hardware confirmation.",
             "Geospatial source licensing and attribution must be re-checked when pulling production data.",
             "Chrono integration is not yet verified inside Unreal or VR frame scheduling.",
+        ),
+        artifact_manifest=artifact_manifest,
+    )
+
+
+def build_geoclaw_readiness_report(
+    *,
+    geoclaw_reference_summary: dict[str, object],
+    cpp_summary: dict[str, object],
+    comparison_summary: dict[str, object],
+    tuning_summary: dict[str, object],
+    raft_coupling_summary: dict[str, object],
+    artifact_manifest: dict[str, object],
+) -> PythonToUnrealReadinessReport:
+    """Build the GeoClaw replacement readiness gate for live Unreal water."""
+
+    normalized_mode = str(geoclaw_reference_summary.get("normalized_mode", "unknown"))
+    checks = (
+        check_from_summary(
+            "geoclaw_reference_exports",
+            "GeoClaw Reference Exports",
+            bool(geoclaw_reference_summary.get("exports_passed")),
+            f"{geoclaw_reference_summary.get('export_count', 0)} GeoClaw export packages generated.",
+            ("geoclaw_reference_summary.json",),
+        ),
+        check_from_summary(
+            "geoclaw_fixed_grid_outputs",
+            "GeoClaw Fixed-Grid Outputs",
+            bool(geoclaw_reference_summary.get("has_full_geoclaw_frames")),
+            f"Normalized output mode is {normalized_mode}; full GeoClaw fgout frames are required for approval.",
+            ("geoclaw_reference_summary.json",),
+        ),
+        check_from_summary(
+            "custom_cpp_solver_scenarios",
+            "Custom C++ Solver Scenarios",
+            bool(cpp_summary.get("passed")),
+            f"{cpp_summary.get('run_count', 0)} C++ scenario runs completed.",
+            ("cpp_solver_summary.json",),
+        ),
+        check_from_summary(
+            "geoclaw_cpp_comparison",
+            "GeoClaw/C++ Comparison",
+            bool(comparison_summary.get("passed")),
+            f"{comparison_summary.get('comparison_count', 0)} GeoClaw/C++ threshold comparisons completed.",
+            ("geoclaw_cpp_comparison_summary.json",),
+        ),
+        check_from_summary(
+            "geoclaw_cpp_tuning",
+            "GeoClaw C++ Tuning",
+            bool(tuning_summary.get("passed")),
+            f"{tuning_summary.get('candidate_count', 0)} C++ tuning candidates scored against GeoClaw.",
+            ("geoclaw_cpp_tuning_summary.json",),
+        ),
+        check_from_summary(
+            "geoclaw_raft_coupling",
+            "GeoClaw Raft Coupling",
+            bool(raft_coupling_summary.get("passed")),
+            f"{raft_coupling_summary.get('comparison_count', 0)} raft coupling comparisons completed.",
+            ("geoclaw_raft_coupling_validation.json",),
+        ),
+    )
+    blocking_failures = tuple(check for check in checks if not check.passed and check.status == "failed")
+    approved = not blocking_failures
+    decision = ReadinessGateDecision(
+        status="approved" if approved else "blocked",
+        approved_for_unreal_production_start=approved,
+        reason=(
+            "GeoClaw/C++ validation passed; live Unreal custom water can proceed after target-hardware confirmation."
+            if approved
+            else "GeoClaw transition artifacts were generated, but live Unreal water remains blocked until the failed GeoClaw validation checks pass."
+        ),
+        required_next_actions=(
+            (
+                "Replace export-only normalized frames with real GeoClaw fixed-grid output for canonical, rafting, and real-world flow suites.",
+                "Run the custom C++ solver against the same packages and pass GeoClaw/C++ thresholds.",
+                "Re-run raft coupling against GeoClaw and C++ fields with outcome agreement.",
+            )
+            if not approved
+            else (
+                "Lock the accepted GeoClaw/C++ telemetry schema before Unreal live-water integration.",
+                "Keep GeoClaw as the offline regression reference for future river content.",
+            )
+        ),
+    )
+    return PythonToUnrealReadinessReport(
+        gate_version=GEOCLAW_READINESS_REPORT_VERSION,
+        decision=decision,
+        checks=checks,
+        runtime_choices={
+            "authoritative_water_candidate": "custom C++ reduced shallow-water / height-field solver",
+            "reference_solver": "GeoClaw offline fixed-grid output normalized into the shared telemetry schema",
+            "raft_and_contact_candidate": "Project Chrono bridge over custom water/contact samples, with custom reduced raft fallback if budgets fail",
+            "unreal_integration_order": "telemetry/replay playback first, then live custom water after GeoClaw revalidation, then Chrono/custom raft coupling",
+            "chrono_fsi": "optional research path only, not a baseline runtime dependency",
+        },
+        accepted_model_limitations=(
+            "2.5D shallow-water/height-field flow remains the accepted runtime model for the first Unreal bridge; full 3D CFD is out of scope.",
+            "GeoClaw is an offline validation/reference dependency, not a shipping Unreal runtime dependency.",
+            "Export-only normalized GeoClaw frames are setup smoke artifacts and cannot approve live water.",
+            "Real-world C++ matching must pass GeoClaw threshold reports before final river-content production.",
+        ),
+        risks=(
+            "GeoClaw setup depends on local Clawpack and Fortran build tooling.",
+            "C++ solver parameters may need retuning after full GeoClaw fgout frames are available.",
+            "Runtime budgets are still measured on local smoke scenarios and need target hardware confirmation.",
+            "Geospatial source licensing and attribution must be re-checked when pulling production data.",
         ),
         artifact_manifest=artifact_manifest,
     )

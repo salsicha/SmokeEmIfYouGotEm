@@ -1,0 +1,102 @@
+{
+  "accepted_model_limitations": [
+    "2.5D shallow-water/height-field flow remains the accepted runtime model for the first Unreal bridge; full 3D CFD is out of scope.",
+    "GeoClaw is an offline validation/reference dependency, not a shipping Unreal runtime dependency.",
+    "Export-only normalized GeoClaw frames are setup smoke artifacts and cannot approve live water.",
+    "Real-world C++ matching must pass GeoClaw threshold reports before final river-content production."
+  ],
+  "artifact_manifest": {
+    "cpp_solver_summary": "cpp_solver_summary.json",
+    "geoclaw_cpp_comparison_summary": "geoclaw_cpp_comparison_summary.json",
+    "geoclaw_cpp_tuning_summary": "geoclaw_cpp_tuning_summary.json",
+    "geoclaw_raft_coupling_validation": "geoclaw_raft_coupling_validation.json",
+    "geoclaw_reference_summary": "geoclaw_reference_summary.json"
+  },
+  "checks": [
+    {
+      "artifacts": [
+        "geoclaw_reference_summary.json"
+      ],
+      "check_id": "geoclaw_reference_exports",
+      "details": "1 GeoClaw export packages generated.",
+      "passed": true,
+      "status": "passed",
+      "title": "GeoClaw Reference Exports"
+    },
+    {
+      "artifacts": [
+        "geoclaw_reference_summary.json"
+      ],
+      "check_id": "geoclaw_fixed_grid_outputs",
+      "details": "Normalized output mode is export_initial_state_only; full GeoClaw fgout frames are required for approval.",
+      "passed": false,
+      "status": "failed",
+      "title": "GeoClaw Fixed-Grid Outputs"
+    },
+    {
+      "artifacts": [
+        "cpp_solver_summary.json"
+      ],
+      "check_id": "custom_cpp_solver_scenarios",
+      "details": "0 C++ scenario runs completed.",
+      "passed": false,
+      "status": "failed",
+      "title": "Custom C++ Solver Scenarios"
+    },
+    {
+      "artifacts": [
+        "geoclaw_cpp_comparison_summary.json"
+      ],
+      "check_id": "geoclaw_cpp_comparison",
+      "details": "0 GeoClaw/C++ threshold comparisons completed.",
+      "passed": false,
+      "status": "failed",
+      "title": "GeoClaw/C++ Comparison"
+    },
+    {
+      "artifacts": [
+        "geoclaw_cpp_tuning_summary.json"
+      ],
+      "check_id": "geoclaw_cpp_tuning",
+      "details": "0 C++ tuning candidates scored against GeoClaw.",
+      "passed": false,
+      "status": "failed",
+      "title": "GeoClaw C++ Tuning"
+    },
+    {
+      "artifacts": [
+        "geoclaw_raft_coupling_validation.json"
+      ],
+      "check_id": "geoclaw_raft_coupling",
+      "details": "0 raft coupling comparisons completed.",
+      "passed": false,
+      "status": "failed",
+      "title": "GeoClaw Raft Coupling"
+    }
+  ],
+  "decision": {
+    "approved_for_unreal_production_start": false,
+    "reason": "GeoClaw transition artifacts were generated, but live Unreal water remains blocked until the failed GeoClaw validation checks pass.",
+    "required_next_actions": [
+      "Replace export-only normalized frames with real GeoClaw fixed-grid output for canonical, rafting, and real-world flow suites.",
+      "Run the custom C++ solver against the same packages and pass GeoClaw/C++ thresholds.",
+      "Re-run raft coupling against GeoClaw and C++ fields with outcome agreement."
+    ],
+    "status": "blocked"
+  },
+  "gate_version": "raftsim.geoclaw_to_unreal_readiness.v1",
+  "passed": false,
+  "risks": [
+    "GeoClaw setup depends on local Clawpack and Fortran build tooling.",
+    "C++ solver parameters may need retuning after full GeoClaw fgout frames are available.",
+    "Runtime budgets are still measured on local smoke scenarios and need target hardware confirmation.",
+    "Geospatial source licensing and attribution must be re-checked when pulling production data."
+  ],
+  "runtime_choices": {
+    "authoritative_water_candidate": "custom C++ reduced shallow-water / height-field solver",
+    "chrono_fsi": "optional research path only, not a baseline runtime dependency",
+    "raft_and_contact_candidate": "Project Chrono bridge over custom water/contact samples, with custom reduced raft fallback if budgets fail",
+    "reference_solver": "GeoClaw offline fixed-grid output normalized into the shared telemetry schema",
+    "unreal_integration_order": "telemetry/replay playback first, then live custom water after GeoClaw revalidation, then Chrono/custom raft coupling"
+  }
+}
