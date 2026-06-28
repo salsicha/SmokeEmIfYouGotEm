@@ -162,7 +162,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 
 ## Milestone 11: Unreal Engine Full Game Production
 
-- [ ] Re-check the latest stable Unreal Engine 5.x feature set, then choose the exact version for visualization and VR.
+- [x] Re-check the latest stable Unreal Engine 5.x feature set, then choose the exact version for visualization and VR.
 - [ ] Create the Unreal project only after the readiness gate is complete.
 - [ ] Enable the current UE5 photoreal open-world stack where supported: Nanite, Nanite foliage, Nanite landscapes/splines/tessellation, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, Substrate/material layering, and OpenXR.
 - [ ] Create the Unreal module/plugin skeleton: core, physics bridge, river, raft, input, UI, and debug modules.
