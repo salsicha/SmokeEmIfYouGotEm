@@ -54,6 +54,11 @@
       "Name": "RaftSimAudio",
       "Type": "Runtime",
       "LoadingPhase": "Default"
+    },
+    {
+      "Name": "RaftSimNetwork",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
     }
   ]
 }

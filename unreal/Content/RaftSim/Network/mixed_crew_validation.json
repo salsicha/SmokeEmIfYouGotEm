@@ -1,0 +1,23 @@
+{
+  "schema": "raftsim.unreal.mixed_crew_validation.v1",
+  "validation_targets": [
+    "desktop_only_crew",
+    "vr_only_crew",
+    "mixed_desktop_vr_crew",
+    "keyboard_gamepad_vr_controller_mix",
+    "manual_input_only_accessibility",
+    "voice_command_and_manual_parity",
+    "comfort_settings_per_connected_player",
+    "subtitles_and_transcription_flow",
+    "reconnect_and_ai_takeover",
+    "packet_loss_latency_jitter",
+    "host_migration_or_session_recovery",
+    "multiplayer_replay_desync_detection"
+  ],
+  "acceptance": {
+    "no_player_required_to_use_voice": true,
+    "vr_players_can_filter_corrections_for_comfort": true,
+    "all_gameplay_critical_actions_have_manual_controls": true,
+    "authoritative_replay_can_explain_score_and_desyncs": true
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schema": "raftsim.unreal.voice_communication_policy.v1",
+  "scope": "everyone_on_boat",
+  "features": {
+    "push_to_talk": true,
+    "open_mic": true,
+    "mute": true,
+    "per_player_volume": true,
+    "subtitles_or_transcription": true,
+    "moderation_hooks": true,
+    "privacy_settings": true,
+    "seat_spatialization": true
+  },
+  "mix_policy": {
+    "guide_commands_priority_ducking": true,
+    "rapid_noise_aware_voice_activity": true,
+    "vr_binaural_when_available": true,
+    "manual_input_parity_for_gameplay_commands": true
+  },
+  "privacy": {
+    "voice_disabled_by_default_for_private_sessions": false,
+    "explicit_mute_controls_required": true,
+    "transcription_opt_in_required": true
+  }
+}

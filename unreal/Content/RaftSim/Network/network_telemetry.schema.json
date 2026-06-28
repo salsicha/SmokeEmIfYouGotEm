@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "raftsim.unreal.network_telemetry.v1",
+  "title": "RaftSim Network Telemetry Frame",
+  "type": "object",
+  "required": [
+    "physics_frame",
+    "player_id",
+    "seat_id",
+    "ping_ms",
+    "jitter_ms",
+    "packet_loss_percent",
+    "command_latency_ms",
+    "voice_activity",
+    "paddle_timing_error_ms",
+    "raft_state_divergence_cm"
+  ],
+  "properties": {
+    "physics_frame": { "type": "integer", "minimum": 0 },
+    "player_id": { "type": "string" },
+    "seat_id": { "type": "string" },
+    "ping_ms": { "type": "number", "minimum": 0 },
+    "jitter_ms": { "type": "number", "minimum": 0 },
+    "packet_loss_percent": { "type": "number", "minimum": 0, "maximum": 100 },
+    "command_latency_ms": { "type": "number", "minimum": 0 },
+    "voice_activity": { "type": "number", "minimum": 0, "maximum": 1 },
+    "paddle_timing_error_ms": { "type": "number" },
+    "raft_state_divergence_cm": { "type": "number", "minimum": 0 }
+  }
+}
