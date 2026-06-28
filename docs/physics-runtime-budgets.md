@@ -15,7 +15,7 @@ These budgets gate the Python/C++ modeling phase before Unreal production begins
 - Baseline reports must include the canonical fixtures plus one generated procedural rapid.
 - C++ solver mean runtime should stay within the per-profile water-solver budget for the target platform.
 - Raft coupling mean runtime should stay within the per-profile raft-coupling budget.
-- Probe/export cost is a research-loop budget, not a shipping per-frame budget, but it must stay low enough for repeated PyClaw/C++ comparison runs.
+- Probe/export cost is a research-loop budget, not a shipping per-frame budget, but it must stay low enough for repeated GeoClaw/C++ comparison runs.
 - Max runtime should remain below twice the relevant mean budget for desktop and handheld, and below 1.5x for VR.
 - Any budget miss must be recorded with scenario id, profile, measured value, candidate parameters, and whether the miss blocks Unreal integration.
 

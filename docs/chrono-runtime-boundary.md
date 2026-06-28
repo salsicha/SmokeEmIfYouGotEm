@@ -6,8 +6,8 @@ This decision freezes the first native runtime split before Unreal production wo
 
 | Area | Owner | Rationale |
 | --- | --- | --- |
-| Reduced shallow-water / height-field solver | Custom C++ | Deterministic, portable, tunable against PyClaw, and small enough for Unreal runtime budgets. |
-| River feature forcing | Custom C++ | Holes, laterals, boils, ledges, shallows, eddy lines, and seasonal flow parameters must match the PyClaw validation path. |
+| Reduced shallow-water / height-field solver | Custom C++ | Deterministic, portable, tunable against GeoClaw, and small enough for Unreal runtime budgets. |
+| River feature forcing | Custom C++ | Holes, laterals, boils, ledges, shallows, eddy lines, and seasonal flow parameters must match the GeoClaw validation path. |
 | Water query API | Custom C++ | Unreal, Chrono coupling, audio, VFX, probes, and replay need one stable water-field interface. |
 | Raft rigid-body integration | Project Chrono | Chrono is the baseline for 6DoF body dynamics, inertia, contacts, collision response, and future constraints. |
 | Rock/bed/shore collision contacts | Project Chrono with custom water/contact inputs | Chrono owns collision resolution; custom code supplies water heights, bed fields, feature tags, and tuned contact coefficients. |
@@ -26,5 +26,5 @@ The detailed coupling strategy is captured in [Chrono Water And Raft Coupling Pl
 1. Build a standalone native C++ Chrono smoke test outside Unreal.
 2. Feed the custom C++ water field into a Chrono raft body as buoyancy/contact samples.
 3. Add distinct Chrono material presets for elastic rock impacts and inelastic bed grounding.
-4. Compare Chrono/custom-water telemetry against Python/PyClaw reference scenarios.
+4. Compare Chrono/custom-water telemetry against GeoClaw reference scenarios.
 5. Keep Chrono::FSI isolated behind an experiment flag and out of required build/test paths.

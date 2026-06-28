@@ -6,10 +6,10 @@ Project Chrono should be the authoritative physics runtime for the full simulato
 
 Unreal Engine should own rendering, VR input, audio, UI, asset streaming, and platform packaging. Chrono should own raft dynamics, rock/contact response, compliant raft structure, paddle-water force transfer, and fluid-solid interaction where available.
 
-The Python `raftsim` package remains the research harness and validation layer. PyClaw should produce the 2.5D shallow-water reference outputs, and the custom C++ reduced shallow-water / height-field solver should be tuned against those outputs before Unreal runtime work depends on it.
+The Python `raftsim` package remains the research harness and validation layer. GeoClaw should produce the 2.5D shallow-water/geophysical-flow reference outputs, and the custom C++ reduced shallow-water / height-field solver should be tuned against those outputs before Unreal runtime work depends on live water.
 
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial and seasonal-flow pipeline that feeds validated river scenarios.
-See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the production roadmap. The production Unreal project should begin only after PyClaw reference modeling, custom C++ solver matching, real-world river scenario validation, profiling, telemetry schema stabilization, and a standalone native Chrono smoke test are complete.
+See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the production roadmap. The production Unreal project should begin only after GeoClaw reference modeling, custom C++ solver matching, real-world river scenario validation, profiling, telemetry schema stabilization, and a standalone native Chrono smoke test are complete.
 
 The first native ownership split is frozen in [Chrono Runtime Boundary](chrono-runtime-boundary.md): custom C++ owns the reduced water solver and stable water query API, while Project Chrono owns baseline raft rigid-body dynamics and collision/contact response.
 
@@ -90,7 +90,7 @@ Mitigations:
 - Keep Python tests as behavior-level validation, not byte-for-byte runtime equivalence.
 - Add a small C++ Chrono smoke test before any Unreal plugin work.
 - Keep water/raft model parameters in versioned data files shared by Python and Unreal.
-- Keep PyClaw reference scenarios available for C++ water-solver regression.
+- Keep GeoClaw reference scenarios available for C++ water-solver regression.
 - Keep river source manifests, flow presets, and difficulty-to-fluid parameter mappings versioned with the scenario packages that Chrono consumes.
 - Preserve a reduced force-field mode for platforms where full FSI is too expensive.
 
@@ -98,11 +98,11 @@ Mitigations:
 
 ### Phase 1: Python Validation
 
-- Keep using `raftsim` for scenario generation, PyClaw reference runs, and comparison tests.
-- Validate PyClaw and custom C++ against the same flat current, buoyancy, standing wave, eddy-line, upwelling, and rock-contact scenarios.
+- Keep using `raftsim` for scenario generation, GeoClaw reference runs, and comparison tests.
+- Validate GeoClaw and custom C++ against the same flat current, buoyancy, standing wave, eddy-line, upwelling, and rock-contact scenarios.
 - Validate one real-world river section across low, median, and high runnable season/difficulty presets before Unreal relies on those parameters.
 - Export telemetry and parameter files.
-- Profile the PyClaw reference and custom C++ solver and identify the runtime budget for each force component.
+- Profile the GeoClaw reference and custom C++ solver and identify the runtime budget for each force component.
 - Freeze the first shared parameter and telemetry schemas before native runtime work.
 
 ### Phase 2: Native Chrono Prototype
@@ -115,7 +115,7 @@ Start after the Python modeling/profiling exit gate.
 - Use `raftsim_water/chrono_coupling.hpp` as the dependency-free bridge from custom C++ water frames to Chrono-applied buoyancy/contact force samples.
 - Step Chrono at fixed timestep.
 - Export the same telemetry categories as Python.
-- Use `python -m raftsim.examples.compare_chrono_bridge_telemetry <dual_solver_run>` to compare the custom-water bridge force envelope against PyClaw/Python reference output.
+- Use `python -m raftsim.examples.compare_chrono_bridge_telemetry <dual_solver_run>` to compare the custom-water bridge force envelope against GeoClaw reference output.
 
 ### Phase 3: Unreal Plugin Skeleton
 

@@ -34,14 +34,14 @@ The first active implementation milestone is not Unreal, rendering, VR, or full 
 The first active physics slice should build:
 
 - A deterministic 2.5D procedural scenario generator
-- A PyClaw shallow-water reference model
+- A GeoClaw shallow-water/geophysical-flow reference model
 - A custom C++ reduced shallow-water / height-field solver
 - A comparison and tuning harness that runs both solvers on the same scenario package
 - A solver-neutral 6-DoF raft coupling layer for buoyancy, drag, grounding, wave climb, surf/flush, and paddle forces
 - Telemetry for water fields, solver error, raft forces, and scenario outcomes
 
 See [Physics Engine Plan](physics-engine-plan.md) for the detailed implementation strategy.
-See [2.5D Dual-Solver Simulation Plan](2.5d-simulation-plan.md) for the PyClaw/C++ validation workflow.
+See [2.5D Dual-Solver Simulation Plan](2.5d-simulation-plan.md) and [GeoClaw Reference Solver Transition Plan](geoclaw-transition-plan.md) for the GeoClaw/C++ validation workflow.
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the real river, geospatial, imagery, season, flow, difficulty, and Unreal photoreal content pipeline.
 See [Free And AI Asset Policy](free-and-ai-asset-policy.md) for the current art and sound sourcing decision, and [Audio Asset Sourcing Plan](audio-asset-sourcing-plan.md) for audio-specific research notes.
 
@@ -151,8 +151,8 @@ Prototype systems:
 
 - Headless Python simulation before Unreal integration
 - 2.5D procedural and real-world scenario packages with bed, surface, depth, velocity, wet/dry state, features, source manifests, seasonal flow presets, and raft parameters
-- PyClaw reference simulation for shallow-water behavior
-- Custom C++ reduced shallow-water / height-field solver tuned against PyClaw
+- GeoClaw reference simulation for shallow-water/geophysical-flow behavior
+- Custom C++ reduced shallow-water / height-field solver tuned against GeoClaw
 - Solver-neutral raft hull/contact sampling for buoyancy, drag, grounding, wave, hole, and paddle forces
 - Recorded telemetry for water fields, solver comparison, raft forces, contacts, and passenger events
 
@@ -173,7 +173,7 @@ Longer-term systems:
 
 ## Physical Accuracy
 
-The raft should behave like a real inflatable raft within the limits of real-time simulation. The active research model is 2.5D: PyClaw provides the reference water behavior, and the custom C++ reduced solver is tuned to match it before becoming a runtime candidate.
+The raft should behave like a real inflatable raft within the limits of real-time simulation. The active research model is 2.5D: GeoClaw provides the reference water behavior, and the custom C++ reduced solver is tuned to match it before becoming a runtime candidate.
 
 Prototype physics priorities:
 
@@ -272,7 +272,7 @@ The real Unreal Engine game project should start after the Python modeling and p
 
 Recommended starting approach:
 
-- Headless 2.5D Python/PyClaw reference model first, with a custom C++ reduced water solver tuned against it before Unreal runtime work
+- Headless 2.5D GeoClaw reference model first, with a custom C++ reduced water solver tuned against it before Unreal runtime work
 - Latest stable Unreal Engine 5.x project chosen at the readiness gate after re-checking current feature support
 - Custom C++ reduced shallow-water / height-field solver as the primary runtime water candidate
 - Project Chrono or custom C++ as the authoritative raft/contact runtime after the readiness report selects the split
@@ -289,9 +289,9 @@ Recommended starting approach:
 
 Prototype scenario:
 
-- One generated 2.5D scenario package consumed by both PyClaw and C++
-- One PyClaw reference run
-- One custom C++ run tuned against the PyClaw output
+- One generated 2.5D scenario package consumed by both GeoClaw and C++
+- One GeoClaw reference run
+- One custom C++ run tuned against the GeoClaw output
 - One 6-DoF raft coupling test against both water outputs
 - One telemetry output showing water fields, solver error, hull forces, paddle forces, and contact components
 - One real-world river section scenario with source manifest, extracted terrain/course, rapid annotations, seasonal flow presets, and low/median/high runnable flow validation
@@ -302,8 +302,8 @@ Prototype scenario:
 ## Open Questions
 
 - What measurable accuracy targets define "physically accurate" for the first vertical slice?
-- What PyClaw-vs-C++ tolerances are acceptable for water fields and raft outcomes?
-- Which physics features must be validated in PyClaw and C++ before Unreal integration starts?
+- What GeoClaw-vs-C++ tolerances are acceptable for water fields and raft outcomes?
+- Which physics features must be validated in GeoClaw and C++ before Unreal integration starts?
 - Which Chrono modules and build configuration are required for each target platform?
 - Which candidate rivers have the best combination of data quality, iconic white water, licensing clarity, and practical first-slice scope?
 - How much rapid identification can be automated from terrain/imagery before manual river-domain review is required?

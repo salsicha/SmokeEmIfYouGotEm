@@ -2,7 +2,7 @@
 
 ## Goal
 
-The boat should be driven by a custom shallow-water / height-field river model and by Project Chrono rigid-body/contact dynamics. The runtime must support rubber-raft buoyancy, paddle and current forces, partially elastic rock impacts, strongly inelastic riverbed grounding, deterministic replay, VR-friendly fixed steps, and telemetry that can still be validated against the Python/PyClaw harness.
+The boat should be driven by a custom shallow-water / height-field river model and by Project Chrono rigid-body/contact dynamics. The runtime must support rubber-raft buoyancy, paddle and current forces, partially elastic rock impacts, strongly inelastic riverbed grounding, deterministic replay, VR-friendly fixed steps, and telemetry that can still be validated against the GeoClaw reference harness.
 
 ## Best Integration Strategy
 
@@ -14,7 +14,7 @@ Use an operator-split coupling loop:
 4. Unreal consumes interpolated Chrono poses for rendering, VR camera motion, passengers, audio, VFX, and debug overlays.
 5. Full Chrono::FSI remains optional research/reference work. It should not replace the custom water runtime until it proves accuracy, platform availability, and VR performance.
 
-This is the best first production path because it keeps the water solver deterministic, tunable against PyClaw, and cheap enough for large waterways, while using Chrono where it is strongest: multibody dynamics, contact, collision response, and compliant/rigid body integration.
+This is the best first production path because it keeps the water solver deterministic, tunable against GeoClaw, and cheap enough for large waterways, while using Chrono where it is strongest: multibody dynamics, contact, collision response, and compliant/rigid body integration.
 
 ## Fixed-Step Schedule
 
@@ -111,7 +111,7 @@ This gets the gameplay and validation loop working quickly and deterministically
 
 - Estimate raft displaced volume and footprint from submerged patches.
 - Inject a smoothed, bounded momentum/depth source into the next water step.
-- Keep the source term optional and tuned against PyClaw/custom validation fixtures.
+- Keep the source term optional and tuned against GeoClaw/custom validation fixtures.
 - Never let raft feedback destabilize the water solver or break replay determinism.
 
 ## Kinematics Contract

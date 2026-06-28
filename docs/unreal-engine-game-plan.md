@@ -17,14 +17,14 @@ Do not start the production Unreal Engine project until the Python physics progr
 
 Required before Unreal production begins:
 
-- PyClaw 2.5D reference scenarios run deterministically.
+- GeoClaw 2.5D reference scenarios run deterministically.
 - Custom C++ reduced shallow-water / height-field scenarios run from the same solver-neutral scenario packages.
-- C++ water fields, probe traces, raft force samples, and scenario outcomes match PyClaw within accepted tolerances.
+- C++ water fields, probe traces, raft force samples, and scenario outcomes match GeoClaw within accepted tolerances.
 - Python profiling identifies hot loops, memory costs, timestep sensitivity, and per-scenario runtime budgets.
 - Parameter files and telemetry schemas are stable enough to share with C++/Unreal tooling.
-- Force model choices are documented: which effects come from PyClaw reference, which live in the C++ water solver, which move into Chrono/custom raft dynamics, and which are visual-only.
+- Force model choices are documented: which effects come from GeoClaw reference, which live in the C++ water solver, which move into Chrono/custom raft dynamics, and which are visual-only.
 - Project Chrono runtime path is validated by a standalone C++ smoke test.
-- At least one real-world river section has a complete source manifest, terrain/course extraction, rapid annotations, gauge/flow research, season presets, difficulty presets, and low/median/high flow validation through PyClaw and the custom C++ solver.
+- At least one real-world river section has a complete source manifest, terrain/course extraction, rapid annotations, gauge/flow research, season presets, difficulty presets, and low/median/high flow validation through GeoClaw and the custom C++ solver.
 - Adaptive fluid parameters are documented for river, season, flow percentile, difficulty, channel geometry, roughness, aeration/turbulence, eddy-line shear, hole retention, wave train strength, boils, shallows, raft drag, paddle catch, and damping.
 - A first real-world corridor package exists for Unreal preproduction: terrain, centerline, banks, imagery masks, rapid boundaries, hazards, flow presets, confidence metadata, and validation telemetry.
 - Unreal readiness report exists with performance budgets for desktop, VR, and handheld/portable targets.
@@ -93,16 +93,16 @@ Unreal Chaos may be used for incidental non-authoritative physics such as loose 
 
 Finish before Unreal production:
 
-- Complete PyClaw 2.5D reference harness.
+- Complete GeoClaw 2.5D reference harness.
 - Complete custom C++ reduced shallow-water / height-field solver harness.
-- Complete PyClaw-vs-C++ comparison and tuning reports.
+- Complete GeoClaw-vs-C++ comparison and tuning reports.
 - Complete first 2.5D raft/water coupling model against both solver outputs.
 - Profile Python models and decide acceleration strategy.
 - Validate representative scenarios: flat pool, calm current, standing wave, hole, eddy line, lateral wave, shallow shelf, submerged rock, boil, and pinning.
 - Produce shared parameter files for raft, water, paddle, rock, and scoring coefficients.
 - Produce replay/telemetry examples that Unreal can visualize.
 - Confirm Chrono C++ viability outside Unreal.
-- Complete one real-world river scenario package with geospatial source manifest, extracted course/elevation, rapid labels, seasonal flow bands, difficulty presets, and PyClaw/custom-C++ validation.
+- Complete one real-world river scenario package with geospatial source manifest, extracted course/elevation, rapid labels, seasonal flow bands, difficulty presets, and GeoClaw/custom-C++ validation.
 - Produce one Unreal-ready real-world river corridor package for preproduction review.
 
 Deliverable:

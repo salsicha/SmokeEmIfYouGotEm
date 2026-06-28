@@ -30,9 +30,9 @@ Implemented artifacts:
 - `physics/data/real_world/south_fork_american_chili_bar/river_course.json`: centerline stationing, approximate banks/cross-section offsets, width, gradient, constriction, roughness, and rapid candidate metadata.
 - `physics/data/real_world/south_fork_american_chili_bar/flow_presets.json`: low, median, and high runnable seed bands.
 - `physics/data/real_world/south_fork_american_chili_bar/rapid_candidates.geojson`: candidate rapid points derived from DEM-slope, constriction, roughness, boulder-density, imagery-texture, bend, guide-note, and access signals.
-- `physics/data/real_world/south_fork_american_chili_bar/scenario/`: loadable shared `scenario2_5d` package for PyClaw and the custom C++ solver path.
+- `physics/data/real_world/south_fork_american_chili_bar/scenario/`: loadable shared `scenario2_5d` package for GeoClaw and the custom C++ solver path.
 - `physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json`: first Unreal-ready corridor package manifest with terrain, imagery mask, centerline, bank, rapid, hazard, flow, and confidence artifact slots.
-- `physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json`: low, median, and high runnable flow smoke matrix. PyClaw and the C++ solver both validate each band after the PyClaw reference export adds a 1 cm shallow shelf for exact dry cells. Full field/probe/Froude matching is tracked by the Milestone 10 readiness report.
+- `physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json`: low, median, and high runnable flow smoke matrix. The existing PyClaw matrix is a legacy baseline; the active plan is to regenerate each band with GeoClaw and the C++ solver.
 
 The seed package records metadata-ready fetch specs for 3DEP/DEM, 3DHP/NHD, OSM, NAIP, USGS/NWIS, NOAA/NWPS/National Water Model, and StreamStats. It does not vendor heavy lidar, imagery, guidebook text, or field media. Production extraction must replace the coarse seed measurements with pulled geospatial/hydrology data, reviewed aerial/satellite labels, and rights-cleared media.
 
@@ -42,7 +42,7 @@ Regenerate the seed source/scenario package:
 python -m raftsim.examples.generate_real_world_scenario --write-full-package --output-dir outputs/real_world
 ```
 
-The validation matrix is a recorded smoke-run result, not a static source-data export. Rebuild it with fresh PyClaw and C++ solver outputs before accepting any real-world flow preset.
+The validation matrix is a recorded smoke-run result, not a static source-data export. Rebuild it with fresh GeoClaw and C++ solver outputs before accepting any real-world flow preset.
 
 Generate one selected scenario:
 
@@ -139,7 +139,7 @@ Workflow:
 2. Build a rapid review tool that shows DEM, aerial/satellite imagery, flowline, cross sections, and candidate tags.
 3. Let a designer or river-domain reviewer classify each candidate: pool, riffle, wave train, technical rapid, hole, ledge, strainer risk, portage, access point.
 4. Save rapid boundaries and feature annotations back into the scenario database.
-5. Feed selected rapid segments into PyClaw/custom-C++ scenario generation.
+5. Feed selected rapid segments into GeoClaw/custom-C++ scenario generation.
 
 The first version can use manual/semi-automated labeling. Machine learning for rapid detection should wait until enough labeled examples exist.
 
@@ -237,7 +237,7 @@ Each option should show:
 - Data confidence
 - Training value
 
-Internally, each selection maps to a scenario package and parameter preset that can be run by PyClaw and the custom C++ solver.
+Internally, each selection maps to a scenario package and parameter preset that can be run by GeoClaw and the custom C++ solver.
 
 ## Unreal Content Pipeline
 
@@ -260,7 +260,7 @@ Each real-world river section must pass:
 - River centerline and bank alignment review.
 - Rapid candidate review.
 - Seasonal flow model review.
-- PyClaw reference run.
+- GeoClaw reference run.
 - Custom C++ solver comparison run.
 - Raft outcome review across selected season/difficulty presets.
 - Unreal visual readability review.
