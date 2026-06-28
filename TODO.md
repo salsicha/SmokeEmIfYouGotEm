@@ -6,14 +6,14 @@ This project is a photo-realistic, physically accurate white water rafting simul
 
 The old 2D river/raft path is retired. Future physics work starts with:
 
-- PyClaw as the Python 2.5D shallow-water reference model.
+- GeoClaw as the offline 2.5D shallow-water/geophysical-flow reference model.
 - A custom C++ reduced shallow-water / height-field solver as the runtime candidate.
 - Identical procedurally generated and real-world geospatial scenarios applied to both solvers.
-- A comparison and tuning harness that makes the C++ model match PyClaw before Unreal production begins.
+- A comparison and tuning harness that makes the C++ model match GeoClaw before Unreal production depends on live water.
 - Real river course, elevation, imagery, gauge, season, and difficulty presets that become validated scenario packages.
 
 See [Physics Engine Plan](docs/physics-engine-plan.md) for the overall physics architecture.
-See [2.5D Dual-Solver Simulation Plan](docs/2.5d-simulation-plan.md) for the PyClaw/C++ validation workflow.
+See [2.5D Dual-Solver Simulation Plan](docs/2.5d-simulation-plan.md) and [GeoClaw Reference Solver Transition Plan](docs/geoclaw-transition-plan.md) for the GeoClaw/C++ validation workflow.
 See [Real-World River Content And Seasonal Flow Plan](docs/real-world-river-content-plan.md) for geospatial extraction, rapid identification, seasonal flow research, adaptive parameters, and the future river/season/difficulty picker.
 See [Free And AI Asset Policy](docs/free-and-ai-asset-policy.md) for the current art/sound sourcing decision, [Art Asset Source Research](docs/art-asset-source-research.md) for visual asset source notes, and [Audio Asset Sourcing Plan](docs/audio-asset-sourcing-plan.md) for audio source research, 3D spatial audio, manifests, and release-gate vendor notes.
 See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full game roadmap after Python modeling and profiling are complete, including local AI voice commands, crew conversation systems, networked crews, and fully immersive 3D audio.
@@ -49,6 +49,8 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 
 ## Milestone 2: PyClaw 2.5D Reference Solver
 
+Superseded as the active acceptance reference by Milestone 14 GeoClaw transition. Keep PyClaw artifacts as legacy regression data.
+
 - [x] Add PyClaw as an optional research dependency.
 - [x] Add an environment/setup check for PyClaw availability.
 - [x] Implement a PyClaw scenario loader for the shared 2.5D scenario package.
@@ -73,6 +75,8 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Add a command that runs one shared scenario and writes comparison-ready output.
 
 ## Milestone 4: Dual-Solver Comparison And Tuning Harness
+
+Legacy PyClaw/C++ comparison milestone. Milestone 14 replaces the active acceptance reference with GeoClaw.
 
 - [x] Run PyClaw and C++ on identical scenario packages.
 - [x] Compare `h`, `eta`, `u`, `v`, `hu`, `hv`, wet/dry masks, surface normals, and slopes.
@@ -143,12 +147,14 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Map river + season + flow level + difficulty into solver parameters: boundary inflow/outflow, depth, momentum, roughness, aeration/turbulence, hole retention, wave trains, eddy-line shear, boil strength, shallows, hazards, raft drag, paddle catch, and damping.
 - [x] Build the player-facing data model for region, river, section, season, flow level, difficulty, and raft/crew setup.
 - [x] Convert at least one real-world river/season/difficulty selection into a shared scenario package that both PyClaw and the custom C++ solver can load.
-- [x] Create low, median, and high runnable flow validation matrix, including PyClaw availability/run status and C++ smoke results; full PyClaw/C++ match tuning remains the Milestone 10 readiness gate.
+- [x] Create low, median, and high runnable flow validation matrix, including PyClaw availability/run status and C++ smoke results; this is now a legacy baseline and GeoClaw/C++ revalidation moves to Milestone 14.
 - [x] Export an Unreal-ready real-world corridor package for later visualization: terrain, imagery masks, centerline, banks, rapids, hazards, flow presets, and confidence metadata.
 
 ## Milestone 10: Python-To-Unreal Readiness Gate
 
-- [x] Complete PyClaw reference scenarios.
+Conditionally superseded for live water by Milestone 14. Telemetry/replay playback can still use these artifacts; live custom water needs GeoClaw revalidation.
+
+- [x] Complete legacy PyClaw reference scenarios.
 - [x] Complete custom C++ solver scenarios.
 - [x] Complete dual-solver comparison and tuning reports; current gate decision is approved after shallow-cell-aware velocity/Froude comparison.
 - [x] Complete 2.5D raft coupling validation against both solvers.
@@ -226,14 +232,27 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Define AI audio prohibited use cases: unclear commercial rights, unlicensed voice cloning, recognizably similar music, celebrity/style imitation, and any core gameplay cue that cannot be reviewed/reproduced.
 - [x] Validate audio in stereo, headphones, VR spatial audio, noisy voice-command conditions, and multiplayer voice-chat scenarios.
 
+## Milestone 14: GeoClaw Reference Solver Transition
+
+- [ ] Freeze existing PyClaw outputs as legacy regression artifacts, not acceptance targets.
+- [ ] Add GeoClaw availability/setup checks and document system dependencies.
+- [ ] Build a shared-scenario-to-GeoClaw exporter for `setrun.py`, topography files, initial water state, roughness, boundaries, hydrographs, AMR regions, and fixed-grid output.
+- [ ] Convert canonical fixtures to GeoClaw: flat pool, uniform channel, dam-break/bore, bed step, constriction, wet/dry shoreline, sloping channel with Manning friction, and drop/ledge over variable topography.
+- [ ] Convert rafting fixtures to GeoClaw: boulder garden, cascading wave train, hydraulic hole/downstream boil, lateral wave, eddy-line shear, shallow shelf, and real-world low/median/high flows.
+- [ ] Normalize GeoClaw fixed-grid outputs into the frozen field/probe/cross-section telemetry schema.
+- [ ] Update the comparison harness from PyClaw-vs-C++ to GeoClaw-vs-C++.
+- [ ] Retune C++ wet/dry handling, roughness, damping, feature forcing, velocity/Froude masks, and raft-force parameters against GeoClaw.
+- [ ] Re-run raft coupling against GeoClaw outputs and C++ fields and compare force envelopes, trajectories, and outcomes.
+- [ ] Regenerate the Python-to-Unreal readiness report with GeoClaw as the approved reference solver before live Unreal water depends on the custom C++ solver.
+
 ## Technical Notes To Revisit
 
 - [ ] Decide when to physically remove legacy 2D code, tests, examples, and videos from the repo.
-- [ ] Decide whether PyClaw is enough or GeoClaw-specific behavior is required for river bathymetry and wet/dry cases.
+- [x] Decide whether PyClaw is enough or GeoClaw-specific behavior is required for river bathymetry and wet/dry cases: GeoClaw is now the target reference solver.
 - [ ] Decide if SWASHES fixtures should be vendored, regenerated, or manually encoded.
 - [ ] Decide whether the C++ solver starts as CPU-only or gets a GPU path after correctness is established.
 - [ ] Decide how much authored feature forcing is acceptable versus pure shallow-water dynamics.
-- [ ] Evaluate Chrono::FSI only after the PyClaw/custom-C++ solver comparison path is stable.
+- [ ] Evaluate Chrono::FSI only after the GeoClaw/custom-C++ solver comparison path is stable.
 - [ ] Identify reference footage, river data, aerial/satellite imagery, flow history, and expert guide feedback needed for validation.
 - [ ] Decide which geospatial formats become canonical for source data, generated scenarios, and Unreal corridor packages.
 - [ ] Re-check latest UE5 rendering/geospatial plugin capabilities at the Python-to-Unreal readiness gate.
@@ -252,9 +271,9 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Define the shared 2.5D scenario schema.
 - [x] Add fixture scenario generation for flat pool, channel flow, dam-break/bore, bed step, constriction, and wet/dry shoreline.
 - [x] Add deterministic procedural 2.5D rafting scenario generation from seed.
-- [x] Add a PyClaw availability check and first reference runner.
+- [x] Add a PyClaw availability check and first reference runner as a legacy baseline; GeoClaw availability/checks are now Milestone 14.
 - [x] Add a C++ solver directory and build skeleton.
-- [ ] Add the first PyClaw-vs-C++ comparison report format.
+- [ ] Add the first GeoClaw-vs-C++ comparison report format.
 - [ ] Draft the first candidate river inventory and source manifest.
 - [ ] Prototype course/elevation extraction for one river section.
 - [ ] Define the first rapid-review labels and seasonal flow/difficulty parameter mapping.
