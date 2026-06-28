@@ -2,7 +2,7 @@
 
 `raftsim` is the headless Python simulation foundation for the white water rafting simulator.
 
-The repository currently includes a legacy top-down 2D prototype, but the active plan has moved to a 2.5D dual-solver program: PyClaw as the Python shallow-water reference model and a custom C++ reduced shallow-water / height-field solver as the runtime candidate. The same generated or real-world geospatial scenario will be applied to both, and the C++ model will be tuned to match PyClaw.
+The repository currently includes a legacy top-down 2D prototype, but the active plan has moved to a 2.5D dual-solver program: GeoClaw as the offline shallow-water/geophysical-flow reference model and a custom C++ reduced shallow-water / height-field solver as the runtime candidate. The same generated or real-world geospatial scenario will be applied to both, and the C++ model will be tuned to match GeoClaw. Earlier PyClaw artifacts are frozen as legacy regression data only.
 
 ## Run Tests
 
@@ -40,7 +40,8 @@ physics/
 - Solver-neutral 2.5D scenario package schema
 - Deterministic 2.5D fixture generator for flat pool, uniform channel, dam-break, bed step, constriction, and wet/dry shoreline cases
 - Deterministic 2.5D procedural rapid generator with bends, width/depth variation, dry banks, flow vectors, and whitewater feature metadata
-- PyClaw 2.5D reference model
+- GeoClaw 2.5D reference model setup checks and transition utilities
+- Legacy PyClaw 2.5D reference model artifacts
 - Standalone custom C++ reduced shallow-water / height-field runtime solver
 - Planned dual-solver comparison and tuning harness
 - Planned real-world river scenario packages with source manifests, course/elevation extraction, rapid annotations, seasonal flow presets, and difficulty-adaptive parameters
@@ -122,11 +123,31 @@ depth.png
 speed.png
 ```
 
-`scenario.json` is the shared manifest. PyClaw and the custom C++ solver both load this same package.
+`scenario.json` is the shared manifest. GeoClaw and the custom C++ solver both load or export from this same package.
+
+## GeoClaw Reference Harness
+
+GeoClaw is the active offline reference target for river-water validation. It is an optional research dependency because local runs normally need the Clawpack Python modules plus a Fortran-capable build toolchain.
+
+Install the optional research extra, then check the local environment:
+
+```bash
+cd physics
+python -m pip install -e ".[research,plot]"
+PYTHONPATH=src python -m raftsim.examples.run_geoclaw_reference --check --allow-unavailable
+```
+
+The setup check writes `outputs/geoclaw_reference/geoclaw_setup_report.json`. A full GeoClaw run requires:
+
+- `clawpack`, `clawpack.geoclaw`, `clawpack.clawutil`, and `clawpack.pyclaw`
+- `make`
+- `gfortran` or a compatible Fortran compiler
+
+Reference docs are recorded in the setup report and in `docs/geoclaw-transition-plan.md`.
 
 ## PyClaw Reference Harness
 
-PyClaw is an optional research dependency. Install it with:
+PyClaw is now a legacy reference path. Its outputs are useful for historical regression checks and provenance, but they are not the active acceptance target for C++ or Unreal water. Install it with the same research extra when you need to inspect old runs:
 
 ```bash
 cd physics
