@@ -11,7 +11,12 @@ from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
 
-from .scenario2_5d import Scenario2_5D, read_scenario2_5d_package
+from .scenario2_5d import (
+    FixtureScenario2_5DParameters,
+    Scenario2_5D,
+    generate_fixture_scenario2_5d,
+    read_scenario2_5d_package,
+)
 
 FloatGrid = NDArray[np.float64]
 
@@ -74,6 +79,17 @@ GEOCLAW_SYSTEM_DEPENDENCY_HINT = (
     "with make and gfortran before running full reference simulations."
 )
 GEOCLAW_EXPORT_SCHEMA = "raftsim.geoclaw_export.v1"
+GEOCLAW_CANONICAL_SUITE_SCHEMA = "raftsim.geoclaw_canonical_suite.v1"
+GEOCLAW_CANONICAL_FIXTURES = (
+    "flat_pool",
+    "uniform_channel",
+    "dam_break",
+    "bed_step",
+    "constriction",
+    "wet_dry_shoreline",
+    "sloping_manning_channel",
+    "drop_ledge",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -124,6 +140,25 @@ class GeoClawExportResult:
             "output_dir": str(self.output_dir),
             "manifest_path": str(self.manifest_path),
             "files": list(self.files),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class GeoClawScenarioSuiteExport:
+    """Summary for a deterministic suite of GeoClaw scenario exports."""
+
+    suite_id: str
+    output_dir: Path
+    manifest_path: Path
+    results: tuple[GeoClawExportResult, ...]
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "suite_id": self.suite_id,
+            "output_dir": str(self.output_dir),
+            "manifest_path": str(self.manifest_path),
+            "scenario_count": len(self.results),
+            "scenarios": [result.to_json_dict() for result in self.results],
         }
 
 
@@ -263,6 +298,56 @@ def export_geoclaw_scenario(
         output_dir=root,
         manifest_path=manifest_path,
         files=tuple(sorted(files)),
+    )
+
+
+def canonical_geoclaw_scenarios(seed: int = 1) -> tuple[Scenario2_5D, ...]:
+    """Return the canonical GeoClaw fixture set for C++ validation."""
+
+    return tuple(
+        generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture=fixture, seed=seed))
+        for fixture in GEOCLAW_CANONICAL_FIXTURES
+    )
+
+
+def export_canonical_geoclaw_scenarios(
+    output_dir: str | Path,
+    *,
+    seed: int = 1,
+    config: GeoClawExportConfig | None = None,
+) -> GeoClawScenarioSuiteExport:
+    """Export every canonical GeoClaw fixture to deterministic run packages."""
+
+    cfg = config or GeoClawExportConfig()
+    root = Path(output_dir)
+    root.mkdir(parents=True, exist_ok=True)
+    results = tuple(
+        export_geoclaw_scenario(scenario, root / scenario.metadata.scenario_id, config=cfg)
+        for scenario in canonical_geoclaw_scenarios(seed=seed)
+    )
+    manifest = {
+        "schema": GEOCLAW_CANONICAL_SUITE_SCHEMA,
+        "suite_id": f"canonical_geoclaw_seed_{seed}",
+        "seed": seed,
+        "fixtures": list(GEOCLAW_CANONICAL_FIXTURES),
+        "scenario_count": len(results),
+        "config": cfg.to_json_dict(),
+        "exports": [
+            {
+                "scenario_id": result.scenario_id,
+                "manifest": _relative_path(result.manifest_path, root),
+                "file_count": len(result.files),
+            }
+            for result in results
+        ],
+    }
+    manifest_path = root / "canonical_suite_manifest.json"
+    _write_json(manifest_path, manifest)
+    return GeoClawScenarioSuiteExport(
+        suite_id=f"canonical_geoclaw_seed_{seed}",
+        output_dir=root,
+        manifest_path=manifest_path,
+        results=results,
     )
 
 

@@ -6,8 +6,10 @@ import argparse
 from pathlib import Path
 
 from ..geoclaw_reference import (
+    GEOCLAW_CANONICAL_FIXTURES,
     GeoClawExportConfig,
     check_geoclaw_availability,
+    export_canonical_geoclaw_scenarios,
     export_geoclaw_scenario,
     write_geoclaw_setup_report,
 )
@@ -19,14 +21,7 @@ from ..scenario2_5d import (
     read_scenario2_5d_package,
 )
 
-FIXTURE_CHOICES = (
-    "flat_pool",
-    "uniform_channel",
-    "dam_break",
-    "bed_step",
-    "constriction",
-    "wet_dry_shoreline",
-)
+FIXTURE_CHOICES = GEOCLAW_CANONICAL_FIXTURES
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -35,6 +30,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--allow-unavailable", action="store_true", help="Return 0 even if GeoClaw is not installed.")
     parser.add_argument("--scenario-dir", type=Path, default=None, help="Existing 2.5D scenario package directory.")
     parser.add_argument("--fixture", choices=FIXTURE_CHOICES, default=None, help="Generate and export one canonical fixture.")
+    parser.add_argument("--all-fixtures", action="store_true", help="Generate and export the full canonical GeoClaw fixture suite.")
     parser.add_argument("--procedural", action="store_true", help="Generate and export one procedural rapid.")
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--nx", type=int, default=64)
@@ -52,6 +48,22 @@ def main(argv: list[str] | None = None) -> int:
         print(f"missing_executables={','.join(availability.missing_executables)}")
         write_geoclaw_setup_report(args.output_dir, availability)
         return 0 if availability.available or args.allow_unavailable else 1
+
+    if args.all_fixtures:
+        if any((args.scenario_dir, args.fixture, args.procedural)):
+            raise SystemExit("Select --all-fixtures by itself, or choose one single scenario source.")
+        result = export_canonical_geoclaw_scenarios(
+            args.output_dir / f"canonical_geoclaw_seed_{args.seed}",
+            seed=args.seed,
+            config=GeoClawExportConfig(num_output_times=args.num_output_times),
+        )
+        print(f"suite={result.suite_id}")
+        print(f"manifest={result.manifest_path}")
+        print(f"scenarios={len(result.results)}")
+        if not availability.available:
+            print(f"GeoClaw unavailable for execution: {availability.reason}")
+            return 0 if args.allow_unavailable else 2
+        return 0
 
     scenario = _select_scenario(args)
     if scenario is not None:
