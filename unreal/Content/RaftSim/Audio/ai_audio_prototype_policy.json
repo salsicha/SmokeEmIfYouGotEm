@@ -1,0 +1,42 @@
+{
+  "schema": "raftsim.unreal.ai_audio_prototype_policy.v1",
+  "default_status": "prototype_only",
+  "allowed_uses": [
+    "ideation",
+    "temporary_ui_or_debug_sounds",
+    "abstract_training_feedback",
+    "temp_dialogue",
+    "noncritical_variations_after_human_review",
+    "local_generation_workflow_research"
+  ],
+  "not_allowed_for_shipping_without_explicit_approval": [
+    "whitewater_realism",
+    "raft_paddle_rock_rescue_cues",
+    "safety_critical_gameplay_cues",
+    "crew_voice_without_performer_consent",
+    "music_or_melodies_with_unclear_training_rights",
+    "celebrity_or_style_imitation",
+    "unreviewable_or_nonreproducible_core_cues"
+  ],
+  "approval_gate": {
+    "legal_review_required": true,
+    "audio_director_review_required": true,
+    "similarity_review_required": true,
+    "commercial_terms_record_required": true,
+    "manifest_record_required": true,
+    "shipping_flag_must_be_explicit": true
+  },
+  "manifest_fields_required_for_ai_assets": [
+    "tool",
+    "model",
+    "version",
+    "prompt",
+    "seed",
+    "generation_date",
+    "account_or_license_tier",
+    "output_terms",
+    "review_status",
+    "similarity_check",
+    "prototype_or_shipping_flag"
+  ]
+}
