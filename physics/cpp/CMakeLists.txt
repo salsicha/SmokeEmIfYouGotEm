@@ -10,6 +10,7 @@ find_package(ZLIB REQUIRED)
 find_package(Chrono QUIET)
 
 add_library(raftsim_water
+  src/chrono_bridge_fixtures.cpp
   src/chrono_coupling.cpp
   src/json.cpp
   src/numpy_io.cpp
@@ -27,6 +28,9 @@ target_link_libraries(raftsim_water_solver PRIVATE raftsim_water)
 
 add_executable(raftsim_water_tests tests/raftsim_water_tests.cpp)
 target_link_libraries(raftsim_water_tests PRIVATE raftsim_water)
+
+add_executable(raftsim_chrono_bridge_fixtures tools/chrono_bridge_fixture_catalog.cpp)
+target_link_libraries(raftsim_chrono_bridge_fixtures PRIVATE raftsim_water)
 
 if(Chrono_FOUND)
   add_executable(raftsim_chrono_smoke tools/chrono_smoke_test.cpp)
