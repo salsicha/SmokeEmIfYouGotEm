@@ -1,0 +1,21 @@
+{
+  "schema": "raftsim.unreal.fixed_step_bridge.v1",
+  "water_step_seconds": 0.0166666667,
+  "chrono_substep_seconds": 0.0083333333,
+  "authority": {
+    "water": "URaftSimWaterRuntimeAdapter",
+    "raft_kinematics": "URaftSimChronoRuntimeAdapter",
+    "unreal_rendering": "interpolated_consumer_only"
+  },
+  "tick_order": [
+    "collect_deterministic_inputs",
+    "advance_custom_water_solver",
+    "sample_water_snapshot_for_raft_patches",
+    "apply_forces_to_chrono_raft",
+    "step_chrono_substeps",
+    "collect_contact_and_force_telemetry",
+    "publish_authoritative_raft_state"
+  ],
+  "subsystem": "URaftSimPhysicsBridgeSubsystem",
+  "status": "source_integrated_pending_editor_compile"
+}
