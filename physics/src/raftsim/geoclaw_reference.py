@@ -5,16 +5,20 @@ from __future__ import annotations
 import importlib
 import json
 import shutil
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 
 import numpy as np
 from numpy.typing import NDArray
 
+from .real_world import default_player_selections, generate_real_world_scenario2_5d
 from .scenario2_5d import (
+    Feature2_5D,
     FixtureScenario2_5DParameters,
     Scenario2_5D,
     generate_fixture_scenario2_5d,
+    generate_procedural_scenario2_5d,
+    ProceduralScenario2_5DParameters,
     read_scenario2_5d_package,
 )
 
@@ -80,6 +84,7 @@ GEOCLAW_SYSTEM_DEPENDENCY_HINT = (
 )
 GEOCLAW_EXPORT_SCHEMA = "raftsim.geoclaw_export.v1"
 GEOCLAW_CANONICAL_SUITE_SCHEMA = "raftsim.geoclaw_canonical_suite.v1"
+GEOCLAW_RAFTING_SUITE_SCHEMA = "raftsim.geoclaw_rafting_suite.v1"
 GEOCLAW_CANONICAL_FIXTURES = (
     "flat_pool",
     "uniform_channel",
@@ -89,6 +94,14 @@ GEOCLAW_CANONICAL_FIXTURES = (
     "wet_dry_shoreline",
     "sloping_manning_channel",
     "drop_ledge",
+)
+GEOCLAW_RAFTING_CASES = (
+    "boulder_garden",
+    "cascading_wave_train",
+    "hydraulic_hole_downstream_boil",
+    "lateral_wave",
+    "eddy_line_shear",
+    "shallow_shelf",
 )
 
 
@@ -349,6 +362,183 @@ def export_canonical_geoclaw_scenarios(
         manifest_path=manifest_path,
         results=results,
     )
+
+
+def rafting_geoclaw_scenarios(seed: int = 1) -> tuple[Scenario2_5D, ...]:
+    """Return feature-heavy rafting and real-world flow scenarios for GeoClaw."""
+
+    synthetic = tuple(_rafting_case_scenario(case_id, seed + index) for index, case_id in enumerate(GEOCLAW_RAFTING_CASES))
+    real_world = tuple(
+        generate_real_world_scenario2_5d(
+            selection,
+            nx=48,
+            ny=24,
+            duration=6.0,
+            pyclaw_reference_min_depth_m=0.0,
+        )
+        for selection in default_player_selections()
+    )
+    return (*synthetic, *real_world)
+
+
+def export_rafting_geoclaw_scenarios(
+    output_dir: str | Path,
+    *,
+    seed: int = 1,
+    config: GeoClawExportConfig | None = None,
+) -> GeoClawScenarioSuiteExport:
+    """Export synthetic rafting cases and real-world flow bands for GeoClaw."""
+
+    cfg = config or GeoClawExportConfig()
+    root = Path(output_dir)
+    root.mkdir(parents=True, exist_ok=True)
+    scenarios = rafting_geoclaw_scenarios(seed=seed)
+    results = tuple(export_geoclaw_scenario(scenario, root / scenario.metadata.scenario_id, config=cfg) for scenario in scenarios)
+    manifest = {
+        "schema": GEOCLAW_RAFTING_SUITE_SCHEMA,
+        "suite_id": f"rafting_geoclaw_seed_{seed}",
+        "seed": seed,
+        "synthetic_cases": list(GEOCLAW_RAFTING_CASES),
+        "real_world_flow_bands": [
+            scenario.metadata.flow_band
+            for scenario in scenarios
+            if scenario.metadata.scenario_type == "real_world"
+        ],
+        "scenario_count": len(results),
+        "config": cfg.to_json_dict(),
+        "exports": [
+            {
+                "scenario_id": result.scenario_id,
+                "scenario_type": scenarios[index].metadata.scenario_type,
+                "flow_band": scenarios[index].metadata.flow_band,
+                "manifest": _relative_path(result.manifest_path, root),
+                "file_count": len(result.files),
+            }
+            for index, result in enumerate(results)
+        ],
+    }
+    manifest_path = root / "rafting_suite_manifest.json"
+    _write_json(manifest_path, manifest)
+    return GeoClawScenarioSuiteExport(
+        suite_id=f"rafting_geoclaw_seed_{seed}",
+        output_dir=root,
+        manifest_path=manifest_path,
+        results=results,
+    )
+
+
+def _rafting_case_scenario(case_id: str, seed: int) -> Scenario2_5D:
+    base = generate_procedural_scenario2_5d(
+        ProceduralScenario2_5DParameters(
+            seed=seed,
+            nx=72,
+            ny=36,
+            difficulty=0.72,
+            feature_count=9,
+            duration=8.0,
+        )
+    )
+    metadata = replace(
+        base.metadata,
+        scenario_id=f"{case_id}_seed_{seed}",
+        description=f"GeoClaw rafting fixture focused on {case_id.replace('_', ' ')}.",
+        provenance={
+            **base.metadata.provenance,
+            "geoclaw_rafting_case": case_id,
+            "source": "geoclaw_rafting_fixture_generator",
+        },
+    )
+    return replace(base, metadata=metadata, features=(*base.features, *_focus_features(base, case_id)))
+
+
+def _focus_features(scenario: Scenario2_5D, case_id: str) -> tuple[Feature2_5D, ...]:
+    x0, y0 = scenario.grid.center
+    x_span = max((scenario.grid.nx - 1) * scenario.grid.dx, scenario.grid.dx)
+    y_span = max((scenario.grid.ny - 1) * scenario.grid.dy, scenario.grid.dy)
+    radius = max(1.5 * scenario.grid.dx, 0.07 * y_span)
+    if case_id == "boulder_garden":
+        offsets = (-0.18, -0.08, 0.02, 0.12, 0.22)
+        return tuple(
+            Feature2_5D(
+                kind="rock",
+                center=(x0 + x_span * offset, y0 + ((index % 2) - 0.5) * y_span * 0.18),
+                radius=radius,
+                strength=1.25,
+                metadata={"geoclaw_case_role": "boulder_garden"},
+            )
+            for index, offset in enumerate(offsets)
+        )
+    if case_id == "cascading_wave_train":
+        return (
+            Feature2_5D(
+                kind="wave_train",
+                center=(x0, y0),
+                radius=radius * 1.4,
+                strength=1.45,
+                length=x_span * 0.42,
+                width=y_span * 0.48,
+                metadata={"geoclaw_case_role": "cascading_wave_train"},
+            ),
+        )
+    if case_id == "hydraulic_hole_downstream_boil":
+        return (
+            Feature2_5D(
+                kind="hole",
+                center=(x0 - x_span * 0.06, y0),
+                radius=radius * 1.25,
+                strength=1.35,
+                length=x_span * 0.14,
+                width=y_span * 0.32,
+                metadata={"geoclaw_case_role": "hydraulic_hole"},
+            ),
+            Feature2_5D(
+                kind="boil",
+                center=(x0 + x_span * 0.08, y0),
+                radius=radius * 1.35,
+                strength=1.15,
+                length=x_span * 0.16,
+                width=y_span * 0.34,
+                metadata={"geoclaw_case_role": "downstream_boil"},
+            ),
+        )
+    if case_id == "lateral_wave":
+        return (
+            Feature2_5D(
+                kind="lateral",
+                center=(x0, y0 + y_span * 0.17),
+                radius=radius * 1.2,
+                strength=1.35,
+                length=x_span * 0.20,
+                width=y_span * 0.38,
+                angle=-0.55,
+                metadata={"geoclaw_case_role": "lateral_wave"},
+            ),
+        )
+    if case_id == "eddy_line_shear":
+        return (
+            Feature2_5D(
+                kind="eddy_line",
+                center=(x0, y0 - y_span * 0.18),
+                radius=radius * 1.4,
+                strength=1.30,
+                length=x_span * 0.28,
+                width=y_span * 0.22,
+                metadata={"geoclaw_case_role": "eddy_line_shear"},
+            ),
+        )
+    if case_id == "shallow_shelf":
+        return (
+            Feature2_5D(
+                kind="shallow",
+                center=(x0 + x_span * 0.05, y0 + y_span * 0.20),
+                radius=radius * 1.6,
+                strength=1.30,
+                length=x_span * 0.30,
+                width=y_span * 0.30,
+                metadata={"geoclaw_case_role": "shallow_shelf"},
+            ),
+        )
+    raise ValueError(f"Unknown GeoClaw rafting case: {case_id}")
 
 
 def _write_shared_scenario_package(scenario: Scenario2_5D, root: Path) -> list[str]:

@@ -156,6 +156,15 @@ PYTHONPATH=src python -m raftsim.examples.run_geoclaw_reference --all-fixtures -
 
 The suite includes flat pool, uniform channel, dam-break/bore, bed step, constriction, wet/dry shoreline, sloping Manning channel, and drop/ledge fixtures.
 
+Export the rafting/real-world GeoClaw suite with:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.run_geoclaw_reference --rafting-suite --allow-unavailable
+```
+
+That suite includes boulder garden, cascading wave train, hydraulic hole/downstream boil, lateral wave, eddy-line shear, shallow shelf, and South Fork American low/median/high runnable flow scenarios.
+
 ## PyClaw Reference Harness
 
 PyClaw is now a legacy reference path. Its outputs are useful for historical regression checks and provenance, but they are not the active acceptance target for C++ or Unreal water. Install it with the same research extra when you need to inspect old runs:

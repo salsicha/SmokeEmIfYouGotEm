@@ -7,6 +7,8 @@ from raftsim.geoclaw_reference import (
     GEOCLAW_CANONICAL_FIXTURES,
     GEOCLAW_CANONICAL_SUITE_SCHEMA,
     GEOCLAW_EXPORT_SCHEMA,
+    GEOCLAW_RAFTING_CASES,
+    GEOCLAW_RAFTING_SUITE_SCHEMA,
     GEOCLAW_REQUIRED_MODULES,
     GeoClawExportConfig,
     GeoClawAvailability,
@@ -14,7 +16,9 @@ from raftsim.geoclaw_reference import (
     canonical_geoclaw_scenarios,
     check_geoclaw_availability,
     export_canonical_geoclaw_scenarios,
+    export_rafting_geoclaw_scenarios,
     export_geoclaw_scenario,
+    rafting_geoclaw_scenarios,
     write_geoclaw_setup_report,
 )
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
@@ -176,3 +180,49 @@ def test_geoclaw_cli_exports_canonical_fixture_suite(tmp_path):
 
     assert exit_code == 0
     assert (tmp_path / "canonical_geoclaw_seed_3" / "canonical_suite_manifest.json").exists()
+
+
+def test_rafting_geoclaw_scenarios_include_feature_cases_and_real_world_flows():
+    scenarios = rafting_geoclaw_scenarios(seed=20)
+    synthetic = [scenario for scenario in scenarios if scenario.metadata.scenario_type == "procedural"]
+    real_world = [scenario for scenario in scenarios if scenario.metadata.scenario_type == "real_world"]
+
+    assert [scenario.metadata.provenance["geoclaw_rafting_case"] for scenario in synthetic] == list(GEOCLAW_RAFTING_CASES)
+    assert {scenario.metadata.flow_band for scenario in real_world} == {
+        "low_runnable",
+        "median_runnable",
+        "high_runnable",
+    }
+    assert len(scenarios) == 9
+    assert all(scenario.validate().passed for scenario in scenarios)
+
+
+def test_export_rafting_geoclaw_scenarios_writes_suite_manifest(tmp_path):
+    suite = export_rafting_geoclaw_scenarios(
+        tmp_path / "rafting",
+        seed=4,
+        config=GeoClawExportConfig(num_output_times=2),
+    )
+    manifest = json.loads(suite.manifest_path.read_text(encoding="utf-8"))
+
+    assert manifest["schema"] == GEOCLAW_RAFTING_SUITE_SCHEMA
+    assert manifest["scenario_count"] == 9
+    assert manifest["synthetic_cases"] == list(GEOCLAW_RAFTING_CASES)
+    assert set(manifest["real_world_flow_bands"]) == {"low_runnable", "median_runnable", "high_runnable"}
+    assert all((suite.output_dir / export["manifest"]).exists() for export in manifest["exports"])
+
+
+def test_geoclaw_cli_exports_rafting_suite(tmp_path):
+    exit_code = geoclaw_main(
+        [
+            "--rafting-suite",
+            "--seed",
+            "5",
+            "--allow-unavailable",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert (tmp_path / "rafting_geoclaw_seed_5" / "rafting_suite_manifest.json").exists()
