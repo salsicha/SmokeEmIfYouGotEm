@@ -59,6 +59,17 @@ from .pyclaw_reference import (
     run_pyclaw_reference,
     write_unavailable_report,
 )
+from .geoclaw_reference import (
+    GEOCLAW_REFERENCE_DOCS,
+    GEOCLAW_RECOMMENDED_EXECUTABLES,
+    GEOCLAW_REQUIRED_MODULES,
+    GeoClawAvailability,
+    GeoClawSetupReport,
+    GeoClawUnavailableError,
+    build_geoclaw_setup_report,
+    check_geoclaw_availability,
+    write_geoclaw_setup_report,
+)
 from .dual_solver import (
     CppSolverRunConfig,
     CppSolverRunResult,
