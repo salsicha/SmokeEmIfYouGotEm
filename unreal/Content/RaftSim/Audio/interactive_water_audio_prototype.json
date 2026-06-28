@@ -1,0 +1,28 @@
+{
+  "schema": "raftsim.unreal.interactive_water_audio_prototype.v1",
+  "module": "RaftSimAudio",
+  "parameter_function": "RaftSimAudio::BuildWaterAudioParameters",
+  "asset_policy": "recorded_or_downloaded_assets_first",
+  "metasound_layers": [
+    "river_bed_loop",
+    "nearby_rapid_feature",
+    "hydraulic_hole",
+    "eddy_line_shear",
+    "spray_and_foam",
+    "raft_scrape",
+    "rock_impact",
+    "paddle_catch",
+    "weather",
+    "canyon_reflection"
+  ],
+  "runtime_inputs": [
+    "flow_speed_mps",
+    "aeration",
+    "turbulence",
+    "raft_impact_impulse",
+    "paddle_catch_strength",
+    "rock_scrape_strength",
+    "weather_wetness",
+    "camera_perspective"
+  ]
+}
