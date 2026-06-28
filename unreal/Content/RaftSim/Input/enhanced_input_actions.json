@@ -1,0 +1,76 @@
+{
+  "schema": "raftsim.unreal.enhanced_input_actions.v1",
+  "mapping_contexts": [
+    {
+      "context_id": "IMC_GuideFlatScreen",
+      "priority": 10,
+      "devices": ["keyboard_mouse", "gamepad"]
+    },
+    {
+      "context_id": "IMC_GuideVR",
+      "priority": 20,
+      "devices": ["vr_motion_controllers"]
+    },
+    {
+      "context_id": "IMC_ReplayDebug",
+      "priority": 30,
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"]
+    }
+  ],
+  "actions": [
+    {
+      "action_id": "PaddleStroke",
+      "value_type": "Axis3D",
+      "devices": ["vr_motion_controllers", "keyboard_mouse", "gamepad"],
+      "deterministic_intent": "guide_paddle_stroke"
+    },
+    {
+      "action_id": "PaddleBrace",
+      "value_type": "Boolean",
+      "devices": ["vr_motion_controllers", "keyboard_mouse", "gamepad"],
+      "deterministic_intent": "guide_brace"
+    },
+    {
+      "action_id": "PaddleDraw",
+      "value_type": "Axis2D",
+      "devices": ["vr_motion_controllers", "keyboard_mouse", "gamepad"],
+      "deterministic_intent": "guide_draw_or_rudder"
+    },
+    {
+      "action_id": "HighSide",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad"],
+      "deterministic_intent": "crew_high_side"
+    },
+    {
+      "action_id": "HoldOn",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "deterministic_intent": "crew_hold_on"
+    },
+    {
+      "action_id": "GuideCommandPushToTalk",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "deterministic_intent": "voice_command_gate"
+    },
+    {
+      "action_id": "RecenterVR",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "deterministic_intent": "recenter_guide_camera"
+    },
+    {
+      "action_id": "ReplayScrub",
+      "value_type": "Axis1D",
+      "devices": ["keyboard_mouse", "gamepad"],
+      "deterministic_intent": "debug_replay_scrub"
+    },
+    {
+      "action_id": "DebugOverlayToggle",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse"],
+      "deterministic_intent": "debug_overlay_toggle"
+    }
+  ]
+}
