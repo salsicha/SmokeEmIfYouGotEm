@@ -63,11 +63,15 @@ from .geoclaw_reference import (
     GEOCLAW_REFERENCE_DOCS,
     GEOCLAW_RECOMMENDED_EXECUTABLES,
     GEOCLAW_REQUIRED_MODULES,
+    GEOCLAW_EXPORT_SCHEMA,
     GeoClawAvailability,
+    GeoClawExportConfig,
+    GeoClawExportResult,
     GeoClawSetupReport,
     GeoClawUnavailableError,
     build_geoclaw_setup_report,
     check_geoclaw_availability,
+    export_geoclaw_scenario,
     write_geoclaw_setup_report,
 )
 from .dual_solver import (
