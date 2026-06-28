@@ -1,0 +1,72 @@
+{
+  "schema": "raftsim.unreal.raft_patch_layout.v1",
+  "deterministic_order": true,
+  "coordinate_space": "raft_local_meters",
+  "force_channels": [
+    "buoyancy",
+    "drag",
+    "added_mass",
+    "surface_slope",
+    "eddy_line_shear",
+    "boil_upwelling",
+    "paddle"
+  ],
+  "patches": [
+    {
+      "patch_id": "stern_left_tube",
+      "role": "tube",
+      "local_position_m": [-1.55, -0.82, 0.0],
+      "area_m2": 0.34,
+      "channels": ["buoyancy", "drag", "added_mass", "eddy_line_shear"]
+    },
+    {
+      "patch_id": "stern_right_tube",
+      "role": "tube",
+      "local_position_m": [-1.55, 0.82, 0.0],
+      "area_m2": 0.34,
+      "channels": ["buoyancy", "drag", "added_mass", "eddy_line_shear"]
+    },
+    {
+      "patch_id": "mid_left_tube",
+      "role": "tube",
+      "local_position_m": [0.0, -0.92, 0.0],
+      "area_m2": 0.42,
+      "channels": ["buoyancy", "drag", "added_mass", "surface_slope", "eddy_line_shear", "boil_upwelling"]
+    },
+    {
+      "patch_id": "mid_right_tube",
+      "role": "tube",
+      "local_position_m": [0.0, 0.92, 0.0],
+      "area_m2": 0.42,
+      "channels": ["buoyancy", "drag", "added_mass", "surface_slope", "eddy_line_shear", "boil_upwelling"]
+    },
+    {
+      "patch_id": "bow_left_tube",
+      "role": "tube",
+      "local_position_m": [1.55, -0.82, 0.0],
+      "area_m2": 0.34,
+      "channels": ["buoyancy", "drag", "added_mass", "surface_slope"]
+    },
+    {
+      "patch_id": "bow_right_tube",
+      "role": "tube",
+      "local_position_m": [1.55, 0.82, 0.0],
+      "area_m2": 0.34,
+      "channels": ["buoyancy", "drag", "added_mass", "surface_slope"]
+    },
+    {
+      "patch_id": "floor_center",
+      "role": "floor",
+      "local_position_m": [0.0, 0.0, -0.18],
+      "area_m2": 1.65,
+      "channels": ["buoyancy", "drag", "added_mass", "boil_upwelling"]
+    },
+    {
+      "patch_id": "guide_paddle_blade",
+      "role": "paddle_blade",
+      "local_position_m": [-1.8, -1.05, -0.2],
+      "area_m2": 0.08,
+      "channels": ["paddle", "drag"]
+    }
+  ]
+}
