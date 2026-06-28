@@ -234,7 +234,7 @@ Conditionally superseded for live water by Milestone 14. Telemetry/replay playba
 
 ## Milestone 14: GeoClaw Reference Solver Transition
 
-- [ ] Freeze existing PyClaw outputs as legacy regression artifacts, not acceptance targets.
+- [x] Freeze existing PyClaw outputs as legacy regression artifacts, not acceptance targets.
 - [ ] Add GeoClaw availability/setup checks and document system dependencies.
 - [ ] Build a shared-scenario-to-GeoClaw exporter for `setrun.py`, topography files, initial water state, roughness, boundaries, hydrographs, AMR regions, and fixed-grid output.
 - [ ] Convert canonical fixtures to GeoClaw: flat pool, uniform channel, dam-break/bore, bed step, constriction, wet/dry shoreline, sloping channel with Manning friction, and drop/ledge over variable topography.
