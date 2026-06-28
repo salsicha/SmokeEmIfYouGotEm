@@ -60,6 +60,16 @@ def test_fixture_semantics_cover_core_schema_cases():
     assert any(feature.kind == "constriction" for feature in constriction.features)
     assert constriction.initial_state.u.max() > constriction.initial_state.u[:, 0].mean()
 
+    sloping = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="sloping_manning_channel", nx=20, ny=10)
+    )
+    assert sloping.roughness > 0.05
+    assert sloping.bed[:, 0].mean() > sloping.bed[:, -1].mean()
+
+    drop = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="drop_ledge", nx=24, ny=10))
+    assert any(feature.kind == "ledge" for feature in drop.features)
+    assert drop.bed[:, 0].mean() > drop.bed[:, -1].mean()
+
 
 def test_scenario_json_points_to_solver_neutral_files(tmp_path):
     scenario = generate_fixture_scenario2_5d(FixtureScenario2_5DParameters(fixture="bed_step", nx=18, ny=8))

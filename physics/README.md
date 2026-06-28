@@ -99,6 +99,8 @@ Available fixtures:
 - `bed_step`
 - `constriction`
 - `wet_dry_shoreline`
+- `sloping_manning_channel`
+- `drop_ledge`
 
 Generate a deterministic procedural rafting rapid with:
 
@@ -144,6 +146,15 @@ The setup check writes `outputs/geoclaw_reference/geoclaw_setup_report.json`. A 
 - `gfortran` or a compatible Fortran compiler
 
 Reference docs are recorded in the setup report and in `docs/geoclaw-transition-plan.md`.
+
+Export the canonical GeoClaw fixture suite with:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.run_geoclaw_reference --all-fixtures --allow-unavailable
+```
+
+The suite includes flat pool, uniform channel, dam-break/bore, bed step, constriction, wet/dry shoreline, sloping Manning channel, and drop/ledge fixtures.
 
 ## PyClaw Reference Harness
 
