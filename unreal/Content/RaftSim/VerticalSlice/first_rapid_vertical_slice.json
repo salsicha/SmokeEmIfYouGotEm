@@ -1,0 +1,34 @@
+{
+  "schema": "raftsim.unreal.first_rapid_vertical_slice.v1",
+  "game_mode": "ARaftSimVerticalSliceGameMode",
+  "default_pawn": "ARaftSimGuidePawn",
+  "map": "/Game/RaftSim/Maps/L_RaftSimBoot",
+  "scenario_sources": {
+    "replay_manifest": "../../physics/data/readiness/milestone_10/unreal_visualization/manifest.json",
+    "river_selection_catalog": "../UI/river_selection_catalog.json",
+    "first_section": "american_south_fork/chili_bar_to_coloma"
+  },
+  "training": {
+    "included": true,
+    "lessons": ["forward_paddle", "back_paddle", "brace", "hold_on", "eddy_turn_intro"]
+  },
+  "scoring": {
+    "breakdown": ["safety", "line_choice", "boat_angle", "paddle_efficiency", "crew_trust"],
+    "after_action_feedback": true
+  },
+  "restart": {
+    "quick_restart": true,
+    "reset_score": true,
+    "reset_replay_frame": true
+  },
+  "replay": {
+    "enabled": true,
+    "source_first": "telemetry_playback_before_live_physics"
+  },
+  "debug_force_visualization": {
+    "enabled": true,
+    "vectors": ["buoyancy", "drag", "added_mass", "paddle", "contact", "eddy_shear", "boil_upwelling"],
+    "contacts": ["rock", "bed", "bank", "ledge", "strainer"]
+  },
+  "status": "source_scaffold_ready_pending_unreal_editor_compile_and_map_authoring"
+}
