@@ -31,6 +31,12 @@ struct FRaftSimWaterAudioTelemetry
     float WeatherWetness = 0.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Audio")
+    float CanyonEnclosure = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Audio")
+    float CrewVoiceActivity = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Audio")
     FName CameraPerspective = TEXT("stern_guide");
 };
 
@@ -56,6 +62,15 @@ struct FRaftSimWaterAudioParameters
 
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Audio")
     float ScrapeLayer = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Audio")
+    float WeatherLayer = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Audio")
+    float CanyonReflection = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Audio")
+    float CrewVoiceDuckAmount = 0.0f;
 };
 
 namespace RaftSimAudio
