@@ -52,6 +52,26 @@ shared scenario package
 
 The C++ solver does not need to duplicate GeoClaw numerics. It must match GeoClaw outputs and raft-relevant behavior within accepted tolerances.
 
+## Local Setup Check
+
+The Python package now includes a GeoClaw setup check:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.run_geoclaw_reference --check --allow-unavailable
+```
+
+The check writes `outputs/geoclaw_reference/geoclaw_setup_report.json` and verifies the required Clawpack Python modules plus local build tools normally needed by GeoClaw reference runs:
+
+- `clawpack`
+- `clawpack.geoclaw`
+- `clawpack.clawutil`
+- `clawpack.pyclaw`
+- `make`
+- `gfortran` or a compatible Fortran compiler
+
+Install the Python research dependency with `python -m pip install -e ".[research]"`, then install compiler tools through the host platform package manager when the setup report flags missing build executables.
+
 ## Transition Steps
 
 1. Freeze PyClaw outputs as legacy baseline artifacts.
