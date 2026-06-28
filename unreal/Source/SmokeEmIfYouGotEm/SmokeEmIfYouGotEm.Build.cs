@@ -10,7 +10,13 @@ public class SmokeEmIfYouGotEm : ModuleRules
         {
             "Core",
             "CoreUObject",
-            "Engine"
+            "Engine",
+            "RaftSimCore",
+            "RaftSimPhysics",
+            "RaftSimRaft",
+            "RaftSimUI",
+            "RaftSimDebug",
+            "RaftSimAudio"
         });
     }
 }
