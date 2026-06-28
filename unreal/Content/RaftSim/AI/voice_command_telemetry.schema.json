@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "raftsim.unreal.voice_command_telemetry.v1",
+  "title": "RaftSim Voice Command Telemetry Event",
+  "type": "object",
+  "required": [
+    "physics_frame",
+    "recognized_phrase",
+    "intent",
+    "confidence",
+    "command_latency_ms",
+    "crew_response",
+    "conversation_state",
+    "command_outcome"
+  ],
+  "properties": {
+    "physics_frame": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "recognized_phrase": {
+      "type": "string"
+    },
+    "intent": {
+      "type": "string",
+      "enum": [
+        "None",
+        "ForwardPaddle",
+        "BackPaddle",
+        "LeftPaddle",
+        "RightPaddle",
+        "Stop",
+        "Brace",
+        "HoldOn",
+        "HighSide",
+        "Rescue",
+        "Recovery"
+      ]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "command_latency_ms": {
+      "type": "number",
+      "minimum": 0.0
+    },
+    "crew_response": {
+      "type": "string"
+    },
+    "conversation_state": {
+      "type": "string"
+    },
+    "command_outcome": {
+      "type": "string",
+      "enum": [
+        "IgnoredLowConfidence",
+        "ConfirmationRequested",
+        "Executed",
+        "RejectedUnsafe",
+        "TimedOut"
+      ]
+    }
+  }
+}
