@@ -178,7 +178,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Keep Unreal Chaos available only for incidental non-authoritative effects.
 - [x] Enable OpenXR-based VR support.
 - [x] Implement telemetry/replay playback in Unreal before live native physics.
-- [ ] Define fixed-step water/raft scheduling and Unreal render interpolation.
+- [x] Define fixed-step water/raft scheduling and Unreal render interpolation.
 - [ ] Set up Enhanced Input actions for VR controllers, keyboard, mouse, and gamepad.
 - [ ] Build the first-person guide camera with flat-screen and VR comfort options.
 - [ ] Build river, season, flow, difficulty, and raft/crew selection UI from validated data assets.
