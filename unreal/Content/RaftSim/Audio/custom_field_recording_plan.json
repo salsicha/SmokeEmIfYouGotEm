@@ -1,0 +1,74 @@
+{
+  "schema": "raftsim.unreal.custom_field_recording_plan.v1",
+  "first_target": {
+    "river_id": "american_south_fork",
+    "section_id": "chili_bar_to_coloma",
+    "reason": "validated scenario package and strong guide-seat reference value"
+  },
+  "flow_targets": [
+    "low_runnable",
+    "median_runnable",
+    "high_runnable"
+  ],
+  "perspectives": [
+    "stern_guide_seat",
+    "bow",
+    "mid_raft_passenger",
+    "shore_scout",
+    "eddy",
+    "rapid_feature_close_pass",
+    "underwater_hydrophone",
+    "canyon_wall_reflection",
+    "rescue_swimmer"
+  ],
+  "capture_kit": [
+    "ambisonic_microphone",
+    "ortf_or_xy_stereo_pair",
+    "spaced_stereo_pair",
+    "close_mono_dynamic_or_condenser",
+    "hydrophone",
+    "timecode_or_slate",
+    "weatherproof_recorders",
+    "dry_bags_and_shock_mounts"
+  ],
+  "must_capture": [
+    "river_beds",
+    "nearby_rapids",
+    "hydraulic_holes",
+    "wave_trains",
+    "eddies",
+    "boils",
+    "raft_tube_impacts",
+    "rock_scrapes",
+    "paddle_catches",
+    "blade_slips",
+    "rope_and_throw_bag",
+    "pump_and_gear",
+    "pfd_helmet_movement",
+    "wet_footsteps",
+    "crew_reactions",
+    "rescue_calls"
+  ],
+  "safety_and_rights": {
+    "professional_river_safety_required": true,
+    "land_access_and_permits_required": true,
+    "flow_and_weather_go_no_go_required": true,
+    "performer_consent_required_for_voices": true,
+    "audio_team_not_rescue_critical": true
+  },
+  "metadata_required": [
+    "river",
+    "section",
+    "rapid",
+    "flow_or_gauge",
+    "weather",
+    "season",
+    "position",
+    "mic_setup",
+    "recordist",
+    "date_time",
+    "take_id",
+    "safety_notes",
+    "intended_unreal_context"
+  ]
+}
