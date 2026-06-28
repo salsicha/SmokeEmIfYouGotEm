@@ -1,0 +1,48 @@
+{
+  "schema": "raftsim.unreal.contact_material_presets.v1",
+  "surface_class": "riverbed",
+  "chrono_contact_model": "compliant_smc",
+  "presets": [
+    {
+      "preset_id": "bed_inelastic_default",
+      "restitution": 0.01,
+      "normal_stiffness": 9000.0,
+      "normal_damping": 3200.0,
+      "tangential_friction": 0.88,
+      "rolling_friction": 0.18,
+      "stick_slip_velocity_mps": 0.12,
+      "contact_hysteresis_m": 0.035,
+      "telemetry_tags": ["ground", "scrape", "drag", "unstick"]
+    },
+    {
+      "preset_id": "bed_inelastic_shallow_shelf",
+      "restitution": 0.0,
+      "normal_stiffness": 10500.0,
+      "normal_damping": 3800.0,
+      "tangential_friction": 0.94,
+      "rolling_friction": 0.22,
+      "stick_slip_velocity_mps": 0.1,
+      "contact_hysteresis_m": 0.05,
+      "telemetry_tags": ["ground", "pivot", "scrape", "drag"]
+    },
+    {
+      "preset_id": "strainer_high_friction_pin",
+      "restitution": 0.03,
+      "normal_stiffness": 12500.0,
+      "normal_damping": 3000.0,
+      "tangential_friction": 1.15,
+      "rolling_friction": 0.35,
+      "stick_slip_velocity_mps": 0.05,
+      "contact_hysteresis_m": 0.06,
+      "telemetry_tags": ["pin", "hold", "scrape", "release"]
+    }
+  ],
+  "sweep_ranges": {
+    "restitution": [0.0, 0.05],
+    "normal_stiffness": [6000.0, 16000.0],
+    "normal_damping": [2200.0, 5200.0],
+    "tangential_friction": [0.65, 1.25],
+    "contact_hysteresis_m": [0.01, 0.08]
+  },
+  "tuning_goal": "raft_grounds_and_scrapes_without_elastic_bed_bounce_or_contact_chatter"
+}

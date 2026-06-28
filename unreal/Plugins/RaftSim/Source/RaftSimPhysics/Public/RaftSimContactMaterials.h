@@ -43,6 +43,12 @@ struct FRaftSimContactMaterialPreset
     float RollingFriction = 0.05f;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Contact")
+    float StickSlipVelocityMetersPerSecond = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Contact")
+    float ContactHysteresisMeters = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Contact")
     TArray<FName> TelemetryTags;
 };
 
