@@ -1,0 +1,99 @@
+{
+  "schema": "raftsim.unreal.spatial_audio_platform_validation.v1",
+  "listener_anchor": "guide_seat_stern",
+  "source_case_manifest": "unreal/Content/RaftSim/Audio/stern_guide_spatial_audio_validation.json",
+  "platform_targets": [
+    {
+      "target": "StereoSpeakers",
+      "requires_physical_device": false,
+      "required_cases": [
+        "nearby_rock_hazard_left",
+        "rapid_downstream_large_source",
+        "crew_positions",
+        "guide_voice_command_feedback",
+        "raft_contact_scrape"
+      ],
+      "required_metrics": [
+        "downmix_balance",
+        "front_stage_readability",
+        "voice_intelligibility",
+        "low_frequency_balance"
+      ],
+      "pass_criteria": "hazards_and_voice_remain_readable_without_binaural_processing"
+    },
+    {
+      "target": "Headphones",
+      "requires_physical_device": true,
+      "required_cases": [
+        "nearby_rock_hazard_left",
+        "rapid_downstream_large_source",
+        "crew_positions",
+        "multiplayer_voice_seats",
+        "near_water_underwater_state"
+      ],
+      "required_metrics": [
+        "azimuth_accuracy",
+        "seat_localization",
+        "front_back_confusion_rate",
+        "fatigue_rating"
+      ],
+      "pass_criteria": "binaural_localization_is_stable_and_nonfatiguing_for_rapid_runs"
+    },
+    {
+      "target": "VRBinauralHRTF",
+      "requires_physical_device": true,
+      "required_cases": [
+        "nearby_rock_hazard_left",
+        "rapid_downstream_large_source",
+        "hydraulic_hole_center",
+        "crew_positions",
+        "canyon_reflection_pass",
+        "near_water_underwater_state"
+      ],
+      "required_metrics": [
+        "head_tracked_stability",
+        "ambisonic_rotation_accuracy",
+        "comfort",
+        "front_back_confusion_rate",
+        "motion_to_audio_latency"
+      ],
+      "pass_criteria": "head_tracked_audio_preserves_localization_during_raft_motion_and_head_turns"
+    },
+    {
+      "target": "Surround5_1",
+      "requires_physical_device": true,
+      "required_cases": [
+        "rapid_downstream_large_source",
+        "crew_positions",
+        "guide_voice_command_feedback",
+        "canyon_reflection_pass",
+        "rescue_cue_swimmer"
+      ],
+      "required_metrics": [
+        "center_channel_voice_clarity",
+        "lfe_discipline",
+        "surround_wrap_continuity",
+        "reverb_transition"
+      ],
+      "pass_criteria": "surround_mix_adds_space_without_masking_voice_or_hazard_cues"
+    },
+    {
+      "target": "Surround7_1",
+      "requires_physical_device": true,
+      "required_cases": [
+        "rapid_downstream_large_source",
+        "multiplayer_voice_seats",
+        "canyon_reflection_pass",
+        "raft_contact_scrape",
+        "rescue_cue_swimmer"
+      ],
+      "required_metrics": [
+        "side_rear_continuity",
+        "large_source_spread",
+        "voice_position_stability",
+        "priority_ducking"
+      ],
+      "pass_criteria": "side_and_rear_channels_extend_rapids_and_ambience_without_phantom_gaps"
+    }
+  ]
+}
