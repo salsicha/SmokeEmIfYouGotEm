@@ -165,7 +165,7 @@ See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.m
 - [x] Re-check the latest stable Unreal Engine 5.x feature set, then choose the exact version for visualization and VR.
 - [x] Create the Unreal project only after the readiness gate is complete.
 - [x] Enable the current UE5 photoreal open-world stack where supported: Nanite, Nanite foliage, Nanite landscapes/splines/tessellation, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, Substrate/material layering, and OpenXR.
-- [ ] Create the Unreal module/plugin skeleton: core, physics bridge, river, raft, input, UI, and debug modules.
+- [x] Create the Unreal module/plugin skeleton: core, physics bridge, river, raft, input, UI, and debug modules.
 - [ ] Integrate the custom C++ water solver as the runtime water field candidate.
 - [ ] Integrate Chrono/custom raft dynamics as selected by the readiness report.
 - [ ] Implement the fixed-step Chrono water/raft bridge: custom C++ shallow-water snapshot feeds Chrono raft substeps, Chrono returns authoritative raft pose, velocity, contacts, and force telemetry.
