@@ -19,6 +19,7 @@ from .scenario2_5d import Scenario2_5D, read_scenario2_5d_package
 @dataclass(frozen=True, slots=True)
 class ChronoBridgeTelemetryComparisonReport:
     scenario_id: str
+    reference_solver: str
     force_delta: tuple[float, float, float]
     torque_delta: tuple[float, float, float]
     trajectory_position_delta: float
@@ -30,6 +31,7 @@ class ChronoBridgeTelemetryComparisonReport:
     def to_json_dict(self) -> dict[str, object]:
         return {
             "scenario_id": self.scenario_id,
+            "reference_solver": self.reference_solver,
             "force_delta": list(self.force_delta),
             "torque_delta": list(self.torque_delta),
             "trajectory_position_delta": self.trajectory_position_delta,
@@ -52,23 +54,25 @@ def compare_chrono_bridge_telemetry(
     output_path: str | Path | None = None,
     state: RaftState6DoF | None = None,
 ) -> ChronoBridgeTelemetryComparisonReport:
-    """Compare C++ custom-water bridge telemetry against PyClaw/Python reference output."""
+    """Compare C++ custom-water bridge telemetry against normalized reference output."""
 
     manifest_path = _manifest_path(dual_solver_dir_or_manifest)
     root = manifest_path.parent
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     scenario = read_scenario2_5d_package(root / manifest["scenario_package"])
-    pyclaw_manifest = _load_manifest(root / manifest["pyclaw"]["manifest"])
+    reference = _reference_solver_entry(manifest, root)
+    reference_manifest = _load_manifest(reference["manifest_path"])
     cpp_manifest = _load_manifest(root / manifest["cpp"]["manifest"])
-    pyclaw_output = root / manifest["pyclaw"]["output_dir"]
+    reference_output = reference["output_dir"]
     cpp_output = root / manifest["cpp"]["output_dir"]
-    pyclaw_water = WaterField2_5D.from_pyclaw_frame_npz(scenario, pyclaw_output / pyclaw_manifest["frames"][-1])
+    reference_water = WaterField2_5D.from_reference_frame_npz(scenario, reference_output / reference_manifest["frames"][-1])
     cpp_water = WaterField2_5D.from_cpp_frame_csv(scenario, cpp_output / cpp_manifest["frames"][-1])
-    comparison_state = state or _default_bridge_state(scenario, pyclaw_water)
+    comparison_state = state or _default_bridge_state(scenario, reference_water)
     properties = build_default_raft_mass_properties(scenario.raft)
-    comparison = compare_raft_force_samples(pyclaw_water, cpp_water, comparison_state, properties)
+    comparison = compare_raft_force_samples(reference_water, cpp_water, comparison_state, properties)
     report = ChronoBridgeTelemetryComparisonReport(
         scenario_id=manifest["scenario_id"],
+        reference_solver=reference["solver"],
         force_delta=comparison.force_delta.as_tuple(),
         torque_delta=comparison.torque_delta.as_tuple(),
         trajectory_position_delta=comparison.trajectory_position_delta,
@@ -97,3 +101,18 @@ def _manifest_path(path: str | Path) -> Path:
 
 def _load_manifest(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _reference_solver_entry(manifest: dict[str, object], root: Path) -> dict[str, object]:
+    for solver in ("geoclaw", "reference", "pyclaw"):
+        if solver not in manifest:
+            continue
+        entry = manifest[solver]
+        if not isinstance(entry, dict):
+            raise ValueError(f"{solver} manifest entry must be an object.")
+        return {
+            "solver": str(entry.get("solver", "geoclaw" if solver == "reference" else solver)),
+            "output_dir": root / str(entry["output_dir"]),
+            "manifest_path": root / str(entry["manifest"]),
+        }
+    raise ValueError("Bridge comparison manifest must include a geoclaw, reference, or pyclaw entry.")

@@ -187,6 +187,8 @@ PYTHONPATH=src python -m raftsim.examples.tune_cpp_solver \
 
 The legacy PyClaw tuning path remains available with `--reference-solver pyclaw` for historical regression checks.
 
+Raft force/trajectory comparison now reads the active reference block from `dual_solver_manifest.json`, so GeoClaw-normalized frames and legacy PyClaw frames both feed the same coupling validation path.
+
 ## PyClaw Reference Harness
 
 PyClaw is now a legacy reference path. Its outputs are useful for historical regression checks and provenance, but they are not the active acceptance target for C++ or Unreal water. Install it with the same research extra when you need to inspect old runs:
