@@ -2,6 +2,7 @@ import pytest
 
 from raftsim.cascading import (
     BankShape2_5D,
+    DropTransitionMetadata2_5D,
     ReachGridTransform2_5D,
     ReachMetadata2_5D,
     StationProfilePoint2_5D,
@@ -70,3 +71,66 @@ def test_reach_metadata_rejects_negative_or_unbounded_controls():
         _reach(confidence_score=-0.1)
     with pytest.raises(ValueError, match="width"):
         _reach(width_profile=(StationProfilePoint2_5D(0.0, 0.0),))
+
+
+def test_drop_transition_metadata_round_trips_required_milestone_fields():
+    transition = DropTransitionMetadata2_5D(
+        transition_id="drop_001",
+        upstream_reach_id="pool_001",
+        downstream_reach_id="wave_train_001",
+        crest_station=42.0,
+        bed_elevation_fall=1.15,
+        geometry_kind="ledge",
+        ramp_length=2.0,
+        ledge_length=0.75,
+        tailwater_depth=1.4,
+        expected_hydraulic_control="retentive_hole",
+        recirculation_risk=0.64,
+        aeration_proxy=0.82,
+        turbulence_proxy=0.77,
+        hazard_tags=("hole", "keeper", "raft_flip"),
+    )
+
+    data = transition.to_json_dict()
+    loaded = DropTransitionMetadata2_5D.from_json_dict(data)
+
+    assert loaded == transition
+    assert data["crest_station"] == 42.0
+    assert data["bed_elevation_fall"] == 1.15
+    assert data["control_length"] == 2.75
+    assert data["tailwater_depth"] == 1.4
+    assert data["expected_hydraulic_control"] == "retentive_hole"
+    assert data["recirculation_risk"] == 0.64
+    assert data["aeration_proxy"] == 0.82
+    assert data["turbulence_proxy"] == 0.77
+    assert data["hazard_tags"] == ["hole", "keeper", "raft_flip"]
+
+
+def test_drop_transition_metadata_rejects_invalid_handoff_controls():
+    with pytest.raises(ValueError, match="distinct reaches"):
+        DropTransitionMetadata2_5D(
+            transition_id="bad",
+            upstream_reach_id="same",
+            downstream_reach_id="same",
+            crest_station=12.0,
+            bed_elevation_fall=0.4,
+            ramp_length=2.0,
+        )
+    with pytest.raises(ValueError, match="ramp or ledge"):
+        DropTransitionMetadata2_5D(
+            transition_id="bad",
+            upstream_reach_id="a",
+            downstream_reach_id="b",
+            crest_station=12.0,
+            bed_elevation_fall=0.4,
+        )
+    with pytest.raises(ValueError, match="recirculation"):
+        DropTransitionMetadata2_5D(
+            transition_id="bad",
+            upstream_reach_id="a",
+            downstream_reach_id="b",
+            crest_station=12.0,
+            bed_elevation_fall=0.4,
+            ramp_length=2.0,
+            recirculation_risk=1.4,
+        )
