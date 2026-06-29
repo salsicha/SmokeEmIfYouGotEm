@@ -46,6 +46,7 @@ from .scenario2_5d import (
 from .cascading import (
     CASCADING_SCHEMA_VERSION,
     BankShape2_5D,
+    DropTransitionMetadata2_5D,
     ReachGridTransform2_5D,
     ReachMetadata2_5D,
     StationProfilePoint2_5D,
@@ -276,6 +277,7 @@ __all__ = [
     "CppTuningCandidateResult",
     "CppTuningReport",
     "CANONICAL_RUN_OUTCOMES",
+    "DropTransitionMetadata2_5D",
     "DualSolverRunConfig",
     "DualSolverRunResult",
     "DiagnosticDeltaSummary",

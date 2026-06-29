@@ -10,6 +10,15 @@ MetadataValue = str | int | float | bool | None
 CASCADING_SCHEMA_VERSION = "raftsim.cascading2_5d.v0"
 ReachKind2_5D = Literal["pool", "tongue", "drop", "wave_train", "eddy_recovery", "boulder_garden", "runout"]
 BankShapeKind2_5D = Literal["trapezoid", "bedrock", "alluvial", "vegetated", "constructed", "unknown"]
+DropGeometryKind2_5D = Literal["ramp", "ledge", "mixed"]
+HydraulicControlKind2_5D = Literal[
+    "subcritical_pool_tailwater",
+    "critical_crest",
+    "hydraulic_jump",
+    "retentive_hole",
+    "wave_train",
+    "unknown",
+]
 
 
 @dataclass(frozen=True, slots=True)
@@ -191,5 +200,94 @@ class ReachMetadata2_5D:
             vegetation_flags=tuple(str(value) for value in data.get("vegetation_flags", [])),  # type: ignore[union-attr]
             debris_flags=tuple(str(value) for value in data.get("debris_flags", [])),  # type: ignore[union-attr]
             confidence_score=float(data.get("confidence_score", 0.5)),
+            metadata=data.get("metadata", {}) if isinstance(data.get("metadata", {}), dict) else {},
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class DropTransitionMetadata2_5D:
+    transition_id: str
+    upstream_reach_id: str
+    downstream_reach_id: str
+    crest_station: float
+    bed_elevation_fall: float
+    geometry_kind: DropGeometryKind2_5D = "ramp"
+    ramp_length: float = 0.0
+    ledge_length: float = 0.0
+    tailwater_depth: float = 0.0
+    expected_hydraulic_control: HydraulicControlKind2_5D = "unknown"
+    recirculation_risk: float = 0.0
+    aeration_proxy: float = 0.0
+    turbulence_proxy: float = 0.0
+    hazard_tags: tuple[str, ...] = ()
+    metadata: dict[str, MetadataValue] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.transition_id:
+            raise ValueError("transition_id is required.")
+        if not self.upstream_reach_id or not self.downstream_reach_id:
+            raise ValueError("drop transition reach ids are required.")
+        if self.upstream_reach_id == self.downstream_reach_id:
+            raise ValueError("drop transition must connect two distinct reaches.")
+        if self.crest_station < 0.0:
+            raise ValueError("drop transition crest station must be non-negative.")
+        if self.bed_elevation_fall < 0.0:
+            raise ValueError("drop transition bed-elevation fall must be non-negative.")
+        if self.ramp_length < 0.0 or self.ledge_length < 0.0:
+            raise ValueError("drop transition ramp/ledge lengths must be non-negative.")
+        if self.ramp_length == 0.0 and self.ledge_length == 0.0:
+            raise ValueError("drop transition must define a ramp or ledge length.")
+        if self.tailwater_depth < 0.0:
+            raise ValueError("drop transition tailwater depth must be non-negative.")
+        for name, value in (
+            ("recirculation risk", self.recirculation_risk),
+            ("aeration proxy", self.aeration_proxy),
+            ("turbulence proxy", self.turbulence_proxy),
+        ):
+            if not 0.0 <= value <= 1.0:
+                raise ValueError(f"drop transition {name} must be between 0 and 1.")
+        object.__setattr__(self, "hazard_tags", tuple(self.hazard_tags))
+
+    @property
+    def control_length(self) -> float:
+        return self.ramp_length + self.ledge_length
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "transition_id": self.transition_id,
+            "upstream_reach_id": self.upstream_reach_id,
+            "downstream_reach_id": self.downstream_reach_id,
+            "crest_station": self.crest_station,
+            "bed_elevation_fall": self.bed_elevation_fall,
+            "geometry_kind": self.geometry_kind,
+            "ramp_length": self.ramp_length,
+            "ledge_length": self.ledge_length,
+            "control_length": self.control_length,
+            "tailwater_depth": self.tailwater_depth,
+            "expected_hydraulic_control": self.expected_hydraulic_control,
+            "recirculation_risk": self.recirculation_risk,
+            "aeration_proxy": self.aeration_proxy,
+            "turbulence_proxy": self.turbulence_proxy,
+            "hazard_tags": list(self.hazard_tags),
+            "metadata": self.metadata,
+        }
+
+    @classmethod
+    def from_json_dict(cls, data: dict[str, object]) -> DropTransitionMetadata2_5D:
+        return cls(
+            transition_id=str(data["transition_id"]),
+            upstream_reach_id=str(data["upstream_reach_id"]),
+            downstream_reach_id=str(data["downstream_reach_id"]),
+            crest_station=float(data["crest_station"]),
+            bed_elevation_fall=float(data["bed_elevation_fall"]),
+            geometry_kind=str(data.get("geometry_kind", "ramp")),  # type: ignore[arg-type]
+            ramp_length=float(data.get("ramp_length", 0.0)),
+            ledge_length=float(data.get("ledge_length", 0.0)),
+            tailwater_depth=float(data.get("tailwater_depth", 0.0)),
+            expected_hydraulic_control=str(data.get("expected_hydraulic_control", "unknown")),  # type: ignore[arg-type]
+            recirculation_risk=float(data.get("recirculation_risk", 0.0)),
+            aeration_proxy=float(data.get("aeration_proxy", 0.0)),
+            turbulence_proxy=float(data.get("turbulence_proxy", 0.0)),
+            hazard_tags=tuple(str(value) for value in data.get("hazard_tags", [])),  # type: ignore[union-attr]
             metadata=data.get("metadata", {}) if isinstance(data.get("metadata", {}), dict) else {},
         )
