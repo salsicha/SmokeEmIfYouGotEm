@@ -57,10 +57,33 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
 
     assert manifest["solver"] == "raftsim_water_cpp_v1"
     assert manifest["solver_mode"] == "reduced"
+    assert manifest["preserve_initial_mass"] is True
     assert validation["passed"] is True
+    assert validation["mass_relative_drift"] < 1.0e-9
     assert "frames/frame_0000.csv" in manifest["frames"]
     assert manifest["probes"]
     assert manifest["cross_sections"]
+
+    uncorrected_output_dir = tmp_path / "cpp_uncorrected_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(scenario_dir),
+            "--output",
+            str(uncorrected_output_dir),
+            "--steps",
+            "8",
+            "--frame-interval",
+            "4",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    uncorrected_manifest = json.loads(
+        (uncorrected_output_dir / scenario.metadata.scenario_id / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert uncorrected_manifest["preserve_initial_mass"] is False
 
     finite_volume_output_dir = tmp_path / "cpp_finite_volume_output"
     subprocess.run(
