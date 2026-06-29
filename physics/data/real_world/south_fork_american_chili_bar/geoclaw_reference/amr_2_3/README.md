@@ -14,3 +14,6 @@ The fixtures are generated from the shared 2.5D South Fork scenario family with:
 Only normalized comparison artifacts belong here. Full GeoClaw app directories,
 compiled executables, raw `_output` files, and local C++ comparison outputs should
 stay under ignored `outputs/` directories.
+
+See `fixture_registry.json` for the flow-band inventory, validation stats, and
+reproduction commands.
