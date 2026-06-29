@@ -9,7 +9,7 @@ The active plan is no longer 2D-first. The 2D prototype path is retired. The pro
 - GeoClaw reference model offline through the Python/Clawpack research harness.
 - Custom C++ reduced shallow-water / height-field solver for runtime use.
 
-Both solvers must run the same solver-neutral scenario packages, starting with procedural fixtures and expanding into real-world geospatial river sections. The C++ solver is tuned and accepted by matching GeoClaw reference outputs.
+Both solvers must run the same solver-neutral scenario packages, starting with procedural fixtures and expanding into real-world geospatial river sections. The next scenario-package revision should model pool-and-drop rivers as variable cascading reach sequences: pools, tongues, drops, boulder gardens, wave trains, eddies, and recovery zones with different slopes and hydraulic controls. The C++ solver is tuned and accepted by matching GeoClaw reference outputs.
 
 ## Core Decision
 
@@ -22,10 +22,11 @@ Use a staged 2.5D approach:
 3. Run the exact same scenarios through a custom C++ reduced shallow-water / height-field solver.
 4. Compare water fields, probe traces, feature metrics, raft force samples, and eventual raft outcomes.
 5. Tune the C++ model until it matches GeoClaw within accepted tolerances.
-6. Extend scenario generation from procedural fixtures into real-world river packages built from geospatial course/elevation data, rapid annotations, seasonal flow research, and difficulty presets.
-7. Use the custom C++ solver as the Unreal runtime candidate.
-8. Keep GeoClaw offline for validation, regression fixtures, parameter fitting, and reference telemetry.
-9. Use Project Chrono for raft rigid/compliant dynamics, contact, and possible FSI experiments once the water-field reference/runtime split is validated.
+6. Extend scenario generation from procedural fixtures into variable cascading river packages built from geospatial course/elevation data, rapid annotations, seasonal flow research, and difficulty presets.
+7. Validate reach-to-reach handoffs, sudden drops, pools, and hydraulic transitions against GeoClaw before treating them as runtime-ready.
+8. Use the custom C++ solver as the Unreal runtime candidate.
+9. Keep GeoClaw offline for validation, regression fixtures, parameter fitting, and reference telemetry.
+10. Use Project Chrono for raft rigid/compliant dynamics, contact, and possible FSI experiments once the water-field reference/runtime split is validated.
 
 See [2.5D Dual-Solver Simulation Plan](2.5d-simulation-plan.md) for the detailed dual-solver workflow.
 See [GeoClaw Reference Solver Transition Plan](geoclaw-transition-plan.md) for the PyClaw-to-GeoClaw replacement plan.
@@ -92,6 +93,14 @@ Every scenario must be solver-neutral:
 - Raft physical parameters
 - Probe points and cross sections
 - Expected telemetry channels
+
+For California-style pool-and-drop rivers, the package should also carry a variable cascading river model:
+
+- Ordered reaches with station ranges, local slope profiles, widths, banks, roughness, boulder density, and confidence metadata.
+- Explicit drop/rapid transitions with bed-elevation fall, crest, ramp/ledge length, tailwater depth, hydraulic-control type, recirculation risk, aeration/damping proxy, and hazard tags.
+- Active pool definitions for storage, depth, eddies, recirculation, and recovery windows.
+- Reach IDs and drop IDs on grids, probes, raft checkpoints, audio/VFX hooks, and Unreal corridor metadata.
+- Handoff diagnostics for mass flux, momentum flux, energy loss, wet/dry fronts, and raft state continuity.
 
 The same files feed:
 
@@ -239,3 +248,10 @@ Unreal production begins only after:
 - Run low, median, and high runnable season/difficulty presets in GeoClaw and the custom C++ solver.
 - Tune adaptive fluid parameters and raft coupling against GeoClaw outputs.
 - Export source manifests, validation telemetry, and an Unreal-ready corridor package before full Unreal production starts.
+
+### Phase 8: Variable Cascading River Readiness
+
+- Replace the current monolithic real-world package with ordered reach/drop sequences for pool-and-drop rivers.
+- Generate South Fork American baseline packages with variable slopes, pools, ledges, boulder gardens, eddies, and recovery zones.
+- Run GeoClaw and C++ on the same cascading package at low, median, and high runnable flows.
+- Validate per-reach behavior and stitched whole-section behavior before exposing live custom water to Unreal gameplay.

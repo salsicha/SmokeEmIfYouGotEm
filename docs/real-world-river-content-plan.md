@@ -118,6 +118,30 @@ Output:
 - `bank_masks.tif` / `water_masks.tif`
 - `source_manifest.json`
 
+## Variable Cascading River Model
+
+For California Sierra pool-and-drop rivers, the real-world extraction should produce a cascading 2.5D scenario package instead of a single uniform river strip. The package should represent the river as an ordered sequence of pools, tongues, steep drops, hydraulic controls, wave trains, boulder gardens, eddies, and recovery sections.
+
+This is a good fit for the simulator because it matches the structure guides actually read on many California runs:
+
+- Pools store water, slow the raft, allow regrouping, and set the tailwater depth for the next drop.
+- Constricted tongues and ledges convert elevation head into velocity, waves, holes, and impact risk.
+- Boulder gardens and rough beds add lateral deflection, drag, pin risk, and localized standing waves.
+- Eddy lines and recovery zones create guide-relevant steering decisions after each drop.
+- Variable slope lets the physics model produce distinct transitions instead of one averaged rapid.
+
+The package should add these production fields:
+
+- `reaches`: downstream station range, local coordinate transform, length, slope profile, width profile, bank geometry, bed roughness, boulder density, vegetation/debris indicators, and confidence score.
+- `drop_transitions`: upstream pool ID, downstream pool/reach ID, crest station, bed-elevation fall, ramp or ledge length, tailwater control, expected hydraulic type, recirculation/aeration proxy, eddy recovery window, hazard tags, and review status.
+- `pool_controls`: depth estimate, residence/storage behavior, inflow/outflow relationship, eddy/recirculation areas, and low-flow/high-flow changes.
+- `stitching`: reach-local grids with overlap/ghost zones or one stitched global grid with reach/drop IDs. The exported GeoClaw and C++ inputs must remain semantically identical.
+- `validation_windows`: per-reach probes, cross sections, drop-entry/drop-exit windows, raft checkpoints, and whole-section conservation summaries.
+
+Use discontinuities carefully. A drop can have an abrupt bed-elevation change, but the solver handoff cannot be a hidden impulse. Energy loss, turbulence, aeration, and recirculation should be represented with topography, roughness, hydraulic controls, and explicit source/damping fields that are visible to the comparison harness.
+
+South Fork American should be the baseline content target for this package revision. Its first production pass should create low, median, and high runnable cascading packages for the seed section, then validate GeoClaw and the custom C++ solver against the same reach/drop sequence.
+
 ## Rapid Identification From Aerial And Satellite Imagery
 
 Identify candidate rapids by combining terrain, hydrography, image analysis, and human review.
@@ -132,6 +156,7 @@ Signals:
 - Sharp bends with outside-bank current.
 - Visible eddies, gravel bars, islands, and ledges.
 - Access points, named rapids, bridges, guidebook notes, and GPS/video references.
+- Alternating pool/drop signatures: lower-gradient wider pools upstream/downstream of short steep gradient breaks, bedrock shelves, constrictions, or boulder bars.
 
 Workflow:
 
@@ -139,7 +164,8 @@ Workflow:
 2. Build a rapid review tool that shows DEM, aerial/satellite imagery, flowline, cross sections, and candidate tags.
 3. Let a designer or river-domain reviewer classify each candidate: pool, riffle, wave train, technical rapid, hole, ledge, strainer risk, portage, access point.
 4. Save rapid boundaries and feature annotations back into the scenario database.
-5. Feed selected rapid segments into GeoClaw/custom-C++ scenario generation.
+5. Group reviewed labels into cascading reaches and drop transitions.
+6. Feed selected reach/drop sequences into GeoClaw/custom-C++ scenario generation.
 
 The first version can use manual/semi-automated labeling. Machine learning for rapid detection should wait until enough labeled examples exist.
 
@@ -260,6 +286,7 @@ Each real-world river section must pass:
 - River centerline and bank alignment review.
 - Rapid candidate review.
 - Seasonal flow model review.
+- Reach/drop sequence review for pool-and-drop structure, transition geometry, and section-boundary confidence.
 - GeoClaw reference run.
 - Custom C++ solver comparison run.
 - Raft outcome review across selected season/difficulty presets.
@@ -282,7 +309,14 @@ Each real-world river section must pass:
 
 - Build automated candidate detection from slope/constriction/imagery texture.
 - Add manual review and feature annotation.
-- Store rapid segments and hazard tags.
+- Store rapid segments, pool segments, drop transitions, hazard tags, and review confidence.
+
+### Milestone C2: Cascading Scenario Segmentation
+
+- Segment the selected river section into ordered reaches and drop transitions.
+- Encode reach-local slope, roughness, width, pool depth, tailwater controls, and drop geometry.
+- Add overlap/ghost zones or a stitched global grid with reach/drop IDs.
+- Validate conservation and raft continuity across reach boundaries.
 
 ### Milestone D: Seasonal Flow Model
 

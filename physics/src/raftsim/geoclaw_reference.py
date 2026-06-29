@@ -6,7 +6,11 @@ import importlib
 import csv
 import json
 import math
+import os
 import shutil
+import subprocess
+import sys
+import time
 from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 
@@ -323,6 +327,59 @@ class GeoClawNormalizedOutputResult:
         }
 
 
+@dataclass(frozen=True, slots=True)
+class GeoClawRunConfig:
+    """Execution settings for a generated GeoClaw app directory."""
+
+    claw_root: Path | None = None
+    timeout_seconds: float = 300.0
+    clean_output: bool = True
+    make_target: str = ".output"
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "claw_root": str(self.claw_root) if self.claw_root is not None else None,
+            "timeout_seconds": self.timeout_seconds,
+            "clean_output": self.clean_output,
+            "make_target": self.make_target,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class GeoClawRunResult:
+    """Summary returned after executing GeoClaw and extracting fgout frames."""
+
+    scenario_id: str
+    export_dir: Path
+    command: tuple[str, ...]
+    returncode: int
+    stdout: str
+    stderr: str
+    runtime_seconds: float
+    output_dir: Path
+    frame_dir: Path
+    frame_count: int
+
+    @property
+    def passed(self) -> bool:
+        return self.returncode == 0 and self.frame_count > 0
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "scenario_id": self.scenario_id,
+            "export_dir": str(self.export_dir),
+            "command": list(self.command),
+            "returncode": self.returncode,
+            "runtime_seconds": self.runtime_seconds,
+            "output_dir": str(self.output_dir),
+            "frame_dir": str(self.frame_dir),
+            "frame_count": self.frame_count,
+            "passed": self.passed,
+            "stdout_tail": self.stdout[-4000:],
+            "stderr_tail": self.stderr[-4000:],
+        }
+
+
 def check_geoclaw_availability() -> GeoClawAvailability:
     """Return whether the optional Clawpack/GeoClaw runtime can be imported."""
 
@@ -419,7 +476,9 @@ def export_geoclaw_scenario(
 
     files: list[str] = []
     files.extend(_write_shared_scenario_package(scenario, root))
+    files.append(_relative_path(_write_makefile(root), root))
     files.append(_relative_path(_write_setrun_py(scenario, cfg, root), root))
+    files.append(_relative_path(_write_qinit_f90(scenario, root), root))
     files.append(_relative_path(_write_topography(scenario, root), root))
     files.append(_relative_path(_write_initial_state_npz(scenario, root), root))
     files.append(_relative_path(_write_qinit_xyz(scenario, root), root))
@@ -434,8 +493,10 @@ def export_geoclaw_scenario(
         "scenario_metadata": scenario.metadata.to_json_dict(),
         "config": cfg.to_json_dict(),
         "files": {
+            "makefile": "Makefile",
             "setrun": "setrun.py",
-            "topography": "topography/bed_topography.xyz",
+            "qinit_fortran": "qinit.f90",
+            "topography": "b.tt1",
             "initial_state": "initial_state/initial_water_state.npz",
             "qinit": "initial_state/qinit.xyz",
             "roughness": "roughness/manning_n.npy",
@@ -459,6 +520,78 @@ def export_geoclaw_scenario(
         output_dir=root,
         manifest_path=manifest_path,
         files=tuple(sorted(files)),
+    )
+
+
+def run_geoclaw_export(
+    geoclaw_export_dir: str | Path,
+    *,
+    config: GeoClawRunConfig | None = None,
+    export_config: GeoClawExportConfig | None = None,
+) -> GeoClawRunResult:
+    """Execute a generated GeoClaw app directory and extract fgout frames."""
+
+    cfg = config or GeoClawRunConfig()
+    export_root = Path(geoclaw_export_dir)
+    manifest_path = export_root / "manifest.json"
+    if not manifest_path.exists():
+        raise FileNotFoundError(f"GeoClaw export manifest not found: {manifest_path}")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    scenario = read_scenario2_5d_package(export_root / "shared_scenario")
+
+    if cfg.clean_output:
+        for path in (export_root / "_output", export_root / "fgout_frames"):
+            if path.exists():
+                shutil.rmtree(path)
+        for marker in (".output", ".data"):
+            marker_path = export_root / marker
+            if marker_path.exists():
+                marker_path.unlink()
+
+    env = _geoclaw_subprocess_env(cfg.claw_root)
+    command = ("make", cfg.make_target)
+    start = time.perf_counter()
+    completed = subprocess.run(
+        command,
+        cwd=export_root,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=cfg.timeout_seconds,
+    )
+    runtime_seconds = time.perf_counter() - start
+    frame_count = 0
+    if completed.returncode == 0:
+        frame_count = _extract_geoclaw_fgout_frames(
+            export_root,
+            scenario,
+            config=export_config,
+        )
+    run_manifest = {
+        "schema": "raftsim.geoclaw_run.v1",
+        "source_export_schema": manifest.get("schema"),
+        "config": cfg.to_json_dict(),
+        "result": {
+            "command": list(command),
+            "returncode": completed.returncode,
+            "runtime_seconds": runtime_seconds,
+            "frame_count": frame_count,
+        },
+        "stdout": completed.stdout,
+        "stderr": completed.stderr,
+    }
+    _write_json(export_root / "geoclaw_run_manifest.json", run_manifest)
+    return GeoClawRunResult(
+        scenario_id=scenario.metadata.scenario_id,
+        export_dir=export_root,
+        command=command,
+        returncode=completed.returncode,
+        stdout=completed.stdout,
+        stderr=completed.stderr,
+        runtime_seconds=runtime_seconds,
+        output_dir=export_root / "_output",
+        frame_dir=export_root / "fgout_frames",
+        frame_count=frame_count,
     )
 
 
@@ -590,6 +723,8 @@ def normalize_geoclaw_fixed_grid_output(
     export_manifest = json.loads(export_manifest_path.read_text(encoding="utf-8"))
     scenario = read_scenario2_5d_package(export_root / "shared_scenario")
     cfg = config or GeoClawExportConfig()
+    if not (export_root / "fgout_frames").exists() and (export_root / "_output").exists():
+        _extract_geoclaw_fgout_frames(export_root, scenario, config=cfg)
     frames = _load_geoclaw_fgout_frames(export_root, scenario, cfg)
     if not frames:
         frames = (frame_from_geoclaw_initial_state(scenario, config=cfg),)
@@ -908,6 +1043,77 @@ def _sample_normalized_cross_section(
     )
 
 
+def _geoclaw_subprocess_env(claw_root: Path | None) -> dict[str, str]:
+    env = os.environ.copy()
+    root = Path(claw_root or env.get("CLAW", "") or "/Users/alexmoran/repos/clawpack").expanduser()
+    if root.exists():
+        env["CLAW"] = str(root)
+        build_path = root / "build" / f"cp{sys.version_info.major}{sys.version_info.minor}"
+        if build_path.exists():
+            env["MESONPY_EDITABLE_SKIP"] = os.pathsep.join(
+                value
+                for value in (env.get("MESONPY_EDITABLE_SKIP", ""), str(build_path))
+                if value
+            )
+        python_paths = [
+            str(root),
+            str(Path(__file__).resolve().parents[1]),
+            env.get("PYTHONPATH", ""),
+        ]
+        env["PYTHONPATH"] = os.pathsep.join(path for path in python_paths if path)
+    env["CLAW_PYTHON"] = sys.executable
+    return env
+
+
+def _extract_geoclaw_fgout_frames(
+    export_root: Path,
+    scenario: Scenario2_5D,
+    *,
+    config: GeoClawExportConfig | None = None,
+) -> int:
+    output_dir = export_root / "_output"
+    if not output_dir.exists():
+        return 0
+
+    from clawpack.geoclaw import fgout_tools
+
+    cfg = config or GeoClawExportConfig()
+    frame_dir = export_root / "fgout_frames"
+    frame_dir.mkdir(parents=True, exist_ok=True)
+    for stale in frame_dir.glob("*.npz"):
+        stale.unlink()
+
+    fgout_grid = fgout_tools.FGoutGrid(1, str(output_dir), "binary32")
+    fgout_grid.read_fgout_grids_data()
+    frame_count = 0
+    for frame_number in range(1, int(fgout_grid.nout) + 1):
+        fgout = fgout_grid.read_frame(frame_number)
+        h = _fgout_array_for_scenario(fgout.h, scenario)
+        hu = _fgout_array_for_scenario(fgout.hu, scenario)
+        hv = _fgout_array_for_scenario(fgout.hv, scenario)
+        frame = _normalized_frame_from_h_momentum(
+            scenario,
+            h=h,
+            hu=hu,
+            hv=hv,
+            time=float(fgout.t),
+            config=cfg,
+        )
+        frame.write_npz(frame_dir / f"frame_{frame_count:04d}.npz")
+        frame_count += 1
+    return frame_count
+
+
+def _fgout_array_for_scenario(array: object, scenario: Scenario2_5D) -> FloatGrid:
+    values = np.asarray(array, dtype=np.float64)
+    if values.shape == scenario.grid.shape:
+        return values.copy()
+    transposed_shape = (scenario.grid.nx, scenario.grid.ny)
+    if values.shape == transposed_shape:
+        return values.T.copy()
+    raise ValueError(f"fgout array shape {values.shape} does not match scenario grid {scenario.grid.shape}.")
+
+
 def _normalized_validation(scenario: Scenario2_5D, frames: tuple[GeoClawNormalizedFrame, ...]) -> dict[str, object]:
     mass_initial = frames[0].mass(scenario)
     mass_final = frames[-1].mass(scenario)
@@ -961,8 +1167,50 @@ def _write_shared_scenario_package(scenario: Scenario2_5D, root: Path) -> list[s
     return sorted(_relative_path(path, root) for path in package_dir.iterdir() if path.is_file())
 
 
+def _write_makefile(root: Path) -> Path:
+    content = """# Generated GeoClaw app Makefile for raftsim reference runs.
+CLAWMAKE = $(CLAW)/clawutil/src/Makefile.common
+
+CLAW_PKG = geoclaw
+EXE = xgeoclaw
+SETRUN_FILE = setrun.py
+OUTDIR = _output
+SETPLOT_FILE = setplot.py
+PLOTDIR = _plots
+
+FFLAGS ?=
+
+GEOLIB = $(CLAW)/geoclaw/src/2d/shallow
+include $(GEOLIB)/Makefile.geoclaw
+
+EXCLUDE_MODULES =
+EXCLUDE_SOURCES =
+MODULES =
+
+SOURCES = \\
+  ./qinit.f90 \\
+  $(CLAW)/riemann/src/rpn2_geoclaw.f \\
+  $(CLAW)/riemann/src/rpt2_geoclaw.f \\
+  $(CLAW)/riemann/src/geoclaw_riemann_utils.f \\
+
+include $(CLAWMAKE)
+
+.PHONY: app-data reference-run
+app-data: .data
+
+reference-run: .output
+"""
+    path = root / "Makefile"
+    path.write_text(content, encoding="utf-8")
+    return path
+
+
 def _write_setrun_py(scenario: Scenario2_5D, config: GeoClawExportConfig, root: Path) -> Path:
     x_min, x_max, y_min, y_max = scenario.grid.extent
+    boundary_lower, boundary_upper = _geoclaw_boundary_codes(scenario)
+    ratios = _geoclaw_refinement_ratios(config)
+    amr_regions = _geoclaw_region_entries(scenario, config)
+    output_times = config.output_times(scenario.duration)
     content = f'''"""Generated GeoClaw run configuration for {scenario.metadata.scenario_id}.
 
 This file is generated from the raftsim shared 2.5D scenario package.
@@ -974,54 +1222,245 @@ from __future__ import annotations
 
 def setrun(claw_pkg: str = "geoclaw"):
     from clawpack.clawutil import data
+    from clawpack.geoclaw import fgout_tools
 
+    if claw_pkg.lower() != "geoclaw":
+        raise ValueError("This generated app is configured for GeoClaw.")
     rundata = data.ClawRunData(claw_pkg, 2)
     clawdata = rundata.clawdata
     clawdata.lower = [{x_min:.17g}, {y_min:.17g}]
     clawdata.upper = [{x_max:.17g}, {y_max:.17g}]
     clawdata.num_cells = [{scenario.grid.nx}, {scenario.grid.ny}]
-    clawdata.t0 = 0.0
-    clawdata.tfinal = {scenario.duration:.17g}
-    clawdata.num_output_times = {config.num_output_times}
-    clawdata.output_style = 1
-    clawdata.dt_variable = True
-    clawdata.dt_initial = {scenario.fixed_dt:.17g}
-    clawdata.cfl_desired = 0.45
-    clawdata.cfl_max = 0.9
     clawdata.num_eqn = 3
     clawdata.num_aux = 1
-    clawdata.bc_lower = {_geoclaw_boundary_codes(scenario)[0]!r}
-    clawdata.bc_upper = {_geoclaw_boundary_codes(scenario)[1]!r}
+    clawdata.capa_index = 0
+    clawdata.t0 = 0.0
+    clawdata.tfinal = {scenario.duration:.17g}
+    clawdata.output_style = 1
+    clawdata.num_output_times = {config.num_output_times}
+    clawdata.output_t0 = True
+    clawdata.output_format = "ascii"
+    clawdata.output_q_components = "all"
+    clawdata.output_aux_components = "none"
+    clawdata.output_aux_onlyonce = True
+    clawdata.dt_variable = True
+    clawdata.dt_initial = {scenario.fixed_dt:.17g}
+    clawdata.dt_max = {max(scenario.fixed_dt, scenario.duration / max(config.num_output_times, 1)):.17g}
+    clawdata.cfl_desired = 0.45
+    clawdata.cfl_max = 0.9
+    clawdata.steps_max = 100000
+    clawdata.num_waves = 3
+    clawdata.limiter = ["mc", "mc", "mc"]
+    clawdata.use_fwaves = True
+    clawdata.source_split = "godunov"
+    clawdata.dimensional_split = "unsplit"
+    clawdata.transverse_waves = 2
+    clawdata.num_ghost = 2
+    clawdata.bc_lower = {boundary_lower!r}
+    clawdata.bc_upper = {boundary_upper!r}
+
+    amrdata = rundata.amrdata
+    amrdata.amr_levels_max = {config.amr_max_level}
+    amrdata.refinement_ratios_x = {ratios!r}
+    amrdata.refinement_ratios_y = {ratios!r}
+    amrdata.refinement_ratios_t = {ratios!r}
+    amrdata.aux_type = ["center"]
+    amrdata.flag_richardson = False
+    amrdata.flag2refine = True
+    amrdata.flag2refine_tol = 0.05
+    amrdata.regrid_interval = 2
+    amrdata.regrid_buffer_width = 2
+    amrdata.clustering_cutoff = 0.7
+    amrdata.verbosity_regrid = 0
+
+    rundata.regiondata.regions = {amr_regions!r}
 
     rundata.geo_data.gravity = {config.gravity:.17g}
+    rundata.geo_data.coordinate_system = 1
+    rundata.geo_data.coriolis_forcing = False
+    rundata.geo_data.sea_level = 0.0
     rundata.geo_data.dry_tolerance = {config.dry_tolerance:.17g}
+    rundata.geo_data.speed_limit = 120.0
     rundata.geo_data.friction_forcing = True
     rundata.geo_data.manning_coefficient = {scenario.roughness:.17g}
+    rundata.geo_data.friction_depth = 100.0
 
     rundata.topo_data.topofiles = [
-        [{config.topography_topotype}, {config.amr_min_level}, {config.amr_max_level}, 0.0, 1.0e10, "topography/bed_topography.xyz"],
+        [{config.topography_topotype}, "b.tt1"],
     ]
 
-    # GeoClaw fixed-grid output and AMR region metadata are exported next to this
-    # file as JSON so the Python normalization harness can consume them directly.
+    rundata.qinit_data.qinit_type = 0
+    rundata.qinit_data.qinitfiles = []
+    rundata.qinit_data.variable_eta_init = False
+
+    fgout = fgout_tools.FGoutGrid()
+    fgout.fgno = 1
+    fgout.point_style = 2
+    fgout.output_format = "binary32"
+    fgout.output_style = 2
+    fgout.output_times = {output_times!r}
+    fgout.nx = {scenario.grid.nx}
+    fgout.ny = {scenario.grid.ny}
+    fgout.x1 = {x_min:.17g}
+    fgout.x2 = {x_max:.17g}
+    fgout.y1 = {y_min:.17g}
+    fgout.y2 = {y_max:.17g}
+    fgout.q_out_vars = [1, 2, 3, 4, 5]
+    rundata.fgout_data.fgout_grids = [fgout]
+
     return rundata
+
+
+if __name__ == "__main__":
+    import sys
+
+    package = sys.argv[1] if len(sys.argv) > 1 else "geoclaw"
+    setrun(package).write()
 '''
     path = root / "setrun.py"
     path.write_text(content, encoding="utf-8")
     return path
 
 
+def _write_qinit_f90(scenario: Scenario2_5D, root: Path) -> Path:
+    content = f"""! Generated qinit routine for raftsim scenario {scenario.metadata.scenario_id}.
+subroutine qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
+
+    implicit none
+
+    integer, intent(in) :: meqn,mbc,mx,my,maux
+    real(kind=8), intent(in) :: xlower,ylower,dx,dy
+    real(kind=8), intent(inout) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(kind=8), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+
+    integer :: i,j,ii,jj,ios,unit,count,nx_file,ny_file
+    real(kind=8) :: x_file,y_file,h_value,hu_value,hv_value,eta_value,wet_value
+    real(kind=8) :: first_y,tolerance,dx_file,dy_file
+    real(kind=8) :: x_min_file,x_max_file,y_min_file,y_max_file,x_cell,y_cell
+    real(kind=8), allocatable :: h_data(:,:),hu_data(:,:),hv_data(:,:),wet_data(:,:)
+    logical :: initialized
+    character(len=*), parameter :: qinit_path = '../initial_state/qinit.xyz'
+
+    q = 0.d0
+
+    if (meqn < 3) then
+        write(*,*) 'raftsim qinit requires at least 3 equations.'
+        stop 2
+    endif
+
+    open(newunit=unit,file=qinit_path,status='old',action='read',iostat=ios)
+    if (ios /= 0) then
+        write(*,*) 'Unable to open raftsim qinit file: ', qinit_path
+        stop 2
+    endif
+
+    count = 0
+    nx_file = 0
+    initialized = .false.
+    do
+        read(unit,*,iostat=ios) x_file,y_file,h_value,hu_value,hv_value,eta_value,wet_value
+        if (ios /= 0) exit
+        count = count + 1
+        if (.not. initialized) then
+            initialized = .true.
+            first_y = y_file
+            x_min_file = x_file
+            x_max_file = x_file
+            y_min_file = y_file
+            y_max_file = y_file
+        endif
+        tolerance = max(1.d-10,abs(first_y)*1.d-12)
+        if (abs(y_file - first_y) <= tolerance) nx_file = nx_file + 1
+        x_min_file = min(x_min_file,x_file)
+        x_max_file = max(x_max_file,x_file)
+        y_min_file = min(y_min_file,y_file)
+        y_max_file = max(y_max_file,y_file)
+    enddo
+    if (ios > 0) then
+        write(*,*) 'Error scanning raftsim qinit file: ', qinit_path
+        stop 2
+    endif
+    if ((count <= 0) .or. (nx_file <= 0) .or. (mod(count,nx_file) /= 0)) then
+        write(*,*) 'Invalid raftsim qinit grid shape in ', qinit_path
+        stop 2
+    endif
+
+    ny_file = count / nx_file
+    allocate(h_data(nx_file,ny_file),hu_data(nx_file,ny_file))
+    allocate(hv_data(nx_file,ny_file),wet_data(nx_file,ny_file))
+    rewind(unit)
+
+    do jj=1,ny_file
+        do ii=1,nx_file
+            read(unit,*,iostat=ios) x_file,y_file,h_value,hu_value,hv_value,eta_value,wet_value
+            if (ios /= 0) then
+                write(*,*) 'Error reading raftsim qinit cell ', ii, jj, ' from ', qinit_path
+                stop 2
+            endif
+            h_data(ii,jj) = max(0.d0,h_value)
+            hu_data(ii,jj) = hu_value
+            hv_data(ii,jj) = hv_value
+            wet_data(ii,jj) = wet_value
+        enddo
+    enddo
+
+    close(unit)
+
+    if (nx_file > 1) then
+        dx_file = (x_max_file - x_min_file) / dble(nx_file - 1)
+    else
+        dx_file = dx
+    endif
+    if (ny_file > 1) then
+        dy_file = (y_max_file - y_min_file) / dble(ny_file - 1)
+    else
+        dy_file = dy
+    endif
+
+    do j=1,my
+        y_cell = ylower + (dble(j) - 0.5d0) * dy
+        jj = nint((y_cell - y_min_file) / max(dy_file,1.d-12)) + 1
+        jj = max(1,min(ny_file,jj))
+        do i=1,mx
+            x_cell = xlower + (dble(i) - 0.5d0) * dx
+            ii = nint((x_cell - x_min_file) / max(dx_file,1.d-12)) + 1
+            ii = max(1,min(nx_file,ii))
+            if (wet_data(ii,jj) >= 0.5d0) then
+                q(1,i,j) = h_data(ii,jj)
+                q(2,i,j) = hu_data(ii,jj)
+                q(3,i,j) = hv_data(ii,jj)
+            else
+                q(1,i,j) = 0.d0
+                q(2,i,j) = 0.d0
+                q(3,i,j) = 0.d0
+            endif
+        enddo
+    enddo
+
+    deallocate(h_data,hu_data,hv_data,wet_data)
+
+end subroutine qinit
+"""
+    path = root / "qinit.f90"
+    path.write_text(content, encoding="utf-8")
+    return path
+
+
 def _write_topography(scenario: Scenario2_5D, root: Path) -> Path:
-    path = root / "topography" / "bed_topography.xyz"
+    path = root / "b.tt1"
     path.parent.mkdir(parents=True, exist_ok=True)
-    x_grid, y_grid = scenario.grid.meshgrid()
+    x_min, x_max, y_min, y_max = scenario.grid.extent
+    x_values = np.linspace(x_min, x_max, scenario.grid.nx + 1, dtype=np.float64)
+    y_values = np.linspace(y_min, y_max, scenario.grid.ny + 1, dtype=np.float64)
     with path.open("w", encoding="utf-8") as handle:
-        handle.write("# raftsim GeoClaw topography export: x y bed_z_m\n")
-        handle.write(f"# nx={scenario.grid.nx} ny={scenario.grid.ny} dx={scenario.grid.dx:.17g} dy={scenario.grid.dy:.17g}\n")
-        for row in range(scenario.grid.ny):
-            for column in range(scenario.grid.nx):
+        for y in reversed(y_values):
+            row = int(np.clip(round((float(y) - scenario.grid.origin_y) / scenario.grid.dy), 0, scenario.grid.ny - 1))
+            for x in x_values:
+                column = int(
+                    np.clip(round((float(x) - scenario.grid.origin_x) / scenario.grid.dx), 0, scenario.grid.nx - 1)
+                )
                 handle.write(
-                    f"{x_grid[row, column]:.17g} {y_grid[row, column]:.17g} {scenario.bed[row, column]:.17g}\n"
+                    f"{float(x):.17g} {float(y):.17g} {scenario.bed[row, column]:.17g}\n"
                 )
     return path
 
@@ -1048,7 +1487,6 @@ def _write_qinit_xyz(scenario: Scenario2_5D, root: Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     x_grid, y_grid = scenario.grid.meshgrid()
     with path.open("w", encoding="utf-8") as handle:
-        handle.write("# raftsim GeoClaw initial state export: x y h hu hv eta wet\n")
         for row in range(scenario.grid.ny):
             for column in range(scenario.grid.nx):
                 handle.write(
@@ -1203,9 +1641,27 @@ def _geoclaw_boundary_codes(scenario: Scenario2_5D) -> tuple[list[str], list[str
 def _boundary_code(kind: str) -> str:
     if kind in {"wall", "bank"}:
         return "wall"
-    if kind == "inflow":
-        return "user"
     return "extrap"
+
+
+def _geoclaw_refinement_ratios(config: GeoClawExportConfig) -> list[int]:
+    return [2] * max(config.amr_max_level - 1, 1)
+
+
+def _geoclaw_region_entries(scenario: Scenario2_5D, config: GeoClawExportConfig) -> list[list[float | int]]:
+    return [
+        [
+            int(region["min_level"]),
+            int(region["max_level"]),
+            float(region["t"][0]),  # type: ignore[index]
+            float(region["t"][1]),  # type: ignore[index]
+            float(region["x"][0]),  # type: ignore[index]
+            float(region["x"][1]),  # type: ignore[index]
+            float(region["y"][0]),  # type: ignore[index]
+            float(region["y"][1]),  # type: ignore[index]
+        ]
+        for region in _amr_regions(scenario, config)
+    ]
 
 
 def _csv_value(value: object) -> object:

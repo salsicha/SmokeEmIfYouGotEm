@@ -345,11 +345,32 @@ def _score_threshold_report(report: ThresholdEvaluationReport) -> float:
     return score
 
 
+def write_geoclaw_dual_solver_manifest(
+    root: str | Path,
+    scenario: Scenario2_5D,
+    geoclaw_normalized,
+    cpp_result,
+    *,
+    geoclaw_runtime_seconds: float = 0.0,
+) -> Path:
+    """Write the shared comparison manifest for one normalized GeoClaw/C++ run."""
+
+    return _write_geoclaw_dual_solver_manifest(
+        Path(root),
+        scenario,
+        geoclaw_normalized,
+        cpp_result,
+        geoclaw_runtime_seconds=geoclaw_runtime_seconds,
+    )
+
+
 def _write_geoclaw_dual_solver_manifest(
     root: Path,
     scenario: Scenario2_5D,
     geoclaw_normalized,
     cpp_result,
+    *,
+    geoclaw_runtime_seconds: float = 0.0,
 ) -> Path:
     scenario_dir = root / "scenario" / scenario.metadata.scenario_id
     scenario.write_package(scenario_dir)
@@ -362,14 +383,14 @@ def _write_geoclaw_dual_solver_manifest(
             "output_dir": _relative_or_absolute(geoclaw_normalized.output_dir, root),
             "manifest": _relative_or_absolute(geoclaw_normalized.manifest_path, root),
             "validation": _relative_or_absolute(geoclaw_normalized.output_dir / "validation.json", root),
-            "runtime_seconds": 0.0,
-            "seconds_per_simulated_second": 0.0,
+            "runtime_seconds": geoclaw_runtime_seconds,
+            "seconds_per_simulated_second": geoclaw_runtime_seconds / max(scenario.duration, 1.0e-12),
         },
         "cpp": cpp_result.to_json_dict(root),
         "runtime": {
             "simulated_duration_seconds": scenario.duration,
-            "geoclaw_runtime_seconds": 0.0,
-            "geoclaw_seconds_per_simulated_second": 0.0,
+            "geoclaw_runtime_seconds": geoclaw_runtime_seconds,
+            "geoclaw_seconds_per_simulated_second": geoclaw_runtime_seconds / max(scenario.duration, 1.0e-12),
             "cpp_runtime_seconds": cpp_result.runtime_seconds,
             "cpp_seconds_per_simulated_second": cpp_result.runtime_seconds / max(scenario.duration, 1.0e-12),
         },
