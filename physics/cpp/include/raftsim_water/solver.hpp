@@ -25,6 +25,7 @@ struct SolverConfig {
     double feature_strength_scale = 1.0;
     double roughness_scale = 1.0;
     double bed_slope_source_scale = 0.0;
+    bool preserve_initial_mass = true;
 };
 
 struct Frame {
@@ -59,8 +60,10 @@ private:
     SolverConfig config_;
     WaterState state_;
     double time_ = 0.0;
+    double initial_mass_ = 0.0;
 
     void apply_boundaries();
+    void apply_initial_mass_correction(WaterState& next) const;
     void step_reduced(double dt);
     void step_finite_volume(double dt);
     void step_finite_volume_once(double dt);

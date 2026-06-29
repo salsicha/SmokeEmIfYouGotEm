@@ -52,6 +52,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--feature-strength-scale", type=float, default=1.0)
     parser.add_argument("--roughness-scale", type=float, default=1.0)
     parser.add_argument("--bed-slope-source-scale", type=float, default=0.0)
+    parser.add_argument("--no-preserve-initial-mass", action="store_true", help="Disable reduced-mode C++ mass correction.")
     parser.add_argument("--max-field-linf", type=float, default=DEFAULT_THRESHOLDS.max_field_linf)
     parser.add_argument("--max-slope-linf", type=float, default=DEFAULT_THRESHOLDS.max_slope_linf)
     parser.add_argument("--max-wet-mismatch-fraction", type=float, default=DEFAULT_THRESHOLDS.max_wet_mismatch_fraction)
@@ -85,6 +86,7 @@ def main(argv: list[str] | None = None) -> int:
             feature_strength_scale=args.feature_strength_scale,
             roughness_scale=args.roughness_scale,
             bed_slope_source_scale=args.bed_slope_source_scale,
+            preserve_initial_mass=not args.no_preserve_initial_mass,
         ),
     )
     manifest_path = write_geoclaw_dual_solver_manifest(
