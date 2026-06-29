@@ -1,0 +1,150 @@
+{
+  "config": {
+    "amr_max_level": 3,
+    "amr_min_level": 2,
+    "dry_tolerance": 1e-06,
+    "feature_padding_m": 3.0,
+    "gravity": 9.81,
+    "num_output_times": 4,
+    "topography_topotype": 1
+  },
+  "cross_section_manifest": [
+    {
+      "distance_count": 31,
+      "metadata": {
+        "length": 60.0,
+        "normal": [
+          0.0,
+          1.0
+        ],
+        "position": [
+          142.0,
+          0.0
+        ]
+      },
+      "probe_id": "mid_cross_section",
+      "time_count": 5
+    }
+  ],
+  "cross_sections": [
+    "cross_sections/mid_cross_section.npz"
+  ],
+  "frames": [
+    "frames/frame_0000.npz",
+    "frames/frame_0001.npz",
+    "frames/frame_0002.npz",
+    "frames/frame_0003.npz",
+    "frames/frame_0004.npz"
+  ],
+  "probe_manifest": [
+    {
+      "kind": "point",
+      "metadata": {
+        "column": 2,
+        "position": [
+          8.0,
+          0.0
+        ],
+        "row": 16
+      },
+      "probe_id": "put_in_center",
+      "sample_count": 5
+    },
+    {
+      "kind": "point",
+      "metadata": {
+        "column": 36,
+        "position": [
+          142.0,
+          0.0
+        ],
+        "row": 16
+      },
+      "probe_id": "mid_run_center",
+      "sample_count": 5
+    },
+    {
+      "kind": "point",
+      "metadata": {
+        "column": 69,
+        "position": [
+          276.0,
+          0.0
+        ],
+        "row": 16
+      },
+      "probe_id": "take_out_center",
+      "sample_count": 5
+    },
+    {
+      "kind": "point",
+      "metadata": {
+        "column": 13,
+        "position": [
+          50.24615384615385,
+          0.0
+        ],
+        "row": 16
+      },
+      "probe_id": "rapid_candidate_01_probe",
+      "sample_count": 5
+    },
+    {
+      "kind": "point",
+      "metadata": {
+        "column": 26,
+        "position": [
+          102.67692307692307,
+          0.0
+        ],
+        "row": 16
+      },
+      "probe_id": "rapid_candidate_02_probe",
+      "sample_count": 5
+    },
+    {
+      "kind": "point",
+      "metadata": {
+        "column": 40,
+        "position": [
+          159.47692307692307,
+          0.0
+        ],
+        "row": 16
+      },
+      "probe_id": "rapid_candidate_03_probe",
+      "sample_count": 5
+    },
+    {
+      "kind": "point",
+      "metadata": {
+        "column": 55,
+        "position": [
+          221.1923076923077,
+          0.0
+        ],
+        "row": 16
+      },
+      "probe_id": "rapid_candidate_04_probe",
+      "sample_count": 5
+    }
+  ],
+  "probes": [
+    "probes/put_in_center.csv",
+    "probes/mid_run_center.csv",
+    "probes/take_out_center.csv",
+    "probes/rapid_candidate_01_probe.csv",
+    "probes/rapid_candidate_02_probe.csv",
+    "probes/rapid_candidate_03_probe.csv",
+    "probes/rapid_candidate_04_probe.csv"
+  ],
+  "run_status": {
+    "frame_count": 5,
+    "mode": "fgout_npz"
+  },
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate",
+  "schema": "raftsim.geoclaw_normalized_output.v1",
+  "source_export_manifest": "../outputs/geoclaw_south_fork_matrix/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate/manifest.json",
+  "source_export_schema": "raftsim.geoclaw_export.v1",
+  "validation": "validation.json"
+}
