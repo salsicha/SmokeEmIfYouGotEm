@@ -1,0 +1,109 @@
+{
+  "amr": {
+    "max_level": 3,
+    "min_level": 2
+  },
+  "duration_seconds": 8.0,
+  "fixtures": [
+    {
+      "cross_section_count": 1,
+      "difficulty": "beginner",
+      "fixture_dir": "low_runnable",
+      "flow_band": "low_runnable",
+      "frame_count": 5,
+      "frames": [
+        "frames/frame_0000.npz",
+        "frames/frame_0001.npz",
+        "frames/frame_0002.npz",
+        "frames/frame_0003.npz",
+        "frames/frame_0004.npz"
+      ],
+      "normalized_manifest": "low_runnable/manifest.json",
+      "probe_count": 7,
+      "run_mode": "fgout_npz",
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner",
+      "source_command": "python -m raftsim.examples.run_geoclaw_reference --south-fork-flow-band low_runnable --south-fork-difficulty beginner --nx 72 --ny 32 --num-output-times 4 --amr-min-level 2 --amr-max-level 3 --run --timeout-seconds 600 --output-dir ../outputs/geoclaw_south_fork_matrix",
+      "stats": {
+        "mass_final": 6569.031433753104,
+        "mass_initial": 6822.2000810602285,
+        "mass_relative_drift": 0.037109531280088225,
+        "max_velocity": 3.6850846563623025,
+        "min_depth": 0.0,
+        "passed": true
+      },
+      "validation": "low_runnable/validation.json"
+    },
+    {
+      "cross_section_count": 1,
+      "difficulty": "intermediate",
+      "fixture_dir": "median_runnable",
+      "flow_band": "median_runnable",
+      "frame_count": 5,
+      "frames": [
+        "frames/frame_0000.npz",
+        "frames/frame_0001.npz",
+        "frames/frame_0002.npz",
+        "frames/frame_0003.npz",
+        "frames/frame_0004.npz"
+      ],
+      "normalized_manifest": "median_runnable/manifest.json",
+      "probe_count": 7,
+      "run_mode": "fgout_npz",
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate",
+      "source_command": "python -m raftsim.examples.run_geoclaw_reference --south-fork-flow-band median_runnable --south-fork-difficulty intermediate --nx 72 --ny 32 --num-output-times 4 --amr-min-level 2 --amr-max-level 3 --run --timeout-seconds 600 --output-dir ../outputs/geoclaw_south_fork_matrix",
+      "stats": {
+        "mass_final": 7332.010447632143,
+        "mass_initial": 7621.462100459926,
+        "mass_relative_drift": 0.0379784940228615,
+        "max_velocity": 4.206902817144353,
+        "min_depth": 0.0,
+        "passed": true
+      },
+      "validation": "median_runnable/validation.json"
+    },
+    {
+      "cross_section_count": 1,
+      "difficulty": "advanced",
+      "fixture_dir": "high_runnable",
+      "flow_band": "high_runnable",
+      "frame_count": 5,
+      "frames": [
+        "frames/frame_0000.npz",
+        "frames/frame_0001.npz",
+        "frames/frame_0002.npz",
+        "frames/frame_0003.npz",
+        "frames/frame_0004.npz"
+      ],
+      "normalized_manifest": "high_runnable/manifest.json",
+      "probe_count": 7,
+      "run_mode": "fgout_npz",
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced",
+      "source_command": "python -m raftsim.examples.run_geoclaw_reference --south-fork-flow-band high_runnable --south-fork-difficulty advanced --nx 72 --ny 32 --num-output-times 4 --amr-min-level 2 --amr-max-level 3 --run --timeout-seconds 600 --output-dir ../outputs/geoclaw_south_fork_matrix",
+      "stats": {
+        "mass_final": 8454.758902280806,
+        "mass_initial": 8802.39759770038,
+        "mass_relative_drift": 0.03949363699617404,
+        "max_velocity": 5.130283924094261,
+        "min_depth": 0.0,
+        "passed": true
+      },
+      "validation": "high_runnable/validation.json"
+    }
+  ],
+  "frame_count": 5,
+  "grid": {
+    "nx": 72,
+    "ny": 32
+  },
+  "normalized_output_schema": "raftsim.geoclaw_normalized_output.v1",
+  "notes": [
+    "Only normalized GeoClaw outputs are committed in this fixture set.",
+    "Raw GeoClaw app directories, _output files, and compiled xgeoclaw executables are intentionally excluded.",
+    "C++ comparison outputs are generated artifacts and should be regenerated from this registry."
+  ],
+  "num_output_times": 4,
+  "reference_solver": "GeoClaw",
+  "river_id": "american_south_fork",
+  "schema": "raftsim.geoclaw_reference_fixture_registry.v1",
+  "section_id": "chili_bar_to_coloma"
+}
