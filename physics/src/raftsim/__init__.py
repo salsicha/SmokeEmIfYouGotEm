@@ -43,6 +43,13 @@ from .scenario2_5d import (
     generate_procedural_scenario2_5d,
     read_scenario2_5d_package,
 )
+from .cascading import (
+    CASCADING_SCHEMA_VERSION,
+    BankShape2_5D,
+    ReachGridTransform2_5D,
+    ReachMetadata2_5D,
+    StationProfilePoint2_5D,
+)
 from .pyclaw_reference import (
     PyClawAvailability,
     PyClawFieldFrame,
@@ -258,7 +265,9 @@ __all__ = [
     "BackendStatus",
     "BackendUnavailableError",
     "BaselinePerformanceReport",
+    "BankShape2_5D",
     "BodyState",
+    "CASCADING_SCHEMA_VERSION",
     "ChronoSimulation",
     "ChronoBridgeTelemetryComparisonReport",
     "CppSolverRunConfig",
@@ -303,6 +312,8 @@ __all__ = [
     "RegressionPromotionResult",
     "ReadinessCheck",
     "ReadinessGateDecision",
+    "ReachGridTransform2_5D",
+    "ReachMetadata2_5D",
     "RunOutcomeSummary",
     "Simulation",
     "SimulationConfig",
@@ -357,6 +368,7 @@ __all__ = [
     "ScenarioMetadata2_5D",
     "ScenarioValidation2_5D",
     "SHARED_SCHEMA_SET_VERSION",
+    "StationProfilePoint2_5D",
     "READINESS_REPORT_VERSION",
     "ValidationCheck2_5D",
     "UNREAL_VISUALIZATION_EXPORT_VERSION",

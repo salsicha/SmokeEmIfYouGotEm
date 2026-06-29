@@ -250,7 +250,7 @@ Conditionally superseded for live water by Milestone 14. Telemetry/replay playba
 
 This milestone replaces the current monolithic/mostly uniform 2.5D scenario package with a river-reach sequence model suitable for California pool-and-drop rivers. Each playable section should become an ordered chain of locally parameterized 2.5D reaches connected by explicit hydraulic transition zones.
 
-- [ ] Define `reach` metadata: station range, local grid transform, slope profile, width profile, bank shape, bed roughness, boulder density, vegetation/debris flags, and confidence score.
+- [x] Define `reach` metadata: station range, local grid transform, slope profile, width profile, bank shape, bed roughness, boulder density, vegetation/debris flags, and confidence score.
 - [ ] Define `drop_transition` metadata between reaches: crest station, bed-elevation fall, ramp/ledge length, tailwater depth, expected hydraulic control, recirculation risk, aeration/turbulence proxy, and hazard tags.
 - [ ] Encode pools separately from rapids: low-gradient recovery pools should have their own depth, eddy, recirculation, and tailwater controls rather than being treated as inactive gaps.
 - [ ] Support a sequence of reach-local grids with overlap/ghost zones or an equivalent stitched global grid so GeoClaw and C++ consume identical bathymetry, boundaries, and initial state.
