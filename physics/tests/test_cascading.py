@@ -9,12 +9,14 @@ from raftsim.cascading import (
     CASCADING_METADATA_FILE,
     CascadingScenarioPackage2_5D,
     DropTransitionMetadata2_5D,
+    HandoffConservationThresholds2_5D,
     PoolControlMetadata2_5D,
     PoolEddyControl2_5D,
     ReachGridTransform2_5D,
     ReachLocalGrid2_5D,
     ReachMetadata2_5D,
     StationProfilePoint2_5D,
+    evaluate_cascading_handoff_conservation,
     read_cascading_scenario_package,
 )
 from raftsim.scenario2_5d import (
@@ -291,3 +293,42 @@ def test_cascading_package_writes_stitched_grid_annotations_and_round_trips(tmp_
     assert loaded.drop_transitions == package.drop_transitions
     np.testing.assert_array_equal(loaded.reach_id_grid, package.reach_id_grid)
     np.testing.assert_array_equal(loaded.drop_transition_id_grid, package.drop_transition_id_grid)
+
+
+def test_cascading_handoff_conservation_reports_flux_energy_and_wet_front_checks():
+    package = _two_reach_package()
+
+    report = evaluate_cascading_handoff_conservation(package)
+    data = report.to_json_dict()
+    check = report.checks[0]
+
+    assert report.passed is True
+    assert data["scenario_id"] == package.scenario.metadata.scenario_id
+    assert data["passed"] is True
+    assert data["thresholds"]["max_mass_flux_delta"] == 0.15
+    assert check.transition_id == "drop_001"
+    assert check.mass_flux_delta == 0.0
+    assert check.momentum_flux_delta == 0.0
+    assert check.energy_delta <= 0.05
+    assert check.wet_fraction_delta == 0.0
+    assert check.surface_elevation_passed is True
+
+
+def test_cascading_handoff_conservation_flags_unbounded_flux_discontinuity():
+    package = _two_reach_package()
+    scenario = package.scenario
+    downstream_col = scenario.grid.nx // 2
+    scenario.initial_state.u[:, downstream_col] *= 2.5
+    scenario.initial_state.hu[:, downstream_col] = scenario.initial_state.depth[:, downstream_col] * scenario.initial_state.u[:, downstream_col]
+
+    report = evaluate_cascading_handoff_conservation(
+        package,
+        HandoffConservationThresholds2_5D(max_mass_flux_delta=0.05, max_momentum_flux_delta=0.05),
+    )
+    check = report.checks[0]
+
+    assert report.passed is False
+    assert check.mass_flux_passed is False
+    assert check.momentum_flux_passed is False
+    assert check.mass_flux_delta > 0.05
+    assert check.momentum_flux_delta > 0.05

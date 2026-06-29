@@ -33,6 +33,103 @@ PoolOutflowControlKind2_5D = Literal["free_outflow", "tailwater_limited", "drop_
 
 
 @dataclass(frozen=True, slots=True)
+class HandoffConservationThresholds2_5D:
+    max_mass_flux_delta: float = 0.15
+    max_momentum_flux_delta: float = 0.35
+    max_surface_elevation_delta: float = 0.08
+    max_energy_gain: float = 0.05
+    max_wet_fraction_delta: float = 0.35
+
+    def __post_init__(self) -> None:
+        for name in (
+            "max_mass_flux_delta",
+            "max_momentum_flux_delta",
+            "max_surface_elevation_delta",
+            "max_energy_gain",
+            "max_wet_fraction_delta",
+        ):
+            if getattr(self, name) < 0.0:
+                raise ValueError(f"{name} must be non-negative.")
+
+    def to_json_dict(self) -> dict[str, float]:
+        return {
+            "max_mass_flux_delta": self.max_mass_flux_delta,
+            "max_momentum_flux_delta": self.max_momentum_flux_delta,
+            "max_surface_elevation_delta": self.max_surface_elevation_delta,
+            "max_energy_gain": self.max_energy_gain,
+            "max_wet_fraction_delta": self.max_wet_fraction_delta,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class HandoffConservationCheck2_5D:
+    transition_id: str
+    upstream_reach_id: str
+    downstream_reach_id: str
+    upstream_column: int
+    downstream_column: int
+    mass_flux_delta: float
+    momentum_flux_delta: float
+    surface_elevation_delta: float
+    energy_delta: float
+    wet_fraction_delta: float
+    mass_flux_passed: bool
+    momentum_flux_passed: bool
+    surface_elevation_passed: bool
+    energy_passed: bool
+    wet_front_passed: bool
+
+    @property
+    def passed(self) -> bool:
+        return (
+            self.mass_flux_passed
+            and self.momentum_flux_passed
+            and self.surface_elevation_passed
+            and self.energy_passed
+            and self.wet_front_passed
+        )
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "transition_id": self.transition_id,
+            "upstream_reach_id": self.upstream_reach_id,
+            "downstream_reach_id": self.downstream_reach_id,
+            "upstream_column": self.upstream_column,
+            "downstream_column": self.downstream_column,
+            "mass_flux_delta": self.mass_flux_delta,
+            "momentum_flux_delta": self.momentum_flux_delta,
+            "surface_elevation_delta": self.surface_elevation_delta,
+            "energy_delta": self.energy_delta,
+            "wet_fraction_delta": self.wet_fraction_delta,
+            "mass_flux_passed": self.mass_flux_passed,
+            "momentum_flux_passed": self.momentum_flux_passed,
+            "surface_elevation_passed": self.surface_elevation_passed,
+            "energy_passed": self.energy_passed,
+            "wet_front_passed": self.wet_front_passed,
+            "passed": self.passed,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class HandoffConservationReport2_5D:
+    scenario_id: str
+    thresholds: HandoffConservationThresholds2_5D
+    checks: tuple[HandoffConservationCheck2_5D, ...]
+
+    @property
+    def passed(self) -> bool:
+        return all(check.passed for check in self.checks)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "scenario_id": self.scenario_id,
+            "passed": self.passed,
+            "thresholds": self.thresholds.to_json_dict(),
+            "checks": [check.to_json_dict() for check in self.checks],
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class StationProfilePoint2_5D:
     station: float
     value: float
@@ -558,6 +655,82 @@ def read_cascading_scenario_package(path: str | Path) -> CascadingScenarioPackag
         reach_id_grid=reach_id_grid,
         drop_transition_id_grid=drop_transition_id_grid,
     )
+
+
+def evaluate_cascading_handoff_conservation(
+    package: CascadingScenarioPackage2_5D,
+    thresholds: HandoffConservationThresholds2_5D | None = None,
+    *,
+    gravity: float = 9.80665,
+) -> HandoffConservationReport2_5D:
+    limits = thresholds or HandoffConservationThresholds2_5D()
+    scenario = package.scenario
+    checks: list[HandoffConservationCheck2_5D] = []
+    for transition in package.drop_transitions:
+        crest_col = int(round((transition.crest_station - scenario.grid.origin_x) / scenario.grid.dx))
+        downstream_col = max(1, min(scenario.grid.nx - 1, crest_col))
+        upstream_col = downstream_col - 1
+        upstream = _cross_section_metrics(scenario, upstream_col, gravity)
+        downstream = _cross_section_metrics(scenario, downstream_col, gravity)
+        mass_delta = _relative_delta(downstream["mass_flux"], upstream["mass_flux"])
+        momentum_delta = _relative_delta(downstream["momentum_flux"], upstream["momentum_flux"])
+        eta_delta = abs(downstream["mean_eta"] - upstream["mean_eta"])
+        energy_delta = downstream["mean_energy"] - upstream["mean_energy"]
+        wet_delta = abs(downstream["wet_fraction"] - upstream["wet_fraction"])
+        surface_passed = transition.bed_elevation_fall > 1.0e-9 or eta_delta <= limits.max_surface_elevation_delta
+        checks.append(
+            HandoffConservationCheck2_5D(
+                transition_id=transition.transition_id,
+                upstream_reach_id=transition.upstream_reach_id,
+                downstream_reach_id=transition.downstream_reach_id,
+                upstream_column=upstream_col,
+                downstream_column=downstream_col,
+                mass_flux_delta=mass_delta,
+                momentum_flux_delta=momentum_delta,
+                surface_elevation_delta=eta_delta,
+                energy_delta=energy_delta,
+                wet_fraction_delta=wet_delta,
+                mass_flux_passed=mass_delta <= limits.max_mass_flux_delta,
+                momentum_flux_passed=momentum_delta <= limits.max_momentum_flux_delta,
+                surface_elevation_passed=surface_passed,
+                energy_passed=energy_delta <= limits.max_energy_gain,
+                wet_front_passed=wet_delta <= limits.max_wet_fraction_delta,
+            )
+        )
+    return HandoffConservationReport2_5D(
+        scenario_id=package.scenario.metadata.scenario_id,
+        thresholds=limits,
+        checks=tuple(checks),
+    )
+
+
+def _cross_section_metrics(scenario: Scenario2_5D, col: int, gravity: float) -> dict[str, float]:
+    h = scenario.initial_state.depth[:, col]
+    u = scenario.initial_state.u[:, col]
+    v = scenario.initial_state.v[:, col]
+    hu = scenario.initial_state.hu[:, col]
+    eta = scenario.initial_state.eta[:, col]
+    bed = scenario.bed[:, col]
+    wet = scenario.initial_state.wet[:, col]
+    wet_count = max(int(np.count_nonzero(wet)), 1)
+    wet_values = wet.astype(np.float64)
+    speed_squared = u * u + v * v
+    mass_flux = float(np.sum(hu) * scenario.grid.dy)
+    momentum_flux = float(np.sum((h * u * u + 0.5 * gravity * h * h) * wet_values) * scenario.grid.dy)
+    mean_eta = float(np.sum(eta * wet_values) / wet_count)
+    mean_energy = float(np.sum((bed + h + speed_squared / (2.0 * gravity)) * wet_values) / wet_count)
+    wet_fraction = float(np.mean(wet_values))
+    return {
+        "mass_flux": mass_flux,
+        "momentum_flux": momentum_flux,
+        "mean_eta": mean_eta,
+        "mean_energy": mean_energy,
+        "wet_fraction": wet_fraction,
+    }
+
+
+def _relative_delta(left: float, right: float) -> float:
+    return abs(left - right) / max(abs(left), abs(right), 1.0)
 
 
 def _write_json(path: Path, data: dict[str, object]) -> None:
