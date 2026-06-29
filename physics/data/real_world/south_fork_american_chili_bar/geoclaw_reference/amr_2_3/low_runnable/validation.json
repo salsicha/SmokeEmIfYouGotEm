@@ -1,0 +1,29 @@
+{
+  "checks": [
+    {
+      "name": "finite_fields",
+      "passed": true
+    },
+    {
+      "min_depth": 0.0,
+      "name": "nonnegative_depth",
+      "passed": true
+    },
+    {
+      "max_velocity": 3.6850846563623025,
+      "name": "bounded_velocity",
+      "passed": true
+    },
+    {
+      "name": "mass_drift_recorded",
+      "passed": true,
+      "relative_drift": 0.037109531280088225
+    }
+  ],
+  "mass_final": 6569.031433753104,
+  "mass_initial": 6822.2000810602285,
+  "mass_relative_drift": 0.037109531280088225,
+  "max_velocity": 3.6850846563623025,
+  "min_depth": 0.0,
+  "passed": true
+}
