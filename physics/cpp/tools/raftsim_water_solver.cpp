@@ -26,6 +26,7 @@ struct CliArgs {
     double feature_strength_scale = 1.0;
     double roughness_scale = 1.0;
     double bed_slope_source_scale = 0.0;
+    bool preserve_initial_mass = true;
 };
 
 void print_usage(const char* program) {
@@ -43,6 +44,7 @@ void print_usage(const char* program) {
         << "  --feature-strength-scale <x>   Scale authored rapid forcing (default: 1.0)\n"
         << "  --roughness-scale <x>          Scale scenario roughness/friction (default: 1.0)\n"
         << "  --bed-slope-source-scale <x>   Scale finite-volume bed slope source term (default: 0.0)\n"
+        << "  --no-preserve-initial-mass     Disable reduced-mode global mass correction\n"
         << "  --help                         Show this help\n";
 }
 
@@ -98,6 +100,8 @@ CliArgs parse_args(int argc, char** argv) {
             args.roughness_scale = parse_double(require_value(flag), flag);
         } else if (flag == "--bed-slope-source-scale") {
             args.bed_slope_source_scale = parse_double(require_value(flag), flag);
+        } else if (flag == "--no-preserve-initial-mass") {
+            args.preserve_initial_mass = false;
         } else {
             throw std::runtime_error("Unknown argument: " + flag);
         }
@@ -145,6 +149,7 @@ int main(int argc, char** argv) {
         config.feature_strength_scale = args.feature_strength_scale;
         config.roughness_scale = args.roughness_scale;
         config.bed_slope_source_scale = args.bed_slope_source_scale;
+        config.preserve_initial_mass = args.preserve_initial_mass;
         raftsim::ReducedShallowWaterSolver solver(std::move(scenario), config);
         std::vector<raftsim::Frame> frames = solver.run(steps, args.frame_interval);
         raftsim::ValidationSummary validation = raftsim::validate_frames(solver.scenario(), frames, config);

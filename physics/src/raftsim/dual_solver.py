@@ -27,6 +27,7 @@ class CppSolverRunConfig:
     feature_strength_scale: float = 1.0
     roughness_scale: float = 1.0
     bed_slope_source_scale: float = 0.0
+    preserve_initial_mass: bool = True
     allow_validation_failure: bool = True
 
     def __post_init__(self) -> None:
@@ -219,7 +220,7 @@ def _run_cpp_solver(
     if frame_interval is None:
         frame_interval = max(1, steps // max(1, PyClawRunConfig().num_output_times))
 
-    command = (
+    command_parts = [
         str(config.executable),
         "--scenario",
         str(scenario_dir),
@@ -243,7 +244,10 @@ def _run_cpp_solver(
         str(config.roughness_scale),
         "--bed-slope-source-scale",
         str(config.bed_slope_source_scale),
-    )
+    ]
+    if not config.preserve_initial_mass:
+        command_parts.append("--no-preserve-initial-mass")
+    command = tuple(command_parts)
     start = time.perf_counter()
     completed = subprocess.run(command, check=False, capture_output=True, text=True)
     runtime_seconds = time.perf_counter() - start

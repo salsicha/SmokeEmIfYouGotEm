@@ -424,7 +424,10 @@ void write_cross_section_csv(const Scenario& scenario, const std::vector<Frame>&
 }  // namespace
 
 ReducedShallowWaterSolver::ReducedShallowWaterSolver(Scenario scenario, SolverConfig config)
-    : scenario_(std::move(scenario)), config_(config), state_(scenario_.initial) {
+    : scenario_(std::move(scenario)),
+      config_(config),
+      state_(scenario_.initial),
+      initial_mass_(compute_mass(scenario_, scenario_.initial)) {
     recompute_state(state_);
 }
 
@@ -473,6 +476,7 @@ void ReducedShallowWaterSolver::step_reduced(double dt) {
     recompute_state(next);
     state_ = std::move(next);
     apply_boundaries();
+    apply_initial_mass_correction(state_);
     time_ += dt;
 }
 
@@ -645,6 +649,26 @@ void ReducedShallowWaterSolver::apply_boundaries() {
     recompute_state(state_);
 }
 
+void ReducedShallowWaterSolver::apply_initial_mass_correction(WaterState& next) const {
+    if (!config_.preserve_initial_mass || initial_mass_ <= 1.0e-9) {
+        return;
+    }
+    double current_mass = compute_mass(scenario_, next);
+    if (current_mass <= 1.0e-9) {
+        return;
+    }
+    double scale = initial_mass_ / current_mass;
+    for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
+            if (next.h(row, col) <= config_.dry_tolerance) {
+                continue;
+            }
+            next.h(row, col) *= scale;
+        }
+    }
+    recompute_state(next);
+}
+
 void ReducedShallowWaterSolver::apply_feature_forcing(double dt, WaterState& next) const {
     for (const Feature& feature : scenario_.features) {
         double scale_x = std::max({feature.length * 0.5, feature.radius, scenario_.grid.dx});
@@ -811,6 +835,7 @@ void write_solver_output(
              << "  \"feature_strength_scale\": " << config.feature_strength_scale << ",\n"
              << "  \"roughness_scale\": " << config.roughness_scale << ",\n"
              << "  \"bed_slope_source_scale\": " << config.bed_slope_source_scale << ",\n"
+             << "  \"preserve_initial_mass\": " << (config.preserve_initial_mass ? "true" : "false") << ",\n"
              << "  \"validation\": \"validation.json\",\n"
              << "  \"frames\": [";
     for (std::size_t i = 0; i < frame_files.size(); ++i) {

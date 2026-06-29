@@ -34,6 +34,7 @@ class CppTuningCandidate:
     feature_strength_scale: float = 1.0
     roughness_scale: float = 1.0
     bed_slope_source_scale: float = 0.0
+    preserve_initial_mass: bool = True
 
     def to_json_dict(self) -> dict[str, object]:
         return {
@@ -45,6 +46,7 @@ class CppTuningCandidate:
             "feature_strength_scale": self.feature_strength_scale,
             "roughness_scale": self.roughness_scale,
             "bed_slope_source_scale": self.bed_slope_source_scale,
+            "preserve_initial_mass": self.preserve_initial_mass,
         }
 
 
@@ -164,6 +166,7 @@ def tune_cpp_solver_against_pyclaw(
                     feature_strength_scale=candidate.feature_strength_scale,
                     roughness_scale=candidate.roughness_scale,
                     bed_slope_source_scale=candidate.bed_slope_source_scale,
+                    preserve_initial_mass=candidate.preserve_initial_mass,
                 ),
             ),
         )
@@ -237,6 +240,7 @@ def tune_cpp_solver_against_geoclaw(
                 feature_strength_scale=candidate.feature_strength_scale,
                 roughness_scale=candidate.roughness_scale,
                 bed_slope_source_scale=candidate.bed_slope_source_scale,
+                preserve_initial_mass=candidate.preserve_initial_mass,
             ),
         )
         manifest_path = _write_geoclaw_dual_solver_manifest(
