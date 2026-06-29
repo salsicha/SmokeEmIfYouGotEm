@@ -1,13 +1,25 @@
+import json
+
+import numpy as np
 import pytest
 
 from raftsim.cascading import (
     BankShape2_5D,
+    CASCADING_ANNOTATIONS_FILE,
+    CASCADING_METADATA_FILE,
+    CascadingScenarioPackage2_5D,
     DropTransitionMetadata2_5D,
     PoolControlMetadata2_5D,
     PoolEddyControl2_5D,
     ReachGridTransform2_5D,
+    ReachLocalGrid2_5D,
     ReachMetadata2_5D,
     StationProfilePoint2_5D,
+    read_cascading_scenario_package,
+)
+from raftsim.scenario2_5d import (
+    FixtureScenario2_5DParameters,
+    generate_fixture_scenario2_5d,
 )
 
 
@@ -35,6 +47,71 @@ def _reach(**overrides):
     }
     values.update(overrides)
     return ReachMetadata2_5D(**values)
+
+
+def _two_reach_package():
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="uniform_channel", nx=18, ny=8, duration=2.0)
+    )
+    split_station = scenario.grid.x_coordinates()[scenario.grid.nx // 2]
+    upstream = _reach(
+        reach_id="pool_001",
+        kind="pool",
+        station_start=0.0,
+        station_end=float(split_station),
+        width_profile=(
+            StationProfilePoint2_5D(0.0, 18.0),
+            StationProfilePoint2_5D(float(split_station), 20.0),
+        ),
+        slope_profile=(
+            StationProfilePoint2_5D(0.0, 0.002),
+            StationProfilePoint2_5D(float(split_station), 0.003),
+        ),
+    )
+    downstream = _reach(
+        reach_id="wave_train_001",
+        kind="wave_train",
+        station_start=float(split_station),
+        station_end=float(scenario.grid.x_coordinates()[-1]),
+        width_profile=(
+            StationProfilePoint2_5D(float(split_station), 14.0),
+            StationProfilePoint2_5D(float(scenario.grid.x_coordinates()[-1]), 16.0),
+        ),
+        slope_profile=(
+            StationProfilePoint2_5D(float(split_station), 0.018),
+            StationProfilePoint2_5D(float(scenario.grid.x_coordinates()[-1]), 0.016),
+        ),
+    )
+    transition = DropTransitionMetadata2_5D(
+        transition_id="drop_001",
+        upstream_reach_id="pool_001",
+        downstream_reach_id="wave_train_001",
+        crest_station=float(split_station),
+        bed_elevation_fall=0.7,
+        geometry_kind="ramp",
+        ramp_length=3.0,
+        tailwater_depth=1.1,
+        expected_hydraulic_control="wave_train",
+        recirculation_risk=0.3,
+        aeration_proxy=0.45,
+        turbulence_proxy=0.5,
+        hazard_tags=("wave_train",),
+    )
+    reach_grid = np.zeros(scenario.grid.shape, dtype=np.int32)
+    reach_grid[:, scenario.grid.nx // 2 :] = 1
+    drop_grid = np.full(scenario.grid.shape, -1, dtype=np.int32)
+    drop_grid[:, scenario.grid.nx // 2 - 1 : scenario.grid.nx // 2 + 1] = 0
+    return CascadingScenarioPackage2_5D(
+        scenario=scenario,
+        reaches=(upstream, downstream),
+        drop_transitions=(transition,),
+        reach_local_grids=(
+            ReachLocalGrid2_5D("pool_001", scenario.grid, downstream_ghost_cells=2),
+            ReachLocalGrid2_5D("wave_train_001", scenario.grid, upstream_ghost_cells=2),
+        ),
+        reach_id_grid=reach_grid,
+        drop_transition_id_grid=drop_grid,
+    )
 
 
 def test_reach_metadata_round_trips_required_milestone_fields():
@@ -195,3 +272,22 @@ def test_pool_control_metadata_rejects_inactive_or_invalid_pool_controls():
         )
     with pytest.raises(ValueError, match="radius"):
         PoolEddyControl2_5D(zone_id="bad", center_station=1.0, lateral_offset=0.0, radius=0.0)
+
+
+def test_cascading_package_writes_stitched_grid_annotations_and_round_trips(tmp_path):
+    package = _two_reach_package()
+    output_dir = package.write_package(tmp_path / "cascade")
+    loaded = read_cascading_scenario_package(output_dir)
+    metadata = json.loads((output_dir / CASCADING_METADATA_FILE).read_text(encoding="utf-8"))
+
+    assert (output_dir / "scenario.json").exists()
+    assert (output_dir / CASCADING_ANNOTATIONS_FILE).exists()
+    assert metadata["stitching"]["mode"] == "stitched_global_grid"
+    assert metadata["reach_index"] == {"0": "pool_001", "1": "wave_train_001"}
+    assert metadata["drop_transition_index"] == {"0": "drop_001"}
+    assert metadata["reach_local_grids"][0]["downstream_ghost_cells"] == 2
+    assert loaded.scenario.to_json_dict() == package.scenario.to_json_dict()
+    assert loaded.reaches == package.reaches
+    assert loaded.drop_transitions == package.drop_transitions
+    np.testing.assert_array_equal(loaded.reach_id_grid, package.reach_id_grid)
+    np.testing.assert_array_equal(loaded.drop_transition_id_grid, package.drop_transition_id_grid)
