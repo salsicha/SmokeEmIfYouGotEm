@@ -9,6 +9,7 @@ The old 2D river/raft path is retired. Future physics work starts with:
 - GeoClaw as the offline 2.5D shallow-water/geophysical-flow reference model.
 - A custom C++ reduced shallow-water / height-field solver as the runtime candidate.
 - Identical procedurally generated and real-world geospatial scenarios applied to both solvers.
+- A variable cascading 2.5D scenario package that models California-style pool-and-drop rivers as connected reaches with different slopes, roughness, hydraulic controls, and rapid/drop transitions.
 - A comparison and tuning harness that makes the C++ model match GeoClaw before Unreal production depends on live water.
 - Real river course, elevation, imagery, gauge, season, and difficulty presets that become validated scenario packages.
 
@@ -245,6 +246,23 @@ Conditionally superseded for live water by Milestone 14. Telemetry/replay playba
 - [x] Re-run raft coupling against GeoClaw outputs and C++ fields and compare force envelopes, trajectories, and outcomes.
 - [x] Regenerate the Python-to-Unreal readiness report with GeoClaw as the approved reference solver before live Unreal water depends on the custom C++ solver.
 
+## Milestone 15: Variable Cascading 2.5D Scenario Package
+
+This milestone replaces the current monolithic/mostly uniform 2.5D scenario package with a river-reach sequence model suitable for California pool-and-drop rivers. Each playable section should become an ordered chain of locally parameterized 2.5D reaches connected by explicit hydraulic transition zones.
+
+- [ ] Define `reach` metadata: station range, local grid transform, slope profile, width profile, bank shape, bed roughness, boulder density, vegetation/debris flags, and confidence score.
+- [ ] Define `drop_transition` metadata between reaches: crest station, bed-elevation fall, ramp/ledge length, tailwater depth, expected hydraulic control, recirculation risk, aeration/turbulence proxy, and hazard tags.
+- [ ] Encode pools separately from rapids: low-gradient recovery pools should have their own depth, eddy, recirculation, and tailwater controls rather than being treated as inactive gaps.
+- [ ] Support a sequence of reach-local grids with overlap/ghost zones or an equivalent stitched global grid so GeoClaw and C++ consume identical bathymetry, boundaries, and initial state.
+- [ ] Add conservation handoff checks across reach boundaries: mass flux, momentum flux, surface-elevation continuity where appropriate, energy loss across drops, and bounded wet/dry fronts.
+- [ ] Add procedural generators for California-style pool-and-drop patterns: pool, constricted tongue, ledge/drop, wave train, recovery eddy, boulder garden, and next pool.
+- [ ] Add South Fork American seed scenarios with variable slopes and rapid/drop transitions before generalizing to other rivers.
+- [ ] Run GeoClaw reference cases over the same cascading package and normalize fixed-grid output per reach and for the stitched river window.
+- [ ] Extend the custom C++ solver loader to consume the cascading package without changing scenario semantics.
+- [ ] Tune C++ section-handoff, roughness, dissipation, wet/dry, and feature-forcing coefficients against GeoClaw cascading outputs.
+- [ ] Add raft validation cases for pool entry, drop entry, hydraulic-hole surf/flush, eddy recovery, boulder-garden impacts, and transition-boundary crossings.
+- [ ] Export Unreal corridor metadata that preserves reach/drop IDs for streaming, debug overlays, audio, VFX, and designer review.
+
 ## Technical Notes To Revisit
 
 - [ ] Decide when to physically remove legacy 2D code, tests, examples, and videos from the repo.
@@ -252,6 +270,7 @@ Conditionally superseded for live water by Milestone 14. Telemetry/replay playba
 - [ ] Decide if SWASHES fixtures should be vendored, regenerated, or manually encoded.
 - [ ] Decide whether the C++ solver starts as CPU-only or gets a GPU path after correctness is established.
 - [ ] Decide how much authored feature forcing is acceptable versus pure shallow-water dynamics.
+- [ ] Decide the canonical storage format for cascading reach/drop packages: one stitched grid with reach annotations, multiple reach-local grids with ghost zones, or both.
 - [ ] Evaluate Chrono::FSI only after the GeoClaw/custom-C++ solver comparison path is stable.
 - [ ] Identify reference footage, river data, aerial/satellite imagery, flow history, and expert guide feedback needed for validation.
 - [ ] Decide which geospatial formats become canonical for source data, generated scenarios, and Unreal corridor packages.

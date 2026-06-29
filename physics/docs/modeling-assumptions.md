@@ -5,9 +5,10 @@
 The first engine is based on these modeling directions:
 
 - Project Chrono is the selected external physics backend for long-term raft/fluid-solid interaction work and full Unreal runtime physics.
-- PyClaw is the offline Python reference for depth-averaged shallow-water modeling.
+- GeoClaw is the offline Python/Clawpack reference for depth-averaged shallow-water/geophysical-flow modeling. PyClaw artifacts are legacy regression data only.
 - A custom C++ reduced shallow-water / height-field solver is the runtime water candidate.
 - Real-world river sections must remain solver-neutral scenario packages with source manifests, geospatial transforms, rapid annotations, seasonal flow presets, difficulty presets, and confidence metadata.
+- California-style pool-and-drop rivers should be modeled as variable cascading 2.5D reach/drop sequences, not as one averaged channel.
 - 6-DoF marine craft dynamics for raft position, orientation, velocity, and angular velocity.
 - Stateless fluid-force approximations for early buoyancy, drag, lift, and added-mass terms.
 - XPBD-style compliant constraints for later inflatable tube and floor deformation.
@@ -26,8 +27,8 @@ See [Backend Evaluation](backend-evaluation.md) for the external backend compari
 - The active first raft model is 6-DoF over 2.5D water fields.
 - The legacy top-down 2D prototype is not an active validation target.
 - Every force contribution must be recorded separately before tuning coefficients.
-- PyClaw and the custom C++ solver must consume the same generated or real-world scenario package.
-- The custom C++ solver is accepted by matching PyClaw reference outputs, not by matching the legacy 2D prototype.
+- GeoClaw and the custom C++ solver must consume the same generated or real-world scenario package.
+- The custom C++ solver is accepted by matching GeoClaw reference outputs, not by matching the legacy 2D prototype or old PyClaw artifacts.
 - "Looks plausible" is not enough; each feature needs an explicit regression scenario.
 
 ## First Physical Accuracy Targets
@@ -49,12 +50,14 @@ See [Backend Evaluation](backend-evaluation.md) for the external backend compari
 
 - Procedural 2.5D scenarios must be deterministic for a fixed seed and parameter set.
 - Real-world 2.5D scenarios must preserve source provenance, coordinate transforms, selected season/flow/difficulty, and confidence scores.
-- PyClaw and C++ must load equivalent bed, water, boundary, feature, and probe definitions.
+- Cascading river packages must preserve reach/drop IDs, station ranges, slope profiles, tailwater controls, roughness, boundaries, probes, and raft checkpoints.
+- GeoClaw and C++ must load equivalent bed, water, boundary, feature, and probe definitions.
 - Water fields must be deterministic functions of scenario state and simulation time.
+- Reach/drop handoffs must report mass flux, momentum flux, expected energy loss, wet/dry front behavior, and raft-state continuity.
 - Eddy-line scenarios must report lateral shear and yaw torque separately.
 - Standing-wave scenarios must classify cleared, stalled, surfed, flipped, or pinned outcomes.
 - Boil/upwelling proxy and low-damping regions must be explicit field values, not hidden random perturbations.
-- C++ field/probe errors must be compared against PyClaw reference outputs.
+- C++ field/probe errors must be compared against GeoClaw reference outputs.
 
 ### Contact And Rocks
 
@@ -64,4 +67,4 @@ See [Backend Evaluation](backend-evaluation.md) for the external backend compari
 
 ## Current Status
 
-Milestone 0 provides reusable infrastructure. The legacy 2D prototype exists, but new validation work starts with the 2.5D PyClaw/C++ dual-solver plan.
+Milestone 0 provides reusable infrastructure. The legacy 2D prototype exists, but new validation work starts with the 2.5D GeoClaw/C++ dual-solver plan and the next package revision should support variable cascading river reaches.

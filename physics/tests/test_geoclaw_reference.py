@@ -4,6 +4,8 @@ import csv
 import pytest
 
 from raftsim.comparison import compare_dual_solver_diagnostics, compare_dual_solver_fields
+from raftsim.dual_solver import CppSolverRunResult
+from raftsim.examples.compare_cpp_to_geoclaw_reference import main as compare_cpp_geoclaw_main
 from raftsim.examples.run_geoclaw_reference import main as geoclaw_main
 from raftsim.geoclaw_reference import (
     GEOCLAW_CANONICAL_FIXTURES,
@@ -99,8 +101,12 @@ def test_geoclaw_exporter_writes_solver_specific_files(tmp_path):
 
     assert manifest["schema"] == GEOCLAW_EXPORT_SCHEMA
     assert manifest["scenario_id"] == scenario.metadata.scenario_id
+    assert manifest["files"]["makefile"] == "Makefile"
+    assert manifest["files"]["qinit_fortran"] == "qinit.f90"
+    assert (result.output_dir / "Makefile").exists()
     assert (result.output_dir / "setrun.py").exists()
-    assert (result.output_dir / "topography" / "bed_topography.xyz").exists()
+    assert (result.output_dir / "qinit.f90").exists()
+    assert (result.output_dir / "b.tt1").exists()
     assert (result.output_dir / "initial_state" / "initial_water_state.npz").exists()
     assert (result.output_dir / "initial_state" / "qinit.xyz").exists()
     assert (result.output_dir / "roughness" / "manning_n.npy").exists()
@@ -108,6 +114,31 @@ def test_geoclaw_exporter_writes_solver_specific_files(tmp_path):
     assert (result.output_dir / "amr" / "amr_regions.json").exists()
     assert (result.output_dir / "fgout" / "fgout_grids.json").exists()
     assert (result.output_dir / "shared_scenario" / "scenario.json").exists()
+
+
+def test_geoclaw_exporter_writes_runnable_app_files(tmp_path):
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="uniform_channel", seed=12, nx=18, ny=10)
+    )
+    result = export_geoclaw_scenario(
+        scenario,
+        tmp_path / "geoclaw" / scenario.metadata.scenario_id,
+        config=GeoClawExportConfig(num_output_times=4),
+    )
+
+    makefile = (result.output_dir / "Makefile").read_text(encoding="utf-8")
+    setrun = (result.output_dir / "setrun.py").read_text(encoding="utf-8")
+    qinit = (result.output_dir / "qinit.f90").read_text(encoding="utf-8")
+    topo_first_line = (result.output_dir / "b.tt1").read_text(encoding="utf-8").splitlines()[0]
+
+    assert "Makefile.geoclaw" in makefile
+    assert "./qinit.f90" in makefile
+    assert "rundata.fgout_data.fgout_grids = [fgout]" in setrun
+    assert "setrun(package).write()" in setrun
+    assert "b.tt1" in setrun
+    assert "../initial_state/qinit.xyz" in qinit
+    assert "read(unit,*,iostat=ios)" in qinit
+    assert not topo_first_line.startswith("#")
 
 
 def test_geoclaw_exporter_records_fixed_grid_times(tmp_path):
@@ -143,6 +174,38 @@ def test_geoclaw_cli_exports_fixture(tmp_path):
 
     assert exit_code == 0
     assert (tmp_path / "flat_pool_seed_7" / "manifest.json").exists()
+
+
+def test_geoclaw_cli_exports_south_fork_flow_band(tmp_path):
+    exit_code = geoclaw_main(
+        [
+            "--south-fork-flow-band",
+            "low_runnable",
+            "--south-fork-difficulty",
+            "beginner",
+            "--nx",
+            "18",
+            "--ny",
+            "10",
+            "--num-output-times",
+            "2",
+            "--amr-min-level",
+            "2",
+            "--amr-max-level",
+            "2",
+            "--allow-unavailable",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+    scenario_id = "american_south_fork_chili_bar_to_coloma_low_runnable_beginner"
+    manifest = json.loads((tmp_path / scenario_id / "manifest.json").read_text(encoding="utf-8"))
+
+    assert exit_code == 0
+    assert manifest["scenario_metadata"]["flow_band"] == "low_runnable"
+    assert manifest["scenario_metadata"]["difficulty_preset"] == "beginner"
+    assert manifest["config"]["amr_min_level"] == 2
+    assert manifest["config"]["amr_max_level"] == 2
 
 
 def test_canonical_geoclaw_scenarios_include_extended_fixtures():
@@ -291,6 +354,42 @@ def test_geoclaw_cli_normalizes_export(tmp_path):
     assert (tmp_path / "normalized" / "manifest.json").exists()
 
 
+def test_geoclaw_cli_runs_existing_export_with_normalization(monkeypatch, tmp_path, capsys):
+    class FakeRunResult:
+        scenario_id = "fake_geoclaw"
+        export_dir = tmp_path / "export"
+        returncode = 0
+        frame_count = 2
+        passed = True
+
+    class FakeNormalizedResult:
+        scenario_id = "fake_geoclaw"
+        manifest_path = tmp_path / "export" / "normalized" / "manifest.json"
+        frame_count = 2
+
+    calls = {}
+
+    def fake_run(export_dir, *, config, export_config):
+        calls["run"] = (export_dir, config.timeout_seconds, config.make_target, export_config.num_output_times)
+        return FakeRunResult()
+
+    def fake_normalize(export_dir, output_dir=None, *, config=None):
+        calls["normalize"] = (export_dir, output_dir, config.num_output_times)
+        return FakeNormalizedResult()
+
+    monkeypatch.setattr("raftsim.examples.run_geoclaw_reference.run_geoclaw_export", fake_run)
+    monkeypatch.setattr("raftsim.examples.run_geoclaw_reference.normalize_geoclaw_fixed_grid_output", fake_normalize)
+
+    exit_code = geoclaw_main(["--run-export", str(tmp_path / "export"), "--num-output-times", "2"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert calls["run"] == (tmp_path / "export", 300.0, ".output", 2)
+    assert calls["normalize"] == (tmp_path / "export", tmp_path / "export" / "normalized", 2)
+    assert "run_frames=2" in output
+    assert "normalized_frames=2" in output
+
+
 def test_comparison_harness_accepts_geoclaw_reference_manifest(tmp_path):
     scenario = generate_fixture_scenario2_5d(
         FixtureScenario2_5DParameters(fixture="flat_pool", seed=19, nx=12, ny=8)
@@ -337,6 +436,66 @@ def test_comparison_harness_accepts_geoclaw_reference_manifest(tmp_path):
     assert field_report.frame_comparisons[0].field_errors[0].linf == 0.0
     assert diagnostic_report.reference_solver == "geoclaw"
     assert diagnostic_report.pyclaw.solver == "geoclaw"
+
+
+def test_cpp_geoclaw_cli_wires_existing_normalized_reference(monkeypatch, tmp_path):
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="flat_pool", seed=20, nx=12, ny=8)
+    )
+    scenario_dir = scenario.write_package(tmp_path / "scenario" / scenario.metadata.scenario_id)
+    export = export_geoclaw_scenario(scenario, tmp_path / "geoclaw_export")
+    normalized = normalize_geoclaw_fixed_grid_output(export.output_dir, tmp_path / "geoclaw_normalized")
+    frame = frame_from_geoclaw_initial_state(scenario)
+
+    def fake_run_cpp_solver_scenario(scenario_or_path, *, output_dir, config):
+        cpp_dir = tmp_path / "comparison" / "cpp_solver" / scenario.metadata.scenario_id
+        _write_cpp_frame_csv(cpp_dir / "frames" / "frame_0000.csv", frame)
+        _write_json(
+            cpp_dir / "manifest.json",
+            {
+                "frames": ["frames/frame_0000.csv"],
+                "probes": [],
+                "cross_sections": [],
+            },
+        )
+        _write_json(cpp_dir / "validation.json", {"passed": True})
+        return CppSolverRunResult(
+            command=("fake_cpp",),
+            returncode=0,
+            stdout="",
+            stderr="",
+            output_dir=cpp_dir,
+            manifest_path=cpp_dir / "manifest.json",
+            validation_path=cpp_dir / "validation.json",
+            runtime_seconds=0.01,
+        )
+
+    monkeypatch.setattr(
+        "raftsim.examples.compare_cpp_to_geoclaw_reference.run_cpp_solver_scenario",
+        fake_run_cpp_solver_scenario,
+    )
+
+    exit_code = compare_cpp_geoclaw_main(
+        [
+            "--scenario-dir",
+            str(scenario_dir),
+            "--geoclaw-normalized",
+            str(normalized.output_dir),
+            "--cpp-solver",
+            str(tmp_path / "fake_cpp"),
+            "--output-dir",
+            str(tmp_path / "comparison"),
+        ]
+    )
+    manifest = json.loads((tmp_path / "comparison" / "dual_solver_manifest.json").read_text(encoding="utf-8"))
+
+    assert exit_code == 0
+    assert manifest["geoclaw"]["solver"] == "geoclaw"
+    assert manifest["runtime"]["cpp_runtime_seconds"] == 0.01
+    assert (tmp_path / "comparison" / "field_comparison.json").exists()
+    assert (tmp_path / "comparison" / "probe_comparison.json").exists()
+    assert (tmp_path / "comparison" / "diagnostic_comparison.json").exists()
+    assert (tmp_path / "comparison" / "threshold_evaluation.json").exists()
 
 
 def _write_cpp_frame_csv(path, frame) -> None:

@@ -8,6 +8,8 @@ The custom C++ reduced shallow-water / height-field solver remains the Unreal ru
 
 PyClaw outputs remain useful as historical regression data, but they are no longer the physics acceptance target for cascading river water.
 
+The next reference target is a variable cascading 2.5D scenario package: an ordered sequence of pools, reach-local slopes, sudden drops, rapid transitions, and recovery zones that represents California pool-and-drop rivers more faithfully than a single averaged channel.
+
 ## Why GeoClaw
 
 GeoClaw is built around depth-averaged geophysical flow over varying topography. That matches the river problems this simulator cares about better than the earlier PyClaw-only plan:
@@ -37,6 +39,7 @@ shared scenario package
       -> initial depth/surface/momentum state
       -> boundary and hydrograph inputs
       -> Manning/roughness fields
+      -> reach/drop transition metadata
       -> AMR refinement regions
       -> fixed-grid output requests
   -> GeoClaw reference run
@@ -51,6 +54,8 @@ shared scenario package
 ```
 
 The C++ solver does not need to duplicate GeoClaw numerics. It must match GeoClaw outputs and raft-relevant behavior within accepted tolerances.
+
+For cascading packages, GeoClaw should validate both the full stitched domain and reach/drop-local windows. The C++ solver may later stream or update reach windows for runtime cost, but the source package must preserve the same bathymetry, roughness, boundaries, and transition semantics.
 
 ## Local Setup Check
 
@@ -85,7 +90,9 @@ Install the Python research dependency with `python -m pip install -e ".[researc
 9. Normalize GeoClaw frames into the current field/probe/cross-section schema.
 10. Update the comparison harness from PyClaw-vs-C++ to GeoClaw-vs-C++.
 11. Retune C++ numerical coefficients, roughness, damping, wet/dry thresholds, authored feature forcing, and raft-force parameters against GeoClaw.
-12. Re-run real-world low/median/high flow validation and regenerate the Python-to-Unreal readiness report.
+12. Replace the current monolithic real-world package with a variable cascading reach/drop package for South Fork American baseline validation.
+13. Add reach-boundary diagnostics for mass flux, momentum flux, energy loss, wet/dry fronts, and raft-state continuity.
+14. Re-run real-world low/median/high flow validation and regenerate the Python-to-Unreal readiness report.
 
 ## Validation Matrix
 
@@ -109,6 +116,7 @@ Install the Python research dependency with `python -m pip install -e ".[researc
 - Eddy line with shear/yaw impulse.
 - Shallow shelf grounding region.
 - Real-world low, median, and high runnable flow bands.
+- Cascading pool-and-drop sequence with alternating low-gradient pools, steep reach entries, sudden bed drops, hydraulic controls, and recovery eddies.
 
 ### Metrics
 
@@ -123,6 +131,7 @@ Install the Python research dependency with `python -m pip install -e ".[researc
 - Eddy-line shear location and strength.
 - Raft force envelope and trajectory outcome.
 - Runtime cost for the custom C++ solver.
+- Reach/drop handoff conservation and continuity: mass flux, momentum flux, expected energy loss, wet/dry boundary behavior, and raft transition stability.
 
 ## Acceptance Gates
 

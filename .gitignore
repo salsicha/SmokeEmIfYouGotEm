@@ -20,3 +20,5 @@ dist/
 outputs/
 *.telemetry.csv
 pyclaw.log
+
+graphify-out/
