@@ -2,12 +2,22 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Literal
 
+import numpy as np
+from numpy.typing import NDArray
+
+from .scenario2_5d import GridSpec2_5D, Scenario2_5D, read_scenario2_5d_package
+
 MetadataValue = str | int | float | bool | None
+IntGrid = NDArray[np.int32]
 
 CASCADING_SCHEMA_VERSION = "raftsim.cascading2_5d.v0"
+CASCADING_METADATA_FILE = "cascading_metadata.json"
+CASCADING_ANNOTATIONS_FILE = "cascading_annotations.npz"
 ReachKind2_5D = Literal["pool", "tongue", "drop", "wave_train", "eddy_recovery", "boulder_garden", "runout"]
 BankShapeKind2_5D = Literal["trapezoid", "bedrock", "alluvial", "vegetated", "constructed", "unknown"]
 DropGeometryKind2_5D = Literal["ramp", "ledge", "mixed"]
@@ -414,3 +424,141 @@ class PoolControlMetadata2_5D:
             ),
             metadata=data.get("metadata", {}) if isinstance(data.get("metadata", {}), dict) else {},
         )
+
+
+@dataclass(frozen=True, slots=True)
+class ReachLocalGrid2_5D:
+    reach_id: str
+    grid: GridSpec2_5D
+    upstream_ghost_cells: int = 0
+    downstream_ghost_cells: int = 0
+
+    def __post_init__(self) -> None:
+        if not self.reach_id:
+            raise ValueError("reach local grid reach_id is required.")
+        if self.upstream_ghost_cells < 0 or self.downstream_ghost_cells < 0:
+            raise ValueError("reach local grid ghost cells must be non-negative.")
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "reach_id": self.reach_id,
+            "grid": self.grid.to_json_dict(),
+            "upstream_ghost_cells": self.upstream_ghost_cells,
+            "downstream_ghost_cells": self.downstream_ghost_cells,
+        }
+
+    @classmethod
+    def from_json_dict(cls, data: dict[str, object]) -> ReachLocalGrid2_5D:
+        return cls(
+            reach_id=str(data["reach_id"]),
+            grid=GridSpec2_5D.from_json_dict(data["grid"]),  # type: ignore[arg-type]
+            upstream_ghost_cells=int(data.get("upstream_ghost_cells", 0)),
+            downstream_ghost_cells=int(data.get("downstream_ghost_cells", 0)),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class CascadingScenarioPackage2_5D:
+    scenario: Scenario2_5D
+    reaches: tuple[ReachMetadata2_5D, ...]
+    drop_transitions: tuple[DropTransitionMetadata2_5D, ...] = ()
+    pool_controls: tuple[PoolControlMetadata2_5D, ...] = ()
+    reach_local_grids: tuple[ReachLocalGrid2_5D, ...] = ()
+    reach_id_grid: IntGrid | None = None
+    drop_transition_id_grid: IntGrid | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "reaches", tuple(self.reaches))
+        object.__setattr__(self, "drop_transitions", tuple(self.drop_transitions))
+        object.__setattr__(self, "pool_controls", tuple(self.pool_controls))
+        object.__setattr__(self, "reach_local_grids", tuple(self.reach_local_grids))
+        if not self.reaches:
+            raise ValueError("cascading package must include at least one reach.")
+        reach_ids = [reach.reach_id for reach in self.reaches]
+        if len(reach_ids) != len(set(reach_ids)):
+            raise ValueError("cascading package reach ids must be unique.")
+        reach_id_set = set(reach_ids)
+        for drop in self.drop_transitions:
+            if drop.upstream_reach_id not in reach_id_set or drop.downstream_reach_id not in reach_id_set:
+                raise ValueError("drop transition references an unknown reach.")
+        for pool in self.pool_controls:
+            if pool.reach_id not in reach_id_set:
+                raise ValueError("pool control references an unknown reach.")
+        for local_grid in self.reach_local_grids:
+            if local_grid.reach_id not in reach_id_set:
+                raise ValueError("reach local grid references an unknown reach.")
+
+        default_reach_grid = np.full(self.scenario.grid.shape, -1, dtype=np.int32)
+        reach_grid = np.asarray(self.reach_id_grid if self.reach_id_grid is not None else default_reach_grid, dtype=np.int32)
+        drop_grid = np.asarray(
+            self.drop_transition_id_grid if self.drop_transition_id_grid is not None else default_reach_grid,
+            dtype=np.int32,
+        )
+        if reach_grid.shape != self.scenario.grid.shape:
+            raise ValueError("reach_id_grid shape must match scenario grid.")
+        if drop_grid.shape != self.scenario.grid.shape:
+            raise ValueError("drop_transition_id_grid shape must match scenario grid.")
+        if reach_grid.size and int(reach_grid.max()) >= len(self.reaches):
+            raise ValueError("reach_id_grid contains an unknown reach index.")
+        if drop_grid.size and int(drop_grid.max()) >= len(self.drop_transitions):
+            raise ValueError("drop_transition_id_grid contains an unknown drop-transition index.")
+        object.__setattr__(self, "reach_id_grid", reach_grid.copy())
+        object.__setattr__(self, "drop_transition_id_grid", drop_grid.copy())
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": CASCADING_SCHEMA_VERSION,
+            "scenario_id": self.scenario.metadata.scenario_id,
+            "base_scenario": "scenario.json",
+            "annotation_files": {"reach_drop_indices": CASCADING_ANNOTATIONS_FILE},
+            "reach_index": {str(index): reach.reach_id for index, reach in enumerate(self.reaches)},
+            "drop_transition_index": {
+                str(index): transition.transition_id for index, transition in enumerate(self.drop_transitions)
+            },
+            "reaches": [reach.to_json_dict() for reach in self.reaches],
+            "drop_transitions": [transition.to_json_dict() for transition in self.drop_transitions],
+            "pool_controls": [pool.to_json_dict() for pool in self.pool_controls],
+            "reach_local_grids": [grid.to_json_dict() for grid in self.reach_local_grids],
+            "stitching": {
+                "mode": "stitched_global_grid",
+                "reach_id_grid": "reach_id_grid",
+                "drop_transition_id_grid": "drop_transition_id_grid",
+            },
+        }
+
+    def write_package(self, directory: str | Path) -> Path:
+        output_dir = self.scenario.write_package(directory)
+        np.savez_compressed(
+            output_dir / CASCADING_ANNOTATIONS_FILE,
+            reach_id_grid=self.reach_id_grid,
+            drop_transition_id_grid=self.drop_transition_id_grid,
+        )
+        _write_json(output_dir / CASCADING_METADATA_FILE, self.to_json_dict())
+        return output_dir
+
+
+def read_cascading_scenario_package(path: str | Path) -> CascadingScenarioPackage2_5D:
+    root = Path(path)
+    package_dir = root.parent if root.name == "scenario.json" else root
+    scenario = read_scenario2_5d_package(package_dir)
+    metadata = json.loads((package_dir / CASCADING_METADATA_FILE).read_text(encoding="utf-8"))
+    if metadata.get("schema_version") != CASCADING_SCHEMA_VERSION:
+        raise ValueError(f"Unsupported cascading schema version: {metadata.get('schema_version')!r}")
+    with np.load(package_dir / CASCADING_ANNOTATIONS_FILE) as annotations:
+        reach_id_grid = np.asarray(annotations["reach_id_grid"], dtype=np.int32)
+        drop_transition_id_grid = np.asarray(annotations["drop_transition_id_grid"], dtype=np.int32)
+    return CascadingScenarioPackage2_5D(
+        scenario=scenario,
+        reaches=tuple(ReachMetadata2_5D.from_json_dict(item) for item in metadata.get("reaches", [])),
+        drop_transitions=tuple(
+            DropTransitionMetadata2_5D.from_json_dict(item) for item in metadata.get("drop_transitions", [])
+        ),
+        pool_controls=tuple(PoolControlMetadata2_5D.from_json_dict(item) for item in metadata.get("pool_controls", [])),
+        reach_local_grids=tuple(ReachLocalGrid2_5D.from_json_dict(item) for item in metadata.get("reach_local_grids", [])),
+        reach_id_grid=reach_id_grid,
+        drop_transition_id_grid=drop_transition_id_grid,
+    )
+
+
+def _write_json(path: Path, data: dict[str, object]) -> None:
+    path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
