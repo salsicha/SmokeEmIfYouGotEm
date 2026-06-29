@@ -16,6 +16,12 @@ from ..comparison import (
     evaluate_dual_solver_thresholds,
 )
 from ..dual_solver import CppSolverRunConfig, run_cpp_solver_scenario
+from ..real_world import (
+    PlayerSelection,
+    default_player_selections,
+    generate_real_world_scenario2_5d,
+    south_fork_american_section,
+)
 from ..scenario2_5d import read_scenario2_5d_package
 from ..tuning import write_geoclaw_dual_solver_manifest
 
@@ -31,8 +37,10 @@ class ExistingGeoClawReference:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--scenario-dir", type=Path, required=True, help="Shared 2.5D scenario package used by GeoClaw.")
-    parser.add_argument("--geoclaw-normalized", type=Path, required=True, help="Normalized GeoClaw output directory.")
+    parser.add_argument("--scenario-dir", type=Path, default=None, help="Shared 2.5D scenario package used by GeoClaw.")
+    parser.add_argument("--geoclaw-normalized", type=Path, default=None, help="Normalized GeoClaw output directory.")
+    parser.add_argument("--fixture-registry", type=Path, default=None, help="Committed GeoClaw fixture registry JSON.")
+    parser.add_argument("--flow-band", default=None, help="Flow band to load from --fixture-registry.")
     parser.add_argument("--cpp-solver", type=Path, required=True, help="Path to raftsim_water_solver.")
     parser.add_argument("--output-dir", type=Path, default=Path("outputs/geoclaw_cpp_comparison"))
     parser.add_argument("--cpp-steps", type=int, default=None)
@@ -53,9 +61,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--velocity-depth-floor", type=float, default=DEFAULT_THRESHOLDS.velocity_depth_floor)
     args = parser.parse_args(argv)
 
-    scenario_dir = args.scenario_dir.resolve()
-    normalized_dir = args.geoclaw_normalized.resolve()
-    scenario = read_scenario2_5d_package(scenario_dir)
+    scenario, normalized_dir = _load_reference_selection(args)
     geoclaw_reference = _existing_geoclaw_reference(normalized_dir)
     if geoclaw_reference.scenario_id != scenario.metadata.scenario_id:
         raise SystemExit(
@@ -131,6 +137,70 @@ def _existing_geoclaw_reference(path: Path) -> ExistingGeoClawReference:
         scenario_id=str(manifest["scenario_id"]),
         output_dir=path,
         manifest_path=manifest_path,
+    )
+
+
+def _load_reference_selection(args: argparse.Namespace):
+    if args.fixture_registry is not None:
+        if args.flow_band is None:
+            raise SystemExit("--flow-band is required when using --fixture-registry.")
+        if args.scenario_dir is not None or args.geoclaw_normalized is not None:
+            raise SystemExit("Use either --fixture-registry/--flow-band or --scenario-dir/--geoclaw-normalized, not both.")
+        return _load_from_fixture_registry(args.fixture_registry.resolve(), str(args.flow_band))
+
+    if args.scenario_dir is None or args.geoclaw_normalized is None:
+        raise SystemExit("Provide --scenario-dir and --geoclaw-normalized, or --fixture-registry and --flow-band.")
+    return read_scenario2_5d_package(args.scenario_dir.resolve()), args.geoclaw_normalized.resolve()
+
+
+def _load_from_fixture_registry(registry_path: Path, flow_band: str):
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    fixtures = registry.get("fixtures", [])
+    if not isinstance(fixtures, list):
+        raise ValueError("fixture registry must include a fixtures list.")
+    entry = next((item for item in fixtures if isinstance(item, dict) and item.get("flow_band") == flow_band), None)
+    if entry is None:
+        raise SystemExit(f"Flow band {flow_band!r} not found in {registry_path}.")
+
+    grid = registry.get("grid", {})
+    if not isinstance(grid, dict):
+        raise ValueError("fixture registry grid must be an object.")
+    scenario = _south_fork_scenario_from_registry_entry(
+        flow_band=flow_band,
+        difficulty=str(entry["difficulty"]),
+        nx=int(grid["nx"]),
+        ny=int(grid["ny"]),
+        duration=float(registry["duration_seconds"]),
+    )
+    normalized_dir = registry_path.parent / str(entry["fixture_dir"])
+    return scenario, normalized_dir
+
+
+def _south_fork_scenario_from_registry_entry(
+    *,
+    flow_band: str,
+    difficulty: str,
+    nx: int,
+    ny: int,
+    duration: float,
+):
+    section = south_fork_american_section()
+    default_selection = next(selection for selection in default_player_selections() if selection.flow_band == flow_band)
+    selection = PlayerSelection(
+        region=default_selection.region,
+        river_id=section.river_id,
+        section_id=section.section_id,
+        season=default_selection.season,
+        flow_band=flow_band,
+        difficulty=difficulty,
+        raft_setup=default_selection.raft_setup,
+    )
+    return generate_real_world_scenario2_5d(
+        selection,
+        nx=nx,
+        ny=ny,
+        duration=duration,
+        pyclaw_reference_min_depth_m=0.0,
     )
 
 
