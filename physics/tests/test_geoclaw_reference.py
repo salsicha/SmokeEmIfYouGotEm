@@ -1,6 +1,8 @@
 import json
 import csv
+from pathlib import Path
 
+import numpy as np
 import pytest
 
 from raftsim.comparison import compare_dual_solver_diagnostics, compare_dual_solver_fields
@@ -498,6 +500,68 @@ def test_cpp_geoclaw_cli_wires_existing_normalized_reference(monkeypatch, tmp_pa
     assert (tmp_path / "comparison" / "threshold_evaluation.json").exists()
 
 
+def test_cpp_geoclaw_cli_loads_committed_fixture_registry(monkeypatch, tmp_path):
+    physics_dir = Path(__file__).resolve().parents[1]
+    registry = (
+        physics_dir
+        / "data"
+        / "real_world"
+        / "south_fork_american_chili_bar"
+        / "geoclaw_reference"
+        / "amr_2_3"
+        / "fixture_registry.json"
+    )
+    fixture_dir = registry.parent / "low_runnable"
+
+    def fake_run_cpp_solver_scenario(scenario_or_path, *, output_dir, config):
+        cpp_dir = tmp_path / "registry_comparison" / "cpp_solver" / scenario_or_path.metadata.scenario_id
+        _write_cpp_frame_csv_from_npz(cpp_dir / "frames" / "frame_0000.csv", fixture_dir / "frames" / "frame_0000.npz")
+        _write_cpp_frame_csv_from_npz(cpp_dir / "frames" / "frame_0001.csv", fixture_dir / "frames" / "frame_0004.npz")
+        _write_json(
+            cpp_dir / "manifest.json",
+            {
+                "frames": ["frames/frame_0000.csv", "frames/frame_0001.csv"],
+                "probes": [],
+                "cross_sections": [],
+            },
+        )
+        _write_json(cpp_dir / "validation.json", {"passed": True})
+        return CppSolverRunResult(
+            command=("fake_cpp",),
+            returncode=0,
+            stdout="",
+            stderr="",
+            output_dir=cpp_dir,
+            manifest_path=cpp_dir / "manifest.json",
+            validation_path=cpp_dir / "validation.json",
+            runtime_seconds=0.01,
+        )
+
+    monkeypatch.setattr(
+        "raftsim.examples.compare_cpp_to_geoclaw_reference.run_cpp_solver_scenario",
+        fake_run_cpp_solver_scenario,
+    )
+
+    exit_code = compare_cpp_geoclaw_main(
+        [
+            "--fixture-registry",
+            str(registry),
+            "--flow-band",
+            "low_runnable",
+            "--cpp-solver",
+            str(tmp_path / "fake_cpp"),
+            "--output-dir",
+            str(tmp_path / "registry_comparison"),
+        ]
+    )
+    manifest = json.loads((tmp_path / "registry_comparison" / "dual_solver_manifest.json").read_text(encoding="utf-8"))
+
+    assert exit_code == 0
+    assert manifest["scenario_id"] == "american_south_fork_chili_bar_to_coloma_low_runnable_beginner"
+    assert manifest["geoclaw"]["manifest"].endswith("low_runnable/manifest.json")
+    assert (tmp_path / "registry_comparison" / "threshold_evaluation.json").exists()
+
+
 def _write_cpp_frame_csv(path, frame) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     columns = [
@@ -537,6 +601,49 @@ def _write_cpp_frame_csv(path, frame) -> None:
                         frame.froude[row, col],
                     ]
                 )
+
+
+def _write_cpp_frame_csv_from_npz(path, frame_path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with np.load(frame_path) as data:
+        columns = [
+            "row",
+            "col",
+            "h",
+            "eta",
+            "u",
+            "v",
+            "hu",
+            "hv",
+            "wet",
+            "normal_x",
+            "normal_y",
+            "normal_z",
+            "froude",
+        ]
+        with path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.writer(handle)
+            writer.writerow(columns)
+            h = data["h"]
+            for row in range(h.shape[0]):
+                for col in range(h.shape[1]):
+                    writer.writerow(
+                        [
+                            row,
+                            col,
+                            data["h"][row, col],
+                            data["eta"][row, col],
+                            data["u"][row, col],
+                            data["v"][row, col],
+                            data["hu"][row, col],
+                            data["hv"][row, col],
+                            int(data["wet"][row, col]),
+                            data["normal_x"][row, col],
+                            data["normal_y"][row, col],
+                            data["normal_z"][row, col],
+                            data["froude"][row, col],
+                        ]
+                    )
 
 
 def _write_json(path, data) -> None:
