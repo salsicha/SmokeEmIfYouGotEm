@@ -19,6 +19,7 @@ HydraulicControlKind2_5D = Literal[
     "wave_train",
     "unknown",
 ]
+PoolOutflowControlKind2_5D = Literal["free_outflow", "tailwater_limited", "drop_controlled", "backwater", "unknown"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -289,5 +290,127 @@ class DropTransitionMetadata2_5D:
             aeration_proxy=float(data.get("aeration_proxy", 0.0)),
             turbulence_proxy=float(data.get("turbulence_proxy", 0.0)),
             hazard_tags=tuple(str(value) for value in data.get("hazard_tags", [])),  # type: ignore[union-attr]
+            metadata=data.get("metadata", {}) if isinstance(data.get("metadata", {}), dict) else {},
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class PoolEddyControl2_5D:
+    zone_id: str
+    center_station: float
+    lateral_offset: float
+    radius: float
+    circulation_strength: float = 0.0
+    recirculation_risk: float = 0.0
+
+    def __post_init__(self) -> None:
+        if not self.zone_id:
+            raise ValueError("pool eddy zone_id is required.")
+        if self.center_station < 0.0:
+            raise ValueError("pool eddy center station must be non-negative.")
+        if self.radius <= 0.0:
+            raise ValueError("pool eddy radius must be positive.")
+        for name, value in (
+            ("circulation strength", self.circulation_strength),
+            ("recirculation risk", self.recirculation_risk),
+        ):
+            if not 0.0 <= value <= 1.0:
+                raise ValueError(f"pool eddy {name} must be between 0 and 1.")
+
+    def to_json_dict(self) -> dict[str, float | str]:
+        return {
+            "zone_id": self.zone_id,
+            "center_station": self.center_station,
+            "lateral_offset": self.lateral_offset,
+            "radius": self.radius,
+            "circulation_strength": self.circulation_strength,
+            "recirculation_risk": self.recirculation_risk,
+        }
+
+    @classmethod
+    def from_json_dict(cls, data: dict[str, object]) -> PoolEddyControl2_5D:
+        return cls(
+            zone_id=str(data["zone_id"]),
+            center_station=float(data["center_station"]),
+            lateral_offset=float(data.get("lateral_offset", 0.0)),
+            radius=float(data["radius"]),
+            circulation_strength=float(data.get("circulation_strength", 0.0)),
+            recirculation_risk=float(data.get("recirculation_risk", 0.0)),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class PoolControlMetadata2_5D:
+    pool_id: str
+    reach_id: str
+    depth_profile: tuple[StationProfilePoint2_5D, ...]
+    tailwater_depth: float
+    storage_coefficient: float = 0.0
+    residence_time_seconds: float = 0.0
+    outflow_control: PoolOutflowControlKind2_5D = "unknown"
+    eddy_controls: tuple[PoolEddyControl2_5D, ...] = ()
+    recirculation_zones: tuple[PoolEddyControl2_5D, ...] = ()
+    metadata: dict[str, MetadataValue] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.pool_id or not self.reach_id:
+            raise ValueError("pool_id and reach_id are required.")
+        object.__setattr__(self, "depth_profile", tuple(self.depth_profile))
+        object.__setattr__(self, "eddy_controls", tuple(self.eddy_controls))
+        object.__setattr__(self, "recirculation_zones", tuple(self.recirculation_zones))
+        if not self.depth_profile:
+            raise ValueError("pool depth profile cannot be empty.")
+        stations = [point.station for point in self.depth_profile]
+        if stations != sorted(stations):
+            raise ValueError("pool depth profile stations must be sorted.")
+        if any(point.value <= 0.0 for point in self.depth_profile):
+            raise ValueError("pool depth profile values must be positive.")
+        if self.tailwater_depth <= 0.0:
+            raise ValueError("pool tailwater depth must be positive.")
+        if self.storage_coefficient < 0.0:
+            raise ValueError("pool storage coefficient must be non-negative.")
+        if self.residence_time_seconds < 0.0:
+            raise ValueError("pool residence time must be non-negative.")
+
+    @property
+    def mean_depth(self) -> float:
+        return sum(point.value for point in self.depth_profile) / len(self.depth_profile)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "pool_id": self.pool_id,
+            "reach_id": self.reach_id,
+            "depth_profile": [point.to_json_dict() for point in self.depth_profile],
+            "mean_depth": self.mean_depth,
+            "tailwater_depth": self.tailwater_depth,
+            "storage_coefficient": self.storage_coefficient,
+            "residence_time_seconds": self.residence_time_seconds,
+            "outflow_control": self.outflow_control,
+            "eddy_controls": [eddy.to_json_dict() for eddy in self.eddy_controls],
+            "recirculation_zones": [zone.to_json_dict() for zone in self.recirculation_zones],
+            "metadata": self.metadata,
+        }
+
+    @classmethod
+    def from_json_dict(cls, data: dict[str, object]) -> PoolControlMetadata2_5D:
+        return cls(
+            pool_id=str(data["pool_id"]),
+            reach_id=str(data["reach_id"]),
+            depth_profile=tuple(
+                StationProfilePoint2_5D.from_json_dict(point)
+                for point in data.get("depth_profile", [])  # type: ignore[union-attr]
+            ),
+            tailwater_depth=float(data["tailwater_depth"]),
+            storage_coefficient=float(data.get("storage_coefficient", 0.0)),
+            residence_time_seconds=float(data.get("residence_time_seconds", 0.0)),
+            outflow_control=str(data.get("outflow_control", "unknown")),  # type: ignore[arg-type]
+            eddy_controls=tuple(
+                PoolEddyControl2_5D.from_json_dict(eddy)
+                for eddy in data.get("eddy_controls", [])  # type: ignore[union-attr]
+            ),
+            recirculation_zones=tuple(
+                PoolEddyControl2_5D.from_json_dict(zone)
+                for zone in data.get("recirculation_zones", [])  # type: ignore[union-attr]
+            ),
             metadata=data.get("metadata", {}) if isinstance(data.get("metadata", {}), dict) else {},
         )

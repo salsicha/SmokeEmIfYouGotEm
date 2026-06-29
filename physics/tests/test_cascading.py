@@ -3,6 +3,8 @@ import pytest
 from raftsim.cascading import (
     BankShape2_5D,
     DropTransitionMetadata2_5D,
+    PoolControlMetadata2_5D,
+    PoolEddyControl2_5D,
     ReachGridTransform2_5D,
     ReachMetadata2_5D,
     StationProfilePoint2_5D,
@@ -134,3 +136,62 @@ def test_drop_transition_metadata_rejects_invalid_handoff_controls():
             ramp_length=2.0,
             recirculation_risk=1.4,
         )
+
+
+def test_pool_control_metadata_round_trips_depth_eddy_recirculation_and_tailwater_controls():
+    eddy = PoolEddyControl2_5D(
+        zone_id="river_left_eddy",
+        center_station=18.0,
+        lateral_offset=6.5,
+        radius=4.0,
+        circulation_strength=0.45,
+        recirculation_risk=0.2,
+    )
+    recirculation = PoolEddyControl2_5D(
+        zone_id="tailout_recirculation",
+        center_station=38.0,
+        lateral_offset=-3.0,
+        radius=2.5,
+        circulation_strength=0.35,
+        recirculation_risk=0.52,
+    )
+    pool = PoolControlMetadata2_5D(
+        pool_id="pool_001_control",
+        reach_id="pool_001",
+        depth_profile=(
+            StationProfilePoint2_5D(0.0, 1.9),
+            StationProfilePoint2_5D(42.0, 1.45),
+        ),
+        tailwater_depth=1.3,
+        storage_coefficient=0.62,
+        residence_time_seconds=28.0,
+        outflow_control="drop_controlled",
+        eddy_controls=(eddy,),
+        recirculation_zones=(recirculation,),
+    )
+
+    data = pool.to_json_dict()
+    loaded = PoolControlMetadata2_5D.from_json_dict(data)
+
+    assert loaded == pool
+    assert data["mean_depth"] == 1.6749999999999998
+    assert data["tailwater_depth"] == 1.3
+    assert data["storage_coefficient"] == 0.62
+    assert data["residence_time_seconds"] == 28.0
+    assert data["outflow_control"] == "drop_controlled"
+    assert data["eddy_controls"][0]["zone_id"] == "river_left_eddy"
+    assert data["recirculation_zones"][0]["recirculation_risk"] == 0.52
+
+
+def test_pool_control_metadata_rejects_inactive_or_invalid_pool_controls():
+    with pytest.raises(ValueError, match="depth profile"):
+        PoolControlMetadata2_5D(pool_id="pool", reach_id="reach", depth_profile=(), tailwater_depth=1.0)
+    with pytest.raises(ValueError, match="tailwater"):
+        PoolControlMetadata2_5D(
+            pool_id="pool",
+            reach_id="reach",
+            depth_profile=(StationProfilePoint2_5D(0.0, 1.0),),
+            tailwater_depth=0.0,
+        )
+    with pytest.raises(ValueError, match="radius"):
+        PoolEddyControl2_5D(zone_id="bad", center_station=1.0, lateral_offset=0.0, radius=0.0)
