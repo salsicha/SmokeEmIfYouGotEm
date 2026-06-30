@@ -1,0 +1,396 @@
+{
+  "actual_scenario_id": "drop_ledge_seed_16",
+  "decision": "BLOCKED",
+  "feature_forcing_policy": "feature_strength_scale must not increase; retune candidates for core parity use 0.0 unless explicitly justified.",
+  "gate_scenario_id": "drop_ledge",
+  "mode_results": [
+    {
+      "candidate_label": "finite_volume_hll_corrected_boundary_feature0",
+      "checks": [
+        {
+          "details": "Max Linf across h/eta/u/v/hu/hv/normals; u/v masked below 0.15 m.",
+          "name": "field_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.8331692071607537
+        },
+        {
+          "details": "Max Linf across eta slope fields.",
+          "name": "slope_linf",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.11612611760651714
+        },
+        {
+          "details": "Max wet/dry mask mismatch fraction across compared frames.",
+          "name": "wet_mismatch_fraction",
+          "passed": true,
+          "threshold": 0.02,
+          "value": 0.0
+        },
+        {
+          "details": "Max Linf across point-probe fields; u/v/Froude masked below 0.15 m.",
+          "name": "probe_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.4210726656218813
+        },
+        {
+          "details": "Max Linf across cross-section fields; u/v/Froude masked below 0.15 m.",
+          "name": "cross_section_linf",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.17757789019516546
+        },
+        {
+          "details": "Absolute C++ minus reference mass-drift delta.",
+          "name": "mass_drift_delta",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 0.02375457570208389
+        },
+        {
+          "details": "Absolute C++ minus reference energy-change delta.",
+          "name": "energy_change_delta",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.01322718948900134
+        },
+        {
+          "details": "Max absolute Froude summary delta for cells at or above 0.15 m.",
+          "name": "froude_delta",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.36250941405192627
+        },
+        {
+          "details": "Max observed feature response location delta.",
+          "name": "feature_location_delta",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 1.0
+        },
+        {
+          "details": "Max observed feature response strength delta.",
+          "name": "feature_strength_delta",
+          "passed": true,
+          "threshold": 10.0,
+          "value": 0.3692636544356904
+        }
+      ],
+      "comparison_dir": "outputs/m18cmp/c_drop_corrected/finite_volume_hll",
+      "failing_checks": [
+        "field_linf",
+        "probe_linf"
+      ],
+      "manifest": "outputs/m18cmp/c_drop_corrected/finite_volume_hll/dual_solver_manifest.json",
+      "notes": [],
+      "promoted": false,
+      "solver_mode": "finite_volume_hll",
+      "threshold_report": "outputs/m18cmp/c_drop_corrected/finite_volume_hll/threshold_evaluation.json",
+      "tuning_parameters": {
+        "bed_slope_source_scale": 0.75,
+        "boundary_mode": "scenario",
+        "cfl": 0.45,
+        "dry_tolerance": 1e-06,
+        "feature_strength_scale": 0,
+        "flux_scheme": "hll",
+        "preserve_initial_mass": false,
+        "roughness_scale": 0.5,
+        "solver_mode": "finite_volume"
+      }
+    },
+    {
+      "candidate_label": "finite_volume_roe_corrected_boundary_feature0",
+      "checks": [
+        {
+          "details": "Max Linf across h/eta/u/v/hu/hv/normals; u/v masked below 0.15 m.",
+          "name": "field_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.8303419363690829
+        },
+        {
+          "details": "Max Linf across eta slope fields.",
+          "name": "slope_linf",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.11412564205976716
+        },
+        {
+          "details": "Max wet/dry mask mismatch fraction across compared frames.",
+          "name": "wet_mismatch_fraction",
+          "passed": true,
+          "threshold": 0.02,
+          "value": 0.0
+        },
+        {
+          "details": "Max Linf across point-probe fields; u/v/Froude masked below 0.15 m.",
+          "name": "probe_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.4176103870740251
+        },
+        {
+          "details": "Max Linf across cross-section fields; u/v/Froude masked below 0.15 m.",
+          "name": "cross_section_linf",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.1854177862203923
+        },
+        {
+          "details": "Absolute C++ minus reference mass-drift delta.",
+          "name": "mass_drift_delta",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 0.023584828122626855
+        },
+        {
+          "details": "Absolute C++ minus reference energy-change delta.",
+          "name": "energy_change_delta",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.013505441619431263
+        },
+        {
+          "details": "Max absolute Froude summary delta for cells at or above 0.15 m.",
+          "name": "froude_delta",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.3608543520501547
+        },
+        {
+          "details": "Max observed feature response location delta.",
+          "name": "feature_location_delta",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 1.0
+        },
+        {
+          "details": "Max observed feature response strength delta.",
+          "name": "feature_strength_delta",
+          "passed": true,
+          "threshold": 10.0,
+          "value": 0.3676886248707437
+        }
+      ],
+      "comparison_dir": "outputs/m18cmp/c_drop_corrected/finite_volume_roe",
+      "failing_checks": [
+        "field_linf",
+        "probe_linf"
+      ],
+      "manifest": "outputs/m18cmp/c_drop_corrected/finite_volume_roe/dual_solver_manifest.json",
+      "notes": [],
+      "promoted": false,
+      "solver_mode": "finite_volume_roe",
+      "threshold_report": "outputs/m18cmp/c_drop_corrected/finite_volume_roe/threshold_evaluation.json",
+      "tuning_parameters": {
+        "bed_slope_source_scale": 0.75,
+        "boundary_mode": "scenario",
+        "cfl": 0.45,
+        "dry_tolerance": 1e-06,
+        "feature_strength_scale": 0,
+        "flux_scheme": "roe",
+        "preserve_initial_mass": false,
+        "roughness_scale": 0.5,
+        "solver_mode": "finite_volume"
+      }
+    },
+    {
+      "candidate_label": "reduced_corrected_boundary_feature0",
+      "checks": [
+        {
+          "details": "Max Linf across h/eta/u/v/hu/hv/normals; u/v masked below 0.15 m.",
+          "name": "field_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 1.0721372725425706
+        },
+        {
+          "details": "Max Linf across eta slope fields.",
+          "name": "slope_linf",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.1701048987934577
+        },
+        {
+          "details": "Max wet/dry mask mismatch fraction across compared frames.",
+          "name": "wet_mismatch_fraction",
+          "passed": true,
+          "threshold": 0.02,
+          "value": 0.0
+        },
+        {
+          "details": "Max Linf across point-probe fields; u/v/Froude masked below 0.15 m.",
+          "name": "probe_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.4974288141554475
+        },
+        {
+          "details": "Max Linf across cross-section fields; u/v/Froude masked below 0.15 m.",
+          "name": "cross_section_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.4845364153916192
+        },
+        {
+          "details": "Absolute C++ minus reference mass-drift delta.",
+          "name": "mass_drift_delta",
+          "passed": false,
+          "threshold": 0.05,
+          "value": 0.14554182203974522
+        },
+        {
+          "details": "Absolute C++ minus reference energy-change delta.",
+          "name": "energy_change_delta",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.22971170915266112
+        },
+        {
+          "details": "Max absolute Froude summary delta for cells at or above 0.15 m.",
+          "name": "froude_delta",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.3345402326451392
+        },
+        {
+          "details": "Max observed feature response location delta.",
+          "name": "feature_location_delta",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 2.23606797749979
+        },
+        {
+          "details": "Max observed feature response strength delta.",
+          "name": "feature_strength_delta",
+          "passed": true,
+          "threshold": 10.0,
+          "value": 0.180085140109837
+        }
+      ],
+      "comparison_dir": "outputs/m18cmp/c_drop_corrected/reduced",
+      "failing_checks": [
+        "field_linf",
+        "probe_linf",
+        "cross_section_linf",
+        "mass_drift_delta"
+      ],
+      "manifest": "outputs/m18cmp/c_drop_corrected/reduced/dual_solver_manifest.json",
+      "notes": [],
+      "promoted": false,
+      "solver_mode": "reduced",
+      "threshold_report": "outputs/m18cmp/c_drop_corrected/reduced/threshold_evaluation.json",
+      "tuning_parameters": {
+        "bed_slope_source_scale": 0,
+        "boundary_mode": "scenario",
+        "cfl": 0.45,
+        "dry_tolerance": 1e-06,
+        "feature_strength_scale": 0,
+        "flux_scheme": "rusanov",
+        "preserve_initial_mass": true,
+        "roughness_scale": 1,
+        "solver_mode": "reduced"
+      }
+    }
+  ],
+  "notes": [
+    "Corrected drop-ledge GeoClaw reference now records west user-boundary inflow via bc2amr.f90 instead of the stale west extrap boundary in the Milestone 16 snapshot.",
+    "No drop-ledge lane is promoted: finite-volume HLL and Roe pass slope, wet-mask, cross-section, mass, energy, Froude, and feature checks with feature forcing off, but field_linf and probe_linf remain outside the frozen thresholds.",
+    "Next retune lever is drop/ledge water-shape reconstruction around the hydraulic control and downstream recovery, not feature forcing or scalar conservation tuning."
+  ],
+  "passed": false,
+  "reference_boundary_semantics": {
+    "bc_lower": [
+      "user",
+      "wall"
+    ],
+    "bc_upper": [
+      "extrap",
+      "wall"
+    ],
+    "edges": [
+      {
+        "edge": "west",
+        "enforced_state": {
+          "depth": 1.2500045584959414,
+          "stage": null,
+          "velocity": [
+            1.4,
+            0.0
+          ]
+        },
+        "geoclaw_code": "user",
+        "hydrograph_policy": "none",
+        "requires_user_boundary_adapter": true,
+        "scenario_kind": "inflow"
+      },
+      {
+        "edge": "east",
+        "enforced_state": {
+          "depth": null,
+          "stage": null,
+          "velocity": null
+        },
+        "geoclaw_code": "extrap",
+        "hydrograph_policy": "none",
+        "requires_user_boundary_adapter": false,
+        "scenario_kind": "outflow"
+      },
+      {
+        "edge": "south",
+        "enforced_state": {
+          "depth": null,
+          "stage": null,
+          "velocity": null
+        },
+        "geoclaw_code": "wall",
+        "hydrograph_policy": "none",
+        "requires_user_boundary_adapter": false,
+        "scenario_kind": "wall"
+      },
+      {
+        "edge": "north",
+        "enforced_state": {
+          "depth": null,
+          "stage": null,
+          "velocity": null
+        },
+        "geoclaw_code": "wall",
+        "hydrograph_policy": "none",
+        "requires_user_boundary_adapter": false,
+        "scenario_kind": "wall"
+      }
+    ],
+    "requires_user_boundary_adapter": true
+  },
+  "reference_manifest": "outputs/m18g/c_drop_corrected/drop_ledge_seed_16/normalized/manifest.json",
+  "scenario_family": "drop_ledge_tailwater",
+  "schema_version": "raftsim.milestone18.parity_family_retune.v0",
+  "summary": {
+    "blocked_modes": [
+      "finite_volume_hll",
+      "finite_volume_roe",
+      "reduced"
+    ],
+    "failing_checks_by_mode": {
+      "finite_volume_hll": [
+        "field_linf",
+        "probe_linf"
+      ],
+      "finite_volume_roe": [
+        "field_linf",
+        "probe_linf"
+      ],
+      "reduced": [
+        "field_linf",
+        "probe_linf",
+        "cross_section_linf",
+        "mass_drift_delta"
+      ]
+    },
+    "mode_count": 3,
+    "promoted_modes": []
+  }
+}
