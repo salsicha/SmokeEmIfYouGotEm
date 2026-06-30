@@ -88,6 +88,8 @@ Fallback or initial-state-only GeoClaw normalization is useful for schema smoke 
 
 ## Phase 7: Acceptance Gate
 
+Milestone 16 full-readiness evidence is tracked in `physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.json` and `physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.md`. The final gate explicitly blocks live custom water because GeoClaw/C++ threshold comparisons, geometry validation, and raft coupling still fail, even though GeoClaw reference runs, C++ manifests, promoted regression artifacts, and runtime profiles pass.
+
 The C++ engine is accepted for live Unreal water only when:
 
 - Every required scenario has a full GeoClaw solution run with fixed-grid frames, not only fallback or initial-state output.

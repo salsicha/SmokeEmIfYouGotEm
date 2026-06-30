@@ -1,0 +1,9 @@
+{
+  "failed_count": 0,
+  "passed": true,
+  "passed_count": 40,
+  "run_count": 40,
+  "scenario_count": 20,
+  "source_report": "reports/milestone16/cpp_solver_runs.json",
+  "summary_version": "raftsim.milestone16.readiness_summary.v0"
+}

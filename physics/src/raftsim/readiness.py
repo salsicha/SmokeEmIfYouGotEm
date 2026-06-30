@@ -487,6 +487,133 @@ def build_geoclaw_readiness_report(
     )
 
 
+def build_milestone16_geoclaw_readiness_report(
+    *,
+    geoclaw_reference_summary: dict[str, object],
+    cpp_summary: dict[str, object],
+    comparison_summary: dict[str, object],
+    geometry_summary: dict[str, object],
+    raft_coupling_summary: dict[str, object],
+    runtime_profile_summary: dict[str, object],
+    regression_promotion_summary: dict[str, object],
+    artifact_manifest: dict[str, object],
+) -> PythonToUnrealReadinessReport:
+    """Build the full Milestone 16 GeoClaw-to-Unreal live-water gate."""
+
+    checks = (
+        check_from_summary(
+            "milestone16_geoclaw_reference_runs",
+            "Milestone 16 GeoClaw Reference Runs",
+            bool(geoclaw_reference_summary.get("passed")),
+            (
+                f"{geoclaw_reference_summary.get('passed_count', 0)} of "
+                f"{geoclaw_reference_summary.get('scenario_count', 0)} scenarios have full GeoClaw frames."
+            ),
+            ("geoclaw_reference_summary.json",),
+        ),
+        check_from_summary(
+            "milestone16_cpp_solver_runs",
+            "Milestone 16 C++ Solver Runs",
+            bool(cpp_summary.get("passed")),
+            f"{cpp_summary.get('passed_count', 0)} of {cpp_summary.get('run_count', 0)} C++ runs completed with manifests.",
+            ("cpp_solver_summary.json",),
+        ),
+        check_from_summary(
+            "milestone16_geoclaw_cpp_thresholds",
+            "Milestone 16 GeoClaw/C++ Thresholds",
+            bool(comparison_summary.get("passed")),
+            (
+                f"{comparison_summary.get('threshold_passed_count', 0)} of "
+                f"{comparison_summary.get('comparison_count', 0)} threshold comparisons pass."
+            ),
+            ("geoclaw_cpp_comparison_summary.json",),
+        ),
+        check_from_summary(
+            "milestone16_geometry_validation",
+            "Milestone 16 Geometry Validation",
+            bool(geometry_summary.get("passed")),
+            f"{geometry_summary.get('passed_count', 0)} of {geometry_summary.get('case_count', 0)} geometry families pass.",
+            ("geometry_validation_summary.json",),
+        ),
+        check_from_summary(
+            "milestone16_raft_coupling",
+            "Milestone 16 Raft Coupling",
+            bool(raft_coupling_summary.get("passed")),
+            (
+                f"{raft_coupling_summary.get('passed_count', 0)} of "
+                f"{raft_coupling_summary.get('comparison_count', 0)} raft comparisons pass."
+            ),
+            ("raft_coupling_validation_summary.json",),
+        ),
+        check_from_summary(
+            "milestone16_runtime_profile",
+            "Milestone 16 Runtime Profile",
+            bool(runtime_profile_summary.get("passed")),
+            (
+                f"{runtime_profile_summary.get('budget_passed_count', 0)} of "
+                f"{runtime_profile_summary.get('run_count', 0)} promoted C++ profile repetitions pass runtime budgets."
+            ),
+            ("runtime_profile_summary.json",),
+        ),
+        check_from_summary(
+            "milestone16_regression_promotion",
+            "Milestone 16 Regression Promotion",
+            bool(regression_promotion_summary.get("passed")),
+            f"{regression_promotion_summary.get('entry_count', 0)} passing artifacts promoted.",
+            ("regression_promotion_summary.json",),
+        ),
+    )
+    blocking_failures = tuple(check for check in checks if not check.passed and check.status == "failed")
+    approved = not blocking_failures
+    decision = ReadinessGateDecision(
+        status="approved" if approved else "blocked",
+        approved_for_unreal_production_start=approved,
+        reason=(
+            "The full Milestone 16 GeoClaw/C++/raft/runtime gate passed; live Unreal custom water can proceed after target-hardware confirmation."
+            if approved
+            else "The full Milestone 16 gate was regenerated, but live Unreal custom water remains blocked by failed GeoClaw/C++ geometry or raft validation checks."
+        ),
+        required_next_actions=(
+            (
+                "Fix GeoClaw/C++ threshold failures outside flat-pool and sloping-channel cases.",
+                "Retune wet/dry, bed-step, constriction, drop/ledge, and cascading reach/drop dynamics until geometry families pass.",
+                "Retune raft coupling against GeoClaw and C++ fields until force envelopes, outcomes, and transition cases pass.",
+                "Add a distinct pin/release fixture beyond the current shallow-shelf and boulder proxy evidence.",
+            )
+            if not approved
+            else (
+                "Lock the accepted Milestone 16 report set and regression fixtures before live-water Unreal integration.",
+                "Repeat runtime profiling on target desktop, VR, and handheld hardware.",
+            )
+        ),
+    )
+    return PythonToUnrealReadinessReport(
+        gate_version=GEOCLAW_READINESS_REPORT_VERSION,
+        decision=decision,
+        checks=checks,
+        runtime_choices={
+            "authoritative_water_candidate": "custom C++ reduced or finite-volume shallow-water / height-field solver after full Milestone 16 approval",
+            "reference_solver": "GeoClaw offline fixed-grid output normalized into the shared telemetry schema",
+            "raft_and_contact_candidate": "Project Chrono bridge or custom reduced raft fallback over validated custom water fields",
+            "unreal_integration_order": "telemetry/replay playback and promoted regression fixtures first; live custom water only after all Milestone 16 checks pass",
+            "chrono_fsi": "optional research path only, not a baseline runtime dependency",
+        },
+        accepted_model_limitations=(
+            "2.5D shallow-water/height-field flow remains the intended runtime model; full 3D CFD is out of scope.",
+            "GeoClaw remains offline reference infrastructure and does not ship inside Unreal.",
+            "Promoted fixtures are passing subsets, not proof that the full live-water gate has passed.",
+            "Current pin/release evidence is proxy coverage until a dedicated strainer/wrap fixture is added.",
+        ),
+        risks=(
+            "Most GeoClaw/C++ threshold comparisons still fail outside hydrostatic/sloping cases.",
+            "Raft force and outcome agreement is not yet stable across hydraulics, drops, and boulder gardens.",
+            "Runtime profile passes only the promoted configurations and still needs target hardware confirmation.",
+            "Real-world river source licensing, guide review, and field-media validation remain production gates.",
+        ),
+        artifact_manifest=artifact_manifest,
+    )
+
+
 def check_from_summary(
     check_id: str,
     title: str,
