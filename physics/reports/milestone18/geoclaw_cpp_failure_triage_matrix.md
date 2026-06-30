@@ -4,7 +4,7 @@ Schema: `raftsim.milestone18.failure_triage_matrix.v0`
 
 Decision: **ACTION REQUIRED**
 
-Entry count: 427
+Entry count: 424
 
 ## Source Reports
 
@@ -18,13 +18,13 @@ Entry count: 427
 | Source component | Entries |
 | --- | ---: |
 | full_cpp_validation_gate | 3 |
-| geoclaw_cpp_comparison | 250 |
-| geometry_validation | 13 |
+| geoclaw_cpp_comparison | 248 |
+| geometry_validation | 12 |
 | raft_coupling | 161 |
 
 | Scenario family | Entries |
 | --- | ---: |
-| bed_step | 9 |
+| bed_step | 6 |
 | boulder_impacts | 68 |
 | cascading_reach_drop | 70 |
 | constriction | 19 |
@@ -50,13 +50,13 @@ Entry count: 427
 | energy_dissipation | 22 |
 | feature_localization | 20 |
 | feature_strength | 25 |
-| field_state | 35 |
-| geometry | 13 |
+| field_state | 34 |
+| geometry | 12 |
 | hydraulic_regime | 28 |
 | localized_probe | 33 |
 | raft_outcome | 87 |
 | reference_feature_check | 26 |
-| surface_slope | 33 |
+| surface_slope | 32 |
 | wet_dry_mask | 11 |
 
 ## Dependency Order
@@ -64,9 +64,9 @@ Entry count: 427
 | Order | Phase | Entries |
 | ---: | --- | ---: |
 | 1 | core_parity_guardrails | 17 |
-| 2 | geometry_parity_thresholds | 41 |
+| 2 | geometry_parity_thresholds | 39 |
 | 3 | whitewater_realworld_parity | 192 |
-| 4 | geometry_family_closure | 13 |
+| 4 | geometry_family_closure | 12 |
 | 5 | raft_coupling_after_water_parity | 161 |
 | 6 | full_gate_rerun | 3 |
 
@@ -91,8 +91,6 @@ Entry count: 427
 | core_parity_guardrails | uniform_channel | uniform_channel | reduced | field_linf | medium | 0.209982 | 0.15 | C++ depth, surface, momentum, or normal fields diverge from the GeoClaw reference. | Inspect finite-volume/reduced update, bed-source balance, reconstruction, CFL, dry-depth handling, and bathymetry alignment. |
 | core_parity_guardrails | uniform_channel | uniform_channel | reduced | probe_linf | medium | 0.192871 | 0.15 | Point probes see a localized water-state mismatch that may be hidden in whole-field summaries. | Check probe placement, interpolation, frame timing, local bathymetry, velocity masks, and water-query sampling. |
 | core_parity_guardrails | uniform_channel | uniform_channel | reduced | slope_linf | medium | 0.0831434 | 0.035 | Free-surface slope differs enough to change hydraulic controls and raft force sampling. | Retune bed-slope source scaling, slope reconstruction, smoothing, and limiter behavior before feature forcing. |
-| geometry_parity_thresholds | bed_step | bed_step | finite_volume | field_linf | medium | 0.353044 | 0.35 | C++ depth, surface, momentum, or normal fields diverge from the GeoClaw reference. | Inspect finite-volume/reduced update, bed-source balance, reconstruction, CFL, dry-depth handling, and bathymetry alignment. |
-| geometry_parity_thresholds | bed_step | bed_step | finite_volume | slope_linf | medium | 0.103296 | 0.08 | Free-surface slope differs enough to change hydraulic controls and raft force sampling. | Retune bed-slope source scaling, slope reconstruction, smoothing, and limiter behavior before feature forcing. |
 | geometry_parity_thresholds | bed_step | bed_step | reduced | mass_drift_delta | medium | 0.0948885 | 0.04 | Mass conservation differs between GeoClaw and C++ for the same scenario package. | Audit fluxes, boundary conditions, source splitting, reach/drop handoff fluxes, and dry-cell volume accounting. |
 | geometry_parity_thresholds | bed_step | bed_step | reduced | energy_change_delta | medium | 0.16485 | 0.15 | Energy gain/loss differs, which can move bores, jumps, drops, and hole stickiness. | Retune roughness, damping, hydraulic-jump/drop dissipation, tailwater controls, and feature forcing only after conservation is stable. |
 | geometry_parity_thresholds | bed_step | bed_step | reduced | field_linf | medium | 0.610705 | 0.35 | C++ depth, surface, momentum, or normal fields diverge from the GeoClaw reference. | Inspect finite-volume/reduced update, bed-source balance, reconstruction, CFL, dry-depth handling, and bathymetry alignment. |
@@ -324,7 +322,6 @@ Entry count: 427
 | whitewater_realworld_parity | wave_train | cascading_wave_train | reduced | froude_delta | medium | 0.551451 | 0.2 | Froude-class or velocity/depth behavior differs across subcritical/supercritical transitions. | Check momentum flux, velocity depth floors, wet-cell masks, roughness, and transcritical control behavior. |
 | whitewater_realworld_parity | wave_train | cascading_wave_train | reduced | probe_linf | medium | 2.10882 | 0.75 | Point probes see a localized water-state mismatch that may be hidden in whole-field summaries. | Check probe placement, interpolation, frame timing, local bathymetry, velocity masks, and water-query sampling. |
 | whitewater_realworld_parity | wave_train | cascading_wave_train | reduced | slope_linf | high | 1.01144 | 0.15 | Free-surface slope differs enough to change hydraulic controls and raft force sampling. | Retune bed-slope source scaling, slope reconstruction, smoothing, and limiter behavior before feature forcing. |
-| geometry_family_closure | bed_step | bed_step | finite_volume | geometry_family | high | n/a | n/a | Discontinuous bed elevation is exposing source-term and free-surface balance error. | Audit hydrostatic reconstruction, bed-step source treatment, mass flux, and local dissipation. |
 | geometry_family_closure | bed_step | bed_step | reduced | geometry_family | high | n/a | n/a | Discontinuous bed elevation is exposing source-term and free-surface balance error. | Audit hydrostatic reconstruction, bed-step source treatment, mass flux, and local dissipation. |
 | geometry_family_closure | constriction | constriction | finite_volume | geometry_family | high | n/a | n/a | Narrow-section acceleration and Froude transitions are not matching GeoClaw. | Retune width/depth mapping, momentum flux, roughness, and constriction feature-strength response. |
 | geometry_family_closure | constriction | constriction | reduced | geometry_family | high | n/a | n/a | Narrow-section acceleration and Froude transitions are not matching GeoClaw. | Retune width/depth mapping, momentum flux, roughness, and constriction feature-strength response. |
@@ -498,6 +495,6 @@ Entry count: 427
 | raft_coupling_after_water_parity | wave_train | cascading_wave_train | reduced | candidate_crest_lift | high | 0.0481843 | 0.05 | The C++ water/contact sample is not producing the expected raft feature signal. | After water-field parity, tune raft sampling, contact thresholds, damping, feature modifiers, and crew weight effects. |
 | raft_coupling_after_water_parity | wave_train | cascading_wave_train | reduced | feature_outcome_match | high | n/a | n/a | Outcome classification differs between the GeoClaw-derived and C++ water-field runs. | Retune only after field parity improves; then adjust feature classification, sample timing, and case-specific outcome thresholds. |
 | raft_coupling_after_water_parity | wave_train | cascading_wave_train | reduced | reference_crest_lift | high | 0.0307862 | 0.05 | The GeoClaw-derived fixture evidence is not producing the expected raft feature signal. | Verify reference frame selection, fixture expected outcomes, feature probes, and guide/reference assumptions before C++ retuning. |
-| full_gate_rerun | suite_gate | geoclaw_cpp_comparisons | n/a | blocked_component | critical | 35 | 0 | A Milestone 16 component is still blocking the live custom-water readiness decision. | Clear the lower-order triage entries, then regenerate the component report and full readiness gate. |
+| full_gate_rerun | suite_gate | geoclaw_cpp_comparisons | n/a | blocked_component | critical | 34 | 0 | A Milestone 16 component is still blocking the live custom-water readiness decision. | Clear the lower-order triage entries, then regenerate the component report and full readiness gate. |
 | full_gate_rerun | suite_gate | geometry | n/a | blocked_component | critical | 4 | 0 | A Milestone 16 component is still blocking the live custom-water readiness decision. | Clear the lower-order triage entries, then regenerate the component report and full readiness gate. |
 | full_gate_rerun | suite_gate | raft_coupling | n/a | blocked_component | critical | 39 | 0 | A Milestone 16 component is still blocking the live custom-water readiness decision. | Clear the lower-order triage entries, then regenerate the component report and full readiness gate. |
