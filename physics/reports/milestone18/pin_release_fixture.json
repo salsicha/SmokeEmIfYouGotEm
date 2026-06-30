@@ -1,0 +1,582 @@
+{
+  "action_window_s": 0.75,
+  "decision": "PASS",
+  "feature_forcing_strength_scale": 0.0,
+  "fixture_id": "midstream_wrap_pin_release",
+  "flow_cases": [
+    {
+      "approach_angle_deg": 18.0,
+      "approach_velocity_mps": 1.15,
+      "checks": [
+        {
+          "details": "",
+          "name": "flow_band_recorded",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "positive_discharge",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 38.0
+        },
+        {
+          "details": "",
+          "name": "positive_depth",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.48
+        },
+        {
+          "details": "",
+          "name": "wrap_depth_recorded",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.16
+        },
+        {
+          "details": "",
+          "name": "side_load_recorded",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 1450.0
+        },
+        {
+          "details": "",
+          "name": "pin_force_recorded",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 2350.0
+        }
+      ],
+      "contact_normal": [
+        0.93,
+        -0.37
+      ],
+      "discharge_cms": 38.0,
+      "flow_band": "low_scrape",
+      "passed": true,
+      "pin_force_n": 2350.0,
+      "raft_orientation_deg": 12.0,
+      "response_paths": [
+        {
+          "action_window_margin_s": null,
+          "checks": [
+            {
+              "details": "",
+              "name": "low_flow_less_sticky",
+              "passed": true,
+              "threshold": 0.7,
+              "value": 0.45
+            },
+            {
+              "details": "",
+              "name": "low_flow_not_pinned",
+              "passed": true,
+              "threshold": 0.0,
+              "value": -850.0
+            },
+            {
+              "details": "",
+              "name": "outcome_scraped_clear",
+              "passed": true,
+              "threshold": 1.0,
+              "value": 1.0
+            }
+          ],
+          "crew_weight": {
+            "active_action_count": 0,
+            "brace_count": 0,
+            "combined_center_of_gravity_offset": {
+              "x": 0.015534031413612603,
+              "y": 0.0,
+              "z": 0.06989528795811518
+            },
+            "contact_loading": {
+              "lateral_bias": 0.0,
+              "left_tube_normal_load_n": 4684.275000000001,
+              "right_tube_normal_load_n": 4684.275000000001
+            },
+            "high_side_count": 0,
+            "occupied_seat_count": 7,
+            "recovery_count": 0,
+            "recovery_thresholds": {
+              "flip_threshold_multiplier": 1.0,
+              "flip_threshold_nm": 1800.0,
+              "pin_threshold_multiplier": 1.0,
+              "pin_threshold_n": 3200.0,
+              "release_threshold_multiplier": 1.0,
+              "release_threshold_n": 2600.0
+            },
+            "roll_moment_nm": 0.0
+          },
+          "outcome": "scraped_clear",
+          "passed": true,
+          "path_id": "no_action_scrape",
+          "pin_margin_n": -850.0,
+          "release_margin_n": -1854.0,
+          "response_delay_s": null,
+          "swimmer": null
+        }
+      ],
+      "side_load_n": 1450.0,
+      "stickiness_factor": 0.45,
+      "water_depth_m": 0.48,
+      "wrap_depth_m": 0.16
+    },
+    {
+      "approach_angle_deg": 31.0,
+      "approach_velocity_mps": 2.05,
+      "checks": [
+        {
+          "details": "",
+          "name": "flow_band_recorded",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "positive_discharge",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 82.0
+        },
+        {
+          "details": "",
+          "name": "positive_depth",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.92
+        },
+        {
+          "details": "",
+          "name": "wrap_depth_recorded",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.58
+        },
+        {
+          "details": "",
+          "name": "side_load_recorded",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 3300.0
+        },
+        {
+          "details": "",
+          "name": "pin_force_recorded",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 3825.0
+        }
+      ],
+      "contact_normal": [
+        0.72,
+        -0.69
+      ],
+      "discharge_cms": 82.0,
+      "flow_band": "runnable_sticky",
+      "passed": true,
+      "pin_force_n": 3825.0,
+      "raft_orientation_deg": 34.0,
+      "response_paths": [
+        {
+          "action_window_margin_s": null,
+          "checks": [
+            {
+              "details": "",
+              "name": "sticky_flow_band",
+              "passed": true,
+              "threshold": 1.0,
+              "value": 1.2
+            },
+            {
+              "details": "",
+              "name": "no_action_pins",
+              "passed": true,
+              "threshold": 0.0,
+              "value": 625.0
+            },
+            {
+              "details": "",
+              "name": "release_margin_negative_without_action",
+              "passed": true,
+              "threshold": 0.0,
+              "value": -1085.0
+            },
+            {
+              "details": "",
+              "name": "crew_action_absent",
+              "passed": true,
+              "threshold": 0.0,
+              "value": 0.0
+            }
+          ],
+          "crew_weight": {
+            "active_action_count": 0,
+            "brace_count": 0,
+            "combined_center_of_gravity_offset": {
+              "x": 0.015534031413612603,
+              "y": 0.0,
+              "z": 0.06989528795811518
+            },
+            "contact_loading": {
+              "lateral_bias": 0.0,
+              "left_tube_normal_load_n": 4684.275000000001,
+              "right_tube_normal_load_n": 4684.275000000001
+            },
+            "high_side_count": 0,
+            "occupied_seat_count": 7,
+            "recovery_count": 0,
+            "recovery_thresholds": {
+              "flip_threshold_multiplier": 1.0,
+              "flip_threshold_nm": 1800.0,
+              "pin_threshold_multiplier": 1.0,
+              "pin_threshold_n": 3200.0,
+              "release_threshold_multiplier": 1.0,
+              "release_threshold_n": 2600.0
+            },
+            "roll_moment_nm": 0.0
+          },
+          "outcome": "pinned",
+          "passed": true,
+          "path_id": "no_action_pin",
+          "pin_margin_n": 625.0,
+          "release_margin_n": -1085.0,
+          "response_delay_s": null,
+          "swimmer": null
+        },
+        {
+          "action_window_margin_s": 0.33,
+          "checks": [
+            {
+              "details": "",
+              "name": "timed_response_inside_window",
+              "passed": true,
+              "threshold": 0.0,
+              "value": 0.33
+            },
+            {
+              "details": "",
+              "name": "release_margin_positive",
+              "passed": true,
+              "threshold": 0.0,
+              "value": 3273.3791678148245
+            },
+            {
+              "details": "",
+              "name": "crew_actions_recorded",
+              "passed": true,
+              "threshold": 1.0,
+              "value": 7.0
+            },
+            {
+              "details": "",
+              "name": "outcome_released",
+              "passed": true,
+              "threshold": 1.0,
+              "value": 1.0
+            }
+          ],
+          "crew_weight": {
+            "active_action_count": 7,
+            "brace_count": 7,
+            "combined_center_of_gravity_offset": {
+              "x": 0.015534031413612603,
+              "y": 0.2520942408376964,
+              "z": 0.04748691099476439
+            },
+            "contact_loading": {
+              "lateral_bias": 0.26536235877652253,
+              "left_tube_normal_load_n": 3441.244736842105,
+              "right_tube_normal_load_n": 5927.305263157896
+            },
+            "high_side_count": 7,
+            "occupied_seat_count": 7,
+            "recovery_count": 7,
+            "recovery_thresholds": {
+              "flip_threshold_multiplier": 1.3328768255717829,
+              "flip_threshold_nm": 2399.178286029209,
+              "pin_threshold_multiplier": 1.2530724717553048,
+              "pin_threshold_n": 4009.8319096169753,
+              "release_threshold_multiplier": 0.652234775420226,
+              "release_threshold_n": 1695.8104160925877
+            },
+            "roll_moment_nm": 2361.7575000000006
+          },
+          "outcome": "released",
+          "passed": true,
+          "path_id": "timed_high_side_release",
+          "pin_margin_n": -184.83190961697528,
+          "release_margin_n": 3273.3791678148245,
+          "response_delay_s": 0.42,
+          "swimmer": null
+        },
+        {
+          "action_window_margin_s": -0.30000000000000004,
+          "checks": [
+            {
+              "details": "",
+              "name": "late_response_misses_window",
+              "passed": true,
+              "threshold": 0.0,
+              "value": -0.30000000000000004
+            },
+            {
+              "details": "",
+              "name": "failed_rescue_recorded",
+              "passed": true,
+              "threshold": 1.0,
+              "value": 1.0
+            },
+            {
+              "details": "",
+              "name": "swimmer_state_recorded",
+              "passed": true,
+              "threshold": 1.0,
+              "value": 1.0
+            },
+            {
+              "details": "",
+              "name": "outcome_failed_rescue",
+              "passed": true,
+              "threshold": 1.0,
+              "value": 1.0
+            }
+          ],
+          "crew_weight": {
+            "active_action_count": 7,
+            "brace_count": 7,
+            "combined_center_of_gravity_offset": {
+              "x": 0.015534031413612603,
+              "y": 0.2520942408376964,
+              "z": 0.04748691099476439
+            },
+            "contact_loading": {
+              "lateral_bias": 0.26536235877652253,
+              "left_tube_normal_load_n": 3441.244736842105,
+              "right_tube_normal_load_n": 5927.305263157896
+            },
+            "high_side_count": 7,
+            "occupied_seat_count": 7,
+            "recovery_count": 7,
+            "recovery_thresholds": {
+              "flip_threshold_multiplier": 1.3328768255717829,
+              "flip_threshold_nm": 2399.178286029209,
+              "pin_threshold_multiplier": 1.2530724717553048,
+              "pin_threshold_n": 4009.8319096169753,
+              "release_threshold_multiplier": 0.652234775420226,
+              "release_threshold_n": 1695.8104160925877
+            },
+            "roll_moment_nm": 2361.7575000000006
+          },
+          "outcome": "failed_rescue",
+          "passed": true,
+          "path_id": "late_high_side_failed_rescue",
+          "pin_margin_n": -184.83190961697528,
+          "release_margin_n": 3273.3791678148245,
+          "response_delay_s": 1.05,
+          "swimmer": {
+            "failed_reason": "missed_rescue_window",
+            "fatigue_delta": 0.15750000000000003,
+            "fixture_id": "pin_failed_rescue",
+            "overboard_triggered": true,
+            "rescue_completed": false,
+            "rescue_method": "throw_line",
+            "safety_score_delta": -9.0,
+            "states": [
+              "seated",
+              "at_risk",
+              "falling_ejected",
+              "swimming",
+              "rescue_targeted",
+              "failed_rescue"
+            ],
+            "swimmer_distance_m": 4.345471781061292,
+            "swimmer_world_position": {
+              "x": 4.05,
+              "y": 1.575,
+              "z": 0.0
+            },
+            "time_in_water_s": 4.5,
+            "trigger_kind": "pin",
+            "trust_delta": -0.1125
+          }
+        }
+      ],
+      "side_load_n": 3300.0,
+      "stickiness_factor": 1.2,
+      "water_depth_m": 0.92,
+      "wrap_depth_m": 0.58
+    },
+    {
+      "approach_angle_deg": 24.0,
+      "approach_velocity_mps": 3.05,
+      "checks": [
+        {
+          "details": "",
+          "name": "flow_band_recorded",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "positive_discharge",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 146.0
+        },
+        {
+          "details": "",
+          "name": "positive_depth",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 1.42
+        },
+        {
+          "details": "",
+          "name": "wrap_depth_recorded",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.24
+        },
+        {
+          "details": "",
+          "name": "side_load_recorded",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 2600.0
+        },
+        {
+          "details": "",
+          "name": "pin_force_recorded",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 2750.0
+        }
+      ],
+      "contact_normal": [
+        0.84,
+        -0.54
+      ],
+      "discharge_cms": 146.0,
+      "flow_band": "high_washout",
+      "passed": true,
+      "pin_force_n": 2750.0,
+      "raft_orientation_deg": 20.0,
+      "response_paths": [
+        {
+          "action_window_margin_s": null,
+          "checks": [
+            {
+              "details": "",
+              "name": "high_flow_washes_out",
+              "passed": true,
+              "threshold": 0.7,
+              "value": 0.52
+            },
+            {
+              "details": "",
+              "name": "washout_not_pinned",
+              "passed": true,
+              "threshold": 0.0,
+              "value": -450.0
+            },
+            {
+              "details": "",
+              "name": "outcome_flushed_washout",
+              "passed": true,
+              "threshold": 1.0,
+              "value": 1.0
+            }
+          ],
+          "crew_weight": {
+            "active_action_count": 0,
+            "brace_count": 0,
+            "combined_center_of_gravity_offset": {
+              "x": 0.015534031413612603,
+              "y": 0.0,
+              "z": 0.06989528795811518
+            },
+            "contact_loading": {
+              "lateral_bias": 0.0,
+              "left_tube_normal_load_n": 4684.275000000001,
+              "right_tube_normal_load_n": 4684.275000000001
+            },
+            "high_side_count": 0,
+            "occupied_seat_count": 7,
+            "recovery_count": 0,
+            "recovery_thresholds": {
+              "flip_threshold_multiplier": 1.0,
+              "flip_threshold_nm": 1800.0,
+              "pin_threshold_multiplier": 1.0,
+              "pin_threshold_n": 3200.0,
+              "release_threshold_multiplier": 1.0,
+              "release_threshold_n": 2600.0
+            },
+            "roll_moment_nm": 0.0
+          },
+          "outcome": "flushed_washout",
+          "passed": true,
+          "path_id": "no_action_washout",
+          "pin_margin_n": -450.0,
+          "release_margin_n": -1438.0,
+          "response_delay_s": null,
+          "swimmer": null
+        }
+      ],
+      "side_load_n": 2600.0,
+      "stickiness_factor": 0.52,
+      "water_depth_m": 1.42,
+      "wrap_depth_m": 0.24
+    }
+  ],
+  "lateral_offset_m": 0.85,
+  "notes": [
+    "Feature forcing is recorded but left off for this closure fixture; release behavior comes from flow band, pin load, crew weight distribution, and rescue timing.",
+    "The runnable_sticky band is intentionally the sticky band: low flow scrapes through and high flow washes out."
+  ],
+  "obstruction_kind": "midstream_wrap_rock",
+  "passed": true,
+  "proxy_separation": {
+    "distinct_obstruction_geometry": true,
+    "excluded_proxy_families": [
+      "shallow_shelf",
+      "boulder_impacts"
+    ],
+    "notes": [
+      "This fixture is a wrap/pin release lane, not shallow-shelf grounding or generic boulder-impact proxy coverage."
+    ],
+    "passed": true,
+    "requires_failed_rescue_path": true,
+    "requires_flow_response": true,
+    "requires_wrap_depth": true
+  },
+  "schema_version": "raftsim.milestone18.pin_release_fixture.v0",
+  "station_m": 42.0,
+  "summary": {
+    "failed_flow_bands": [],
+    "flow_bands": [
+      "low_scrape",
+      "runnable_sticky",
+      "high_washout"
+    ],
+    "flow_case_count": 3,
+    "outcomes": [
+      "failed_rescue",
+      "flushed_washout",
+      "pinned",
+      "released",
+      "scraped_clear"
+    ],
+    "required_outcomes": [
+      "failed_rescue",
+      "pinned",
+      "released"
+    ]
+  }
+}

@@ -29,7 +29,7 @@ The closure work must happen in this order:
 - Fix GeoClaw-vs-C++ field, probe, cross-section, conservation, Froude, wet/dry, and feature-localization failures before accepting raft outcome fixes.
 - Close the geometry families that still fail: wet/dry shorelines, bed steps, constrictions, drops/ledges, tailwater controls, and cascading reach/drop behavior.
 - Retune raft coupling only after the relevant C++ water fields improve, so force and outcome fixes are not masking bad hydraulics.
-- Add a distinct pin/release fixture that is not only shallow-shelf or boulder proxy evidence.
+- Keep the distinct pin/release fixture separate from shallow-shelf or boulder proxy evidence.
 - Re-run the full Milestone 16 gate and regenerate the GeoClaw-to-Unreal readiness report.
 
 Chaos/Jolt runtime authority evaluation stays after this closure work. Those engines can be evaluated for raft/contact/swimmer authority, but no authority decision should treat unapproved C++ live water as accepted input.
@@ -203,6 +203,8 @@ Add a dedicated pin/release fixture separate from shallow-shelf grounding and bo
 
 The fixture must include at least three outcomes: unsafe no-action or late-action pin, successful high-side or weight-shift release inside the counterplay window, and failed release that transitions into swim/rescue or safety-score consequences. Reports should expose pin force, side load, raft orientation, crew weight distribution, release margin, flow band, and whether feature forcing contributed to the outcome.
 
+The first dedicated fixture artifact is `physics/reports/milestone18/pin_release_fixture.json` with a human-readable companion at `physics/reports/milestone18/pin_release_fixture.md`. It uses schema `raftsim.milestone18.pin_release_fixture.v0` and records a midstream wrap/pin obstruction with low-flow scrape, runnable sticky, and high-flow washout cases. The sticky band includes no-action pin, timed high-side/brace/recovery release, and late failed-rescue paths, with feature forcing recorded at zero so the fixture is not hiding water-field failures.
+
 ### 5. Milestone 17 Analytic Guardrails
 
 Run the manually encoded Milestone 17 analytic fixtures before and after every solver retune batch. The guardrail set covers lake-at-rest balance, sloping-channel friction, wet/dry shoreline behavior, bed steps, dam-break/bore behavior, hydraulic jumps, and transcritical flow over a bump where practical.
@@ -222,7 +224,7 @@ After parity, geometry, raft-coupling, pin/release, and analytic-guardrail check
 - Whether the first accepted runtime remains CPU-only or starts a GPU path after correctness is established.
 - Exact numerical thresholds for research-accepted, Unreal-prototype, and production-candidate tiers.
 - Exact schema fields and acceptance thresholds for river validation annotations and guide-review signoff.
-- Exact report schema for the Milestone 18 failure triage matrix and the distinct pin/release closure artifact.
+- Exact report schema for any future Milestone 18 closure artifacts beyond the failure triage, parity retune, analytic guardrail, and pin/release fixture reports.
 
 ## Related Docs
 

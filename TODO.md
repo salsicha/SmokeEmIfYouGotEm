@@ -301,7 +301,7 @@ This milestone turns the blocked Milestone 16 evidence into an ordered fix plan.
 - [ ] Fix GeoClaw-vs-C++ parity failures in dependency order: keep flat-pool and sloping-channel cases as guardrails, then retune wet/dry, bed-step, constriction, drop/ledge, and cascading reach/drop comparisons with feature forcing off or at low validated defaults.
 - [ ] Close geometry-specific validation failures for wet/dry shorelines, bed steps, constrictions, drops/ledges, tailwater controls, and stitched reach/drop handoffs, promoting each newly passing family into regression artifacts.
 - [ ] Retune raft coupling over C++ water only after field and geometry gates improve, comparing force envelopes, trajectories, surf/flush/clear/ground/pin/flip outcomes, and reach/drop transition stability against GeoClaw-derived fields.
-- [ ] Add a distinct pin/release fixture that is not just shallow-shelf or boulder proxy coverage, with flow-dependent pin force, boat orientation, wrap depth, crew high-side/shift timing, release threshold, and failed-rescue outcome telemetry.
+- [x] Add a distinct pin/release fixture that is not just shallow-shelf or boulder proxy coverage, with flow-dependent pin force, boat orientation, wrap depth, crew high-side/shift timing, release threshold, and failed-rescue outcome telemetry.
 - [x] Run Milestone 17 analytic fixtures as required preflight and postflight guardrails for every retune batch, blocking any change that regresses lake-at-rest, sloping-channel, wet/dry, bed-step, bore, hydraulic-jump, or transcritical-bump diagnostics.
 - [ ] Re-run the full Milestone 16 gate after fixes, regenerate the suite-level C++ validation report and GeoClaw-to-Unreal readiness report, and explicitly approve or block live custom water.
 
@@ -375,7 +375,7 @@ This milestone decides whether Unreal Chaos, Jolt, Chrono, or the custom reduced
 - [x] Wire Milestone 17 analytic fixture validation into the retune preflight/postflight workflow before changing solver parameters.
 - [x] Fix and record GeoClaw boundary semantics so authored constant inflow/stage/depth/velocity boundaries are enforced by generated GeoClaw `user` boundaries instead of silently falling back to extrapolation.
 - [x] Retune and re-run the first blocked GeoClaw/C++ parity family without increasing feature-forcing defaults, promoting the corrected-boundary finite-volume uniform-channel lane while recording reduced mode as still blocked.
-- [ ] Add the distinct flow-dependent pin/release fixture and report separate from shallow-shelf and boulder proxy evidence.
+- [x] Add the distinct flow-dependent pin/release fixture and report separate from shallow-shelf and boulder proxy evidence.
 - [ ] Re-run raft-coupling validation over the improved C++ water fields and promote newly passing outcomes.
 - [ ] Regenerate the Milestone 16 full C++ gate and GeoClaw-to-Unreal readiness report after the closure fixes.
 - [ ] Implement the Unreal Chaos automation fixtures from the shared runtime evaluation contract.

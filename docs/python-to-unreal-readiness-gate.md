@@ -50,7 +50,7 @@ Milestone 18 closure actions:
 - Run Milestone 17 analytic fixtures before and after every retune batch.
 - Fix GeoClaw/C++ parity failures before accepting raft-outcome tuning.
 - Close wet/dry, bed-step, constriction, drop/ledge, tailwater, and stitched reach/drop geometry families.
-- Add a distinct flow-dependent pin/release fixture separate from shallow-shelf and boulder proxy evidence.
+- Use the dedicated flow-dependent pin/release fixture report separate from shallow-shelf and boulder proxy evidence.
 - Re-run raft coupling over improved C++ water fields.
 - Regenerate and explicitly approve or block the readiness report.
 
