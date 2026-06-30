@@ -66,6 +66,7 @@ Unreal Chaos may be used for incidental non-authoritative physics such as loose 
 - Scripted or AI-assisted passenger crew responding to guide commands.
 - Local AI voice interaction so the guide can speak paddle, brace, high-side, rescue, and recovery commands.
 - Crew members can talk, acknowledge commands, react to hazards, and hold conversations shaped by passenger persona, trust, fear, fatigue, skill, weather, river history, and recent run events.
+- Crew safety has explicit gameplay states: seated, at-risk, falling/ejected, swimming, rescue-targeted, rescued, re-seated/recovered, and lost/failed-rescue for scoring and training.
 - Fully immersive 3D audio where rapids, hydraulics, rocks, raft contacts, crew, rescue cues, voice chat, weather, and canyon reflections occupy stable world positions from the guide's stern seat.
 - Realistic but teachable white water behavior.
 - Data-backed river, section, season, flow level, difficulty, and raft/crew selection.
@@ -159,6 +160,7 @@ Tasks:
 - Add first paddle interaction model connected to physics runtime.
 - Add guide voice/command inputs for passenger crew using local speech recognition where available.
 - Map recognized speech into deterministic command intents: forward paddle, back paddle, left/right paddle, stop, hold on, brace, high side, rescue, swimmer callout, and recovery commands.
+- Reserve input/actions for swimmer spotting, rescue target selection, throw-line or reach/pull-in attempts, and re-seat/recovery confirmation.
 - Add confidence thresholds, command repeat/confirm behavior for ambiguous recognition, subtitles, accessibility fallbacks, and manual input parity.
 - Add noisy-water and VR microphone test scenes for false-positive and latency tuning.
 
@@ -195,7 +197,8 @@ Tasks:
 - Add passenger command response: forward, back, left, right, hold on, brace.
 - Add local voice-command path for the same passenger responses, with deterministic command execution after intent recognition.
 - Add crew acknowledgments, missed-command behavior, hesitation, and urgency barks based on command confidence and passenger state.
-- Add safety outcomes: fall out, swim, rescue, pin, surf, flip, flush.
+- Add safety outcomes and state transitions: fall out/ejection, swim, swimmer drift, rescue target, pull-in, re-seat/recovery, failed rescue, pin, surf, flip, flush.
+- Add rescue gameplay for guide and crew actions: spotting, approach line, reach/paddle grab, throw rope when available, timing window, pull-in duration, and post-rescue recovery/fatigue.
 - Add scoring for safety, line, boat angle, paddle efficiency, passenger trust, and completion.
 - Add restart, replay, ghost telemetry, and after-action feedback.
 - Add basic menus and settings.
@@ -328,6 +331,7 @@ Replay data should include:
 - Recognized speech text or redacted transcript policy
 - Voice command intent, confidence, latency, fallback path, and crew acknowledgment
 - Crew conversation state, generated/selected line id, passenger speaker, and gameplay event trigger
+- Crew safety state, ejection trigger, swimmer world position, rescue target, rescue method, time in water, pull-in/re-seat result, failed-rescue reason, fatigue, trust delta, and safety score impact
 - Audio event id, source asset id, mix state, runtime parameters, attenuation/spatialization preset, occlusion/reverb state, ambisonic bed state, voice count, streaming/decompression/spatialization cost, and source-manifest approval state
 - Force contributions
 - Contact points
