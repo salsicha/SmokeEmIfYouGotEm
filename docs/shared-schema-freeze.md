@@ -12,6 +12,9 @@ Milestone 7 freezes the first schema set shared by Python modeling, C++ runtime 
 | Parameter candidate JSON | `raftsim.parameters.v0` | `physics/schemas/parameters.schema.json` |
 | Analytic fixture manifest | `raftsim.analytic_fixture_manifest.v0` | `physics/schemas/analytic_fixture_manifest.schema.json` |
 | Feature-forcing manifest | `raftsim.feature_forcing.v0` | `physics/schemas/feature_forcing.schema.json` |
+| Reach-local grid contract | `raftsim.reach_local_grid.v0` | `physics/schemas/reach_local_grid.schema.json` |
+| River validation annotations | `raftsim.river_validation_annotation.v0` | `physics/schemas/river_validation_annotation.schema.json` |
+| Geospatial format contract | `raftsim.geospatial_format_contract.v0` | `physics/schemas/geospatial_format_contract.schema.json` |
 
 The schema set is indexed by `physics/schemas/shared_schemas_manifest.json` with version `raftsim.shared_schemas.v0`.
 
@@ -24,3 +27,6 @@ The schema set is indexed by `physics/schemas/shared_schemas_manifest.json` with
 - Parameter candidate files must preserve both water-solver knobs and raft-force/contact knobs so tuning reports remain reproducible.
 - Analytic fixture manifests must preserve provenance, benchmark-family notes, expected behavior, tolerance tiers, and a no-vendored-external-data flag until SWASHES licensing and maintenance are decided.
 - Feature-forcing manifests must preserve low defaults, flow-response curves, solver-state effects, raft-coupling effects, visual-only parameters, GeoClaw comparison requirements, and conservation-failure guards.
+- Reach-local grid contracts must preserve ghost-zone ownership while requiring stitched whole-window validation outputs and seam diagnostics.
+- River validation annotation packages must preserve evidence links, guide feedback, expected raft outcomes, confidence, rights, and export targets for Python, validation reports, and Unreal.
+- Geospatial format contracts must preserve CRS policy, source manifests, standard canonical formats, tracked WGS84/local transforms, and the ban on Shapefile as canonical source of truth.
