@@ -54,10 +54,15 @@ from .milestone16 import (
     run_milestone16_runtime_profile,
 )
 from .milestone18 import (
+    MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
+    Milestone18AnalyticGuardrailStage,
+    Milestone18AnalyticRegression,
+    Milestone18AnalyticRetuneGuardrailReport,
     Milestone18FailureTriageEntry,
     Milestone18FailureTriageReport,
     build_milestone18_failure_triage_matrix,
+    run_milestone18_analytic_retune_guardrail,
 )
 from .raft2d import (
     PaddleCommand2D,
@@ -548,6 +553,7 @@ __all__ = [
     "MILESTONE16_REGRESSION_REGISTRY_SCHEMA",
     "MILESTONE16_REGRESSION_PROMOTION_REPORT_SCHEMA",
     "MILESTONE16_RUNTIME_PROFILE_REPORT_SCHEMA",
+    "MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA",
     "MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA",
     "Milestone16ComparisonRecord",
     "Milestone16ComparisonReport",
@@ -565,6 +571,9 @@ __all__ = [
     "Milestone16RegressionPromotionReport",
     "Milestone16RuntimeProfileRecord",
     "Milestone16RuntimeProfileReport",
+    "Milestone18AnalyticGuardrailStage",
+    "Milestone18AnalyticRegression",
+    "Milestone18AnalyticRetuneGuardrailReport",
     "Milestone18FailureTriageEntry",
     "Milestone18FailureTriageReport",
     "River2DParameters",
@@ -666,6 +675,7 @@ __all__ = [
     "run_milestone16_raft_coupling_validation",
     "run_milestone16_regression_promotion",
     "run_milestone16_runtime_profile",
+    "run_milestone18_analytic_retune_guardrail",
     "run_raft_force_parameter_sweep",
     "run_pyclaw_reference",
     "select_backend",
