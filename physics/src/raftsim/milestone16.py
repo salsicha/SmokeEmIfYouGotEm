@@ -632,6 +632,7 @@ class Milestone16RegressionPromotionReport:
     raft_coupling_report: str
     registry_path: str
     fixture_root: str
+    geometry_validation_report: str | None = None
     entries: tuple[Milestone16RegressionPromotionEntry, ...] = field(default_factory=tuple)
     notes: tuple[str, ...] = ()
 
@@ -645,11 +646,13 @@ class Milestone16RegressionPromotionReport:
             "passed": self.passed,
             "comparison_report": self.comparison_report,
             "raft_coupling_report": self.raft_coupling_report,
+            "geometry_validation_report": self.geometry_validation_report,
             "registry_path": self.registry_path,
             "fixture_root": self.fixture_root,
             "entry_count": len(self.entries),
             "geoclaw_cpp_fixture_count": sum(1 for entry in self.entries if entry.category == "geoclaw_cpp"),
             "raft_artifact_count": sum(1 for entry in self.entries if entry.category == "raft_coupling"),
+            "geometry_artifact_count": sum(1 for entry in self.entries if entry.category == "geometry_validation"),
             "notes": list(self.notes),
             "entries": [entry.to_json_dict() for entry in self.entries],
         }
@@ -1301,22 +1304,33 @@ def run_milestone16_regression_promotion(
     comparison_report: str | Path,
     raft_coupling_report: str | Path,
     *,
+    geometry_report: str | Path | None = None,
     fixture_root: str | Path = "regression_fixtures/milestone16",
     registry_path: str | Path | None = None,
 ) -> Milestone16RegressionPromotionReport:
-    """Promote passing Milestone 16 GeoClaw/C++ and raft artifacts."""
+    """Promote passing Milestone 16 GeoClaw/C++, geometry, and raft artifacts."""
 
     comparison_path = Path(comparison_report)
     raft_path = Path(raft_coupling_report)
+    geometry_path = Path(geometry_report) if geometry_report is not None else None
     root = Path(fixture_root)
     registry = Path(registry_path) if registry_path is not None else root / "registry.json"
     comparison = _read_json(comparison_path)
     raft = _read_json(raft_path)
+    geometry = _read_json(geometry_path) if geometry_path is not None else None
     entries: list[Milestone16RegressionPromotionEntry] = []
 
     for record in comparison["records"]:
         if bool(record.get("threshold_passed")):
             entries.append(_promote_geoclaw_cpp_regression(record, comparison_path, root))
+
+    if geometry is not None:
+        for case in geometry.get("cases", []):
+            if not _should_promote_geometry_case(case):
+                continue
+            for evidence in case.get("evidence", []):
+                if bool(evidence.get("passed")):
+                    entries.append(_promote_geometry_validation_artifact(case, evidence, geometry_path, root))
 
     for record in raft["records"]:
         if bool(record.get("passed")):
@@ -1329,6 +1343,7 @@ def run_milestone16_regression_promotion(
                 "schema_version": MILESTONE16_REGRESSION_REGISTRY_SCHEMA,
                 "comparison_report": str(comparison_path),
                 "raft_coupling_report": str(raft_path),
+                "geometry_validation_report": str(geometry_path) if geometry_path is not None else None,
                 "entry_count": len(entries),
                 "entries": [entry.to_json_dict() for entry in entries],
             },
@@ -1340,11 +1355,13 @@ def run_milestone16_regression_promotion(
     return Milestone16RegressionPromotionReport(
         comparison_report=str(comparison_path),
         raft_coupling_report=str(raft_path),
+        geometry_validation_report=str(geometry_path) if geometry_path is not None else None,
         registry_path=str(registry),
         fixture_root=str(root),
         entries=tuple(entries),
         notes=(
             "Only passing GeoClaw/C++ threshold runs were copied as regression fixtures.",
+            "Passing stitched reach/drop geometry checks were promoted as artifact manifests that preserve seam-visible handoff diagnostics.",
             "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs.",
         ),
     )
@@ -1939,6 +1956,57 @@ def _promote_geoclaw_cpp_regression(
         scenario_package=str(scenario_target),
         manifest=str(reports_target / "dual_solver_manifest.json"),
         reports=reports,
+    )
+
+
+def _should_promote_geometry_case(case: dict[str, object]) -> bool:
+    return bool(case.get("passed")) and str(case.get("case_id")) == "stitched_reach_drop_handoffs"
+
+
+def _promote_geometry_validation_artifact(
+    case: dict[str, object],
+    evidence: dict[str, object],
+    source_report: Path,
+    fixture_root: Path,
+) -> Milestone16RegressionPromotionEntry:
+    case_id = str(case["case_id"])
+    gate_id = str(evidence.get("gate_scenario_id", case_id))
+    solver_mode = "geoclaw_package"
+    artifact_dir = fixture_root / "geometry_validation" / case_id / _case_dir(gate_id)
+    artifact_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = artifact_dir / "geometry_case.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": MILESTONE16_REGRESSION_REGISTRY_SCHEMA,
+                "source_report": str(source_report),
+                "case_id": case_id,
+                "title": case.get("title"),
+                "gate_scenario_id": gate_id,
+                "scenarios": case.get("scenarios", []),
+                "solver_modes": case.get("solver_modes", []),
+                "evidence": evidence,
+                "passed": True,
+            },
+            indent=2,
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+    return Milestone16RegressionPromotionEntry(
+        artifact_id=f"geometry_validation/{case_id}/{gate_id}",
+        category="geometry_validation",
+        gate_scenario_id=gate_id,
+        actual_scenario_id=str(evidence.get("actual_scenario_id", gate_id)),
+        suite="cascading" if gate_id.startswith("south_fork_cascading") else "geometry",
+        solver_mode=solver_mode,
+        artifact_dir=str(artifact_dir),
+        source_report=str(source_report),
+        passed=True,
+        case_id=case_id,
+        manifest=str(manifest_path),
+        reports={"geometry_case": str(manifest_path)},
+        notes=("Preserves seam-visible reach/drop handoff diagnostics from the geometry validation report.",),
     )
 
 

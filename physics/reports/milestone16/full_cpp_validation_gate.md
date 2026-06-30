@@ -12,7 +12,7 @@ Decision: **BLOCKED**
 | Geometry-Specific Validation | BLOCKED | 2 | 4 | 6 | `reports/milestone16/geometry_validation.json` |
 | Raft Coupling Validation | BLOCKED | 11 | 39 | 50 | `reports/milestone16/raft_coupling_validation.json` |
 | Runtime Profile And Determinism | PASS | 12 | 0 | 12 | `reports/milestone16/runtime_profile.json` |
-| Regression Promotion | PASS | 17 | 0 | 17 | `reports/milestone16/regression_promotion_manifest.json` |
+| Regression Promotion | PASS | 20 | 0 | 20 | `reports/milestone16/regression_promotion_manifest.json` |
 
 ## Blockers
 

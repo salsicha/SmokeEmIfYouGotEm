@@ -237,17 +237,50 @@ def test_milestone16_regression_promotion_writes_fixtures_and_artifacts(tmp_path
         }""",
         encoding="utf-8",
     )
+    geometry_report = tmp_path / "geometry_report.json"
+    geometry_report.write_text(
+        """{
+          "cases": [{
+            "case_id": "stitched_reach_drop_handoffs",
+            "title": "Stitched Reach/Drop Boundary Handoffs",
+            "scenarios": ["south_fork_cascading_low_runnable"],
+            "solver_modes": ["geoclaw", "package"],
+            "passed": true,
+            "evidence": [{
+              "gate_scenario_id": "south_fork_cascading_low_runnable",
+              "passed": true,
+              "check_count": 1,
+              "checks": [{"transition_id": "ledge_drop_001", "passed": true}]
+            }]
+          }, {
+            "case_id": "constriction",
+            "passed": false,
+            "evidence": [{"gate_scenario_id": "constriction", "passed": false}]
+          }]
+        }""",
+        encoding="utf-8",
+    )
 
     report = run_milestone16_regression_promotion(
         comparison_report,
         raft_report,
+        geometry_report=geometry_report,
         fixture_root=tmp_path / "fixtures",
     )
     registry = report.to_json_dict()
 
     assert report.passed is True
-    assert registry["entry_count"] == 2
+    assert registry["entry_count"] == 3
+    assert registry["geometry_artifact_count"] == 1
     assert (tmp_path / "fixtures" / "geoclaw_cpp" / "c_flat" / "reduced" / "scenario" / "scenario.json").exists()
+    assert (
+        tmp_path
+        / "fixtures"
+        / "geometry_validation"
+        / "stitched_reach_drop_handoffs"
+        / "cg_low"
+        / "geometry_case.json"
+    ).exists()
     assert (
         tmp_path
         / "fixtures"

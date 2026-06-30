@@ -104,13 +104,14 @@
       "failed_count": 0,
       "notes": [
         "Only passing GeoClaw/C++ threshold runs were copied as regression fixtures.",
+        "Passing stitched reach/drop geometry checks were promoted as artifact manifests that preserve seam-visible handoff diagnostics.",
         "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs."
       ],
       "passed": true,
-      "passed_count": 17,
+      "passed_count": 20,
       "source_report": "reports/milestone16/regression_promotion_manifest.json",
       "title": "Regression Promotion",
-      "total_count": 17
+      "total_count": 20
     }
   ],
   "decision": "BLOCKED",

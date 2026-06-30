@@ -4,7 +4,7 @@ Schema: `raftsim.milestone16.regression_promotion.v0`
 
 Decision: **PASS**
 
-Promoted entries: 17
+Promoted entries: 20
 
 | Category | Gate scenario | Mode | Case | Artifact |
 | --- | --- | --- | --- | --- |
@@ -14,6 +14,9 @@ Promoted entries: 17
 | geoclaw_cpp | wet_dry_shoreline | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced |
 | geoclaw_cpp | sloping_manning_channel | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced |
 | geoclaw_cpp | sloping_manning_channel | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume |
+| geometry_validation | south_fork_cascading_low_runnable | geoclaw_package | stitched_reach_drop_handoffs | regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_low |
+| geometry_validation | south_fork_cascading_median_runnable | geoclaw_package | stitched_reach_drop_handoffs | regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_med |
+| geometry_validation | south_fork_cascading_high_runnable | geoclaw_package | stitched_reach_drop_handoffs | regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_high |
 | raft_coupling | hydraulic_hole_downstream_boil | finite_volume | downstream_boil_recovery | regression_fixtures/milestone16/raft_coupling/r_hole/finite_volume/downstream_boil_recovery |
 | raft_coupling | eddy_line_shear | reduced | eddy_recovery | regression_fixtures/milestone16/raft_coupling/r_eddy/reduced/eddy_recovery |
 | raft_coupling | shallow_shelf | reduced | shallow_shelf_pivot_release | regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release |
@@ -29,4 +32,5 @@ Promoted entries: 17
 ## Notes
 
 - Only passing GeoClaw/C++ threshold runs were copied as regression fixtures.
+- Passing stitched reach/drop geometry checks were promoted as artifact manifests that preserve seam-visible handoff diagnostics.
 - Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs.
