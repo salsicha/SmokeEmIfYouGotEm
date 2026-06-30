@@ -1,0 +1,249 @@
+{
+  "comparison_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+  "entries": [
+    {
+      "actual_scenario_id": "flat_pool_seed_16",
+      "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced",
+      "artifact_id": "geoclaw_cpp/flat_pool/reduced",
+      "case_id": null,
+      "category": "geoclaw_cpp",
+      "gate_scenario_id": "flat_pool",
+      "manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/dual_solver_manifest.json",
+      "notes": [],
+      "passed": true,
+      "reports": {
+        "diagnostic_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/diagnostic_comparison.json",
+        "dual_solver_manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/dual_solver_manifest.json",
+        "feature_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/feature_comparison.json",
+        "field_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/field_comparison.json",
+        "probe_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/probe_comparison.json",
+        "threshold_evaluation": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/threshold_evaluation.json"
+      },
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/scenario",
+      "solver_mode": "reduced",
+      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+      "suite": "canonical"
+    },
+    {
+      "actual_scenario_id": "flat_pool_seed_16",
+      "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume",
+      "artifact_id": "geoclaw_cpp/flat_pool/finite_volume",
+      "case_id": null,
+      "category": "geoclaw_cpp",
+      "gate_scenario_id": "flat_pool",
+      "manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/dual_solver_manifest.json",
+      "notes": [],
+      "passed": true,
+      "reports": {
+        "diagnostic_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/diagnostic_comparison.json",
+        "dual_solver_manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/dual_solver_manifest.json",
+        "feature_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/feature_comparison.json",
+        "field_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/field_comparison.json",
+        "probe_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/probe_comparison.json",
+        "threshold_evaluation": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/threshold_evaluation.json"
+      },
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/scenario",
+      "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+      "suite": "canonical"
+    },
+    {
+      "actual_scenario_id": "sloping_manning_channel_seed_16",
+      "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced",
+      "artifact_id": "geoclaw_cpp/sloping_manning_channel/reduced",
+      "case_id": null,
+      "category": "geoclaw_cpp",
+      "gate_scenario_id": "sloping_manning_channel",
+      "manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/dual_solver_manifest.json",
+      "notes": [],
+      "passed": true,
+      "reports": {
+        "diagnostic_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/diagnostic_comparison.json",
+        "dual_solver_manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/dual_solver_manifest.json",
+        "feature_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/feature_comparison.json",
+        "field_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/field_comparison.json",
+        "probe_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/probe_comparison.json",
+        "threshold_evaluation": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/threshold_evaluation.json"
+      },
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/scenario",
+      "solver_mode": "reduced",
+      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+      "suite": "canonical"
+    },
+    {
+      "actual_scenario_id": "sloping_manning_channel_seed_16",
+      "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume",
+      "artifact_id": "geoclaw_cpp/sloping_manning_channel/finite_volume",
+      "case_id": null,
+      "category": "geoclaw_cpp",
+      "gate_scenario_id": "sloping_manning_channel",
+      "manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/dual_solver_manifest.json",
+      "notes": [],
+      "passed": true,
+      "reports": {
+        "diagnostic_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/diagnostic_comparison.json",
+        "dual_solver_manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/dual_solver_manifest.json",
+        "feature_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/feature_comparison.json",
+        "field_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/field_comparison.json",
+        "probe_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/probe_comparison.json",
+        "threshold_evaluation": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/threshold_evaluation.json"
+      },
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/scenario",
+      "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+      "suite": "canonical"
+    },
+    {
+      "actual_scenario_id": "shallow_shelf_seed_21",
+      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release",
+      "artifact_id": "raft_coupling/shallow_shelf/reduced/shallow_shelf_pivot_release",
+      "case_id": "shallow_shelf_pivot_release",
+      "category": "raft_coupling",
+      "gate_scenario_id": "shallow_shelf",
+      "manifest": "regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release/raft_coupling_case.json",
+      "notes": [
+        "Frame paths remain in generated Milestone 16 output directories."
+      ],
+      "passed": true,
+      "reports": {
+        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release/raft_coupling_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "reduced",
+      "source_report": "reports/milestone16/raft_coupling_validation.json",
+      "suite": "rafting"
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/drop_entry",
+      "artifact_id": "raft_coupling/south_fork_cascading_low_runnable/finite_volume/drop_entry",
+      "case_id": "drop_entry",
+      "category": "raft_coupling",
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "manifest": "regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/drop_entry/raft_coupling_case.json",
+      "notes": [
+        "Frame paths remain in generated Milestone 16 output directories."
+      ],
+      "passed": true,
+      "reports": {
+        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/drop_entry/raft_coupling_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/raft_coupling_validation.json",
+      "suite": "cascading"
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/eddy_recovery",
+      "artifact_id": "raft_coupling/south_fork_cascading_low_runnable/finite_volume/eddy_recovery",
+      "case_id": "eddy_recovery",
+      "category": "raft_coupling",
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "manifest": "regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/eddy_recovery/raft_coupling_case.json",
+      "notes": [
+        "Frame paths remain in generated Milestone 16 output directories."
+      ],
+      "passed": true,
+      "reports": {
+        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/eddy_recovery/raft_coupling_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/raft_coupling_validation.json",
+      "suite": "cascading"
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/transition_boundary_crossing",
+      "artifact_id": "raft_coupling/south_fork_cascading_low_runnable/finite_volume/transition_boundary_crossing",
+      "case_id": "transition_boundary_crossing",
+      "category": "raft_coupling",
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "manifest": "regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/transition_boundary_crossing/raft_coupling_case.json",
+      "notes": [
+        "Frame paths remain in generated Milestone 16 output directories."
+      ],
+      "passed": true,
+      "reports": {
+        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/transition_boundary_crossing/raft_coupling_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/raft_coupling_validation.json",
+      "suite": "cascading"
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/drop_entry",
+      "artifact_id": "raft_coupling/south_fork_cascading_median_runnable/finite_volume/drop_entry",
+      "case_id": "drop_entry",
+      "category": "raft_coupling",
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "manifest": "regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/drop_entry/raft_coupling_case.json",
+      "notes": [
+        "Frame paths remain in generated Milestone 16 output directories."
+      ],
+      "passed": true,
+      "reports": {
+        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/drop_entry/raft_coupling_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/raft_coupling_validation.json",
+      "suite": "cascading"
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/transition_boundary_crossing",
+      "artifact_id": "raft_coupling/south_fork_cascading_median_runnable/finite_volume/transition_boundary_crossing",
+      "case_id": "transition_boundary_crossing",
+      "category": "raft_coupling",
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "manifest": "regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/transition_boundary_crossing/raft_coupling_case.json",
+      "notes": [
+        "Frame paths remain in generated Milestone 16 output directories."
+      ],
+      "passed": true,
+      "reports": {
+        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/transition_boundary_crossing/raft_coupling_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/raft_coupling_validation.json",
+      "suite": "cascading"
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/transition_boundary_crossing",
+      "artifact_id": "raft_coupling/south_fork_cascading_high_runnable/finite_volume/transition_boundary_crossing",
+      "case_id": "transition_boundary_crossing",
+      "category": "raft_coupling",
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "manifest": "regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/transition_boundary_crossing/raft_coupling_case.json",
+      "notes": [
+        "Frame paths remain in generated Milestone 16 output directories."
+      ],
+      "passed": true,
+      "reports": {
+        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/transition_boundary_crossing/raft_coupling_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/raft_coupling_validation.json",
+      "suite": "cascading"
+    }
+  ],
+  "entry_count": 11,
+  "fixture_root": "regression_fixtures/milestone16",
+  "geoclaw_cpp_fixture_count": 4,
+  "notes": [
+    "Only passing GeoClaw/C++ threshold runs were copied as regression fixtures.",
+    "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs."
+  ],
+  "passed": true,
+  "raft_artifact_count": 7,
+  "raft_coupling_report": "reports/milestone16/raft_coupling_validation.json",
+  "registry_path": "regression_fixtures/milestone16/registry.json",
+  "schema_version": "raftsim.milestone16.regression_promotion.v0"
+}

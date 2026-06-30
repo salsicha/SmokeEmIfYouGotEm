@@ -1,0 +1,114 @@
+{
+  "cpp": {
+    "energy_final": 2207.25,
+    "energy_initial": 2207.25,
+    "energy_relative_change": 0.0,
+    "frame_count": 9,
+    "froude_max": 0.0,
+    "froude_mean_wet": 0.0,
+    "hole_retention": {
+      "centroid_x": null,
+      "centroid_y": null,
+      "hole_count": 0,
+      "retained_area": 0.0
+    },
+    "hydraulic_jump": {
+      "value": 0.0,
+      "x": 0.0,
+      "y": -5.5
+    },
+    "mass_final": 360.0,
+    "mass_initial": 360.0,
+    "mass_relative_drift": 0.0,
+    "solver": "cpp",
+    "wave_crest": {
+      "value": 1.25,
+      "x": 0.0,
+      "y": -5.5
+    },
+    "wave_trough": {
+      "value": 1.25,
+      "x": 0.0,
+      "y": -5.5
+    }
+  },
+  "delta": {
+    "energy_relative_change_delta": 0.0,
+    "froude_max_delta": 0.0,
+    "froude_mean_wet_delta": 0.0,
+    "hole_centroid_distance": null,
+    "hole_retained_area_delta": 0.0,
+    "hydraulic_jump_distance": 0.0,
+    "mass_relative_drift_delta": 0.0,
+    "wave_crest_distance": 0.0,
+    "wave_trough_distance": 0.0
+  },
+  "pyclaw": {
+    "energy_final": 2207.25,
+    "energy_initial": 2207.25,
+    "energy_relative_change": 0.0,
+    "frame_count": 3,
+    "froude_max": 0.0,
+    "froude_mean_wet": 0.0,
+    "hole_retention": {
+      "centroid_x": null,
+      "centroid_y": null,
+      "hole_count": 0,
+      "retained_area": 0.0
+    },
+    "hydraulic_jump": {
+      "value": 0.0,
+      "x": 0.0,
+      "y": -5.5
+    },
+    "mass_final": 360.0,
+    "mass_initial": 360.0,
+    "mass_relative_drift": 0.0,
+    "solver": "geoclaw",
+    "wave_crest": {
+      "value": 1.25,
+      "x": 0.0,
+      "y": -5.5
+    },
+    "wave_trough": {
+      "value": 1.25,
+      "x": 0.0,
+      "y": -5.5
+    }
+  },
+  "reference": {
+    "energy_final": 2207.25,
+    "energy_initial": 2207.25,
+    "energy_relative_change": 0.0,
+    "frame_count": 3,
+    "froude_max": 0.0,
+    "froude_mean_wet": 0.0,
+    "hole_retention": {
+      "centroid_x": null,
+      "centroid_y": null,
+      "hole_count": 0,
+      "retained_area": 0.0
+    },
+    "hydraulic_jump": {
+      "value": 0.0,
+      "x": 0.0,
+      "y": -5.5
+    },
+    "mass_final": 360.0,
+    "mass_initial": 360.0,
+    "mass_relative_drift": 0.0,
+    "solver": "geoclaw",
+    "wave_crest": {
+      "value": 1.25,
+      "x": 0.0,
+      "y": -5.5
+    },
+    "wave_trough": {
+      "value": 1.25,
+      "x": 0.0,
+      "y": -5.5
+    }
+  },
+  "reference_solver": "geoclaw",
+  "scenario_id": "flat_pool_seed_16"
+}

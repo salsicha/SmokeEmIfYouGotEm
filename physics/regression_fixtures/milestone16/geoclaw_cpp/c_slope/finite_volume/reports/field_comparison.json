@@ -1,0 +1,363 @@
+{
+  "aggregate_field_errors": [
+    {
+      "field": "eta",
+      "max_l1": 0.0586653613164054,
+      "max_l2": 0.06523800946037825,
+      "max_linf": 0.11409163475036621
+    },
+    {
+      "field": "h",
+      "max_l1": 0.05866536131640538,
+      "max_l2": 0.06523800946037824,
+      "max_linf": 0.11409163475036621
+    },
+    {
+      "field": "hu",
+      "max_l1": 0.05132534853402539,
+      "max_l2": 0.06460438728813389,
+      "max_linf": 0.1271008749036151
+    },
+    {
+      "field": "hv",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "normal_x",
+      "max_l1": 0.00932862533072513,
+      "max_l2": 0.010353434240935225,
+      "max_linf": 0.017799685459907445
+    },
+    {
+      "field": "normal_y",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "normal_z",
+      "max_l1": 7.411678037110477e-05,
+      "max_l2": 0.00010630234853860104,
+      "max_linf": 0.00037904593463833347
+    },
+    {
+      "field": "u",
+      "max_l1": 0.047798656417563125,
+      "max_l2": 0.0631072748430761,
+      "max_linf": 0.1442740824274722
+    },
+    {
+      "field": "v",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    }
+  ],
+  "aggregate_slope_errors": [
+    {
+      "field": "slope_x",
+      "max_l1": 0.009330054986416503,
+      "max_l2": 0.010355293224800275,
+      "max_linf": 0.017812500972558043
+    },
+    {
+      "field": "slope_y",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    }
+  ],
+  "frame_comparisons": [
+    {
+      "cpp_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_slope/finite_volume/cpp_solver/sloping_manning_channel_seed_16/frames/frame_0000.csv",
+      "field_errors": [
+        {
+          "candidate_max": 1.25,
+          "candidate_min": 1.25,
+          "compared_count": 288,
+          "field": "h",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 1.25,
+          "reference_min": 1.25,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.25,
+          "candidate_min": 0.974,
+          "compared_count": 288,
+          "field": "eta",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 1.25,
+          "reference_min": 0.974,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.4,
+          "candidate_min": 1.4,
+          "compared_count": 288,
+          "field": "u",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 1.4,
+          "reference_min": 1.4,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "v",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.75,
+          "candidate_min": 1.75,
+          "compared_count": 288,
+          "field": "hu",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 1.75,
+          "reference_min": 1.75,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "hv",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.011999136093300814,
+          "candidate_min": 0.011999136093300703,
+          "compared_count": 288,
+          "field": "normal_x",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.011999136093300814,
+          "reference_min": 0.011999136093300703,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": -0.0,
+          "candidate_min": -0.0,
+          "compared_count": 288,
+          "field": "normal_y",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": -0.0,
+          "reference_min": -0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.999928007775067,
+          "candidate_min": 0.999928007775067,
+          "compared_count": 288,
+          "field": "normal_z",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.999928007775067,
+          "reference_min": 0.999928007775067,
+          "sample_count": 288
+        }
+      ],
+      "label": "initial",
+      "pyclaw_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_slope/normalized/frames/frame_0000.npz",
+      "reference_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_slope/normalized/frames/frame_0000.npz",
+      "reference_solver": "geoclaw",
+      "slope_errors": [
+        {
+          "candidate_max": -0.0119999999999999,
+          "candidate_min": -0.01200000000000001,
+          "compared_count": 288,
+          "field": "slope_x",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": -0.0119999999999999,
+          "reference_min": -0.01200000000000001,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "slope_y",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        }
+      ],
+      "wet_mismatch_fraction": 0.0
+    },
+    {
+      "cpp_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_slope/finite_volume/cpp_solver/sloping_manning_channel_seed_16/frames/frame_0008.csv",
+      "field_errors": [
+        {
+          "candidate_max": 1.25,
+          "candidate_min": 1.2238159485605093,
+          "compared_count": 288,
+          "field": "h",
+          "l1": 0.05866536131640538,
+          "l2": 0.06523800946037824,
+          "linf": 0.11409163475036621,
+          "reference_max": 1.338912010192871,
+          "reference_min": 1.1355178356170654,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.25,
+          "candidate_min": 0.9655789211382106,
+          "compared_count": 288,
+          "field": "eta",
+          "l1": 0.0586653613164054,
+          "l2": 0.06523800946037825,
+          "linf": 0.11409163475036621,
+          "reference_max": 1.1359083652496338,
+          "reference_min": 1.0484211978912352,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.5390966225303675,
+          "candidate_min": 1.4,
+          "compared_count": 288,
+          "field": "u",
+          "l1": 0.047798656417563125,
+          "l2": 0.0631072748430761,
+          "linf": 0.1442740824274722,
+          "reference_max": 1.5648901830512756,
+          "reference_min": 1.3948225401028953,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "v",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.9109099241287175,
+          "candidate_min": 1.75,
+          "compared_count": 288,
+          "field": "hu",
+          "l1": 0.05132534853402539,
+          "l2": 0.06460438728813389,
+          "linf": 0.1271008749036151,
+          "reference_max": 1.8675446510314941,
+          "reference_min": 1.6408021450042725,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "hv",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.03018926407255635,
+          "candidate_min": 0.010961892334395122,
+          "compared_count": 288,
+          "field": "normal_x",
+          "l1": 0.00932862533072513,
+          "l2": 0.010353434240935225,
+          "linf": 0.017799685459907445,
+          "reference_max": 0.012389578612648906,
+          "reference_min": -0.0022250005959204267,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": -0.0,
+          "candidate_min": -0.0,
+          "compared_count": 288,
+          "field": "normal_y",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": -0.0,
+          "reference_min": -0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.9999399166532204,
+          "candidate_min": 0.9995442002906912,
+          "compared_count": 288,
+          "field": "normal_z",
+          "l1": 7.411678037110477e-05,
+          "l2": 0.00010630234853860104,
+          "linf": 0.00037904593463833347,
+          "reference_max": 0.9999998884181487,
+          "reference_min": 0.9999232462253296,
+          "sample_count": 288
+        }
+      ],
+      "label": "final",
+      "pyclaw_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_slope/normalized/frames/frame_0002.npz",
+      "reference_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_slope/normalized/frames/frame_0002.npz",
+      "reference_solver": "geoclaw",
+      "slope_errors": [
+        {
+          "candidate_max": -0.010962551001148513,
+          "candidate_min": -0.030203030605126413,
+          "compared_count": 288,
+          "field": "slope_x",
+          "l1": 0.009330054986416503,
+          "l2": 0.010355293224800275,
+          "linf": 0.017812500972558043,
+          "reference_max": 0.0022250061035156143,
+          "reference_min": -0.01239052963256837,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "slope_y",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        }
+      ],
+      "wet_mismatch_fraction": 0.0
+    }
+  ],
+  "scenario_id": "sloping_manning_channel_seed_16"
+}
