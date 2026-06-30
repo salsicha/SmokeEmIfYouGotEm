@@ -140,6 +140,66 @@
       "suite": "canonical"
     },
     {
+      "actual_scenario_id": "south_fork_cascading_low_runnable",
+      "artifact_dir": "regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_low",
+      "artifact_id": "geometry_validation/stitched_reach_drop_handoffs/south_fork_cascading_low_runnable",
+      "case_id": "stitched_reach_drop_handoffs",
+      "category": "geometry_validation",
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "manifest": "regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_low/geometry_case.json",
+      "notes": [
+        "Preserves seam-visible reach/drop handoff diagnostics from the geometry validation report."
+      ],
+      "passed": true,
+      "reports": {
+        "geometry_case": "regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_low/geometry_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "geoclaw_package",
+      "source_report": "reports/milestone16/geometry_validation.json",
+      "suite": "cascading"
+    },
+    {
+      "actual_scenario_id": "south_fork_cascading_median_runnable",
+      "artifact_dir": "regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_med",
+      "artifact_id": "geometry_validation/stitched_reach_drop_handoffs/south_fork_cascading_median_runnable",
+      "case_id": "stitched_reach_drop_handoffs",
+      "category": "geometry_validation",
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "manifest": "regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_med/geometry_case.json",
+      "notes": [
+        "Preserves seam-visible reach/drop handoff diagnostics from the geometry validation report."
+      ],
+      "passed": true,
+      "reports": {
+        "geometry_case": "regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_med/geometry_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "geoclaw_package",
+      "source_report": "reports/milestone16/geometry_validation.json",
+      "suite": "cascading"
+    },
+    {
+      "actual_scenario_id": "south_fork_cascading_high_runnable",
+      "artifact_dir": "regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_high",
+      "artifact_id": "geometry_validation/stitched_reach_drop_handoffs/south_fork_cascading_high_runnable",
+      "case_id": "stitched_reach_drop_handoffs",
+      "category": "geometry_validation",
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "manifest": "regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_high/geometry_case.json",
+      "notes": [
+        "Preserves seam-visible reach/drop handoff diagnostics from the geometry validation report."
+      ],
+      "passed": true,
+      "reports": {
+        "geometry_case": "regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_high/geometry_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "geoclaw_package",
+      "source_report": "reports/milestone16/geometry_validation.json",
+      "suite": "cascading"
+    },
+    {
       "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
       "artifact_dir": "regression_fixtures/milestone16/raft_coupling/r_hole/finite_volume/downstream_boil_recovery",
       "artifact_id": "raft_coupling/hydraulic_hole_downstream_boil/finite_volume/downstream_boil_recovery",
@@ -360,11 +420,14 @@
       "suite": "cascading"
     }
   ],
-  "entry_count": 17,
+  "entry_count": 20,
   "fixture_root": "regression_fixtures/milestone16",
   "geoclaw_cpp_fixture_count": 6,
+  "geometry_artifact_count": 3,
+  "geometry_validation_report": "reports/milestone16/geometry_validation.json",
   "notes": [
     "Only passing GeoClaw/C++ threshold runs were copied as regression fixtures.",
+    "Passing stitched reach/drop geometry checks were promoted as artifact manifests that preserve seam-visible handoff diagnostics.",
     "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs."
   ],
   "passed": true,

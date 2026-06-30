@@ -1,0 +1,44 @@
+{
+  "case_id": "stitched_reach_drop_handoffs",
+  "evidence": {
+    "check_count": 1,
+    "checks": [
+      {
+        "downstream_column": 18,
+        "downstream_reach_id": "drop_001",
+        "energy_delta": -0.11855929493664785,
+        "energy_passed": true,
+        "mass_flux_delta": 0.024480808172619165,
+        "mass_flux_passed": true,
+        "momentum_flux_delta": 0.023665874254017744,
+        "momentum_flux_passed": true,
+        "passed": true,
+        "surface_elevation_delta": 0.1532545516999061,
+        "surface_elevation_passed": true,
+        "transition_id": "ledge_drop_001",
+        "upstream_column": 17,
+        "upstream_reach_id": "tongue_001",
+        "wet_fraction_delta": 0.0,
+        "wet_front_passed": true
+      }
+    ],
+    "gate_scenario_id": "south_fork_cascading_high_runnable",
+    "geoclaw_drop_transition_windows": 1,
+    "geoclaw_reach_windows": 7,
+    "passed": true
+  },
+  "gate_scenario_id": "south_fork_cascading_high_runnable",
+  "passed": true,
+  "scenarios": [
+    "south_fork_cascading_low_runnable",
+    "south_fork_cascading_median_runnable",
+    "south_fork_cascading_high_runnable"
+  ],
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "solver_modes": [
+    "geoclaw",
+    "package"
+  ],
+  "source_report": "reports/milestone16/geometry_validation.json",
+  "title": "Stitched Reach/Drop Boundary Handoffs"
+}
