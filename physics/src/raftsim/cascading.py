@@ -34,6 +34,7 @@ CASCADING_ANNOTATIONS_FILE = "cascading_annotations.npz"
 UNREAL_CASCADING_CORRIDOR_METADATA_VERSION = "raftsim.unreal_cascading_corridor_metadata.v0"
 UNREAL_CASCADING_CORRIDOR_METADATA_FILE = "unreal_cascading_corridor_metadata.json"
 UNREAL_CASCADING_CORRIDOR_GRID_FILE = "unreal_cascading_reach_drop_grid.json"
+UNREAL_FIDELITY_REVIEW_OVERLAY_SCHEMA_VERSION = "raftsim.unreal_fidelity_review_overlays.v0"
 STITCHED_WHOLE_WINDOW_VALIDATION_SCHEMA_VERSION = "raftsim.stitched_whole_window_validation.v0"
 STITCHED_WHOLE_WINDOW_VALIDATION_DIR = "stitched_validation"
 STITCHED_WHOLE_WINDOW_VALIDATION_MANIFEST_FILE = "manifest.json"
@@ -1142,6 +1143,11 @@ def build_unreal_cascading_corridor_metadata(package: CascadingScenarioPackage2_
         "debug_overlays": _unreal_debug_overlays(package, reach_index, drop_transition_index),
         "audio_zones": _unreal_audio_zones(streaming_tiles, drop_transitions),
         "vfx_zones": _unreal_vfx_zones(streaming_tiles, drop_transitions),
+        "fidelity_review_overlays": _unreal_fidelity_review_overlays(
+            package,
+            streaming_tiles,
+            drop_transitions,
+        ),
         "designer_review": {
             "scenario_description": scenario.metadata.description,
             "reach_review_count": len(streaming_tiles),
@@ -2092,6 +2098,265 @@ def _unreal_debug_overlays(
             "purpose": "Shows authored feature ownership by reach/drop metadata.",
         },
     ]
+
+
+def _unreal_fidelity_review_overlays(
+    package: CascadingScenarioPackage2_5D,
+    streaming_tiles: list[dict[str, object]],
+    drop_transitions: list[dict[str, object]],
+) -> dict[str, object]:
+    checkpoint_ids = [
+        checkpoint.checkpoint_id for checkpoint in _stitched_validation_raft_transition_checkpoints(package)
+    ]
+    return {
+        "schema_version": UNREAL_FIDELITY_REVIEW_OVERLAY_SCHEMA_VERSION,
+        "review_mode": "river_fidelity_review",
+        "default_enabled": False,
+        "purpose": (
+            "Compare authored validation annotations, GeoClaw/C++ fields, raft motion, rendered water/foam, "
+            "audio cues, and expected raft outcomes in the Unreal viewport."
+        ),
+        "source_files": {
+            "rapid_review_workflow": "rapid_review_editor_workflow.json",
+            "river_validation_annotations": "review/river_validation_annotations.geojson",
+            "stitched_validation_manifest": (
+                f"{STITCHED_WHOLE_WINDOW_VALIDATION_DIR}/"
+                f"{STITCHED_WHOLE_WINDOW_VALIDATION_MANIFEST_FILE}"
+            ),
+            "stitched_validation_fields": (
+                f"{STITCHED_WHOLE_WINDOW_VALIDATION_DIR}/"
+                f"{STITCHED_WHOLE_WINDOW_VALIDATION_FIELDS_FILE}"
+            ),
+            "raft_transition_checkpoints": (
+                f"{STITCHED_WHOLE_WINDOW_VALIDATION_DIR}/"
+                f"{STITCHED_WHOLE_WINDOW_VALIDATION_RAFT_CHECKPOINTS_FILE}"
+            ),
+            "corridor_metadata": UNREAL_CASCADING_CORRIDOR_METADATA_FILE,
+            "reach_drop_grid": UNREAL_CASCADING_CORRIDOR_GRID_FILE,
+        },
+        "overlays": [
+            _unreal_annotation_fidelity_overlay(),
+            _unreal_solver_field_fidelity_overlay(),
+            _unreal_raft_trajectory_fidelity_overlay(checkpoint_ids),
+            _unreal_rendered_water_fidelity_overlay(streaming_tiles, drop_transitions),
+            _unreal_audio_cue_fidelity_overlay(streaming_tiles, drop_transitions),
+            _unreal_expected_outcome_fidelity_overlay(drop_transitions),
+        ],
+        "review_targets": _unreal_fidelity_review_targets(drop_transitions),
+        "comparison_panels": [
+            {
+                "panel_id": "annotation_vs_rendered_water",
+                "primary_overlays": ["annotation_geometry", "rendered_water_foam_audio"],
+                "purpose": "Check that pins, spans, polygons, and raft lines match visible hydraulics, foam, spray, and sound.",
+            },
+            {
+                "panel_id": "solver_fields_vs_visuals",
+                "primary_overlays": ["solver_fields", "rendered_water_foam_audio"],
+                "purpose": "Compare depth, surface, velocity, wet mask, turbulence, aeration, and foam cues.",
+            },
+            {
+                "panel_id": "raft_outcomes",
+                "primary_overlays": ["raft_trajectories", "expected_outcomes"],
+                "purpose": "Review expected surf, flush, pin, release, flip, and clean-line behavior against raft motion.",
+            },
+        ],
+    }
+
+
+def _unreal_annotation_fidelity_overlay() -> dict[str, object]:
+    return {
+        "overlay_id": "annotation_geometry",
+        "display_name": "Annotation Pins Spans Polygons",
+        "category": "annotation",
+        "source_file": "review/river_validation_annotations.geojson",
+        "geometry_types": ["Point", "LineString", "Polygon"],
+        "viewport_draw": {
+            "point_style": "validation_pin",
+            "span_style": "station_span",
+            "polygon_style": "transparent_hazard_region",
+            "line_style": "raft_line",
+            "label_fields": ["annotation_id", "expected_outcome", "confidence"],
+        },
+        "required_properties": [
+            "annotation_id",
+            "anchor_type",
+            "station_m",
+            "expected_outcome",
+            "rights_provenance",
+        ],
+    }
+
+
+def _unreal_solver_field_fidelity_overlay() -> dict[str, object]:
+    return {
+        "overlay_id": "solver_fields",
+        "display_name": "GeoClaw Cpp Solver Fields",
+        "category": "solver",
+        "source_file": STITCHED_WHOLE_WINDOW_VALIDATION_FIELDS_FILE,
+        "source_manifest": STITCHED_WHOLE_WINDOW_VALIDATION_MANIFEST_FILE,
+        "fields": [
+            "bed",
+            "depth",
+            "eta",
+            "u",
+            "v",
+            "hu",
+            "hv",
+            "wet",
+            "reach_id_grid",
+            "drop_transition_id_grid",
+        ],
+        "viewport_draw": {
+            "depth": "blue_alpha_heatmap",
+            "surface_elevation": "contour_lines",
+            "velocity": "arrow_glyphs",
+            "wet_mask": "wet_dry_stipple",
+            "reach_drop_ids": "indexed_color_overlay",
+        },
+        "comparison_sources": ["GeoClaw normalized output", "custom C++ fixed-grid output"],
+    }
+
+
+def _unreal_raft_trajectory_fidelity_overlay(checkpoint_ids: list[str]) -> dict[str, object]:
+    return {
+        "overlay_id": "raft_trajectories",
+        "display_name": "Raft Trajectories And Checkpoints",
+        "category": "raft",
+        "source_file": STITCHED_WHOLE_WINDOW_VALIDATION_RAFT_CHECKPOINTS_FILE,
+        "future_runtime_capture": "replay/raft_trajectory.jsonl",
+        "checkpoint_ids": checkpoint_ids,
+        "viewport_draw": {
+            "trajectory_style": "time_gradient_polyline",
+            "checkpoint_style": "numbered_transition_marker",
+            "contact_style": "pin_flip_release_event_marker",
+            "crew_action_style": "high_side_brace_lean_callout",
+        },
+        "required_events": ["entry", "crest", "recovery", "surf", "flush", "pin", "release", "flip"],
+    }
+
+
+def _unreal_rendered_water_fidelity_overlay(
+    streaming_tiles: list[dict[str, object]],
+    drop_transitions: list[dict[str, object]],
+) -> dict[str, object]:
+    return {
+        "overlay_id": "rendered_water_foam_audio",
+        "display_name": "Rendered Water Foam Spray",
+        "category": "visual",
+        "source_collections": ["streaming_tiles.vfx", "drop_transition_zones.vfx"],
+        "reach_vfx_zone_ids": [
+            str(tile["vfx"]["zone_id"])
+            for tile in streaming_tiles
+            if isinstance(tile.get("vfx"), dict) and "zone_id" in tile["vfx"]
+        ],
+        "drop_vfx_zone_ids": [
+            str(transition["vfx"]["zone_id"])
+            for transition in drop_transitions
+            if isinstance(transition.get("vfx"), dict) and "zone_id" in transition["vfx"]
+        ],
+        "viewport_draw": {
+            "foam": "foam_intensity_heatmap",
+            "spray": "niagara_spawn_debug",
+            "aeration": "whitewater_mask",
+            "turbulence": "surface_chop_vectors",
+        },
+        "comparison_fields": ["depth", "velocity", "wet", "aeration_proxy", "turbulence_proxy"],
+    }
+
+
+def _unreal_audio_cue_fidelity_overlay(
+    streaming_tiles: list[dict[str, object]],
+    drop_transitions: list[dict[str, object]],
+) -> dict[str, object]:
+    return {
+        "overlay_id": "audio_cues",
+        "display_name": "Water Audio Cues",
+        "category": "audio",
+        "source_collections": ["audio_zones", "streaming_tiles.audio", "drop_transition_zones.audio"],
+        "reach_audio_zone_ids": [
+            str(tile["audio"]["zone_id"])
+            for tile in streaming_tiles
+            if isinstance(tile.get("audio"), dict) and "zone_id" in tile["audio"]
+        ],
+        "drop_audio_zone_ids": [
+            str(transition["audio"]["zone_id"])
+            for transition in drop_transitions
+            if isinstance(transition.get("audio"), dict) and "zone_id" in transition["audio"]
+        ],
+        "viewport_draw": {
+            "emitter_shape": "wire_volume",
+            "attenuation": "radius_shell",
+            "event_tags": "floating_labels",
+            "intensity": "meter_bar",
+        },
+        "comparison_fields": ["velocity", "aeration_proxy", "turbulence_proxy", "fall_m"],
+    }
+
+
+def _unreal_expected_outcome_fidelity_overlay(
+    drop_transitions: list[dict[str, object]],
+) -> dict[str, object]:
+    return {
+        "overlay_id": "expected_outcomes",
+        "display_name": "Expected Surf Flush Pin Flip",
+        "category": "outcome",
+        "source_collection": "drop_transition_zones",
+        "transition_outcomes": [
+            {
+                "transition_id": str(transition["transition_id"]),
+                "expected_hydraulic_control": str(transition.get("expected_hydraulic_control", "unknown")),
+                "hazard_tags": list(transition.get("hazard_tags", [])),
+                "expected_outcomes": _unreal_expected_outcomes_for_transition(transition),
+            }
+            for transition in drop_transitions
+        ],
+        "viewport_draw": {
+            "surf": "retentive_hole_badge",
+            "flush": "downstream_arrow_badge",
+            "pin": "contact_warning_badge",
+            "release": "counterplay_window_badge",
+            "flip": "roll_risk_badge",
+        },
+    }
+
+
+def _unreal_fidelity_review_targets(drop_transitions: list[dict[str, object]]) -> list[dict[str, object]]:
+    return [
+        {
+            "target_id": f"fidelity_{transition['transition_id']}",
+            "anchor_type": "drop_transition",
+            "transition_id": transition["transition_id"],
+            "upstream_reach_id": transition["upstream_reach_id"],
+            "downstream_reach_id": transition["downstream_reach_id"],
+            "station_m": transition["crest_station"],
+            "bounds_m": transition["bounds_m"],
+            "expected_outcomes": _unreal_expected_outcomes_for_transition(transition),
+            "review_overlays": [
+                "annotation_geometry",
+                "solver_fields",
+                "raft_trajectories",
+                "rendered_water_foam_audio",
+                "audio_cues",
+                "expected_outcomes",
+            ],
+        }
+        for transition in drop_transitions
+    ]
+
+
+def _unreal_expected_outcomes_for_transition(transition: dict[str, object]) -> list[str]:
+    tags = {str(tag) for tag in transition.get("hazard_tags", [])}
+    control = str(transition.get("expected_hydraulic_control", "unknown"))
+    outcomes = {"flush", "clean_line"}
+    if "hole" in tags or control == "retentive_hole":
+        outcomes.update(("surf", "flush", "pin_risk", "release_window"))
+    if {"rock", "boulder_sieves", "boulder_garden"} & tags:
+        outcomes.update(("pin", "release", "flip_risk"))
+    if "wave_train" in tags or control == "wave_train":
+        outcomes.update(("clean_line", "flip_risk"))
+    if "lateral" in tags:
+        outcomes.update(("flip_risk", "high_side_counterplay"))
+    return sorted(outcomes)
 
 
 def _unreal_audio_zones(
