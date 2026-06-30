@@ -205,6 +205,49 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert wet_counts == int(wet_dry_scenario.initial_state.wet.sum())
     assert max(lateral_velocities) < 1.0e-9
 
+    wet_dry_fv_output_dir = tmp_path / "cpp_wet_dry_fv_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(wet_dry_scenario_dir),
+            "--output",
+            str(wet_dry_fv_output_dir),
+            "--steps",
+            "12",
+            "--frame-interval",
+            "6",
+            "--solver-mode",
+            "finite_volume",
+            "--boundary-mode",
+            "scenario",
+            "--flux-scheme",
+            "hll",
+            "--feature-strength-scale",
+            "0",
+            "--roughness-scale",
+            "0.5",
+            "--bed-slope-source-scale",
+            "0.75",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    wet_dry_fv_run = wet_dry_fv_output_dir / wet_dry_scenario.metadata.scenario_id
+    wet_dry_fv_manifest = json.loads((wet_dry_fv_run / "manifest.json").read_text(encoding="utf-8"))
+    wet_dry_fv_final_frame = wet_dry_fv_run / wet_dry_fv_manifest["frames"][-1]
+    finite_volume_lateral_velocities = []
+    finite_volume_wet_counts = 0
+    with wet_dry_fv_final_frame.open(newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            finite_volume_lateral_velocities.append(abs(float(row["v"])))
+            finite_volume_wet_counts += int(row["wet"])
+
+    assert wet_dry_fv_manifest["solver_mode"] == "finite_volume"
+    assert wet_dry_fv_manifest["fixture_scoped_wet_dry_reconstruction"] is True
+    assert finite_volume_wet_counts == int(wet_dry_scenario.initial_state.wet.sum())
+    assert max(finite_volume_lateral_velocities) < 1.0e-9
+
     cascading_scenario_dir = tmp_path / "scenario" / "cascading"
     cascading_output_dir = tmp_path / "cpp_cascading_output"
     cascading_package = generate_california_pool_drop_cascading_scenario2_5d(
