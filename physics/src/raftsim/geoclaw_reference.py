@@ -388,10 +388,11 @@ class GeoClawRunResult:
     output_dir: Path
     frame_dir: Path
     frame_count: int
+    extraction_error: str | None = None
 
     @property
     def passed(self) -> bool:
-        return self.returncode == 0 and self.frame_count > 0
+        return self.returncode == 0 and self.extraction_error is None and self.frame_count > 0
 
     def to_json_dict(self) -> dict[str, object]:
         return {
@@ -403,6 +404,7 @@ class GeoClawRunResult:
             "output_dir": str(self.output_dir),
             "frame_dir": str(self.frame_dir),
             "frame_count": self.frame_count,
+            "extraction_error": self.extraction_error,
             "passed": self.passed,
             "stdout_tail": self.stdout[-4000:],
             "stderr_tail": self.stderr[-4000:],
@@ -691,12 +693,16 @@ def run_geoclaw_export(
     )
     runtime_seconds = time.perf_counter() - start
     frame_count = 0
+    extraction_error = None
     if completed.returncode == 0:
-        frame_count = _extract_geoclaw_fgout_frames(
-            export_root,
-            scenario,
-            config=export_config,
-        )
+        try:
+            frame_count = _extract_geoclaw_fgout_frames(
+                export_root,
+                scenario,
+                config=export_config,
+            )
+        except Exception as exc:  # pragma: no cover - depends on GeoClaw output availability.
+            extraction_error = f"{type(exc).__name__}: {exc}"
     run_manifest = {
         "schema": "raftsim.geoclaw_run.v1",
         "source_export_schema": manifest.get("schema"),
@@ -706,6 +712,7 @@ def run_geoclaw_export(
             "returncode": completed.returncode,
             "runtime_seconds": runtime_seconds,
             "frame_count": frame_count,
+            "extraction_error": extraction_error,
         },
         "stdout": completed.stdout,
         "stderr": completed.stderr,
@@ -722,6 +729,7 @@ def run_geoclaw_export(
         output_dir=export_root / "_output",
         frame_dir=export_root / "fgout_frames",
         frame_count=frame_count,
+        extraction_error=extraction_error,
     )
 
 
