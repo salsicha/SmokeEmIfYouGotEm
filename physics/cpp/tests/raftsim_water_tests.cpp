@@ -37,6 +37,12 @@ void assert_scenario_loads(const raftsim::Scenario& scenario) {
     expect(scenario.initial.wet.values.size() == scenario.grid.nx * scenario.grid.ny, "wet mask shape mismatch");
     expect(!scenario.boundaries.empty(), "expected scenario boundaries");
     expect(!scenario.probes.empty(), "expected probes for telemetry exports");
+    if (scenario.cascading.present) {
+        expect(scenario.cascading.schema_version == "raftsim.cascading2_5d.v0", "unexpected cascading schema version");
+        expect(!scenario.cascading.reaches.empty(), "expected cascading reaches");
+        expect(!scenario.cascading.drop_transitions.empty(), "expected cascading drop transitions");
+        expect(scenario.cascading.reaches.front().station_start <= scenario.cascading.reaches.front().station_end, "invalid cascading reach range");
+    }
 }
 
 void assert_solver_is_deterministic(const raftsim::Scenario& scenario) {
@@ -106,6 +112,10 @@ int main(int argc, char** argv) {
         assert_chrono_coupling_samples_water_and_contact(scenario);
         if (argc == 3) {
             assert_output_can_be_written(scenario, argv[2]);
+        }
+        if (scenario.cascading.present) {
+            std::cout << "cascading_reaches=" << scenario.cascading.reaches.size()
+                      << " cascading_drop_transitions=" << scenario.cascading.drop_transitions.size() << "\n";
         }
         std::cout << "raftsim_water_tests passed for " << scenario.scenario_id << "\n";
         return 0;

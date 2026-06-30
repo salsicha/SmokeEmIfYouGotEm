@@ -50,6 +50,38 @@ BoolGrid require_bool_array(const NpzArchive& archive, const std::string& name) 
     return it->second;
 }
 
+CascadingMetadata load_cascading_metadata(const fs::path& package_dir) {
+    fs::path metadata_path = package_dir / "cascading_metadata.json";
+    if (!fs::exists(metadata_path)) {
+        return {};
+    }
+    JsonValue root = parse_json_file(metadata_path.string());
+    CascadingMetadata metadata;
+    metadata.present = true;
+    metadata.schema_version = root.at("schema_version").as_string();
+    if (metadata.schema_version != "raftsim.cascading2_5d.v0") {
+        throw std::runtime_error("Unsupported cascading schema version.");
+    }
+    for (const JsonValue& value : root.at("reaches").as_array()) {
+        CascadingReach reach;
+        reach.id = value.at("reach_id").as_string();
+        reach.kind = value.at("kind").as_string();
+        reach.station_start = value.at("station_start").as_number();
+        reach.station_end = value.at("station_end").as_number();
+        metadata.reaches.push_back(reach);
+    }
+    for (const JsonValue& value : root.at("drop_transitions").as_array()) {
+        CascadingDropTransition transition;
+        transition.id = value.at("transition_id").as_string();
+        transition.upstream_reach_id = value.at("upstream_reach_id").as_string();
+        transition.downstream_reach_id = value.at("downstream_reach_id").as_string();
+        transition.crest_station = value.at("crest_station").as_number();
+        transition.bed_elevation_fall = value.at("bed_elevation_fall").as_number();
+        metadata.drop_transitions.push_back(transition);
+    }
+    return metadata;
+}
+
 }  // namespace
 
 Scenario load_scenario_package(const std::string& scenario_dir) {
@@ -141,6 +173,7 @@ Scenario load_scenario_package(const std::string& scenario_dir) {
         scenario.probes.push_back(probe);
     }
 
+    scenario.cascading = load_cascading_metadata(package_dir);
     validate_scenario(scenario);
     return scenario;
 }
@@ -171,6 +204,9 @@ void validate_scenario(const Scenario& scenario) {
     }
     if (scenario.fixed_dt <= 0.0 || scenario.duration <= 0.0) {
         throw std::runtime_error("Scenario timestep and duration must be positive.");
+    }
+    if (scenario.cascading.present && scenario.cascading.reaches.empty()) {
+        throw std::runtime_error("Cascading package metadata must include at least one reach.");
     }
 }
 

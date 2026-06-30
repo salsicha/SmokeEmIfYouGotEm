@@ -51,6 +51,28 @@ struct Probe {
     double length = 0.0;
 };
 
+struct CascadingReach {
+    std::string id;
+    std::string kind;
+    double station_start = 0.0;
+    double station_end = 0.0;
+};
+
+struct CascadingDropTransition {
+    std::string id;
+    std::string upstream_reach_id;
+    std::string downstream_reach_id;
+    double crest_station = 0.0;
+    double bed_elevation_fall = 0.0;
+};
+
+struct CascadingMetadata {
+    bool present = false;
+    std::string schema_version;
+    std::vector<CascadingReach> reaches;
+    std::vector<CascadingDropTransition> drop_transitions;
+};
+
 struct WaterState {
     Array2D h;
     Array2D eta;
@@ -74,6 +96,7 @@ struct Scenario {
     std::vector<BoundaryCondition> boundaries;
     std::vector<Feature> features;
     std::vector<Probe> probes;
+    CascadingMetadata cascading;
 };
 
 Scenario load_scenario_package(const std::string& scenario_dir);

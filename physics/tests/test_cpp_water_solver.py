@@ -5,6 +5,10 @@ from pathlib import Path
 
 import pytest
 
+from raftsim.cascading import (
+    CaliforniaPoolDropParameters2_5D,
+    generate_california_pool_drop_cascading_scenario2_5d,
+)
 from raftsim.scenario2_5d import (
     ProceduralScenario2_5DParameters,
     generate_procedural_scenario2_5d,
@@ -120,6 +124,41 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert finite_volume_manifest["solver_mode"] == "finite_volume"
     assert finite_volume_manifest["boundary_mode"] == "pyclaw"
     assert finite_volume_manifest["flux_scheme"] == "roe"
+
+    cascading_scenario_dir = tmp_path / "scenario" / "cascading"
+    cascading_output_dir = tmp_path / "cpp_cascading_output"
+    cascading_package = generate_california_pool_drop_cascading_scenario2_5d(
+        CaliforniaPoolDropParameters2_5D(seed=31, nx=64, ny=24, duration=1.0)
+    )
+    cascading_package.write_package(cascading_scenario_dir)
+    native_result = subprocess.run(
+        [str(build_dir / "raftsim_water_tests"), str(cascading_scenario_dir)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert "cascading_reaches=7" in native_result.stdout
+
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(cascading_scenario_dir),
+            "--output",
+            str(cascading_output_dir),
+            "--steps",
+            "8",
+            "--frame-interval",
+            "4",
+        ],
+        check=True,
+    )
+    cascading_manifest = json.loads(
+        (cascading_output_dir / cascading_package.scenario.metadata.scenario_id / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert cascading_manifest["cascading"]["present"] is True
+    assert cascading_manifest["cascading"]["reach_count"] == 7
+    assert cascading_manifest["cascading"]["drop_transition_count"] == 1
 
 
 def test_chrono_smoke_target_is_optional_and_outside_unreal():
