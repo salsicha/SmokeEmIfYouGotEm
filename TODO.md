@@ -192,6 +192,9 @@ Conditionally superseded for live water by Milestone 14. Telemetry/replay playba
 - [x] Add local/offline AI integration layer for speech recognition, command intent parsing, crew dialogue, and optional local speech synthesis.
 - [x] Implement guide voice commands that map spoken instructions into deterministic crew intents: forward paddle, back paddle, left/right paddle, stop, brace, hold on, high side, rescue, and recovery commands.
 - [x] Add confidence thresholds, push-to-talk/open-mic settings, noisy-river audio tests, subtitles, accessibility fallbacks, and manual input parity for all voice commands.
+- [ ] Add a crew-overboard safety-state model: seated, at-risk, falling/ejected, swimming, rescue-targeted, rescued, re-seated/recovered, and failed-rescue.
+- [ ] Add swimmer and rescue gameplay: swimmer drift/visibility, guide and crew callouts, rescue target selection, reach/paddle grab, throw-line support where available, pull-in timing, re-seat/recovery, and failed-rescue consequences.
+- [ ] Add crew safety telemetry and scoring for ejection trigger, swimmer position, time in water, rescue method, pull-in/re-seat outcome, fatigue/trust deltas, and safety-score impact.
 - [x] Add AI-assisted crew conversation with passenger personas, trust, fear, fatigue, skill, river knowledge, and scenario state, while keeping gameplay-critical paddling under explicit command-state control.
 - [x] Add telemetry for recognized phrase, intent, confidence, command latency, crew response, conversation state, and command outcome.
 - [x] Build the first development art/audio source policy and defer downloaded/professional library purchases for water, raft, paddle, rocks, weather, Foley, UI, ambience, and visual assets until release-readiness.
@@ -326,6 +329,7 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [x] Add GeoClaw/C++ validation checks that reject feature forcing when it hides mass, momentum, energy, wet/dry, or reach/drop handoff failures.
 - [x] Add crew weight-distribution and high-side/brace/lean telemetry for seat occupancy, center-of-gravity shifts, roll moment, contact loading, and pin/flip/release thresholds.
 - [ ] Add rock, sticky-hole, lateral-hit, shallow-shelf, pin/release, and flip fixtures that require correctly timed crew weight shifts for safe outcomes.
+- [ ] Add crew-overboard, swimmer drift, rescue timing, pull-in/re-seat, and failed-rescue fixtures tied to impacts, flips, pins, holes, missed brace/high-side timing, and recovery windows.
 - [x] Add a versioned reach-local grid schema with local transforms, overlap/ghost-zone ownership, neighbor references, and reach/drop IDs.
 - [ ] Export stitched whole-window validation fields, probes, cross sections, conservation summaries, and raft transition checkpoints for every cascading package.
 - [x] Add contract-level seam diagnostics that fail validation when reach-local boundaries omit mass, momentum, energy, wet/dry, bed-slope, feature-location, or raft-state checks.
