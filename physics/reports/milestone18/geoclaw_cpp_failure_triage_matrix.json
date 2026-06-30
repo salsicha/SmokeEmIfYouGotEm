@@ -572,38 +572,6 @@
       "actual_scenario_id": "bed_step_seed_16",
       "dependency_order": 2,
       "dependency_phase": "geometry_parity_thresholds",
-      "entry_id": "comparison/bed_step/finite_volume/cross_section_linf",
-      "evidence_refs": [
-        "outputs/m16cmp/c_step/finite_volume/threshold_evaluation.json",
-        "outputs/m16cmp/c_step/finite_volume"
-      ],
-      "failed_checks": [
-        "field_linf",
-        "slope_linf",
-        "probe_linf",
-        "cross_section_linf"
-      ],
-      "gate_scenario_id": "bed_step",
-      "likely_root_cause": "Cross-section profiles disagree, indicating reach-scale shape, velocity, or water-surface drift.",
-      "metric": "cross_section_linf",
-      "metric_group": "cross_section",
-      "notes": [
-        "Max Linf across cross-section fields; u/v/Froude masked below 0.15 m."
-      ],
-      "observed_value": 0.43914054425917315,
-      "retune_lever": "Compare section alignment, width/depth profiles, roughness mapping, and cross-section sampling windows.",
-      "scenario_family": "bed_step",
-      "severity": "medium",
-      "solver_mode": "finite_volume",
-      "source_component": "geoclaw_cpp_comparison",
-      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
-      "suite": "canonical",
-      "threshold": 0.35
-    },
-    {
-      "actual_scenario_id": "bed_step_seed_16",
-      "dependency_order": 2,
-      "dependency_phase": "geometry_parity_thresholds",
       "entry_id": "comparison/bed_step/finite_volume/field_linf",
       "evidence_refs": [
         "outputs/m16cmp/c_step/finite_volume/threshold_evaluation.json",
@@ -611,9 +579,7 @@
       ],
       "failed_checks": [
         "field_linf",
-        "slope_linf",
-        "probe_linf",
-        "cross_section_linf"
+        "slope_linf"
       ],
       "gate_scenario_id": "bed_step",
       "likely_root_cause": "C++ depth, surface, momentum, or normal fields diverge from the GeoClaw reference.",
@@ -622,40 +588,8 @@
       "notes": [
         "Max Linf across h/eta/u/v/hu/hv/normals; u/v masked below 0.15 m."
       ],
-      "observed_value": 0.4186562214653342,
+      "observed_value": 0.353044197857991,
       "retune_lever": "Inspect finite-volume/reduced update, bed-source balance, reconstruction, CFL, dry-depth handling, and bathymetry alignment.",
-      "scenario_family": "bed_step",
-      "severity": "medium",
-      "solver_mode": "finite_volume",
-      "source_component": "geoclaw_cpp_comparison",
-      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
-      "suite": "canonical",
-      "threshold": 0.35
-    },
-    {
-      "actual_scenario_id": "bed_step_seed_16",
-      "dependency_order": 2,
-      "dependency_phase": "geometry_parity_thresholds",
-      "entry_id": "comparison/bed_step/finite_volume/probe_linf",
-      "evidence_refs": [
-        "outputs/m16cmp/c_step/finite_volume/threshold_evaluation.json",
-        "outputs/m16cmp/c_step/finite_volume"
-      ],
-      "failed_checks": [
-        "field_linf",
-        "slope_linf",
-        "probe_linf",
-        "cross_section_linf"
-      ],
-      "gate_scenario_id": "bed_step",
-      "likely_root_cause": "Point probes see a localized water-state mismatch that may be hidden in whole-field summaries.",
-      "metric": "probe_linf",
-      "metric_group": "localized_probe",
-      "notes": [
-        "Max Linf across point-probe fields; u/v/Froude masked below 0.15 m."
-      ],
-      "observed_value": 0.43914054425917315,
-      "retune_lever": "Check probe placement, interpolation, frame timing, local bathymetry, velocity masks, and water-query sampling.",
       "scenario_family": "bed_step",
       "severity": "medium",
       "solver_mode": "finite_volume",
@@ -675,9 +609,7 @@
       ],
       "failed_checks": [
         "field_linf",
-        "slope_linf",
-        "probe_linf",
-        "cross_section_linf"
+        "slope_linf"
       ],
       "gate_scenario_id": "bed_step",
       "likely_root_cause": "Free-surface slope differs enough to change hydraulic controls and raft force sampling.",
@@ -686,7 +618,7 @@
       "notes": [
         "Max Linf across eta slope fields."
       ],
-      "observed_value": 0.13406273957596693,
+      "observed_value": 0.10329619502833176,
       "retune_lever": "Retune bed-slope source scaling, slope reconstruction, smoothing, and limiter behavior before feature forcing.",
       "scenario_family": "bed_step",
       "severity": "medium",
@@ -9007,9 +8939,7 @@
       "evidence_refs": [],
       "failed_checks": [
         "field_linf",
-        "slope_linf",
-        "probe_linf",
-        "cross_section_linf"
+        "slope_linf"
       ],
       "gate_scenario_id": "bed_step",
       "likely_root_cause": "Discontinuous bed elevation is exposing source-term and free-surface balance error.",
@@ -14389,7 +14319,7 @@
       "dependency_phase": "full_gate_rerun",
       "entry_id": "full_gate/geoclaw_cpp_comparisons",
       "evidence_refs": [
-        "physics/reports/milestone16/geoclaw_cpp_comparisons.json"
+        "reports/milestone16/geoclaw_cpp_comparisons.json"
       ],
       "failed_checks": [
         "geoclaw_cpp_comparisons"
@@ -14401,14 +14331,14 @@
       "notes": [
         "uniform_channel: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, mass_drift_delta)",
         "uniform_channel: GeoClaw/C++ threshold comparison failed (field_linf)",
-        "dam_break: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, wet_mismatch_fraction, probe_linf)",
         "dam_break: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
-        "bed_step: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
-        "bed_step: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
+        "dam_break: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
+        "bed_step: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, mass_drift_delta)",
+        "bed_step: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf)",
         "constriction: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, wet_mismatch_fraction, probe_linf)",
         "constriction: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)"
       ],
-      "observed_value": 36.0,
+      "observed_value": 35.0,
       "retune_lever": "Clear the lower-order triage entries, then regenerate the component report and full readiness gate.",
       "scenario_family": "suite_gate",
       "severity": "critical",
@@ -14424,7 +14354,7 @@
       "dependency_phase": "full_gate_rerun",
       "entry_id": "full_gate/geometry",
       "evidence_refs": [
-        "physics/reports/milestone16/geometry_validation.json"
+        "reports/milestone16/geometry_validation.json"
       ],
       "failed_checks": [
         "geometry"
@@ -14455,7 +14385,7 @@
       "dependency_phase": "full_gate_rerun",
       "entry_id": "full_gate/raft_coupling",
       "evidence_refs": [
-        "physics/reports/milestone16/raft_coupling_validation.json"
+        "reports/milestone16/raft_coupling_validation.json"
       ],
       "failed_checks": [
         "raft_coupling"
@@ -14467,14 +14397,14 @@
       "notes": [
         "boulder_impacts: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Force-envelope outcomes differ., Force delta exceeds the weight-normalized threshold.)",
         "boulder_impacts: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Force delta exceeds the weight-normalized threshold.)",
+        "wave_train_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Canonical feature outcomes differ.)",
         "wave_train_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Canonical feature outcomes differ., Force delta exceeds the weight-normalized threshold.)",
-        "wave_train_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Canonical feature outcomes differ., Force delta exceeds the weight-normalized threshold.)",
-        "hydraulic_hole_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Force-envelope outcomes differ., Force delta exceeds the weight-normalized threshold.)",
-        "downstream_boil_recovery: raft coupling comparison failed (C++ raft feature checks are not passing., Force delta exceeds the weight-normalized threshold., Torque delta exceeds the inertia-normalized threshold., One-step velocity delta exceeds threshold.)",
-        "hydraulic_hole_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Force delta exceeds the weight-normalized threshold., One-step velocity delta exceeds threshold.)",
-        "downstream_boil_recovery: raft coupling comparison failed (C++ raft feature checks are not passing., Force delta exceeds the weight-normalized threshold., One-step velocity delta exceeds threshold.)"
+        "hydraulic_hole_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)",
+        "downstream_boil_recovery: raft coupling comparison failed (C++ raft feature checks are not passing., Force delta exceeds the weight-normalized threshold., Torque delta exceeds the inertia-normalized threshold.)",
+        "hydraulic_hole_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)",
+        "lateral_wave_side_impulse: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)"
       ],
-      "observed_value": 43.0,
+      "observed_value": 39.0,
       "retune_lever": "Clear the lower-order triage entries, then regenerate the component report and full readiness gate.",
       "scenario_family": "suite_gate",
       "severity": "critical",
@@ -14486,18 +14416,6 @@
     }
   ],
   "groups": [
-    {
-      "entry_count": 1,
-      "metric_group": "cross_section",
-      "metrics": {
-        "cross_section_linf": 1
-      },
-      "scenario_family": "bed_step",
-      "solver_mode": "finite_volume",
-      "source_components": {
-        "geoclaw_cpp_comparison": 1
-      }
-    },
     {
       "entry_count": 1,
       "metric_group": "field_state",
@@ -14520,18 +14438,6 @@
       "solver_mode": "finite_volume",
       "source_components": {
         "geometry_validation": 1
-      }
-    },
-    {
-      "entry_count": 1,
-      "metric_group": "localized_probe",
-      "metrics": {
-        "probe_linf": 1
-      },
-      "scenario_family": "bed_step",
-      "solver_mode": "finite_volume",
-      "source_components": {
-        "geoclaw_cpp_comparison": 1
       }
     },
     {
@@ -17303,7 +17209,7 @@
       "core_parity_guardrails": 17,
       "full_gate_rerun": 3,
       "geometry_family_closure": 13,
-      "geometry_parity_thresholds": 43,
+      "geometry_parity_thresholds": 41,
       "raft_coupling_after_water_parity": 161,
       "whitewater_realworld_parity": 192
     },
@@ -17311,21 +17217,21 @@
       "acceptance_gate": 3,
       "candidate_feature_check": 48,
       "conservation": 13,
-      "cross_section": 31,
+      "cross_section": 30,
       "energy_dissipation": 22,
       "feature_localization": 20,
       "feature_strength": 25,
       "field_state": 35,
       "geometry": 13,
       "hydraulic_regime": 28,
-      "localized_probe": 34,
+      "localized_probe": 33,
       "raft_outcome": 87,
       "reference_feature_check": 26,
       "surface_slope": 33,
       "wet_dry_mask": 11
     },
     "by_scenario_family": {
-      "bed_step": 11,
+      "bed_step": 9,
       "boulder_impacts": 68,
       "cascading_reach_drop": 70,
       "constriction": 19,
@@ -17345,19 +17251,19 @@
     "by_severity": {
       "critical": 63,
       "high": 267,
-      "medium": 99
+      "medium": 97
     },
     "by_solver_mode": {
       "component": 3,
-      "finite_volume": 205,
+      "finite_volume": 203,
       "reduced": 221
     },
     "by_source_component": {
       "full_cpp_validation_gate": 3,
-      "geoclaw_cpp_comparison": 252,
+      "geoclaw_cpp_comparison": 250,
       "geometry_validation": 13,
       "raft_coupling": 161
     },
-    "entry_count": 429
+    "entry_count": 427
   }
 }

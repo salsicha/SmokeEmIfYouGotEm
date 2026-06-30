@@ -95,9 +95,7 @@
         {
           "failing_checks": [
             "field_linf",
-            "slope_linf",
-            "probe_linf",
-            "cross_section_linf"
+            "slope_linf"
           ],
           "gate_scenario_id": "bed_step",
           "solver_mode": "finite_volume",
