@@ -2,7 +2,7 @@
   "FileVersion": 3,
   "EngineAssociation": "5.8",
   "Category": "Simulation",
-  "Description": "Photorealistic white water rafting simulator with custom shallow-water physics, Project Chrono raft dynamics, VR support, local AI crew systems, and immersive audio.",
+  "Description": "Photorealistic white water rafting simulator with custom shallow-water physics, hybrid raft/contact runtime evaluation, VR support, local AI crew systems, and immersive audio.",
   "Modules": [
     {
       "Name": "SmokeEmIfYouGotEm",

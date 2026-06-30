@@ -54,7 +54,7 @@ Generate one selected scenario:
 python -m raftsim.examples.generate_real_world_scenario --flow-band high_runnable --difficulty advanced --output-dir outputs/real_world
 ```
 
-Milestone 10 generated the first readiness gate artifacts. Its current decision is approved after shallow-cell-aware velocity/Froude comparison. Production Unreal work can begin with telemetry/replay playback, while live water, Chrono raft coupling, VR, contact integration, and richer real-world flow presets continue behind validation fixtures.
+Milestone 10 generated the first readiness gate artifacts. Its current decision is approved after shallow-cell-aware velocity/Froude comparison. Production Unreal work can begin with telemetry/replay playback, while live water, selected raft/contact runtime coupling, VR, contact integration, and richer real-world flow presets continue behind validation fixtures.
 
 ## Engine And Rendering Direction
 

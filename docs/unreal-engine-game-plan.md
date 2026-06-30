@@ -8,8 +8,9 @@ The Unreal game should deliver the first-person guide fantasy: seated in the ste
 
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial extraction, rapid identification, seasonal flow, adaptive fluid-parameter, and river-selection work that must feed Unreal content.
 See [Free And AI Asset Policy](free-and-ai-asset-policy.md) for the current art and sound sourcing decision, and [Audio Asset Sourcing Plan](audio-asset-sourcing-plan.md) for audio-specific source research, library shortlist, field-recording plan, AI-audio limits, and asset manifest.
-See [Python-To-Unreal Readiness Gate](python-to-unreal-readiness-gate.md) for the current Milestone 10 audit. The current gate decision is approved after shallow-cell-aware velocity/Froude comparison; production Unreal work should start with telemetry/replay playback before live water, Chrono raft coupling, VR, and contact integration.
+See [Python-To-Unreal Readiness Gate](python-to-unreal-readiness-gate.md) for the current Milestone 10 audit. The current gate decision is approved after shallow-cell-aware velocity/Froude comparison; production Unreal work should start with telemetry/replay playback before live water, selected raft/contact runtime coupling, VR, and contact integration.
 See [Unreal Engine Version Lock](unreal-engine-version-lock.md) for the UE 5.8 feature review and version decision.
+See [Chaos And Jolt Runtime Evaluation](chaos-jolt-runtime-evaluation.md) for the split/hybrid raft/contact runtime plan and the shared Chaos/Jolt fixture suite.
 
 ## Hard Dependency Gate
 
@@ -22,8 +23,8 @@ Required before Unreal production begins:
 - C++ water fields, probe traces, raft force samples, and scenario outcomes match GeoClaw within accepted tolerances.
 - Python profiling identifies hot loops, memory costs, timestep sensitivity, and per-scenario runtime budgets.
 - Parameter files and telemetry schemas are stable enough to share with C++/Unreal tooling.
-- Force model choices are documented: which effects come from GeoClaw reference, which live in the C++ water solver, which move into Chrono/custom raft dynamics, and which are visual-only.
-- Project Chrono runtime path is validated by a standalone C++ smoke test.
+- Force model choices are documented: which effects come from GeoClaw reference, which live in the C++ water solver, which move into the selected raft/contact runtime, and which are visual-only.
+- The raft/contact runtime path is validated by shared Chaos/Jolt fixtures for rock impacts, shelf grounding, pin/release, crew ejection, replay determinism, and crowded-scene runtime cost. Project Chrono remains a high-fidelity reference/research path.
 - At least one real-world river section has a complete source manifest, terrain/course extraction, rapid annotations, gauge/flow research, season presets, difficulty presets, and low/median/high flow validation through GeoClaw and the custom C++ solver.
 - Adaptive fluid parameters are documented for river, season, flow percentile, difficulty, channel geometry, roughness, aeration/turbulence, eddy-line shear, hole retention, wave train strength, boils, shallows, raft drag, paddle catch, and damping.
 - A first real-world corridor package exists for Unreal preproduction: terrain, centerline, banks, imagery masks, rapid boundaries, hazards, flow presets, confidence metadata, and validation telemetry.
@@ -45,7 +46,7 @@ Unreal owns:
 - Audio asset ingest, source manifests, license/attribution tracking, interactive water sound, crew barks, dialogue playback, voice-chat mix, and runtime audio budgets
 - Level authoring, cooked content, build automation, and platform packaging
 
-Chrono or the validated reduced runtime owns:
+The selected raft/contact runtime owns:
 
 - Authoritative raft transform and velocities
 - Raft-water force integration
@@ -54,7 +55,9 @@ Chrono or the validated reduced runtime owns:
 - Compliant raft experiments
 - Physics telemetry, debug forces, and deterministic replay data where possible
 
-Unreal Chaos may be used for incidental non-authoritative physics such as loose props, splash debris, visual ropes, or background objects. It should not own the raft.
+Unreal Chaos is the default Unreal-integrated path for visual/non-authoritative physics such as loose props, splash debris, visual ropes, background objects, and visual crew ragdolls. Chaos can own scoring-critical raft/contact outcomes only if it passes the same shared fixture suite as Jolt.
+
+Jolt is the leading specialized candidate for a portable authoritative raft/contact/swimmer gameplay island. It can own scoring-critical contacts only after a native smoke harness or plugin path runs the shared fixtures against the same water snapshots and telemetry schema.
 
 ## Target Product Shape
 
@@ -445,8 +448,8 @@ The first Unreal vertical slice is successful when:
 - Exact Unreal Engine version for the first vertical slice.
 - Exact geospatial import path: Cesium for Unreal, custom GDAL pipeline, Unreal-native landscape tiles, 3D Tiles, or a hybrid.
 - First candidate river/section for the real-world vertical slice.
-- Whether the first live runtime uses Chrono rigid-body integration, reduced native C++ force integration, or both.
-- How much Chrono::FSI is practical for real-time VR.
+- Whether Chaos or Jolt becomes the first authoritative raft/contact gameplay island after the shared fixture evaluation, with custom reduced runtime as fallback and Chrono as reference.
+- How much Chrono::FSI remains useful for offline/reference comparison rather than real-time VR.
 - Which platforms are first-class at alpha.
 - Whether generated rivers become a shipping feature or remain internal content tooling after real-world river sections are proven.
 - How much passenger animation is physical simulation versus animation-driven state.
