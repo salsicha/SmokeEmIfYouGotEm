@@ -7,6 +7,9 @@ from raftsim.cascading import (
     BankShape2_5D,
     CASCADING_ANNOTATIONS_FILE,
     CASCADING_METADATA_FILE,
+    UNREAL_CASCADING_CORRIDOR_GRID_FILE,
+    UNREAL_CASCADING_CORRIDOR_METADATA_FILE,
+    UNREAL_CASCADING_CORRIDOR_METADATA_VERSION,
     CaliforniaPoolDropParameters2_5D,
     CascadingScenarioPackage2_5D,
     DropTransitionMetadata2_5D,
@@ -17,9 +20,11 @@ from raftsim.cascading import (
     ReachLocalGrid2_5D,
     ReachMetadata2_5D,
     StationProfilePoint2_5D,
+    build_unreal_cascading_corridor_metadata,
     evaluate_cascading_handoff_conservation,
     generate_california_pool_drop_cascading_scenario2_5d,
     read_cascading_scenario_package,
+    write_unreal_cascading_corridor_metadata,
 )
 from raftsim.scenario2_5d import (
     FixtureScenario2_5DParameters,
@@ -356,6 +361,43 @@ def test_california_pool_drop_generator_builds_required_reach_pattern():
     assert {"constriction", "ledge", "hole", "wave_train", "eddy_line", "boil", "rock"} <= feature_kinds
     assert np.array_equal(np.unique(package.reach_id_grid), np.arange(len(package.reaches), dtype=np.int32))
     assert np.array_equal(np.unique(package.drop_transition_id_grid), np.asarray([-1, 0], dtype=np.int32))
+
+
+def test_unreal_cascading_corridor_metadata_preserves_reach_and_drop_ids(tmp_path):
+    package = generate_california_pool_drop_cascading_scenario2_5d(
+        CaliforniaPoolDropParameters2_5D(seed=8, nx=96, ny=34, difficulty=0.62, duration=3.0)
+    )
+
+    metadata = build_unreal_cascading_corridor_metadata(package)
+    metadata_path = write_unreal_cascading_corridor_metadata(package, tmp_path / "unreal_corridor")
+    exported = json.loads(metadata_path.read_text(encoding="utf-8"))
+    grid = json.loads((metadata_path.parent / UNREAL_CASCADING_CORRIDOR_GRID_FILE).read_text(encoding="utf-8"))
+
+    assert metadata["schema_version"] == UNREAL_CASCADING_CORRIDOR_METADATA_VERSION
+    assert metadata_path.name == UNREAL_CASCADING_CORRIDOR_METADATA_FILE
+    assert exported["schema_version"] == UNREAL_CASCADING_CORRIDOR_METADATA_VERSION
+    assert exported["id_preservation"]["reach_ids"] == [reach.reach_id for reach in package.reaches]
+    assert exported["id_preservation"]["drop_transition_ids"] == [
+        transition.transition_id for transition in package.drop_transitions
+    ]
+    assert len(exported["streaming_tiles"]) == 7
+    assert exported["streaming_tiles"][2]["reach_id"] == "drop_001"
+    assert exported["streaming_tiles"][2]["debug_overlay"]["color_rgba"]
+    assert exported["streaming_tiles"][2]["audio"]["zone_id"] == "audio_drop_001"
+    assert exported["streaming_tiles"][2]["vfx"]["zone_id"] == "vfx_drop_001"
+    assert exported["drop_transition_zones"][0]["transition_id"] == "ledge_drop_001"
+    assert "hole" in exported["drop_transition_zones"][0]["audio"]["event_tags"]
+    assert len(exported["audio_zones"]) == len(package.reaches) + len(package.drop_transitions)
+    assert len(exported["vfx_zones"]) == len(package.reaches) + len(package.drop_transitions)
+    assert {overlay["overlay_id"] for overlay in exported["debug_overlays"]} >= {
+        "reach_id_grid",
+        "drop_transition_id_grid",
+    }
+    assert "boulder_sieves" in exported["designer_review"]["review_flags"]
+    assert grid["reach_index"]["0"] == package.reaches[0].reach_id
+    assert grid["drop_transition_index"]["0"] == package.drop_transitions[0].transition_id
+    assert grid["reach_id_grid"] == package.reach_id_grid.tolist()
+    assert grid["drop_transition_id_grid"] == package.drop_transition_id_grid.tolist()
 
 
 def test_california_pool_drop_generator_is_deterministic_and_round_trips(tmp_path):

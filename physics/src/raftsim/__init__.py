@@ -45,6 +45,9 @@ from .scenario2_5d import (
 )
 from .cascading import (
     CASCADING_SCHEMA_VERSION,
+    UNREAL_CASCADING_CORRIDOR_GRID_FILE,
+    UNREAL_CASCADING_CORRIDOR_METADATA_FILE,
+    UNREAL_CASCADING_CORRIDOR_METADATA_VERSION,
     BankShape2_5D,
     CaliforniaPoolDropParameters2_5D,
     CascadingScenarioPackage2_5D,
@@ -58,9 +61,11 @@ from .cascading import (
     ReachGridTransform2_5D,
     ReachMetadata2_5D,
     StationProfilePoint2_5D,
+    build_unreal_cascading_corridor_metadata,
     evaluate_cascading_handoff_conservation,
     generate_california_pool_drop_cascading_scenario2_5d,
     read_cascading_scenario_package,
+    write_unreal_cascading_corridor_metadata,
 )
 from .pyclaw_reference import (
     PyClawAvailability,
@@ -409,11 +414,15 @@ __all__ = [
     "StationProfilePoint2_5D",
     "READINESS_REPORT_VERSION",
     "ValidationCheck2_5D",
+    "UNREAL_CASCADING_CORRIDOR_GRID_FILE",
+    "UNREAL_CASCADING_CORRIDOR_METADATA_FILE",
+    "UNREAL_CASCADING_CORRIDOR_METADATA_VERSION",
     "UNREAL_VISUALIZATION_EXPORT_VERSION",
     "build_adaptive_flow_validation",
     "build_initial_pyclaw_reference_result",
     "build_baseline_performance_report",
     "build_cascading_raft_validation_cases",
+    "build_unreal_cascading_corridor_metadata",
     "build_default_raft_mass_properties",
     "build_milestone10_scenario_suite",
     "build_readiness_report",
@@ -477,6 +486,7 @@ __all__ = [
     "validate_standing_wave_case",
     "validate_submerged_rock_case",
     "write_json_artifact",
+    "write_unreal_cascading_corridor_metadata",
     "write_unavailable_report",
     "write_unreal_visualization_exports",
 ]
