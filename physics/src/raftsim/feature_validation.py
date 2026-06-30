@@ -31,6 +31,14 @@ CREW_TIMED_HAZARD_FIXTURE_IDS = (
     "pin_release_weight_shift",
     "flip_high_side",
 )
+CREW_OVERBOARD_FIXTURE_IDS = (
+    "impact_swimmer_rescue",
+    "flip_swimmer_reseat",
+    "pin_failed_rescue",
+    "hole_pull_in_rescue",
+    "missed_brace_overboard",
+    "missed_high_side_recovery",
+)
 CASCADING_RAFT_VALIDATION_CASES = (
     "pool_entry",
     "drop_entry",
@@ -104,6 +112,64 @@ class CrewTimedHazardFixture2_5D:
             raise ValueError("hazard loads must be non-negative.")
         if self.required_lateral_bias < 0.0:
             raise ValueError("required_lateral_bias must be non-negative.")
+
+
+@dataclass(frozen=True, slots=True)
+class CrewOverboardFixture2_5D:
+    """Crew-overboard fixture with swimmer drift and rescue timing windows."""
+
+    fixture_id: str
+    trigger_kind: str
+    ejection_impulse_n_s: float
+    ejection_threshold_n_s: float
+    successful_rescue_delay_s: float
+    failed_rescue_delay_s: float
+    rescue_window_s: float
+    pull_in_duration_s: float
+    re_seat_duration_s: float
+    swimmer_start: Vec3 = Vec3()
+    swimmer_drift_velocity: Vec3 = Vec3(1.2, 0.25, 0.0)
+    rescue_method: str = "reach_pull_in"
+    fatigue_rate_per_s: float = 0.035
+    trust_penalty_per_s: float = 0.025
+    safety_penalty_per_s: float = 2.0
+
+    def __post_init__(self) -> None:
+        if not self.fixture_id:
+            raise ValueError("fixture_id must be non-empty.")
+        if self.ejection_impulse_n_s < 0.0 or self.ejection_threshold_n_s < 0.0:
+            raise ValueError("ejection impulse and threshold must be non-negative.")
+        if self.ejection_threshold_n_s == 0.0:
+            raise ValueError("ejection_threshold_n_s must be positive.")
+        if (
+            self.successful_rescue_delay_s < 0.0
+            or self.failed_rescue_delay_s < 0.0
+            or self.rescue_window_s <= 0.0
+            or self.pull_in_duration_s < 0.0
+            or self.re_seat_duration_s < 0.0
+        ):
+            raise ValueError("rescue timings must be non-negative and window must be positive.")
+        if not self.rescue_method:
+            raise ValueError("rescue_method must be non-empty.")
+
+
+@dataclass(frozen=True, slots=True)
+class CrewOverboardTelemetry2_5D:
+    """Deterministic crew safety telemetry for swimmer and rescue fixtures."""
+
+    fixture_id: str
+    trigger_kind: str
+    states: tuple[str, ...]
+    overboard_triggered: bool
+    rescue_completed: bool
+    swimmer_world_position: Vec3
+    swimmer_distance_m: float
+    time_in_water_s: float
+    rescue_method: str
+    failed_reason: str
+    fatigue_delta: float
+    trust_delta: float
+    safety_score_delta: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -298,6 +364,216 @@ def validate_crew_timed_hazard_fixtures2_5d(
                 "Fixture must record active crew actions.",
             ),
         )
+        results.append(FeatureValidationResult(fixture.fixture_id, outcome, checks))
+    return tuple(results)
+
+
+def build_crew_overboard_fixtures2_5d() -> tuple[CrewOverboardFixture2_5D, ...]:
+    """Build deterministic crew-overboard fixtures for swimmer drift and rescue outcomes."""
+
+    return (
+        CrewOverboardFixture2_5D(
+            fixture_id="impact_swimmer_rescue",
+            trigger_kind="impact",
+            ejection_impulse_n_s=7600.0,
+            ejection_threshold_n_s=6200.0,
+            successful_rescue_delay_s=1.4,
+            failed_rescue_delay_s=5.6,
+            rescue_window_s=4.2,
+            pull_in_duration_s=1.0,
+            re_seat_duration_s=0.9,
+            swimmer_drift_velocity=Vec3(1.3, 0.15, 0.0),
+            rescue_method="reach_pull_in",
+        ),
+        CrewOverboardFixture2_5D(
+            fixture_id="flip_swimmer_reseat",
+            trigger_kind="flip",
+            ejection_impulse_n_s=8200.0,
+            ejection_threshold_n_s=6000.0,
+            successful_rescue_delay_s=1.1,
+            failed_rescue_delay_s=5.2,
+            rescue_window_s=4.0,
+            pull_in_duration_s=1.1,
+            re_seat_duration_s=1.0,
+            swimmer_drift_velocity=Vec3(1.1, -0.2, 0.0),
+            rescue_method="bow_grab",
+        ),
+        CrewOverboardFixture2_5D(
+            fixture_id="pin_failed_rescue",
+            trigger_kind="pin",
+            ejection_impulse_n_s=7100.0,
+            ejection_threshold_n_s=5800.0,
+            successful_rescue_delay_s=1.6,
+            failed_rescue_delay_s=6.4,
+            rescue_window_s=4.5,
+            pull_in_duration_s=1.2,
+            re_seat_duration_s=1.1,
+            swimmer_drift_velocity=Vec3(0.9, 0.35, 0.0),
+            rescue_method="throw_line",
+        ),
+        CrewOverboardFixture2_5D(
+            fixture_id="hole_pull_in_rescue",
+            trigger_kind="hole",
+            ejection_impulse_n_s=6800.0,
+            ejection_threshold_n_s=5600.0,
+            successful_rescue_delay_s=1.3,
+            failed_rescue_delay_s=5.7,
+            rescue_window_s=4.4,
+            pull_in_duration_s=1.0,
+            re_seat_duration_s=1.2,
+            swimmer_drift_velocity=Vec3(0.7, -0.45, 0.0),
+            rescue_method="paddle_t_grip",
+        ),
+        CrewOverboardFixture2_5D(
+            fixture_id="missed_brace_overboard",
+            trigger_kind="missed_brace",
+            ejection_impulse_n_s=6500.0,
+            ejection_threshold_n_s=5400.0,
+            successful_rescue_delay_s=1.2,
+            failed_rescue_delay_s=5.1,
+            rescue_window_s=3.8,
+            pull_in_duration_s=0.9,
+            re_seat_duration_s=1.0,
+            swimmer_drift_velocity=Vec3(1.0, 0.4, 0.0),
+            rescue_method="side_tube_pull_in",
+        ),
+        CrewOverboardFixture2_5D(
+            fixture_id="missed_high_side_recovery",
+            trigger_kind="missed_high_side",
+            ejection_impulse_n_s=7800.0,
+            ejection_threshold_n_s=5900.0,
+            successful_rescue_delay_s=1.0,
+            failed_rescue_delay_s=5.9,
+            rescue_window_s=4.1,
+            pull_in_duration_s=1.0,
+            re_seat_duration_s=1.1,
+            swimmer_drift_velocity=Vec3(1.2, -0.3, 0.0),
+            rescue_method="stern_pull_in",
+        ),
+    )
+
+
+def evaluate_crew_overboard_fixture2_5d(
+    fixture: CrewOverboardFixture2_5D,
+    *,
+    rescue_delay_s: float,
+) -> CrewOverboardTelemetry2_5D:
+    """Evaluate one deterministic swimmer/rescue timing path."""
+
+    if rescue_delay_s < 0.0:
+        raise ValueError("rescue_delay_s must be non-negative.")
+    overboard = fixture.ejection_impulse_n_s >= fixture.ejection_threshold_n_s
+    if not overboard:
+        return CrewOverboardTelemetry2_5D(
+            fixture_id=fixture.fixture_id,
+            trigger_kind=fixture.trigger_kind,
+            states=("seated",),
+            overboard_triggered=False,
+            rescue_completed=False,
+            swimmer_world_position=fixture.swimmer_start,
+            swimmer_distance_m=0.0,
+            time_in_water_s=0.0,
+            rescue_method=fixture.rescue_method,
+            failed_reason="",
+            fatigue_delta=0.0,
+            trust_delta=0.0,
+            safety_score_delta=0.0,
+        )
+
+    total_rescue_time = rescue_delay_s + fixture.pull_in_duration_s + fixture.re_seat_duration_s
+    rescue_completed = total_rescue_time <= fixture.rescue_window_s
+    time_in_water = total_rescue_time if rescue_completed else min(total_rescue_time, fixture.rescue_window_s)
+    swimmer_position = fixture.swimmer_start + fixture.swimmer_drift_velocity * time_in_water
+    states = ["seated", "at_risk", "falling_ejected", "swimming", "rescue_targeted"]
+    if rescue_completed:
+        states.extend(("rescued", "re_seated_recovered"))
+        failed_reason = ""
+    else:
+        states.append("failed_rescue")
+        failed_reason = "missed_rescue_window"
+    return CrewOverboardTelemetry2_5D(
+        fixture_id=fixture.fixture_id,
+        trigger_kind=fixture.trigger_kind,
+        states=tuple(states),
+        overboard_triggered=True,
+        rescue_completed=rescue_completed,
+        swimmer_world_position=swimmer_position,
+        swimmer_distance_m=(swimmer_position - fixture.swimmer_start).magnitude,
+        time_in_water_s=time_in_water,
+        rescue_method=fixture.rescue_method,
+        failed_reason=failed_reason,
+        fatigue_delta=time_in_water * fixture.fatigue_rate_per_s,
+        trust_delta=-time_in_water * fixture.trust_penalty_per_s,
+        safety_score_delta=-time_in_water * fixture.safety_penalty_per_s,
+    )
+
+
+def validate_crew_overboard_fixtures2_5d(
+    *,
+    fixtures: tuple[CrewOverboardFixture2_5D, ...] | None = None,
+) -> tuple[FeatureValidationResult, ...]:
+    """Validate overboard, swimmer drift, rescue, re-seat, and failed-rescue fixtures."""
+
+    overboard_fixtures = fixtures or build_crew_overboard_fixtures2_5d()
+    results: list[FeatureValidationResult] = []
+    for fixture in overboard_fixtures:
+        rescued = evaluate_crew_overboard_fixture2_5d(
+            fixture,
+            rescue_delay_s=fixture.successful_rescue_delay_s,
+        )
+        failed = evaluate_crew_overboard_fixture2_5d(
+            fixture,
+            rescue_delay_s=fixture.failed_rescue_delay_s,
+        )
+        checks = (
+            FeatureValidationCheck(
+                "overboard_triggered",
+                rescued.overboard_triggered,
+                fixture.ejection_impulse_n_s,
+                fixture.ejection_threshold_n_s,
+                "Fixture must eject a seated crew member into a swimmer state.",
+            ),
+            FeatureValidationCheck(
+                "swimmer_drift_recorded",
+                rescued.swimmer_distance_m > 0.0,
+                rescued.swimmer_distance_m,
+                0.0,
+                "Swimmer position should drift with the current while in the water.",
+            ),
+            FeatureValidationCheck(
+                "timed_rescue_reseats",
+                rescued.rescue_completed and rescued.states[-1] == "re_seated_recovered",
+                rescued.time_in_water_s,
+                fixture.rescue_window_s,
+                "Rescue inside the window should pull in and re-seat the swimmer.",
+            ),
+            FeatureValidationCheck(
+                "pull_in_reseat_duration",
+                fixture.pull_in_duration_s + fixture.re_seat_duration_s > 0.0,
+                fixture.pull_in_duration_s + fixture.re_seat_duration_s,
+                0.0,
+                "Fixture must include pull-in and re-seat timing.",
+            ),
+            FeatureValidationCheck(
+                "late_rescue_fails",
+                not failed.rescue_completed and failed.states[-1] == "failed_rescue",
+                failed.time_in_water_s,
+                fixture.rescue_window_s,
+                "Late rescue should hit the failed-rescue state.",
+            ),
+            FeatureValidationCheck(
+                "safety_telemetry_recorded",
+                (
+                    rescued.fatigue_delta > 0.0
+                    and rescued.trust_delta < 0.0
+                    and rescued.safety_score_delta < 0.0
+                ),
+                rescued.fatigue_delta,
+                0.0,
+                "Swimmer fixtures must emit fatigue, trust, and safety-score deltas.",
+            ),
+        )
+        outcome = "re_seated_recovered" if all(check.passed for check in checks) else "failed_rescue"
         results.append(FeatureValidationResult(fixture.fixture_id, outcome, checks))
     return tuple(results)
 
