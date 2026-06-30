@@ -6,12 +6,15 @@ import pytest
 from raftsim.math3d import Quaternion, Vec3
 from raftsim.pyclaw_reference import build_initial_pyclaw_reference_result
 from raftsim.raft_coupling2_5d import (
+    CrewAction2_5D,
     PaddleBladePose2_5D,
     RaftSamplePatch,
     RaftState6DoF,
     WaterField2_5D,
+    build_default_crew_seats2_5d,
     build_default_raft_mass_properties,
     compare_raft_force_samples,
+    evaluate_crew_weight_distribution2_5d,
     sample_buoyancy_forces,
     sample_grounding_forces,
     sample_hydrodynamic_forces,
@@ -70,6 +73,100 @@ def test_default_mass_properties_include_crew_inertia_and_samples():
     assert len(properties.passenger_offsets) == 4
     assert len(properties.sample_patches) == 14
     assert {patch.kind for patch in properties.sample_patches} == {"left_tube", "right_tube", "floor"}
+
+
+def test_crew_weight_distribution_reports_neutral_occupancy_and_loading():
+    params = RaftParameters2_5D(mass_kg=400.0, guide_mass_kg=90.0, passenger_mass_kg=70.0, passenger_count=4)
+    properties = build_default_raft_mass_properties(params)
+    seats = build_default_crew_seats2_5d(params)
+
+    telemetry = evaluate_crew_weight_distribution2_5d(
+        properties,
+        seats,
+        raft_length_m=params.length_m,
+        raft_width_m=params.width_m,
+    )
+
+    assert telemetry.occupied_seat_count == 5
+    assert telemetry.active_action_count == 0
+    assert telemetry.raft_base_mass_kg == pytest.approx(400.0)
+    assert telemetry.total_crew_mass_kg == pytest.approx(370.0)
+    assert telemetry.total_loaded_mass_kg == pytest.approx(770.0)
+    assert telemetry.crew_center_of_gravity_offset.y == pytest.approx(0.0)
+    assert telemetry.roll_moment_nm == pytest.approx(0.0)
+    assert telemetry.contact_loading.left_tube_normal_load_n == pytest.approx(
+        telemetry.contact_loading.right_tube_normal_load_n
+    )
+    assert telemetry.recovery_thresholds.pin_threshold_multiplier == pytest.approx(1.0)
+    assert telemetry.recovery_thresholds.flip_threshold_multiplier == pytest.approx(1.0)
+    assert telemetry.recovery_thresholds.release_threshold_multiplier == pytest.approx(1.0)
+
+
+def test_high_side_brace_and_recovery_shift_cg_loading_and_thresholds():
+    params = RaftParameters2_5D(mass_kg=400.0, guide_mass_kg=90.0, passenger_mass_kg=70.0, passenger_count=4)
+    properties = build_default_raft_mass_properties(params)
+    seats = build_default_crew_seats2_5d(params)
+    neutral = evaluate_crew_weight_distribution2_5d(
+        properties,
+        seats,
+        raft_length_m=params.length_m,
+        raft_width_m=params.width_m,
+    )
+    actions = tuple(
+        CrewAction2_5D(
+            seat_id=seat.seat_id,
+            high_side_direction=1,
+            brace=seat.role == "passenger",
+            recovery=seat.role == "guide",
+        )
+        for seat in seats
+    )
+
+    shifted = evaluate_crew_weight_distribution2_5d(
+        properties,
+        seats,
+        actions,
+        raft_length_m=params.length_m,
+        raft_width_m=params.width_m,
+    )
+
+    assert shifted.occupied_seat_count == neutral.occupied_seat_count
+    assert shifted.active_action_count == shifted.occupied_seat_count
+    assert shifted.high_side_count == shifted.occupied_seat_count
+    assert shifted.brace_count == 4
+    assert shifted.recovery_count == 1
+    assert shifted.combined_center_of_gravity_offset.y > neutral.combined_center_of_gravity_offset.y
+    assert shifted.roll_moment_nm > neutral.roll_moment_nm
+    assert shifted.contact_loading.right_tube_normal_load_n > shifted.contact_loading.left_tube_normal_load_n
+    assert shifted.recovery_thresholds.pin_threshold_multiplier > neutral.recovery_thresholds.pin_threshold_multiplier
+    assert shifted.recovery_thresholds.flip_threshold_multiplier > neutral.recovery_thresholds.flip_threshold_multiplier
+    assert shifted.recovery_thresholds.release_threshold_multiplier < neutral.recovery_thresholds.release_threshold_multiplier
+
+
+def test_crew_weight_distribution_clamps_lean_and_rejects_unknown_action_seats():
+    params = RaftParameters2_5D(passenger_count=1)
+    properties = build_default_raft_mass_properties(params)
+    seats = build_default_crew_seats2_5d(params)
+
+    telemetry = evaluate_crew_weight_distribution2_5d(
+        properties,
+        seats,
+        (CrewAction2_5D("passenger_0", lean_offset=Vec3(0.0, 2.0, 0.0)),),
+        max_lean_offset_m=0.3,
+    )
+
+    passenger = next(seat for seat in telemetry.seat_telemetry if seat.seat_id == "passenger_0")
+    assert passenger.lean_was_clamped is True
+    assert passenger.action_offset.magnitude == pytest.approx(0.3)
+
+    with pytest.raises(ValueError, match="unknown seats"):
+        evaluate_crew_weight_distribution2_5d(
+            properties,
+            seats,
+            (CrewAction2_5D("missing", high_side_direction=1),),
+        )
+    with pytest.raises(ValueError, match="high_side_direction"):
+        CrewAction2_5D("passenger_0", high_side_direction=2)
 
 
 def test_sample_patch_requires_positive_area_and_normalizes_normal():

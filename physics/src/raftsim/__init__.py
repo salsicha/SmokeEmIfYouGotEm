@@ -231,6 +231,12 @@ from .sweeps import (
     run_raft_force_parameter_sweep,
 )
 from .raft_coupling2_5d import (
+    CrewAction2_5D,
+    CrewContactLoading2_5D,
+    CrewRecoveryThresholds2_5D,
+    CrewSeat2_5D,
+    CrewSeatTelemetry2_5D,
+    CrewWeightTelemetry2_5D,
     PaddleBladePose2_5D,
     PaddleBladeSample2_5D,
     RaftForceEnvelope2_5D,
@@ -241,8 +247,10 @@ from .raft_coupling2_5d import (
     RaftState6DoF,
     WaterField2_5D,
     WaterSample2_5D,
+    build_default_crew_seats2_5d,
     build_default_raft_mass_properties,
     compare_raft_force_samples,
+    evaluate_crew_weight_distribution2_5d,
     sample_buoyancy_forces,
     sample_grounding_forces,
     sample_hydrodynamic_forces,
