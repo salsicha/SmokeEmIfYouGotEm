@@ -20,12 +20,16 @@ from .validation_gate import (
 )
 from .milestone16 import (
     MILESTONE16_CPP_RUN_REPORT_SCHEMA,
+    MILESTONE16_COMPARISON_REPORT_SCHEMA,
     MILESTONE16_GEOCLAW_REFERENCE_REPORT_SCHEMA,
+    Milestone16ComparisonRecord,
+    Milestone16ComparisonReport,
     Milestone16CppRunRecord,
     Milestone16CppRunReport,
     Milestone16GeoClawReferenceReport,
     Milestone16GeoClawRunRecord,
     run_milestone16_cpp_solver_matrix,
+    run_milestone16_comparison_matrix,
     run_milestone16_geoclaw_reference_suite,
 )
 from .raft2d import (
@@ -418,6 +422,9 @@ __all__ = [
     "GeneratedRiver2D",
     "MILESTONE16_GEOCLAW_REFERENCE_REPORT_SCHEMA",
     "MILESTONE16_CPP_RUN_REPORT_SCHEMA",
+    "MILESTONE16_COMPARISON_REPORT_SCHEMA",
+    "Milestone16ComparisonRecord",
+    "Milestone16ComparisonReport",
     "Milestone16CppRunRecord",
     "Milestone16CppRunReport",
     "Milestone16GeoClawReferenceReport",
@@ -503,6 +510,7 @@ __all__ = [
     "run_cpp_solver_scenario",
     "run_dual_solver_scenario",
     "run_milestone16_cpp_solver_matrix",
+    "run_milestone16_comparison_matrix",
     "run_milestone16_geoclaw_reference_suite",
     "run_raft_force_parameter_sweep",
     "run_pyclaw_reference",

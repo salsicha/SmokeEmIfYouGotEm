@@ -1,4 +1,6 @@
 from raftsim.milestone16 import (
+    Milestone16ComparisonRecord,
+    Milestone16ComparisonReport,
     Milestone16CppRunRecord,
     Milestone16CppRunReport,
     Milestone16GeoClawReferenceReport,
@@ -91,3 +93,34 @@ def test_milestone16_cpp_run_report_requires_manifest_settings():
     assert report.passed is True
     assert payload["run_count"] == 1
     assert payload["records"][0]["passed"] is True
+
+
+def test_milestone16_comparison_report_tracks_threshold_failures():
+    record = Milestone16ComparisonRecord(
+        gate_scenario_id="flat_pool",
+        actual_scenario_id="flat_pool_seed_16",
+        suite="canonical",
+        solver_mode="reduced",
+        threshold_tier="production_candidate",
+        comparison_dir="outputs/m16cmp/c_flat/reduced",
+        threshold_report="outputs/m16cmp/c_flat/reduced/threshold_evaluation.json",
+        threshold_passed=False,
+        failing_checks=("field_linf", "probe_linf"),
+        check_values={"field_linf": {"passed": False, "value": 1.0, "threshold": 0.15}},
+        frame_comparisons=2,
+        point_probes=3,
+        cross_sections=1,
+        feature_count=0,
+        reach_drop_check={"required": False, "passed": True},
+    )
+    report = Milestone16ComparisonReport(
+        geoclaw_reference_report="reports/milestone16/geoclaw_reference_runs.json",
+        cpp_run_report="reports/milestone16/cpp_solver_runs.json",
+        output_root="outputs/m16cmp",
+        records=(record,),
+    )
+
+    payload = report.to_json_dict()
+    assert report.passed is False
+    assert payload["threshold_failed_count"] == 1
+    assert payload["records"][0]["compared"] is True

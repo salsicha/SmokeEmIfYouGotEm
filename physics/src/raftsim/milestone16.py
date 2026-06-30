@@ -6,6 +6,14 @@ import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
+from .comparison import (
+    ScenarioThresholds,
+    compare_dual_solver_diagnostics,
+    compare_dual_solver_features,
+    compare_dual_solver_fields,
+    compare_dual_solver_probes,
+    evaluate_dual_solver_thresholds,
+)
 from .dual_solver import CppSolverRunConfig, run_cpp_solver_scenario
 from .geoclaw_reference import (
     GEOCLAW_CANONICAL_FIXTURES,
@@ -24,9 +32,11 @@ from .geoclaw_reference import (
 from .real_world import default_player_selections, generate_real_world_scenario2_5d
 from .scenario2_5d import Scenario2_5D
 from .scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
+from .validation_gate import CUSTOM_CPP_VALIDATION_SCENARIOS, CUSTOM_CPP_VALIDATION_THRESHOLD_TIERS
 
 MILESTONE16_GEOCLAW_REFERENCE_REPORT_SCHEMA = "raftsim.milestone16.geoclaw_reference_runs.v0"
 MILESTONE16_CPP_RUN_REPORT_SCHEMA = "raftsim.milestone16.cpp_solver_runs.v0"
+MILESTONE16_COMPARISON_REPORT_SCHEMA = "raftsim.milestone16.geoclaw_cpp_comparisons.v0"
 MILESTONE16_CASE_DIRS = {
     "flat_pool": "c_flat",
     "uniform_channel": "c_uniform",
@@ -247,6 +257,104 @@ class Milestone16CppRunReport:
         return output_path
 
 
+@dataclass(frozen=True, slots=True)
+class Milestone16ComparisonRecord:
+    """Summary for one GeoClaw-vs-C++ comparison run."""
+
+    gate_scenario_id: str
+    actual_scenario_id: str
+    suite: str
+    solver_mode: str
+    threshold_tier: str
+    comparison_dir: str
+    threshold_report: str
+    threshold_passed: bool
+    failing_checks: tuple[str, ...]
+    check_values: dict[str, dict[str, object]]
+    frame_comparisons: int
+    point_probes: int
+    cross_sections: int
+    feature_count: int
+    reach_drop_check: dict[str, object]
+
+    @property
+    def compared(self) -> bool:
+        return self.frame_comparisons > 0 and self.point_probes >= 0 and self.cross_sections >= 0
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["failing_checks"] = list(self.failing_checks)
+        data["compared"] = self.compared
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone16ComparisonReport:
+    """Suite-level GeoClaw-vs-C++ comparison report."""
+
+    geoclaw_reference_report: str
+    cpp_run_report: str
+    output_root: str
+    records: tuple[Milestone16ComparisonRecord, ...] = field(default_factory=tuple)
+
+    @property
+    def passed(self) -> bool:
+        return bool(self.records) and all(record.threshold_passed for record in self.records)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE16_COMPARISON_REPORT_SCHEMA,
+            "passed": self.passed,
+            "geoclaw_reference_report": self.geoclaw_reference_report,
+            "cpp_run_report": self.cpp_run_report,
+            "output_root": self.output_root,
+            "comparison_count": len(self.records),
+            "threshold_passed_count": sum(1 for record in self.records if record.threshold_passed),
+            "threshold_failed_count": sum(1 for record in self.records if not record.threshold_passed),
+            "records": [record.to_json_dict() for record in self.records],
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = [
+            "# Milestone 16 GeoClaw/C++ Comparisons",
+            "",
+            f"Schema: `{MILESTONE16_COMPARISON_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Comparison count: {len(self.records)}",
+            "",
+            "| Suite | Gate scenario | Mode | Tier | Thresholds | Failing checks | Reach/drop |",
+            "| --- | --- | --- | --- | --- | --- | --- |",
+        ]
+        for record in self.records:
+            reach_drop = record.reach_drop_check
+            if reach_drop.get("required") is True:
+                reach_label = "PASS" if reach_drop.get("passed") is True else "FAIL"
+            else:
+                reach_label = "n/a"
+            lines.append(
+                "| "
+                f"{record.suite} | "
+                f"{record.gate_scenario_id} | "
+                f"{record.solver_mode} | "
+                f"{record.threshold_tier} | "
+                f"{'PASS' if record.threshold_passed else 'FAIL'} | "
+                f"{', '.join(record.failing_checks) if record.failing_checks else 'none'} | "
+                f"{reach_label} |"
+            )
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+
 def run_milestone16_geoclaw_reference_suite(
     output_root: str | Path,
     *,
@@ -336,6 +444,75 @@ def run_milestone16_geoclaw_reference_suite(
     )
 
 
+def run_milestone16_comparison_matrix(
+    geoclaw_reference_report: str | Path,
+    cpp_run_report: str | Path,
+    *,
+    output_root: str | Path = "outputs/m16cmp",
+) -> Milestone16ComparisonReport:
+    """Compare GeoClaw and C++ outputs over the Milestone 16 matrix."""
+
+    geoclaw_report_path = Path(geoclaw_reference_report)
+    cpp_report_path = Path(cpp_run_report)
+    geoclaw_report = _read_json(geoclaw_report_path)
+    cpp_report = _read_json(cpp_report_path)
+    if not bool(geoclaw_report.get("passed")):
+        raise RuntimeError(f"GeoClaw reference report is not passing: {geoclaw_report_path}")
+    if not bool(cpp_report.get("passed")):
+        raise RuntimeError(f"C++ run report is not passing: {cpp_report_path}")
+
+    geoclaw_by_gate = {str(record["gate_scenario_id"]): record for record in geoclaw_report["records"]}
+    root = Path(output_root)
+    root.mkdir(parents=True, exist_ok=True)
+    records: list[Milestone16ComparisonRecord] = []
+    for cpp_record in cpp_report["records"]:
+        gate_id = str(cpp_record["gate_scenario_id"])
+        geoclaw_record = geoclaw_by_gate[gate_id]
+        comparison_dir = root / _case_dir(gate_id) / str(cpp_record["solver_mode"])
+        comparison_dir.mkdir(parents=True, exist_ok=True)
+        manifest_path = _write_milestone16_comparison_manifest(comparison_dir, geoclaw_record, cpp_record)
+        thresholds = _thresholds_for_gate(gate_id)
+        field_report = compare_dual_solver_fields(manifest_path, output_path=comparison_dir / "field_comparison.json")
+        probe_report = compare_dual_solver_probes(manifest_path, output_path=comparison_dir / "probe_comparison.json")
+        diagnostic_report = compare_dual_solver_diagnostics(
+            manifest_path,
+            output_path=comparison_dir / "diagnostic_comparison.json",
+        )
+        feature_report = compare_dual_solver_features(manifest_path, output_path=comparison_dir / "feature_comparison.json")
+        threshold_report = evaluate_dual_solver_thresholds(
+            manifest_path,
+            thresholds=thresholds,
+            output_path=comparison_dir / "threshold_evaluation.json",
+        )
+        records.append(
+            Milestone16ComparisonRecord(
+                gate_scenario_id=gate_id,
+                actual_scenario_id=str(cpp_record["actual_scenario_id"]),
+                suite=str(cpp_record["suite"]),
+                solver_mode=str(cpp_record["solver_mode"]),
+                threshold_tier=_threshold_tier_for_gate(gate_id),
+                comparison_dir=str(comparison_dir),
+                threshold_report=str(comparison_dir / "threshold_evaluation.json"),
+                threshold_passed=threshold_report.passed,
+                failing_checks=tuple(check.name for check in threshold_report.checks if not check.passed),
+                check_values={check.name: check.to_json_dict() for check in threshold_report.checks},
+                frame_comparisons=len(field_report.frame_comparisons),
+                point_probes=len(probe_report.point_probes),
+                cross_sections=len(probe_report.cross_sections),
+                feature_count=feature_report.feature_count,
+                reach_drop_check=_reach_drop_check(geoclaw_record, cpp_record),
+            )
+        )
+        _ = diagnostic_report
+
+    return Milestone16ComparisonReport(
+        geoclaw_reference_report=str(geoclaw_report_path),
+        cpp_run_report=str(cpp_report_path),
+        output_root=str(root),
+        records=tuple(records),
+    )
+
+
 def run_milestone16_cpp_solver_matrix(
     geoclaw_reference_report: str | Path,
     *,
@@ -382,6 +559,103 @@ def run_milestone16_cpp_solver_matrix(
         cpp_solver=str(executable),
         records=tuple(records),
     )
+
+
+def _write_milestone16_comparison_manifest(
+    root: Path,
+    geoclaw_record: dict[str, object],
+    cpp_record: dict[str, object],
+) -> Path:
+    export_dir = Path(str(geoclaw_record["export_dir"])).resolve()
+    if geoclaw_record["suite"] == "cascading":
+        scenario_package = export_dir / "shared_cascading_package"
+        geoclaw_output = export_dir / "normalized_cascading" / "stitched"
+    else:
+        scenario_package = export_dir / "shared_scenario"
+        geoclaw_output = export_dir / "normalized"
+    run_manifest = _read_json(export_dir / "geoclaw_run_manifest.json")
+    geoclaw_runtime = float(run_manifest.get("result", {}).get("runtime_seconds", 0.0))
+    cpp_output_dir = Path(str(cpp_record["output_dir"])).resolve()
+    cpp_runtime = float(cpp_record["runtime_seconds"])
+    scenario = _read_json(scenario_package / "scenario.json")
+    duration = float(scenario["duration"])
+    manifest = {
+        "scenario_id": cpp_record["actual_scenario_id"],
+        "scenario_package": str(scenario_package),
+        "scenario_json": str(scenario_package / "scenario.json"),
+        "geoclaw": {
+            "solver": "geoclaw",
+            "output_dir": str(geoclaw_output),
+            "manifest": str(geoclaw_output / "manifest.json"),
+            "validation": str(geoclaw_output / "validation.json"),
+            "runtime_seconds": geoclaw_runtime,
+            "seconds_per_simulated_second": geoclaw_runtime / max(duration, 1.0e-12),
+        },
+        "cpp": {
+            "command": [],
+            "returncode": cpp_record["returncode"],
+            "stdout": "",
+            "stderr": "",
+            "output_dir": str(cpp_output_dir),
+            "manifest": str(Path(str(cpp_record["manifest"])).resolve()),
+            "validation": str(Path(str(cpp_record["validation"])).resolve()),
+            "runtime_seconds": cpp_runtime,
+        },
+        "runtime": {
+            "simulated_duration_seconds": duration,
+            "geoclaw_runtime_seconds": geoclaw_runtime,
+            "geoclaw_seconds_per_simulated_second": geoclaw_runtime / max(duration, 1.0e-12),
+            "cpp_runtime_seconds": cpp_runtime,
+            "cpp_seconds_per_simulated_second": cpp_runtime / max(duration, 1.0e-12),
+        },
+    }
+    manifest_path = root / "dual_solver_manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
+    return manifest_path
+
+
+def _threshold_tier_for_gate(gate_scenario_id: str) -> str:
+    for scenario in CUSTOM_CPP_VALIDATION_SCENARIOS:
+        if scenario.scenario_id == gate_scenario_id:
+            return scenario.threshold_tier
+    raise KeyError(f"Unknown validation gate scenario: {gate_scenario_id}")
+
+
+def _thresholds_for_gate(gate_scenario_id: str) -> ScenarioThresholds:
+    tier_id = _threshold_tier_for_gate(gate_scenario_id)
+    tier = next(item for item in CUSTOM_CPP_VALIDATION_THRESHOLD_TIERS if item.tier_id == tier_id)
+    return ScenarioThresholds(
+        max_field_linf=tier.field_linf_max_m,
+        max_slope_linf=tier.slope_linf_max,
+        max_wet_mismatch_fraction=tier.wet_mismatch_max_fraction,
+        max_probe_linf=tier.probe_linf_max,
+        max_cross_section_linf=tier.cross_section_linf_max,
+        max_mass_drift_delta=tier.mass_relative_drift_max,
+        max_energy_change_delta=tier.energy_relative_change_delta_max,
+        max_froude_delta=tier.froude_class_mismatch_max_fraction,
+        max_feature_location_delta=tier.feature_location_max_m,
+        max_feature_strength_delta=tier.feature_strength_linf_max,
+    )
+
+
+def _reach_drop_check(geoclaw_record: dict[str, object], cpp_record: dict[str, object]) -> dict[str, object]:
+    if geoclaw_record["suite"] != "cascading":
+        return {"required": False, "passed": True}
+    cpp_cascading = cpp_record.get("cascading", {})
+    if not isinstance(cpp_cascading, dict):
+        cpp_cascading = {}
+    expected_reaches = int(geoclaw_record.get("reach_window_count", 0))
+    expected_drops = int(geoclaw_record.get("drop_transition_window_count", 0))
+    actual_reaches = int(cpp_cascading.get("reach_count", 0))
+    actual_drops = int(cpp_cascading.get("drop_transition_count", 0))
+    return {
+        "required": True,
+        "passed": expected_reaches == actual_reaches and expected_drops == actual_drops,
+        "geoclaw_reach_windows": expected_reaches,
+        "cpp_reach_count": actual_reaches,
+        "geoclaw_drop_transition_windows": expected_drops,
+        "cpp_drop_transition_count": actual_drops,
+    }
 
 
 def _run_standard_geoclaw_case(
