@@ -832,6 +832,7 @@ void write_solver_output(
              << "  \"boundary_mode\": \"" << json_escape(config.boundary_mode) << "\",\n"
              << "  \"flux_scheme\": \"" << json_escape(config.flux_scheme) << "\",\n"
              << "  \"cfl\": " << config.cfl << ",\n"
+             << "  \"dry_tolerance\": " << config.dry_tolerance << ",\n"
              << "  \"feature_strength_scale\": " << config.feature_strength_scale << ",\n"
              << "  \"roughness_scale\": " << config.roughness_scale << ",\n"
              << "  \"bed_slope_source_scale\": " << config.bed_slope_source_scale << ",\n"

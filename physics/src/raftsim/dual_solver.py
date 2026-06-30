@@ -24,6 +24,7 @@ class CppSolverRunConfig:
     boundary_mode: str = "scenario"
     flux_scheme: str = "rusanov"
     cfl: float = 0.45
+    dry_tolerance: float = 1.0e-6
     feature_strength_scale: float = 1.0
     roughness_scale: float = 1.0
     bed_slope_source_scale: float = 0.0
@@ -43,6 +44,8 @@ class CppSolverRunConfig:
             raise ValueError("flux_scheme must be 'rusanov', 'hll', or 'roe'.")
         if self.cfl <= 0.0:
             raise ValueError("cfl must be positive.")
+        if self.dry_tolerance < 0.0:
+            raise ValueError("dry_tolerance must be non-negative.")
         if self.feature_strength_scale < 0.0:
             raise ValueError("feature_strength_scale must be non-negative.")
         if self.roughness_scale < 0.0:
@@ -238,6 +241,8 @@ def _run_cpp_solver(
         config.flux_scheme,
         "--cfl",
         str(config.cfl),
+        "--dry-tolerance",
+        str(config.dry_tolerance),
         "--feature-strength-scale",
         str(config.feature_strength_scale),
         "--roughness-scale",

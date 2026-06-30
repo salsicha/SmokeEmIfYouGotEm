@@ -13,6 +13,10 @@ from raftsim.comparison import (
     evaluate_dual_solver_thresholds,
 )
 from raftsim.chrono_validation import compare_chrono_bridge_telemetry
+from raftsim.cascading import (
+    CaliforniaPoolDropParameters2_5D,
+    generate_california_pool_drop_cascading_scenario2_5d,
+)
 from raftsim.dual_solver import CppSolverRunConfig, DualSolverRunConfig, run_dual_solver_scenario
 from raftsim.pyclaw_reference import PyClawRunConfig, check_pyclaw_availability
 from raftsim.regression import promote_passing_dual_solver_run
@@ -20,7 +24,9 @@ from raftsim.scenario2_5d import FixtureScenario2_5DParameters, generate_fixture
 from raftsim.sweeps import ParameterSweepCandidate
 from raftsim.tuning import (
     CppTuningCandidate,
+    default_cascading_cpp_tuning_candidates,
     fit_cpp_and_raft_parameters_against_pyclaw,
+    tune_cpp_solver_against_cascading_geoclaw,
     tune_cpp_solver_against_geoclaw,
     tune_cpp_solver_against_pyclaw,
 )
@@ -312,6 +318,72 @@ def test_cpp_tuning_against_geoclaw_selects_best_candidate(tmp_path):
     coupling_report = compare_chrono_bridge_telemetry(report.candidates[0].dual_solver_dir)
     assert coupling_report.reference_solver == "geoclaw"
     assert coupling_report.trajectory_position_delta >= 0.0
+
+
+def test_cpp_tuning_against_cascading_geoclaw_records_window_manifests(tmp_path):
+    cpp_solver = _build_cpp_solver(tmp_path)
+    package = generate_california_pool_drop_cascading_scenario2_5d(
+        CaliforniaPoolDropParameters2_5D(seed=44, nx=64, ny=24, duration=1.0 / 60.0)
+    )
+    defaults = default_cascading_cpp_tuning_candidates()
+    candidates = (
+        CppTuningCandidate(
+            "baseline",
+            feature_strength_scale=1.0,
+            roughness_scale=1.0,
+            tuning_roles=("section_handoff", "roughness", "dissipation", "wet_dry", "feature_forcing"),
+        ),
+        CppTuningCandidate(
+            "wet_dry_guarded",
+            dry_tolerance=1.0e-5,
+            feature_strength_scale=0.9,
+            roughness_scale=1.1,
+            tuning_roles=("wet_dry", "roughness", "feature_forcing"),
+        ),
+    )
+
+    report = tune_cpp_solver_against_cascading_geoclaw(
+        package,
+        output_dir=tmp_path / "cascading_tuning",
+        cpp_solver_executable=cpp_solver,
+        candidates=candidates,
+        cpp_steps=1,
+        cpp_frame_interval=1,
+    )
+    report_data = json.loads(
+        (tmp_path / "cascading_tuning" / "cascading_geoclaw_tuning_report.json").read_text(encoding="utf-8")
+    )
+    first_manifest = json.loads(
+        (
+            tmp_path
+            / "cascading_tuning"
+            / report.candidates[0].candidate.label
+            / "dual_solver_manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    first_cpp_manifest = json.loads(
+        (
+            tmp_path
+            / "cascading_tuning"
+            / report.candidates[0].candidate.label
+            / first_manifest["cpp"]["manifest"]
+        ).read_text(encoding="utf-8")
+    )
+
+    assert len(report.candidates) == 2
+    assert report.best_candidate.candidate.label in {"baseline", "wet_dry_guarded"}
+    assert report_data["best_candidate"]["candidate"]["label"] == report.best_candidate.candidate.label
+    assert report_data["candidates"][1]["candidate"]["dry_tolerance"] == 1.0e-5
+    assert "wet_dry" in report_data["candidates"][1]["candidate"]["tuning_roles"]
+    assert any("section_handoff" in candidate.tuning_roles for candidate in defaults)
+    assert any("wet_dry" in candidate.tuning_roles for candidate in defaults)
+    assert first_manifest["scenario_package"].endswith(package.scenario.metadata.scenario_id)
+    assert first_manifest["cascading_geoclaw"]["reach_window_count"] == 7
+    assert first_manifest["cascading_geoclaw"]["drop_transition_window_count"] == 1
+    assert first_manifest["cascading_geoclaw"]["stitched_manifest"].endswith("stitched/manifest.json")
+    assert first_manifest["cpp"]["manifest"].endswith("manifest.json")
+    assert first_cpp_manifest["cascading"]["present"] is True
+    assert first_cpp_manifest["dry_tolerance"] == 1.0e-6
 
 
 def test_promote_passing_run_to_regression_fixture(tmp_path):
