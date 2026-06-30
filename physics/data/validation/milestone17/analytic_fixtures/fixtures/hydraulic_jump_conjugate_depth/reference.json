@@ -1,0 +1,21 @@
+{
+  "diagnostics": {
+    "depth_ratio": 3.772001872658765
+  },
+  "field_files": {
+    "reference_fields": "reference_fields.npz"
+  },
+  "fixture_id": "hydraulic_jump_conjugate_depth",
+  "fixture_set_version": "manual_swashes_style_seed_v0",
+  "parameters": {
+    "downstream_depth": 1.6974008426964444,
+    "downstream_froude": 0.40950895688910405,
+    "downstream_velocity": 1.6710525813494863,
+    "unit_discharge": 2.836446059772687,
+    "upstream_depth": 0.45,
+    "upstream_froude": 3.0,
+    "upstream_velocity": 6.303213466161526
+  },
+  "schema_version": "raftsim.analytic_reference.v0",
+  "summary": "Supercritical upstream flow transitions to the conjugate subcritical downstream depth."
+}

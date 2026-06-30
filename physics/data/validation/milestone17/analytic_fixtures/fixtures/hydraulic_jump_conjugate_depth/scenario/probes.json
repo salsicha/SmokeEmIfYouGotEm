@@ -1,0 +1,51 @@
+{
+  "probes": [
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 16.0,
+        "y": 0.0
+      },
+      "probe_id": "upstream_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 31.5,
+        "y": 0.0
+      },
+      "probe_id": "midstream_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 48.0,
+        "y": 0.0
+      },
+      "probe_id": "downstream_center"
+    },
+    {
+      "kind": "cross_section",
+      "length": 23.0,
+      "metadata": {},
+      "normal": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "position": {
+        "x": 31.5,
+        "y": 0.0
+      },
+      "probe_id": "mid_cross_section"
+    }
+  ]
+}

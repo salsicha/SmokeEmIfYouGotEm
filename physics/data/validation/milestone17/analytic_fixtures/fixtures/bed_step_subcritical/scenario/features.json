@@ -1,0 +1,19 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 31.5,
+        "y": 0.0
+      },
+      "kind": "ledge",
+      "length": 23.0,
+      "metadata": {
+        "analytic_fixture_role": "bed_step"
+      },
+      "radius": 0.0,
+      "strength": 0.22,
+      "width": 0.0
+    }
+  ]
+}
