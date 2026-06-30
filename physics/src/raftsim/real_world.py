@@ -4,12 +4,19 @@ from __future__ import annotations
 
 import json
 import math
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Literal
 
 import numpy as np
 
+from .cascading import (
+    CaliforniaPoolDropParameters2_5D,
+    CascadingScenarioPackage2_5D,
+    DropTransitionMetadata2_5D,
+    ReachMetadata2_5D,
+    generate_california_pool_drop_cascading_scenario2_5d,
+)
 from .scenario2_5d import (
     BoundaryCondition2_5D,
     Feature2_5D,
@@ -996,6 +1003,158 @@ def generate_real_world_scenario2_5d(
     )
 
 
+def generate_south_fork_american_cascading_scenario2_5d(
+    selection: PlayerSelection | None = None,
+    *,
+    nx: int = 112,
+    ny: int = 40,
+    dx: float = 4.0,
+    dy: float = 2.0,
+    duration: float = 8.0,
+) -> CascadingScenarioPackage2_5D:
+    """Generate a South Fork American pool-drop cascading seed package."""
+
+    chosen = selection or default_player_selections()[1]
+    section = south_fork_american_section()
+    centerline = south_fork_american_centerline_stations()
+    indicators = extract_channel_indicators(centerline)
+    rapid_candidates = identify_candidate_rapids(indicators)
+    representative_width = float(np.mean([station.channel_width_m for station in centerline]))
+    preset = adaptive_solver_parameters(chosen, representative_width_m=representative_width)
+    median_discharge = _flow_band_by_name("median_runnable").discharge_cfs
+    flow_discharge = _flow_band_by_name(chosen.flow_band).discharge_cfs
+    flow_factor = max(0.35, flow_discharge / max(median_discharge, 1.0))
+    cascade_params = CaliforniaPoolDropParameters2_5D(
+        seed=_south_fork_cascading_seed(chosen),
+        nx=nx,
+        ny=ny,
+        dx=dx,
+        dy=dy,
+        base_width=representative_width * (0.92 + 0.04 * min(flow_factor, 1.8)),
+        base_depth=preset.initial_depth_m,
+        inflow_speed=preset.downstream_velocity_mps,
+        difficulty=_south_fork_cascading_difficulty(chosen, flow_factor),
+        duration=duration,
+    )
+    base = generate_california_pool_drop_cascading_scenario2_5d(cascade_params)
+    station_min = centerline[0].station_m
+    station_max = centerline[-1].station_m
+    reaches = _south_fork_cascading_reaches(
+        base.reaches,
+        base.scenario.grid,
+        indicators,
+        rapid_candidates,
+        station_min,
+        station_max,
+    )
+    drop_transitions = tuple(
+        _south_fork_cascading_drop_transition(
+            transition,
+            base.scenario.grid,
+            centerline,
+            rapid_candidates,
+            preset,
+            chosen,
+            station_min,
+            station_max,
+        )
+        for transition in base.drop_transitions
+    )
+    metadata = ScenarioMetadata2_5D(
+        scenario_id=f"{chosen.river_id}_{chosen.section_id}_{chosen.flow_band}_{chosen.difficulty}_cascading",
+        scenario_type="real_world",
+        seed=cascade_params.seed,
+        generator="raftsim.real_world.cascading",
+        generator_version="milestone_15_sfa_seed.v0",
+        description=(
+            "South Fork American seed cascading package with variable pool/drop reaches, "
+            "source-station metadata, and rapid/drop transition annotations."
+        ),
+        river_id=section.river_id,
+        section_id=section.section_id,
+        coordinate_reference_system="local meters from source_manifest EPSG:4326 planning bounds",
+        source_manifest=SOURCE_MANIFEST_FILE,
+        gauge_source="USGS 11445500 South Fork American River near Lotus, CA",
+        season_preset=chosen.season,
+        flow_percentile=float(np.mean(_flow_band_by_name(chosen.flow_band).percentile_range)),
+        flow_band=chosen.flow_band,
+        difficulty_preset=chosen.difficulty,
+        confidence_score=preset.confidence_score,
+        provenance={
+            "source_manifest": SOURCE_MANIFEST_FILE,
+            "source_package": "physics/data/real_world/south_fork_american_chili_bar",
+            "base_generator": "raftsim.cascading.generate_california_pool_drop_cascading_scenario2_5d",
+            "rapid_candidate_count": len(rapid_candidates),
+            "reach_sequence": "pool,tongue,drop,wave_train,eddy_recovery,boulder_garden,pool",
+            "flow_preset_confidence": preset.confidence_score,
+        },
+    )
+    boundaries = (
+        BoundaryCondition2_5D(
+            "west",
+            "inflow",
+            depth=preset.initial_depth_m,
+            velocity=(preset.downstream_velocity_mps, 0.0),
+            metadata={"flow_band": chosen.flow_band, "discharge_m3s": preset.boundary_inflow_m3s},
+        ),
+        BoundaryCondition2_5D(
+            "east",
+            "outflow",
+            stage=preset.initial_depth_m + preset.outflow_stage_bias_m,
+            metadata={"flow_band": chosen.flow_band},
+        ),
+        BoundaryCondition2_5D("south", "bank"),
+        BoundaryCondition2_5D("north", "bank"),
+    )
+    source_features = _features_from_rapid_candidates(
+        rapid_candidates,
+        base.scenario.grid,
+        station_min,
+        station_max,
+        preset,
+    )
+    scenario = replace(
+        base.scenario,
+        metadata=metadata,
+        boundaries=boundaries,
+        features=(*base.scenario.features, *source_features),
+        raft=RaftParameters2_5D(drag_coefficient=1.25 * preset.raft_drag_coefficient_scale),
+        roughness=preset.roughness_manning_n,
+    )
+    return CascadingScenarioPackage2_5D(
+        scenario=scenario,
+        reaches=reaches,
+        drop_transitions=drop_transitions,
+        pool_controls=base.pool_controls,
+        reach_local_grids=base.reach_local_grids,
+        reach_id_grid=base.reach_id_grid,
+        drop_transition_id_grid=base.drop_transition_id_grid,
+    )
+
+
+def generate_south_fork_american_cascading_seed_scenarios(
+    *,
+    nx: int = 112,
+    ny: int = 40,
+    dx: float = 4.0,
+    dy: float = 2.0,
+    duration: float = 8.0,
+) -> tuple[CascadingScenarioPackage2_5D, ...]:
+    """Generate low, median, and high runnable South Fork cascading seed packages."""
+
+    return tuple(
+        generate_south_fork_american_cascading_scenario2_5d(
+            selection,
+            nx=nx,
+            ny=ny,
+            dx=dx,
+            dy=dy,
+            duration=duration,
+        )
+        for selection in default_player_selections()
+    )
+
+
 def write_real_world_seed_package(directory: str | Path) -> Path:
     """Write manifest, review data, flow presets, and a shared scenario package."""
 
@@ -1014,7 +1173,150 @@ def write_real_world_seed_package(directory: str | Path) -> Path:
     _write_json(data_dir / "rapid_candidates.geojson", _rapid_candidates_geojson(package.rapid_candidates, package.indicators))
     _write_json(data_dir / "corridor_package_manifest.json", _corridor_manifest(package))
     generate_real_world_scenario2_5d().write_package(scenario_dir)
+    cascading_dir = data_dir / "cascading_scenarios"
+    for cascading_package in generate_south_fork_american_cascading_seed_scenarios():
+        cascading_package.write_package(cascading_dir / cascading_package.scenario.metadata.scenario_id)
     return data_dir
+
+
+def _south_fork_cascading_seed(selection: PlayerSelection) -> int:
+    flow_seed = {
+        "low_runnable": 101,
+        "median_runnable": 202,
+        "high_runnable": 303,
+    }[selection.flow_band]
+    difficulty_seed = {
+        "beginner": 7,
+        "intermediate": 13,
+        "advanced": 19,
+        "expert": 29,
+    }[selection.difficulty]
+    return 1500 + flow_seed + difficulty_seed
+
+
+def _south_fork_cascading_difficulty(selection: PlayerSelection, flow_factor: float) -> float:
+    base = {
+        "beginner": 0.32,
+        "intermediate": 0.54,
+        "advanced": 0.74,
+        "expert": 0.88,
+    }[selection.difficulty]
+    return _clamp01(base + 0.12 * (flow_factor - 1.0))
+
+
+def _south_fork_cascading_reaches(
+    reaches: tuple[ReachMetadata2_5D, ...],
+    grid: GridSpec2_5D,
+    indicators: tuple[ChannelIndicator, ...],
+    rapid_candidates: tuple[RapidCandidate, ...],
+    station_min: float,
+    station_max: float,
+) -> tuple[ReachMetadata2_5D, ...]:
+    updated: list[ReachMetadata2_5D] = []
+    for reach in reaches:
+        source_start = _source_station_for_solver_station(grid, reach.station_start, station_min, station_max)
+        source_end = _source_station_for_solver_station(grid, reach.station_end, station_min, station_max)
+        source_mid = (source_start + source_end) * 0.5
+        roughness = _interp_indicator_value(indicators, "roughness_score", source_mid)
+        boulder_density = _interp_centerline_value(south_fork_american_centerline_stations(), "boulder_density", source_mid)
+        overlapping_candidates = tuple(
+            candidate.rapid_id
+            for candidate in rapid_candidates
+            if candidate.end_station_m >= source_start and candidate.start_station_m <= source_end
+        )
+        metadata = {
+            **reach.metadata,
+            "river_id": "american_south_fork",
+            "section_id": "chili_bar_to_coloma",
+            "source_station_start_m": source_start,
+            "source_station_end_m": source_end,
+            "source_gradient_start": _interp_indicator_value(indicators, "gradient", source_start),
+            "source_gradient_end": _interp_indicator_value(indicators, "gradient", source_end),
+            "source_channel_width_start_m": _interp_indicator_value(indicators, "channel_width_m", source_start),
+            "source_channel_width_end_m": _interp_indicator_value(indicators, "channel_width_m", source_end),
+            "source_roughness_score": roughness,
+            "source_rapid_candidates": ",".join(overlapping_candidates),
+        }
+        updated.append(
+            replace(
+                reach,
+                bed_roughness=max(reach.bed_roughness, 0.032 + 0.026 * roughness),
+                boulder_density=max(reach.boulder_density, _clamp01(boulder_density)),
+                confidence_score=min(reach.confidence_score, 0.60),
+                metadata=metadata,
+            )
+        )
+    return tuple(updated)
+
+
+def _south_fork_cascading_drop_transition(
+    transition: DropTransitionMetadata2_5D,
+    grid: GridSpec2_5D,
+    centerline: tuple[CenterlineStation, ...],
+    rapid_candidates: tuple[RapidCandidate, ...],
+    preset: SolverParameterPreset,
+    selection: PlayerSelection,
+    station_min: float,
+    station_max: float,
+) -> DropTransitionMetadata2_5D:
+    source_crest = _source_station_for_solver_station(grid, transition.crest_station, station_min, station_max)
+    nearest = min(rapid_candidates, key=lambda candidate: abs(candidate.peak_station_m - source_crest)) if rapid_candidates else None
+    source_fall = 0.0
+    rapid_id = ""
+    candidate_tags: tuple[str, ...] = ()
+    if nearest is not None:
+        rapid_id = nearest.rapid_id
+        candidate_tags = nearest.suggested_labels
+        fallback_window = max(120.0, (station_max - station_min) * 0.035)
+        fall_start = max(station_min, min(nearest.start_station_m, nearest.peak_station_m - fallback_window))
+        fall_end = min(station_max, max(nearest.end_station_m, nearest.peak_station_m + fallback_window))
+        upstream_elevation = _interp_centerline_value(centerline, "elevation_m", fall_start)
+        downstream_elevation = _interp_centerline_value(centerline, "elevation_m", fall_end)
+        source_fall = max(0.0, upstream_elevation - downstream_elevation)
+    hazard_tags = tuple(sorted(set((*transition.hazard_tags, *candidate_tags))))
+    metadata = {
+        **transition.metadata,
+        "river_id": selection.river_id,
+        "section_id": selection.section_id,
+        "flow_band": selection.flow_band,
+        "difficulty": selection.difficulty,
+        "source_rapid_id": rapid_id,
+        "source_crest_station_m": source_crest,
+        "source_elevation_fall_m": source_fall,
+        "gauge_source": "USGS 11445500 South Fork American River near Lotus, CA",
+    }
+    return replace(
+        transition,
+        recirculation_risk=max(transition.recirculation_risk, min(1.0, preset.hole_retention_strength * 0.46)),
+        aeration_proxy=max(transition.aeration_proxy, min(1.0, preset.aeration_turbulence_scale * 0.42)),
+        turbulence_proxy=max(transition.turbulence_proxy, min(1.0, preset.aeration_turbulence_scale * 0.48)),
+        hazard_tags=hazard_tags,
+        metadata=metadata,
+    )
+
+
+def _source_station_for_solver_station(
+    grid: GridSpec2_5D,
+    solver_station: float,
+    station_min: float,
+    station_max: float,
+) -> float:
+    solver_start = float(grid.x_coordinates()[0])
+    solver_end = float(grid.x_coordinates()[-1])
+    fraction = (solver_station - solver_start) / max(solver_end - solver_start, 1.0)
+    return station_min + _clamp01(fraction) * (station_max - station_min)
+
+
+def _interp_indicator_value(indicators: tuple[ChannelIndicator, ...], field_name: str, station_m: float) -> float:
+    stations = np.asarray([indicator.station_m for indicator in indicators], dtype=np.float64)
+    values = np.asarray([float(getattr(indicator, field_name)) for indicator in indicators], dtype=np.float64)
+    return float(np.interp(station_m, stations, values))
+
+
+def _interp_centerline_value(centerline: tuple[CenterlineStation, ...], field_name: str, station_m: float) -> float:
+    stations = np.asarray([station.station_m for station in centerline], dtype=np.float64)
+    values = np.asarray([float(getattr(station, field_name)) for station in centerline], dtype=np.float64)
+    return float(np.interp(station_m, stations, values))
 
 
 def _flow_band_by_name(flow_band: str) -> FlowBand:
