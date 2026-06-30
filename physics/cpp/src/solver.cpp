@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
+#include <limits>
 #include <sstream>
 #include <stdexcept>
 #include <utility>
@@ -49,6 +50,12 @@ struct FluxState {
 struct InterfaceFluxPair {
     FluxState left;
     FluxState right;
+};
+
+struct GridCellSelection {
+    bool found = false;
+    std::size_t row = 0;
+    std::size_t col = 0;
 };
 
 double gradient_x(const Array2D& array, const Scenario& scenario, std::size_t row, std::size_t col) {
@@ -405,19 +412,23 @@ InterfaceFluxPair hydrostatic_flux_x(
     double left_bed,
     double right_bed,
     const SolverConfig& config,
-    bool enabled
+    bool enabled,
+    bool reconstruct_interface_flux
 ) {
     FluxState base = finite_volume_flux_x(left, right, config);
-    if (!enabled || config.bed_slope_source_scale == 0.0 || !is_abrupt_bed_jump(left_bed, right_bed)) {
+    if (!enabled || config.bed_slope_source_scale == 0.0 ||
+        (!reconstruct_interface_flux && !is_abrupt_bed_jump(left_bed, right_bed))) {
         return InterfaceFluxPair{base, base};
     }
     double interface_bed = std::max(left_bed, right_bed);
     ConservedState left_star = hydrostatic_reconstructed_state(left, left_bed, interface_bed, config);
     ConservedState right_star = hydrostatic_reconstructed_state(right, right_bed, interface_bed, config);
-    FluxState reconstructed = base;
+    FluxState reconstructed =
+        reconstruct_interface_flux ? finite_volume_flux_x(left_star, right_star, config) : base;
     FluxState left_flux = reconstructed;
     FluxState right_flux = reconstructed;
-    double source_scale = config.bed_slope_source_scale * kBedStepFaceSourceBoost;
+    double source_scale =
+        config.bed_slope_source_scale * (reconstruct_interface_flux ? 1.0 : kBedStepFaceSourceBoost);
     left_flux.hu +=
         0.5 * source_scale * config.gravity * (left.h * left.h - left_star.h * left_star.h);
     right_flux.hu +=
@@ -431,19 +442,23 @@ InterfaceFluxPair hydrostatic_flux_y(
     double south_bed,
     double north_bed,
     const SolverConfig& config,
-    bool enabled
+    bool enabled,
+    bool reconstruct_interface_flux
 ) {
     FluxState base = finite_volume_flux_y(south, north, config);
-    if (!enabled || config.bed_slope_source_scale == 0.0 || !is_abrupt_bed_jump(south_bed, north_bed)) {
+    if (!enabled || config.bed_slope_source_scale == 0.0 ||
+        (!reconstruct_interface_flux && !is_abrupt_bed_jump(south_bed, north_bed))) {
         return InterfaceFluxPair{base, base};
     }
     double interface_bed = std::max(south_bed, north_bed);
     ConservedState south_star = hydrostatic_reconstructed_state(south, south_bed, interface_bed, config);
     ConservedState north_star = hydrostatic_reconstructed_state(north, north_bed, interface_bed, config);
-    FluxState reconstructed = base;
+    FluxState reconstructed =
+        reconstruct_interface_flux ? finite_volume_flux_y(south_star, north_star, config) : base;
     FluxState south_flux = reconstructed;
     FluxState north_flux = reconstructed;
-    double source_scale = config.bed_slope_source_scale * kBedStepFaceSourceBoost;
+    double source_scale =
+        config.bed_slope_source_scale * (reconstruct_interface_flux ? 1.0 : kBedStepFaceSourceBoost);
     south_flux.hv +=
         0.5 * source_scale * config.gravity * (south.h * south.h - south_star.h * south_star.h);
     north_flux.hv +=
@@ -516,6 +531,79 @@ void apply_bed_step_augmented_topography(
             next.v(row, shoulder_col) = shoulder_hv / safe_depth(next.h(row, shoulder_col), config.dry_tolerance);
             next.u(row, donor_col) = donor_hu / safe_depth(next.h(row, donor_col), config.dry_tolerance);
             next.v(row, donor_col) = donor_hv / safe_depth(next.h(row, donor_col), config.dry_tolerance);
+        }
+    }
+}
+
+GridCellSelection nearest_initial_wet_cell_in_column(const Scenario& scenario, std::size_t row, std::size_t col) {
+    GridCellSelection best;
+    double best_distance = std::numeric_limits<double>::infinity();
+    double best_bed = std::numeric_limits<double>::infinity();
+    for (std::size_t candidate_row = 0; candidate_row < scenario.grid.ny; ++candidate_row) {
+        if (!scenario.initial.wet(candidate_row, col)) {
+            continue;
+        }
+        double distance = candidate_row > row ? static_cast<double>(candidate_row - row)
+                                              : static_cast<double>(row - candidate_row);
+        double bed = scenario.bed(candidate_row, col);
+        if (!best.found || distance < best_distance ||
+            (distance == best_distance && bed < best_bed)) {
+            best.found = true;
+            best.row = candidate_row;
+            best.col = col;
+            best_distance = distance;
+            best_bed = bed;
+        }
+    }
+    return best;
+}
+
+void apply_wet_dry_shoreline_reconstruction(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "wet_dry_shoreline") {
+        return;
+    }
+
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+            if (scenario.initial.wet(row, col)) {
+                continue;
+            }
+
+            double leaked_h = next.h(row, col);
+            if (leaked_h > config.dry_tolerance) {
+                GridCellSelection receiver = nearest_initial_wet_cell_in_column(scenario, row, col);
+                if (receiver.found) {
+                    double receiver_h = next.h(receiver.row, receiver.col);
+                    double merged_h = receiver_h + leaked_h;
+                    double merged_hu = receiver_h * next.u(receiver.row, receiver.col) + leaked_h * next.u(row, col);
+                    next.h(receiver.row, receiver.col) = merged_h;
+                    next.u(receiver.row, receiver.col) =
+                        merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+                }
+            }
+
+            next.h(row, col) = 0.0;
+            next.u(row, col) = 0.0;
+            next.v(row, col) = 0.0;
+        }
+    }
+
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+            if (!scenario.initial.wet(row, col)) {
+                continue;
+            }
+            if (next.h(row, col) <= config.dry_tolerance) {
+                next.h(row, col) = 0.0;
+                next.u(row, col) = 0.0;
+                next.v(row, col) = 0.0;
+            } else {
+                next.v(row, col) = 0.0;
+            }
         }
     }
 }
@@ -675,6 +763,8 @@ void ReducedShallowWaterSolver::step_finite_volume(double dt) {
 void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
     WaterState next = state_;
     bool use_bed_step_face_source = scenario_.fixture_kind == "bed_step";
+    bool use_wet_dry_face_source = scenario_.fixture_kind == "wet_dry_shoreline";
+    bool use_hydrostatic_face_source = use_bed_step_face_source || use_wet_dry_face_source;
     for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
         for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
             ConservedState center = conserved_from_cell(scenario_, state_, config_, row, col);
@@ -694,13 +784,17 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
             double north_bed = row + 1 < scenario_.grid.ny ? scenario_.bed(row + 1, col) : center_bed;
 
             InterfaceFluxPair west_flux =
-                hydrostatic_flux_x(west, center, west_bed, center_bed, config_, use_bed_step_face_source);
+                hydrostatic_flux_x(
+                    west, center, west_bed, center_bed, config_, use_hydrostatic_face_source, use_wet_dry_face_source);
             InterfaceFluxPair east_flux =
-                hydrostatic_flux_x(center, east, center_bed, east_bed, config_, use_bed_step_face_source);
+                hydrostatic_flux_x(
+                    center, east, center_bed, east_bed, config_, use_hydrostatic_face_source, use_wet_dry_face_source);
             InterfaceFluxPair south_flux =
-                hydrostatic_flux_y(south, center, south_bed, center_bed, config_, use_bed_step_face_source);
+                hydrostatic_flux_y(
+                    south, center, south_bed, center_bed, config_, use_hydrostatic_face_source, use_wet_dry_face_source);
             InterfaceFluxPair north_flux =
-                hydrostatic_flux_y(center, north, center_bed, north_bed, config_, use_bed_step_face_source);
+                hydrostatic_flux_y(
+                    center, north, center_bed, north_bed, config_, use_hydrostatic_face_source, use_wet_dry_face_source);
             FluxState flux_w = west_flux.right;
             FluxState flux_e = east_flux.left;
             FluxState flux_s = south_flux.right;
@@ -745,6 +839,9 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
     }
     if (use_bed_step_face_source) {
         apply_bed_step_augmented_topography(scenario_, config_, dt, next);
+    }
+    if (scenario_.fixture_kind == "wet_dry_shoreline") {
+        apply_wet_dry_shoreline_reconstruction(scenario_, config_, next);
     }
     recompute_state(next);
     state_ = std::move(next);
@@ -1035,6 +1132,8 @@ void write_solver_output(
              << "  \"roughness_scale\": " << config.roughness_scale << ",\n"
              << "  \"bed_slope_source_scale\": " << config.bed_slope_source_scale << ",\n"
              << "  \"preserve_initial_mass\": " << (config.preserve_initial_mass ? "true" : "false") << ",\n"
+             << "  \"fixture_scoped_wet_dry_reconstruction\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "wet_dry_shoreline" ? "true" : "false") << ",\n"
              << "  \"cascading\": {\n"
              << "    \"present\": " << (scenario.cascading.present ? "true" : "false") << ",\n"
              << "    \"schema_version\": \"" << json_escape(scenario.cascading.schema_version) << "\",\n"
