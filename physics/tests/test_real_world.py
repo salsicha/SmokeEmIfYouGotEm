@@ -5,10 +5,13 @@ import numpy as np
 from raftsim.real_world import (
     CANDIDATE_RIVER_INVENTORY_FILE,
     CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION,
+    COURSE_ELEVATION_EXTRACTION_FILE,
+    COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION,
     RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
     RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION,
     adaptive_solver_parameters,
     build_candidate_river_inventory_package,
+    build_course_elevation_extraction,
     build_player_selection_model,
     build_rapid_review_editor_workflow,
     build_real_world_corridor_package,
@@ -91,6 +94,7 @@ def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
     assert {"elevation", "hydrography", "imagery", "gauges", "guide_references", "field_media"}.issubset(
         set(manifest["artifacts"])
     )
+    assert COURSE_ELEVATION_EXTRACTION_FILE in manifest["artifacts"]["elevation"]
 
 
 def test_channel_indicators_and_rapid_candidates_find_complex_water():
@@ -103,6 +107,34 @@ def test_channel_indicators_and_rapid_candidates_find_complex_water():
     assert len(candidates) >= 3
     assert any("boulder_garden" in candidate.suggested_labels for candidate in candidates)
     assert any("foam_whitewater_texture" in candidate.signals for candidate in candidates)
+
+
+def test_course_elevation_extraction_summarizes_section_profile_and_cross_sections():
+    package = build_real_world_corridor_package()
+    extraction = build_course_elevation_extraction(package)
+    data = extraction.to_json_dict()
+    summary = data["summary"]
+    samples = data["samples"]
+    cross_sections = data["cross_section_prototypes"]
+
+    assert data["schema_version"] == COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION
+    assert data["river_id"] == "american_south_fork"
+    assert data["section_id"] == "chili_bar_to_coloma"
+    assert data["source_artifacts"]["source_manifest"] == "source_manifest.json"
+    assert summary["sample_count"] == len(package.centerline)
+    assert summary["cross_section_prototype_count"] == len(package.indicators)
+    assert summary["rapid_candidate_count"] == len(package.rapid_candidates)
+    assert summary["length_m"] == package.centerline[-1].station_m - package.centerline[0].station_m
+    np.testing.assert_allclose(summary["total_drop_m"], 66.0)
+    assert summary["mean_gradient"] > 0.01
+    assert summary["max_local_gradient"] > summary["min_local_gradient"]
+    assert samples[0]["cumulative_drop_m"] == 0.0
+    assert samples[-1]["cumulative_drop_m"] == summary["total_drop_m"]
+    assert len(cross_sections) == len(package.indicators)
+    assert any(section["rapid_candidate_ids"] for section in cross_sections)
+    assert all(section["bank_offsets_m"]["left"] > 0.0 for section in cross_sections)
+    assert all(section["bank_offsets_m"]["right"] < 0.0 for section in cross_sections)
+    assert data["provenance"]["review_status"] == "prototype_needs_real_dem_lidar_hydrography_pull"
 
 
 def test_manual_review_labels_cover_required_whitewater_features():
@@ -152,6 +184,7 @@ def test_real_world_corridor_package_collects_unreal_handoff_metadata():
     package = build_real_world_corridor_package()
 
     assert package.unreal_ready_artifacts["terrain"] == "terrain/solver_bed_grid.npy"
+    assert package.unreal_ready_artifacts["course_elevation_extraction"] == COURSE_ELEVATION_EXTRACTION_FILE
     assert package.unreal_ready_artifacts["rapid_review_editor_workflow"] == RAPID_REVIEW_EDITOR_WORKFLOW_FILE
     assert len(package.rapid_candidates) >= 3
     assert {band.flow_band for band in south_fork_american_flow_bands()} == {
@@ -248,6 +281,7 @@ def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
     assert (output_dir.parent / CANDIDATE_RIVER_INVENTORY_FILE).exists()
     assert (output_dir.parent / "candidate_rivers.json").exists()
     assert (output_dir / "source_manifest.json").exists()
+    assert (output_dir / COURSE_ELEVATION_EXTRACTION_FILE).exists()
     assert (output_dir / "flow_presets.json").exists()
     assert (output_dir / "rapid_candidates.geojson").exists()
     assert (output_dir / RAPID_REVIEW_EDITOR_WORKFLOW_FILE).exists()
@@ -257,6 +291,7 @@ def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
     assert len(cascading_dirs) == 3
 
     manifest = json.loads((output_dir / "source_manifest.json").read_text(encoding="utf-8"))
+    course_elevation = json.loads((output_dir / COURSE_ELEVATION_EXTRACTION_FILE).read_text(encoding="utf-8"))
     inventory = json.loads((output_dir.parent / CANDIDATE_RIVER_INVENTORY_FILE).read_text(encoding="utf-8"))
     workflow = json.loads((output_dir / RAPID_REVIEW_EDITOR_WORKFLOW_FILE).read_text(encoding="utf-8"))
     scenario = read_scenario2_5d_package(output_dir / "scenario")
@@ -264,6 +299,8 @@ def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
     cascading = read_cascading_scenario_package(median_cascading_dir)
     unreal_metadata_dir = median_cascading_dir / "unreal_corridor_metadata"
     assert manifest["schema_version"] == SOURCE_MANIFEST_SCHEMA_VERSION
+    assert course_elevation["schema_version"] == COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION
+    assert course_elevation["summary"]["sample_count"] == len(south_fork_american_centerline_stations())
     assert inventory["schema_version"] == CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION
     assert inventory["section_source_manifests"][0]["source_manifest_status"] == "drafted"
     assert workflow["schema_version"] == RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION
