@@ -48,6 +48,29 @@
       "suite": "canonical"
     },
     {
+      "actual_scenario_id": "wet_dry_shoreline_seed_16",
+      "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced",
+      "artifact_id": "geoclaw_cpp/wet_dry_shoreline/reduced",
+      "case_id": null,
+      "category": "geoclaw_cpp",
+      "gate_scenario_id": "wet_dry_shoreline",
+      "manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/dual_solver_manifest.json",
+      "notes": [],
+      "passed": true,
+      "reports": {
+        "diagnostic_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/diagnostic_comparison.json",
+        "dual_solver_manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/dual_solver_manifest.json",
+        "feature_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/feature_comparison.json",
+        "field_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/field_comparison.json",
+        "probe_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/probe_comparison.json",
+        "threshold_evaluation": "regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/threshold_evaluation.json"
+      },
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/scenario",
+      "solver_mode": "reduced",
+      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+      "suite": "canonical"
+    },
+    {
       "actual_scenario_id": "sloping_manning_channel_seed_16",
       "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced",
       "artifact_id": "geoclaw_cpp/sloping_manning_channel/reduced",
@@ -110,6 +133,46 @@
       },
       "scenario_package": null,
       "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/raft_coupling_validation.json",
+      "suite": "rafting"
+    },
+    {
+      "actual_scenario_id": "eddy_line_shear_seed_20",
+      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/r_eddy/reduced/eddy_recovery",
+      "artifact_id": "raft_coupling/eddy_line_shear/reduced/eddy_recovery",
+      "case_id": "eddy_recovery",
+      "category": "raft_coupling",
+      "gate_scenario_id": "eddy_line_shear",
+      "manifest": "regression_fixtures/milestone16/raft_coupling/r_eddy/reduced/eddy_recovery/raft_coupling_case.json",
+      "notes": [
+        "Frame paths remain in generated Milestone 16 output directories."
+      ],
+      "passed": true,
+      "reports": {
+        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/r_eddy/reduced/eddy_recovery/raft_coupling_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "reduced",
+      "source_report": "reports/milestone16/raft_coupling_validation.json",
+      "suite": "rafting"
+    },
+    {
+      "actual_scenario_id": "shallow_shelf_seed_21",
+      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release",
+      "artifact_id": "raft_coupling/shallow_shelf/reduced/shallow_shelf_pivot_release",
+      "case_id": "shallow_shelf_pivot_release",
+      "category": "raft_coupling",
+      "gate_scenario_id": "shallow_shelf",
+      "manifest": "regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release/raft_coupling_case.json",
+      "notes": [
+        "Frame paths remain in generated Milestone 16 output directories."
+      ],
+      "passed": true,
+      "reports": {
+        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release/raft_coupling_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "reduced",
       "source_report": "reports/milestone16/raft_coupling_validation.json",
       "suite": "rafting"
     },
@@ -274,15 +337,15 @@
       "suite": "cascading"
     }
   ],
-  "entry_count": 13,
+  "entry_count": 16,
   "fixture_root": "regression_fixtures/milestone16",
-  "geoclaw_cpp_fixture_count": 4,
+  "geoclaw_cpp_fixture_count": 5,
   "notes": [
     "Only passing GeoClaw/C++ threshold runs were copied as regression fixtures.",
     "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs."
   ],
   "passed": true,
-  "raft_artifact_count": 9,
+  "raft_artifact_count": 11,
   "raft_coupling_report": "reports/milestone16/raft_coupling_validation.json",
   "registry_path": "regression_fixtures/milestone16/registry.json",
   "schema_version": "raftsim.milestone16.regression_promotion.v0"

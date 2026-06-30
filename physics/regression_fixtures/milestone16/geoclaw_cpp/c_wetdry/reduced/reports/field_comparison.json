@@ -1,0 +1,363 @@
+{
+  "aggregate_field_errors": [
+    {
+      "field": "eta",
+      "max_l1": 4.120396857043573e-09,
+      "max_l2": 8.073632945872415e-09,
+      "max_linf": 2.1674416261774354e-08
+    },
+    {
+      "field": "h",
+      "max_l1": 4.1203968477917146e-09,
+      "max_l2": 8.073632939663048e-09,
+      "max_linf": 2.1674416261774354e-08
+    },
+    {
+      "field": "hu",
+      "max_l1": 0.007527566297941395,
+      "max_l2": 0.010762041721178948,
+      "max_linf": 0.016872981813875837
+    },
+    {
+      "field": "hv",
+      "max_l1": 5.528591587858736e-17,
+      "max_l2": 9.841480928061423e-17,
+      "max_linf": 2.234236804422797e-16
+    },
+    {
+      "field": "normal_x",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "normal_y",
+      "max_l1": 4.339693723010944e-09,
+      "max_l2": 7.481169134990594e-09,
+      "max_linf": 2.167441626177435e-08
+    },
+    {
+      "field": "normal_z",
+      "max_l1": 2.94244258588113e-11,
+      "max_l2": 8.282356683397692e-11,
+      "max_linf": 2.764954931677721e-10
+    },
+    {
+      "field": "u",
+      "max_l1": 0.025247908423622668,
+      "max_l2": 0.028645676681757406,
+      "max_linf": 0.04943989303283297
+    },
+    {
+      "field": "v",
+      "max_l1": 2.1523080829647536e-16,
+      "max_l2": 3.0130584888914655e-16,
+      "max_linf": 6.172297556197866e-16
+    }
+  ],
+  "aggregate_slope_errors": [
+    {
+      "field": "slope_x",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "slope_y",
+      "max_l1": 4.3461720056203745e-09,
+      "max_l2": 7.4825821947888e-09,
+      "max_linf": 2.1674416261774354e-08
+    }
+  ],
+  "frame_comparisons": [
+    {
+      "cpp_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_wetdry/reduced/cpp_solver/wet_dry_shoreline_seed_16/frames/frame_0000.csv",
+      "field_errors": [
+        {
+          "candidate_max": 1.25,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "h",
+          "l1": 4.1203968477917146e-09,
+          "l2": 8.073632939663048e-09,
+          "linf": 2.1674416261774354e-08,
+          "reference_max": 1.25,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 2.5,
+          "candidate_min": 1.25,
+          "compared_count": 288,
+          "field": "eta",
+          "l1": 4.120396857043573e-09,
+          "l2": 8.073632945872415e-09,
+          "linf": 2.1674416261774354e-08,
+          "reference_max": 2.5,
+          "reference_min": 1.2499999783255837,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.35,
+          "candidate_min": 0.35,
+          "compared_count": 120,
+          "field": "u",
+          "l1": 5.761403887305505e-09,
+          "l2": 6.847981020318909e-09,
+          "linf": 1.0490417590158785e-08,
+          "reference_max": 0.35000001049041757,
+          "reference_min": 0.3499999912579855,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 120,
+          "field": "v",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.4375,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "hu",
+          "l1": 1.9190889392663632e-09,
+          "l2": 4.202694246390818e-09,
+          "linf": 1.3546510135853396e-08,
+          "reference_max": 0.4375,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "hv",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": -0.0,
+          "candidate_min": -0.0,
+          "compared_count": 288,
+          "field": "normal_x",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": -0.0,
+          "reference_min": -0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": -0.0,
+          "candidate_min": -0.22162110358896833,
+          "compared_count": 288,
+          "field": "normal_y",
+          "l1": 4.339693723010944e-09,
+          "l2": 7.481169134990594e-09,
+          "linf": 2.167441626177435e-08,
+          "reference_max": 2.167441626177435e-08,
+          "reference_min": -0.22162110358896833,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.0,
+          "candidate_min": 0.9751328557914596,
+          "compared_count": 288,
+          "field": "normal_z",
+          "l1": 2.94244258588113e-11,
+          "l2": 8.282356683397692e-11,
+          "linf": 2.764954931677721e-10,
+          "reference_max": 1.0,
+          "reference_min": 0.9751328557914596,
+          "sample_count": 288
+        }
+      ],
+      "label": "initial",
+      "pyclaw_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_wetdry/normalized/frames/frame_0000.npz",
+      "reference_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_wetdry/normalized/frames/frame_0000.npz",
+      "reference_solver": "geoclaw",
+      "slope_errors": [
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "slope_x",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.22727272727272751,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "slope_y",
+          "l1": 4.3461720056203745e-09,
+          "l2": 7.4825821947888e-09,
+          "linf": 2.1674416261774354e-08,
+          "reference_max": 0.22727272727272751,
+          "reference_min": -2.1674416261774354e-08,
+          "sample_count": 288
+        }
+      ],
+      "wet_mismatch_fraction": 0.0
+    },
+    {
+      "cpp_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_wetdry/reduced/cpp_solver/wet_dry_shoreline_seed_16/frames/frame_0008.csv",
+      "field_errors": [
+        {
+          "candidate_max": 1.25,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "h",
+          "l1": 4.1203968477917146e-09,
+          "l2": 8.073632939663048e-09,
+          "linf": 2.1674416261774354e-08,
+          "reference_max": 1.25,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 2.5,
+          "candidate_min": 1.25,
+          "compared_count": 288,
+          "field": "eta",
+          "l1": 4.120396857043573e-09,
+          "l2": 8.073632945872415e-09,
+          "linf": 2.1674416261774354e-08,
+          "reference_max": 2.5,
+          "reference_min": 1.2499999783255837,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.3318815428340874,
+          "candidate_min": 0.26740843415209586,
+          "compared_count": 120,
+          "field": "u",
+          "l1": 0.025247908423622668,
+          "l2": 0.028645676681757406,
+          "linf": 0.04943989303283297,
+          "reference_max": 0.3436408758163452,
+          "reference_min": 0.31684832718492884,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 120,
+          "field": "v",
+          "l1": 2.1523080829647536e-16,
+          "l2": 3.0130584888914655e-16,
+          "linf": 6.172297556197866e-16,
+          "reference_max": 6.172297556197866e-16,
+          "reference_min": -1.3391030295012828e-16,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.4148519285426092,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "hu",
+          "l1": 0.007527566297941395,
+          "l2": 0.010762041721178948,
+          "linf": 0.016872981813875837,
+          "reference_max": 0.4295510947704315,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "hv",
+          "l1": 5.528591587858736e-17,
+          "l2": 9.841480928061423e-17,
+          "linf": 2.234236804422797e-16,
+          "reference_max": 2.234236804422797e-16,
+          "reference_min": -1.065195613416955e-16,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": -0.0,
+          "candidate_min": -0.0,
+          "compared_count": 288,
+          "field": "normal_x",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": -0.0,
+          "reference_min": -0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": -0.0,
+          "candidate_min": -0.22162110358896833,
+          "compared_count": 288,
+          "field": "normal_y",
+          "l1": 4.339693723010944e-09,
+          "l2": 7.481169134990594e-09,
+          "linf": 2.167441626177435e-08,
+          "reference_max": 2.167441626177435e-08,
+          "reference_min": -0.22162110358896833,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.0,
+          "candidate_min": 0.9751328557914596,
+          "compared_count": 288,
+          "field": "normal_z",
+          "l1": 2.94244258588113e-11,
+          "l2": 8.282356683397692e-11,
+          "linf": 2.764954931677721e-10,
+          "reference_max": 1.0,
+          "reference_min": 0.9751328557914596,
+          "sample_count": 288
+        }
+      ],
+      "label": "final",
+      "pyclaw_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_wetdry/normalized/frames/frame_0002.npz",
+      "reference_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_wetdry/normalized/frames/frame_0002.npz",
+      "reference_solver": "geoclaw",
+      "slope_errors": [
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "slope_x",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.22727272727272751,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "slope_y",
+          "l1": 4.3461720056203745e-09,
+          "l2": 7.4825821947888e-09,
+          "linf": 2.1674416261774354e-08,
+          "reference_max": 0.22727272727272751,
+          "reference_min": -2.1674416261774354e-08,
+          "sample_count": 288
+        }
+      ],
+      "wet_mismatch_fraction": 0.0
+    }
+  ],
+  "scenario_id": "wet_dry_shoreline_seed_16"
+}
