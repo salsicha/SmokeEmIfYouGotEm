@@ -2,12 +2,16 @@ import numpy as np
 
 from raftsim.feature_validation import (
     CASCADING_RAFT_VALIDATION_CASES,
+    CREW_TIMED_HAZARD_FIXTURE_IDS,
     CascadingRaftValidationCase,
+    CrewTimedHazardFixture2_5D,
     FeatureValidationCheck,
     FeatureValidationResult,
     build_cascading_raft_validation_cases,
+    build_crew_timed_hazard_fixtures2_5d,
     validate_cascading_raft_cases,
     validate_boil_upwelling_case,
+    validate_crew_timed_hazard_fixtures2_5d,
     validate_eddy_line_case,
     validate_hole_case,
     validate_lateral_wave_case,
@@ -344,6 +348,41 @@ def test_run_outcome_summary_canonicalizes_validation_results():
     assert counts["pinned"] == 1
     assert counts["flipped"] == 1
     assert summary.summary_lines()[0] == "total=6 passed=5 failed=1"
+
+
+def test_crew_timed_hazard_fixtures_require_correct_weight_shift_timing():
+    fixtures = build_crew_timed_hazard_fixtures2_5d()
+
+    results = validate_crew_timed_hazard_fixtures2_5d(fixtures=fixtures)
+    by_fixture = {result.feature: result for result in results}
+
+    assert tuple(fixture.fixture_id for fixture in fixtures) == CREW_TIMED_HAZARD_FIXTURE_IDS
+    assert {fixture.hazard_kind for fixture in fixtures} == {
+        "rock",
+        "sticky_hole",
+        "lateral_hit",
+        "shallow_shelf",
+        "pin_release",
+        "flip",
+    }
+    assert all(isinstance(fixture, CrewTimedHazardFixture2_5D) for fixture in fixtures)
+    assert all(fixture.safe_response_delay_s < fixture.action_window_s for fixture in fixtures)
+    assert all(fixture.late_response_delay_s > fixture.action_window_s for fixture in fixtures)
+    assert tuple(by_fixture) == CREW_TIMED_HAZARD_FIXTURE_IDS
+    assert all(result.passed for result in results)
+    assert by_fixture["rock_high_side"].outcome == "clear"
+    assert by_fixture["sticky_hole_brace_release"].outcome == "flushed"
+    assert by_fixture["lateral_hit_lean"].outcome == "clear"
+    assert by_fixture["shallow_shelf_recovery"].outcome == "clear"
+    assert by_fixture["pin_release_weight_shift"].outcome == "clear"
+    assert by_fixture["flip_high_side"].outcome == "clear"
+    for result in results:
+        checks = {check.name: check for check in result.checks}
+        assert checks["missing_response_hazard"].value < 0.0
+        assert checks["late_response_hazard"].value < 0.0
+        assert checks["timed_response_safe"].value >= 0.0
+        assert checks["crew_action_changes_margin"].value > 0.0
+        assert checks["crew_action_recorded"].value >= 1.0
 
 
 def test_cascading_raft_validation_cases_cover_pool_drop_eddy_boulder_and_boundaries():
