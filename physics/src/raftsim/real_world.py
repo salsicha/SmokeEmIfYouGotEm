@@ -41,9 +41,12 @@ CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION = "raftsim.candidate_river_inventory.v0
 CANDIDATE_RIVER_INVENTORY_FILE = "candidate_river_inventory.json"
 COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION = "raftsim.course_elevation_extraction.v0"
 COURSE_ELEVATION_EXTRACTION_FILE = "course_elevation_extraction.json"
+RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_SCHEMA_VERSION = "raftsim.rapid_review_flow_difficulty_mapping.v0"
+RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE = "rapid_review_flow_difficulty_mapping.json"
 RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION = "raftsim.rapid_review_editor_workflow.v0"
 RAPID_REVIEW_EDITOR_WORKFLOW_FILE = "rapid_review_editor_workflow.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
+DIFFICULTY_PRESETS: tuple[DifficultyPreset, ...] = ("beginner", "intermediate", "advanced", "expert")
 
 
 @dataclass(frozen=True, slots=True)
@@ -370,6 +373,35 @@ class FlowBand:
         data = asdict(self)
         data["discharge_m3s"] = self.discharge_m3s
         return data
+
+
+@dataclass(frozen=True, slots=True)
+class RapidReviewFlowDifficultyMapping:
+    river_id: str
+    section_id: str
+    source_manifest: str
+    label_catalog: tuple[RapidReviewLabel, ...]
+    flow_bands: tuple[FlowBand, ...]
+    difficulty_presets: tuple[dict[str, object], ...]
+    label_flow_responses: tuple[dict[str, object], ...]
+    parameter_matrix: tuple[dict[str, object], ...]
+    review_requirements: tuple[str, ...]
+    provenance: dict[str, object] = field(default_factory=dict)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_SCHEMA_VERSION,
+            "river_id": self.river_id,
+            "section_id": self.section_id,
+            "source_manifest": self.source_manifest,
+            "label_catalog": [label.to_json_dict() for label in self.label_catalog],
+            "flow_bands": [band.to_json_dict() for band in self.flow_bands],
+            "difficulty_presets": list(self.difficulty_presets),
+            "label_flow_responses": list(self.label_flow_responses),
+            "parameter_matrix": list(self.parameter_matrix),
+            "review_requirements": list(self.review_requirements),
+            "provenance": self.provenance,
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -808,6 +840,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
             "guide_references": [
                 "review/guide_reference_index.json",
                 "review/rapid_review_labels.json",
+                RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
                 RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
             ],
             "field_media": ["field_media/README.md"],
@@ -1020,7 +1053,8 @@ def build_player_selection_model() -> dict[str, object]:
                                 "difficulty_range": list(section.difficulty_range),
                                 "seasons": sorted({band.season for band in flow_bands}),
                                 "flow_bands": [band.to_json_dict() for band in flow_bands],
-                                "difficulty_presets": ["beginner", "intermediate", "advanced", "expert"],
+                                "difficulty_presets": list(DIFFICULTY_PRESETS),
+                                "flow_difficulty_mapping": RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
                                 "raft_setups": ["standard_14ft_paddle_raft", "heavier_training_raft"],
                                 "gauge_sources": list(section.gauge_candidates),
                                 "data_confidence": 0.35,
@@ -1100,6 +1134,49 @@ def adaptive_solver_parameters(
     )
 
 
+def build_rapid_review_flow_difficulty_mapping(
+    package: RealWorldCorridorPackage | None = None,
+) -> RapidReviewFlowDifficultyMapping:
+    """Expose label-specific flow response and difficulty tuning controls."""
+
+    target = package or build_real_world_corridor_package()
+    labels = default_manual_rapid_review_labels()
+    representative_width = float(np.mean([station.channel_width_m for station in target.centerline]))
+    return RapidReviewFlowDifficultyMapping(
+        river_id=target.section.river_id,
+        section_id=target.section.section_id,
+        source_manifest=SOURCE_MANIFEST_FILE,
+        label_catalog=labels,
+        flow_bands=target.flow_bands,
+        difficulty_presets=_rapid_review_difficulty_presets(),
+        label_flow_responses=tuple(
+            _rapid_review_label_flow_response(label, target.flow_bands)
+            for label in labels
+        ),
+        parameter_matrix=_rapid_review_parameter_matrix(
+            target.section,
+            target.flow_bands,
+            representative_width,
+        ),
+        review_requirements=(
+            "Every accepted rapid label must name the flow band and difficulty presets it was reviewed against.",
+            "Hole, lateral, eddy-line, boulder, shelf, pin, release, and flip behavior must stay flow-dependent; fixed gains are review failures.",
+            "Gameplay forcing can be tuned from this mapping only after GeoClaw/C++ conservation and feature validation pass for the same flow band.",
+            "Guide feedback, footage, imagery, and gauge context must remain source-manifest linked with rights/provenance before production use.",
+        ),
+        provenance={
+            "generated_by": "raftsim.real_world.build_rapid_review_flow_difficulty_mapping",
+            "processing_version": "milestone_17_flow_difficulty_mapping_seed.v0",
+            "review_status": "seed_mapping_needs_gauge_history_and_guide_review",
+            "source_limitations": (
+                "Uses preliminary South Fork flow bands and hand-authored label response curves; "
+                "production mapping must be calibrated against gauge history, footage, guide feedback, "
+                "GeoClaw/C++ validation, and game-feel review."
+            ),
+        },
+    )
+
+
 def build_real_world_corridor_package() -> RealWorldCorridorPackage:
     section = south_fork_american_section()
     centerline = south_fork_american_centerline_stations()
@@ -1122,6 +1199,7 @@ def build_real_world_corridor_package() -> RealWorldCorridorPackage:
             "rapids": "review/rapid_candidates.geojson",
             "hazards": "review/rapid_review_labels.json",
             "rapid_review_editor_workflow": RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
+            "rapid_review_flow_difficulty_mapping": RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
             "flow_presets": "hydrology/flow_presets.json",
             "validation_matrix": "validation_matrix.json",
             "confidence_metadata": "confidence.json",
@@ -1567,6 +1645,10 @@ def write_real_world_seed_package(directory: str | Path) -> Path:
     _write_json(data_dir / SOURCE_MANIFEST_FILE, package.source_manifest)
     _write_json(data_dir / "river_course.json", package.to_json_dict())
     _write_json(data_dir / COURSE_ELEVATION_EXTRACTION_FILE, build_course_elevation_extraction(package).to_json_dict())
+    _write_json(
+        data_dir / RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
+        build_rapid_review_flow_difficulty_mapping(package).to_json_dict(),
+    )
     _write_json(data_dir / "flow_presets.json", {"flow_bands": [band.to_json_dict() for band in package.flow_bands]})
     _write_json(data_dir / "rapid_candidates.geojson", _rapid_candidates_geojson(package.rapid_candidates, package.indicators))
     _write_json(data_dir / RAPID_REVIEW_EDITOR_WORKFLOW_FILE, build_rapid_review_editor_workflow(package).to_json_dict())
@@ -1599,6 +1681,271 @@ def _candidate_section_source_manifest_link(
             else "Draft a source manifest before generating solver or Unreal packages."
         ),
     }
+
+
+def _rapid_review_difficulty_presets() -> tuple[dict[str, object], ...]:
+    return (
+        {
+            "difficulty": "beginner",
+            "feature_gain_scale": 0.72,
+            "crew_timing_window": "wide",
+            "gameplay_intent": "Training-oriented lines with clearer recovery, lower flip likelihood, and forgiving raft response.",
+            "review_focus": [
+                "recovery_pools",
+                "clear_tongues",
+                "visible_shallow_hazards",
+                "access_and_portage_context",
+            ],
+            "expected_outcome_bias": ["flush", "recover", "guided_avoidance"],
+        },
+        {
+            "difficulty": "intermediate",
+            "feature_gain_scale": 1.0,
+            "crew_timing_window": "normal",
+            "gameplay_intent": "Default commercial-style run with useful holes, waves, laterals, eddies, and recoverable mistakes.",
+            "review_focus": [
+                "wave_trains",
+                "sticky_holes_at_reviewed_flows",
+                "eddy_line_choices",
+                "boulder_avoidance",
+            ],
+            "expected_outcome_bias": ["clean_line", "surf", "flush", "brief_pin"],
+        },
+        {
+            "difficulty": "advanced",
+            "feature_gain_scale": 1.18,
+            "crew_timing_window": "tight",
+            "gameplay_intent": "Stronger hydraulics and consequences that require line choice, bracing, and high-side timing.",
+            "review_focus": [
+                "lateral_hits",
+                "keeper_holes",
+                "pin_release_windows",
+                "crew_weight_distribution",
+            ],
+            "expected_outcome_bias": ["surf", "pin", "release", "flip_if_mishandled"],
+        },
+        {
+            "difficulty": "expert",
+            "feature_gain_scale": 1.35,
+            "crew_timing_window": "very_tight",
+            "gameplay_intent": "High-consequence tuning where poor angle, missed brace, or late high-side can produce pins or flips.",
+            "review_focus": [
+                "high_consequence_holes",
+                "rock_push_and_damping",
+                "flip_thresholds",
+                "rescue_or_recovery_windows",
+            ],
+            "expected_outcome_bias": ["pin", "release", "flip", "swimmer_recovery"],
+        },
+    )
+
+
+def _rapid_review_label_flow_response(
+    label: RapidReviewLabel,
+    flow_bands: tuple[FlowBand, ...],
+) -> dict[str, object]:
+    return {
+        "label": label.label,
+        "category": label.category,
+        "solver_tags": list(label.solver_tags),
+        "requires_human_review": label.requires_human_review,
+        "tuning_parameters": _rapid_review_label_tuning_parameters(label.label),
+        "expected_raft_outcomes": _rapid_review_label_outcomes(label.label),
+        "flow_responses": [
+            {
+                "flow_band": band.flow_band,
+                "season": band.season,
+                "discharge_cfs": band.discharge_cfs,
+                "activation_scale": _rapid_review_label_flow_scale(label.label, band.flow_band),
+                "review_priority": _rapid_review_label_review_priority(label, band.flow_band),
+                "expected_behavior": _rapid_review_label_flow_note(label.label, band.flow_band),
+            }
+            for band in flow_bands
+        ],
+    }
+
+
+def _rapid_review_parameter_matrix(
+    section: CandidateRiverSection,
+    flow_bands: tuple[FlowBand, ...],
+    representative_width_m: float,
+) -> tuple[dict[str, object], ...]:
+    rows: list[dict[str, object]] = []
+    for band in flow_bands:
+        for difficulty in DIFFICULTY_PRESETS:
+            selection = PlayerSelection(
+                region=section.region,
+                river_id=section.river_id,
+                section_id=section.section_id,
+                season=band.season,
+                flow_band=band.flow_band,
+                difficulty=difficulty,
+                raft_setup="standard_14ft_paddle_raft",
+            )
+            preset = adaptive_solver_parameters(
+                selection,
+                flow_bands=flow_bands,
+                representative_width_m=representative_width_m,
+            )
+            rows.append(
+                {
+                    "season": band.season,
+                    "flow_band": band.flow_band,
+                    "difficulty": difficulty,
+                    "discharge_cfs": band.discharge_cfs,
+                    "discharge_m3s": band.discharge_m3s,
+                    "flow_percentile_mid": float(np.mean(band.percentile_range)),
+                    "parameters": {
+                        "boundary_inflow_m3s": preset.boundary_inflow_m3s,
+                        "initial_depth_m": preset.initial_depth_m,
+                        "downstream_velocity_mps": preset.downstream_velocity_mps,
+                        "downstream_momentum_scale": preset.downstream_momentum_scale,
+                        "roughness_manning_n": preset.roughness_manning_n,
+                        "aeration_turbulence_scale": preset.aeration_turbulence_scale,
+                        "hole_retention_strength": preset.hole_retention_strength,
+                        "wave_train_strength": preset.wave_train_strength,
+                        "eddy_line_shear": preset.eddy_line_shear,
+                        "boil_strength": preset.boil_strength,
+                        "shallow_hazard_threshold_m": preset.shallow_hazard_threshold_m,
+                        "hazard_activation_scale": preset.hazard_activation_scale,
+                        "raft_drag_coefficient_scale": preset.raft_drag_coefficient_scale,
+                        "paddle_catch_scale": preset.paddle_catch_scale,
+                        "damping_scale": preset.damping_scale,
+                    },
+                    "review_controls": {
+                        "feature_gain_scale": _difficulty_feature_gain_scale(difficulty),
+                        "crew_timing_window": _difficulty_crew_timing_window(difficulty),
+                        "must_record_expected_outcomes": True,
+                        "must_validate_conservation_before_forcing": True,
+                    },
+                }
+            )
+    return tuple(rows)
+
+
+def _rapid_review_label_flow_scale(label: str, flow_band: str) -> float:
+    default = {
+        "low_runnable": 0.75,
+        "median_runnable": 1.0,
+        "high_runnable": 1.15,
+    }
+    curves = {
+        "pool": {"low_runnable": 1.05, "median_runnable": 1.0, "high_runnable": 0.78},
+        "riffle": {"low_runnable": 1.15, "median_runnable": 0.95, "high_runnable": 0.70},
+        "wave_train": {"low_runnable": 0.58, "median_runnable": 1.0, "high_runnable": 1.35},
+        "hole": {"low_runnable": 0.35, "median_runnable": 1.0, "high_runnable": 0.65},
+        "ledge": {"low_runnable": 0.72, "median_runnable": 1.0, "high_runnable": 1.10},
+        "lateral": {"low_runnable": 0.55, "median_runnable": 1.0, "high_runnable": 1.30},
+        "eddy": {"low_runnable": 1.05, "median_runnable": 1.0, "high_runnable": 0.82},
+        "eddy_line": {"low_runnable": 0.70, "median_runnable": 1.0, "high_runnable": 1.25},
+        "strainer": {"low_runnable": 1.15, "median_runnable": 1.0, "high_runnable": 1.30},
+        "portage": {"low_runnable": 1.0, "median_runnable": 1.0, "high_runnable": 1.25},
+        "access_point": {"low_runnable": 1.0, "median_runnable": 1.0, "high_runnable": 0.90},
+        "boulder_garden": {"low_runnable": 1.25, "median_runnable": 1.0, "high_runnable": 0.72},
+        "constriction": {"low_runnable": 0.78, "median_runnable": 1.0, "high_runnable": 1.22},
+    }
+    return curves.get(label, default).get(flow_band, 1.0)
+
+
+def _rapid_review_label_flow_note(label: str, flow_band: str) -> str:
+    notes = {
+        "hole": {
+            "low_runnable": "Usually a shallow drop or rough tongue; keep retention low and verify it is not a fake keeper.",
+            "median_runnable": "Primary sticky-hole review band; tune surf/flush/pin/release outcomes against guide and footage evidence.",
+            "high_runnable": "May become aerated or wash out; reduce retention unless reviewed evidence shows a keeper at this flow.",
+        },
+        "boulder_garden": {
+            "low_runnable": "Rocks expose and pin risk rises; tune rock push, damping, shallow shelves, and crew high-side timing.",
+            "median_runnable": "Default line-choice and collision review band.",
+            "high_runnable": "More rocks cover over; emphasize powerful laterals, hidden impacts, and faster recovery windows.",
+        },
+        "wave_train": {
+            "low_runnable": "Small waves or riffles; keep amplitude modest.",
+            "median_runnable": "Default standing-wave spacing and raft timing review band.",
+            "high_runnable": "Larger wave train with stronger momentum, splash, aeration, and flip consequences.",
+        },
+        "lateral": {
+            "low_runnable": "Often weak or rock-controlled; verify it is not just bank roughness.",
+            "median_runnable": "Default cross-current hit and recovery review band.",
+            "high_runnable": "Strong lateral push; tune angle, brace timing, and flip-risk escalation.",
+        },
+        "eddy_line": {
+            "low_runnable": "Lower shear, useful training target.",
+            "median_runnable": "Default ferry, peel-out, and recovery review band.",
+            "high_runnable": "Sharper shear with stronger catch/flip consequences.",
+        },
+    }
+    fallback = {
+        "low_runnable": "Low-flow review should emphasize exposed geometry, slower recovery, and shallow hazards.",
+        "median_runnable": "Median-flow review is the default tuning baseline.",
+        "high_runnable": "High-flow review should emphasize stronger momentum, faster decisions, and washed-out or covered features.",
+    }
+    return notes.get(label, fallback).get(flow_band, fallback.get(flow_band, "Review against the selected flow band."))
+
+
+def _rapid_review_label_review_priority(label: RapidReviewLabel, flow_band: str) -> str:
+    scale = _rapid_review_label_flow_scale(label.label, flow_band)
+    if label.category == "hazard" or scale >= 1.18:
+        return "high"
+    if scale >= 0.80 or label.requires_human_review:
+        return "medium"
+    return "low"
+
+
+def _rapid_review_label_tuning_parameters(label: str) -> list[str]:
+    mapping = {
+        "pool": ["damping_scale", "outflow_stage_bias_m"],
+        "riffle": ["roughness_manning_n", "shallow_hazard_threshold_m"],
+        "wave_train": ["wave_train_strength", "aeration_turbulence_scale"],
+        "hole": ["hole_retention_strength", "boil_strength", "hazard_activation_scale"],
+        "ledge": ["hazard_activation_scale", "wave_train_strength", "boil_strength"],
+        "lateral": ["eddy_line_shear", "downstream_momentum_scale", "hazard_activation_scale"],
+        "eddy": ["damping_scale", "eddy_line_shear"],
+        "eddy_line": ["eddy_line_shear", "damping_scale", "raft_drag_coefficient_scale"],
+        "strainer": ["hazard_activation_scale", "raft_drag_coefficient_scale"],
+        "portage": ["hazard_activation_scale"],
+        "access_point": ["confidence_score"],
+        "boulder_garden": ["shallow_hazard_threshold_m", "hazard_activation_scale", "damping_scale"],
+        "constriction": ["downstream_momentum_scale", "wave_train_strength", "eddy_line_shear"],
+    }
+    return mapping.get(label, ["hazard_activation_scale"])
+
+
+def _rapid_review_label_outcomes(label: str) -> list[str]:
+    mapping = {
+        "pool": ["recover", "regroup", "set_safety"],
+        "riffle": ["clean_line", "shallow_scrape"],
+        "wave_train": ["clean_line", "splash", "brief_surf", "flip_if_sideways"],
+        "hole": ["surf", "flush", "pin", "release", "flip_if_mishandled"],
+        "ledge": ["boof_or_drop", "lateral_hit", "hole_or_wave_train"],
+        "lateral": ["angle_correction", "brace", "flip_if_mishandled"],
+        "eddy": ["catch_eddy", "recover", "missed_eddy"],
+        "eddy_line": ["peel_out", "ferry", "spin_or_flip_if_mishandled"],
+        "strainer": ["avoid", "portage", "failed_line_hazard"],
+        "portage": ["scout", "avoid", "walk_around"],
+        "access_point": ["put_in", "take_out", "scout"],
+        "boulder_garden": ["clean_line", "rock_bump", "pin", "release", "crew_overboard"],
+        "constriction": ["accelerate", "wave_train", "lateral_hit", "hole_if_controlled"],
+    }
+    return mapping.get(label, ["review_required"])
+
+
+def _difficulty_feature_gain_scale(difficulty: DifficultyPreset) -> float:
+    return {
+        "beginner": 0.72,
+        "intermediate": 1.0,
+        "advanced": 1.18,
+        "expert": 1.35,
+    }[difficulty]
+
+
+def _difficulty_crew_timing_window(difficulty: DifficultyPreset) -> str:
+    return {
+        "beginner": "wide",
+        "intermediate": "normal",
+        "advanced": "tight",
+        "expert": "very_tight",
+    }[difficulty]
 
 
 def _rapid_review_layers() -> tuple[RapidReviewLayer, ...]:
@@ -1642,6 +1989,14 @@ def _rapid_review_layers() -> tuple[RapidReviewLayer, ...]:
             "hydrology/usgs_11445500_daily_discharge.json",
             ("usgs_nwis", "noaa_nwps_nwm", "usgs_streamstats"),
             "Flow bands, discharge/stage context, season notes, and validation-flow selection.",
+        ),
+        RapidReviewLayer(
+            "flow_difficulty_mapping",
+            "Flow/Difficulty Mapping",
+            "table",
+            RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
+            ("usgs_nwis", "guide_references"),
+            "Label-specific flow response, difficulty controls, solver parameters, and expected raft outcomes.",
         ),
         RapidReviewLayer(
             "source_manifest",
@@ -1708,7 +2063,7 @@ def _rapid_review_panels() -> tuple[RapidReviewPanel, ...]:
             "flow_and_sources",
             "Flow And Sources",
             "hydrology",
-            ("gauge_history", "source_manifest", "guide_notes"),
+            ("gauge_history", "flow_difficulty_mapping", "source_manifest", "guide_notes"),
             "Gauge bands, source provenance, rights, and confidence for the selected candidate.",
         ),
         RapidReviewPanel(
@@ -1794,6 +2149,11 @@ def _rapid_review_evidence_refs(candidate: RapidCandidate) -> dict[str, object]:
             "layer_id": "gauge_history",
             "artifacts": ["hydrology/usgs_11445500_daily_discharge.json", "hydrology/flow_presets.json"],
             "source_ids": ["usgs_nwis", "noaa_nwps_nwm", "usgs_streamstats"],
+        },
+        "flow_difficulty_mapping": {
+            "layer_id": "flow_difficulty_mapping",
+            "artifacts": [RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE],
+            "source_ids": ["usgs_nwis", "guide_references"],
         },
         "source_manifest": {
             "layer_id": "source_manifest",

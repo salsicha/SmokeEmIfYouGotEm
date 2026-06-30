@@ -9,11 +9,14 @@ from raftsim.real_world import (
     COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION,
     RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
     RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION,
+    RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
+    RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_SCHEMA_VERSION,
     adaptive_solver_parameters,
     build_candidate_river_inventory_package,
     build_course_elevation_extraction,
     build_player_selection_model,
     build_rapid_review_editor_workflow,
+    build_rapid_review_flow_difficulty_mapping,
     build_real_world_corridor_package,
     build_source_manifest,
     default_candidate_river_inventory,
@@ -95,6 +98,7 @@ def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
         set(manifest["artifacts"])
     )
     assert COURSE_ELEVATION_EXTRACTION_FILE in manifest["artifacts"]["elevation"]
+    assert RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE in manifest["artifacts"]["guide_references"]
 
 
 def test_channel_indicators_and_rapid_candidates_find_complex_water():
@@ -164,6 +168,46 @@ def test_adaptive_parameters_scale_with_flow_and_difficulty():
     assert advanced_high.shallow_hazard_threshold_m < beginner_low.shallow_hazard_threshold_m
 
 
+def test_rapid_review_flow_difficulty_mapping_exposes_label_curves_and_parameter_matrix():
+    package = build_real_world_corridor_package()
+    mapping = build_rapid_review_flow_difficulty_mapping(package)
+    data = mapping.to_json_dict()
+    label_responses = {entry["label"]: entry for entry in data["label_flow_responses"]}
+    hole_responses = {
+        response["flow_band"]: response
+        for response in label_responses["hole"]["flow_responses"]
+    }
+    boulder_responses = {
+        response["flow_band"]: response
+        for response in label_responses["boulder_garden"]["flow_responses"]
+    }
+    parameter_rows = data["parameter_matrix"]
+
+    assert data["schema_version"] == RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_SCHEMA_VERSION
+    assert data["river_id"] == "american_south_fork"
+    assert data["section_id"] == "chili_bar_to_coloma"
+    assert {"hole", "wave_train", "lateral", "eddy_line", "boulder_garden"}.issubset(label_responses)
+    assert hole_responses["median_runnable"]["activation_scale"] > hole_responses["low_runnable"]["activation_scale"]
+    assert hole_responses["median_runnable"]["activation_scale"] > hole_responses["high_runnable"]["activation_scale"]
+    assert boulder_responses["low_runnable"]["activation_scale"] > boulder_responses["high_runnable"]["activation_scale"]
+    assert "hole_retention_strength" in label_responses["hole"]["tuning_parameters"]
+    assert "pin" in label_responses["boulder_garden"]["expected_raft_outcomes"]
+    assert len(parameter_rows) == len(south_fork_american_flow_bands()) * 4
+
+    beginner_low = next(
+        row for row in parameter_rows
+        if row["flow_band"] == "low_runnable" and row["difficulty"] == "beginner"
+    )
+    expert_high = next(
+        row for row in parameter_rows
+        if row["flow_band"] == "high_runnable" and row["difficulty"] == "expert"
+    )
+    assert expert_high["parameters"]["hole_retention_strength"] > beginner_low["parameters"]["hole_retention_strength"]
+    assert expert_high["parameters"]["hazard_activation_scale"] > beginner_low["parameters"]["hazard_activation_scale"]
+    assert expert_high["review_controls"]["crew_timing_window"] == "very_tight"
+    assert any("GeoClaw/C++ conservation" in requirement for requirement in data["review_requirements"])
+
+
 def test_player_selection_model_exposes_river_season_flow_difficulty_and_raft_setup():
     model = build_player_selection_model()
     section = model["regions"][0]["rivers"][0]["sections"][0]
@@ -177,6 +221,7 @@ def test_player_selection_model_exposes_river_season_flow_difficulty_and_raft_se
         "median_runnable",
         "high_runnable",
     }
+    assert section["flow_difficulty_mapping"] == RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE
     assert "standard_14ft_paddle_raft" in section["raft_setups"]
 
 
@@ -186,6 +231,7 @@ def test_real_world_corridor_package_collects_unreal_handoff_metadata():
     assert package.unreal_ready_artifacts["terrain"] == "terrain/solver_bed_grid.npy"
     assert package.unreal_ready_artifacts["course_elevation_extraction"] == COURSE_ELEVATION_EXTRACTION_FILE
     assert package.unreal_ready_artifacts["rapid_review_editor_workflow"] == RAPID_REVIEW_EDITOR_WORKFLOW_FILE
+    assert package.unreal_ready_artifacts["rapid_review_flow_difficulty_mapping"] == RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE
     assert len(package.rapid_candidates) >= 3
     assert {band.flow_band for band in south_fork_american_flow_bands()} == {
         "low_runnable",
@@ -209,6 +255,7 @@ def test_rapid_review_editor_workflow_displays_required_context_in_one_view():
         "flowlines",
         "cross_sections",
         "gauge_history",
+        "flow_difficulty_mapping",
         "source_manifest",
         "candidate_tags",
         "guide_notes",
@@ -219,6 +266,9 @@ def test_rapid_review_editor_workflow_displays_required_context_in_one_view():
     assert first_item["evidence_refs"]["dem_lidar"]["source_ids"] == ["usgs_3dep", "usgs_tnm"]
     assert "aerial_satellite_imagery" in first_item["evidence_refs"]
     assert first_item["cross_section_summary"]["channel_width_m"] > 0.0
+    assert first_item["evidence_refs"]["flow_difficulty_mapping"]["artifacts"] == [
+        RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE
+    ]
     assert {band["flow_band"] for band in first_item["gauge_context"]["flow_bands"]} == {
         "low_runnable",
         "median_runnable",
@@ -282,6 +332,7 @@ def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
     assert (output_dir.parent / "candidate_rivers.json").exists()
     assert (output_dir / "source_manifest.json").exists()
     assert (output_dir / COURSE_ELEVATION_EXTRACTION_FILE).exists()
+    assert (output_dir / RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE).exists()
     assert (output_dir / "flow_presets.json").exists()
     assert (output_dir / "rapid_candidates.geojson").exists()
     assert (output_dir / RAPID_REVIEW_EDITOR_WORKFLOW_FILE).exists()
@@ -292,6 +343,7 @@ def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
 
     manifest = json.loads((output_dir / "source_manifest.json").read_text(encoding="utf-8"))
     course_elevation = json.loads((output_dir / COURSE_ELEVATION_EXTRACTION_FILE).read_text(encoding="utf-8"))
+    flow_mapping = json.loads((output_dir / RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE).read_text(encoding="utf-8"))
     inventory = json.loads((output_dir.parent / CANDIDATE_RIVER_INVENTORY_FILE).read_text(encoding="utf-8"))
     workflow = json.loads((output_dir / RAPID_REVIEW_EDITOR_WORKFLOW_FILE).read_text(encoding="utf-8"))
     scenario = read_scenario2_5d_package(output_dir / "scenario")
@@ -301,6 +353,8 @@ def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
     assert manifest["schema_version"] == SOURCE_MANIFEST_SCHEMA_VERSION
     assert course_elevation["schema_version"] == COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION
     assert course_elevation["summary"]["sample_count"] == len(south_fork_american_centerline_stations())
+    assert flow_mapping["schema_version"] == RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_SCHEMA_VERSION
+    assert len(flow_mapping["parameter_matrix"]) == len(south_fork_american_flow_bands()) * 4
     assert inventory["schema_version"] == CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION
     assert inventory["section_source_manifests"][0]["source_manifest_status"] == "drafted"
     assert workflow["schema_version"] == RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION

@@ -30,6 +30,7 @@ Implemented artifacts:
 - `physics/data/real_world/south_fork_american_chili_bar/source_manifest.json`: representative source manifest for the South Fork American River, Chili Bar to Coloma seed section.
 - `physics/data/real_world/south_fork_american_chili_bar/river_course.json`: centerline stationing, approximate banks/cross-section offsets, width, gradient, constriction, roughness, and rapid candidate metadata.
 - `physics/data/real_world/south_fork_american_chili_bar/course_elevation_extraction.json`: prototype course/elevation extraction with station samples, cumulative drop, local gradient, width summary, cross-section prototypes, and provenance notes.
+- `physics/data/real_world/south_fork_american_chili_bar/rapid_review_flow_difficulty_mapping.json`: first label-to-flow/difficulty tuning map for review labels, flow-response curves, expected raft outcomes, and generated solver parameter rows.
 - `physics/data/real_world/south_fork_american_chili_bar/flow_presets.json`: low, median, and high runnable seed bands.
 - `physics/data/real_world/south_fork_american_chili_bar/rapid_candidates.geojson`: candidate rapid points derived from DEM-slope, constriction, roughness, boulder-density, imagery-texture, bend, guide-note, and access signals.
 - `physics/data/real_world/south_fork_american_chili_bar/rapid_review_editor_workflow.json`: first one-view rapid review/editor workflow contract with required DEM/lidar, aerial/satellite imagery, flowline, cross-section, gauge-history, source-manifest, candidate-tag, and guide-note layers.
@@ -231,6 +232,7 @@ Per river section, derive:
 - Typical runnable season windows.
 - Monthly/weekly percentile flows: low, median, high, flood.
 - User-facing difficulty bands at flow ranges.
+- Label-specific flow-response curves, such as sticky holes peaking only in the flow bands where guide/footage evidence says they should, shallow/boulder hazards becoming more prominent at low flows, and high-flow features washing out or strengthening according to reviewed evidence.
 - Gauge-to-section transfer function if the nearest gauge is upstream/downstream.
 - Stage-to-width/depth estimates for the scenario grid.
 - Flow confidence score.
@@ -268,6 +270,7 @@ Adaptive outputs:
 - Hole retention strength.
 - Wave train amplitude and spacing.
 - Lateral wave forcing.
+- Rapid-review flow/difficulty mapping rows that expose the derived gameplay and validation parameters to designers.
 - Boil/upwelling proxy strength.
 - Eddy strength and eddy-line shear.
 - Shallow grounding risk.
