@@ -836,6 +836,12 @@ void write_solver_output(
              << "  \"roughness_scale\": " << config.roughness_scale << ",\n"
              << "  \"bed_slope_source_scale\": " << config.bed_slope_source_scale << ",\n"
              << "  \"preserve_initial_mass\": " << (config.preserve_initial_mass ? "true" : "false") << ",\n"
+             << "  \"cascading\": {\n"
+             << "    \"present\": " << (scenario.cascading.present ? "true" : "false") << ",\n"
+             << "    \"schema_version\": \"" << json_escape(scenario.cascading.schema_version) << "\",\n"
+             << "    \"reach_count\": " << scenario.cascading.reaches.size() << ",\n"
+             << "    \"drop_transition_count\": " << scenario.cascading.drop_transitions.size() << "\n"
+             << "  },\n"
              << "  \"validation\": \"validation.json\",\n"
              << "  \"frames\": [";
     for (std::size_t i = 0; i < frame_files.size(); ++i) {
