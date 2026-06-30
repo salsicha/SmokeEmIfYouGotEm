@@ -283,7 +283,7 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 
 - [x] Add a versioned analytic fixture manifest with provenance notes, expected behavior, tolerance tier, source-equation references, and explicit no-vendored-external-data policy.
 - [x] Manually encode a small SWASHES-style set for lake-at-rest balance, sloping-channel friction, wet/dry shoreline, bed step, dam-break/bore, hydraulic jump, and transcritical bump cases where practical.
-- [ ] Add C++ and GeoClaw/analytic comparison reports that fail retuning when small analytic fixtures regress.
+- [x] Add C++ and GeoClaw/analytic comparison reports that fail retuning when small analytic fixtures regress.
 - [ ] Add versioned contracts and validators for feature forcing, reach-local grids, stitched validation outputs, river validation annotations, and canonical geospatial packages.
 
 ## Technical Notes To Revisit
@@ -318,7 +318,7 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [ ] Implement suite-level JSON and Markdown reports for the full C++ validation gate.
 - [x] Add a versioned analytic fixture manifest with provenance notes, expected behavior, tolerance tier, and source-equation references.
 - [x] Manually encode a small SWASHES-style set for lake-at-rest balance, sloping-channel friction, wet/dry shoreline, bed step, dam-break/bore, hydraulic jump, and transcritical bump cases where practical.
-- [ ] Add C++ and GeoClaw/analytic comparison reports that fail retuning when these small fixtures regress.
+- [x] Add C++ and GeoClaw/analytic comparison reports that fail retuning when these small fixtures regress.
 - [ ] Add a versioned authored feature-forcing schema for holes, boils, laterals, eddy lines, wave trains, shallow shelves, boulder push/damping, pins/releases, and flips.
 - [ ] Add low-default feature-forcing parameters and flow-response curves keyed by discharge, flow band, flow percentile, or boundary inflow.
 - [ ] Record feature-forcing manifests with active feature kinds, gain scales, flow-response curve IDs, conservation deltas, raft-coupling modifiers, and visual-only parameters.

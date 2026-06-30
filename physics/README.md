@@ -138,6 +138,15 @@ PYTHONPATH=src python -m raftsim.examples.generate_analytic_fixtures
 
 The suite writes `data/validation/milestone17/analytic_fixtures/manifest.json` plus per-fixture solver-neutral scenario packages and analytic reference files for lake-at-rest balance, sloping-channel friction, wet/dry shoreline, bed step, dam-break/bore, hydraulic jump, and transcritical bump diagnostics.
 
+Generate a validation report against the scenario initial states, or point the same report at per-fixture C++ frame CSV manifests or GeoClaw normalized NPZ manifests:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.run_analytic_fixture_validation
+PYTHONPATH=src python -m raftsim.examples.run_analytic_fixture_validation --candidate-kind cpp --candidate-root outputs/analytic_cpp
+PYTHONPATH=src python -m raftsim.examples.run_analytic_fixture_validation --candidate-kind geoclaw --candidate-root outputs/analytic_geoclaw
+```
+
 ## GeoClaw Reference Harness
 
 GeoClaw is the active offline reference target for river-water validation. It is an optional research dependency because local runs normally need the Clawpack Python modules plus a Fortran-capable build toolchain.
