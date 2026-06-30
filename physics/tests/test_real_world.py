@@ -3,9 +3,12 @@ import json
 import numpy as np
 
 from raftsim.real_world import (
+    CANDIDATE_RIVER_INVENTORY_FILE,
+    CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION,
     RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
     RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION,
     adaptive_solver_parameters,
+    build_candidate_river_inventory_package,
     build_player_selection_model,
     build_rapid_review_editor_workflow,
     build_real_world_corridor_package,
@@ -44,6 +47,26 @@ def test_candidate_inventory_covers_first_playable_sections_and_priorities():
     assert {"3dep_lidar_dem", "3dhp_nhd_flowlines", "naip_imagery", "nwis_gauge_11445500"}.issubset(
         set(first.data_priorities)
     )
+
+
+def test_candidate_river_inventory_package_links_primary_source_manifest():
+    inventory = build_candidate_river_inventory_package()
+    data = inventory.to_json_dict()
+    primary_link = data["section_source_manifests"][0]
+    planned_links = data["section_source_manifests"][1:]
+
+    assert data["schema_version"] == CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION
+    assert data["inventory_id"] == "raftsim.real_world_candidate_river_inventory.v0"
+    assert data["source_catalog"] == "source_catalog.json"
+    assert data["section_count"] == len(default_candidate_river_inventory())
+    assert data["primary_section"] == {
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+    }
+    assert primary_link["source_manifest_status"] == "drafted"
+    assert primary_link["source_manifest_path"] == "south_fork_american_chili_bar/source_manifest.json"
+    assert all(link["source_manifest_status"] == "planned" for link in planned_links)
+    assert any("seasonal flow bands" in criterion for criterion in data["selection_criteria"])
 
 
 def test_source_catalog_records_required_categories_and_attribution():
@@ -222,6 +245,8 @@ def test_south_fork_cascading_seed_suite_covers_low_median_and_high_flows():
 def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
     output_dir = write_real_world_seed_package(tmp_path / "real_world_data")
 
+    assert (output_dir.parent / CANDIDATE_RIVER_INVENTORY_FILE).exists()
+    assert (output_dir.parent / "candidate_rivers.json").exists()
     assert (output_dir / "source_manifest.json").exists()
     assert (output_dir / "flow_presets.json").exists()
     assert (output_dir / "rapid_candidates.geojson").exists()
@@ -232,12 +257,15 @@ def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
     assert len(cascading_dirs) == 3
 
     manifest = json.loads((output_dir / "source_manifest.json").read_text(encoding="utf-8"))
+    inventory = json.loads((output_dir.parent / CANDIDATE_RIVER_INVENTORY_FILE).read_text(encoding="utf-8"))
     workflow = json.loads((output_dir / RAPID_REVIEW_EDITOR_WORKFLOW_FILE).read_text(encoding="utf-8"))
     scenario = read_scenario2_5d_package(output_dir / "scenario")
     median_cascading_dir = next(path for path in cascading_dirs if "median_runnable" in path.name)
     cascading = read_cascading_scenario_package(median_cascading_dir)
     unreal_metadata_dir = median_cascading_dir / "unreal_corridor_metadata"
     assert manifest["schema_version"] == SOURCE_MANIFEST_SCHEMA_VERSION
+    assert inventory["schema_version"] == CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION
+    assert inventory["section_source_manifests"][0]["source_manifest_status"] == "drafted"
     assert workflow["schema_version"] == RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION
     assert "dem_lidar" in workflow["required_layer_ids"]
     assert scenario.metadata.scenario_type == "real_world"
