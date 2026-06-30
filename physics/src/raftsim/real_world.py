@@ -16,6 +16,7 @@ from .cascading import (
     DropTransitionMetadata2_5D,
     ReachMetadata2_5D,
     generate_california_pool_drop_cascading_scenario2_5d,
+    write_unreal_cascading_corridor_metadata,
 )
 from .scenario2_5d import (
     BoundaryCondition2_5D,
@@ -1175,7 +1176,8 @@ def write_real_world_seed_package(directory: str | Path) -> Path:
     generate_real_world_scenario2_5d().write_package(scenario_dir)
     cascading_dir = data_dir / "cascading_scenarios"
     for cascading_package in generate_south_fork_american_cascading_seed_scenarios():
-        cascading_package.write_package(cascading_dir / cascading_package.scenario.metadata.scenario_id)
+        cascading_scenario_dir = cascading_package.write_package(cascading_dir / cascading_package.scenario.metadata.scenario_id)
+        write_unreal_cascading_corridor_metadata(cascading_package, cascading_scenario_dir / "unreal_corridor_metadata")
     return data_dir
 
 

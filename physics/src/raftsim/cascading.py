@@ -31,6 +31,9 @@ FloatGrid = NDArray[np.float64]
 CASCADING_SCHEMA_VERSION = "raftsim.cascading2_5d.v0"
 CASCADING_METADATA_FILE = "cascading_metadata.json"
 CASCADING_ANNOTATIONS_FILE = "cascading_annotations.npz"
+UNREAL_CASCADING_CORRIDOR_METADATA_VERSION = "raftsim.unreal_cascading_corridor_metadata.v0"
+UNREAL_CASCADING_CORRIDOR_METADATA_FILE = "unreal_cascading_corridor_metadata.json"
+UNREAL_CASCADING_CORRIDOR_GRID_FILE = "unreal_cascading_reach_drop_grid.json"
 ReachKind2_5D = Literal["pool", "tongue", "drop", "wave_train", "eddy_recovery", "boulder_garden", "runout"]
 BankShapeKind2_5D = Literal["trapezoid", "bedrock", "alluvial", "vegetated", "constructed", "unknown"]
 DropGeometryKind2_5D = Literal["ramp", "ledge", "mixed"]
@@ -722,6 +725,98 @@ def read_cascading_scenario_package(path: str | Path) -> CascadingScenarioPackag
         reach_id_grid=reach_id_grid,
         drop_transition_id_grid=drop_transition_id_grid,
     )
+
+
+def build_unreal_cascading_corridor_metadata(package: CascadingScenarioPackage2_5D) -> dict[str, object]:
+    """Build Unreal-facing reach/drop metadata for streaming, overlays, audio, VFX, and review."""
+
+    scenario = package.scenario
+    reach_index = {str(index): reach.reach_id for index, reach in enumerate(package.reaches)}
+    drop_transition_index = {
+        str(index): transition.transition_id for index, transition in enumerate(package.drop_transitions)
+    }
+    streaming_tiles = [
+        _unreal_reach_streaming_tile(package, index, reach)
+        for index, reach in enumerate(package.reaches)
+    ]
+    drop_transitions = [
+        _unreal_drop_transition_zone(package, index, transition)
+        for index, transition in enumerate(package.drop_transitions)
+    ]
+    return {
+        "schema_version": UNREAL_CASCADING_CORRIDOR_METADATA_VERSION,
+        "scenario_id": scenario.metadata.scenario_id,
+        "river_id": scenario.metadata.river_id,
+        "section_id": scenario.metadata.section_id,
+        "flow_band": scenario.metadata.flow_band,
+        "difficulty_preset": scenario.metadata.difficulty_preset,
+        "coordinate_system": {
+            "solver_units": "meters",
+            "unreal_units": "centimeters",
+            "unreal_unit_scale_cm_per_meter": 100.0,
+            "station_axis": "x",
+            "lateral_axis": "y",
+            "vertical_axis": "z",
+            "origin_m": {
+                "x": scenario.grid.origin_x,
+                "y": scenario.grid.origin_y,
+                "z": 0.0,
+            },
+        },
+        "grid": {
+            "nx": scenario.grid.nx,
+            "ny": scenario.grid.ny,
+            "dx": scenario.grid.dx,
+            "dy": scenario.grid.dy,
+            "origin_x": scenario.grid.origin_x,
+            "origin_y": scenario.grid.origin_y,
+        },
+        "files": {
+            "metadata": UNREAL_CASCADING_CORRIDOR_METADATA_FILE,
+            "reach_drop_id_grid": UNREAL_CASCADING_CORRIDOR_GRID_FILE,
+            "source_cascading_metadata": CASCADING_METADATA_FILE,
+            "source_cascading_annotations": CASCADING_ANNOTATIONS_FILE,
+        },
+        "id_preservation": {
+            "reach_index": reach_index,
+            "drop_transition_index": drop_transition_index,
+            "reach_ids": [reach.reach_id for reach in package.reaches],
+            "drop_transition_ids": [transition.transition_id for transition in package.drop_transitions],
+        },
+        "streaming_tiles": streaming_tiles,
+        "drop_transition_zones": drop_transitions,
+        "debug_overlays": _unreal_debug_overlays(package, reach_index, drop_transition_index),
+        "audio_zones": _unreal_audio_zones(streaming_tiles, drop_transitions),
+        "vfx_zones": _unreal_vfx_zones(streaming_tiles, drop_transitions),
+        "designer_review": {
+            "scenario_description": scenario.metadata.description,
+            "reach_review_count": len(streaming_tiles),
+            "drop_transition_review_count": len(drop_transitions),
+            "confidence_score": scenario.metadata.confidence_score,
+            "review_flags": sorted(
+                {
+                    flag
+                    for reach in package.reaches
+                    for flag in (*reach.vegetation_flags, *reach.debris_flags)
+                }
+                | {tag for transition in package.drop_transitions for tag in transition.hazard_tags}
+            ),
+        },
+    }
+
+
+def write_unreal_cascading_corridor_metadata(
+    package: CascadingScenarioPackage2_5D,
+    directory: str | Path,
+) -> Path:
+    """Write Unreal-facing cascading corridor metadata and ID grids."""
+
+    output_dir = Path(directory)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    _write_json(output_dir / UNREAL_CASCADING_CORRIDOR_GRID_FILE, _unreal_reach_drop_grid(package))
+    metadata_path = output_dir / UNREAL_CASCADING_CORRIDOR_METADATA_FILE
+    _write_json(metadata_path, build_unreal_cascading_corridor_metadata(package))
+    return metadata_path
 
 
 def generate_california_pool_drop_cascading_scenario2_5d(
@@ -1483,6 +1578,362 @@ def _feature_influence(
     dx_norm = (x - feature.center[0]) / scale_x
     dy_norm = (y - feature.center[1]) / scale_y
     return np.exp(-(dx_norm**2 + dy_norm**2))
+
+
+def _unreal_reach_streaming_tile(
+    package: CascadingScenarioPackage2_5D,
+    index: int,
+    reach: ReachMetadata2_5D,
+) -> dict[str, object]:
+    mask = package.reach_id_grid == index
+    bounds = _unreal_reach_bounds(package, reach, mask)
+    return {
+        "tile_id": f"reach_{index:02d}_{reach.reach_id}",
+        "world_partition_layer": "river_reach",
+        "streaming_priority": _unreal_reach_streaming_priority(reach),
+        "reach_id": reach.reach_id,
+        "reach_kind": reach.kind,
+        "station_start": reach.station_start,
+        "station_end": reach.station_end,
+        "length": reach.length,
+        "bounds_m": bounds,
+        "cell_coverage": int(np.count_nonzero(mask)),
+        "local_grid": reach.local_grid.to_json_dict(),
+        "debug_overlay": {
+            "label": reach.reach_id,
+            "color_rgba": _unreal_reach_debug_color(reach.kind),
+            "show_station_labels": True,
+        },
+        "audio": {
+            "zone_id": f"audio_{reach.reach_id}",
+            "emitter_shape": "spline_segment",
+            "attenuation_preset": "large_water_reach",
+            "parameters": _unreal_reach_audio_parameters(package, reach, mask),
+        },
+        "vfx": {
+            "zone_id": f"vfx_{reach.reach_id}",
+            "effect_family": _unreal_reach_vfx_family(reach.kind),
+            "parameters": _unreal_reach_vfx_parameters(reach),
+        },
+        "designer_review": {
+            "display_name": reach.reach_id.replace("_", " ").title(),
+            "confidence_score": reach.confidence_score,
+            "bank_shape": reach.bank_shape.to_json_dict(),
+            "vegetation_flags": list(reach.vegetation_flags),
+            "debris_flags": list(reach.debris_flags),
+            "metadata": reach.metadata,
+            "linked_features": _unreal_feature_links(package, reach_id=reach.reach_id),
+        },
+    }
+
+
+def _unreal_drop_transition_zone(
+    package: CascadingScenarioPackage2_5D,
+    index: int,
+    transition: DropTransitionMetadata2_5D,
+) -> dict[str, object]:
+    mask = package.drop_transition_id_grid == index
+    bounds = _unreal_drop_bounds(package, transition, mask)
+    return {
+        "zone_id": f"drop_{index:02d}_{transition.transition_id}",
+        "world_partition_layer": "river_drop_transition",
+        "streaming_priority": 100,
+        "transition_id": transition.transition_id,
+        "upstream_reach_id": transition.upstream_reach_id,
+        "downstream_reach_id": transition.downstream_reach_id,
+        "crest_station": transition.crest_station,
+        "bounds_m": bounds,
+        "cell_coverage": int(np.count_nonzero(mask)),
+        "geometry_kind": transition.geometry_kind,
+        "bed_elevation_fall": transition.bed_elevation_fall,
+        "ramp_length": transition.ramp_length,
+        "ledge_length": transition.ledge_length,
+        "tailwater_depth": transition.tailwater_depth,
+        "expected_hydraulic_control": transition.expected_hydraulic_control,
+        "recirculation_risk": transition.recirculation_risk,
+        "aeration_proxy": transition.aeration_proxy,
+        "turbulence_proxy": transition.turbulence_proxy,
+        "hazard_tags": list(transition.hazard_tags),
+        "debug_overlay": {
+            "label": transition.transition_id,
+            "color_rgba": [1.0, 0.22, 0.08, 0.88],
+            "show_crest_marker": True,
+            "show_upstream_downstream_links": True,
+        },
+        "audio": {
+            "zone_id": f"audio_{transition.transition_id}",
+            "emitter_shape": "area_drop",
+            "attenuation_preset": "rapid_hazard",
+            "event_tags": sorted(set(("drop", "hydraulic", *transition.hazard_tags))),
+            "parameters": {
+                "recirculation_risk": transition.recirculation_risk,
+                "aeration": transition.aeration_proxy,
+                "turbulence": transition.turbulence_proxy,
+                "fall_m": transition.bed_elevation_fall,
+            },
+        },
+        "vfx": {
+            "zone_id": f"vfx_{transition.transition_id}",
+            "effect_family": "drop_hydraulic",
+            "event_tags": sorted(set(("foam", "spray", *transition.hazard_tags))),
+            "parameters": {
+                "foam_intensity": max(transition.aeration_proxy, transition.turbulence_proxy),
+                "spray_intensity": min(1.0, transition.bed_elevation_fall),
+                "recirculation": transition.recirculation_risk,
+            },
+        },
+        "designer_review": {
+            "display_name": transition.transition_id.replace("_", " ").title(),
+            "metadata": transition.metadata,
+            "review_focus": sorted(set(("line_choice", "safety", *transition.hazard_tags))),
+        },
+    }
+
+
+def _unreal_reach_drop_grid(package: CascadingScenarioPackage2_5D) -> dict[str, object]:
+    return {
+        "schema_version": "raftsim.unreal_cascading_reach_drop_grid.v0",
+        "scenario_id": package.scenario.metadata.scenario_id,
+        "grid": {
+            "nx": package.scenario.grid.nx,
+            "ny": package.scenario.grid.ny,
+            "dx": package.scenario.grid.dx,
+            "dy": package.scenario.grid.dy,
+            "origin_x": package.scenario.grid.origin_x,
+            "origin_y": package.scenario.grid.origin_y,
+        },
+        "reach_index": {str(index): reach.reach_id for index, reach in enumerate(package.reaches)},
+        "drop_transition_index": {
+            str(index): transition.transition_id for index, transition in enumerate(package.drop_transitions)
+        },
+        "reach_id_grid": package.reach_id_grid.tolist(),
+        "drop_transition_id_grid": package.drop_transition_id_grid.tolist(),
+    }
+
+
+def _unreal_debug_overlays(
+    package: CascadingScenarioPackage2_5D,
+    reach_index: dict[str, str],
+    drop_transition_index: dict[str, str],
+) -> list[dict[str, object]]:
+    return [
+        {
+            "overlay_id": "reach_id_grid",
+            "source_file": UNREAL_CASCADING_CORRIDOR_GRID_FILE,
+            "grid_field": "reach_id_grid",
+            "legend": reach_index,
+            "purpose": "World Partition reach streaming and designer/debug color overlays.",
+        },
+        {
+            "overlay_id": "drop_transition_id_grid",
+            "source_file": UNREAL_CASCADING_CORRIDOR_GRID_FILE,
+            "grid_field": "drop_transition_id_grid",
+            "legend": drop_transition_index,
+            "purpose": "Hydraulic transition debug markers and force/audio/VFX trigger zones.",
+        },
+        {
+            "overlay_id": "feature_reach_links",
+            "source_file": UNREAL_CASCADING_CORRIDOR_METADATA_FILE,
+            "feature_count": len(package.scenario.features),
+            "purpose": "Shows authored feature ownership by reach/drop metadata.",
+        },
+    ]
+
+
+def _unreal_audio_zones(
+    streaming_tiles: list[dict[str, object]],
+    drop_transitions: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    zones: list[dict[str, object]] = []
+    for tile in streaming_tiles:
+        audio = tile["audio"]
+        if isinstance(audio, dict):
+            zones.append({"owner_id": tile["reach_id"], **audio})
+    for transition in drop_transitions:
+        audio = transition["audio"]
+        if isinstance(audio, dict):
+            zones.append({"owner_id": transition["transition_id"], **audio})
+    return zones
+
+
+def _unreal_vfx_zones(
+    streaming_tiles: list[dict[str, object]],
+    drop_transitions: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    zones: list[dict[str, object]] = []
+    for tile in streaming_tiles:
+        vfx = tile["vfx"]
+        if isinstance(vfx, dict):
+            zones.append({"owner_id": tile["reach_id"], **vfx})
+    for transition in drop_transitions:
+        vfx = transition["vfx"]
+        if isinstance(vfx, dict):
+            zones.append({"owner_id": transition["transition_id"], **vfx})
+    return zones
+
+
+def _unreal_reach_bounds(
+    package: CascadingScenarioPackage2_5D,
+    reach: ReachMetadata2_5D,
+    mask: NDArray[np.bool_],
+) -> dict[str, float]:
+    half_width = _reach_max_width(reach) * 0.5
+    z_min, z_max = _vertical_bounds(package, mask)
+    return {
+        "min_x": reach.station_start,
+        "max_x": reach.station_end,
+        "min_y": -half_width,
+        "max_y": half_width,
+        "min_z": z_min,
+        "max_z": z_max,
+    }
+
+
+def _unreal_drop_bounds(
+    package: CascadingScenarioPackage2_5D,
+    transition: DropTransitionMetadata2_5D,
+    mask: NDArray[np.bool_],
+) -> dict[str, float]:
+    upstream = _reach_by_id(package.reaches, transition.upstream_reach_id)
+    downstream = _reach_by_id(package.reaches, transition.downstream_reach_id)
+    half_width = max(_reach_max_width(upstream), _reach_max_width(downstream)) * 0.55
+    half_length = max(transition.ramp_length + transition.ledge_length, package.scenario.grid.dx * 4.0) * 0.5
+    z_min, z_max = _vertical_bounds(package, mask)
+    return {
+        "min_x": transition.crest_station - half_length,
+        "max_x": transition.crest_station + half_length,
+        "min_y": -half_width,
+        "max_y": half_width,
+        "min_z": z_min,
+        "max_z": z_max,
+    }
+
+
+def _vertical_bounds(package: CascadingScenarioPackage2_5D, mask: NDArray[np.bool_]) -> tuple[float, float]:
+    if np.any(mask):
+        bed = package.scenario.bed[mask]
+        eta = package.scenario.initial_state.eta[mask]
+        return float(np.min(bed)), float(np.max(eta))
+    return float(np.min(package.scenario.bed)), float(np.max(package.scenario.initial_state.eta))
+
+
+def _reach_by_id(reaches: tuple[ReachMetadata2_5D, ...], reach_id: str) -> ReachMetadata2_5D:
+    for reach in reaches:
+        if reach.reach_id == reach_id:
+            return reach
+    raise ValueError(f"Unknown reach id: {reach_id}")
+
+
+def _reach_max_width(reach: ReachMetadata2_5D) -> float:
+    return max(point.value for point in reach.width_profile)
+
+
+def _reach_mean_slope(reach: ReachMetadata2_5D) -> float:
+    return float(sum(point.value for point in reach.slope_profile) / len(reach.slope_profile))
+
+
+def _unreal_reach_streaming_priority(reach: ReachMetadata2_5D) -> int:
+    priority_by_kind = {
+        "drop": 90,
+        "wave_train": 80,
+        "boulder_garden": 76,
+        "tongue": 70,
+        "eddy_recovery": 62,
+        "pool": 50,
+        "runout": 45,
+    }
+    return priority_by_kind.get(reach.kind, 50)
+
+
+def _unreal_reach_debug_color(kind: str) -> list[float]:
+    colors = {
+        "pool": [0.12, 0.42, 1.0, 0.62],
+        "tongue": [0.0, 0.84, 0.95, 0.68],
+        "drop": [1.0, 0.18, 0.08, 0.78],
+        "wave_train": [0.68, 0.92, 1.0, 0.72],
+        "eddy_recovery": [0.12, 0.72, 0.38, 0.68],
+        "boulder_garden": [0.56, 0.56, 0.56, 0.72],
+        "runout": [0.18, 0.34, 0.72, 0.58],
+    }
+    return colors.get(kind, [1.0, 1.0, 1.0, 0.55])
+
+
+def _unreal_reach_audio_parameters(
+    package: CascadingScenarioPackage2_5D,
+    reach: ReachMetadata2_5D,
+    mask: NDArray[np.bool_],
+) -> dict[str, float | str]:
+    speed = np.hypot(package.scenario.initial_state.u, package.scenario.initial_state.v)
+    if np.any(mask):
+        mean_speed = float(np.mean(speed[mask]))
+        max_speed = float(np.max(speed[mask]))
+    else:
+        mean_speed = float(np.mean(speed))
+        max_speed = float(np.max(speed))
+    return {
+        "reach_kind": reach.kind,
+        "mean_flow_speed": mean_speed,
+        "max_flow_speed": max_speed,
+        "roughness": reach.bed_roughness,
+        "boulder_density": reach.boulder_density,
+        "slope": _reach_mean_slope(reach),
+    }
+
+
+def _unreal_reach_vfx_family(kind: str) -> str:
+    families = {
+        "pool": "calm_pool",
+        "tongue": "fast_tongue",
+        "drop": "ledge_drop",
+        "wave_train": "standing_waves",
+        "eddy_recovery": "eddy_and_boil",
+        "boulder_garden": "boulder_spray",
+        "runout": "runout_flow",
+    }
+    return families.get(kind, "river_surface")
+
+
+def _unreal_reach_vfx_parameters(reach: ReachMetadata2_5D) -> dict[str, float | str]:
+    foam_by_kind = {
+        "pool": 0.08,
+        "tongue": 0.25,
+        "drop": 0.85,
+        "wave_train": 0.72,
+        "eddy_recovery": 0.36,
+        "boulder_garden": 0.58,
+        "runout": 0.16,
+    }
+    foam = min(1.0, foam_by_kind.get(reach.kind, 0.2) + reach.boulder_density * 0.25)
+    return {
+        "reach_kind": reach.kind,
+        "foam_intensity": foam,
+        "surface_chop": min(1.0, _reach_mean_slope(reach) * 16.0 + reach.boulder_density * 0.35),
+        "spray_probability": min(1.0, foam * 0.45 + reach.boulder_density * 0.25),
+    }
+
+
+def _unreal_feature_links(
+    package: CascadingScenarioPackage2_5D,
+    *,
+    reach_id: str,
+) -> list[dict[str, object]]:
+    links: list[dict[str, object]] = []
+    for index, feature in enumerate(package.scenario.features):
+        metadata = feature.metadata if isinstance(feature.metadata, dict) else {}
+        if metadata.get("reach_id") != reach_id:
+            continue
+        links.append(
+            {
+                "feature_index": index,
+                "kind": feature.kind,
+                "center_m": {"x": feature.center[0], "y": feature.center[1]},
+                "radius": feature.radius,
+                "length": feature.length,
+                "width": feature.width,
+                "pattern_role": metadata.get("pattern_role", ""),
+            }
+        )
+    return links
 
 
 def _smoothstep(value: float | FloatGrid) -> float | FloatGrid:

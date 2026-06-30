@@ -22,7 +22,11 @@ from raftsim.real_world import (
     write_real_world_seed_package,
 )
 from raftsim.examples.generate_real_world_scenario import main as generate_real_world_main
-from raftsim.cascading import read_cascading_scenario_package
+from raftsim.cascading import (
+    UNREAL_CASCADING_CORRIDOR_GRID_FILE,
+    UNREAL_CASCADING_CORRIDOR_METADATA_FILE,
+    read_cascading_scenario_package,
+)
 from raftsim.scenario2_5d import read_scenario2_5d_package
 from raftsim.schema_versions import SOURCE_MANIFEST_SCHEMA_VERSION
 
@@ -190,10 +194,13 @@ def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
     scenario = read_scenario2_5d_package(output_dir / "scenario")
     median_cascading_dir = next(path for path in cascading_dirs if "median_runnable" in path.name)
     cascading = read_cascading_scenario_package(median_cascading_dir)
+    unreal_metadata_dir = median_cascading_dir / "unreal_corridor_metadata"
     assert manifest["schema_version"] == SOURCE_MANIFEST_SCHEMA_VERSION
     assert scenario.metadata.scenario_type == "real_world"
     assert cascading.scenario.metadata.flow_band == "median_runnable"
     assert len(cascading.reaches) == 7
+    assert (unreal_metadata_dir / UNREAL_CASCADING_CORRIDOR_METADATA_FILE).exists()
+    assert (unreal_metadata_dir / UNREAL_CASCADING_CORRIDOR_GRID_FILE).exists()
 
 
 def test_generate_real_world_scenario_example_writes_selected_package(tmp_path):
