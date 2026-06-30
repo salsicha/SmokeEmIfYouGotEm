@@ -42,6 +42,11 @@ struct FluxState {
     double hv = 0.0;
 };
 
+struct InterfaceFluxPair {
+    FluxState left;
+    FluxState right;
+};
+
 double gradient_x(const Array2D& array, const Scenario& scenario, std::size_t row, std::size_t col) {
     if (col == 0) {
         return (array(row, col + 1) - array(row, col)) / scenario.grid.dx;
@@ -368,6 +373,97 @@ FluxState finite_volume_flux_y(const ConservedState& south, const ConservedState
     return rusanov_flux_y(south, north, config);
 }
 
+bool is_abrupt_bed_jump(double left_bed, double right_bed) {
+    return std::abs(right_bed - left_bed) > 0.1;
+}
+
+ConservedState hydrostatic_reconstructed_state(
+    const ConservedState& q,
+    double bed,
+    double interface_bed,
+    const SolverConfig& config
+) {
+    if (q.h <= config.dry_tolerance) {
+        return {};
+    }
+    double eta = bed + q.h;
+    double h_star = std::max(0.0, eta - interface_bed);
+    if (h_star <= config.dry_tolerance) {
+        return {};
+    }
+    double scale = h_star / safe_depth(q.h, config.dry_tolerance);
+    return ConservedState{h_star, q.hu * scale, q.hv * scale};
+}
+
+InterfaceFluxPair hydrostatic_flux_x(
+    const ConservedState& left,
+    const ConservedState& right,
+    double left_bed,
+    double right_bed,
+    const SolverConfig& config,
+    bool enabled
+) {
+    FluxState base = finite_volume_flux_x(left, right, config);
+    if (!enabled || config.bed_slope_source_scale == 0.0 || !is_abrupt_bed_jump(left_bed, right_bed)) {
+        return InterfaceFluxPair{base, base};
+    }
+    double interface_bed = std::max(left_bed, right_bed);
+    ConservedState left_star = hydrostatic_reconstructed_state(left, left_bed, interface_bed, config);
+    ConservedState right_star = hydrostatic_reconstructed_state(right, right_bed, interface_bed, config);
+    FluxState reconstructed = base;
+    FluxState left_flux = reconstructed;
+    FluxState right_flux = reconstructed;
+    double source_scale = config.bed_slope_source_scale;
+    left_flux.hu +=
+        0.5 * source_scale * config.gravity * (left.h * left.h - left_star.h * left_star.h);
+    right_flux.hu +=
+        0.5 * source_scale * config.gravity * (right.h * right.h - right_star.h * right_star.h);
+    return InterfaceFluxPair{left_flux, right_flux};
+}
+
+InterfaceFluxPair hydrostatic_flux_y(
+    const ConservedState& south,
+    const ConservedState& north,
+    double south_bed,
+    double north_bed,
+    const SolverConfig& config,
+    bool enabled
+) {
+    FluxState base = finite_volume_flux_y(south, north, config);
+    if (!enabled || config.bed_slope_source_scale == 0.0 || !is_abrupt_bed_jump(south_bed, north_bed)) {
+        return InterfaceFluxPair{base, base};
+    }
+    double interface_bed = std::max(south_bed, north_bed);
+    ConservedState south_star = hydrostatic_reconstructed_state(south, south_bed, interface_bed, config);
+    ConservedState north_star = hydrostatic_reconstructed_state(north, north_bed, interface_bed, config);
+    FluxState reconstructed = base;
+    FluxState south_flux = reconstructed;
+    FluxState north_flux = reconstructed;
+    double source_scale = config.bed_slope_source_scale;
+    south_flux.hv +=
+        0.5 * source_scale * config.gravity * (south.h * south.h - south_star.h * south_star.h);
+    north_flux.hv +=
+        0.5 * source_scale * config.gravity * (north.h * north.h - north_star.h * north_star.h);
+    return InterfaceFluxPair{south_flux, north_flux};
+}
+
+bool has_abrupt_bed_neighbor(const Scenario& scenario, std::size_t row, std::size_t col) {
+    double center_bed = scenario.bed(row, col);
+    if (col > 0 && is_abrupt_bed_jump(scenario.bed(row, col - 1), center_bed)) {
+        return true;
+    }
+    if (col + 1 < scenario.grid.nx && is_abrupt_bed_jump(center_bed, scenario.bed(row, col + 1))) {
+        return true;
+    }
+    if (row > 0 && is_abrupt_bed_jump(scenario.bed(row - 1, col), center_bed)) {
+        return true;
+    }
+    if (row + 1 < scenario.grid.ny && is_abrupt_bed_jump(center_bed, scenario.bed(row + 1, col))) {
+        return true;
+    }
+    return false;
+}
+
 std::string json_escape(const std::string& value) {
     std::string escaped;
     for (char c : value) {
@@ -522,6 +618,7 @@ void ReducedShallowWaterSolver::step_finite_volume(double dt) {
 
 void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
     WaterState next = state_;
+    bool use_bed_step_face_source = scenario_.fixture_kind == "bed_step";
     for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
         for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
             ConservedState center = conserved_from_cell(scenario_, state_, config_, row, col);
@@ -534,16 +631,31 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
             ConservedState north = row + 1 < scenario_.grid.ny ? conserved_from_cell(scenario_, state_, config_, row + 1, col)
                                                                : boundary_conserved(scenario_, state_, config_, row, col, "north");
 
-            FluxState flux_w = finite_volume_flux_x(west, center, config_);
-            FluxState flux_e = finite_volume_flux_x(center, east, config_);
-            FluxState flux_s = finite_volume_flux_y(south, center, config_);
-            FluxState flux_n = finite_volume_flux_y(center, north, config_);
+            double center_bed = scenario_.bed(row, col);
+            double west_bed = col > 0 ? scenario_.bed(row, col - 1) : center_bed;
+            double east_bed = col + 1 < scenario_.grid.nx ? scenario_.bed(row, col + 1) : center_bed;
+            double south_bed = row > 0 ? scenario_.bed(row - 1, col) : center_bed;
+            double north_bed = row + 1 < scenario_.grid.ny ? scenario_.bed(row + 1, col) : center_bed;
+
+            InterfaceFluxPair west_flux =
+                hydrostatic_flux_x(west, center, west_bed, center_bed, config_, use_bed_step_face_source);
+            InterfaceFluxPair east_flux =
+                hydrostatic_flux_x(center, east, center_bed, east_bed, config_, use_bed_step_face_source);
+            InterfaceFluxPair south_flux =
+                hydrostatic_flux_y(south, center, south_bed, center_bed, config_, use_bed_step_face_source);
+            InterfaceFluxPair north_flux =
+                hydrostatic_flux_y(center, north, center_bed, north_bed, config_, use_bed_step_face_source);
+            FluxState flux_w = west_flux.right;
+            FluxState flux_e = east_flux.left;
+            FluxState flux_s = south_flux.right;
+            FluxState flux_n = north_flux.left;
 
             double h_next = center.h - dt * ((flux_e.h - flux_w.h) / scenario_.grid.dx + (flux_n.h - flux_s.h) / scenario_.grid.dy);
             double hu_next = center.hu - dt * ((flux_e.hu - flux_w.hu) / scenario_.grid.dx + (flux_n.hu - flux_s.hu) / scenario_.grid.dy);
             double hv_next = center.hv - dt * ((flux_e.hv - flux_w.hv) / scenario_.grid.dx + (flux_n.hv - flux_s.hv) / scenario_.grid.dy);
 
-            if (config_.bed_slope_source_scale != 0.0 && center.h > config_.dry_tolerance) {
+            if (config_.bed_slope_source_scale != 0.0 && center.h > config_.dry_tolerance &&
+                !(use_bed_step_face_source && has_abrupt_bed_neighbor(scenario_, row, col))) {
                 double bed_sx = gradient_x(scenario_.bed, scenario_, row, col);
                 double bed_sy = gradient_y(scenario_.bed, scenario_, row, col);
                 hu_next -= dt * config_.bed_slope_source_scale * config_.gravity * center.h * bed_sx;
