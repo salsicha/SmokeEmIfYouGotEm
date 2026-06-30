@@ -18,6 +18,7 @@ from raftsim.cascading import (
     UNREAL_CASCADING_CORRIDOR_GRID_FILE,
     UNREAL_CASCADING_CORRIDOR_METADATA_FILE,
     UNREAL_CASCADING_CORRIDOR_METADATA_VERSION,
+    UNREAL_FIDELITY_REVIEW_OVERLAY_SCHEMA_VERSION,
     CaliforniaPoolDropParameters2_5D,
     CascadingScenarioPackage2_5D,
     DropTransitionMetadata2_5D,
@@ -472,6 +473,33 @@ def test_unreal_cascading_corridor_metadata_preserves_reach_and_drop_ids(tmp_pat
         "reach_id_grid",
         "drop_transition_id_grid",
     }
+    fidelity_review = exported["fidelity_review_overlays"]
+    fidelity_overlay_ids = {overlay["overlay_id"] for overlay in fidelity_review["overlays"]}
+    expected_outcome_overlay = next(
+        overlay for overlay in fidelity_review["overlays"] if overlay["overlay_id"] == "expected_outcomes"
+    )
+    assert fidelity_review["schema_version"] == UNREAL_FIDELITY_REVIEW_OVERLAY_SCHEMA_VERSION
+    assert fidelity_review["source_files"]["river_validation_annotations"] == "review/river_validation_annotations.geojson"
+    assert {
+        "annotation_geometry",
+        "solver_fields",
+        "raft_trajectories",
+        "rendered_water_foam_audio",
+        "audio_cues",
+        "expected_outcomes",
+    } <= fidelity_overlay_ids
+    assert fidelity_review["review_targets"][0]["transition_id"] == "ledge_drop_001"
+    assert fidelity_review["review_targets"][0]["review_overlays"] == [
+        "annotation_geometry",
+        "solver_fields",
+        "raft_trajectories",
+        "rendered_water_foam_audio",
+        "audio_cues",
+        "expected_outcomes",
+    ]
+    assert {"surf", "flush", "pin_risk"}.issubset(
+        set(expected_outcome_overlay["transition_outcomes"][0]["expected_outcomes"])
+    )
     assert "boulder_sieves" in exported["designer_review"]["review_flags"]
     assert grid["reach_index"]["0"] == package.reaches[0].reach_id
     assert grid["drop_transition_index"]["0"] == package.drop_transitions[0].transition_id

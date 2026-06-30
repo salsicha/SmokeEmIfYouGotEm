@@ -183,6 +183,7 @@ Tasks:
 - Validate large water-source behavior, ambisonic ambience rotation, binaural/HRTF localization, reverb zones, occlusion traces, and guide-seat readability for hazards and rescue cues.
 - Add debug view that compares solver fields and adaptive fluid parameters with visible water cues.
 - During game-engine fidelity review, overlay river annotations against GeoClaw/C++ fields, raft trajectories, rendered water features, foam/spray, audio cues, and expected surf/flush/pin/flip behavior.
+- `build_unreal_cascading_corridor_metadata()` now exports a `fidelity_review_overlays` contract for annotation geometry, stitched solver fields, raft transition checkpoints/trajectories, rendered water/foam/spray, audio cues, and expected surf/flush/pin/release/flip outcomes.
 - Define handoff from Python/geospatial/generated data to Unreal-authored content.
 
 Deliverable:
