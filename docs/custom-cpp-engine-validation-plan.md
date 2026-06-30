@@ -36,6 +36,14 @@ Flow response is mandatory. For example, a hole can be sticky in one flow range,
 
 Crew weight distribution is part of the validation surface. Seat occupancy, high-side, lean, brace, paddle timing, and recovery actions must change mass distribution, roll moment, contact loading, and pin/flip/release thresholds in deterministic raft telemetry. A forced rock or hydraulic feature may create a flip/pin hazard only if the player has a fair, validated counterplay window.
 
+## Analytic Fixture Decision
+
+Add a small manually encoded SWASHES-style analytic fixture set before more broad retuning. These fixtures should isolate solver fundamentals such as lake-at-rest balance, sloping-channel friction, wet/dry shoreline motion, bed steps, dam-break/bores, hydraulic jumps, and transcritical flow over a bump where practical.
+
+Each analytic fixture must include provenance notes that explain the source equation or benchmark family, why the case is representative, which fields are expected to be exact or approximate, and which tolerances are used. Do not vendor external SWASHES data or code until licensing, redistribution, update cadence, and maintenance ownership are clear.
+
+Analytic fixtures are diagnostic gates, not gameplay content. Parameter retuning for big rapids must not be accepted if it regresses these small cases.
+
 ## Non-Goals
 
 - Do not require full 3D CFD or Navier-Stokes simulation for the first accepted runtime.
@@ -52,6 +60,7 @@ Crew weight distribution is part of the validation surface. Seat occupancy, high
 - Define diagnostic metrics: mass drift, energy trend, Froude-class agreement, hydraulic-jump location, wave-train phase/amplitude, feature location/strength, and reach/drop boundary fluxes.
 - Define raft metrics: force-envelope error, trajectory deltas, surf/flush/clear/ground/pin/flip outcome agreement, and crossing stability at reach/drop boundaries.
 - Define feature-forcing bounds, low default gains, flow-response curves, conservation-failure guards, and manifest fields for physics, gameplay, and visual-only tuning.
+- Define the manually encoded analytic fixture manifest, provenance fields, expected metrics, and tolerance tiers.
 
 ## Phase 1: GeoClaw Reference Runs
 
