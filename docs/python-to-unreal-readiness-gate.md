@@ -8,16 +8,18 @@ Production Unreal work may continue with telemetry/replay playback and non-autho
 
 ## Artifacts
 
-Current Milestone 16 GeoClaw/C++ gate artifacts live in `physics/data/readiness/milestone_16/`:
+Current packaged Milestone 16 GeoClaw/C++ gate artifacts from the last full-gate generation live in `physics/data/readiness/milestone_16/`:
 
 - `geoclaw_reference_summary.json`: 20 of 20 full GeoClaw fixed-grid reference runs passed.
 - `cpp_solver_summary.json`: 40 of 40 reduced and finite-volume C++ runs completed with manifests.
 - `geoclaw_cpp_comparison_summary.json`: 4 of 40 GeoClaw/C++ threshold comparisons pass, so the comparison gate blocks.
 - `geometry_validation_summary.json`: 2 of 6 geometry families pass; wet/dry, bed-step, constriction, and drop/ledge/tailwater cases still block.
-- `raft_coupling_validation_summary.json`: 7 of 50 raft-coupling comparisons pass, so force, outcome, and transition agreement still block.
+- `raft_coupling_validation_summary.json`: 7 of 50 raft-coupling comparisons pass in the last packaged readiness snapshot, so force, outcome, and transition agreement still block.
 - `runtime_profile_summary.json`: 8 of 8 promoted C++ profile repetitions pass local desktop, VR, and handheld water-solver budgets.
-- `regression_promotion_summary.json`: 11 passing artifacts were promoted as regression fixtures or manifests.
+- `regression_promotion_summary.json`: 11 passing artifacts were promoted as regression fixtures or manifests in the last packaged readiness snapshot.
 - `geoclaw_to_unreal_readiness_report.json` and `.md`: final Milestone 16 decision; live custom water is blocked.
+
+Milestone 18 source reports are now ahead of that packaged readiness snapshot: `physics/reports/milestone16/raft_coupling_validation.json` has 9 of 50 raft-coupling comparisons passing, and `physics/reports/milestone16/regression_promotion_manifest.json` has 13 promoted artifacts. Keep the packaged readiness files unchanged until the explicit full-gate regeneration step.
 
 Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 

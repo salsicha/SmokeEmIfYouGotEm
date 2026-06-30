@@ -131,7 +131,7 @@ Each river-validation annotation should record its anchor location, source/prove
 
 ## Phase 4: Whitewater And Raft-Relevant Validation
 
-- Milestone 16 raft-coupling evidence is tracked in `physics/reports/milestone16/raft_coupling_validation.json` and `physics/reports/milestone16/raft_coupling_validation.md`; the gate remains blocked with 7 of 50 GeoClaw-vs-C++ raft comparisons passing, while force deltas, candidate feature checks, and several outcome classes still fail.
+- Milestone 16 raft-coupling evidence is tracked in `physics/reports/milestone16/raft_coupling_validation.json` and `physics/reports/milestone16/raft_coupling_validation.md`; after the first Milestone 18 finite-volume retune re-run, the gate remains blocked with 9 of 50 GeoClaw-vs-C++ raft comparisons passing, while force deltas, candidate feature checks, and several outcome classes still fail.
 - Re-run raft coupling over GeoClaw-derived fields and C++ runtime fields with the same probe/sample sets.
 - Validate pool entry, drop entry, hydraulic-hole surf/flush, downstream boil recovery, eddy recovery, boulder impacts, shallow shelves, pins/releases, and transition-boundary crossings.
 - Compare force envelopes, trajectory deltas, outcome classes, and contact/grounding events.
@@ -148,7 +148,7 @@ Each river-validation annotation should record its anchor location, source/prove
 
 ## Phase 6: Regression Fixtures And Reports
 
-- Milestone 16 promoted-regression evidence is tracked in `physics/reports/milestone16/regression_promotion_manifest.json`, `physics/reports/milestone16/regression_promotion_manifest.md`, and `physics/regression_fixtures/milestone16/registry.json`; 4 passing GeoClaw/C++ threshold runs were copied as fixtures and 7 passing raft-coupling cases were captured as artifact manifests.
+- Milestone 16 promoted-regression evidence is tracked in `physics/reports/milestone16/regression_promotion_manifest.json`, `physics/reports/milestone16/regression_promotion_manifest.md`, and `physics/regression_fixtures/milestone16/registry.json`; 4 passing GeoClaw/C++ threshold runs were copied as fixtures and 9 passing raft-coupling cases were captured as artifact manifests.
 - Promote passing GeoClaw/C++/raft comparison runs into committed regression fixtures or artifact manifests.
 - Generate one JSON report and one human-readable Markdown report for each scenario suite.
 - Keep a CI smoke subset that does not require external GeoClaw execution.
@@ -196,6 +196,8 @@ Each family should be promoted into regression artifacts when it passes. Do not 
 Re-run raft coupling after the relevant water-field and geometry failures improve. Compare GeoClaw-derived and C++ water fields with the same raft initial states, water samples, feature probes, crew actions, and contact setup.
 
 The raft gate must compare force envelopes, impulse timing, trajectory deltas, yaw/roll/pitch proxies, surf/flush/clear/ground/pin/flip outcome classes, recovery timing, swimmer/ejection state when present, and reach/drop transition stability. Retuning may adjust sampling, force integration, damping, contact thresholds, crew center-of-gravity effects, and feature-forcing modifiers only when the water-field diagnostics remain inside threshold.
+
+The first Milestone 18 raft-coupling re-run refreshed `physics/reports/milestone16/cpp_solver_runs.json`, `physics/reports/milestone16/raft_coupling_validation.json`, and `physics/reports/milestone16/regression_promotion_manifest.json` after the finite-volume uniform-channel retune. Passing raft outcomes increased from 7 to 9 of 50, adding finite-volume `downstream_boil_recovery` for `hydraulic_hole_downstream_boil` and finite-volume `pool_entry` for `south_fork_cascading_low_runnable`. The raft gate remains blocked and the full Milestone 16 gate still needs a separate re-run.
 
 ### 4. Distinct Pin/Release Fixture
 
