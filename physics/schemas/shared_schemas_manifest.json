@@ -25,6 +25,11 @@
       "name": "source_manifest",
       "version": "raftsim.source_manifest.v0",
       "file": "source_manifest.schema.json"
+    },
+    {
+      "name": "analytic_fixture_manifest",
+      "version": "raftsim.analytic_fixture_manifest.v0",
+      "file": "analytic_fixture_manifest.schema.json"
     }
   ]
 }

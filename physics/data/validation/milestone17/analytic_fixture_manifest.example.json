@@ -1,0 +1,67 @@
+{
+  "schema_version": "raftsim.analytic_fixture_manifest.v0",
+  "manifest_id": "milestone17_analytic_fixtures_example",
+  "fixture_set_version": "manual_swashes_style_seed_v0",
+  "generator": "manual_contract_example",
+  "generated_at": "2026-06-29T00:00:00Z",
+  "license_policy": {
+    "external_data_vendored": false,
+    "notes": "This example records hand-authored shallow-water benchmark families only. No external SWASHES data or code is vendored."
+  },
+  "fixtures": [
+    {
+      "fixture_id": "lake_at_rest_balance",
+      "title": "Lake At Rest Over Uneven Bed",
+      "benchmark_family": "well-balanced shallow-water steady state",
+      "scenario_kind": "lake_at_rest",
+      "provenance": {
+        "source_type": "analytic_equation",
+        "source_note": "Derived from eta = h + z_b constant with zero velocity.",
+        "derived_by": "raftsim milestone 17 planning",
+        "external_data_vendored": false
+      },
+      "equations": [
+        "eta(x,y) = h(x,y) + z_b(x,y) = constant",
+        "u(x,y) = 0",
+        "v(x,y) = 0"
+      ],
+      "expected_behavior": {
+        "summary": "A well-balanced solver keeps the free surface flat and velocity near zero over a non-flat bed.",
+        "exact_fields": [
+          "eta",
+          "u",
+          "v"
+        ],
+        "approximate_fields": [
+          "h"
+        ],
+        "failure_modes": [
+          "spurious velocity from bed-slope source imbalance",
+          "free-surface drift",
+          "negative depth near bed peaks"
+        ]
+      },
+      "tolerance_tier": "well_balanced",
+      "metrics": [
+        {
+          "metric_id": "surface_linf",
+          "field": "eta",
+          "norm": "linf",
+          "threshold": 1e-9,
+          "units": "m"
+        },
+        {
+          "metric_id": "speed_linf",
+          "field": "speed",
+          "norm": "linf",
+          "threshold": 1e-9,
+          "units": "m/s"
+        }
+      ],
+      "outputs": {
+        "scenario_package": "fixtures/lake_at_rest_balance/scenario",
+        "analytic_reference": "fixtures/lake_at_rest_balance/reference.json"
+      }
+    }
+  ]
+}
