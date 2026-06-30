@@ -173,12 +173,14 @@ Tasks:
 - Import Python-authored and real-world geospatial river sections with scenario metadata, source manifests, seasonal presets, difficulty presets, and validation confidence.
 - Build spline/volume/data-asset representation for river centerline, banks, cross sections, rapids, hazards, gauges, season/flow presets, and current fields.
 - Convert DEM/lidar, aerial/satellite masks, hydrography, and reviewed rapid annotations into Unreal terrain/corridor assets.
+- Build a river validation annotation editor for viewport pins, station spans, polygons, raft lines, footage timecodes, gauge-history snippets, aerial imagery references, guide notes, confidence, and expected raft outcomes.
 - Use Cesium for Unreal or equivalent geospatial tooling where it helps with real-world scale, WGS84 positioning, 3D Tiles, terrain, imagery, and georeferenced scene setup.
 - Create photo-real canyon/forest/desert/mountain river environment pipeline using Nanite rocks/canyon walls/terrain details, Nanite foliage, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, and advanced material layering where supported.
 - Add water material, foam lines, bubbles, waves, wet rocks, spray, mist, debris cues, aeration masks, turbulence masks, and seasonal water appearance.
 - Build first interactive 3D water-audio prototype from free/open, first-party generated, procedural, and AI-generated development assets: river bed, nearby rapid, hydraulic hole, eddy line, spray, foam, raft scrape, paddle catch, rock impact, weather, and canyon reflections driven by solver telemetry.
 - Validate large water-source behavior, ambisonic ambience rotation, binaural/HRTF localization, reverb zones, occlusion traces, and guide-seat readability for hazards and rescue cues.
 - Add debug view that compares solver fields and adaptive fluid parameters with visible water cues.
+- During game-engine fidelity review, overlay river annotations against GeoClaw/C++ fields, raft trajectories, rendered water features, foam/spray, audio cues, and expected surf/flush/pin/flip behavior.
 - Define handoff from Python/geospatial/generated data to Unreal-authored content.
 
 Deliverable:
