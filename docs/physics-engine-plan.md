@@ -139,6 +139,8 @@ Responsibilities:
 
 The C++ solver may use a simpler numerical model than GeoClaw, but the outputs must match GeoClaw well enough for raft-relevant behavior.
 
+Authored feature forcing is allowed in the C++ runtime only as a bounded, manifest-recorded, GeoClaw-compared tuning layer. It may expose holes, boils, laterals, eddy lines, wave trains, shallow shelves, boulder push/damping, pins/releases, and flips for gameplay and visualization, but the default gains remain low until the full GeoClaw/C++ geometry and raft-coupling gates pass. Forced features must be flow-dependent, with sticky/washout/low-water behavior tied to discharge or flow band rather than a single static strength.
+
 ## Raft Coupling
 
 The raft samples either solver through one interface:
@@ -159,6 +161,7 @@ For each raft sample point:
 - Apply added-mass approximation where useful.
 - Resolve bed, rock, ledge, and shallow grounding contact.
 - Apply paddle blade forces based on depth and relative water velocity.
+- Apply crew weight distribution from seat occupancy, lean, high-side, brace, paddle timing, and recovery actions.
 
 The same raft-force sampler should run against GeoClaw output and C++ runtime fields whenever possible.
 
@@ -178,6 +181,7 @@ Compare GeoClaw and C++ on:
 - Lateral/boil feature metrics
 - Raft force envelopes
 - Raft trajectory and outcome classification
+- Crew counterplay telemetry for high-side/brace/lean timing, weight distribution, and pin/flip/release outcomes
 
 Acceptance metrics should include L1/L2/Linf field errors, probe errors, feature-location error, mass drift, runtime cost, and scenario outcome agreement.
 
