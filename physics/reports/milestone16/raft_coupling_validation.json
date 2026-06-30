@@ -1,0 +1,5007 @@
+{
+  "comparison_count": 50,
+  "cpp_run_report": "reports/milestone16/cpp_solver_runs.json",
+  "failed_count": 43,
+  "geoclaw_reference_report": "reports/milestone16/geoclaw_reference_runs.json",
+  "notes": [
+    "Pin/release remains represented by shallow-shelf pivot/release and high-flow boulder/pin proxies; a distinct strainer or wrap fixture is still needed before production acceptance."
+  ],
+  "passed": false,
+  "passed_count": 7,
+  "records": [
+    {
+      "actual_scenario_id": "boulder_garden_seed_16",
+      "candidate_checks": [
+        {
+          "details": "Grounding contacts should include a submerged rock tag.",
+          "name": "rock_contact",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 14.0
+        },
+        {
+          "details": "Rock contact should happen below the water surface.",
+          "name": "submerged_depth",
+          "passed": false,
+          "threshold": 0.1,
+          "value": 0.0
+        },
+        {
+          "details": "Rock contact should scrape opposite raft travel.",
+          "name": "scrape_drag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 14.864921465968594
+        },
+        {
+          "details": "Rock contact should kick the raft upward.",
+          "name": "launch_acceleration",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 13.059109947643977
+        },
+        {
+          "details": "Off-center rock contact should pitch the raft during launch.",
+          "name": "pitch_launch",
+          "passed": false,
+          "threshold": 0.3,
+          "value": 0.2631432444795938
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_boulder/reduced/cpp_solver/boulder_garden_seed_16/frames/frame_0008.csv",
+      "candidate_outcome": "scraped",
+      "candidate_passed": false,
+      "case_id": "boulder_impacts",
+      "expected_outcomes": [
+        "grounded",
+        "pinned"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": null,
+      "force_delta_weight_ratio": 1.562420493985674,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "boulder_garden",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "C++ raft feature checks are not passing.",
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "Grounding contacts should include a submerged rock tag.",
+          "name": "rock_contact",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.0
+        },
+        {
+          "details": "Rock contact should happen below the water surface.",
+          "name": "submerged_depth",
+          "passed": false,
+          "threshold": 0.1,
+          "value": 0.0
+        },
+        {
+          "details": "Rock contact should scrape opposite raft travel.",
+          "name": "scrape_drag",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.0
+        },
+        {
+          "details": "Rock contact should kick the raft upward.",
+          "name": "launch_acceleration",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.0
+        },
+        {
+          "details": "Off-center rock contact should pitch the raft during launch.",
+          "name": "pitch_launch",
+          "passed": false,
+          "threshold": 0.3,
+          "value": 0.0
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_boulder/normalized/frames/frame_0002.npz",
+      "reference_outcome": "scraped",
+      "reference_passed": false,
+      "solver_mode": "reduced",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 0.42618131472034015,
+      "trajectory_position_delta_m": 0.004257595846111086,
+      "trajectory_velocity_delta_mps": 0.25545575076665783
+    },
+    {
+      "actual_scenario_id": "boulder_garden_seed_16",
+      "candidate_checks": [
+        {
+          "details": "Grounding contacts should include a submerged rock tag.",
+          "name": "rock_contact",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.0
+        },
+        {
+          "details": "Rock contact should happen below the water surface.",
+          "name": "submerged_depth",
+          "passed": false,
+          "threshold": 0.1,
+          "value": 0.0
+        },
+        {
+          "details": "Rock contact should scrape opposite raft travel.",
+          "name": "scrape_drag",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.0
+        },
+        {
+          "details": "Rock contact should kick the raft upward.",
+          "name": "launch_acceleration",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.0
+        },
+        {
+          "details": "Off-center rock contact should pitch the raft during launch.",
+          "name": "pitch_launch",
+          "passed": false,
+          "threshold": 0.3,
+          "value": 0.0
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_boulder/finite_volume/cpp_solver/boulder_garden_seed_16/frames/frame_0008.csv",
+      "candidate_outcome": "scraped",
+      "candidate_passed": false,
+      "case_id": "boulder_impacts",
+      "expected_outcomes": [
+        "grounded",
+        "pinned"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": null,
+      "force_delta_weight_ratio": 1.439912670505428,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "boulder_garden",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "C++ raft feature checks are not passing.",
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "Grounding contacts should include a submerged rock tag.",
+          "name": "rock_contact",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.0
+        },
+        {
+          "details": "Rock contact should happen below the water surface.",
+          "name": "submerged_depth",
+          "passed": false,
+          "threshold": 0.1,
+          "value": 0.0
+        },
+        {
+          "details": "Rock contact should scrape opposite raft travel.",
+          "name": "scrape_drag",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.0
+        },
+        {
+          "details": "Rock contact should kick the raft upward.",
+          "name": "launch_acceleration",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.0
+        },
+        {
+          "details": "Off-center rock contact should pitch the raft during launch.",
+          "name": "pitch_launch",
+          "passed": false,
+          "threshold": 0.3,
+          "value": 0.0
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_boulder/normalized/frames/frame_0002.npz",
+      "reference_outcome": "scraped",
+      "reference_passed": false,
+      "solver_mode": "finite_volume",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 0.5877784478744511,
+      "trajectory_position_delta_m": 0.003923762027126044,
+      "trajectory_velocity_delta_mps": 0.23542572162763756
+    },
+    {
+      "actual_scenario_id": "cascading_wave_train_seed_17",
+      "candidate_checks": [
+        {
+          "details": "Surface normal should show a measurable crest face.",
+          "name": "crest_lift",
+          "passed": false,
+          "threshold": 0.05,
+          "value": 0.026687180698380164
+        },
+        {
+          "details": "Standing wave lift should remain finite and non-negative.",
+          "name": "bounded_vertical_force",
+          "passed": true,
+          "threshold": 6.0,
+          "value": 1.2707508194013657
+        },
+        {
+          "details": "Outcome must be one of the standing-wave labels.",
+          "name": "outcome_classified",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_waves/reduced/cpp_solver/cascading_wave_train_seed_17/frames/frame_0008.csv",
+      "candidate_outcome": "flush",
+      "candidate_passed": false,
+      "case_id": "wave_train_surf_flush",
+      "expected_outcomes": [
+        "clear",
+        "stalled",
+        "surfed",
+        "flushed"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": null,
+      "force_delta_weight_ratio": 2.559323612298782,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "cascading_wave_train",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "Torque delta exceeds the inertia-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "Surface normal should show a measurable crest face.",
+          "name": "crest_lift",
+          "passed": false,
+          "threshold": 0.05,
+          "value": 0.03078624527019369
+        },
+        {
+          "details": "Standing wave lift should remain finite and non-negative.",
+          "name": "bounded_vertical_force",
+          "passed": true,
+          "threshold": 6.0,
+          "value": 1.978340506113141
+        },
+        {
+          "details": "Outcome must be one of the standing-wave labels.",
+          "name": "outcome_classified",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_waves/normalized/frames/frame_0002.npz",
+      "reference_outcome": "surf",
+      "reference_passed": false,
+      "solver_mode": "reduced",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 3.9900754295951315,
+      "trajectory_position_delta_m": 0.006974156843513104,
+      "trajectory_velocity_delta_mps": 0.418449410610851
+    },
+    {
+      "actual_scenario_id": "cascading_wave_train_seed_17",
+      "candidate_checks": [
+        {
+          "details": "Surface normal should show a measurable crest face.",
+          "name": "crest_lift",
+          "passed": false,
+          "threshold": 0.05,
+          "value": 0.04924475629030889
+        },
+        {
+          "details": "Standing wave lift should remain finite and non-negative.",
+          "name": "bounded_vertical_force",
+          "passed": true,
+          "threshold": 6.0,
+          "value": 2.2206730730713353
+        },
+        {
+          "details": "Outcome must be one of the standing-wave labels.",
+          "name": "outcome_classified",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_waves/finite_volume/cpp_solver/cascading_wave_train_seed_17/frames/frame_0008.csv",
+      "candidate_outcome": "flush",
+      "candidate_passed": false,
+      "case_id": "wave_train_surf_flush",
+      "expected_outcomes": [
+        "clear",
+        "stalled",
+        "surfed",
+        "flushed"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": null,
+      "force_delta_weight_ratio": 2.239184901294926,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "cascading_wave_train",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "Surface normal should show a measurable crest face.",
+          "name": "crest_lift",
+          "passed": false,
+          "threshold": 0.05,
+          "value": 0.03078624527019369
+        },
+        {
+          "details": "Standing wave lift should remain finite and non-negative.",
+          "name": "bounded_vertical_force",
+          "passed": true,
+          "threshold": 6.0,
+          "value": 1.978340506113141
+        },
+        {
+          "details": "Outcome must be one of the standing-wave labels.",
+          "name": "outcome_classified",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_waves/normalized/frames/frame_0002.npz",
+      "reference_outcome": "surf",
+      "reference_passed": false,
+      "solver_mode": "finite_volume",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 2.341552616789049,
+      "trajectory_position_delta_m": 0.006101778856029625,
+      "trajectory_velocity_delta_mps": 0.36610673136172056
+    },
+    {
+      "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "depression",
+          "passed": false,
+          "threshold": 0.08,
+          "value": 0.03474824558292988
+        },
+        {
+          "details": "Upstream hole velocity should be slow or reversing.",
+          "name": "upstream_retention",
+          "passed": true,
+          "threshold": 0.15,
+          "value": -0.04132169245368502
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.9338365221507011
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": false,
+          "threshold": 0.5,
+          "value": 0.0377872904558336
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_hole/reduced/cpp_solver/hydraulic_hole_downstream_boil_seed_18/frames/frame_0008.csv",
+      "candidate_outcome": "flush",
+      "candidate_passed": false,
+      "case_id": "hydraulic_hole_surf_flush",
+      "expected_outcomes": [
+        "surfed",
+        "flushed",
+        "pinned"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": null,
+      "force_delta_weight_ratio": 2.0747771849130934,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "hydraulic_hole_downstream_boil",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "C++ raft feature checks are not passing.",
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "depression",
+          "passed": false,
+          "threshold": 0.08,
+          "value": 0.012019770934491247
+        },
+        {
+          "details": "Upstream hole velocity should be slow or reversing.",
+          "name": "upstream_retention",
+          "passed": false,
+          "threshold": 0.15,
+          "value": 1.0414238445499535
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.5127384067065511
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 2.0654605397829355
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_hole/normalized/frames/frame_0002.npz",
+      "reference_outcome": "flush",
+      "reference_passed": false,
+      "solver_mode": "reduced",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 0.15516524907044893,
+      "trajectory_position_delta_m": 0.0056537678288882095,
+      "trajectory_velocity_delta_mps": 0.33922606973329084
+    },
+    {
+      "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "boil_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "Boil should form a measurable upwelling dome.",
+          "name": "surface_dome",
+          "passed": true,
+          "threshold": 0.03,
+          "value": 0.14139402491192787
+        },
+        {
+          "details": "Boil should impart upward raft acceleration.",
+          "name": "vertical_impulse",
+          "passed": false,
+          "threshold": 2.0,
+          "value": 0.0
+        },
+        {
+          "details": "Repeated force sampling should return identical boil impulses.",
+          "name": "deterministic_repeat",
+          "passed": true,
+          "threshold": 1e-09,
+          "value": 0.0
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_hole/reduced/cpp_solver/hydraulic_hole_downstream_boil_seed_18/frames/frame_0008.csv",
+      "candidate_outcome": "flat",
+      "candidate_passed": false,
+      "case_id": "downstream_boil_recovery",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": null,
+      "force_delta_weight_ratio": 3.853442200053351,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "hydraulic_hole_downstream_boil",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "Torque delta exceeds the inertia-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "boil_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "Boil should form a measurable upwelling dome.",
+          "name": "surface_dome",
+          "passed": true,
+          "threshold": 0.03,
+          "value": 0.2212845796280189
+        },
+        {
+          "details": "Boil should impart upward raft acceleration.",
+          "name": "vertical_impulse",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 8.185559832125405
+        },
+        {
+          "details": "Repeated force sampling should return identical boil impulses.",
+          "name": "deterministic_repeat",
+          "passed": true,
+          "threshold": 1e-09,
+          "value": 0.0
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_hole/normalized/frames/frame_0002.npz",
+      "reference_outcome": "upwelling",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 2.5110061774877313,
+      "trajectory_position_delta_m": 0.010500629995145824,
+      "trajectory_velocity_delta_mps": 0.6300377997087231
+    },
+    {
+      "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "depression",
+          "passed": true,
+          "threshold": 0.08,
+          "value": 0.24223665432752833
+        },
+        {
+          "details": "Upstream hole velocity should be slow or reversing.",
+          "name": "upstream_retention",
+          "passed": true,
+          "threshold": 0.15,
+          "value": -2.0971761345979023
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.3757002556965586
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": false,
+          "threshold": 0.5,
+          "value": 0.0653557039242999
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_hole/finite_volume/cpp_solver/hydraulic_hole_downstream_boil_seed_18/frames/frame_0008.csv",
+      "candidate_outcome": "flush",
+      "candidate_passed": false,
+      "case_id": "hydraulic_hole_surf_flush",
+      "expected_outcomes": [
+        "surfed",
+        "flushed",
+        "pinned"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": null,
+      "force_delta_weight_ratio": 4.167010487293791,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "hydraulic_hole_downstream_boil",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "C++ raft feature checks are not passing.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "depression",
+          "passed": false,
+          "threshold": 0.08,
+          "value": 0.012019770934491247
+        },
+        {
+          "details": "Upstream hole velocity should be slow or reversing.",
+          "name": "upstream_retention",
+          "passed": false,
+          "threshold": 0.15,
+          "value": 1.0414238445499535
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.5127384067065511
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 2.0654605397829355
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_hole/normalized/frames/frame_0002.npz",
+      "reference_outcome": "flush",
+      "reference_passed": false,
+      "solver_mode": "finite_volume",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 2.4284780058482105,
+      "trajectory_position_delta_m": 0.011355103577876276,
+      "trajectory_velocity_delta_mps": 0.681306214672535
+    },
+    {
+      "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "boil_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "Boil should form a measurable upwelling dome.",
+          "name": "surface_dome",
+          "passed": true,
+          "threshold": 0.03,
+          "value": 0.13291742894871467
+        },
+        {
+          "details": "Boil should impart upward raft acceleration.",
+          "name": "vertical_impulse",
+          "passed": false,
+          "threshold": 2.0,
+          "value": 0.3996776378029132
+        },
+        {
+          "details": "Repeated force sampling should return identical boil impulses.",
+          "name": "deterministic_repeat",
+          "passed": true,
+          "threshold": 1e-09,
+          "value": 0.0
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_hole/finite_volume/cpp_solver/hydraulic_hole_downstream_boil_seed_18/frames/frame_0008.csv",
+      "candidate_outcome": "flat",
+      "candidate_passed": false,
+      "case_id": "downstream_boil_recovery",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": null,
+      "force_delta_weight_ratio": 5.438010501076746,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "hydraulic_hole_downstream_boil",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "boil_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "Boil should form a measurable upwelling dome.",
+          "name": "surface_dome",
+          "passed": true,
+          "threshold": 0.03,
+          "value": 0.2212845796280189
+        },
+        {
+          "details": "Boil should impart upward raft acceleration.",
+          "name": "vertical_impulse",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 8.185559832125405
+        },
+        {
+          "details": "Repeated force sampling should return identical boil impulses.",
+          "name": "deterministic_repeat",
+          "passed": true,
+          "threshold": 1e-09,
+          "value": 0.0
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_hole/normalized/frames/frame_0002.npz",
+      "reference_outcome": "upwelling",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 2.1893210504222917,
+      "trajectory_position_delta_m": 0.014818578615437972,
+      "trajectory_velocity_delta_mps": 0.8891147169260483
+    },
+    {
+      "actual_scenario_id": "lateral_wave_seed_19",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "lateral_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "Lateral wave should expose a meaningful cross-current.",
+          "name": "cross_current",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.028164986732720967
+        },
+        {
+          "details": "Integrated raft forces should push the raft sideways.",
+          "name": "side_impulse",
+          "passed": true,
+          "threshold": 0.12,
+          "value": 54.61100297148656
+        },
+        {
+          "details": "Asymmetric water loading should create roll acceleration.",
+          "name": "roll_torque",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 194.26892938779943
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_lateral/reduced/cpp_solver/lateral_wave_seed_19/frames/frame_0008.csv",
+      "candidate_outcome": "clear",
+      "candidate_passed": false,
+      "case_id": "lateral_wave_side_impulse",
+      "expected_outcomes": [
+        "clear",
+        "surfed"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": null,
+      "force_delta_weight_ratio": 0.5033108173862423,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "lateral_wave",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "C++ raft feature checks are not passing."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "lateral_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "Lateral wave should expose a meaningful cross-current.",
+          "name": "cross_current",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.11759968745490737
+        },
+        {
+          "details": "Integrated raft forces should push the raft sideways.",
+          "name": "side_impulse",
+          "passed": true,
+          "threshold": 0.12,
+          "value": 56.20744224754625
+        },
+        {
+          "details": "Asymmetric water loading should create roll acceleration.",
+          "name": "roll_torque",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 196.1771522796502
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_lateral/normalized/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": false,
+      "solver_mode": "reduced",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 1.5567166428777681,
+      "trajectory_position_delta_m": 0.0013715219773775653,
+      "trajectory_velocity_delta_mps": 0.08229131864265063
+    },
+    {
+      "actual_scenario_id": "lateral_wave_seed_19",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "lateral_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "Lateral wave should expose a meaningful cross-current.",
+          "name": "cross_current",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 1.6155193607391825
+        },
+        {
+          "details": "Integrated raft forces should push the raft sideways.",
+          "name": "side_impulse",
+          "passed": true,
+          "threshold": 0.12,
+          "value": 74.39957852330437
+        },
+        {
+          "details": "Asymmetric water loading should create roll acceleration.",
+          "name": "roll_torque",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 224.67251846593356
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_lateral/finite_volume/cpp_solver/lateral_wave_seed_19/frames/frame_0008.csv",
+      "candidate_outcome": "side_surf",
+      "candidate_passed": true,
+      "case_id": "lateral_wave_side_impulse",
+      "expected_outcomes": [
+        "clear",
+        "surfed"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": null,
+      "force_delta_weight_ratio": 2.212788192758609,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "lateral_wave",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "Torque delta exceeds the inertia-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "lateral_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "Lateral wave should expose a meaningful cross-current.",
+          "name": "cross_current",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.11759968745490737
+        },
+        {
+          "details": "Integrated raft forces should push the raft sideways.",
+          "name": "side_impulse",
+          "passed": true,
+          "threshold": 0.12,
+          "value": 56.20744224754625
+        },
+        {
+          "details": "Asymmetric water loading should create roll acceleration.",
+          "name": "roll_torque",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 196.1771522796502
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_lateral/normalized/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": false,
+      "solver_mode": "finite_volume",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 10.062619675667817,
+      "trajectory_position_delta_m": 0.006029847825266926,
+      "trajectory_velocity_delta_mps": 0.36179086951603284
+    },
+    {
+      "actual_scenario_id": "eddy_line_shear_seed_20",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "Current should change sharply across the raft width.",
+          "name": "shear_velocity",
+          "passed": true,
+          "threshold": 0.6,
+          "value": 1.0420099431258072
+        },
+        {
+          "details": "Differential current should rotate the raft around vertical.",
+          "name": "yaw_torque",
+          "passed": true,
+          "threshold": 0.4,
+          "value": 9.039818055727816
+        },
+        {
+          "details": "Eddy-line crossing should also couple into roll.",
+          "name": "roll_coupling",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 44.91237913971108
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_eddy/reduced/cpp_solver/eddy_line_shear_seed_20/frames/frame_0008.csv",
+      "candidate_outcome": "eddy_coupled",
+      "candidate_passed": true,
+      "case_id": "eddy_recovery",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": null,
+      "force_delta_weight_ratio": 1.8245184814776154,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "eddy_line_shear",
+      "notes": [
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "Current should change sharply across the raft width.",
+          "name": "shear_velocity",
+          "passed": true,
+          "threshold": 0.6,
+          "value": 1.4077247178860992
+        },
+        {
+          "details": "Differential current should rotate the raft around vertical.",
+          "name": "yaw_torque",
+          "passed": true,
+          "threshold": 0.4,
+          "value": 8.907502332359927
+        },
+        {
+          "details": "Eddy-line crossing should also couple into roll.",
+          "name": "roll_coupling",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 54.68396427531284
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_eddy/normalized/frames/frame_0002.npz",
+      "reference_outcome": "eddy_coupled",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 1.491640347871463,
+      "trajectory_position_delta_m": 0.004971812862030393,
+      "trajectory_velocity_delta_mps": 0.2983087717215902
+    },
+    {
+      "actual_scenario_id": "eddy_line_shear_seed_20",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "Current should change sharply across the raft width.",
+          "name": "shear_velocity",
+          "passed": true,
+          "threshold": 0.6,
+          "value": 2.6548373855650227
+        },
+        {
+          "details": "Differential current should rotate the raft around vertical.",
+          "name": "yaw_torque",
+          "passed": true,
+          "threshold": 0.4,
+          "value": 8.642630460758562
+        },
+        {
+          "details": "Eddy-line crossing should also couple into roll.",
+          "name": "roll_coupling",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 51.93947938627511
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_eddy/finite_volume/cpp_solver/eddy_line_shear_seed_20/frames/frame_0008.csv",
+      "candidate_outcome": "eddy_coupled",
+      "candidate_passed": true,
+      "case_id": "eddy_recovery",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": null,
+      "force_delta_weight_ratio": 1.3679098981560218,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "eddy_line_shear",
+      "notes": [
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "Current should change sharply across the raft width.",
+          "name": "shear_velocity",
+          "passed": true,
+          "threshold": 0.6,
+          "value": 1.4077247178860992
+        },
+        {
+          "details": "Differential current should rotate the raft around vertical.",
+          "name": "yaw_torque",
+          "passed": true,
+          "threshold": 0.4,
+          "value": 8.907502332359927
+        },
+        {
+          "details": "Eddy-line crossing should also couple into roll.",
+          "name": "roll_coupling",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 54.68396427531284
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_eddy/normalized/frames/frame_0002.npz",
+      "reference_outcome": "eddy_coupled",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 2.187149889646177,
+      "trajectory_position_delta_m": 0.003727554472478522,
+      "trajectory_velocity_delta_mps": 0.22365326834850954
+    },
+    {
+      "actual_scenario_id": "shallow_shelf_seed_21",
+      "candidate_checks": [
+        {
+          "details": "Grounding contacts should include a shallow shelf tag.",
+          "name": "shallow_contact",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 13.0
+        },
+        {
+          "details": "Shelf contact should occur in shallow water.",
+          "name": "shallow_depth",
+          "passed": true,
+          "threshold": 0.35,
+          "value": 0.0
+        },
+        {
+          "details": "Grounding force should support a meaningful share of raft weight.",
+          "name": "grounding_support",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 8.908450581601228
+        },
+        {
+          "details": "Off-center shelf contact should pivot the raft.",
+          "name": "pivot_yaw",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 18.687572847285093
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_shelf/reduced/cpp_solver/shallow_shelf_seed_21/frames/frame_0008.csv",
+      "candidate_outcome": "pivoted",
+      "candidate_passed": true,
+      "case_id": "shallow_shelf_pivot_release",
+      "expected_outcomes": [
+        "grounded",
+        "pinned"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": null,
+      "force_delta_weight_ratio": 0.8623755252301205,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "shallow_shelf",
+      "notes": [],
+      "passed": true,
+      "reference_checks": [
+        {
+          "details": "Grounding contacts should include a shallow shelf tag.",
+          "name": "shallow_contact",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 7.0
+        },
+        {
+          "details": "Shelf contact should occur in shallow water.",
+          "name": "shallow_depth",
+          "passed": true,
+          "threshold": 0.35,
+          "value": 4.2773710222263627e-07
+        },
+        {
+          "details": "Grounding force should support a meaningful share of raft weight.",
+          "name": "grounding_support",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 8.235987927295065
+        },
+        {
+          "details": "Off-center shelf contact should pivot the raft.",
+          "name": "pivot_yaw",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 20.18441062783289
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_shelf/normalized/frames/frame_0002.npz",
+      "reference_outcome": "pivoted",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 2.3286381408928993,
+      "trajectory_position_delta_m": 0.0023499733062520055,
+      "trajectory_velocity_delta_mps": 0.1409983983751247
+    },
+    {
+      "actual_scenario_id": "shallow_shelf_seed_21",
+      "candidate_checks": [
+        {
+          "details": "Grounding contacts should include a shallow shelf tag.",
+          "name": "shallow_contact",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 9.0
+        },
+        {
+          "details": "Shelf contact should occur in shallow water.",
+          "name": "shallow_depth",
+          "passed": true,
+          "threshold": 0.35,
+          "value": 0.0416032927369683
+        },
+        {
+          "details": "Grounding force should support a meaningful share of raft weight.",
+          "name": "grounding_support",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 8.46014214539712
+        },
+        {
+          "details": "Off-center shelf contact should pivot the raft.",
+          "name": "pivot_yaw",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 19.914044672870094
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/r_shelf/finite_volume/cpp_solver/shallow_shelf_seed_21/frames/frame_0008.csv",
+      "candidate_outcome": "pivoted",
+      "candidate_passed": true,
+      "case_id": "shallow_shelf_pivot_release",
+      "expected_outcomes": [
+        "grounded",
+        "pinned"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": null,
+      "force_delta_weight_ratio": 3.0336672981958333,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "shallow_shelf",
+      "notes": [
+        "Force delta exceeds the weight-normalized threshold.",
+        "Torque delta exceeds the inertia-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "Grounding contacts should include a shallow shelf tag.",
+          "name": "shallow_contact",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 7.0
+        },
+        {
+          "details": "Shelf contact should occur in shallow water.",
+          "name": "shallow_depth",
+          "passed": true,
+          "threshold": 0.35,
+          "value": 4.2773710222263627e-07
+        },
+        {
+          "details": "Grounding force should support a meaningful share of raft weight.",
+          "name": "grounding_support",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 8.235987927295065
+        },
+        {
+          "details": "Off-center shelf contact should pivot the raft.",
+          "name": "pivot_yaw",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 20.18441062783289
+        }
+      ],
+      "reference_frame": "outputs/m16g/r_shelf/normalized/frames/frame_0002.npz",
+      "reference_outcome": "pivoted",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "rafting",
+      "torque_delta_inertia_ratio": 5.404218122917938,
+      "trajectory_position_delta_m": 0.008266743387584376,
+      "trajectory_velocity_delta_mps": 0.4960046032550189
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "pool_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_depth",
+          "passed": false,
+          "threshold": 0.8,
+          "value": 0.526652121388205
+        },
+        {
+          "details": "",
+          "name": "pool_slower_than_tongue",
+          "passed": false,
+          "threshold": 1.1157515444126591,
+          "value": 1.2243505100396979
+        },
+        {
+          "details": "",
+          "name": "bounded_lift",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 1.9903841339000554
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_low/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "stalled",
+      "candidate_passed": false,
+      "case_id": "pool_entry",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "low_runnable",
+      "force_delta_weight_ratio": 2.0066907193165915,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "pool_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_depth",
+          "passed": true,
+          "threshold": 0.8,
+          "value": 1.2608861888011464
+        },
+        {
+          "details": "",
+          "name": "pool_slower_than_tongue",
+          "passed": true,
+          "threshold": 2.177110006431442,
+          "value": 0.9403136891285476
+        },
+        {
+          "details": "",
+          "name": "bounded_lift",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 2.0046719451494215
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.04493686008031177,
+      "trajectory_position_delta_m": 0.005468232210137727,
+      "trajectory_velocity_delta_mps": 0.3280939326082628
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "drop_transition",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "ledge_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 2.0332367798473596
+        },
+        {
+          "details": "",
+          "name": "surface_fall",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 1.872505855504384
+        },
+        {
+          "details": "",
+          "name": "tailwater_depth",
+          "passed": false,
+          "threshold": 0.45,
+          "value": 0.20838574750173744
+        },
+        {
+          "details": "",
+          "name": "bounded_entry_lift",
+          "passed": true,
+          "threshold": 8.0,
+          "value": 7.054320074511395
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_low/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "stalled",
+      "candidate_passed": false,
+      "case_id": "drop_entry",
+      "expected_outcomes": [
+        "flushed"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "low_runnable",
+      "force_delta_weight_ratio": 1.8728350215265959,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "drop_transition",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "ledge_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 3.7009240716748404
+        },
+        {
+          "details": "",
+          "name": "surface_fall",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 1.7943508705832079
+        },
+        {
+          "details": "",
+          "name": "tailwater_depth",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 1.1540689122528776
+        },
+        {
+          "details": "",
+          "name": "bounded_entry_lift",
+          "passed": true,
+          "threshold": 8.0,
+          "value": 1.855406934293517
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "flushed",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 1.3237229087558149,
+      "trajectory_position_delta_m": 0.0051034754336601405,
+      "trajectory_velocity_delta_mps": 0.3062085260195985
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "recirculation_risk",
+          "passed": false,
+          "threshold": 0.45,
+          "value": 0.43515000000000004
+        },
+        {
+          "details": "",
+          "name": "surf_or_flush_signal",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.5300878273782017
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": false,
+          "threshold": 0.5,
+          "value": 0.026599499819398645
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.5279795977370008
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_low/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "stalled",
+      "candidate_passed": false,
+      "case_id": "hydraulic_hole_surf_flush",
+      "expected_outcomes": [
+        "surfed",
+        "flushed"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "low_runnable",
+      "force_delta_weight_ratio": 6.0739961744819055,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "C++ raft feature checks are not passing.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "Torque delta exceeds the inertia-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "recirculation_risk",
+          "passed": false,
+          "threshold": 0.45,
+          "value": 0.43515000000000004
+        },
+        {
+          "details": "",
+          "name": "surf_or_flush_signal",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 2.5360275354133703
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 2.156113005354831
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.2035836051816136
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "stalled",
+      "reference_passed": false,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 3.929525503170893,
+      "trajectory_position_delta_m": 0.01655163957546218,
+      "trajectory_velocity_delta_mps": 0.9930983745277921
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "eddy_recovery_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "speed_recovery",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.4721245177980329
+        },
+        {
+          "details": "",
+          "name": "lateral_shear",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 0.7973716444650923
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_low/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "clear",
+      "candidate_passed": true,
+      "case_id": "eddy_recovery",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "low_runnable",
+      "force_delta_weight_ratio": 2.0163718637066137,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "notes": [
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "eddy_recovery_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "speed_recovery",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 2.018967441953559
+        },
+        {
+          "details": "",
+          "name": "lateral_shear",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 0.2840749522466916
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.4634288247415614,
+      "trajectory_position_delta_m": 0.005494613328601468,
+      "trajectory_velocity_delta_mps": 0.3296767997160314
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "rock_feature_count",
+          "passed": true,
+          "threshold": 3.0,
+          "value": 6.0
+        },
+        {
+          "details": "",
+          "name": "rock_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "rock_contacts",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 14.0
+        },
+        {
+          "details": "",
+          "name": "scrape_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 208.25505241141477
+        },
+        {
+          "details": "",
+          "name": "launch_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 310.58238832525353
+        },
+        {
+          "details": "",
+          "name": "pitch_impulse",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 2.2945432147665357
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_low/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "grounded",
+      "candidate_passed": true,
+      "case_id": "boulder_garden_impacts",
+      "expected_outcomes": [
+        "grounded"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "low_runnable",
+      "force_delta_weight_ratio": 4.098144466174149,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "notes": [
+        "Force delta exceeds the weight-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "rock_feature_count",
+          "passed": true,
+          "threshold": 3.0,
+          "value": 6.0
+        },
+        {
+          "details": "",
+          "name": "rock_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "rock_contacts",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 14.0
+        },
+        {
+          "details": "",
+          "name": "scrape_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 43.58250188906126
+        },
+        {
+          "details": "",
+          "name": "launch_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 57.240002906248094
+        },
+        {
+          "details": "",
+          "name": "pitch_impulse",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 3.054186565987537
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "grounded",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.952570244514553,
+      "trajectory_position_delta_m": 0.011167443670338702,
+      "trajectory_velocity_delta_mps": 0.6700466202194734
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "upstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "downstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "transition_grid_coverage",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "crossing_speed",
+          "passed": false,
+          "threshold": 2.0,
+          "value": 1.0978337170240358
+        },
+        {
+          "details": "",
+          "name": "crossing_surface_fall",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 0.8164476181415763
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_low/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "stalled",
+      "candidate_passed": false,
+      "case_id": "transition_boundary_crossing",
+      "expected_outcomes": [
+        "flushed"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "low_runnable",
+      "force_delta_weight_ratio": 3.1565552211171277,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "upstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "downstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "transition_grid_coverage",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "crossing_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 3.9622021141144055
+        },
+        {
+          "details": "",
+          "name": "crossing_surface_fall",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 1.2729243809204176
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "flushed",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 1.8855382688712348,
+      "trajectory_position_delta_m": 0.008601612977539733,
+      "trajectory_velocity_delta_mps": 0.5160967786526506
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "pool_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_depth",
+          "passed": true,
+          "threshold": 0.8,
+          "value": 1.552936446184688
+        },
+        {
+          "details": "",
+          "name": "pool_slower_than_tongue",
+          "passed": true,
+          "threshold": 1.8893210588339908,
+          "value": 0.5020419282176303
+        },
+        {
+          "details": "",
+          "name": "bounded_lift",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 2.002240708631689
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_low/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "clear",
+      "candidate_passed": true,
+      "case_id": "pool_entry",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "low_runnable",
+      "force_delta_weight_ratio": 1.3941690122399493,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "notes": [
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "pool_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_depth",
+          "passed": true,
+          "threshold": 0.8,
+          "value": 1.2608861888011464
+        },
+        {
+          "details": "",
+          "name": "pool_slower_than_tongue",
+          "passed": true,
+          "threshold": 2.177110006431442,
+          "value": 0.9403136891285476
+        },
+        {
+          "details": "",
+          "name": "bounded_lift",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 2.0046719451494215
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.15327208845157045,
+      "trajectory_position_delta_m": 0.0037991105583539426,
+      "trajectory_velocity_delta_mps": 0.2279466335012317
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "drop_transition",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "ledge_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 2.921571068008009
+        },
+        {
+          "details": "",
+          "name": "surface_fall",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 1.6507793056551576
+        },
+        {
+          "details": "",
+          "name": "tailwater_depth",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 1.1852675778023003
+        },
+        {
+          "details": "",
+          "name": "bounded_entry_lift",
+          "passed": true,
+          "threshold": 8.0,
+          "value": 1.8291598610106476
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_low/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "flushed",
+      "candidate_passed": true,
+      "case_id": "drop_entry",
+      "expected_outcomes": [
+        "flushed"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "low_runnable",
+      "force_delta_weight_ratio": 0.2958091823027368,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "notes": [],
+      "passed": true,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "drop_transition",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "ledge_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 3.7009240716748404
+        },
+        {
+          "details": "",
+          "name": "surface_fall",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 1.7943508705832079
+        },
+        {
+          "details": "",
+          "name": "tailwater_depth",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 1.1540689122528776
+        },
+        {
+          "details": "",
+          "name": "bounded_entry_lift",
+          "passed": true,
+          "threshold": 8.0,
+          "value": 1.855406934293517
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "flushed",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.5732606340110646,
+      "trajectory_position_delta_m": 0.0008060800217784972,
+      "trajectory_velocity_delta_mps": 0.04836480130649774
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "recirculation_risk",
+          "passed": false,
+          "threshold": 0.45,
+          "value": 0.43515000000000004
+        },
+        {
+          "details": "",
+          "name": "surf_or_flush_signal",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.9405155934001582
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.9723335327505369
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.3866920952046928
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_low/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "stalled",
+      "candidate_passed": false,
+      "case_id": "hydraulic_hole_surf_flush",
+      "expected_outcomes": [
+        "surfed",
+        "flushed"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "low_runnable",
+      "force_delta_weight_ratio": 4.236314156231893,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "C++ raft feature checks are not passing.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "recirculation_risk",
+          "passed": false,
+          "threshold": 0.45,
+          "value": 0.43515000000000004
+        },
+        {
+          "details": "",
+          "name": "surf_or_flush_signal",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 2.5360275354133703
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 2.156113005354831
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.2035836051816136
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "stalled",
+      "reference_passed": false,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 1.4989696556105858,
+      "trajectory_position_delta_m": 0.011543956075731129,
+      "trajectory_velocity_delta_mps": 0.6926373645439149
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "eddy_recovery_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "speed_recovery",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.7690370949985379
+        },
+        {
+          "details": "",
+          "name": "lateral_shear",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 0.2610251625659335
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_low/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "clear",
+      "candidate_passed": true,
+      "case_id": "eddy_recovery",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "low_runnable",
+      "force_delta_weight_ratio": 0.504408454320044,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "notes": [],
+      "passed": true,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "eddy_recovery_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "speed_recovery",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 2.018967441953559
+        },
+        {
+          "details": "",
+          "name": "lateral_shear",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 0.2840749522466916
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.24518029336920463,
+      "trajectory_position_delta_m": 0.0013745130380156663,
+      "trajectory_velocity_delta_mps": 0.08247078228132719
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "rock_feature_count",
+          "passed": true,
+          "threshold": 3.0,
+          "value": 6.0
+        },
+        {
+          "details": "",
+          "name": "rock_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "rock_contacts",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "scrape_acceleration",
+          "passed": false,
+          "threshold": 0.2,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "launch_acceleration",
+          "passed": false,
+          "threshold": 0.2,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "pitch_impulse",
+          "passed": false,
+          "threshold": 0.05,
+          "value": 0.0
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_low/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "clear",
+      "candidate_passed": false,
+      "case_id": "boulder_garden_impacts",
+      "expected_outcomes": [
+        "grounded"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "low_runnable",
+      "force_delta_weight_ratio": 29.20708506470126,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "Torque delta exceeds the inertia-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "rock_feature_count",
+          "passed": true,
+          "threshold": 3.0,
+          "value": 6.0
+        },
+        {
+          "details": "",
+          "name": "rock_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "rock_contacts",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 14.0
+        },
+        {
+          "details": "",
+          "name": "scrape_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 43.58250188906126
+        },
+        {
+          "details": "",
+          "name": "launch_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 57.240002906248094
+        },
+        {
+          "details": "",
+          "name": "pitch_impulse",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 3.054186565987537
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "grounded",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 5.1115869662344195,
+      "trajectory_position_delta_m": 0.07958930680131446,
+      "trajectory_velocity_delta_mps": 4.775358408078656
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "upstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "downstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "transition_grid_coverage",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "crossing_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 3.151290410949537
+        },
+        {
+          "details": "",
+          "name": "crossing_surface_fall",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 0.7614525609632401
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_low/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "flushed",
+      "candidate_passed": true,
+      "case_id": "transition_boundary_crossing",
+      "expected_outcomes": [
+        "flushed"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "low_runnable",
+      "force_delta_weight_ratio": 0.6124708847625813,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "notes": [],
+      "passed": true,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "upstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "downstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "transition_grid_coverage",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "crossing_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 3.9622021141144055
+        },
+        {
+          "details": "",
+          "name": "crossing_surface_fall",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 1.2729243809204176
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "flushed",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.9285972516445631,
+      "trajectory_position_delta_m": 0.001668983160974998,
+      "trajectory_velocity_delta_mps": 0.10013898965868212
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "pool_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_depth",
+          "passed": false,
+          "threshold": 0.8,
+          "value": 0.6540246570326871
+        },
+        {
+          "details": "",
+          "name": "pool_slower_than_tongue",
+          "passed": false,
+          "threshold": 1.0712797144670054,
+          "value": 1.9126030052948222
+        },
+        {
+          "details": "",
+          "name": "bounded_lift",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 2.0002482589587833
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_med/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "stalled",
+      "candidate_passed": false,
+      "case_id": "pool_entry",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "median_runnable",
+      "force_delta_weight_ratio": 2.012679658370745,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "pool_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_depth",
+          "passed": true,
+          "threshold": 0.8,
+          "value": 1.4338611750226526
+        },
+        {
+          "details": "",
+          "name": "pool_slower_than_tongue",
+          "passed": true,
+          "threshold": 2.7254341275417837,
+          "value": 1.5168320858481588
+        },
+        {
+          "details": "",
+          "name": "bounded_lift",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 2.0047571083472464
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.02975807766420871,
+      "trajectory_position_delta_m": 0.005484552069060366,
+      "trajectory_velocity_delta_mps": 0.3290731241436169
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "drop_transition",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "ledge_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_speed",
+          "passed": false,
+          "threshold": 2.0,
+          "value": 1.985855900802612
+        },
+        {
+          "details": "",
+          "name": "surface_fall",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 2.141235765054137
+        },
+        {
+          "details": "",
+          "name": "tailwater_depth",
+          "passed": false,
+          "threshold": 0.45,
+          "value": 0.20420381071685428
+        },
+        {
+          "details": "",
+          "name": "bounded_entry_lift",
+          "passed": true,
+          "threshold": 8.0,
+          "value": 7.855927869924996
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_med/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "stalled",
+      "candidate_passed": false,
+      "case_id": "drop_entry",
+      "expected_outcomes": [
+        "flushed"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "median_runnable",
+      "force_delta_weight_ratio": 1.8077603352592768,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "drop_transition",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "ledge_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 3.6506756197343764
+        },
+        {
+          "details": "",
+          "name": "surface_fall",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 2.572944899242443
+        },
+        {
+          "details": "",
+          "name": "tailwater_depth",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 0.8831330094901266
+        },
+        {
+          "details": "",
+          "name": "bounded_entry_lift",
+          "passed": true,
+          "threshold": 8.0,
+          "value": 1.7973300864243786
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "flushed",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 1.1888443577708854,
+      "trajectory_position_delta_m": 0.004926146913578908,
+      "trajectory_velocity_delta_mps": 0.29556881481489156
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "recirculation_risk",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 0.5932
+        },
+        {
+          "details": "",
+          "name": "surf_or_flush_signal",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.5932
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": false,
+          "threshold": 0.5,
+          "value": 0.06165068348612006
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.5896860769185455
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_med/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "stalled",
+      "candidate_passed": false,
+      "case_id": "hydraulic_hole_surf_flush",
+      "expected_outcomes": [
+        "surfed",
+        "flushed"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "median_runnable",
+      "force_delta_weight_ratio": 6.981608956290777,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "C++ raft feature checks are not passing.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "recirculation_risk",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 0.5932
+        },
+        {
+          "details": "",
+          "name": "surf_or_flush_signal",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 2.816391180678329
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 1.0497065048184295
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.1955899447759061
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "stalled",
+      "reference_passed": false,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 2.2026975105798163,
+      "trajectory_position_delta_m": 0.019024884405885997,
+      "trajectory_velocity_delta_mps": 1.1414930643535421
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "eddy_recovery_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "speed_recovery",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.3501268217926383
+        },
+        {
+          "details": "",
+          "name": "lateral_shear",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 1.22816970910949
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_med/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "clear",
+      "candidate_passed": true,
+      "case_id": "eddy_recovery",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "median_runnable",
+      "force_delta_weight_ratio": 2.4105800149175307,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "notes": [
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "eddy_recovery_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "speed_recovery",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 1.6494845583068365
+        },
+        {
+          "details": "",
+          "name": "lateral_shear",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 0.4851192525423252
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.32706659982102276,
+      "trajectory_position_delta_m": 0.006568830540645738,
+      "trajectory_velocity_delta_mps": 0.3941298324390164
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "rock_feature_count",
+          "passed": true,
+          "threshold": 3.0,
+          "value": 7.0
+        },
+        {
+          "details": "",
+          "name": "rock_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "rock_contacts",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 14.0
+        },
+        {
+          "details": "",
+          "name": "scrape_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 210.58932578026958
+        },
+        {
+          "details": "",
+          "name": "launch_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 314.17357812349184
+        },
+        {
+          "details": "",
+          "name": "pitch_impulse",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 23.71440203205776
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_med/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "grounded",
+      "candidate_passed": true,
+      "case_id": "boulder_garden_impacts",
+      "expected_outcomes": [
+        "grounded"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "median_runnable",
+      "force_delta_weight_ratio": 4.9366570648598485,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "notes": [
+        "Force delta exceeds the weight-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "rock_feature_count",
+          "passed": true,
+          "threshold": 3.0,
+          "value": 7.0
+        },
+        {
+          "details": "",
+          "name": "rock_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "rock_contacts",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 14.0
+        },
+        {
+          "details": "",
+          "name": "scrape_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 86.28819676371256
+        },
+        {
+          "details": "",
+          "name": "launch_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 122.94107194417316
+        },
+        {
+          "details": "",
+          "name": "pitch_impulse",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 21.52175935131306
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "grounded",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 1.6780632807350429,
+      "trajectory_position_delta_m": 0.013452390501736347,
+      "trajectory_velocity_delta_mps": 0.807143430104585
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "upstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "downstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "transition_grid_coverage",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "crossing_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 2.1192526834176606
+        },
+        {
+          "details": "",
+          "name": "crossing_surface_fall",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 0.9364162631859364
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_med/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "flushed",
+      "candidate_passed": true,
+      "case_id": "transition_boundary_crossing",
+      "expected_outcomes": [
+        "flushed"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "median_runnable",
+      "force_delta_weight_ratio": 3.1543143241282463,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "notes": [
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "Torque delta exceeds the inertia-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "upstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "downstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "transition_grid_coverage",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "crossing_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 4.746206409874653
+        },
+        {
+          "details": "",
+          "name": "crossing_surface_fall",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 1.5531508338432163
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "flushed",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 3.504057831021839,
+      "trajectory_position_delta_m": 0.008595506533255215,
+      "trajectory_velocity_delta_mps": 0.5157303919949686
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "pool_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_depth",
+          "passed": true,
+          "threshold": 0.8,
+          "value": 1.8335158584266709
+        },
+        {
+          "details": "",
+          "name": "pool_slower_than_tongue",
+          "passed": true,
+          "threshold": 2.2229097150541404,
+          "value": 0.9290120342873233
+        },
+        {
+          "details": "",
+          "name": "bounded_lift",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 2.0054621858583093
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "clear",
+      "candidate_passed": true,
+      "case_id": "pool_entry",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "median_runnable",
+      "force_delta_weight_ratio": 1.9186795885243224,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "notes": [
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "pool_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_depth",
+          "passed": true,
+          "threshold": 0.8,
+          "value": 1.4338611750226526
+        },
+        {
+          "details": "",
+          "name": "pool_slower_than_tongue",
+          "passed": true,
+          "threshold": 2.7254341275417837,
+          "value": 1.5168320858481588
+        },
+        {
+          "details": "",
+          "name": "bounded_lift",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 2.0047571083472464
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.2545021325414809,
+      "trajectory_position_delta_m": 0.005228401878728914,
+      "trajectory_velocity_delta_mps": 0.3137041127237268
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "drop_transition",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "ledge_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 3.4050366575662756
+        },
+        {
+          "details": "",
+          "name": "surface_fall",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 2.089536017137616
+        },
+        {
+          "details": "",
+          "name": "tailwater_depth",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 1.2128584707455559
+        },
+        {
+          "details": "",
+          "name": "bounded_entry_lift",
+          "passed": true,
+          "threshold": 8.0,
+          "value": 1.8572765937119242
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "flushed",
+      "candidate_passed": true,
+      "case_id": "drop_entry",
+      "expected_outcomes": [
+        "flushed"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "median_runnable",
+      "force_delta_weight_ratio": 0.2869930815879055,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "notes": [],
+      "passed": true,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "drop_transition",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "ledge_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 3.6506756197343764
+        },
+        {
+          "details": "",
+          "name": "surface_fall",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 2.572944899242443
+        },
+        {
+          "details": "",
+          "name": "tailwater_depth",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 0.8831330094901266
+        },
+        {
+          "details": "",
+          "name": "bounded_entry_lift",
+          "passed": true,
+          "threshold": 8.0,
+          "value": 1.7973300864243786
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "flushed",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.3311376288104053,
+      "trajectory_position_delta_m": 0.0007820561473241715,
+      "trajectory_velocity_delta_mps": 0.04692336883962238
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "recirculation_risk",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 0.5932
+        },
+        {
+          "details": "",
+          "name": "surf_or_flush_signal",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.300715628077477
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.9062231414589915
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.32135941951415264
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "flushed",
+      "candidate_passed": true,
+      "case_id": "hydraulic_hole_surf_flush",
+      "expected_outcomes": [
+        "surfed",
+        "flushed"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "median_runnable",
+      "force_delta_weight_ratio": 4.748481883609494,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "recirculation_risk",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 0.5932
+        },
+        {
+          "details": "",
+          "name": "surf_or_flush_signal",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 2.816391180678329
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 1.0497065048184295
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.1955899447759061
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "stalled",
+      "reference_passed": false,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.7129348164928397,
+      "trajectory_position_delta_m": 0.012939613132834255,
+      "trajectory_velocity_delta_mps": 0.7763767879701526
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "eddy_recovery_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "speed_recovery",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.8141539334980341
+        },
+        {
+          "details": "",
+          "name": "lateral_shear",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 0.4068276629119926
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "clear",
+      "candidate_passed": true,
+      "case_id": "eddy_recovery",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "median_runnable",
+      "force_delta_weight_ratio": 1.001986175587037,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "notes": [
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "eddy_recovery_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "speed_recovery",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 1.6494845583068365
+        },
+        {
+          "details": "",
+          "name": "lateral_shear",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 0.4851192525423252
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.2924256043191301,
+      "trajectory_position_delta_m": 0.0027304123284685343,
+      "trajectory_velocity_delta_mps": 0.1638247397084805
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "rock_feature_count",
+          "passed": true,
+          "threshold": 3.0,
+          "value": 7.0
+        },
+        {
+          "details": "",
+          "name": "rock_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "rock_contacts",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "scrape_acceleration",
+          "passed": false,
+          "threshold": 0.2,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "launch_acceleration",
+          "passed": false,
+          "threshold": 0.2,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "pitch_impulse",
+          "passed": false,
+          "threshold": 0.05,
+          "value": 0.0
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "clear",
+      "candidate_passed": false,
+      "case_id": "boulder_garden_impacts",
+      "expected_outcomes": [
+        "grounded"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "median_runnable",
+      "force_delta_weight_ratio": 36.9261639590451,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "Torque delta exceeds the inertia-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "rock_feature_count",
+          "passed": true,
+          "threshold": 3.0,
+          "value": 7.0
+        },
+        {
+          "details": "",
+          "name": "rock_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "rock_contacts",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 14.0
+        },
+        {
+          "details": "",
+          "name": "scrape_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 86.28819676371256
+        },
+        {
+          "details": "",
+          "name": "launch_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 122.94107194417316
+        },
+        {
+          "details": "",
+          "name": "pitch_impulse",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 21.52175935131306
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "grounded",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 6.861830955462309,
+      "trajectory_position_delta_m": 0.10062379678840278,
+      "trajectory_velocity_delta_mps": 6.0374278073038745
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "upstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "downstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "transition_grid_coverage",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "crossing_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 3.74744384896639
+        },
+        {
+          "details": "",
+          "name": "crossing_surface_fall",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 1.0754645428699012
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "flushed",
+      "candidate_passed": true,
+      "case_id": "transition_boundary_crossing",
+      "expected_outcomes": [
+        "flushed"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "median_runnable",
+      "force_delta_weight_ratio": 0.9500617377787512,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "notes": [],
+      "passed": true,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "upstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "downstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "transition_grid_coverage",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "crossing_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 4.746206409874653
+        },
+        {
+          "details": "",
+          "name": "crossing_surface_fall",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 1.5531508338432163
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "flushed",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 1.4976682844812836,
+      "trajectory_position_delta_m": 0.0025889182354476136,
+      "trajectory_velocity_delta_mps": 0.155335094126826
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "pool_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_depth",
+          "passed": true,
+          "threshold": 0.8,
+          "value": 0.9612683587517192
+        },
+        {
+          "details": "",
+          "name": "pool_slower_than_tongue",
+          "passed": false,
+          "threshold": 1.6052183382668697,
+          "value": 2.9329730034308894
+        },
+        {
+          "details": "",
+          "name": "bounded_lift",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 1.9962933106321112
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_high/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "stalled",
+      "candidate_passed": false,
+      "case_id": "pool_entry",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "high_runnable",
+      "force_delta_weight_ratio": 2.023478663895405,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "pool_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_depth",
+          "passed": true,
+          "threshold": 0.8,
+          "value": 1.7127859157620549
+        },
+        {
+          "details": "",
+          "name": "pool_slower_than_tongue",
+          "passed": true,
+          "threshold": 3.225888224827585,
+          "value": 2.5581099594917975
+        },
+        {
+          "details": "",
+          "name": "bounded_lift",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 2.004238340214839
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.1972990233684518,
+      "trajectory_position_delta_m": 0.005513979359115081,
+      "trajectory_velocity_delta_mps": 0.3308387615468988
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "drop_transition",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "ledge_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 2.802612913587683
+        },
+        {
+          "details": "",
+          "name": "surface_fall",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 2.357889067732512
+        },
+        {
+          "details": "",
+          "name": "tailwater_depth",
+          "passed": false,
+          "threshold": 0.45,
+          "value": 0.31168399656466217
+        },
+        {
+          "details": "",
+          "name": "bounded_entry_lift",
+          "passed": true,
+          "threshold": 8.0,
+          "value": 5.24536956643917
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_high/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "stalled",
+      "candidate_passed": false,
+      "case_id": "drop_entry",
+      "expected_outcomes": [
+        "flushed"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "high_runnable",
+      "force_delta_weight_ratio": 1.7001859186284256,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "drop_transition",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "ledge_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 3.985663636248669
+        },
+        {
+          "details": "",
+          "name": "surface_fall",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 3.4722001175583
+        },
+        {
+          "details": "",
+          "name": "tailwater_depth",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 0.9476341350822998
+        },
+        {
+          "details": "",
+          "name": "bounded_entry_lift",
+          "passed": true,
+          "threshold": 8.0,
+          "value": 1.7988408476122784
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "flushed",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 1.811457437388576,
+      "trajectory_position_delta_m": 0.004633006628254389,
+      "trajectory_velocity_delta_mps": 0.2779803976957473
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "recirculation_risk",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 0.7701
+        },
+        {
+          "details": "",
+          "name": "surf_or_flush_signal",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.7701
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": false,
+          "threshold": 0.5,
+          "value": 0.20397775653272995
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 1.0025142631214596
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_high/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "stalled",
+      "candidate_passed": false,
+      "case_id": "hydraulic_hole_surf_flush",
+      "expected_outcomes": [
+        "surfed",
+        "flushed"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "high_runnable",
+      "force_delta_weight_ratio": 9.736542149956621,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "C++ raft feature checks are not passing.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "recirculation_risk",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 0.7701
+        },
+        {
+          "details": "",
+          "name": "surf_or_flush_signal",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 3.534218422791176
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.7229280632300318
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.17771812845078214
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "stalled",
+      "reference_passed": false,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 1.5897611053527805,
+      "trajectory_position_delta_m": 0.026532077358639078,
+      "trajectory_velocity_delta_mps": 1.591924641517908
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "eddy_recovery_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "speed_recovery",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.013012033417934221
+        },
+        {
+          "details": "",
+          "name": "lateral_shear",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 1.2915736209989506
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_high/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "stalled",
+      "candidate_passed": false,
+      "case_id": "eddy_recovery",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "high_runnable",
+      "force_delta_weight_ratio": 2.7299335356271133,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "eddy_recovery_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "speed_recovery",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.40492220289767733
+        },
+        {
+          "details": "",
+          "name": "lateral_shear",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 1.7648801680778028
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 1.984084334105304,
+      "trajectory_position_delta_m": 0.0074390688845723035,
+      "trajectory_velocity_delta_mps": 0.4463441330750333
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "rock_feature_count",
+          "passed": true,
+          "threshold": 3.0,
+          "value": 8.0
+        },
+        {
+          "details": "",
+          "name": "rock_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "rock_contacts",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 14.0
+        },
+        {
+          "details": "",
+          "name": "scrape_acceleration",
+          "passed": false,
+          "threshold": 0.2,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "launch_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 364.80999139543127
+        },
+        {
+          "details": "",
+          "name": "pitch_impulse",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 5.60903345131155
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_high/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "clear",
+      "candidate_passed": false,
+      "case_id": "boulder_garden_impacts",
+      "expected_outcomes": [
+        "grounded"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "high_runnable",
+      "force_delta_weight_ratio": 5.153098527932334,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "rock_feature_count",
+          "passed": true,
+          "threshold": 3.0,
+          "value": 8.0
+        },
+        {
+          "details": "",
+          "name": "rock_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "rock_contacts",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 14.0
+        },
+        {
+          "details": "",
+          "name": "scrape_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 74.10851915292345
+        },
+        {
+          "details": "",
+          "name": "launch_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 104.20310638911299
+        },
+        {
+          "details": "",
+          "name": "pitch_impulse",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 13.838138985881823
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "grounded",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.7204292028667592,
+      "trajectory_position_delta_m": 0.014042193488615197,
+      "trajectory_velocity_delta_mps": 0.8425316093169366
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "upstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "downstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "transition_grid_coverage",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "crossing_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 2.3622868561814085
+        },
+        {
+          "details": "",
+          "name": "crossing_surface_fall",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 1.2284894626110479
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_high/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "flushed",
+      "candidate_passed": true,
+      "case_id": "transition_boundary_crossing",
+      "expected_outcomes": [
+        "flushed"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "high_runnable",
+      "force_delta_weight_ratio": 4.4808671928821795,
+      "force_envelope_outcome_match": false,
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "notes": [
+        "Force-envelope outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "Torque delta exceeds the inertia-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "upstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "downstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "transition_grid_coverage",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "crossing_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 5.699126243141125
+        },
+        {
+          "details": "",
+          "name": "crossing_surface_fall",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 2.3028791509006337
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "flushed",
+      "reference_passed": true,
+      "solver_mode": "reduced",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 4.75639329735752,
+      "trajectory_position_delta_m": 0.012210363100607042,
+      "trajectory_velocity_delta_mps": 0.7326217860362368
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "pool_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_depth",
+          "passed": true,
+          "threshold": 0.8,
+          "value": 2.3117243921843937
+        },
+        {
+          "details": "",
+          "name": "pool_slower_than_tongue",
+          "passed": true,
+          "threshold": 2.6862067837353196,
+          "value": 1.6674726365486117
+        },
+        {
+          "details": "",
+          "name": "bounded_lift",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 2.006777306956692
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_high/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "clear",
+      "candidate_passed": true,
+      "case_id": "pool_entry",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "high_runnable",
+      "force_delta_weight_ratio": 2.9216119541026955,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "notes": [
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "pool_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_depth",
+          "passed": true,
+          "threshold": 0.8,
+          "value": 1.7127859157620549
+        },
+        {
+          "details": "",
+          "name": "pool_slower_than_tongue",
+          "passed": true,
+          "threshold": 3.225888224827585,
+          "value": 2.5581099594917975
+        },
+        {
+          "details": "",
+          "name": "bounded_lift",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 2.004238340214839
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 0.7085816639096774,
+      "trajectory_position_delta_m": 0.007961392574929928,
+      "trajectory_velocity_delta_mps": 0.4776835544957908
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "drop_transition",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "ledge_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 4.145126104869625
+        },
+        {
+          "details": "",
+          "name": "surface_fall",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 2.7271120432349902
+        },
+        {
+          "details": "",
+          "name": "tailwater_depth",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 1.3365734147479105
+        },
+        {
+          "details": "",
+          "name": "bounded_entry_lift",
+          "passed": true,
+          "threshold": 8.0,
+          "value": 1.8617672683715372
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_high/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "flushed",
+      "candidate_passed": true,
+      "case_id": "drop_entry",
+      "expected_outcomes": [
+        "flushed"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "high_runnable",
+      "force_delta_weight_ratio": 1.6590978803566183,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "notes": [
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "drop_transition",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "ledge_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "entry_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 3.985663636248669
+        },
+        {
+          "details": "",
+          "name": "surface_fall",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 3.4722001175583
+        },
+        {
+          "details": "",
+          "name": "tailwater_depth",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 0.9476341350822998
+        },
+        {
+          "details": "",
+          "name": "bounded_entry_lift",
+          "passed": true,
+          "threshold": 8.0,
+          "value": 1.7988408476122784
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "flushed",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 1.7063601001097857,
+      "trajectory_position_delta_m": 0.004521041723971179,
+      "trajectory_velocity_delta_mps": 0.27126250343830716
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "recirculation_risk",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 0.7701
+        },
+        {
+          "details": "",
+          "name": "surf_or_flush_signal",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.874267054684001
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.662252689018136
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.2608501987431559
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_high/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "flushed",
+      "candidate_passed": true,
+      "case_id": "hydraulic_hole_surf_flush",
+      "expected_outcomes": [
+        "surfed",
+        "flushed"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "high_runnable",
+      "force_delta_weight_ratio": 6.546012455193161,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "notes": [
+        "GeoClaw-derived raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "hole_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "recirculation_risk",
+          "passed": true,
+          "threshold": 0.45,
+          "value": 0.7701
+        },
+        {
+          "details": "",
+          "name": "surf_or_flush_signal",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 3.534218422791176
+        },
+        {
+          "details": "",
+          "name": "downstream_boil_lift",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.7229280632300318
+        },
+        {
+          "details": "",
+          "name": "aerated_damping",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.17771812845078214
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "stalled",
+      "reference_passed": false,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 1.8354924425393118,
+      "trajectory_position_delta_m": 0.01783788394040627,
+      "trajectory_velocity_delta_mps": 1.070273036424082
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "eddy_recovery_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "speed_recovery",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.5960649822921549
+        },
+        {
+          "details": "",
+          "name": "lateral_shear",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 0.5446708596935709
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_high/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "clear",
+      "candidate_passed": true,
+      "case_id": "eddy_recovery",
+      "expected_outcomes": [
+        "clear"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "high_runnable",
+      "force_delta_weight_ratio": 1.8050508688289868,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "notes": [
+        "Force delta exceeds the weight-normalized threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "eddy_recovery_reach",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "eddy_line_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "speed_recovery",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.40492220289767733
+        },
+        {
+          "details": "",
+          "name": "lateral_shear",
+          "passed": true,
+          "threshold": 0.15,
+          "value": 1.7648801680778028
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "clear",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 1.4727993278110585,
+      "trajectory_position_delta_m": 0.00491876361755502,
+      "trajectory_velocity_delta_mps": 0.2951258170535395
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "rock_feature_count",
+          "passed": true,
+          "threshold": 3.0,
+          "value": 8.0
+        },
+        {
+          "details": "",
+          "name": "rock_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "rock_contacts",
+          "passed": false,
+          "threshold": 1.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "scrape_acceleration",
+          "passed": false,
+          "threshold": 0.2,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "launch_acceleration",
+          "passed": false,
+          "threshold": 0.2,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "pitch_impulse",
+          "passed": false,
+          "threshold": 0.05,
+          "value": 0.0
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_high/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "clear",
+      "candidate_passed": false,
+      "case_id": "boulder_garden_impacts",
+      "expected_outcomes": [
+        "grounded"
+      ],
+      "feature_outcome_match": false,
+      "flow_band": "high_runnable",
+      "force_delta_weight_ratio": 46.782317358596806,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "notes": [
+        "C++ raft feature checks are not passing.",
+        "Canonical feature outcomes differ.",
+        "Force delta exceeds the weight-normalized threshold.",
+        "Torque delta exceeds the inertia-normalized threshold.",
+        "One-step velocity delta exceeds threshold."
+      ],
+      "passed": false,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "rock_feature_count",
+          "passed": true,
+          "threshold": 3.0,
+          "value": 8.0
+        },
+        {
+          "details": "",
+          "name": "rock_tag",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "rock_contacts",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 14.0
+        },
+        {
+          "details": "",
+          "name": "scrape_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 74.10851915292345
+        },
+        {
+          "details": "",
+          "name": "launch_acceleration",
+          "passed": true,
+          "threshold": 0.2,
+          "value": 104.20310638911299
+        },
+        {
+          "details": "",
+          "name": "pitch_impulse",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 13.838138985881823
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "grounded",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 8.873220416914137,
+      "trajectory_position_delta_m": 0.12748181480217816,
+      "trajectory_velocity_delta_mps": 7.64890888813058
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "candidate_checks": [
+        {
+          "details": "",
+          "name": "upstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "downstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "transition_grid_coverage",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "crossing_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 4.698823586412459
+        },
+        {
+          "details": "",
+          "name": "crossing_surface_fall",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 1.5224368254708787
+        }
+      ],
+      "candidate_frame": "outputs/m16cpp/cg_high/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+      "candidate_outcome": "flushed",
+      "candidate_passed": true,
+      "case_id": "transition_boundary_crossing",
+      "expected_outcomes": [
+        "flushed"
+      ],
+      "feature_outcome_match": true,
+      "flow_band": "high_runnable",
+      "force_delta_weight_ratio": 0.7657945445842281,
+      "force_envelope_outcome_match": true,
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "notes": [],
+      "passed": true,
+      "reference_checks": [
+        {
+          "details": "",
+          "name": "upstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "downstream_reach_match",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 1.0
+        },
+        {
+          "details": "",
+          "name": "transition_grid_coverage",
+          "passed": true,
+          "threshold": 0.0,
+          "value": 0.0
+        },
+        {
+          "details": "",
+          "name": "crossing_speed",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 5.699126243141125
+        },
+        {
+          "details": "",
+          "name": "crossing_surface_fall",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 2.3028791509006337
+        }
+      ],
+      "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+      "reference_outcome": "flushed",
+      "reference_passed": true,
+      "solver_mode": "finite_volume",
+      "suite": "cascading",
+      "torque_delta_inertia_ratio": 2.0260647583224336,
+      "trajectory_position_delta_m": 0.0020867901339933557,
+      "trajectory_velocity_delta_mps": 0.1252074080395214
+    }
+  ],
+  "schema_version": "raftsim.milestone16.raft_coupling_validation.v0",
+  "thresholds": {
+    "force_delta_weight_ratio": 1.0,
+    "torque_delta_inertia_ratio": 2.5,
+    "trajectory_position_delta_m": 0.25,
+    "trajectory_velocity_delta_mps": 0.5
+  }
+}
