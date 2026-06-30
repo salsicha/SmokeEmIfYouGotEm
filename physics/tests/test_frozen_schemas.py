@@ -4,6 +4,7 @@ from pathlib import Path
 
 from raftsim.scenario2_5d import SCENARIO_SCHEMA_VERSION
 from raftsim.schema_versions import (
+    ANALYTIC_FIXTURE_MANIFEST_SCHEMA_VERSION,
     PARAMETER_SCHEMA_VERSION,
     REPLAY_SCHEMA_VERSION,
     SHARED_SCHEMA_SET_VERSION,
@@ -20,7 +21,14 @@ def test_shared_schema_manifest_references_frozen_schema_files():
 
     assert manifest["schema_set_version"] == SHARED_SCHEMA_SET_VERSION
     entries = {entry["name"]: entry for entry in manifest["schemas"]}
-    assert set(entries) == {"scenario2_5d", "telemetry_forces", "replay", "parameters", "source_manifest"}
+    assert set(entries) == {
+        "scenario2_5d",
+        "telemetry_forces",
+        "replay",
+        "parameters",
+        "source_manifest",
+        "analytic_fixture_manifest",
+    }
     for entry in entries.values():
         assert (schemas_dir / entry["file"]).exists()
 
@@ -62,6 +70,31 @@ def test_frozen_source_manifest_schema_uses_source_manifest_version():
     assert schema["properties"]["schema_version"]["const"] == SOURCE_MANIFEST_SCHEMA_VERSION
     assert "remote_fetches" in schema["required"]
     assert "field_media" in schema["properties"]["artifacts"]["required"]
+
+
+def test_frozen_analytic_fixture_manifest_schema_uses_fixture_manifest_version():
+    schema = _load_schema("analytic_fixture_manifest.schema.json")
+    example = json.loads(
+        (Path(__file__).resolve().parents[1] / "data" / "validation" / "milestone17" / "analytic_fixture_manifest.example.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert schema["properties"]["schema_version"]["const"] == ANALYTIC_FIXTURE_MANIFEST_SCHEMA_VERSION
+    assert schema["properties"]["license_policy"]["properties"]["external_data_vendored"]["const"] is False
+    fixture_required = set(schema["properties"]["fixtures"]["items"]["required"])
+    assert {
+        "fixture_id",
+        "provenance",
+        "equations",
+        "expected_behavior",
+        "tolerance_tier",
+        "metrics",
+        "outputs",
+    }.issubset(fixture_required)
+    assert example["schema_version"] == ANALYTIC_FIXTURE_MANIFEST_SCHEMA_VERSION
+    assert example["license_policy"]["external_data_vendored"] is False
+    assert example["fixtures"][0]["provenance"]["external_data_vendored"] is False
 
 
 def _load_schema(name: str) -> dict[str, object]:
