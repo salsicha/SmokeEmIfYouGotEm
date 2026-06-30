@@ -267,7 +267,7 @@ This milestone replaces the current monolithic/mostly uniform 2.5D scenario pack
 
 This milestone turns the custom C++ shallow-water / height-field solver from a runtime candidate into an accepted Unreal live-water candidate by comparing full GeoClaw reference runs, C++ outputs, raft outcomes, and runtime budgets on the same solver-neutral packages.
 
-- [ ] Freeze the scenario matrix and threshold tiers for smoke, research-accepted, Unreal-prototype, and production-candidate validation.
+- [x] Freeze the scenario matrix and threshold tiers for smoke, research-accepted, Unreal-prototype, and production-candidate validation.
 - [ ] Run full GeoClaw fixed-grid reference simulations for canonical, rafting, real-world low/median/high, and South Fork cascading suites; do not count initial-state-only fallback normalization as full validation.
 - [ ] Run C++ reduced and finite-volume solver modes on the same packages with versioned manifests for CFL, dry tolerance, roughness, feature forcing, bed-slope source scale, and cascading metadata.
 - [ ] Compare GeoClaw and C++ fields, probes, cross sections, mass/energy/Froude diagnostics, wet/dry masks, feature localization, and reach/drop window outputs against frozen thresholds.
