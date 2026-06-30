@@ -9,6 +9,7 @@ from raftsim.milestone16 import (
     Milestone16GeoClawRunRecord,
     Milestone16RaftCouplingRecord,
     Milestone16RaftCouplingReport,
+    run_milestone16_regression_promotion,
 )
 
 
@@ -187,3 +188,67 @@ def test_milestone16_raft_coupling_report_blocks_on_force_delta():
     assert report.passed is False
     assert payload["failed_count"] == 1
     assert payload["records"][0]["passed"] is False
+
+
+def test_milestone16_regression_promotion_writes_fixtures_and_artifacts(tmp_path):
+    scenario_package = tmp_path / "scenario_package"
+    scenario_package.mkdir()
+    (scenario_package / "scenario.json").write_text('{"metadata": {"scenario_id": "flat_pool_seed_16"}}', encoding="utf-8")
+    comparison_dir = tmp_path / "comparison"
+    comparison_dir.mkdir()
+    (comparison_dir / "dual_solver_manifest.json").write_text(
+        '{"scenario_id": "flat_pool_seed_16", "scenario_package": "' + str(scenario_package) + '"}',
+        encoding="utf-8",
+    )
+    (comparison_dir / "threshold_evaluation.json").write_text('{"passed": true}', encoding="utf-8")
+    for name in ("field_comparison.json", "probe_comparison.json", "diagnostic_comparison.json", "feature_comparison.json"):
+        (comparison_dir / name).write_text("{}", encoding="utf-8")
+    comparison_report = tmp_path / "comparison_report.json"
+    comparison_report.write_text(
+        """{
+          "records": [{
+            "gate_scenario_id": "flat_pool",
+            "actual_scenario_id": "flat_pool_seed_16",
+            "suite": "canonical",
+            "solver_mode": "reduced",
+            "comparison_dir": "%s",
+            "threshold_passed": true
+          }]
+        }"""
+        % comparison_dir,
+        encoding="utf-8",
+    )
+    raft_report = tmp_path / "raft_report.json"
+    raft_report.write_text(
+        """{
+          "records": [{
+            "gate_scenario_id": "shallow_shelf",
+            "actual_scenario_id": "shallow_shelf_seed_21",
+            "suite": "rafting",
+            "solver_mode": "reduced",
+            "case_id": "shallow_shelf_pivot_release",
+            "passed": true
+          }]
+        }""",
+        encoding="utf-8",
+    )
+
+    report = run_milestone16_regression_promotion(
+        comparison_report,
+        raft_report,
+        fixture_root=tmp_path / "fixtures",
+    )
+    registry = report.to_json_dict()
+
+    assert report.passed is True
+    assert registry["entry_count"] == 2
+    assert (tmp_path / "fixtures" / "geoclaw_cpp" / "c_flat" / "reduced" / "scenario" / "scenario.json").exists()
+    assert (
+        tmp_path
+        / "fixtures"
+        / "raft_coupling"
+        / "r_shelf"
+        / "reduced"
+        / "shallow_shelf_pivot_release"
+        / "raft_coupling_case.json"
+    ).exists()

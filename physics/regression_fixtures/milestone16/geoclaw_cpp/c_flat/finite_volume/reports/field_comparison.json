@@ -1,0 +1,363 @@
+{
+  "aggregate_field_errors": [
+    {
+      "field": "eta",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "h",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "hu",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "hv",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "normal_x",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "normal_y",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "normal_z",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "u",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "v",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    }
+  ],
+  "aggregate_slope_errors": [
+    {
+      "field": "slope_x",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "slope_y",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    }
+  ],
+  "frame_comparisons": [
+    {
+      "cpp_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_flat/finite_volume/cpp_solver/flat_pool_seed_16/frames/frame_0000.csv",
+      "field_errors": [
+        {
+          "candidate_max": 1.25,
+          "candidate_min": 1.25,
+          "compared_count": 288,
+          "field": "h",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 1.25,
+          "reference_min": 1.25,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.25,
+          "candidate_min": 1.25,
+          "compared_count": 288,
+          "field": "eta",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 1.25,
+          "reference_min": 1.25,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "u",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "v",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "hu",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "hv",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": -0.0,
+          "candidate_min": -0.0,
+          "compared_count": 288,
+          "field": "normal_x",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": -0.0,
+          "reference_min": -0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": -0.0,
+          "candidate_min": -0.0,
+          "compared_count": 288,
+          "field": "normal_y",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": -0.0,
+          "reference_min": -0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.0,
+          "candidate_min": 1.0,
+          "compared_count": 288,
+          "field": "normal_z",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 1.0,
+          "reference_min": 1.0,
+          "sample_count": 288
+        }
+      ],
+      "label": "initial",
+      "pyclaw_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_flat/normalized/frames/frame_0000.npz",
+      "reference_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_flat/normalized/frames/frame_0000.npz",
+      "reference_solver": "geoclaw",
+      "slope_errors": [
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "slope_x",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "slope_y",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        }
+      ],
+      "wet_mismatch_fraction": 0.0
+    },
+    {
+      "cpp_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_flat/finite_volume/cpp_solver/flat_pool_seed_16/frames/frame_0008.csv",
+      "field_errors": [
+        {
+          "candidate_max": 1.25,
+          "candidate_min": 1.25,
+          "compared_count": 288,
+          "field": "h",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 1.25,
+          "reference_min": 1.25,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.25,
+          "candidate_min": 1.25,
+          "compared_count": 288,
+          "field": "eta",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 1.25,
+          "reference_min": 1.25,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "u",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "v",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "hu",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "hv",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": -0.0,
+          "candidate_min": -0.0,
+          "compared_count": 288,
+          "field": "normal_x",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": -0.0,
+          "reference_min": -0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": -0.0,
+          "candidate_min": -0.0,
+          "compared_count": 288,
+          "field": "normal_y",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": -0.0,
+          "reference_min": -0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.0,
+          "candidate_min": 1.0,
+          "compared_count": 288,
+          "field": "normal_z",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 1.0,
+          "reference_min": 1.0,
+          "sample_count": 288
+        }
+      ],
+      "label": "final",
+      "pyclaw_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_flat/normalized/frames/frame_0002.npz",
+      "reference_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_flat/normalized/frames/frame_0002.npz",
+      "reference_solver": "geoclaw",
+      "slope_errors": [
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "slope_x",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "slope_y",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        }
+      ],
+      "wet_mismatch_fraction": 0.0
+    }
+  ],
+  "scenario_id": "flat_pool_seed_16"
+}

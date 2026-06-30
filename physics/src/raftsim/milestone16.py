@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -63,6 +64,8 @@ MILESTONE16_CPP_RUN_REPORT_SCHEMA = "raftsim.milestone16.cpp_solver_runs.v0"
 MILESTONE16_COMPARISON_REPORT_SCHEMA = "raftsim.milestone16.geoclaw_cpp_comparisons.v0"
 MILESTONE16_GEOMETRY_VALIDATION_REPORT_SCHEMA = "raftsim.milestone16.geometry_validation.v0"
 MILESTONE16_RAFT_COUPLING_REPORT_SCHEMA = "raftsim.milestone16.raft_coupling_validation.v0"
+MILESTONE16_REGRESSION_PROMOTION_REPORT_SCHEMA = "raftsim.milestone16.regression_promotion.v0"
+MILESTONE16_REGRESSION_REGISTRY_SCHEMA = "raftsim.milestone16.regression_registry.v0"
 MILESTONE16_RAFT_FORCE_DELTA_WEIGHT_RATIO_THRESHOLD = 1.0
 MILESTONE16_RAFT_TORQUE_DELTA_INERTIA_RATIO_THRESHOLD = 2.5
 MILESTONE16_RAFT_TRAJECTORY_POSITION_DELTA_M_THRESHOLD = 0.25
@@ -584,6 +587,98 @@ class Milestone16RaftCouplingReport:
         return output_path
 
 
+@dataclass(frozen=True, slots=True)
+class Milestone16RegressionPromotionEntry:
+    """One promoted Milestone 16 regression fixture or artifact manifest."""
+
+    artifact_id: str
+    category: str
+    gate_scenario_id: str
+    actual_scenario_id: str
+    suite: str
+    solver_mode: str
+    artifact_dir: str
+    source_report: str
+    passed: bool
+    case_id: str | None = None
+    scenario_package: str | None = None
+    manifest: str | None = None
+    reports: dict[str, str] = field(default_factory=dict)
+    notes: tuple[str, ...] = ()
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["notes"] = list(self.notes)
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone16RegressionPromotionReport:
+    """Promotion manifest for passing Milestone 16 comparison artifacts."""
+
+    comparison_report: str
+    raft_coupling_report: str
+    registry_path: str
+    fixture_root: str
+    entries: tuple[Milestone16RegressionPromotionEntry, ...] = field(default_factory=tuple)
+    notes: tuple[str, ...] = ()
+
+    @property
+    def passed(self) -> bool:
+        return bool(self.entries) and all(entry.passed for entry in self.entries)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE16_REGRESSION_PROMOTION_REPORT_SCHEMA,
+            "passed": self.passed,
+            "comparison_report": self.comparison_report,
+            "raft_coupling_report": self.raft_coupling_report,
+            "registry_path": self.registry_path,
+            "fixture_root": self.fixture_root,
+            "entry_count": len(self.entries),
+            "geoclaw_cpp_fixture_count": sum(1 for entry in self.entries if entry.category == "geoclaw_cpp"),
+            "raft_artifact_count": sum(1 for entry in self.entries if entry.category == "raft_coupling"),
+            "notes": list(self.notes),
+            "entries": [entry.to_json_dict() for entry in self.entries],
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = [
+            "# Milestone 16 Regression Promotion",
+            "",
+            f"Schema: `{MILESTONE16_REGRESSION_PROMOTION_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Promoted entries: {len(self.entries)}",
+            "",
+            "| Category | Gate scenario | Mode | Case | Artifact |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+        for entry in self.entries:
+            lines.append(
+                "| "
+                f"{entry.category} | "
+                f"{entry.gate_scenario_id} | "
+                f"{entry.solver_mode} | "
+                f"{entry.case_id or 'n/a'} | "
+                f"{entry.artifact_dir} |"
+            )
+        if self.notes:
+            lines.extend(["", "## Notes", ""])
+            lines.extend(f"- {note}" for note in self.notes)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+
 def run_milestone16_geoclaw_reference_suite(
     output_root: str | Path,
     *,
@@ -759,6 +854,59 @@ def run_milestone16_raft_coupling_validation(
         notes=(
             "Pin/release remains represented by shallow-shelf pivot/release and high-flow boulder/pin proxies; "
             "a distinct strainer or wrap fixture is still needed before production acceptance.",
+        ),
+    )
+
+
+def run_milestone16_regression_promotion(
+    comparison_report: str | Path,
+    raft_coupling_report: str | Path,
+    *,
+    fixture_root: str | Path = "regression_fixtures/milestone16",
+    registry_path: str | Path | None = None,
+) -> Milestone16RegressionPromotionReport:
+    """Promote passing Milestone 16 GeoClaw/C++ and raft artifacts."""
+
+    comparison_path = Path(comparison_report)
+    raft_path = Path(raft_coupling_report)
+    root = Path(fixture_root)
+    registry = Path(registry_path) if registry_path is not None else root / "registry.json"
+    comparison = _read_json(comparison_path)
+    raft = _read_json(raft_path)
+    entries: list[Milestone16RegressionPromotionEntry] = []
+
+    for record in comparison["records"]:
+        if bool(record.get("threshold_passed")):
+            entries.append(_promote_geoclaw_cpp_regression(record, comparison_path, root))
+
+    for record in raft["records"]:
+        if bool(record.get("passed")):
+            entries.append(_promote_raft_coupling_artifact(record, raft_path, root))
+
+    registry.parent.mkdir(parents=True, exist_ok=True)
+    registry.write_text(
+        json.dumps(
+            {
+                "schema_version": MILESTONE16_REGRESSION_REGISTRY_SCHEMA,
+                "comparison_report": str(comparison_path),
+                "raft_coupling_report": str(raft_path),
+                "entry_count": len(entries),
+                "entries": [entry.to_json_dict() for entry in entries],
+            },
+            indent=2,
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+    return Milestone16RegressionPromotionReport(
+        comparison_report=str(comparison_path),
+        raft_coupling_report=str(raft_path),
+        registry_path=str(registry),
+        fixture_root=str(root),
+        entries=tuple(entries),
+        notes=(
+            "Only passing GeoClaw/C++ threshold runs were copied as regression fixtures.",
+            "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs.",
         ),
     )
 
@@ -1225,6 +1373,100 @@ def _last_manifest_frame_path(manifest_path: Path) -> Path:
     if not isinstance(frames, list) or not frames:
         raise ValueError(f"Manifest {manifest_path} does not contain frames.")
     return manifest_path.parent / Path(str(frames[-1]))
+
+
+def _promote_geoclaw_cpp_regression(
+    record: dict[str, object],
+    source_report: Path,
+    fixture_root: Path,
+) -> Milestone16RegressionPromotionEntry:
+    gate_id = str(record["gate_scenario_id"])
+    solver_mode = str(record["solver_mode"])
+    comparison_dir = Path(str(record["comparison_dir"]))
+    manifest_path = comparison_dir / "dual_solver_manifest.json"
+    threshold_path = comparison_dir / "threshold_evaluation.json"
+    manifest = _read_json(manifest_path)
+    threshold = _read_json(threshold_path)
+    if not bool(threshold.get("passed")):
+        raise ValueError(f"Refusing to promote failed comparison artifact: {comparison_dir}")
+
+    artifact_dir = fixture_root / "geoclaw_cpp" / _case_dir(gate_id) / solver_mode
+    scenario_target = artifact_dir / "scenario"
+    reports_target = artifact_dir / "reports"
+    scenario_source = Path(str(manifest["scenario_package"]))
+    if scenario_target.exists():
+        shutil.rmtree(scenario_target)
+    shutil.copytree(scenario_source, scenario_target)
+    reports_target.mkdir(parents=True, exist_ok=True)
+    reports = {}
+    for name in (
+        "dual_solver_manifest.json",
+        "threshold_evaluation.json",
+        "field_comparison.json",
+        "probe_comparison.json",
+        "diagnostic_comparison.json",
+        "feature_comparison.json",
+    ):
+        source = comparison_dir / name
+        if source.exists():
+            target = reports_target / name
+            shutil.copy2(source, target)
+            reports[Path(name).stem] = str(target)
+
+    return Milestone16RegressionPromotionEntry(
+        artifact_id=f"geoclaw_cpp/{gate_id}/{solver_mode}",
+        category="geoclaw_cpp",
+        gate_scenario_id=gate_id,
+        actual_scenario_id=str(record["actual_scenario_id"]),
+        suite=str(record["suite"]),
+        solver_mode=solver_mode,
+        artifact_dir=str(artifact_dir),
+        source_report=str(source_report),
+        passed=True,
+        scenario_package=str(scenario_target),
+        manifest=str(reports_target / "dual_solver_manifest.json"),
+        reports=reports,
+    )
+
+
+def _promote_raft_coupling_artifact(
+    record: dict[str, object],
+    source_report: Path,
+    fixture_root: Path,
+) -> Milestone16RegressionPromotionEntry:
+    gate_id = str(record["gate_scenario_id"])
+    solver_mode = str(record["solver_mode"])
+    case_id = str(record["case_id"])
+    artifact_dir = fixture_root / "raft_coupling" / _case_dir(gate_id) / solver_mode / case_id
+    artifact_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = artifact_dir / "raft_coupling_case.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": MILESTONE16_REGRESSION_REGISTRY_SCHEMA,
+                "source_report": str(source_report),
+                "record": record,
+            },
+            indent=2,
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+    return Milestone16RegressionPromotionEntry(
+        artifact_id=f"raft_coupling/{gate_id}/{solver_mode}/{case_id}",
+        category="raft_coupling",
+        gate_scenario_id=gate_id,
+        actual_scenario_id=str(record["actual_scenario_id"]),
+        suite=str(record["suite"]),
+        solver_mode=solver_mode,
+        artifact_dir=str(artifact_dir),
+        source_report=str(source_report),
+        passed=True,
+        case_id=case_id,
+        manifest=str(manifest_path),
+        reports={"raft_coupling_case": str(manifest_path)},
+        notes=("Frame paths remain in generated Milestone 16 output directories.",),
+    )
 
 
 def _write_milestone16_comparison_manifest(

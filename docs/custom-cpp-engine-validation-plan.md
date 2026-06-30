@@ -79,6 +79,7 @@ Fallback or initial-state-only GeoClaw normalization is useful for schema smoke 
 
 ## Phase 6: Regression Fixtures And Reports
 
+- Milestone 16 promoted-regression evidence is tracked in `physics/reports/milestone16/regression_promotion_manifest.json`, `physics/reports/milestone16/regression_promotion_manifest.md`, and `physics/regression_fixtures/milestone16/registry.json`; 4 passing GeoClaw/C++ threshold runs were copied as fixtures and 7 passing raft-coupling cases were captured as artifact manifests.
 - Promote passing GeoClaw/C++/raft comparison runs into committed regression fixtures or artifact manifests.
 - Generate one JSON report and one human-readable Markdown report for each scenario suite.
 - Keep a CI smoke subset that does not require external GeoClaw execution.

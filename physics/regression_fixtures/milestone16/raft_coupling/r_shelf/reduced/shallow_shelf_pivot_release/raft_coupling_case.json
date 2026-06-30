@@ -1,0 +1,90 @@
+{
+  "record": {
+    "actual_scenario_id": "shallow_shelf_seed_21",
+    "candidate_checks": [
+      {
+        "details": "Grounding contacts should include a shallow shelf tag.",
+        "name": "shallow_contact",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 13.0
+      },
+      {
+        "details": "Shelf contact should occur in shallow water.",
+        "name": "shallow_depth",
+        "passed": true,
+        "threshold": 0.35,
+        "value": 0.0
+      },
+      {
+        "details": "Grounding force should support a meaningful share of raft weight.",
+        "name": "grounding_support",
+        "passed": true,
+        "threshold": 0.5,
+        "value": 8.908450581601228
+      },
+      {
+        "details": "Off-center shelf contact should pivot the raft.",
+        "name": "pivot_yaw",
+        "passed": true,
+        "threshold": 0.5,
+        "value": 18.687572847285093
+      }
+    ],
+    "candidate_frame": "outputs/m16cpp/r_shelf/reduced/cpp_solver/shallow_shelf_seed_21/frames/frame_0008.csv",
+    "candidate_outcome": "pivoted",
+    "candidate_passed": true,
+    "case_id": "shallow_shelf_pivot_release",
+    "expected_outcomes": [
+      "grounded",
+      "pinned"
+    ],
+    "feature_outcome_match": true,
+    "flow_band": null,
+    "force_delta_weight_ratio": 0.8623755252301205,
+    "force_envelope_outcome_match": true,
+    "gate_scenario_id": "shallow_shelf",
+    "notes": [],
+    "passed": true,
+    "reference_checks": [
+      {
+        "details": "Grounding contacts should include a shallow shelf tag.",
+        "name": "shallow_contact",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 7.0
+      },
+      {
+        "details": "Shelf contact should occur in shallow water.",
+        "name": "shallow_depth",
+        "passed": true,
+        "threshold": 0.35,
+        "value": 4.2773710222263627e-07
+      },
+      {
+        "details": "Grounding force should support a meaningful share of raft weight.",
+        "name": "grounding_support",
+        "passed": true,
+        "threshold": 0.5,
+        "value": 8.235987927295065
+      },
+      {
+        "details": "Off-center shelf contact should pivot the raft.",
+        "name": "pivot_yaw",
+        "passed": true,
+        "threshold": 0.5,
+        "value": 20.18441062783289
+      }
+    ],
+    "reference_frame": "outputs/m16g/r_shelf/normalized/frames/frame_0002.npz",
+    "reference_outcome": "pivoted",
+    "reference_passed": true,
+    "solver_mode": "reduced",
+    "suite": "rafting",
+    "torque_delta_inertia_ratio": 2.3286381408928993,
+    "trajectory_position_delta_m": 0.0023499733062520055,
+    "trajectory_velocity_delta_mps": 0.1409983983751247
+  },
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "source_report": "reports/milestone16/raft_coupling_validation.json"
+}
