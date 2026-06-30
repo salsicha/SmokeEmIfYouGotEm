@@ -44,6 +44,12 @@ Each analytic fixture must include provenance notes that explain the source equa
 
 Analytic fixtures are diagnostic gates, not gameplay content. Parameter retuning for big rapids must not be accepted if it regresses these small cases.
 
+## Real-World Validation Evidence Decision
+
+GeoClaw parity is necessary but not enough for raft outcomes such as surf, flush, pin, release, and flip. Real-world footage, gauge history, aerial/satellite imagery, and guide feedback must be attached to precise river locations through a validation annotation editor.
+
+Each river-validation annotation should record its anchor location, source/provenance, flow context, rights status, expected feature behavior, expected raft outcome, reviewer confidence, and whether it is used for physics validation, visual/audio fidelity, gameplay tuning, or all three. These annotations should be visible during game-engine fidelity review so rendered rapids, solver fields, raft trajectories, foam/spray/audio cues, and guide notes can be compared in the same place.
+
 ## Non-Goals
 
 - Do not require full 3D CFD or Navier-Stokes simulation for the first accepted runtime.
@@ -135,7 +141,7 @@ The C++ engine is accepted for live Unreal water only when:
 - Exact numerical bounds and default gains for each allowed feature-forcing family.
 - Whether the first accepted runtime remains CPU-only or starts a GPU path after correctness is established.
 - Exact numerical thresholds for research-accepted, Unreal-prototype, and production-candidate tiers.
-- Which real-world footage, gauge histories, guide notes, and aerial references are required to validate rapid-specific behavior beyond GeoClaw parity.
+- Exact schema fields and acceptance thresholds for river validation annotations and guide-review signoff.
 
 ## Related Docs
 

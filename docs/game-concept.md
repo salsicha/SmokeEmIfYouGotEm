@@ -151,6 +151,7 @@ Prototype systems:
 
 - Headless Python simulation before Unreal integration
 - 2.5D procedural and real-world scenario packages with bed, surface, depth, velocity, wet/dry state, features, source manifests, seasonal flow presets, and raft parameters
+- A river/rapid editor for attaching footage, gauge history, aerial imagery, guide feedback, expected raft outcomes, and validation confidence to exact river locations
 - GeoClaw reference simulation for shallow-water/geophysical-flow behavior
 - Custom C++ reduced shallow-water / height-field solver tuned against GeoClaw
 - Solver-neutral raft hull/contact sampling for buoyancy, drag, grounding, wave, hole, and paddle forces
@@ -226,7 +227,7 @@ Possible later modes:
 
 - Co-op raft crew
 - Asynchronous leaderboard runs
-- Custom river editor
+- Custom river/rapid editor with validation annotations
 - Guide career mode
 
 ## Progression

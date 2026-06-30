@@ -161,13 +161,29 @@ Signals:
 Workflow:
 
 1. Generate automated rapid candidates from slope, constriction, roughness, and imagery texture.
-2. Build a rapid review tool that shows DEM, aerial/satellite imagery, flowline, cross sections, and candidate tags.
+2. Build a rapid review and validation annotation editor that shows DEM, aerial/satellite imagery, flowline, cross sections, gauge history, reference footage links, guide feedback, and candidate tags.
 3. Let a designer or river-domain reviewer classify each candidate: pool, riffle, wave train, technical rapid, hole, ledge, strainer risk, portage, access point.
-4. Save rapid boundaries and feature annotations back into the scenario database.
-5. Group reviewed labels into cascading reaches and drop transitions.
-6. Feed selected reach/drop sequences into GeoClaw/custom-C++ scenario generation.
+4. Let reviewers annotate station ranges, reach/drop IDs, polygons, points, and raft lines with footage timecodes, gauge/date context, aerial imagery dates, guide notes, confidence, expected surf/flush/pin/flip outcomes, and rights/provenance status.
+5. Save rapid boundaries, validation annotations, and feature annotations back into the scenario database.
+6. Group reviewed labels into cascading reaches and drop transitions.
+7. Feed selected reach/drop sequences into GeoClaw/custom-C++ scenario generation.
 
 The first version can use manual/semi-automated labeling. Machine learning for rapid detection should wait until enough labeled examples exist.
+
+## River Validation Annotation Editor
+
+The rapid review tool should grow into a game/editor-integrated level-design tool for rapid fidelity review. It must let designers and river-domain reviewers attach evidence directly to locations in the river rather than keeping footage, gauge notes, imagery, and guide feedback in loose documents.
+
+Annotation anchors:
+
+- River station, centerline distance, local/world coordinate, reach ID, drop-transition ID, pool/control ID, and optional polygon/line/point geometry.
+- Flow context: gauge source, discharge/stage, observation date/time, flow band, flow percentile, season, transfer-function confidence, and release/snowmelt/rain context where known.
+- Visual context: aerial/satellite imagery source, acquisition date, tile/product ID, water mask, foam/whitewater texture note, boulder/bank/ledge observation, and confidence.
+- Media context: reference footage/still ID, timecode, camera location/direction where known, licensing/review status, and whether the media can be redistributed or only referenced internally.
+- Guide feedback: expected line, hazard notes, scout notes, commercial/local running advice, flow-specific changes, and reviewer confidence.
+- Validation target: expected water feature behavior, raft outcome class, surf/flush/pin/flip risk, high-side/brace/line counterplay, and accepted tolerance or review status.
+
+The editor should export text-first JSON/GeoJSON annotation packages that can be consumed by Python scenario generation, GeoClaw/C++ validation reports, and Unreal data assets. Heavy footage, imagery, guidebook text, or third-party media should be referenced through source manifests unless rights allow vendoring. During game-engine fidelity review, the same annotations should appear as viewport pins, station spans, polygons, overlays, and comparison panels next to GeoClaw/C++ fields, raft trajectories, and rendered water/foam/audio cues.
 
 ## Seasonal Flow Research
 

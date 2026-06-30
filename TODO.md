@@ -286,7 +286,7 @@ This milestone turns the custom C++ shallow-water / height-field solver from a r
 - [x] Decide how much authored feature forcing is acceptable versus pure shallow-water dynamics: forcing is allowed only when bounded, manifest-recorded, GeoClaw-compared, flow-dependent, and not hiding conservation failures; expose parameters for gameplay/visual tuning with low default gains until validation passes.
 - [x] Decide the canonical storage format for cascading reach/drop packages: support reach-local grids with overlap/ghost zones for authoring and streaming, but require stitched whole-window validation outputs so seams cannot hide physics errors.
 - [ ] Evaluate Chrono::FSI only after the GeoClaw/custom-C++ solver comparison path is stable.
-- [ ] Identify reference footage, river data, aerial/satellite imagery, flow history, and expert guide feedback needed for validation.
+- [x] Identify reference footage, river data, aerial/satellite imagery, flow history, and expert guide feedback needed for validation: build a game/editor-integrated river validation annotation tool so evidence is attached directly to river stations, reaches, drops, raft lines, and expected outcomes.
 - [ ] Decide which geospatial formats become canonical for source data, generated scenarios, and Unreal corridor packages.
 - [ ] Re-check latest UE5 rendering/geospatial plugin capabilities at the Python-to-Unreal readiness gate.
 - [ ] Decide local AI model/runtime strategy for desktop, VR, handheld, and future console targets.
@@ -319,6 +319,10 @@ This milestone turns the custom C++ shallow-water / height-field solver from a r
 - [ ] Add a versioned reach-local grid schema with local transforms, overlap/ghost-zone ownership, neighbor references, and reach/drop IDs.
 - [ ] Export stitched whole-window validation fields, probes, cross sections, conservation summaries, and raft transition checkpoints for every cascading package.
 - [ ] Add seam diagnostics that fail validation when reach-local boundaries hide mass, momentum, energy, wet/dry, bed-slope, feature-location, or raft-state errors.
+- [ ] Add a versioned river validation annotation schema for station/reach/drop anchors, footage timecodes, gauge history, aerial imagery, guide feedback, expected raft outcomes, confidence, and rights/provenance.
+- [ ] Build the first rapid review/editor workflow that displays DEM/lidar, aerial/satellite imagery, flowlines, cross sections, gauge history, source manifests, candidate tags, and guide notes in one view.
+- [ ] Export annotation packages as JSON/GeoJSON for Python scenario generation, GeoClaw/C++ validation reports, and Unreal river data assets.
+- [ ] Add Unreal fidelity-review overlays for annotation pins/spans/polygons, solver fields, raft trajectories, rendered water/foam/audio cues, and expected surf/flush/pin/flip behavior.
 - [ ] Draft the first candidate river inventory and source manifest.
 - [ ] Prototype course/elevation extraction for one river section.
 - [ ] Define the first rapid-review labels and seasonal flow/difficulty parameter mapping.
