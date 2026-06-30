@@ -19,16 +19,17 @@ See [Chaos And Jolt Runtime Evaluation](chaos-jolt-runtime-evaluation.md) for th
 
 ## Integration Rule
 
-The custom C++ water solver remains the primary Unreal runtime candidate, as frozen in [Custom Water Runtime Baseline](custom-water-runtime-baseline.md). The selected raft/contact runtime receives sampled water/contact inputs and returns raft transforms, velocities, contacts, and force telemetry. If Chaos and Jolt both miss authority gates, the fallback is a reduced custom rigid-body integrator using the same schemas and water query API, not a replacement of the water solver.
+The custom C++ water solver remains the primary Unreal runtime candidate, as frozen in [Custom Water Runtime Baseline](custom-water-runtime-baseline.md), but live custom water still depends on the Milestone 18 validation closure described in [Custom C++ Engine Full Validation Plan](custom-cpp-engine-validation-plan.md). The selected raft/contact runtime receives sampled water/contact inputs and returns raft transforms, velocities, contacts, and force telemetry. If Chaos and Jolt both miss authority gates, the fallback is a reduced custom rigid-body integrator using the same schemas and water query API, not a replacement of the water solver.
 
 The detailed coupling strategy is captured in [Chrono Water And Raft Coupling Plan](chrono-water-raft-coupling-plan.md). Rock contacts should use partially elastic rubber-raft collision presets, while riverbed grounding should use low-restitution, high-damping inelastic contact presets.
 
 Project Chrono remains useful for high-fidelity reference, compliant-contact experiments, and optional FSI exploration, but it is no longer the only candidate for the shipping raft/contact runtime.
 
-## Near-Term Milestone 8 Work
+## Near-Term Runtime Work
 
-1. Build the Chaos automation fixtures and Jolt smoke fixtures from `chaos_jolt_runtime_evaluation.json`.
-2. Feed the custom C++ water field into both runtime targets as buoyancy/contact samples.
-3. Add distinct material presets for elastic rock impacts and inelastic bed grounding in both targets.
-4. Compare Chaos/Jolt telemetry, determinism, contact outcomes, and runtime cost against the same fixture summaries.
-5. Keep Chrono::FSI isolated behind an experiment flag and out of required build/test paths.
+1. Complete the Milestone 18 custom-water validation closure, or label any Chaos/Jolt runs as snapshot-only comparisons while live water remains blocked.
+2. Build the Chaos automation fixtures and Jolt smoke fixtures from `chaos_jolt_runtime_evaluation.json`.
+3. Feed the approved custom C++ water field, or a frozen validation snapshot, into both runtime targets as buoyancy/contact samples.
+4. Add distinct material presets for elastic rock impacts and inelastic bed grounding in both targets.
+5. Compare Chaos/Jolt telemetry, determinism, contact outcomes, and runtime cost against the same fixture summaries.
+6. Keep Chrono::FSI isolated behind an experiment flag and out of required build/test paths.
