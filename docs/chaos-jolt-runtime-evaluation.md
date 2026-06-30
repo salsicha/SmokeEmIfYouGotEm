@@ -11,6 +11,8 @@ Use a split/hybrid plan for now:
 
 No engine can own scoring-critical raft, crew, swimmer, pin, release, rescue, or flip outcomes until it passes the shared fixture suite in `unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json`.
 
+This evaluation follows the Milestone 18 custom-water validation closure. Until the C++ water solver is approved for live Unreal use, Chaos/Jolt fixtures may use frozen water snapshots and telemetry for runtime comparison, but they must not imply that live custom water has passed the GeoClaw/C++ gate.
+
 ## Why This Split
 
 Chaos is already inside Unreal, which makes it the practical default for animation-driven gameplay, visual ragdolls, physical assets, debugging, VR/editor iteration, props, ropes, paddles, bags, and shore clutter.
@@ -48,15 +50,17 @@ Both Chaos and Jolt must run the same six fixtures with the same water snapshots
 - Chaos cannot become authoritative for scoring-critical raft/contact outcomes merely because it is already in Unreal; it must pass the same fixtures.
 - Loose Chaos props may not change scoring-critical raft or swimmer outcomes unless they emit deterministic hazard events into the authoritative bridge.
 - Neither Chaos nor Jolt may mutate authoritative water state. Both consume custom-water snapshots through the same water query API.
+- Chaos/Jolt authority selection cannot override a blocked custom-water readiness report.
 - The selected runtime must export telemetry and replay data compatible with the existing raft/contact schemas.
 
 ## Implementation Steps
 
-1. Build Chaos automation fixtures in Unreal using `chaos_jolt_runtime_evaluation.json`.
-2. Build a Jolt native smoke harness or Unreal plugin path that loads the same fixture definitions.
-3. Export matching JSON summaries and fixed-step replay files for both runtimes.
-4. Add a comparison report that ranks Chaos and Jolt per fixture by determinism, runtime cost, contact quality, and gameplay outcome stability.
-5. Keep Chrono comparison optional for high-fidelity reference cases after the Chaos/Jolt fixture loop is working.
+1. Wait for Milestone 18 water-validation closure, or explicitly mark fixtures as snapshot-only runtime comparisons while live water remains blocked.
+2. Build Chaos automation fixtures in Unreal using `chaos_jolt_runtime_evaluation.json`.
+3. Build a Jolt native smoke harness or Unreal plugin path that loads the same fixture definitions.
+4. Export matching JSON summaries and fixed-step replay files for both runtimes.
+5. Add a comparison report that ranks Chaos and Jolt per fixture by determinism, runtime cost, contact quality, and gameplay outcome stability.
+6. Keep Chrono comparison optional for high-fidelity reference cases after the Chaos/Jolt fixture loop is working.
 
 ## Current Recommendation
 
