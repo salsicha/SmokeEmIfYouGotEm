@@ -1,0 +1,21 @@
+{
+  "diagnostics": {
+    "specific_energy_residual": 0.0
+  },
+  "field_files": {
+    "reference_fields": "reference_fields.npz"
+  },
+  "fixture_id": "bed_step_subcritical",
+  "fixture_set_version": "manual_swashes_style_seed_v0",
+  "parameters": {
+    "downstream_depth": 0.9702833810332594,
+    "downstream_velocity": 0.7420512543802086,
+    "step_height": 0.22,
+    "total_head": 1.2183486238532109,
+    "unit_discharge": 0.72,
+    "upstream_depth": 1.2,
+    "upstream_velocity": 0.6
+  },
+  "schema_version": "raftsim.analytic_reference.v0",
+  "summary": "Specific energy and unit discharge define upstream/downstream subcritical depths."
+}

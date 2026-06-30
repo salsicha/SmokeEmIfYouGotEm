@@ -1,0 +1,19 @@
+{
+  "diagnostics": {
+    "left_total_depth": 1536.0,
+    "right_total_depth": 268.8
+  },
+  "field_files": {
+    "reference_fields": "reference_fields.npz"
+  },
+  "fixture_id": "dam_break_bore",
+  "fixture_set_version": "manual_swashes_style_seed_v0",
+  "parameters": {
+    "left_depth": 2.0,
+    "left_gravity_wave_speed": 4.4294469180700204,
+    "right_depth": 0.35,
+    "right_gravity_wave_speed": 1.8529705880018712
+  },
+  "schema_version": "raftsim.analytic_reference.v0",
+  "summary": "A left rarefaction and right-moving bore should form from the initial discontinuity."
+}

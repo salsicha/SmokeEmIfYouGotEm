@@ -127,6 +127,17 @@ speed.png
 
 `scenario.json` is the shared manifest. GeoClaw and the custom C++ solver both load or export from this same package.
 
+## Analytic Diagnostic Fixtures
+
+Milestone 17 adds a manually encoded SWASHES-style diagnostic suite before more C++ retuning. These fixtures are hand-authored from shallow-water equations and benchmark families; no external SWASHES data or code is vendored.
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.generate_analytic_fixtures
+```
+
+The suite writes `data/validation/milestone17/analytic_fixtures/manifest.json` plus per-fixture solver-neutral scenario packages and analytic reference files for lake-at-rest balance, sloping-channel friction, wet/dry shoreline, bed step, dam-break/bore, hydraulic jump, and transcritical bump diagnostics.
+
 ## GeoClaw Reference Harness
 
 GeoClaw is the active offline reference target for river-water validation. It is an optional research dependency because local runs normally need the Clawpack Python modules plus a Fortran-capable build toolchain.

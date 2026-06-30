@@ -1,0 +1,19 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 31.5,
+        "y": 0.0
+      },
+      "kind": "wave_train",
+      "length": 6.0,
+      "metadata": {
+        "analytic_fixture_role": "hydraulic_jump"
+      },
+      "radius": 2.0,
+      "strength": 3.0,
+      "width": 23.0
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "diagnostics": {
+    "eta_max": 1.35,
+    "eta_min": 1.35,
+    "speed_linf": 0.0
+  },
+  "field_files": {
+    "reference_fields": "reference_fields.npz"
+  },
+  "fixture_id": "lake_at_rest_balance",
+  "fixture_set_version": "manual_swashes_style_seed_v0",
+  "parameters": {
+    "eta": 1.35
+  },
+  "schema_version": "raftsim.analytic_reference.v0",
+  "summary": "Free surface eta is spatially constant and velocity is zero."
+}

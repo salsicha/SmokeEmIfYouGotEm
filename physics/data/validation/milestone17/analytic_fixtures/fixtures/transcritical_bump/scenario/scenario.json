@@ -1,0 +1,98 @@
+{
+  "array_files": {
+    "bed": "bed.npy",
+    "features": "features.json",
+    "initial_state": "initial_state.npz",
+    "probes": "probes.json"
+  },
+  "boundaries": [
+    {
+      "depth": 0.7682214714102663,
+      "edge": "west",
+      "hydrograph": [],
+      "kind": "inflow",
+      "metadata": {},
+      "stage": null,
+      "velocity": [
+        1.1715371588714132,
+        0.0
+      ]
+    },
+    {
+      "depth": null,
+      "edge": "east",
+      "hydrograph": [],
+      "kind": "outflow",
+      "metadata": {},
+      "stage": null,
+      "velocity": null
+    },
+    {
+      "depth": null,
+      "edge": "south",
+      "hydrograph": [],
+      "kind": "wall",
+      "metadata": {},
+      "stage": null,
+      "velocity": null
+    },
+    {
+      "depth": null,
+      "edge": "north",
+      "hydrograph": [],
+      "kind": "wall",
+      "metadata": {},
+      "stage": null,
+      "velocity": null
+    }
+  ],
+  "duration": 6.0,
+  "feature_count": 1,
+  "fixed_dt": 0.016666666666666666,
+  "grid": {
+    "dx": 1.0,
+    "dy": 1.0,
+    "nx": 64,
+    "ny": 24,
+    "origin_x": 0.0,
+    "origin_y": -11.5
+  },
+  "metadata": {
+    "confidence_score": 1.0,
+    "coordinate_reference_system": null,
+    "description": "Steady rectangular-channel flow over a smooth bump with near-critical crest behavior.",
+    "difficulty_preset": "not_gameplay",
+    "fixture_kind": null,
+    "flow_band": "analytic_diagnostic",
+    "flow_percentile": null,
+    "gauge_source": null,
+    "generator": "raftsim.analytic_fixtures",
+    "generator_version": "manual_swashes_style_seed_v0",
+    "provenance": {
+      "analytic_fixture_id": "transcritical_bump",
+      "external_data_vendored": false,
+      "title": "Transcritical Flow Over Bump"
+    },
+    "river_id": null,
+    "scenario_id": "analytic_transcritical_bump",
+    "scenario_type": "fixture",
+    "season_preset": null,
+    "section_id": null,
+    "seed": 17,
+    "source_manifest": null
+  },
+  "probe_count": 4,
+  "raft": {
+    "drag_coefficient": 1.25,
+    "grounding_friction": 0.65,
+    "guide_mass_kg": 85.0,
+    "length_m": 4.3,
+    "mass_kg": 420.0,
+    "passenger_count": 6,
+    "passenger_mass_kg": 75.0,
+    "tube_radius_m": 0.28,
+    "width_m": 1.9
+  },
+  "roughness": 0.0,
+  "schema_version": "raftsim.scenario2_5d.v0"
+}

@@ -1,0 +1,19 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 31.5,
+        "y": 0.0
+      },
+      "kind": "constriction",
+      "length": 16.0,
+      "metadata": {
+        "analytic_fixture_role": "transcritical_bump"
+      },
+      "radius": 8.0,
+      "strength": 0.18,
+      "width": 23.0
+    }
+  ]
+}
