@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raftsim.local/schemas/reach_local_grid.schema.json",
+  "title": "RaftSim Reach-Local Grid Contract",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "reach_local_grids",
+    "stitched_validation_outputs",
+    "seam_diagnostics"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "raftsim.reach_local_grid.v0"
+    },
+    "contract_id": {
+      "type": "string"
+    },
+    "reach_local_grids": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "grid_id",
+          "reach_id",
+          "station_range_m",
+          "local_transform",
+          "ghost_zones",
+          "neighbor_refs"
+        ]
+      }
+    },
+    "stitched_validation_outputs": {
+      "type": "object",
+      "required": [
+        "required",
+        "fields",
+        "probes",
+        "cross_sections",
+        "conservation_summary",
+        "raft_transition_checkpoints"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "seam_diagnostics": {
+      "type": "object",
+      "required": [
+        "required",
+        "checks"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    }
+  }
+}

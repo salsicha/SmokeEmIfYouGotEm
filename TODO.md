@@ -285,7 +285,7 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [x] Manually encode a small SWASHES-style set for lake-at-rest balance, sloping-channel friction, wet/dry shoreline, bed step, dam-break/bore, hydraulic jump, and transcritical bump cases where practical.
 - [x] Add C++ and GeoClaw/analytic comparison reports that fail retuning when small analytic fixtures regress.
 - [x] Add a versioned feature-forcing contract and validator with low defaults, flow-response curves, manifest records, GeoClaw comparison requirements, and conservation guards.
-- [ ] Add versioned contracts and validators for reach-local grids, stitched validation outputs, river validation annotations, and canonical geospatial packages.
+- [x] Add versioned contracts and validators for reach-local grids, stitched validation outputs, river validation annotations, and canonical geospatial packages.
 
 ## Technical Notes To Revisit
 
@@ -326,15 +326,15 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [x] Add GeoClaw/C++ validation checks that reject feature forcing when it hides mass, momentum, energy, wet/dry, or reach/drop handoff failures.
 - [ ] Add crew weight-distribution and high-side/brace/lean telemetry for seat occupancy, center-of-gravity shifts, roll moment, contact loading, and pin/flip/release thresholds.
 - [ ] Add rock, sticky-hole, lateral-hit, shallow-shelf, pin/release, and flip fixtures that require correctly timed crew weight shifts for safe outcomes.
-- [ ] Add a versioned reach-local grid schema with local transforms, overlap/ghost-zone ownership, neighbor references, and reach/drop IDs.
+- [x] Add a versioned reach-local grid schema with local transforms, overlap/ghost-zone ownership, neighbor references, and reach/drop IDs.
 - [ ] Export stitched whole-window validation fields, probes, cross sections, conservation summaries, and raft transition checkpoints for every cascading package.
-- [ ] Add seam diagnostics that fail validation when reach-local boundaries hide mass, momentum, energy, wet/dry, bed-slope, feature-location, or raft-state errors.
-- [ ] Add a versioned river validation annotation schema for station/reach/drop anchors, footage timecodes, gauge history, aerial imagery, guide feedback, expected raft outcomes, confidence, and rights/provenance.
+- [x] Add contract-level seam diagnostics that fail validation when reach-local boundaries omit mass, momentum, energy, wet/dry, bed-slope, feature-location, or raft-state checks.
+- [x] Add a versioned river validation annotation schema for station/reach/drop anchors, footage timecodes, gauge history, aerial imagery, guide feedback, expected raft outcomes, confidence, and rights/provenance.
 - [ ] Build the first rapid review/editor workflow that displays DEM/lidar, aerial/satellite imagery, flowlines, cross sections, gauge history, source manifests, candidate tags, and guide notes in one view.
-- [ ] Export annotation packages as JSON/GeoJSON for Python scenario generation, GeoClaw/C++ validation reports, and Unreal river data assets.
+- [x] Export annotation packages as JSON/GeoJSON for Python scenario generation, GeoClaw/C++ validation reports, and Unreal river data assets.
 - [ ] Add Unreal fidelity-review overlays for annotation pins/spans/polygons, solver fields, raft trajectories, rendered water/foam/audio cues, and expected surf/flush/pin/flip behavior.
-- [ ] Add a versioned geospatial format contract covering CRS policy, GeoJSON/GeoPackage vectors, GeoTIFF/COG rasters, LAS/LAZ/COPC point clouds, gauge-history tables, solver arrays, and Unreal corridor exports.
-- [ ] Add import/export validation checks that reject missing CRS metadata, lossy Shapefile-only canonical inputs, missing source manifests, and untracked WGS84/local transform changes.
+- [x] Add a versioned geospatial format contract covering CRS policy, GeoJSON/GeoPackage vectors, GeoTIFF/COG rasters, LAS/LAZ/COPC point clouds, gauge-history tables, solver arrays, and Unreal corridor exports.
+- [x] Add import/export validation checks that reject missing CRS metadata, lossy Shapefile-only canonical inputs, missing source manifests, and untracked WGS84/local transform changes.
 - [ ] Draft the first candidate river inventory and source manifest.
 - [ ] Prototype course/elevation extraction for one river section.
 - [ ] Define the first rapid-review labels and seasonal flow/difficulty parameter mapping.

@@ -1,0 +1,70 @@
+{
+  "schema_version": "raftsim.reach_local_grid.v0",
+  "contract_id": "milestone17_reach_local_grid_contract",
+  "reach_local_grids": [
+    {
+      "grid_id": "reach_001_pool_grid",
+      "reach_id": "reach_001_pool",
+      "drop_id": null,
+      "station_range_m": [0.0, 140.0],
+      "local_transform": {
+        "source_crs": "EPSG:4326",
+        "working_crs": "local_enu_m",
+        "origin_wgs84": [-120.0, 38.8],
+        "origin_station_m": 0.0,
+        "rotation_degrees": 0.0,
+        "dx_m": 1.0,
+        "dy_m": 1.0
+      },
+      "ghost_zones": {
+        "upstream_cells": 4,
+        "downstream_cells": 6,
+        "left_cells": 2,
+        "right_cells": 2,
+        "ownership": "interior_wins_ghosts_are_read_only"
+      },
+      "neighbor_refs": {
+        "upstream": null,
+        "downstream": "drop_001_grid"
+      }
+    },
+    {
+      "grid_id": "drop_001_grid",
+      "reach_id": "reach_002_drop",
+      "drop_id": "drop_001",
+      "station_range_m": [132.0, 210.0],
+      "local_transform": {
+        "source_crs": "EPSG:4326",
+        "working_crs": "local_enu_m",
+        "origin_wgs84": [-120.0, 38.8],
+        "origin_station_m": 132.0,
+        "rotation_degrees": 0.0,
+        "dx_m": 0.5,
+        "dy_m": 0.5
+      },
+      "ghost_zones": {
+        "upstream_cells": 6,
+        "downstream_cells": 6,
+        "left_cells": 3,
+        "right_cells": 3,
+        "ownership": "interior_wins_ghosts_are_read_only"
+      },
+      "neighbor_refs": {
+        "upstream": "reach_001_pool_grid",
+        "downstream": "reach_003_recovery_grid"
+      }
+    }
+  ],
+  "stitched_validation_outputs": {
+    "required": true,
+    "fields": ["h", "eta", "u", "v", "hu", "hv", "wet", "froude"],
+    "probes": true,
+    "cross_sections": true,
+    "conservation_summary": true,
+    "raft_transition_checkpoints": true
+  },
+  "seam_diagnostics": {
+    "required": true,
+    "checks": ["mass", "momentum", "energy", "wet_dry", "bed_slope", "feature_location", "raft_state"]
+  }
+}

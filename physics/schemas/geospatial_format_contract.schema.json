@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raftsim.local/schemas/geospatial_format_contract.schema.json",
+  "title": "RaftSim Geospatial Format Contract",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "crs_policy",
+    "source_manifest_required",
+    "shapefile_canonical_allowed",
+    "canonical_formats",
+    "transform_policy"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "raftsim.geospatial_format_contract.v0"
+    },
+    "contract_id": {
+      "type": "string"
+    },
+    "source_manifest_required": {
+      "type": "boolean",
+      "const": true
+    },
+    "shapefile_canonical_allowed": {
+      "type": "boolean",
+      "const": false
+    },
+    "canonical_formats": {
+      "type": "array",
+      "minItems": 7
+    },
+    "transform_policy": {
+      "type": "object",
+      "required": [
+        "wgs84_required",
+        "local_solver_transform_required",
+        "transform_changes_tracked"
+      ]
+    }
+  }
+}

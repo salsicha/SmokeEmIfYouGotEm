@@ -6,8 +6,11 @@ from raftsim.scenario2_5d import SCENARIO_SCHEMA_VERSION
 from raftsim.schema_versions import (
     ANALYTIC_FIXTURE_MANIFEST_SCHEMA_VERSION,
     FEATURE_FORCING_SCHEMA_VERSION,
+    GEOSPATIAL_FORMAT_CONTRACT_SCHEMA_VERSION,
     PARAMETER_SCHEMA_VERSION,
+    REACH_LOCAL_GRID_SCHEMA_VERSION,
     REPLAY_SCHEMA_VERSION,
+    RIVER_VALIDATION_ANNOTATION_SCHEMA_VERSION,
     SHARED_SCHEMA_SET_VERSION,
     SOURCE_MANIFEST_SCHEMA_VERSION,
     TELEMETRY_FORCE_SCHEMA_VERSION,
@@ -30,6 +33,9 @@ def test_shared_schema_manifest_references_frozen_schema_files():
         "source_manifest",
         "analytic_fixture_manifest",
         "feature_forcing",
+        "reach_local_grid",
+        "river_validation_annotation",
+        "geospatial_format_contract",
     }
     for entry in entries.values():
         assert (schemas_dir / entry["file"]).exists()
@@ -109,6 +115,20 @@ def test_frozen_feature_forcing_schema_uses_feature_forcing_version():
     assert manifest["schema_version"] == FEATURE_FORCING_SCHEMA_VERSION
     assert manifest["defaults"]["enabled_by_default"] is False
     assert len(manifest["feature_families"]) == 9
+
+
+def test_frozen_milestone17_contract_schemas_use_versions():
+    reach = _load_schema("reach_local_grid.schema.json")
+    annotations = _load_schema("river_validation_annotation.schema.json")
+    geospatial = _load_schema("geospatial_format_contract.schema.json")
+    config_dir = Path(__file__).resolve().parents[1] / "config"
+
+    assert reach["properties"]["schema_version"]["const"] == REACH_LOCAL_GRID_SCHEMA_VERSION
+    assert annotations["properties"]["schema_version"]["const"] == RIVER_VALIDATION_ANNOTATION_SCHEMA_VERSION
+    assert geospatial["properties"]["schema_version"]["const"] == GEOSPATIAL_FORMAT_CONTRACT_SCHEMA_VERSION
+    assert json.loads((config_dir / "reach_local_grid_contract.json").read_text(encoding="utf-8"))["schema_version"] == REACH_LOCAL_GRID_SCHEMA_VERSION
+    assert json.loads((config_dir / "river_validation_annotations.example.geojson").read_text(encoding="utf-8"))["schema_version"] == RIVER_VALIDATION_ANNOTATION_SCHEMA_VERSION
+    assert json.loads((config_dir / "geospatial_format_contract.json").read_text(encoding="utf-8"))["schema_version"] == GEOSPATIAL_FORMAT_CONTRACT_SCHEMA_VERSION
 
 
 def _load_schema(name: str) -> dict[str, object]:

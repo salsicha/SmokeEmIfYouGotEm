@@ -1,0 +1,39 @@
+{
+  "schema_version": "raftsim.river_validation_annotation.v0",
+  "type": "FeatureCollection",
+  "package_id": "milestone17_south_fork_annotation_example",
+  "export_targets": ["python_scenario_generation", "geoclaw_cpp_validation_reports", "unreal_data_assets"],
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.0, 38.8]
+      },
+      "properties": {
+        "annotation_id": "sf_chili_bar_hole_001",
+        "anchor_type": "station",
+        "station_m": 152.0,
+        "reach_id": "reach_002_drop",
+        "drop_id": "drop_001",
+        "evidence": {
+          "footage": [{"source_id": "field_video_placeholder", "timecode": "00:01:12", "rights_status": "reference_only"}],
+          "gauge_history": [{"source_id": "usgs_gauge_placeholder", "flow_band": "medium"}],
+          "aerial_imagery": [{"source_id": "naip_placeholder", "capture_date": "planned"}],
+          "guide_feedback": [{"reviewer_id": "guide_placeholder", "summary": "Expected surf or flush depending on entry angle."}]
+        },
+        "expected_outcome": {
+          "feature_behavior": "sticky_hole_at_medium_flow",
+          "raft_outcome_class": "surf_or_flush",
+          "counterplay": ["square_entry", "forward_paddle", "high_side_if_stalled"],
+          "confidence": 0.4
+        },
+        "rights_provenance": {
+          "source_manifest": "source_manifest.json",
+          "redistribution": "metadata_only_until_rights_clear",
+          "review_status": "placeholder"
+        }
+      }
+    }
+  ]
+}

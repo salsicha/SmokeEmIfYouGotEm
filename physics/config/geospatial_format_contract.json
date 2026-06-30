@@ -1,0 +1,29 @@
+{
+  "schema_version": "raftsim.geospatial_format_contract.v0",
+  "contract_id": "milestone17_geospatial_format_contract",
+  "source_manifest_required": true,
+  "shapefile_canonical_allowed": false,
+  "crs_policy": {
+    "source_crs_required": true,
+    "working_crs_required": true,
+    "solver_local_crs_required": true,
+    "unreal_transform_required": true
+  },
+  "transform_policy": {
+    "wgs84_required": true,
+    "local_solver_transform_required": true,
+    "transform_changes_tracked": true
+  },
+  "canonical_formats": [
+    {"category": "source_manifests", "formats": ["JSON"], "required_metadata": ["provider", "license_or_terms", "attribution"]},
+    {"category": "vectors_annotations", "formats": ["GeoJSON", "GeoPackage"], "required_metadata": ["crs", "source_manifest"]},
+    {"category": "rasters", "formats": ["GeoTIFF", "COG"], "required_metadata": ["crs", "resolution", "source_manifest"]},
+    {"category": "point_clouds", "formats": ["LAS", "LAZ", "COPC"], "required_metadata": ["crs", "vertical_datum", "source_manifest"]},
+    {"category": "gauge_history", "formats": ["JSON", "CSV", "Parquet"], "required_metadata": ["gauge_id", "units", "time_zone", "source_manifest"]},
+    {"category": "solver_packages", "formats": ["JSON", "NPY", "NPZ"], "required_metadata": ["scenario_schema", "array_manifest", "source_manifest"]},
+    {"category": "unreal_corridor_exports", "formats": ["JSON", "GeoJSON", "converted_engine_assets"], "required_metadata": ["wgs84_to_local_transform", "source_manifest"]}
+  ],
+  "rejected_canonical_formats": [
+    {"format": "Shapefile", "reason": "Allowed only as import material; not canonical because CRS, field names, multipart geometry, and metadata are too lossy for the source of truth."}
+  ]
+}

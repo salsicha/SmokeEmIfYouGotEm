@@ -35,6 +35,21 @@
       "name": "feature_forcing",
       "version": "raftsim.feature_forcing.v0",
       "file": "feature_forcing.schema.json"
+    },
+    {
+      "name": "reach_local_grid",
+      "version": "raftsim.reach_local_grid.v0",
+      "file": "reach_local_grid.schema.json"
+    },
+    {
+      "name": "river_validation_annotation",
+      "version": "raftsim.river_validation_annotation.v0",
+      "file": "river_validation_annotation.schema.json"
+    },
+    {
+      "name": "geospatial_format_contract",
+      "version": "raftsim.geospatial_format_contract.v0",
+      "file": "geospatial_format_contract.schema.json"
     }
   ]
 }
