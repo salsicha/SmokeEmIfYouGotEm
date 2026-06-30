@@ -110,6 +110,8 @@ The same files feed:
 - Solver comparison harness
 - Unreal replay/debug tools later
 
+Canonical geospatial interchange uses JSON source manifests, GeoJSON vectors/annotations, GeoPackage for larger reviewed GIS workspaces, GeoTIFF/Cloud Optimized GeoTIFF for DEMs and masks, LAS/LAZ or COPC for point clouds when needed, and normalized JSON/CSV/Parquet for gauge time series. Deterministic solver packages remain versioned JSON plus `.npy`/`.npz` arrays, and Unreal corridor exports use JSON/GeoJSON metadata plus converted engine assets.
+
 ## GeoClaw Reference Model
 
 GeoClaw is the reference solver for 2.5D river-water modeling.

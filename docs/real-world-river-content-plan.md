@@ -95,6 +95,24 @@ Optional / supplemental sources:
 - Commercial photogrammetry or aerial imagery when licensing allows.
 - Field survey data, guide GPS tracks, drone imagery, and reference video.
 
+## Canonical Geospatial Formats
+
+Use standard geospatial formats for source/editor data, then convert into deterministic solver packages and Unreal-facing assets.
+
+| Layer | Canonical format | Notes |
+| --- | --- | --- |
+| Source manifest and provenance | JSON | Record rights, CRS, source URLs, confidence, processing version, and redistribution notes. |
+| Simple vector exchange | GeoJSON | Centerlines, banks, cross sections, rapid polygons, validation annotations, and editor-friendly interchange. |
+| Larger multi-layer GIS workspace | GeoPackage (`.gpkg`) | Use when a river section outgrows loose GeoJSON layers or needs multi-layer review in desktop GIS. |
+| Terrain, DEMs, water masks, foam masks, and raster confidence layers | GeoTIFF / Cloud Optimized GeoTIFF | Preserve georeferencing for elevation and imagery-derived masks. |
+| Lidar or dense point clouds | LAS/LAZ or COPC | Use only when raw point clouds are needed beyond processed DEM tiles. |
+| Gauge and flow history | Normalized JSON first; CSV/Parquet for larger time series | Preserve gauge id, parameter code, units, timestamp, timezone, retrieval date, and transfer-function context. |
+| Solver package | Versioned JSON plus `.npy`/`.npz` arrays | Deterministic bed, state, reach/drop IDs, probes, features, flow presets, and comparison windows for GeoClaw/C++. |
+| River validation annotations | GeoJSON plus JSON manifest | Geometry anchors plus footage timecodes, gauge context, imagery dates, guide feedback, expected outcomes, confidence, and rights. |
+| Unreal corridor package | JSON/GeoJSON metadata plus converted terrain, masks, splines, data assets, and optional 3D Tiles | Preserve source references and local-to-WGS84 transforms while producing engine-ready assets. |
+
+Avoid Shapefile as a canonical format. It can be imported from outside sources, but it should be converted into GeoJSON or GeoPackage because Shapefile loses modern metadata, has awkward field limits, and is brittle for provenance-heavy workflows.
+
 ## River Course And Elevation Extraction
 
 Pipeline:
@@ -114,8 +132,10 @@ Output:
 - `river_course.json`
 - `centerline.geojson`
 - `cross_sections.geojson`
-- `terrain_dem.tif` or normalized grid export
+- `terrain_dem.tif` or Cloud Optimized GeoTIFF plus normalized solver grid export
 - `bank_masks.tif` / `water_masks.tif`
+- `rapid_annotations.geojson` and `river_validation_annotations.geojson`
+- Optional `river_workspace.gpkg` for larger reviewed multi-layer sections
 - `source_manifest.json`
 
 ## Variable Cascading River Model
