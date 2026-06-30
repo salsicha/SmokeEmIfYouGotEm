@@ -1,10 +1,14 @@
 import json
 from pathlib import Path
 
+from raftsim.analytic_fixtures import write_analytic_fixture_suite
 from raftsim.examples.generate_milestone18_failure_triage_matrix import main as generate_triage_main
+from raftsim.examples.run_milestone18_analytic_retune_guardrail import main as guardrail_main
 from raftsim.milestone18 import (
+    MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
     build_milestone18_failure_triage_matrix,
+    run_milestone18_analytic_retune_guardrail,
 )
 
 
@@ -181,3 +185,46 @@ def test_generate_milestone18_failure_triage_cli_writes_reports(tmp_path):
     assert payload["schema_version"] == MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA
     assert payload["summary"]["entry_count"] == 9
     assert "Milestone 18 GeoClaw/C++ Failure Triage Matrix" in output_md.read_text(encoding="utf-8")
+
+
+def test_milestone18_analytic_retune_guardrail_passes_for_baseline_scenario(tmp_path):
+    manifest_path = write_analytic_fixture_suite(tmp_path / "analytic_fixtures")
+
+    report = run_milestone18_analytic_retune_guardrail(
+        manifest_path,
+        tmp_path / "guardrails",
+        retune_batch_id="baseline",
+    )
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA
+    assert payload["decision"] == "PASS"
+    assert payload["preflight"]["passed"] is True
+    assert payload["postflight"]["passed"] is True
+    assert payload["regression_count"] == 0
+    assert (Path(report.output_dir) / "preflight_analytic_validation.json").exists()
+    assert (Path(report.output_dir) / "postflight_analytic_validation.json").exists()
+
+
+def test_run_milestone18_analytic_retune_guardrail_cli_writes_summary(tmp_path):
+    manifest_path = write_analytic_fixture_suite(tmp_path / "analytic_fixtures")
+
+    exit_code = guardrail_main(
+        [
+            "--manifest",
+            str(manifest_path),
+            "--output-dir",
+            str(tmp_path / "guardrails"),
+            "--retune-batch-id",
+            "baseline",
+        ]
+    )
+
+    assert exit_code == 0
+    output_root = tmp_path / "guardrails" / "baseline"
+    payload = json.loads((output_root / "analytic_retune_guardrail.json").read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA
+    assert payload["passed"] is True
+    assert "Milestone 18 Analytic Retune Guardrail" in (output_root / "analytic_retune_guardrail.md").read_text(
+        encoding="utf-8"
+    )

@@ -205,6 +205,8 @@ Run the manually encoded Milestone 17 analytic fixtures before and after every s
 
 A retune batch is blocked if these reports regress, even when a larger rapid or raft outcome improves. This keeps broad whitewater tuning from hiding source-term, wet/dry, conservation, or jump-location failures in small trusted cases.
 
+The preflight/postflight wrapper is `raftsim.examples.run_milestone18_analytic_retune_guardrail`. Its baseline scenario guardrail report lives under `physics/reports/milestone18/analytic_retune_guardrails/baseline_scenario_guardrail/` and records both analytic validation stages plus any pass-to-fail regressions.
+
 ### 6. Full Milestone 16 Gate Re-Run
 
 After parity, geometry, raft-coupling, pin/release, and analytic-guardrail checks pass, regenerate the suite-level C++ validation report and the GeoClaw-to-Unreal readiness report. The readiness report must still be allowed to block live custom water if any comparison, geometry family, raft outcome, runtime budget, deterministic replay, or regression-promotion requirement fails.

@@ -9,7 +9,10 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
+from .analytic_validation import AnalyticCandidateKind, AnalyticValidationReport, compare_analytic_fixture_manifest
+
 MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA = "raftsim.milestone18.failure_triage_matrix.v0"
+MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA = "raftsim.milestone18.analytic_retune_guardrail.v0"
 
 _CORE_GUARDRAIL_FAMILIES = {"hydrostatic_sloping_balance", "uniform_channel", "dam_break_bore"}
 _GEOMETRY_CLOSURE_FAMILIES = {"wet_dry_shoreline", "bed_step", "constriction", "drops_ledges_tailwater"}
@@ -260,6 +263,146 @@ class Milestone18FailureTriageReport:
         return output_path
 
 
+@dataclass(frozen=True, slots=True)
+class Milestone18AnalyticGuardrailStage:
+    """Preflight or postflight analytic-fixture validation evidence."""
+
+    stage: str
+    report_json: str
+    report_markdown: str
+    candidate_kind: str
+    candidate_label: str
+    candidate_root: str | None
+    frame_index: int
+    passed: bool
+    fixture_count: int
+    passed_count: int
+    failed_count: int
+    failing_metrics: tuple[dict[str, object], ...] = ()
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["failing_metrics"] = list(self.failing_metrics)
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18AnalyticRegression:
+    """A metric that passed before retuning and failed after retuning."""
+
+    fixture_id: str
+    metric_id: str
+    field: str
+    preflight_value: float
+    postflight_value: float
+    threshold: float
+    units: str
+
+    def to_json_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18AnalyticRetuneGuardrailReport:
+    """Preflight/postflight guardrail around Milestone 17 analytic fixtures."""
+
+    manifest_path: str
+    retune_batch_id: str
+    output_dir: str
+    preflight: Milestone18AnalyticGuardrailStage
+    postflight: Milestone18AnalyticGuardrailStage
+    regressions: tuple[Milestone18AnalyticRegression, ...] = ()
+
+    @property
+    def passed(self) -> bool:
+        return self.preflight.passed and self.postflight.passed and not self.regressions
+
+    @property
+    def blocked_reasons(self) -> tuple[str, ...]:
+        reasons: list[str] = []
+        if not self.preflight.passed:
+            reasons.append("Preflight analytic fixtures are already failing; retuning cannot start from this baseline.")
+        if not self.postflight.passed:
+            reasons.append("Postflight analytic fixtures failed; reject the retune batch.")
+        if self.regressions:
+            reasons.append("At least one analytic metric passed preflight and failed postflight.")
+        return tuple(reasons)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "manifest_path": self.manifest_path,
+            "retune_batch_id": self.retune_batch_id,
+            "output_dir": self.output_dir,
+            "blocked_reasons": list(self.blocked_reasons),
+            "preflight": self.preflight.to_json_dict(),
+            "postflight": self.postflight.to_json_dict(),
+            "regression_count": len(self.regressions),
+            "regressions": [regression.to_json_dict() for regression in self.regressions],
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = [
+            "# Milestone 18 Analytic Retune Guardrail",
+            "",
+            f"Schema: `{MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Retune batch: `{self.retune_batch_id}`",
+            "",
+            f"Manifest: `{self.manifest_path}`",
+            "",
+            "| Stage | Result | Candidate | Fixtures | Failed | Report |",
+            "| --- | --- | --- | ---: | ---: | --- |",
+        ]
+        for stage in (self.preflight, self.postflight):
+            lines.append(
+                "| "
+                f"{stage.stage} | "
+                f"{'PASS' if stage.passed else 'FAIL'} | "
+                f"{stage.candidate_label} (`{stage.candidate_kind}`) | "
+                f"{stage.fixture_count} | "
+                f"{stage.failed_count} | "
+                f"`{stage.report_json}` |"
+            )
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.regressions:
+            lines.extend(
+                [
+                    "",
+                    "## Regressions",
+                    "",
+                    "| Fixture | Metric | Field | Preflight | Postflight | Threshold |",
+                    "| --- | --- | --- | ---: | ---: | ---: |",
+                ]
+            )
+            for regression in self.regressions:
+                lines.append(
+                    "| "
+                    f"{regression.fixture_id} | "
+                    f"{regression.metric_id} | "
+                    f"{regression.field} | "
+                    f"{regression.preflight_value:.6g} | "
+                    f"{regression.postflight_value:.6g} | "
+                    f"{regression.threshold:.6g} {regression.units} |"
+                )
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+
 def build_milestone18_failure_triage_matrix(
     comparison_report: str | Path,
     geometry_report: str | Path,
@@ -306,6 +449,141 @@ def build_milestone18_failure_triage_matrix(
         },
         entries=sorted_entries,
     )
+
+
+def run_milestone18_analytic_retune_guardrail(
+    manifest_path: str | Path,
+    output_dir: str | Path,
+    *,
+    retune_batch_id: str,
+    preflight_candidate_kind: AnalyticCandidateKind = "scenario",
+    preflight_candidate_root: str | Path | None = None,
+    preflight_candidate_label: str | None = None,
+    preflight_frame_index: int = 0,
+    postflight_candidate_kind: AnalyticCandidateKind = "scenario",
+    postflight_candidate_root: str | Path | None = None,
+    postflight_candidate_label: str | None = None,
+    postflight_frame_index: int = 0,
+) -> Milestone18AnalyticRetuneGuardrailReport:
+    """Run Milestone 17 analytic fixtures as a preflight/postflight retune guardrail."""
+
+    root = Path(output_dir) / _slug(retune_batch_id)
+    root.mkdir(parents=True, exist_ok=True)
+    preflight = compare_analytic_fixture_manifest(
+        manifest_path,
+        candidate_kind=preflight_candidate_kind,
+        candidate_root=preflight_candidate_root,
+        candidate_label=preflight_candidate_label or f"{retune_batch_id}_preflight",
+        frame_index=preflight_frame_index,
+    )
+    postflight = compare_analytic_fixture_manifest(
+        manifest_path,
+        candidate_kind=postflight_candidate_kind,
+        candidate_root=postflight_candidate_root,
+        candidate_label=postflight_candidate_label or f"{retune_batch_id}_postflight",
+        frame_index=postflight_frame_index,
+    )
+    preflight_json = preflight.write_json(root / "preflight_analytic_validation.json")
+    preflight_md = preflight.write_markdown(root / "preflight_analytic_validation.md")
+    postflight_json = postflight.write_json(root / "postflight_analytic_validation.json")
+    postflight_md = postflight.write_markdown(root / "postflight_analytic_validation.md")
+    return Milestone18AnalyticRetuneGuardrailReport(
+        manifest_path=str(manifest_path),
+        retune_batch_id=retune_batch_id,
+        output_dir=str(root),
+        preflight=_analytic_guardrail_stage("preflight", preflight, preflight_json, preflight_md),
+        postflight=_analytic_guardrail_stage("postflight", postflight, postflight_json, postflight_md),
+        regressions=_analytic_regressions(preflight, postflight),
+    )
+
+
+def _analytic_guardrail_stage(
+    stage: str,
+    report: AnalyticValidationReport,
+    report_json: Path,
+    report_markdown: Path,
+) -> Milestone18AnalyticGuardrailStage:
+    payload = report.to_json_dict()
+    return Milestone18AnalyticGuardrailStage(
+        stage=stage,
+        report_json=str(report_json),
+        report_markdown=str(report_markdown),
+        candidate_kind=str(payload["candidate_kind"]),
+        candidate_label=str(payload["candidate_label"]),
+        candidate_root=_str_or_none(payload.get("candidate_root")),
+        frame_index=int(payload["frame_index"]),
+        passed=bool(payload["passed"]),
+        fixture_count=int(payload["fixture_count"]),
+        passed_count=int(payload["passed_count"]),
+        failed_count=int(payload["failed_count"]),
+        failing_metrics=tuple(_analytic_failing_metrics(payload)),
+    )
+
+
+def _analytic_failing_metrics(payload: dict[str, object]) -> list[dict[str, object]]:
+    failures: list[dict[str, object]] = []
+    comparisons = payload.get("comparisons", [])
+    if not isinstance(comparisons, list):
+        return failures
+    for comparison in comparisons:
+        if not isinstance(comparison, dict):
+            continue
+        for metric in comparison.get("metrics", []):
+            if not isinstance(metric, dict) or bool(metric.get("passed")):
+                continue
+            failures.append(
+                {
+                    "fixture_id": comparison.get("fixture_id"),
+                    "metric_id": metric.get("metric_id"),
+                    "field": metric.get("field"),
+                    "value": metric.get("value"),
+                    "threshold": metric.get("threshold"),
+                    "units": metric.get("units"),
+                }
+            )
+    return failures
+
+
+def _analytic_regressions(
+    preflight: AnalyticValidationReport,
+    postflight: AnalyticValidationReport,
+) -> tuple[Milestone18AnalyticRegression, ...]:
+    preflight_metrics = _analytic_metric_map(preflight)
+    postflight_metrics = _analytic_metric_map(postflight)
+    regressions: list[Milestone18AnalyticRegression] = []
+    for key, pre_metric in preflight_metrics.items():
+        post_metric = postflight_metrics.get(key)
+        if post_metric is None:
+            continue
+        if bool(pre_metric.get("passed")) and not bool(post_metric.get("passed")):
+            regressions.append(
+                Milestone18AnalyticRegression(
+                    fixture_id=key[0],
+                    metric_id=key[1],
+                    field=str(post_metric.get("field", "")),
+                    preflight_value=float(pre_metric.get("value", 0.0)),
+                    postflight_value=float(post_metric.get("value", 0.0)),
+                    threshold=float(post_metric.get("threshold", 0.0)),
+                    units=str(post_metric.get("units", "")),
+                )
+            )
+    return tuple(regressions)
+
+
+def _analytic_metric_map(report: AnalyticValidationReport) -> dict[tuple[str, str], dict[str, object]]:
+    payload = report.to_json_dict()
+    metrics: dict[tuple[str, str], dict[str, object]] = {}
+    comparisons = payload.get("comparisons", [])
+    if not isinstance(comparisons, list):
+        return metrics
+    for comparison in comparisons:
+        if not isinstance(comparison, dict):
+            continue
+        fixture_id = str(comparison.get("fixture_id", ""))
+        for metric in comparison.get("metrics", []):
+            if isinstance(metric, dict):
+                metrics[(fixture_id, str(metric.get("metric_id", "")))] = metric
+    return metrics
 
 
 def _comparison_entries(report: dict[str, Any], source_report: Path) -> list[Milestone18FailureTriageEntry]:
