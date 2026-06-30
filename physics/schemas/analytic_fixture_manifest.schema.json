@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raftsim.local/schemas/analytic_fixture_manifest.schema.json",
+  "title": "RaftSim Analytic Fixture Manifest",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "fixture_set_version",
+    "generator",
+    "generated_at",
+    "license_policy",
+    "fixtures"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "raftsim.analytic_fixture_manifest.v0"
+    },
+    "manifest_id": {
+      "type": "string"
+    },
+    "fixture_set_version": {
+      "type": "string"
+    },
+    "generator": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "license_policy": {
+      "type": "object",
+      "required": [
+        "external_data_vendored",
+        "notes"
+      ],
+      "properties": {
+        "external_data_vendored": {
+          "type": "boolean",
+          "const": false
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "fixtures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "fixture_id",
+          "title",
+          "benchmark_family",
+          "scenario_kind",
+          "provenance",
+          "equations",
+          "expected_behavior",
+          "tolerance_tier",
+          "metrics",
+          "outputs"
+        ],
+        "properties": {
+          "fixture_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "benchmark_family": {
+            "type": "string"
+          },
+          "scenario_kind": {
+            "type": "string"
+          },
+          "provenance": {
+            "type": "object",
+            "required": [
+              "source_type",
+              "source_note",
+              "derived_by",
+              "external_data_vendored"
+            ],
+            "properties": {
+              "source_type": {
+                "type": "string"
+              },
+              "source_note": {
+                "type": "string"
+              },
+              "derived_by": {
+                "type": "string"
+              },
+              "external_data_vendored": {
+                "type": "boolean",
+                "const": false
+              }
+            }
+          },
+          "equations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "expected_behavior": {
+            "type": "object",
+            "required": [
+              "summary",
+              "exact_fields",
+              "approximate_fields",
+              "failure_modes"
+            ]
+          },
+          "tolerance_tier": {
+            "type": "string",
+            "enum": [
+              "identity",
+              "well_balanced",
+              "analytic",
+              "diagnostic",
+              "qualitative"
+            ]
+          },
+          "metrics": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "metric_id",
+                "field",
+                "norm",
+                "threshold",
+                "units"
+              ]
+            }
+          },
+          "outputs": {
+            "type": "object",
+            "required": [
+              "scenario_package",
+              "analytic_reference"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
