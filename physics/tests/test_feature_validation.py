@@ -2,15 +2,20 @@ import numpy as np
 
 from raftsim.feature_validation import (
     CASCADING_RAFT_VALIDATION_CASES,
+    CREW_OVERBOARD_FIXTURE_IDS,
     CREW_TIMED_HAZARD_FIXTURE_IDS,
     CascadingRaftValidationCase,
+    CrewOverboardFixture2_5D,
     CrewTimedHazardFixture2_5D,
     FeatureValidationCheck,
     FeatureValidationResult,
     build_cascading_raft_validation_cases,
+    build_crew_overboard_fixtures2_5d,
     build_crew_timed_hazard_fixtures2_5d,
+    evaluate_crew_overboard_fixture2_5d,
     validate_cascading_raft_cases,
     validate_boil_upwelling_case,
+    validate_crew_overboard_fixtures2_5d,
     validate_crew_timed_hazard_fixtures2_5d,
     validate_eddy_line_case,
     validate_hole_case,
@@ -383,6 +388,77 @@ def test_crew_timed_hazard_fixtures_require_correct_weight_shift_timing():
         assert checks["timed_response_safe"].value >= 0.0
         assert checks["crew_action_changes_margin"].value > 0.0
         assert checks["crew_action_recorded"].value >= 1.0
+
+
+def test_crew_overboard_fixture_evaluator_reports_rescue_and_failed_paths():
+    fixture = build_crew_overboard_fixtures2_5d()[0]
+
+    rescued = evaluate_crew_overboard_fixture2_5d(
+        fixture,
+        rescue_delay_s=fixture.successful_rescue_delay_s,
+    )
+    failed = evaluate_crew_overboard_fixture2_5d(
+        fixture,
+        rescue_delay_s=fixture.failed_rescue_delay_s,
+    )
+
+    assert rescued.overboard_triggered is True
+    assert rescued.rescue_completed is True
+    assert rescued.states == (
+        "seated",
+        "at_risk",
+        "falling_ejected",
+        "swimming",
+        "rescue_targeted",
+        "rescued",
+        "re_seated_recovered",
+    )
+    assert rescued.swimmer_distance_m > 0.0
+    assert rescued.swimmer_world_position.x > fixture.swimmer_start.x
+    assert rescued.time_in_water_s <= fixture.rescue_window_s
+    assert rescued.rescue_method == fixture.rescue_method
+    assert rescued.failed_reason == ""
+    assert rescued.fatigue_delta > 0.0
+    assert rescued.trust_delta < 0.0
+    assert rescued.safety_score_delta < 0.0
+
+    assert failed.overboard_triggered is True
+    assert failed.rescue_completed is False
+    assert failed.states[-1] == "failed_rescue"
+    assert failed.failed_reason == "missed_rescue_window"
+    assert failed.swimmer_distance_m >= rescued.swimmer_distance_m
+
+
+def test_crew_overboard_fixtures_cover_swimmer_rescue_and_failed_rescue():
+    fixtures = build_crew_overboard_fixtures2_5d()
+
+    results = validate_crew_overboard_fixtures2_5d(fixtures=fixtures)
+    by_fixture = {result.feature: result for result in results}
+
+    assert tuple(fixture.fixture_id for fixture in fixtures) == CREW_OVERBOARD_FIXTURE_IDS
+    assert {fixture.trigger_kind for fixture in fixtures} == {
+        "impact",
+        "flip",
+        "pin",
+        "hole",
+        "missed_brace",
+        "missed_high_side",
+    }
+    assert all(isinstance(fixture, CrewOverboardFixture2_5D) for fixture in fixtures)
+    assert all(fixture.ejection_impulse_n_s >= fixture.ejection_threshold_n_s for fixture in fixtures)
+    assert all(fixture.successful_rescue_delay_s < fixture.rescue_window_s for fixture in fixtures)
+    assert all(fixture.failed_rescue_delay_s > fixture.rescue_window_s for fixture in fixtures)
+    assert tuple(by_fixture) == CREW_OVERBOARD_FIXTURE_IDS
+    assert all(result.passed for result in results)
+    assert all(result.outcome == "re_seated_recovered" for result in results)
+    for result in results:
+        checks = {check.name: check for check in result.checks}
+        assert checks["overboard_triggered"].passed
+        assert checks["swimmer_drift_recorded"].value > 0.0
+        assert checks["timed_rescue_reseats"].passed
+        assert checks["pull_in_reseat_duration"].value > 0.0
+        assert checks["late_rescue_fails"].passed
+        assert checks["safety_telemetry_recorded"].value > 0.0
 
 
 def test_cascading_raft_validation_cases_cover_pool_drop_eddy_boulder_and_boundaries():
