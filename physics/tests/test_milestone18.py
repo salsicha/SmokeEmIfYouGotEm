@@ -4,13 +4,16 @@ from pathlib import Path
 from raftsim.analytic_fixtures import write_analytic_fixture_suite
 from raftsim.examples.generate_milestone18_failure_triage_matrix import main as generate_triage_main
 from raftsim.examples.generate_milestone18_parity_family_retune_report import main as generate_retune_main
+from raftsim.examples.generate_milestone18_pin_release_fixture_report import main as generate_pin_release_main
 from raftsim.examples.run_milestone18_analytic_retune_guardrail import main as guardrail_main
 from raftsim.milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
     MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
+    MILESTONE18_PIN_RELEASE_REPORT_SCHEMA,
     build_milestone18_failure_triage_matrix,
     build_milestone18_parity_family_retune_report,
+    build_milestone18_pin_release_fixture_report,
     run_milestone18_analytic_retune_guardrail,
 )
 
@@ -316,6 +319,48 @@ def test_generate_milestone18_parity_family_retune_cli_writes_reports(tmp_path):
     assert payload["schema_version"] == MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA
     assert payload["decision"] == "PARTIAL_PROMOTION"
     assert "Milestone 18 Parity Family Retune" in output_md.read_text(encoding="utf-8")
+
+
+def test_milestone18_pin_release_fixture_report_records_distinct_flow_dependent_paths():
+    report = build_milestone18_pin_release_fixture_report()
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_PIN_RELEASE_REPORT_SCHEMA
+    assert payload["decision"] == "PASS"
+    assert payload["feature_forcing_strength_scale"] == 0.0
+    assert payload["proxy_separation"]["excluded_proxy_families"] == ["shallow_shelf", "boulder_impacts"]
+    assert payload["summary"]["flow_bands"] == ["low_scrape", "runnable_sticky", "high_washout"]
+    assert {"pinned", "released", "failed_rescue"}.issubset(set(payload["summary"]["outcomes"]))
+
+    sticky = next(case for case in payload["flow_cases"] if case["flow_band"] == "runnable_sticky")
+    paths = {path["path_id"]: path for path in sticky["response_paths"]}
+    assert paths["no_action_pin"]["outcome"] == "pinned"
+    assert paths["no_action_pin"]["release_margin_n"] < 0.0
+    assert paths["timed_high_side_release"]["outcome"] == "released"
+    assert paths["timed_high_side_release"]["crew_weight"]["high_side_count"] > 0
+    assert paths["late_high_side_failed_rescue"]["outcome"] == "failed_rescue"
+    assert paths["late_high_side_failed_rescue"]["swimmer"]["states"][-1] == "failed_rescue"
+    assert paths["late_high_side_failed_rescue"]["swimmer"]["safety_score_delta"] < 0.0
+
+
+def test_generate_milestone18_pin_release_fixture_cli_writes_reports(tmp_path):
+    output_json = tmp_path / "reports" / "milestone18" / "pin_release_fixture.json"
+    output_md = tmp_path / "reports" / "milestone18" / "pin_release_fixture.md"
+
+    exit_code = generate_pin_release_main(
+        [
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 0
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_PIN_RELEASE_REPORT_SCHEMA
+    assert payload["decision"] == "PASS"
+    assert "Milestone 18 Pin/Release Fixture" in output_md.read_text(encoding="utf-8")
 
 
 def test_milestone18_analytic_retune_guardrail_passes_for_baseline_scenario(tmp_path):
