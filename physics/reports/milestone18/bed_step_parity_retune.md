@@ -58,5 +58,4 @@ Reference manifest: `outputs/m16g/c_step/normalized/manifest.json`
 
 - Finite-volume bed-step parity is promoted with feature forcing off: the augmented topography source distribution passes field, slope, probe, cross-section, wet-mask, mass, energy, Froude, and feature checks.
 - The augmented topography path remains scoped to fixture_kind=bed_step so boulder, drop, wet/dry, and cascading acceptance lanes keep their own validation gates.
-- Reduced mode remains blocked on field_linf, slope_linf, probe_linf, mass_drift_delta, and energy_change_delta; it should not be used as the strict bed-step parity lane until reduced dynamics are redesigned.
-
+- Reduced mode remains blocked on field_linf, slope_linf, probe_linf, mass_drift_delta, and energy_change_delta; Milestone 18 scopes it to diagnostic/smoke-only bed-step evidence until a separate reduced-dynamics redesign is justified.
