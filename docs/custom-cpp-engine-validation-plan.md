@@ -10,7 +10,7 @@ The current engine is a runtime candidate, not a fully accepted production solve
 
 The full game should model rivers as continuous gridded 2.5D geometry with explicit reach, drop, pool, hazard, roughness, and hydraulic-control annotations.
 
-Reach-local grids with overlap or ghost zones are acceptable for authoring, streaming, and solver cost. A single stitched global grid is also acceptable. Disconnected pools stitched only by scripted handoffs are not acceptable for full validation because they hide momentum, wet/dry, bed-slope, and raft-transition errors at the exact places rapids matter most.
+The canonical cascading storage format supports reach-local grids with overlap or ghost zones for authoring, streaming, and runtime cost, but every package must also export stitched whole-window validation outputs. The stitched output is the acceptance view that proves reach/drop seams do not hide momentum, wet/dry, bed-slope, conservation, or raft-transition errors. Disconnected pools stitched only by scripted handoffs are not acceptable for full validation because they hide failures at the exact places rapids matter most.
 
 ## Validation Principle
 
@@ -59,7 +59,7 @@ Crew weight distribution is part of the validation surface. Seat occupancy, high
 - Run real GeoClaw fixed-grid simulations for the canonical, rafting, real-world, and cascading suites.
 - Store manifests with GeoClaw availability, dependency versions, AMR/fixed-grid settings, scenario package hash, and export time.
 - Normalize full solution frames into the shared field/probe/cross-section telemetry schema.
-- Export per-reach windows and stitched whole-river windows for cascading packages.
+- Export per-reach windows for authoring/debugging and stitched whole-river windows for validation acceptance on cascading packages.
 - Flag any scenario that only has schema, setup, or initial-state fallback output as not fully validated.
 
 ## Phase 2: C++ Parity Runs
@@ -122,7 +122,7 @@ The C++ engine is accepted for live Unreal water only when:
 
 ## Open Decisions
 
-- Whether the canonical cascading storage format is one stitched grid, reach-local grids with ghost zones, or both.
+- Exact schema fields for reach-local grids, ghost-zone ownership, stitched whole-window validation exports, and seam diagnostics.
 - Exact numerical bounds and default gains for each allowed feature-forcing family.
 - Whether the first accepted runtime remains CPU-only or starts a GPU path after correctness is established.
 - Exact numerical thresholds for research-accepted, Unreal-prototype, and production-candidate tiers.
