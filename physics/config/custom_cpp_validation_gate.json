@@ -1,0 +1,678 @@
+{
+  "acceptance_rule": "Live Unreal water remains blocked until each required scenario has full GeoClaw fixed-grid solution frames, C++ reduced and finite-volume outputs, comparison reports, raft-relevant checks where listed, and runtime evidence where listed.",
+  "candidate_solver": "raftsim_water_cpp_v1",
+  "reference_solver": "geoclaw",
+  "scenario_matrix": [
+    {
+      "flow_band": null,
+      "generator": "generate_fixture_scenario2_5d",
+      "geometry_focus": [
+        "hydrostatic_balance",
+        "mass_conservation",
+        "flat_surface_normal"
+      ],
+      "raft_focus": [],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation"
+      ],
+      "scenario_id": "flat_pool",
+      "source": "fixture",
+      "suite": "canonical",
+      "threshold_tier": "production_candidate"
+    },
+    {
+      "flow_band": null,
+      "generator": "generate_fixture_scenario2_5d",
+      "geometry_focus": [
+        "steady_advection",
+        "boundary_inflow_outflow",
+        "momentum_conservation"
+      ],
+      "raft_focus": [],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation"
+      ],
+      "scenario_id": "uniform_channel",
+      "source": "fixture",
+      "suite": "canonical",
+      "threshold_tier": "production_candidate"
+    },
+    {
+      "flow_band": null,
+      "generator": "generate_fixture_scenario2_5d",
+      "geometry_focus": [
+        "bore_speed",
+        "wet_front",
+        "hydraulic_jump"
+      ],
+      "raft_focus": [],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation"
+      ],
+      "scenario_id": "dam_break",
+      "source": "fixture",
+      "suite": "canonical",
+      "threshold_tier": "unreal_prototype"
+    },
+    {
+      "flow_band": null,
+      "generator": "generate_fixture_scenario2_5d",
+      "geometry_focus": [
+        "bed_slope_source",
+        "energy_change",
+        "wet_dry_mask"
+      ],
+      "raft_focus": [],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation"
+      ],
+      "scenario_id": "bed_step",
+      "source": "fixture",
+      "suite": "canonical",
+      "threshold_tier": "unreal_prototype"
+    },
+    {
+      "flow_band": null,
+      "generator": "generate_fixture_scenario2_5d",
+      "geometry_focus": [
+        "lateral_acceleration",
+        "froude_class",
+        "cross_section_velocity"
+      ],
+      "raft_focus": [],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation"
+      ],
+      "scenario_id": "constriction",
+      "source": "fixture",
+      "suite": "canonical",
+      "threshold_tier": "unreal_prototype"
+    },
+    {
+      "flow_band": null,
+      "generator": "generate_fixture_scenario2_5d",
+      "geometry_focus": [
+        "shoreline_front",
+        "dry_cell_stability",
+        "bank_shelf_transition"
+      ],
+      "raft_focus": [],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation"
+      ],
+      "scenario_id": "wet_dry_shoreline",
+      "source": "fixture",
+      "suite": "canonical",
+      "threshold_tier": "unreal_prototype"
+    },
+    {
+      "flow_band": null,
+      "generator": "generate_fixture_scenario2_5d",
+      "geometry_focus": [
+        "bed_slope_balance",
+        "manning_friction",
+        "steady_surface_gradient"
+      ],
+      "raft_focus": [],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation"
+      ],
+      "scenario_id": "sloping_manning_channel",
+      "source": "fixture",
+      "suite": "canonical",
+      "threshold_tier": "unreal_prototype"
+    },
+    {
+      "flow_band": null,
+      "generator": "generate_fixture_scenario2_5d",
+      "geometry_focus": [
+        "ledge_energy_loss",
+        "tailwater_depth",
+        "hydraulic_control"
+      ],
+      "raft_focus": [
+        "drop_entry",
+        "pool_entry"
+      ],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation",
+        "raft_force_comparison",
+        "raft_outcome_comparison"
+      ],
+      "scenario_id": "drop_ledge",
+      "source": "fixture",
+      "suite": "canonical",
+      "threshold_tier": "unreal_prototype"
+    },
+    {
+      "flow_band": null,
+      "generator": "rafting_geoclaw_scenarios",
+      "geometry_focus": [
+        "rock_deflection",
+        "local_wet_dry",
+        "feature_strength"
+      ],
+      "raft_focus": [
+        "boulder_impacts",
+        "scrape_launch"
+      ],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation",
+        "raft_force_comparison",
+        "raft_outcome_comparison"
+      ],
+      "scenario_id": "boulder_garden",
+      "source": "procedural_feature",
+      "suite": "rafting",
+      "threshold_tier": "research_accepted"
+    },
+    {
+      "flow_band": null,
+      "generator": "rafting_geoclaw_scenarios",
+      "geometry_focus": [
+        "wave_phase",
+        "wave_amplitude",
+        "froude_transition"
+      ],
+      "raft_focus": [
+        "standing_wave_clear",
+        "stall_surf_flush"
+      ],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation",
+        "raft_force_comparison",
+        "raft_outcome_comparison"
+      ],
+      "scenario_id": "cascading_wave_train",
+      "source": "procedural_feature",
+      "suite": "rafting",
+      "threshold_tier": "research_accepted"
+    },
+    {
+      "flow_band": null,
+      "generator": "rafting_geoclaw_scenarios",
+      "geometry_focus": [
+        "hole_retention",
+        "boil_upwelling_proxy",
+        "recirculation_zone"
+      ],
+      "raft_focus": [
+        "hole_surf",
+        "hole_flush",
+        "boil_recovery"
+      ],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation",
+        "raft_force_comparison",
+        "raft_outcome_comparison"
+      ],
+      "scenario_id": "hydraulic_hole_downstream_boil",
+      "source": "procedural_feature",
+      "suite": "rafting",
+      "threshold_tier": "research_accepted"
+    },
+    {
+      "flow_band": null,
+      "generator": "rafting_geoclaw_scenarios",
+      "geometry_focus": [
+        "lateral_impulse",
+        "bank_angle_response",
+        "surface_slope"
+      ],
+      "raft_focus": [
+        "side_impulse",
+        "roll_torque"
+      ],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation",
+        "raft_force_comparison",
+        "raft_outcome_comparison"
+      ],
+      "scenario_id": "lateral_wave",
+      "source": "procedural_feature",
+      "suite": "rafting",
+      "threshold_tier": "research_accepted"
+    },
+    {
+      "flow_band": null,
+      "generator": "rafting_geoclaw_scenarios",
+      "geometry_focus": [
+        "shear_location",
+        "eddy_recirculation",
+        "velocity_gradient"
+      ],
+      "raft_focus": [
+        "eddy_recovery",
+        "yaw_impulse"
+      ],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation",
+        "raft_force_comparison",
+        "raft_outcome_comparison"
+      ],
+      "scenario_id": "eddy_line_shear",
+      "source": "procedural_feature",
+      "suite": "rafting",
+      "threshold_tier": "research_accepted"
+    },
+    {
+      "flow_band": null,
+      "generator": "rafting_geoclaw_scenarios",
+      "geometry_focus": [
+        "shelf_wet_dry",
+        "bed_contact_depth",
+        "shoreline_stability"
+      ],
+      "raft_focus": [
+        "grounding",
+        "pivot_release"
+      ],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation",
+        "raft_force_comparison",
+        "raft_outcome_comparison"
+      ],
+      "scenario_id": "shallow_shelf",
+      "source": "procedural_feature",
+      "suite": "rafting",
+      "threshold_tier": "research_accepted"
+    },
+    {
+      "flow_band": "low_runnable",
+      "generator": "generate_real_world_scenario2_5d",
+      "geometry_focus": [
+        "source_provenance",
+        "flow_band_mapping",
+        "low_water_shallows"
+      ],
+      "raft_focus": [
+        "shallow_shelf",
+        "pool_entry"
+      ],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation",
+        "raft_force_comparison",
+        "raft_outcome_comparison"
+      ],
+      "scenario_id": "south_fork_low_runnable",
+      "source": "south_fork_american_chili_bar_to_coloma",
+      "suite": "real_world",
+      "threshold_tier": "research_accepted"
+    },
+    {
+      "flow_band": "median_runnable",
+      "generator": "generate_real_world_scenario2_5d",
+      "geometry_focus": [
+        "source_provenance",
+        "flow_band_mapping",
+        "nominal_feature_strength"
+      ],
+      "raft_focus": [
+        "wave_train",
+        "eddy_recovery"
+      ],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation",
+        "raft_force_comparison",
+        "raft_outcome_comparison"
+      ],
+      "scenario_id": "south_fork_median_runnable",
+      "source": "south_fork_american_chili_bar_to_coloma",
+      "suite": "real_world",
+      "threshold_tier": "research_accepted"
+    },
+    {
+      "flow_band": "high_runnable",
+      "generator": "generate_real_world_scenario2_5d",
+      "geometry_focus": [
+        "source_provenance",
+        "flow_band_mapping",
+        "high_water_boundary_flux"
+      ],
+      "raft_focus": [
+        "boulder_impacts",
+        "transition_crossing"
+      ],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation",
+        "raft_force_comparison",
+        "raft_outcome_comparison"
+      ],
+      "scenario_id": "south_fork_high_runnable",
+      "source": "south_fork_american_chili_bar_to_coloma",
+      "suite": "real_world",
+      "threshold_tier": "research_accepted"
+    },
+    {
+      "flow_band": "low_runnable",
+      "generator": "generate_south_fork_american_cascading_seed_scenarios",
+      "geometry_focus": [
+        "reach_handoff",
+        "pool_depth",
+        "drop_tailwater",
+        "stitched_window_consistency"
+      ],
+      "raft_focus": [
+        "pool_entry",
+        "transition_boundary_crossing"
+      ],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation",
+        "raft_force_comparison",
+        "raft_outcome_comparison",
+        "cpp_profile",
+        "deterministic_replay"
+      ],
+      "scenario_id": "south_fork_cascading_low_runnable",
+      "source": "south_fork_american_chili_bar_to_coloma",
+      "suite": "cascading",
+      "threshold_tier": "unreal_prototype"
+    },
+    {
+      "flow_band": "median_runnable",
+      "generator": "generate_south_fork_american_cascading_seed_scenarios",
+      "geometry_focus": [
+        "reach_handoff",
+        "wave_train",
+        "drop_energy_loss",
+        "stitched_window_consistency"
+      ],
+      "raft_focus": [
+        "drop_entry",
+        "hydraulic_hole_surf_flush"
+      ],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation",
+        "raft_force_comparison",
+        "raft_outcome_comparison",
+        "cpp_profile",
+        "deterministic_replay"
+      ],
+      "scenario_id": "south_fork_cascading_median_runnable",
+      "source": "south_fork_american_chili_bar_to_coloma",
+      "suite": "cascading",
+      "threshold_tier": "unreal_prototype"
+    },
+    {
+      "flow_band": "high_runnable",
+      "generator": "generate_south_fork_american_cascading_seed_scenarios",
+      "geometry_focus": [
+        "reach_handoff",
+        "tailwater_control",
+        "high_flow_wet_front",
+        "stitched_window_consistency"
+      ],
+      "raft_focus": [
+        "boulder_impacts",
+        "pin_release",
+        "transition_boundary_crossing"
+      ],
+      "required_outputs": [
+        "geoclaw_run_manifest",
+        "geoclaw_fixed_grid_frames",
+        "geoclaw_normalized_manifest",
+        "cpp_reduced_manifest",
+        "cpp_finite_volume_manifest",
+        "field_comparison",
+        "probe_comparison",
+        "cross_section_comparison",
+        "diagnostic_comparison",
+        "threshold_evaluation",
+        "raft_force_comparison",
+        "raft_outcome_comparison",
+        "cpp_profile",
+        "deterministic_replay"
+      ],
+      "scenario_id": "south_fork_cascading_high_runnable",
+      "source": "south_fork_american_chili_bar_to_coloma",
+      "suite": "cascading",
+      "threshold_tier": "unreal_prototype"
+    }
+  ],
+  "schema_version": "raftsim.custom_cpp_engine_validation_gate.v0",
+  "threshold_tiers": [
+    {
+      "cross_section_linf_max": 1.5,
+      "energy_relative_change_delta_max": 0.5,
+      "feature_location_max_m": 12.0,
+      "feature_strength_linf_max": 2.0,
+      "field_linf_max_m": 1.5,
+      "froude_class_mismatch_max_fraction": 0.35,
+      "mass_relative_drift_max": 0.15,
+      "probe_linf_max": 1.5,
+      "raft_force_relative_linf_max": 0.75,
+      "raft_trajectory_delta_max_m": 8.0,
+      "reach_flux_relative_delta_max": 0.25,
+      "runtime_budget_multiplier_max": 2.0,
+      "slope_linf_max": 0.25,
+      "tier_id": "smoke",
+      "velocity_linf_max_mps": 2.5,
+      "wet_mismatch_max_fraction": 0.35
+    },
+    {
+      "cross_section_linf_max": 0.75,
+      "energy_relative_change_delta_max": 0.3,
+      "feature_location_max_m": 6.0,
+      "feature_strength_linf_max": 1.0,
+      "field_linf_max_m": 0.75,
+      "froude_class_mismatch_max_fraction": 0.2,
+      "mass_relative_drift_max": 0.08,
+      "probe_linf_max": 0.75,
+      "raft_force_relative_linf_max": 0.45,
+      "raft_trajectory_delta_max_m": 4.0,
+      "reach_flux_relative_delta_max": 0.15,
+      "runtime_budget_multiplier_max": 1.5,
+      "slope_linf_max": 0.15,
+      "tier_id": "research_accepted",
+      "velocity_linf_max_mps": 1.5,
+      "wet_mismatch_max_fraction": 0.2
+    },
+    {
+      "cross_section_linf_max": 0.35,
+      "energy_relative_change_delta_max": 0.15,
+      "feature_location_max_m": 3.0,
+      "feature_strength_linf_max": 0.55,
+      "field_linf_max_m": 0.35,
+      "froude_class_mismatch_max_fraction": 0.1,
+      "mass_relative_drift_max": 0.04,
+      "probe_linf_max": 0.35,
+      "raft_force_relative_linf_max": 0.25,
+      "raft_trajectory_delta_max_m": 2.0,
+      "reach_flux_relative_delta_max": 0.08,
+      "runtime_budget_multiplier_max": 1.0,
+      "slope_linf_max": 0.08,
+      "tier_id": "unreal_prototype",
+      "velocity_linf_max_mps": 0.8,
+      "wet_mismatch_max_fraction": 0.1
+    },
+    {
+      "cross_section_linf_max": 0.15,
+      "energy_relative_change_delta_max": 0.08,
+      "feature_location_max_m": 1.25,
+      "feature_strength_linf_max": 0.25,
+      "field_linf_max_m": 0.15,
+      "froude_class_mismatch_max_fraction": 0.04,
+      "mass_relative_drift_max": 0.02,
+      "probe_linf_max": 0.15,
+      "raft_force_relative_linf_max": 0.12,
+      "raft_trajectory_delta_max_m": 0.75,
+      "reach_flux_relative_delta_max": 0.04,
+      "runtime_budget_multiplier_max": 0.9,
+      "slope_linf_max": 0.035,
+      "tier_id": "production_candidate",
+      "velocity_linf_max_mps": 0.35,
+      "wet_mismatch_max_fraction": 0.04
+    }
+  ]
+}

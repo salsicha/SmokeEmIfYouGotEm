@@ -27,6 +27,7 @@ Fallback or initial-state-only GeoClaw normalization is useful for schema smoke 
 
 ## Phase 0: Freeze Acceptance Definitions
 
+- The frozen scenario matrix and threshold tiers live in `physics/src/raftsim/validation_gate.py` and `physics/config/custom_cpp_validation_gate.json`.
 - Freeze the canonical scenario matrix: flat pool, uniform channel, dam-break/bore, bed step, constriction, wet/dry shoreline, sloping channel with Manning friction, drop/ledge, standing-wave transition, boulder garden, hydraulic hole, eddy line, shallow shelf, real-world low/median/high flows, and South Fork cascading reach/drop suites.
 - Define threshold tiers for smoke, research-accepted, Unreal-prototype, and production-candidate validation.
 - Define field metrics: L1/L2/Linf error for `h`, `eta`, `u`, `v`, `hu`, `hv`, surface slope, and wet/dry masks.
