@@ -106,7 +106,7 @@ Primary responsibilities:
 - Choose the line through each rapid
 - Control raft angle and steering
 - Call paddle commands to the crew
-- React to hazards, passengers falling out, stuck rafts, and changing river conditions
+- React to hazards, passengers falling out, swimmers, rescue timing, stuck rafts, and changing river conditions
 - Balance safety, speed, style, and score
 - In VR, physically perform guide strokes and rescue gestures when hardware allows
 
@@ -133,7 +133,7 @@ Possible guide inputs:
 - Spoken commands through local speech recognition and constrained intent parsing
 - Hard left / hard right guide stroke
 - Hold on / brace command
-- Rescue command when a passenger falls out
+- Rescue and swimmer commands when a passenger falls out
 - VR paddle grip, blade angle, stroke depth, and pull path
 - Flat-screen analog paddle stroke controls for non-VR play
 
@@ -201,7 +201,8 @@ First draft behaviors:
 - High-side, lean, and shift weight to counter pins, wraps, lateral hits, sticky holes, and flip hazards
 - Panic or miss strokes when trust is low
 - Fall out after heavy impacts or bad wave hits
-- Require rescue before the score or safety rating collapses
+- Enter a swimmer state after falling out, with downstream position, fatigue/panic, audio callouts, and visibility from the guide's seat
+- Require rescue, pull-in, and re-seating/recovery before the score, trust, or safety rating collapses
 - Respond to spoken guide commands with short acknowledgments, hesitation, confusion, or urgency based on command clarity and crew state
 - Hold lightweight conversations in calm water, eddies, scouting moments, loading screens, and recovery pools
 - Keep conversation short and functional inside active rapids so it never hides urgent river audio or command feedback
