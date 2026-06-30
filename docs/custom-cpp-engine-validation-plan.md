@@ -72,6 +72,7 @@ Fallback or initial-state-only GeoClaw normalization is useful for schema smoke 
 
 ## Phase 5: Runtime, Determinism, And Portability
 
+- Milestone 16 runtime-profile evidence is tracked in `physics/reports/milestone16/runtime_profile.json` and `physics/reports/milestone16/runtime_profile.md`; all 8 promoted C++ profiling repetitions pass desktop, VR, and handheld water-solver budgets, and deterministic replay hashes match for each promoted configuration.
 - Verify deterministic replay for repeated runs on the same platform and, where practical, across supported compilers/platforms.
 - Profile validated configurations against desktop, VR, and handheld runtime budgets.
 - Record memory, output, streaming, and telemetry costs for Unreal preproduction.

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import shutil
+from hashlib import sha256
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -66,6 +67,7 @@ MILESTONE16_GEOMETRY_VALIDATION_REPORT_SCHEMA = "raftsim.milestone16.geometry_va
 MILESTONE16_RAFT_COUPLING_REPORT_SCHEMA = "raftsim.milestone16.raft_coupling_validation.v0"
 MILESTONE16_REGRESSION_PROMOTION_REPORT_SCHEMA = "raftsim.milestone16.regression_promotion.v0"
 MILESTONE16_REGRESSION_REGISTRY_SCHEMA = "raftsim.milestone16.regression_registry.v0"
+MILESTONE16_RUNTIME_PROFILE_REPORT_SCHEMA = "raftsim.milestone16.runtime_profile.v0"
 MILESTONE16_RAFT_FORCE_DELTA_WEIGHT_RATIO_THRESHOLD = 1.0
 MILESTONE16_RAFT_TORQUE_DELTA_INERTIA_RATIO_THRESHOLD = 2.5
 MILESTONE16_RAFT_TRAJECTORY_POSITION_DELTA_M_THRESHOLD = 0.25
@@ -679,6 +681,118 @@ class Milestone16RegressionPromotionReport:
         return output_path
 
 
+@dataclass(frozen=True, slots=True)
+class Milestone16RuntimeProfileRecord:
+    """One profiled C++ runtime repetition for a promoted Milestone 16 config."""
+
+    artifact_id: str
+    gate_scenario_id: str
+    actual_scenario_id: str
+    solver_mode: str
+    repetition: int
+    scenario_package: str
+    output_dir: str
+    manifest: str
+    validation: str
+    runtime_seconds: float
+    simulated_seconds: float
+    step_count: int
+    runtime_ms_per_tick: float
+    validation_passed: bool
+    frame_hash: str
+    budget_results: dict[str, dict[str, object]]
+
+    @property
+    def passed(self) -> bool:
+        return self.validation_passed and all(bool(result["passed"]) for result in self.budget_results.values())
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["passed"] = self.passed
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone16RuntimeProfileReport:
+    """Runtime-budget and deterministic-replay profile for promoted C++ configs."""
+
+    registry_path: str
+    cpp_solver: str
+    budget_config: str
+    output_root: str
+    records: tuple[Milestone16RuntimeProfileRecord, ...] = field(default_factory=tuple)
+    deterministic_replay: tuple[dict[str, object], ...] = field(default_factory=tuple)
+
+    @property
+    def passed(self) -> bool:
+        return (
+            bool(self.records)
+            and all(record.passed for record in self.records)
+            and all(bool(group["passed"]) for group in self.deterministic_replay)
+        )
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE16_RUNTIME_PROFILE_REPORT_SCHEMA,
+            "passed": self.passed,
+            "registry_path": self.registry_path,
+            "cpp_solver": self.cpp_solver,
+            "budget_config": self.budget_config,
+            "output_root": self.output_root,
+            "run_count": len(self.records),
+            "budget_passed_count": sum(1 for record in self.records if record.passed),
+            "budget_failed_count": sum(1 for record in self.records if not record.passed),
+            "deterministic_replay": list(self.deterministic_replay),
+            "records": [record.to_json_dict() for record in self.records],
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = [
+            "# Milestone 16 Runtime Profile",
+            "",
+            f"Schema: `{MILESTONE16_RUNTIME_PROFILE_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            "| Artifact | Mode | Rep | ms/tick | Desktop | VR | Handheld | Replay hash |",
+            "| --- | --- | ---: | ---: | --- | --- | --- | --- |",
+        ]
+        for record in self.records:
+            desktop = "PASS" if record.budget_results["desktop"]["passed"] else "FAIL"
+            vr = "PASS" if record.budget_results["vr"]["passed"] else "FAIL"
+            handheld = "PASS" if record.budget_results["handheld"]["passed"] else "FAIL"
+            lines.append(
+                "| "
+                f"{record.artifact_id} | "
+                f"{record.solver_mode} | "
+                f"{record.repetition} | "
+                f"{record.runtime_ms_per_tick:.4f} | "
+                f"{desktop} | "
+                f"{vr} | "
+                f"{handheld} | "
+                f"`{record.frame_hash[:12]}` |"
+            )
+        lines.extend(["", "## Deterministic Replay", "", "| Artifact | Status | Hashes |", "| --- | --- | --- |"])
+        for group in self.deterministic_replay:
+            hashes = ", ".join(str(value)[:12] for value in group["hashes"])
+            lines.append(
+                "| "
+                f"{group['artifact_id']} | "
+                f"{'PASS' if group['passed'] else 'FAIL'} | "
+                f"`{hashes}` |"
+            )
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+
 def run_milestone16_geoclaw_reference_suite(
     output_root: str | Path,
     *,
@@ -908,6 +1022,80 @@ def run_milestone16_regression_promotion(
             "Only passing GeoClaw/C++ threshold runs were copied as regression fixtures.",
             "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs.",
         ),
+    )
+
+
+def run_milestone16_runtime_profile(
+    registry_path: str | Path,
+    *,
+    cpp_solver: str | Path,
+    budget_config: str | Path = "config/runtime_budgets.json",
+    output_root: str | Path = "outputs/m16profile",
+    repetitions: int = 2,
+) -> Milestone16RuntimeProfileReport:
+    """Profile promoted Milestone 16 C++ configs against runtime budgets."""
+
+    if repetitions < 2:
+        raise ValueError("repetitions must be at least 2 to check deterministic replay.")
+    registry = _read_json(Path(registry_path))
+    budgets = _read_json(Path(budget_config))
+    root = Path(output_root)
+    executable = Path(cpp_solver)
+    records: list[Milestone16RuntimeProfileRecord] = []
+    replay_groups: list[dict[str, object]] = []
+    for entry in registry["entries"]:
+        if entry["category"] != "geoclaw_cpp":
+            continue
+        artifact_id = str(entry["artifact_id"])
+        hashes: list[str] = []
+        for repetition in range(repetitions):
+            scenario_package = Path(str(entry["scenario_package"]))
+            scenario = read_scenario2_5d_package(scenario_package)
+            run_output = root / _artifact_path_fragment(artifact_id) / f"rep_{repetition:02d}"
+            result = run_cpp_solver_scenario(
+                scenario_package,
+                output_dir=run_output,
+                config=_cpp_config_for_mode(executable, str(entry["solver_mode"])),
+            )
+            frame_hash = _cpp_run_frame_hash(result.manifest_path)
+            hashes.append(frame_hash)
+            step_count = max(1, int(round(scenario.duration / scenario.fixed_dt)))
+            runtime_ms_per_tick = result.runtime_seconds * 1000.0 / step_count
+            records.append(
+                Milestone16RuntimeProfileRecord(
+                    artifact_id=artifact_id,
+                    gate_scenario_id=str(entry["gate_scenario_id"]),
+                    actual_scenario_id=str(entry["actual_scenario_id"]),
+                    solver_mode=str(entry["solver_mode"]),
+                    repetition=repetition,
+                    scenario_package=str(scenario_package),
+                    output_dir=str(result.output_dir),
+                    manifest=str(result.manifest_path),
+                    validation=str(result.validation_path),
+                    runtime_seconds=result.runtime_seconds,
+                    simulated_seconds=float(scenario.duration),
+                    step_count=step_count,
+                    runtime_ms_per_tick=runtime_ms_per_tick,
+                    validation_passed=result.returncode in {0, 2},
+                    frame_hash=frame_hash,
+                    budget_results=_runtime_budget_results(runtime_ms_per_tick, budgets),
+                )
+            )
+        replay_groups.append(
+            {
+                "artifact_id": artifact_id,
+                "passed": len(set(hashes)) == 1,
+                "hashes": hashes,
+            }
+        )
+
+    return Milestone16RuntimeProfileReport(
+        registry_path=str(registry_path),
+        cpp_solver=str(executable),
+        budget_config=str(budget_config),
+        output_root=str(root),
+        records=tuple(records),
+        deterministic_replay=tuple(replay_groups),
     )
 
 
@@ -1467,6 +1655,43 @@ def _promote_raft_coupling_artifact(
         reports={"raft_coupling_case": str(manifest_path)},
         notes=("Frame paths remain in generated Milestone 16 output directories.",),
     )
+
+
+def _runtime_budget_results(runtime_ms_per_tick: float, budgets: dict[str, object]) -> dict[str, dict[str, object]]:
+    profiles = budgets.get("profiles", {})
+    if not isinstance(profiles, dict):
+        raise ValueError("Runtime budget config must include a profiles object.")
+    results: dict[str, dict[str, object]] = {}
+    for profile_name, profile in profiles.items():
+        if not isinstance(profile, dict):
+            continue
+        budget_ms = float(profile["water_solver_ms"])
+        max_runtime_multiplier = float(profile.get("max_runtime_multiplier", 1.0))
+        results[str(profile_name)] = {
+            "passed": runtime_ms_per_tick <= budget_ms,
+            "runtime_ms_per_tick": runtime_ms_per_tick,
+            "water_solver_budget_ms": budget_ms,
+            "max_runtime_budget_ms": budget_ms * max_runtime_multiplier,
+            "max_runtime_multiplier": max_runtime_multiplier,
+        }
+    return results
+
+
+def _cpp_run_frame_hash(manifest_path: Path) -> str:
+    manifest = _read_json(manifest_path)
+    frames = manifest.get("frames", [])
+    if not isinstance(frames, list) or not frames:
+        raise ValueError(f"C++ manifest {manifest_path} does not include frames.")
+    digest = sha256()
+    for frame in frames:
+        frame_path = manifest_path.parent / Path(str(frame))
+        digest.update(frame_path.name.encode("utf-8"))
+        digest.update(frame_path.read_bytes())
+    return digest.hexdigest()
+
+
+def _artifact_path_fragment(artifact_id: str) -> Path:
+    return Path(*[part for part in artifact_id.split("/") if part])
 
 
 def _write_milestone16_comparison_manifest(
