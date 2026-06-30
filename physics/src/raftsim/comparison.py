@@ -620,13 +620,13 @@ def evaluate_dual_solver_thresholds(
             "mass_drift_delta",
             abs(diagnostic_report.delta.mass_relative_drift_delta),
             limits.max_mass_drift_delta,
-            "Absolute C++ minus PyClaw mass-drift delta.",
+            "Absolute C++ minus reference mass-drift delta.",
         ),
         _threshold_check(
             "energy_change_delta",
             abs(diagnostic_report.delta.energy_relative_change_delta),
             limits.max_energy_change_delta,
-            "Absolute C++ minus PyClaw energy-change delta.",
+            "Absolute C++ minus reference energy-change delta.",
         ),
         _threshold_check(
             "froude_delta",

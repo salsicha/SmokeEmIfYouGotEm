@@ -1,3 +1,4 @@
+import csv
 import json
 import shutil
 import subprocess
@@ -10,7 +11,9 @@ from raftsim.cascading import (
     generate_california_pool_drop_cascading_scenario2_5d,
 )
 from raftsim.scenario2_5d import (
+    FixtureScenario2_5DParameters,
     ProceduralScenario2_5DParameters,
+    generate_fixture_scenario2_5d,
     generate_procedural_scenario2_5d,
 )
 
@@ -124,6 +127,48 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert finite_volume_manifest["solver_mode"] == "finite_volume"
     assert finite_volume_manifest["boundary_mode"] == "pyclaw"
     assert finite_volume_manifest["flux_scheme"] == "roe"
+
+    uniform_scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="uniform_channel", seed=24, nx=24, ny=12, duration=0.2)
+    )
+    uniform_scenario_dir = tmp_path / "scenario" / "uniform_channel"
+    uniform_scenario.write_package(uniform_scenario_dir)
+    scenario_boundary_output_dir = tmp_path / "cpp_finite_volume_scenario_boundary_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(uniform_scenario_dir),
+            "--output",
+            str(scenario_boundary_output_dir),
+            "--steps",
+            "12",
+            "--frame-interval",
+            "6",
+            "--solver-mode",
+            "finite_volume",
+            "--boundary-mode",
+            "scenario",
+            "--feature-strength-scale",
+            "0",
+            "--bed-slope-source-scale",
+            "1",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    scenario_boundary_run = scenario_boundary_output_dir / uniform_scenario.metadata.scenario_id
+    scenario_boundary_manifest = json.loads((scenario_boundary_run / "manifest.json").read_text(encoding="utf-8"))
+    final_frame = scenario_boundary_run / scenario_boundary_manifest["frames"][-1]
+    west_column = []
+    with final_frame.open(newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            if int(row["col"]) == 0:
+                west_column.append((float(row["h"]), float(row["u"])))
+
+    assert scenario_boundary_manifest["boundary_mode"] == "scenario"
+    assert west_column
+    assert any(abs(h - 1.25) > 1.0e-6 or abs(u - 1.4) > 1.0e-6 for h, u in west_column)
 
     cascading_scenario_dir = tmp_path / "scenario" / "cascading"
     cascading_output_dir = tmp_path / "cpp_cascading_output"
