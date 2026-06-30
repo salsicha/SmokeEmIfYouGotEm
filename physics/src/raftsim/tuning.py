@@ -6,9 +6,16 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from .cascading import CascadingScenarioPackage2_5D
 from .comparison import ScenarioThresholds, ThresholdEvaluationReport, evaluate_dual_solver_thresholds
 from .dual_solver import CppSolverRunConfig, DualSolverRunConfig, run_cpp_solver_scenario, run_dual_solver_scenario
-from .geoclaw_reference import GeoClawExportConfig, export_geoclaw_scenario, normalize_geoclaw_fixed_grid_output
+from .geoclaw_reference import (
+    GeoClawExportConfig,
+    export_geoclaw_cascading_package,
+    export_geoclaw_scenario,
+    normalize_geoclaw_cascading_fixed_grid_output,
+    normalize_geoclaw_fixed_grid_output,
+)
 from .math3d import Vec3
 from .pyclaw_reference import PyClawRunConfig
 from .raft_coupling2_5d import (
@@ -31,10 +38,12 @@ class CppTuningCandidate:
     boundary_mode: str = "scenario"
     flux_scheme: str = "rusanov"
     cfl: float = 0.45
+    dry_tolerance: float = 1.0e-6
     feature_strength_scale: float = 1.0
     roughness_scale: float = 1.0
     bed_slope_source_scale: float = 0.0
     preserve_initial_mass: bool = True
+    tuning_roles: tuple[str, ...] = ()
 
     def to_json_dict(self) -> dict[str, object]:
         return {
@@ -43,10 +52,12 @@ class CppTuningCandidate:
             "boundary_mode": self.boundary_mode,
             "flux_scheme": self.flux_scheme,
             "cfl": self.cfl,
+            "dry_tolerance": self.dry_tolerance,
             "feature_strength_scale": self.feature_strength_scale,
             "roughness_scale": self.roughness_scale,
             "bed_slope_source_scale": self.bed_slope_source_scale,
             "preserve_initial_mass": self.preserve_initial_mass,
+            "tuning_roles": list(self.tuning_roles),
         }
 
 
@@ -86,6 +97,12 @@ class CppTuningReport:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(json.dumps(self.to_json_dict(output_path.parent), indent=2, sort_keys=True), encoding="utf-8")
         return output_path
+
+
+@dataclass(frozen=True, slots=True)
+class _NormalizedReferenceView:
+    output_dir: Path
+    manifest_path: Path
 
 
 @dataclass(frozen=True, slots=True)
@@ -163,6 +180,7 @@ def tune_cpp_solver_against_pyclaw(
                     boundary_mode=candidate.boundary_mode,
                     flux_scheme=candidate.flux_scheme,
                     cfl=candidate.cfl,
+                    dry_tolerance=candidate.dry_tolerance,
                     feature_strength_scale=candidate.feature_strength_scale,
                     roughness_scale=candidate.roughness_scale,
                     bed_slope_source_scale=candidate.bed_slope_source_scale,
@@ -237,6 +255,7 @@ def tune_cpp_solver_against_geoclaw(
                 boundary_mode=candidate.boundary_mode,
                 flux_scheme=candidate.flux_scheme,
                 cfl=candidate.cfl,
+                dry_tolerance=candidate.dry_tolerance,
                 feature_strength_scale=candidate.feature_strength_scale,
                 roughness_scale=candidate.roughness_scale,
                 bed_slope_source_scale=candidate.bed_slope_source_scale,
@@ -271,6 +290,141 @@ def tune_cpp_solver_against_geoclaw(
         candidates=tuple(results),
     )
     report.write_json(root / "geoclaw_tuning_report.json")
+    return report
+
+
+def default_cascading_cpp_tuning_candidates() -> tuple[CppTuningCandidate, ...]:
+    """Return coefficient candidates for cascading reach/drop GeoClaw tuning."""
+
+    return (
+        CppTuningCandidate(
+            "cascading_baseline",
+            tuning_roles=("section_handoff", "roughness", "dissipation", "wet_dry", "feature_forcing"),
+        ),
+        CppTuningCandidate(
+            "rougher_damped",
+            cfl=0.35,
+            feature_strength_scale=0.85,
+            roughness_scale=1.25,
+            tuning_roles=("roughness", "dissipation", "feature_forcing"),
+        ),
+        CppTuningCandidate(
+            "wet_dry_guarded",
+            dry_tolerance=1.0e-5,
+            feature_strength_scale=0.9,
+            roughness_scale=1.1,
+            tuning_roles=("wet_dry", "roughness", "feature_forcing"),
+        ),
+        CppTuningCandidate(
+            "finite_volume_handoff",
+            solver_mode="finite_volume",
+            boundary_mode="pyclaw",
+            flux_scheme="hll",
+            cfl=0.35,
+            bed_slope_source_scale=0.25,
+            preserve_initial_mass=False,
+            tuning_roles=("section_handoff", "dissipation", "wet_dry"),
+        ),
+    )
+
+
+def tune_cpp_solver_against_cascading_geoclaw(
+    package: CascadingScenarioPackage2_5D,
+    *,
+    output_dir: str | Path,
+    cpp_solver_executable: str | Path,
+    candidates: tuple[CppTuningCandidate, ...] | None = None,
+    geoclaw_config: GeoClawExportConfig | None = None,
+    thresholds: ScenarioThresholds | None = None,
+    cpp_steps: int | None = None,
+    cpp_frame_interval: int | None = None,
+) -> CppTuningReport:
+    """Tune C++ reach/drop coefficients against stitched cascading GeoClaw output."""
+
+    chosen_candidates = candidates or default_cascading_cpp_tuning_candidates()
+    if not chosen_candidates:
+        raise ValueError("At least one tuning candidate is required.")
+
+    scenario = package.scenario
+    root = Path(output_dir)
+    root.mkdir(parents=True, exist_ok=True)
+    results: list[CppTuningCandidateResult] = []
+    for candidate in chosen_candidates:
+        candidate_dir = root / candidate.label
+        candidate_dir.mkdir(parents=True, exist_ok=True)
+        package_dir = package.write_package(candidate_dir / "scenario" / scenario.metadata.scenario_id)
+        geoclaw_export = export_geoclaw_cascading_package(
+            package,
+            candidate_dir / "geoclaw_export" / scenario.metadata.scenario_id,
+            config=geoclaw_config,
+        )
+        cascading_normalized = normalize_geoclaw_cascading_fixed_grid_output(
+            geoclaw_export.output_dir,
+            candidate_dir / "geoclaw_cascading_reference" / scenario.metadata.scenario_id,
+            config=geoclaw_config,
+        )
+        stitched_reference = _NormalizedReferenceView(
+            output_dir=cascading_normalized.stitched_manifest_path.parent,
+            manifest_path=cascading_normalized.stitched_manifest_path,
+        )
+        cpp_result = run_cpp_solver_scenario(
+            package_dir,
+            output_dir=candidate_dir,
+            config=CppSolverRunConfig(
+                executable=Path(cpp_solver_executable),
+                steps=cpp_steps,
+                frame_interval=cpp_frame_interval,
+                solver_mode=candidate.solver_mode,
+                boundary_mode=candidate.boundary_mode,
+                flux_scheme=candidate.flux_scheme,
+                cfl=candidate.cfl,
+                dry_tolerance=candidate.dry_tolerance,
+                feature_strength_scale=candidate.feature_strength_scale,
+                roughness_scale=candidate.roughness_scale,
+                bed_slope_source_scale=candidate.bed_slope_source_scale,
+                preserve_initial_mass=candidate.preserve_initial_mass,
+            ),
+        )
+        manifest_path = _write_geoclaw_dual_solver_manifest(
+            candidate_dir,
+            scenario,
+            stitched_reference,
+            cpp_result,
+        )
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["scenario_package"] = _relative_or_absolute(package_dir, candidate_dir)
+        manifest["scenario_json"] = _relative_or_absolute(package_dir / "scenario.json", candidate_dir)
+        manifest["cascading_geoclaw"] = {
+            "normalized_manifest": _relative_or_absolute(cascading_normalized.manifest_path, candidate_dir),
+            "stitched_manifest": _relative_or_absolute(cascading_normalized.stitched_manifest_path, candidate_dir),
+            "reach_window_count": cascading_normalized.reach_window_count,
+            "drop_transition_window_count": cascading_normalized.drop_transition_window_count,
+            "frame_count": cascading_normalized.frame_count,
+        }
+        manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
+        threshold_path = candidate_dir / "threshold_evaluation.json"
+        threshold_report = evaluate_dual_solver_thresholds(
+            manifest_path,
+            thresholds=thresholds,
+            output_path=threshold_path,
+        )
+        results.append(
+            CppTuningCandidateResult(
+                candidate=candidate,
+                score=_score_threshold_report(threshold_report),
+                passed=threshold_report.passed,
+                dual_solver_dir=candidate_dir,
+                threshold_report=threshold_path,
+            )
+        )
+
+    best = min(results, key=lambda result: result.score)
+    report = CppTuningReport(
+        scenario_id=scenario.metadata.scenario_id,
+        best_candidate=best,
+        candidates=tuple(results),
+    )
+    report.write_json(root / "cascading_geoclaw_tuning_report.json")
     return report
 
 
