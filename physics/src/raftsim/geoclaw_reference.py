@@ -24,6 +24,7 @@ from .real_world import (
     generate_south_fork_american_cascading_seed_scenarios,
 )
 from .scenario2_5d import (
+    BoundaryCondition2_5D,
     Feature2_5D,
     FixtureScenario2_5DParameters,
     Scenario2_5D,
@@ -504,12 +505,16 @@ def export_geoclaw_scenario(
     cfg = config or GeoClawExportConfig()
     root = Path(output_dir)
     root.mkdir(parents=True, exist_ok=True)
+    boundary_semantics = _geoclaw_boundary_semantics(scenario)
+    include_boundary_adapter = bool(boundary_semantics["requires_user_boundary_adapter"])
 
     files: list[str] = []
     files.extend(_write_shared_scenario_package(scenario, root))
-    files.append(_relative_path(_write_makefile(root), root))
+    files.append(_relative_path(_write_makefile(root, include_boundary_adapter=include_boundary_adapter), root))
     files.append(_relative_path(_write_setrun_py(scenario, cfg, root), root))
     files.append(_relative_path(_write_qinit_f90(scenario, root), root))
+    if include_boundary_adapter:
+        files.append(_relative_path(_write_bc2amr_f90(scenario, root), root))
     files.append(_relative_path(_write_topography(scenario, root), root))
     files.append(_relative_path(_write_initial_state_npz(scenario, root), root))
     files.append(_relative_path(_write_qinit_xyz(scenario, root), root))
@@ -527,6 +532,7 @@ def export_geoclaw_scenario(
             "makefile": "Makefile",
             "setrun": "setrun.py",
             "qinit_fortran": "qinit.f90",
+            "boundary_adapter": "bc2amr.f90" if include_boundary_adapter else None,
             "topography": "b.tt1",
             "initial_state": "initial_state/initial_water_state.npz",
             "qinit": "initial_state/qinit.xyz",
@@ -536,11 +542,13 @@ def export_geoclaw_scenario(
             "fixed_grid_output": "fgout/fgout_grids.json",
             "shared_scenario": "shared_scenario/scenario.json",
         },
+        "boundary_semantics": boundary_semantics,
         "exported_files": sorted(files),
         "notes": [
             "GeoClaw is the active offline reference target.",
             "This package is generated from the shared solver-neutral scenario; do not edit exported inputs by hand.",
             "The custom C++ solver must be validated against normalized GeoClaw fixed-grid outputs from this scenario.",
+            "GeoClaw boundary codes are recorded in boundary_semantics; explicit constant scenario boundary state is enforced by bc2amr.f90 when required.",
         ],
     }
     manifest_path = root / "manifest.json"
@@ -1470,8 +1478,10 @@ def _write_shared_scenario_package(scenario: Scenario2_5D, root: Path) -> list[s
     return sorted(_relative_path(path, root) for path in package_dir.iterdir() if path.is_file())
 
 
-def _write_makefile(root: Path) -> Path:
-    content = """# Generated GeoClaw app Makefile for raftsim reference runs.
+def _write_makefile(root: Path, *, include_boundary_adapter: bool = False) -> Path:
+    exclude_sources = "$(GEOLIB)/bc2amr.f90" if include_boundary_adapter else ""
+    boundary_source = "  ./bc2amr.f90 \\\n" if include_boundary_adapter else ""
+    content = f"""# Generated GeoClaw app Makefile for raftsim reference runs.
 CLAWMAKE = $(CLAW)/clawutil/src/Makefile.common
 
 CLAW_PKG = geoclaw
@@ -1487,12 +1497,12 @@ GEOLIB = $(CLAW)/geoclaw/src/2d/shallow
 include $(GEOLIB)/Makefile.geoclaw
 
 EXCLUDE_MODULES =
-EXCLUDE_SOURCES =
+EXCLUDE_SOURCES = {exclude_sources}
 MODULES =
 
 SOURCES = \\
   ./qinit.f90 \\
-  $(CLAW)/riemann/src/rpn2_geoclaw.f \\
+{boundary_source}  $(CLAW)/riemann/src/rpn2_geoclaw.f \\
   $(CLAW)/riemann/src/rpt2_geoclaw.f \\
   $(CLAW)/riemann/src/geoclaw_riemann_utils.f \\
 
@@ -1749,6 +1759,264 @@ end subroutine qinit
     return path
 
 
+def _write_bc2amr_f90(scenario: Scenario2_5D, root: Path) -> Path:
+    edge_parameters = "\n".join(_fortran_boundary_parameters(boundary) for boundary in _boundaries_by_edge(scenario).values())
+    content = f"""! Generated GeoClaw boundary adapter for raftsim scenario {scenario.metadata.scenario_id}.
+! Constant scenario boundary state is applied only for GeoClaw user boundaries.
+subroutine bc2amr(val,aux,nrow,ncol,meqn,naux, hx, hy, level, time,   &
+                  xlo_patch, xhi_patch, ylo_patch, yhi_patch)
+
+    use amr_module, only: mthbc, xlower, ylower, xupper, yupper
+    use amr_module, only: xperdom,yperdom,spheredom
+
+    implicit none
+
+    integer, intent(in) :: nrow, ncol, meqn, naux, level
+    real(kind=8), intent(in) :: hx, hy, time
+    real(kind=8), intent(in) :: xlo_patch, xhi_patch
+    real(kind=8), intent(in) :: ylo_patch, yhi_patch
+    real(kind=8), intent(in out) :: val(meqn, nrow, ncol)
+    real(kind=8), intent(in out) :: aux(naux, nrow, ncol)
+
+    integer :: i, j, ibeg, jbeg, nxl, nxr, nyb, nyt
+    real(kind=8) :: hxmarg, hymarg
+
+{edge_parameters}
+
+    hxmarg = hx * .01d0
+    hymarg = hy * .01d0
+
+    if (xperdom .and. (yperdom .or. spheredom)) then
+        return
+    end if
+
+    if (xlo_patch < xlower-hxmarg) then
+        nxl = int((xlower + hxmarg - xlo_patch) / hx)
+        select case(mthbc(1))
+            case(0)
+                do j = 1, ncol
+                    do i = 1, nxl
+                        aux(:, i, j) = aux(:, nxl + 1, j)
+                        call apply_raftsim_boundary(1, val, aux, meqn, naux, i, j, nxl + 1, j)
+                    end do
+                end do
+            case(1)
+                do j = 1, ncol
+                    do i = 1, nxl
+                        aux(:, i, j) = aux(:, nxl + 1, j)
+                        val(:, i, j) = val(:, nxl + 1, j)
+                    end do
+                end do
+            case(2)
+                continue
+            case(3)
+                do j = 1, ncol
+                    do i = 1, nxl
+                        aux(:, i, j) = aux(:, 2 * nxl + 1 - i, j)
+                        val(:, i, j) = val(:, 2 * nxl + 1 - i, j)
+                        val(2, i, j) = -val(2, i, j)
+                    end do
+                end do
+            case(4)
+                continue
+            case default
+                print *, "Invalid boundary condition requested."
+                stop
+        end select
+    end if
+
+    if (xhi_patch > xupper+hxmarg) then
+        nxr = int((xhi_patch - xupper + hxmarg) / hx)
+        ibeg = max(nrow - nxr + 1, 1)
+        select case(mthbc(2))
+            case(0)
+                do i = ibeg, nrow
+                    do j = 1, ncol
+                        aux(:, i, j) = aux(:, ibeg - 1, j)
+                        call apply_raftsim_boundary(2, val, aux, meqn, naux, i, j, ibeg - 1, j)
+                    end do
+                end do
+            case(1)
+                do i = ibeg, nrow
+                    do j = 1, ncol
+                        aux(:, i, j) = aux(:, ibeg - 1, j)
+                        val(:, i, j) = val(:, ibeg - 1, j)
+                    end do
+                end do
+            case(2)
+                continue
+            case(3)
+                do i = ibeg, nrow
+                    do j = 1, ncol
+                        aux(:, i, j) = aux(:, 2 * ibeg - 1 - i, j)
+                        val(:, i, j) = val(:, 2 * ibeg - 1 - i, j)
+                        val(2, i, j) = -val(2, i, j)
+                    end do
+                end do
+            case(4)
+                continue
+            case default
+                print *, "Invalid boundary condition requested."
+                stop
+        end select
+    end if
+
+    if (ylo_patch < ylower - hymarg) then
+        nyb = int((ylower + hymarg - ylo_patch) / hy)
+        select case(mthbc(3))
+            case(0)
+                do j = 1, nyb
+                    do i = 1, nrow
+                        aux(:, i, j) = aux(:, i, nyb + 1)
+                        call apply_raftsim_boundary(3, val, aux, meqn, naux, i, j, i, nyb + 1)
+                    end do
+                end do
+            case(1)
+                do j = 1, nyb
+                    do i = 1, nrow
+                        aux(:, i, j) = aux(:, i, nyb + 1)
+                        val(:, i, j) = val(:, i, nyb + 1)
+                    end do
+                end do
+            case(2)
+                continue
+            case(3)
+                do j = 1, nyb
+                    do i = 1, nrow
+                        aux(:, i, j) = aux(:, i, 2 * nyb + 1 - j)
+                        val(:, i, j) = val(:, i, 2 * nyb + 1 - j)
+                        val(3, i, j) = -val(3, i, j)
+                    end do
+                end do
+            case(4)
+                continue
+            case default
+                print *, "Invalid boundary condition requested."
+                stop
+        end select
+    end if
+
+    if (yhi_patch > yupper + hymarg) then
+        nyt = int((yhi_patch - yupper + hymarg) / hy)
+        jbeg = max(ncol - nyt + 1, 1)
+        select case(mthbc(4))
+            case(0)
+                do j = jbeg, ncol
+                    do i = 1, nrow
+                        aux(:, i, j) = aux(:, i, jbeg - 1)
+                        call apply_raftsim_boundary(4, val, aux, meqn, naux, i, j, i, jbeg - 1)
+                    end do
+                end do
+            case(1)
+                do j = jbeg, ncol
+                    do i = 1, nrow
+                        aux(:, i, j) = aux(:, i, jbeg - 1)
+                        val(:, i, j) = val(:, i, jbeg - 1)
+                    end do
+                end do
+            case(2)
+                continue
+            case(3)
+                do j = jbeg, ncol
+                    do i = 1, nrow
+                        aux(:, i, j) = aux(:, i, 2 * jbeg - 1 - j)
+                        val(:, i, j) = val(:, i, 2 * jbeg - 1 - j)
+                        val(3, i, j) = -val(3, i, j)
+                    end do
+                end do
+            case(4)
+                continue
+            case default
+                print *, "Invalid boundary condition requested."
+                stop
+        end select
+    end if
+
+contains
+
+    subroutine apply_raftsim_boundary(edge, q, a, neq, naux_local, i, j, ii, jj)
+        integer, intent(in) :: edge, neq, naux_local, i, j, ii, jj
+        real(kind=8), intent(inout) :: q(neq, nrow, ncol)
+        real(kind=8), intent(in) :: a(naux_local, nrow, ncol)
+        real(kind=8) :: h, u, v, h_interior
+        logical :: has_depth, has_stage, has_velocity
+        real(kind=8) :: depth_value, stage_value, u_value, v_value
+
+        has_depth = .false.
+        has_stage = .false.
+        has_velocity = .false.
+        depth_value = 0.d0
+        stage_value = 0.d0
+        u_value = 0.d0
+        v_value = 0.d0
+
+        select case(edge)
+            case(1)
+                has_depth = west_has_depth
+                has_stage = west_has_stage
+                has_velocity = west_has_velocity
+                depth_value = west_depth
+                stage_value = west_stage
+                u_value = west_u
+                v_value = west_v
+            case(2)
+                has_depth = east_has_depth
+                has_stage = east_has_stage
+                has_velocity = east_has_velocity
+                depth_value = east_depth
+                stage_value = east_stage
+                u_value = east_u
+                v_value = east_v
+            case(3)
+                has_depth = south_has_depth
+                has_stage = south_has_stage
+                has_velocity = south_has_velocity
+                depth_value = south_depth
+                stage_value = south_stage
+                u_value = south_u
+                v_value = south_v
+            case(4)
+                has_depth = north_has_depth
+                has_stage = north_has_stage
+                has_velocity = north_has_velocity
+                depth_value = north_depth
+                stage_value = north_stage
+                u_value = north_u
+                v_value = north_v
+        end select
+
+        q(:, i, j) = q(:, ii, jj)
+        h = q(1, ii, jj)
+        if (has_stage .and. naux_local >= 1) then
+            h = max(0.d0, stage_value - a(1, i, j))
+        endif
+        if (has_depth) then
+            h = max(0.d0, depth_value)
+        endif
+        q(1, i, j) = h
+
+        if (has_velocity) then
+            q(2, i, j) = h * u_value
+            q(3, i, j) = h * v_value
+        else if (q(1, ii, jj) > 1.d-12) then
+            h_interior = q(1, ii, jj)
+            u = q(2, ii, jj) / h_interior
+            v = q(3, ii, jj) / h_interior
+            q(2, i, j) = h * u
+            q(3, i, j) = h * v
+        else
+            q(2, i, j) = 0.d0
+            q(3, i, j) = 0.d0
+        endif
+    end subroutine apply_raftsim_boundary
+
+end subroutine bc2amr
+"""
+    path = root / "bc2amr.f90"
+    path.write_text(content, encoding="utf-8")
+    return path
+
+
 def _write_topography(scenario: Scenario2_5D, root: Path) -> Path:
     path = root / "b.tt1"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -1937,14 +2205,90 @@ def _feature_influence(
 
 
 def _geoclaw_boundary_codes(scenario: Scenario2_5D) -> tuple[list[str], list[str]]:
-    code_by_edge = {boundary.edge: _boundary_code(boundary.kind) for boundary in scenario.boundaries}
+    code_by_edge = {boundary.edge: _boundary_code(boundary) for boundary in scenario.boundaries}
     return [code_by_edge["west"], code_by_edge["south"]], [code_by_edge["east"], code_by_edge["north"]]
 
 
-def _boundary_code(kind: str) -> str:
-    if kind in {"wall", "bank"}:
+def _geoclaw_boundary_semantics(scenario: Scenario2_5D) -> dict[str, object]:
+    boundaries = _boundaries_by_edge(scenario)
+    lower, upper = _geoclaw_boundary_codes(scenario)
+    edge_records = []
+    for edge in ("west", "east", "south", "north"):
+        boundary = boundaries[edge]
+        edge_records.append(
+            {
+                "edge": edge,
+                "scenario_kind": boundary.kind,
+                "geoclaw_code": _boundary_code(boundary),
+                "requires_user_boundary_adapter": _boundary_requires_user_adapter(boundary),
+                "enforced_state": {
+                    "stage": boundary.stage,
+                    "depth": boundary.depth,
+                    "velocity": list(boundary.velocity) if boundary.velocity is not None else None,
+                },
+                "hydrograph_policy": "unsupported_dynamic_boundary" if boundary.hydrograph else "none",
+            }
+        )
+    return {
+        "bc_lower": lower,
+        "bc_upper": upper,
+        "requires_user_boundary_adapter": any(item["requires_user_boundary_adapter"] for item in edge_records),
+        "edges": edge_records,
+    }
+
+
+def _boundaries_by_edge(scenario: Scenario2_5D) -> dict[str, BoundaryCondition2_5D]:
+    boundaries = {boundary.edge: boundary for boundary in scenario.boundaries}
+    missing = [edge for edge in ("west", "east", "south", "north") if edge not in boundaries]
+    if missing:
+        raise ValueError(f"Scenario is missing GeoClaw boundary definitions for: {', '.join(missing)}")
+    return boundaries
+
+
+def _boundary_code(boundary: BoundaryCondition2_5D) -> str:
+    if boundary.kind in {"wall", "bank"}:
         return "wall"
+    if _boundary_requires_user_adapter(boundary):
+        return "user"
     return "extrap"
+
+
+def _boundary_requires_user_adapter(boundary: BoundaryCondition2_5D) -> bool:
+    if boundary.hydrograph:
+        raise ValueError(
+            "GeoClaw export records boundary hydrograph files but does not yet apply dynamic hydrograph "
+            f"state in bc2amr.f90; edge={boundary.edge!r} must be converted to static stage/depth/velocity "
+            "or the dynamic adapter must be implemented before this scenario is used as a parity reference."
+        )
+    return boundary.stage is not None or boundary.depth is not None or boundary.velocity is not None
+
+
+def _fortran_boundary_parameters(boundary: BoundaryCondition2_5D) -> str:
+    edge = boundary.edge
+    velocity = boundary.velocity or (0.0, 0.0)
+    lines = [
+        f"    logical, parameter :: {edge}_has_depth = {_fortran_bool(boundary.depth is not None)}",
+        f"    logical, parameter :: {edge}_has_stage = {_fortran_bool(boundary.stage is not None)}",
+        f"    logical, parameter :: {edge}_has_velocity = {_fortran_bool(boundary.velocity is not None)}",
+        f"    real(kind=8), parameter :: {edge}_depth = {_fortran_float(boundary.depth or 0.0)}",
+        f"    real(kind=8), parameter :: {edge}_stage = {_fortran_float(boundary.stage or 0.0)}",
+        f"    real(kind=8), parameter :: {edge}_u = {_fortran_float(velocity[0])}",
+        f"    real(kind=8), parameter :: {edge}_v = {_fortran_float(velocity[1])}",
+    ]
+    return "\n".join(lines)
+
+
+def _fortran_bool(value: bool) -> str:
+    return ".true." if value else ".false."
+
+
+def _fortran_float(value: float) -> str:
+    literal = f"{float(value):.17g}".replace("e", "d").replace("E", "d")
+    if "d" not in literal and "." not in literal:
+        literal = f"{literal}."
+    if "d" not in literal:
+        literal = f"{literal}d0"
+    return literal
 
 
 def _geoclaw_refinement_ratios(config: GeoClawExportConfig) -> list[int]:

@@ -1,5 +1,6 @@
 import json
 import csv
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
@@ -36,7 +37,11 @@ from raftsim.geoclaw_reference import (
     write_geoclaw_setup_report,
 )
 from raftsim.real_world import generate_south_fork_american_cascading_scenario2_5d
-from raftsim.scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
+from raftsim.scenario2_5d import (
+    BoundaryHydrographSample2_5D,
+    FixtureScenario2_5DParameters,
+    generate_fixture_scenario2_5d,
+)
 
 
 def test_geoclaw_availability_check_is_machine_readable():
@@ -111,9 +116,18 @@ def test_geoclaw_exporter_writes_solver_specific_files(tmp_path):
     assert manifest["scenario_id"] == scenario.metadata.scenario_id
     assert manifest["files"]["makefile"] == "Makefile"
     assert manifest["files"]["qinit_fortran"] == "qinit.f90"
+    assert manifest["files"]["boundary_adapter"] == "bc2amr.f90"
+    assert manifest["boundary_semantics"]["bc_lower"] == ["user", "wall"]
+    assert manifest["boundary_semantics"]["bc_upper"] == ["extrap", "wall"]
+    west_boundary = manifest["boundary_semantics"]["edges"][0]
+    assert west_boundary["edge"] == "west"
+    assert west_boundary["geoclaw_code"] == "user"
+    assert west_boundary["enforced_state"]["depth"] == pytest.approx(1.25)
+    assert west_boundary["enforced_state"]["velocity"] == [1.4, 0.0]
     assert (result.output_dir / "Makefile").exists()
     assert (result.output_dir / "setrun.py").exists()
     assert (result.output_dir / "qinit.f90").exists()
+    assert (result.output_dir / "bc2amr.f90").exists()
     assert (result.output_dir / "b.tt1").exists()
     assert (result.output_dir / "initial_state" / "initial_water_state.npz").exists()
     assert (result.output_dir / "initial_state" / "qinit.xyz").exists()
@@ -141,12 +155,55 @@ def test_geoclaw_exporter_writes_runnable_app_files(tmp_path):
 
     assert "Makefile.geoclaw" in makefile
     assert "./qinit.f90" in makefile
+    assert "./bc2amr.f90" in makefile
+    assert "EXCLUDE_SOURCES = $(GEOLIB)/bc2amr.f90" in makefile
     assert "rundata.fgout_data.fgout_grids = [fgout]" in setrun
     assert "setrun(package).write()" in setrun
+    assert "clawdata.bc_lower = ['user', 'wall']" in setrun
+    assert "clawdata.bc_upper = ['extrap', 'wall']" in setrun
     assert "b.tt1" in setrun
     assert "../initial_state/qinit.xyz" in qinit
     assert "read(unit,*,iostat=ios)" in qinit
     assert not topo_first_line.startswith("#")
+    bc2amr = (result.output_dir / "bc2amr.f90").read_text(encoding="utf-8")
+    assert "subroutine bc2amr" in bc2amr
+    assert "west_has_depth = .true." in bc2amr
+    assert "west_has_velocity = .true." in bc2amr
+    assert "call apply_raftsim_boundary(1" in bc2amr
+
+
+def test_geoclaw_exporter_records_no_adapter_when_boundaries_are_native(tmp_path):
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="flat_pool", seed=13, nx=18, ny=12)
+    )
+    result = export_geoclaw_scenario(scenario, tmp_path / "geoclaw" / scenario.metadata.scenario_id)
+    manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+    makefile = (result.output_dir / "Makefile").read_text(encoding="utf-8")
+
+    assert manifest["files"]["boundary_adapter"] is None
+    assert manifest["boundary_semantics"]["requires_user_boundary_adapter"] is False
+    assert manifest["boundary_semantics"]["bc_lower"] == ["wall", "wall"]
+    assert manifest["boundary_semantics"]["bc_upper"] == ["wall", "wall"]
+    assert not (result.output_dir / "bc2amr.f90").exists()
+    assert "./bc2amr.f90" not in makefile
+
+
+def test_geoclaw_exporter_rejects_unapplied_boundary_hydrographs(tmp_path):
+    scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="uniform_channel", seed=14, nx=18, ny=12)
+    )
+    west = scenario.boundaries[0]
+    dynamic_west = replace(
+        west,
+        hydrograph=(
+            BoundaryHydrographSample2_5D(time=0.0, depth=1.25, velocity=(1.4, 0.0)),
+            BoundaryHydrographSample2_5D(time=4.0, depth=1.4, velocity=(1.7, 0.0)),
+        ),
+    )
+    dynamic_scenario = replace(scenario, boundaries=(dynamic_west, *scenario.boundaries[1:]))
+
+    with pytest.raises(ValueError, match="dynamic hydrograph"):
+        export_geoclaw_scenario(dynamic_scenario, tmp_path / "geoclaw" / scenario.metadata.scenario_id)
 
 
 def test_geoclaw_exporter_records_fixed_grid_times(tmp_path):
