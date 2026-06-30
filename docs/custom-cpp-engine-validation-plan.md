@@ -36,6 +36,7 @@ Fallback or initial-state-only GeoClaw normalization is useful for schema smoke 
 
 ## Phase 1: GeoClaw Reference Runs
 
+- Milestone 16 reference evidence is tracked in `physics/reports/milestone16/geoclaw_reference_runs.json` and `physics/reports/milestone16/geoclaw_reference_runs.md`; generated GeoClaw app/output trees use the compact ignored `physics/outputs/m16g/` path to avoid GeoClaw/Fortran path truncation.
 - Run real GeoClaw fixed-grid simulations for the canonical, rafting, real-world, and cascading suites.
 - Store manifests with GeoClaw availability, dependency versions, AMR/fixed-grid settings, scenario package hash, and export time.
 - Normalize full solution frames into the shared field/probe/cross-section telemetry schema.
