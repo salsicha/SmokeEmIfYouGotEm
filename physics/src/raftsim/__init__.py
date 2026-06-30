@@ -18,6 +18,12 @@ from .validation_gate import (
     custom_cpp_validation_gate_json,
     write_custom_cpp_validation_gate,
 )
+from .milestone16 import (
+    MILESTONE16_GEOCLAW_REFERENCE_REPORT_SCHEMA,
+    Milestone16GeoClawReferenceReport,
+    Milestone16GeoClawRunRecord,
+    run_milestone16_geoclaw_reference_suite,
+)
 from .raft2d import (
     PaddleCommand2D,
     Raft2DConfig,
@@ -406,6 +412,9 @@ __all__ = [
     "WaterField2_5D",
     "WaterSample2_5D",
     "GeneratedRiver2D",
+    "MILESTONE16_GEOCLAW_REFERENCE_REPORT_SCHEMA",
+    "Milestone16GeoClawReferenceReport",
+    "Milestone16GeoClawRunRecord",
     "River2DParameters",
     "RiverFeature2D",
     "RiverSample2D",
@@ -486,6 +495,7 @@ __all__ = [
     "profile_raft_coupling_runs",
     "run_cpp_solver_scenario",
     "run_dual_solver_scenario",
+    "run_milestone16_geoclaw_reference_suite",
     "run_raft_force_parameter_sweep",
     "run_pyclaw_reference",
     "select_backend",
