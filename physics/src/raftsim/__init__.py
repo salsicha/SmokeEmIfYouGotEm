@@ -53,6 +53,12 @@ from .milestone16 import (
     run_milestone16_regression_promotion,
     run_milestone16_runtime_profile,
 )
+from .milestone18 import (
+    MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
+    Milestone18FailureTriageEntry,
+    Milestone18FailureTriageReport,
+    build_milestone18_failure_triage_matrix,
+)
 from .raft2d import (
     PaddleCommand2D,
     Raft2DConfig,
@@ -542,6 +548,7 @@ __all__ = [
     "MILESTONE16_REGRESSION_REGISTRY_SCHEMA",
     "MILESTONE16_REGRESSION_PROMOTION_REPORT_SCHEMA",
     "MILESTONE16_RUNTIME_PROFILE_REPORT_SCHEMA",
+    "MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA",
     "Milestone16ComparisonRecord",
     "Milestone16ComparisonReport",
     "Milestone16CppRunRecord",
@@ -558,6 +565,8 @@ __all__ = [
     "Milestone16RegressionPromotionReport",
     "Milestone16RuntimeProfileRecord",
     "Milestone16RuntimeProfileReport",
+    "Milestone18FailureTriageEntry",
+    "Milestone18FailureTriageReport",
     "River2DParameters",
     "RiverFeature2D",
     "RiverSample2D",
@@ -596,6 +605,7 @@ __all__ = [
     "build_milestone10_scenario_suite",
     "build_milestone16_full_cpp_validation_gate_report",
     "build_milestone16_geoclaw_readiness_report",
+    "build_milestone18_failure_triage_matrix",
     "build_rapid_review_editor_workflow",
     "build_rapid_review_flow_difficulty_mapping",
     "build_readiness_report",
