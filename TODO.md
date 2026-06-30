@@ -255,7 +255,7 @@ This milestone replaces the current monolithic/mostly uniform 2.5D scenario pack
 - [x] Encode pools separately from rapids: low-gradient recovery pools should have their own depth, eddy, recirculation, and tailwater controls rather than being treated as inactive gaps.
 - [x] Support a sequence of reach-local grids with overlap/ghost zones or an equivalent stitched global grid so GeoClaw and C++ consume identical bathymetry, boundaries, and initial state.
 - [x] Add conservation handoff checks across reach boundaries: mass flux, momentum flux, surface-elevation continuity where appropriate, energy loss across drops, and bounded wet/dry fronts.
-- [ ] Add procedural generators for California-style pool-and-drop patterns: pool, constricted tongue, ledge/drop, wave train, recovery eddy, boulder garden, and next pool.
+- [x] Add procedural generators for California-style pool-and-drop patterns: pool, constricted tongue, ledge/drop, wave train, recovery eddy, boulder garden, and next pool.
 - [ ] Add South Fork American seed scenarios with variable slopes and rapid/drop transitions before generalizing to other rivers.
 - [ ] Run GeoClaw reference cases over the same cascading package and normalize fixed-grid output per reach and for the stitched river window.
 - [ ] Extend the custom C++ solver loader to consume the cascading package without changing scenario semantics.
