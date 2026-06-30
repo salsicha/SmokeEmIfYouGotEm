@@ -316,7 +316,7 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [x] Add deterministic procedural 2.5D rafting scenario generation from seed.
 - [x] Add a PyClaw availability check and first reference runner as a legacy baseline; GeoClaw availability/checks are now Milestone 14.
 - [x] Add a C++ solver directory and build skeleton.
-- [ ] Implement suite-level JSON and Markdown reports for the full C++ validation gate.
+- [x] Implement suite-level JSON and Markdown reports for the full C++ validation gate.
 - [x] Add a versioned analytic fixture manifest with provenance notes, expected behavior, tolerance tier, and source-equation references.
 - [x] Manually encode a small SWASHES-style set for lake-at-rest balance, sloping-channel friction, wet/dry shoreline, bed step, dam-break/bore, hydraulic jump, and transcritical bump cases where practical.
 - [x] Add C++ and GeoClaw/analytic comparison reports that fail retuning when these small fixtures regress.

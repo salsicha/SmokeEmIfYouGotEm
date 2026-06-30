@@ -68,6 +68,7 @@ MILESTONE16_RAFT_COUPLING_REPORT_SCHEMA = "raftsim.milestone16.raft_coupling_val
 MILESTONE16_REGRESSION_PROMOTION_REPORT_SCHEMA = "raftsim.milestone16.regression_promotion.v0"
 MILESTONE16_REGRESSION_REGISTRY_SCHEMA = "raftsim.milestone16.regression_registry.v0"
 MILESTONE16_RUNTIME_PROFILE_REPORT_SCHEMA = "raftsim.milestone16.runtime_profile.v0"
+MILESTONE16_FULL_CPP_VALIDATION_GATE_REPORT_SCHEMA = "raftsim.milestone16.full_cpp_validation_gate.v0"
 MILESTONE16_RAFT_FORCE_DELTA_WEIGHT_RATIO_THRESHOLD = 1.0
 MILESTONE16_RAFT_TORQUE_DELTA_INERTIA_RATIO_THRESHOLD = 2.5
 MILESTONE16_RAFT_TRAJECTORY_POSITION_DELTA_M_THRESHOLD = 0.25
@@ -93,6 +94,15 @@ MILESTONE16_CASE_DIRS = {
     "south_fork_cascading_low_runnable": "cg_low",
     "south_fork_cascading_median_runnable": "cg_med",
     "south_fork_cascading_high_runnable": "cg_high",
+}
+MILESTONE16_FULL_GATE_REPORT_FILES = {
+    "geoclaw_reference": "geoclaw_reference_runs.json",
+    "cpp_solver": "cpp_solver_runs.json",
+    "geoclaw_cpp_comparisons": "geoclaw_cpp_comparisons.json",
+    "geometry": "geometry_validation.json",
+    "raft_coupling": "raft_coupling_validation.json",
+    "runtime_profile": "runtime_profile.json",
+    "regression_promotion": "regression_promotion_manifest.json",
 }
 
 
@@ -791,6 +801,321 @@ class Milestone16RuntimeProfileReport:
             )
         output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
         return output_path
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone16FullGateComponent:
+    component_id: str
+    title: str
+    source_report: str
+    passed: bool
+    total_count: int
+    passed_count: int
+    failed_count: int
+    blockers: tuple[str, ...] = ()
+    notes: tuple[str, ...] = ()
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "component_id": self.component_id,
+            "title": self.title,
+            "source_report": self.source_report,
+            "passed": self.passed,
+            "total_count": self.total_count,
+            "passed_count": self.passed_count,
+            "failed_count": self.failed_count,
+            "blockers": list(self.blockers),
+            "notes": list(self.notes),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone16FullCppValidationGateReport:
+    report_dir: str
+    components: tuple[Milestone16FullGateComponent, ...]
+
+    @property
+    def passed(self) -> bool:
+        return bool(self.components) and all(component.passed for component in self.components)
+
+    def to_json_dict(self) -> dict[str, object]:
+        blocked = tuple(component for component in self.components if not component.passed)
+        return {
+            "schema_version": MILESTONE16_FULL_CPP_VALIDATION_GATE_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "report_dir": self.report_dir,
+            "component_count": len(self.components),
+            "passed_component_count": sum(1 for component in self.components if component.passed),
+            "blocked_component_count": len(blocked),
+            "blocked_component_ids": [component.component_id for component in blocked],
+            "components": [component.to_json_dict() for component in self.components],
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = [
+            "# Milestone 16 Full C++ Validation Gate",
+            "",
+            f"Schema: `{MILESTONE16_FULL_CPP_VALIDATION_GATE_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            "| Component | Result | Passed | Failed | Total | Source |",
+            "| --- | --- | ---: | ---: | ---: | --- |",
+        ]
+        for component in self.components:
+            lines.append(
+                "| "
+                f"{component.title} | "
+                f"{'PASS' if component.passed else 'BLOCKED'} | "
+                f"{component.passed_count} | "
+                f"{component.failed_count} | "
+                f"{component.total_count} | "
+                f"`{component.source_report}` |"
+            )
+        blocked = [component for component in self.components if not component.passed]
+        if blocked:
+            lines.extend(["", "## Blockers", ""])
+            for component in blocked:
+                lines.append(f"### {component.title}")
+                if component.blockers:
+                    for blocker in component.blockers:
+                        lines.append(f"- {blocker}")
+                else:
+                    lines.append("- Component reported blocked without detailed blockers.")
+                lines.append("")
+        output_path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+        return output_path
+
+
+def build_milestone16_full_cpp_validation_gate_report(report_dir: str | Path) -> Milestone16FullCppValidationGateReport:
+    """Build one suite-level report from the Milestone 16 component reports."""
+
+    root = Path(report_dir)
+    reports = {key: _load_json_report(root / filename) for key, filename in MILESTONE16_FULL_GATE_REPORT_FILES.items()}
+    components = (
+        _full_gate_component(
+            "geoclaw_reference",
+            "GeoClaw Reference Runs",
+            root / MILESTONE16_FULL_GATE_REPORT_FILES["geoclaw_reference"],
+            reports["geoclaw_reference"],
+            total_key="scenario_count",
+            passed_key="passed_count",
+            failed_key="failed_count",
+            blocker_records_key="records",
+            blocker_label_key="gate_scenario_id",
+            blocker_detail="GeoClaw reference did not produce a full passing solution",
+        ),
+        _full_gate_component(
+            "cpp_solver",
+            "C++ Solver Runs",
+            root / MILESTONE16_FULL_GATE_REPORT_FILES["cpp_solver"],
+            reports["cpp_solver"],
+            total_key="run_count",
+            passed_key="passed_count",
+            failed_key="failed_count",
+            blocker_records_key="records",
+            blocker_label_key="gate_scenario_id",
+            blocker_detail="C++ run or manifest gate failed",
+        ),
+        _full_gate_component(
+            "geoclaw_cpp_comparisons",
+            "GeoClaw/C++ Threshold Comparisons",
+            root / MILESTONE16_FULL_GATE_REPORT_FILES["geoclaw_cpp_comparisons"],
+            reports["geoclaw_cpp_comparisons"],
+            total_key="comparison_count",
+            passed_key="threshold_passed_count",
+            failed_key="threshold_failed_count",
+            blocker_records_key="records",
+            blocker_label_key="gate_scenario_id",
+            blocker_detail="GeoClaw/C++ threshold comparison failed",
+            pass_field="threshold_passed",
+            detail_field="failing_checks",
+        ),
+        _full_gate_component(
+            "geometry",
+            "Geometry-Specific Validation",
+            root / MILESTONE16_FULL_GATE_REPORT_FILES["geometry"],
+            reports["geometry"],
+            total_key="case_count",
+            passed_key="passed_count",
+            failed_key="failed_count",
+            blocker_records_key="cases",
+            blocker_label_key="case_id",
+            blocker_detail="geometry family is blocked",
+        ),
+        _full_gate_component(
+            "raft_coupling",
+            "Raft Coupling Validation",
+            root / MILESTONE16_FULL_GATE_REPORT_FILES["raft_coupling"],
+            reports["raft_coupling"],
+            total_key="comparison_count",
+            passed_key="passed_count",
+            failed_key="failed_count",
+            blocker_records_key="records",
+            blocker_label_key="case_id",
+            blocker_detail="raft coupling comparison failed",
+            detail_field="notes",
+        ),
+        _runtime_profile_full_gate_component(root / MILESTONE16_FULL_GATE_REPORT_FILES["runtime_profile"], reports["runtime_profile"]),
+        _full_gate_component(
+            "regression_promotion",
+            "Regression Promotion",
+            root / MILESTONE16_FULL_GATE_REPORT_FILES["regression_promotion"],
+            reports["regression_promotion"],
+            total_key="entry_count",
+            passed_key=None,
+            failed_key=None,
+            blocker_records_key="entries",
+            blocker_label_key="artifact_id",
+            blocker_detail="regression promotion entry failed",
+        ),
+    )
+    return Milestone16FullCppValidationGateReport(report_dir=str(root), components=components)
+
+
+def _load_json_report(path: Path) -> dict[str, object]:
+    with path.open(encoding="utf-8") as handle:
+        data = json.load(handle)
+    if not isinstance(data, dict):
+        raise ValueError(f"{path} must contain a JSON object.")
+    return data
+
+
+def _full_gate_component(
+    component_id: str,
+    title: str,
+    source_report: Path,
+    report: dict[str, object],
+    *,
+    total_key: str,
+    passed_key: str | None,
+    failed_key: str | None,
+    blocker_records_key: str,
+    blocker_label_key: str,
+    blocker_detail: str,
+    pass_field: str = "passed",
+    detail_field: str | None = None,
+) -> Milestone16FullGateComponent:
+    records = _report_records(report, blocker_records_key)
+    passed = bool(report.get("passed"))
+    total_count = _int_or_len(report, total_key, records)
+    passed_count = (
+        _int_or_len(report, passed_key, [record for record in records if record.get(pass_field)])
+        if passed_key is not None
+        else sum(1 for record in records if record.get(pass_field, passed))
+    )
+    failed_count = (
+        _int_or_len(report, failed_key, [record for record in records if not record.get(pass_field)])
+        if failed_key is not None
+        else max(0, total_count - passed_count)
+    )
+    blockers = _component_blockers(
+        records,
+        label_key=blocker_label_key,
+        detail=blocker_detail,
+        pass_field=pass_field,
+        detail_field=detail_field,
+    )
+    return Milestone16FullGateComponent(
+        component_id=component_id,
+        title=title,
+        source_report=str(source_report),
+        passed=passed,
+        total_count=total_count,
+        passed_count=passed_count,
+        failed_count=failed_count,
+        blockers=blockers,
+        notes=tuple(str(note) for note in report.get("notes", []) if isinstance(note, str)),
+    )
+
+
+def _runtime_profile_full_gate_component(source_report: Path, report: dict[str, object]) -> Milestone16FullGateComponent:
+    records = _report_records(report, "records")
+    replays = _report_records(report, "deterministic_replay")
+    budget_passed = _int_or_len(report, "budget_passed_count", [record for record in records if record.get("passed")])
+    budget_failed = _int_or_len(report, "budget_failed_count", [record for record in records if not record.get("passed")])
+    replay_passed = sum(1 for replay in replays if replay.get("passed"))
+    replay_failed = len(replays) - replay_passed
+    blockers = list(
+        _component_blockers(
+            records,
+            label_key="artifact_id",
+            detail="runtime budget failed",
+            pass_field="passed",
+        )
+    )
+    blockers.extend(
+        _component_blockers(
+            replays,
+            label_key="artifact_id",
+            detail="deterministic replay hash failed",
+            pass_field="passed",
+        )
+    )
+    return Milestone16FullGateComponent(
+        component_id="runtime_profile",
+        title="Runtime Profile And Determinism",
+        source_report=str(source_report),
+        passed=bool(report.get("passed")),
+        total_count=len(records) + len(replays),
+        passed_count=budget_passed + replay_passed,
+        failed_count=budget_failed + replay_failed,
+        blockers=tuple(blockers[:8]),
+    )
+
+
+def _component_blockers(
+    records: list[dict[str, object]],
+    *,
+    label_key: str,
+    detail: str,
+    pass_field: str,
+    detail_field: str | None = None,
+) -> tuple[str, ...]:
+    blockers: list[str] = []
+    for record in records:
+        if bool(record.get(pass_field)):
+            continue
+        label = str(record.get(label_key, "<unknown>"))
+        extra = _format_blocker_detail(record.get(detail_field)) if detail_field is not None else ""
+        blockers.append(f"{label}: {detail}{extra}")
+        if len(blockers) >= 8:
+            break
+    return tuple(blockers)
+
+
+def _format_blocker_detail(value: object) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return f" ({value})" if value else ""
+    if isinstance(value, (list, tuple)):
+        details = ", ".join(str(item) for item in value[:4])
+        return f" ({details})" if details else ""
+    return f" ({value})"
+
+
+def _report_records(report: dict[str, object], key: str) -> list[dict[str, object]]:
+    value = report.get(key, [])
+    if not isinstance(value, list):
+        raise ValueError(f"{key} must be a list.")
+    return [record for record in value if isinstance(record, dict)]
+
+
+def _int_or_len(report: dict[str, object], key: str | None, fallback_records: list[dict[str, object]]) -> int:
+    if key is None:
+        return len(fallback_records)
+    value = report.get(key)
+    return int(value) if isinstance(value, int) else len(fallback_records)
 
 
 def run_milestone16_geoclaw_reference_suite(

@@ -1,0 +1,121 @@
+{
+  "blocked_component_count": 3,
+  "blocked_component_ids": [
+    "geoclaw_cpp_comparisons",
+    "geometry",
+    "raft_coupling"
+  ],
+  "component_count": 7,
+  "components": [
+    {
+      "blockers": [],
+      "component_id": "geoclaw_reference",
+      "failed_count": 0,
+      "notes": [],
+      "passed": true,
+      "passed_count": 20,
+      "source_report": "physics/reports/milestone16/geoclaw_reference_runs.json",
+      "title": "GeoClaw Reference Runs",
+      "total_count": 20
+    },
+    {
+      "blockers": [],
+      "component_id": "cpp_solver",
+      "failed_count": 0,
+      "notes": [],
+      "passed": true,
+      "passed_count": 40,
+      "source_report": "physics/reports/milestone16/cpp_solver_runs.json",
+      "title": "C++ Solver Runs",
+      "total_count": 40
+    },
+    {
+      "blockers": [
+        "uniform_channel: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, mass_drift_delta)",
+        "uniform_channel: GeoClaw/C++ threshold comparison failed (field_linf)",
+        "dam_break: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, wet_mismatch_fraction, probe_linf)",
+        "dam_break: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
+        "bed_step: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
+        "bed_step: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
+        "constriction: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, wet_mismatch_fraction, probe_linf)",
+        "constriction: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)"
+      ],
+      "component_id": "geoclaw_cpp_comparisons",
+      "failed_count": 36,
+      "notes": [],
+      "passed": false,
+      "passed_count": 4,
+      "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+      "title": "GeoClaw/C++ Threshold Comparisons",
+      "total_count": 40
+    },
+    {
+      "blockers": [
+        "wet_dry_shoreline: geometry family is blocked",
+        "bed_step: geometry family is blocked",
+        "constriction: geometry family is blocked",
+        "drops_ledges_tailwater: geometry family is blocked"
+      ],
+      "component_id": "geometry",
+      "failed_count": 4,
+      "notes": [],
+      "passed": false,
+      "passed_count": 2,
+      "source_report": "physics/reports/milestone16/geometry_validation.json",
+      "title": "Geometry-Specific Validation",
+      "total_count": 6
+    },
+    {
+      "blockers": [
+        "boulder_impacts: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Force-envelope outcomes differ., Force delta exceeds the weight-normalized threshold.)",
+        "boulder_impacts: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Force delta exceeds the weight-normalized threshold.)",
+        "wave_train_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Canonical feature outcomes differ., Force delta exceeds the weight-normalized threshold.)",
+        "wave_train_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Canonical feature outcomes differ., Force delta exceeds the weight-normalized threshold.)",
+        "hydraulic_hole_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Force-envelope outcomes differ., Force delta exceeds the weight-normalized threshold.)",
+        "downstream_boil_recovery: raft coupling comparison failed (C++ raft feature checks are not passing., Force delta exceeds the weight-normalized threshold., Torque delta exceeds the inertia-normalized threshold., One-step velocity delta exceeds threshold.)",
+        "hydraulic_hole_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Force delta exceeds the weight-normalized threshold., One-step velocity delta exceeds threshold.)",
+        "downstream_boil_recovery: raft coupling comparison failed (C++ raft feature checks are not passing., Force delta exceeds the weight-normalized threshold., One-step velocity delta exceeds threshold.)"
+      ],
+      "component_id": "raft_coupling",
+      "failed_count": 43,
+      "notes": [
+        "Pin/release remains represented by shallow-shelf pivot/release and high-flow boulder/pin proxies; a distinct strainer or wrap fixture is still needed before production acceptance."
+      ],
+      "passed": false,
+      "passed_count": 7,
+      "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+      "title": "Raft Coupling Validation",
+      "total_count": 50
+    },
+    {
+      "blockers": [],
+      "component_id": "runtime_profile",
+      "failed_count": 0,
+      "notes": [],
+      "passed": true,
+      "passed_count": 12,
+      "source_report": "physics/reports/milestone16/runtime_profile.json",
+      "title": "Runtime Profile And Determinism",
+      "total_count": 12
+    },
+    {
+      "blockers": [],
+      "component_id": "regression_promotion",
+      "failed_count": 0,
+      "notes": [
+        "Only passing GeoClaw/C++ threshold runs were copied as regression fixtures.",
+        "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs."
+      ],
+      "passed": true,
+      "passed_count": 11,
+      "source_report": "physics/reports/milestone16/regression_promotion_manifest.json",
+      "title": "Regression Promotion",
+      "total_count": 11
+    }
+  ],
+  "decision": "BLOCKED",
+  "passed": false,
+  "passed_component_count": 4,
+  "report_dir": "physics/reports/milestone16",
+  "schema_version": "raftsim.milestone16.full_cpp_validation_gate.v0"
+}
