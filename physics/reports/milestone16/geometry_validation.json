@@ -93,13 +93,10 @@
           "threshold_passed": false
         },
         {
-          "failing_checks": [
-            "field_linf",
-            "slope_linf"
-          ],
+          "failing_checks": [],
           "gate_scenario_id": "bed_step",
           "solver_mode": "finite_volume",
-          "threshold_passed": false
+          "threshold_passed": true
         }
       ],
       "notes": [
