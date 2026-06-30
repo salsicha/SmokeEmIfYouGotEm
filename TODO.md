@@ -329,7 +329,7 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [x] Add GeoClaw/C++ validation checks that reject feature forcing when it hides mass, momentum, energy, wet/dry, or reach/drop handoff failures.
 - [x] Add crew weight-distribution and high-side/brace/lean telemetry for seat occupancy, center-of-gravity shifts, roll moment, contact loading, and pin/flip/release thresholds.
 - [x] Add rock, sticky-hole, lateral-hit, shallow-shelf, pin/release, and flip fixtures that require correctly timed crew weight shifts for safe outcomes.
-- [ ] Add crew-overboard, swimmer drift, rescue timing, pull-in/re-seat, and failed-rescue fixtures tied to impacts, flips, pins, holes, missed brace/high-side timing, and recovery windows.
+- [x] Add crew-overboard, swimmer drift, rescue timing, pull-in/re-seat, and failed-rescue fixtures tied to impacts, flips, pins, holes, missed brace/high-side timing, and recovery windows.
 - [x] Add a versioned reach-local grid schema with local transforms, overlap/ghost-zone ownership, neighbor references, and reach/drop IDs.
 - [ ] Export stitched whole-window validation fields, probes, cross sections, conservation summaries, and raft transition checkpoints for every cascading package.
 - [x] Add contract-level seam diagnostics that fail validation when reach-local boundaries omit mass, momentum, energy, wet/dry, bed-slope, feature-location, or raft-state checks.

@@ -42,6 +42,8 @@ The first crew weight-distribution telemetry implementation lives in `raftsim.ra
 
 The first timed crew-hazard fixture gate lives in `raftsim.feature_validation` as `CrewTimedHazardFixture2_5D`. It covers rock high-side, sticky-hole brace/release, lateral-hit lean, shallow-shelf recovery, pin/release weight shift, and flip high-side cases. Each fixture checks that missing or late crew action remains unsafe, while the correct high-side, brace, lean, or recovery action inside the response window clears the hazard by improving roll, pin, release, or lateral-bias margins.
 
+Crew-overboard validation is also represented in `raftsim.feature_validation` with `CrewOverboardFixture2_5D` and `CrewOverboardTelemetry2_5D`. The first fixture gate covers impact ejections, flips, pins, holes, missed brace timing, and missed high-side recovery. Each case validates swimmer drift, rescue timing, pull-in and re-seat duration, failed-rescue behavior, and fatigue/trust/safety-score telemetry before those states are wired into full Unreal gameplay.
+
 ## Analytic Fixture Decision
 
 Add a small manually encoded SWASHES-style analytic fixture set before more broad retuning. These fixtures should isolate solver fundamentals such as lake-at-rest balance, sloping-channel friction, wet/dry shoreline motion, bed steps, dam-break/bores, hydraulic jumps, and transcritical flow over a bump where practical.
