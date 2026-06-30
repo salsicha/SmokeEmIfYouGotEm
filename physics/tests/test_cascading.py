@@ -7,6 +7,7 @@ from raftsim.cascading import (
     BankShape2_5D,
     CASCADING_ANNOTATIONS_FILE,
     CASCADING_METADATA_FILE,
+    CaliforniaPoolDropParameters2_5D,
     CascadingScenarioPackage2_5D,
     DropTransitionMetadata2_5D,
     HandoffConservationThresholds2_5D,
@@ -17,6 +18,7 @@ from raftsim.cascading import (
     ReachMetadata2_5D,
     StationProfilePoint2_5D,
     evaluate_cascading_handoff_conservation,
+    generate_california_pool_drop_cascading_scenario2_5d,
     read_cascading_scenario_package,
 )
 from raftsim.scenario2_5d import (
@@ -332,3 +334,47 @@ def test_cascading_handoff_conservation_flags_unbounded_flux_discontinuity():
     assert check.momentum_flux_passed is False
     assert check.mass_flux_delta > 0.05
     assert check.momentum_flux_delta > 0.05
+
+
+def test_california_pool_drop_generator_builds_required_reach_pattern():
+    package = generate_california_pool_drop_cascading_scenario2_5d(
+        CaliforniaPoolDropParameters2_5D(seed=7, nx=96, ny=34, difficulty=0.62, duration=3.0)
+    )
+    reach_kinds = [reach.kind for reach in package.reaches]
+    feature_kinds = {feature.kind for feature in package.scenario.features}
+
+    assert package.scenario.validate().passed is True
+    assert reach_kinds == ["pool", "tongue", "drop", "wave_train", "eddy_recovery", "boulder_garden", "pool"]
+    assert package.scenario.metadata.scenario_id == "california_pool_drop_seed_7"
+    assert package.scenario.metadata.generator == "raftsim.cascading"
+    assert len(package.pool_controls) == 2
+    assert package.pool_controls[0].outflow_control == "drop_controlled"
+    assert len(package.drop_transitions) == 1
+    assert package.drop_transitions[0].upstream_reach_id == "tongue_001"
+    assert package.drop_transitions[0].downstream_reach_id == "drop_001"
+    assert package.drop_transitions[0].expected_hydraulic_control == "retentive_hole"
+    assert {"constriction", "ledge", "hole", "wave_train", "eddy_line", "boil", "rock"} <= feature_kinds
+    assert np.array_equal(np.unique(package.reach_id_grid), np.arange(len(package.reaches), dtype=np.int32))
+    assert np.array_equal(np.unique(package.drop_transition_id_grid), np.asarray([-1, 0], dtype=np.int32))
+
+
+def test_california_pool_drop_generator_is_deterministic_and_round_trips(tmp_path):
+    params = CaliforniaPoolDropParameters2_5D(seed=11, nx=88, ny=30, difficulty=0.44, duration=2.5)
+    first = generate_california_pool_drop_cascading_scenario2_5d(params)
+    second = generate_california_pool_drop_cascading_scenario2_5d(params)
+
+    np.testing.assert_allclose(first.scenario.bed, second.scenario.bed)
+    np.testing.assert_allclose(first.scenario.initial_state.depth, second.scenario.initial_state.depth)
+    assert first.reaches == second.reaches
+    assert first.drop_transitions == second.drop_transitions
+    assert first.pool_controls == second.pool_controls
+    assert first.scenario.features == second.scenario.features
+
+    output_dir = first.write_package(tmp_path / "california_pool_drop")
+    loaded = read_cascading_scenario_package(output_dir)
+
+    assert loaded.reaches == first.reaches
+    assert loaded.drop_transitions == first.drop_transitions
+    assert loaded.pool_controls == first.pool_controls
+    np.testing.assert_array_equal(loaded.reach_id_grid, first.reach_id_grid)
+    np.testing.assert_array_equal(loaded.drop_transition_id_grid, first.drop_transition_id_grid)

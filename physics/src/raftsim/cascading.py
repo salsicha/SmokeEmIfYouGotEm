@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import math
+import random
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
@@ -10,10 +12,21 @@ from typing import Literal
 import numpy as np
 from numpy.typing import NDArray
 
-from .scenario2_5d import GridSpec2_5D, Scenario2_5D, read_scenario2_5d_package
+from .scenario2_5d import (
+    BoundaryCondition2_5D,
+    Feature2_5D,
+    GridSpec2_5D,
+    InitialWaterState2_5D,
+    Probe2_5D,
+    RaftParameters2_5D,
+    Scenario2_5D,
+    ScenarioMetadata2_5D,
+    read_scenario2_5d_package,
+)
 
 MetadataValue = str | int | float | bool | None
 IntGrid = NDArray[np.int32]
+FloatGrid = NDArray[np.float64]
 
 CASCADING_SCHEMA_VERSION = "raftsim.cascading2_5d.v0"
 CASCADING_METADATA_FILE = "cascading_metadata.json"
@@ -30,6 +43,60 @@ HydraulicControlKind2_5D = Literal[
     "unknown",
 ]
 PoolOutflowControlKind2_5D = Literal["free_outflow", "tailwater_limited", "drop_controlled", "backwater", "unknown"]
+
+
+@dataclass(frozen=True, slots=True)
+class _CaliforniaPoolDropReachSpec:
+    reach_id: str
+    kind: ReachKind2_5D
+    station_start: float
+    station_end: float
+    width_start: float
+    width_end: float
+    depth_start: float
+    depth_end: float
+    slope_start: float
+    slope_end: float
+    bed_roughness: float
+    boulder_density: float
+    bank_shape: BankShapeKind2_5D
+    vegetation_flags: tuple[str, ...] = ()
+    debris_flags: tuple[str, ...] = ()
+
+    @property
+    def station_midpoint(self) -> float:
+        return (self.station_start + self.station_end) * 0.5
+
+    @property
+    def length(self) -> float:
+        return self.station_end - self.station_start
+
+
+@dataclass(frozen=True, slots=True)
+class CaliforniaPoolDropParameters2_5D:
+    seed: int = 1
+    nx: int = 112
+    ny: int = 40
+    dx: float = 1.0
+    dy: float = 1.0
+    base_width: float = 18.0
+    base_depth: float = 1.35
+    inflow_speed: float = 1.55
+    difficulty: float = 0.55
+    fixed_dt: float = 1.0 / 60.0
+    duration: float = 10.0
+
+    def __post_init__(self) -> None:
+        if self.nx < 56:
+            raise ValueError("nx must be at least 56 for a pool-drop cascade.")
+        if self.ny < 20:
+            raise ValueError("ny must be at least 20 for a pool-drop cascade.")
+        if self.dx <= 0.0 or self.dy <= 0.0:
+            raise ValueError("dx and dy must be positive.")
+        if self.base_width <= 0.0 or self.base_depth <= 0.0:
+            raise ValueError("base width and depth must be positive.")
+        if not 0.0 <= self.difficulty <= 1.0:
+            raise ValueError("difficulty must be between 0 and 1.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -657,6 +724,133 @@ def read_cascading_scenario_package(path: str | Path) -> CascadingScenarioPackag
     )
 
 
+def generate_california_pool_drop_cascading_scenario2_5d(
+    parameters: CaliforniaPoolDropParameters2_5D | None = None,
+) -> CascadingScenarioPackage2_5D:
+    """Generate a deterministic California-style pool-and-drop cascading package."""
+
+    params = parameters or CaliforniaPoolDropParameters2_5D()
+    rng = random.Random(params.seed)
+    origin_y = -0.5 * (params.ny - 1) * params.dy
+    grid = GridSpec2_5D(nx=params.nx, ny=params.ny, dx=params.dx, dy=params.dy, origin_x=0.0, origin_y=origin_y)
+    xs = grid.x_coordinates()
+    x, y = grid.meshgrid()
+    total_station = float(xs[-1] - xs[0])
+    specs = _california_pool_drop_reach_specs(params, rng, total_station)
+    reach_grid = _california_reach_id_grid(grid, xs, specs)
+
+    channel_width = _interpolate_spec_profile(xs, specs, "width_start", "width_end")
+    center_depth = _interpolate_spec_profile(xs, specs, "depth_start", "depth_end")
+    bed_slope = _interpolate_spec_profile(xs, specs, "slope_start", "slope_end")
+    centerline = _california_centerline(params, rng, xs, channel_width)
+
+    drop_spec = _spec_by_id(specs, "drop_001")
+    wave_spec = _spec_by_id(specs, "wave_train_001")
+    main_drop_fall = 0.42 + 0.72 * params.difficulty + rng.uniform(-0.035, 0.035)
+    drop_control_length = max(params.dx * 3.0, drop_spec.length * 0.58)
+    drop_transition = DropTransitionMetadata2_5D(
+        transition_id="ledge_drop_001",
+        upstream_reach_id="tongue_001",
+        downstream_reach_id="drop_001",
+        crest_station=drop_spec.station_start,
+        bed_elevation_fall=main_drop_fall,
+        geometry_kind="mixed",
+        ramp_length=max(params.dx * 2.0, drop_control_length * 0.7),
+        ledge_length=max(params.dx, drop_control_length * 0.3),
+        tailwater_depth=wave_spec.depth_start,
+        expected_hydraulic_control="retentive_hole" if params.difficulty >= 0.58 else "wave_train",
+        recirculation_risk=min(1.0, 0.28 + 0.58 * params.difficulty),
+        aeration_proxy=min(1.0, 0.36 + 0.52 * params.difficulty),
+        turbulence_proxy=min(1.0, 0.42 + 0.50 * params.difficulty),
+        hazard_tags=("ledge", "hole", "wave_train"),
+        metadata={"generator": "california_pool_drop", "pattern_role": "main_drop"},
+    )
+    drop_grid = _california_drop_transition_id_grid(grid, xs, (drop_transition,))
+
+    bed_grade_drop = np.cumsum(np.concatenate(([0.0], bed_slope[:-1]))) * params.dx
+    explicit_drop = main_drop_fall * _smoothstep((xs - drop_spec.station_start) / drop_control_length)
+    bed_centerline = -(bed_grade_drop + explicit_drop)
+    center_depth = _add_wave_train_depth_signal(center_depth, xs, wave_spec, params)
+    center_depth = np.maximum(center_depth, params.base_depth * 0.35)
+
+    features = _california_pool_drop_features(params, rng, grid, xs, centerline, channel_width, specs, main_drop_fall)
+    lateral = y - centerline[np.newaxis, :]
+    half_width = np.maximum(channel_width[np.newaxis, :] * 0.5, params.dy)
+    lateral_fraction = np.abs(lateral) / half_width
+    wet_channel = lateral_fraction <= 1.0
+    depth = np.where(
+        wet_channel,
+        center_depth[np.newaxis, :] * np.maximum(0.24, 1.0 - 0.44 * lateral_fraction**2),
+        0.0,
+    )
+    depth = _apply_california_feature_depth_modifiers(depth, x, y, features, params)
+    depth = np.where(wet_channel, np.maximum(depth, 0.0), 0.0)
+
+    eta_centerline = bed_centerline + center_depth
+    bank_lift = params.base_depth + 0.72 + 0.18 * np.maximum(lateral_fraction - 1.0, 0.0)
+    bed = np.where(depth > 1.0e-6, eta_centerline[np.newaxis, :] - depth, eta_centerline[np.newaxis, :] + bank_lift)
+
+    u, v = _california_initial_velocity(params, grid, depth, lateral_fraction, wet_channel, centerline)
+    u, v = _apply_california_feature_velocity_modifiers(u, v, x, y, features, params, centerline, xs)
+    u = np.where(depth > 1.0e-6, u, 0.0)
+    v = np.where(depth > 1.0e-6, v, 0.0)
+
+    state = InitialWaterState2_5D.from_depth_velocity(bed, depth, u, v)
+    boundaries = (
+        BoundaryCondition2_5D(
+            "west",
+            "inflow",
+            depth=float(depth[:, 0][depth[:, 0] > 1.0e-6].mean()),
+            velocity=(float(u[:, 0][depth[:, 0] > 1.0e-6].mean()), float(v[:, 0][depth[:, 0] > 1.0e-6].mean())),
+            metadata={"source": "california_pool_drop_generator"},
+        ),
+        BoundaryCondition2_5D("east", "outflow"),
+        BoundaryCondition2_5D("south", "wall"),
+        BoundaryCondition2_5D("north", "wall"),
+    )
+    reaches = tuple(_metadata_from_california_spec(spec, grid) for spec in specs)
+    scenario = Scenario2_5D(
+        metadata=ScenarioMetadata2_5D(
+            scenario_id=f"california_pool_drop_seed_{params.seed}",
+            scenario_type="procedural",
+            seed=params.seed,
+            generator="raftsim.cascading",
+            generator_version="milestone_15_pool_drop.v0",
+            description=(
+                "Seeded California-style pool-drop sequence with pool, constricted tongue, ledge/drop, "
+                "wave train, recovery eddy, boulder garden, and next pool reaches."
+            ),
+            flow_band="synthetic_pool_drop",
+            difficulty_preset=f"california_pool_drop_{params.difficulty:.2f}",
+            confidence_score=0.58,
+            provenance={
+                "source": "deterministic_california_pool_drop_generator",
+                "reach_pattern": "pool,tongue,drop,wave_train,eddy_recovery,boulder_garden,pool",
+                "drop_count": len((drop_transition,)),
+            },
+        ),
+        grid=grid,
+        fixed_dt=params.fixed_dt,
+        duration=params.duration,
+        bed=bed,
+        initial_state=state,
+        boundaries=boundaries,
+        features=features,
+        probes=_california_pool_drop_probes(grid, xs, centerline, specs, drop_transition),
+        raft=RaftParameters2_5D(),
+        roughness=float(sum(spec.bed_roughness for spec in specs) / len(specs)),
+    )
+    return CascadingScenarioPackage2_5D(
+        scenario=scenario,
+        reaches=reaches,
+        drop_transitions=(drop_transition,),
+        pool_controls=_california_pool_controls(params, specs, channel_width),
+        reach_local_grids=_california_reach_local_grids(params, grid, xs, specs),
+        reach_id_grid=reach_grid,
+        drop_transition_id_grid=drop_grid,
+    )
+
+
 def evaluate_cascading_handoff_conservation(
     package: CascadingScenarioPackage2_5D,
     thresholds: HandoffConservationThresholds2_5D | None = None,
@@ -702,6 +896,598 @@ def evaluate_cascading_handoff_conservation(
         thresholds=limits,
         checks=tuple(checks),
     )
+
+
+def _california_pool_drop_reach_specs(
+    params: CaliforniaPoolDropParameters2_5D,
+    rng: random.Random,
+    total_station: float,
+) -> tuple[_CaliforniaPoolDropReachSpec, ...]:
+    base_fractions = np.asarray((0.20, 0.11, 0.08, 0.17, 0.12, 0.17, 0.15), dtype=np.float64)
+    jitter = np.asarray([rng.uniform(-0.012, 0.012) for _ in range(len(base_fractions))], dtype=np.float64)
+    fractions = np.maximum(base_fractions + jitter, 0.055)
+    fractions /= float(np.sum(fractions))
+    boundaries = [0.0]
+    for fraction in fractions[:-1]:
+        boundaries.append(boundaries[-1] + float(fraction) * total_station)
+    boundaries.append(total_station)
+
+    d = params.difficulty
+    max_width = max(params.dy * 8.0, (params.ny - 3) * params.dy)
+    min_width = max(params.dy * 4.0, params.base_width * 0.38)
+
+    def width(value: float) -> float:
+        return max(min_width, min(max_width, value * (1.0 + rng.uniform(-0.025, 0.025))))
+
+    specs = (
+        _CaliforniaPoolDropReachSpec(
+            "pool_001",
+            "pool",
+            boundaries[0],
+            boundaries[1],
+            width(params.base_width * 1.22),
+            width(params.base_width * 1.12),
+            params.base_depth * 1.24,
+            params.base_depth * 1.08,
+            0.0018 + 0.0005 * d,
+            0.0024 + 0.0006 * d,
+            0.036,
+            0.08 + 0.06 * d,
+            "vegetated",
+            vegetation_flags=("riparian_willow", "pool_margin_grass"),
+        ),
+        _CaliforniaPoolDropReachSpec(
+            "tongue_001",
+            "tongue",
+            boundaries[1],
+            boundaries[2],
+            width(params.base_width * 0.96),
+            width(params.base_width * (0.62 - 0.06 * d)),
+            params.base_depth * 0.98,
+            params.base_depth * 0.82,
+            0.010 + 0.006 * d,
+            0.017 + 0.008 * d,
+            0.040,
+            0.16 + 0.08 * d,
+            "bedrock",
+        ),
+        _CaliforniaPoolDropReachSpec(
+            "drop_001",
+            "drop",
+            boundaries[2],
+            boundaries[3],
+            width(params.base_width * (0.62 - 0.04 * d)),
+            width(params.base_width * 0.72),
+            params.base_depth * 0.80,
+            params.base_depth * 0.95,
+            0.042 + 0.020 * d,
+            0.052 + 0.024 * d,
+            0.047 + 0.010 * d,
+            0.22 + 0.12 * d,
+            "bedrock",
+            debris_flags=("aerated_hydraulic",),
+        ),
+        _CaliforniaPoolDropReachSpec(
+            "wave_train_001",
+            "wave_train",
+            boundaries[3],
+            boundaries[4],
+            width(params.base_width * 0.78),
+            width(params.base_width * 0.92),
+            params.base_depth * 0.92,
+            params.base_depth * 0.84,
+            0.024 + 0.010 * d,
+            0.018 + 0.008 * d,
+            0.044 + 0.008 * d,
+            0.26 + 0.12 * d,
+            "bedrock",
+        ),
+        _CaliforniaPoolDropReachSpec(
+            "eddy_recovery_001",
+            "eddy_recovery",
+            boundaries[4],
+            boundaries[5],
+            width(params.base_width * 1.04),
+            width(params.base_width * 1.14),
+            params.base_depth * 1.02,
+            params.base_depth * 1.08,
+            0.006 + 0.003 * d,
+            0.004 + 0.002 * d,
+            0.038,
+            0.12 + 0.05 * d,
+            "alluvial",
+            vegetation_flags=("eddy_margin_willow",),
+            debris_flags=("eddy_foam",),
+        ),
+        _CaliforniaPoolDropReachSpec(
+            "boulder_garden_001",
+            "boulder_garden",
+            boundaries[5],
+            boundaries[6],
+            width(params.base_width * 0.92),
+            width(params.base_width * 0.84),
+            params.base_depth * 0.91,
+            params.base_depth * 0.82,
+            0.017 + 0.007 * d,
+            0.022 + 0.010 * d,
+            0.055 + 0.012 * d,
+            0.42 + 0.32 * d,
+            "bedrock",
+            debris_flags=("boulder_sieves", "technical_moves"),
+        ),
+        _CaliforniaPoolDropReachSpec(
+            "pool_002",
+            "pool",
+            boundaries[6],
+            boundaries[7],
+            width(params.base_width * 1.18),
+            width(params.base_width * 1.30),
+            params.base_depth * 1.16,
+            params.base_depth * 1.30,
+            0.0028 + 0.0008 * d,
+            0.0018 + 0.0004 * d,
+            0.037,
+            0.10 + 0.04 * d,
+            "vegetated",
+            vegetation_flags=("recovery_pool_willow",),
+        ),
+    )
+    return specs
+
+
+def _metadata_from_california_spec(spec: _CaliforniaPoolDropReachSpec, grid: GridSpec2_5D) -> ReachMetadata2_5D:
+    mean_width = (spec.width_start + spec.width_end) * 0.5
+    return ReachMetadata2_5D(
+        reach_id=spec.reach_id,
+        kind=spec.kind,
+        station_start=spec.station_start,
+        station_end=spec.station_end,
+        local_grid=ReachGridTransform2_5D(
+            origin_x=spec.station_start,
+            origin_y=grid.origin_y,
+            station_origin=spec.station_start,
+            dx=grid.dx,
+            dy=grid.dy,
+        ),
+        slope_profile=(
+            StationProfilePoint2_5D(spec.station_start, spec.slope_start),
+            StationProfilePoint2_5D(spec.station_end, spec.slope_end),
+        ),
+        width_profile=(
+            StationProfilePoint2_5D(spec.station_start, spec.width_start),
+            StationProfilePoint2_5D(spec.station_end, spec.width_end),
+        ),
+        bank_shape=BankShape2_5D(
+            spec.bank_shape,
+            left_bank_offset_m=mean_width * 0.5,
+            right_bank_offset_m=-mean_width * 0.5,
+            left_bank_slope=0.32 if spec.kind == "pool" else 0.48,
+            right_bank_slope=0.34 if spec.kind == "pool" else 0.50,
+        ),
+        bed_roughness=spec.bed_roughness,
+        boulder_density=spec.boulder_density,
+        vegetation_flags=spec.vegetation_flags,
+        debris_flags=spec.debris_flags,
+        confidence_score=0.66,
+        metadata={"generator": "california_pool_drop", "pattern_role": spec.kind},
+    )
+
+
+def _california_centerline(
+    params: CaliforniaPoolDropParameters2_5D,
+    rng: random.Random,
+    xs: FloatGrid,
+    channel_width: FloatGrid,
+) -> FloatGrid:
+    y_span = max((params.ny - 1) * params.dy, params.dy)
+    margin = float(np.max(channel_width)) * 0.5 + params.dy * 2.0
+    bend_amplitude = max(0.0, min(2.4 + 1.6 * params.difficulty, y_span * 0.5 - margin))
+    if bend_amplitude == 0.0:
+        return np.zeros_like(xs, dtype=np.float64)
+    t = xs / max(float(xs[-1] - xs[0]), params.dx)
+    phase_a = rng.uniform(0.0, math.tau)
+    phase_b = rng.uniform(0.0, math.tau)
+    centerline = bend_amplitude * np.sin(1.15 * math.tau * t + phase_a)
+    centerline += bend_amplitude * 0.28 * np.sin(2.65 * math.tau * t + phase_b)
+    return centerline.astype(np.float64)
+
+
+def _interpolate_spec_profile(
+    xs: FloatGrid,
+    specs: tuple[_CaliforniaPoolDropReachSpec, ...],
+    start_attr: str,
+    end_attr: str,
+) -> FloatGrid:
+    values = np.zeros_like(xs, dtype=np.float64)
+    for index, spec in enumerate(specs):
+        mask = _spec_column_mask(xs, spec, is_last=index == len(specs) - 1)
+        if not bool(np.any(mask)):
+            continue
+        local = (xs[mask] - spec.station_start) / max(spec.length, 1.0e-9)
+        start = float(getattr(spec, start_attr))
+        end = float(getattr(spec, end_attr))
+        values[mask] = start + (end - start) * _smoothstep(local)
+    return values
+
+
+def _add_wave_train_depth_signal(
+    center_depth: FloatGrid,
+    xs: FloatGrid,
+    wave_spec: _CaliforniaPoolDropReachSpec,
+    params: CaliforniaPoolDropParameters2_5D,
+) -> FloatGrid:
+    local = (xs - wave_spec.station_start) / max(wave_spec.length, 1.0e-9)
+    window = _smoothstep(local) * (1.0 - _smoothstep(local - 0.72))
+    wave = np.sin(local * math.tau * 4.0)
+    return center_depth + params.base_depth * (0.035 + 0.035 * params.difficulty) * wave * window
+
+
+def _california_pool_drop_features(
+    params: CaliforniaPoolDropParameters2_5D,
+    rng: random.Random,
+    grid: GridSpec2_5D,
+    xs: FloatGrid,
+    centerline: FloatGrid,
+    channel_width: FloatGrid,
+    specs: tuple[_CaliforniaPoolDropReachSpec, ...],
+    main_drop_fall: float,
+) -> tuple[Feature2_5D, ...]:
+    features: list[Feature2_5D] = []
+    tongue = _spec_by_id(specs, "tongue_001")
+    drop = _spec_by_id(specs, "drop_001")
+    wave_train = _spec_by_id(specs, "wave_train_001")
+    eddy = _spec_by_id(specs, "eddy_recovery_001")
+    boulders = _spec_by_id(specs, "boulder_garden_001")
+
+    tongue_center = _feature_center(grid, xs, centerline, channel_width, tongue.station_midpoint)
+    tongue_width = _width_at_station(xs, channel_width, tongue.station_midpoint)
+    features.append(
+        Feature2_5D(
+            "constriction",
+            tongue_center,
+            radius=tongue_width * 0.24,
+            strength=0.72 + 0.48 * params.difficulty,
+            length=tongue.length * 0.78,
+            width=tongue_width * 0.62,
+            metadata={"reach_id": tongue.reach_id, "pattern_role": "constricted_tongue"},
+        )
+    )
+
+    ledge_station = drop.station_start
+    drop_width = _width_at_station(xs, channel_width, ledge_station)
+    features.append(
+        Feature2_5D(
+            "ledge",
+            _feature_center(grid, xs, centerline, channel_width, ledge_station),
+            radius=0.0,
+            strength=main_drop_fall,
+            length=drop_width,
+            width=max(params.dx * 2.0, drop.length * 0.4),
+            metadata={"reach_id": drop.reach_id, "pattern_role": "ledge_drop"},
+        )
+    )
+    hole_station = min(drop.station_end, drop.station_start + drop.length * 0.72)
+    features.append(
+        Feature2_5D(
+            "hole",
+            _feature_center(grid, xs, centerline, channel_width, hole_station),
+            radius=drop_width * 0.18,
+            strength=0.62 + 0.42 * params.difficulty,
+            length=drop.length * 0.52,
+            width=drop_width * 0.58,
+            metadata={"reach_id": drop.reach_id, "pattern_role": "hydraulic_hole"},
+        )
+    )
+
+    wave_width = _width_at_station(xs, channel_width, wave_train.station_midpoint)
+    features.append(
+        Feature2_5D(
+            "wave_train",
+            _feature_center(grid, xs, centerline, channel_width, wave_train.station_midpoint),
+            radius=wave_width * 0.18,
+            strength=0.58 + 0.40 * params.difficulty,
+            length=wave_train.length * 0.86,
+            width=wave_width * 0.72,
+            metadata={"reach_id": wave_train.reach_id, "pattern_role": "standing_wave_sequence"},
+        )
+    )
+
+    eddy_width = _width_at_station(xs, channel_width, eddy.station_midpoint)
+    eddy_side = -1.0 if rng.random() < 0.5 else 1.0
+    features.append(
+        Feature2_5D(
+            "eddy_line",
+            _feature_center(grid, xs, centerline, channel_width, eddy.station_midpoint, eddy_side * eddy_width * 0.28),
+            radius=eddy_width * 0.16,
+            strength=0.46 + 0.32 * params.difficulty,
+            length=eddy.length * 0.72,
+            width=eddy_width * 0.38,
+            metadata={"reach_id": eddy.reach_id, "pattern_role": "recovery_eddy_line", "side": eddy_side},
+        )
+    )
+    features.append(
+        Feature2_5D(
+            "boil",
+            _feature_center(grid, xs, centerline, channel_width, eddy.station_start + eddy.length * 0.70, -eddy_side * eddy_width * 0.14),
+            radius=eddy_width * 0.12,
+            strength=0.34 + 0.24 * params.difficulty,
+            metadata={"reach_id": eddy.reach_id, "pattern_role": "tailwater_boil"},
+        )
+    )
+
+    rock_count = 4 + int(round(4.0 * params.difficulty))
+    for index in range(rock_count):
+        station = boulders.station_start + boulders.length * ((index + 1) / (rock_count + 1))
+        station += rng.uniform(-0.035, 0.035) * boulders.length
+        station = max(boulders.station_start, min(boulders.station_end, station))
+        width = _width_at_station(xs, channel_width, station)
+        lateral = rng.uniform(-0.32, 0.32) * width
+        radius = max(params.dx * 0.75, width * rng.uniform(0.045, 0.085))
+        features.append(
+            Feature2_5D(
+                "rock",
+                _feature_center(grid, xs, centerline, channel_width, station, lateral),
+                radius=radius,
+                strength=0.70 + 0.30 * params.difficulty,
+                length=radius * rng.uniform(1.4, 2.3),
+                width=radius * rng.uniform(1.2, 1.9),
+                metadata={"reach_id": boulders.reach_id, "pattern_role": "boulder_garden", "source_index": index},
+            )
+        )
+
+    return tuple(features)
+
+
+def _apply_california_feature_depth_modifiers(
+    depth: FloatGrid,
+    x: FloatGrid,
+    y: FloatGrid,
+    features: tuple[Feature2_5D, ...],
+    params: CaliforniaPoolDropParameters2_5D,
+) -> FloatGrid:
+    adjusted = depth.copy()
+    for feature in features:
+        influence = _feature_influence(x, y, feature, params.dx, params.dy)
+        if feature.kind == "hole":
+            adjusted += params.base_depth * 0.16 * feature.strength * influence
+        elif feature.kind == "wave_train":
+            wave = np.sin((x - feature.center[0]) * 2.25)
+            adjusted += params.base_depth * 0.045 * feature.strength * wave * influence
+        elif feature.kind == "rock":
+            adjusted *= np.maximum(0.16, 1.0 - 0.58 * min(feature.strength, 1.3) * influence)
+        elif feature.kind == "shallow":
+            adjusted *= np.maximum(0.35, 1.0 - 0.42 * feature.strength * influence)
+    return np.maximum(adjusted, 0.0)
+
+
+def _california_initial_velocity(
+    params: CaliforniaPoolDropParameters2_5D,
+    grid: GridSpec2_5D,
+    depth: FloatGrid,
+    lateral_fraction: FloatGrid,
+    wet_channel: NDArray[np.bool_],
+    centerline: FloatGrid,
+) -> tuple[FloatGrid, FloatGrid]:
+    bank_profile = np.where(wet_channel, np.maximum(0.22, 1.0 - 0.44 * lateral_fraction**1.8), 0.0)
+    weighted_depth = np.sum(depth * bank_profile, axis=0) * grid.dy
+    discharge = params.base_width * params.base_depth * params.inflow_speed * (0.92 + 0.16 * params.difficulty)
+    speed = discharge / np.maximum(weighted_depth, 1.0e-6)
+    centerline_slope = np.gradient(centerline, grid.dx)
+    tangent_scale = np.sqrt(1.0 + centerline_slope**2)
+    tangent_x = 1.0 / tangent_scale
+    tangent_y = centerline_slope / tangent_scale
+    u = bank_profile * speed[np.newaxis, :] * tangent_x[np.newaxis, :]
+    v = bank_profile * speed[np.newaxis, :] * tangent_y[np.newaxis, :]
+    return u, v
+
+
+def _apply_california_feature_velocity_modifiers(
+    u: FloatGrid,
+    v: FloatGrid,
+    x: FloatGrid,
+    y: FloatGrid,
+    features: tuple[Feature2_5D, ...],
+    params: CaliforniaPoolDropParameters2_5D,
+    centerline: FloatGrid,
+    xs: FloatGrid,
+) -> tuple[FloatGrid, FloatGrid]:
+    adjusted_u = u.copy()
+    adjusted_v = v.copy()
+    for feature in features:
+        influence = _feature_influence(x, y, feature, params.dx, params.dy)
+        if feature.kind == "constriction":
+            adjusted_u *= 1.0 + 0.12 * feature.strength * influence
+        elif feature.kind == "hole":
+            adjusted_u -= params.inflow_speed * 0.16 * feature.strength * influence
+        elif feature.kind == "eddy_line":
+            center_y = float(np.interp(feature.center[0], xs, centerline))
+            side = 1.0 if feature.center[1] >= center_y else -1.0
+            adjusted_v += side * params.inflow_speed * 0.34 * feature.strength * influence
+        elif feature.kind == "boil":
+            adjusted_u += params.inflow_speed * 0.12 * feature.strength * ((x - feature.center[0]) / max(feature.radius, params.dx)) * influence
+            adjusted_v += params.inflow_speed * 0.16 * feature.strength * ((y - feature.center[1]) / max(feature.radius, params.dy)) * influence
+        elif feature.kind == "wave_train":
+            wave = np.abs(np.sin((x - feature.center[0]) * 2.25))
+            adjusted_u *= 1.0 + 0.08 * feature.strength * wave * influence
+    return adjusted_u, adjusted_v
+
+
+def _california_pool_controls(
+    params: CaliforniaPoolDropParameters2_5D,
+    specs: tuple[_CaliforniaPoolDropReachSpec, ...],
+    channel_width: FloatGrid,
+) -> tuple[PoolControlMetadata2_5D, ...]:
+    controls: list[PoolControlMetadata2_5D] = []
+    for pool_index, spec in enumerate((spec for spec in specs if spec.kind == "pool"), start=1):
+        mean_width = (spec.width_start + spec.width_end) * 0.5
+        lateral = mean_width * (0.26 if pool_index == 1 else -0.24)
+        controls.append(
+            PoolControlMetadata2_5D(
+                pool_id=f"{spec.reach_id}_control",
+                reach_id=spec.reach_id,
+                depth_profile=(
+                    StationProfilePoint2_5D(spec.station_start, spec.depth_start),
+                    StationProfilePoint2_5D(spec.station_end, spec.depth_end),
+                ),
+                tailwater_depth=spec.depth_end,
+                storage_coefficient=0.52 + 0.10 * (1.0 - params.difficulty),
+                residence_time_seconds=max(6.0, spec.length / max(params.inflow_speed * 0.35, 0.1)),
+                outflow_control="drop_controlled" if pool_index == 1 else "tailwater_limited",
+                eddy_controls=(
+                    PoolEddyControl2_5D(
+                        zone_id=f"{spec.reach_id}_river_{'left' if lateral > 0.0 else 'right'}_eddy",
+                        center_station=spec.station_start + spec.length * 0.58,
+                        lateral_offset=lateral,
+                        radius=max(params.dy * 1.5, mean_width * 0.16),
+                        circulation_strength=0.32 + 0.18 * params.difficulty,
+                        recirculation_risk=0.14 + 0.12 * params.difficulty,
+                    ),
+                ),
+                recirculation_zones=(
+                    PoolEddyControl2_5D(
+                        zone_id=f"{spec.reach_id}_tailout_recirculation",
+                        center_station=spec.station_end - spec.length * 0.18,
+                        lateral_offset=-lateral * 0.45,
+                        radius=max(params.dy * 1.2, mean_width * 0.12),
+                        circulation_strength=0.22 + 0.12 * params.difficulty,
+                        recirculation_risk=0.20 + 0.20 * params.difficulty,
+                    ),
+                ),
+                metadata={"generator": "california_pool_drop", "sampled_width": float(np.mean(channel_width))},
+            )
+        )
+    return tuple(controls)
+
+
+def _california_reach_local_grids(
+    params: CaliforniaPoolDropParameters2_5D,
+    grid: GridSpec2_5D,
+    xs: FloatGrid,
+    specs: tuple[_CaliforniaPoolDropReachSpec, ...],
+) -> tuple[ReachLocalGrid2_5D, ...]:
+    local_grids: list[ReachLocalGrid2_5D] = []
+    for index, spec in enumerate(specs):
+        columns = np.flatnonzero(_spec_column_mask(xs, spec, is_last=index == len(specs) - 1))
+        upstream_ghost = 0 if index == 0 else 2
+        downstream_ghost = 0 if index == len(specs) - 1 else 2
+        start_col = max(0, int(columns[0]) - upstream_ghost)
+        end_col = min(grid.nx - 1, int(columns[-1]) + downstream_ghost)
+        local_grids.append(
+            ReachLocalGrid2_5D(
+                spec.reach_id,
+                GridSpec2_5D(
+                    nx=end_col - start_col + 1,
+                    ny=params.ny,
+                    dx=params.dx,
+                    dy=params.dy,
+                    origin_x=float(xs[start_col]),
+                    origin_y=grid.origin_y,
+                ),
+                upstream_ghost_cells=upstream_ghost,
+                downstream_ghost_cells=downstream_ghost,
+            )
+        )
+    return tuple(local_grids)
+
+
+def _california_pool_drop_probes(
+    grid: GridSpec2_5D,
+    xs: FloatGrid,
+    centerline: FloatGrid,
+    specs: tuple[_CaliforniaPoolDropReachSpec, ...],
+    drop_transition: DropTransitionMetadata2_5D,
+) -> tuple[Probe2_5D, ...]:
+    probes: list[Probe2_5D] = []
+    for spec in specs:
+        center = _feature_center(grid, xs, centerline, np.asarray([spec.width_start] * len(xs)), spec.station_midpoint)
+        probes.append(Probe2_5D(f"{spec.reach_id}_center", center, metadata={"reach_id": spec.reach_id, "reach_kind": spec.kind}))
+    probes.append(
+        Probe2_5D(
+            "main_drop_cross_section",
+            _feature_center(grid, xs, centerline, np.asarray([specs[2].width_start] * len(xs)), drop_transition.crest_station),
+            kind="cross_section",
+            normal=(0.0, 1.0),
+            length=max(specs[2].width_start, specs[2].width_end),
+            metadata={"drop_transition_id": drop_transition.transition_id},
+        )
+    )
+    return tuple(probes)
+
+
+def _california_reach_id_grid(
+    grid: GridSpec2_5D,
+    xs: FloatGrid,
+    specs: tuple[_CaliforniaPoolDropReachSpec, ...],
+) -> IntGrid:
+    reach_grid = np.full(grid.shape, -1, dtype=np.int32)
+    for index, spec in enumerate(specs):
+        reach_grid[:, _spec_column_mask(xs, spec, is_last=index == len(specs) - 1)] = index
+    return reach_grid
+
+
+def _california_drop_transition_id_grid(
+    grid: GridSpec2_5D,
+    xs: FloatGrid,
+    transitions: tuple[DropTransitionMetadata2_5D, ...],
+) -> IntGrid:
+    drop_grid = np.full(grid.shape, -1, dtype=np.int32)
+    for index, transition in enumerate(transitions):
+        station_start = transition.crest_station - grid.dx * 0.5
+        station_end = transition.crest_station + max(transition.control_length, grid.dx)
+        drop_grid[:, (xs >= station_start) & (xs <= station_end)] = index
+    return drop_grid
+
+
+def _spec_by_id(specs: tuple[_CaliforniaPoolDropReachSpec, ...], reach_id: str) -> _CaliforniaPoolDropReachSpec:
+    for spec in specs:
+        if spec.reach_id == reach_id:
+            return spec
+    raise ValueError(f"Unknown generated reach id: {reach_id}")
+
+
+def _spec_column_mask(xs: FloatGrid, spec: _CaliforniaPoolDropReachSpec, *, is_last: bool = False) -> NDArray[np.bool_]:
+    if is_last:
+        return (xs >= spec.station_start) & (xs <= spec.station_end)
+    return (xs >= spec.station_start) & (xs < spec.station_end)
+
+
+def _feature_center(
+    grid: GridSpec2_5D,
+    xs: FloatGrid,
+    centerline: FloatGrid,
+    channel_width: FloatGrid,
+    station: float,
+    lateral_offset: float = 0.0,
+) -> tuple[float, float]:
+    y_min = float(grid.y_coordinates()[0])
+    y_max = float(grid.y_coordinates()[-1])
+    width = _width_at_station(xs, channel_width, station)
+    center_y = float(np.interp(station, xs, centerline)) + lateral_offset
+    margin = max(grid.dy, min(width * 0.08, grid.dy * 2.0))
+    return (float(station), max(y_min + margin, min(y_max - margin, center_y)))
+
+
+def _width_at_station(xs: FloatGrid, channel_width: FloatGrid, station: float) -> float:
+    return float(np.interp(station, xs, channel_width))
+
+
+def _feature_influence(
+    x: FloatGrid,
+    y: FloatGrid,
+    feature: Feature2_5D,
+    dx: float,
+    dy: float,
+) -> FloatGrid:
+    scale_x = max(feature.length * 0.5, feature.radius, dx)
+    scale_y = max(feature.width * 0.5, feature.radius, dy)
+    dx_norm = (x - feature.center[0]) / scale_x
+    dy_norm = (y - feature.center[1]) / scale_y
+    return np.exp(-(dx_norm**2 + dy_norm**2))
+
+
+def _smoothstep(value: float | FloatGrid) -> float | FloatGrid:
+    t = np.clip(value, 0.0, 1.0)
+    return t * t * (3.0 - 2.0 * t)
 
 
 def _cross_section_metrics(scenario: Scenario2_5D, col: int, gravity: float) -> dict[str, float]:

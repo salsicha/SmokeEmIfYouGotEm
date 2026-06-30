@@ -46,6 +46,7 @@ from .scenario2_5d import (
 from .cascading import (
     CASCADING_SCHEMA_VERSION,
     BankShape2_5D,
+    CaliforniaPoolDropParameters2_5D,
     CascadingScenarioPackage2_5D,
     DropTransitionMetadata2_5D,
     HandoffConservationCheck2_5D,
@@ -58,6 +59,7 @@ from .cascading import (
     ReachMetadata2_5D,
     StationProfilePoint2_5D,
     evaluate_cascading_handoff_conservation,
+    generate_california_pool_drop_cascading_scenario2_5d,
     read_cascading_scenario_package,
 )
 from .pyclaw_reference import (
@@ -278,6 +280,7 @@ __all__ = [
     "BankShape2_5D",
     "BodyState",
     "CASCADING_SCHEMA_VERSION",
+    "CaliforniaPoolDropParameters2_5D",
     "ChronoSimulation",
     "ChronoBridgeTelemetryComparisonReport",
     "CppSolverRunConfig",
@@ -422,6 +425,7 @@ __all__ = [
     "frame_from_scenario_initial_state",
     "fit_cpp_and_raft_parameters_against_pyclaw",
     "generate_fixture_scenario2_5d",
+    "generate_california_pool_drop_cascading_scenario2_5d",
     "generate_procedural_scenario2_5d",
     "generate_river_2d",
     "make_pyclaw_reference_compatible",
