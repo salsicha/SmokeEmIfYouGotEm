@@ -284,7 +284,8 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [x] Add a versioned analytic fixture manifest with provenance notes, expected behavior, tolerance tier, source-equation references, and explicit no-vendored-external-data policy.
 - [x] Manually encode a small SWASHES-style set for lake-at-rest balance, sloping-channel friction, wet/dry shoreline, bed step, dam-break/bore, hydraulic jump, and transcritical bump cases where practical.
 - [x] Add C++ and GeoClaw/analytic comparison reports that fail retuning when small analytic fixtures regress.
-- [ ] Add versioned contracts and validators for feature forcing, reach-local grids, stitched validation outputs, river validation annotations, and canonical geospatial packages.
+- [x] Add a versioned feature-forcing contract and validator with low defaults, flow-response curves, manifest records, GeoClaw comparison requirements, and conservation guards.
+- [ ] Add versioned contracts and validators for reach-local grids, stitched validation outputs, river validation annotations, and canonical geospatial packages.
 
 ## Technical Notes To Revisit
 
@@ -319,10 +320,10 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [x] Add a versioned analytic fixture manifest with provenance notes, expected behavior, tolerance tier, and source-equation references.
 - [x] Manually encode a small SWASHES-style set for lake-at-rest balance, sloping-channel friction, wet/dry shoreline, bed step, dam-break/bore, hydraulic jump, and transcritical bump cases where practical.
 - [x] Add C++ and GeoClaw/analytic comparison reports that fail retuning when these small fixtures regress.
-- [ ] Add a versioned authored feature-forcing schema for holes, boils, laterals, eddy lines, wave trains, shallow shelves, boulder push/damping, pins/releases, and flips.
-- [ ] Add low-default feature-forcing parameters and flow-response curves keyed by discharge, flow band, flow percentile, or boundary inflow.
-- [ ] Record feature-forcing manifests with active feature kinds, gain scales, flow-response curve IDs, conservation deltas, raft-coupling modifiers, and visual-only parameters.
-- [ ] Add GeoClaw/C++ validation checks that reject feature forcing when it hides mass, momentum, energy, wet/dry, or reach/drop handoff failures.
+- [x] Add a versioned authored feature-forcing schema for holes, boils, laterals, eddy lines, wave trains, shallow shelves, boulder push/damping, pins/releases, and flips.
+- [x] Add low-default feature-forcing parameters and flow-response curves keyed by discharge, flow band, flow percentile, or boundary inflow.
+- [x] Record feature-forcing manifests with active feature kinds, gain scales, flow-response curve IDs, conservation deltas, raft-coupling modifiers, and visual-only parameters.
+- [x] Add GeoClaw/C++ validation checks that reject feature forcing when it hides mass, momentum, energy, wet/dry, or reach/drop handoff failures.
 - [ ] Add crew weight-distribution and high-side/brace/lean telemetry for seat occupancy, center-of-gravity shifts, roll moment, contact loading, and pin/flip/release thresholds.
 - [ ] Add rock, sticky-hole, lateral-hit, shallow-shelf, pin/release, and flip fixtures that require correctly timed crew weight shifts for safe outcomes.
 - [ ] Add a versioned reach-local grid schema with local transforms, overlap/ghost-zone ownership, neighbor references, and reach/drop IDs.

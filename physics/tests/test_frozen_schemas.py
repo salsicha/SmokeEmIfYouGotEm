@@ -5,6 +5,7 @@ from pathlib import Path
 from raftsim.scenario2_5d import SCENARIO_SCHEMA_VERSION
 from raftsim.schema_versions import (
     ANALYTIC_FIXTURE_MANIFEST_SCHEMA_VERSION,
+    FEATURE_FORCING_SCHEMA_VERSION,
     PARAMETER_SCHEMA_VERSION,
     REPLAY_SCHEMA_VERSION,
     SHARED_SCHEMA_SET_VERSION,
@@ -28,6 +29,7 @@ def test_shared_schema_manifest_references_frozen_schema_files():
         "parameters",
         "source_manifest",
         "analytic_fixture_manifest",
+        "feature_forcing",
     }
     for entry in entries.values():
         assert (schemas_dir / entry["file"]).exists()
@@ -95,6 +97,18 @@ def test_frozen_analytic_fixture_manifest_schema_uses_fixture_manifest_version()
     assert example["schema_version"] == ANALYTIC_FIXTURE_MANIFEST_SCHEMA_VERSION
     assert example["license_policy"]["external_data_vendored"] is False
     assert example["fixtures"][0]["provenance"]["external_data_vendored"] is False
+
+
+def test_frozen_feature_forcing_schema_uses_feature_forcing_version():
+    schema = _load_schema("feature_forcing.schema.json")
+    manifest = json.loads((Path(__file__).resolve().parents[1] / "config" / "feature_forcing_defaults.json").read_text(encoding="utf-8"))
+
+    assert schema["properties"]["schema_version"]["const"] == FEATURE_FORCING_SCHEMA_VERSION
+    assert schema["properties"]["defaults"]["properties"]["tuning_surface_exposed"]["const"] is True
+    assert schema["properties"]["validation_requirements"]["properties"]["hide_conservation_failures"]["const"] is False
+    assert manifest["schema_version"] == FEATURE_FORCING_SCHEMA_VERSION
+    assert manifest["defaults"]["enabled_by_default"] is False
+    assert len(manifest["feature_families"]) == 9
 
 
 def _load_schema(name: str) -> dict[str, object]:
