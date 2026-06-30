@@ -53,6 +53,7 @@ Fallback or initial-state-only GeoClaw normalization is useful for schema smoke 
 
 ## Phase 3: Geometry-Specific Shallow-Water Validation
 
+- Milestone 16 comparison evidence is tracked in `physics/reports/milestone16/geoclaw_cpp_comparisons.json` and `physics/reports/milestone16/geoclaw_cpp_comparisons.md`; the comparison gate currently blocks live-water approval because most frozen field/probe/diagnostic/feature thresholds fail, while cascading reach/drop metadata checks pass.
 - Validate hydrostatic balance and bed-slope source terms on sloping and frictional channels.
 - Validate wet/dry fronts over shelves, banks, and shallow eddies.
 - Validate bed steps, constrictions, ledges, drops, tailwater controls, and expected energy loss.
