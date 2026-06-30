@@ -26,13 +26,13 @@ Use a staged 2.5D approach:
 7. Validate reach-to-reach handoffs, sudden drops, pools, and hydraulic transitions against GeoClaw before treating them as runtime-ready.
 8. Use the custom C++ solver as the Unreal runtime candidate.
 9. Keep GeoClaw offline for validation, regression fixtures, parameter fitting, and reference telemetry.
-10. Use Project Chrono for raft rigid/compliant dynamics, contact, and possible FSI experiments once the water-field reference/runtime split is validated.
+10. Select raft/contact authority through the Chaos/Jolt fixture evaluation, while keeping Project Chrono for high-fidelity compliant-contact and FSI experiments once the water-field reference/runtime split is validated.
 
 See [2.5D Dual-Solver Simulation Plan](2.5d-simulation-plan.md) for the detailed dual-solver workflow.
 See [GeoClaw Reference Solver Transition Plan](geoclaw-transition-plan.md) for the PyClaw-to-GeoClaw replacement plan.
 See [Custom C++ Engine Full Validation Plan](custom-cpp-engine-validation-plan.md) for the complete acceptance gate before live Unreal water depends on the custom engine.
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial, imagery, gauge, seasonal flow, adaptive parameter, and river-selection pipeline.
-See [Chrono And Unreal Integration Plan](chrono-unreal-integration.md) for the full game runtime path.
+See [Chrono And Unreal Integration Plan](chrono-unreal-integration.md) and [Chaos And Jolt Runtime Evaluation](chaos-jolt-runtime-evaluation.md) for the full game runtime path.
 See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the full game production roadmap after Python modeling, validation, and profiling.
 
 ## Retired 2D Path
@@ -56,7 +56,9 @@ Useful foundations:
 - PyClaw artifacts only as legacy comparison/regression data from earlier milestones.
 - Manually encoded SWASHES-style analytic cases for validating shallow-water solvers, with provenance notes and no vendored external data until licensing and maintenance are clear.
 - Fossen-style marine craft dynamics for raft rigid-body state, hydrodynamic forces, and added-mass approximations.
-- Project Chrono for C++ raft dynamics, contact, compliant raft experiments, and potential FSI evaluation.
+- Unreal Chaos for Unreal-native visual physics, physical animation, ragdolls, props, and non-authoritative effects.
+- Jolt as a candidate for the portable authoritative raft/contact/swimmer gameplay island.
+- Project Chrono for high-fidelity C++ raft dynamics, contact, compliant raft experiments, and potential FSI evaluation.
 - JAX/Taichi/Numba only as later acceleration or fitting tools if they help the Python research loop.
 
 ## 2.5D Water State

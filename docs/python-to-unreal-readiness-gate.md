@@ -4,7 +4,7 @@ Milestone 10 generated the first Python-to-Unreal readiness gate artifacts in `p
 
 Current decision: **blocked for live custom water**. The Milestone 10 audit remains useful for telemetry/replay playback and historical regression, but the Milestone 16 GeoClaw-to-Unreal readiness report blocks live custom water until the custom C++ solver passes the full GeoClaw/C++ geometry and raft-coupling gate.
 
-Production Unreal work may continue with telemetry/replay playback and non-authoritative visualization, but live water, Chrono/custom raft coupling, and runtime tuning must wait for a passing regenerated GeoClaw-based readiness report.
+Production Unreal work may continue with telemetry/replay playback and non-authoritative visualization, but live water, selected raft/contact runtime coupling, and runtime tuning must wait for a passing regenerated GeoClaw-based readiness report.
 
 ## Artifacts
 
@@ -37,12 +37,12 @@ Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 - Authoritative water candidate: custom C++ reduced shallow-water / height-field solver.
 - Reference solver: GeoClaw after Milestone 14 transition; PyClaw artifacts are legacy regression data only.
 - Raft/contact candidate: Project Chrono bridge over custom water/contact samples, with custom reduced raft fallback if budgets fail.
-- Unreal integration order: telemetry/replay playback first, then live custom water, then Chrono/custom raft coupling.
+- Unreal integration order: telemetry/replay playback first, then live custom water, then selected raft/contact runtime coupling.
 - Chrono::FSI remains an optional research path, not the baseline runtime dependency.
 
 ## Next Action
 
-Keep telemetry playback as the first integration target. Live water, Chrono/custom raft coupling, VR comfort, and native collision/contact should come after the replay path can inspect GeoClaw-validated physics outputs.
+Keep telemetry playback as the first integration target. Live water, selected raft/contact runtime coupling, VR comfort, and native collision/contact should come after the replay path can inspect GeoClaw-validated physics outputs.
 
 GeoClaw transition actions:
 

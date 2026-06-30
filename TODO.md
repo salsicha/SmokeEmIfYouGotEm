@@ -18,7 +18,8 @@ See [2.5D Dual-Solver Simulation Plan](docs/2.5d-simulation-plan.md), [GeoClaw R
 See [Real-World River Content And Seasonal Flow Plan](docs/real-world-river-content-plan.md) for geospatial extraction, rapid identification, seasonal flow research, adaptive parameters, and the future river/season/difficulty picker.
 See [Free And AI Asset Policy](docs/free-and-ai-asset-policy.md) for the current art/sound sourcing decision, [Art Asset Source Research](docs/art-asset-source-research.md) for visual asset source notes, and [Audio Asset Sourcing Plan](docs/audio-asset-sourcing-plan.md) for audio source research, 3D spatial audio, manifests, and release-gate vendor notes.
 See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full game roadmap after Python modeling and profiling are complete, including local AI voice commands, crew conversation systems, networked crews, and fully immersive 3D audio.
-See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.md) for the fixed-step bridge between the shallow-water solver, Chrono raft kinematics, elastic rock impacts, and inelastic bed grounding.
+See [Chrono Water And Raft Coupling Plan](docs/chrono-water-raft-coupling-plan.md) for the fixed-step bridge between the shallow-water solver, candidate raft/contact runtime kinematics, elastic rock impacts, and inelastic bed grounding.
+See [Chaos And Jolt Runtime Evaluation](docs/chaos-jolt-runtime-evaluation.md) for the split/hybrid runtime plan and shared fixtures that compare Unreal Chaos and Jolt before scoring-critical raft/contact authority is selected.
 
 ## Milestone 0: Python Physics Research Foundation
 
@@ -174,7 +175,7 @@ Conditionally superseded for live water by Milestone 14. Telemetry/replay playba
 - [x] Enable the current UE5 photoreal open-world stack where supported: Nanite, Nanite foliage, Nanite landscapes/splines/tessellation, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, Substrate/material layering, and OpenXR.
 - [x] Create the Unreal module/plugin skeleton: core, physics bridge, river, raft, input, UI, and debug modules.
 - [x] Integrate the custom C++ water solver as the runtime water field candidate.
-- [x] Integrate Chrono/custom raft dynamics as selected by the readiness report.
+- [x] Integrate the selected raft/contact runtime bridge path as selected by readiness and runtime fixture reports.
 - [x] Implement the fixed-step Chrono water/raft bridge: custom C++ shallow-water snapshot feeds Chrono raft substeps, Chrono returns authoritative raft pose, velocity, contacts, and force telemetry.
 - [x] Add deterministic raft patch sampling for buoyancy, drag, added mass, slope force, eddy-line shear, boil/upwelling impulse, paddle blade forces, and feature tags.
 - [x] Build Chrono collision geometry from rocks, banks, ledges, shallows, strainers, and bed/corridor data.
@@ -182,7 +183,7 @@ Conditionally superseded for live water by Milestone 14. Telemetry/replay playba
 - [x] Add strongly inelastic riverbed grounding presets: near-zero restitution, high damping, grounding friction, stick-slip, contact hysteresis, scrape telemetry, and shallow-shelf pivot tests.
 - [x] Start with one-way water-to-raft coupling; add optional bounded raft-to-water displacement/source terms only after the bridge is stable and validated.
 - [x] Add native fixtures for flat pool float, current drift, standing wave lift, eddy-line yaw, rock bounce, riverbed grounding, shallow shelf pivot, and pin/release.
-- [x] Keep Unreal Chaos available only for incidental non-authoritative effects.
+- [x] Keep Unreal Chaos available as the default visual/non-authoritative physics path, and require the shared Chaos/Jolt fixture suite before it can own scoring-critical raft/contact outcomes.
 - [x] Enable OpenXR-based VR support.
 - [x] Implement telemetry/replay playback in Unreal before live native physics.
 - [x] Define fixed-step water/raft scheduling and Unreal render interpolation.
@@ -290,6 +291,17 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [x] Add a versioned feature-forcing contract and validator with low defaults, flow-response curves, manifest records, GeoClaw comparison requirements, and conservation guards.
 - [x] Add versioned contracts and validators for reach-local grids, stitched validation outputs, river validation annotations, and canonical geospatial packages.
 
+## Milestone 18: Chaos/Jolt Runtime Authority Evaluation
+
+This milestone decides whether Unreal Chaos, Jolt, Chrono, or the custom reduced runtime owns scoring-critical raft/contact/swimmer gameplay after custom C++ water remains authoritative.
+
+- [x] Adopt the split/hybrid runtime plan: Chaos is default for Unreal-integrated visual/non-authoritative physics, Jolt is the leading portable authoritative gameplay-island candidate, Chrono remains high-fidelity reference/research, and custom C++ remains water authority.
+- [x] Add a versioned shared Chaos/Jolt fixture contract for raft-rock angle sweeps, shallow shelf grounding, pin/release, crew ejection to swimmer, 1000-step determinism, and crowded-scene runtime cost.
+- [ ] Build Unreal Chaos automation fixtures from `chaos_jolt_runtime_evaluation.json` and export matching telemetry/replay summaries.
+- [ ] Build a native Jolt smoke harness or Unreal plugin path from the same fixture contract and export matching telemetry/replay summaries.
+- [ ] Add a Chaos-vs-Jolt comparison report that ranks determinism, CPU cost, contact quality, outcome stability, swimmer state, and authoring/debug ergonomics.
+- [ ] Select the first authoritative raft/contact runtime for the vertical slice, or keep the custom reduced runtime fallback if neither Chaos nor Jolt passes.
+
 ## Technical Notes To Revisit
 
 - [ ] Decide when to physically remove legacy 2D code, tests, examples, and videos from the repo.
@@ -298,7 +310,8 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [ ] Decide whether the C++ solver starts as CPU-only or gets a GPU path after correctness is established.
 - [x] Decide how much authored feature forcing is acceptable versus pure shallow-water dynamics: forcing is allowed only when bounded, manifest-recorded, GeoClaw-compared, flow-dependent, and not hiding conservation failures; expose parameters for gameplay/visual tuning with low default gains until validation passes.
 - [x] Decide the canonical storage format for cascading reach/drop packages: support reach-local grids with overlap/ghost zones for authoring and streaming, but require stitched whole-window validation outputs so seams cannot hide physics errors.
-- [ ] Evaluate Chrono::FSI only after the GeoClaw/custom-C++ solver comparison path is stable.
+- [ ] Evaluate Chrono::FSI only after the GeoClaw/custom-C++ solver comparison path and Chaos/Jolt raft-contact fixture loop are stable.
+- [x] Decide whether Project Chrono remains the sole planned raft/contact runtime: no, use the split/hybrid Chaos/Jolt evaluation plan and keep Chrono as high-fidelity reference/research.
 - [x] Identify reference footage, river data, aerial/satellite imagery, flow history, and expert guide feedback needed for validation: build a game/editor-integrated river validation annotation tool so evidence is attached directly to river stations, reaches, drops, raft lines, and expected outcomes.
 - [x] Decide which geospatial formats become canonical for source data, generated scenarios, and Unreal corridor packages: JSON source manifests, GeoJSON vectors/annotations, GeoPackage for larger GIS workspaces, GeoTIFF/COG rasters, LAS/LAZ or COPC point clouds, normalized JSON/CSV/Parquet gauge history, custom JSON plus `.npy`/`.npz` solver packages, and JSON/GeoJSON plus converted assets for Unreal corridor packages.
 - [ ] Re-check latest UE5 rendering/geospatial plugin capabilities at the Python-to-Unreal readiness gate.
@@ -342,3 +355,5 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [x] Draft the first candidate river inventory and source manifest.
 - [x] Prototype course/elevation extraction for one river section.
 - [x] Define the first rapid-review labels and seasonal flow/difficulty parameter mapping.
+- [x] Set up the shared Chaos/Jolt runtime evaluation fixture contract for raft-rock impacts, shelf grounding, pin/release, crew ejection/swimming, determinism, and crowded runtime cost.
+- [ ] Implement the Unreal Chaos automation fixtures from the shared runtime evaluation contract.

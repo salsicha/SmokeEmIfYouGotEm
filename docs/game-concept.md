@@ -47,11 +47,12 @@ See [Free And AI Asset Policy](free-and-ai-asset-policy.md) for the current art 
 
 ## Full Engine Physics Runtime
 
-Project Chrono is the planned authoritative physics runtime for the full Unreal Engine simulator. The Python `raftsim` package remains the research and validation harness, but the shipped game should use Chrono for raft dynamics, rock/contact response, compliant raft behavior, paddle force transfer, and fluid-solid interaction experiments.
+The full Unreal Engine simulator now uses a split/hybrid physics runtime plan. The Python `raftsim` package remains the research and validation harness, the custom C++ solver owns water, Unreal Chaos is the default for visual/non-authoritative physics, and Jolt is evaluated as the portable authoritative raft/contact/swimmer gameplay island. Project Chrono remains a high-fidelity reference path for compliant raft behavior, paddle force transfer comparisons, and fluid-solid interaction experiments.
 
-Unreal should own rendering, VR input, audio, UI, asset streaming, and platform packaging. Chrono should own the physical raft state and expose transforms, contacts, force telemetry, and debug vectors back to Unreal.
+Unreal should own rendering, VR input, audio, UI, asset streaming, and platform packaging. The selected raft/contact runtime should expose transforms, contacts, force telemetry, and debug vectors back to Unreal.
 
 See [Chrono And Unreal Integration Plan](chrono-unreal-integration.md) for the runtime architecture.
+See [Chaos And Jolt Runtime Evaluation](chaos-jolt-runtime-evaluation.md) for the shared fixture suite that selects raft/contact authority.
 See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the production roadmap that begins after Python modeling, validation, and profiling are complete.
 
 ## Target Platforms
@@ -281,7 +282,7 @@ Recommended starting approach:
 - Headless 2.5D GeoClaw reference model first, with a custom C++ reduced water solver tuned against it before Unreal runtime work
 - Latest stable Unreal Engine 5.x project chosen at the readiness gate after re-checking current feature support
 - Custom C++ reduced shallow-water / height-field solver as the primary runtime water candidate
-- Project Chrono or custom C++ as the authoritative raft/contact runtime after the readiness report selects the split
+- Chaos or Jolt as the authoritative raft/contact runtime only after the shared fixture suite selects the split, with custom reduced C++ as fallback and Chrono as reference
 - C++ core systems with Blueprint-facing tuning where useful
 - OpenXR-based VR support with flat-screen input parity
 - Enhanced Input for VR controllers, keyboard, mouse, and gamepad
@@ -291,7 +292,7 @@ Recommended starting approach:
 - World Partition for long real-world river corridors once the content scope requires streaming
 - Data assets for river sections, source manifests, gauges, seasons, flow levels, difficulty presets, hazards, raft tuning, water tuning, paddle forces, and scoring rules
 - High-fidelity lighting, material, terrain, foliage, water, and particle pipelines aimed at photo-realism, including Nanite foliage and geospatial corridor import when practical
-- Debug modes for Chrono force vectors, current fields, collision impulses, FSI state, and raft stability metrics
+- Debug modes for selected-runtime force vectors, current fields, collision impulses, optional Chrono/FSI reference state, and raft stability metrics
 
 Prototype scenario:
 
@@ -310,7 +311,7 @@ Prototype scenario:
 - What measurable accuracy targets define "physically accurate" for the first vertical slice?
 - What GeoClaw-vs-C++ tolerances are acceptable for water fields and raft outcomes?
 - Which physics features must be validated in GeoClaw and C++ before Unreal integration starts?
-- Which Chrono modules and build configuration are required for each target platform?
+- Whether Chaos or Jolt passes the shared fixture suite strongly enough to own scoring-critical raft/contact/swimmer gameplay on each target platform.
 - Which candidate rivers have the best combination of data quality, iconic white water, licensing clarity, and practical first-slice scope?
 - How much rapid identification can be automated from terrain/imagery before manual river-domain review is required?
 - Which gauge or modeled-flow sources are accurate enough for each selected river section and season?

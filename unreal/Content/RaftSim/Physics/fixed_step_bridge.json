@@ -4,18 +4,19 @@
   "chrono_substep_seconds": 0.0083333333,
   "authority": {
     "water": "URaftSimWaterRuntimeAdapter",
-    "raft_kinematics": "URaftSimChronoRuntimeAdapter",
+    "raft_kinematics": "runtime_selected_after_chaos_jolt_evaluation",
     "unreal_rendering": "interpolated_consumer_only"
   },
   "tick_order": [
     "collect_deterministic_inputs",
     "advance_custom_water_solver",
     "sample_water_snapshot_for_raft_patches",
-    "apply_forces_to_chrono_raft",
-    "step_chrono_substeps",
+    "apply_forces_to_selected_raft_runtime",
+    "step_selected_runtime_substeps",
     "collect_contact_and_force_telemetry",
     "publish_authoritative_raft_state"
   ],
   "subsystem": "URaftSimPhysicsBridgeSubsystem",
-  "status": "source_integrated_pending_editor_compile"
+  "evaluation_manifest": "chaos_jolt_runtime_evaluation.json",
+  "status": "source_integrated_pending_chaos_jolt_fixture_automation"
 }

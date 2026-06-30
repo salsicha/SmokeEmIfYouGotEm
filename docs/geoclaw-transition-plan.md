@@ -151,5 +151,5 @@ GeoClaw becomes the new reference when:
 GeoClaw is not planned for shipping or for the UE5 runtime. The Unreal runtime remains:
 
 - Custom C++ reduced shallow-water / height-field solver for water fields.
-- Project Chrono/custom raft dynamics for raft kinematics and contact.
+- Selected raft/contact runtime for raft kinematics and contact, chosen after the Chaos/Jolt fixture evaluation.
 - GeoClaw offline for reference validation, regression fixtures, parameter fitting, and readiness gates.
