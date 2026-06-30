@@ -37,6 +37,8 @@ RapidReviewLayerKind = Literal["raster", "vector", "table", "manifest", "annotat
 RapidReviewPanelKind = Literal["map", "profile", "hydrology", "evidence", "annotation_form"]
 
 SOURCE_MANIFEST_FILE = "source_manifest.json"
+CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION = "raftsim.candidate_river_inventory.v0"
+CANDIDATE_RIVER_INVENTORY_FILE = "candidate_river_inventory.json"
 RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION = "raftsim.rapid_review_editor_workflow.v0"
 RAPID_REVIEW_EDITOR_WORKFLOW_FILE = "rapid_review_editor_workflow.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
@@ -374,6 +376,36 @@ class RealWorldCorridorPackage:
         }
 
 
+@dataclass(frozen=True, slots=True)
+class CandidateRiverInventoryPackage:
+    inventory_id: str
+    sections: tuple[CandidateRiverSection, ...]
+    primary_river_id: str
+    primary_section_id: str
+    source_catalog_file: str
+    section_source_manifests: tuple[dict[str, object], ...]
+    selection_criteria: tuple[str, ...]
+    next_review_actions: tuple[str, ...]
+    provenance: dict[str, object] = field(default_factory=dict)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION,
+            "inventory_id": self.inventory_id,
+            "primary_section": {
+                "river_id": self.primary_river_id,
+                "section_id": self.primary_section_id,
+            },
+            "source_catalog": self.source_catalog_file,
+            "section_count": len(self.sections),
+            "sections": [section.to_json_dict() for section in self.sections],
+            "section_source_manifests": list(self.section_source_manifests),
+            "selection_criteria": list(self.selection_criteria),
+            "next_review_actions": list(self.next_review_actions),
+            "provenance": self.provenance,
+        }
+
+
 def default_candidate_river_inventory() -> tuple[CandidateRiverSection, ...]:
     """Return the first-pass river inventory for real-world playable sections."""
 
@@ -457,6 +489,46 @@ def default_candidate_river_inventory() -> tuple[CandidateRiverSection, ...]:
             data_priorities=("3dep_lidar_dem", "3dhp_nhd_flowlines", "naip_imagery", "release_schedule_research", "nwis_gauge_search"),
             gauge_candidates=("USGS/NWIS Gauley River release/gauge search",),
         ),
+    )
+
+
+def build_candidate_river_inventory_package(
+    sections: tuple[CandidateRiverSection, ...] | None = None,
+) -> CandidateRiverInventoryPackage:
+    """Build the first candidate river inventory with source-manifest linkage."""
+
+    inventory_sections = sections or default_candidate_river_inventory()
+    if not inventory_sections:
+        raise ValueError("candidate river inventory requires at least one section.")
+    primary = inventory_sections[0]
+    return CandidateRiverInventoryPackage(
+        inventory_id="raftsim.real_world_candidate_river_inventory.v0",
+        sections=inventory_sections,
+        primary_river_id=primary.river_id,
+        primary_section_id=primary.section_id,
+        source_catalog_file="source_catalog.json",
+        section_source_manifests=tuple(
+            _candidate_section_source_manifest_link(section, primary)
+            for section in inventory_sections
+        ),
+        selection_criteria=(
+            "Commercial or instructional whitewater value with known playable lines.",
+            "Public or metadata-ready elevation, hydrography, imagery, and gauge data.",
+            "Distinct seasonal flow bands that can change the nature of rapids.",
+            "Enough guide/reference context to sanity-check surf, flush, pin, flip, access, and safety outcomes.",
+            "Representative geography spread for future rendering, hydrology, and difficulty coverage.",
+        ),
+        next_review_actions=(
+            "Verify planning bounds and gauge candidates before production extraction.",
+            "Replace seed DEM/imagery/guide placeholders with pulled source products and reviewed annotations.",
+            "Draft source manifests for non-primary sections before generating solver packages from them.",
+            "Keep rights/provenance separate from third-party media until redistribution permissions are explicit.",
+        ),
+        provenance={
+            "generated_by": "raftsim.real_world.build_candidate_river_inventory_package",
+            "processing_version": "milestone_17_inventory_seed.v0",
+            "review_status": "draft_inventory_with_one_drafted_source_manifest",
+        },
     )
 
 
@@ -1324,6 +1396,8 @@ def write_real_world_seed_package(directory: str | Path) -> Path:
     scenario_dir = data_dir / "scenario"
     data_dir.mkdir(parents=True, exist_ok=True)
     package = build_real_world_corridor_package()
+    inventory = build_candidate_river_inventory_package()
+    _write_json(output_dir / CANDIDATE_RIVER_INVENTORY_FILE, inventory.to_json_dict())
     _write_json(output_dir / "candidate_rivers.json", {"sections": [section.to_json_dict() for section in default_candidate_river_inventory()]})
     _write_json(output_dir / "source_catalog.json", {"sources": [source.to_json_dict() for source in default_source_catalog()]})
     _write_json(output_dir / "rapid_review_labels.json", {"labels": [label.to_json_dict() for label in default_manual_rapid_review_labels()]})
@@ -1340,6 +1414,28 @@ def write_real_world_seed_package(directory: str | Path) -> Path:
         cascading_scenario_dir = cascading_package.write_package(cascading_dir / cascading_package.scenario.metadata.scenario_id)
         write_unreal_cascading_corridor_metadata(cascading_package, cascading_scenario_dir / "unreal_corridor_metadata")
     return data_dir
+
+
+def _candidate_section_source_manifest_link(
+    section: CandidateRiverSection,
+    primary: CandidateRiverSection,
+) -> dict[str, object]:
+    is_primary = section.river_id == primary.river_id and section.section_id == primary.section_id
+    manifest_path = f"south_fork_american_chili_bar/{SOURCE_MANIFEST_FILE}" if is_primary else None
+    return {
+        "river_id": section.river_id,
+        "section_id": section.section_id,
+        "source_manifest_status": "drafted" if is_primary else "planned",
+        "source_manifest_path": manifest_path,
+        "source_manifest_id": (
+            f"{section.river_id}.{section.section_id}.source_manifest.v0" if is_primary else None
+        ),
+        "required_before_generation": (
+            "Use the drafted source manifest for the seed South Fork package."
+            if is_primary
+            else "Draft a source manifest before generating solver or Unreal packages."
+        ),
+    }
 
 
 def _rapid_review_layers() -> tuple[RapidReviewLayer, ...]:

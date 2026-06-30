@@ -1,0 +1,260 @@
+{
+  "inventory_id": "raftsim.real_world_candidate_river_inventory.v0",
+  "next_review_actions": [
+    "Verify planning bounds and gauge candidates before production extraction.",
+    "Replace seed DEM/imagery/guide placeholders with pulled source products and reviewed annotations.",
+    "Draft source manifests for non-primary sections before generating solver packages from them.",
+    "Keep rights/provenance separate from third-party media until redistribution permissions are explicit."
+  ],
+  "primary_section": {
+    "river_id": "american_south_fork",
+    "section_id": "chili_bar_to_coloma"
+  },
+  "provenance": {
+    "generated_by": "raftsim.real_world.build_candidate_river_inventory_package",
+    "processing_version": "milestone_17_inventory_seed.v0",
+    "review_status": "draft_inventory_with_one_drafted_source_manifest"
+  },
+  "schema_version": "raftsim.candidate_river_inventory.v0",
+  "section_count": 6,
+  "section_source_manifests": [
+    {
+      "required_before_generation": "Use the drafted source manifest for the seed South Fork package.",
+      "river_id": "american_south_fork",
+      "section_id": "chili_bar_to_coloma",
+      "source_manifest_id": "american_south_fork.chili_bar_to_coloma.source_manifest.v0",
+      "source_manifest_path": "south_fork_american_chili_bar/source_manifest.json",
+      "source_manifest_status": "drafted"
+    },
+    {
+      "required_before_generation": "Draft a source manifest before generating solver or Unreal packages.",
+      "river_id": "youghiogheny_lower",
+      "section_id": "ohiopyle_to_bruner_run",
+      "source_manifest_id": null,
+      "source_manifest_path": null,
+      "source_manifest_status": "planned"
+    },
+    {
+      "required_before_generation": "Draft a source manifest before generating solver or Unreal packages.",
+      "river_id": "arkansas_browns_canyon",
+      "section_id": "browns_canyon",
+      "source_manifest_id": null,
+      "source_manifest_path": null,
+      "source_manifest_status": "planned"
+    },
+    {
+      "required_before_generation": "Draft a source manifest before generating solver or Unreal packages.",
+      "river_id": "nantahala",
+      "section_id": "nantahala_gorge",
+      "source_manifest_id": null,
+      "source_manifest_path": null,
+      "source_manifest_status": "planned"
+    },
+    {
+      "required_before_generation": "Draft a source manifest before generating solver or Unreal packages.",
+      "river_id": "new_river_gorge",
+      "section_id": "new_river_gorge",
+      "source_manifest_id": null,
+      "source_manifest_path": null,
+      "source_manifest_status": "planned"
+    },
+    {
+      "required_before_generation": "Draft a source manifest before generating solver or Unreal packages.",
+      "river_id": "gauley_upper",
+      "section_id": "upper_gauley",
+      "source_manifest_id": null,
+      "source_manifest_path": null,
+      "source_manifest_status": "planned"
+    }
+  ],
+  "sections": [
+    {
+      "bounds_wgs84": {
+        "max_lat": 38.83,
+        "max_lon": -120.72,
+        "min_lat": 38.74,
+        "min_lon": -120.9
+      },
+      "country": "US",
+      "data_priorities": [
+        "3dep_lidar_dem",
+        "3dhp_nhd_flowlines",
+        "naip_imagery",
+        "nwis_gauge_11445500",
+        "osm_access"
+      ],
+      "difficulty_range": [
+        "class_ii",
+        "class_iii"
+      ],
+      "gauge_candidates": [
+        "USGS 11445500 South Fork American River near Lotus, CA"
+      ],
+      "notes": "Representative Milestone 9 seed section; coordinates are planning bounds and must be verified before production extraction.",
+      "playable_reason": "Commercially important training-to-intermediate run with clear access, named rapids, gauge context, and varied channel geometry.",
+      "region": "California Sierra Nevada",
+      "river_id": "american_south_fork",
+      "river_name": "South Fork American River",
+      "section_id": "chili_bar_to_coloma",
+      "section_name": "Chili Bar to Coloma"
+    },
+    {
+      "bounds_wgs84": {
+        "max_lat": 39.91,
+        "max_lon": -79.43,
+        "min_lat": 39.83,
+        "min_lon": -79.53
+      },
+      "country": "US",
+      "data_priorities": [
+        "3dep_lidar_dem",
+        "3dhp_nhd_flowlines",
+        "naip_imagery",
+        "nwis_gauge_search",
+        "guide_reference_review"
+      ],
+      "difficulty_range": [
+        "class_iii",
+        "class_iv"
+      ],
+      "gauge_candidates": [
+        "USGS/NWIS Ohiopyle-area gauge search"
+      ],
+      "notes": "",
+      "playable_reason": "Classic technical pool-drop section with many named rapids and strong guide/reference availability.",
+      "region": "Pennsylvania Laurel Highlands",
+      "river_id": "youghiogheny_lower",
+      "river_name": "Youghiogheny River",
+      "section_id": "ohiopyle_to_bruner_run",
+      "section_name": "Lower Yough"
+    },
+    {
+      "bounds_wgs84": {
+        "max_lat": 38.83,
+        "max_lon": -105.95,
+        "min_lat": 38.67,
+        "min_lon": -106.15
+      },
+      "country": "US",
+      "data_priorities": [
+        "3dep_lidar_dem",
+        "3dhp_nhd_flowlines",
+        "naip_imagery",
+        "nwis_gauge_search",
+        "seasonal_snowmelt_context"
+      ],
+      "difficulty_range": [
+        "class_iii",
+        "class_iv"
+      ],
+      "gauge_candidates": [
+        "USGS/NWIS Arkansas River Browns Canyon-area gauge search"
+      ],
+      "notes": "",
+      "playable_reason": "High-value mountain whitewater corridor with seasonal snowmelt variability and strong public-land geodata coverage.",
+      "region": "Colorado Rockies",
+      "river_id": "arkansas_browns_canyon",
+      "river_name": "Arkansas River",
+      "section_id": "browns_canyon",
+      "section_name": "Browns Canyon"
+    },
+    {
+      "bounds_wgs84": {
+        "max_lat": 35.36,
+        "max_lon": -83.55,
+        "min_lat": 35.27,
+        "min_lon": -83.72
+      },
+      "country": "US",
+      "data_priorities": [
+        "3dep_lidar_dem",
+        "3dhp_nhd_flowlines",
+        "naip_imagery",
+        "release_schedule_research",
+        "osm_access"
+      ],
+      "difficulty_range": [
+        "class_ii",
+        "class_iii"
+      ],
+      "gauge_candidates": [
+        "USGS/NWIS Nantahala Gorge-area gauge search"
+      ],
+      "notes": "",
+      "playable_reason": "Accessible training river with repeatable dam-release flows, narrow gorge banks, and useful beginner/intermediate difficulty mapping.",
+      "region": "North Carolina Appalachians",
+      "river_id": "nantahala",
+      "river_name": "Nantahala River",
+      "section_id": "nantahala_gorge",
+      "section_name": "Nantahala Gorge"
+    },
+    {
+      "bounds_wgs84": {
+        "max_lat": 38.08,
+        "max_lon": -80.95,
+        "min_lat": 37.78,
+        "min_lon": -81.15
+      },
+      "country": "US",
+      "data_priorities": [
+        "3dep_lidar_dem",
+        "3dhp_nhd_flowlines",
+        "naip_imagery",
+        "nwis_gauge_search",
+        "rapid_guide_reference_review"
+      ],
+      "difficulty_range": [
+        "class_iii",
+        "class_iv"
+      ],
+      "gauge_candidates": [
+        "USGS/NWIS New River Gorge-area gauge search"
+      ],
+      "notes": "",
+      "playable_reason": "Large-volume river with iconic rapids, broad flow ranges, canyon visuals, and strong future UE5 photoreal corridor value.",
+      "region": "West Virginia Appalachians",
+      "river_id": "new_river_gorge",
+      "river_name": "New River",
+      "section_id": "new_river_gorge",
+      "section_name": "New River Gorge"
+    },
+    {
+      "bounds_wgs84": {
+        "max_lat": 38.27,
+        "max_lon": -80.82,
+        "min_lat": 38.19,
+        "min_lon": -80.96
+      },
+      "country": "US",
+      "data_priorities": [
+        "3dep_lidar_dem",
+        "3dhp_nhd_flowlines",
+        "naip_imagery",
+        "release_schedule_research",
+        "nwis_gauge_search"
+      ],
+      "difficulty_range": [
+        "class_iv",
+        "class_v"
+      ],
+      "gauge_candidates": [
+        "USGS/NWIS Gauley River release/gauge search"
+      ],
+      "notes": "",
+      "playable_reason": "Expert-flow stretch with release-driven seasonal difficulty, powerful hydraulics, and future high-consequence validation value.",
+      "region": "West Virginia Appalachians",
+      "river_id": "gauley_upper",
+      "river_name": "Gauley River",
+      "section_id": "upper_gauley",
+      "section_name": "Upper Gauley"
+    }
+  ],
+  "selection_criteria": [
+    "Commercial or instructional whitewater value with known playable lines.",
+    "Public or metadata-ready elevation, hydrography, imagery, and gauge data.",
+    "Distinct seasonal flow bands that can change the nature of rapids.",
+    "Enough guide/reference context to sanity-check surf, flush, pin, flip, access, and safety outcomes.",
+    "Representative geography spread for future rendering, hydrology, and difficulty coverage."
+  ],
+  "source_catalog": "source_catalog.json"
+}
