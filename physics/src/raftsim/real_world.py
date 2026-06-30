@@ -33,8 +33,12 @@ from .schema_versions import SOURCE_MANIFEST_SCHEMA_VERSION
 DataCategory = Literal["elevation", "hydrography", "imagery", "gauge", "guide_reference", "field_media"]
 DifficultyPreset = Literal["beginner", "intermediate", "advanced", "expert"]
 SourceStatus = Literal["planned", "metadata_ready", "downloaded", "derived", "reviewed"]
+RapidReviewLayerKind = Literal["raster", "vector", "table", "manifest", "annotation", "reference"]
+RapidReviewPanelKind = Literal["map", "profile", "hydrology", "evidence", "annotation_form"]
 
 SOURCE_MANIFEST_FILE = "source_manifest.json"
+RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION = "raftsim.rapid_review_editor_workflow.v0"
+RAPID_REVIEW_EDITOR_WORKFLOW_FILE = "rapid_review_editor_workflow.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
 
 
@@ -162,6 +166,124 @@ class RapidReviewLabel:
 
     def to_json_dict(self) -> dict[str, object]:
         return asdict(self)
+
+
+@dataclass(frozen=True, slots=True)
+class RapidReviewLayer:
+    layer_id: str
+    display_name: str
+    layer_kind: RapidReviewLayerKind
+    artifact_path: str
+    source_ids: tuple[str, ...]
+    display_role: str
+    visible_by_default: bool = True
+    required_for_review: bool = True
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "layer_id": self.layer_id,
+            "display_name": self.display_name,
+            "layer_kind": self.layer_kind,
+            "artifact_path": self.artifact_path,
+            "source_ids": list(self.source_ids),
+            "display_role": self.display_role,
+            "visible_by_default": self.visible_by_default,
+            "required_for_review": self.required_for_review,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class RapidReviewPanel:
+    panel_id: str
+    title: str
+    panel_kind: RapidReviewPanelKind
+    layer_ids: tuple[str, ...]
+    purpose: str
+    editable_fields: tuple[str, ...] = ()
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "panel_id": self.panel_id,
+            "title": self.title,
+            "panel_kind": self.panel_kind,
+            "layer_ids": list(self.layer_ids),
+            "purpose": self.purpose,
+            "editable_fields": list(self.editable_fields),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class RapidReviewItem:
+    review_item_id: str
+    rapid_id: str
+    station_range_m: tuple[float, float]
+    peak_station_m: float
+    map_focus_wgs84: tuple[float, float]
+    candidate_tags: tuple[str, ...]
+    signals: tuple[str, ...]
+    confidence: float
+    evidence_refs: dict[str, object]
+    cross_section_summary: dict[str, float]
+    gauge_context: dict[str, object]
+    guide_notes: tuple[str, ...]
+    required_actions: tuple[str, ...]
+    editable_fields: tuple[str, ...]
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "review_item_id": self.review_item_id,
+            "rapid_id": self.rapid_id,
+            "station_range_m": {
+                "start": self.station_range_m[0],
+                "end": self.station_range_m[1],
+            },
+            "peak_station_m": self.peak_station_m,
+            "map_focus_wgs84": {
+                "lon": self.map_focus_wgs84[0],
+                "lat": self.map_focus_wgs84[1],
+            },
+            "candidate_tags": list(self.candidate_tags),
+            "signals": list(self.signals),
+            "confidence": self.confidence,
+            "evidence_refs": self.evidence_refs,
+            "cross_section_summary": self.cross_section_summary,
+            "gauge_context": self.gauge_context,
+            "guide_notes": list(self.guide_notes),
+            "required_actions": list(self.required_actions),
+            "editable_fields": list(self.editable_fields),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class RapidReviewEditorWorkflow:
+    river_id: str
+    section_id: str
+    source_manifest: str
+    layers: tuple[RapidReviewLayer, ...]
+    panels: tuple[RapidReviewPanel, ...]
+    review_items: tuple[RapidReviewItem, ...]
+    label_catalog: tuple[RapidReviewLabel, ...]
+    save_targets: tuple[str, ...]
+    export_targets: tuple[str, ...]
+    quality_gates: tuple[str, ...]
+
+    def to_json_dict(self) -> dict[str, object]:
+        required_layer_ids = [layer.layer_id for layer in self.layers if layer.required_for_review]
+        return {
+            "schema_version": RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION,
+            "river_id": self.river_id,
+            "section_id": self.section_id,
+            "source_manifest": self.source_manifest,
+            "view_id": "rapid_review_one_view",
+            "required_layer_ids": required_layer_ids,
+            "layers": [layer.to_json_dict() for layer in self.layers],
+            "panels": [panel.to_json_dict() for panel in self.panels],
+            "review_items": [item.to_json_dict() for item in self.review_items],
+            "label_catalog": [label.to_json_dict() for label in self.label_catalog],
+            "save_targets": list(self.save_targets),
+            "export_targets": list(self.export_targets),
+            "quality_gates": list(self.quality_gates),
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -548,7 +670,11 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
             "hydrography": ["hydrography/centerline.geojson", "hydrography/banks.geojson", "hydrography/cross_sections.geojson"],
             "imagery": ["imagery/naip_tiles", "imagery/water_mask.tif", "imagery/foam_texture_mask.tif"],
             "gauges": ["hydrology/usgs_11445500_daily_discharge.json", "hydrology/flow_presets.json"],
-            "guide_references": ["review/guide_reference_index.json", "review/rapid_review_labels.json"],
+            "guide_references": [
+                "review/guide_reference_index.json",
+                "review/rapid_review_labels.json",
+                RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
+            ],
             "field_media": ["field_media/README.md"],
             "solver": ["scenario/scenario.json", "scenario/bed.npy", "scenario/initial_state.npz"],
             "validation": ["validation_matrix.json"],
@@ -859,10 +985,44 @@ def build_real_world_corridor_package() -> RealWorldCorridorPackage:
             "banks": "hydrography/banks.geojson",
             "rapids": "review/rapid_candidates.geojson",
             "hazards": "review/rapid_review_labels.json",
+            "rapid_review_editor_workflow": RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
             "flow_presets": "hydrology/flow_presets.json",
             "validation_matrix": "validation_matrix.json",
             "confidence_metadata": "confidence.json",
         },
+    )
+
+
+def build_rapid_review_editor_workflow(
+    package: RealWorldCorridorPackage | None = None,
+) -> RapidReviewEditorWorkflow:
+    """Build the first one-view rapid review/editor workflow payload."""
+
+    target = package or build_real_world_corridor_package()
+    return RapidReviewEditorWorkflow(
+        river_id=target.section.river_id,
+        section_id=target.section.section_id,
+        source_manifest=SOURCE_MANIFEST_FILE,
+        layers=_rapid_review_layers(),
+        panels=_rapid_review_panels(),
+        review_items=tuple(_rapid_review_item(target, candidate) for candidate in target.rapid_candidates),
+        label_catalog=default_manual_rapid_review_labels(),
+        save_targets=(
+            "review/rapid_candidates.geojson",
+            "review/river_validation_annotations.geojson",
+            "review/feature_annotations.geojson",
+            "scenario/source_manifest_links.json",
+        ),
+        export_targets=(
+            "python_scenario_generation",
+            "geoclaw_cpp_validation_reports",
+            "unreal_data_assets",
+        ),
+        quality_gates=(
+            "Every accepted rapid has DEM/lidar, imagery, flowline, cross-section, gauge, source-manifest, candidate-tag, and guide-note context visible in the one-view layout.",
+            "Every accepted annotation records rights/provenance before it can feed validation or Unreal data assets.",
+            "Guidebook text, third-party imagery, and field media remain referenced through manifests unless redistribution rights are explicit.",
+        ),
     )
 
 
@@ -1172,6 +1332,7 @@ def write_real_world_seed_package(directory: str | Path) -> Path:
     _write_json(data_dir / "river_course.json", package.to_json_dict())
     _write_json(data_dir / "flow_presets.json", {"flow_bands": [band.to_json_dict() for band in package.flow_bands]})
     _write_json(data_dir / "rapid_candidates.geojson", _rapid_candidates_geojson(package.rapid_candidates, package.indicators))
+    _write_json(data_dir / RAPID_REVIEW_EDITOR_WORKFLOW_FILE, build_rapid_review_editor_workflow(package).to_json_dict())
     _write_json(data_dir / "corridor_package_manifest.json", _corridor_manifest(package))
     generate_real_world_scenario2_5d().write_package(scenario_dir)
     cascading_dir = data_dir / "cascading_scenarios"
@@ -1179,6 +1340,266 @@ def write_real_world_seed_package(directory: str | Path) -> Path:
         cascading_scenario_dir = cascading_package.write_package(cascading_dir / cascading_package.scenario.metadata.scenario_id)
         write_unreal_cascading_corridor_metadata(cascading_package, cascading_scenario_dir / "unreal_corridor_metadata")
     return data_dir
+
+
+def _rapid_review_layers() -> tuple[RapidReviewLayer, ...]:
+    return (
+        RapidReviewLayer(
+            "dem_lidar",
+            "DEM/Lidar Terrain",
+            "raster",
+            "terrain/3dep_dem_tiles",
+            ("usgs_3dep", "usgs_tnm"),
+            "Elevation, slope, bank breaks, boulder shadows, and terrain confidence backdrop.",
+        ),
+        RapidReviewLayer(
+            "aerial_satellite_imagery",
+            "Aerial/Satellite Imagery",
+            "raster",
+            "imagery/naip_tiles",
+            ("usda_naip",),
+            "Visible channel, banks, boulders, foam texture, water masks, and access context.",
+        ),
+        RapidReviewLayer(
+            "flowlines",
+            "Flowlines And Centerline",
+            "vector",
+            "hydrography/centerline.geojson",
+            ("usgs_3dhp_nhd", "osm"),
+            "River centerline, stationing, flow direction, and named/access hydrography context.",
+        ),
+        RapidReviewLayer(
+            "cross_sections",
+            "Cross Sections",
+            "vector",
+            "hydrography/cross_sections.geojson",
+            ("usgs_3dep", "usgs_3dhp_nhd"),
+            "Bank offsets, width, slope, constriction, and section sampling for solver authoring.",
+        ),
+        RapidReviewLayer(
+            "gauge_history",
+            "Gauge History",
+            "table",
+            "hydrology/usgs_11445500_daily_discharge.json",
+            ("usgs_nwis", "noaa_nwps_nwm", "usgs_streamstats"),
+            "Flow bands, discharge/stage context, season notes, and validation-flow selection.",
+        ),
+        RapidReviewLayer(
+            "source_manifest",
+            "Source Manifest",
+            "manifest",
+            SOURCE_MANIFEST_FILE,
+            ("usgs_3dep", "usgs_3dhp_nhd", "usda_naip", "usgs_nwis", "guide_references"),
+            "Provenance, rights, artifact paths, confidence, and source-status review.",
+        ),
+        RapidReviewLayer(
+            "candidate_tags",
+            "Candidate Tags",
+            "annotation",
+            "review/rapid_candidates.geojson",
+            ("guide_references",),
+            "Automated slope/constriction/roughness/imagery tags and human review labels.",
+        ),
+        RapidReviewLayer(
+            "guide_notes",
+            "Guide Notes",
+            "reference",
+            "review/guide_reference_index.json",
+            ("guide_references", "field_media"),
+            "Guide feedback, footage pointers, scout notes, expected outcomes, and review status.",
+        ),
+        RapidReviewLayer(
+            "validation_annotations",
+            "Validation Annotations",
+            "annotation",
+            "review/river_validation_annotations.geojson",
+            ("guide_references", "field_media"),
+            "Accepted pins, spans, polygons, raft lines, expected outcomes, and rights metadata.",
+            visible_by_default=False,
+            required_for_review=False,
+        ),
+    )
+
+
+def _rapid_review_panels() -> tuple[RapidReviewPanel, ...]:
+    return (
+        RapidReviewPanel(
+            "one_view_map",
+            "Map Review",
+            "map",
+            (
+                "dem_lidar",
+                "aerial_satellite_imagery",
+                "flowlines",
+                "cross_sections",
+                "candidate_tags",
+                "guide_notes",
+                "validation_annotations",
+            ),
+            "Primary rapid-design view with terrain, imagery, hydrography, candidates, and evidence overlays.",
+        ),
+        RapidReviewPanel(
+            "station_profile",
+            "Station Profile",
+            "profile",
+            ("dem_lidar", "flowlines", "cross_sections", "candidate_tags"),
+            "Longitudinal elevation/gradient profile plus selected cross-section context.",
+        ),
+        RapidReviewPanel(
+            "flow_and_sources",
+            "Flow And Sources",
+            "hydrology",
+            ("gauge_history", "source_manifest", "guide_notes"),
+            "Gauge bands, source provenance, rights, and confidence for the selected candidate.",
+        ),
+        RapidReviewPanel(
+            "annotation_editor",
+            "Annotation Editor",
+            "annotation_form",
+            ("candidate_tags", "guide_notes", "validation_annotations"),
+            "Manual edits for labels, boundaries, raft lines, expected outcomes, confidence, and rights.",
+            editable_fields=(
+                "review_labels",
+                "station_range_m",
+                "geometry",
+                "expected_outcome",
+                "guide_feedback",
+                "flow_context",
+                "rights_provenance",
+                "confidence",
+            ),
+        ),
+    )
+
+
+def _rapid_review_item(package: RealWorldCorridorPackage, candidate: RapidCandidate) -> RapidReviewItem:
+    nearest_indicator = min(package.indicators, key=lambda indicator: abs(indicator.station_m - candidate.peak_station_m))
+    return RapidReviewItem(
+        review_item_id=f"{candidate.rapid_id}_review",
+        rapid_id=candidate.rapid_id,
+        station_range_m=(candidate.start_station_m, candidate.end_station_m),
+        peak_station_m=candidate.peak_station_m,
+        map_focus_wgs84=(nearest_indicator.lon, nearest_indicator.lat),
+        candidate_tags=candidate.suggested_labels,
+        signals=candidate.signals,
+        confidence=candidate.confidence,
+        evidence_refs=_rapid_review_evidence_refs(candidate),
+        cross_section_summary=_rapid_review_cross_section_summary(nearest_indicator),
+        gauge_context=_rapid_review_gauge_context(package),
+        guide_notes=_rapid_review_guide_notes(candidate),
+        required_actions=(
+            "Confirm or edit rapid boundary station range.",
+            "Classify water features and hazards from the label catalog.",
+            "Attach guide feedback, footage/timecode references, and rights/provenance before acceptance.",
+            "Record expected raft outcomes such as surf, flush, pin, release, flip, or clean line.",
+            "Mark whether the annotation feeds gameplay tuning, physics validation, visual/audio fidelity, or all three.",
+        ),
+        editable_fields=(
+            "review_labels",
+            "station_range_m",
+            "point_span_polygon_geometry",
+            "raft_line_geometry",
+            "footage_timecodes",
+            "aerial_imagery_date_tile",
+            "guide_feedback",
+            "expected_outcome",
+            "rights_provenance",
+            "confidence",
+        ),
+    )
+
+
+def _rapid_review_evidence_refs(candidate: RapidCandidate) -> dict[str, object]:
+    return {
+        "dem_lidar": {
+            "layer_id": "dem_lidar",
+            "artifacts": ["terrain/3dep_dem_tiles", "terrain/solver_bed_grid.npy"],
+            "source_ids": ["usgs_3dep", "usgs_tnm"],
+        },
+        "aerial_satellite_imagery": {
+            "layer_id": "aerial_satellite_imagery",
+            "artifacts": ["imagery/naip_tiles", "imagery/water_mask.tif", "imagery/foam_texture_mask.tif"],
+            "source_ids": ["usda_naip"],
+        },
+        "flowlines": {
+            "layer_id": "flowlines",
+            "artifacts": ["hydrography/centerline.geojson", "hydrography/banks.geojson"],
+            "source_ids": ["usgs_3dhp_nhd", "osm"],
+        },
+        "cross_sections": {
+            "layer_id": "cross_sections",
+            "artifacts": ["hydrography/cross_sections.geojson"],
+            "source_ids": ["usgs_3dep", "usgs_3dhp_nhd"],
+        },
+        "gauge_history": {
+            "layer_id": "gauge_history",
+            "artifacts": ["hydrology/usgs_11445500_daily_discharge.json", "hydrology/flow_presets.json"],
+            "source_ids": ["usgs_nwis", "noaa_nwps_nwm", "usgs_streamstats"],
+        },
+        "source_manifest": {
+            "layer_id": "source_manifest",
+            "artifacts": [SOURCE_MANIFEST_FILE],
+            "source_ids": ["source_manifest"],
+        },
+        "candidate_tags": {
+            "layer_id": "candidate_tags",
+            "artifacts": ["review/rapid_candidates.geojson"],
+            "candidate_id": candidate.rapid_id,
+            "tags": list(candidate.suggested_labels),
+            "signals": list(candidate.signals),
+        },
+        "guide_notes": {
+            "layer_id": "guide_notes",
+            "artifacts": ["review/guide_reference_index.json", "review/rapid_review_labels.json"],
+            "source_ids": ["guide_references", "field_media"],
+        },
+    }
+
+
+def _rapid_review_cross_section_summary(indicator: ChannelIndicator) -> dict[str, float]:
+    return {
+        "station_m": indicator.station_m,
+        "center_lon": indicator.lon,
+        "center_lat": indicator.lat,
+        "channel_width_m": indicator.channel_width_m,
+        "left_bank_offset_m": indicator.left_bank_offset_m,
+        "right_bank_offset_m": indicator.right_bank_offset_m,
+        "gradient": indicator.gradient,
+        "constriction_score": indicator.constriction_score,
+        "roughness_score": indicator.roughness_score,
+        "rapid_score": indicator.rapid_score,
+    }
+
+
+def _rapid_review_gauge_context(package: RealWorldCorridorPackage) -> dict[str, object]:
+    return {
+        "gauge_candidates": list(package.section.gauge_candidates),
+        "default_flow_band": "median_runnable",
+        "flow_bands": [
+            {
+                "flow_band": band.flow_band,
+                "season": band.season,
+                "discharge_cfs": band.discharge_cfs,
+                "discharge_m3s": band.discharge_m3s,
+                "runnable": band.runnable,
+                "confidence": band.confidence,
+            }
+            for band in package.flow_bands
+        ],
+    }
+
+
+def _rapid_review_guide_notes(candidate: RapidCandidate) -> tuple[str, ...]:
+    notes = [
+        "Human guide review pending; keep copyrighted guidebook text and third-party media out of the repo unless rights are explicit.",
+    ]
+    if "guide_note" in candidate.signals:
+        notes.append("Seed guide-note signal is present near this candidate; reviewer must attach citation, flow context, and derived guidance.")
+    if "access_point" in candidate.signals:
+        notes.append("Access or scout context may be nearby; verify put-in/take-out, trail, road, and safety notes.")
+    if candidate.confidence < 0.65:
+        notes.append("Candidate confidence is still low enough that a reviewer should confirm boundaries and labels before solver tuning.")
+    return tuple(notes)
 
 
 def _south_fork_cascading_seed(selection: PlayerSelection) -> int:

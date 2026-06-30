@@ -3,8 +3,11 @@ import json
 import numpy as np
 
 from raftsim.real_world import (
+    RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
+    RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION,
     adaptive_solver_parameters,
     build_player_selection_model,
+    build_rapid_review_editor_workflow,
     build_real_world_corridor_package,
     build_source_manifest,
     default_candidate_river_inventory,
@@ -126,12 +129,49 @@ def test_real_world_corridor_package_collects_unreal_handoff_metadata():
     package = build_real_world_corridor_package()
 
     assert package.unreal_ready_artifacts["terrain"] == "terrain/solver_bed_grid.npy"
+    assert package.unreal_ready_artifacts["rapid_review_editor_workflow"] == RAPID_REVIEW_EDITOR_WORKFLOW_FILE
     assert len(package.rapid_candidates) >= 3
     assert {band.flow_band for band in south_fork_american_flow_bands()} == {
         "low_runnable",
         "median_runnable",
         "high_runnable",
     }
+
+
+def test_rapid_review_editor_workflow_displays_required_context_in_one_view():
+    workflow = build_rapid_review_editor_workflow()
+    data = workflow.to_json_dict()
+    required_layer_ids = set(data["required_layer_ids"])
+    panel_ids = {panel["panel_id"] for panel in data["panels"]}
+    first_item = data["review_items"][0]
+
+    assert data["schema_version"] == RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION
+    assert data["view_id"] == "rapid_review_one_view"
+    assert {
+        "dem_lidar",
+        "aerial_satellite_imagery",
+        "flowlines",
+        "cross_sections",
+        "gauge_history",
+        "source_manifest",
+        "candidate_tags",
+        "guide_notes",
+    }.issubset(required_layer_ids)
+    assert {"one_view_map", "station_profile", "flow_and_sources", "annotation_editor"}.issubset(panel_ids)
+    assert len(data["review_items"]) >= 3
+    assert first_item["candidate_tags"]
+    assert first_item["evidence_refs"]["dem_lidar"]["source_ids"] == ["usgs_3dep", "usgs_tnm"]
+    assert "aerial_satellite_imagery" in first_item["evidence_refs"]
+    assert first_item["cross_section_summary"]["channel_width_m"] > 0.0
+    assert {band["flow_band"] for band in first_item["gauge_context"]["flow_bands"]} == {
+        "low_runnable",
+        "median_runnable",
+        "high_runnable",
+    }
+    assert first_item["guide_notes"]
+    assert {"python_scenario_generation", "geoclaw_cpp_validation_reports", "unreal_data_assets"}.issubset(
+        set(data["export_targets"])
+    )
 
 
 def test_real_world_scenario_generates_solver_neutral_package(tmp_path):
@@ -185,17 +225,21 @@ def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
     assert (output_dir / "source_manifest.json").exists()
     assert (output_dir / "flow_presets.json").exists()
     assert (output_dir / "rapid_candidates.geojson").exists()
+    assert (output_dir / RAPID_REVIEW_EDITOR_WORKFLOW_FILE).exists()
     assert (output_dir / "corridor_package_manifest.json").exists()
     assert (output_dir / "scenario" / "scenario.json").exists()
     cascading_dirs = sorted((output_dir / "cascading_scenarios").glob("*_cascading"))
     assert len(cascading_dirs) == 3
 
     manifest = json.loads((output_dir / "source_manifest.json").read_text(encoding="utf-8"))
+    workflow = json.loads((output_dir / RAPID_REVIEW_EDITOR_WORKFLOW_FILE).read_text(encoding="utf-8"))
     scenario = read_scenario2_5d_package(output_dir / "scenario")
     median_cascading_dir = next(path for path in cascading_dirs if "median_runnable" in path.name)
     cascading = read_cascading_scenario_package(median_cascading_dir)
     unreal_metadata_dir = median_cascading_dir / "unreal_corridor_metadata"
     assert manifest["schema_version"] == SOURCE_MANIFEST_SCHEMA_VERSION
+    assert workflow["schema_version"] == RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION
+    assert "dem_lidar" in workflow["required_layer_ids"]
     assert scenario.metadata.scenario_type == "real_world"
     assert cascading.scenario.metadata.flow_band == "median_runnable"
     assert len(cascading.reaches) == 7

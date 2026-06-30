@@ -28,6 +28,7 @@
       "imagery/water_mask.tif",
       "imagery/foam_texture_mask.tif"
     ],
+    "rapid_review_editor_workflow": "rapid_review_editor_workflow.json",
     "rapids": "review/rapid_candidates.geojson",
     "terrain": "terrain/solver_bed_grid.npy",
     "validation_matrix": "validation_matrix.json"
