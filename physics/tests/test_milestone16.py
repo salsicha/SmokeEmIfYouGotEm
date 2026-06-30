@@ -7,6 +7,8 @@ from raftsim.milestone16 import (
     Milestone16GeometryValidationReport,
     Milestone16GeoClawReferenceReport,
     Milestone16GeoClawRunRecord,
+    Milestone16RaftCouplingRecord,
+    Milestone16RaftCouplingReport,
 )
 
 
@@ -148,3 +150,40 @@ def test_milestone16_geometry_report_blocks_on_failed_case():
     assert report.passed is False
     assert payload["failed_count"] == 1
     assert payload["cases"][0]["case_id"] == "wet_dry_shoreline"
+
+
+def test_milestone16_raft_coupling_report_blocks_on_force_delta():
+    record = Milestone16RaftCouplingRecord(
+        gate_scenario_id="south_fork_cascading_low_runnable",
+        actual_scenario_id="american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+        suite="cascading",
+        flow_band="low_runnable",
+        solver_mode="reduced",
+        case_id="pool_entry",
+        expected_outcomes=("clear",),
+        reference_frame="outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+        candidate_frame="outputs/m16cpp/cg_low/reduced/cpp_solver/example/frames/frame_0008.csv",
+        reference_outcome="clear",
+        candidate_outcome="clear",
+        reference_passed=True,
+        candidate_passed=True,
+        feature_outcome_match=True,
+        force_envelope_outcome_match=True,
+        force_delta_weight_ratio=4.0,
+        torque_delta_inertia_ratio=0.1,
+        trajectory_position_delta_m=0.01,
+        trajectory_velocity_delta_mps=0.02,
+        reference_checks=({"name": "entry_depth", "passed": True, "value": 1.0, "threshold": 0.8},),
+        candidate_checks=({"name": "entry_depth", "passed": True, "value": 1.0, "threshold": 0.8},),
+        notes=("Force delta exceeds the weight-normalized threshold.",),
+    )
+    report = Milestone16RaftCouplingReport(
+        geoclaw_reference_report="reports/milestone16/geoclaw_reference_runs.json",
+        cpp_run_report="reports/milestone16/cpp_solver_runs.json",
+        records=(record,),
+    )
+
+    payload = report.to_json_dict()
+    assert report.passed is False
+    assert payload["failed_count"] == 1
+    assert payload["records"][0]["passed"] is False
