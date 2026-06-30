@@ -14,6 +14,10 @@ from .comparison import (
     compare_dual_solver_probes,
     evaluate_dual_solver_thresholds,
 )
+from .cascading import (
+    evaluate_cascading_handoff_conservation,
+    read_cascading_scenario_package,
+)
 from .dual_solver import CppSolverRunConfig, run_cpp_solver_scenario
 from .geoclaw_reference import (
     GEOCLAW_CANONICAL_FIXTURES,
@@ -37,6 +41,7 @@ from .validation_gate import CUSTOM_CPP_VALIDATION_SCENARIOS, CUSTOM_CPP_VALIDAT
 MILESTONE16_GEOCLAW_REFERENCE_REPORT_SCHEMA = "raftsim.milestone16.geoclaw_reference_runs.v0"
 MILESTONE16_CPP_RUN_REPORT_SCHEMA = "raftsim.milestone16.cpp_solver_runs.v0"
 MILESTONE16_COMPARISON_REPORT_SCHEMA = "raftsim.milestone16.geoclaw_cpp_comparisons.v0"
+MILESTONE16_GEOMETRY_VALIDATION_REPORT_SCHEMA = "raftsim.milestone16.geometry_validation.v0"
 MILESTONE16_CASE_DIRS = {
     "flat_pool": "c_flat",
     "uniform_channel": "c_uniform",
@@ -355,6 +360,82 @@ class Milestone16ComparisonReport:
         return output_path
 
 
+@dataclass(frozen=True, slots=True)
+class Milestone16GeometryCaseResult:
+    """One geometry-specific validation family."""
+
+    case_id: str
+    title: str
+    scenarios: tuple[str, ...]
+    solver_modes: tuple[str, ...]
+    passed: bool
+    evidence: tuple[dict[str, object], ...]
+    notes: tuple[str, ...] = ()
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["scenarios"] = list(self.scenarios)
+        data["solver_modes"] = list(self.solver_modes)
+        data["evidence"] = list(self.evidence)
+        data["notes"] = list(self.notes)
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone16GeometryValidationReport:
+    """Geometry-specific validation summary for Milestone 16."""
+
+    comparison_report: str
+    geoclaw_reference_report: str
+    cases: tuple[Milestone16GeometryCaseResult, ...] = field(default_factory=tuple)
+
+    @property
+    def passed(self) -> bool:
+        return bool(self.cases) and all(case.passed for case in self.cases)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE16_GEOMETRY_VALIDATION_REPORT_SCHEMA,
+            "passed": self.passed,
+            "comparison_report": self.comparison_report,
+            "geoclaw_reference_report": self.geoclaw_reference_report,
+            "case_count": len(self.cases),
+            "passed_count": sum(1 for case in self.cases if case.passed),
+            "failed_count": sum(1 for case in self.cases if not case.passed),
+            "cases": [case.to_json_dict() for case in self.cases],
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = [
+            "# Milestone 16 Geometry Validation",
+            "",
+            f"Schema: `{MILESTONE16_GEOMETRY_VALIDATION_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            "| Case | Status | Scenarios | Notes |",
+            "| --- | --- | --- | --- |",
+        ]
+        for case in self.cases:
+            lines.append(
+                "| "
+                f"{case.title} | "
+                f"{'PASS' if case.passed else 'FAIL'} | "
+                f"{', '.join(case.scenarios)} | "
+                f"{'; '.join(case.notes) if case.notes else 'none'} |"
+            )
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+
 def run_milestone16_geoclaw_reference_suite(
     output_root: str | Path,
     *,
@@ -441,6 +522,62 @@ def run_milestone16_geoclaw_reference_suite(
         },
         availability=availability.to_json_dict(),
         records=tuple(records),
+    )
+
+
+def run_milestone16_geometry_validation(
+    comparison_report: str | Path,
+    geoclaw_reference_report: str | Path,
+) -> Milestone16GeometryValidationReport:
+    """Build geometry-specific validation results from Milestone 16 artifacts."""
+
+    comparison_path = Path(comparison_report)
+    geoclaw_path = Path(geoclaw_reference_report)
+    comparison = _read_json(comparison_path)
+    geoclaw = _read_json(geoclaw_path)
+    comparison_records = list(comparison["records"])
+    cases = (
+        _geometry_case_from_thresholds(
+            "hydrostatic_sloping_balance",
+            "Hydrostatic And Sloping Balance",
+            ("flat_pool", "sloping_manning_channel"),
+            comparison_records,
+        ),
+        _geometry_case_from_thresholds(
+            "wet_dry_shoreline",
+            "Wet/Dry Shorelines",
+            ("wet_dry_shoreline",),
+            comparison_records,
+        ),
+        _geometry_case_from_thresholds(
+            "bed_step",
+            "Bed Steps",
+            ("bed_step",),
+            comparison_records,
+        ),
+        _geometry_case_from_thresholds(
+            "constriction",
+            "Constrictions",
+            ("constriction",),
+            comparison_records,
+        ),
+        _geometry_case_from_thresholds(
+            "drops_ledges_tailwater",
+            "Drops, Ledges, And Tailwater",
+            (
+                "drop_ledge",
+                "south_fork_cascading_low_runnable",
+                "south_fork_cascading_median_runnable",
+                "south_fork_cascading_high_runnable",
+            ),
+            comparison_records,
+        ),
+        _reach_drop_handoff_geometry_case(geoclaw),
+    )
+    return Milestone16GeometryValidationReport(
+        comparison_report=str(comparison_path),
+        geoclaw_reference_report=str(geoclaw_path),
+        cases=cases,
     )
 
 
@@ -558,6 +695,76 @@ def run_milestone16_cpp_solver_matrix(
         output_root=str(root),
         cpp_solver=str(executable),
         records=tuple(records),
+    )
+
+
+def _geometry_case_from_thresholds(
+    case_id: str,
+    title: str,
+    scenario_ids: tuple[str, ...],
+    comparison_records: list[dict[str, object]],
+) -> Milestone16GeometryCaseResult:
+    evidence = tuple(
+        {
+            "gate_scenario_id": record["gate_scenario_id"],
+            "solver_mode": record["solver_mode"],
+            "threshold_passed": record["threshold_passed"],
+            "failing_checks": record["failing_checks"],
+        }
+        for record in comparison_records
+        if record["gate_scenario_id"] in scenario_ids
+    )
+    passed = bool(evidence) and all(bool(item["threshold_passed"]) for item in evidence)
+    failing = sorted(
+        {
+            str(item["gate_scenario_id"])
+            for item in evidence
+            if not bool(item["threshold_passed"])
+        }
+    )
+    notes = ()
+    if failing:
+        notes = (f"Threshold failures remain in: {', '.join(failing)}.",)
+    return Milestone16GeometryCaseResult(
+        case_id=case_id,
+        title=title,
+        scenarios=scenario_ids,
+        solver_modes=tuple(sorted({str(item["solver_mode"]) for item in evidence})),
+        passed=passed,
+        evidence=evidence,
+        notes=notes,
+    )
+
+
+def _reach_drop_handoff_geometry_case(geoclaw_report: dict[str, object]) -> Milestone16GeometryCaseResult:
+    evidence: list[dict[str, object]] = []
+    notes: list[str] = []
+    for record in geoclaw_report["records"]:
+        if record["suite"] != "cascading":
+            continue
+        package = read_cascading_scenario_package(Path(str(record["export_dir"])) / "shared_cascading_package")
+        handoff = evaluate_cascading_handoff_conservation(package)
+        evidence.append(
+            {
+                "gate_scenario_id": record["gate_scenario_id"],
+                "passed": handoff.passed,
+                "check_count": len(handoff.checks),
+                "checks": [check.to_json_dict() for check in handoff.checks],
+                "geoclaw_reach_windows": record["reach_window_count"],
+                "geoclaw_drop_transition_windows": record["drop_transition_window_count"],
+            }
+        )
+        if not handoff.passed:
+            notes.append(f"Handoff conservation failed for {record['gate_scenario_id']}.")
+    passed = bool(evidence) and all(bool(item["passed"]) for item in evidence)
+    return Milestone16GeometryCaseResult(
+        case_id="stitched_reach_drop_handoffs",
+        title="Stitched Reach/Drop Boundary Handoffs",
+        scenarios=tuple(str(item["gate_scenario_id"]) for item in evidence),
+        solver_modes=("geoclaw", "package"),
+        passed=passed,
+        evidence=tuple(evidence),
+        notes=tuple(notes),
     )
 
 
