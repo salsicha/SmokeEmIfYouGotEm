@@ -3,6 +3,8 @@ from raftsim.milestone16 import (
     Milestone16ComparisonReport,
     Milestone16CppRunRecord,
     Milestone16CppRunReport,
+    Milestone16GeometryCaseResult,
+    Milestone16GeometryValidationReport,
     Milestone16GeoClawReferenceReport,
     Milestone16GeoClawRunRecord,
 )
@@ -124,3 +126,25 @@ def test_milestone16_comparison_report_tracks_threshold_failures():
     assert report.passed is False
     assert payload["threshold_failed_count"] == 1
     assert payload["records"][0]["compared"] is True
+
+
+def test_milestone16_geometry_report_blocks_on_failed_case():
+    case = Milestone16GeometryCaseResult(
+        case_id="wet_dry_shoreline",
+        title="Wet/Dry Shorelines",
+        scenarios=("wet_dry_shoreline",),
+        solver_modes=("finite_volume", "reduced"),
+        passed=False,
+        evidence=({"gate_scenario_id": "wet_dry_shoreline", "threshold_passed": False},),
+        notes=("Threshold failures remain in: wet_dry_shoreline.",),
+    )
+    report = Milestone16GeometryValidationReport(
+        comparison_report="reports/milestone16/geoclaw_cpp_comparisons.json",
+        geoclaw_reference_report="reports/milestone16/geoclaw_reference_runs.json",
+        cases=(case,),
+    )
+
+    payload = report.to_json_dict()
+    assert report.passed is False
+    assert payload["failed_count"] == 1
+    assert payload["cases"][0]["case_id"] == "wet_dry_shoreline"
