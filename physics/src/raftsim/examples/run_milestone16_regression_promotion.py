@@ -12,6 +12,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--comparison-report", type=Path, default=Path("reports/milestone16/geoclaw_cpp_comparisons.json"))
     parser.add_argument("--raft-report", type=Path, default=Path("reports/milestone16/raft_coupling_validation.json"))
+    parser.add_argument("--geometry-report", type=Path, default=None)
     parser.add_argument("--fixture-root", type=Path, default=Path("regression_fixtures/milestone16"))
     parser.add_argument("--registry", type=Path, default=None)
     parser.add_argument("--report-dir", type=Path, default=Path("reports/milestone16"))
@@ -20,6 +21,7 @@ def main(argv: list[str] | None = None) -> int:
     report = run_milestone16_regression_promotion(
         args.comparison_report,
         args.raft_report,
+        geometry_report=args.geometry_report,
         fixture_root=args.fixture_root,
         registry_path=args.registry,
     )

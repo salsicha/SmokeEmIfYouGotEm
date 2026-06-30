@@ -148,7 +148,7 @@ Each river-validation annotation should record its anchor location, source/prove
 
 ## Phase 6: Regression Fixtures And Reports
 
-- Milestone 16 promoted-regression evidence is tracked in `physics/reports/milestone16/regression_promotion_manifest.json`, `physics/reports/milestone16/regression_promotion_manifest.md`, and `physics/regression_fixtures/milestone16/registry.json`; 5 passing GeoClaw/C++ threshold runs were copied as fixtures and 11 passing raft-coupling cases were captured as artifact manifests.
+- Milestone 16 promoted-regression evidence is tracked in `physics/reports/milestone16/regression_promotion_manifest.json`, `physics/reports/milestone16/regression_promotion_manifest.md`, and `physics/regression_fixtures/milestone16/registry.json`; 6 passing GeoClaw/C++ threshold runs were copied as fixtures, 3 passing stitched reach/drop geometry checks were captured as artifact manifests, and 11 passing raft-coupling cases were captured as artifact manifests.
 - Promote passing GeoClaw/C++/raft comparison runs into committed regression fixtures or artifact manifests.
 - Generate one JSON report and one human-readable Markdown report for each scenario suite.
 - Keep a CI smoke subset that does not require external GeoClaw execution.
@@ -207,7 +207,7 @@ Re-run raft coupling after the relevant water-field and geometry failures improv
 
 The raft gate must compare force envelopes, impulse timing, trajectory deltas, yaw/roll/pitch proxies, surf/flush/clear/ground/pin/flip outcome classes, recovery timing, swimmer/ejection state when present, and reach/drop transition stability. Retuning may adjust sampling, force integration, damping, contact thresholds, crew center-of-gravity effects, and feature-forcing modifiers only when the water-field diagnostics remain inside threshold.
 
-Milestone 18 source reports now include raft-coupling refreshes after the uniform-channel, wet/dry, and bed-step finite-volume work. The first finite-volume uniform-channel refresh increased passing raft outcomes from 7 to 9 of 50. The wet/dry reduced pressure-gradient refresh increased passing raft outcomes to 11 of 50, adding reduced `eddy_recovery` for `eddy_line_shear` and reduced `shallow_shelf_pivot_release` for `shallow_shelf`. The scoped bed-step augmented-topography promotion preserves those 11 passing raft outcomes and raises promoted regression artifacts to 17. The raft gate and refreshed full Milestone 16 C++ validation gate remain blocked.
+Milestone 18 source reports now include raft-coupling refreshes after the uniform-channel, wet/dry, and bed-step finite-volume work. The first finite-volume uniform-channel refresh increased passing raft outcomes from 7 to 9 of 50. The wet/dry reduced pressure-gradient refresh increased passing raft outcomes to 11 of 50, adding reduced `eddy_recovery` for `eddy_line_shear` and reduced `shallow_shelf_pivot_release` for `shallow_shelf`. The scoped bed-step augmented-topography promotion preserves those 11 passing raft outcomes, and the stitched reach/drop handoff promotion preserves low, median, and high South Fork cascading seam diagnostics as geometry artifacts. Promoted source-report artifacts now total 20. The raft gate and refreshed full Milestone 16 C++ validation gate remain blocked.
 
 ### 4. Distinct Pin/Release Fixture
 
