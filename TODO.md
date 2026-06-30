@@ -260,7 +260,7 @@ This milestone replaces the current monolithic/mostly uniform 2.5D scenario pack
 - [x] Run GeoClaw reference cases over the same cascading package and normalize fixed-grid output per reach and for the stitched river window.
 - [x] Extend the custom C++ solver loader to consume the cascading package without changing scenario semantics.
 - [x] Tune C++ section-handoff, roughness, dissipation, wet/dry, and feature-forcing coefficients against GeoClaw cascading outputs.
-- [ ] Add raft validation cases for pool entry, drop entry, hydraulic-hole surf/flush, eddy recovery, boulder-garden impacts, and transition-boundary crossings.
+- [x] Add raft validation cases for pool entry, drop entry, hydraulic-hole surf/flush, eddy recovery, boulder-garden impacts, and transition-boundary crossings.
 - [ ] Export Unreal corridor metadata that preserves reach/drop IDs for streaming, debug overlays, audio, VFX, and designer review.
 
 ## Technical Notes To Revisit
