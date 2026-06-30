@@ -1291,8 +1291,8 @@ def run_milestone16_raft_coupling_validation(
         cpp_run_report=str(cpp_report_path),
         records=tuple(records),
         notes=(
-            "Pin/release remains represented by shallow-shelf pivot/release and high-flow boulder/pin proxies; "
-            "a distinct strainer or wrap fixture is still needed before production acceptance.",
+            "Distinct pin/release closure evidence is tracked separately in the Milestone 18 "
+            "pin_release_fixture report; this report only compares raft coupling over GeoClaw-derived and C++ water fields.",
         ),
     )
 
