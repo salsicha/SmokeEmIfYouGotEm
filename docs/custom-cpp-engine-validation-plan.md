@@ -38,6 +38,8 @@ Crew weight distribution is part of the validation surface. Seat occupancy, high
 
 The first feature-forcing contract is frozen as `raftsim.feature_forcing.v0` in `physics/schemas/feature_forcing.schema.json`, with low-default parameters in `physics/config/feature_forcing_defaults.json` and contract checks in `raftsim.feature_forcing`. The validator rejects manifests that enable forcing by default, exceed low default gains, omit flow-response curves, skip GeoClaw comparison requirements, merge physics/raft/visual controls, or allow forcing to hide mass, momentum, energy, wet/dry, or reach-handoff failures.
 
+The first crew weight-distribution telemetry implementation lives in `raftsim.raft_coupling2_5d`. It exposes version-ready seat/action primitives, bounded lean and high-side offsets, per-seat occupancy telemetry, crew and combined center-of-gravity offsets, roll/pitch moment proxies, side and longitudinal contact-load proxies, and pin/flip/release threshold multipliers. These values are deterministic inputs for the next rock, sticky-hole, lateral-hit, shallow-shelf, pin/release, and flip fixtures; they are not yet accepted capsize/contact outcomes by themselves.
+
 ## Analytic Fixture Decision
 
 Add a small manually encoded SWASHES-style analytic fixture set before more broad retuning. These fixtures should isolate solver fundamentals such as lake-at-rest balance, sloping-channel friction, wet/dry shoreline motion, bed steps, dam-break/bores, hydraulic jumps, and transcritical flow over a bump where practical.

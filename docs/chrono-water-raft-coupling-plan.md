@@ -31,7 +31,7 @@ Per water tick:
 
 1. Gather deterministic input intents: guide commands, paddle strokes, controller poses, crew actions, and scripted AI actions.
 2. Advance or sample the shallow-water field for the current tick.
-3. Build a read-only water-query snapshot for Chrono substeps.
+3. Build a read-only water-query snapshot and crew weight-distribution telemetry for Chrono substeps.
 4. For each Chrono substep:
    - Sample raft tube/floor patches against the water snapshot.
    - Apply buoyancy, drag, added-mass approximation, current shear, slope, paddle, and feature forces.
@@ -137,6 +137,7 @@ Add versioned schemas for:
 - `ChronoRaftBodyConfig`: mass, inertia, collision primitives, material presets, sample patch layout, and seat/camera anchors.
 - `ContactMaterialPreset`: rock elastic, bed inelastic, shallow shelf, strainer, and bank variants.
 - `PhysicsTickInput`: paddle commands, guide commands, controller poses, AI crew intents, and difficulty/assist modifiers.
+- `CrewWeightTelemetry`: per-seat occupancy, bounded lean/high-side/brace/recovery actions, center-of-gravity offsets, roll/pitch moment proxies, contact-load proxies, and pin/flip/release threshold multipliers.
 - `PhysicsTickOutput`: raft state, water sample summary, force breakdown, contact events, replay keyframe, and debug vectors.
 
 ## Validation Plan
