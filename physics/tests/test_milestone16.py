@@ -9,6 +9,8 @@ from raftsim.milestone16 import (
     Milestone16GeoClawRunRecord,
     Milestone16RaftCouplingRecord,
     Milestone16RaftCouplingReport,
+    Milestone16RuntimeProfileRecord,
+    Milestone16RuntimeProfileReport,
     run_milestone16_regression_promotion,
 )
 
@@ -252,3 +254,70 @@ def test_milestone16_regression_promotion_writes_fixtures_and_artifacts(tmp_path
         / "shallow_shelf_pivot_release"
         / "raft_coupling_case.json"
     ).exists()
+
+
+def test_milestone16_runtime_profile_report_blocks_on_budget_or_replay_failure():
+    passing_budget = {
+        "desktop": {"passed": True, "runtime_ms_per_tick": 0.2, "water_solver_budget_ms": 2.4},
+        "vr": {"passed": True, "runtime_ms_per_tick": 0.2, "water_solver_budget_ms": 1.6},
+        "handheld": {"passed": True, "runtime_ms_per_tick": 0.2, "water_solver_budget_ms": 2.8},
+    }
+    failing_budget = {
+        "desktop": {"passed": True, "runtime_ms_per_tick": 2.0, "water_solver_budget_ms": 2.4},
+        "vr": {"passed": False, "runtime_ms_per_tick": 2.0, "water_solver_budget_ms": 1.6},
+        "handheld": {"passed": True, "runtime_ms_per_tick": 2.0, "water_solver_budget_ms": 2.8},
+    }
+    records = (
+        Milestone16RuntimeProfileRecord(
+            artifact_id="geoclaw_cpp/flat_pool/reduced",
+            gate_scenario_id="flat_pool",
+            actual_scenario_id="flat_pool_seed_16",
+            solver_mode="reduced",
+            repetition=0,
+            scenario_package="regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/scenario",
+            output_dir="outputs/m16profile/geoclaw_cpp/flat_pool/reduced/rep_00",
+            manifest="outputs/m16profile/geoclaw_cpp/flat_pool/reduced/rep_00/cpp_solver/flat_pool_seed_16/manifest.json",
+            validation="outputs/m16profile/geoclaw_cpp/flat_pool/reduced/rep_00/cpp_solver/flat_pool_seed_16/validation.json",
+            runtime_seconds=0.1,
+            simulated_seconds=1.0,
+            step_count=500,
+            runtime_ms_per_tick=0.2,
+            validation_passed=True,
+            frame_hash="abc",
+            budget_results=passing_budget,
+        ),
+        Milestone16RuntimeProfileRecord(
+            artifact_id="geoclaw_cpp/flat_pool/finite_volume",
+            gate_scenario_id="flat_pool",
+            actual_scenario_id="flat_pool_seed_16",
+            solver_mode="finite_volume",
+            repetition=0,
+            scenario_package="regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/scenario",
+            output_dir="outputs/m16profile/geoclaw_cpp/flat_pool/finite_volume/rep_00",
+            manifest="outputs/m16profile/geoclaw_cpp/flat_pool/finite_volume/rep_00/cpp_solver/flat_pool_seed_16/manifest.json",
+            validation="outputs/m16profile/geoclaw_cpp/flat_pool/finite_volume/rep_00/cpp_solver/flat_pool_seed_16/validation.json",
+            runtime_seconds=1.0,
+            simulated_seconds=1.0,
+            step_count=500,
+            runtime_ms_per_tick=2.0,
+            validation_passed=True,
+            frame_hash="def",
+            budget_results=failing_budget,
+        ),
+    )
+    report = Milestone16RuntimeProfileReport(
+        registry_path="regression_fixtures/milestone16/registry.json",
+        cpp_solver="/tmp/raftsim-water-m16-build/raftsim_water_solver",
+        budget_config="config/runtime_budgets.json",
+        output_root="outputs/m16profile",
+        records=records,
+        deterministic_replay=(
+            {"artifact_id": "geoclaw_cpp/flat_pool/reduced", "passed": True, "hashes": ["abc", "abc"]},
+            {"artifact_id": "geoclaw_cpp/flat_pool/finite_volume", "passed": False, "hashes": ["def", "fed"]},
+        ),
+    )
+
+    payload = report.to_json_dict()
+    assert report.passed is False
+    assert payload["budget_failed_count"] == 1
+    assert payload["deterministic_replay"][1]["passed"] is False
