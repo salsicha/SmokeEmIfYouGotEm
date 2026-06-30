@@ -14,7 +14,7 @@ The old 2D river/raft path is retired. Future physics work starts with:
 - Real river course, elevation, imagery, gauge, season, and difficulty presets that become validated scenario packages.
 
 See [Physics Engine Plan](docs/physics-engine-plan.md) for the overall physics architecture.
-See [2.5D Dual-Solver Simulation Plan](docs/2.5d-simulation-plan.md) and [GeoClaw Reference Solver Transition Plan](docs/geoclaw-transition-plan.md) for the GeoClaw/C++ validation workflow.
+See [2.5D Dual-Solver Simulation Plan](docs/2.5d-simulation-plan.md), [GeoClaw Reference Solver Transition Plan](docs/geoclaw-transition-plan.md), and [Custom C++ Engine Full Validation Plan](docs/custom-cpp-engine-validation-plan.md) for the GeoClaw/C++ validation workflow and live-water acceptance gate.
 See [Real-World River Content And Seasonal Flow Plan](docs/real-world-river-content-plan.md) for geospatial extraction, rapid identification, seasonal flow research, adaptive parameters, and the future river/season/difficulty picker.
 See [Free And AI Asset Policy](docs/free-and-ai-asset-policy.md) for the current art/sound sourcing decision, [Art Asset Source Research](docs/art-asset-source-research.md) for visual asset source notes, and [Audio Asset Sourcing Plan](docs/audio-asset-sourcing-plan.md) for audio source research, 3D spatial audio, manifests, and release-gate vendor notes.
 See [Unreal Engine Full Game Plan](docs/unreal-engine-game-plan.md) for the full game roadmap after Python modeling and profiling are complete, including local AI voice commands, crew conversation systems, networked crews, and fully immersive 3D audio.
@@ -263,6 +263,20 @@ This milestone replaces the current monolithic/mostly uniform 2.5D scenario pack
 - [x] Add raft validation cases for pool entry, drop entry, hydraulic-hole surf/flush, eddy recovery, boulder-garden impacts, and transition-boundary crossings.
 - [x] Export Unreal corridor metadata that preserves reach/drop IDs for streaming, debug overlays, audio, VFX, and designer review.
 
+## Milestone 16: Full Custom C++ Engine Validation Gate
+
+This milestone turns the custom C++ shallow-water / height-field solver from a runtime candidate into an accepted Unreal live-water candidate by comparing full GeoClaw reference runs, C++ outputs, raft outcomes, and runtime budgets on the same solver-neutral packages.
+
+- [ ] Freeze the scenario matrix and threshold tiers for smoke, research-accepted, Unreal-prototype, and production-candidate validation.
+- [ ] Run full GeoClaw fixed-grid reference simulations for canonical, rafting, real-world low/median/high, and South Fork cascading suites; do not count initial-state-only fallback normalization as full validation.
+- [ ] Run C++ reduced and finite-volume solver modes on the same packages with versioned manifests for CFL, dry tolerance, roughness, feature forcing, bed-slope source scale, and cascading metadata.
+- [ ] Compare GeoClaw and C++ fields, probes, cross sections, mass/energy/Froude diagnostics, wet/dry masks, feature localization, and reach/drop window outputs against frozen thresholds.
+- [ ] Validate geometry-specific cases: hydrostatic/sloping-channel balance, wet/dry shorelines, bed steps, constrictions, drops/ledges, tailwater controls, and stitched reach/drop boundary handoffs.
+- [ ] Re-run raft coupling validation for pool entry, drop entry, hydraulic-hole surf/flush, eddy recovery, boulder impacts, shallow shelves, pins/releases, and transition-boundary crossings against GeoClaw-derived and C++ water fields.
+- [ ] Promote passing GeoClaw/C++/raft comparison runs into regression fixtures or artifact manifests with JSON and Markdown reports.
+- [ ] Profile validated C++ configurations against desktop, VR, and handheld runtime budgets and record deterministic replay results.
+- [ ] Regenerate the GeoClaw-to-Unreal readiness report and explicitly approve or block live custom water based on the full validation gate.
+
 ## Technical Notes To Revisit
 
 - [ ] Decide when to physically remove legacy 2D code, tests, examples, and videos from the repo.
@@ -292,7 +306,7 @@ This milestone replaces the current monolithic/mostly uniform 2.5D scenario pack
 - [x] Add deterministic procedural 2.5D rafting scenario generation from seed.
 - [x] Add a PyClaw availability check and first reference runner as a legacy baseline; GeoClaw availability/checks are now Milestone 14.
 - [x] Add a C++ solver directory and build skeleton.
-- [ ] Add the first GeoClaw-vs-C++ comparison report format.
+- [ ] Implement suite-level JSON and Markdown reports for the full C++ validation gate.
 - [ ] Draft the first candidate river inventory and source manifest.
 - [ ] Prototype course/elevation extraction for one river section.
 - [ ] Define the first rapid-review labels and seasonal flow/difficulty parameter mapping.

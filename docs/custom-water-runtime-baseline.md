@@ -6,6 +6,7 @@ The primary Unreal runtime water candidate is the custom C++ reduced shallow-wat
 
 - Keep `raftsim_water_solver` as the default runtime water path for Unreal preproduction.
 - Continue validating the custom solver against GeoClaw reference outputs.
+- Treat the solver as a runtime candidate until the full gate in [Custom C++ Engine Full Validation Plan](custom-cpp-engine-validation-plan.md) passes; smoke tests and fallback normalized exports are not production acceptance.
 - Feed Project Chrono from the custom water query/coupling layer for raft rigid-body, collision, and contact dynamics.
 - Keep Chrono::FSI optional and separate from required builds.
 - Preserve frozen scenario, telemetry, replay, and parameter schemas as the interchange contract between Python, C++, Chrono, and Unreal.
