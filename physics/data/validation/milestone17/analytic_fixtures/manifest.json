@@ -1,0 +1,403 @@
+{
+  "fixture_set_version": "manual_swashes_style_seed_v0",
+  "fixtures": [
+    {
+      "benchmark_family": "well-balanced shallow-water steady state",
+      "equations": [
+        "eta(x,y) = h(x,y) + z_b(x,y) = constant",
+        "u(x,y) = 0",
+        "v(x,y) = 0"
+      ],
+      "expected_behavior": {
+        "approximate_fields": [
+          "h"
+        ],
+        "exact_fields": [
+          "eta",
+          "u",
+          "v"
+        ],
+        "failure_modes": [
+          "spurious bed-slope velocity",
+          "free-surface drift",
+          "negative depth near bed peaks"
+        ],
+        "summary": "A well-balanced solver keeps the free surface flat and velocity near zero over a non-flat bed."
+      },
+      "fixture_id": "lake_at_rest_balance",
+      "metrics": [
+        {
+          "field": "eta",
+          "metric_id": "surface_linf",
+          "norm": "linf",
+          "threshold": 1e-09,
+          "units": "m"
+        },
+        {
+          "field": "speed",
+          "metric_id": "speed_linf",
+          "norm": "linf",
+          "threshold": 1e-09,
+          "units": "m/s"
+        }
+      ],
+      "outputs": {
+        "analytic_fields": "fixtures/lake_at_rest_balance/reference_fields.npz",
+        "analytic_reference": "fixtures/lake_at_rest_balance/reference.json",
+        "scenario_package": "fixtures/lake_at_rest_balance/scenario"
+      },
+      "provenance": {
+        "derived_by": "raftsim milestone 17",
+        "external_data_vendored": false,
+        "source_note": "Derived from eta = h + z_b constant with zero velocity.",
+        "source_type": "manual_analytic_derivation"
+      },
+      "scenario_kind": "lake_at_rest",
+      "title": "Lake At Rest Over Uneven Bed",
+      "tolerance_tier": "well_balanced"
+    },
+    {
+      "benchmark_family": "steady uniform flow with Manning friction",
+      "equations": [
+        "u = h^(2/3) sqrt(S) / n",
+        "q = h u",
+        "z_b(x) = -S x"
+      ],
+      "expected_behavior": {
+        "approximate_fields": [
+          "eta",
+          "hu"
+        ],
+        "exact_fields": [
+          "h",
+          "u",
+          "v"
+        ],
+        "failure_modes": [
+          "roughness/source imbalance",
+          "velocity drift",
+          "mass flux drift"
+        ],
+        "summary": "A friction/source-balanced solver preserves uniform velocity and normal depth down the slope."
+      },
+      "fixture_id": "sloping_channel_friction",
+      "metrics": [
+        {
+          "field": "u",
+          "metric_id": "normal_velocity_linf",
+          "norm": "linf",
+          "threshold": 0.025,
+          "units": "m/s"
+        },
+        {
+          "field": "hu",
+          "metric_id": "unit_discharge_linf",
+          "norm": "linf",
+          "threshold": 0.03,
+          "units": "m2/s"
+        }
+      ],
+      "outputs": {
+        "analytic_fields": "fixtures/sloping_channel_friction/reference_fields.npz",
+        "analytic_reference": "fixtures/sloping_channel_friction/reference.json",
+        "scenario_package": "fixtures/sloping_channel_friction/scenario"
+      },
+      "provenance": {
+        "derived_by": "raftsim milestone 17",
+        "external_data_vendored": false,
+        "source_note": "Derived from the wide-channel Manning relation u = h^(2/3) sqrt(S) / n.",
+        "source_type": "manual_analytic_derivation"
+      },
+      "scenario_kind": "sloping_channel",
+      "title": "Sloping Manning Channel",
+      "tolerance_tier": "analytic"
+    },
+    {
+      "benchmark_family": "wet/dry shoreline balance",
+      "equations": [
+        "z_b(y) = S(y - y_min)",
+        "h(y) = max(eta - z_b(y), 0)",
+        "wet iff h > dry_tolerance"
+      ],
+      "expected_behavior": {
+        "approximate_fields": [
+          "shoreline_position"
+        ],
+        "exact_fields": [
+          "h",
+          "eta",
+          "wet"
+        ],
+        "failure_modes": [
+          "dry-cell leakage",
+          "negative depth",
+          "shoreline drift"
+        ],
+        "summary": "The shoreline stays at the analytic eta/bed intersection without wetting dry high ground."
+      },
+      "fixture_id": "wet_dry_shoreline",
+      "metrics": [
+        {
+          "field": "wet",
+          "metric_id": "wet_mask_mismatch_count",
+          "norm": "count",
+          "threshold": 0.0,
+          "units": "cells"
+        },
+        {
+          "field": "shoreline_y",
+          "metric_id": "shoreline_position_abs",
+          "norm": "abs",
+          "threshold": 0.5,
+          "units": "m"
+        }
+      ],
+      "outputs": {
+        "analytic_fields": "fixtures/wet_dry_shoreline/reference_fields.npz",
+        "analytic_reference": "fixtures/wet_dry_shoreline/reference.json",
+        "scenario_package": "fixtures/wet_dry_shoreline/scenario"
+      },
+      "provenance": {
+        "derived_by": "raftsim milestone 17",
+        "external_data_vendored": false,
+        "source_note": "Derived from h = max(eta - z_b, 0) on a planar beach.",
+        "source_type": "manual_analytic_derivation"
+      },
+      "scenario_kind": "wet_dry_shoreline",
+      "title": "Planar Wet/Dry Shoreline",
+      "tolerance_tier": "well_balanced"
+    },
+    {
+      "benchmark_family": "steady flow over bed step",
+      "equations": [
+        "H = z_b + h + q^2/(2 g h^2)",
+        "q = h u",
+        "H_upstream = H_downstream"
+      ],
+      "expected_behavior": {
+        "approximate_fields": [
+          "eta"
+        ],
+        "exact_fields": [
+          "h",
+          "u",
+          "hu"
+        ],
+        "failure_modes": [
+          "wrong depth branch",
+          "spurious jump at step",
+          "unit discharge drift"
+        ],
+        "summary": "Subcritical flow shallows and accelerates over the raised bed without violating energy balance."
+      },
+      "fixture_id": "bed_step_subcritical",
+      "metrics": [
+        {
+          "field": "h",
+          "metric_id": "depth_linf",
+          "norm": "linf",
+          "threshold": 0.04,
+          "units": "m"
+        },
+        {
+          "field": "specific_energy",
+          "metric_id": "specific_energy_abs",
+          "norm": "abs",
+          "threshold": 0.05,
+          "units": "m"
+        }
+      ],
+      "outputs": {
+        "analytic_fields": "fixtures/bed_step_subcritical/reference_fields.npz",
+        "analytic_reference": "fixtures/bed_step_subcritical/reference.json",
+        "scenario_package": "fixtures/bed_step_subcritical/scenario"
+      },
+      "provenance": {
+        "derived_by": "raftsim milestone 17",
+        "external_data_vendored": false,
+        "source_note": "Derived from steady specific-energy balance for a rectangular channel.",
+        "source_type": "manual_analytic_derivation"
+      },
+      "scenario_kind": "bed_step",
+      "title": "Subcritical Bed Step",
+      "tolerance_tier": "analytic"
+    },
+    {
+      "benchmark_family": "shallow-water Riemann dam-break",
+      "equations": [
+        "h_L > h_R",
+        "u_L = u_R = 0",
+        "c = sqrt(g h)"
+      ],
+      "expected_behavior": {
+        "approximate_fields": [
+          "bore_speed",
+          "rarefaction_fan"
+        ],
+        "exact_fields": [
+          "initial_h",
+          "initial_u",
+          "initial_v"
+        ],
+        "failure_modes": [
+          "negative depth at discontinuity",
+          "wrong wave direction",
+          "excessive mass drift"
+        ],
+        "summary": "The initial state should evolve into a left rarefaction and right-moving bore without negative depth."
+      },
+      "fixture_id": "dam_break_bore",
+      "metrics": [
+        {
+          "field": "h",
+          "metric_id": "initial_depth_linf",
+          "norm": "linf",
+          "threshold": 1e-12,
+          "units": "m"
+        },
+        {
+          "field": "mass",
+          "metric_id": "mass_relative_drift",
+          "norm": "relative",
+          "threshold": 0.0005,
+          "units": "ratio"
+        }
+      ],
+      "outputs": {
+        "analytic_fields": "fixtures/dam_break_bore/reference_fields.npz",
+        "analytic_reference": "fixtures/dam_break_bore/reference.json",
+        "scenario_package": "fixtures/dam_break_bore/scenario"
+      },
+      "provenance": {
+        "derived_by": "raftsim milestone 17",
+        "external_data_vendored": false,
+        "source_note": "Hand-authored left/right still-water states from the classic shallow-water dam-break Riemann problem.",
+        "source_type": "manual_analytic_derivation"
+      },
+      "scenario_kind": "dam_break_bore",
+      "title": "Dam-Break Bore Riemann Initial State",
+      "tolerance_tier": "diagnostic"
+    },
+    {
+      "benchmark_family": "hydraulic jump conjugate depths",
+      "equations": [
+        "Fr1 = u1 / sqrt(g h1)",
+        "h2/h1 = 0.5(sqrt(1 + 8 Fr1^2) - 1)",
+        "q = h1 u1 = h2 u2"
+      ],
+      "expected_behavior": {
+        "approximate_fields": [
+          "jump_location",
+          "energy_loss"
+        ],
+        "exact_fields": [
+          "h1",
+          "h2",
+          "u1",
+          "u2"
+        ],
+        "failure_modes": [
+          "wrong conjugate depth",
+          "jump moves upstream/downstream too far",
+          "Froude class mismatch"
+        ],
+        "summary": "The solver should preserve a supercritical-to-subcritical jump with the expected conjugate depth ratio."
+      },
+      "fixture_id": "hydraulic_jump_conjugate_depth",
+      "metrics": [
+        {
+          "field": "h2_over_h1",
+          "metric_id": "conjugate_depth_ratio_abs",
+          "norm": "abs",
+          "threshold": 0.06,
+          "units": "ratio"
+        },
+        {
+          "field": "froude",
+          "metric_id": "froude_class_agreement",
+          "norm": "class",
+          "threshold": 0.0,
+          "units": "class_mismatch_count"
+        }
+      ],
+      "outputs": {
+        "analytic_fields": "fixtures/hydraulic_jump_conjugate_depth/reference_fields.npz",
+        "analytic_reference": "fixtures/hydraulic_jump_conjugate_depth/reference.json",
+        "scenario_package": "fixtures/hydraulic_jump_conjugate_depth/scenario"
+      },
+      "provenance": {
+        "derived_by": "raftsim milestone 17",
+        "external_data_vendored": false,
+        "source_note": "Derived from the rectangular-channel conjugate-depth relation h2/h1 = 0.5(sqrt(1 + 8 Fr1^2) - 1).",
+        "source_type": "manual_analytic_derivation"
+      },
+      "scenario_kind": "hydraulic_jump",
+      "title": "Hydraulic Jump Conjugate Depth",
+      "tolerance_tier": "analytic"
+    },
+    {
+      "benchmark_family": "steady transcritical bump flow",
+      "equations": [
+        "H = z_b + h + q^2/(2 g h^2)",
+        "h_c = (q^2/g)^(1/3)",
+        "Fr = q/(h sqrt(g h))"
+      ],
+      "expected_behavior": {
+        "approximate_fields": [
+          "critical_location"
+        ],
+        "exact_fields": [
+          "h",
+          "u",
+          "hu",
+          "froude"
+        ],
+        "failure_modes": [
+          "wrong energy branch",
+          "crest Froude far from one",
+          "unit discharge drift"
+        ],
+        "summary": "The flow approaches critical near the crest, with subcritical upstream and supercritical downstream branches."
+      },
+      "fixture_id": "transcritical_bump",
+      "metrics": [
+        {
+          "field": "hu",
+          "metric_id": "unit_discharge_linf",
+          "norm": "linf",
+          "threshold": 0.04,
+          "units": "m2/s"
+        },
+        {
+          "field": "froude",
+          "metric_id": "crest_froude_abs",
+          "norm": "abs",
+          "threshold": 0.2,
+          "units": "ratio"
+        }
+      ],
+      "outputs": {
+        "analytic_fields": "fixtures/transcritical_bump/reference_fields.npz",
+        "analytic_reference": "fixtures/transcritical_bump/reference.json",
+        "scenario_package": "fixtures/transcritical_bump/scenario"
+      },
+      "provenance": {
+        "derived_by": "raftsim milestone 17",
+        "external_data_vendored": false,
+        "source_note": "Derived from rectangular-channel specific energy with branch selection across a parabolic bed bump.",
+        "source_type": "manual_analytic_derivation"
+      },
+      "scenario_kind": "transcritical_bump",
+      "title": "Transcritical Flow Over Bump",
+      "tolerance_tier": "analytic"
+    }
+  ],
+  "generated_at": "2026-06-30T00:00:00Z",
+  "generator": "raftsim.analytic_fixtures",
+  "license_policy": {
+    "external_data_vendored": false,
+    "notes": "Fixtures are hand-authored from shallow-water benchmark equations and notes. No external SWASHES data or code is vendored."
+  },
+  "manifest_id": "milestone17_analytic_fixtures",
+  "schema_version": "raftsim.analytic_fixture_manifest.v0"
+}

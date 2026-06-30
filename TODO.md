@@ -282,7 +282,7 @@ This milestone turns the custom C++ shallow-water / height-field solver from a r
 This milestone turns the Milestone 16 blocker into sharper diagnostics by freezing text-first contracts and small trusted fixtures before broad C++ retuning, Unreal editor work, GPU work, or Chrono::FSI exploration.
 
 - [x] Add a versioned analytic fixture manifest with provenance notes, expected behavior, tolerance tier, source-equation references, and explicit no-vendored-external-data policy.
-- [ ] Manually encode a small SWASHES-style set for lake-at-rest balance, sloping-channel friction, wet/dry shoreline, bed step, dam-break/bore, hydraulic jump, and transcritical bump cases where practical.
+- [x] Manually encode a small SWASHES-style set for lake-at-rest balance, sloping-channel friction, wet/dry shoreline, bed step, dam-break/bore, hydraulic jump, and transcritical bump cases where practical.
 - [ ] Add C++ and GeoClaw/analytic comparison reports that fail retuning when small analytic fixtures regress.
 - [ ] Add versioned contracts and validators for feature forcing, reach-local grids, stitched validation outputs, river validation annotations, and canonical geospatial packages.
 
@@ -317,7 +317,7 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [x] Add a C++ solver directory and build skeleton.
 - [ ] Implement suite-level JSON and Markdown reports for the full C++ validation gate.
 - [x] Add a versioned analytic fixture manifest with provenance notes, expected behavior, tolerance tier, and source-equation references.
-- [ ] Manually encode a small SWASHES-style set for lake-at-rest balance, sloping-channel friction, wet/dry shoreline, bed step, dam-break/bore, hydraulic jump, and transcritical bump cases where practical.
+- [x] Manually encode a small SWASHES-style set for lake-at-rest balance, sloping-channel friction, wet/dry shoreline, bed step, dam-break/bore, hydraulic jump, and transcritical bump cases where practical.
 - [ ] Add C++ and GeoClaw/analytic comparison reports that fail retuning when these small fixtures regress.
 - [ ] Add a versioned authored feature-forcing schema for holes, boils, laterals, eddy lines, wave trains, shallow shelves, boulder push/damping, pins/releases, and flips.
 - [ ] Add low-default feature-forcing parameters and flow-response curves keyed by discharge, flow band, flow percentile, or boundary inflow.

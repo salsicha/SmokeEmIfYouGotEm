@@ -1,0 +1,21 @@
+{
+  "diagnostics": {
+    "crest_froude": 1.1478805557553893,
+    "downstream_froude": 2.0547669739776637,
+    "upstream_froude": 0.4267547303888397
+  },
+  "field_files": {
+    "reference_fields": "reference_fields.npz"
+  },
+  "fixture_id": "transcritical_bump",
+  "fixture_set_version": "manual_swashes_style_seed_v0",
+  "parameters": {
+    "bump_height": 0.18,
+    "bump_width": 8.0,
+    "critical_depth": 0.43545037661175845,
+    "total_head": 0.8381755649176376,
+    "unit_discharge": 0.9
+  },
+  "schema_version": "raftsim.analytic_reference.v0",
+  "summary": "Specific energy selects a subcritical upstream branch and supercritical downstream branch over the bump."
+}

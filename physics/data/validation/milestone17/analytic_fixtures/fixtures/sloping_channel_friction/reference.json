@@ -1,0 +1,20 @@
+{
+  "diagnostics": {
+    "bed_drop": 0.1575,
+    "velocity_linf": 1.5222889096665868
+  },
+  "field_files": {
+    "reference_fields": "reference_fields.npz"
+  },
+  "fixture_id": "sloping_channel_friction",
+  "fixture_set_version": "manual_swashes_style_seed_v0",
+  "parameters": {
+    "manning_n": 0.035,
+    "normal_depth": 1.1,
+    "normal_velocity": 1.5222889096665868,
+    "slope": 0.0025,
+    "unit_discharge": 1.6745178006332457
+  },
+  "schema_version": "raftsim.analytic_reference.v0",
+  "summary": "Wide-channel Manning velocity is constant for a uniform depth and bed slope."
+}

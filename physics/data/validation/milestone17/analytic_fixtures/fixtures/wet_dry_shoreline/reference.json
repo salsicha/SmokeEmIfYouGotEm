@@ -1,0 +1,18 @@
+{
+  "diagnostics": {
+    "dry_cell_count": 896,
+    "wet_cell_count": 640
+  },
+  "field_files": {
+    "reference_fields": "reference_fields.npz"
+  },
+  "fixture_id": "wet_dry_shoreline",
+  "fixture_set_version": "manual_swashes_style_seed_v0",
+  "parameters": {
+    "beach_slope": 0.08,
+    "eta": 0.75,
+    "shoreline_y": -2.125
+  },
+  "schema_version": "raftsim.analytic_reference.v0",
+  "summary": "Cells with z_b below eta are wet; cells above eta are dry."
+}
