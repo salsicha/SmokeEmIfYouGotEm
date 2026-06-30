@@ -1,0 +1,19 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 11.5,
+        "y": 0.0
+      },
+      "kind": "shallow",
+      "length": 23.0,
+      "metadata": {
+        "fixture_role": "wet_dry_transition"
+      },
+      "radius": 2.2,
+      "strength": 1.0,
+      "width": 4.4
+    }
+  ]
+}

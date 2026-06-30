@@ -19,7 +19,7 @@ Current packaged Milestone 16 GeoClaw/C++ gate artifacts from the last full-gate
 - `regression_promotion_summary.json`: 11 passing artifacts were promoted as regression fixtures or manifests in the last packaged readiness snapshot.
 - `geoclaw_to_unreal_readiness_report.json` and `.md`: final Milestone 16 decision; live custom water is blocked.
 
-Milestone 18 source reports are now ahead of that packaged readiness snapshot: `physics/reports/milestone16/raft_coupling_validation.json` has 9 of 50 raft-coupling comparisons passing, and `physics/reports/milestone16/regression_promotion_manifest.json` has 13 promoted artifacts. Keep the packaged readiness files unchanged until the explicit full-gate regeneration step.
+Milestone 18 source reports are now ahead of that packaged readiness snapshot: `physics/reports/milestone16/geoclaw_cpp_comparisons.json` has 5 of 40 GeoClaw/C++ threshold comparisons passing, `physics/reports/milestone16/raft_coupling_validation.json` has 11 of 50 raft-coupling comparisons passing, and `physics/reports/milestone16/regression_promotion_manifest.json` has 16 promoted artifacts. Keep the packaged readiness files unchanged until the explicit full-gate regeneration step.
 
 Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 

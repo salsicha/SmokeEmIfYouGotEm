@@ -1,11 +1,11 @@
 {
   "cpp": {
-    "energy_final": 2069.6738793011964,
+    "energy_final": 2072.1038870412094,
     "energy_initial": 2072.6892,
-    "energy_relative_change": -0.0014547867083996035,
+    "energy_relative_change": -0.00028239301810921885,
     "frame_count": 9,
-    "froude_max": 0.44100571351840767,
-    "froude_mean_wet": 0.43356178864830713,
+    "froude_max": 0.4633931624207173,
+    "froude_mean_wet": 0.4539565780230111,
     "hole_retention": {
       "centroid_x": null,
       "centroid_y": null,
@@ -13,33 +13,33 @@
       "retained_area": 0.0
     },
     "hydraulic_jump": {
-      "value": 0.018203030605126402,
-      "x": 0.0,
+      "value": 0.0014962266881226594,
+      "x": 12.0,
       "y": -5.5
     },
-    "mass_final": 355.08502292567846,
+    "mass_final": 352.41834667953475,
     "mass_initial": 360.0,
-    "mass_relative_drift": 0.013652714095337614,
+    "mass_relative_drift": 0.021060148112403473,
     "solver": "cpp",
     "wave_crest": {
-      "value": 1.25,
+      "value": 1.2077596193643096,
       "x": 0.0,
       "y": -5.5
     },
     "wave_trough": {
-      "value": 0.9655789211382106,
+      "value": 0.9643795811531548,
       "x": 23.0,
       "y": -5.5
     }
   },
   "delta": {
-    "energy_relative_change_delta": 0.04227131122646632,
-    "froude_max_delta": -0.019835740079308162,
-    "froude_mean_wet_delta": -0.0003144615975715914,
+    "energy_relative_change_delta": 0.0434437049167567,
+    "froude_max_delta": 0.002551708823001486,
+    "froude_mean_wet_delta": 0.020080327777132367,
     "hole_centroid_distance": null,
     "hole_retained_area_delta": 0.0,
-    "hydraulic_jump_distance": 21.0,
-    "mass_relative_drift_delta": -0.01685871680396455,
+    "hydraulic_jump_distance": 9.0,
+    "mass_relative_drift_delta": -0.00945128278689869,
     "wave_crest_distance": 0.0,
     "wave_trough_distance": 11.0
   },
