@@ -1,0 +1,1224 @@
+{
+  "difficulty_presets": [
+    {
+      "crew_timing_window": "wide",
+      "difficulty": "beginner",
+      "expected_outcome_bias": [
+        "flush",
+        "recover",
+        "guided_avoidance"
+      ],
+      "feature_gain_scale": 0.72,
+      "gameplay_intent": "Training-oriented lines with clearer recovery, lower flip likelihood, and forgiving raft response.",
+      "review_focus": [
+        "recovery_pools",
+        "clear_tongues",
+        "visible_shallow_hazards",
+        "access_and_portage_context"
+      ]
+    },
+    {
+      "crew_timing_window": "normal",
+      "difficulty": "intermediate",
+      "expected_outcome_bias": [
+        "clean_line",
+        "surf",
+        "flush",
+        "brief_pin"
+      ],
+      "feature_gain_scale": 1.0,
+      "gameplay_intent": "Default commercial-style run with useful holes, waves, laterals, eddies, and recoverable mistakes.",
+      "review_focus": [
+        "wave_trains",
+        "sticky_holes_at_reviewed_flows",
+        "eddy_line_choices",
+        "boulder_avoidance"
+      ]
+    },
+    {
+      "crew_timing_window": "tight",
+      "difficulty": "advanced",
+      "expected_outcome_bias": [
+        "surf",
+        "pin",
+        "release",
+        "flip_if_mishandled"
+      ],
+      "feature_gain_scale": 1.18,
+      "gameplay_intent": "Stronger hydraulics and consequences that require line choice, bracing, and high-side timing.",
+      "review_focus": [
+        "lateral_hits",
+        "keeper_holes",
+        "pin_release_windows",
+        "crew_weight_distribution"
+      ]
+    },
+    {
+      "crew_timing_window": "very_tight",
+      "difficulty": "expert",
+      "expected_outcome_bias": [
+        "pin",
+        "release",
+        "flip",
+        "swimmer_recovery"
+      ],
+      "feature_gain_scale": 1.35,
+      "gameplay_intent": "High-consequence tuning where poor angle, missed brace, or late high-side can produce pins or flips.",
+      "review_focus": [
+        "high_consequence_holes",
+        "rock_push_and_damping",
+        "flip_thresholds",
+        "rescue_or_recovery_windows"
+      ]
+    }
+  ],
+  "flow_bands": [
+    {
+      "confidence": 0.3,
+      "discharge_cfs": 900.0,
+      "discharge_m3s": 25.4851619328,
+      "flow_band": "low_runnable",
+      "notes": "Lower training-oriented flow; expect exposed rocks, shallows, and slower recovery from mistakes.",
+      "percentile_range": [
+        0.1,
+        0.35
+      ],
+      "runnable": true,
+      "season": "late_summer_low_water",
+      "stage_ft": null
+    },
+    {
+      "confidence": 0.35,
+      "discharge_cfs": 1600.0,
+      "discharge_m3s": 45.3069545472,
+      "flow_band": "median_runnable",
+      "notes": "Default validation band for intermediate commercial-style runs.",
+      "percentile_range": [
+        0.35,
+        0.7
+      ],
+      "runnable": true,
+      "season": "summer_commercial",
+      "stage_ft": null
+    },
+    {
+      "confidence": 0.25,
+      "discharge_cfs": 3000.0,
+      "discharge_m3s": 84.950539776,
+      "flow_band": "high_runnable",
+      "notes": "Higher consequence preset with stronger holes, wave trains, eddy-line shear, and faster raft response.",
+      "percentile_range": [
+        0.7,
+        0.9
+      ],
+      "runnable": true,
+      "season": "spring_runoff_or_release",
+      "stage_ft": null
+    }
+  ],
+  "label_catalog": [
+    {
+      "category": "water_state",
+      "description": "Recovery or staging pool with low gradient and lower velocity.",
+      "label": "pool",
+      "requires_human_review": true,
+      "solver_tags": [
+        "pool",
+        "recovery"
+      ]
+    },
+    {
+      "category": "water_state",
+      "description": "Shallow rough water with small waves and moderate roughness.",
+      "label": "riffle",
+      "requires_human_review": true,
+      "solver_tags": [
+        "shallow",
+        "roughness"
+      ]
+    },
+    {
+      "category": "hydraulic",
+      "description": "Series of standing waves aligned with the main tongue.",
+      "label": "wave_train",
+      "requires_human_review": true,
+      "solver_tags": [
+        "wave_train",
+        "aeration"
+      ]
+    },
+    {
+      "category": "hydraulic",
+      "description": "Recirculating hydraulic or keeper-like feature needing raft interaction tuning.",
+      "label": "hole",
+      "requires_human_review": true,
+      "solver_tags": [
+        "hole",
+        "retention"
+      ]
+    },
+    {
+      "category": "bedform",
+      "description": "Abrupt bed drop or shelf that can form a hydraulic or lateral wave.",
+      "label": "ledge",
+      "requires_human_review": true,
+      "solver_tags": [
+        "ledge",
+        "bed_step"
+      ]
+    },
+    {
+      "category": "hydraulic",
+      "description": "Sideways wave or current crossing the main current.",
+      "label": "lateral",
+      "requires_human_review": true,
+      "solver_tags": [
+        "lateral",
+        "cross_current"
+      ]
+    },
+    {
+      "category": "current",
+      "description": "Circulating slack/current reversal area useful for recovery or route choice.",
+      "label": "eddy",
+      "requires_human_review": true,
+      "solver_tags": [
+        "eddy",
+        "recovery"
+      ]
+    },
+    {
+      "category": "current",
+      "description": "High shear boundary between main current and eddy circulation.",
+      "label": "eddy_line",
+      "requires_human_review": true,
+      "solver_tags": [
+        "eddy_line",
+        "shear"
+      ]
+    },
+    {
+      "category": "hazard",
+      "description": "Tree, debris, sieve, or brush hazard that should be avoided.",
+      "label": "strainer",
+      "requires_human_review": true,
+      "solver_tags": [
+        "strainer",
+        "hazard"
+      ]
+    },
+    {
+      "category": "hazard",
+      "description": "Feature or reach that should support scout/portage gameplay and safety warnings.",
+      "label": "portage",
+      "requires_human_review": true,
+      "solver_tags": [
+        "portage",
+        "hazard"
+      ]
+    },
+    {
+      "category": "logistics",
+      "description": "Put-in, take-out, trail, road, or scout access.",
+      "label": "access_point",
+      "requires_human_review": false,
+      "solver_tags": [
+        "access",
+        "logistics"
+      ]
+    },
+    {
+      "category": "bedform",
+      "description": "Cluster of exposed or submerged rocks that drives roughness and collision hazards.",
+      "label": "boulder_garden",
+      "requires_human_review": true,
+      "solver_tags": [
+        "rock",
+        "roughness"
+      ]
+    },
+    {
+      "category": "geometry",
+      "description": "Narrowed channel that accelerates flow and can produce stronger waves or holes.",
+      "label": "constriction",
+      "requires_human_review": true,
+      "solver_tags": [
+        "constriction",
+        "velocity"
+      ]
+    }
+  ],
+  "label_flow_responses": [
+    {
+      "category": "water_state",
+      "expected_raft_outcomes": [
+        "recover",
+        "regroup",
+        "set_safety"
+      ],
+      "flow_responses": [
+        {
+          "activation_scale": 1.05,
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Low-flow review should emphasize exposed geometry, slower recovery, and shallow hazards.",
+          "flow_band": "low_runnable",
+          "review_priority": "medium",
+          "season": "late_summer_low_water"
+        },
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Median-flow review is the default tuning baseline.",
+          "flow_band": "median_runnable",
+          "review_priority": "medium",
+          "season": "summer_commercial"
+        },
+        {
+          "activation_scale": 0.78,
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "High-flow review should emphasize stronger momentum, faster decisions, and washed-out or covered features.",
+          "flow_band": "high_runnable",
+          "review_priority": "medium",
+          "season": "spring_runoff_or_release"
+        }
+      ],
+      "label": "pool",
+      "requires_human_review": true,
+      "solver_tags": [
+        "pool",
+        "recovery"
+      ],
+      "tuning_parameters": [
+        "damping_scale",
+        "outflow_stage_bias_m"
+      ]
+    },
+    {
+      "category": "water_state",
+      "expected_raft_outcomes": [
+        "clean_line",
+        "shallow_scrape"
+      ],
+      "flow_responses": [
+        {
+          "activation_scale": 1.15,
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Low-flow review should emphasize exposed geometry, slower recovery, and shallow hazards.",
+          "flow_band": "low_runnable",
+          "review_priority": "medium",
+          "season": "late_summer_low_water"
+        },
+        {
+          "activation_scale": 0.95,
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Median-flow review is the default tuning baseline.",
+          "flow_band": "median_runnable",
+          "review_priority": "medium",
+          "season": "summer_commercial"
+        },
+        {
+          "activation_scale": 0.7,
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "High-flow review should emphasize stronger momentum, faster decisions, and washed-out or covered features.",
+          "flow_band": "high_runnable",
+          "review_priority": "medium",
+          "season": "spring_runoff_or_release"
+        }
+      ],
+      "label": "riffle",
+      "requires_human_review": true,
+      "solver_tags": [
+        "shallow",
+        "roughness"
+      ],
+      "tuning_parameters": [
+        "roughness_manning_n",
+        "shallow_hazard_threshold_m"
+      ]
+    },
+    {
+      "category": "hydraulic",
+      "expected_raft_outcomes": [
+        "clean_line",
+        "splash",
+        "brief_surf",
+        "flip_if_sideways"
+      ],
+      "flow_responses": [
+        {
+          "activation_scale": 0.58,
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Small waves or riffles; keep amplitude modest.",
+          "flow_band": "low_runnable",
+          "review_priority": "medium",
+          "season": "late_summer_low_water"
+        },
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Default standing-wave spacing and raft timing review band.",
+          "flow_band": "median_runnable",
+          "review_priority": "medium",
+          "season": "summer_commercial"
+        },
+        {
+          "activation_scale": 1.35,
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "Larger wave train with stronger momentum, splash, aeration, and flip consequences.",
+          "flow_band": "high_runnable",
+          "review_priority": "high",
+          "season": "spring_runoff_or_release"
+        }
+      ],
+      "label": "wave_train",
+      "requires_human_review": true,
+      "solver_tags": [
+        "wave_train",
+        "aeration"
+      ],
+      "tuning_parameters": [
+        "wave_train_strength",
+        "aeration_turbulence_scale"
+      ]
+    },
+    {
+      "category": "hydraulic",
+      "expected_raft_outcomes": [
+        "surf",
+        "flush",
+        "pin",
+        "release",
+        "flip_if_mishandled"
+      ],
+      "flow_responses": [
+        {
+          "activation_scale": 0.35,
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Usually a shallow drop or rough tongue; keep retention low and verify it is not a fake keeper.",
+          "flow_band": "low_runnable",
+          "review_priority": "medium",
+          "season": "late_summer_low_water"
+        },
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Primary sticky-hole review band; tune surf/flush/pin/release outcomes against guide and footage evidence.",
+          "flow_band": "median_runnable",
+          "review_priority": "medium",
+          "season": "summer_commercial"
+        },
+        {
+          "activation_scale": 0.65,
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "May become aerated or wash out; reduce retention unless reviewed evidence shows a keeper at this flow.",
+          "flow_band": "high_runnable",
+          "review_priority": "medium",
+          "season": "spring_runoff_or_release"
+        }
+      ],
+      "label": "hole",
+      "requires_human_review": true,
+      "solver_tags": [
+        "hole",
+        "retention"
+      ],
+      "tuning_parameters": [
+        "hole_retention_strength",
+        "boil_strength",
+        "hazard_activation_scale"
+      ]
+    },
+    {
+      "category": "bedform",
+      "expected_raft_outcomes": [
+        "boof_or_drop",
+        "lateral_hit",
+        "hole_or_wave_train"
+      ],
+      "flow_responses": [
+        {
+          "activation_scale": 0.72,
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Low-flow review should emphasize exposed geometry, slower recovery, and shallow hazards.",
+          "flow_band": "low_runnable",
+          "review_priority": "medium",
+          "season": "late_summer_low_water"
+        },
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Median-flow review is the default tuning baseline.",
+          "flow_band": "median_runnable",
+          "review_priority": "medium",
+          "season": "summer_commercial"
+        },
+        {
+          "activation_scale": 1.1,
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "High-flow review should emphasize stronger momentum, faster decisions, and washed-out or covered features.",
+          "flow_band": "high_runnable",
+          "review_priority": "medium",
+          "season": "spring_runoff_or_release"
+        }
+      ],
+      "label": "ledge",
+      "requires_human_review": true,
+      "solver_tags": [
+        "ledge",
+        "bed_step"
+      ],
+      "tuning_parameters": [
+        "hazard_activation_scale",
+        "wave_train_strength",
+        "boil_strength"
+      ]
+    },
+    {
+      "category": "hydraulic",
+      "expected_raft_outcomes": [
+        "angle_correction",
+        "brace",
+        "flip_if_mishandled"
+      ],
+      "flow_responses": [
+        {
+          "activation_scale": 0.55,
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Often weak or rock-controlled; verify it is not just bank roughness.",
+          "flow_band": "low_runnable",
+          "review_priority": "medium",
+          "season": "late_summer_low_water"
+        },
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Default cross-current hit and recovery review band.",
+          "flow_band": "median_runnable",
+          "review_priority": "medium",
+          "season": "summer_commercial"
+        },
+        {
+          "activation_scale": 1.3,
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "Strong lateral push; tune angle, brace timing, and flip-risk escalation.",
+          "flow_band": "high_runnable",
+          "review_priority": "high",
+          "season": "spring_runoff_or_release"
+        }
+      ],
+      "label": "lateral",
+      "requires_human_review": true,
+      "solver_tags": [
+        "lateral",
+        "cross_current"
+      ],
+      "tuning_parameters": [
+        "eddy_line_shear",
+        "downstream_momentum_scale",
+        "hazard_activation_scale"
+      ]
+    },
+    {
+      "category": "current",
+      "expected_raft_outcomes": [
+        "catch_eddy",
+        "recover",
+        "missed_eddy"
+      ],
+      "flow_responses": [
+        {
+          "activation_scale": 1.05,
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Low-flow review should emphasize exposed geometry, slower recovery, and shallow hazards.",
+          "flow_band": "low_runnable",
+          "review_priority": "medium",
+          "season": "late_summer_low_water"
+        },
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Median-flow review is the default tuning baseline.",
+          "flow_band": "median_runnable",
+          "review_priority": "medium",
+          "season": "summer_commercial"
+        },
+        {
+          "activation_scale": 0.82,
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "High-flow review should emphasize stronger momentum, faster decisions, and washed-out or covered features.",
+          "flow_band": "high_runnable",
+          "review_priority": "medium",
+          "season": "spring_runoff_or_release"
+        }
+      ],
+      "label": "eddy",
+      "requires_human_review": true,
+      "solver_tags": [
+        "eddy",
+        "recovery"
+      ],
+      "tuning_parameters": [
+        "damping_scale",
+        "eddy_line_shear"
+      ]
+    },
+    {
+      "category": "current",
+      "expected_raft_outcomes": [
+        "peel_out",
+        "ferry",
+        "spin_or_flip_if_mishandled"
+      ],
+      "flow_responses": [
+        {
+          "activation_scale": 0.7,
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Lower shear, useful training target.",
+          "flow_band": "low_runnable",
+          "review_priority": "medium",
+          "season": "late_summer_low_water"
+        },
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Default ferry, peel-out, and recovery review band.",
+          "flow_band": "median_runnable",
+          "review_priority": "medium",
+          "season": "summer_commercial"
+        },
+        {
+          "activation_scale": 1.25,
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "Sharper shear with stronger catch/flip consequences.",
+          "flow_band": "high_runnable",
+          "review_priority": "high",
+          "season": "spring_runoff_or_release"
+        }
+      ],
+      "label": "eddy_line",
+      "requires_human_review": true,
+      "solver_tags": [
+        "eddy_line",
+        "shear"
+      ],
+      "tuning_parameters": [
+        "eddy_line_shear",
+        "damping_scale",
+        "raft_drag_coefficient_scale"
+      ]
+    },
+    {
+      "category": "hazard",
+      "expected_raft_outcomes": [
+        "avoid",
+        "portage",
+        "failed_line_hazard"
+      ],
+      "flow_responses": [
+        {
+          "activation_scale": 1.15,
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Low-flow review should emphasize exposed geometry, slower recovery, and shallow hazards.",
+          "flow_band": "low_runnable",
+          "review_priority": "high",
+          "season": "late_summer_low_water"
+        },
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Median-flow review is the default tuning baseline.",
+          "flow_band": "median_runnable",
+          "review_priority": "high",
+          "season": "summer_commercial"
+        },
+        {
+          "activation_scale": 1.3,
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "High-flow review should emphasize stronger momentum, faster decisions, and washed-out or covered features.",
+          "flow_band": "high_runnable",
+          "review_priority": "high",
+          "season": "spring_runoff_or_release"
+        }
+      ],
+      "label": "strainer",
+      "requires_human_review": true,
+      "solver_tags": [
+        "strainer",
+        "hazard"
+      ],
+      "tuning_parameters": [
+        "hazard_activation_scale",
+        "raft_drag_coefficient_scale"
+      ]
+    },
+    {
+      "category": "hazard",
+      "expected_raft_outcomes": [
+        "scout",
+        "avoid",
+        "walk_around"
+      ],
+      "flow_responses": [
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Low-flow review should emphasize exposed geometry, slower recovery, and shallow hazards.",
+          "flow_band": "low_runnable",
+          "review_priority": "high",
+          "season": "late_summer_low_water"
+        },
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Median-flow review is the default tuning baseline.",
+          "flow_band": "median_runnable",
+          "review_priority": "high",
+          "season": "summer_commercial"
+        },
+        {
+          "activation_scale": 1.25,
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "High-flow review should emphasize stronger momentum, faster decisions, and washed-out or covered features.",
+          "flow_band": "high_runnable",
+          "review_priority": "high",
+          "season": "spring_runoff_or_release"
+        }
+      ],
+      "label": "portage",
+      "requires_human_review": true,
+      "solver_tags": [
+        "portage",
+        "hazard"
+      ],
+      "tuning_parameters": [
+        "hazard_activation_scale"
+      ]
+    },
+    {
+      "category": "logistics",
+      "expected_raft_outcomes": [
+        "put_in",
+        "take_out",
+        "scout"
+      ],
+      "flow_responses": [
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Low-flow review should emphasize exposed geometry, slower recovery, and shallow hazards.",
+          "flow_band": "low_runnable",
+          "review_priority": "medium",
+          "season": "late_summer_low_water"
+        },
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Median-flow review is the default tuning baseline.",
+          "flow_band": "median_runnable",
+          "review_priority": "medium",
+          "season": "summer_commercial"
+        },
+        {
+          "activation_scale": 0.9,
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "High-flow review should emphasize stronger momentum, faster decisions, and washed-out or covered features.",
+          "flow_band": "high_runnable",
+          "review_priority": "medium",
+          "season": "spring_runoff_or_release"
+        }
+      ],
+      "label": "access_point",
+      "requires_human_review": false,
+      "solver_tags": [
+        "access",
+        "logistics"
+      ],
+      "tuning_parameters": [
+        "confidence_score"
+      ]
+    },
+    {
+      "category": "bedform",
+      "expected_raft_outcomes": [
+        "clean_line",
+        "rock_bump",
+        "pin",
+        "release",
+        "crew_overboard"
+      ],
+      "flow_responses": [
+        {
+          "activation_scale": 1.25,
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Rocks expose and pin risk rises; tune rock push, damping, shallow shelves, and crew high-side timing.",
+          "flow_band": "low_runnable",
+          "review_priority": "high",
+          "season": "late_summer_low_water"
+        },
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Default line-choice and collision review band.",
+          "flow_band": "median_runnable",
+          "review_priority": "medium",
+          "season": "summer_commercial"
+        },
+        {
+          "activation_scale": 0.72,
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "More rocks cover over; emphasize powerful laterals, hidden impacts, and faster recovery windows.",
+          "flow_band": "high_runnable",
+          "review_priority": "medium",
+          "season": "spring_runoff_or_release"
+        }
+      ],
+      "label": "boulder_garden",
+      "requires_human_review": true,
+      "solver_tags": [
+        "rock",
+        "roughness"
+      ],
+      "tuning_parameters": [
+        "shallow_hazard_threshold_m",
+        "hazard_activation_scale",
+        "damping_scale"
+      ]
+    },
+    {
+      "category": "geometry",
+      "expected_raft_outcomes": [
+        "accelerate",
+        "wave_train",
+        "lateral_hit",
+        "hole_if_controlled"
+      ],
+      "flow_responses": [
+        {
+          "activation_scale": 0.78,
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Low-flow review should emphasize exposed geometry, slower recovery, and shallow hazards.",
+          "flow_band": "low_runnable",
+          "review_priority": "medium",
+          "season": "late_summer_low_water"
+        },
+        {
+          "activation_scale": 1.0,
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Median-flow review is the default tuning baseline.",
+          "flow_band": "median_runnable",
+          "review_priority": "medium",
+          "season": "summer_commercial"
+        },
+        {
+          "activation_scale": 1.22,
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "High-flow review should emphasize stronger momentum, faster decisions, and washed-out or covered features.",
+          "flow_band": "high_runnable",
+          "review_priority": "high",
+          "season": "spring_runoff_or_release"
+        }
+      ],
+      "label": "constriction",
+      "requires_human_review": true,
+      "solver_tags": [
+        "constriction",
+        "velocity"
+      ],
+      "tuning_parameters": [
+        "downstream_momentum_scale",
+        "wave_train_strength",
+        "eddy_line_shear"
+      ]
+    }
+  ],
+  "parameter_matrix": [
+    {
+      "difficulty": "beginner",
+      "discharge_cfs": 900.0,
+      "discharge_m3s": 25.4851619328,
+      "flow_band": "low_runnable",
+      "flow_percentile_mid": 0.22499999999999998,
+      "parameters": {
+        "aeration_turbulence_scale": 0.46125,
+        "boil_strength": 0.1845,
+        "boundary_inflow_m3s": 25.4851619328,
+        "damping_scale": 1.035,
+        "downstream_momentum_scale": 0.46125,
+        "downstream_velocity_mps": 0.7785550383860191,
+        "eddy_line_shear": 0.27674999999999994,
+        "hazard_activation_scale": 0.533,
+        "hole_retention_strength": 0.2536875,
+        "initial_depth_m": 1.1099999999999999,
+        "paddle_catch_scale": 0.97375,
+        "raft_drag_coefficient_scale": 0.95625,
+        "roughness_manning_n": 0.0379375,
+        "shallow_hazard_threshold_m": 0.4266666666666667,
+        "wave_train_strength": 0.4304999999999999
+      },
+      "review_controls": {
+        "crew_timing_window": "wide",
+        "feature_gain_scale": 0.72,
+        "must_record_expected_outcomes": true,
+        "must_validate_conservation_before_forcing": true
+      },
+      "season": "late_summer_low_water"
+    },
+    {
+      "difficulty": "intermediate",
+      "discharge_cfs": 900.0,
+      "discharge_m3s": 25.4851619328,
+      "flow_band": "low_runnable",
+      "flow_percentile_mid": 0.22499999999999998,
+      "parameters": {
+        "aeration_turbulence_scale": 0.5625,
+        "boil_strength": 0.225,
+        "boundary_inflow_m3s": 25.4851619328,
+        "damping_scale": 1.035,
+        "downstream_momentum_scale": 0.5625,
+        "downstream_velocity_mps": 0.9494573638853893,
+        "eddy_line_shear": 0.33749999999999997,
+        "hazard_activation_scale": 0.65,
+        "hole_retention_strength": 0.309375,
+        "initial_depth_m": 1.1099999999999999,
+        "paddle_catch_scale": 0.97375,
+        "raft_drag_coefficient_scale": 0.95625,
+        "roughness_manning_n": 0.0379375,
+        "shallow_hazard_threshold_m": 0.4266666666666667,
+        "wave_train_strength": 0.5249999999999999
+      },
+      "review_controls": {
+        "crew_timing_window": "normal",
+        "feature_gain_scale": 1.0,
+        "must_record_expected_outcomes": true,
+        "must_validate_conservation_before_forcing": true
+      },
+      "season": "late_summer_low_water"
+    },
+    {
+      "difficulty": "advanced",
+      "discharge_cfs": 900.0,
+      "discharge_m3s": 25.4851619328,
+      "flow_band": "low_runnable",
+      "flow_percentile_mid": 0.22499999999999998,
+      "parameters": {
+        "aeration_turbulence_scale": 0.66375,
+        "boil_strength": 0.2655,
+        "boundary_inflow_m3s": 25.4851619328,
+        "damping_scale": 1.035,
+        "downstream_momentum_scale": 0.66375,
+        "downstream_velocity_mps": 1.1203596893847592,
+        "eddy_line_shear": 0.39824999999999994,
+        "hazard_activation_scale": 0.767,
+        "hole_retention_strength": 0.3650625,
+        "initial_depth_m": 1.1099999999999999,
+        "paddle_catch_scale": 0.97375,
+        "raft_drag_coefficient_scale": 0.95625,
+        "roughness_manning_n": 0.0379375,
+        "shallow_hazard_threshold_m": 0.4266666666666667,
+        "wave_train_strength": 0.6194999999999998
+      },
+      "review_controls": {
+        "crew_timing_window": "tight",
+        "feature_gain_scale": 1.18,
+        "must_record_expected_outcomes": true,
+        "must_validate_conservation_before_forcing": true
+      },
+      "season": "late_summer_low_water"
+    },
+    {
+      "difficulty": "expert",
+      "discharge_cfs": 900.0,
+      "discharge_m3s": 25.4851619328,
+      "flow_band": "low_runnable",
+      "flow_percentile_mid": 0.22499999999999998,
+      "parameters": {
+        "aeration_turbulence_scale": 0.759375,
+        "boil_strength": 0.30375,
+        "boundary_inflow_m3s": 25.4851619328,
+        "damping_scale": 1.035,
+        "downstream_momentum_scale": 0.759375,
+        "downstream_velocity_mps": 1.2817674412452755,
+        "eddy_line_shear": 0.455625,
+        "hazard_activation_scale": 0.8775000000000001,
+        "hole_retention_strength": 0.41765625000000006,
+        "initial_depth_m": 1.1099999999999999,
+        "paddle_catch_scale": 0.97375,
+        "raft_drag_coefficient_scale": 0.95625,
+        "roughness_manning_n": 0.0379375,
+        "shallow_hazard_threshold_m": 0.4266666666666667,
+        "wave_train_strength": 0.7087499999999999
+      },
+      "review_controls": {
+        "crew_timing_window": "very_tight",
+        "feature_gain_scale": 1.35,
+        "must_record_expected_outcomes": true,
+        "must_validate_conservation_before_forcing": true
+      },
+      "season": "late_summer_low_water"
+    },
+    {
+      "difficulty": "beginner",
+      "discharge_cfs": 1600.0,
+      "discharge_m3s": 45.3069545472,
+      "flow_band": "median_runnable",
+      "flow_percentile_mid": 0.5249999999999999,
+      "parameters": {
+        "aeration_turbulence_scale": 0.82,
+        "boil_strength": 0.328,
+        "boundary_inflow_m3s": 45.3069545472,
+        "damping_scale": 1.0,
+        "downstream_momentum_scale": 0.82,
+        "downstream_velocity_mps": 1.2389908137756003,
+        "eddy_line_shear": 0.49199999999999994,
+        "hazard_activation_scale": 0.533,
+        "hole_retention_strength": 0.451,
+        "initial_depth_m": 1.24,
+        "paddle_catch_scale": 1.0,
+        "raft_drag_coefficient_scale": 1.0,
+        "roughness_manning_n": 0.041,
+        "shallow_hazard_threshold_m": 0.32,
+        "wave_train_strength": 0.574
+      },
+      "review_controls": {
+        "crew_timing_window": "wide",
+        "feature_gain_scale": 0.72,
+        "must_record_expected_outcomes": true,
+        "must_validate_conservation_before_forcing": true
+      },
+      "season": "summer_commercial"
+    },
+    {
+      "difficulty": "intermediate",
+      "discharge_cfs": 1600.0,
+      "discharge_m3s": 45.3069545472,
+      "flow_band": "median_runnable",
+      "flow_percentile_mid": 0.5249999999999999,
+      "parameters": {
+        "aeration_turbulence_scale": 1.0,
+        "boil_strength": 0.4,
+        "boundary_inflow_m3s": 45.3069545472,
+        "damping_scale": 1.0,
+        "downstream_momentum_scale": 1.0,
+        "downstream_velocity_mps": 1.510964407043415,
+        "eddy_line_shear": 0.6,
+        "hazard_activation_scale": 0.65,
+        "hole_retention_strength": 0.55,
+        "initial_depth_m": 1.24,
+        "paddle_catch_scale": 1.0,
+        "raft_drag_coefficient_scale": 1.0,
+        "roughness_manning_n": 0.041,
+        "shallow_hazard_threshold_m": 0.32,
+        "wave_train_strength": 0.7
+      },
+      "review_controls": {
+        "crew_timing_window": "normal",
+        "feature_gain_scale": 1.0,
+        "must_record_expected_outcomes": true,
+        "must_validate_conservation_before_forcing": true
+      },
+      "season": "summer_commercial"
+    },
+    {
+      "difficulty": "advanced",
+      "discharge_cfs": 1600.0,
+      "discharge_m3s": 45.3069545472,
+      "flow_band": "median_runnable",
+      "flow_percentile_mid": 0.5249999999999999,
+      "parameters": {
+        "aeration_turbulence_scale": 1.18,
+        "boil_strength": 0.472,
+        "boundary_inflow_m3s": 45.3069545472,
+        "damping_scale": 1.0,
+        "downstream_momentum_scale": 1.18,
+        "downstream_velocity_mps": 1.7829380003112296,
+        "eddy_line_shear": 0.708,
+        "hazard_activation_scale": 0.767,
+        "hole_retention_strength": 0.649,
+        "initial_depth_m": 1.24,
+        "paddle_catch_scale": 1.0,
+        "raft_drag_coefficient_scale": 1.0,
+        "roughness_manning_n": 0.041,
+        "shallow_hazard_threshold_m": 0.32,
+        "wave_train_strength": 0.826
+      },
+      "review_controls": {
+        "crew_timing_window": "tight",
+        "feature_gain_scale": 1.18,
+        "must_record_expected_outcomes": true,
+        "must_validate_conservation_before_forcing": true
+      },
+      "season": "summer_commercial"
+    },
+    {
+      "difficulty": "expert",
+      "discharge_cfs": 1600.0,
+      "discharge_m3s": 45.3069545472,
+      "flow_band": "median_runnable",
+      "flow_percentile_mid": 0.5249999999999999,
+      "parameters": {
+        "aeration_turbulence_scale": 1.35,
+        "boil_strength": 0.54,
+        "boundary_inflow_m3s": 45.3069545472,
+        "damping_scale": 1.0,
+        "downstream_momentum_scale": 1.35,
+        "downstream_velocity_mps": 2.03980194950861,
+        "eddy_line_shear": 0.81,
+        "hazard_activation_scale": 0.8775000000000001,
+        "hole_retention_strength": 0.7425000000000002,
+        "initial_depth_m": 1.24,
+        "paddle_catch_scale": 1.0,
+        "raft_drag_coefficient_scale": 1.0,
+        "roughness_manning_n": 0.041,
+        "shallow_hazard_threshold_m": 0.32,
+        "wave_train_strength": 0.945
+      },
+      "review_controls": {
+        "crew_timing_window": "very_tight",
+        "feature_gain_scale": 1.35,
+        "must_record_expected_outcomes": true,
+        "must_validate_conservation_before_forcing": true
+      },
+      "season": "summer_commercial"
+    },
+    {
+      "difficulty": "beginner",
+      "discharge_cfs": 3000.0,
+      "discharge_m3s": 84.950539776,
+      "flow_band": "high_runnable",
+      "flow_percentile_mid": 0.8,
+      "parameters": {
+        "aeration_turbulence_scale": 1.5374999999999999,
+        "boil_strength": 0.615,
+        "boundary_inflow_m3s": 84.950539776,
+        "damping_scale": 0.9299999999999999,
+        "downstream_momentum_scale": 1.5374999999999999,
+        "downstream_velocity_mps": 2.011574397593903,
+        "eddy_line_shear": 0.9225,
+        "hazard_activation_scale": 0.59696,
+        "hole_retention_strength": 0.845625,
+        "initial_depth_m": 1.4320393247567158,
+        "paddle_catch_scale": 1.0525,
+        "raft_drag_coefficient_scale": 1.0875,
+        "roughness_manning_n": 0.045200000000000004,
+        "shallow_hazard_threshold_m": 0.23369495786887087,
+        "wave_train_strength": 0.7859818700199133
+      },
+      "review_controls": {
+        "crew_timing_window": "wide",
+        "feature_gain_scale": 0.72,
+        "must_record_expected_outcomes": true,
+        "must_validate_conservation_before_forcing": true
+      },
+      "season": "spring_runoff_or_release"
+    },
+    {
+      "difficulty": "intermediate",
+      "discharge_cfs": 3000.0,
+      "discharge_m3s": 84.950539776,
+      "flow_band": "high_runnable",
+      "flow_percentile_mid": 0.8,
+      "parameters": {
+        "aeration_turbulence_scale": 1.875,
+        "boil_strength": 0.75,
+        "boundary_inflow_m3s": 84.950539776,
+        "damping_scale": 0.9299999999999999,
+        "downstream_momentum_scale": 1.875,
+        "downstream_velocity_mps": 2.4531395092608577,
+        "eddy_line_shear": 1.125,
+        "hazard_activation_scale": 0.7280000000000001,
+        "hole_retention_strength": 1.03125,
+        "initial_depth_m": 1.4320393247567158,
+        "paddle_catch_scale": 1.0525,
+        "raft_drag_coefficient_scale": 1.0875,
+        "roughness_manning_n": 0.045200000000000004,
+        "shallow_hazard_threshold_m": 0.23369495786887087,
+        "wave_train_strength": 0.9585144756340407
+      },
+      "review_controls": {
+        "crew_timing_window": "normal",
+        "feature_gain_scale": 1.0,
+        "must_record_expected_outcomes": true,
+        "must_validate_conservation_before_forcing": true
+      },
+      "season": "spring_runoff_or_release"
+    },
+    {
+      "difficulty": "advanced",
+      "discharge_cfs": 3000.0,
+      "discharge_m3s": 84.950539776,
+      "flow_band": "high_runnable",
+      "flow_percentile_mid": 0.8,
+      "parameters": {
+        "aeration_turbulence_scale": 2.2125,
+        "boil_strength": 0.885,
+        "boundary_inflow_m3s": 84.950539776,
+        "damping_scale": 0.9299999999999999,
+        "downstream_momentum_scale": 2.2125,
+        "downstream_velocity_mps": 2.8947046209278118,
+        "eddy_line_shear": 1.3275,
+        "hazard_activation_scale": 0.8590400000000001,
+        "hole_retention_strength": 1.216875,
+        "initial_depth_m": 1.4320393247567158,
+        "paddle_catch_scale": 1.0525,
+        "raft_drag_coefficient_scale": 1.0875,
+        "roughness_manning_n": 0.045200000000000004,
+        "shallow_hazard_threshold_m": 0.23369495786887087,
+        "wave_train_strength": 1.1310470812481679
+      },
+      "review_controls": {
+        "crew_timing_window": "tight",
+        "feature_gain_scale": 1.18,
+        "must_record_expected_outcomes": true,
+        "must_validate_conservation_before_forcing": true
+      },
+      "season": "spring_runoff_or_release"
+    },
+    {
+      "difficulty": "expert",
+      "discharge_cfs": 3000.0,
+      "discharge_m3s": 84.950539776,
+      "flow_band": "high_runnable",
+      "flow_percentile_mid": 0.8,
+      "parameters": {
+        "aeration_turbulence_scale": 2.53125,
+        "boil_strength": 1.0125000000000002,
+        "boundary_inflow_m3s": 84.950539776,
+        "damping_scale": 0.9299999999999999,
+        "downstream_momentum_scale": 2.53125,
+        "downstream_velocity_mps": 3.311738337502158,
+        "eddy_line_shear": 1.51875,
+        "hazard_activation_scale": 0.9828000000000001,
+        "hole_retention_strength": 1.3921875000000001,
+        "initial_depth_m": 1.4320393247567158,
+        "paddle_catch_scale": 1.0525,
+        "raft_drag_coefficient_scale": 1.0875,
+        "roughness_manning_n": 0.045200000000000004,
+        "shallow_hazard_threshold_m": 0.23369495786887087,
+        "wave_train_strength": 1.293994542105955
+      },
+      "review_controls": {
+        "crew_timing_window": "very_tight",
+        "feature_gain_scale": 1.35,
+        "must_record_expected_outcomes": true,
+        "must_validate_conservation_before_forcing": true
+      },
+      "season": "spring_runoff_or_release"
+    }
+  ],
+  "provenance": {
+    "generated_by": "raftsim.real_world.build_rapid_review_flow_difficulty_mapping",
+    "processing_version": "milestone_17_flow_difficulty_mapping_seed.v0",
+    "review_status": "seed_mapping_needs_gauge_history_and_guide_review",
+    "source_limitations": "Uses preliminary South Fork flow bands and hand-authored label response curves; production mapping must be calibrated against gauge history, footage, guide feedback, GeoClaw/C++ validation, and game-feel review."
+  },
+  "review_requirements": [
+    "Every accepted rapid label must name the flow band and difficulty presets it was reviewed against.",
+    "Hole, lateral, eddy-line, boulder, shelf, pin, release, and flip behavior must stay flow-dependent; fixed gains are review failures.",
+    "Gameplay forcing can be tuned from this mapping only after GeoClaw/C++ conservation and feature validation pass for the same flow band.",
+    "Guide feedback, footage, imagery, and gauge context must remain source-manifest linked with rights/provenance before production use."
+  ],
+  "river_id": "american_south_fork",
+  "schema_version": "raftsim.rapid_review_flow_difficulty_mapping.v0",
+  "section_id": "chili_bar_to_coloma",
+  "source_manifest": "source_manifest.json"
+}

@@ -554,6 +554,7 @@
       "guide_references": [
         "review/guide_reference_index.json",
         "review/rapid_review_labels.json",
+        "rapid_review_flow_difficulty_mapping.json",
         "rapid_review_editor_workflow.json"
       ],
       "hydrography": [
@@ -850,6 +851,7 @@
       "imagery/foam_texture_mask.tif"
     ],
     "rapid_review_editor_workflow": "rapid_review_editor_workflow.json",
+    "rapid_review_flow_difficulty_mapping": "rapid_review_flow_difficulty_mapping.json",
     "rapids": "review/rapid_candidates.geojson",
     "terrain": "terrain/solver_bed_grid.npy",
     "validation_matrix": "validation_matrix.json"

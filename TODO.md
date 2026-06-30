@@ -341,4 +341,4 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [x] Add import/export validation checks that reject missing CRS metadata, lossy Shapefile-only canonical inputs, missing source manifests, and untracked WGS84/local transform changes.
 - [x] Draft the first candidate river inventory and source manifest.
 - [x] Prototype course/elevation extraction for one river section.
-- [ ] Define the first rapid-review labels and seasonal flow/difficulty parameter mapping.
+- [x] Define the first rapid-review labels and seasonal flow/difficulty parameter mapping.
