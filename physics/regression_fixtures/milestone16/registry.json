@@ -94,24 +94,44 @@
       "suite": "canonical"
     },
     {
-      "actual_scenario_id": "shallow_shelf_seed_21",
-      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release",
-      "artifact_id": "raft_coupling/shallow_shelf/reduced/shallow_shelf_pivot_release",
-      "case_id": "shallow_shelf_pivot_release",
+      "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
+      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/r_hole/finite_volume/downstream_boil_recovery",
+      "artifact_id": "raft_coupling/hydraulic_hole_downstream_boil/finite_volume/downstream_boil_recovery",
+      "case_id": "downstream_boil_recovery",
       "category": "raft_coupling",
-      "gate_scenario_id": "shallow_shelf",
-      "manifest": "regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release/raft_coupling_case.json",
+      "gate_scenario_id": "hydraulic_hole_downstream_boil",
+      "manifest": "regression_fixtures/milestone16/raft_coupling/r_hole/finite_volume/downstream_boil_recovery/raft_coupling_case.json",
       "notes": [
         "Frame paths remain in generated Milestone 16 output directories."
       ],
       "passed": true,
       "reports": {
-        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release/raft_coupling_case.json"
+        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/r_hole/finite_volume/downstream_boil_recovery/raft_coupling_case.json"
       },
       "scenario_package": null,
-      "solver_mode": "reduced",
+      "solver_mode": "finite_volume",
       "source_report": "reports/milestone16/raft_coupling_validation.json",
       "suite": "rafting"
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/pool_entry",
+      "artifact_id": "raft_coupling/south_fork_cascading_low_runnable/finite_volume/pool_entry",
+      "case_id": "pool_entry",
+      "category": "raft_coupling",
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "manifest": "regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/pool_entry/raft_coupling_case.json",
+      "notes": [
+        "Frame paths remain in generated Milestone 16 output directories."
+      ],
+      "passed": true,
+      "reports": {
+        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/pool_entry/raft_coupling_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/raft_coupling_validation.json",
+      "suite": "cascading"
     },
     {
       "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
@@ -195,6 +215,26 @@
     },
     {
       "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/eddy_recovery",
+      "artifact_id": "raft_coupling/south_fork_cascading_median_runnable/finite_volume/eddy_recovery",
+      "case_id": "eddy_recovery",
+      "category": "raft_coupling",
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "manifest": "regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/eddy_recovery/raft_coupling_case.json",
+      "notes": [
+        "Frame paths remain in generated Milestone 16 output directories."
+      ],
+      "passed": true,
+      "reports": {
+        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/eddy_recovery/raft_coupling_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/raft_coupling_validation.json",
+      "suite": "cascading"
+    },
+    {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
       "artifact_dir": "regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/transition_boundary_crossing",
       "artifact_id": "raft_coupling/south_fork_cascading_median_runnable/finite_volume/transition_boundary_crossing",
       "case_id": "transition_boundary_crossing",
@@ -234,7 +274,7 @@
       "suite": "cascading"
     }
   ],
-  "entry_count": 11,
+  "entry_count": 13,
   "raft_coupling_report": "reports/milestone16/raft_coupling_validation.json",
   "schema_version": "raftsim.milestone16.regression_registry.v0"
 }

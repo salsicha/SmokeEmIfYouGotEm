@@ -21,14 +21,14 @@
         "name": "speed_recovery",
         "passed": true,
         "threshold": 0.25,
-        "value": 0.7690370949985379
+        "value": 1.1792129459169847
       },
       {
         "details": "",
         "name": "lateral_shear",
         "passed": true,
         "threshold": 0.15,
-        "value": 0.2610251625659335
+        "value": 0.16627820052733125
       }
     ],
     "candidate_frame": "outputs/m16cpp/cg_low/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
@@ -40,7 +40,7 @@
     ],
     "feature_outcome_match": true,
     "flow_band": "low_runnable",
-    "force_delta_weight_ratio": 0.504408454320044,
+    "force_delta_weight_ratio": 0.4050197837815817,
     "force_envelope_outcome_match": true,
     "gate_scenario_id": "south_fork_cascading_low_runnable",
     "notes": [],
@@ -80,9 +80,9 @@
     "reference_passed": true,
     "solver_mode": "finite_volume",
     "suite": "cascading",
-    "torque_delta_inertia_ratio": 0.24518029336920463,
-    "trajectory_position_delta_m": 0.0013745130380156663,
-    "trajectory_velocity_delta_mps": 0.08247078228132719
+    "torque_delta_inertia_ratio": 0.5465586430132965,
+    "trajectory_position_delta_m": 0.0011036789107894784,
+    "trajectory_velocity_delta_mps": 0.06622073464828863
   },
   "schema_version": "raftsim.milestone16.regression_registry.v0",
   "source_report": "reports/milestone16/raft_coupling_validation.json"

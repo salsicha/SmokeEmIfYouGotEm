@@ -4,50 +4,43 @@
     "candidate_checks": [
       {
         "details": "",
-        "name": "upstream_reach_match",
+        "name": "pool_reach",
         "passed": true,
         "threshold": 1.0,
         "value": 1.0
       },
       {
         "details": "",
-        "name": "downstream_reach_match",
+        "name": "entry_depth",
         "passed": true,
-        "threshold": 1.0,
-        "value": 1.0
+        "threshold": 0.8,
+        "value": 1.4360680858065018
       },
       {
         "details": "",
-        "name": "transition_grid_coverage",
+        "name": "pool_slower_than_tongue",
         "passed": true,
-        "threshold": 0.0,
-        "value": 0.0
+        "threshold": 1.7994179594423834,
+        "value": 0.7640164391822086
       },
       {
         "details": "",
-        "name": "crossing_speed",
+        "name": "bounded_lift",
         "passed": true,
-        "threshold": 2.0,
-        "value": 3.5876158764898944
-      },
-      {
-        "details": "",
-        "name": "crossing_surface_fall",
-        "passed": true,
-        "threshold": 0.1,
-        "value": 1.2323667018882567
+        "threshold": 5.0,
+        "value": 2.003775778693306
       }
     ],
     "candidate_frame": "outputs/m16cpp/cg_low/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
-    "candidate_outcome": "flushed",
+    "candidate_outcome": "clear",
     "candidate_passed": true,
-    "case_id": "transition_boundary_crossing",
+    "case_id": "pool_entry",
     "expected_outcomes": [
-      "flushed"
+      "clear"
     ],
     "feature_outcome_match": true,
     "flow_band": "low_runnable",
-    "force_delta_weight_ratio": 0.6057574896006449,
+    "force_delta_weight_ratio": 0.8326382968664514,
     "force_envelope_outcome_match": true,
     "gate_scenario_id": "south_fork_cascading_low_runnable",
     "notes": [],
@@ -55,48 +48,41 @@
     "reference_checks": [
       {
         "details": "",
-        "name": "upstream_reach_match",
+        "name": "pool_reach",
         "passed": true,
         "threshold": 1.0,
         "value": 1.0
       },
       {
         "details": "",
-        "name": "downstream_reach_match",
+        "name": "entry_depth",
         "passed": true,
-        "threshold": 1.0,
-        "value": 1.0
+        "threshold": 0.8,
+        "value": 1.2608861888011464
       },
       {
         "details": "",
-        "name": "transition_grid_coverage",
+        "name": "pool_slower_than_tongue",
         "passed": true,
-        "threshold": 0.0,
-        "value": 0.0
+        "threshold": 2.177110006431442,
+        "value": 0.9403136891285476
       },
       {
         "details": "",
-        "name": "crossing_speed",
+        "name": "bounded_lift",
         "passed": true,
-        "threshold": 2.0,
-        "value": 3.9622021141144055
-      },
-      {
-        "details": "",
-        "name": "crossing_surface_fall",
-        "passed": true,
-        "threshold": 0.1,
-        "value": 1.2729243809204176
+        "threshold": 5.0,
+        "value": 2.0046719451494215
       }
     ],
     "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
-    "reference_outcome": "flushed",
+    "reference_outcome": "clear",
     "reference_passed": true,
     "solver_mode": "finite_volume",
     "suite": "cascading",
-    "torque_delta_inertia_ratio": 0.09842462629865147,
-    "trajectory_position_delta_m": 0.0016506891591619639,
-    "trajectory_velocity_delta_mps": 0.09904134954970548
+    "torque_delta_inertia_ratio": 0.02796412836652249,
+    "trajectory_position_delta_m": 0.002268939358961038,
+    "trajectory_velocity_delta_mps": 0.13613636153766476
   },
   "schema_version": "raftsim.milestone16.regression_registry.v0",
   "source_report": "reports/milestone16/raft_coupling_validation.json"

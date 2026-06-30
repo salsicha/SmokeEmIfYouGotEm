@@ -578,7 +578,7 @@ def build_milestone16_geoclaw_readiness_report(
                 "Fix GeoClaw/C++ threshold failures outside flat-pool and sloping-channel cases.",
                 "Retune wet/dry, bed-step, constriction, drop/ledge, and cascading reach/drop dynamics until geometry families pass.",
                 "Retune raft coupling against GeoClaw and C++ fields until force envelopes, outcomes, and transition cases pass.",
-                "Add a distinct pin/release fixture beyond the current shallow-shelf and boulder proxy evidence.",
+                "Keep the distinct Milestone 18 pin/release fixture separate from the raft-coupling water-field agreement gate.",
             )
             if not approved
             else (
@@ -602,7 +602,7 @@ def build_milestone16_geoclaw_readiness_report(
             "2.5D shallow-water/height-field flow remains the intended runtime model; full 3D CFD is out of scope.",
             "GeoClaw remains offline reference infrastructure and does not ship inside Unreal.",
             "Promoted fixtures are passing subsets, not proof that the full live-water gate has passed.",
-            "Current pin/release evidence is proxy coverage until a dedicated strainer/wrap fixture is added.",
+            "Dedicated pin/release evidence remains a separate Milestone 18 fixture until the full readiness gate is rerun.",
         ),
         risks=(
             "Most GeoClaw/C++ threshold comparisons still fail outside hydrostatic/sloping cases.",

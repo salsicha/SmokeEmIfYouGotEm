@@ -4,57 +4,43 @@
     "candidate_checks": [
       {
         "details": "",
-        "name": "drop_transition",
+        "name": "eddy_recovery_reach",
         "passed": true,
         "threshold": 1.0,
         "value": 1.0
       },
       {
         "details": "",
-        "name": "ledge_tag",
+        "name": "eddy_line_tag",
         "passed": true,
         "threshold": 1.0,
         "value": 1.0
       },
       {
         "details": "",
-        "name": "entry_speed",
+        "name": "speed_recovery",
         "passed": true,
-        "threshold": 2.0,
-        "value": 3.301477183401971
+        "threshold": 0.25,
+        "value": 1.2479631157597402
       },
       {
         "details": "",
-        "name": "surface_fall",
+        "name": "lateral_shear",
         "passed": true,
         "threshold": 0.15,
-        "value": 2.3592407334649064
-      },
-      {
-        "details": "",
-        "name": "tailwater_depth",
-        "passed": true,
-        "threshold": 0.45,
-        "value": 0.9926940958173859
-      },
-      {
-        "details": "",
-        "name": "bounded_entry_lift",
-        "passed": true,
-        "threshold": 8.0,
-        "value": 1.8252863618912756
+        "value": 0.44063715609576115
       }
     ],
     "candidate_frame": "outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
-    "candidate_outcome": "flushed",
+    "candidate_outcome": "clear",
     "candidate_passed": true,
-    "case_id": "drop_entry",
+    "case_id": "eddy_recovery",
     "expected_outcomes": [
-      "flushed"
+      "clear"
     ],
     "feature_outcome_match": true,
     "flow_band": "median_runnable",
-    "force_delta_weight_ratio": 0.19739262744756408,
+    "force_delta_weight_ratio": 0.537402025787273,
     "force_envelope_outcome_match": true,
     "gate_scenario_id": "south_fork_cascading_median_runnable",
     "notes": [],
@@ -62,55 +48,41 @@
     "reference_checks": [
       {
         "details": "",
-        "name": "drop_transition",
+        "name": "eddy_recovery_reach",
         "passed": true,
         "threshold": 1.0,
         "value": 1.0
       },
       {
         "details": "",
-        "name": "ledge_tag",
+        "name": "eddy_line_tag",
         "passed": true,
         "threshold": 1.0,
         "value": 1.0
       },
       {
         "details": "",
-        "name": "entry_speed",
+        "name": "speed_recovery",
         "passed": true,
-        "threshold": 2.0,
-        "value": 3.6506756197343764
+        "threshold": 0.25,
+        "value": 1.6494845583068365
       },
       {
         "details": "",
-        "name": "surface_fall",
+        "name": "lateral_shear",
         "passed": true,
         "threshold": 0.15,
-        "value": 2.572944899242443
-      },
-      {
-        "details": "",
-        "name": "tailwater_depth",
-        "passed": true,
-        "threshold": 0.45,
-        "value": 0.8831330094901266
-      },
-      {
-        "details": "",
-        "name": "bounded_entry_lift",
-        "passed": true,
-        "threshold": 8.0,
-        "value": 1.7973300864243786
+        "value": 0.4851192525423252
       }
     ],
     "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
-    "reference_outcome": "flushed",
+    "reference_outcome": "clear",
     "reference_passed": true,
     "solver_mode": "finite_volume",
     "suite": "cascading",
-    "torque_delta_inertia_ratio": 0.5977419753589749,
-    "trajectory_position_delta_m": 0.000537894909793616,
-    "trajectory_velocity_delta_mps": 0.03227369458767674
+    "torque_delta_inertia_ratio": 0.4158244019207191,
+    "trajectory_position_delta_m": 0.001464420520264257,
+    "trajectory_velocity_delta_mps": 0.08786523121621898
   },
   "schema_version": "raftsim.milestone16.regression_registry.v0",
   "source_report": "reports/milestone16/raft_coupling_validation.json"

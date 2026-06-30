@@ -1,0 +1,89 @@
+{
+  "record": {
+    "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
+    "candidate_checks": [
+      {
+        "details": "",
+        "name": "boil_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "Boil should form a measurable upwelling dome.",
+        "name": "surface_dome",
+        "passed": true,
+        "threshold": 0.03,
+        "value": 0.21764271538776828
+      },
+      {
+        "details": "Boil should impart upward raft acceleration.",
+        "name": "vertical_impulse",
+        "passed": true,
+        "threshold": 2.0,
+        "value": 8.97765792962507
+      },
+      {
+        "details": "Repeated force sampling should return identical boil impulses.",
+        "name": "deterministic_repeat",
+        "passed": true,
+        "threshold": 1e-09,
+        "value": 0.0
+      }
+    ],
+    "candidate_frame": "outputs/m16cpp/r_hole/finite_volume/cpp_solver/hydraulic_hole_downstream_boil_seed_18/frames/frame_0008.csv",
+    "candidate_outcome": "upwelling",
+    "candidate_passed": true,
+    "case_id": "downstream_boil_recovery",
+    "expected_outcomes": [
+      "clear"
+    ],
+    "feature_outcome_match": true,
+    "flow_band": null,
+    "force_delta_weight_ratio": 0.6138200238279957,
+    "force_envelope_outcome_match": true,
+    "gate_scenario_id": "hydraulic_hole_downstream_boil",
+    "notes": [],
+    "passed": true,
+    "reference_checks": [
+      {
+        "details": "",
+        "name": "boil_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "Boil should form a measurable upwelling dome.",
+        "name": "surface_dome",
+        "passed": true,
+        "threshold": 0.03,
+        "value": 0.2212845796280189
+      },
+      {
+        "details": "Boil should impart upward raft acceleration.",
+        "name": "vertical_impulse",
+        "passed": true,
+        "threshold": 2.0,
+        "value": 8.185559832125405
+      },
+      {
+        "details": "Repeated force sampling should return identical boil impulses.",
+        "name": "deterministic_repeat",
+        "passed": true,
+        "threshold": 1e-09,
+        "value": 0.0
+      }
+    ],
+    "reference_frame": "outputs/m16g/r_hole/normalized/frames/frame_0002.npz",
+    "reference_outcome": "upwelling",
+    "reference_passed": true,
+    "solver_mode": "finite_volume",
+    "suite": "rafting",
+    "torque_delta_inertia_ratio": 1.1212714333811185,
+    "trajectory_position_delta_m": 0.0016726595649346554,
+    "trajectory_velocity_delta_mps": 0.10035957389587766
+  },
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "source_report": "reports/milestone16/raft_coupling_validation.json"
+}
