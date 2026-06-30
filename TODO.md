@@ -269,7 +269,7 @@ This milestone turns the custom C++ shallow-water / height-field solver from a r
 
 - [x] Freeze the scenario matrix and threshold tiers for smoke, research-accepted, Unreal-prototype, and production-candidate validation.
 - [x] Run full GeoClaw fixed-grid reference simulations for canonical, rafting, real-world low/median/high, and South Fork cascading suites; do not count initial-state-only fallback normalization as full validation.
-- [ ] Run C++ reduced and finite-volume solver modes on the same packages with versioned manifests for CFL, dry tolerance, roughness, feature forcing, bed-slope source scale, and cascading metadata.
+- [x] Run C++ reduced and finite-volume solver modes on the same packages with versioned manifests for CFL, dry tolerance, roughness, feature forcing, bed-slope source scale, and cascading metadata.
 - [ ] Compare GeoClaw and C++ fields, probes, cross sections, mass/energy/Froude diagnostics, wet/dry masks, feature localization, and reach/drop window outputs against frozen thresholds.
 - [ ] Validate geometry-specific cases: hydrostatic/sloping-channel balance, wet/dry shorelines, bed steps, constrictions, drops/ledges, tailwater controls, and stitched reach/drop boundary handoffs.
 - [ ] Re-run raft coupling validation for pool entry, drop entry, hydraulic-hole surf/flush, eddy recovery, boulder impacts, shallow shelves, pins/releases, and transition-boundary crossings against GeoClaw-derived and C++ water fields.
