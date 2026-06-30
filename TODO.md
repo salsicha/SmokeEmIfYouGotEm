@@ -336,7 +336,7 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 - [x] Add a versioned river validation annotation schema for station/reach/drop anchors, footage timecodes, gauge history, aerial imagery, guide feedback, expected raft outcomes, confidence, and rights/provenance.
 - [x] Build the first rapid review/editor workflow that displays DEM/lidar, aerial/satellite imagery, flowlines, cross sections, gauge history, source manifests, candidate tags, and guide notes in one view.
 - [x] Export annotation packages as JSON/GeoJSON for Python scenario generation, GeoClaw/C++ validation reports, and Unreal river data assets.
-- [ ] Add Unreal fidelity-review overlays for annotation pins/spans/polygons, solver fields, raft trajectories, rendered water/foam/audio cues, and expected surf/flush/pin/flip behavior.
+- [x] Add Unreal fidelity-review overlays for annotation pins/spans/polygons, solver fields, raft trajectories, rendered water/foam/audio cues, and expected surf/flush/pin/flip behavior.
 - [x] Add a versioned geospatial format contract covering CRS policy, GeoJSON/GeoPackage vectors, GeoTIFF/COG rasters, LAS/LAZ/COPC point clouds, gauge-history tables, solver arrays, and Unreal corridor exports.
 - [x] Add import/export validation checks that reject missing CRS metadata, lossy Shapefile-only canonical inputs, missing source manifests, and untracked WGS84/local transform changes.
 - [ ] Draft the first candidate river inventory and source manifest.
