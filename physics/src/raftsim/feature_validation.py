@@ -8,16 +8,29 @@ from dataclasses import dataclass
 from .cascading import CascadingScenarioPackage2_5D, DropTransitionMetadata2_5D, ReachMetadata2_5D
 from .math3d import Vec3
 from .raft_coupling2_5d import (
+    CrewAction2_5D,
+    CrewSeat2_5D,
+    CrewWeightTelemetry2_5D,
     RaftMassProperties,
     RaftState6DoF,
     WaterField2_5D,
+    build_default_crew_seats2_5d,
     build_default_raft_mass_properties,
+    evaluate_crew_weight_distribution2_5d,
     sample_grounding_forces,
     sample_total_raft_forces,
     sum_force_contributions,
 )
 
 CANONICAL_RUN_OUTCOMES = ("clear", "stalled", "surfed", "flushed", "grounded", "pinned", "flipped")
+CREW_TIMED_HAZARD_FIXTURE_IDS = (
+    "rock_high_side",
+    "sticky_hole_brace_release",
+    "lateral_hit_lean",
+    "shallow_shelf_recovery",
+    "pin_release_weight_shift",
+    "flip_high_side",
+)
 CASCADING_RAFT_VALIDATION_CASES = (
     "pool_entry",
     "drop_entry",
@@ -57,6 +70,40 @@ class CascadingRaftValidationCase:
     state: RaftState6DoF
     expected_outcomes: tuple[str, ...]
     transition_id: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class CrewTimedHazardFixture2_5D:
+    """Crew-timing fixture for hazards survivable only with correct weight shifts."""
+
+    fixture_id: str
+    hazard_kind: str
+    action_recipe: str
+    action_window_s: float
+    safe_response_delay_s: float
+    late_response_delay_s: float
+    hazard_roll_moment_nm: float = 0.0
+    pin_load_n: float = 0.0
+    release_impulse_n: float = 0.0
+    required_lateral_bias: float = 0.0
+    expected_hazard_outcome: str = "flipped"
+    expected_safe_outcome: str = "clear"
+
+    def __post_init__(self) -> None:
+        if not self.fixture_id:
+            raise ValueError("fixture_id must be non-empty.")
+        if self.action_window_s <= 0.0:
+            raise ValueError("action_window_s must be positive.")
+        if self.safe_response_delay_s < 0.0 or self.late_response_delay_s < 0.0:
+            raise ValueError("response delays must be non-negative.")
+        if (
+            self.hazard_roll_moment_nm < 0.0
+            or self.pin_load_n < 0.0
+            or self.release_impulse_n < 0.0
+        ):
+            raise ValueError("hazard loads must be non-negative.")
+        if self.required_lateral_bias < 0.0:
+            raise ValueError("required_lateral_bias must be non-negative.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -110,6 +157,149 @@ def summarize_run_outcomes(results: Iterable[FeatureValidationResult | str]) -> 
         passed_runs=passed_runs,
         failed_runs=failed_runs,
     )
+
+
+def build_crew_timed_hazard_fixtures2_5d() -> tuple[CrewTimedHazardFixture2_5D, ...]:
+    """Build deterministic crew-timing fixtures for rock, hole, lateral, shelf, pin, and flip hazards."""
+
+    return (
+        CrewTimedHazardFixture2_5D(
+            fixture_id="rock_high_side",
+            hazard_kind="rock",
+            action_recipe="high_side_right",
+            action_window_s=0.65,
+            safe_response_delay_s=0.32,
+            late_response_delay_s=0.82,
+            hazard_roll_moment_nm=2200.0,
+            pin_load_n=3600.0,
+            required_lateral_bias=0.18,
+            expected_hazard_outcome="flipped",
+            expected_safe_outcome="clear",
+        ),
+        CrewTimedHazardFixture2_5D(
+            fixture_id="sticky_hole_brace_release",
+            hazard_kind="sticky_hole",
+            action_recipe="brace_recovery",
+            action_window_s=0.90,
+            safe_response_delay_s=0.45,
+            late_response_delay_s=1.10,
+            pin_load_n=3400.0,
+            release_impulse_n=2200.0,
+            expected_hazard_outcome="pinned",
+            expected_safe_outcome="flushed",
+        ),
+        CrewTimedHazardFixture2_5D(
+            fixture_id="lateral_hit_lean",
+            hazard_kind="lateral_hit",
+            action_recipe="lean_right",
+            action_window_s=0.55,
+            safe_response_delay_s=0.28,
+            late_response_delay_s=0.72,
+            hazard_roll_moment_nm=1900.0,
+            required_lateral_bias=0.16,
+            expected_hazard_outcome="flipped",
+            expected_safe_outcome="clear",
+        ),
+        CrewTimedHazardFixture2_5D(
+            fixture_id="shallow_shelf_recovery",
+            hazard_kind="shallow_shelf",
+            action_recipe="brace_recovery",
+            action_window_s=0.80,
+            safe_response_delay_s=0.42,
+            late_response_delay_s=1.00,
+            pin_load_n=3400.0,
+            release_impulse_n=2200.0,
+            expected_hazard_outcome="grounded",
+            expected_safe_outcome="clear",
+        ),
+        CrewTimedHazardFixture2_5D(
+            fixture_id="pin_release_weight_shift",
+            hazard_kind="pin_release",
+            action_recipe="high_side_recovery_right",
+            action_window_s=0.75,
+            safe_response_delay_s=0.36,
+            late_response_delay_s=0.96,
+            pin_load_n=3800.0,
+            release_impulse_n=2100.0,
+            required_lateral_bias=0.18,
+            expected_hazard_outcome="pinned",
+            expected_safe_outcome="clear",
+        ),
+        CrewTimedHazardFixture2_5D(
+            fixture_id="flip_high_side",
+            hazard_kind="flip",
+            action_recipe="high_side_left",
+            action_window_s=0.50,
+            safe_response_delay_s=0.24,
+            late_response_delay_s=0.70,
+            hazard_roll_moment_nm=2250.0,
+            required_lateral_bias=0.20,
+            expected_hazard_outcome="flipped",
+            expected_safe_outcome="clear",
+        ),
+    )
+
+
+def validate_crew_timed_hazard_fixtures2_5d(
+    *,
+    properties: RaftMassProperties | None = None,
+    seats: tuple[CrewSeat2_5D, ...] | None = None,
+    fixtures: tuple[CrewTimedHazardFixture2_5D, ...] | None = None,
+) -> tuple[FeatureValidationResult, ...]:
+    """Validate that hazards require timely crew high-side, brace, lean, or recovery actions."""
+
+    raft_properties = properties or build_default_raft_mass_properties()
+    crew_seats = seats or build_default_crew_seats2_5d()
+    hazard_fixtures = fixtures or build_crew_timed_hazard_fixtures2_5d()
+    neutral = evaluate_crew_weight_distribution2_5d(raft_properties, crew_seats)
+    results: list[FeatureValidationResult] = []
+    for fixture in hazard_fixtures:
+        safe_actions = _crew_actions_for_hazard_fixture(fixture, crew_seats)
+        safe_telemetry = evaluate_crew_weight_distribution2_5d(raft_properties, crew_seats, safe_actions)
+        unsafe_margin = _crew_hazard_safety_margin(fixture, neutral)
+        safe_physics_margin = _crew_hazard_safety_margin(fixture, safe_telemetry)
+        safe_timed_margin = min(safe_physics_margin, fixture.action_window_s - fixture.safe_response_delay_s)
+        late_timed_margin = min(safe_physics_margin, fixture.action_window_s - fixture.late_response_delay_s)
+        outcome = fixture.expected_safe_outcome if safe_timed_margin >= 0.0 else fixture.expected_hazard_outcome
+        checks = (
+            FeatureValidationCheck(
+                "missing_response_hazard",
+                unsafe_margin < 0.0,
+                unsafe_margin,
+                0.0,
+                "Without crew weight shift, the hazard should remain unsafe.",
+            ),
+            FeatureValidationCheck(
+                "late_response_hazard",
+                late_timed_margin < 0.0,
+                late_timed_margin,
+                0.0,
+                "The same action after the response window should still fail.",
+            ),
+            FeatureValidationCheck(
+                "timed_response_safe",
+                safe_timed_margin >= 0.0,
+                safe_timed_margin,
+                0.0,
+                "Correct crew action inside the response window should clear the hazard.",
+            ),
+            FeatureValidationCheck(
+                "crew_action_changes_margin",
+                safe_physics_margin > unsafe_margin,
+                safe_physics_margin - unsafe_margin,
+                0.0,
+                "Crew weight telemetry must improve the pin, release, roll, or lateral margin.",
+            ),
+            FeatureValidationCheck(
+                "crew_action_recorded",
+                safe_telemetry.active_action_count > 0,
+                float(safe_telemetry.active_action_count),
+                1.0,
+                "Fixture must record active crew actions.",
+            ),
+        )
+        results.append(FeatureValidationResult(fixture.fixture_id, outcome, checks))
+    return tuple(results)
 
 
 def build_cascading_raft_validation_cases(
@@ -795,6 +985,45 @@ def _validate_transition_boundary_crossing_case(
         _validation_check("crossing_surface_fall", surface_fall >= min_surface_fall, surface_fall, min_surface_fall),
     )
     return FeatureValidationResult(case.case_id, "flushed" if all(check.passed for check in checks) else "stalled", checks)
+
+
+def _crew_actions_for_hazard_fixture(
+    fixture: CrewTimedHazardFixture2_5D,
+    seats: tuple[CrewSeat2_5D, ...],
+) -> tuple[CrewAction2_5D, ...]:
+    if fixture.action_recipe == "high_side_right":
+        return tuple(CrewAction2_5D(seat.seat_id, high_side_direction=1, brace=True) for seat in seats)
+    if fixture.action_recipe == "high_side_left":
+        return tuple(CrewAction2_5D(seat.seat_id, high_side_direction=-1, brace=True) for seat in seats)
+    if fixture.action_recipe == "high_side_recovery_right":
+        return tuple(
+            CrewAction2_5D(seat.seat_id, high_side_direction=1, brace=True, recovery=True)
+            for seat in seats
+        )
+    if fixture.action_recipe == "brace_recovery":
+        return tuple(CrewAction2_5D(seat.seat_id, brace=True, recovery=True) for seat in seats)
+    if fixture.action_recipe == "lean_right":
+        return tuple(
+            CrewAction2_5D(seat.seat_id, lean_offset=Vec3(0.0, 0.35, 0.0), brace=True)
+            for seat in seats
+        )
+    raise ValueError(f"Unknown crew hazard action recipe: {fixture.action_recipe!r}")
+
+
+def _crew_hazard_safety_margin(
+    fixture: CrewTimedHazardFixture2_5D,
+    telemetry: CrewWeightTelemetry2_5D,
+) -> float:
+    margins: list[float] = []
+    if fixture.hazard_roll_moment_nm > 0.0:
+        margins.append(telemetry.recovery_thresholds.flip_threshold_nm - fixture.hazard_roll_moment_nm)
+    if fixture.pin_load_n > 0.0:
+        margins.append(telemetry.recovery_thresholds.pin_threshold_n - fixture.pin_load_n)
+    if fixture.release_impulse_n > 0.0:
+        margins.append(fixture.release_impulse_n - telemetry.recovery_thresholds.release_threshold_n)
+    if fixture.required_lateral_bias > 0.0:
+        margins.append(abs(telemetry.contact_loading.lateral_bias) - fixture.required_lateral_bias)
+    return min(margins, default=0.0)
 
 
 def _validation_check(
