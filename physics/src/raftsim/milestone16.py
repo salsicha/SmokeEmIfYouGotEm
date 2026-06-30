@@ -2216,17 +2216,18 @@ def _run_cascading_geoclaw_case(
 
 
 def _cpp_config_for_mode(executable: Path, solver_mode: str) -> CppSolverRunConfig:
+    finite_volume = solver_mode == "finite_volume"
     return CppSolverRunConfig(
         executable=executable,
         solver_mode=solver_mode,
         boundary_mode="scenario",
-        flux_scheme="rusanov",
+        flux_scheme="hll" if finite_volume else "rusanov",
         cfl=0.45,
         dry_tolerance=1.0e-6,
-        feature_strength_scale=1.0,
-        roughness_scale=1.0,
-        bed_slope_source_scale=1.0 if solver_mode == "finite_volume" else 0.0,
-        preserve_initial_mass=True,
+        feature_strength_scale=0.0,
+        roughness_scale=0.5 if finite_volume else 1.0,
+        bed_slope_source_scale=0.75 if finite_volume else 0.0,
+        preserve_initial_mass=not finite_volume,
         allow_validation_failure=True,
     )
 
