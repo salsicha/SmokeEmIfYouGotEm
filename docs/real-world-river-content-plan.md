@@ -135,7 +135,7 @@ The package should add these production fields:
 - `reaches`: downstream station range, local coordinate transform, length, slope profile, width profile, bank geometry, bed roughness, boulder density, vegetation/debris indicators, and confidence score.
 - `drop_transitions`: upstream pool ID, downstream pool/reach ID, crest station, bed-elevation fall, ramp or ledge length, tailwater control, expected hydraulic type, recirculation/aeration proxy, eddy recovery window, hazard tags, and review status.
 - `pool_controls`: depth estimate, residence/storage behavior, inflow/outflow relationship, eddy/recirculation areas, and low-flow/high-flow changes.
-- `stitching`: reach-local grids with overlap/ghost zones or one stitched global grid with reach/drop IDs. The exported GeoClaw and C++ inputs must remain semantically identical.
+- `stitching`: reach-local grids with overlap/ghost zones for authoring and streaming, plus mandatory stitched whole-window validation outputs with reach/drop IDs. The exported GeoClaw and C++ inputs must remain semantically identical.
 - `validation_windows`: per-reach probes, cross sections, drop-entry/drop-exit windows, raft checkpoints, and whole-section conservation summaries.
 
 Use discontinuities carefully. A drop can have an abrupt bed-elevation change, but the solver handoff cannot be a hidden impulse. Energy loss, turbulence, aeration, and recirculation should be represented with topography, roughness, hydraulic controls, and explicit source/damping fields that are visible to the comparison harness.
@@ -315,7 +315,7 @@ Each real-world river section must pass:
 
 - Segment the selected river section into ordered reaches and drop transitions.
 - Encode reach-local slope, roughness, width, pool depth, tailwater controls, and drop geometry.
-- Add overlap/ghost zones or a stitched global grid with reach/drop IDs.
+- Add reach-local overlap/ghost zones and stitched whole-window validation outputs with reach/drop IDs.
 - Validate conservation and raft continuity across reach boundaries.
 
 ### Milestone D: Seasonal Flow Model
