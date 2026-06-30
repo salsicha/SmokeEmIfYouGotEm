@@ -18,6 +18,22 @@ GeoClaw and the C++ engine must consume the same solver-neutral scenario package
 
 Fallback or initial-state-only GeoClaw normalization is useful for schema smoke tests, but it does not count as full shallow-water solution validation.
 
+## Current Closure Order
+
+The Milestone 16 gate has enough evidence to guide the next work, but it does not approve live Unreal water. GeoClaw reference runs, C++ run manifests, promoted regression subsets, runtime budgets, and deterministic replay checks pass. The blocking failures are the GeoClaw/C++ threshold comparisons, geometry-specific validation, and raft-coupling agreement over C++ water.
+
+The closure work must happen in this order:
+
+- Keep the Milestone 17 analytic fixtures green before and after every retune batch.
+- Build a failure triage matrix from the blocked GeoClaw/C++ comparison, geometry, raft-coupling, and full-gate reports.
+- Fix GeoClaw-vs-C++ field, probe, cross-section, conservation, Froude, wet/dry, and feature-localization failures before accepting raft outcome fixes.
+- Close the geometry families that still fail: wet/dry shorelines, bed steps, constrictions, drops/ledges, tailwater controls, and cascading reach/drop behavior.
+- Retune raft coupling only after the relevant C++ water fields improve, so force and outcome fixes are not masking bad hydraulics.
+- Add a distinct pin/release fixture that is not only shallow-shelf or boulder proxy evidence.
+- Re-run the full Milestone 16 gate and regenerate the GeoClaw-to-Unreal readiness report.
+
+Chaos/Jolt runtime authority evaluation stays after this closure work. Those engines can be evaluated for raft/contact/swimmer authority, but no authority decision should treat unapproved C++ live water as accepted input.
+
 ## Authored Feature Forcing Decision
 
 Authored feature forcing is allowed, but only as a bounded, manifest-recorded, GeoClaw-compared layer that does not hide conservation failures. It is a runtime and gameplay tuning tool, not permission to replace shallow-water geometry with scripted outcomes.
@@ -153,6 +169,44 @@ The C++ engine is accepted for live Unreal water only when:
 - Deterministic replay is documented for the accepted solver mode and parameter set.
 - The GeoClaw-to-Unreal readiness report explicitly approves live custom water.
 
+## Phase 8: Validation Closure Workplan
+
+Milestone 18 is the closure pass for the blocked Milestone 16 evidence. It does not relax acceptance thresholds. It turns the current failures into ordered implementation work and requires the same JSON/Markdown report trail before the readiness decision can change.
+
+### 1. GeoClaw/C++ Parity Failures
+
+Create a triage matrix where each failed comparison records the scenario package, solver mode, metric, threshold tier, observed error, likely cause, and retune lever. The matrix should split field errors from probe, cross-section, conservation, wet/dry-mask, Froude-class, feature-localization, and reach/drop-window errors.
+
+Retune in dependency order. Preserve flat-pool and sloping-channel behavior first, then work through wet/dry, bed-step, constriction, drop/ledge, and cascading cases. Feature forcing must remain disabled or at low validated defaults while core field parity is being fixed. A parity fix is accepted only when the corresponding GeoClaw/C++ report passes without causing an analytic fixture regression.
+
+### 2. Geometry-Specific Failures
+
+Treat each blocked geometry family as its own acceptance lane. Wet/dry fixes must show bounded shoreline movement, dry-cell velocity masking, and mass drift. Bed-step fixes must show the right free-surface response and source-term balance. Constriction fixes must preserve flux, velocity acceleration, and Froude-class transitions. Drop/ledge/tailwater fixes must show expected energy loss, hydraulic control, and downstream recovery. Cascading reach/drop fixes must compare reach-local outputs against stitched whole-window outputs so seams cannot hide errors.
+
+Each family should be promoted into regression artifacts when it passes. Do not tune a whitewater feature by sacrificing lake-at-rest, sloping-channel, wet/dry, bed-step, bore, hydraulic-jump, or transcritical-bump guardrails.
+
+### 3. Raft Coupling Agreement Over C++ Water
+
+Re-run raft coupling after the relevant water-field and geometry failures improve. Compare GeoClaw-derived and C++ water fields with the same raft initial states, water samples, feature probes, crew actions, and contact setup.
+
+The raft gate must compare force envelopes, impulse timing, trajectory deltas, yaw/roll/pitch proxies, surf/flush/clear/ground/pin/flip outcome classes, recovery timing, swimmer/ejection state when present, and reach/drop transition stability. Retuning may adjust sampling, force integration, damping, contact thresholds, crew center-of-gravity effects, and feature-forcing modifiers only when the water-field diagnostics remain inside threshold.
+
+### 4. Distinct Pin/Release Fixture
+
+Add a dedicated pin/release fixture separate from shallow-shelf grounding and boulder-impact proxy coverage. The fixture should encode a flow-dependent pin against a rock, strainer, or ledge-like obstruction with explicit approach angle, water depth, discharge band, contact normal, wrap depth proxy, side load, and release threshold.
+
+The fixture must include at least three outcomes: unsafe no-action or late-action pin, successful high-side or weight-shift release inside the counterplay window, and failed release that transitions into swim/rescue or safety-score consequences. Reports should expose pin force, side load, raft orientation, crew weight distribution, release margin, flow band, and whether feature forcing contributed to the outcome.
+
+### 5. Milestone 17 Analytic Guardrails
+
+Run the manually encoded Milestone 17 analytic fixtures before and after every solver retune batch. The guardrail set covers lake-at-rest balance, sloping-channel friction, wet/dry shoreline behavior, bed steps, dam-break/bore behavior, hydraulic jumps, and transcritical flow over a bump where practical.
+
+A retune batch is blocked if these reports regress, even when a larger rapid or raft outcome improves. This keeps broad whitewater tuning from hiding source-term, wet/dry, conservation, or jump-location failures in small trusted cases.
+
+### 6. Full Milestone 16 Gate Re-Run
+
+After parity, geometry, raft-coupling, pin/release, and analytic-guardrail checks pass, regenerate the suite-level C++ validation report and the GeoClaw-to-Unreal readiness report. The readiness report must still be allowed to block live custom water if any comparison, geometry family, raft outcome, runtime budget, deterministic replay, or regression-promotion requirement fails.
+
 ## Open Decisions
 
 - Exact schema fields for reach-local grids, ghost-zone ownership, stitched whole-window validation exports, and seam diagnostics.
@@ -160,10 +214,13 @@ The C++ engine is accepted for live Unreal water only when:
 - Whether the first accepted runtime remains CPU-only or starts a GPU path after correctness is established.
 - Exact numerical thresholds for research-accepted, Unreal-prototype, and production-candidate tiers.
 - Exact schema fields and acceptance thresholds for river validation annotations and guide-review signoff.
+- Exact report schema for the Milestone 18 failure triage matrix and the distinct pin/release closure artifact.
 
 ## Related Docs
 
 - [2.5D Dual-Solver Simulation Plan](2.5d-simulation-plan.md)
 - [GeoClaw Reference Solver Transition Plan](geoclaw-transition-plan.md)
 - [Custom Water Runtime Baseline](custom-water-runtime-baseline.md)
+- [Python-To-Unreal Readiness Gate](python-to-unreal-readiness-gate.md)
+- [Chaos And Jolt Runtime Evaluation](chaos-jolt-runtime-evaluation.md)
 - [Chrono Water And Raft Coupling Plan](chrono-water-raft-coupling-plan.md)

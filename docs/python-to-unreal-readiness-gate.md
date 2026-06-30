@@ -2,9 +2,9 @@
 
 Milestone 10 generated the first Python-to-Unreal readiness gate artifacts in `physics/data/readiness/milestone_10/`.
 
-Current decision: **blocked for live custom water**. The Milestone 10 audit remains useful for telemetry/replay playback and historical regression, but the Milestone 16 GeoClaw-to-Unreal readiness report blocks live custom water until the custom C++ solver passes the full GeoClaw/C++ geometry and raft-coupling gate.
+Current decision: **blocked for live custom water**. The Milestone 10 audit remains useful for telemetry/replay playback and historical regression, but the Milestone 16 GeoClaw-to-Unreal readiness report blocks live custom water until the custom C++ solver passes the full GeoClaw/C++ geometry and raft-coupling gate. Milestone 18 is the ordered closure pass for those failures: GeoClaw/C++ parity triage and fixes, geometry-family closure, raft-coupling retune, a distinct pin/release fixture, Milestone 17 analytic guardrails, and a full readiness re-run.
 
-Production Unreal work may continue with telemetry/replay playback and non-authoritative visualization, but live water, selected raft/contact runtime coupling, and runtime tuning must wait for a passing regenerated GeoClaw-based readiness report.
+Production Unreal work may continue with telemetry/replay playback and non-authoritative visualization, but live water, selected raft/contact runtime coupling, and runtime tuning must wait for Milestone 18 closure and a passing regenerated GeoClaw-based readiness report.
 
 ## Artifacts
 
@@ -36,21 +36,23 @@ Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 
 - Authoritative water candidate: custom C++ reduced shallow-water / height-field solver.
 - Reference solver: GeoClaw after Milestone 14 transition; PyClaw artifacts are legacy regression data only.
-- Raft/contact candidate: Project Chrono bridge over custom water/contact samples, with custom reduced raft fallback if budgets fail.
-- Unreal integration order: telemetry/replay playback first, then live custom water, then selected raft/contact runtime coupling.
+- Raft/contact candidate: selected after the Chaos/Jolt shared fixture evaluation, with Chrono kept as high-fidelity reference/research and the custom reduced runtime as fallback if neither candidate passes.
+- Unreal integration order: telemetry/replay playback first, Milestone 18 water-validation closure, live custom water approval, then selected raft/contact runtime coupling.
 - Chrono::FSI remains an optional research path, not the baseline runtime dependency.
 
 ## Next Action
 
-Keep telemetry playback as the first integration target. Live water, selected raft/contact runtime coupling, VR comfort, and native collision/contact should come after the replay path can inspect GeoClaw-validated physics outputs.
+Keep telemetry playback as the first integration target. Live water, selected raft/contact runtime coupling, VR comfort, and native collision/contact should come after the replay path can inspect GeoClaw-validated physics outputs and after Milestone 18 closes the blocked water-solver evidence.
 
-GeoClaw transition actions:
+Milestone 18 closure actions:
 
-- Export the same readiness scenarios into GeoClaw.
-- Add GeoClaw fixed-grid output to the comparison schema.
-- Re-run GeoClaw-vs-C++ field/probe/raft-force comparison.
-- Re-profile the C++ path with GeoClaw-tuned parameters.
-- Regenerate and explicitly re-approve the readiness report.
+- Build the failure triage matrix from the current GeoClaw/C++ comparison, geometry, raft-coupling, and full-gate reports.
+- Run Milestone 17 analytic fixtures before and after every retune batch.
+- Fix GeoClaw/C++ parity failures before accepting raft-outcome tuning.
+- Close wet/dry, bed-step, constriction, drop/ledge, tailwater, and stitched reach/drop geometry families.
+- Add a distinct flow-dependent pin/release fixture separate from shallow-shelf and boulder proxy evidence.
+- Re-run raft coupling over improved C++ water fields.
+- Regenerate and explicitly approve or block the readiness report.
 
 Regenerate the Milestone 16 GeoClaw-to-Unreal report from completed full-gate reports:
 
