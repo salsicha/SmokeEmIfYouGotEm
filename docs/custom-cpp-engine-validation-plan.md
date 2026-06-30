@@ -36,6 +36,8 @@ Flow response is mandatory. For example, a hole can be sticky in one flow range,
 
 Crew weight distribution is part of the validation surface. Seat occupancy, high-side, lean, brace, paddle timing, and recovery actions must change mass distribution, roll moment, contact loading, and pin/flip/release thresholds in deterministic raft telemetry. A forced rock or hydraulic feature may create a flip/pin hazard only if the player has a fair, validated counterplay window.
 
+The first feature-forcing contract is frozen as `raftsim.feature_forcing.v0` in `physics/schemas/feature_forcing.schema.json`, with low-default parameters in `physics/config/feature_forcing_defaults.json` and contract checks in `raftsim.feature_forcing`. The validator rejects manifests that enable forcing by default, exceed low default gains, omit flow-response curves, skip GeoClaw comparison requirements, merge physics/raft/visual controls, or allow forcing to hide mass, momentum, energy, wet/dry, or reach-handoff failures.
+
 ## Analytic Fixture Decision
 
 Add a small manually encoded SWASHES-style analytic fixture set before more broad retuning. These fixtures should isolate solver fundamentals such as lake-at-rest balance, sloping-channel friction, wet/dry shoreline motion, bed steps, dam-break/bores, hydraulic jumps, and transcritical flow over a bump where practical.

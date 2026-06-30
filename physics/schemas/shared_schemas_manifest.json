@@ -30,6 +30,11 @@
       "name": "analytic_fixture_manifest",
       "version": "raftsim.analytic_fixture_manifest.v0",
       "file": "analytic_fixture_manifest.schema.json"
+    },
+    {
+      "name": "feature_forcing",
+      "version": "raftsim.feature_forcing.v0",
+      "file": "feature_forcing.schema.json"
     }
   ]
 }
