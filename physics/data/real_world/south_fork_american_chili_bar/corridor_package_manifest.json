@@ -22,6 +22,7 @@
     "banks": "hydrography/banks.geojson",
     "centerline": "hydrography/centerline.geojson",
     "confidence_metadata": "confidence.json",
+    "course_elevation_extraction": "course_elevation_extraction.json",
     "flow_presets": "hydrology/flow_presets.json",
     "hazards": "review/rapid_review_labels.json",
     "imagery_masks": [

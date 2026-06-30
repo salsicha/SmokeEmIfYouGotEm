@@ -1,0 +1,640 @@
+{
+  "cross_section_prototypes": [
+    {
+      "authoring_status": "prototype_requires_dem_lidar_bank_review",
+      "bank_offsets_m": {
+        "left": 13.0,
+        "right": -13.0
+      },
+      "center_wgs84": {
+        "lat": 38.76,
+        "lon": -120.873
+      },
+      "channel_width_m": 26.0,
+      "constriction_score": 0.0,
+      "cross_section_id": "course_section_001",
+      "elevation_m": 304.0,
+      "gradient": 0.010666666666666692,
+      "local_axis": {
+        "downstream_m": 0.0,
+        "left_m_positive": true,
+        "right_m_negative": true
+      },
+      "nearest_rapid_candidate_id": "rapid_candidate_01",
+      "rapid_candidate_ids": [],
+      "rapid_score": 0.23288000000000045,
+      "roughness_score": 0.1524,
+      "signals": [
+        "access_point"
+      ],
+      "station_m": 0.0,
+      "suggested_labels": []
+    },
+    {
+      "authoring_status": "prototype_requires_dem_lidar_bank_review",
+      "bank_offsets_m": {
+        "left": 12.0,
+        "right": -12.0
+      },
+      "center_wgs84": {
+        "lat": 38.764,
+        "lon": -120.865
+      },
+      "channel_width_m": 24.0,
+      "constriction_score": 0.1111111111111111,
+      "cross_section_id": "course_section_002",
+      "elevation_m": 299.2,
+      "gradient": 0.014130434782608696,
+      "local_axis": {
+        "downstream_m": 450.0,
+        "left_m_positive": true,
+        "right_m_negative": true
+      },
+      "nearest_rapid_candidate_id": "rapid_candidate_01",
+      "rapid_candidate_ids": [],
+      "rapid_score": 0.34415661835748795,
+      "roughness_score": 0.2248,
+      "signals": [
+        "dem_slope"
+      ],
+      "station_m": 450.0,
+      "suggested_labels": []
+    },
+    {
+      "authoring_status": "prototype_requires_dem_lidar_bank_review",
+      "bank_offsets_m": {
+        "left": 9.0,
+        "right": -9.0
+      },
+      "center_wgs84": {
+        "lat": 38.7685,
+        "lon": -120.858
+      },
+      "channel_width_m": 18.0,
+      "constriction_score": 0.3076923076923077,
+      "cross_section_id": "course_section_003",
+      "elevation_m": 291.0,
+      "gradient": 0.014347826086956509,
+      "local_axis": {
+        "downstream_m": 920.0,
+        "left_m_positive": true,
+        "right_m_negative": true
+      },
+      "nearest_rapid_candidate_id": "rapid_candidate_01",
+      "rapid_candidate_ids": [
+        "rapid_candidate_01"
+      ],
+      "rapid_score": 0.5575514381270901,
+      "roughness_score": 0.5655999999999999,
+      "signals": [
+        "dem_slope",
+        "constriction",
+        "boulder_density",
+        "foam_whitewater_texture",
+        "guide_note",
+        "roughness",
+        "high_score"
+      ],
+      "station_m": 920.0,
+      "suggested_labels": [
+        "boulder_garden",
+        "constriction",
+        "manual_review_required",
+        "wave_train"
+      ]
+    },
+    {
+      "authoring_status": "prototype_requires_dem_lidar_bank_review",
+      "bank_offsets_m": {
+        "left": 15.0,
+        "right": -15.0
+      },
+      "center_wgs84": {
+        "lat": 38.773,
+        "lon": -120.85
+      },
+      "channel_width_m": 30.0,
+      "constriction_score": 0.0,
+      "cross_section_id": "course_section_004",
+      "elevation_m": 286.0,
+      "gradient": 0.013541666666666667,
+      "local_axis": {
+        "downstream_m": 1370.0,
+        "left_m_positive": true,
+        "right_m_negative": true
+      },
+      "nearest_rapid_candidate_id": "rapid_candidate_01",
+      "rapid_candidate_ids": [],
+      "rapid_score": 0.29695750000000004,
+      "roughness_score": 0.1916,
+      "signals": [
+        "dem_slope"
+      ],
+      "station_m": 1370.0,
+      "suggested_labels": []
+    },
+    {
+      "authoring_status": "prototype_requires_dem_lidar_bank_review",
+      "bank_offsets_m": {
+        "left": 8.5,
+        "right": -8.5
+      },
+      "center_wgs84": {
+        "lat": 38.7765,
+        "lon": -120.842
+      },
+      "channel_width_m": 17.0,
+      "constriction_score": 0.43333333333333335,
+      "cross_section_id": "course_section_005",
+      "elevation_m": 278.0,
+      "gradient": 0.011313131313131301,
+      "local_axis": {
+        "downstream_m": 1880.0,
+        "left_m_positive": true,
+        "right_m_negative": true
+      },
+      "nearest_rapid_candidate_id": "rapid_candidate_02",
+      "rapid_candidate_ids": [
+        "rapid_candidate_02"
+      ],
+      "rapid_score": 0.5634599999999998,
+      "roughness_score": 0.6258,
+      "signals": [
+        "constriction",
+        "boulder_density",
+        "foam_whitewater_texture",
+        "guide_note",
+        "roughness",
+        "high_score"
+      ],
+      "station_m": 1880.0,
+      "suggested_labels": [
+        "boulder_garden",
+        "constriction",
+        "manual_review_required",
+        "wave_train"
+      ]
+    },
+    {
+      "authoring_status": "prototype_requires_dem_lidar_bank_review",
+      "bank_offsets_m": {
+        "left": 16.5,
+        "right": -16.5
+      },
+      "center_wgs84": {
+        "lat": 38.78,
+        "lon": -120.833
+      },
+      "channel_width_m": 33.0,
+      "constriction_score": 0.0,
+      "cross_section_id": "course_section_006",
+      "elevation_m": 274.8,
+      "gradient": 0.012307692307692318,
+      "local_axis": {
+        "downstream_m": 2360.0,
+        "left_m_positive": true,
+        "right_m_negative": true
+      },
+      "nearest_rapid_candidate_id": "rapid_candidate_02",
+      "rapid_candidate_ids": [],
+      "rapid_score": 0.2593169230769232,
+      "roughness_score": 0.1452,
+      "signals": [
+        "dem_slope"
+      ],
+      "station_m": 2360.0,
+      "suggested_labels": []
+    },
+    {
+      "authoring_status": "prototype_requires_dem_lidar_bank_review",
+      "bank_offsets_m": {
+        "left": 10.0,
+        "right": -10.0
+      },
+      "center_wgs84": {
+        "lat": 38.785,
+        "lon": -120.8235
+      },
+      "channel_width_m": 20.0,
+      "constriction_score": 0.16666666666666666,
+      "cross_section_id": "course_section_007",
+      "elevation_m": 265.2,
+      "gradient": 0.015135135135135145,
+      "local_axis": {
+        "downstream_m": 2920.0,
+        "left_m_positive": true,
+        "right_m_negative": true
+      },
+      "nearest_rapid_candidate_id": "rapid_candidate_03",
+      "rapid_candidate_ids": [
+        "rapid_candidate_03"
+      ],
+      "rapid_score": 0.5085363963963966,
+      "roughness_score": 0.5342000000000001,
+      "signals": [
+        "dem_slope",
+        "boulder_density",
+        "foam_whitewater_texture",
+        "bend_or_lateral_candidate",
+        "guide_note",
+        "roughness"
+      ],
+      "station_m": 2920.0,
+      "suggested_labels": [
+        "boulder_garden",
+        "lateral",
+        "manual_review_required",
+        "wave_train"
+      ]
+    },
+    {
+      "authoring_status": "prototype_requires_dem_lidar_bank_review",
+      "bank_offsets_m": {
+        "left": 11.5,
+        "right": -11.5
+      },
+      "center_wgs84": {
+        "lat": 38.79,
+        "lon": -120.814
+      },
+      "channel_width_m": 23.0,
+      "constriction_score": 0.20689655172413793,
+      "cross_section_id": "course_section_008",
+      "elevation_m": 258.0,
+      "gradient": 0.014336283185840699,
+      "local_axis": {
+        "downstream_m": 3470.0,
+        "left_m_positive": true,
+        "right_m_negative": true
+      },
+      "nearest_rapid_candidate_id": "rapid_candidate_03",
+      "rapid_candidate_ids": [],
+      "rapid_score": 0.400465913945682,
+      "roughness_score": 0.296,
+      "signals": [
+        "dem_slope",
+        "constriction"
+      ],
+      "station_m": 3470.0,
+      "suggested_labels": []
+    },
+    {
+      "authoring_status": "prototype_requires_dem_lidar_bank_review",
+      "bank_offsets_m": {
+        "left": 9.5,
+        "right": -9.5
+      },
+      "center_wgs84": {
+        "lat": 38.796,
+        "lon": -120.804
+      },
+      "channel_width_m": 19.0,
+      "constriction_score": 0.2962962962962963,
+      "cross_section_id": "course_section_009",
+      "elevation_m": 249.0,
+      "gradient": 0.01163793103448276,
+      "local_axis": {
+        "downstream_m": 4050.0,
+        "left_m_positive": true,
+        "right_m_negative": true
+      },
+      "nearest_rapid_candidate_id": "rapid_candidate_04",
+      "rapid_candidate_ids": [
+        "rapid_candidate_04"
+      ],
+      "rapid_score": 0.5185310472541507,
+      "roughness_score": 0.6016,
+      "signals": [
+        "constriction",
+        "boulder_density",
+        "foam_whitewater_texture",
+        "bend_or_lateral_candidate",
+        "guide_note",
+        "roughness"
+      ],
+      "station_m": 4050.0,
+      "suggested_labels": [
+        "boulder_garden",
+        "constriction",
+        "lateral",
+        "manual_review_required",
+        "wave_train"
+      ]
+    },
+    {
+      "authoring_status": "prototype_requires_dem_lidar_bank_review",
+      "bank_offsets_m": {
+        "left": 14.5,
+        "right": -14.5
+      },
+      "center_wgs84": {
+        "lat": 38.803,
+        "lon": -120.793
+      },
+      "channel_width_m": 29.0,
+      "constriction_score": 0.0,
+      "cross_section_id": "course_section_010",
+      "elevation_m": 244.5,
+      "gradient": 0.009565217391304347,
+      "local_axis": {
+        "downstream_m": 4630.0,
+        "left_m_positive": true,
+        "right_m_negative": true
+      },
+      "nearest_rapid_candidate_id": "rapid_candidate_04",
+      "rapid_candidate_ids": [],
+      "rapid_score": 0.23726608695652174,
+      "roughness_score": 0.2012,
+      "signals": [],
+      "station_m": 4630.0,
+      "suggested_labels": []
+    },
+    {
+      "authoring_status": "prototype_requires_dem_lidar_bank_review",
+      "bank_offsets_m": {
+        "left": 13.5,
+        "right": -13.5
+      },
+      "center_wgs84": {
+        "lat": 38.81,
+        "lon": -120.782
+      },
+      "channel_width_m": 27.0,
+      "constriction_score": 0.03571428571428571,
+      "cross_section_id": "course_section_011",
+      "elevation_m": 238.0,
+      "gradient": 0.011403508771929825,
+      "local_axis": {
+        "downstream_m": 5200.0,
+        "left_m_positive": true,
+        "right_m_negative": true
+      },
+      "nearest_rapid_candidate_id": "rapid_candidate_04",
+      "rapid_candidate_ids": [],
+      "rapid_score": 0.28553503759398496,
+      "roughness_score": 0.2236,
+      "signals": [
+        "access_point"
+      ],
+      "station_m": 5200.0,
+      "suggested_labels": []
+    }
+  ],
+  "provenance": {
+    "extraction_method": "seed_centerline_station_interpolation_with_indicator_cross_sections",
+    "generated_by": "raftsim.real_world.build_course_elevation_extraction",
+    "processing_version": "milestone_17_course_elevation_seed.v0",
+    "review_status": "prototype_needs_real_dem_lidar_hydrography_pull",
+    "source_limitations": "Uses coarse planning stations and derived indicators only; production extraction must replace these with CRS-recorded DEM/lidar, flowline, bank, water-mask, and cross-section measurements."
+  },
+  "river_id": "american_south_fork",
+  "samples": [
+    {
+      "channel_width_m": 26.0,
+      "constriction_score": 0.0,
+      "cumulative_drop_m": 0.0,
+      "elevation_m": 304.0,
+      "gradient": 0.010666666666666692,
+      "lat": 38.76,
+      "left_bank_offset_m": 13.0,
+      "local_drop_m": 0.0,
+      "lon": -120.873,
+      "rapid_score": 0.23288000000000045,
+      "right_bank_offset_m": -13.0,
+      "roughness_score": 0.1524,
+      "signals": [
+        "access_point"
+      ],
+      "station_m": 0.0
+    },
+    {
+      "channel_width_m": 24.0,
+      "constriction_score": 0.1111111111111111,
+      "cumulative_drop_m": 4.800000000000011,
+      "elevation_m": 299.2,
+      "gradient": 0.014130434782608696,
+      "lat": 38.764,
+      "left_bank_offset_m": 12.0,
+      "local_drop_m": 4.800000000000011,
+      "lon": -120.865,
+      "rapid_score": 0.34415661835748795,
+      "right_bank_offset_m": -12.0,
+      "roughness_score": 0.2248,
+      "signals": [
+        "dem_slope"
+      ],
+      "station_m": 450.0
+    },
+    {
+      "channel_width_m": 18.0,
+      "constriction_score": 0.3076923076923077,
+      "cumulative_drop_m": 13.0,
+      "elevation_m": 291.0,
+      "gradient": 0.014347826086956509,
+      "lat": 38.7685,
+      "left_bank_offset_m": 9.0,
+      "local_drop_m": 8.199999999999989,
+      "lon": -120.858,
+      "rapid_score": 0.5575514381270901,
+      "right_bank_offset_m": -9.0,
+      "roughness_score": 0.5655999999999999,
+      "signals": [
+        "dem_slope",
+        "constriction",
+        "boulder_density",
+        "foam_whitewater_texture",
+        "guide_note",
+        "roughness",
+        "high_score"
+      ],
+      "station_m": 920.0
+    },
+    {
+      "channel_width_m": 30.0,
+      "constriction_score": 0.0,
+      "cumulative_drop_m": 18.0,
+      "elevation_m": 286.0,
+      "gradient": 0.013541666666666667,
+      "lat": 38.773,
+      "left_bank_offset_m": 15.0,
+      "local_drop_m": 5.0,
+      "lon": -120.85,
+      "rapid_score": 0.29695750000000004,
+      "right_bank_offset_m": -15.0,
+      "roughness_score": 0.1916,
+      "signals": [
+        "dem_slope"
+      ],
+      "station_m": 1370.0
+    },
+    {
+      "channel_width_m": 17.0,
+      "constriction_score": 0.43333333333333335,
+      "cumulative_drop_m": 26.0,
+      "elevation_m": 278.0,
+      "gradient": 0.011313131313131301,
+      "lat": 38.7765,
+      "left_bank_offset_m": 8.5,
+      "local_drop_m": 8.0,
+      "lon": -120.842,
+      "rapid_score": 0.5634599999999998,
+      "right_bank_offset_m": -8.5,
+      "roughness_score": 0.6258,
+      "signals": [
+        "constriction",
+        "boulder_density",
+        "foam_whitewater_texture",
+        "guide_note",
+        "roughness",
+        "high_score"
+      ],
+      "station_m": 1880.0
+    },
+    {
+      "channel_width_m": 33.0,
+      "constriction_score": 0.0,
+      "cumulative_drop_m": 29.19999999999999,
+      "elevation_m": 274.8,
+      "gradient": 0.012307692307692318,
+      "lat": 38.78,
+      "left_bank_offset_m": 16.5,
+      "local_drop_m": 3.1999999999999886,
+      "lon": -120.833,
+      "rapid_score": 0.2593169230769232,
+      "right_bank_offset_m": -16.5,
+      "roughness_score": 0.1452,
+      "signals": [
+        "dem_slope"
+      ],
+      "station_m": 2360.0
+    },
+    {
+      "channel_width_m": 20.0,
+      "constriction_score": 0.16666666666666666,
+      "cumulative_drop_m": 38.80000000000001,
+      "elevation_m": 265.2,
+      "gradient": 0.015135135135135145,
+      "lat": 38.785,
+      "left_bank_offset_m": 10.0,
+      "local_drop_m": 9.600000000000023,
+      "lon": -120.8235,
+      "rapid_score": 0.5085363963963966,
+      "right_bank_offset_m": -10.0,
+      "roughness_score": 0.5342000000000001,
+      "signals": [
+        "dem_slope",
+        "boulder_density",
+        "foam_whitewater_texture",
+        "bend_or_lateral_candidate",
+        "guide_note",
+        "roughness"
+      ],
+      "station_m": 2920.0
+    },
+    {
+      "channel_width_m": 23.0,
+      "constriction_score": 0.20689655172413793,
+      "cumulative_drop_m": 46.0,
+      "elevation_m": 258.0,
+      "gradient": 0.014336283185840699,
+      "lat": 38.79,
+      "left_bank_offset_m": 11.5,
+      "local_drop_m": 7.199999999999989,
+      "lon": -120.814,
+      "rapid_score": 0.400465913945682,
+      "right_bank_offset_m": -11.5,
+      "roughness_score": 0.296,
+      "signals": [
+        "dem_slope",
+        "constriction"
+      ],
+      "station_m": 3470.0
+    },
+    {
+      "channel_width_m": 19.0,
+      "constriction_score": 0.2962962962962963,
+      "cumulative_drop_m": 55.0,
+      "elevation_m": 249.0,
+      "gradient": 0.01163793103448276,
+      "lat": 38.796,
+      "left_bank_offset_m": 9.5,
+      "local_drop_m": 9.0,
+      "lon": -120.804,
+      "rapid_score": 0.5185310472541507,
+      "right_bank_offset_m": -9.5,
+      "roughness_score": 0.6016,
+      "signals": [
+        "constriction",
+        "boulder_density",
+        "foam_whitewater_texture",
+        "bend_or_lateral_candidate",
+        "guide_note",
+        "roughness"
+      ],
+      "station_m": 4050.0
+    },
+    {
+      "channel_width_m": 29.0,
+      "constriction_score": 0.0,
+      "cumulative_drop_m": 59.5,
+      "elevation_m": 244.5,
+      "gradient": 0.009565217391304347,
+      "lat": 38.803,
+      "left_bank_offset_m": 14.5,
+      "local_drop_m": 4.5,
+      "lon": -120.793,
+      "rapid_score": 0.23726608695652174,
+      "right_bank_offset_m": -14.5,
+      "roughness_score": 0.2012,
+      "signals": [],
+      "station_m": 4630.0
+    },
+    {
+      "channel_width_m": 27.0,
+      "constriction_score": 0.03571428571428571,
+      "cumulative_drop_m": 66.0,
+      "elevation_m": 238.0,
+      "gradient": 0.011403508771929825,
+      "lat": 38.81,
+      "left_bank_offset_m": 13.5,
+      "local_drop_m": 6.5,
+      "lon": -120.782,
+      "rapid_score": 0.28553503759398496,
+      "right_bank_offset_m": -13.5,
+      "roughness_score": 0.2236,
+      "signals": [
+        "access_point"
+      ],
+      "station_m": 5200.0
+    }
+  ],
+  "schema_version": "raftsim.course_elevation_extraction.v0",
+  "section_id": "chili_bar_to_coloma",
+  "source_artifacts": {
+    "banks": "hydrography/banks.geojson",
+    "course_elevation_extraction": "course_elevation_extraction.json",
+    "cross_sections": "hydrography/cross_sections.geojson",
+    "dem_lidar": "terrain/3dep_dem_tiles",
+    "flowlines": "hydrography/centerline.geojson",
+    "solver_bed_grid": "terrain/solver_bed_grid.npy",
+    "source_manifest": "source_manifest.json"
+  },
+  "source_manifest": "source_manifest.json",
+  "summary": {
+    "cross_section_prototype_count": 11,
+    "elevation_end_m": 238.0,
+    "elevation_start_m": 304.0,
+    "length_m": 5200.0,
+    "max_channel_width_m": 33.0,
+    "max_local_gradient": 0.015135135135135145,
+    "mean_channel_width_m": 24.181818181818183,
+    "mean_gradient": 0.012692307692307692,
+    "min_channel_width_m": 17.0,
+    "min_local_gradient": 0.009565217391304347,
+    "rapid_candidate_count": 4,
+    "sample_count": 11,
+    "station_end_m": 5200.0,
+    "station_start_m": 0.0,
+    "total_drop_m": 66.0
+  }
+}
