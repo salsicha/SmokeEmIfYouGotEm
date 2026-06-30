@@ -1,0 +1,11 @@
+{
+  "comparison_count": 50,
+  "failed_count": 43,
+  "notes": [
+    "Pin/release remains represented by shallow-shelf pivot/release and high-flow boulder/pin proxies; a distinct strainer or wrap fixture is still needed before production acceptance."
+  ],
+  "passed": false,
+  "passed_count": 7,
+  "source_report": "reports/milestone16/raft_coupling_validation.json",
+  "summary_version": "raftsim.milestone16.readiness_summary.v0"
+}

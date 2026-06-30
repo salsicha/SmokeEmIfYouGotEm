@@ -1,0 +1,126 @@
+{
+  "accepted_model_limitations": [
+    "2.5D shallow-water/height-field flow remains the intended runtime model; full 3D CFD is out of scope.",
+    "GeoClaw remains offline reference infrastructure and does not ship inside Unreal.",
+    "Promoted fixtures are passing subsets, not proof that the full live-water gate has passed.",
+    "Current pin/release evidence is proxy coverage until a dedicated strainer/wrap fixture is added."
+  ],
+  "artifact_manifest": {
+    "source_reports": {
+      "comparison": "reports/milestone16/geoclaw_cpp_comparisons.json",
+      "cpp_solver": "reports/milestone16/cpp_solver_runs.json",
+      "geoclaw_reference": "reports/milestone16/geoclaw_reference_runs.json",
+      "geometry": "reports/milestone16/geometry_validation.json",
+      "raft_coupling": "reports/milestone16/raft_coupling_validation.json",
+      "regression_promotion": "reports/milestone16/regression_promotion_manifest.json",
+      "runtime_profile": "reports/milestone16/runtime_profile.json"
+    },
+    "summaries": {
+      "comparison": "geoclaw_cpp_comparison_summary.json",
+      "cpp_solver": "cpp_solver_summary.json",
+      "geoclaw_reference": "geoclaw_reference_summary.json",
+      "geometry": "geometry_validation_summary.json",
+      "raft_coupling": "raft_coupling_validation_summary.json",
+      "regression_promotion": "regression_promotion_summary.json",
+      "runtime_profile": "runtime_profile_summary.json"
+    }
+  },
+  "checks": [
+    {
+      "artifacts": [
+        "geoclaw_reference_summary.json"
+      ],
+      "check_id": "milestone16_geoclaw_reference_runs",
+      "details": "20 of 20 scenarios have full GeoClaw frames.",
+      "passed": true,
+      "status": "passed",
+      "title": "Milestone 16 GeoClaw Reference Runs"
+    },
+    {
+      "artifacts": [
+        "cpp_solver_summary.json"
+      ],
+      "check_id": "milestone16_cpp_solver_runs",
+      "details": "40 of 40 C++ runs completed with manifests.",
+      "passed": true,
+      "status": "passed",
+      "title": "Milestone 16 C++ Solver Runs"
+    },
+    {
+      "artifacts": [
+        "geoclaw_cpp_comparison_summary.json"
+      ],
+      "check_id": "milestone16_geoclaw_cpp_thresholds",
+      "details": "4 of 40 threshold comparisons pass.",
+      "passed": false,
+      "status": "failed",
+      "title": "Milestone 16 GeoClaw/C++ Thresholds"
+    },
+    {
+      "artifacts": [
+        "geometry_validation_summary.json"
+      ],
+      "check_id": "milestone16_geometry_validation",
+      "details": "2 of 6 geometry families pass.",
+      "passed": false,
+      "status": "failed",
+      "title": "Milestone 16 Geometry Validation"
+    },
+    {
+      "artifacts": [
+        "raft_coupling_validation_summary.json"
+      ],
+      "check_id": "milestone16_raft_coupling",
+      "details": "7 of 50 raft comparisons pass.",
+      "passed": false,
+      "status": "failed",
+      "title": "Milestone 16 Raft Coupling"
+    },
+    {
+      "artifacts": [
+        "runtime_profile_summary.json"
+      ],
+      "check_id": "milestone16_runtime_profile",
+      "details": "8 of 8 promoted C++ profile repetitions pass runtime budgets.",
+      "passed": true,
+      "status": "passed",
+      "title": "Milestone 16 Runtime Profile"
+    },
+    {
+      "artifacts": [
+        "regression_promotion_summary.json"
+      ],
+      "check_id": "milestone16_regression_promotion",
+      "details": "11 passing artifacts promoted.",
+      "passed": true,
+      "status": "passed",
+      "title": "Milestone 16 Regression Promotion"
+    }
+  ],
+  "decision": {
+    "approved_for_unreal_production_start": false,
+    "reason": "The full Milestone 16 gate was regenerated, but live Unreal custom water remains blocked by failed GeoClaw/C++ geometry or raft validation checks.",
+    "required_next_actions": [
+      "Fix GeoClaw/C++ threshold failures outside flat-pool and sloping-channel cases.",
+      "Retune wet/dry, bed-step, constriction, drop/ledge, and cascading reach/drop dynamics until geometry families pass.",
+      "Retune raft coupling against GeoClaw and C++ fields until force envelopes, outcomes, and transition cases pass.",
+      "Add a distinct pin/release fixture beyond the current shallow-shelf and boulder proxy evidence."
+    ],
+    "status": "blocked"
+  },
+  "gate_version": "raftsim.geoclaw_to_unreal_readiness.v1",
+  "passed": false,
+  "risks": [
+    "Most GeoClaw/C++ threshold comparisons still fail outside hydrostatic/sloping cases.",
+    "Raft force and outcome agreement is not yet stable across hydraulics, drops, and boulder gardens.",
+    "Runtime profile passes only the promoted configurations and still needs target hardware confirmation.",
+    "Real-world river source licensing, guide review, and field-media validation remain production gates."
+  ],
+  "runtime_choices": {
+    "authoritative_water_candidate": "custom C++ reduced or finite-volume shallow-water / height-field solver after full Milestone 16 approval",
+    "chrono_fsi": "optional research path only, not a baseline runtime dependency",
+    "raft_and_contact_candidate": "Project Chrono bridge or custom reduced raft fallback over validated custom water fields",
+    "reference_solver": "GeoClaw offline fixed-grid output normalized into the shared telemetry schema",
+    "unreal_integration_order": "telemetry/replay playback and promoted regression fixtures first; live custom water only after all Milestone 16 checks pass"
+  }
+}

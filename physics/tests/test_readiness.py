@@ -6,6 +6,7 @@ from raftsim.readiness import (
     build_adaptive_flow_validation,
     build_geoclaw_readiness_report,
     build_milestone10_scenario_suite,
+    build_milestone16_geoclaw_readiness_report,
     build_readiness_report,
     check_from_summary,
     count_csv_rows,
@@ -13,6 +14,7 @@ from raftsim.readiness import (
     write_unreal_visualization_exports,
 )
 from raftsim.examples.generate_geoclaw_to_unreal_readiness import main as generate_geoclaw_readiness_main
+from raftsim.examples.generate_milestone16_geoclaw_to_unreal_readiness import main as generate_milestone16_readiness_main
 from raftsim.scenario2_5d import ProceduralScenario2_5DParameters, generate_procedural_scenario2_5d
 from raftsim.schema_versions import REPLAY_SCHEMA_VERSION
 
@@ -124,3 +126,78 @@ def test_generate_geoclaw_readiness_example_writes_blocked_report_without_cpp(tm
     assert report["gate_version"] == GEOCLAW_READINESS_REPORT_VERSION
     assert report["decision"]["status"] == "blocked"
     assert (tmp_path / "readiness" / "geoclaw_reference_summary.json").exists()
+
+
+def test_milestone16_geoclaw_readiness_report_blocks_live_custom_water():
+    report = build_milestone16_geoclaw_readiness_report(
+        geoclaw_reference_summary={"passed": True, "passed_count": 20, "scenario_count": 20},
+        cpp_summary={"passed": True, "passed_count": 40, "run_count": 40},
+        comparison_summary={"passed": False, "threshold_passed_count": 4, "comparison_count": 40},
+        geometry_summary={"passed": False, "passed_count": 2, "case_count": 6},
+        raft_coupling_summary={"passed": False, "passed_count": 7, "comparison_count": 50},
+        runtime_profile_summary={"passed": True, "budget_passed_count": 8, "run_count": 8},
+        regression_promotion_summary={"passed": True, "entry_count": 11},
+        artifact_manifest={},
+    )
+    check_ids = {check.check_id for check in report.checks}
+
+    assert report.gate_version == GEOCLAW_READINESS_REPORT_VERSION
+    assert report.passed is False
+    assert report.decision.status == "blocked"
+    assert report.decision.approved_for_unreal_production_start is False
+    assert "milestone16_geoclaw_cpp_thresholds" in check_ids
+    assert "milestone16_geometry_validation" in check_ids
+    assert "milestone16_raft_coupling" in check_ids
+
+
+def test_generate_milestone16_readiness_writes_blocked_report(tmp_path):
+    report_dir = tmp_path / "reports"
+    report_dir.mkdir()
+    _write_json(
+        report_dir / "geoclaw_reference_runs.json",
+        {"passed": True, "passed_count": 1, "failed_count": 0, "records": [{"passed": True, "full_solution": True}]},
+    )
+    _write_json(
+        report_dir / "cpp_solver_runs.json",
+        {"passed": True, "passed_count": 1, "failed_count": 0, "records": [{"passed": True, "gate_scenario_id": "flat_pool"}]},
+    )
+    _write_json(
+        report_dir / "geoclaw_cpp_comparisons.json",
+        {"passed": False, "comparison_count": 2, "records": [{"threshold_passed": True}, {"threshold_passed": False}]},
+    )
+    _write_json(
+        report_dir / "geometry_validation.json",
+        {"passed": False, "case_count": 1, "cases": [{"passed": False}]},
+    )
+    _write_json(
+        report_dir / "raft_coupling_validation.json",
+        {"passed": False, "comparison_count": 1, "passed_count": 0, "failed_count": 1, "records": [{"passed": False}]},
+    )
+    _write_json(
+        report_dir / "runtime_profile.json",
+        {"passed": True, "budget_passed_count": 1, "budget_failed_count": 0, "records": [{"passed": True}], "deterministic_replay": [{"passed": True}]},
+    )
+    _write_json(
+        report_dir / "regression_promotion_manifest.json",
+        {"passed": True, "entries": [{"passed": True, "category": "geoclaw_cpp"}, {"passed": True, "category": "raft_coupling"}]},
+    )
+
+    exit_code = generate_milestone16_readiness_main(
+        [
+            "--output-dir",
+            str(tmp_path / "readiness"),
+            "--report-dir",
+            str(report_dir),
+        ]
+    )
+    report = json.loads((tmp_path / "readiness" / "geoclaw_to_unreal_readiness_report.json").read_text(encoding="utf-8"))
+    comparison_summary = json.loads((tmp_path / "readiness" / "geoclaw_cpp_comparison_summary.json").read_text(encoding="utf-8"))
+
+    assert exit_code == 0
+    assert report["decision"]["status"] == "blocked"
+    assert report["decision"]["approved_for_unreal_production_start"] is False
+    assert comparison_summary["threshold_failed_count"] == 1
+
+
+def _write_json(path, data):
+    path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")

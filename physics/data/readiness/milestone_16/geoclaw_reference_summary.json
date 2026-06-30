@@ -1,0 +1,9 @@
+{
+  "failed_count": 0,
+  "full_solution_count": 20,
+  "passed": true,
+  "passed_count": 20,
+  "scenario_count": 20,
+  "source_report": "reports/milestone16/geoclaw_reference_runs.json",
+  "summary_version": "raftsim.milestone16.readiness_summary.v0"
+}
