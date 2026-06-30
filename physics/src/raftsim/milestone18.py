@@ -13,6 +13,7 @@ from .analytic_validation import AnalyticCandidateKind, AnalyticValidationReport
 
 MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA = "raftsim.milestone18.failure_triage_matrix.v0"
 MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA = "raftsim.milestone18.analytic_retune_guardrail.v0"
+MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA = "raftsim.milestone18.parity_family_retune.v0"
 
 _CORE_GUARDRAIL_FAMILIES = {"hydrostatic_sloping_balance", "uniform_channel", "dam_break_bore"}
 _GEOMETRY_CLOSURE_FAMILIES = {"wet_dry_shoreline", "bed_step", "constriction", "drops_ledges_tailwater"}
@@ -401,6 +402,178 @@ class Milestone18AnalyticRetuneGuardrailReport:
                 )
         output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
         return output_path
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ParityModeResult:
+    """One solver-mode rerun in a Milestone 18 parity-family retune batch."""
+
+    solver_mode: str
+    candidate_label: str
+    promoted: bool
+    threshold_report: str
+    comparison_dir: str
+    manifest: str | None
+    tuning_parameters: dict[str, object]
+    failing_checks: tuple[str, ...]
+    checks: tuple[dict[str, object], ...]
+    notes: tuple[str, ...] = ()
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "solver_mode": self.solver_mode,
+            "candidate_label": self.candidate_label,
+            "promoted": self.promoted,
+            "threshold_report": self.threshold_report,
+            "comparison_dir": self.comparison_dir,
+            "manifest": self.manifest,
+            "tuning_parameters": self.tuning_parameters,
+            "failing_checks": list(self.failing_checks),
+            "checks": list(self.checks),
+            "notes": list(self.notes),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ParityFamilyRetuneReport:
+    """Evidence report for rerunning one GeoClaw/C++ parity family."""
+
+    scenario_family: str
+    gate_scenario_id: str
+    actual_scenario_id: str
+    reference_manifest: str
+    reference_boundary_semantics: dict[str, object]
+    feature_forcing_policy: str
+    mode_results: tuple[Milestone18ParityModeResult, ...]
+    notes: tuple[str, ...] = ()
+
+    @property
+    def passed(self) -> bool:
+        return bool(self.mode_results) and all(result.promoted for result in self.mode_results)
+
+    @property
+    def partially_promoted(self) -> bool:
+        return any(result.promoted for result in self.mode_results) and not self.passed
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "PARTIAL_PROMOTION" if self.partially_promoted else "BLOCKED",
+            "scenario_family": self.scenario_family,
+            "gate_scenario_id": self.gate_scenario_id,
+            "actual_scenario_id": self.actual_scenario_id,
+            "reference_manifest": self.reference_manifest,
+            "reference_boundary_semantics": self.reference_boundary_semantics,
+            "feature_forcing_policy": self.feature_forcing_policy,
+            "summary": {
+                "mode_count": len(self.mode_results),
+                "promoted_modes": [result.solver_mode for result in self.mode_results if result.promoted],
+                "blocked_modes": [result.solver_mode for result in self.mode_results if not result.promoted],
+                "failing_checks_by_mode": {
+                    result.solver_mode: list(result.failing_checks) for result in self.mode_results if result.failing_checks
+                },
+            },
+            "mode_results": [result.to_json_dict() for result in self.mode_results],
+            "notes": list(self.notes),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = [
+            "# Milestone 18 Parity Family Retune",
+            "",
+            f"Schema: `{MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{self.to_json_dict()['decision']}**",
+            "",
+            f"Scenario family: `{self.scenario_family}`",
+            f"Gate scenario: `{self.gate_scenario_id}`",
+            f"Actual scenario: `{self.actual_scenario_id}`",
+            f"Reference manifest: `{self.reference_manifest}`",
+            "",
+            "## Boundary Semantics",
+            "",
+            f"- `bc_lower`: `{self.reference_boundary_semantics.get('bc_lower')}`",
+            f"- `bc_upper`: `{self.reference_boundary_semantics.get('bc_upper')}`",
+            f"- Requires adapter: `{self.reference_boundary_semantics.get('requires_user_boundary_adapter')}`",
+            "",
+            "## Mode Results",
+            "",
+            "| Mode | Candidate | Decision | Failing checks | Key tuning |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+        for result in self.mode_results:
+            tuning = ", ".join(f"{key}={value}" for key, value in sorted(result.tuning_parameters.items()))
+            failing = ", ".join(result.failing_checks) if result.failing_checks else "none"
+            lines.append(
+                f"| `{result.solver_mode}` | `{result.candidate_label}` | "
+                f"{'PROMOTED' if result.promoted else 'BLOCKED'} | {failing} | `{tuning}` |"
+            )
+        lines.extend(["", "## Threshold Checks", ""])
+        for result in self.mode_results:
+            lines.extend([f"### {result.solver_mode}", "", "| Check | Value | Threshold | Result |", "| --- | ---: | ---: | --- |"])
+            for check in result.checks:
+                lines.append(
+                    f"| `{check.get('name')}` | {_format_number(_float_or_none(check.get('value')))} | "
+                    f"{_format_number(_float_or_none(check.get('threshold')))} | "
+                    f"{'PASS' if check.get('passed') else 'FAIL'} |"
+                )
+            lines.append("")
+        if self.notes:
+            lines.extend(["## Notes", ""])
+            lines.extend(f"- {note}" for note in self.notes)
+            lines.append("")
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+
+def build_milestone18_parity_family_retune_report(
+    *,
+    scenario_family: str,
+    gate_scenario_id: str,
+    reference_manifest: str | Path,
+    threshold_reports: dict[str, str | Path],
+    candidate_labels: dict[str, str] | None = None,
+    feature_forcing_policy: str = "feature_strength_scale must not increase; retune candidates for core parity use 0.0 unless explicitly justified.",
+    notes: tuple[str, ...] = (),
+) -> Milestone18ParityFamilyRetuneReport:
+    """Build a summary report for one rerun GeoClaw/C++ parity family."""
+
+    reference_manifest_path = Path(reference_manifest)
+    reference_payload = _load_json_report(reference_manifest_path)
+    source_manifest_path = _resolve_reference_source_manifest(reference_manifest_path, reference_payload)
+    source_manifest = _load_json_report(source_manifest_path) if source_manifest_path is not None else {}
+    actual_scenario_id = str(reference_payload.get("scenario_id") or source_manifest.get("scenario_id") or gate_scenario_id)
+    boundary_semantics = source_manifest.get("boundary_semantics", {})
+    if not isinstance(boundary_semantics, dict):
+        boundary_semantics = {}
+    labels = candidate_labels or {}
+    results = tuple(
+        _parity_mode_result(
+            solver_mode=solver_mode,
+            threshold_report=Path(threshold_report),
+            candidate_label=labels.get(solver_mode, solver_mode),
+        )
+        for solver_mode, threshold_report in sorted(threshold_reports.items())
+    )
+    return Milestone18ParityFamilyRetuneReport(
+        scenario_family=scenario_family,
+        gate_scenario_id=gate_scenario_id,
+        actual_scenario_id=actual_scenario_id,
+        reference_manifest=str(reference_manifest_path),
+        reference_boundary_semantics=boundary_semantics,
+        feature_forcing_policy=feature_forcing_policy,
+        mode_results=results,
+        notes=notes,
+    )
 
 
 def build_milestone18_failure_triage_matrix(
@@ -964,6 +1137,79 @@ def _records(container: dict[str, Any], key: str) -> list[dict[str, Any]]:
     if not isinstance(value, list):
         raise ValueError(f"{key} must be a list.")
     return [item for item in value if isinstance(item, dict)]
+
+
+def _parity_mode_result(
+    *,
+    solver_mode: str,
+    threshold_report: Path,
+    candidate_label: str,
+) -> Milestone18ParityModeResult:
+    threshold = _load_json_report(threshold_report)
+    checks = tuple(dict(check) for check in _records(threshold, "checks"))
+    failing_checks = tuple(str(check.get("name", "unknown_check")) for check in checks if not bool(check.get("passed")))
+    comparison_dir = threshold_report.parent
+    manifest_path = comparison_dir / "dual_solver_manifest.json"
+    manifest_ref = str(manifest_path) if manifest_path.exists() else None
+    tuning_parameters: dict[str, object] = {}
+    notes: list[str] = []
+    if manifest_path.exists():
+        manifest = _load_json_report(manifest_path)
+        cpp_entry = manifest.get("cpp", {})
+        if isinstance(cpp_entry, dict):
+            cpp_manifest_ref = cpp_entry.get("manifest")
+            if isinstance(cpp_manifest_ref, str):
+                cpp_manifest_path = _resolve_path(cpp_manifest_ref, manifest_path.parent)
+                if cpp_manifest_path.exists():
+                    cpp_manifest = _load_json_report(cpp_manifest_path)
+                    for key in (
+                        "solver_mode",
+                        "boundary_mode",
+                        "flux_scheme",
+                        "cfl",
+                        "dry_tolerance",
+                        "feature_strength_scale",
+                        "roughness_scale",
+                        "bed_slope_source_scale",
+                        "preserve_initial_mass",
+                    ):
+                        if key in cpp_manifest:
+                            tuning_parameters[key] = cpp_manifest[key]
+    feature_scale = _float_or_none(tuning_parameters.get("feature_strength_scale"))
+    if feature_scale is not None and feature_scale > 0.0:
+        notes.append("Feature forcing is nonzero for this retune candidate; verify it is justified by the fixture.")
+    return Milestone18ParityModeResult(
+        solver_mode=solver_mode,
+        candidate_label=candidate_label,
+        promoted=bool(threshold.get("passed")),
+        threshold_report=str(threshold_report),
+        comparison_dir=str(comparison_dir),
+        manifest=manifest_ref,
+        tuning_parameters=tuning_parameters,
+        failing_checks=failing_checks,
+        checks=checks,
+        notes=tuple(notes),
+    )
+
+
+def _resolve_reference_source_manifest(reference_manifest: Path, payload: dict[str, Any]) -> Path | None:
+    source_ref = payload.get("source_export_manifest")
+    if isinstance(source_ref, str):
+        return _resolve_path(source_ref, reference_manifest.parent)
+    if payload.get("schema") == "raftsim.geoclaw_export.v1":
+        return reference_manifest
+    return None
+
+
+def _resolve_path(value: str, base: Path) -> Path:
+    path = Path(value)
+    if path.is_absolute():
+        return path
+    candidates = (base / path, Path.cwd() / path)
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
 
 
 def _load_json_report(path: Path) -> dict[str, Any]:

@@ -3,11 +3,14 @@ from pathlib import Path
 
 from raftsim.analytic_fixtures import write_analytic_fixture_suite
 from raftsim.examples.generate_milestone18_failure_triage_matrix import main as generate_triage_main
+from raftsim.examples.generate_milestone18_parity_family_retune_report import main as generate_retune_main
 from raftsim.examples.run_milestone18_analytic_retune_guardrail import main as guardrail_main
 from raftsim.milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
+    MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
     build_milestone18_failure_triage_matrix,
+    build_milestone18_parity_family_retune_report,
     run_milestone18_analytic_retune_guardrail,
 )
 
@@ -185,6 +188,134 @@ def test_generate_milestone18_failure_triage_cli_writes_reports(tmp_path):
     assert payload["schema_version"] == MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA
     assert payload["summary"]["entry_count"] == 9
     assert "Milestone 18 GeoClaw/C++ Failure Triage Matrix" in output_md.read_text(encoding="utf-8")
+
+
+def _parity_retune_inputs(tmp_path: Path) -> tuple[Path, dict[str, Path]]:
+    export_manifest = _write_json(
+        tmp_path / "geoclaw" / "manifest.json",
+        {
+            "schema": "raftsim.geoclaw_export.v1",
+            "scenario_id": "uniform_channel_seed_16",
+            "boundary_semantics": {
+                "bc_lower": ["user", "wall"],
+                "bc_upper": ["extrap", "wall"],
+                "requires_user_boundary_adapter": True,
+            },
+        },
+    )
+    reference_manifest = _write_json(
+        tmp_path / "geoclaw" / "normalized" / "manifest.json",
+        {
+            "schema": "raftsim.geoclaw_normalized_output.v1",
+            "scenario_id": "uniform_channel_seed_16",
+            "source_export_manifest": "../manifest.json",
+        },
+    )
+    _ = export_manifest
+
+    reports: dict[str, Path] = {}
+    for mode, passed, checks, config in (
+        (
+            "finite_volume",
+            True,
+            [
+                {"name": "field_linf", "passed": True, "value": 0.12, "threshold": 0.15},
+                {"name": "slope_linf", "passed": True, "value": 0.02, "threshold": 0.035},
+            ],
+            {
+                "solver_mode": "finite_volume",
+                "boundary_mode": "scenario",
+                "flux_scheme": "hll",
+                "feature_strength_scale": 0.0,
+                "roughness_scale": 0.5,
+                "bed_slope_source_scale": 0.75,
+                "preserve_initial_mass": False,
+            },
+        ),
+        (
+            "reduced",
+            False,
+            [
+                {"name": "field_linf", "passed": False, "value": 0.28, "threshold": 0.15},
+                {"name": "slope_linf", "passed": False, "value": 0.09, "threshold": 0.035},
+            ],
+            {
+                "solver_mode": "reduced",
+                "boundary_mode": "scenario",
+                "flux_scheme": "rusanov",
+                "feature_strength_scale": 0.0,
+                "roughness_scale": 1.0,
+                "bed_slope_source_scale": 0.0,
+                "preserve_initial_mass": True,
+            },
+        ),
+    ):
+        root = tmp_path / "comparisons" / mode
+        _write_json(root / "cpp_manifest.json", config)
+        _write_json(root / "dual_solver_manifest.json", {"cpp": {"manifest": "cpp_manifest.json"}})
+        reports[mode] = _write_json(
+            root / "threshold_evaluation.json",
+            {"scenario_id": "uniform_channel_seed_16", "passed": passed, "checks": checks},
+        )
+    return reference_manifest, reports
+
+
+def test_milestone18_parity_family_retune_report_records_partial_promotion(tmp_path):
+    reference_manifest, threshold_reports = _parity_retune_inputs(tmp_path)
+
+    report = build_milestone18_parity_family_retune_report(
+        scenario_family="uniform_channel",
+        gate_scenario_id="uniform_channel",
+        reference_manifest=reference_manifest,
+        threshold_reports=threshold_reports,
+        candidate_labels={"finite_volume": "hll_roughness_0p5_bed_0p75"},
+    )
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA
+    assert payload["decision"] == "PARTIAL_PROMOTION"
+    assert payload["reference_boundary_semantics"]["bc_lower"] == ["user", "wall"]
+    assert payload["summary"]["promoted_modes"] == ["finite_volume"]
+    assert payload["summary"]["blocked_modes"] == ["reduced"]
+    finite_volume = next(result for result in payload["mode_results"] if result["solver_mode"] == "finite_volume")
+    assert finite_volume["tuning_parameters"]["flux_scheme"] == "hll"
+    assert finite_volume["tuning_parameters"]["feature_strength_scale"] == 0.0
+
+
+def test_generate_milestone18_parity_family_retune_cli_writes_reports(tmp_path):
+    reference_manifest, threshold_reports = _parity_retune_inputs(tmp_path)
+    output_json = tmp_path / "reports" / "milestone18" / "retune.json"
+    output_md = tmp_path / "reports" / "milestone18" / "retune.md"
+
+    exit_code = generate_retune_main(
+        [
+            "--scenario-family",
+            "uniform_channel",
+            "--gate-scenario-id",
+            "uniform_channel",
+            "--reference-manifest",
+            str(reference_manifest),
+            "--threshold-report",
+            "finite_volume",
+            str(threshold_reports["finite_volume"]),
+            "--threshold-report",
+            "reduced",
+            str(threshold_reports["reduced"]),
+            "--candidate-label",
+            "finite_volume",
+            "hll_roughness_0p5_bed_0p75",
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 0
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA
+    assert payload["decision"] == "PARTIAL_PROMOTION"
+    assert "Milestone 18 Parity Family Retune" in output_md.read_text(encoding="utf-8")
 
 
 def test_milestone18_analytic_retune_guardrail_passes_for_baseline_scenario(tmp_path):

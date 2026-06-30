@@ -481,17 +481,11 @@ void ReducedShallowWaterSolver::step_reduced(double dt) {
 }
 
 void ReducedShallowWaterSolver::step_finite_volume(double dt) {
-    if (config_.boundary_mode != "pyclaw") {
-        apply_boundaries();
-    }
     double stable_dt = finite_volume_stable_dt();
     int substeps = std::max(1, static_cast<int>(std::ceil(dt / std::max(stable_dt, 1.0e-9))));
     double sub_dt = dt / static_cast<double>(substeps);
     for (int i = 0; i < substeps; ++i) {
         step_finite_volume_once(sub_dt);
-    }
-    if (config_.boundary_mode != "pyclaw") {
-        apply_boundaries();
     }
     time_ += dt;
 }
