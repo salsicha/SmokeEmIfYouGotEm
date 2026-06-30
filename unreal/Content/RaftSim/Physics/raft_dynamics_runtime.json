@@ -1,7 +1,14 @@
 {
   "schema": "raftsim.unreal.raft_dynamics_runtime.v1",
-  "selected_runtime": "ProjectChrono",
+  "selected_runtime": "HybridEvaluation",
   "fallback_runtime": "CustomReducedRigidBody",
+  "candidate_runtimes": [
+    "UnrealChaos",
+    "Jolt",
+    "ProjectChrono",
+    "CustomReducedRigidBody"
+  ],
+  "evaluation_manifest": "chaos_jolt_runtime_evaluation.json",
   "unreal_adapter": {
     "module": "RaftSimPhysics",
     "class": "URaftSimChronoRuntimeAdapter",
@@ -17,9 +24,11 @@
     "enable_compliant_contacts": true
   },
   "runtime_policy": {
-    "chrono_role": "authoritative_raft_kinematics_and_collision_contacts",
-    "chaos_role": "incidental_non_authoritative_effects_only",
+    "chaos_role": "default_unreal_integrated_visual_and_non_authoritative_physics_pending_authority_fixtures",
+    "jolt_role": "candidate_authoritative_raft_contact_swimmer_gameplay_island_pending_fixtures",
+    "chrono_role": "high_fidelity_reference_and_optional_research_backend",
+    "custom_reduced_role": "portable_fallback_using_the_shared_water_query_and_telemetry_schema",
     "unreal_role": "render_interpolated_state_and_forward_deterministic_inputs"
   },
-  "status": "source_integrated_pending_chrono_link_and_editor_compile"
+  "status": "hybrid_evaluation_defined_pending_chaos_automation_and_jolt_smoke_harness"
 }

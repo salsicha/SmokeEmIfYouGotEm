@@ -2,18 +2,20 @@
   "schema": "raftsim.unreal.physics_authority_policy.v1",
   "authoritative": {
     "water_state": "custom_cxx_shallow_water_solver",
-    "raft_kinematics": "project_chrono_or_custom_reduced_runtime",
-    "contacts": "project_chrono_or_custom_reduced_runtime",
+    "raft_kinematics": "runtime_selected_after_chaos_jolt_fixture_evaluation",
+    "contacts": "runtime_selected_after_chaos_jolt_fixture_evaluation",
     "paddle_forces": "fixed_step_physics_bridge"
   },
   "unreal_chaos": {
-    "role": "incidental_non_authoritative_effects_only",
+    "role": "default_unreal_integrated_physics_and_visual_ragdoll_path_pending_authoritative_fixture_results",
     "allowed": [
       "loose_visual_props",
       "splash_debris",
       "background_ropes",
       "shoreline_clutter",
-      "non_scoring_breakables"
+      "non_scoring_breakables",
+      "visual_crew_ragdolls",
+      "authoritative_raft_contact_candidate_only_inside_chaos_jolt_runtime_evaluation"
     ],
     "disallowed": [
       "raft_transform_authority",
@@ -21,6 +23,32 @@
       "raft_bed_grounding",
       "water_force_integration",
       "scoring_critical_rescue_outcomes"
+    ]
+  },
+  "jolt": {
+    "role": "candidate_portable_authoritative_raft_contact_and_swimmer_gameplay_island",
+    "allowed_when_evaluation_passes": [
+      "raft_rock_collision_response",
+      "raft_bed_grounding",
+      "pin_release_state",
+      "crew_ejection_gameplay_state",
+      "swimmer_collision_and_drift_state",
+      "fixed_step_replay"
+    ],
+    "disallowed": [
+      "water_state_authority",
+      "visual_only_unreal_ragdoll_authoring_without_exporting_gameplay_state"
+    ]
+  },
+  "evaluation": {
+    "manifest": "chaos_jolt_runtime_evaluation.json",
+    "required_before_scoring_authority": [
+      "raft_rock_angle_sweep",
+      "shallow_shelf_grounding",
+      "pin_release_wrap_proxy",
+      "crew_ejection_swimmer_transition",
+      "fixed_step_replay_determinism",
+      "runtime_cost_crowded_scene"
     ]
   }
 }
