@@ -39,6 +39,8 @@ RapidReviewPanelKind = Literal["map", "profile", "hydrology", "evidence", "annot
 SOURCE_MANIFEST_FILE = "source_manifest.json"
 CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION = "raftsim.candidate_river_inventory.v0"
 CANDIDATE_RIVER_INVENTORY_FILE = "candidate_river_inventory.json"
+COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION = "raftsim.course_elevation_extraction.v0"
+COURSE_ELEVATION_EXTRACTION_FILE = "course_elevation_extraction.json"
 RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION = "raftsim.rapid_review_editor_workflow.v0"
 RAPID_REVIEW_EDITOR_WORKFLOW_FILE = "rapid_review_editor_workflow.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
@@ -156,6 +158,67 @@ class RapidCandidate:
 
     def to_json_dict(self) -> dict[str, object]:
         return asdict(self)
+
+
+@dataclass(frozen=True, slots=True)
+class CourseElevationSample:
+    station_m: float
+    lon: float
+    lat: float
+    elevation_m: float
+    channel_width_m: float
+    local_drop_m: float
+    cumulative_drop_m: float
+    gradient: float
+    left_bank_offset_m: float
+    right_bank_offset_m: float
+    constriction_score: float
+    roughness_score: float
+    rapid_score: float
+    signals: tuple[str, ...] = ()
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "station_m": self.station_m,
+            "lon": self.lon,
+            "lat": self.lat,
+            "elevation_m": self.elevation_m,
+            "channel_width_m": self.channel_width_m,
+            "local_drop_m": self.local_drop_m,
+            "cumulative_drop_m": self.cumulative_drop_m,
+            "gradient": self.gradient,
+            "left_bank_offset_m": self.left_bank_offset_m,
+            "right_bank_offset_m": self.right_bank_offset_m,
+            "constriction_score": self.constriction_score,
+            "roughness_score": self.roughness_score,
+            "rapid_score": self.rapid_score,
+            "signals": list(self.signals),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class CourseElevationExtraction:
+    river_id: str
+    section_id: str
+    source_manifest: str
+    source_artifacts: dict[str, object]
+    samples: tuple[CourseElevationSample, ...]
+    summary: dict[str, object]
+    cross_section_prototypes: tuple[dict[str, object], ...]
+    provenance: dict[str, object] = field(default_factory=dict)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION,
+            "river_id": self.river_id,
+            "section_id": self.section_id,
+            "source_manifest": self.source_manifest,
+            "source_artifacts": self.source_artifacts,
+            "summary": self.summary,
+            "samples": [sample.to_json_dict() for sample in self.samples],
+            "cross_section_prototypes": list(self.cross_section_prototypes),
+            "provenance": self.provenance,
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -738,7 +801,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
         "sources": [source.to_json_dict() for source in default_source_catalog()],
         "remote_fetches": [fetch.to_json_dict() for fetch in south_fork_american_fetch_specs()],
         "artifacts": {
-            "elevation": ["terrain/3dep_dem_tiles", "terrain/solver_bed_grid.npy"],
+            "elevation": ["terrain/3dep_dem_tiles", COURSE_ELEVATION_EXTRACTION_FILE, "terrain/solver_bed_grid.npy"],
             "hydrography": ["hydrography/centerline.geojson", "hydrography/banks.geojson", "hydrography/cross_sections.geojson"],
             "imagery": ["imagery/naip_tiles", "imagery/water_mask.tif", "imagery/foam_texture_mask.tif"],
             "gauges": ["hydrology/usgs_11445500_daily_discharge.json", "hydrology/flow_presets.json"],
@@ -1055,12 +1118,111 @@ def build_real_world_corridor_package() -> RealWorldCorridorPackage:
             "imagery_masks": ["imagery/water_mask.tif", "imagery/foam_texture_mask.tif"],
             "centerline": "hydrography/centerline.geojson",
             "banks": "hydrography/banks.geojson",
+            "course_elevation_extraction": COURSE_ELEVATION_EXTRACTION_FILE,
             "rapids": "review/rapid_candidates.geojson",
             "hazards": "review/rapid_review_labels.json",
             "rapid_review_editor_workflow": RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
             "flow_presets": "hydrology/flow_presets.json",
             "validation_matrix": "validation_matrix.json",
             "confidence_metadata": "confidence.json",
+        },
+    )
+
+
+def build_course_elevation_extraction(
+    package: RealWorldCorridorPackage | None = None,
+) -> CourseElevationExtraction:
+    """Build the first section-level course/elevation extraction artifact."""
+
+    target = package or build_real_world_corridor_package()
+    centerline = tuple(sorted(target.centerline, key=lambda station: station.station_m))
+    indicators = tuple(sorted(target.indicators, key=lambda indicator: indicator.station_m))
+    if not centerline:
+        raise ValueError("Course/elevation extraction requires centerline stations.")
+    if not indicators:
+        raise ValueError("Course/elevation extraction requires channel indicators.")
+    station_start = centerline[0].station_m
+    station_end = centerline[-1].station_m
+    length_m = station_end - station_start
+    if length_m <= 0.0:
+        raise ValueError("Course/elevation extraction requires a positive station span.")
+
+    samples: list[CourseElevationSample] = []
+    start_elevation = centerline[0].elevation_m
+    previous_elevation = start_elevation
+    for station in centerline:
+        indicator = min(indicators, key=lambda item: abs(item.station_m - station.station_m))
+        local_drop = max(0.0, previous_elevation - station.elevation_m)
+        samples.append(
+            CourseElevationSample(
+                station_m=station.station_m,
+                lon=station.lon,
+                lat=station.lat,
+                elevation_m=station.elevation_m,
+                channel_width_m=station.channel_width_m,
+                local_drop_m=local_drop,
+                cumulative_drop_m=max(0.0, start_elevation - station.elevation_m),
+                gradient=indicator.gradient,
+                left_bank_offset_m=indicator.left_bank_offset_m,
+                right_bank_offset_m=indicator.right_bank_offset_m,
+                constriction_score=indicator.constriction_score,
+                roughness_score=indicator.roughness_score,
+                rapid_score=indicator.rapid_score,
+                signals=indicator.signals,
+            )
+        )
+        previous_elevation = station.elevation_m
+
+    elevations = np.asarray([station.elevation_m for station in centerline], dtype=np.float64)
+    widths = np.asarray([station.channel_width_m for station in centerline], dtype=np.float64)
+    gradients = np.asarray([indicator.gradient for indicator in indicators], dtype=np.float64)
+    total_drop = max(0.0, float(elevations[0] - elevations[-1]))
+    cross_sections = tuple(
+        _course_elevation_cross_section_prototype(target, indicator, index + 1)
+        for index, indicator in enumerate(indicators)
+    )
+    summary = {
+        "station_start_m": station_start,
+        "station_end_m": station_end,
+        "length_m": length_m,
+        "elevation_start_m": float(elevations[0]),
+        "elevation_end_m": float(elevations[-1]),
+        "total_drop_m": total_drop,
+        "mean_gradient": total_drop / length_m,
+        "max_local_gradient": float(np.max(gradients)),
+        "min_local_gradient": float(np.min(gradients)),
+        "min_channel_width_m": float(np.min(widths)),
+        "max_channel_width_m": float(np.max(widths)),
+        "mean_channel_width_m": float(np.mean(widths)),
+        "sample_count": len(samples),
+        "cross_section_prototype_count": len(cross_sections),
+        "rapid_candidate_count": len(target.rapid_candidates),
+    }
+    return CourseElevationExtraction(
+        river_id=target.section.river_id,
+        section_id=target.section.section_id,
+        source_manifest=SOURCE_MANIFEST_FILE,
+        source_artifacts={
+            "source_manifest": SOURCE_MANIFEST_FILE,
+            "dem_lidar": "terrain/3dep_dem_tiles",
+            "flowlines": "hydrography/centerline.geojson",
+            "banks": "hydrography/banks.geojson",
+            "cross_sections": "hydrography/cross_sections.geojson",
+            "solver_bed_grid": "terrain/solver_bed_grid.npy",
+            "course_elevation_extraction": COURSE_ELEVATION_EXTRACTION_FILE,
+        },
+        samples=tuple(samples),
+        summary=summary,
+        cross_section_prototypes=cross_sections,
+        provenance={
+            "generated_by": "raftsim.real_world.build_course_elevation_extraction",
+            "processing_version": "milestone_17_course_elevation_seed.v0",
+            "extraction_method": "seed_centerline_station_interpolation_with_indicator_cross_sections",
+            "review_status": "prototype_needs_real_dem_lidar_hydrography_pull",
+            "source_limitations": (
+                "Uses coarse planning stations and derived indicators only; production extraction must replace "
+                "these with CRS-recorded DEM/lidar, flowline, bank, water-mask, and cross-section measurements."
+            ),
         },
     )
 
@@ -1404,6 +1566,7 @@ def write_real_world_seed_package(directory: str | Path) -> Path:
     _write_json(output_dir / "player_selection_model.json", build_player_selection_model())
     _write_json(data_dir / SOURCE_MANIFEST_FILE, package.source_manifest)
     _write_json(data_dir / "river_course.json", package.to_json_dict())
+    _write_json(data_dir / COURSE_ELEVATION_EXTRACTION_FILE, build_course_elevation_extraction(package).to_json_dict())
     _write_json(data_dir / "flow_presets.json", {"flow_bands": [band.to_json_dict() for band in package.flow_bands]})
     _write_json(data_dir / "rapid_candidates.geojson", _rapid_candidates_geojson(package.rapid_candidates, package.indicators))
     _write_json(data_dir / RAPID_REVIEW_EDITOR_WORKFLOW_FILE, build_rapid_review_editor_workflow(package).to_json_dict())
@@ -1664,6 +1827,52 @@ def _rapid_review_cross_section_summary(indicator: ChannelIndicator) -> dict[str
         "constriction_score": indicator.constriction_score,
         "roughness_score": indicator.roughness_score,
         "rapid_score": indicator.rapid_score,
+    }
+
+
+def _course_elevation_cross_section_prototype(
+    package: RealWorldCorridorPackage,
+    indicator: ChannelIndicator,
+    index: int,
+) -> dict[str, object]:
+    overlapping = [
+        candidate
+        for candidate in package.rapid_candidates
+        if candidate.start_station_m <= indicator.station_m <= candidate.end_station_m
+    ]
+    nearest = (
+        min(
+            package.rapid_candidates,
+            key=lambda candidate: abs(candidate.peak_station_m - indicator.station_m),
+        )
+        if package.rapid_candidates
+        else None
+    )
+    labels = sorted({label for candidate in overlapping for label in candidate.suggested_labels})
+    return {
+        "cross_section_id": f"course_section_{index:03d}",
+        "station_m": indicator.station_m,
+        "center_wgs84": {"lon": indicator.lon, "lat": indicator.lat},
+        "local_axis": {
+            "downstream_m": indicator.station_m,
+            "left_m_positive": True,
+            "right_m_negative": True,
+        },
+        "channel_width_m": indicator.channel_width_m,
+        "bank_offsets_m": {
+            "left": indicator.left_bank_offset_m,
+            "right": indicator.right_bank_offset_m,
+        },
+        "elevation_m": indicator.elevation_m,
+        "gradient": indicator.gradient,
+        "constriction_score": indicator.constriction_score,
+        "roughness_score": indicator.roughness_score,
+        "rapid_score": indicator.rapid_score,
+        "rapid_candidate_ids": [candidate.rapid_id for candidate in overlapping],
+        "nearest_rapid_candidate_id": nearest.rapid_id if nearest is not None else None,
+        "suggested_labels": labels,
+        "signals": list(indicator.signals),
+        "authoring_status": "prototype_requires_dem_lidar_bank_review",
     }
 
 

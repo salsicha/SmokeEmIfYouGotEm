@@ -2,6 +2,7 @@
   "artifacts": {
     "elevation": [
       "terrain/3dep_dem_tiles",
+      "course_elevation_extraction.json",
       "terrain/solver_bed_grid.npy"
     ],
     "field_media": [

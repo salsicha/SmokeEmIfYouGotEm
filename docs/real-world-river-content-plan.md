@@ -29,6 +29,7 @@ Implemented artifacts:
 - `physics/data/real_world/player_selection_model.json`: first player-facing region, river, section, season, flow, difficulty, and raft setup model.
 - `physics/data/real_world/south_fork_american_chili_bar/source_manifest.json`: representative source manifest for the South Fork American River, Chili Bar to Coloma seed section.
 - `physics/data/real_world/south_fork_american_chili_bar/river_course.json`: centerline stationing, approximate banks/cross-section offsets, width, gradient, constriction, roughness, and rapid candidate metadata.
+- `physics/data/real_world/south_fork_american_chili_bar/course_elevation_extraction.json`: prototype course/elevation extraction with station samples, cumulative drop, local gradient, width summary, cross-section prototypes, and provenance notes.
 - `physics/data/real_world/south_fork_american_chili_bar/flow_presets.json`: low, median, and high runnable seed bands.
 - `physics/data/real_world/south_fork_american_chili_bar/rapid_candidates.geojson`: candidate rapid points derived from DEM-slope, constriction, roughness, boulder-density, imagery-texture, bend, guide-note, and access signals.
 - `physics/data/real_world/south_fork_american_chili_bar/rapid_review_editor_workflow.json`: first one-view rapid review/editor workflow contract with required DEM/lidar, aerial/satellite imagery, flowline, cross-section, gauge-history, source-manifest, candidate-tag, and guide-note layers.
@@ -36,7 +37,7 @@ Implemented artifacts:
 - `physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json`: first Unreal-ready corridor package manifest with terrain, imagery mask, centerline, bank, rapid, hazard, flow, and confidence artifact slots.
 - `physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json`: low, median, and high runnable flow smoke matrix. The existing PyClaw matrix is a legacy baseline; the active plan is to regenerate each band with GeoClaw and the C++ solver.
 
-The seed package records metadata-ready fetch specs for 3DEP/DEM, 3DHP/NHD, OSM, NAIP, USGS/NWIS, NOAA/NWPS/National Water Model, and StreamStats. The candidate inventory package marks the South Fork American Chili Bar to Coloma section as the primary drafted source-manifest section and leaves the other candidate sections planned until they get their own source manifests. It does not vendor heavy lidar, imagery, guidebook text, or field media. Production extraction must replace the coarse seed measurements with pulled geospatial/hydrology data, reviewed aerial/satellite labels, and rights-cleared media.
+The seed package records metadata-ready fetch specs for 3DEP/DEM, 3DHP/NHD, OSM, NAIP, USGS/NWIS, NOAA/NWPS/National Water Model, and StreamStats. The candidate inventory package marks the South Fork American Chili Bar to Coloma section as the primary drafted source-manifest section and leaves the other candidate sections planned until they get their own source manifests. It does not vendor heavy lidar, imagery, guidebook text, or field media. Production extraction must replace the coarse seed measurements with pulled geospatial/hydrology data, reviewed aerial/satellite labels, and rights-cleared media. The course/elevation extraction prototype is intentionally derived from the seed station set first; before production use, it must be regenerated from CRS-recorded DEM/lidar, flowline, bank, water-mask, and cross-section measurements.
 
 Regenerate the seed source/scenario package:
 
@@ -132,6 +133,7 @@ Pipeline:
 Output:
 
 - `river_course.json`
+- `course_elevation_extraction.json`
 - `centerline.geojson`
 - `cross_sections.geojson`
 - `terrain_dem.tif` or Cloud Optimized GeoTIFF plus normalized solver grid export
