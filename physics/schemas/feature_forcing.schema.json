@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raftsim.local/schemas/feature_forcing.schema.json",
+  "title": "RaftSim Authored Feature Forcing Manifest",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "forcing_set_version",
+    "defaults",
+    "validation_requirements",
+    "flow_response_curves",
+    "feature_families"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "raftsim.feature_forcing.v0"
+    },
+    "manifest_id": {
+      "type": "string"
+    },
+    "forcing_set_version": {
+      "type": "string"
+    },
+    "defaults": {
+      "type": "object",
+      "required": [
+        "enabled_by_default",
+        "global_gain_scale",
+        "max_default_gain",
+        "tuning_surface_exposed",
+        "physics_gameplay_visual_separated"
+      ],
+      "properties": {
+        "enabled_by_default": {
+          "type": "boolean"
+        },
+        "global_gain_scale": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_default_gain": {
+          "type": "number",
+          "minimum": 0
+        },
+        "tuning_surface_exposed": {
+          "type": "boolean",
+          "const": true
+        },
+        "physics_gameplay_visual_separated": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "validation_requirements": {
+      "type": "object",
+      "required": [
+        "bounded",
+        "manifest_recorded",
+        "geoclaw_compared",
+        "flow_dependent",
+        "hide_conservation_failures"
+      ],
+      "properties": {
+        "bounded": {
+          "type": "boolean",
+          "const": true
+        },
+        "manifest_recorded": {
+          "type": "boolean",
+          "const": true
+        },
+        "geoclaw_compared": {
+          "type": "boolean",
+          "const": true
+        },
+        "flow_dependent": {
+          "type": "boolean",
+          "const": true
+        },
+        "hide_conservation_failures": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "flow_response_curves": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "curve_id",
+          "input_type",
+          "points"
+        ],
+        "properties": {
+          "curve_id": {
+            "type": "string"
+          },
+          "input_type": {
+            "type": "string",
+            "enum": [
+              "discharge_cfs",
+              "flow_band",
+              "flow_percentile",
+              "boundary_inflow"
+            ]
+          },
+          "points": {
+            "type": "array",
+            "minItems": 3,
+            "items": {
+              "type": "object",
+              "required": [
+                "flow_band",
+                "normalized_flow",
+                "gain_multiplier",
+                "outcome_note"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "feature_families": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "enabled_by_default",
+          "default_gain",
+          "gain_bounds",
+          "flow_response_curve_id",
+          "solver_state_effects",
+          "raft_coupling_effects",
+          "visual_only_parameters",
+          "conservation_limits",
+          "validation_evidence"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "hole",
+              "boil",
+              "lateral",
+              "eddy_line",
+              "wave_train",
+              "shallow_shelf",
+              "boulder_push_damping",
+              "pin_release",
+              "flip"
+            ]
+          },
+          "enabled_by_default": {
+            "type": "boolean"
+          },
+          "default_gain": {
+            "type": "number",
+            "minimum": 0
+          },
+          "gain_bounds": {
+            "type": "object",
+            "required": ["min", "max"]
+          },
+          "flow_response_curve_id": {
+            "type": "string"
+          },
+          "solver_state_effects": {
+            "type": "array"
+          },
+          "raft_coupling_effects": {
+            "type": "array"
+          },
+          "visual_only_parameters": {
+            "type": "object"
+          },
+          "conservation_limits": {
+            "type": "object",
+            "required": [
+              "mass_relative_delta",
+              "momentum_relative_delta",
+              "energy_relative_delta",
+              "wet_dry_mismatch_fraction",
+              "reach_handoff_delta",
+              "hides_conservation_failures"
+            ],
+            "properties": {
+              "hides_conservation_failures": {
+                "type": "boolean",
+                "const": false
+              }
+            }
+          },
+          "validation_evidence": {
+            "type": "object",
+            "required": [
+              "manifest_record_required",
+              "geoclaw_comparison_required",
+              "real_world_annotation_allowed",
+              "status"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

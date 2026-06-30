@@ -1,0 +1,212 @@
+{
+  "schema_version": "raftsim.feature_forcing.v0",
+  "manifest_id": "milestone17_feature_forcing_defaults",
+  "forcing_set_version": "low_default_feature_forcing_v0",
+  "defaults": {
+    "enabled_by_default": false,
+    "global_gain_scale": 0.05,
+    "max_default_gain": 0.12,
+    "tuning_surface_exposed": true,
+    "physics_gameplay_visual_separated": true
+  },
+  "validation_requirements": {
+    "bounded": true,
+    "manifest_recorded": true,
+    "geoclaw_compared": true,
+    "flow_dependent": true,
+    "hide_conservation_failures": false
+  },
+  "flow_response_curves": [
+    {
+      "curve_id": "hole_retention_flow_v0",
+      "input_type": "flow_band",
+      "points": [
+        {"flow_band": "too_low", "normalized_flow": 0.15, "gain_multiplier": 0.15, "outcome_note": "non-retentive rapid"},
+        {"flow_band": "sticky", "normalized_flow": 0.55, "gain_multiplier": 1.0, "outcome_note": "retentive surf/flush window"},
+        {"flow_band": "washout", "normalized_flow": 1.0, "gain_multiplier": 0.2, "outcome_note": "hole washes out"}
+      ]
+    },
+    {
+      "curve_id": "boil_flow_v0",
+      "input_type": "flow_band",
+      "points": [
+        {"flow_band": "too_low", "normalized_flow": 0.15, "gain_multiplier": 0.25, "outcome_note": "weak upwelling"},
+        {"flow_band": "medium", "normalized_flow": 0.6, "gain_multiplier": 0.9, "outcome_note": "visible boil instability"},
+        {"flow_band": "high", "normalized_flow": 1.0, "gain_multiplier": 1.0, "outcome_note": "strong boil and damping"}
+      ]
+    },
+    {
+      "curve_id": "lateral_flow_v0",
+      "input_type": "flow_band",
+      "points": [
+        {"flow_band": "too_low", "normalized_flow": 0.15, "gain_multiplier": 0.2, "outcome_note": "small diagonal push"},
+        {"flow_band": "medium", "normalized_flow": 0.55, "gain_multiplier": 0.75, "outcome_note": "line-changing lateral"},
+        {"flow_band": "high", "normalized_flow": 1.0, "gain_multiplier": 1.0, "outcome_note": "strong yaw/roll contribution"}
+      ]
+    },
+    {
+      "curve_id": "eddy_line_flow_v0",
+      "input_type": "flow_band",
+      "points": [
+        {"flow_band": "too_low", "normalized_flow": 0.15, "gain_multiplier": 0.15, "outcome_note": "soft eddy transition"},
+        {"flow_band": "medium", "normalized_flow": 0.55, "gain_multiplier": 0.85, "outcome_note": "catchable eddy-line shear"},
+        {"flow_band": "high", "normalized_flow": 1.0, "gain_multiplier": 1.0, "outcome_note": "grabby crossing and recovery window"}
+      ]
+    },
+    {
+      "curve_id": "wave_train_flow_v0",
+      "input_type": "flow_band",
+      "points": [
+        {"flow_band": "too_low", "normalized_flow": 0.15, "gain_multiplier": 0.25, "outcome_note": "riffle waves"},
+        {"flow_band": "medium", "normalized_flow": 0.55, "gain_multiplier": 0.8, "outcome_note": "readable wave train"},
+        {"flow_band": "high", "normalized_flow": 1.0, "gain_multiplier": 1.0, "outcome_note": "larger crests and spray"}
+      ]
+    },
+    {
+      "curve_id": "shallow_shelf_flow_v0",
+      "input_type": "flow_band",
+      "points": [
+        {"flow_band": "too_low", "normalized_flow": 0.15, "gain_multiplier": 1.0, "outcome_note": "scrape and pivot hazard"},
+        {"flow_band": "medium", "normalized_flow": 0.55, "gain_multiplier": 0.65, "outcome_note": "shallow drag and release"},
+        {"flow_band": "high", "normalized_flow": 1.0, "gain_multiplier": 0.25, "outcome_note": "mostly covered shelf"}
+      ]
+    },
+    {
+      "curve_id": "boulder_push_flow_v0",
+      "input_type": "flow_band",
+      "points": [
+        {"flow_band": "too_low", "normalized_flow": 0.15, "gain_multiplier": 0.35, "outcome_note": "scrape dominates"},
+        {"flow_band": "medium", "normalized_flow": 0.55, "gain_multiplier": 0.85, "outcome_note": "deflection and damping"},
+        {"flow_band": "high", "normalized_flow": 1.0, "gain_multiplier": 1.0, "outcome_note": "strong wrap/pin pressure"}
+      ]
+    },
+    {
+      "curve_id": "pin_release_flow_v0",
+      "input_type": "flow_band",
+      "points": [
+        {"flow_band": "too_low", "normalized_flow": 0.15, "gain_multiplier": 0.3, "outcome_note": "grounding/contact hold"},
+        {"flow_band": "medium", "normalized_flow": 0.55, "gain_multiplier": 0.9, "outcome_note": "pin/release skill window"},
+        {"flow_band": "high", "normalized_flow": 1.0, "gain_multiplier": 1.0, "outcome_note": "high water loading"}
+      ]
+    },
+    {
+      "curve_id": "flip_flow_v0",
+      "input_type": "flow_band",
+      "points": [
+        {"flow_band": "too_low", "normalized_flow": 0.15, "gain_multiplier": 0.25, "outcome_note": "rock/tube leverage dominates"},
+        {"flow_band": "medium", "normalized_flow": 0.55, "gain_multiplier": 0.85, "outcome_note": "high-side counterplay window"},
+        {"flow_band": "high", "normalized_flow": 1.0, "gain_multiplier": 1.0, "outcome_note": "fast roll impulse risk"}
+      ]
+    }
+  ],
+  "feature_families": [
+    {
+      "kind": "hole",
+      "enabled_by_default": false,
+      "default_gain": 0.05,
+      "gain_bounds": {"min": 0.0, "max": 1.0},
+      "flow_response_curve_id": "hole_retention_flow_v0",
+      "solver_state_effects": ["retentive_momentum_bias", "aerated_damping_proxy", "downstream_boil_recovery"],
+      "raft_coupling_effects": ["surf_flush_window_modifier", "bow_stall_drag_modifier"],
+      "visual_only_parameters": {"foam_intensity_default": 0.15, "spray_intensity_default": 0.1},
+      "conservation_limits": {"mass_relative_delta": 0.0005, "momentum_relative_delta": 0.015, "energy_relative_delta": 0.02, "wet_dry_mismatch_fraction": 0.002, "reach_handoff_delta": 0.002, "hides_conservation_failures": false},
+      "validation_evidence": {"manifest_record_required": true, "geoclaw_comparison_required": true, "real_world_annotation_allowed": true, "status": "planned"}
+    },
+    {
+      "kind": "boil",
+      "enabled_by_default": false,
+      "default_gain": 0.04,
+      "gain_bounds": {"min": 0.0, "max": 1.0},
+      "flow_response_curve_id": "boil_flow_v0",
+      "solver_state_effects": ["upwelling_proxy", "local_damping"],
+      "raft_coupling_effects": ["lateral_instability_modifier"],
+      "visual_only_parameters": {"surface_pulse_default": 0.12, "audio_intensity_default": 0.1},
+      "conservation_limits": {"mass_relative_delta": 0.0005, "momentum_relative_delta": 0.012, "energy_relative_delta": 0.02, "wet_dry_mismatch_fraction": 0.001, "reach_handoff_delta": 0.002, "hides_conservation_failures": false},
+      "validation_evidence": {"manifest_record_required": true, "geoclaw_comparison_required": true, "real_world_annotation_allowed": true, "status": "planned"}
+    },
+    {
+      "kind": "lateral",
+      "enabled_by_default": false,
+      "default_gain": 0.05,
+      "gain_bounds": {"min": 0.0, "max": 1.0},
+      "flow_response_curve_id": "lateral_flow_v0",
+      "solver_state_effects": ["cross_current_momentum_bias"],
+      "raft_coupling_effects": ["yaw_impulse_modifier", "roll_impulse_modifier"],
+      "visual_only_parameters": {"foam_streak_default": 0.1},
+      "conservation_limits": {"mass_relative_delta": 0.0005, "momentum_relative_delta": 0.015, "energy_relative_delta": 0.02, "wet_dry_mismatch_fraction": 0.001, "reach_handoff_delta": 0.002, "hides_conservation_failures": false},
+      "validation_evidence": {"manifest_record_required": true, "geoclaw_comparison_required": true, "real_world_annotation_allowed": true, "status": "planned"}
+    },
+    {
+      "kind": "eddy_line",
+      "enabled_by_default": false,
+      "default_gain": 0.04,
+      "gain_bounds": {"min": 0.0, "max": 1.0},
+      "flow_response_curve_id": "eddy_line_flow_v0",
+      "solver_state_effects": ["shear_band_damping", "eddy_recovery_bias"],
+      "raft_coupling_effects": ["crossing_grab_modifier", "steering_authority_modifier"],
+      "visual_only_parameters": {"foam_edge_default": 0.12},
+      "conservation_limits": {"mass_relative_delta": 0.0005, "momentum_relative_delta": 0.012, "energy_relative_delta": 0.02, "wet_dry_mismatch_fraction": 0.001, "reach_handoff_delta": 0.002, "hides_conservation_failures": false},
+      "validation_evidence": {"manifest_record_required": true, "geoclaw_comparison_required": true, "real_world_annotation_allowed": true, "status": "planned"}
+    },
+    {
+      "kind": "wave_train",
+      "enabled_by_default": false,
+      "default_gain": 0.04,
+      "gain_bounds": {"min": 0.0, "max": 1.0},
+      "flow_response_curve_id": "wave_train_flow_v0",
+      "solver_state_effects": ["phase_amplitude_bias", "crest_lift_proxy"],
+      "raft_coupling_effects": ["vertical_lift_modifier", "pitch_impulse_modifier"],
+      "visual_only_parameters": {"spray_intensity_default": 0.14, "foam_crest_default": 0.12},
+      "conservation_limits": {"mass_relative_delta": 0.0005, "momentum_relative_delta": 0.012, "energy_relative_delta": 0.02, "wet_dry_mismatch_fraction": 0.001, "reach_handoff_delta": 0.002, "hides_conservation_failures": false},
+      "validation_evidence": {"manifest_record_required": true, "geoclaw_comparison_required": true, "real_world_annotation_allowed": true, "status": "planned"}
+    },
+    {
+      "kind": "shallow_shelf",
+      "enabled_by_default": false,
+      "default_gain": 0.06,
+      "gain_bounds": {"min": 0.0, "max": 1.0},
+      "flow_response_curve_id": "shallow_shelf_flow_v0",
+      "solver_state_effects": ["local_drag_bias", "roughness_bias"],
+      "raft_coupling_effects": ["grounding_friction_modifier", "pivot_release_modifier"],
+      "visual_only_parameters": {"scrape_audio_default": 0.12, "thin_water_highlight_default": 0.1},
+      "conservation_limits": {"mass_relative_delta": 0.0005, "momentum_relative_delta": 0.015, "energy_relative_delta": 0.02, "wet_dry_mismatch_fraction": 0.002, "reach_handoff_delta": 0.002, "hides_conservation_failures": false},
+      "validation_evidence": {"manifest_record_required": true, "geoclaw_comparison_required": true, "real_world_annotation_allowed": true, "status": "planned"}
+    },
+    {
+      "kind": "boulder_push_damping",
+      "enabled_by_default": false,
+      "default_gain": 0.05,
+      "gain_bounds": {"min": 0.0, "max": 1.0},
+      "flow_response_curve_id": "boulder_push_flow_v0",
+      "solver_state_effects": ["local_deflection_bias", "wake_damping_proxy"],
+      "raft_coupling_effects": ["scrape_modifier", "launch_modifier", "pin_pressure_modifier"],
+      "visual_only_parameters": {"splash_default": 0.12, "contact_audio_default": 0.1},
+      "conservation_limits": {"mass_relative_delta": 0.0005, "momentum_relative_delta": 0.015, "energy_relative_delta": 0.02, "wet_dry_mismatch_fraction": 0.001, "reach_handoff_delta": 0.002, "hides_conservation_failures": false},
+      "validation_evidence": {"manifest_record_required": true, "geoclaw_comparison_required": true, "real_world_annotation_allowed": true, "status": "planned"}
+    },
+    {
+      "kind": "pin_release",
+      "enabled_by_default": false,
+      "default_gain": 0.03,
+      "gain_bounds": {"min": 0.0, "max": 1.0},
+      "flow_response_curve_id": "pin_release_flow_v0",
+      "solver_state_effects": ["water_loading_pressure_proxy"],
+      "raft_coupling_effects": ["contact_hold_modifier", "release_threshold_modifier", "crew_response_window_modifier"],
+      "visual_only_parameters": {"hazard_highlight_default": 0.06},
+      "conservation_limits": {"mass_relative_delta": 0.0005, "momentum_relative_delta": 0.012, "energy_relative_delta": 0.02, "wet_dry_mismatch_fraction": 0.001, "reach_handoff_delta": 0.002, "hides_conservation_failures": false},
+      "validation_evidence": {"manifest_record_required": true, "geoclaw_comparison_required": true, "real_world_annotation_allowed": true, "status": "planned"}
+    },
+    {
+      "kind": "flip",
+      "enabled_by_default": false,
+      "default_gain": 0.03,
+      "gain_bounds": {"min": 0.0, "max": 1.0},
+      "flow_response_curve_id": "flip_flow_v0",
+      "solver_state_effects": ["roll_impulse_source_proxy"],
+      "raft_coupling_effects": ["upstream_tube_loading_modifier", "high_side_counterplay_window_modifier", "recovery_threshold_modifier"],
+      "visual_only_parameters": {"camera_shake_default": 0.04, "crew_callout_intensity_default": 0.08},
+      "conservation_limits": {"mass_relative_delta": 0.0005, "momentum_relative_delta": 0.012, "energy_relative_delta": 0.02, "wet_dry_mismatch_fraction": 0.001, "reach_handoff_delta": 0.002, "hides_conservation_failures": false},
+      "validation_evidence": {"manifest_record_required": true, "geoclaw_comparison_required": true, "real_world_annotation_allowed": true, "status": "planned"}
+    }
+  ]
+}

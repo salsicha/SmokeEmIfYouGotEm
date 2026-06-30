@@ -11,6 +11,7 @@ Milestone 7 freezes the first schema set shared by Python modeling, C++ runtime 
 | Deterministic replay JSON | `raftsim.replay.v0` | `physics/schemas/replay.schema.json` |
 | Parameter candidate JSON | `raftsim.parameters.v0` | `physics/schemas/parameters.schema.json` |
 | Analytic fixture manifest | `raftsim.analytic_fixture_manifest.v0` | `physics/schemas/analytic_fixture_manifest.schema.json` |
+| Feature-forcing manifest | `raftsim.feature_forcing.v0` | `physics/schemas/feature_forcing.schema.json` |
 
 The schema set is indexed by `physics/schemas/shared_schemas_manifest.json` with version `raftsim.shared_schemas.v0`.
 
@@ -22,3 +23,4 @@ The schema set is indexed by `physics/schemas/shared_schemas_manifest.json` with
 - Replay files must preserve fixed-step timing and enough raft state to drive Unreal playback and debug visualization.
 - Parameter candidate files must preserve both water-solver knobs and raft-force/contact knobs so tuning reports remain reproducible.
 - Analytic fixture manifests must preserve provenance, benchmark-family notes, expected behavior, tolerance tiers, and a no-vendored-external-data flag until SWASHES licensing and maintenance are decided.
+- Feature-forcing manifests must preserve low defaults, flow-response curves, solver-state effects, raft-coupling effects, visual-only parameters, GeoClaw comparison requirements, and conservation-failure guards.
