@@ -6,6 +6,7 @@ import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
+from .dual_solver import CppSolverRunConfig, run_cpp_solver_scenario
 from .geoclaw_reference import (
     GEOCLAW_CANONICAL_FIXTURES,
     GEOCLAW_RAFTING_CASES,
@@ -25,6 +26,7 @@ from .scenario2_5d import Scenario2_5D
 from .scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
 
 MILESTONE16_GEOCLAW_REFERENCE_REPORT_SCHEMA = "raftsim.milestone16.geoclaw_reference_runs.v0"
+MILESTONE16_CPP_RUN_REPORT_SCHEMA = "raftsim.milestone16.cpp_solver_runs.v0"
 MILESTONE16_CASE_DIRS = {
     "flat_pool": "c_flat",
     "uniform_channel": "c_uniform",
@@ -143,6 +145,108 @@ class Milestone16GeoClawReferenceReport:
         return output_path
 
 
+@dataclass(frozen=True, slots=True)
+class Milestone16CppRunRecord:
+    """Tracked evidence for one C++ solver mode run in the validation matrix."""
+
+    gate_scenario_id: str
+    actual_scenario_id: str
+    suite: str
+    solver_mode: str
+    scenario_package: str
+    output_dir: str
+    manifest: str
+    validation: str
+    returncode: int
+    runtime_seconds: float
+    frame_count: int
+    validation_passed: bool
+    manifest_settings: dict[str, object]
+    cascading: dict[str, object]
+    required_manifest_fields_present: bool
+
+    @property
+    def passed(self) -> bool:
+        return (
+            self.returncode in {0, 2}
+            and self.frame_count > 0
+            and self.required_manifest_fields_present
+            and self.manifest_settings.get("solver_mode") == self.solver_mode
+        )
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["passed"] = self.passed
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone16CppRunReport:
+    """Compact report for C++ reduced and finite-volume runs over Milestone 16 scenarios."""
+
+    geoclaw_reference_report: str
+    output_root: str
+    cpp_solver: str
+    records: tuple[Milestone16CppRunRecord, ...] = field(default_factory=tuple)
+
+    @property
+    def passed(self) -> bool:
+        return bool(self.records) and all(record.passed for record in self.records)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE16_CPP_RUN_REPORT_SCHEMA,
+            "passed": self.passed,
+            "geoclaw_reference_report": self.geoclaw_reference_report,
+            "output_root": self.output_root,
+            "cpp_solver": self.cpp_solver,
+            "scenario_count": len({record.gate_scenario_id for record in self.records}),
+            "run_count": len(self.records),
+            "passed_count": sum(1 for record in self.records if record.passed),
+            "failed_count": sum(1 for record in self.records if not record.passed),
+            "records": [record.to_json_dict() for record in self.records],
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = [
+            "# Milestone 16 C++ Solver Runs",
+            "",
+            f"Schema: `{MILESTONE16_CPP_RUN_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Run count: {len(self.records)}",
+            "",
+            "| Suite | Gate scenario | Mode | Frames | Validation | Runtime (s) | Cascading |",
+            "| --- | --- | --- | ---: | --- | ---: | --- |",
+        ]
+        for record in self.records:
+            cascading = record.cascading
+            cascading_label = "no"
+            if cascading.get("present") is True:
+                cascading_label = f"{cascading.get('reach_count')} reaches / {cascading.get('drop_transition_count')} drops"
+            lines.append(
+                "| "
+                f"{record.suite} | "
+                f"{record.gate_scenario_id} | "
+                f"{record.solver_mode} | "
+                f"{record.frame_count} | "
+                f"{'PASS' if record.validation_passed else 'FAIL'} | "
+                f"{record.runtime_seconds:.3f} | "
+                f"{cascading_label} |"
+            )
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+
 def run_milestone16_geoclaw_reference_suite(
     output_root: str | Path,
     *,
@@ -228,6 +332,54 @@ def run_milestone16_geoclaw_reference_suite(
             "timeout_seconds": timeout_seconds,
         },
         availability=availability.to_json_dict(),
+        records=tuple(records),
+    )
+
+
+def run_milestone16_cpp_solver_matrix(
+    geoclaw_reference_report: str | Path,
+    *,
+    cpp_solver: str | Path,
+    output_root: str | Path = "outputs/m16cpp",
+) -> Milestone16CppRunReport:
+    """Run C++ reduced and finite-volume modes on the GeoClaw scenario packages."""
+
+    report_path = Path(geoclaw_reference_report)
+    geoclaw_report = _read_json(report_path)
+    if not bool(geoclaw_report.get("passed")):
+        raise RuntimeError(f"GeoClaw reference report is not passing: {report_path}")
+
+    root = Path(output_root)
+    root.mkdir(parents=True, exist_ok=True)
+    executable = Path(cpp_solver)
+    records: list[Milestone16CppRunRecord] = []
+    for geoclaw_record in geoclaw_report["records"]:
+        export_dir = Path(str(geoclaw_record["export_dir"]))
+        if geoclaw_record["suite"] == "cascading":
+            scenario_package = export_dir / "shared_cascading_package"
+        else:
+            scenario_package = export_dir / "shared_scenario"
+        gate_scenario_id = str(geoclaw_record["gate_scenario_id"])
+        for solver_mode in ("reduced", "finite_volume"):
+            config = _cpp_config_for_mode(executable, solver_mode)
+            result = run_cpp_solver_scenario(
+                scenario_package,
+                output_dir=root / _case_dir(gate_scenario_id) / solver_mode,
+                config=config,
+            )
+            records.append(
+                _cpp_record_from_result(
+                    geoclaw_record,
+                    solver_mode=solver_mode,
+                    scenario_package=scenario_package,
+                    result=result,
+                )
+            )
+
+    return Milestone16CppRunReport(
+        geoclaw_reference_report=str(report_path),
+        output_root=str(root),
+        cpp_solver=str(executable),
         records=tuple(records),
     )
 
@@ -328,6 +480,73 @@ def _run_cascading_geoclaw_case(
         reach_window_count=reach_window_count,
         drop_transition_window_count=drop_transition_window_count,
         notes=tuple(notes),
+    )
+
+
+def _cpp_config_for_mode(executable: Path, solver_mode: str) -> CppSolverRunConfig:
+    return CppSolverRunConfig(
+        executable=executable,
+        solver_mode=solver_mode,
+        boundary_mode="scenario",
+        flux_scheme="rusanov",
+        cfl=0.45,
+        dry_tolerance=1.0e-6,
+        feature_strength_scale=1.0,
+        roughness_scale=1.0,
+        bed_slope_source_scale=1.0 if solver_mode == "finite_volume" else 0.0,
+        preserve_initial_mass=True,
+        allow_validation_failure=True,
+    )
+
+
+def _cpp_record_from_result(
+    geoclaw_record: dict[str, object],
+    *,
+    solver_mode: str,
+    scenario_package: Path,
+    result,
+) -> Milestone16CppRunRecord:
+    manifest = _read_json(result.manifest_path)
+    validation = _read_json(result.validation_path)
+    required_settings = (
+        "solver",
+        "solver_mode",
+        "boundary_mode",
+        "flux_scheme",
+        "cfl",
+        "dry_tolerance",
+        "feature_strength_scale",
+        "roughness_scale",
+        "bed_slope_source_scale",
+        "cascading",
+    )
+    return Milestone16CppRunRecord(
+        gate_scenario_id=str(geoclaw_record["gate_scenario_id"]),
+        actual_scenario_id=str(geoclaw_record["actual_scenario_id"]),
+        suite=str(geoclaw_record["suite"]),
+        solver_mode=solver_mode,
+        scenario_package=str(scenario_package),
+        output_dir=str(result.output_dir),
+        manifest=str(result.manifest_path),
+        validation=str(result.validation_path),
+        returncode=result.returncode,
+        runtime_seconds=result.runtime_seconds,
+        frame_count=len(manifest.get("frames", [])),
+        validation_passed=bool(validation.get("passed")),
+        manifest_settings={
+            "solver": manifest.get("solver"),
+            "solver_mode": manifest.get("solver_mode"),
+            "boundary_mode": manifest.get("boundary_mode"),
+            "flux_scheme": manifest.get("flux_scheme"),
+            "cfl": manifest.get("cfl"),
+            "dry_tolerance": manifest.get("dry_tolerance"),
+            "feature_strength_scale": manifest.get("feature_strength_scale"),
+            "roughness_scale": manifest.get("roughness_scale"),
+            "bed_slope_source_scale": manifest.get("bed_slope_source_scale"),
+            "preserve_initial_mass": manifest.get("preserve_initial_mass"),
+        },
+        cascading=dict(manifest.get("cascading", {})),
+        required_manifest_fields_present=all(name in manifest for name in required_settings),
     )
 
 

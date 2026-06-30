@@ -45,6 +45,7 @@ Fallback or initial-state-only GeoClaw normalization is useful for schema smoke 
 
 ## Phase 2: C++ Parity Runs
 
+- Milestone 16 C++ run evidence is tracked in `physics/reports/milestone16/cpp_solver_runs.json` and `physics/reports/milestone16/cpp_solver_runs.md`; the run/manifests gate passes for reduced and finite-volume modes, while cascading finite-volume validation failures remain visible for comparison/tuning gates.
 - Run the C++ reduced and finite-volume modes on the same scenario packages.
 - Emit manifests for solver mode, timestep, CFL policy, dry tolerance, roughness mapping, bed-slope source scale, feature forcing, damping, reach/drop metadata, and executable version.
 - Compare C++ fields, probes, cross sections, diagnostics, and raft samples against the GeoClaw reference runs.
