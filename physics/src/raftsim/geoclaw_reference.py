@@ -17,7 +17,12 @@ from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
 
-from .real_world import default_player_selections, generate_real_world_scenario2_5d
+from .cascading import CascadingScenarioPackage2_5D, read_cascading_scenario_package
+from .real_world import (
+    default_player_selections,
+    generate_real_world_scenario2_5d,
+    generate_south_fork_american_cascading_seed_scenarios,
+)
 from .scenario2_5d import (
     Feature2_5D,
     FixtureScenario2_5DParameters,
@@ -90,8 +95,10 @@ GEOCLAW_SYSTEM_DEPENDENCY_HINT = (
 )
 GEOCLAW_EXPORT_SCHEMA = "raftsim.geoclaw_export.v1"
 GEOCLAW_NORMALIZED_OUTPUT_SCHEMA = "raftsim.geoclaw_normalized_output.v1"
+GEOCLAW_CASCADING_NORMALIZED_OUTPUT_SCHEMA = "raftsim.geoclaw_cascading_normalized_output.v1"
 GEOCLAW_CANONICAL_SUITE_SCHEMA = "raftsim.geoclaw_canonical_suite.v1"
 GEOCLAW_RAFTING_SUITE_SCHEMA = "raftsim.geoclaw_rafting_suite.v1"
+GEOCLAW_CASCADING_SUITE_SCHEMA = "raftsim.geoclaw_cascading_suite.v1"
 GEOCLAW_CANONICAL_FIXTURES = (
     "flat_pool",
     "uniform_channel",
@@ -328,6 +335,28 @@ class GeoClawNormalizedOutputResult:
 
 
 @dataclass(frozen=True, slots=True)
+class GeoClawCascadingNormalizedOutputResult:
+    scenario_id: str
+    output_dir: Path
+    manifest_path: Path
+    stitched_manifest_path: Path
+    reach_window_count: int
+    drop_transition_window_count: int
+    frame_count: int
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "scenario_id": self.scenario_id,
+            "output_dir": str(self.output_dir),
+            "manifest_path": str(self.manifest_path),
+            "stitched_manifest_path": str(self.stitched_manifest_path),
+            "reach_window_count": self.reach_window_count,
+            "drop_transition_window_count": self.drop_transition_window_count,
+            "frame_count": self.frame_count,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class GeoClawRunConfig:
     """Execution settings for a generated GeoClaw app directory."""
 
@@ -520,6 +549,107 @@ def export_geoclaw_scenario(
         output_dir=root,
         manifest_path=manifest_path,
         files=tuple(sorted(files)),
+    )
+
+
+def export_geoclaw_cascading_package(
+    package: CascadingScenarioPackage2_5D,
+    output_dir: str | Path,
+    *,
+    config: GeoClawExportConfig | None = None,
+) -> GeoClawExportResult:
+    """Export a cascading package to GeoClaw inputs while preserving reach/drop annotations."""
+
+    result = export_geoclaw_scenario(package.scenario, output_dir, config=config)
+    root = result.output_dir
+    cascading_dir = package.write_package(root / "shared_cascading_package")
+    cascading_files = sorted(_relative_path(path, root) for path in cascading_dir.iterdir() if path.is_file())
+    manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+    manifest["files"]["shared_cascading_package"] = "shared_cascading_package/cascading_metadata.json"
+    manifest["cascading_package"] = {
+        "schema": "raftsim.geoclaw_cascading_export.v1",
+        "metadata": "shared_cascading_package/cascading_metadata.json",
+        "annotations": "shared_cascading_package/cascading_annotations.npz",
+        "reach_count": len(package.reaches),
+        "drop_transition_count": len(package.drop_transitions),
+        "reach_ids": [reach.reach_id for reach in package.reaches],
+        "drop_transition_ids": [transition.transition_id for transition in package.drop_transitions],
+    }
+    manifest["exported_files"] = sorted(set((*manifest["exported_files"], *cascading_files)))
+    _write_json(result.manifest_path, manifest)
+    return GeoClawExportResult(
+        scenario_id=result.scenario_id,
+        output_dir=root,
+        manifest_path=result.manifest_path,
+        files=tuple(manifest["exported_files"]),
+    )
+
+
+def cascading_geoclaw_scenarios(
+    *,
+    nx: int = 112,
+    ny: int = 40,
+    dx: float = 4.0,
+    dy: float = 2.0,
+    duration: float = 8.0,
+) -> tuple[CascadingScenarioPackage2_5D, ...]:
+    """Return South Fork American cascading packages for GeoClaw reference export."""
+
+    return generate_south_fork_american_cascading_seed_scenarios(
+        nx=nx,
+        ny=ny,
+        dx=dx,
+        dy=dy,
+        duration=duration,
+    )
+
+
+def export_cascading_geoclaw_scenarios(
+    output_dir: str | Path,
+    *,
+    config: GeoClawExportConfig | None = None,
+    nx: int = 112,
+    ny: int = 40,
+    dx: float = 4.0,
+    dy: float = 2.0,
+    duration: float = 8.0,
+) -> GeoClawScenarioSuiteExport:
+    """Export South Fork cascading flow packages for GeoClaw reference runs."""
+
+    cfg = config or GeoClawExportConfig()
+    root = Path(output_dir)
+    root.mkdir(parents=True, exist_ok=True)
+    packages = cascading_geoclaw_scenarios(nx=nx, ny=ny, dx=dx, dy=dy, duration=duration)
+    results = tuple(
+        export_geoclaw_cascading_package(package, root / package.scenario.metadata.scenario_id, config=cfg)
+        for package in packages
+    )
+    manifest = {
+        "schema": GEOCLAW_CASCADING_SUITE_SCHEMA,
+        "suite_id": "south_fork_cascading_geoclaw",
+        "scenario_count": len(results),
+        "flow_bands": [package.scenario.metadata.flow_band for package in packages],
+        "config": cfg.to_json_dict(),
+        "exports": [
+            {
+                "scenario_id": result.scenario_id,
+                "flow_band": packages[index].scenario.metadata.flow_band,
+                "difficulty": packages[index].scenario.metadata.difficulty_preset,
+                "manifest": _relative_path(result.manifest_path, root),
+                "reach_count": len(packages[index].reaches),
+                "drop_transition_count": len(packages[index].drop_transitions),
+                "file_count": len(result.files),
+            }
+            for index, result in enumerate(results)
+        ],
+    }
+    manifest_path = root / "cascading_suite_manifest.json"
+    _write_json(manifest_path, manifest)
+    return GeoClawScenarioSuiteExport(
+        suite_id="south_fork_cascading_geoclaw",
+        output_dir=root,
+        manifest_path=manifest_path,
+        results=results,
     )
 
 
@@ -782,6 +912,93 @@ def normalize_geoclaw_fixed_grid_output(
     )
 
 
+def normalize_geoclaw_cascading_fixed_grid_output(
+    geoclaw_export_dir: str | Path,
+    output_dir: str | Path | None = None,
+    *,
+    config: GeoClawExportConfig | None = None,
+) -> GeoClawCascadingNormalizedOutputResult:
+    """Normalize a cascading GeoClaw export into stitched and reach-local windows."""
+
+    export_root = Path(geoclaw_export_dir)
+    export_manifest_path = export_root / "manifest.json"
+    cascading_dir = export_root / "shared_cascading_package"
+    if not export_manifest_path.exists():
+        raise FileNotFoundError(f"GeoClaw export manifest not found: {export_manifest_path}")
+    if not cascading_dir.exists():
+        raise FileNotFoundError(f"Cascading package not found in GeoClaw export: {cascading_dir}")
+
+    cfg = config or GeoClawExportConfig()
+    package = read_cascading_scenario_package(cascading_dir)
+    root = Path(output_dir) if output_dir is not None else export_root / "cascading_normalized"
+    root.mkdir(parents=True, exist_ok=True)
+    stitched = normalize_geoclaw_fixed_grid_output(export_root, root / "stitched", config=cfg)
+    frames = _load_geoclaw_fgout_frames(export_root, package.scenario, cfg)
+    if not frames:
+        frames = (frame_from_geoclaw_initial_state(package.scenario, config=cfg),)
+
+    reach_windows = _write_cascading_frame_windows(
+        root,
+        "reach_windows",
+        package.scenario,
+        frames,
+        package.reach_id_grid,
+        tuple(range(len(package.reaches))),
+        lambda index: package.reaches[index].reach_id,
+        lambda index: {
+            "reach_id": package.reaches[index].reach_id,
+            "kind": package.reaches[index].kind,
+            "station_start": package.reaches[index].station_start,
+            "station_end": package.reaches[index].station_end,
+            "metadata": package.reaches[index].metadata,
+        },
+    )
+    drop_windows = _write_cascading_frame_windows(
+        root,
+        "drop_transition_windows",
+        package.scenario,
+        frames,
+        package.drop_transition_id_grid,
+        tuple(range(len(package.drop_transitions))),
+        lambda index: package.drop_transitions[index].transition_id,
+        lambda index: {
+            "transition_id": package.drop_transitions[index].transition_id,
+            "upstream_reach_id": package.drop_transitions[index].upstream_reach_id,
+            "downstream_reach_id": package.drop_transitions[index].downstream_reach_id,
+            "crest_station": package.drop_transitions[index].crest_station,
+            "bed_elevation_fall": package.drop_transitions[index].bed_elevation_fall,
+            "hazard_tags": list(package.drop_transitions[index].hazard_tags),
+            "metadata": package.drop_transitions[index].metadata,
+        },
+    )
+    export_manifest = json.loads(export_manifest_path.read_text(encoding="utf-8"))
+    manifest = {
+        "schema": GEOCLAW_CASCADING_NORMALIZED_OUTPUT_SCHEMA,
+        "scenario_id": package.scenario.metadata.scenario_id,
+        "source_export_manifest": str(export_manifest_path),
+        "source_export_schema": export_manifest.get("schema"),
+        "stitched_manifest": _relative_path(stitched.manifest_path, root),
+        "run_status": {
+            "mode": "fgout_npz" if (export_root / "fgout_frames").exists() else "export_initial_state_only",
+            "frame_count": len(frames),
+        },
+        "config": cfg.to_json_dict(),
+        "reach_windows": reach_windows,
+        "drop_transition_windows": drop_windows,
+    }
+    manifest_path = root / "manifest.json"
+    _write_json(manifest_path, manifest)
+    return GeoClawCascadingNormalizedOutputResult(
+        scenario_id=package.scenario.metadata.scenario_id,
+        output_dir=root,
+        manifest_path=manifest_path,
+        stitched_manifest_path=stitched.manifest_path,
+        reach_window_count=len(reach_windows),
+        drop_transition_window_count=len(drop_windows),
+        frame_count=len(frames),
+    )
+
+
 def frame_from_geoclaw_initial_state(
     scenario: Scenario2_5D,
     *,
@@ -913,6 +1130,84 @@ def _focus_features(scenario: Scenario2_5D, case_id: str) -> tuple[Feature2_5D, 
             ),
         )
     raise ValueError(f"Unknown GeoClaw rafting case: {case_id}")
+
+
+def _write_cascading_frame_windows(
+    root: Path,
+    prefix: str,
+    scenario: Scenario2_5D,
+    frames: tuple[GeoClawNormalizedFrame, ...],
+    id_grid: NDArray[np.int32],
+    indices: tuple[int, ...],
+    id_for_index,
+    metadata_for_index,
+) -> list[dict[str, object]]:
+    windows: list[dict[str, object]] = []
+    for index in indices:
+        mask = id_grid == index
+        if not bool(np.any(mask)):
+            continue
+        rows = np.flatnonzero(np.any(mask, axis=1))
+        columns = np.flatnonzero(np.any(mask, axis=0))
+        row_slice = slice(int(rows[0]), int(rows[-1]) + 1)
+        column_slice = slice(int(columns[0]), int(columns[-1]) + 1)
+        window_id = str(id_for_index(index))
+        frame_files: list[str] = []
+        for frame_index, frame in enumerate(frames):
+            relative = Path(prefix) / window_id / "frames" / f"frame_{frame_index:04d}.npz"
+            _slice_normalized_frame(frame, row_slice, column_slice).write_npz(root / relative)
+            frame_files.append(relative.as_posix())
+        windows.append(
+            {
+                **metadata_for_index(index),
+                "index": index,
+                "bounds": _cascading_window_bounds(scenario, row_slice, column_slice),
+                "frames": frame_files,
+            }
+        )
+    return windows
+
+
+def _slice_normalized_frame(
+    frame: GeoClawNormalizedFrame,
+    row_slice: slice,
+    column_slice: slice,
+) -> GeoClawNormalizedFrame:
+    return GeoClawNormalizedFrame(
+        time=frame.time,
+        h=frame.h[row_slice, column_slice],
+        eta=frame.eta[row_slice, column_slice],
+        u=frame.u[row_slice, column_slice],
+        v=frame.v[row_slice, column_slice],
+        hu=frame.hu[row_slice, column_slice],
+        hv=frame.hv[row_slice, column_slice],
+        wet=frame.wet[row_slice, column_slice],
+        normal_x=frame.normal_x[row_slice, column_slice],
+        normal_y=frame.normal_y[row_slice, column_slice],
+        normal_z=frame.normal_z[row_slice, column_slice],
+        froude=frame.froude[row_slice, column_slice],
+    )
+
+
+def _cascading_window_bounds(
+    scenario: Scenario2_5D,
+    row_slice: slice,
+    column_slice: slice,
+) -> dict[str, object]:
+    rows = (int(row_slice.start), int(row_slice.stop) - 1)
+    columns = (int(column_slice.start), int(column_slice.stop) - 1)
+    xs = scenario.grid.x_coordinates()
+    ys = scenario.grid.y_coordinates()
+    return {
+        "row_min": rows[0],
+        "row_max": rows[1],
+        "column_min": columns[0],
+        "column_max": columns[1],
+        "x_min": float(xs[columns[0]]),
+        "x_max": float(xs[columns[1]]),
+        "y_min": float(ys[rows[0]]),
+        "y_max": float(ys[rows[1]]),
+    }
 
 
 def _load_geoclaw_fgout_frames(

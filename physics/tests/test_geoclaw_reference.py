@@ -12,6 +12,8 @@ from raftsim.examples.run_geoclaw_reference import main as geoclaw_main
 from raftsim.geoclaw_reference import (
     GEOCLAW_CANONICAL_FIXTURES,
     GEOCLAW_CANONICAL_SUITE_SCHEMA,
+    GEOCLAW_CASCADING_NORMALIZED_OUTPUT_SCHEMA,
+    GEOCLAW_CASCADING_SUITE_SCHEMA,
     GEOCLAW_EXPORT_SCHEMA,
     GEOCLAW_NORMALIZED_OUTPUT_SCHEMA,
     GEOCLAW_RAFTING_CASES,
@@ -22,14 +24,18 @@ from raftsim.geoclaw_reference import (
     build_geoclaw_setup_report,
     canonical_geoclaw_scenarios,
     check_geoclaw_availability,
+    export_cascading_geoclaw_scenarios,
     export_canonical_geoclaw_scenarios,
+    export_geoclaw_cascading_package,
     export_rafting_geoclaw_scenarios,
     export_geoclaw_scenario,
     frame_from_geoclaw_initial_state,
+    normalize_geoclaw_cascading_fixed_grid_output,
     normalize_geoclaw_fixed_grid_output,
     rafting_geoclaw_scenarios,
     write_geoclaw_setup_report,
 )
+from raftsim.real_world import generate_south_fork_american_cascading_scenario2_5d
 from raftsim.scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
 
 
@@ -296,6 +302,79 @@ def test_geoclaw_cli_exports_rafting_suite(tmp_path):
 
     assert exit_code == 0
     assert (tmp_path / "rafting_geoclaw_seed_5" / "rafting_suite_manifest.json").exists()
+
+
+def test_geoclaw_cascading_export_preserves_reach_drop_metadata(tmp_path):
+    package = generate_south_fork_american_cascading_scenario2_5d(nx=72, ny=28, duration=0.5)
+    export = export_geoclaw_cascading_package(
+        package,
+        tmp_path / "cascading_export",
+        config=GeoClawExportConfig(num_output_times=2),
+    )
+    manifest = json.loads(export.manifest_path.read_text(encoding="utf-8"))
+
+    assert manifest["schema"] == GEOCLAW_EXPORT_SCHEMA
+    assert manifest["cascading_package"]["reach_count"] == 7
+    assert manifest["cascading_package"]["drop_transition_count"] == 1
+    assert "shared_cascading_package/cascading_metadata.json" in export.files
+    assert (export.output_dir / "shared_cascading_package" / "cascading_annotations.npz").exists()
+
+
+def test_export_cascading_geoclaw_scenarios_writes_suite_manifest(tmp_path):
+    suite = export_cascading_geoclaw_scenarios(
+        tmp_path / "cascading_suite",
+        config=GeoClawExportConfig(num_output_times=2),
+        nx=72,
+        ny=28,
+        duration=0.5,
+    )
+    manifest = json.loads(suite.manifest_path.read_text(encoding="utf-8"))
+
+    assert manifest["schema"] == GEOCLAW_CASCADING_SUITE_SCHEMA
+    assert manifest["scenario_count"] == 3
+    assert manifest["flow_bands"] == ["low_runnable", "median_runnable", "high_runnable"]
+    assert all((suite.output_dir / export["manifest"]).exists() for export in manifest["exports"])
+
+
+def test_normalize_geoclaw_cascading_fixed_grid_output_writes_reach_windows(tmp_path):
+    package = generate_south_fork_american_cascading_scenario2_5d(nx=72, ny=28, duration=0.5)
+    export = export_geoclaw_cascading_package(
+        package,
+        tmp_path / "cascading_export",
+        config=GeoClawExportConfig(num_output_times=2),
+    )
+    normalized = normalize_geoclaw_cascading_fixed_grid_output(export.output_dir, tmp_path / "cascading_normalized")
+    manifest = json.loads(normalized.manifest_path.read_text(encoding="utf-8"))
+    first_reach_frame = tmp_path / "cascading_normalized" / manifest["reach_windows"][0]["frames"][0]
+
+    assert manifest["schema"] == GEOCLAW_CASCADING_NORMALIZED_OUTPUT_SCHEMA
+    assert manifest["stitched_manifest"] == "stitched/manifest.json"
+    assert normalized.reach_window_count == 7
+    assert normalized.drop_transition_window_count == 1
+    assert first_reach_frame.exists()
+    with np.load(first_reach_frame) as data:
+        assert data["h"].shape[0] == package.scenario.grid.ny
+        assert data["h"].shape[1] < package.scenario.grid.nx
+
+
+def test_geoclaw_cli_exports_cascading_suite(tmp_path):
+    exit_code = geoclaw_main(
+        [
+            "--cascading-suite",
+            "--allow-unavailable",
+            "--nx",
+            "72",
+            "--ny",
+            "28",
+            "--num-output-times",
+            "2",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert (tmp_path / "south_fork_cascading_geoclaw" / "cascading_suite_manifest.json").exists()
 
 
 def test_geoclaw_initial_state_frame_exports_normalized_fields():

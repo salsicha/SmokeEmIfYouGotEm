@@ -10,9 +10,11 @@ from ..geoclaw_reference import (
     GeoClawExportConfig,
     GeoClawRunConfig,
     check_geoclaw_availability,
+    export_cascading_geoclaw_scenarios,
     export_canonical_geoclaw_scenarios,
     export_rafting_geoclaw_scenarios,
     export_geoclaw_scenario,
+    normalize_geoclaw_cascading_fixed_grid_output,
     normalize_geoclaw_fixed_grid_output,
     run_geoclaw_export,
     write_geoclaw_setup_report,
@@ -41,7 +43,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--south-fork-difficulty", choices=DIFFICULTY_CHOICES, default=None, help="Override the default difficulty for a South Fork flow band.")
     parser.add_argument("--all-fixtures", action="store_true", help="Generate and export the full canonical GeoClaw fixture suite.")
     parser.add_argument("--rafting-suite", action="store_true", help="Generate and export rafting feature cases plus real-world flow bands.")
+    parser.add_argument("--cascading-suite", action="store_true", help="Generate and export South Fork cascading reach/drop flow-band packages.")
     parser.add_argument("--normalize-export", type=Path, default=None, help="Normalize an existing GeoClaw export directory.")
+    parser.add_argument("--normalize-cascading-export", type=Path, default=None, help="Normalize an existing cascading GeoClaw export into stitched and reach-window outputs.")
     parser.add_argument("--run-export", type=Path, default=None, help="Run an existing generated GeoClaw export directory.")
     parser.add_argument("--run", action="store_true", help="Run GeoClaw after exporting one selected scenario.")
     parser.add_argument("--claw-root", type=Path, default=None, help="Optional Clawpack checkout root for GeoClaw execution.")
@@ -76,6 +80,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"frames={result.frame_count}")
         return 0
 
+    if args.normalize_cascading_export is not None:
+        _ensure_single_mode(args, "normalize-cascading-export")
+        result = normalize_geoclaw_cascading_fixed_grid_output(args.normalize_cascading_export, args.output_dir)
+        print(f"scenario={result.scenario_id}")
+        print(f"manifest={result.manifest_path}")
+        print(f"stitched_manifest={result.stitched_manifest_path}")
+        print(f"reach_windows={result.reach_window_count}")
+        print(f"drop_transition_windows={result.drop_transition_window_count}")
+        return 0
+
     if args.run_export is not None:
         _ensure_single_mode(args, "run-export")
         if not availability.available:
@@ -86,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.all_fixtures:
         if args.run:
             raise SystemExit("--run is only supported for one selected scenario, not suites.")
-        if any((args.scenario_dir, args.fixture, args.south_fork_flow_band, args.rafting_suite, args.normalize_export, args.run_export, args.procedural)):
+        if any((args.scenario_dir, args.fixture, args.south_fork_flow_band, args.rafting_suite, args.cascading_suite, args.normalize_export, args.normalize_cascading_export, args.run_export, args.procedural)):
             raise SystemExit("Select --all-fixtures by itself, or choose one single scenario source.")
         result = export_canonical_geoclaw_scenarios(
             args.output_dir / f"canonical_geoclaw_seed_{args.seed}",
@@ -104,12 +118,31 @@ def main(argv: list[str] | None = None) -> int:
     if args.rafting_suite:
         if args.run:
             raise SystemExit("--run is only supported for one selected scenario, not suites.")
-        if any((args.scenario_dir, args.fixture, args.south_fork_flow_band, args.normalize_export, args.run_export, args.procedural)):
+        if any((args.scenario_dir, args.fixture, args.south_fork_flow_band, args.cascading_suite, args.normalize_export, args.normalize_cascading_export, args.run_export, args.procedural)):
             raise SystemExit("Select --rafting-suite by itself, or choose one single scenario source.")
         result = export_rafting_geoclaw_scenarios(
             args.output_dir / f"rafting_geoclaw_seed_{args.seed}",
             seed=args.seed,
             config=_export_config(args),
+        )
+        print(f"suite={result.suite_id}")
+        print(f"manifest={result.manifest_path}")
+        print(f"scenarios={len(result.results)}")
+        if not availability.available:
+            print(f"GeoClaw unavailable for execution: {availability.reason}")
+            return 0 if args.allow_unavailable else 2
+        return 0
+
+    if args.cascading_suite:
+        if args.run:
+            raise SystemExit("--run is only supported for one selected scenario, not suites.")
+        if any((args.scenario_dir, args.fixture, args.south_fork_flow_band, args.all_fixtures, args.rafting_suite, args.normalize_export, args.normalize_cascading_export, args.run_export, args.procedural)):
+            raise SystemExit("Select --cascading-suite by itself, or choose one single scenario source.")
+        result = export_cascading_geoclaw_scenarios(
+            args.output_dir / "south_fork_cascading_geoclaw",
+            config=_export_config(args),
+            nx=args.nx,
+            ny=args.ny,
         )
         print(f"suite={result.suite_id}")
         print(f"manifest={result.manifest_path}")
@@ -197,8 +230,9 @@ def _export_config(args: argparse.Namespace) -> GeoClawExportConfig:
 
 def _ensure_single_mode(args: argparse.Namespace, mode: str) -> None:
     conflicts = {
-        "normalize-export": (args.scenario_dir, args.fixture, args.south_fork_flow_band, args.all_fixtures, args.rafting_suite, args.run_export, args.procedural, args.run),
-        "run-export": (args.scenario_dir, args.fixture, args.south_fork_flow_band, args.all_fixtures, args.rafting_suite, args.normalize_export, args.procedural, args.run),
+        "normalize-export": (args.scenario_dir, args.fixture, args.south_fork_flow_band, args.all_fixtures, args.rafting_suite, args.cascading_suite, args.normalize_cascading_export, args.run_export, args.procedural, args.run),
+        "normalize-cascading-export": (args.scenario_dir, args.fixture, args.south_fork_flow_band, args.all_fixtures, args.rafting_suite, args.cascading_suite, args.normalize_export, args.run_export, args.procedural, args.run),
+        "run-export": (args.scenario_dir, args.fixture, args.south_fork_flow_band, args.all_fixtures, args.rafting_suite, args.cascading_suite, args.normalize_export, args.normalize_cascading_export, args.procedural, args.run),
     }
     if any(conflicts[mode]):
         raise SystemExit(f"Select --{mode} by itself, or choose one single scenario source.")
