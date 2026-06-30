@@ -13,6 +13,8 @@ from raftsim.real_world import (
     default_source_catalog,
     extract_channel_indicators,
     generate_real_world_scenario2_5d,
+    generate_south_fork_american_cascading_scenario2_5d,
+    generate_south_fork_american_cascading_seed_scenarios,
     identify_candidate_rapids,
     south_fork_american_centerline_stations,
     south_fork_american_fetch_specs,
@@ -20,6 +22,7 @@ from raftsim.real_world import (
     write_real_world_seed_package,
 )
 from raftsim.examples.generate_real_world_scenario import main as generate_real_world_main
+from raftsim.cascading import read_cascading_scenario_package
 from raftsim.scenario2_5d import read_scenario2_5d_package
 from raftsim.schema_versions import SOURCE_MANIFEST_SCHEMA_VERSION
 
@@ -140,6 +143,38 @@ def test_real_world_scenario_generates_solver_neutral_package(tmp_path):
     np.testing.assert_allclose(loaded.initial_state.depth, scenario.initial_state.depth)
 
 
+def test_south_fork_cascading_scenario_adds_variable_reaches_and_rapid_drop_metadata():
+    package = generate_south_fork_american_cascading_scenario2_5d(nx=80, ny=30, duration=0.5)
+    reach_kinds = [reach.kind for reach in package.reaches]
+    source_station_ranges = [
+        (reach.metadata["source_station_start_m"], reach.metadata["source_station_end_m"]) for reach in package.reaches
+    ]
+
+    assert package.scenario.validate().passed
+    assert package.scenario.metadata.scenario_type == "real_world"
+    assert package.scenario.metadata.river_id == "american_south_fork"
+    assert package.scenario.metadata.flow_band == "median_runnable"
+    assert package.scenario.metadata.generator == "raftsim.real_world.cascading"
+    assert reach_kinds == ["pool", "tongue", "drop", "wave_train", "eddy_recovery", "boulder_garden", "pool"]
+    assert len({round(reach.slope_profile[0].value, 4) for reach in package.reaches}) > 3
+    assert all(start < end for start, end in source_station_ranges)
+    assert package.drop_transitions[0].metadata["source_rapid_id"].startswith("rapid_candidate_")
+    assert package.drop_transitions[0].metadata["source_elevation_fall_m"] > 0.0
+    assert "boulder_garden" in package.drop_transitions[0].hazard_tags
+    assert any(feature.metadata.get("source") == "real_world_rapid_candidate" for feature in package.scenario.features)
+
+
+def test_south_fork_cascading_seed_suite_covers_low_median_and_high_flows():
+    packages = generate_south_fork_american_cascading_seed_scenarios(nx=72, ny=28, duration=0.5)
+    flow_bands = [package.scenario.metadata.flow_band for package in packages]
+    depths = [float(package.scenario.initial_state.depth.mean()) for package in packages]
+
+    assert flow_bands == ["low_runnable", "median_runnable", "high_runnable"]
+    assert [package.scenario.metadata.difficulty_preset for package in packages] == ["beginner", "intermediate", "advanced"]
+    assert depths[0] < depths[1] < depths[2]
+    assert all(package.scenario.validate().passed for package in packages)
+
+
 def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
     output_dir = write_real_world_seed_package(tmp_path / "real_world_data")
 
@@ -148,11 +183,17 @@ def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
     assert (output_dir / "rapid_candidates.geojson").exists()
     assert (output_dir / "corridor_package_manifest.json").exists()
     assert (output_dir / "scenario" / "scenario.json").exists()
+    cascading_dirs = sorted((output_dir / "cascading_scenarios").glob("*_cascading"))
+    assert len(cascading_dirs) == 3
 
     manifest = json.loads((output_dir / "source_manifest.json").read_text(encoding="utf-8"))
     scenario = read_scenario2_5d_package(output_dir / "scenario")
+    median_cascading_dir = next(path for path in cascading_dirs if "median_runnable" in path.name)
+    cascading = read_cascading_scenario_package(median_cascading_dir)
     assert manifest["schema_version"] == SOURCE_MANIFEST_SCHEMA_VERSION
     assert scenario.metadata.scenario_type == "real_world"
+    assert cascading.scenario.metadata.flow_band == "median_runnable"
+    assert len(cascading.reaches) == 7
 
 
 def test_generate_real_world_scenario_example_writes_selected_package(tmp_path):
