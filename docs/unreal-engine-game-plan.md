@@ -122,7 +122,7 @@ Tasks:
 - Define plugin/module boundaries: core game, Chrono bridge, water visualization, raft, river, input, UI, local AI/voice, crew AI, audio, and debug.
 - Build a small visual prototype with placeholder physics replay data, not gameplay physics.
 - Establish asset scale, coordinate conventions, units, and import/export rules.
-- Define geospatial import rules: coordinate reference systems, WGS84/local transforms, source manifests, terrain tile sizes, imagery masks, river corridor bounds, and confidence metadata.
+- Define geospatial import rules: coordinate reference systems, WGS84/local transforms, JSON source manifests, GeoJSON/GeoPackage vector imports, GeoTIFF/COG terrain and mask imports, LAS/LAZ/COPC point-cloud handling where needed, terrain tile sizes, imagery masks, river corridor bounds, and confidence metadata.
 - Evaluate local/offline AI runtime options for target platforms: speech-to-text, constrained command parsing, crew dialogue generation/selection, optional local speech synthesis, latency, memory, CPU/GPU cost, licensing, privacy, and console feasibility.
 - Build the development asset source plan: free/open art and sound sources, AI-generation provenance, license requirements, attribution rules, AI-audio policy, asset manifest, LFS/storage policy, and Unreal import conventions; keep paid-vendor research for release-readiness only.
 - Start with Unreal-native audio and MetaSounds for interactive water/raft/crew sound; evaluate Wwise/FMOD only if the native toolchain cannot meet authoring, mixing, localization, memory, or platform needs.
@@ -172,7 +172,7 @@ Tasks:
 
 - Import Python-authored and real-world geospatial river sections with scenario metadata, source manifests, seasonal presets, difficulty presets, and validation confidence.
 - Build spline/volume/data-asset representation for river centerline, banks, cross sections, rapids, hazards, gauges, season/flow presets, and current fields.
-- Convert DEM/lidar, aerial/satellite masks, hydrography, and reviewed rapid annotations into Unreal terrain/corridor assets.
+- Convert GeoTIFF/COG DEMs and masks, LAS/LAZ/COPC point clouds when needed, GeoJSON/GeoPackage hydrography, and reviewed rapid annotations into Unreal terrain/corridor assets.
 - Build a river validation annotation editor for viewport pins, station spans, polygons, raft lines, footage timecodes, gauge-history snippets, aerial imagery references, guide notes, confidence, and expected raft outcomes.
 - Use Cesium for Unreal or equivalent geospatial tooling where it helps with real-world scale, WGS84 positioning, 3D Tiles, terrain, imagery, and georeferenced scene setup.
 - Create photo-real canyon/forest/desert/mountain river environment pipeline using Nanite rocks/canyon walls/terrain details, Nanite foliage, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, and advanced material layering where supported.

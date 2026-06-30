@@ -287,7 +287,7 @@ This milestone turns the custom C++ shallow-water / height-field solver from a r
 - [x] Decide the canonical storage format for cascading reach/drop packages: support reach-local grids with overlap/ghost zones for authoring and streaming, but require stitched whole-window validation outputs so seams cannot hide physics errors.
 - [ ] Evaluate Chrono::FSI only after the GeoClaw/custom-C++ solver comparison path is stable.
 - [x] Identify reference footage, river data, aerial/satellite imagery, flow history, and expert guide feedback needed for validation: build a game/editor-integrated river validation annotation tool so evidence is attached directly to river stations, reaches, drops, raft lines, and expected outcomes.
-- [ ] Decide which geospatial formats become canonical for source data, generated scenarios, and Unreal corridor packages.
+- [x] Decide which geospatial formats become canonical for source data, generated scenarios, and Unreal corridor packages: JSON source manifests, GeoJSON vectors/annotations, GeoPackage for larger GIS workspaces, GeoTIFF/COG rasters, LAS/LAZ or COPC point clouds, normalized JSON/CSV/Parquet gauge history, custom JSON plus `.npy`/`.npz` solver packages, and JSON/GeoJSON plus converted assets for Unreal corridor packages.
 - [ ] Re-check latest UE5 rendering/geospatial plugin capabilities at the Python-to-Unreal readiness gate.
 - [ ] Decide local AI model/runtime strategy for desktop, VR, handheld, and future console targets.
 - [ ] Decide how much crew dialogue is generated locally versus authored as recorded barks, constrained templates, or designer-approved lines.
@@ -323,6 +323,8 @@ This milestone turns the custom C++ shallow-water / height-field solver from a r
 - [ ] Build the first rapid review/editor workflow that displays DEM/lidar, aerial/satellite imagery, flowlines, cross sections, gauge history, source manifests, candidate tags, and guide notes in one view.
 - [ ] Export annotation packages as JSON/GeoJSON for Python scenario generation, GeoClaw/C++ validation reports, and Unreal river data assets.
 - [ ] Add Unreal fidelity-review overlays for annotation pins/spans/polygons, solver fields, raft trajectories, rendered water/foam/audio cues, and expected surf/flush/pin/flip behavior.
+- [ ] Add a versioned geospatial format contract covering CRS policy, GeoJSON/GeoPackage vectors, GeoTIFF/COG rasters, LAS/LAZ/COPC point clouds, gauge-history tables, solver arrays, and Unreal corridor exports.
+- [ ] Add import/export validation checks that reject missing CRS metadata, lossy Shapefile-only canonical inputs, missing source manifests, and untracked WGS84/local transform changes.
 - [ ] Draft the first candidate river inventory and source manifest.
 - [ ] Prototype course/elevation extraction for one river section.
 - [ ] Define the first rapid-review labels and seasonal flow/difficulty parameter mapping.
