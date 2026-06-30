@@ -274,7 +274,7 @@ This milestone turns the custom C++ shallow-water / height-field solver from a r
 - [x] Validate geometry-specific cases: hydrostatic/sloping-channel balance, wet/dry shorelines, bed steps, constrictions, drops/ledges, tailwater controls, and stitched reach/drop boundary handoffs.
 - [x] Re-run raft coupling validation for pool entry, drop entry, hydraulic-hole surf/flush, eddy recovery, boulder impacts, shallow shelves, pins/releases, and transition-boundary crossings against GeoClaw-derived and C++ water fields.
 - [x] Promote passing GeoClaw/C++/raft comparison runs into regression fixtures or artifact manifests with JSON and Markdown reports.
-- [ ] Profile validated C++ configurations against desktop, VR, and handheld runtime budgets and record deterministic replay results.
+- [x] Profile validated C++ configurations against desktop, VR, and handheld runtime budgets and record deterministic replay results.
 - [ ] Regenerate the GeoClaw-to-Unreal readiness report and explicitly approve or block live custom water based on the full validation gate.
 
 ## Technical Notes To Revisit
