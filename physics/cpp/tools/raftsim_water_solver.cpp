@@ -23,6 +23,7 @@ struct CliArgs {
     int steps = -1;
     int frame_interval = 60;
     double cfl = 0.45;
+    double dry_tolerance = 1.0e-6;
     double feature_strength_scale = 1.0;
     double roughness_scale = 1.0;
     double bed_slope_source_scale = 0.0;
@@ -41,6 +42,7 @@ void print_usage(const char* program) {
         << "  --steps <n>                    Fixed steps to run (default: scenario duration / fixed_dt)\n"
         << "  --frame-interval <n>           Save every n solver steps (default: 60)\n"
         << "  --cfl <x>                      Finite-volume CFL target (default: 0.45)\n"
+        << "  --dry-tolerance <x>            Wet/dry depth tolerance in meters (default: 1e-6)\n"
         << "  --feature-strength-scale <x>   Scale authored rapid forcing (default: 1.0)\n"
         << "  --roughness-scale <x>          Scale scenario roughness/friction (default: 1.0)\n"
         << "  --bed-slope-source-scale <x>   Scale finite-volume bed slope source term (default: 0.0)\n"
@@ -94,6 +96,8 @@ CliArgs parse_args(int argc, char** argv) {
             args.frame_interval = parse_int(require_value(flag), flag);
         } else if (flag == "--cfl") {
             args.cfl = parse_double(require_value(flag), flag);
+        } else if (flag == "--dry-tolerance") {
+            args.dry_tolerance = parse_double(require_value(flag), flag);
         } else if (flag == "--feature-strength-scale") {
             args.feature_strength_scale = parse_double(require_value(flag), flag);
         } else if (flag == "--roughness-scale") {
@@ -127,6 +131,9 @@ CliArgs parse_args(int argc, char** argv) {
     if (args.cfl <= 0.0) {
         throw std::runtime_error("--cfl must be positive.");
     }
+    if (args.dry_tolerance < 0.0) {
+        throw std::runtime_error("--dry-tolerance must be non-negative.");
+    }
     return args;
 }
 
@@ -146,6 +153,7 @@ int main(int argc, char** argv) {
         config.boundary_mode = args.boundary_mode;
         config.flux_scheme = args.flux_scheme;
         config.cfl = args.cfl;
+        config.dry_tolerance = args.dry_tolerance;
         config.feature_strength_scale = args.feature_strength_scale;
         config.roughness_scale = args.roughness_scale;
         config.bed_slope_source_scale = args.bed_slope_source_scale;
