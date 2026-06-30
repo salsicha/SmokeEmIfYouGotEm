@@ -1,0 +1,89 @@
+{
+  "record": {
+    "actual_scenario_id": "eddy_line_shear_seed_20",
+    "candidate_checks": [
+      {
+        "details": "",
+        "name": "eddy_line_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "Current should change sharply across the raft width.",
+        "name": "shear_velocity",
+        "passed": true,
+        "threshold": 0.6,
+        "value": 1.2528497530160048
+      },
+      {
+        "details": "Differential current should rotate the raft around vertical.",
+        "name": "yaw_torque",
+        "passed": true,
+        "threshold": 0.4,
+        "value": 10.901794317565479
+      },
+      {
+        "details": "Eddy-line crossing should also couple into roll.",
+        "name": "roll_coupling",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 43.9114638606536
+      }
+    ],
+    "candidate_frame": "outputs/m16cpp/r_eddy/reduced/cpp_solver/eddy_line_shear_seed_20/frames/frame_0008.csv",
+    "candidate_outcome": "eddy_coupled",
+    "candidate_passed": true,
+    "case_id": "eddy_recovery",
+    "expected_outcomes": [
+      "clear"
+    ],
+    "feature_outcome_match": true,
+    "flow_band": null,
+    "force_delta_weight_ratio": 0.4953086108068335,
+    "force_envelope_outcome_match": true,
+    "gate_scenario_id": "eddy_line_shear",
+    "notes": [],
+    "passed": true,
+    "reference_checks": [
+      {
+        "details": "",
+        "name": "eddy_line_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "Current should change sharply across the raft width.",
+        "name": "shear_velocity",
+        "passed": true,
+        "threshold": 0.6,
+        "value": 1.4077247178860992
+      },
+      {
+        "details": "Differential current should rotate the raft around vertical.",
+        "name": "yaw_torque",
+        "passed": true,
+        "threshold": 0.4,
+        "value": 8.907502332359927
+      },
+      {
+        "details": "Eddy-line crossing should also couple into roll.",
+        "name": "roll_coupling",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 54.68396427531284
+      }
+    ],
+    "reference_frame": "outputs/m16g/r_eddy/normalized/frames/frame_0002.npz",
+    "reference_outcome": "eddy_coupled",
+    "reference_passed": true,
+    "solver_mode": "reduced",
+    "suite": "rafting",
+    "torque_delta_inertia_ratio": 2.258229925967897,
+    "trajectory_position_delta_m": 0.0013497159644505637,
+    "trajectory_velocity_delta_mps": 0.08098295786691725
+  },
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "source_report": "reports/milestone16/raft_coupling_validation.json"
+}

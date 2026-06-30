@@ -1,0 +1,39 @@
+{
+  "blocked_reasons": [],
+  "decision": "PASS",
+  "manifest_path": "data/validation/milestone17/analytic_fixtures/manifest.json",
+  "output_dir": "reports/milestone18/analytic_retune_guardrails/wet_dry_reduced_pressure_gradient",
+  "passed": true,
+  "postflight": {
+    "candidate_kind": "scenario",
+    "candidate_label": "wet_dry_postflight_reduced_pressure_gradient",
+    "candidate_root": null,
+    "failed_count": 0,
+    "failing_metrics": [],
+    "fixture_count": 7,
+    "frame_index": 0,
+    "passed": true,
+    "passed_count": 7,
+    "report_json": "reports/milestone18/analytic_retune_guardrails/wet_dry_reduced_pressure_gradient/postflight_analytic_validation.json",
+    "report_markdown": "reports/milestone18/analytic_retune_guardrails/wet_dry_reduced_pressure_gradient/postflight_analytic_validation.md",
+    "stage": "postflight"
+  },
+  "preflight": {
+    "candidate_kind": "scenario",
+    "candidate_label": "wet_dry_preflight_baseline",
+    "candidate_root": null,
+    "failed_count": 0,
+    "failing_metrics": [],
+    "fixture_count": 7,
+    "frame_index": 0,
+    "passed": true,
+    "passed_count": 7,
+    "report_json": "reports/milestone18/analytic_retune_guardrails/wet_dry_reduced_pressure_gradient/preflight_analytic_validation.json",
+    "report_markdown": "reports/milestone18/analytic_retune_guardrails/wet_dry_reduced_pressure_gradient/preflight_analytic_validation.md",
+    "stage": "preflight"
+  },
+  "regression_count": 0,
+  "regressions": [],
+  "retune_batch_id": "wet_dry_reduced_pressure_gradient",
+  "schema_version": "raftsim.milestone18.analytic_retune_guardrail.v0"
+}

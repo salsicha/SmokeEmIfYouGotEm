@@ -36,14 +36,14 @@
       "value": 0.0
     },
     {
-      "details": "Absolute C++ minus PyClaw mass-drift delta.",
+      "details": "Absolute C++ minus reference mass-drift delta.",
       "name": "mass_drift_delta",
       "passed": true,
       "threshold": 0.02,
       "value": 0.0
     },
     {
-      "details": "Absolute C++ minus PyClaw energy-change delta.",
+      "details": "Absolute C++ minus reference energy-change delta.",
       "name": "energy_change_delta",
       "passed": true,
       "threshold": 0.08,

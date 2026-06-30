@@ -170,6 +170,41 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert west_column
     assert any(abs(h - 1.25) > 1.0e-6 or abs(u - 1.4) > 1.0e-6 for h, u in west_column)
 
+    wet_dry_scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="wet_dry_shoreline", seed=25, nx=24, ny=12, duration=0.2)
+    )
+    wet_dry_scenario_dir = tmp_path / "scenario" / "wet_dry_shoreline"
+    wet_dry_scenario.write_package(wet_dry_scenario_dir)
+    wet_dry_output_dir = tmp_path / "cpp_wet_dry_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(wet_dry_scenario_dir),
+            "--output",
+            str(wet_dry_output_dir),
+            "--steps",
+            "12",
+            "--frame-interval",
+            "6",
+            "--feature-strength-scale",
+            "0",
+        ],
+        check=True,
+    )
+    wet_dry_run = wet_dry_output_dir / wet_dry_scenario.metadata.scenario_id
+    wet_dry_manifest = json.loads((wet_dry_run / "manifest.json").read_text(encoding="utf-8"))
+    wet_dry_final_frame = wet_dry_run / wet_dry_manifest["frames"][-1]
+    lateral_velocities = []
+    wet_counts = 0
+    with wet_dry_final_frame.open(newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            lateral_velocities.append(abs(float(row["v"])))
+            wet_counts += int(row["wet"])
+
+    assert wet_counts == int(wet_dry_scenario.initial_state.wet.sum())
+    assert max(lateral_velocities) < 1.0e-9
+
     cascading_scenario_dir = tmp_path / "scenario" / "cascading"
     cascading_output_dir = tmp_path / "cpp_cascading_output"
     cascading_package = generate_california_pool_drop_cascading_scenario2_5d(

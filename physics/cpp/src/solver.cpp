@@ -62,6 +62,36 @@ double gradient_y(const Array2D& array, const Scenario& scenario, std::size_t ro
     return (array(row + 1, col) - array(row - 1, col)) / (2.0 * scenario.grid.dy);
 }
 
+double pressure_eta_x(const WaterState& state, const Scenario& scenario, const SolverConfig& config, std::size_t row, std::size_t col) {
+    double center = state.eta(row, col);
+    if (col == 0) {
+        double east = state.h(row, col + 1) > config.dry_tolerance ? state.eta(row, col + 1) : center;
+        return (east - center) / scenario.grid.dx;
+    }
+    if (col + 1 >= scenario.grid.nx) {
+        double west = state.h(row, col - 1) > config.dry_tolerance ? state.eta(row, col - 1) : center;
+        return (center - west) / scenario.grid.dx;
+    }
+    double west = state.h(row, col - 1) > config.dry_tolerance ? state.eta(row, col - 1) : center;
+    double east = state.h(row, col + 1) > config.dry_tolerance ? state.eta(row, col + 1) : center;
+    return (east - west) / (2.0 * scenario.grid.dx);
+}
+
+double pressure_eta_y(const WaterState& state, const Scenario& scenario, const SolverConfig& config, std::size_t row, std::size_t col) {
+    double center = state.eta(row, col);
+    if (row == 0) {
+        double north = state.h(row + 1, col) > config.dry_tolerance ? state.eta(row + 1, col) : center;
+        return (north - center) / scenario.grid.dy;
+    }
+    if (row + 1 >= scenario.grid.ny) {
+        double south = state.h(row - 1, col) > config.dry_tolerance ? state.eta(row - 1, col) : center;
+        return (center - south) / scenario.grid.dy;
+    }
+    double south = state.h(row - 1, col) > config.dry_tolerance ? state.eta(row - 1, col) : center;
+    double north = state.h(row + 1, col) > config.dry_tolerance ? state.eta(row + 1, col) : center;
+    return (north - south) / (2.0 * scenario.grid.dy);
+}
+
 double divergence_x(const Array2D& array, const Scenario& scenario, std::size_t row, std::size_t col) {
     if (col == 0) {
         return (array(row, col + 1) - array(row, col)) / scenario.grid.dx;
@@ -457,8 +487,8 @@ void ReducedShallowWaterSolver::step_reduced(double dt) {
             }
             double div = divergence_x(state_.hu, scenario_, row, col) + divergence_y(state_.hv, scenario_, row, col);
             double h_next = std::max(0.0, h - dt * div);
-            double sx = gradient_x(state_.eta, scenario_, row, col);
-            double sy = gradient_y(state_.eta, scenario_, row, col);
+            double sx = pressure_eta_x(state_, scenario_, config_, row, col);
+            double sy = pressure_eta_y(state_, scenario_, config_, row, col);
             double u_next = state_.u(row, col) - dt * config_.gravity * sx;
             double v_next = state_.v(row, col) - dt * config_.gravity * sy;
             double speed = std::hypot(u_next, v_next);

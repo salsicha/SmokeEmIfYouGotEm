@@ -45,24 +45,17 @@
       "case_id": "wet_dry_shoreline",
       "evidence": [
         {
-          "failing_checks": [
-            "field_linf",
-            "slope_linf",
-            "cross_section_linf",
-            "feature_location_delta"
-          ],
+          "failing_checks": [],
           "gate_scenario_id": "wet_dry_shoreline",
           "solver_mode": "reduced",
-          "threshold_passed": false
+          "threshold_passed": true
         },
         {
           "failing_checks": [
             "field_linf",
-            "slope_linf",
+            "wet_mismatch_fraction",
             "probe_linf",
             "cross_section_linf",
-            "mass_drift_delta",
-            "energy_change_delta",
             "froude_delta",
             "feature_location_delta"
           ],
@@ -92,10 +85,8 @@
             "field_linf",
             "slope_linf",
             "probe_linf",
-            "cross_section_linf",
             "mass_drift_delta",
-            "energy_change_delta",
-            "froude_delta"
+            "energy_change_delta"
           ],
           "gate_scenario_id": "bed_step",
           "solver_mode": "reduced",
@@ -136,8 +127,8 @@
             "wet_mismatch_fraction",
             "probe_linf",
             "cross_section_linf",
-            "energy_change_delta",
             "froude_delta",
+            "feature_location_delta",
             "feature_strength_delta"
           ],
           "gate_scenario_id": "constriction",
@@ -196,7 +187,6 @@
             "field_linf",
             "slope_linf",
             "probe_linf",
-            "cross_section_linf",
             "froude_delta"
           ],
           "gate_scenario_id": "drop_ledge",
@@ -271,7 +261,6 @@
           "failing_checks": [
             "field_linf",
             "slope_linf",
-            "wet_mismatch_fraction",
             "probe_linf",
             "cross_section_linf",
             "energy_change_delta",
