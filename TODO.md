@@ -296,6 +296,7 @@ This milestone turns the Milestone 16 blocker into sharper diagnostics by freezi
 This milestone turns the blocked Milestone 16 evidence into an ordered fix plan. Milestone 17 analytic and contract fixtures must stay green while the C++ solver is retuned; Chaos/Jolt authority evaluation moves after this closure work so raft/contact runtime decisions do not depend on unapproved live water.
 
 - [x] Build a failure triage matrix for every failed GeoClaw/C++ comparison, grouped by scenario family, solver mode, metric, likely root cause, and retune lever.
+- [x] Fix and record GeoClaw boundary semantics before parity retuning: constant authored stage/depth/velocity boundaries now export as GeoClaw `user` boundaries with a generated `bc2amr.f90` adapter and manifest evidence; dynamic hydrographs fail fast until a time-varying adapter is implemented.
 - [ ] Fix GeoClaw-vs-C++ parity failures in dependency order: keep flat-pool and sloping-channel cases as guardrails, then retune wet/dry, bed-step, constriction, drop/ledge, and cascading reach/drop comparisons with feature forcing off or at low validated defaults.
 - [ ] Close geometry-specific validation failures for wet/dry shorelines, bed steps, constrictions, drops/ledges, tailwater controls, and stitched reach/drop handoffs, promoting each newly passing family into regression artifacts.
 - [ ] Retune raft coupling over C++ water only after field and geometry gates improve, comparing force envelopes, trajectories, surf/flush/clear/ground/pin/flip outcomes, and reach/drop transition stability against GeoClaw-derived fields.
@@ -371,6 +372,7 @@ This milestone decides whether Unreal Chaos, Jolt, Chrono, or the custom reduced
 - [x] Set up the shared Chaos/Jolt runtime evaluation fixture contract for raft-rock impacts, shelf grounding, pin/release, crew ejection/swimming, determinism, and crowded runtime cost.
 - [x] Build the Milestone 18 GeoClaw/C++ failure triage matrix from the current threshold, geometry, raft-coupling, and full-gate reports.
 - [x] Wire Milestone 17 analytic fixture validation into the retune preflight/postflight workflow before changing solver parameters.
+- [x] Fix and record GeoClaw boundary semantics so authored constant inflow/stage/depth/velocity boundaries are enforced by generated GeoClaw `user` boundaries instead of silently falling back to extrapolation.
 - [ ] Retune and re-run the first blocked GeoClaw/C++ parity family without increasing feature-forcing defaults.
 - [ ] Add the distinct flow-dependent pin/release fixture and report separate from shallow-shelf and boulder proxy evidence.
 - [ ] Re-run raft-coupling validation over the improved C++ water fields and promote newly passing outcomes.
