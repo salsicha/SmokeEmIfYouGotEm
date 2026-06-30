@@ -64,6 +64,7 @@ Fallback or initial-state-only GeoClaw normalization is useful for schema smoke 
 
 ## Phase 4: Whitewater And Raft-Relevant Validation
 
+- Milestone 16 raft-coupling evidence is tracked in `physics/reports/milestone16/raft_coupling_validation.json` and `physics/reports/milestone16/raft_coupling_validation.md`; the gate remains blocked with 7 of 50 GeoClaw-vs-C++ raft comparisons passing, while force deltas, candidate feature checks, and several outcome classes still fail.
 - Re-run raft coupling over GeoClaw-derived fields and C++ runtime fields with the same probe/sample sets.
 - Validate pool entry, drop entry, hydraulic-hole surf/flush, downstream boil recovery, eddy recovery, boulder impacts, shallow shelves, pins/releases, and transition-boundary crossings.
 - Compare force envelopes, trajectory deltas, outcome classes, and contact/grounding events.

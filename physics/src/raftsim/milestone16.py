@@ -19,6 +19,19 @@ from .cascading import (
     read_cascading_scenario_package,
 )
 from .dual_solver import CppSolverRunConfig, run_cpp_solver_scenario
+from .feature_validation import (
+    FeatureValidationResult,
+    build_cascading_raft_validation_cases,
+    summarize_run_outcomes,
+    validate_boil_upwelling_case,
+    validate_cascading_raft_cases,
+    validate_eddy_line_case,
+    validate_hole_case,
+    validate_lateral_wave_case,
+    validate_shallow_shelf_case,
+    validate_standing_wave_case,
+    validate_submerged_rock_case,
+)
 from .geoclaw_reference import (
     GEOCLAW_CANONICAL_FIXTURES,
     GEOCLAW_RAFTING_CASES,
@@ -33,15 +46,27 @@ from .geoclaw_reference import (
     rafting_geoclaw_scenarios,
     run_geoclaw_export,
 )
+from .math3d import Vec3
+from .raft_coupling2_5d import (
+    RaftState6DoF,
+    WaterField2_5D,
+    build_default_raft_mass_properties,
+    compare_raft_force_samples,
+)
 from .real_world import default_player_selections, generate_real_world_scenario2_5d
 from .scenario2_5d import Scenario2_5D
-from .scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d
+from .scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d, read_scenario2_5d_package
 from .validation_gate import CUSTOM_CPP_VALIDATION_SCENARIOS, CUSTOM_CPP_VALIDATION_THRESHOLD_TIERS
 
 MILESTONE16_GEOCLAW_REFERENCE_REPORT_SCHEMA = "raftsim.milestone16.geoclaw_reference_runs.v0"
 MILESTONE16_CPP_RUN_REPORT_SCHEMA = "raftsim.milestone16.cpp_solver_runs.v0"
 MILESTONE16_COMPARISON_REPORT_SCHEMA = "raftsim.milestone16.geoclaw_cpp_comparisons.v0"
 MILESTONE16_GEOMETRY_VALIDATION_REPORT_SCHEMA = "raftsim.milestone16.geometry_validation.v0"
+MILESTONE16_RAFT_COUPLING_REPORT_SCHEMA = "raftsim.milestone16.raft_coupling_validation.v0"
+MILESTONE16_RAFT_FORCE_DELTA_WEIGHT_RATIO_THRESHOLD = 1.0
+MILESTONE16_RAFT_TORQUE_DELTA_INERTIA_RATIO_THRESHOLD = 2.5
+MILESTONE16_RAFT_TRAJECTORY_POSITION_DELTA_M_THRESHOLD = 0.25
+MILESTONE16_RAFT_TRAJECTORY_VELOCITY_DELTA_MPS_THRESHOLD = 0.5
 MILESTONE16_CASE_DIRS = {
     "flat_pool": "c_flat",
     "uniform_channel": "c_uniform",
@@ -436,6 +461,129 @@ class Milestone16GeometryValidationReport:
         return output_path
 
 
+@dataclass(frozen=True, slots=True)
+class Milestone16RaftCouplingRecord:
+    """One GeoClaw-vs-C++ raft-coupling case comparison."""
+
+    gate_scenario_id: str
+    actual_scenario_id: str
+    suite: str
+    flow_band: str | None
+    solver_mode: str
+    case_id: str
+    expected_outcomes: tuple[str, ...]
+    reference_frame: str
+    candidate_frame: str
+    reference_outcome: str
+    candidate_outcome: str
+    reference_passed: bool
+    candidate_passed: bool
+    feature_outcome_match: bool
+    force_envelope_outcome_match: bool
+    force_delta_weight_ratio: float
+    torque_delta_inertia_ratio: float
+    trajectory_position_delta_m: float
+    trajectory_velocity_delta_mps: float
+    reference_checks: tuple[dict[str, object], ...]
+    candidate_checks: tuple[dict[str, object], ...]
+    notes: tuple[str, ...] = ()
+
+    @property
+    def passed(self) -> bool:
+        return (
+            self.reference_passed
+            and self.candidate_passed
+            and self.feature_outcome_match
+            and self.force_envelope_outcome_match
+            and self.force_delta_weight_ratio <= MILESTONE16_RAFT_FORCE_DELTA_WEIGHT_RATIO_THRESHOLD
+            and self.torque_delta_inertia_ratio <= MILESTONE16_RAFT_TORQUE_DELTA_INERTIA_RATIO_THRESHOLD
+            and self.trajectory_position_delta_m <= MILESTONE16_RAFT_TRAJECTORY_POSITION_DELTA_M_THRESHOLD
+            and self.trajectory_velocity_delta_mps <= MILESTONE16_RAFT_TRAJECTORY_VELOCITY_DELTA_MPS_THRESHOLD
+        )
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["expected_outcomes"] = list(self.expected_outcomes)
+        data["reference_checks"] = list(self.reference_checks)
+        data["candidate_checks"] = list(self.candidate_checks)
+        data["notes"] = list(self.notes)
+        data["passed"] = self.passed
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone16RaftCouplingReport:
+    """Milestone 16 raft coupling validation over GeoClaw and C++ fields."""
+
+    geoclaw_reference_report: str
+    cpp_run_report: str
+    records: tuple[Milestone16RaftCouplingRecord, ...] = field(default_factory=tuple)
+    notes: tuple[str, ...] = ()
+
+    @property
+    def passed(self) -> bool:
+        return bool(self.records) and all(record.passed for record in self.records)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE16_RAFT_COUPLING_REPORT_SCHEMA,
+            "passed": self.passed,
+            "geoclaw_reference_report": self.geoclaw_reference_report,
+            "cpp_run_report": self.cpp_run_report,
+            "thresholds": {
+                "force_delta_weight_ratio": MILESTONE16_RAFT_FORCE_DELTA_WEIGHT_RATIO_THRESHOLD,
+                "torque_delta_inertia_ratio": MILESTONE16_RAFT_TORQUE_DELTA_INERTIA_RATIO_THRESHOLD,
+                "trajectory_position_delta_m": MILESTONE16_RAFT_TRAJECTORY_POSITION_DELTA_M_THRESHOLD,
+                "trajectory_velocity_delta_mps": MILESTONE16_RAFT_TRAJECTORY_VELOCITY_DELTA_MPS_THRESHOLD,
+            },
+            "comparison_count": len(self.records),
+            "passed_count": sum(1 for record in self.records if record.passed),
+            "failed_count": sum(1 for record in self.records if not record.passed),
+            "notes": list(self.notes),
+            "records": [record.to_json_dict() for record in self.records],
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = [
+            "# Milestone 16 Raft Coupling Validation",
+            "",
+            f"Schema: `{MILESTONE16_RAFT_COUPLING_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Comparisons: {len(self.records)}",
+            "",
+            "| Suite | Gate scenario | Mode | Case | Status | Ref outcome | C++ outcome | Force ratio | Velocity delta |",
+            "| --- | --- | --- | --- | --- | --- | --- | ---: | ---: |",
+        ]
+        for record in self.records:
+            lines.append(
+                "| "
+                f"{record.suite} | "
+                f"{record.gate_scenario_id} | "
+                f"{record.solver_mode} | "
+                f"{record.case_id} | "
+                f"{'PASS' if record.passed else 'FAIL'} | "
+                f"{record.reference_outcome} | "
+                f"{record.candidate_outcome} | "
+                f"{record.force_delta_weight_ratio:.3f} | "
+                f"{record.trajectory_velocity_delta_mps:.3f} |"
+            )
+        if self.notes:
+            lines.extend(["", "## Notes", ""])
+            lines.extend(f"- {note}" for note in self.notes)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+
 def run_milestone16_geoclaw_reference_suite(
     output_root: str | Path,
     *,
@@ -578,6 +726,40 @@ def run_milestone16_geometry_validation(
         comparison_report=str(comparison_path),
         geoclaw_reference_report=str(geoclaw_path),
         cases=cases,
+    )
+
+
+def run_milestone16_raft_coupling_validation(
+    geoclaw_reference_report: str | Path,
+    cpp_run_report: str | Path,
+) -> Milestone16RaftCouplingReport:
+    """Re-run Milestone 16 raft coupling over GeoClaw-derived and C++ fields."""
+
+    geoclaw_report_path = Path(geoclaw_reference_report)
+    cpp_report_path = Path(cpp_run_report)
+    geoclaw_report = _read_json(geoclaw_report_path)
+    cpp_report = _read_json(cpp_report_path)
+    geoclaw_by_gate = {str(record["gate_scenario_id"]): record for record in geoclaw_report["records"]}
+    records: list[Milestone16RaftCouplingRecord] = []
+    for cpp_record in cpp_report["records"]:
+        suite = str(cpp_record["suite"])
+        if suite not in {"rafting", "cascading"}:
+            continue
+        gate_id = str(cpp_record["gate_scenario_id"])
+        geoclaw_record = geoclaw_by_gate[gate_id]
+        if suite == "cascading":
+            records.extend(_cascading_raft_coupling_records(geoclaw_record, cpp_record))
+        else:
+            records.extend(_standalone_rafting_coupling_records(geoclaw_record, cpp_record))
+
+    return Milestone16RaftCouplingReport(
+        geoclaw_reference_report=str(geoclaw_report_path),
+        cpp_run_report=str(cpp_report_path),
+        records=tuple(records),
+        notes=(
+            "Pin/release remains represented by shallow-shelf pivot/release and high-flow boulder/pin proxies; "
+            "a distinct strainer or wrap fixture is still needed before production acceptance.",
+        ),
     )
 
 
@@ -766,6 +948,283 @@ def _reach_drop_handoff_geometry_case(geoclaw_report: dict[str, object]) -> Mile
         evidence=tuple(evidence),
         notes=tuple(notes),
     )
+
+
+def _cascading_raft_coupling_records(
+    geoclaw_record: dict[str, object],
+    cpp_record: dict[str, object],
+) -> tuple[Milestone16RaftCouplingRecord, ...]:
+    package = read_cascading_scenario_package(Path(str(geoclaw_record["export_dir"])) / "shared_cascading_package")
+    reference_frame = _last_manifest_frame_path(Path(str(geoclaw_record["normalized_manifest"])))
+    candidate_frame = _last_manifest_frame_path(Path(str(cpp_record["manifest"])))
+    reference_water = WaterField2_5D.from_geoclaw_frame_npz(package.scenario, str(reference_frame))
+    candidate_water = WaterField2_5D.from_cpp_frame_csv(package.scenario, str(candidate_frame))
+    properties = build_default_raft_mass_properties(package.scenario.raft)
+    reference_results = {result.feature: result for result in validate_cascading_raft_cases(package, water=reference_water)}
+    candidate_results = {result.feature: result for result in validate_cascading_raft_cases(package, water=candidate_water)}
+    cases = build_cascading_raft_validation_cases(package, water=reference_water)
+    return tuple(
+        _raft_coupling_record_from_results(
+            geoclaw_record,
+            cpp_record,
+            case.case_id,
+            case.expected_outcomes,
+            reference_frame,
+            candidate_frame,
+            reference_results[case.case_id],
+            candidate_results[case.case_id],
+            compare_raft_force_samples(reference_water, candidate_water, case.state, properties),
+            properties,
+        )
+        for case in cases
+    )
+
+
+def _standalone_rafting_coupling_records(
+    geoclaw_record: dict[str, object],
+    cpp_record: dict[str, object],
+) -> tuple[Milestone16RaftCouplingRecord, ...]:
+    scenario = read_scenario2_5d_package(Path(str(geoclaw_record["export_dir"])) / "shared_scenario")
+    reference_frame = _last_manifest_frame_path(Path(str(geoclaw_record["normalized_manifest"])))
+    candidate_frame = _last_manifest_frame_path(Path(str(cpp_record["manifest"])))
+    reference_water = WaterField2_5D.from_geoclaw_frame_npz(scenario, str(reference_frame))
+    candidate_water = WaterField2_5D.from_cpp_frame_csv(scenario, str(candidate_frame))
+    properties = build_default_raft_mass_properties(scenario.raft)
+    specs = _standalone_raft_case_specs(str(geoclaw_record["gate_scenario_id"]))
+    records: list[Milestone16RaftCouplingRecord] = []
+    for spec in specs:
+        case_id, feature_kind, role, expected_outcomes, validator, z_offset, vertical_velocity = spec
+        feature = _feature_by_role_or_kind(scenario, feature_kind, role)
+        state = _raft_state_at_feature(reference_water, feature.center[0], feature.center[1], z_offset, vertical_velocity)
+        reference_result = validator(reference_water, state, properties)
+        candidate_result = validator(candidate_water, state, properties)
+        records.append(
+            _raft_coupling_record_from_results(
+                geoclaw_record,
+                cpp_record,
+                case_id,
+                expected_outcomes,
+                reference_frame,
+                candidate_frame,
+                reference_result,
+                candidate_result,
+                compare_raft_force_samples(reference_water, candidate_water, state, properties),
+                properties,
+            )
+        )
+    return tuple(records)
+
+
+def _raft_coupling_record_from_results(
+    geoclaw_record: dict[str, object],
+    cpp_record: dict[str, object],
+    case_id: str,
+    expected_outcomes: tuple[str, ...],
+    reference_frame: Path,
+    candidate_frame: Path,
+    reference_result: FeatureValidationResult,
+    candidate_result: FeatureValidationResult,
+    force_comparison,
+    properties,
+) -> Milestone16RaftCouplingRecord:
+    weight = max(properties.total_mass_kg * abs(properties.gravity.z), 1.0)
+    inertia_scale = max(properties.inertia_diagonal_kg_m2.magnitude, 1.0)
+    reference_canonical = _canonical_feature_outcome(reference_result)
+    candidate_canonical = _canonical_feature_outcome(candidate_result)
+    notes = _raft_coupling_failure_notes(
+        reference_result,
+        candidate_result,
+        reference_canonical == candidate_canonical,
+        force_comparison.outcome_match,
+        force_comparison.force_delta.magnitude / weight,
+        force_comparison.torque_delta.magnitude / inertia_scale,
+        force_comparison.trajectory_position_delta,
+        force_comparison.trajectory_velocity_delta,
+    )
+    return Milestone16RaftCouplingRecord(
+        gate_scenario_id=str(geoclaw_record["gate_scenario_id"]),
+        actual_scenario_id=str(geoclaw_record["actual_scenario_id"]),
+        suite=str(geoclaw_record["suite"]),
+        flow_band=geoclaw_record.get("flow_band") if isinstance(geoclaw_record.get("flow_band"), str) else None,
+        solver_mode=str(cpp_record["solver_mode"]),
+        case_id=case_id,
+        expected_outcomes=expected_outcomes,
+        reference_frame=str(reference_frame),
+        candidate_frame=str(candidate_frame),
+        reference_outcome=reference_result.outcome,
+        candidate_outcome=candidate_result.outcome,
+        reference_passed=reference_result.passed,
+        candidate_passed=candidate_result.passed,
+        feature_outcome_match=reference_canonical == candidate_canonical,
+        force_envelope_outcome_match=force_comparison.outcome_match,
+        force_delta_weight_ratio=force_comparison.force_delta.magnitude / weight,
+        torque_delta_inertia_ratio=force_comparison.torque_delta.magnitude / inertia_scale,
+        trajectory_position_delta_m=force_comparison.trajectory_position_delta,
+        trajectory_velocity_delta_mps=force_comparison.trajectory_velocity_delta,
+        reference_checks=_feature_checks_json(reference_result),
+        candidate_checks=_feature_checks_json(candidate_result),
+        notes=notes,
+    )
+
+
+def _raft_coupling_failure_notes(
+    reference_result: FeatureValidationResult,
+    candidate_result: FeatureValidationResult,
+    feature_outcome_match: bool,
+    force_envelope_outcome_match: bool,
+    force_delta_weight_ratio: float,
+    torque_delta_inertia_ratio: float,
+    trajectory_position_delta: float,
+    trajectory_velocity_delta: float,
+) -> tuple[str, ...]:
+    notes: list[str] = []
+    if not reference_result.passed:
+        notes.append("GeoClaw-derived raft feature checks are not passing.")
+    if not candidate_result.passed:
+        notes.append("C++ raft feature checks are not passing.")
+    if not feature_outcome_match:
+        notes.append("Canonical feature outcomes differ.")
+    if not force_envelope_outcome_match:
+        notes.append("Force-envelope outcomes differ.")
+    if force_delta_weight_ratio > MILESTONE16_RAFT_FORCE_DELTA_WEIGHT_RATIO_THRESHOLD:
+        notes.append("Force delta exceeds the weight-normalized threshold.")
+    if torque_delta_inertia_ratio > MILESTONE16_RAFT_TORQUE_DELTA_INERTIA_RATIO_THRESHOLD:
+        notes.append("Torque delta exceeds the inertia-normalized threshold.")
+    if trajectory_position_delta > MILESTONE16_RAFT_TRAJECTORY_POSITION_DELTA_M_THRESHOLD:
+        notes.append("One-step position delta exceeds threshold.")
+    if trajectory_velocity_delta > MILESTONE16_RAFT_TRAJECTORY_VELOCITY_DELTA_MPS_THRESHOLD:
+        notes.append("One-step velocity delta exceeds threshold.")
+    return tuple(notes)
+
+
+def _standalone_raft_case_specs(gate_scenario_id: str):
+    specs = {
+        "boulder_garden": (
+            (
+                "boulder_impacts",
+                "rock",
+                "boulder_garden",
+                ("grounded", "pinned"),
+                validate_submerged_rock_case,
+                0.45,
+                -0.7,
+            ),
+        ),
+        "cascading_wave_train": (
+            (
+                "wave_train_surf_flush",
+                "wave_train",
+                "cascading_wave_train",
+                ("clear", "stalled", "surfed", "flushed"),
+                validate_standing_wave_case,
+                0.35,
+                -0.2,
+            ),
+        ),
+        "hydraulic_hole_downstream_boil": (
+            (
+                "hydraulic_hole_surf_flush",
+                "hole",
+                "hydraulic_hole",
+                ("surfed", "flushed", "pinned"),
+                validate_hole_case,
+                0.35,
+                -0.3,
+            ),
+            (
+                "downstream_boil_recovery",
+                "boil",
+                "downstream_boil",
+                ("clear",),
+                validate_boil_upwelling_case,
+                0.30,
+                -0.4,
+            ),
+        ),
+        "lateral_wave": (
+            (
+                "lateral_wave_side_impulse",
+                "lateral",
+                "lateral_wave",
+                ("clear", "surfed"),
+                validate_lateral_wave_case,
+                0.35,
+                -0.2,
+            ),
+        ),
+        "eddy_line_shear": (
+            (
+                "eddy_recovery",
+                "eddy_line",
+                "eddy_line_shear",
+                ("clear",),
+                validate_eddy_line_case,
+                0.35,
+                -0.2,
+            ),
+        ),
+        "shallow_shelf": (
+            (
+                "shallow_shelf_pivot_release",
+                "shallow",
+                "shallow_shelf",
+                ("grounded", "pinned"),
+                validate_shallow_shelf_case,
+                0.35,
+                -0.5,
+            ),
+        ),
+    }
+    return specs.get(gate_scenario_id, ())
+
+
+def _feature_by_role_or_kind(scenario: Scenario2_5D, kind: str, role: str):
+    for feature in scenario.features:
+        if feature.kind == kind and feature.metadata.get("geoclaw_case_role") == role:
+            return feature
+    for feature in reversed(scenario.features):
+        if feature.kind == kind:
+            return feature
+    raise ValueError(f"Scenario {scenario.metadata.scenario_id} does not include feature {kind!r}.")
+
+
+def _raft_state_at_feature(
+    water: WaterField2_5D,
+    x: float,
+    y: float,
+    z_offset: float,
+    vertical_velocity: float,
+) -> RaftState6DoF:
+    sample = water.sample(x, y)
+    return RaftState6DoF(
+        position=Vec3(x, y, sample.surface_height - z_offset),
+        linear_velocity=Vec3(sample.velocity.x, sample.velocity.y, vertical_velocity),
+    )
+
+
+def _canonical_feature_outcome(result: FeatureValidationResult) -> str:
+    return summarize_run_outcomes((result,)).dominant_outcome
+
+
+def _feature_checks_json(result: FeatureValidationResult) -> tuple[dict[str, object], ...]:
+    return tuple(
+        {
+            "name": check.name,
+            "passed": check.passed,
+            "value": check.value,
+            "threshold": check.threshold,
+            "details": check.details,
+        }
+        for check in result.checks
+    )
+
+
+def _last_manifest_frame_path(manifest_path: Path) -> Path:
+    manifest = _read_json(manifest_path)
+    frames = manifest.get("frames", [])
+    if not isinstance(frames, list) or not frames:
+        raise ValueError(f"Manifest {manifest_path} does not contain frames.")
+    return manifest_path.parent / Path(str(frames[-1]))
 
 
 def _write_milestone16_comparison_manifest(
