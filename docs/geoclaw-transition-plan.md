@@ -55,7 +55,7 @@ shared scenario package
 
 The C++ solver does not need to duplicate GeoClaw numerics. It must match GeoClaw outputs and raft-relevant behavior within accepted tolerances.
 
-For cascading packages, GeoClaw should validate both the full stitched domain and reach/drop-local windows. The C++ solver may later stream or update reach windows for runtime cost, but the source package must preserve the same bathymetry, roughness, boundaries, and transition semantics.
+For cascading packages, reach-local grids with overlap/ghost zones are the canonical authoring and streaming representation, while stitched whole-window outputs are mandatory validation artifacts. GeoClaw should validate both the stitched domain and reach/drop-local windows. The C++ solver may later stream or update reach windows for runtime cost, but the source package must preserve the same bathymetry, roughness, boundaries, and transition semantics.
 
 The full C++ acceptance sequence is tracked in [Custom C++ Engine Full Validation Plan](custom-cpp-engine-validation-plan.md). Setup checks, fallback exports, or initial-state-only normalized files are useful smoke artifacts, but they do not replace full GeoClaw fixed-grid solution runs for live-water acceptance.
 

@@ -284,7 +284,7 @@ This milestone turns the custom C++ shallow-water / height-field solver from a r
 - [ ] Decide if SWASHES fixtures should be vendored, regenerated, or manually encoded.
 - [ ] Decide whether the C++ solver starts as CPU-only or gets a GPU path after correctness is established.
 - [x] Decide how much authored feature forcing is acceptable versus pure shallow-water dynamics: forcing is allowed only when bounded, manifest-recorded, GeoClaw-compared, flow-dependent, and not hiding conservation failures; expose parameters for gameplay/visual tuning with low default gains until validation passes.
-- [ ] Decide the canonical storage format for cascading reach/drop packages: one stitched grid with reach annotations, multiple reach-local grids with ghost zones, or both.
+- [x] Decide the canonical storage format for cascading reach/drop packages: support reach-local grids with overlap/ghost zones for authoring and streaming, but require stitched whole-window validation outputs so seams cannot hide physics errors.
 - [ ] Evaluate Chrono::FSI only after the GeoClaw/custom-C++ solver comparison path is stable.
 - [ ] Identify reference footage, river data, aerial/satellite imagery, flow history, and expert guide feedback needed for validation.
 - [ ] Decide which geospatial formats become canonical for source data, generated scenarios, and Unreal corridor packages.
@@ -313,6 +313,9 @@ This milestone turns the custom C++ shallow-water / height-field solver from a r
 - [ ] Add GeoClaw/C++ validation checks that reject feature forcing when it hides mass, momentum, energy, wet/dry, or reach/drop handoff failures.
 - [ ] Add crew weight-distribution and high-side/brace/lean telemetry for seat occupancy, center-of-gravity shifts, roll moment, contact loading, and pin/flip/release thresholds.
 - [ ] Add rock, sticky-hole, lateral-hit, shallow-shelf, pin/release, and flip fixtures that require correctly timed crew weight shifts for safe outcomes.
+- [ ] Add a versioned reach-local grid schema with local transforms, overlap/ghost-zone ownership, neighbor references, and reach/drop IDs.
+- [ ] Export stitched whole-window validation fields, probes, cross sections, conservation summaries, and raft transition checkpoints for every cascading package.
+- [ ] Add seam diagnostics that fail validation when reach-local boundaries hide mass, momentum, energy, wet/dry, bed-slope, feature-location, or raft-state errors.
 - [ ] Draft the first candidate river inventory and source manifest.
 - [ ] Prototype course/elevation extraction for one river section.
 - [ ] Define the first rapid-review labels and seasonal flow/difficulty parameter mapping.

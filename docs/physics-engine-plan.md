@@ -258,5 +258,6 @@ Unreal production begins only after:
 
 - Replace the current monolithic real-world package with ordered reach/drop sequences for pool-and-drop rivers.
 - Generate South Fork American baseline packages with variable slopes, pools, ledges, boulder gardens, eddies, and recovery zones.
+- Use reach-local grids with overlap/ghost zones for authoring and streaming, and require stitched whole-window validation outputs with reach/drop IDs.
 - Run GeoClaw and C++ on the same cascading package at low, median, and high runnable flows.
 - Validate per-reach behavior and stitched whole-section behavior before exposing live custom water to Unreal gameplay.
