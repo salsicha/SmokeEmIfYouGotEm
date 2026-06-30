@@ -182,6 +182,9 @@ Prototype physics priorities:
 - Rocks deflect, pin, slow, or flip the raft based on contact point, velocity, current, and raft angle
 - Waves can shove, lift, surf, stall, destabilize, or spin the raft in the 2.5D model
 - Shallows, aerated patches, and eddy lines alter drag, damping, and steering authority
+- Holes, boils, laterals, eddy lines, wave trains, shallow shelves, boulder push/damping, pins/releases, and flips are exposed as tunable feature families, but physics forcing starts turned down and must pass the GeoClaw/C++ validation policy before it becomes authoritative
+- Flow volume changes how rapids play: holes can become sticky in a certain band, wash out at high water, or become less retentive at low water; laterals, eddies, wave trains, shallows, pins, and flip hazards also change with discharge and flow percentile
+- Crew weight distribution is core gameplay: high-side, brace, lean, seat occupancy, paddle timing, and recovery commands shift mass and roll moment, affecting whether a rock, hole, or lateral pins, releases, or flips the raft
 - Raft material properties initially represent drag, friction, collision softness, and pinning tendency
 - Every major force has debug visualization and telemetry for tuning and validation
 - The initial active raft model should be 6-DoF over 2.5D water and leave room for XPBD-style compliant tubes and floor constraints
@@ -194,6 +197,7 @@ First draft behaviors:
 
 - Paddle when commanded
 - Brace when warned
+- High-side, lean, and shift weight to counter pins, wraps, lateral hits, sticky holes, and flip hazards
 - Panic or miss strokes when trust is low
 - Fall out after heavy impacts or bad wave hits
 - Require rescue before the score or safety rating collapses
