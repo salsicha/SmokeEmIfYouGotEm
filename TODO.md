@@ -281,7 +281,7 @@ This milestone turns the custom C++ shallow-water / height-field solver from a r
 
 - [ ] Decide when to physically remove legacy 2D code, tests, examples, and videos from the repo.
 - [x] Decide whether PyClaw is enough or GeoClaw-specific behavior is required for river bathymetry and wet/dry cases: GeoClaw is now the target reference solver.
-- [ ] Decide if SWASHES fixtures should be vendored, regenerated, or manually encoded.
+- [x] Decide if SWASHES fixtures should be vendored, regenerated, or manually encoded: manually encode a small SWASHES-style analytic set first with provenance notes; avoid vendoring external data until licensing and maintenance are clear.
 - [ ] Decide whether the C++ solver starts as CPU-only or gets a GPU path after correctness is established.
 - [x] Decide how much authored feature forcing is acceptable versus pure shallow-water dynamics: forcing is allowed only when bounded, manifest-recorded, GeoClaw-compared, flow-dependent, and not hiding conservation failures; expose parameters for gameplay/visual tuning with low default gains until validation passes.
 - [x] Decide the canonical storage format for cascading reach/drop packages: support reach-local grids with overlap/ghost zones for authoring and streaming, but require stitched whole-window validation outputs so seams cannot hide physics errors.
@@ -307,6 +307,9 @@ This milestone turns the custom C++ shallow-water / height-field solver from a r
 - [x] Add a PyClaw availability check and first reference runner as a legacy baseline; GeoClaw availability/checks are now Milestone 14.
 - [x] Add a C++ solver directory and build skeleton.
 - [ ] Implement suite-level JSON and Markdown reports for the full C++ validation gate.
+- [ ] Add a versioned analytic fixture manifest with provenance notes, expected behavior, tolerance tier, and source-equation references.
+- [ ] Manually encode a small SWASHES-style set for lake-at-rest balance, sloping-channel friction, wet/dry shoreline, bed step, dam-break/bore, hydraulic jump, and transcritical bump cases where practical.
+- [ ] Add C++ and GeoClaw/analytic comparison reports that fail retuning when these small fixtures regress.
 - [ ] Add a versioned authored feature-forcing schema for holes, boils, laterals, eddy lines, wave trains, shallow shelves, boulder push/damping, pins/releases, and flips.
 - [ ] Add low-default feature-forcing parameters and flow-response curves keyed by discharge, flow band, flow percentile, or boundary inflow.
 - [ ] Record feature-forcing manifests with active feature kinds, gain scales, flow-response curve IDs, conservation deltas, raft-coupling modifiers, and visual-only parameters.

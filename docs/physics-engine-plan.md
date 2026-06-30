@@ -54,7 +54,7 @@ Useful foundations:
 
 - GeoClaw/Clawpack for depth-averaged geophysical-flow reference modeling, topography/bathymetry source terms, wet/dry handling, Manning friction, and adaptive mesh refinement.
 - PyClaw artifacts only as legacy comparison/regression data from earlier milestones.
-- SWASHES-style analytic cases for validating shallow-water solvers.
+- Manually encoded SWASHES-style analytic cases for validating shallow-water solvers, with provenance notes and no vendored external data until licensing and maintenance are clear.
 - Fossen-style marine craft dynamics for raft rigid-body state, hydrodynamic forces, and added-mass approximations.
 - Project Chrono for C++ raft dynamics, contact, compliant raft experiments, and potential FSI evaluation.
 - JAX/Taichi/Numba only as later acceleration or fitting tools if they help the Python research loop.
@@ -218,7 +218,7 @@ Unreal production begins only after:
 - Add optional GeoClaw integration.
 - Run canonical shallow-water fixtures.
 - Export fields, probes, and telemetry.
-- Add analytic/SWASHES-style validation where practical.
+- Add manually encoded analytic/SWASHES-style validation where practical.
 
 ### Phase 3: Custom C++ Solver
 
