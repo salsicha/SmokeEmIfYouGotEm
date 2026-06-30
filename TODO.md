@@ -283,7 +283,7 @@ This milestone turns the custom C++ shallow-water / height-field solver from a r
 - [x] Decide whether PyClaw is enough or GeoClaw-specific behavior is required for river bathymetry and wet/dry cases: GeoClaw is now the target reference solver.
 - [ ] Decide if SWASHES fixtures should be vendored, regenerated, or manually encoded.
 - [ ] Decide whether the C++ solver starts as CPU-only or gets a GPU path after correctness is established.
-- [ ] Decide how much authored feature forcing is acceptable versus pure shallow-water dynamics.
+- [x] Decide how much authored feature forcing is acceptable versus pure shallow-water dynamics: forcing is allowed only when bounded, manifest-recorded, GeoClaw-compared, flow-dependent, and not hiding conservation failures; expose parameters for gameplay/visual tuning with low default gains until validation passes.
 - [ ] Decide the canonical storage format for cascading reach/drop packages: one stitched grid with reach annotations, multiple reach-local grids with ghost zones, or both.
 - [ ] Evaluate Chrono::FSI only after the GeoClaw/custom-C++ solver comparison path is stable.
 - [ ] Identify reference footage, river data, aerial/satellite imagery, flow history, and expert guide feedback needed for validation.
@@ -307,6 +307,12 @@ This milestone turns the custom C++ shallow-water / height-field solver from a r
 - [x] Add a PyClaw availability check and first reference runner as a legacy baseline; GeoClaw availability/checks are now Milestone 14.
 - [x] Add a C++ solver directory and build skeleton.
 - [ ] Implement suite-level JSON and Markdown reports for the full C++ validation gate.
+- [ ] Add a versioned authored feature-forcing schema for holes, boils, laterals, eddy lines, wave trains, shallow shelves, boulder push/damping, pins/releases, and flips.
+- [ ] Add low-default feature-forcing parameters and flow-response curves keyed by discharge, flow band, flow percentile, or boundary inflow.
+- [ ] Record feature-forcing manifests with active feature kinds, gain scales, flow-response curve IDs, conservation deltas, raft-coupling modifiers, and visual-only parameters.
+- [ ] Add GeoClaw/C++ validation checks that reject feature forcing when it hides mass, momentum, energy, wet/dry, or reach/drop handoff failures.
+- [ ] Add crew weight-distribution and high-side/brace/lean telemetry for seat occupancy, center-of-gravity shifts, roll moment, contact loading, and pin/flip/release thresholds.
+- [ ] Add rock, sticky-hole, lateral-hit, shallow-shelf, pin/release, and flip fixtures that require correctly timed crew weight shifts for safe outcomes.
 - [ ] Draft the first candidate river inventory and source manifest.
 - [ ] Prototype course/elevation extraction for one river section.
 - [ ] Define the first rapid-review labels and seasonal flow/difficulty parameter mapping.

@@ -18,6 +18,24 @@ GeoClaw and the C++ engine must consume the same solver-neutral scenario package
 
 Fallback or initial-state-only GeoClaw normalization is useful for schema smoke tests, but it does not count as full shallow-water solution validation.
 
+## Authored Feature Forcing Decision
+
+Authored feature forcing is allowed, but only as a bounded, manifest-recorded, GeoClaw-compared layer that does not hide conservation failures. It is a runtime and gameplay tuning tool, not permission to replace shallow-water geometry with scripted outcomes.
+
+The accepted feature-forcing surface includes holes, boils, laterals, eddy lines, wave trains, shallow shelves, boulder push/damping, pins/releases, and flips. Parameters must be exposed for gameplay and visual tuning, but default gains stay low until the Milestone 16 GeoClaw/C++ geometry and raft-coupling gates pass.
+
+Each feature-forcing parameter set must record:
+
+- Feature kind, location, radius/width/length/angle, strength, damping/aeration proxy, and visual-only intensity where applicable.
+- Flow-response curve keyed by discharge, flow band, flow percentile, or boundary inflow.
+- Solver-state effects separately from raft-coupling effects and visual/audio-only effects.
+- Conservation diagnostics before and after forcing: mass drift, momentum delta, energy delta, wet/dry mask changes, and reach/drop handoff deltas.
+- Validation evidence: GeoClaw/C++ comparison when GeoClaw can represent the feature, or accepted real-world reference footage/data/guide review when the feature is primarily raft-outcome or gameplay readability.
+
+Flow response is mandatory. For example, a hole can be sticky in one flow range, wash out at high water, and become a non-retentive rapid or shallow obstacle at low water. The same rule applies to laterals, eddy lines, wave trains, shelves, boulder contacts, pins, releases, and flips: water volume changes the running technique and the acceptable outcome envelope.
+
+Crew weight distribution is part of the validation surface. Seat occupancy, high-side, lean, brace, paddle timing, and recovery actions must change mass distribution, roll moment, contact loading, and pin/flip/release thresholds in deterministic raft telemetry. A forced rock or hydraulic feature may create a flip/pin hazard only if the player has a fair, validated counterplay window.
+
 ## Non-Goals
 
 - Do not require full 3D CFD or Navier-Stokes simulation for the first accepted runtime.
@@ -33,6 +51,7 @@ Fallback or initial-state-only GeoClaw normalization is useful for schema smoke 
 - Define field metrics: L1/L2/Linf error for `h`, `eta`, `u`, `v`, `hu`, `hv`, surface slope, and wet/dry masks.
 - Define diagnostic metrics: mass drift, energy trend, Froude-class agreement, hydraulic-jump location, wave-train phase/amplitude, feature location/strength, and reach/drop boundary fluxes.
 - Define raft metrics: force-envelope error, trajectory deltas, surf/flush/clear/ground/pin/flip outcome agreement, and crossing stability at reach/drop boundaries.
+- Define feature-forcing bounds, low default gains, flow-response curves, conservation-failure guards, and manifest fields for physics, gameplay, and visual-only tuning.
 
 ## Phase 1: GeoClaw Reference Runs
 
@@ -48,6 +67,7 @@ Fallback or initial-state-only GeoClaw normalization is useful for schema smoke 
 - Milestone 16 C++ run evidence is tracked in `physics/reports/milestone16/cpp_solver_runs.json` and `physics/reports/milestone16/cpp_solver_runs.md`; the run/manifests gate passes for reduced and finite-volume modes, while cascading finite-volume validation failures remain visible for comparison/tuning gates.
 - Run the C++ reduced and finite-volume modes on the same scenario packages.
 - Emit manifests for solver mode, timestep, CFL policy, dry tolerance, roughness mapping, bed-slope source scale, feature forcing, damping, reach/drop metadata, and executable version.
+- Emit feature-forcing manifests for active feature kinds, flow-response curve IDs, gain scales, conservation deltas, raft-coupling modifiers, and visual-only parameters.
 - Compare C++ fields, probes, cross sections, diagnostics, and raft samples against the GeoClaw reference runs.
 - Record failures by scenario family so tuning does not improve one rapid feature while regressing canonical shallow-water behavior.
 
@@ -68,7 +88,8 @@ Fallback or initial-state-only GeoClaw normalization is useful for schema smoke 
 - Re-run raft coupling over GeoClaw-derived fields and C++ runtime fields with the same probe/sample sets.
 - Validate pool entry, drop entry, hydraulic-hole surf/flush, downstream boil recovery, eddy recovery, boulder impacts, shallow shelves, pins/releases, and transition-boundary crossings.
 - Compare force envelopes, trajectory deltas, outcome classes, and contact/grounding events.
-- Keep authored feature forcing only when it is documented, bounded, and validated against GeoClaw outputs or accepted real-world reference behavior.
+- Keep authored feature forcing only when it is documented, bounded, manifest-recorded, flow-dependent, and validated against GeoClaw outputs or accepted real-world reference behavior.
+- Validate high-side, brace, lean, seat occupancy, and crew weight distribution as counterplay for boulder pins, sticky holes, lateral hits, shallow-shelf pivots, and flips.
 
 ## Phase 5: Runtime, Determinism, And Portability
 
@@ -102,7 +123,7 @@ The C++ engine is accepted for live Unreal water only when:
 ## Open Decisions
 
 - Whether the canonical cascading storage format is one stitched grid, reach-local grids with ghost zones, or both.
-- How much authored feature forcing is acceptable versus pure shallow-water dynamics.
+- Exact numerical bounds and default gains for each allowed feature-forcing family.
 - Whether the first accepted runtime remains CPU-only or starts a GPU path after correctness is established.
 - Exact numerical thresholds for research-accepted, Unreal-prototype, and production-candidate tiers.
 - Which real-world footage, gauge histories, guide notes, and aerial references are required to validate rapid-specific behavior beyond GeoClaw parity.
