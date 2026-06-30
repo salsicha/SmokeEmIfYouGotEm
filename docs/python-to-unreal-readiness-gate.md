@@ -52,6 +52,7 @@ Milestone 18 closure actions:
 - Run Milestone 17 analytic fixtures before and after every retune batch.
 - Fix GeoClaw/C++ parity failures before accepting raft-outcome tuning.
 - Carry reduced-mode bed-step as diagnostic/smoke-only evidence unless a separate reduced-dynamics redesign is opened; finite-volume bed-step is the strict discontinuous-bed parity lane for Milestone 18 readiness.
+- Keep constriction parity blocked until the corrected west `user`-boundary reference passes a geometry-aware throat reconstruction/source-treatment retune; finite-volume Roe is the current best diagnostic candidate but still fails core field and conservation checks.
 - Close wet/dry, bed-step, constriction, drop/ledge, tailwater, and stitched reach/drop geometry families.
 - Use the dedicated flow-dependent pin/release fixture report separate from shallow-shelf and boulder proxy evidence.
 - Re-run raft coupling over improved C++ water fields.
