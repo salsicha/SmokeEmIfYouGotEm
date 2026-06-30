@@ -203,6 +203,19 @@
       "visible_by_default": true
     },
     {
+      "artifact_path": "rapid_review_flow_difficulty_mapping.json",
+      "display_name": "Flow/Difficulty Mapping",
+      "display_role": "Label-specific flow response, difficulty controls, solver parameters, and expected raft outcomes.",
+      "layer_id": "flow_difficulty_mapping",
+      "layer_kind": "table",
+      "required_for_review": true,
+      "source_ids": [
+        "usgs_nwis",
+        "guide_references"
+      ],
+      "visible_by_default": true
+    },
+    {
       "artifact_path": "source_manifest.json",
       "display_name": "Source Manifest",
       "display_role": "Provenance, rights, artifact paths, confidence, and source-status review.",
@@ -291,6 +304,7 @@
       "editable_fields": [],
       "layer_ids": [
         "gauge_history",
+        "flow_difficulty_mapping",
         "source_manifest",
         "guide_notes"
       ],
@@ -332,6 +346,7 @@
     "flowlines",
     "cross_sections",
     "gauge_history",
+    "flow_difficulty_mapping",
     "source_manifest",
     "candidate_tags",
     "guide_notes"
@@ -422,6 +437,16 @@
           "source_ids": [
             "usgs_3dep",
             "usgs_tnm"
+          ]
+        },
+        "flow_difficulty_mapping": {
+          "artifacts": [
+            "rapid_review_flow_difficulty_mapping.json"
+          ],
+          "layer_id": "flow_difficulty_mapping",
+          "source_ids": [
+            "usgs_nwis",
+            "guide_references"
           ]
         },
         "flowlines": {
@@ -618,6 +643,16 @@
             "usgs_tnm"
           ]
         },
+        "flow_difficulty_mapping": {
+          "artifacts": [
+            "rapid_review_flow_difficulty_mapping.json"
+          ],
+          "layer_id": "flow_difficulty_mapping",
+          "source_ids": [
+            "usgs_nwis",
+            "guide_references"
+          ]
+        },
         "flowlines": {
           "artifacts": [
             "hydrography/centerline.geojson",
@@ -809,6 +844,16 @@
           "source_ids": [
             "usgs_3dep",
             "usgs_tnm"
+          ]
+        },
+        "flow_difficulty_mapping": {
+          "artifacts": [
+            "rapid_review_flow_difficulty_mapping.json"
+          ],
+          "layer_id": "flow_difficulty_mapping",
+          "source_ids": [
+            "usgs_nwis",
+            "guide_references"
           ]
         },
         "flowlines": {
@@ -1004,6 +1049,16 @@
           "source_ids": [
             "usgs_3dep",
             "usgs_tnm"
+          ]
+        },
+        "flow_difficulty_mapping": {
+          "artifacts": [
+            "rapid_review_flow_difficulty_mapping.json"
+          ],
+          "layer_id": "flow_difficulty_mapping",
+          "source_ids": [
+            "usgs_nwis",
+            "guide_references"
           ]
         },
         "flowlines": {

@@ -63,6 +63,7 @@
                   "stage_ft": null
                 }
               ],
+              "flow_difficulty_mapping": "rapid_review_flow_difficulty_mapping.json",
               "gauge_sources": [
                 "USGS 11445500 South Fork American River near Lotus, CA"
               ],

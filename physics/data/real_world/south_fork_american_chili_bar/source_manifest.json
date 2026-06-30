@@ -15,6 +15,7 @@
     "guide_references": [
       "review/guide_reference_index.json",
       "review/rapid_review_labels.json",
+      "rapid_review_flow_difficulty_mapping.json",
       "rapid_review_editor_workflow.json"
     ],
     "hydrography": [
