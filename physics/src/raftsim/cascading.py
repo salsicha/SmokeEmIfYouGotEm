@@ -34,6 +34,14 @@ CASCADING_ANNOTATIONS_FILE = "cascading_annotations.npz"
 UNREAL_CASCADING_CORRIDOR_METADATA_VERSION = "raftsim.unreal_cascading_corridor_metadata.v0"
 UNREAL_CASCADING_CORRIDOR_METADATA_FILE = "unreal_cascading_corridor_metadata.json"
 UNREAL_CASCADING_CORRIDOR_GRID_FILE = "unreal_cascading_reach_drop_grid.json"
+STITCHED_WHOLE_WINDOW_VALIDATION_SCHEMA_VERSION = "raftsim.stitched_whole_window_validation.v0"
+STITCHED_WHOLE_WINDOW_VALIDATION_DIR = "stitched_validation"
+STITCHED_WHOLE_WINDOW_VALIDATION_MANIFEST_FILE = "manifest.json"
+STITCHED_WHOLE_WINDOW_VALIDATION_FIELDS_FILE = "fields.npz"
+STITCHED_WHOLE_WINDOW_VALIDATION_PROBES_FILE = "probes.json"
+STITCHED_WHOLE_WINDOW_VALIDATION_CROSS_SECTIONS_FILE = "cross_sections.json"
+STITCHED_WHOLE_WINDOW_VALIDATION_CONSERVATION_FILE = "conservation_summary.json"
+STITCHED_WHOLE_WINDOW_VALIDATION_RAFT_CHECKPOINTS_FILE = "raft_transition_checkpoints.json"
 ReachKind2_5D = Literal["pool", "tongue", "drop", "wave_train", "eddy_recovery", "boulder_garden", "runout"]
 BankShapeKind2_5D = Literal["trapezoid", "bedrock", "alluvial", "vegetated", "constructed", "unknown"]
 DropGeometryKind2_5D = Literal["ramp", "ledge", "mixed"]
@@ -196,6 +204,253 @@ class HandoffConservationReport2_5D:
             "passed": self.passed,
             "thresholds": self.thresholds.to_json_dict(),
             "checks": [check.to_json_dict() for check in self.checks],
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class StitchedValidationFieldSummary2_5D:
+    field_name: str
+    npz_key: str
+    units: str
+    shape: tuple[int, int]
+    dtype: str
+    min_value: float | None
+    max_value: float | None
+    mean_value: float | None
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "field_name": self.field_name,
+            "npz_key": self.npz_key,
+            "units": self.units,
+            "shape": list(self.shape),
+            "dtype": self.dtype,
+            "min_value": self.min_value,
+            "max_value": self.max_value,
+            "mean_value": self.mean_value,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class StitchedValidationProbeSample2_5D:
+    probe_id: str
+    kind: str
+    position: tuple[float, float]
+    grid_index: tuple[int, int]
+    reach_id: str | None
+    drop_transition_id: str | None
+    bed_elevation_m: float
+    depth_m: float
+    surface_elevation_m: float
+    velocity_m_s: tuple[float, float]
+    speed_m_s: float
+    froude_number: float
+    wet: bool
+    metadata: dict[str, MetadataValue] = field(default_factory=dict)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "probe_id": self.probe_id,
+            "kind": self.kind,
+            "position": {"x": self.position[0], "y": self.position[1]},
+            "grid_index": {"row": self.grid_index[0], "column": self.grid_index[1]},
+            "reach_id": self.reach_id,
+            "drop_transition_id": self.drop_transition_id,
+            "bed_elevation_m": self.bed_elevation_m,
+            "depth_m": self.depth_m,
+            "surface_elevation_m": self.surface_elevation_m,
+            "velocity_m_s": {"u": self.velocity_m_s[0], "v": self.velocity_m_s[1]},
+            "speed_m_s": self.speed_m_s,
+            "froude_number": self.froude_number,
+            "wet": self.wet,
+            "metadata": self.metadata,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class StitchedValidationCrossSection2_5D:
+    section_id: str
+    station_m: float
+    center: tuple[float, float]
+    sample_direction: tuple[float, float]
+    length_m: float
+    column: int
+    reach_id: str | None
+    drop_transition_id: str | None
+    sample_count: int
+    wet_sample_count: int
+    wetted_width_m: float
+    mean_depth_m: float
+    max_depth_m: float
+    mean_surface_elevation_m: float
+    min_bed_elevation_m: float
+    max_speed_m_s: float
+    mass_flux_proxy_m3_s: float
+    momentum_flux_proxy_m4_s2: float
+    metadata: dict[str, MetadataValue] = field(default_factory=dict)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "section_id": self.section_id,
+            "station_m": self.station_m,
+            "center": {"x": self.center[0], "y": self.center[1]},
+            "sample_direction": {"x": self.sample_direction[0], "y": self.sample_direction[1]},
+            "length_m": self.length_m,
+            "column": self.column,
+            "reach_id": self.reach_id,
+            "drop_transition_id": self.drop_transition_id,
+            "sample_count": self.sample_count,
+            "wet_sample_count": self.wet_sample_count,
+            "wetted_width_m": self.wetted_width_m,
+            "mean_depth_m": self.mean_depth_m,
+            "max_depth_m": self.max_depth_m,
+            "mean_surface_elevation_m": self.mean_surface_elevation_m,
+            "min_bed_elevation_m": self.min_bed_elevation_m,
+            "max_speed_m_s": self.max_speed_m_s,
+            "mass_flux_proxy_m3_s": self.mass_flux_proxy_m3_s,
+            "momentum_flux_proxy_m4_s2": self.momentum_flux_proxy_m4_s2,
+            "metadata": self.metadata,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class StitchedValidationConservationSummary2_5D:
+    scenario_id: str
+    wet_cell_count: int
+    total_cell_count: int
+    wet_fraction: float
+    total_water_volume_m3: float
+    mass_proxy_kg: float
+    x_momentum_proxy_kg_m_s: float
+    y_momentum_proxy_kg_m_s: float
+    min_depth_m: float
+    max_depth_m: float
+    min_surface_elevation_m: float
+    max_surface_elevation_m: float
+    min_bed_elevation_m: float
+    max_bed_elevation_m: float
+    max_speed_m_s: float
+    handoff_report: HandoffConservationReport2_5D
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "scenario_id": self.scenario_id,
+            "wet_cell_count": self.wet_cell_count,
+            "total_cell_count": self.total_cell_count,
+            "wet_fraction": self.wet_fraction,
+            "total_water_volume_m3": self.total_water_volume_m3,
+            "mass_proxy_kg": self.mass_proxy_kg,
+            "x_momentum_proxy_kg_m_s": self.x_momentum_proxy_kg_m_s,
+            "y_momentum_proxy_kg_m_s": self.y_momentum_proxy_kg_m_s,
+            "min_depth_m": self.min_depth_m,
+            "max_depth_m": self.max_depth_m,
+            "min_surface_elevation_m": self.min_surface_elevation_m,
+            "max_surface_elevation_m": self.max_surface_elevation_m,
+            "min_bed_elevation_m": self.min_bed_elevation_m,
+            "max_bed_elevation_m": self.max_bed_elevation_m,
+            "max_speed_m_s": self.max_speed_m_s,
+            "handoff_report": self.handoff_report.to_json_dict(),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class StitchedValidationRaftTransitionCheckpoint2_5D:
+    checkpoint_id: str
+    transition_id: str
+    drop_transition_id: str | None
+    phase: str
+    upstream_reach_id: str
+    downstream_reach_id: str
+    station_m: float
+    position: tuple[float, float]
+    grid_index: tuple[int, int]
+    sampled_reach_id: str | None
+    sampled_drop_transition_id: str | None
+    expected_hydraulic_control: str
+    hazard_tags: tuple[str, ...]
+    bed_elevation_fall_m: float
+    depth_m: float
+    surface_elevation_m: float
+    velocity_m_s: tuple[float, float]
+    speed_m_s: float
+    froude_number: float
+    wet: bool
+    metadata: dict[str, MetadataValue] = field(default_factory=dict)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "checkpoint_id": self.checkpoint_id,
+            "transition_id": self.transition_id,
+            "drop_transition_id": self.drop_transition_id,
+            "phase": self.phase,
+            "upstream_reach_id": self.upstream_reach_id,
+            "downstream_reach_id": self.downstream_reach_id,
+            "station_m": self.station_m,
+            "position": {"x": self.position[0], "y": self.position[1]},
+            "grid_index": {"row": self.grid_index[0], "column": self.grid_index[1]},
+            "sampled_reach_id": self.sampled_reach_id,
+            "sampled_drop_transition_id": self.sampled_drop_transition_id,
+            "expected_hydraulic_control": self.expected_hydraulic_control,
+            "hazard_tags": list(self.hazard_tags),
+            "bed_elevation_fall_m": self.bed_elevation_fall_m,
+            "depth_m": self.depth_m,
+            "surface_elevation_m": self.surface_elevation_m,
+            "velocity_m_s": {"u": self.velocity_m_s[0], "v": self.velocity_m_s[1]},
+            "speed_m_s": self.speed_m_s,
+            "froude_number": self.froude_number,
+            "wet": self.wet,
+            "metadata": self.metadata,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class StitchedWholeWindowValidationExport2_5D:
+    scenario_id: str
+    river_id: str | None
+    section_id: str | None
+    grid: GridSpec2_5D
+    fields_file: str
+    field_summaries: tuple[StitchedValidationFieldSummary2_5D, ...]
+    probes_file: str
+    probes: tuple[StitchedValidationProbeSample2_5D, ...]
+    cross_sections_file: str
+    cross_sections: tuple[StitchedValidationCrossSection2_5D, ...]
+    conservation_file: str
+    conservation_summary: StitchedValidationConservationSummary2_5D
+    raft_transition_checkpoints_file: str
+    raft_transition_checkpoints: tuple[StitchedValidationRaftTransitionCheckpoint2_5D, ...]
+    reach_index: dict[str, str]
+    drop_transition_index: dict[str, str]
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": STITCHED_WHOLE_WINDOW_VALIDATION_SCHEMA_VERSION,
+            "scenario_id": self.scenario_id,
+            "river_id": self.river_id,
+            "section_id": self.section_id,
+            "grid": self.grid.to_json_dict(),
+            "files": {
+                "fields": self.fields_file,
+                "probes": self.probes_file,
+                "cross_sections": self.cross_sections_file,
+                "conservation_summary": self.conservation_file,
+                "raft_transition_checkpoints": self.raft_transition_checkpoints_file,
+            },
+            "field_summaries": [summary.to_json_dict() for summary in self.field_summaries],
+            "counts": {
+                "fields": len(self.field_summaries),
+                "probes": len(self.probes),
+                "cross_sections": len(self.cross_sections),
+                "raft_transition_checkpoints": len(self.raft_transition_checkpoints),
+            },
+            "reach_index": self.reach_index,
+            "drop_transition_index": self.drop_transition_index,
+            "validation_scope": {
+                "storage": "stitched_whole_window",
+                "covers_reach_local_grids": True,
+                "seams_visible_to_validators": True,
+                "consumer_contract": "GeoClaw/C++/Unreal must compare this stitched export, not isolated reach chunks.",
+            },
         }
 
 
@@ -678,6 +933,27 @@ class CascadingScenarioPackage2_5D:
             "scenario_id": self.scenario.metadata.scenario_id,
             "base_scenario": "scenario.json",
             "annotation_files": {"reach_drop_indices": CASCADING_ANNOTATIONS_FILE},
+            "validation_outputs": {
+                "stitched_whole_window": {
+                    "schema_version": STITCHED_WHOLE_WINDOW_VALIDATION_SCHEMA_VERSION,
+                    "directory": STITCHED_WHOLE_WINDOW_VALIDATION_DIR,
+                    "manifest": f"{STITCHED_WHOLE_WINDOW_VALIDATION_DIR}/{STITCHED_WHOLE_WINDOW_VALIDATION_MANIFEST_FILE}",
+                    "fields": f"{STITCHED_WHOLE_WINDOW_VALIDATION_DIR}/{STITCHED_WHOLE_WINDOW_VALIDATION_FIELDS_FILE}",
+                    "probes": f"{STITCHED_WHOLE_WINDOW_VALIDATION_DIR}/{STITCHED_WHOLE_WINDOW_VALIDATION_PROBES_FILE}",
+                    "cross_sections": (
+                        f"{STITCHED_WHOLE_WINDOW_VALIDATION_DIR}/"
+                        f"{STITCHED_WHOLE_WINDOW_VALIDATION_CROSS_SECTIONS_FILE}"
+                    ),
+                    "conservation_summary": (
+                        f"{STITCHED_WHOLE_WINDOW_VALIDATION_DIR}/"
+                        f"{STITCHED_WHOLE_WINDOW_VALIDATION_CONSERVATION_FILE}"
+                    ),
+                    "raft_transition_checkpoints": (
+                        f"{STITCHED_WHOLE_WINDOW_VALIDATION_DIR}/"
+                        f"{STITCHED_WHOLE_WINDOW_VALIDATION_RAFT_CHECKPOINTS_FILE}"
+                    ),
+                }
+            },
             "reach_index": {str(index): reach.reach_id for index, reach in enumerate(self.reaches)},
             "drop_transition_index": {
                 str(index): transition.transition_id for index, transition in enumerate(self.drop_transitions)
@@ -700,6 +976,7 @@ class CascadingScenarioPackage2_5D:
             reach_id_grid=self.reach_id_grid,
             drop_transition_id_grid=self.drop_transition_id_grid,
         )
+        write_stitched_whole_window_validation_export(self, output_dir / STITCHED_WHOLE_WINDOW_VALIDATION_DIR)
         _write_json(output_dir / CASCADING_METADATA_FILE, self.to_json_dict())
         return output_dir
 
@@ -725,6 +1002,83 @@ def read_cascading_scenario_package(path: str | Path) -> CascadingScenarioPackag
         reach_id_grid=reach_id_grid,
         drop_transition_id_grid=drop_transition_id_grid,
     )
+
+
+def build_stitched_whole_window_validation_export(
+    package: CascadingScenarioPackage2_5D,
+) -> StitchedWholeWindowValidationExport2_5D:
+    """Build stitched, seam-visible validation diagnostics for a cascading package."""
+
+    field_arrays = _stitched_validation_field_arrays(package)
+    return StitchedWholeWindowValidationExport2_5D(
+        scenario_id=package.scenario.metadata.scenario_id,
+        river_id=package.scenario.metadata.river_id,
+        section_id=package.scenario.metadata.section_id,
+        grid=package.scenario.grid,
+        fields_file=STITCHED_WHOLE_WINDOW_VALIDATION_FIELDS_FILE,
+        field_summaries=tuple(_stitched_validation_field_summary(name, array) for name, array in field_arrays.items()),
+        probes_file=STITCHED_WHOLE_WINDOW_VALIDATION_PROBES_FILE,
+        probes=_stitched_validation_probe_samples(package),
+        cross_sections_file=STITCHED_WHOLE_WINDOW_VALIDATION_CROSS_SECTIONS_FILE,
+        cross_sections=_stitched_validation_cross_sections(package),
+        conservation_file=STITCHED_WHOLE_WINDOW_VALIDATION_CONSERVATION_FILE,
+        conservation_summary=_stitched_validation_conservation_summary(package),
+        raft_transition_checkpoints_file=STITCHED_WHOLE_WINDOW_VALIDATION_RAFT_CHECKPOINTS_FILE,
+        raft_transition_checkpoints=_stitched_validation_raft_transition_checkpoints(package),
+        reach_index={str(index): reach.reach_id for index, reach in enumerate(package.reaches)},
+        drop_transition_index={
+            str(index): transition.transition_id for index, transition in enumerate(package.drop_transitions)
+        },
+    )
+
+
+def write_stitched_whole_window_validation_export(
+    package: CascadingScenarioPackage2_5D,
+    directory: str | Path,
+) -> Path:
+    """Write stitched validation fields and diagnostic sidecars for a cascading package."""
+
+    output_dir = Path(directory)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    export = build_stitched_whole_window_validation_export(package)
+    np.savez_compressed(output_dir / STITCHED_WHOLE_WINDOW_VALIDATION_FIELDS_FILE, **_stitched_validation_field_arrays(package))
+    _write_json(
+        output_dir / STITCHED_WHOLE_WINDOW_VALIDATION_PROBES_FILE,
+        {
+            "schema_version": STITCHED_WHOLE_WINDOW_VALIDATION_SCHEMA_VERSION,
+            "scenario_id": export.scenario_id,
+            "probes": [probe.to_json_dict() for probe in export.probes],
+        },
+    )
+    _write_json(
+        output_dir / STITCHED_WHOLE_WINDOW_VALIDATION_CROSS_SECTIONS_FILE,
+        {
+            "schema_version": STITCHED_WHOLE_WINDOW_VALIDATION_SCHEMA_VERSION,
+            "scenario_id": export.scenario_id,
+            "cross_sections": [section.to_json_dict() for section in export.cross_sections],
+        },
+    )
+    _write_json(
+        output_dir / STITCHED_WHOLE_WINDOW_VALIDATION_CONSERVATION_FILE,
+        {
+            "schema_version": STITCHED_WHOLE_WINDOW_VALIDATION_SCHEMA_VERSION,
+            "scenario_id": export.scenario_id,
+            "conservation_summary": export.conservation_summary.to_json_dict(),
+        },
+    )
+    _write_json(
+        output_dir / STITCHED_WHOLE_WINDOW_VALIDATION_RAFT_CHECKPOINTS_FILE,
+        {
+            "schema_version": STITCHED_WHOLE_WINDOW_VALIDATION_SCHEMA_VERSION,
+            "scenario_id": export.scenario_id,
+            "raft_transition_checkpoints": [
+                checkpoint.to_json_dict() for checkpoint in export.raft_transition_checkpoints
+            ],
+        },
+    )
+    manifest_path = output_dir / STITCHED_WHOLE_WINDOW_VALIDATION_MANIFEST_FILE
+    _write_json(manifest_path, export.to_json_dict())
+    return manifest_path
 
 
 def build_unreal_cascading_corridor_metadata(package: CascadingScenarioPackage2_5D) -> dict[str, object]:
@@ -1968,6 +2322,389 @@ def _cross_section_metrics(scenario: Scenario2_5D, col: int, gravity: float) -> 
 
 def _relative_delta(left: float, right: float) -> float:
     return abs(left - right) / max(abs(left), abs(right), 1.0)
+
+
+def _stitched_validation_field_arrays(package: CascadingScenarioPackage2_5D) -> dict[str, NDArray[np.generic]]:
+    state = package.scenario.initial_state
+    return {
+        "bed": package.scenario.bed,
+        "depth": state.depth,
+        "eta": state.eta,
+        "u": state.u,
+        "v": state.v,
+        "hu": state.hu,
+        "hv": state.hv,
+        "wet": state.wet,
+        "reach_id_grid": package.reach_id_grid,
+        "drop_transition_id_grid": package.drop_transition_id_grid,
+    }
+
+
+def _stitched_validation_field_summary(
+    name: str,
+    array: NDArray[np.generic],
+) -> StitchedValidationFieldSummary2_5D:
+    values = np.asarray(array, dtype=np.float64)
+    finite_values = values[np.isfinite(values)]
+    if finite_values.size:
+        min_value = float(np.min(finite_values))
+        max_value = float(np.max(finite_values))
+        mean_value = float(np.mean(finite_values))
+    else:
+        min_value = None
+        max_value = None
+        mean_value = None
+    units_by_name = {
+        "bed": "m",
+        "depth": "m",
+        "eta": "m",
+        "u": "m/s",
+        "v": "m/s",
+        "hu": "m^2/s",
+        "hv": "m^2/s",
+        "wet": "boolean",
+        "reach_id_grid": "index",
+        "drop_transition_id_grid": "index",
+    }
+    field_name_by_key = {
+        "bed": "bed_elevation_m",
+        "depth": "water_depth_m",
+        "eta": "surface_elevation_m",
+        "u": "velocity_u_m_s",
+        "v": "velocity_v_m_s",
+        "hu": "momentum_hu_m2_s",
+        "hv": "momentum_hv_m2_s",
+        "wet": "wet_mask",
+        "reach_id_grid": "reach_id_grid",
+        "drop_transition_id_grid": "drop_transition_id_grid",
+    }
+    return StitchedValidationFieldSummary2_5D(
+        field_name=field_name_by_key[name],
+        npz_key=name,
+        units=units_by_name[name],
+        shape=(int(array.shape[0]), int(array.shape[1])),
+        dtype=str(array.dtype),
+        min_value=min_value,
+        max_value=max_value,
+        mean_value=mean_value,
+    )
+
+
+def _stitched_validation_probe_samples(
+    package: CascadingScenarioPackage2_5D,
+) -> tuple[StitchedValidationProbeSample2_5D, ...]:
+    probes: list[Probe2_5D] = [probe for probe in package.scenario.probes if probe.kind != "cross_section"]
+    covered_reach_ids = {
+        str(probe.metadata["reach_id"])
+        for probe in probes
+        if probe.metadata.get("reach_id") is not None
+    }
+    for reach in package.reaches:
+        if reach.reach_id not in covered_reach_ids:
+            probes.append(
+                Probe2_5D(
+                    probe_id=f"{reach.reach_id}_validation_center",
+                    position=(reach.station_start + reach.length * 0.5, 0.0),
+                    metadata={"reach_id": reach.reach_id, "source": "stitched_validation_default"},
+                )
+            )
+    return tuple(_stitched_validation_probe_sample(package, probe) for probe in probes)
+
+
+def _stitched_validation_probe_sample(
+    package: CascadingScenarioPackage2_5D,
+    probe: Probe2_5D,
+) -> StitchedValidationProbeSample2_5D:
+    sample = _sample_stitched_validation_cell(package, probe.position)
+    return StitchedValidationProbeSample2_5D(
+        probe_id=probe.probe_id,
+        kind=probe.kind,
+        position=(float(probe.position[0]), float(probe.position[1])),
+        grid_index=sample["grid_index"],  # type: ignore[arg-type]
+        reach_id=sample["reach_id"],  # type: ignore[arg-type]
+        drop_transition_id=sample["drop_transition_id"],  # type: ignore[arg-type]
+        bed_elevation_m=float(sample["bed_elevation_m"]),
+        depth_m=float(sample["depth_m"]),
+        surface_elevation_m=float(sample["surface_elevation_m"]),
+        velocity_m_s=sample["velocity_m_s"],  # type: ignore[arg-type]
+        speed_m_s=float(sample["speed_m_s"]),
+        froude_number=float(sample["froude_number"]),
+        wet=bool(sample["wet"]),
+        metadata=dict(probe.metadata),
+    )
+
+
+def _stitched_validation_cross_sections(
+    package: CascadingScenarioPackage2_5D,
+) -> tuple[StitchedValidationCrossSection2_5D, ...]:
+    probes: list[Probe2_5D] = [probe for probe in package.scenario.probes if probe.kind == "cross_section"]
+    seen_ids = {probe.probe_id for probe in probes}
+    for reach in package.reaches:
+        probe_id = f"{reach.reach_id}_validation_cross_section"
+        if probe_id not in seen_ids:
+            probes.append(
+                Probe2_5D(
+                    probe_id=probe_id,
+                    position=(reach.station_start + reach.length * 0.5, 0.0),
+                    kind="cross_section",
+                    normal=(0.0, 1.0),
+                    length=_reach_max_width(reach),
+                    metadata={"reach_id": reach.reach_id, "source": "stitched_validation_default"},
+                )
+            )
+            seen_ids.add(probe_id)
+    for transition in package.drop_transitions:
+        probe_id = f"{transition.transition_id}_validation_cross_section"
+        if probe_id not in seen_ids:
+            upstream = _reach_by_id(package.reaches, transition.upstream_reach_id)
+            downstream = _reach_by_id(package.reaches, transition.downstream_reach_id)
+            probes.append(
+                Probe2_5D(
+                    probe_id=probe_id,
+                    position=(transition.crest_station, 0.0),
+                    kind="cross_section",
+                    normal=(0.0, 1.0),
+                    length=max(_reach_max_width(upstream), _reach_max_width(downstream)),
+                    metadata={
+                        "drop_transition_id": transition.transition_id,
+                        "source": "stitched_validation_default",
+                    },
+                )
+            )
+            seen_ids.add(probe_id)
+    return tuple(_stitched_validation_cross_section(package, probe) for probe in probes)
+
+
+def _stitched_validation_cross_section(
+    package: CascadingScenarioPackage2_5D,
+    probe: Probe2_5D,
+) -> StitchedValidationCrossSection2_5D:
+    grid = package.scenario.grid
+    direction = probe.normal or (0.0, 1.0)
+    direction_length = math.hypot(direction[0], direction[1])
+    if direction_length <= 1.0e-9:
+        direction = (0.0, 1.0)
+        direction_length = 1.0
+    direction = (direction[0] / direction_length, direction[1] / direction_length)
+    length = probe.length if probe.length > 0.0 else grid.dy * max(grid.ny - 1, 1)
+    spacing = max(min(grid.dx, grid.dy), 1.0e-9)
+    sample_count = max(3, int(math.ceil(length / spacing)) + 1)
+    offsets = np.linspace(-0.5 * length, 0.5 * length, sample_count)
+    samples = [
+        _sample_stitched_validation_cell(
+            package,
+            (probe.position[0] + float(offset) * direction[0], probe.position[1] + float(offset) * direction[1]),
+        )
+        for offset in offsets
+    ]
+    depths = np.asarray([float(sample["depth_m"]) for sample in samples], dtype=np.float64)
+    etas = np.asarray([float(sample["surface_elevation_m"]) for sample in samples], dtype=np.float64)
+    beds = np.asarray([float(sample["bed_elevation_m"]) for sample in samples], dtype=np.float64)
+    speeds = np.asarray([float(sample["speed_m_s"]) for sample in samples], dtype=np.float64)
+    us = np.asarray([float(sample["velocity_m_s"][0]) for sample in samples], dtype=np.float64)  # type: ignore[index]
+    wet = np.asarray([bool(sample["wet"]) for sample in samples], dtype=np.bool_)
+    center_sample = _sample_stitched_validation_cell(package, probe.position)
+    wet_values = wet.astype(np.float64)
+    wet_sample_count = int(np.count_nonzero(wet))
+    mass_flux_proxy = float(np.sum(depths * us * wet_values) * spacing)
+    momentum_flux_proxy = float(np.sum(depths * us * speeds * wet_values) * spacing)
+    return StitchedValidationCrossSection2_5D(
+        section_id=probe.probe_id,
+        station_m=float(probe.position[0]),
+        center=(float(probe.position[0]), float(probe.position[1])),
+        sample_direction=direction,
+        length_m=float(length),
+        column=center_sample["grid_index"][1],  # type: ignore[index]
+        reach_id=center_sample["reach_id"],  # type: ignore[arg-type]
+        drop_transition_id=center_sample["drop_transition_id"],  # type: ignore[arg-type]
+        sample_count=sample_count,
+        wet_sample_count=wet_sample_count,
+        wetted_width_m=float(wet_sample_count * spacing),
+        mean_depth_m=float(np.mean(depths)),
+        max_depth_m=float(np.max(depths)),
+        mean_surface_elevation_m=float(np.mean(etas)),
+        min_bed_elevation_m=float(np.min(beds)),
+        max_speed_m_s=float(np.max(speeds)),
+        mass_flux_proxy_m3_s=mass_flux_proxy,
+        momentum_flux_proxy_m4_s2=momentum_flux_proxy,
+        metadata=dict(probe.metadata),
+    )
+
+
+def _stitched_validation_conservation_summary(
+    package: CascadingScenarioPackage2_5D,
+) -> StitchedValidationConservationSummary2_5D:
+    scenario = package.scenario
+    state = scenario.initial_state
+    cell_area = scenario.grid.dx * scenario.grid.dy
+    speed = np.hypot(state.u, state.v)
+    wet_cell_count = int(np.count_nonzero(state.wet))
+    total_cell_count = int(state.wet.size)
+    total_water_volume = float(np.sum(state.depth) * cell_area)
+    water_density_kg_m3 = 1000.0
+    return StitchedValidationConservationSummary2_5D(
+        scenario_id=scenario.metadata.scenario_id,
+        wet_cell_count=wet_cell_count,
+        total_cell_count=total_cell_count,
+        wet_fraction=float(wet_cell_count / max(total_cell_count, 1)),
+        total_water_volume_m3=total_water_volume,
+        mass_proxy_kg=float(total_water_volume * water_density_kg_m3),
+        x_momentum_proxy_kg_m_s=float(np.sum(state.hu) * cell_area * water_density_kg_m3),
+        y_momentum_proxy_kg_m_s=float(np.sum(state.hv) * cell_area * water_density_kg_m3),
+        min_depth_m=float(np.min(state.depth)),
+        max_depth_m=float(np.max(state.depth)),
+        min_surface_elevation_m=float(np.min(state.eta)),
+        max_surface_elevation_m=float(np.max(state.eta)),
+        min_bed_elevation_m=float(np.min(scenario.bed)),
+        max_bed_elevation_m=float(np.max(scenario.bed)),
+        max_speed_m_s=float(np.max(speed)),
+        handoff_report=evaluate_cascading_handoff_conservation(package),
+    )
+
+
+def _stitched_validation_raft_transition_checkpoints(
+    package: CascadingScenarioPackage2_5D,
+) -> tuple[StitchedValidationRaftTransitionCheckpoint2_5D, ...]:
+    checkpoints: list[StitchedValidationRaftTransitionCheckpoint2_5D] = []
+    covered_pairs: set[tuple[str, str]] = set()
+    for transition in package.drop_transitions:
+        covered_pairs.add((transition.upstream_reach_id, transition.downstream_reach_id))
+        offsets = (
+            ("upstream_entry", -package.scenario.grid.dx),
+            ("crest", 0.0),
+            ("downstream_recovery", max(transition.control_length, package.scenario.grid.dx)),
+        )
+        for phase, offset in offsets:
+            station = _clamped_station(package, transition.crest_station + offset)
+            checkpoints.append(
+                _stitched_validation_raft_checkpoint(
+                    package,
+                    checkpoint_id=f"{transition.transition_id}_{phase}",
+                    transition_id=transition.transition_id,
+                    drop_transition_id=transition.transition_id,
+                    phase=phase,
+                    upstream_reach_id=transition.upstream_reach_id,
+                    downstream_reach_id=transition.downstream_reach_id,
+                    station=station,
+                    expected_hydraulic_control=transition.expected_hydraulic_control,
+                    hazard_tags=transition.hazard_tags,
+                    bed_elevation_fall=transition.bed_elevation_fall,
+                    metadata={
+                        "geometry_kind": transition.geometry_kind,
+                        "recirculation_risk": transition.recirculation_risk,
+                        "aeration_proxy": transition.aeration_proxy,
+                        "turbulence_proxy": transition.turbulence_proxy,
+                    },
+                )
+            )
+    ordered_reaches = tuple(sorted(package.reaches, key=lambda reach: reach.station_start))
+    for upstream, downstream in zip(ordered_reaches, ordered_reaches[1:]):
+        pair = (upstream.reach_id, downstream.reach_id)
+        if pair in covered_pairs:
+            continue
+        transition_id = f"reach_boundary_{upstream.reach_id}_to_{downstream.reach_id}"
+        station = _clamped_station(package, upstream.station_end)
+        checkpoints.append(
+            _stitched_validation_raft_checkpoint(
+                package,
+                checkpoint_id=f"{transition_id}_continuity",
+                transition_id=transition_id,
+                drop_transition_id=None,
+                phase="reach_boundary_continuity",
+                upstream_reach_id=upstream.reach_id,
+                downstream_reach_id=downstream.reach_id,
+                station=station,
+                expected_hydraulic_control="unknown",
+                hazard_tags=(),
+                bed_elevation_fall=0.0,
+                metadata={"source": "stitched_validation_reach_boundary"},
+            )
+        )
+    return tuple(checkpoints)
+
+
+def _stitched_validation_raft_checkpoint(
+    package: CascadingScenarioPackage2_5D,
+    *,
+    checkpoint_id: str,
+    transition_id: str,
+    drop_transition_id: str | None,
+    phase: str,
+    upstream_reach_id: str,
+    downstream_reach_id: str,
+    station: float,
+    expected_hydraulic_control: str,
+    hazard_tags: tuple[str, ...],
+    bed_elevation_fall: float,
+    metadata: dict[str, MetadataValue],
+) -> StitchedValidationRaftTransitionCheckpoint2_5D:
+    position = (station, 0.0)
+    sample = _sample_stitched_validation_cell(package, position)
+    return StitchedValidationRaftTransitionCheckpoint2_5D(
+        checkpoint_id=checkpoint_id,
+        transition_id=transition_id,
+        drop_transition_id=drop_transition_id,
+        phase=phase,
+        upstream_reach_id=upstream_reach_id,
+        downstream_reach_id=downstream_reach_id,
+        station_m=station,
+        position=position,
+        grid_index=sample["grid_index"],  # type: ignore[arg-type]
+        sampled_reach_id=sample["reach_id"],  # type: ignore[arg-type]
+        sampled_drop_transition_id=sample["drop_transition_id"],  # type: ignore[arg-type]
+        expected_hydraulic_control=expected_hydraulic_control,
+        hazard_tags=hazard_tags,
+        bed_elevation_fall_m=bed_elevation_fall,
+        depth_m=float(sample["depth_m"]),
+        surface_elevation_m=float(sample["surface_elevation_m"]),
+        velocity_m_s=sample["velocity_m_s"],  # type: ignore[arg-type]
+        speed_m_s=float(sample["speed_m_s"]),
+        froude_number=float(sample["froude_number"]),
+        wet=bool(sample["wet"]),
+        metadata=metadata,
+    )
+
+
+def _sample_stitched_validation_cell(
+    package: CascadingScenarioPackage2_5D,
+    position: tuple[float, float],
+    *,
+    gravity: float = 9.80665,
+) -> dict[str, object]:
+    grid = package.scenario.grid
+    row, column = _grid_index_for_position(grid, position)
+    state = package.scenario.initial_state
+    depth = float(state.depth[row, column])
+    u = float(state.u[row, column])
+    v = float(state.v[row, column])
+    speed = math.hypot(u, v)
+    reach_index = int(package.reach_id_grid[row, column])
+    drop_transition_index = int(package.drop_transition_id_grid[row, column])
+    return {
+        "grid_index": (row, column),
+        "reach_id": None if reach_index < 0 else package.reaches[reach_index].reach_id,
+        "drop_transition_id": (
+            None if drop_transition_index < 0 else package.drop_transitions[drop_transition_index].transition_id
+        ),
+        "bed_elevation_m": float(package.scenario.bed[row, column]),
+        "depth_m": depth,
+        "surface_elevation_m": float(state.eta[row, column]),
+        "velocity_m_s": (u, v),
+        "speed_m_s": speed,
+        "froude_number": 0.0 if depth <= 1.0e-9 else speed / math.sqrt(gravity * depth),
+        "wet": bool(state.wet[row, column]),
+    }
+
+
+def _grid_index_for_position(grid: GridSpec2_5D, position: tuple[float, float]) -> tuple[int, int]:
+    column = int(round((position[0] - grid.origin_x) / grid.dx))
+    row = int(round((position[1] - grid.origin_y) / grid.dy))
+    return max(0, min(grid.ny - 1, row)), max(0, min(grid.nx - 1, column))
+
+
+def _clamped_station(package: CascadingScenarioPackage2_5D, station: float) -> float:
+    grid = package.scenario.grid
+    return max(grid.origin_x, min(grid.origin_x + grid.dx * (grid.nx - 1), station))
 
 
 def _write_json(path: Path, data: dict[str, object]) -> None:

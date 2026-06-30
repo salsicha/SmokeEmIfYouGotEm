@@ -7,6 +7,14 @@ from raftsim.cascading import (
     BankShape2_5D,
     CASCADING_ANNOTATIONS_FILE,
     CASCADING_METADATA_FILE,
+    STITCHED_WHOLE_WINDOW_VALIDATION_CONSERVATION_FILE,
+    STITCHED_WHOLE_WINDOW_VALIDATION_CROSS_SECTIONS_FILE,
+    STITCHED_WHOLE_WINDOW_VALIDATION_DIR,
+    STITCHED_WHOLE_WINDOW_VALIDATION_FIELDS_FILE,
+    STITCHED_WHOLE_WINDOW_VALIDATION_MANIFEST_FILE,
+    STITCHED_WHOLE_WINDOW_VALIDATION_PROBES_FILE,
+    STITCHED_WHOLE_WINDOW_VALIDATION_RAFT_CHECKPOINTS_FILE,
+    STITCHED_WHOLE_WINDOW_VALIDATION_SCHEMA_VERSION,
     UNREAL_CASCADING_CORRIDOR_GRID_FILE,
     UNREAL_CASCADING_CORRIDOR_METADATA_FILE,
     UNREAL_CASCADING_CORRIDOR_METADATA_VERSION,
@@ -20,10 +28,12 @@ from raftsim.cascading import (
     ReachLocalGrid2_5D,
     ReachMetadata2_5D,
     StationProfilePoint2_5D,
+    build_stitched_whole_window_validation_export,
     build_unreal_cascading_corridor_metadata,
     evaluate_cascading_handoff_conservation,
     generate_california_pool_drop_cascading_scenario2_5d,
     read_cascading_scenario_package,
+    write_stitched_whole_window_validation_export,
     write_unreal_cascading_corridor_metadata,
 )
 from raftsim.scenario2_5d import (
@@ -300,6 +310,75 @@ def test_cascading_package_writes_stitched_grid_annotations_and_round_trips(tmp_
     assert loaded.drop_transitions == package.drop_transitions
     np.testing.assert_array_equal(loaded.reach_id_grid, package.reach_id_grid)
     np.testing.assert_array_equal(loaded.drop_transition_id_grid, package.drop_transition_id_grid)
+
+
+def test_cascading_package_exports_stitched_whole_window_validation_bundle(tmp_path):
+    package = _two_reach_package()
+    export = build_stitched_whole_window_validation_export(package)
+
+    assert export.scenario_id == package.scenario.metadata.scenario_id
+    assert {summary.npz_key for summary in export.field_summaries} >= {
+        "bed",
+        "depth",
+        "eta",
+        "u",
+        "v",
+        "reach_id_grid",
+        "drop_transition_id_grid",
+    }
+    assert len(export.probes) >= len(package.reaches)
+    assert len(export.cross_sections) >= len(package.reaches) + len(package.drop_transitions)
+    assert export.conservation_summary.total_water_volume_m3 > 0.0
+    assert export.conservation_summary.handoff_report.passed is True
+    assert {checkpoint.phase for checkpoint in export.raft_transition_checkpoints} >= {
+        "upstream_entry",
+        "crest",
+        "downstream_recovery",
+    }
+
+    output_dir = package.write_package(tmp_path / "cascade")
+    validation_dir = output_dir / STITCHED_WHOLE_WINDOW_VALIDATION_DIR
+    metadata = json.loads((output_dir / CASCADING_METADATA_FILE).read_text(encoding="utf-8"))
+    manifest = json.loads(
+        (validation_dir / STITCHED_WHOLE_WINDOW_VALIDATION_MANIFEST_FILE).read_text(encoding="utf-8")
+    )
+    probes = json.loads((validation_dir / STITCHED_WHOLE_WINDOW_VALIDATION_PROBES_FILE).read_text(encoding="utf-8"))
+    cross_sections = json.loads(
+        (validation_dir / STITCHED_WHOLE_WINDOW_VALIDATION_CROSS_SECTIONS_FILE).read_text(encoding="utf-8")
+    )
+    conservation = json.loads(
+        (validation_dir / STITCHED_WHOLE_WINDOW_VALIDATION_CONSERVATION_FILE).read_text(encoding="utf-8")
+    )
+    checkpoints = json.loads(
+        (validation_dir / STITCHED_WHOLE_WINDOW_VALIDATION_RAFT_CHECKPOINTS_FILE).read_text(encoding="utf-8")
+    )
+
+    assert metadata["validation_outputs"]["stitched_whole_window"]["manifest"] == (
+        f"{STITCHED_WHOLE_WINDOW_VALIDATION_DIR}/{STITCHED_WHOLE_WINDOW_VALIDATION_MANIFEST_FILE}"
+    )
+    assert manifest["schema_version"] == STITCHED_WHOLE_WINDOW_VALIDATION_SCHEMA_VERSION
+    assert manifest["files"]["fields"] == STITCHED_WHOLE_WINDOW_VALIDATION_FIELDS_FILE
+    assert manifest["validation_scope"]["seams_visible_to_validators"] is True
+    assert manifest["counts"]["probes"] == len(probes["probes"])
+    assert manifest["counts"]["cross_sections"] == len(cross_sections["cross_sections"])
+    assert manifest["counts"]["raft_transition_checkpoints"] == len(checkpoints["raft_transition_checkpoints"])
+    assert conservation["conservation_summary"]["total_water_volume_m3"] > 0.0
+    assert conservation["conservation_summary"]["handoff_report"]["passed"] is True
+    assert any(
+        checkpoint["transition_id"] == "drop_001" and checkpoint["phase"] == "crest"
+        for checkpoint in checkpoints["raft_transition_checkpoints"]
+    )
+
+    with np.load(validation_dir / STITCHED_WHOLE_WINDOW_VALIDATION_FIELDS_FILE) as fields:
+        np.testing.assert_allclose(fields["bed"], package.scenario.bed)
+        np.testing.assert_allclose(fields["depth"], package.scenario.initial_state.depth)
+        np.testing.assert_array_equal(fields["reach_id_grid"], package.reach_id_grid)
+        np.testing.assert_array_equal(fields["drop_transition_id_grid"], package.drop_transition_id_grid)
+        assert fields["wet"].shape == package.scenario.grid.shape
+
+    standalone_manifest = write_stitched_whole_window_validation_export(package, tmp_path / "standalone_validation")
+    assert standalone_manifest.name == STITCHED_WHOLE_WINDOW_VALIDATION_MANIFEST_FILE
+    assert (standalone_manifest.parent / STITCHED_WHOLE_WINDOW_VALIDATION_FIELDS_FILE).exists()
 
 
 def test_cascading_handoff_conservation_reports_flux_energy_and_wet_front_checks():
