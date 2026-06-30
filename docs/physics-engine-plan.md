@@ -30,6 +30,7 @@ Use a staged 2.5D approach:
 
 See [2.5D Dual-Solver Simulation Plan](2.5d-simulation-plan.md) for the detailed dual-solver workflow.
 See [GeoClaw Reference Solver Transition Plan](geoclaw-transition-plan.md) for the PyClaw-to-GeoClaw replacement plan.
+See [Custom C++ Engine Full Validation Plan](custom-cpp-engine-validation-plan.md) for the complete acceptance gate before live Unreal water depends on the custom engine.
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial, imagery, gauge, seasonal flow, adaptive parameter, and river-selection pipeline.
 See [Chrono And Unreal Integration Plan](chrono-unreal-integration.md) for the full game runtime path.
 See [Unreal Engine Full Game Plan](unreal-engine-game-plan.md) for the full game production roadmap after Python modeling, validation, and profiling.
