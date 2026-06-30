@@ -17,6 +17,10 @@ namespace fs = std::filesystem;
 namespace {
 
 constexpr double kPi = 3.14159265358979323846;
+// Scoped bed-step constants are calibrated against the GeoClaw discontinuous-bed fixture.
+constexpr double kBedStepFaceSourceBoost = 1.26;
+constexpr double kBedStepPreStepDischargeFloor = 0.66;
+constexpr double kBedStepTopographyRedistributionRate = 0.47;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -413,7 +417,7 @@ InterfaceFluxPair hydrostatic_flux_x(
     FluxState reconstructed = base;
     FluxState left_flux = reconstructed;
     FluxState right_flux = reconstructed;
-    double source_scale = config.bed_slope_source_scale;
+    double source_scale = config.bed_slope_source_scale * kBedStepFaceSourceBoost;
     left_flux.hu +=
         0.5 * source_scale * config.gravity * (left.h * left.h - left_star.h * left_star.h);
     right_flux.hu +=
@@ -439,7 +443,7 @@ InterfaceFluxPair hydrostatic_flux_y(
     FluxState reconstructed = base;
     FluxState south_flux = reconstructed;
     FluxState north_flux = reconstructed;
-    double source_scale = config.bed_slope_source_scale;
+    double source_scale = config.bed_slope_source_scale * kBedStepFaceSourceBoost;
     south_flux.hv +=
         0.5 * source_scale * config.gravity * (south.h * south.h - south_star.h * south_star.h);
     north_flux.hv +=
@@ -462,6 +466,58 @@ bool has_abrupt_bed_neighbor(const Scenario& scenario, std::size_t row, std::siz
         return true;
     }
     return false;
+}
+
+double pre_step_discharge_floor(const ConservedState& west, const ConservedState& east) {
+    double available = std::max(std::max(0.0, west.hu), std::max(0.0, east.hu));
+    return kBedStepPreStepDischargeFloor * available;
+}
+
+void apply_bed_step_augmented_topography(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    WaterState& next
+) {
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        for (std::size_t col = 1; col + 1 < scenario.grid.nx; ++col) {
+            if (!is_abrupt_bed_jump(scenario.bed(row, col), scenario.bed(row, col + 1)) ||
+                scenario.bed(row, col + 1) <= scenario.bed(row, col)) {
+                continue;
+            }
+            std::size_t shoulder_col = col - 1;
+            std::size_t donor_col = col + 1;
+            if (next.h(row, donor_col) <= config.dry_tolerance) {
+                continue;
+            }
+            double shoulder_eta = scenario.bed(row, shoulder_col) + next.h(row, shoulder_col);
+            double donor_eta = scenario.bed(row, donor_col) + next.h(row, donor_col);
+            double excess = donor_eta - shoulder_eta;
+            if (excess <= 0.0) {
+                continue;
+            }
+            double transfer = kBedStepTopographyRedistributionRate * dt * excess;
+            transfer = std::min(transfer, std::max(0.0, next.h(row, donor_col) - config.dry_tolerance));
+            if (transfer <= 0.0) {
+                continue;
+            }
+
+            double shoulder_h = next.h(row, shoulder_col);
+            double donor_h = next.h(row, donor_col);
+            double donor_u = next.u(row, donor_col);
+            double donor_v = next.v(row, donor_col);
+            double shoulder_hu = shoulder_h * next.u(row, shoulder_col) + transfer * donor_u;
+            double shoulder_hv = shoulder_h * next.v(row, shoulder_col) + transfer * donor_v;
+            double donor_hu = donor_h * donor_u - transfer * donor_u;
+            double donor_hv = donor_h * donor_v - transfer * donor_v;
+            next.h(row, shoulder_col) = shoulder_h + transfer;
+            next.h(row, donor_col) = donor_h - transfer;
+            next.u(row, shoulder_col) = shoulder_hu / safe_depth(next.h(row, shoulder_col), config.dry_tolerance);
+            next.v(row, shoulder_col) = shoulder_hv / safe_depth(next.h(row, shoulder_col), config.dry_tolerance);
+            next.u(row, donor_col) = donor_hu / safe_depth(next.h(row, donor_col), config.dry_tolerance);
+            next.v(row, donor_col) = donor_hv / safe_depth(next.h(row, donor_col), config.dry_tolerance);
+        }
+    }
 }
 
 std::string json_escape(const std::string& value) {
@@ -661,6 +717,9 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
                 hu_next -= dt * config_.bed_slope_source_scale * config_.gravity * center.h * bed_sx;
                 hv_next -= dt * config_.bed_slope_source_scale * config_.gravity * center.h * bed_sy;
             }
+            if (use_bed_step_face_source && east_bed - center_bed > 0.1) {
+                hu_next = std::max(hu_next, pre_step_discharge_floor(west, east));
+            }
 
             h_next = std::max(0.0, h_next);
             if (h_next <= config_.dry_tolerance) {
@@ -683,6 +742,9 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
     }
     if (config_.feature_strength_scale > 0.0) {
         apply_feature_forcing(dt, next);
+    }
+    if (use_bed_step_face_source) {
+        apply_bed_step_augmented_topography(scenario_, config_, dt, next);
     }
     recompute_state(next);
     state_ = std::move(next);

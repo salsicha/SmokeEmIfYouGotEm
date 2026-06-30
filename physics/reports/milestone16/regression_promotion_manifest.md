@@ -4,12 +4,13 @@ Schema: `raftsim.milestone16.regression_promotion.v0`
 
 Decision: **PASS**
 
-Promoted entries: 16
+Promoted entries: 17
 
 | Category | Gate scenario | Mode | Case | Artifact |
 | --- | --- | --- | --- | --- |
 | geoclaw_cpp | flat_pool | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced |
 | geoclaw_cpp | flat_pool | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume |
+| geoclaw_cpp | bed_step | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/c_step/finite_volume |
 | geoclaw_cpp | wet_dry_shoreline | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced |
 | geoclaw_cpp | sloping_manning_channel | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced |
 | geoclaw_cpp | sloping_manning_channel | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume |

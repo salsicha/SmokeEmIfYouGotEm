@@ -572,66 +572,6 @@
       "actual_scenario_id": "bed_step_seed_16",
       "dependency_order": 2,
       "dependency_phase": "geometry_parity_thresholds",
-      "entry_id": "comparison/bed_step/finite_volume/field_linf",
-      "evidence_refs": [
-        "outputs/m16cmp/c_step/finite_volume/threshold_evaluation.json",
-        "outputs/m16cmp/c_step/finite_volume"
-      ],
-      "failed_checks": [
-        "field_linf",
-        "slope_linf"
-      ],
-      "gate_scenario_id": "bed_step",
-      "likely_root_cause": "C++ depth, surface, momentum, or normal fields diverge from the GeoClaw reference.",
-      "metric": "field_linf",
-      "metric_group": "field_state",
-      "notes": [
-        "Max Linf across h/eta/u/v/hu/hv/normals; u/v masked below 0.15 m."
-      ],
-      "observed_value": 0.353044197857991,
-      "retune_lever": "Inspect finite-volume/reduced update, bed-source balance, reconstruction, CFL, dry-depth handling, and bathymetry alignment.",
-      "scenario_family": "bed_step",
-      "severity": "medium",
-      "solver_mode": "finite_volume",
-      "source_component": "geoclaw_cpp_comparison",
-      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
-      "suite": "canonical",
-      "threshold": 0.35
-    },
-    {
-      "actual_scenario_id": "bed_step_seed_16",
-      "dependency_order": 2,
-      "dependency_phase": "geometry_parity_thresholds",
-      "entry_id": "comparison/bed_step/finite_volume/slope_linf",
-      "evidence_refs": [
-        "outputs/m16cmp/c_step/finite_volume/threshold_evaluation.json",
-        "outputs/m16cmp/c_step/finite_volume"
-      ],
-      "failed_checks": [
-        "field_linf",
-        "slope_linf"
-      ],
-      "gate_scenario_id": "bed_step",
-      "likely_root_cause": "Free-surface slope differs enough to change hydraulic controls and raft force sampling.",
-      "metric": "slope_linf",
-      "metric_group": "surface_slope",
-      "notes": [
-        "Max Linf across eta slope fields."
-      ],
-      "observed_value": 0.10329619502833176,
-      "retune_lever": "Retune bed-slope source scaling, slope reconstruction, smoothing, and limiter behavior before feature forcing.",
-      "scenario_family": "bed_step",
-      "severity": "medium",
-      "solver_mode": "finite_volume",
-      "source_component": "geoclaw_cpp_comparison",
-      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
-      "suite": "canonical",
-      "threshold": 0.08
-    },
-    {
-      "actual_scenario_id": "bed_step_seed_16",
-      "dependency_order": 2,
-      "dependency_phase": "geometry_parity_thresholds",
       "entry_id": "comparison/bed_step/reduced/mass_drift_delta",
       "evidence_refs": [
         "outputs/m16cmp/c_step/reduced/threshold_evaluation.json",
@@ -8935,33 +8875,6 @@
       "actual_scenario_id": null,
       "dependency_order": 4,
       "dependency_phase": "geometry_family_closure",
-      "entry_id": "geometry/bed_step/bed_step/finite_volume",
-      "evidence_refs": [],
-      "failed_checks": [
-        "field_linf",
-        "slope_linf"
-      ],
-      "gate_scenario_id": "bed_step",
-      "likely_root_cause": "Discontinuous bed elevation is exposing source-term and free-surface balance error.",
-      "metric": "geometry_family",
-      "metric_group": "geometry",
-      "notes": [
-        "Threshold failures remain in: bed_step."
-      ],
-      "observed_value": null,
-      "retune_lever": "Audit hydrostatic reconstruction, bed-step source treatment, mass flux, and local dissipation.",
-      "scenario_family": "bed_step",
-      "severity": "high",
-      "solver_mode": "finite_volume",
-      "source_component": "geometry_validation",
-      "source_report": "reports/milestone16/geometry_validation.json",
-      "suite": null,
-      "threshold": null
-    },
-    {
-      "actual_scenario_id": null,
-      "dependency_order": 4,
-      "dependency_phase": "geometry_family_closure",
       "entry_id": "geometry/bed_step/bed_step/reduced",
       "evidence_refs": [],
       "failed_checks": [
@@ -14334,11 +14247,11 @@
         "dam_break: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "dam_break: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "bed_step: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, mass_drift_delta)",
-        "bed_step: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf)",
         "constriction: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, wet_mismatch_fraction, probe_linf)",
-        "constriction: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)"
+        "constriction: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
+        "wet_dry_shoreline: GeoClaw/C++ threshold comparison failed (field_linf, wet_mismatch_fraction, probe_linf, cross_section_linf)"
       ],
-      "observed_value": 35.0,
+      "observed_value": 34.0,
       "retune_lever": "Clear the lower-order triage entries, then regenerate the component report and full readiness gate.",
       "scenario_family": "suite_gate",
       "severity": "critical",
@@ -14416,42 +14329,6 @@
     }
   ],
   "groups": [
-    {
-      "entry_count": 1,
-      "metric_group": "field_state",
-      "metrics": {
-        "field_linf": 1
-      },
-      "scenario_family": "bed_step",
-      "solver_mode": "finite_volume",
-      "source_components": {
-        "geoclaw_cpp_comparison": 1
-      }
-    },
-    {
-      "entry_count": 1,
-      "metric_group": "geometry",
-      "metrics": {
-        "geometry_family": 1
-      },
-      "scenario_family": "bed_step",
-      "solver_mode": "finite_volume",
-      "source_components": {
-        "geometry_validation": 1
-      }
-    },
-    {
-      "entry_count": 1,
-      "metric_group": "surface_slope",
-      "metrics": {
-        "slope_linf": 1
-      },
-      "scenario_family": "bed_step",
-      "solver_mode": "finite_volume",
-      "source_components": {
-        "geoclaw_cpp_comparison": 1
-      }
-    },
     {
       "entry_count": 1,
       "metric_group": "conservation",
@@ -17208,8 +17085,8 @@
     "by_dependency_phase": {
       "core_parity_guardrails": 17,
       "full_gate_rerun": 3,
-      "geometry_family_closure": 13,
-      "geometry_parity_thresholds": 41,
+      "geometry_family_closure": 12,
+      "geometry_parity_thresholds": 39,
       "raft_coupling_after_water_parity": 161,
       "whitewater_realworld_parity": 192
     },
@@ -17221,17 +17098,17 @@
       "energy_dissipation": 22,
       "feature_localization": 20,
       "feature_strength": 25,
-      "field_state": 35,
-      "geometry": 13,
+      "field_state": 34,
+      "geometry": 12,
       "hydraulic_regime": 28,
       "localized_probe": 33,
       "raft_outcome": 87,
       "reference_feature_check": 26,
-      "surface_slope": 33,
+      "surface_slope": 32,
       "wet_dry_mask": 11
     },
     "by_scenario_family": {
-      "bed_step": 9,
+      "bed_step": 6,
       "boulder_impacts": 68,
       "cascading_reach_drop": 70,
       "constriction": 19,
@@ -17250,20 +17127,20 @@
     },
     "by_severity": {
       "critical": 63,
-      "high": 267,
-      "medium": 97
+      "high": 266,
+      "medium": 95
     },
     "by_solver_mode": {
       "component": 3,
-      "finite_volume": 203,
+      "finite_volume": 200,
       "reduced": 221
     },
     "by_source_component": {
       "full_cpp_validation_gate": 3,
-      "geoclaw_cpp_comparison": 250,
-      "geometry_validation": 13,
+      "geoclaw_cpp_comparison": 248,
+      "geometry_validation": 12,
       "raft_coupling": 161
     },
-    "entry_count": 427
+    "entry_count": 424
   }
 }
