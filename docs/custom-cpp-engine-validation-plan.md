@@ -134,6 +134,8 @@ Each river-validation annotation should record its anchor location, source/prove
 
 Milestone 16 full-readiness evidence is tracked in `physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.json` and `physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.md`. The final gate explicitly blocks live custom water because GeoClaw/C++ threshold comparisons, geometry validation, and raft coupling still fail, even though GeoClaw reference runs, C++ manifests, promoted regression artifacts, and runtime profiles pass.
 
+The suite-level C++ validation gate is tracked separately in `physics/reports/milestone16/full_cpp_validation_gate.json` and `physics/reports/milestone16/full_cpp_validation_gate.md`. This report aggregates the seven component reports in `physics/reports/milestone16/` so the C++ validation gate itself has one JSON/Markdown decision artifact before the Unreal-readiness report consumes summaries.
+
 The C++ engine is accepted for live Unreal water only when:
 
 - Every required scenario has a full GeoClaw solution run with fixed-grid frames, not only fallback or initial-state output.

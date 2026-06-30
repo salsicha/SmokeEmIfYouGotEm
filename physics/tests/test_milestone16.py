@@ -1,4 +1,5 @@
 from raftsim.milestone16 import (
+    MILESTONE16_FULL_CPP_VALIDATION_GATE_REPORT_SCHEMA,
     Milestone16ComparisonRecord,
     Milestone16ComparisonReport,
     Milestone16CppRunRecord,
@@ -11,8 +12,10 @@ from raftsim.milestone16 import (
     Milestone16RaftCouplingReport,
     Milestone16RuntimeProfileRecord,
     Milestone16RuntimeProfileReport,
+    build_milestone16_full_cpp_validation_gate_report,
     run_milestone16_regression_promotion,
 )
+from raftsim.examples.generate_milestone16_full_cpp_validation_gate import main as generate_full_gate_main
 
 
 def test_milestone16_geoclaw_reference_report_requires_full_solution():
@@ -321,3 +324,123 @@ def test_milestone16_runtime_profile_report_blocks_on_budget_or_replay_failure()
     assert report.passed is False
     assert payload["budget_failed_count"] == 1
     assert payload["deterministic_replay"][1]["passed"] is False
+
+
+def test_milestone16_full_cpp_validation_gate_report_aggregates_component_reports(tmp_path):
+    report_dir = tmp_path / "reports"
+    report_dir.mkdir()
+    _write_component_reports(report_dir)
+
+    report = build_milestone16_full_cpp_validation_gate_report(report_dir)
+    payload = report.to_json_dict()
+    json_path = report.write_json(tmp_path / "full_gate.json")
+    markdown_path = report.write_markdown(tmp_path / "full_gate.md")
+
+    assert report.passed is False
+    assert payload["schema_version"] == MILESTONE16_FULL_CPP_VALIDATION_GATE_REPORT_SCHEMA
+    assert payload["component_count"] == 7
+    assert payload["blocked_component_ids"] == ["geoclaw_cpp_comparisons", "geometry", "raft_coupling"]
+    assert "wet_dry_shoreline" in payload["components"][2]["blockers"][0]
+    assert "Decision: **BLOCKED**" in markdown_path.read_text(encoding="utf-8")
+    assert json_path.exists()
+
+
+def test_generate_milestone16_full_cpp_validation_gate_cli_writes_blocked_report(tmp_path):
+    report_dir = tmp_path / "reports"
+    report_dir.mkdir()
+    _write_component_reports(report_dir)
+    output_json = tmp_path / "suite.json"
+    output_md = tmp_path / "suite.md"
+
+    exit_code = generate_full_gate_main(
+        [
+            "--report-dir",
+            str(report_dir),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    assert output_json.exists()
+    assert "Decision: **BLOCKED**" in output_md.read_text(encoding="utf-8")
+
+
+def _write_component_reports(report_dir):
+    (report_dir / "geoclaw_reference_runs.json").write_text(
+        """{
+          "passed": true,
+          "scenario_count": 2,
+          "passed_count": 2,
+          "failed_count": 0,
+          "records": [{"gate_scenario_id": "flat_pool", "passed": true}, {"gate_scenario_id": "uniform_channel", "passed": true}]
+        }""",
+        encoding="utf-8",
+    )
+    (report_dir / "cpp_solver_runs.json").write_text(
+        """{
+          "passed": true,
+          "run_count": 4,
+          "passed_count": 4,
+          "failed_count": 0,
+          "records": [{"gate_scenario_id": "flat_pool", "passed": true}, {"gate_scenario_id": "uniform_channel", "passed": true}]
+        }""",
+        encoding="utf-8",
+    )
+    (report_dir / "geoclaw_cpp_comparisons.json").write_text(
+        """{
+          "passed": false,
+          "comparison_count": 2,
+          "threshold_passed_count": 1,
+          "threshold_failed_count": 1,
+          "records": [
+            {"gate_scenario_id": "flat_pool", "threshold_passed": true},
+            {"gate_scenario_id": "wet_dry_shoreline", "threshold_passed": false, "failing_checks": ["field_linf"]}
+          ]
+        }""",
+        encoding="utf-8",
+    )
+    (report_dir / "geometry_validation.json").write_text(
+        """{
+          "passed": false,
+          "case_count": 2,
+          "passed_count": 1,
+          "failed_count": 1,
+          "cases": [{"case_id": "hydrostatic", "passed": true}, {"case_id": "bed_steps", "passed": false}]
+        }""",
+        encoding="utf-8",
+    )
+    (report_dir / "raft_coupling_validation.json").write_text(
+        """{
+          "passed": false,
+          "comparison_count": 2,
+          "passed_count": 1,
+          "failed_count": 1,
+          "records": [
+            {"case_id": "pool_entry", "passed": true},
+            {"case_id": "hydraulic_hole_surf", "passed": false, "notes": ["force delta"]}
+          ]
+        }""",
+        encoding="utf-8",
+    )
+    (report_dir / "runtime_profile.json").write_text(
+        """{
+          "passed": true,
+          "run_count": 1,
+          "budget_passed_count": 1,
+          "budget_failed_count": 0,
+          "records": [{"artifact_id": "flat_pool/reduced", "passed": true}],
+          "deterministic_replay": [{"artifact_id": "flat_pool/reduced", "passed": true, "hashes": ["abc", "abc"]}]
+        }""",
+        encoding="utf-8",
+    )
+    (report_dir / "regression_promotion_manifest.json").write_text(
+        """{
+          "passed": true,
+          "entry_count": 1,
+          "entries": [{"artifact_id": "flat_pool/reduced", "passed": true}]
+        }""",
+        encoding="utf-8",
+    )
