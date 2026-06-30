@@ -1,8 +1,12 @@
 import numpy as np
 
 from raftsim.feature_validation import (
+    CASCADING_RAFT_VALIDATION_CASES,
+    CascadingRaftValidationCase,
     FeatureValidationCheck,
     FeatureValidationResult,
+    build_cascading_raft_validation_cases,
+    validate_cascading_raft_cases,
     validate_boil_upwelling_case,
     validate_eddy_line_case,
     validate_hole_case,
@@ -11,6 +15,10 @@ from raftsim.feature_validation import (
     validate_standing_wave_case,
     validate_submerged_rock_case,
     summarize_run_outcomes,
+)
+from raftsim.cascading import (
+    CaliforniaPoolDropParameters2_5D,
+    generate_california_pool_drop_cascading_scenario2_5d,
 )
 from raftsim.math3d import Vec3
 from raftsim.raft_coupling2_5d import RaftState6DoF, WaterField2_5D, build_default_raft_mass_properties
@@ -336,3 +344,37 @@ def test_run_outcome_summary_canonicalizes_validation_results():
     assert counts["pinned"] == 1
     assert counts["flipped"] == 1
     assert summary.summary_lines()[0] == "total=6 passed=5 failed=1"
+
+
+def test_cascading_raft_validation_cases_cover_pool_drop_eddy_boulder_and_boundaries():
+    package = generate_california_pool_drop_cascading_scenario2_5d(
+        CaliforniaPoolDropParameters2_5D(seed=7, nx=96, ny=34, difficulty=0.62, duration=3.0)
+    )
+
+    cases = build_cascading_raft_validation_cases(package)
+    results = validate_cascading_raft_cases(package)
+    by_case = {result.feature: result for result in results}
+
+    assert all(isinstance(case, CascadingRaftValidationCase) for case in cases)
+    assert tuple(case.case_id for case in cases) == CASCADING_RAFT_VALIDATION_CASES
+    assert cases[0].reach_id == "pool_001"
+    assert cases[1].transition_id == "ledge_drop_001"
+    assert cases[-1].expected_outcomes == ("flushed",)
+    assert tuple(by_case) == CASCADING_RAFT_VALIDATION_CASES
+    assert all(result.passed for result in results)
+    assert by_case["pool_entry"].outcome == "clear"
+    assert by_case["drop_entry"].outcome == "flushed"
+    assert by_case["hydraulic_hole_surf_flush"].outcome in {"surfed", "flushed"}
+    assert by_case["eddy_recovery"].outcome == "clear"
+    assert by_case["boulder_garden_impacts"].outcome == "grounded"
+    assert by_case["transition_boundary_crossing"].outcome == "flushed"
+    assert {check.name for check in by_case["hydraulic_hole_surf_flush"].checks} >= {
+        "hole_tag",
+        "surf_or_flush_signal",
+        "downstream_boil_lift",
+    }
+    assert {check.name for check in by_case["boulder_garden_impacts"].checks} >= {
+        "rock_feature_count",
+        "rock_contacts",
+        "scrape_acceleration",
+    }
