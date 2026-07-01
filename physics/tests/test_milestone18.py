@@ -1,16 +1,23 @@
 import json
 from pathlib import Path
 
+import numpy as np
+
 from raftsim.analytic_fixtures import write_analytic_fixture_suite
+from raftsim.examples.generate_milestone18_constriction_throat_shape_report import (
+    main as generate_constriction_throat_main,
+)
 from raftsim.examples.generate_milestone18_failure_triage_matrix import main as generate_triage_main
 from raftsim.examples.generate_milestone18_parity_family_retune_report import main as generate_retune_main
 from raftsim.examples.generate_milestone18_pin_release_fixture_report import main as generate_pin_release_main
 from raftsim.examples.run_milestone18_analytic_retune_guardrail import main as guardrail_main
 from raftsim.milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
+    MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA,
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
     MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
     MILESTONE18_PIN_RELEASE_REPORT_SCHEMA,
+    build_milestone18_constriction_throat_shape_report,
     build_milestone18_failure_triage_matrix,
     build_milestone18_parity_family_retune_report,
     build_milestone18_pin_release_fixture_report,
@@ -261,6 +268,128 @@ def _parity_retune_inputs(tmp_path: Path) -> tuple[Path, dict[str, Path]]:
             {"scenario_id": "uniform_channel_seed_16", "passed": passed, "checks": checks},
         )
     return reference_manifest, reports
+
+
+def _constriction_throat_inputs(tmp_path: Path) -> Path:
+    scenario_root = tmp_path / "scenario" / "constriction_seed_18"
+    scenario = _write_json(
+        scenario_root / "scenario.json",
+        {
+            "array_files": {"initial_state": "initial_state.npz", "features": "features.json"},
+            "grid": {"nx": 3, "ny": 3, "dx": 1.0, "dy": 1.0, "origin_x": 0.0, "origin_y": 0.0},
+            "metadata": {"scenario_id": "constriction_seed_18"},
+        },
+    )
+    _ = scenario
+    _write_json(
+        scenario_root / "features.json",
+        {
+            "features": [
+                {
+                    "kind": "constriction",
+                    "center": {"x": 1.0, "y": 1.0},
+                    "width": 1.0,
+                    "length": 4.0,
+                    "radius": 0.5,
+                    "strength": 2.0,
+                    "angle": 0.0,
+                }
+            ]
+        },
+    )
+    zeros = np.zeros((3, 3), dtype=float)
+    np.savez(
+        scenario_root / "initial_state.npz",
+        depth=np.array([[0.0, 0.05, 0.0], [0.0, 1.0, 0.0], [0.0, 0.05, 0.0]], dtype=float),
+        eta=zeros,
+        u=np.ones((3, 3), dtype=float),
+        v=zeros,
+        hu=zeros,
+        hv=zeros,
+        wet=np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]], dtype=bool),
+    )
+
+    geoclaw_root = tmp_path / "geoclaw" / "normalized"
+    geoclaw_frame = geoclaw_root / "frames" / "frame_0002.npz"
+    geoclaw_frame.parent.mkdir(parents=True, exist_ok=True)
+    geoclaw_h = np.array([[0.0, 0.35, 0.0], [0.0, 1.45, 0.0], [0.0, 0.35, 0.0]], dtype=float)
+    np.savez(
+        geoclaw_frame,
+        h=geoclaw_h,
+        eta=geoclaw_h,
+        u=np.full((3, 3), 1.2, dtype=float),
+        v=np.full((3, 3), 0.1, dtype=float),
+        hu=zeros,
+        hv=zeros,
+        wet=geoclaw_h > 0.0,
+        froude=np.full((3, 3), 0.6, dtype=float),
+    )
+    _write_json(geoclaw_root / "manifest.json", {"scenario_id": "constriction_seed_18", "frames": ["frames/frame_0002.npz"]})
+
+    cpp_root = tmp_path / "cpp" / "constriction_seed_18"
+    cpp_frame = cpp_root / "frames" / "frame_0008.csv"
+    cpp_frame.parent.mkdir(parents=True, exist_ok=True)
+    rows = ["row,col,x,y,h,eta,u,v,hu,hv,wet,normal_x,normal_y,normal_z,froude"]
+    cpp_h = np.array([[0.0, 0.02, 0.0], [0.0, 0.95, 0.0], [0.0, 0.02, 0.0]], dtype=float)
+    cpp_v = np.array([[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 0.0]], dtype=float)
+    for row_index in range(3):
+        for col_index in range(3):
+            h = cpp_h[row_index, col_index]
+            v = cpp_v[row_index, col_index]
+            rows.append(
+                f"{row_index},{col_index},{col_index},{row_index},{h},{h},1.8,{v},0,0,{1 if h > 0 else 0},0,0,1,1.4"
+            )
+    cpp_frame.write_text("\n".join(rows) + "\n", encoding="utf-8")
+    _write_json(cpp_root / "manifest.json", {"scenario_id": "constriction_seed_18", "frames": ["frames/frame_0008.csv"]})
+
+    return _write_json(
+        tmp_path / "comparison" / "dual_solver_manifest.json",
+        {
+            "scenario_id": "constriction_seed_18",
+            "scenario_package": "../scenario/constriction_seed_18",
+            "geoclaw": {"manifest": "../geoclaw/normalized/manifest.json"},
+            "cpp": {"manifest": "../cpp/constriction_seed_18/manifest.json"},
+        },
+    )
+
+
+def test_milestone18_constriction_throat_shape_report_records_width_depth_deltas(tmp_path):
+    dual_manifest = _constriction_throat_inputs(tmp_path)
+
+    report = build_milestone18_constriction_throat_shape_report(dual_manifest)
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert payload["throat_column_index"] == 1
+    assert payload["center_row_index"] == 1
+    assert payload["summary"]["cpp_center_depth_delta_m"] == -0.5
+    assert payload["summary"]["cpp_wet_width_delta_m"] == -2.0
+    assert "width/depth mapping" in payload["next_levers"][0]
+    assert any("wet width" in reason for reason in payload["blocked_reasons"])
+
+
+def test_generate_milestone18_constriction_throat_shape_cli_writes_reports(tmp_path):
+    dual_manifest = _constriction_throat_inputs(tmp_path)
+    output_json = tmp_path / "reports" / "milestone18" / "constriction_throat.json"
+    output_md = tmp_path / "reports" / "milestone18" / "constriction_throat.md"
+
+    exit_code = generate_constriction_throat_main(
+        [
+            "--dual-solver-manifest",
+            str(dual_manifest),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert "Constriction Throat Shape Diagnostic" in output_md.read_text(encoding="utf-8")
 
 
 def test_milestone18_parity_family_retune_report_records_partial_promotion(tmp_path):

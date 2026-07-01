@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import csv
 import json
 import re
 from collections import Counter
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
+
+import numpy as np
 
 from .analytic_validation import AnalyticCandidateKind, AnalyticValidationReport, compare_analytic_fixture_manifest
 from .feature_validation import build_crew_overboard_fixtures2_5d, evaluate_crew_overboard_fixture2_5d
@@ -24,6 +27,7 @@ MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA = "raftsim.milestone18.failure_triage_m
 MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA = "raftsim.milestone18.analytic_retune_guardrail.v0"
 MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA = "raftsim.milestone18.parity_family_retune.v0"
 MILESTONE18_PIN_RELEASE_REPORT_SCHEMA = "raftsim.milestone18.pin_release_fixture.v0"
+MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA = "raftsim.milestone18.constriction_throat_shape.v0"
 
 _CORE_GUARDRAIL_FAMILIES = {"hydrostatic_sloping_balance", "uniform_channel", "dam_break_bore"}
 _GEOMETRY_CLOSURE_FAMILIES = {"wet_dry_shoreline", "bed_step", "constriction", "drops_ledges_tailwater"}
@@ -546,6 +550,192 @@ class Milestone18ParityFamilyRetuneReport:
 
 
 @dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionThroatProfile:
+    """One water-shape profile sampled at the constriction throat."""
+
+    label: str
+    source_path: str
+    column_index: int
+    center_row_index: int
+    wet_depth_threshold_m: float
+    wet_cell_count: int
+    wet_width_m: float
+    center_depth_m: float
+    max_depth_m: float
+    mean_wet_depth_m: float
+    column_mass_m3: float
+    center_downstream_velocity_mps: float
+    max_abs_cross_stream_velocity_mps: float
+    mean_abs_cross_stream_velocity_mps: float
+    center_froude: float
+
+    def to_json_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionThroatDelta:
+    """Candidate-minus-reference delta for throat water-shape metrics."""
+
+    candidate_label: str
+    reference_label: str
+    wet_width_m: float
+    center_depth_m: float
+    max_depth_m: float
+    mean_wet_depth_m: float
+    column_mass_m3: float
+    center_downstream_velocity_mps: float
+    max_abs_cross_stream_velocity_mps: float
+    mean_abs_cross_stream_velocity_mps: float
+    center_froude: float
+
+    def to_json_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionThroatShapeReport:
+    """Diagnostic report comparing constriction throat shape across authored, GeoClaw, and C++ fields."""
+
+    dual_solver_manifest: str
+    scenario_package: str
+    scenario_id: str
+    feature: dict[str, object]
+    grid: dict[str, object]
+    throat_column_index: int
+    center_row_index: int
+    wet_depth_threshold_m: float
+    profiles: tuple[Milestone18ConstrictionThroatProfile, ...]
+    cpp_minus_geoclaw: Milestone18ConstrictionThroatDelta
+    authored_initial_minus_geoclaw: Milestone18ConstrictionThroatDelta
+    blocked_reasons: tuple[str, ...]
+    next_levers: tuple[str, ...]
+
+    @property
+    def passed(self) -> bool:
+        return not self.blocked_reasons
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "dual_solver_manifest": self.dual_solver_manifest,
+            "scenario_package": self.scenario_package,
+            "scenario_id": self.scenario_id,
+            "feature": self.feature,
+            "grid": self.grid,
+            "throat_column_index": self.throat_column_index,
+            "center_row_index": self.center_row_index,
+            "wet_depth_threshold_m": self.wet_depth_threshold_m,
+            "summary": {
+                "profile_count": len(self.profiles),
+                "cpp_wet_width_delta_m": self.cpp_minus_geoclaw.wet_width_m,
+                "cpp_center_depth_delta_m": self.cpp_minus_geoclaw.center_depth_m,
+                "cpp_column_mass_delta_m3": self.cpp_minus_geoclaw.column_mass_m3,
+                "cpp_max_abs_cross_stream_velocity_delta_mps": (
+                    self.cpp_minus_geoclaw.max_abs_cross_stream_velocity_mps
+                ),
+                "cpp_center_froude_delta": self.cpp_minus_geoclaw.center_froude,
+            },
+            "profiles": [profile.to_json_dict() for profile in self.profiles],
+            "deltas": {
+                "cpp_minus_geoclaw": self.cpp_minus_geoclaw.to_json_dict(),
+                "authored_initial_minus_geoclaw": self.authored_initial_minus_geoclaw.to_json_dict(),
+            },
+            "blocked_reasons": list(self.blocked_reasons),
+            "next_levers": list(self.next_levers),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = [
+            "# Milestone 18 Constriction Throat Shape Diagnostic",
+            "",
+            f"Schema: `{MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Scenario: `{self.scenario_id}`",
+            f"Dual solver manifest: `{self.dual_solver_manifest}`",
+            f"Scenario package: `{self.scenario_package}`",
+            f"Throat column: `{self.throat_column_index}`",
+            f"Center row: `{self.center_row_index}`",
+            f"Wet-depth threshold: `{self.wet_depth_threshold_m:.6g}` m",
+            "",
+            "## Feature",
+            "",
+        ]
+        for key, value in sorted(self.feature.items()):
+            lines.append(f"- `{key}`: `{value}`")
+        lines.extend(
+            [
+                "",
+                "## Profiles",
+                "",
+                "| Profile | Wet cells | Wet width m | Center depth m | Max depth m | Mean wet depth m | Column mass m3 | Center u m/s | Max abs v m/s | Mean abs v m/s | Center Froude |",
+                "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for profile in self.profiles:
+            lines.append(
+                "| "
+                f"{profile.label} | "
+                f"{profile.wet_cell_count} | "
+                f"{profile.wet_width_m:.6g} | "
+                f"{profile.center_depth_m:.6g} | "
+                f"{profile.max_depth_m:.6g} | "
+                f"{profile.mean_wet_depth_m:.6g} | "
+                f"{profile.column_mass_m3:.6g} | "
+                f"{profile.center_downstream_velocity_mps:.6g} | "
+                f"{profile.max_abs_cross_stream_velocity_mps:.6g} | "
+                f"{profile.mean_abs_cross_stream_velocity_mps:.6g} | "
+                f"{profile.center_froude:.6g} |"
+            )
+        lines.extend(
+            [
+                "",
+                "## Deltas",
+                "",
+                "| Delta | Wet width m | Center depth m | Max depth m | Mean wet depth m | Column mass m3 | Center u m/s | Max abs v m/s | Mean abs v m/s | Center Froude |",
+                "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for label, delta in (
+            ("C++ minus GeoClaw", self.cpp_minus_geoclaw),
+            ("Authored initial minus GeoClaw", self.authored_initial_minus_geoclaw),
+        ):
+            lines.append(
+                "| "
+                f"{label} | "
+                f"{delta.wet_width_m:.6g} | "
+                f"{delta.center_depth_m:.6g} | "
+                f"{delta.max_depth_m:.6g} | "
+                f"{delta.mean_wet_depth_m:.6g} | "
+                f"{delta.column_mass_m3:.6g} | "
+                f"{delta.center_downstream_velocity_mps:.6g} | "
+                f"{delta.max_abs_cross_stream_velocity_mps:.6g} | "
+                f"{delta.mean_abs_cross_stream_velocity_mps:.6g} | "
+                f"{delta.center_froude:.6g} |"
+            )
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.next_levers:
+            lines.extend(["", "## Next Levers", ""])
+            lines.extend(f"- {lever}" for lever in self.next_levers)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+
+@dataclass(frozen=True, slots=True)
 class Milestone18PinReleaseResponsePath:
     """One action timing path through the dedicated pin/release fixture."""
 
@@ -786,6 +976,95 @@ def build_milestone18_parity_family_retune_report(
         feature_forcing_policy=feature_forcing_policy,
         mode_results=results,
         notes=notes,
+    )
+
+
+def build_milestone18_constriction_throat_shape_report(
+    dual_solver_manifest: str | Path,
+    *,
+    wet_depth_threshold_m: float = 0.15,
+) -> Milestone18ConstrictionThroatShapeReport:
+    """Compare authored, GeoClaw, and C++ throat water shape for a constriction rerun."""
+
+    manifest_path = Path(dual_solver_manifest)
+    manifest = _load_json_report(manifest_path)
+    scenario_package = _resolve_path(str(manifest.get("scenario_package", "")), manifest_path.parent)
+    scenario = _load_json_report(scenario_package / "scenario.json")
+    features = _load_json_report(scenario_package / "features.json")
+    constriction = _constriction_feature(features)
+    grid = _scenario_grid(scenario)
+    throat_column = _grid_column(float(constriction["center_x"]), grid)
+    center_row = _grid_row(float(constriction["center_y"]), grid)
+
+    geoclaw_manifest_ref = _manifest_nested_string(manifest, "geoclaw", "manifest")
+    cpp_manifest_ref = _manifest_nested_string(manifest, "cpp", "manifest")
+    geoclaw_manifest_path = _resolve_path(geoclaw_manifest_ref, manifest_path.parent)
+    cpp_manifest_path = _resolve_path(cpp_manifest_ref, manifest_path.parent)
+    geoclaw_manifest = _load_json_report(geoclaw_manifest_path)
+    cpp_manifest = _load_json_report(cpp_manifest_path)
+
+    initial_state_path = _scenario_array_path(scenario_package, scenario, "initial_state", "initial_state.npz")
+    geoclaw_frame_path = _final_frame_path(geoclaw_manifest, geoclaw_manifest_path.parent)
+    cpp_frame_path = _final_frame_path(cpp_manifest, cpp_manifest_path.parent)
+
+    initial_state = _load_npz_water_state(initial_state_path, h_key="depth")
+    geoclaw_state = _load_npz_water_state(geoclaw_frame_path, h_key="h")
+    cpp_state = _load_cpp_water_csv(cpp_frame_path, int(grid["ny"]), int(grid["nx"]))
+    profiles = (
+        _constriction_throat_profile(
+            "authored_initial",
+            initial_state_path,
+            initial_state,
+            grid,
+            throat_column,
+            center_row,
+            wet_depth_threshold_m,
+        ),
+        _constriction_throat_profile(
+            "geoclaw_final",
+            geoclaw_frame_path,
+            geoclaw_state,
+            grid,
+            throat_column,
+            center_row,
+            wet_depth_threshold_m,
+        ),
+        _constriction_throat_profile(
+            "cpp_final",
+            cpp_frame_path,
+            cpp_state,
+            grid,
+            throat_column,
+            center_row,
+            wet_depth_threshold_m,
+        ),
+    )
+    profile_by_label = {profile.label: profile for profile in profiles}
+    cpp_minus_geoclaw = _constriction_profile_delta(profile_by_label["cpp_final"], profile_by_label["geoclaw_final"])
+    authored_minus_geoclaw = _constriction_profile_delta(
+        profile_by_label["authored_initial"],
+        profile_by_label["geoclaw_final"],
+    )
+    blocked_reasons = _constriction_throat_blocked_reasons(cpp_minus_geoclaw, grid)
+    next_levers = (
+        "Fit constriction throat width/depth mapping from GeoClaw profile evidence before adding feature forcing.",
+        "Add a geometry-aware throat reconstruction that preserves mass while matching wet width and centerline depth.",
+        "Rerun the corrected-reference constriction GeoClaw/C++ comparison and Milestone 17 guardrail after changes.",
+    )
+    return Milestone18ConstrictionThroatShapeReport(
+        dual_solver_manifest=str(manifest_path),
+        scenario_package=str(scenario_package),
+        scenario_id=str(manifest.get("scenario_id") or scenario.get("metadata", {}).get("scenario_id") or "unknown"),
+        feature=constriction,
+        grid=grid,
+        throat_column_index=throat_column,
+        center_row_index=center_row,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        profiles=profiles,
+        cpp_minus_geoclaw=cpp_minus_geoclaw,
+        authored_initial_minus_geoclaw=authored_minus_geoclaw,
+        blocked_reasons=blocked_reasons,
+        next_levers=next_levers,
     )
 
 
@@ -1463,6 +1742,214 @@ def _records(container: dict[str, Any], key: str) -> list[dict[str, Any]]:
     if not isinstance(value, list):
         raise ValueError(f"{key} must be a list.")
     return [item for item in value if isinstance(item, dict)]
+
+
+def _manifest_nested_string(container: dict[str, Any], outer_key: str, inner_key: str) -> str:
+    outer = container.get(outer_key)
+    if not isinstance(outer, dict):
+        raise ValueError(f"{outer_key} must be a JSON object.")
+    value = outer.get(inner_key)
+    if not isinstance(value, str) or not value:
+        raise ValueError(f"{outer_key}.{inner_key} must be a non-empty string.")
+    return value
+
+
+def _scenario_grid(scenario: dict[str, Any]) -> dict[str, object]:
+    grid = scenario.get("grid")
+    if not isinstance(grid, dict):
+        raise ValueError("scenario grid must be a JSON object.")
+    required = ("nx", "ny", "dx", "dy", "origin_x", "origin_y")
+    missing = [key for key in required if key not in grid]
+    if missing:
+        raise ValueError(f"scenario grid is missing: {', '.join(missing)}")
+    return {
+        "nx": int(grid["nx"]),
+        "ny": int(grid["ny"]),
+        "dx": float(grid["dx"]),
+        "dy": float(grid["dy"]),
+        "origin_x": float(grid["origin_x"]),
+        "origin_y": float(grid["origin_y"]),
+    }
+
+
+def _constriction_feature(features_payload: dict[str, Any]) -> dict[str, object]:
+    features = features_payload.get("features", [])
+    if not isinstance(features, list):
+        raise ValueError("features must be a list.")
+    for feature in features:
+        if not isinstance(feature, dict) or feature.get("kind") != "constriction":
+            continue
+        center = feature.get("center", {})
+        if not isinstance(center, dict):
+            center = {}
+        return {
+            "kind": "constriction",
+            "center_x": float(center.get("x", 0.0)),
+            "center_y": float(center.get("y", 0.0)),
+            "width_m": _float_or_none(feature.get("width")),
+            "length_m": _float_or_none(feature.get("length")),
+            "radius_m": _float_or_none(feature.get("radius")),
+            "strength": _float_or_none(feature.get("strength")),
+            "angle_rad": _float_or_none(feature.get("angle")),
+            "metadata": feature.get("metadata", {}),
+        }
+    raise ValueError("features.json does not contain a constriction feature.")
+
+
+def _grid_column(x: float, grid: dict[str, object]) -> int:
+    raw = int(round((x - float(grid["origin_x"])) / float(grid["dx"])))
+    return max(0, min(raw, int(grid["nx"]) - 1))
+
+
+def _grid_row(y: float, grid: dict[str, object]) -> int:
+    raw = int(round((y - float(grid["origin_y"])) / float(grid["dy"])))
+    return max(0, min(raw, int(grid["ny"]) - 1))
+
+
+def _scenario_array_path(scenario_package: Path, scenario: dict[str, Any], key: str, fallback: str) -> Path:
+    array_files = scenario.get("array_files", {})
+    if not isinstance(array_files, dict):
+        array_files = {}
+    value = array_files.get(key, fallback)
+    if not isinstance(value, str):
+        value = fallback
+    return _resolve_path(value, scenario_package)
+
+
+def _final_frame_path(manifest: dict[str, Any], manifest_dir: Path) -> Path:
+    frames = manifest.get("frames", [])
+    if not isinstance(frames, list) or not frames:
+        raise ValueError("solver manifest must include at least one frame.")
+    frame = frames[-1]
+    if not isinstance(frame, str):
+        raise ValueError("solver manifest frame entries must be strings.")
+    return _resolve_path(frame, manifest_dir)
+
+
+def _load_npz_water_state(path: Path, *, h_key: str) -> dict[str, np.ndarray]:
+    with np.load(path) as data:
+        h = np.asarray(data[h_key], dtype=float)
+        u = np.asarray(data["u"], dtype=float) if "u" in data else np.zeros_like(h)
+        v = np.asarray(data["v"], dtype=float) if "v" in data else np.zeros_like(h)
+        froude = np.asarray(data["froude"], dtype=float) if "froude" in data else _froude_array(h, u, v)
+        wet = np.asarray(data["wet"], dtype=bool) if "wet" in data else h > 0.0
+    return {"h": h, "u": u, "v": v, "froude": froude, "wet": wet}
+
+
+def _load_cpp_water_csv(path: Path, ny: int, nx: int) -> dict[str, np.ndarray]:
+    arrays = {
+        "h": np.zeros((ny, nx), dtype=float),
+        "u": np.zeros((ny, nx), dtype=float),
+        "v": np.zeros((ny, nx), dtype=float),
+        "froude": np.zeros((ny, nx), dtype=float),
+        "wet": np.zeros((ny, nx), dtype=bool),
+    }
+    with path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        for row in reader:
+            row_index = int(row["row"])
+            column_index = int(row["col"])
+            arrays["h"][row_index, column_index] = float(row.get("h", 0.0))
+            arrays["u"][row_index, column_index] = float(row.get("u", 0.0))
+            arrays["v"][row_index, column_index] = float(row.get("v", 0.0))
+            arrays["froude"][row_index, column_index] = float(row.get("froude", 0.0))
+            arrays["wet"][row_index, column_index] = row.get("wet", "0") in {"1", "true", "True"}
+    return arrays
+
+
+def _froude_array(h: np.ndarray, u: np.ndarray, v: np.ndarray) -> np.ndarray:
+    speed = np.hypot(u, v)
+    froude = np.zeros_like(h, dtype=float)
+    safe_depth = np.where(h > 0.0, h, 0.0)
+    np.divide(speed, np.sqrt(9.81 * safe_depth), out=froude, where=safe_depth > 0.0)
+    return froude
+
+
+def _constriction_throat_profile(
+    label: str,
+    source_path: Path,
+    state: dict[str, np.ndarray],
+    grid: dict[str, object],
+    throat_column: int,
+    center_row: int,
+    wet_depth_threshold_m: float,
+) -> Milestone18ConstrictionThroatProfile:
+    h_col = state["h"][:, throat_column]
+    u_col = state["u"][:, throat_column]
+    v_col = state["v"][:, throat_column]
+    wet_mask = h_col > wet_depth_threshold_m
+    wet_count = int(np.count_nonzero(wet_mask))
+    if wet_count:
+        wet_depths = h_col[wet_mask]
+        abs_v = np.abs(v_col[wet_mask])
+        mean_wet_depth = float(np.mean(wet_depths))
+        max_abs_v = float(np.max(abs_v))
+        mean_abs_v = float(np.mean(abs_v))
+    else:
+        mean_wet_depth = 0.0
+        max_abs_v = 0.0
+        mean_abs_v = 0.0
+    return Milestone18ConstrictionThroatProfile(
+        label=label,
+        source_path=str(source_path),
+        column_index=throat_column,
+        center_row_index=center_row,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        wet_cell_count=wet_count,
+        wet_width_m=wet_count * float(grid["dy"]),
+        center_depth_m=float(state["h"][center_row, throat_column]),
+        max_depth_m=float(np.max(h_col)) if h_col.size else 0.0,
+        mean_wet_depth_m=mean_wet_depth,
+        column_mass_m3=float(np.sum(h_col) * float(grid["dx"]) * float(grid["dy"])),
+        center_downstream_velocity_mps=float(u_col[center_row]),
+        max_abs_cross_stream_velocity_mps=max_abs_v,
+        mean_abs_cross_stream_velocity_mps=mean_abs_v,
+        center_froude=float(state["froude"][center_row, throat_column]),
+    )
+
+
+def _constriction_profile_delta(
+    candidate: Milestone18ConstrictionThroatProfile,
+    reference: Milestone18ConstrictionThroatProfile,
+) -> Milestone18ConstrictionThroatDelta:
+    return Milestone18ConstrictionThroatDelta(
+        candidate_label=candidate.label,
+        reference_label=reference.label,
+        wet_width_m=candidate.wet_width_m - reference.wet_width_m,
+        center_depth_m=candidate.center_depth_m - reference.center_depth_m,
+        max_depth_m=candidate.max_depth_m - reference.max_depth_m,
+        mean_wet_depth_m=candidate.mean_wet_depth_m - reference.mean_wet_depth_m,
+        column_mass_m3=candidate.column_mass_m3 - reference.column_mass_m3,
+        center_downstream_velocity_mps=(
+            candidate.center_downstream_velocity_mps - reference.center_downstream_velocity_mps
+        ),
+        max_abs_cross_stream_velocity_mps=(
+            candidate.max_abs_cross_stream_velocity_mps - reference.max_abs_cross_stream_velocity_mps
+        ),
+        mean_abs_cross_stream_velocity_mps=(
+            candidate.mean_abs_cross_stream_velocity_mps - reference.mean_abs_cross_stream_velocity_mps
+        ),
+        center_froude=candidate.center_froude - reference.center_froude,
+    )
+
+
+def _constriction_throat_blocked_reasons(
+    cpp_minus_geoclaw: Milestone18ConstrictionThroatDelta,
+    grid: dict[str, object],
+) -> tuple[str, ...]:
+    reasons: list[str] = []
+    one_cell_width = float(grid["dy"])
+    if abs(cpp_minus_geoclaw.wet_width_m) > one_cell_width:
+        reasons.append("C++ throat wet width differs from GeoClaw by more than one lateral cell.")
+    if abs(cpp_minus_geoclaw.center_depth_m) > 0.25:
+        reasons.append("C++ throat center depth differs from GeoClaw by more than 0.25 m.")
+    if abs(cpp_minus_geoclaw.mean_wet_depth_m) > 0.25:
+        reasons.append("C++ throat mean wet depth differs from GeoClaw by more than 0.25 m.")
+    if abs(cpp_minus_geoclaw.max_abs_cross_stream_velocity_mps) > 0.5:
+        reasons.append("C++ throat cross-stream velocity envelope differs from GeoClaw by more than 0.5 m/s.")
+    if abs(cpp_minus_geoclaw.center_froude) > 0.5:
+        reasons.append("C++ throat center Froude differs from GeoClaw by more than 0.5.")
+    return tuple(reasons)
 
 
 def _pin_release_flow_case(
