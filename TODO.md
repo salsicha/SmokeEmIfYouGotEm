@@ -194,6 +194,7 @@ Conditionally superseded for live water by Milestone 14. Telemetry/replay playba
 - [x] Implement guide voice commands that map spoken instructions into deterministic crew intents: forward paddle, back paddle, left/right paddle, stop, brace, hold on, high side, rescue, and recovery commands.
 - [x] Add confidence thresholds, push-to-talk/open-mic settings, noisy-river audio tests, subtitles, accessibility fallbacks, and manual input parity for all voice commands.
 - [ ] Add a crew-overboard safety-state model: seated, at-risk, falling/ejected, swimming, rescue-targeted, rescued, re-seated/recovered, and failed-rescue.
+- [ ] Add randomly assigned passenger swimming skills at run setup, including non-swimmers who cannot self-rescue, so ejection urgency, panic, pull-in difficulty, rescue priority, and safety scoring vary by passenger.
 - [ ] Add swimmer and rescue gameplay: swimmer drift/visibility, guide and crew callouts, rescue target selection, reach/paddle grab, throw-line support where available, pull-in timing, re-seat/recovery, and failed-rescue consequences.
 - [ ] Add crew safety telemetry and scoring for ejection trigger, swimmer position, time in water, rescue method, pull-in/re-seat outcome, fatigue/trust deltas, and safety-score impact.
 - [x] Add AI-assisted crew conversation with passenger personas, trust, fear, fatigue, skill, river knowledge, and scenario state, while keeping gameplay-critical paddling under explicit command-state control.
@@ -386,6 +387,7 @@ This milestone decides whether Unreal Chaos, Jolt, Chrono, or the custom reduced
 - [x] Add import/export validation checks that reject missing CRS metadata, lossy Shapefile-only canonical inputs, missing source manifests, and untracked WGS84/local transform changes.
 - [x] Draft the first candidate river inventory and source manifest.
 - [x] Prototype course/elevation extraction for one river section.
+- [ ] Draft the Colorado River rowing/oar-rig route as the second real-world river target after the South Fork American baseline, including source manifest, flow bands, rowing-frame controls, guide review, and validation annotation needs.
 - [x] Define the first rapid-review labels and seasonal flow/difficulty parameter mapping.
 - [x] Set up the shared Chaos/Jolt runtime evaluation fixture contract for raft-rock impacts, shelf grounding, pin/release, crew ejection/swimming, determinism, and crowded runtime cost.
 - [x] Build the Milestone 18 GeoClaw/C++ failure triage matrix from the current threshold, geometry, raft-coupling, and full-gate reports.

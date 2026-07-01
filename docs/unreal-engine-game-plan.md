@@ -70,6 +70,7 @@ Jolt is the leading specialized candidate for a portable authoritative raft/cont
 - Local AI voice interaction so the guide can speak paddle, brace, high-side, rescue, and recovery commands.
 - Crew members can talk, acknowledge commands, react to hazards, and hold conversations shaped by passenger persona, trust, fear, fatigue, skill, weather, river history, and recent run events.
 - Crew safety has explicit gameplay states: seated, at-risk, falling/ejected, swimming, rescue-targeted, rescued, re-seated/recovered, and lost/failed-rescue for scoring and training.
+- Passenger swimming ability is assigned per run or roster entry, from strong swimmer through weak swimmer to completely unable to swim; this affects panic, self-rescue, drift risk, throw-line urgency, pull-in difficulty, and safety scoring after ejection.
 - Fully immersive 3D audio where rapids, hydraulics, rocks, raft contacts, crew, rescue cues, voice chat, weather, and canyon reflections occupy stable world positions from the guide's stern seat.
 - Realistic but teachable white water behavior.
 - Data-backed river, section, season, flow level, difficulty, and raft/crew selection.
@@ -90,6 +91,7 @@ Jolt is the leading specialized candidate for a portable authoritative raft/cont
 - Co-op crew.
 - Leaderboards and challenge ghosts.
 - Scenario packs based on different river types.
+- Second real-world route target: rowing the Colorado River with an oar rig/rowing frame after the South Fork American paddle-raft baseline is proven.
 
 ## Production Milestones
 
@@ -202,6 +204,7 @@ Tasks:
 - Add local voice-command path for the same passenger responses, with deterministic command execution after intent recognition.
 - Add crew acknowledgments, missed-command behavior, hesitation, and urgency barks based on command confidence and passenger state.
 - Add safety outcomes and state transitions: fall out/ejection, swim, swimmer drift, rescue target, pull-in, re-seat/recovery, failed rescue, pin, surf, flip, flush.
+- Assign passenger swimming skills at run setup, including non-swimmers who cannot self-rescue and require faster guide/crew intervention.
 - Add rescue gameplay for guide and crew actions: spotting, approach line, reach/paddle grab, throw rope when available, timing window, pull-in duration, and post-rescue recovery/fatigue.
 - Add scoring for safety, line, boat angle, paddle efficiency, passenger trust, and completion.
 - Add restart, replay, ghost telemetry, and after-action feedback.
@@ -237,6 +240,7 @@ Tasks:
 
 - Build additional river biomes.
 - Build additional real-world river sections from source manifests and reviewed rapid annotations.
+- Prioritize the Colorado River rowing/oar-rig route as the second real-world river after the South Fork American baseline, with rowing-frame controls, large-volume reading, canyon pacing, and longer rescue/recovery stakes.
 - Add difficulty progression.
 - Add more raft types and handling profiles.
 - Add passenger archetypes and crew trust progression.
