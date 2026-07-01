@@ -20,6 +20,9 @@ from raftsim.examples.generate_milestone18_constriction_face_state_width_depth_r
 from raftsim.examples.generate_milestone18_constriction_hydrostatic_source_decision_report import (
     main as generate_constriction_hydrostatic_source_decision_main,
 )
+from raftsim.examples.generate_milestone18_constriction_upstream_edge_balance_report import (
+    main as generate_constriction_upstream_edge_balance_main,
+)
 from raftsim.examples.generate_milestone18_constriction_probe_cross_section_report import (
     main as generate_constriction_probe_cross_section_main,
 )
@@ -53,6 +56,7 @@ from raftsim.milestone18 import (
     MILESTONE18_CONSTRICTION_RESPONSE_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA,
+    MILESTONE18_CONSTRICTION_UPSTREAM_EDGE_BALANCE_REPORT_SCHEMA,
     MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA,
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
     MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
@@ -67,6 +71,7 @@ from raftsim.milestone18 import (
     build_milestone18_constriction_response_timing_report,
     build_milestone18_constriction_shape_timing_report,
     build_milestone18_constriction_throat_shape_report,
+    build_milestone18_constriction_upstream_edge_balance_report,
     build_milestone18_drop_ledge_hydraulic_control_report,
     build_milestone18_failure_triage_matrix,
     build_milestone18_parity_family_retune_report,
@@ -1028,6 +1033,66 @@ def test_generate_milestone18_constriction_face_state_width_depth_cli_writes_rep
     assert payload["schema_version"] == MILESTONE18_CONSTRICTION_FACE_STATE_WIDTH_DEPTH_REPORT_SCHEMA
     assert payload["decision"] == "BLOCKED"
     assert "Face-State Width/Depth Diagnostic" in output_md.read_text(encoding="utf-8")
+
+
+def test_milestone18_constriction_upstream_edge_balance_joins_focused_reports(tmp_path):
+    dual_manifest = _constriction_lateral_face_flux_inputs(tmp_path)
+    face_state_report = build_milestone18_constriction_face_state_width_depth_report(dual_manifest)
+    face_state_json = face_state_report.write_json(
+        tmp_path / "reports" / "milestone18" / "constriction_face_state_width_depth.json"
+    )
+    face_source_report = build_milestone18_constriction_face_source_audit_report(dual_manifest, top_n=8)
+    face_source_json = face_source_report.write_json(
+        tmp_path / "reports" / "milestone18" / "constriction_face_source_audit.json"
+    )
+
+    report = build_milestone18_constriction_upstream_edge_balance_report(face_state_json, face_source_json)
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_UPSTREAM_EDGE_BALANCE_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert payload["summary"]["target_sample_count"] >= 1
+    assert payload["summary"]["source_balance_blocker_count"] >= 1
+    assert payload["summary"]["paired_edge_opposition_mismatch_count"] >= 1
+    primary = payload["summary"]["primary_target"]
+    assert primary["face_role"] == "lower_edge_face"
+    assert primary["native_post_left_flux_h_m3ps"] == -0.1
+    assert primary["recommended_solver_lever"] in {
+        "upstream_edge_y_face_flux_source_balance",
+        "upstream_edge_width_depth_flux_balance",
+    }
+    assert "feature forcing off" in " ".join(payload["next_levers"])
+
+
+def test_generate_milestone18_constriction_upstream_edge_balance_cli_writes_reports(tmp_path):
+    dual_manifest = _constriction_lateral_face_flux_inputs(tmp_path)
+    face_state_json = build_milestone18_constriction_face_state_width_depth_report(dual_manifest).write_json(
+        tmp_path / "reports" / "milestone18" / "constriction_face_state_width_depth.json"
+    )
+    face_source_json = build_milestone18_constriction_face_source_audit_report(dual_manifest, top_n=8).write_json(
+        tmp_path / "reports" / "milestone18" / "constriction_face_source_audit.json"
+    )
+    output_json = tmp_path / "reports" / "milestone18" / "constriction_upstream_edge_balance.json"
+    output_md = tmp_path / "reports" / "milestone18" / "constriction_upstream_edge_balance.md"
+
+    exit_code = generate_constriction_upstream_edge_balance_main(
+        [
+            "--face-state-width-depth-report",
+            str(face_state_json),
+            "--face-source-audit-report",
+            str(face_source_json),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_UPSTREAM_EDGE_BALANCE_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert "Constriction Upstream Edge Balance Diagnostic" in output_md.read_text(encoding="utf-8")
 
 
 def test_milestone18_constriction_hydrostatic_source_decision_records_next_experiment(tmp_path):

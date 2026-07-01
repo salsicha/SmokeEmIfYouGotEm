@@ -5,7 +5,7 @@ Schema: `raftsim.milestone18.remaining_geometry_closure.v0`
 Decision: **BLOCKED**
 
 Geometry report: `reports/milestone16/geometry_validation.json`
-Focused reports: `reports/milestone18/constriction_y_face_state_reconstruction_face_state_width_depth_diagnostic.json, reports/milestone18/constriction_y_face_state_reconstruction_face_source_audit_diagnostic.json, reports/milestone18/constriction_y_face_state_reconstruction_retune.json, reports/milestone18/constriction_hydrostatic_source_decision.json, reports/milestone18/drop_ledge_hydraulic_control_diagnostic.json`
+Focused reports: `reports/milestone18/constriction_upstream_edge_balance_diagnostic.json, reports/milestone18/constriction_y_face_state_reconstruction_face_state_width_depth_diagnostic.json, reports/milestone18/constriction_y_face_state_reconstruction_face_source_audit_diagnostic.json, reports/milestone18/constriction_y_face_state_reconstruction_retune.json, reports/milestone18/constriction_hydrostatic_source_decision.json, reports/milestone18/drop_ledge_hydraulic_control_diagnostic.json`
 
 ## Summary
 
@@ -17,7 +17,7 @@ Focused reports: `reports/milestone18/constriction_y_face_state_reconstruction_f
 
 | Priority | Case | Status | Failing checks | Focused evidence | Next lever |
 | ---: | --- | --- | --- | --- | --- |
-| 1 | `constriction` | BLOCKED | cross_section_linf=2, energy_change_delta=1, feature_location_delta=2, feature_strength_delta=2, field_linf=2, froude_delta=2, mass_drift_delta=1, probe_linf=2, slope_linf=2, wet_mismatch_fraction=1 | reports/milestone18/constriction_y_face_state_reconstruction_face_state_width_depth_diagnostic.json, reports/milestone18/constriction_y_face_state_reconstruction_face_source_audit_diagnostic.json, reports/milestone18/constriction_y_face_state_reconstruction_retune.json, reports/milestone18/constriction_hydrostatic_source_decision.json | Start with `upper_edge_face` column 1 rows 8-9; q delta is 2.31188 m3/s, face mean-depth delta is 0.462006 m, wet-width delta is -1 cells, and max bank-row delta is 1 cells. |
+| 1 | `constriction` | BLOCKED | cross_section_linf=2, energy_change_delta=1, feature_location_delta=2, feature_strength_delta=2, field_linf=2, froude_delta=2, mass_drift_delta=1, probe_linf=2, slope_linf=2, wet_mismatch_fraction=1 | reports/milestone18/constriction_upstream_edge_balance_diagnostic.json, reports/milestone18/constriction_y_face_state_reconstruction_face_state_width_depth_diagnostic.json, reports/milestone18/constriction_y_face_state_reconstruction_face_source_audit_diagnostic.json, reports/milestone18/constriction_y_face_state_reconstruction_retune.json, reports/milestone18/constriction_hydrostatic_source_decision.json | Start with `lower_edge_face` column 0 rows 1-2; q delta is -2.03004 m3/s, balance delta is -15.4598 m3/s2, native post-source delta is -2.57234 m3/s, wet-width delta is -2 cells, and bank-row delta is 1 cells. |
 | 2 | `drops_ledges_tailwater` | BLOCKED | cross_section_linf=7, energy_change_delta=7, feature_location_delta=6, feature_strength_delta=6, field_linf=8, froude_delta=8, mass_drift_delta=4, probe_linf=8, slope_linf=8, wet_mismatch_fraction=3 | reports/milestone18/drop_ledge_hydraulic_control_diagnostic.json | Start with `field`/`u` at `final` cell 0,10; it is 3.32137x the diagnostic threshold. |
 | 3 | `stitched_reach_drop_handoffs` | PASS | none | none | Preserve this geometry family as a guardrail while retuning active blockers. |
 | 10 | `wet_dry_shoreline` | PASS | none | none | Preserve this geometry family as a guardrail while retuning active blockers. |
@@ -34,6 +34,11 @@ Focused reports: `reports/milestone18/constriction_y_face_state_reconstruction_f
 - Threshold failures remain in: constriction.
 
 Next levers:
+- Start with `lower_edge_face` column 0 rows 1-2; q delta is -2.03004 m3/s, balance delta is -15.4598 m3/s2, native post-source delta is -2.57234 m3/s, wet-width delta is -2 cells, and bank-row delta is 1 cells.
+- Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.
+- Retune y-face flux/source balance at the same face after the geometry support is corrected, not as a standalone source-strength increase.
+- Preserve GeoClaw's lower-positive/upper-negative edge opposition across upstream wet-band columns.
+- Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change.
 - Start with `upper_edge_face` column 1 rows 8-9; q delta is 2.31188 m3/s, face mean-depth delta is 0.462006 m, wet-width delta is -1 cells, and max bank-row delta is 1 cells.
 - Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.
 - Use the authored initial -> GeoClaw final -> C++ final column profiles to retune constriction width/depth mapping before accepting any face-state change.
