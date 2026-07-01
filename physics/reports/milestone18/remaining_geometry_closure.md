@@ -40,6 +40,8 @@ Next levers:
 - Start with `upper_edge_face` column 6 rows 8-9; reconstructed q delta is 2.72825 m3/s and balance delta is 8.87381 m3/s2.
 - Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.
 - Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.
+- Use the exported C++ internal audit at `upper_edge_face` column 6 rows 8-9; post-source q delta is 2.6134 m3/s.
+- Decide whether constriction y-faces need hydrostatic reconstruction/source splitting instead of relying on cell-centered bed-slope source terms.
 - Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible.
 - Close constriction field, slope, probe, cross-section, and wet-mask parity before treating raft coupling as actionable.
 - Preserve or restore conservation and energy checks before accepting any visual/gameplay forcing.

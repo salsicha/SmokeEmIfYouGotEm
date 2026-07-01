@@ -2071,6 +2071,7 @@ class Milestone18ConstrictionFaceSourceAuditReport:
     zones: dict[str, tuple[int, ...]]
     samples: tuple[Milestone18ConstrictionFaceSourceAuditSample, ...]
     edge_pair_summary: tuple[dict[str, object], ...]
+    cpp_internal_audit: tuple[dict[str, object], ...]
     blocked_reasons: tuple[str, ...]
     next_levers: tuple[str, ...]
 
@@ -2131,9 +2132,27 @@ class Milestone18ConstrictionFaceSourceAuditReport:
                 "opposition_mismatch_count": sum(
                     1 for pair in self.edge_pair_summary if not pair.get("matches_reference_opposition", True)
                 ),
+                "cpp_internal_audit_sample_count": len(self.cpp_internal_audit),
+                "cpp_internal_source_applied_count": sum(
+                    1 for sample in self.cpp_internal_audit if bool(sample.get("constriction_face_source_applied"))
+                ),
+                "cpp_internal_hydrostatic_face_source_enabled_count": sum(
+                    1 for sample in self.cpp_internal_audit if bool(sample.get("hydrostatic_face_source_enabled"))
+                ),
+                "cpp_internal_post_source_sign_mismatch_count": sum(
+                    1 for sample in self.cpp_internal_audit if not bool(sample.get("post_left_sign_matches", True))
+                ),
+                "cpp_internal_max_abs_post_source_delta_m3ps": max(
+                    (
+                        abs(float(sample.get("post_left_flux_delta_m3ps", 0.0)))
+                        for sample in self.cpp_internal_audit
+                    ),
+                    default=0.0,
+                ),
                 "worst_samples": [sample.to_json_dict() for sample in self._worst_samples()],
             },
             "edge_pair_summary": list(self.edge_pair_summary),
+            "cpp_internal_audit": list(self.cpp_internal_audit),
             "samples": [sample.to_json_dict() for sample in self.samples],
             "blocked_reasons": list(self.blocked_reasons),
             "next_levers": list(self.next_levers),
@@ -2172,6 +2191,8 @@ class Milestone18ConstrictionFaceSourceAuditReport:
             f"- Opposition mismatch count: `{summary['opposition_mismatch_count']}`",
             f"- Max abs lateral volume-flux delta: `{_format_number(_float_or_none(summary['max_abs_volume_flux_delta_m3ps']))}` m3/s",
             f"- Max abs flux/source balance delta: `{_format_number(_float_or_none(summary['max_abs_balance_delta_m3ps2']))}` m3/s2",
+            f"- C++ internal audit samples: `{summary['cpp_internal_audit_sample_count']}`",
+            f"- C++ internal post-source sign mismatches: `{summary['cpp_internal_post_source_sign_mismatch_count']}`",
             "",
             "## Worst Face/Source Samples",
             "",
@@ -2180,6 +2201,18 @@ class Milestone18ConstrictionFaceSourceAuditReport:
         ]
         for sample in self._worst_samples():
             lines.append(_face_source_audit_sample_row(sample))
+        if self.cpp_internal_audit:
+            lines.extend(
+                [
+                    "",
+                    "## C++ Internal Y-Face Audit",
+                    "",
+                    "| Face | Column | Rows | GeoClaw q/sign | C++ base q | C++ post-source q/sign | Delta | Source Applied | Hydro Face Source | Cell bed-source S/N |",
+                    "| --- | ---: | --- | --- | ---: | --- | ---: | --- | --- | --- |",
+                ]
+            )
+            for sample in self.cpp_internal_audit[:12]:
+                lines.append(_cpp_internal_face_audit_row(sample))
         lines.extend(
             [
                 "",
@@ -3046,6 +3079,13 @@ def build_milestone18_constriction_face_source_audit_report(
     cpp_frame_path = _final_frame_path(cpp_manifest, cpp_manifest_path.parent)
     geoclaw_state = _load_water_frame_fields(geoclaw_frame_path, ny, nx)
     cpp_state = _load_water_frame_fields(cpp_frame_path, ny, nx)
+    cpp_internal_audit = _load_cpp_constriction_y_face_audit(
+        cpp_manifest,
+        cpp_manifest_path.parent,
+        geoclaw_state,
+        grid,
+        velocity_sign_floor_mps,
+    )
 
     samples = _constriction_upstream_face_source_audit_samples(
         initial_state,
@@ -3072,8 +3112,8 @@ def build_milestone18_constriction_face_source_audit_report(
             reverse=True,
         )[:top_n]
     )
-    blocked_reasons = _face_source_audit_blocked_reasons(sorted_samples, edge_pair_summary)
-    next_levers = _face_source_audit_next_levers(sorted_samples, edge_pair_summary)
+    blocked_reasons = _face_source_audit_blocked_reasons(sorted_samples, edge_pair_summary, cpp_internal_audit)
+    next_levers = _face_source_audit_next_levers(sorted_samples, edge_pair_summary, cpp_internal_audit)
     return Milestone18ConstrictionFaceSourceAuditReport(
         dual_solver_manifest=str(manifest_path),
         scenario_package=str(scenario_package),
@@ -3091,6 +3131,7 @@ def build_milestone18_constriction_face_source_audit_report(
         zones=zones,
         samples=sorted_samples,
         edge_pair_summary=edge_pair_summary,
+        cpp_internal_audit=cpp_internal_audit,
         blocked_reasons=blocked_reasons,
         next_levers=next_levers,
     )
@@ -6300,6 +6341,7 @@ def _constriction_face_source_edge_pair_summary(
 def _face_source_audit_blocked_reasons(
     samples: tuple[Milestone18ConstrictionFaceSourceAuditSample, ...],
     edge_pair_summary: tuple[dict[str, object], ...],
+    cpp_internal_audit: tuple[dict[str, object], ...] = (),
 ) -> tuple[str, ...]:
     reasons: list[str] = []
     if any(not sample.volume_sign_matches for sample in samples):
@@ -6312,12 +6354,17 @@ def _face_source_audit_blocked_reasons(
         reasons.append("C++ reconstructed normal momentum plus bed-source balance deltas exceed the diagnostic threshold.")
     if any(not pair.get("matches_reference_opposition", True) for pair in edge_pair_summary):
         reasons.append("GeoClaw has opposite-signed lower/upper upstream edge fluxes that C++ still does not reproduce.")
+    if any(not bool(sample.get("post_left_sign_matches", True)) for sample in cpp_internal_audit):
+        reasons.append("C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow.")
+    if cpp_internal_audit and not any(bool(sample.get("hydrostatic_face_source_enabled")) for sample in cpp_internal_audit):
+        reasons.append("C++ internal audit records hydrostatic y-face source terms as disabled for constriction faces.")
     return tuple(reasons)
 
 
 def _face_source_audit_next_levers(
     samples: tuple[Milestone18ConstrictionFaceSourceAuditSample, ...],
     edge_pair_summary: tuple[dict[str, object], ...],
+    cpp_internal_audit: tuple[dict[str, object], ...] = (),
 ) -> tuple[str, ...]:
     if not samples:
         return ()
@@ -6341,11 +6388,146 @@ def _face_source_audit_next_levers(
         "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
         "Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.",
     ]
+    if cpp_internal_audit:
+        matching_internal = [
+            sample
+            for sample in cpp_internal_audit
+            if sample.get("face_role") == worst.face_role
+            and sample.get("column_index") == worst.column_index
+            and sample.get("south_row_index") == worst.south_row_index
+            and sample.get("north_row_index") == worst.north_row_index
+        ]
+        worst_internal = sorted(
+            matching_internal or list(cpp_internal_audit),
+            key=lambda sample: (
+                not bool(sample.get("post_left_sign_matches", True)),
+                abs(float(sample.get("post_left_flux_delta_m3ps", 0.0))),
+            ),
+            reverse=True,
+        )[0]
+        levers.append(
+            "Use the exported C++ internal audit at "
+            f"`{worst_internal.get('face_role')}` column {worst_internal.get('column_index')} rows "
+            f"{worst_internal.get('south_row_index')}-{worst_internal.get('north_row_index')}; post-source q delta is "
+            f"{_format_number(_float_or_none(worst_internal.get('post_left_flux_delta_m3ps')))} m3/s."
+        )
+        if not any(bool(sample.get("hydrostatic_face_source_enabled")) for sample in cpp_internal_audit):
+            levers.append(
+                "Decide whether constriction y-faces need hydrostatic reconstruction/source splitting instead of relying on cell-centered bed-slope source terms."
+            )
     if any(not pair.get("matches_reference_opposition", True) for pair in edge_pair_summary):
         levers.append(
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
         )
     return tuple(levers)
+
+
+def _load_cpp_constriction_y_face_audit(
+    cpp_manifest: dict[str, Any],
+    manifest_dir: Path,
+    reference_state: dict[str, np.ndarray],
+    grid: dict[str, object],
+    velocity_sign_floor_mps: float,
+) -> tuple[dict[str, object], ...]:
+    audit_path = _cpp_constriction_y_face_audit_path(cpp_manifest, manifest_dir)
+    if audit_path is None or not audit_path.exists():
+        return ()
+    records: list[dict[str, object]] = []
+    face_width_m = float(grid["dx"])
+    with audit_path.open(newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            face_role = str(row.get("face_role", ""))
+            col = _int_from_csv(row, "column_index")
+            south_row = _int_from_csv(row, "south_row_index")
+            north_row = _int_from_csv(row, "north_row_index")
+            if col is None or south_row is None or north_row is None:
+                continue
+            if not (0 <= south_row < reference_state["h"].shape[0] and 0 <= north_row < reference_state["h"].shape[0]):
+                continue
+            if not (0 <= col < reference_state["h"].shape[1]):
+                continue
+            reference_mean_h = 0.5 * (
+                float(reference_state["h"][south_row, col]) + float(reference_state["h"][north_row, col])
+            )
+            reference_mean_v = 0.5 * (
+                float(reference_state["v"][south_row, col]) + float(reference_state["v"][north_row, col])
+            )
+            reference_flux = reference_mean_h * reference_mean_v * face_width_m
+            post_left_flux = _float_from_csv(row, "post_left_flux_h_m3ps")
+            base_flux = _float_from_csv(row, "base_flux_h_m3ps")
+            reference_sign = _velocity_sign(reference_mean_v, velocity_sign_floor_mps)
+            post_sign = _velocity_sign(post_left_flux, velocity_sign_floor_mps * face_width_m)
+            records.append(
+                {
+                    "source_report": str(audit_path),
+                    "face_role": face_role,
+                    "column_index": col,
+                    "south_row_index": south_row,
+                    "north_row_index": north_row,
+                    "time_s": _float_from_csv(row, "time_s"),
+                    "reference_volume_flux_m3ps": reference_flux,
+                    "reference_sign": reference_sign,
+                    "base_flux_h_m3ps": base_flux,
+                    "post_left_flux_h_m3ps": post_left_flux,
+                    "post_left_flux_delta_m3ps": post_left_flux - reference_flux,
+                    "post_left_sign": post_sign,
+                    "post_left_sign_matches": reference_sign == 0 or post_sign == reference_sign,
+                    "hydro_left_source_hv_m3ps2": _float_from_csv(row, "hydro_left_source_hv_m3ps2"),
+                    "hydro_right_source_hv_m3ps2": _float_from_csv(row, "hydro_right_source_hv_m3ps2"),
+                    "constriction_left_source_h_m3ps": _float_from_csv(row, "constriction_left_source_h_m3ps"),
+                    "constriction_right_source_h_m3ps": _float_from_csv(row, "constriction_right_source_h_m3ps"),
+                    "south_cell_bed_slope_source_hv_per_s": _float_from_csv(
+                        row, "south_cell_bed_slope_source_hv_per_s"
+                    ),
+                    "north_cell_bed_slope_source_hv_per_s": _float_from_csv(
+                        row, "north_cell_bed_slope_source_hv_per_s"
+                    ),
+                    "hydrostatic_face_source_enabled": _bool_from_csv(row, "hydrostatic_face_source_enabled"),
+                    "constriction_face_source_applied": _bool_from_csv(row, "constriction_face_source_applied"),
+                }
+            )
+    return tuple(
+        sorted(
+            records,
+            key=lambda sample: (
+                not bool(sample.get("post_left_sign_matches", True)),
+                abs(float(sample.get("post_left_flux_delta_m3ps", 0.0))),
+            ),
+            reverse=True,
+        )
+    )
+
+
+def _cpp_constriction_y_face_audit_path(cpp_manifest: dict[str, Any], manifest_dir: Path) -> Path | None:
+    audit = cpp_manifest.get("constriction_y_face_flux_source_audit")
+    if isinstance(audit, dict):
+        path = audit.get("path")
+        if isinstance(path, str) and path:
+            return _resolve_path(path, manifest_dir)
+    diagnostics = cpp_manifest.get("diagnostics", [])
+    if isinstance(diagnostics, list):
+        for item in diagnostics:
+            if isinstance(item, str) and "constriction_y_face_flux_source_audit" in item:
+                return _resolve_path(item, manifest_dir)
+    return None
+
+
+def _float_from_csv(row: dict[str, str], key: str) -> float:
+    try:
+        return float(row.get(key, "0") or 0.0)
+    except ValueError:
+        return 0.0
+
+
+def _int_from_csv(row: dict[str, str], key: str) -> int | None:
+    try:
+        return int(row.get(key, ""))
+    except ValueError:
+        return None
+
+
+def _bool_from_csv(row: dict[str, str], key: str) -> bool:
+    return str(row.get(key, "")).strip().lower() in {"1", "true", "yes"}
 
 
 def _threshold_ratio(value: float, threshold: float) -> float:
@@ -6553,6 +6735,35 @@ def _face_source_audit_pair_row(pair: dict[str, object]) -> str:
         f"`{bool(pair.get('reference_opposed_edges'))}` | "
         f"`{bool(pair.get('candidate_opposed_edges'))}` | "
         f"`{bool(pair.get('matches_reference_opposition'))}` |"
+    )
+
+
+def _cpp_internal_face_audit_row(sample: dict[str, object]) -> str:
+    rows = f"{sample.get('south_row_index')}-{sample.get('north_row_index')}"
+    reference = (
+        f"{_format_number(_float_or_none(sample.get('reference_volume_flux_m3ps')))}/"
+        f"{sample.get('reference_sign')}"
+    )
+    post = (
+        f"{_format_number(_float_or_none(sample.get('post_left_flux_h_m3ps')))}/"
+        f"{sample.get('post_left_sign')}"
+    )
+    cell_sources = (
+        f"{_format_number(_float_or_none(sample.get('south_cell_bed_slope_source_hv_per_s')))}/"
+        f"{_format_number(_float_or_none(sample.get('north_cell_bed_slope_source_hv_per_s')))}"
+    )
+    return (
+        "| "
+        f"`{sample.get('face_role')}` | "
+        f"{sample.get('column_index')} | "
+        f"`{rows}` | "
+        f"`{reference}` | "
+        f"{_format_number(_float_or_none(sample.get('base_flux_h_m3ps')))} | "
+        f"`{post}` | "
+        f"{_format_number(_float_or_none(sample.get('post_left_flux_delta_m3ps')))} | "
+        f"`{bool(sample.get('constriction_face_source_applied'))}` | "
+        f"`{bool(sample.get('hydrostatic_face_source_enabled'))}` | "
+        f"`{cell_sources}` |"
     )
 
 

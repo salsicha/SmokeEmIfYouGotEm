@@ -20,6 +20,8 @@ Balance delta threshold: `0.75` m3/s2
 - Opposition mismatch count: `10`
 - Max abs lateral volume-flux delta: `2.72825` m3/s
 - Max abs flux/source balance delta: `15.4484` m3/s2
+- C++ internal audit samples: `96`
+- C++ internal post-source sign mismatches: `65`
 
 ## Worst Face/Source Samples
 
@@ -37,6 +39,23 @@ Balance delta threshold: `0.75` m3/s2
 | `upper_edge_face` | 3 | `8-9` | 3 | 3 | 0 | `1.08534/2.51154/-1.26068/-1.36827` | `1.67751/1.97168/0.134209/0.225138` | 1.59341 | `-1->1` | `6.33018/0/6.33018` | `6.37365/8.44023` |
 | `lower_edge_face` | 2 | `1-2` | 2 | -4 | -2 | `1.01111/2.71386/1.30241/1.31687` | `0.90901/1.95071/-0.010121/-0.00920011` | -1.32607 | `1->0` | `-2.67658/-2.00314/-4.67971` | `5.30429/6.23962` |
 | `upper_edge_face` | 1 | `8-9` | 1 | 3 | 0 | `1.03834/2.53794/-2.21375/-2.29862` | `1.50071/1.80208/-0.0280077/-0.0420315` | 2.25659 | `-1->-1` | `0.671012/0/0.671012` | `9.02635/0.894683` |
+
+## C++ Internal Y-Face Audit
+
+| Face | Column | Rows | GeoClaw q/sign | C++ base q | C++ post-source q/sign | Delta | Source Applied | Hydro Face Source | Cell bed-source S/N |
+| --- | ---: | --- | --- | ---: | --- | ---: | --- | --- | --- |
+| `upper_outer_face` | 7 | `8-9` | `-1.31978/-1` | 3.73632 | `3.73632/1` | 5.0561 | `False` | `False` | `-15.3554/-1.61865` |
+| `upper_outer_face` | 8 | `8-9` | `-1.14709/-1` | 3.24573 | `3.24573/1` | 4.39283 | `False` | `False` | `-14.5454/-1.61865` |
+| `lower_edge_face` | 8 | `2-3` | `0.0743101/1` | -4.01148 | `-4.01148/-1` | -4.08579 | `False` | `False` | `0/14.5454` |
+| `lower_inner_source_face` | 15 | `3-4` | `1.15902/1` | -2.71479 | `-2.71479/-1` | -3.8738 | `False` | `False` | `0.00590561/-0` |
+| `lower_edge_face` | 1 | `1-2` | `1.97499/1` | -1.84968 | `-1.84968/-1` | -3.82467 | `False` | `False` | `1.61865/10.9867` |
+| `lower_edge_face` | 5 | `1-2` | `1.46296/1` | -2.34549 | `-2.34549/-1` | -3.80845 | `False` | `False` | `1.32435/14.0331` |
+| `upper_outer_face` | 6 | `9-10` | `-0.484427/-1` | 3.24222 | `3.24222/1` | 3.72665 | `False` | `False` | `-13.7891/-1.61865` |
+| `lower_edge_face` | 9 | `2-3` | `0.0615163/1` | -3.62258 | `-3.62258/-1` | -3.68409 | `False` | `False` | `0/13.3282` |
+| `lower_edge_face` | 0 | `1-2` | `2.04571/1` | -1.59005 | `-1.59005/-1` | -3.63576 | `False` | `False` | `1.61865/10.0214` |
+| `upper_outer_face` | 9 | `8-9` | `-0.837723/-1` | 2.71298 | `2.71298/1` | 3.5507 | `False` | `False` | `-13.3282/-1.61865` |
+| `upper_outer_face` | 5 | `9-10` | `-0.436978/-1` | 3.10148 | `3.10148/1` | 3.53846 | `False` | `False` | `-13.7596/-1.61865` |
+| `lower_edge_face` | 2 | `1-2` | `1.31687/1` | -2.06439 | `-2.06439/-1` | -3.38127 | `False` | `False` | `1.61865/11.7574` |
 
 ## Edge Pair Summary
 
@@ -60,10 +79,14 @@ Balance delta threshold: `0.75` m3/s2
 - C++ reconstructed upstream lateral volume-flux deltas exceed the diagnostic threshold.
 - C++ reconstructed normal momentum plus bed-source balance deltas exceed the diagnostic threshold.
 - GeoClaw has opposite-signed lower/upper upstream edge fluxes that C++ still does not reproduce.
+- C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow.
+- C++ internal audit records hydrostatic y-face source terms as disabled for constriction faces.
 
 ## Next Levers
 
 - Start with `upper_edge_face` column 6 rows 8-9; reconstructed q delta is 2.72825 m3/s and balance delta is 8.87381 m3/s2.
 - Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.
 - Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.
+- Use the exported C++ internal audit at `upper_edge_face` column 6 rows 8-9; post-source q delta is 2.6134 m3/s.
+- Decide whether constriction y-faces need hydrostatic reconstruction/source splitting instead of relying on cell-centered bed-slope source terms.
 - Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible.
