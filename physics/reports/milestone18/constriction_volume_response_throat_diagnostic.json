@@ -1,0 +1,127 @@
+{
+  "blocked_reasons": [],
+  "center_row_index": 6,
+  "decision": "PASS",
+  "deltas": {
+    "authored_initial_minus_geoclaw": {
+      "candidate_label": "authored_initial",
+      "center_depth_m": 0.0016095638275146484,
+      "center_downstream_velocity_mps": -0.28165805855649495,
+      "center_froude": -0.08143158854104937,
+      "column_mass_m3": 0.13266433450917248,
+      "max_abs_cross_stream_velocity_mps": -1.1805450378071505,
+      "max_depth_m": -0.22238373756408691,
+      "mean_abs_cross_stream_velocity_mps": -0.40589057117372623,
+      "mean_wet_depth_m": 0.12454017251729965,
+      "reference_label": "geoclaw_final",
+      "wet_width_m": 0.0
+    },
+    "cpp_minus_geoclaw": {
+      "candidate_label": "cpp_final",
+      "center_depth_m": 0.22356662826211138,
+      "center_downstream_velocity_mps": -0.28165805855649495,
+      "center_froude": -0.1450955986798298,
+      "column_mass_m3": 0.2155286854432612,
+      "max_abs_cross_stream_velocity_mps": 0.3660214112335898,
+      "max_depth_m": -0.0004266731294901849,
+      "mean_abs_cross_stream_velocity_mps": 0.42489337577915126,
+      "mean_wet_depth_m": 0.14525626025082206,
+      "reference_label": "geoclaw_final",
+      "wet_width_m": 0.0
+    }
+  },
+  "dual_solver_manifest": "outputs/m18cmp/c_constrict_volume_response/finite_volume_roe/dual_solver_manifest.json",
+  "feature": {
+    "angle_rad": 0.0,
+    "center_x": 11.5,
+    "center_y": 0.0,
+    "kind": "constriction",
+    "length_m": 8.64,
+    "metadata": {
+      "fixture_role": "dry_bank_throat"
+    },
+    "radius_m": 2.0,
+    "strength": 2.060119640661019,
+    "width_m": 4.0
+  },
+  "grid": {
+    "dx": 1.0,
+    "dy": 1.0,
+    "nx": 24,
+    "ny": 12,
+    "origin_x": 0.0,
+    "origin_y": -5.5
+  },
+  "next_levers": [
+    "Fit constriction throat width/depth mapping from GeoClaw profile evidence before adding feature forcing.",
+    "Add a geometry-aware throat reconstruction that preserves mass while matching wet width and centerline depth.",
+    "Rerun the corrected-reference constriction GeoClaw/C++ comparison and Milestone 17 guardrail after changes."
+  ],
+  "passed": true,
+  "profiles": [
+    {
+      "center_depth_m": 1.25,
+      "center_downstream_velocity_mps": 2.8841674969254267,
+      "center_froude": 0.8236277451709472,
+      "center_row_index": 6,
+      "column_index": 12,
+      "column_mass_m3": 5.0,
+      "label": "authored_initial",
+      "max_abs_cross_stream_velocity_mps": 0.0,
+      "max_depth_m": 1.25,
+      "mean_abs_cross_stream_velocity_mps": 0.0,
+      "mean_wet_depth_m": 1.25,
+      "source_path": "outputs/m18cmp/c_constrict_volume_response/finite_volume_roe/scenario/constriction_seed_16/initial_state.npz",
+      "wet_cell_count": 4,
+      "wet_depth_threshold_m": 0.15,
+      "wet_width_m": 4.0
+    },
+    {
+      "center_depth_m": 1.2483904361724854,
+      "center_downstream_velocity_mps": 3.1658255554819217,
+      "center_froude": 0.9050593337119965,
+      "center_row_index": 6,
+      "column_index": 12,
+      "column_mass_m3": 4.8673356654908275,
+      "label": "geoclaw_final",
+      "max_abs_cross_stream_velocity_mps": 1.1805450378071505,
+      "max_depth_m": 1.472383737564087,
+      "mean_abs_cross_stream_velocity_mps": 0.40589057117372623,
+      "mean_wet_depth_m": 1.1254598274827003,
+      "source_path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m18g/c_constrict_corrected/constriction_seed_16/normalized/frames/frame_0002.npz",
+      "wet_cell_count": 4,
+      "wet_depth_threshold_m": 0.15,
+      "wet_width_m": 4.0
+    },
+    {
+      "center_depth_m": 1.4719570644345967,
+      "center_downstream_velocity_mps": 2.8841674969254267,
+      "center_froude": 0.7599637350321667,
+      "center_row_index": 6,
+      "column_index": 12,
+      "column_mass_m3": 5.082864350934089,
+      "label": "cpp_final",
+      "max_abs_cross_stream_velocity_mps": 1.5465664490407403,
+      "max_depth_m": 1.4719570644345967,
+      "mean_abs_cross_stream_velocity_mps": 0.8307839469528775,
+      "mean_wet_depth_m": 1.2707160877335224,
+      "source_path": "outputs/m18cmp/c_constrict_volume_response/finite_volume_roe/cpp_solver/constriction_seed_16/frames/frame_0008.csv",
+      "wet_cell_count": 4,
+      "wet_depth_threshold_m": 0.15,
+      "wet_width_m": 4.0
+    }
+  ],
+  "scenario_id": "constriction_seed_16",
+  "scenario_package": "outputs/m18cmp/c_constrict_volume_response/finite_volume_roe/scenario/constriction_seed_16",
+  "schema_version": "raftsim.milestone18.constriction_throat_shape.v0",
+  "summary": {
+    "cpp_center_depth_delta_m": 0.22356662826211138,
+    "cpp_center_froude_delta": -0.1450955986798298,
+    "cpp_column_mass_delta_m3": 0.2155286854432612,
+    "cpp_max_abs_cross_stream_velocity_delta_mps": 0.3660214112335898,
+    "cpp_wet_width_delta_m": 0.0,
+    "profile_count": 3
+  },
+  "throat_column_index": 12,
+  "wet_depth_threshold_m": 0.15
+}
