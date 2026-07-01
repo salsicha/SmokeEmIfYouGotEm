@@ -92,7 +92,7 @@ constexpr double kConstrictionUpstreamEdgeFluxTargetDepthScale = 0.28;
 constexpr double kConstrictionUpstreamEdgeFluxMinTargetDepth = 0.32;
 constexpr double kConstrictionYFaceOppositionFluxTargetDepthScale = 0.92;
 constexpr double kConstrictionYFaceOppositionFluxCrossStreamFraction = 1.2;
-constexpr double kConstrictionYFaceOppositionFluxMaxReferenceScale = 0.45;
+constexpr double kConstrictionYFaceOppositionFluxMaxReferenceScale = 0.28;
 constexpr double kConstrictionUpstreamEdgeMomentumRate = 3.0;
 constexpr double kConstrictionUpstreamEdgeMomentumMaxSpeedPerSecond = 8.0;
 constexpr double kConstrictionUpstreamEdgeSpeedFraction = 1.35;
@@ -104,6 +104,7 @@ constexpr double kConstrictionYFaceStateMaxSpeedDelta = 1.1;
 constexpr double kConstrictionYFaceStateDepthScale = 0.72;
 constexpr double kConstrictionYFaceStateMinDepth = 0.24;
 constexpr double kConstrictionYFaceStateCompanionDepthFraction = 0.5;
+constexpr double kConstrictionYFaceStateOutsideCompanionDepthFraction = 0.5;
 constexpr double kConstrictionYFaceStateDownstreamSpeedFraction = 1.15;
 constexpr double kConstrictionYFaceStateCrossStreamFraction = 1.25;
 constexpr double kConstrictionUpstreamEdgeSupportRate = 1.2;
@@ -1161,14 +1162,16 @@ bool apply_constriction_y_face_state_reconstruction(
     double max_speed_delta = kConstrictionYFaceStateMaxSpeedDelta * approach_weight;
     bool changed = false;
 
-    auto reconstruct_state = [&](ConservedState& q, double depth_fraction, double velocity_fraction) {
+    auto reconstruct_state = [&](ConservedState& q, double depth_fraction, double velocity_fraction, bool reset_velocity) {
         double target_h = edge_target_h * depth_fraction;
         double new_h = q.h + blend * (target_h - q.h);
         new_h = std::max(new_h, config.dry_tolerance);
         double current_u = velocity_x(q, config);
         double current_v = velocity_y(q, config);
-        double limited_u = move_toward(current_u, target_u, max_speed_delta * velocity_fraction);
-        double limited_v = move_toward(current_v, target_v, max_speed_delta * velocity_fraction);
+        double limited_u =
+            reset_velocity ? target_u : move_toward(current_u, target_u, max_speed_delta * velocity_fraction);
+        double limited_v =
+            reset_velocity ? target_v : move_toward(current_v, target_v, max_speed_delta * velocity_fraction);
         changed = changed || std::abs(new_h - q.h) > 1.0e-12 || std::abs(limited_u - current_u) > 1.0e-12 ||
                   std::abs(limited_v - current_v) > 1.0e-12;
         q.h = new_h;
@@ -1176,8 +1179,11 @@ bool apply_constriction_y_face_state_reconstruction(
         q.hv = new_h * limited_v;
     };
 
-    reconstruct_state(north, 1.0, 1.0);
-    reconstruct_state(south, kConstrictionYFaceStateCompanionDepthFraction, 0.5);
+    reconstruct_state(north, 1.0, 1.0, false);
+    bool lower_outside_companion = lower_edge_face && south_row + 1 == band.first_row;
+    double companion_depth_fraction = lower_outside_companion ? kConstrictionYFaceStateOutsideCompanionDepthFraction
+                                                              : kConstrictionYFaceStateCompanionDepthFraction;
+    reconstruct_state(south, companion_depth_fraction, 0.5, lower_outside_companion);
     return changed;
 }
 
@@ -3820,6 +3826,8 @@ void write_solver_output(
              << "    \"target_depth_scale\": " << kConstrictionYFaceStateDepthScale << ",\n"
              << "    \"min_target_depth_m\": " << kConstrictionYFaceStateMinDepth << ",\n"
              << "    \"companion_depth_fraction\": " << kConstrictionYFaceStateCompanionDepthFraction << ",\n"
+             << "    \"outside_companion_depth_fraction\": " << kConstrictionYFaceStateOutsideCompanionDepthFraction << ",\n"
+             << "    \"resets_lower_outside_companion_velocity\": true,\n"
              << "    \"downstream_speed_fraction\": " << kConstrictionYFaceStateDownstreamSpeedFraction << ",\n"
              << "    \"cross_stream_fraction\": " << kConstrictionYFaceStateCrossStreamFraction << ",\n"
              << "    \"records_audit_columns\": true,\n"

@@ -347,6 +347,12 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         is True
     )
     assert constriction_manifest["constriction_y_face_state_reconstruction"]["requires_feature_forcing"] is False
+    assert (
+        constriction_manifest["constriction_y_face_state_reconstruction"][
+            "resets_lower_outside_companion_velocity"
+        ]
+        is True
+    )
     assert constriction_manifest["fixture_scoped_constriction_upstream_edge_support_reconstruction"] is True
     assert constriction_manifest["constriction_upstream_edge_support"]["bounded"] is True
     assert constriction_manifest["constriction_upstream_edge_support"]["mass_conservative_depth_transfer"] is True
