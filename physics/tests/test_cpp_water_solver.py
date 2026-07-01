@@ -351,6 +351,12 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["fixture_scoped_constriction_center_throat_circulation_reconstruction"] is True
     assert constriction_manifest["constriction_center_throat_circulation"]["velocity_only"] is True
     assert constriction_manifest["constriction_center_throat_circulation"]["mass_preserving"] is True
+    assert constriction_manifest["fixture_scoped_constriction_localized_circulation_reconstruction"] is True
+    assert constriction_manifest["constriction_localized_circulation"]["velocity_only"] is True
+    assert constriction_manifest["constriction_localized_circulation"]["mass_preserving"] is True
+    assert constriction_manifest["constriction_localized_circulation"]["applies_center_throat_near_recovery"] is True
+    assert constriction_manifest["constriction_localized_circulation"]["upstream_component_disabled_for_froude_guard"] is True
+    assert constriction_manifest["constriction_localized_circulation"]["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_momentum_reconstruction"] is True
     assert final_throat_wet_count == initial_throat_wet_count
     assert max(dry_bank_depths) <= constriction_manifest["constriction_near_throat_support"]["throat_depth_scale"] * 1.25
