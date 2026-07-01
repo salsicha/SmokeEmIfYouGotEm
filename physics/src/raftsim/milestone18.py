@@ -42,6 +42,9 @@ MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA = "raftsim.milestone18.const
 MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA = (
     "raftsim.milestone18.constriction_probe_cross_section.v0"
 )
+MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA = (
+    "raftsim.milestone18.constriction_lateral_face_flux.v0"
+)
 
 _CORE_GUARDRAIL_FAMILIES = {"hydrostatic_sloping_balance", "uniform_channel", "dam_break_bore"}
 _GEOMETRY_CLOSURE_FAMILIES = {"wet_dry_shoreline", "bed_step", "constriction", "drops_ledges_tailwater"}
@@ -1496,6 +1499,175 @@ class Milestone18ConstrictionProbeCrossSectionReport:
 
 
 @dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionLateralFaceFluxSample:
+    """One upstream lateral face flux proxy comparing final GeoClaw and C++ states."""
+
+    face_role: str
+    column_index: int
+    south_row_index: int
+    north_row_index: int
+    x_m: float
+    y_face_m: float
+    reference_mean_h: float
+    candidate_mean_h: float
+    reference_mean_v: float
+    candidate_mean_v: float
+    reference_lateral_volume_flux_m3ps: float
+    candidate_lateral_volume_flux_m3ps: float
+    flux_delta_m3ps: float
+    abs_flux_delta_m3ps: float
+    flux_delta_threshold_m3ps: float
+    ratio_to_threshold: float
+    reference_sign: int
+    candidate_sign: int
+    sign_matches: bool
+    reference_south_h: float
+    reference_south_v: float
+    reference_north_h: float
+    reference_north_v: float
+    candidate_south_h: float
+    candidate_south_v: float
+    candidate_north_h: float
+    candidate_north_v: float
+
+    @property
+    def passed(self) -> bool:
+        return self.sign_matches and self.abs_flux_delta_m3ps <= self.flux_delta_threshold_m3ps
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["passed"] = self.passed
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionLateralFaceFluxReport:
+    """Diagnostic report for upstream constriction lateral face flux proxy balance."""
+
+    dual_solver_manifest: str
+    scenario_package: str
+    scenario_id: str
+    feature: dict[str, object]
+    grid: dict[str, object]
+    wet_depth_threshold_m: float
+    velocity_sign_floor_mps: float
+    flux_delta_threshold_m3ps: float
+    zones: dict[str, tuple[int, ...]]
+    samples: tuple[Milestone18ConstrictionLateralFaceFluxSample, ...]
+    edge_pair_summary: tuple[dict[str, object], ...]
+    blocked_reasons: tuple[str, ...]
+    next_levers: tuple[str, ...]
+
+    @property
+    def passed(self) -> bool:
+        return not self.blocked_reasons
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "dual_solver_manifest": self.dual_solver_manifest,
+            "scenario_package": self.scenario_package,
+            "scenario_id": self.scenario_id,
+            "feature": self.feature,
+            "grid": self.grid,
+            "wet_depth_threshold_m": self.wet_depth_threshold_m,
+            "velocity_sign_floor_mps": self.velocity_sign_floor_mps,
+            "flux_delta_threshold_m3ps": self.flux_delta_threshold_m3ps,
+            "zones": {zone_id: list(columns) for zone_id, columns in self.zones.items()},
+            "summary": {
+                "sample_count": len(self.samples),
+                "sign_mismatch_count": sum(1 for sample in self.samples if not sample.sign_matches),
+                "max_abs_flux_delta_m3ps": max(
+                    (sample.abs_flux_delta_m3ps for sample in self.samples),
+                    default=0.0,
+                ),
+                "reference_opposed_edge_column_count": sum(
+                    1 for pair in self.edge_pair_summary if pair.get("reference_opposed_edges")
+                ),
+                "candidate_opposed_edge_column_count": sum(
+                    1 for pair in self.edge_pair_summary if pair.get("candidate_opposed_edges")
+                ),
+                "opposition_mismatch_count": sum(
+                    1 for pair in self.edge_pair_summary if not pair.get("matches_reference_opposition", True)
+                ),
+                "worst_samples": [sample.to_json_dict() for sample in self._worst_samples()],
+            },
+            "edge_pair_summary": list(self.edge_pair_summary),
+            "samples": [sample.to_json_dict() for sample in self.samples],
+            "blocked_reasons": list(self.blocked_reasons),
+            "next_levers": list(self.next_levers),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        summary = self.to_json_dict()["summary"]
+        lines = [
+            "# Milestone 18 Constriction Lateral Face Flux Diagnostic",
+            "",
+            f"Schema: `{MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Scenario: `{self.scenario_id}`",
+            f"Dual solver manifest: `{self.dual_solver_manifest}`",
+            f"Scenario package: `{self.scenario_package}`",
+            f"Wet-depth threshold: `{self.wet_depth_threshold_m:.6g}` m",
+            f"Velocity sign floor: `{self.velocity_sign_floor_mps:.6g}` m/s",
+            f"Flux delta threshold: `{self.flux_delta_threshold_m3ps:.6g}` m3/s",
+            "",
+            "## Summary",
+            "",
+            f"- Sign mismatch count: `{summary['sign_mismatch_count']}`",
+            f"- Opposition mismatch count: `{summary['opposition_mismatch_count']}`",
+            f"- Max abs lateral flux delta: `{_format_number(_float_or_none(summary['max_abs_flux_delta_m3ps']))}` m3/s",
+            "",
+            "## Worst Lateral Faces",
+            "",
+            "| Face | Column | Rows | x m | y-face m | GeoClaw h/v/flux | C++ h/v/flux | Delta | Threshold | Ratio | Signs |",
+            "| --- | ---: | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | --- |",
+        ]
+        for sample in self._worst_samples():
+            lines.append(_lateral_face_flux_sample_row(sample))
+        lines.extend(
+            [
+                "",
+                "## Edge Pair Summary",
+                "",
+                "| Column | Lower signs | Upper signs | GeoClaw opposed | C++ opposed | Match |",
+                "| ---: | --- | --- | --- | --- | --- |",
+            ]
+        )
+        for pair in self.edge_pair_summary:
+            lines.append(_lateral_face_flux_pair_row(pair))
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.next_levers:
+            lines.extend(["", "## Next Levers", ""])
+            lines.extend(f"- {lever}" for lever in self.next_levers)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+    def _worst_samples(self) -> tuple[Milestone18ConstrictionLateralFaceFluxSample, ...]:
+        return tuple(
+            sorted(
+                self.samples,
+                key=lambda sample: (not sample.sign_matches, sample.ratio_to_threshold),
+                reverse=True,
+            )[:12]
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class Milestone18PinReleaseResponsePath:
     """One action timing path through the dedicated pin/release fixture."""
 
@@ -2211,6 +2383,79 @@ def build_milestone18_constriction_probe_cross_section_report(
         thresholds=thresholds,
         probe_samples=probe_samples,
         cross_section_samples=cross_section_samples,
+        blocked_reasons=blocked_reasons,
+        next_levers=next_levers,
+    )
+
+
+def build_milestone18_constriction_lateral_face_flux_report(
+    dual_solver_manifest: str | Path,
+    *,
+    wet_depth_threshold_m: float = 0.15,
+    velocity_sign_floor_mps: float = 0.05,
+    flux_delta_threshold_m3ps: float = 0.25,
+    top_n: int = 16,
+) -> Milestone18ConstrictionLateralFaceFluxReport:
+    """Compare final-frame upstream lateral face flux proxies for the constriction blocker."""
+
+    manifest_path = Path(dual_solver_manifest)
+    manifest = _load_json_report(manifest_path)
+    comparison_dir = manifest_path.parent
+    scenario_package = _resolve_path(str(manifest.get("scenario_package", "")), comparison_dir)
+    scenario = _load_json_report(scenario_package / "scenario.json")
+    features = _load_json_report(scenario_package / "features.json")
+    constriction = _constriction_feature(features)
+    grid = _scenario_grid(scenario)
+    ny = int(grid["ny"])
+    nx = int(grid["nx"])
+
+    initial_state_path = _scenario_array_path(scenario_package, scenario, "initial_state", "initial_state.npz")
+    initial_state = _load_npz_water_state(initial_state_path, h_key="depth")
+    zones = _constriction_response_zones(initial_state, grid, constriction, wet_depth_threshold_m)
+
+    geoclaw_manifest_ref = _manifest_nested_string(manifest, "geoclaw", "manifest")
+    cpp_manifest_ref = _manifest_nested_string(manifest, "cpp", "manifest")
+    geoclaw_manifest_path = _resolve_path(geoclaw_manifest_ref, comparison_dir)
+    cpp_manifest_path = _resolve_path(cpp_manifest_ref, comparison_dir)
+    geoclaw_manifest = _load_json_report(geoclaw_manifest_path)
+    cpp_manifest = _load_json_report(cpp_manifest_path)
+    geoclaw_frame_path = _final_frame_path(geoclaw_manifest, geoclaw_manifest_path.parent)
+    cpp_frame_path = _final_frame_path(cpp_manifest, cpp_manifest_path.parent)
+    geoclaw_state = _load_water_frame_fields(geoclaw_frame_path, ny, nx)
+    cpp_state = _load_water_frame_fields(cpp_frame_path, ny, nx)
+
+    samples = _constriction_upstream_lateral_face_samples(
+        initial_state,
+        geoclaw_state,
+        cpp_state,
+        grid,
+        zones,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        velocity_sign_floor_mps=velocity_sign_floor_mps,
+        flux_delta_threshold_m3ps=flux_delta_threshold_m3ps,
+    )
+    edge_pair_summary = _constriction_lateral_face_edge_pair_summary(samples)
+    sorted_samples = tuple(
+        sorted(
+            samples,
+            key=lambda sample: (not sample.sign_matches, sample.ratio_to_threshold),
+            reverse=True,
+        )[:top_n]
+    )
+    blocked_reasons = _lateral_face_flux_blocked_reasons(sorted_samples, edge_pair_summary)
+    next_levers = _lateral_face_flux_next_levers(sorted_samples, edge_pair_summary)
+    return Milestone18ConstrictionLateralFaceFluxReport(
+        dual_solver_manifest=str(manifest_path),
+        scenario_package=str(scenario_package),
+        scenario_id=str(manifest.get("scenario_id") or scenario.get("metadata", {}).get("scenario_id") or "unknown"),
+        feature=constriction,
+        grid=grid,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        velocity_sign_floor_mps=velocity_sign_floor_mps,
+        flux_delta_threshold_m3ps=flux_delta_threshold_m3ps,
+        zones=zones,
+        samples=sorted_samples,
+        edge_pair_summary=edge_pair_summary,
         blocked_reasons=blocked_reasons,
         next_levers=next_levers,
     )
@@ -4490,6 +4735,195 @@ def _probe_cross_section_next_levers(
     return tuple(levers)
 
 
+def _constriction_upstream_lateral_face_samples(
+    initial_state: dict[str, np.ndarray],
+    reference_state: dict[str, np.ndarray],
+    candidate_state: dict[str, np.ndarray],
+    grid: dict[str, object],
+    zones: dict[str, tuple[int, ...]],
+    *,
+    wet_depth_threshold_m: float,
+    velocity_sign_floor_mps: float,
+    flux_delta_threshold_m3ps: float,
+) -> tuple[Milestone18ConstrictionLateralFaceFluxSample, ...]:
+    samples: list[Milestone18ConstrictionLateralFaceFluxSample] = []
+    upstream_columns = zones.get("upstream_approach", ())
+    for col in upstream_columns:
+        wet_rows = np.flatnonzero(initial_state["h"][:, col] > wet_depth_threshold_m)
+        if wet_rows.size == 0:
+            continue
+        first_row = int(wet_rows[0])
+        last_row = int(wet_rows[-1])
+        if first_row > 0:
+            samples.append(
+                _lateral_face_flux_sample(
+                    "lower_edge_face",
+                    col,
+                    first_row - 1,
+                    first_row,
+                    reference_state,
+                    candidate_state,
+                    grid,
+                    velocity_sign_floor_mps,
+                    flux_delta_threshold_m3ps,
+                )
+            )
+        if last_row > 0:
+            samples.append(
+                _lateral_face_flux_sample(
+                    "upper_edge_face",
+                    col,
+                    last_row - 1,
+                    last_row,
+                    reference_state,
+                    candidate_state,
+                    grid,
+                    velocity_sign_floor_mps,
+                    flux_delta_threshold_m3ps,
+                )
+            )
+    return tuple(samples)
+
+
+def _lateral_face_flux_sample(
+    face_role: str,
+    col: int,
+    south_row: int,
+    north_row: int,
+    reference_state: dict[str, np.ndarray],
+    candidate_state: dict[str, np.ndarray],
+    grid: dict[str, object],
+    velocity_sign_floor_mps: float,
+    flux_delta_threshold_m3ps: float,
+) -> Milestone18ConstrictionLateralFaceFluxSample:
+    face_width_m = float(grid["dx"])
+    reference_south_h = float(reference_state["h"][south_row, col])
+    reference_north_h = float(reference_state["h"][north_row, col])
+    reference_south_v = float(reference_state["v"][south_row, col])
+    reference_north_v = float(reference_state["v"][north_row, col])
+    candidate_south_h = float(candidate_state["h"][south_row, col])
+    candidate_north_h = float(candidate_state["h"][north_row, col])
+    candidate_south_v = float(candidate_state["v"][south_row, col])
+    candidate_north_v = float(candidate_state["v"][north_row, col])
+    reference_mean_h = 0.5 * (reference_south_h + reference_north_h)
+    candidate_mean_h = 0.5 * (candidate_south_h + candidate_north_h)
+    reference_mean_v = 0.5 * (reference_south_v + reference_north_v)
+    candidate_mean_v = 0.5 * (candidate_south_v + candidate_north_v)
+    reference_flux = reference_mean_h * reference_mean_v * face_width_m
+    candidate_flux = candidate_mean_h * candidate_mean_v * face_width_m
+    flux_delta = candidate_flux - reference_flux
+    reference_sign = _velocity_sign(reference_mean_v, velocity_sign_floor_mps)
+    candidate_sign = _velocity_sign(candidate_mean_v, velocity_sign_floor_mps)
+    sign_matches = reference_sign == 0 or candidate_sign == reference_sign
+    x_m = float(grid["origin_x"]) + col * float(grid["dx"])
+    y_face_m = float(grid["origin_y"]) + (0.5 * (south_row + north_row)) * float(grid["dy"])
+    abs_flux_delta = abs(flux_delta)
+    return Milestone18ConstrictionLateralFaceFluxSample(
+        face_role=face_role,
+        column_index=col,
+        south_row_index=south_row,
+        north_row_index=north_row,
+        x_m=x_m,
+        y_face_m=y_face_m,
+        reference_mean_h=reference_mean_h,
+        candidate_mean_h=candidate_mean_h,
+        reference_mean_v=reference_mean_v,
+        candidate_mean_v=candidate_mean_v,
+        reference_lateral_volume_flux_m3ps=reference_flux,
+        candidate_lateral_volume_flux_m3ps=candidate_flux,
+        flux_delta_m3ps=flux_delta,
+        abs_flux_delta_m3ps=abs_flux_delta,
+        flux_delta_threshold_m3ps=flux_delta_threshold_m3ps,
+        ratio_to_threshold=_threshold_ratio(abs_flux_delta, flux_delta_threshold_m3ps),
+        reference_sign=reference_sign,
+        candidate_sign=candidate_sign,
+        sign_matches=sign_matches,
+        reference_south_h=reference_south_h,
+        reference_south_v=reference_south_v,
+        reference_north_h=reference_north_h,
+        reference_north_v=reference_north_v,
+        candidate_south_h=candidate_south_h,
+        candidate_south_v=candidate_south_v,
+        candidate_north_h=candidate_north_h,
+        candidate_north_v=candidate_north_v,
+    )
+
+
+def _velocity_sign(value: float, floor: float) -> int:
+    if value > floor:
+        return 1
+    if value < -floor:
+        return -1
+    return 0
+
+
+def _constriction_lateral_face_edge_pair_summary(
+    samples: tuple[Milestone18ConstrictionLateralFaceFluxSample, ...],
+) -> tuple[dict[str, object], ...]:
+    by_col: dict[int, dict[str, Milestone18ConstrictionLateralFaceFluxSample]] = {}
+    for sample in samples:
+        by_col.setdefault(sample.column_index, {})[sample.face_role] = sample
+    pairs: list[dict[str, object]] = []
+    for col, faces in sorted(by_col.items()):
+        lower = faces.get("lower_edge_face")
+        upper = faces.get("upper_edge_face")
+        if lower is None or upper is None:
+            continue
+        reference_opposed = lower.reference_sign != 0 and upper.reference_sign != 0 and lower.reference_sign == -upper.reference_sign
+        candidate_opposed = lower.candidate_sign != 0 and upper.candidate_sign != 0 and lower.candidate_sign == -upper.candidate_sign
+        pairs.append(
+            {
+                "column_index": col,
+                "lower_reference_sign": lower.reference_sign,
+                "upper_reference_sign": upper.reference_sign,
+                "lower_candidate_sign": lower.candidate_sign,
+                "upper_candidate_sign": upper.candidate_sign,
+                "reference_opposed_edges": reference_opposed,
+                "candidate_opposed_edges": candidate_opposed,
+                "matches_reference_opposition": (not reference_opposed) or candidate_opposed,
+                "lower_abs_flux_delta_m3ps": lower.abs_flux_delta_m3ps,
+                "upper_abs_flux_delta_m3ps": upper.abs_flux_delta_m3ps,
+            }
+        )
+    return tuple(pairs)
+
+
+def _lateral_face_flux_blocked_reasons(
+    samples: tuple[Milestone18ConstrictionLateralFaceFluxSample, ...],
+    edge_pair_summary: tuple[dict[str, object], ...],
+) -> tuple[str, ...]:
+    reasons: list[str] = []
+    if any(not sample.sign_matches for sample in samples):
+        reasons.append("C++ upstream lateral face velocity signs do not match GeoClaw on one or more edge faces.")
+    if any(sample.abs_flux_delta_m3ps > sample.flux_delta_threshold_m3ps for sample in samples):
+        reasons.append("C++ upstream lateral face volume-flux proxy deltas exceed the diagnostic threshold.")
+    if any(not pair.get("matches_reference_opposition", True) for pair in edge_pair_summary):
+        reasons.append("GeoClaw shows opposite-signed lower/upper upstream edge faces that C++ does not reproduce.")
+    return tuple(reasons)
+
+
+def _lateral_face_flux_next_levers(
+    samples: tuple[Milestone18ConstrictionLateralFaceFluxSample, ...],
+    edge_pair_summary: tuple[dict[str, object], ...],
+) -> tuple[str, ...]:
+    if not samples:
+        return ()
+    worst = sorted(samples, key=lambda sample: (not sample.sign_matches, sample.ratio_to_threshold), reverse=True)[0]
+    levers = [
+        (
+            f"Start with `{worst.face_role}` column {worst.column_index} rows "
+            f"{worst.south_row_index}-{worst.north_row_index}; the GeoClaw/C++ lateral flux proxy differs by "
+            f"{_format_number(worst.flux_delta_m3ps)} m3/s."
+        ),
+        "Instrument or reconstruct the actual finite-volume lateral face flux/source balance before adding another post-step velocity or depth transport.",
+    ]
+    if any(not pair.get("matches_reference_opposition", True) for pair in edge_pair_summary):
+        levers.append(
+            "Preserve GeoClaw's opposite-signed lower/upper upstream edge behavior; a single-sign lateral transport will keep damaging Froude shape."
+        )
+    return tuple(levers)
+
+
 def _threshold_ratio(value: float, threshold: float) -> float:
     if threshold == 0.0:
         return float("inf") if value else 0.0
@@ -4572,6 +5006,48 @@ def _probe_cross_section_sample_row(sample: Milestone18ConstrictionProbeCrossSec
         f"`{candidate_state}` | "
         f"{sample.threshold:.6g} | "
         f"{sample.ratio_to_threshold:.6g} |"
+    )
+
+
+def _lateral_face_flux_sample_row(sample: Milestone18ConstrictionLateralFaceFluxSample) -> str:
+    reference_state = (
+        f"{_format_number(sample.reference_mean_h)}/"
+        f"{_format_number(sample.reference_mean_v)}/"
+        f"{_format_number(sample.reference_lateral_volume_flux_m3ps)}"
+    )
+    candidate_state = (
+        f"{_format_number(sample.candidate_mean_h)}/"
+        f"{_format_number(sample.candidate_mean_v)}/"
+        f"{_format_number(sample.candidate_lateral_volume_flux_m3ps)}"
+    )
+    signs = f"{sample.reference_sign}->{sample.candidate_sign}"
+    return (
+        "| "
+        f"`{sample.face_role}` | "
+        f"{sample.column_index} | "
+        f"`{sample.south_row_index}-{sample.north_row_index}` | "
+        f"{_format_number(sample.x_m)} | "
+        f"{_format_number(sample.y_face_m)} | "
+        f"`{reference_state}` | "
+        f"`{candidate_state}` | "
+        f"{_format_number(sample.flux_delta_m3ps)} | "
+        f"{_format_number(sample.flux_delta_threshold_m3ps)} | "
+        f"{sample.ratio_to_threshold:.6g} | "
+        f"`{signs}` |"
+    )
+
+
+def _lateral_face_flux_pair_row(pair: dict[str, object]) -> str:
+    lower_signs = f"{pair.get('lower_reference_sign')}->{pair.get('lower_candidate_sign')}"
+    upper_signs = f"{pair.get('upper_reference_sign')}->{pair.get('upper_candidate_sign')}"
+    return (
+        "| "
+        f"{pair.get('column_index')} | "
+        f"`{lower_signs}` | "
+        f"`{upper_signs}` | "
+        f"`{bool(pair.get('reference_opposed_edges'))}` | "
+        f"`{bool(pair.get('candidate_opposed_edges'))}` | "
+        f"`{bool(pair.get('matches_reference_opposition'))}` |"
     )
 
 
