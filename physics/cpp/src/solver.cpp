@@ -170,6 +170,9 @@ ConservedState boundary_conserved(
     if (config.boundary_mode == "pyclaw") {
         return interior;
     }
+    if (scenario.fixture_kind == "constriction" && boundary->has_depth && !scenario.initial.wet(row, col)) {
+        return {};
+    }
     double h = interior.h;
     if (boundary->has_stage) {
         h = std::max(0.0, boundary->stage - scenario.bed(row, col));
@@ -608,6 +611,57 @@ void apply_wet_dry_shoreline_reconstruction(
     }
 }
 
+void apply_constriction_dry_bank_reconstruction(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction") {
+        return;
+    }
+
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+            if (scenario.initial.wet(row, col)) {
+                continue;
+            }
+
+            double leaked_h = next.h(row, col);
+            if (leaked_h > config.dry_tolerance) {
+                GridCellSelection receiver = nearest_initial_wet_cell_in_column(scenario, row, col);
+                if (receiver.found) {
+                    double receiver_h = next.h(receiver.row, receiver.col);
+                    double merged_h = receiver_h + leaked_h;
+                    double merged_hu = receiver_h * next.u(receiver.row, receiver.col) + leaked_h * next.u(row, col);
+                    double merged_hv = receiver_h * next.v(receiver.row, receiver.col) + leaked_h * next.v(row, col);
+                    next.h(receiver.row, receiver.col) = merged_h;
+                    next.u(receiver.row, receiver.col) =
+                        merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+                    next.v(receiver.row, receiver.col) =
+                        merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+                }
+            }
+
+            next.h(row, col) = 0.0;
+            next.u(row, col) = 0.0;
+            next.v(row, col) = 0.0;
+        }
+    }
+
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+            if (!scenario.initial.wet(row, col)) {
+                continue;
+            }
+            if (next.h(row, col) <= config.dry_tolerance) {
+                next.h(row, col) = 0.0;
+                next.u(row, col) = 0.0;
+                next.v(row, col) = 0.0;
+            }
+        }
+    }
+}
+
 std::string json_escape(const std::string& value) {
     std::string escaped;
     for (char c : value) {
@@ -842,6 +896,9 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
     }
     if (scenario_.fixture_kind == "wet_dry_shoreline") {
         apply_wet_dry_shoreline_reconstruction(scenario_, config_, next);
+    }
+    if (scenario_.fixture_kind == "constriction") {
+        apply_constriction_dry_bank_reconstruction(scenario_, config_, next);
     }
     recompute_state(next);
     state_ = std::move(next);
@@ -1134,6 +1191,10 @@ void write_solver_output(
              << "  \"preserve_initial_mass\": " << (config.preserve_initial_mass ? "true" : "false") << ",\n"
              << "  \"fixture_scoped_wet_dry_reconstruction\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "wet_dry_shoreline" ? "true" : "false") << ",\n"
+             << "  \"fixture_scoped_constriction_boundary_mask\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"fixture_scoped_constriction_dry_bank_reconstruction\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
              << "  \"cascading\": {\n"
              << "    \"present\": " << (scenario.cascading.present ? "true" : "false") << ",\n"
              << "    \"schema_version\": \"" << json_escape(scenario.cascading.schema_version) << "\",\n"
