@@ -94,6 +94,8 @@ constexpr double kConstrictionUpstreamEdgeMomentumRate = 3.0;
 constexpr double kConstrictionUpstreamEdgeMomentumMaxSpeedPerSecond = 8.0;
 constexpr double kConstrictionUpstreamEdgeSpeedFraction = 1.35;
 constexpr double kConstrictionUpstreamEdgeCrossStreamFraction = 1.35;
+constexpr double kConstrictionYFaceSourceSplitFraction = 0.06;
+constexpr double kConstrictionYFaceSourceSplitMaxSpeedPerSecond = 0.45;
 constexpr double kConstrictionCrossStreamMomentumRate = 2.2;
 constexpr double kConstrictionCrossStreamMomentumMaxSpeedPerSecond = 3.6;
 constexpr double kConstrictionCrossStreamMomentumRecoveryFraction = 0.58;
@@ -192,6 +194,8 @@ struct ConstrictionFaceFluxAuditRow {
     double post_right_flux_hv = 0.0;
     double hydro_left_source_hv = 0.0;
     double hydro_right_source_hv = 0.0;
+    double constriction_source_split_left_hv = 0.0;
+    double constriction_source_split_right_hv = 0.0;
     double constriction_left_source_h = 0.0;
     double constriction_left_source_hu = 0.0;
     double constriction_left_source_hv = 0.0;
@@ -201,6 +205,7 @@ struct ConstrictionFaceFluxAuditRow {
     double south_cell_bed_slope_source_hv_per_s = 0.0;
     double north_cell_bed_slope_source_hv_per_s = 0.0;
     bool hydrostatic_face_source_enabled = false;
+    bool constriction_hydrostatic_source_split_applied = false;
     bool constriction_face_source_applied = false;
 };
 
@@ -1057,6 +1062,84 @@ double constriction_upstream_edge_approach_weight(const Scenario& scenario, std:
         return 1.0;
     }
     return clamp((-signed_x - half_length) / half_length, 0.0, 1.0);
+}
+
+double bed_slope_source_y_per_s(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double h,
+    std::size_t row,
+    std::size_t col
+) {
+    if (config.bed_slope_source_scale == 0.0 || h <= config.dry_tolerance) {
+        return 0.0;
+    }
+    double bed_sy = gradient_y(scenario.bed, scenario, row, col);
+    return -config.bed_slope_source_scale * config.gravity * h * bed_sy;
+}
+
+double constriction_y_face_source_split_weight(
+    const Scenario& scenario,
+    std::size_t throat_width_cells,
+    std::size_t row,
+    std::size_t col
+) {
+    ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+    if (!constriction_upstream_edge_cell(scenario, band, throat_width_cells, col, row)) {
+        return 0.0;
+    }
+    return kConstrictionYFaceSourceSplitFraction * constriction_upstream_edge_approach_weight(scenario, col);
+}
+
+double constriction_y_face_source_split_hv_delta(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    std::size_t throat_width_cells,
+    const ConservedState& q,
+    std::size_t row,
+    std::size_t col
+) {
+    double split_weight = constriction_y_face_source_split_weight(scenario, throat_width_cells, row, col);
+    if (split_weight <= 0.0 || q.h <= config.dry_tolerance) {
+        return 0.0;
+    }
+    double source_hv_per_s = bed_slope_source_y_per_s(scenario, config, q.h, row, col);
+    double max_hv_delta = q.h * kConstrictionYFaceSourceSplitMaxSpeedPerSecond * dt * split_weight;
+    return clamp(source_hv_per_s * dt * split_weight, -max_hv_delta, max_hv_delta);
+}
+
+bool apply_constriction_y_face_hydrostatic_source_split(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    std::size_t throat_width_cells,
+    std::size_t south_row,
+    std::size_t north_row,
+    std::size_t col,
+    const ConservedState& south,
+    const ConservedState& north,
+    InterfaceFluxPair& flux
+) {
+    if (scenario.fixture_kind != "constriction" || throat_width_cells == 0 || dt <= 0.0) {
+        return false;
+    }
+    double south_delta_hv = constriction_y_face_source_split_hv_delta(
+        scenario, config, dt, throat_width_cells, south, south_row, col);
+    double north_delta_hv = constriction_y_face_source_split_hv_delta(
+        scenario, config, dt, throat_width_cells, north, north_row, col);
+    if (std::abs(south_delta_hv) <= 1.0e-12 && std::abs(north_delta_hv) <= 1.0e-12) {
+        return false;
+    }
+
+    ConservedState south_predictor = south;
+    ConservedState north_predictor = north;
+    south_predictor.hv += south_delta_hv;
+    north_predictor.hv += north_delta_hv;
+    FluxState split_flux = finite_volume_flux_y(south_predictor, north_predictor, config);
+    flux.left = split_flux;
+    flux.right = split_flux;
+    return true;
 }
 
 void apply_constriction_upstream_edge_face_flux_source(
@@ -2630,6 +2713,18 @@ ConstrictionFaceFluxAuditRow constriction_face_flux_audit_row(
     bool use_hydrostatic_face_source = use_bed_step_face_source || use_wet_dry_face_source;
     InterfaceFluxPair hydro =
         hydrostatic_flux_y(south, north, south_bed, north_bed, config, use_hydrostatic_face_source, use_wet_dry_face_source);
+    bool constriction_source_split_applied =
+        apply_constriction_y_face_hydrostatic_source_split(
+            scenario,
+            config,
+            scenario.fixed_dt,
+            throat_width_cells,
+            south_row,
+            north_row,
+            col,
+            south,
+            north,
+            hydro);
     InterfaceFluxPair post = hydro;
     apply_constriction_upstream_edge_face_flux_source(
         scenario, config, throat_width_cells, south_row, north_row, col, south, north, post);
@@ -2665,6 +2760,8 @@ ConstrictionFaceFluxAuditRow constriction_face_flux_audit_row(
     row.post_right_flux_hv = post.right.hv * face_width;
     row.hydro_left_source_hv = row.hydro_left_flux_hv - row.base_flux_hv;
     row.hydro_right_source_hv = row.hydro_right_flux_hv - row.base_flux_hv;
+    row.constriction_source_split_left_hv = constriction_source_split_applied ? row.hydro_left_source_hv : 0.0;
+    row.constriction_source_split_right_hv = constriction_source_split_applied ? row.hydro_right_source_hv : 0.0;
     row.constriction_left_source_h = row.post_left_flux_h - row.hydro_left_flux_h;
     row.constriction_left_source_hu = row.post_left_flux_hu - row.hydro_left_flux_hu;
     row.constriction_left_source_hv = row.post_left_flux_hv - row.hydro_left_flux_hv;
@@ -2673,7 +2770,8 @@ ConstrictionFaceFluxAuditRow constriction_face_flux_audit_row(
     row.constriction_right_source_hv = row.post_right_flux_hv - row.hydro_right_flux_hv;
     row.south_cell_bed_slope_source_hv_per_s = bed_slope_source_y_per_s(scenario, config, state, south_row, col);
     row.north_cell_bed_slope_source_hv_per_s = bed_slope_source_y_per_s(scenario, config, state, north_row, col);
-    row.hydrostatic_face_source_enabled = use_hydrostatic_face_source;
+    row.hydrostatic_face_source_enabled = use_hydrostatic_face_source || constriction_source_split_applied;
+    row.constriction_hydrostatic_source_split_applied = constriction_source_split_applied;
     row.constriction_face_source_applied =
         std::abs(row.constriction_left_source_h) > 1.0e-12 ||
         std::abs(row.constriction_left_source_hu) > 1.0e-12 ||
@@ -2704,10 +2802,12 @@ void write_constriction_y_face_flux_source_audit_csv(
         << "post_left_flux_h_m3ps,post_left_flux_hu_m3ps2,post_left_flux_hv_m3ps2,"
         << "post_right_flux_h_m3ps,post_right_flux_hu_m3ps2,post_right_flux_hv_m3ps2,"
         << "hydro_left_source_hv_m3ps2,hydro_right_source_hv_m3ps2,"
+        << "constriction_source_split_left_hv_m3ps2,constriction_source_split_right_hv_m3ps2,"
         << "constriction_left_source_h_m3ps,constriction_left_source_hu_m3ps2,constriction_left_source_hv_m3ps2,"
         << "constriction_right_source_h_m3ps,constriction_right_source_hu_m3ps2,constriction_right_source_hv_m3ps2,"
         << "south_cell_bed_slope_source_hv_per_s,north_cell_bed_slope_source_hv_per_s,"
-        << "hydrostatic_face_source_enabled,constriction_face_source_applied\n";
+        << "hydrostatic_face_source_enabled,constriction_hydrostatic_source_split_applied,"
+        << "constriction_face_source_applied\n";
 
     auto write_row = [&](const ConstrictionFaceFluxAuditRow& row) {
         out << row.face_role << ','
@@ -2740,6 +2840,8 @@ void write_constriction_y_face_flux_source_audit_csv(
             << row.post_right_flux_hv << ','
             << row.hydro_left_source_hv << ','
             << row.hydro_right_source_hv << ','
+            << row.constriction_source_split_left_hv << ','
+            << row.constriction_source_split_right_hv << ','
             << row.constriction_left_source_h << ','
             << row.constriction_left_source_hu << ','
             << row.constriction_left_source_hv << ','
@@ -2749,6 +2851,7 @@ void write_constriction_y_face_flux_source_audit_csv(
             << row.south_cell_bed_slope_source_hv_per_s << ','
             << row.north_cell_bed_slope_source_hv_per_s << ','
             << (row.hydrostatic_face_source_enabled ? 1 : 0) << ','
+            << (row.constriction_hydrostatic_source_split_applied ? 1 : 0) << ','
             << (row.constriction_face_source_applied ? 1 : 0) << '\n';
     };
 
@@ -2855,6 +2958,8 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
     bool use_wet_dry_face_source = scenario_.fixture_kind == "wet_dry_shoreline";
     bool use_hydrostatic_face_source = use_bed_step_face_source || use_wet_dry_face_source;
     bool use_constriction_upstream_edge_source = scenario_.fixture_kind == "constriction";
+    bool use_constriction_y_face_source_split =
+        use_constriction_upstream_edge_source && config_.bed_slope_source_scale != 0.0;
     std::size_t constriction_throat_width_cells =
         use_constriction_upstream_edge_source ? min_initial_wet_count(scenario_) : 0;
     double constriction_reference_speed =
@@ -2913,6 +3018,34 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
             InterfaceFluxPair north_flux =
                 hydrostatic_flux_y(
                     center, north, center_bed, north_bed, config_, use_hydrostatic_face_source, use_wet_dry_face_source);
+            if (use_constriction_y_face_source_split) {
+                if (row > 0) {
+                    apply_constriction_y_face_hydrostatic_source_split(
+                        scenario_,
+                        config_,
+                        dt,
+                        constriction_throat_width_cells,
+                        row - 1,
+                        row,
+                        col,
+                        south,
+                        center,
+                        south_flux);
+                }
+                if (row + 1 < scenario_.grid.ny) {
+                    apply_constriction_y_face_hydrostatic_source_split(
+                        scenario_,
+                        config_,
+                        dt,
+                        constriction_throat_width_cells,
+                        row,
+                        row + 1,
+                        col,
+                        center,
+                        north,
+                        north_flux);
+                }
+            }
             if (use_constriction_upstream_edge_source) {
                 if (row > 0) {
                     apply_constriction_upstream_edge_face_flux_source(
@@ -2937,7 +3070,13 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
                 double bed_sx = gradient_x(scenario_.bed, scenario_, row, col);
                 double bed_sy = gradient_y(scenario_.bed, scenario_, row, col);
                 hu_next -= dt * config_.bed_slope_source_scale * config_.gravity * center.h * bed_sx;
-                hv_next -= dt * config_.bed_slope_source_scale * config_.gravity * center.h * bed_sy;
+                double y_source_scale = config_.bed_slope_source_scale;
+                if (use_constriction_y_face_source_split) {
+                    y_source_scale *=
+                        1.0 - constriction_y_face_source_split_weight(
+                                  scenario_, constriction_throat_width_cells, row, col);
+                }
+                hv_next -= dt * y_source_scale * config_.gravity * center.h * bed_sy;
             }
             if (use_bed_step_face_source && east_bed - center_bed > 0.1) {
                 hu_next = std::max(hu_next, pre_step_discharge_floor(west, east));
@@ -3330,6 +3469,18 @@ void write_solver_output(
              << "    \"excluded_from_later_depth_receivers\": true,\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
+             << "  \"fixture_scoped_constriction_y_face_hydrostatic_source_split\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_y_face_hydrostatic_source_split\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"source_split_fraction\": " << kConstrictionYFaceSourceSplitFraction << ",\n"
+             << "    \"max_speed_m_per_s2\": " << kConstrictionYFaceSourceSplitMaxSpeedPerSecond << ",\n"
+             << "    \"applies_only_upstream_edge_y_faces\": true,\n"
+             << "    \"reduces_matching_cell_center_y_source_fraction\": true,\n"
+             << "    \"uses_predictor_riemann_state\": true,\n"
+             << "    \"records_audit_columns\": true,\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
              << "  \"fixture_scoped_constriction_cross_stream_momentum_source\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
              << "  \"constriction_cross_stream_momentum_source\": {\n"
@@ -3510,6 +3661,7 @@ void write_solver_output(
              << "    \"scope\": \"final_frame_upstream_wet_band_y_faces\",\n"
              << "    \"uses_internal_cpp_riemann_flux\": true,\n"
              << "    \"records_hydrostatic_face_source_terms\": true,\n"
+             << "    \"records_constriction_hydrostatic_source_split_terms\": true,\n"
              << "    \"records_cell_center_bed_slope_source_terms\": true,\n"
              << "    \"records_constriction_face_source_delta\": true\n"
              << "  },\n"

@@ -48,16 +48,14 @@
             "C++ reconstructed upstream lateral volume-flux deltas exceed the diagnostic threshold.",
             "C++ reconstructed normal momentum plus bed-source balance deltas exceed the diagnostic threshold.",
             "GeoClaw has opposite-signed lower/upper upstream edge fluxes that C++ still does not reproduce.",
-            "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow.",
-            "C++ internal audit records hydrostatic y-face source terms as disabled for constriction faces."
+            "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
           "next_levers": [
-            "Start with `upper_edge_face` column 6 rows 8-9; reconstructed q delta is 2.72825 m3/s and balance delta is 8.87381 m3/s2.",
+            "Start with `upper_edge_face` column 6 rows 8-9; reconstructed q delta is 2.72633 m3/s and balance delta is 8.87096 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
             "Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.",
-            "Use the exported C++ internal audit at `upper_edge_face` column 6 rows 8-9; post-source q delta is 2.6134 m3/s.",
-            "Decide whether constriction y-faces need hydrostatic reconstruction/source splitting instead of relying on cell-centered bed-slope source terms.",
+            "Use the exported C++ internal audit at `upper_edge_face` column 6 rows 8-9; post-source q delta is 2.61144 m3/s.",
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
@@ -66,15 +64,16 @@
           "summary": {
             "candidate_opposed_edge_column_count": 0,
             "cpp_internal_audit_sample_count": 96,
-            "cpp_internal_hydrostatic_face_source_enabled_count": 0,
-            "cpp_internal_max_abs_post_source_delta_m3ps": 5.056101953096378,
+            "cpp_internal_constriction_source_split_applied_count": 32,
+            "cpp_internal_hydrostatic_face_source_enabled_count": 32,
+            "cpp_internal_max_abs_post_source_delta_m3ps": 5.054937522835045,
             "cpp_internal_post_source_sign_mismatch_count": 65,
             "cpp_internal_source_applied_count": 16,
-            "max_abs_balance_delta_m3ps2": 15.448354719223058,
-            "max_abs_bed_source_delta_m3ps2": 7.984657983733976,
-            "max_abs_normal_momentum_flux_delta_m3ps2": 9.992849930712746,
-            "max_abs_volume_flux_delta_m3ps": 2.728245087487932,
-            "max_abs_x_momentum_flux_delta_m3ps2": 5.758010659602333,
+            "max_abs_balance_delta_m3ps2": 15.448494257461753,
+            "max_abs_bed_source_delta_m3ps2": 7.984757974860017,
+            "max_abs_normal_momentum_flux_delta_m3ps2": 9.993311424515392,
+            "max_abs_volume_flux_delta_m3ps": 2.726334428935486,
+            "max_abs_x_momentum_flux_delta_m3ps2": 5.75799166190117,
             "opposition_mismatch_count": 10,
             "reference_opposed_edge_column_count": 10,
             "sample_count": 16,
@@ -86,27 +85,27 @@
         {
           "blocked_reasons": [
             "Native C++ constriction y-face flux signs still disagree with GeoClaw after current source handling.",
-            "Hydrostatic y-face source treatment is absent for the audited constriction faces.",
+            "A constriction y-face source split is present, but post-source face signs still disagree with GeoClaw.",
             "The next change must not be promoted until full geometry checks pass or improve without hiding conservation failures."
           ],
-          "decision": "TEST_REQUIRED",
+          "decision": "REVISE_OR_REJECT",
           "next_levers": [
-            "Implement a fixture-scoped constriction y-face hydrostatic/source-splitting experiment at the audited `upper_edge_face` column 6 rows 8-9 target first.",
-            "Apply the treatment inside the finite-volume face/source update, not as final velocity/depth transport or gameplay forcing.",
-            "Promote only if the face/source report, throat/shape/timing diagnostics, Milestone 17 guardrail, and threshold report all support the change.",
-            "If the split worsens field, slope, wet-mask, probe, cross-section, Froude, mass, or energy checks, reject it and move to geometry width/depth mapping."
+            "Do not promote the current constriction y-face source split by itself; it is manifest-recorded and audited on 32 faces but still leaves 65 post-source sign mismatches.",
+            "Move the next constriction attempt to geometry-aware face-state reconstruction or width/depth mapping instead of increasing source-split strength.",
+            "Keep the split bounded and feature forcing off unless a future geometry/state reconstruction report proves it helps without regressing conservation, Froude, or sampled fields."
           ],
           "passed": false,
           "schema_version": "raftsim.milestone18.constriction_hydrostatic_source_decision.v0",
           "source_report": "reports/milestone18/constriction_hydrostatic_source_decision.json",
           "summary": {
             "cpp_internal_audit_sample_count": 96,
-            "cpp_internal_hydrostatic_face_source_enabled_count": 0,
-            "cpp_internal_max_abs_post_source_delta_m3ps": 5.056101953096378,
+            "cpp_internal_constriction_source_split_applied_count": 32,
+            "cpp_internal_hydrostatic_face_source_enabled_count": 32,
+            "cpp_internal_max_abs_post_source_delta_m3ps": 5.054937522835045,
             "cpp_internal_post_source_sign_mismatch_count": 65,
             "cpp_internal_source_applied_count": 16,
             "source_audit_decision": "BLOCKED",
-            "target_post_source_delta_m3ps": 2.613404403269023
+            "target_post_source_delta_m3ps": 2.6114414619317508
           }
         }
       ],
@@ -114,15 +113,14 @@
         "Start with `upper_edge_face` column 6 rows 8-9; the GeoClaw/C++ lateral flux proxy differs by 2.72825 m3/s.",
         "Instrument or reconstruct the actual finite-volume lateral face flux/source balance before adding another post-step velocity or depth transport.",
         "Preserve GeoClaw's opposite-signed lower/upper upstream edge behavior; a single-sign lateral transport will keep damaging Froude shape.",
-        "Start with `upper_edge_face` column 6 rows 8-9; reconstructed q delta is 2.72825 m3/s and balance delta is 8.87381 m3/s2.",
+        "Start with `upper_edge_face` column 6 rows 8-9; reconstructed q delta is 2.72633 m3/s and balance delta is 8.87096 m3/s2.",
         "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
         "Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.",
-        "Use the exported C++ internal audit at `upper_edge_face` column 6 rows 8-9; post-source q delta is 2.6134 m3/s.",
+        "Use the exported C++ internal audit at `upper_edge_face` column 6 rows 8-9; post-source q delta is 2.61144 m3/s.",
         "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible.",
-        "Implement a fixture-scoped constriction y-face hydrostatic/source-splitting experiment at the audited `upper_edge_face` column 6 rows 8-9 target first.",
-        "Apply the treatment inside the finite-volume face/source update, not as final velocity/depth transport or gameplay forcing.",
-        "Promote only if the face/source report, throat/shape/timing diagnostics, Milestone 17 guardrail, and threshold report all support the change.",
-        "If the split worsens field, slope, wet-mask, probe, cross-section, Froude, mass, or energy checks, reject it and move to geometry width/depth mapping.",
+        "Do not promote the current constriction y-face source split by itself; it is manifest-recorded and audited on 32 faces but still leaves 65 post-source sign mismatches.",
+        "Move the next constriction attempt to geometry-aware face-state reconstruction or width/depth mapping instead of increasing source-split strength.",
+        "Keep the split bounded and feature forcing off unless a future geometry/state reconstruction report proves it helps without regressing conservation, Froude, or sampled fields.",
         "Close constriction field, slope, probe, cross-section, and wet-mask parity before treating raft coupling as actionable.",
         "Preserve or restore conservation and energy checks before accepting any visual/gameplay forcing."
       ],
