@@ -40,12 +40,49 @@
             "sign_mismatch_count": 13,
             "worst_samples_count": 12
           }
+        },
+        {
+          "blocked_reasons": [
+            "C++ reconstructed y-face volume flux signs do not match GeoClaw on one or more upstream edge faces.",
+            "C++ reconstructed y-face x-momentum transport signs do not match GeoClaw.",
+            "C++ reconstructed upstream lateral volume-flux deltas exceed the diagnostic threshold.",
+            "C++ reconstructed normal momentum plus bed-source balance deltas exceed the diagnostic threshold.",
+            "GeoClaw has opposite-signed lower/upper upstream edge fluxes that C++ still does not reproduce."
+          ],
+          "decision": "BLOCKED",
+          "next_levers": [
+            "Start with `upper_edge_face` column 6 rows 8-9; reconstructed q delta is 2.72825 m3/s and balance delta is 8.87381 m3/s2.",
+            "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
+            "Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.",
+            "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
+          ],
+          "passed": false,
+          "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
+          "source_report": "reports/milestone18/constriction_face_source_audit_diagnostic.json",
+          "summary": {
+            "candidate_opposed_edge_column_count": 0,
+            "max_abs_balance_delta_m3ps2": 15.448354719223058,
+            "max_abs_bed_source_delta_m3ps2": 7.984657983733976,
+            "max_abs_normal_momentum_flux_delta_m3ps2": 9.992849930712746,
+            "max_abs_volume_flux_delta_m3ps": 2.728245087487932,
+            "max_abs_x_momentum_flux_delta_m3ps2": 5.758010659602333,
+            "opposition_mismatch_count": 10,
+            "reference_opposed_edge_column_count": 10,
+            "sample_count": 16,
+            "volume_sign_mismatch_count": 13,
+            "worst_samples_count": 12,
+            "x_momentum_sign_mismatch_count": 11
+          }
         }
       ],
       "next_levers": [
         "Start with `upper_edge_face` column 6 rows 8-9; the GeoClaw/C++ lateral flux proxy differs by 2.72825 m3/s.",
         "Instrument or reconstruct the actual finite-volume lateral face flux/source balance before adding another post-step velocity or depth transport.",
         "Preserve GeoClaw's opposite-signed lower/upper upstream edge behavior; a single-sign lateral transport will keep damaging Froude shape.",
+        "Start with `upper_edge_face` column 6 rows 8-9; reconstructed q delta is 2.72825 m3/s and balance delta is 8.87381 m3/s2.",
+        "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
+        "Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.",
+        "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible.",
         "Close constriction field, slope, probe, cross-section, and wet-mask parity before treating raft coupling as actionable.",
         "Preserve or restore conservation and energy checks before accepting any visual/gameplay forcing."
       ],
@@ -242,6 +279,7 @@
   "decision": "BLOCKED",
   "focused_report_paths": [
     "reports/milestone18/constriction_lateral_face_flux_diagnostic.json",
+    "reports/milestone18/constriction_face_source_audit_diagnostic.json",
     "reports/milestone18/drop_ledge_hydraulic_control_diagnostic.json"
   ],
   "geometry_report": "reports/milestone16/geometry_validation.json",

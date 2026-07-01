@@ -45,6 +45,9 @@ MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA = (
 MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA = (
     "raftsim.milestone18.constriction_lateral_face_flux.v0"
 )
+MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA = (
+    "raftsim.milestone18.constriction_face_source_audit.v0"
+)
 MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA = (
     "raftsim.milestone18.drop_ledge_hydraulic_control.v0"
 )
@@ -1987,6 +1990,232 @@ class Milestone18ConstrictionLateralFaceFluxReport:
 
 
 @dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionFaceSourceAuditSample:
+    """One reconstructed finite-volume y-face flux/source audit sample."""
+
+    face_role: str
+    column_index: int
+    south_row_index: int
+    north_row_index: int
+    x_m: float
+    y_face_m: float
+    bed_step_m: float
+    reference_eta_step_m: float
+    candidate_eta_step_m: float
+    reference_mean_h: float
+    candidate_mean_h: float
+    reference_mean_u: float
+    candidate_mean_u: float
+    reference_mean_v: float
+    candidate_mean_v: float
+    reference_volume_flux_m3ps: float
+    candidate_volume_flux_m3ps: float
+    volume_flux_delta_m3ps: float
+    abs_volume_flux_delta_m3ps: float
+    flux_delta_threshold_m3ps: float
+    volume_ratio_to_threshold: float
+    reference_volume_sign: int
+    candidate_volume_sign: int
+    volume_sign_matches: bool
+    reference_x_momentum_flux_proxy_m3ps2: float
+    candidate_x_momentum_flux_proxy_m3ps2: float
+    x_momentum_flux_delta_m3ps2: float
+    abs_x_momentum_flux_delta_m3ps2: float
+    reference_x_momentum_sign: int
+    candidate_x_momentum_sign: int
+    x_momentum_sign_matches: bool
+    reference_normal_momentum_flux_proxy_m3ps2: float
+    candidate_normal_momentum_flux_proxy_m3ps2: float
+    normal_momentum_flux_delta_m3ps2: float
+    abs_normal_momentum_flux_delta_m3ps2: float
+    reference_bed_source_proxy_m3ps2: float
+    candidate_bed_source_proxy_m3ps2: float
+    bed_source_delta_m3ps2: float
+    abs_bed_source_delta_m3ps2: float
+    reference_flux_source_balance_proxy_m3ps2: float
+    candidate_flux_source_balance_proxy_m3ps2: float
+    balance_delta_m3ps2: float
+    abs_balance_delta_m3ps2: float
+    balance_delta_threshold_m3ps2: float
+    balance_ratio_to_threshold: float
+
+    @property
+    def passed(self) -> bool:
+        return (
+            self.volume_sign_matches
+            and self.x_momentum_sign_matches
+            and self.abs_volume_flux_delta_m3ps <= self.flux_delta_threshold_m3ps
+            and self.abs_balance_delta_m3ps2 <= self.balance_delta_threshold_m3ps2
+        )
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["passed"] = self.passed
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionFaceSourceAuditReport:
+    """Diagnostic report for reconstructed constriction y-face flux/source balance."""
+
+    dual_solver_manifest: str
+    scenario_package: str
+    scenario_id: str
+    feature: dict[str, object]
+    grid: dict[str, object]
+    diagnostic_scope: str
+    wet_depth_threshold_m: float
+    velocity_sign_floor_mps: float
+    flux_delta_threshold_m3ps: float
+    balance_delta_threshold_m3ps2: float
+    zones: dict[str, tuple[int, ...]]
+    samples: tuple[Milestone18ConstrictionFaceSourceAuditSample, ...]
+    edge_pair_summary: tuple[dict[str, object], ...]
+    blocked_reasons: tuple[str, ...]
+    next_levers: tuple[str, ...]
+
+    @property
+    def passed(self) -> bool:
+        return not self.blocked_reasons
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "dual_solver_manifest": self.dual_solver_manifest,
+            "scenario_package": self.scenario_package,
+            "scenario_id": self.scenario_id,
+            "feature": self.feature,
+            "grid": self.grid,
+            "diagnostic_scope": self.diagnostic_scope,
+            "wet_depth_threshold_m": self.wet_depth_threshold_m,
+            "velocity_sign_floor_mps": self.velocity_sign_floor_mps,
+            "flux_delta_threshold_m3ps": self.flux_delta_threshold_m3ps,
+            "balance_delta_threshold_m3ps2": self.balance_delta_threshold_m3ps2,
+            "zones": {zone_id: list(columns) for zone_id, columns in self.zones.items()},
+            "summary": {
+                "sample_count": len(self.samples),
+                "volume_sign_mismatch_count": sum(
+                    1 for sample in self.samples if not sample.volume_sign_matches
+                ),
+                "x_momentum_sign_mismatch_count": sum(
+                    1 for sample in self.samples if not sample.x_momentum_sign_matches
+                ),
+                "max_abs_volume_flux_delta_m3ps": max(
+                    (sample.abs_volume_flux_delta_m3ps for sample in self.samples),
+                    default=0.0,
+                ),
+                "max_abs_x_momentum_flux_delta_m3ps2": max(
+                    (sample.abs_x_momentum_flux_delta_m3ps2 for sample in self.samples),
+                    default=0.0,
+                ),
+                "max_abs_normal_momentum_flux_delta_m3ps2": max(
+                    (sample.abs_normal_momentum_flux_delta_m3ps2 for sample in self.samples),
+                    default=0.0,
+                ),
+                "max_abs_bed_source_delta_m3ps2": max(
+                    (sample.abs_bed_source_delta_m3ps2 for sample in self.samples),
+                    default=0.0,
+                ),
+                "max_abs_balance_delta_m3ps2": max(
+                    (sample.abs_balance_delta_m3ps2 for sample in self.samples),
+                    default=0.0,
+                ),
+                "reference_opposed_edge_column_count": sum(
+                    1 for pair in self.edge_pair_summary if pair.get("reference_opposed_edges")
+                ),
+                "candidate_opposed_edge_column_count": sum(
+                    1 for pair in self.edge_pair_summary if pair.get("candidate_opposed_edges")
+                ),
+                "opposition_mismatch_count": sum(
+                    1 for pair in self.edge_pair_summary if not pair.get("matches_reference_opposition", True)
+                ),
+                "worst_samples": [sample.to_json_dict() for sample in self._worst_samples()],
+            },
+            "edge_pair_summary": list(self.edge_pair_summary),
+            "samples": [sample.to_json_dict() for sample in self.samples],
+            "blocked_reasons": list(self.blocked_reasons),
+            "next_levers": list(self.next_levers),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        summary = self.to_json_dict()["summary"]
+        lines = [
+            "# Milestone 18 Constriction Face/Source Audit",
+            "",
+            f"Schema: `{MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Scenario: `{self.scenario_id}`",
+            f"Dual solver manifest: `{self.dual_solver_manifest}`",
+            f"Scenario package: `{self.scenario_package}`",
+            f"Diagnostic scope: {self.diagnostic_scope}",
+            f"Wet-depth threshold: `{self.wet_depth_threshold_m:.6g}` m",
+            f"Velocity sign floor: `{self.velocity_sign_floor_mps:.6g}` m/s",
+            f"Flux delta threshold: `{self.flux_delta_threshold_m3ps:.6g}` m3/s",
+            f"Balance delta threshold: `{self.balance_delta_threshold_m3ps2:.6g}` m3/s2",
+            "",
+            "## Summary",
+            "",
+            f"- Volume sign mismatch count: `{summary['volume_sign_mismatch_count']}`",
+            f"- X-momentum sign mismatch count: `{summary['x_momentum_sign_mismatch_count']}`",
+            f"- Opposition mismatch count: `{summary['opposition_mismatch_count']}`",
+            f"- Max abs lateral volume-flux delta: `{_format_number(_float_or_none(summary['max_abs_volume_flux_delta_m3ps']))}` m3/s",
+            f"- Max abs flux/source balance delta: `{_format_number(_float_or_none(summary['max_abs_balance_delta_m3ps2']))}` m3/s2",
+            "",
+            "## Worst Face/Source Samples",
+            "",
+            "| Face | Column | Rows | x m | y-face m | bed step | GeoClaw h/u/v/q | C++ h/u/v/q | q delta | x-mom signs | normal/source/balance delta | Ratios |",
+            "| --- | ---: | --- | ---: | ---: | ---: | --- | --- | ---: | --- | --- | --- |",
+        ]
+        for sample in self._worst_samples():
+            lines.append(_face_source_audit_sample_row(sample))
+        lines.extend(
+            [
+                "",
+                "## Edge Pair Summary",
+                "",
+                "| Column | Lower signs | Upper signs | GeoClaw opposed | C++ opposed | Match |",
+                "| ---: | --- | --- | --- | --- | --- |",
+            ]
+        )
+        for pair in self.edge_pair_summary:
+            lines.append(_face_source_audit_pair_row(pair))
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.next_levers:
+            lines.extend(["", "## Next Levers", ""])
+            lines.extend(f"- {lever}" for lever in self.next_levers)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+    def _worst_samples(self) -> tuple[Milestone18ConstrictionFaceSourceAuditSample, ...]:
+        return tuple(
+            sorted(
+                self.samples,
+                key=lambda sample: (
+                    not sample.volume_sign_matches,
+                    not sample.x_momentum_sign_matches,
+                    sample.volume_ratio_to_threshold,
+                    sample.balance_ratio_to_threshold,
+                ),
+                reverse=True,
+            )[:12]
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class Milestone18PinReleaseResponsePath:
     """One action timing path through the dedicated pin/release fixture."""
 
@@ -2772,6 +3001,93 @@ def build_milestone18_constriction_lateral_face_flux_report(
         wet_depth_threshold_m=wet_depth_threshold_m,
         velocity_sign_floor_mps=velocity_sign_floor_mps,
         flux_delta_threshold_m3ps=flux_delta_threshold_m3ps,
+        zones=zones,
+        samples=sorted_samples,
+        edge_pair_summary=edge_pair_summary,
+        blocked_reasons=blocked_reasons,
+        next_levers=next_levers,
+    )
+
+
+def build_milestone18_constriction_face_source_audit_report(
+    dual_solver_manifest: str | Path,
+    *,
+    wet_depth_threshold_m: float = 0.15,
+    velocity_sign_floor_mps: float = 0.05,
+    flux_delta_threshold_m3ps: float = 0.25,
+    balance_delta_threshold_m3ps2: float = 0.75,
+    top_n: int = 16,
+) -> Milestone18ConstrictionFaceSourceAuditReport:
+    """Reconstruct upstream y-face flux/source balance for the constriction blocker."""
+
+    manifest_path = Path(dual_solver_manifest)
+    manifest = _load_json_report(manifest_path)
+    comparison_dir = manifest_path.parent
+    scenario_package = _resolve_path(str(manifest.get("scenario_package", "")), comparison_dir)
+    scenario = _load_json_report(scenario_package / "scenario.json")
+    features = _load_json_report(scenario_package / "features.json")
+    constriction = _constriction_feature(features)
+    grid = _scenario_grid(scenario)
+    ny = int(grid["ny"])
+    nx = int(grid["nx"])
+
+    initial_state_path = _scenario_array_path(scenario_package, scenario, "initial_state", "initial_state.npz")
+    initial_state = _load_npz_water_state(initial_state_path, h_key="depth")
+    bed = _load_scenario_bed_array(scenario_package, scenario, initial_state["h"])
+    zones = _constriction_response_zones(initial_state, grid, constriction, wet_depth_threshold_m)
+
+    geoclaw_manifest_ref = _manifest_nested_string(manifest, "geoclaw", "manifest")
+    cpp_manifest_ref = _manifest_nested_string(manifest, "cpp", "manifest")
+    geoclaw_manifest_path = _resolve_path(geoclaw_manifest_ref, comparison_dir)
+    cpp_manifest_path = _resolve_path(cpp_manifest_ref, comparison_dir)
+    geoclaw_manifest = _load_json_report(geoclaw_manifest_path)
+    cpp_manifest = _load_json_report(cpp_manifest_path)
+    geoclaw_frame_path = _final_frame_path(geoclaw_manifest, geoclaw_manifest_path.parent)
+    cpp_frame_path = _final_frame_path(cpp_manifest, cpp_manifest_path.parent)
+    geoclaw_state = _load_water_frame_fields(geoclaw_frame_path, ny, nx)
+    cpp_state = _load_water_frame_fields(cpp_frame_path, ny, nx)
+
+    samples = _constriction_upstream_face_source_audit_samples(
+        initial_state,
+        geoclaw_state,
+        cpp_state,
+        bed,
+        grid,
+        zones,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        velocity_sign_floor_mps=velocity_sign_floor_mps,
+        flux_delta_threshold_m3ps=flux_delta_threshold_m3ps,
+        balance_delta_threshold_m3ps2=balance_delta_threshold_m3ps2,
+    )
+    edge_pair_summary = _constriction_face_source_edge_pair_summary(samples)
+    sorted_samples = tuple(
+        sorted(
+            samples,
+            key=lambda sample: (
+                not sample.volume_sign_matches,
+                not sample.x_momentum_sign_matches,
+                sample.volume_ratio_to_threshold,
+                sample.balance_ratio_to_threshold,
+            ),
+            reverse=True,
+        )[:top_n]
+    )
+    blocked_reasons = _face_source_audit_blocked_reasons(sorted_samples, edge_pair_summary)
+    next_levers = _face_source_audit_next_levers(sorted_samples, edge_pair_summary)
+    return Milestone18ConstrictionFaceSourceAuditReport(
+        dual_solver_manifest=str(manifest_path),
+        scenario_package=str(scenario_package),
+        scenario_id=str(manifest.get("scenario_id") or scenario.get("metadata", {}).get("scenario_id") or "unknown"),
+        feature=constriction,
+        grid=grid,
+        diagnostic_scope=(
+            "Finite-volume y-face flux/source reconstruction from exported final frames; "
+            "this is not internal per-timestep Riemann telemetry."
+        ),
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        velocity_sign_floor_mps=velocity_sign_floor_mps,
+        flux_delta_threshold_m3ps=flux_delta_threshold_m3ps,
+        balance_delta_threshold_m3ps2=balance_delta_threshold_m3ps2,
         zones=zones,
         samples=sorted_samples,
         edge_pair_summary=edge_pair_summary,
@@ -3717,6 +4033,17 @@ def _scenario_array_path(scenario_package: Path, scenario: dict[str, Any], key: 
     if not isinstance(value, str):
         value = fallback
     return _resolve_path(value, scenario_package)
+
+
+def _load_scenario_bed_array(
+    scenario_package: Path,
+    scenario: dict[str, Any],
+    fallback_shape: np.ndarray,
+) -> np.ndarray:
+    bed_path = _scenario_array_path(scenario_package, scenario, "bed", "bed.npy")
+    if bed_path.exists():
+        return np.asarray(np.load(bed_path), dtype=float)
+    return np.zeros_like(fallback_shape, dtype=float)
 
 
 def _final_frame_path(manifest: dict[str, Any], manifest_dir: Path) -> Path:
@@ -5752,6 +6079,275 @@ def _lateral_face_flux_next_levers(
     return tuple(levers)
 
 
+def _constriction_upstream_face_source_audit_samples(
+    initial_state: dict[str, np.ndarray],
+    reference_state: dict[str, np.ndarray],
+    candidate_state: dict[str, np.ndarray],
+    bed: np.ndarray,
+    grid: dict[str, object],
+    zones: dict[str, tuple[int, ...]],
+    *,
+    wet_depth_threshold_m: float,
+    velocity_sign_floor_mps: float,
+    flux_delta_threshold_m3ps: float,
+    balance_delta_threshold_m3ps2: float,
+) -> tuple[Milestone18ConstrictionFaceSourceAuditSample, ...]:
+    samples: list[Milestone18ConstrictionFaceSourceAuditSample] = []
+    upstream_columns = zones.get("upstream_approach", ())
+    for col in upstream_columns:
+        wet_rows = np.flatnonzero(initial_state["h"][:, col] > wet_depth_threshold_m)
+        if wet_rows.size == 0:
+            continue
+        first_row = int(wet_rows[0])
+        last_row = int(wet_rows[-1])
+        if first_row > 0:
+            samples.append(
+                _face_source_audit_sample(
+                    "lower_edge_face",
+                    col,
+                    first_row - 1,
+                    first_row,
+                    reference_state,
+                    candidate_state,
+                    bed,
+                    grid,
+                    velocity_sign_floor_mps,
+                    flux_delta_threshold_m3ps,
+                    balance_delta_threshold_m3ps2,
+                )
+            )
+        if last_row > 0:
+            samples.append(
+                _face_source_audit_sample(
+                    "upper_edge_face",
+                    col,
+                    last_row - 1,
+                    last_row,
+                    reference_state,
+                    candidate_state,
+                    bed,
+                    grid,
+                    velocity_sign_floor_mps,
+                    flux_delta_threshold_m3ps,
+                    balance_delta_threshold_m3ps2,
+                )
+            )
+    return tuple(samples)
+
+
+def _face_source_audit_sample(
+    face_role: str,
+    col: int,
+    south_row: int,
+    north_row: int,
+    reference_state: dict[str, np.ndarray],
+    candidate_state: dict[str, np.ndarray],
+    bed: np.ndarray,
+    grid: dict[str, object],
+    velocity_sign_floor_mps: float,
+    flux_delta_threshold_m3ps: float,
+    balance_delta_threshold_m3ps2: float,
+) -> Milestone18ConstrictionFaceSourceAuditSample:
+    face_width_m = float(grid["dx"])
+    g = 9.81
+    reference = _face_source_terms(reference_state, bed, south_row, north_row, col, face_width_m, g)
+    candidate = _face_source_terms(candidate_state, bed, south_row, north_row, col, face_width_m, g)
+    volume_flux_delta = candidate["volume_flux"] - reference["volume_flux"]
+    x_momentum_delta = candidate["x_momentum_flux"] - reference["x_momentum_flux"]
+    normal_momentum_delta = candidate["normal_momentum_flux"] - reference["normal_momentum_flux"]
+    bed_source_delta = candidate["bed_source"] - reference["bed_source"]
+    balance_delta = candidate["balance"] - reference["balance"]
+    reference_volume_sign = _velocity_sign(reference["mean_v"], velocity_sign_floor_mps)
+    candidate_volume_sign = _velocity_sign(candidate["mean_v"], velocity_sign_floor_mps)
+    reference_x_momentum_sign = _velocity_sign(reference["x_momentum_flux"], velocity_sign_floor_mps * face_width_m)
+    candidate_x_momentum_sign = _velocity_sign(candidate["x_momentum_flux"], velocity_sign_floor_mps * face_width_m)
+    x_m = float(grid["origin_x"]) + col * float(grid["dx"])
+    y_face_m = float(grid["origin_y"]) + (0.5 * (south_row + north_row)) * float(grid["dy"])
+    return Milestone18ConstrictionFaceSourceAuditSample(
+        face_role=face_role,
+        column_index=col,
+        south_row_index=south_row,
+        north_row_index=north_row,
+        x_m=x_m,
+        y_face_m=y_face_m,
+        bed_step_m=reference["bed_step"],
+        reference_eta_step_m=reference["eta_step"],
+        candidate_eta_step_m=candidate["eta_step"],
+        reference_mean_h=reference["mean_h"],
+        candidate_mean_h=candidate["mean_h"],
+        reference_mean_u=reference["mean_u"],
+        candidate_mean_u=candidate["mean_u"],
+        reference_mean_v=reference["mean_v"],
+        candidate_mean_v=candidate["mean_v"],
+        reference_volume_flux_m3ps=reference["volume_flux"],
+        candidate_volume_flux_m3ps=candidate["volume_flux"],
+        volume_flux_delta_m3ps=volume_flux_delta,
+        abs_volume_flux_delta_m3ps=abs(volume_flux_delta),
+        flux_delta_threshold_m3ps=flux_delta_threshold_m3ps,
+        volume_ratio_to_threshold=_threshold_ratio(volume_flux_delta, flux_delta_threshold_m3ps),
+        reference_volume_sign=reference_volume_sign,
+        candidate_volume_sign=candidate_volume_sign,
+        volume_sign_matches=reference_volume_sign == 0 or candidate_volume_sign == reference_volume_sign,
+        reference_x_momentum_flux_proxy_m3ps2=reference["x_momentum_flux"],
+        candidate_x_momentum_flux_proxy_m3ps2=candidate["x_momentum_flux"],
+        x_momentum_flux_delta_m3ps2=x_momentum_delta,
+        abs_x_momentum_flux_delta_m3ps2=abs(x_momentum_delta),
+        reference_x_momentum_sign=reference_x_momentum_sign,
+        candidate_x_momentum_sign=candidate_x_momentum_sign,
+        x_momentum_sign_matches=reference_x_momentum_sign == 0
+        or candidate_x_momentum_sign == reference_x_momentum_sign,
+        reference_normal_momentum_flux_proxy_m3ps2=reference["normal_momentum_flux"],
+        candidate_normal_momentum_flux_proxy_m3ps2=candidate["normal_momentum_flux"],
+        normal_momentum_flux_delta_m3ps2=normal_momentum_delta,
+        abs_normal_momentum_flux_delta_m3ps2=abs(normal_momentum_delta),
+        reference_bed_source_proxy_m3ps2=reference["bed_source"],
+        candidate_bed_source_proxy_m3ps2=candidate["bed_source"],
+        bed_source_delta_m3ps2=bed_source_delta,
+        abs_bed_source_delta_m3ps2=abs(bed_source_delta),
+        reference_flux_source_balance_proxy_m3ps2=reference["balance"],
+        candidate_flux_source_balance_proxy_m3ps2=candidate["balance"],
+        balance_delta_m3ps2=balance_delta,
+        abs_balance_delta_m3ps2=abs(balance_delta),
+        balance_delta_threshold_m3ps2=balance_delta_threshold_m3ps2,
+        balance_ratio_to_threshold=_threshold_ratio(balance_delta, balance_delta_threshold_m3ps2),
+    )
+
+
+def _face_source_terms(
+    state: dict[str, np.ndarray],
+    bed: np.ndarray,
+    south_row: int,
+    north_row: int,
+    col: int,
+    face_width_m: float,
+    gravity_mps2: float,
+) -> dict[str, float]:
+    south_h = float(state["h"][south_row, col])
+    north_h = float(state["h"][north_row, col])
+    south_u = float(state["u"][south_row, col])
+    north_u = float(state["u"][north_row, col])
+    south_v = float(state["v"][south_row, col])
+    north_v = float(state["v"][north_row, col])
+    south_eta = float(state["eta"][south_row, col])
+    north_eta = float(state["eta"][north_row, col])
+    bed_step = float(bed[north_row, col] - bed[south_row, col])
+    mean_h = 0.5 * (south_h + north_h)
+    mean_u = 0.5 * (south_u + north_u)
+    mean_v = 0.5 * (south_v + north_v)
+    volume_flux = mean_h * mean_v * face_width_m
+    x_momentum_flux = mean_h * mean_u * mean_v * face_width_m
+    normal_momentum_flux = (mean_h * mean_v * mean_v + 0.5 * gravity_mps2 * mean_h * mean_h) * face_width_m
+    bed_source = -gravity_mps2 * mean_h * bed_step * face_width_m
+    return {
+        "mean_h": mean_h,
+        "mean_u": mean_u,
+        "mean_v": mean_v,
+        "eta_step": north_eta - south_eta,
+        "bed_step": bed_step,
+        "volume_flux": volume_flux,
+        "x_momentum_flux": x_momentum_flux,
+        "normal_momentum_flux": normal_momentum_flux,
+        "bed_source": bed_source,
+        "balance": normal_momentum_flux + bed_source,
+    }
+
+
+def _constriction_face_source_edge_pair_summary(
+    samples: tuple[Milestone18ConstrictionFaceSourceAuditSample, ...],
+) -> tuple[dict[str, object], ...]:
+    by_col: dict[int, dict[str, Milestone18ConstrictionFaceSourceAuditSample]] = {}
+    for sample in samples:
+        by_col.setdefault(sample.column_index, {})[sample.face_role] = sample
+    pairs: list[dict[str, object]] = []
+    for col, faces in sorted(by_col.items()):
+        lower = faces.get("lower_edge_face")
+        upper = faces.get("upper_edge_face")
+        if lower is None or upper is None:
+            continue
+        reference_opposed = (
+            lower.reference_volume_sign != 0
+            and upper.reference_volume_sign != 0
+            and lower.reference_volume_sign == -upper.reference_volume_sign
+        )
+        candidate_opposed = (
+            lower.candidate_volume_sign != 0
+            and upper.candidate_volume_sign != 0
+            and lower.candidate_volume_sign == -upper.candidate_volume_sign
+        )
+        pairs.append(
+            {
+                "column_index": col,
+                "lower_reference_volume_sign": lower.reference_volume_sign,
+                "upper_reference_volume_sign": upper.reference_volume_sign,
+                "lower_candidate_volume_sign": lower.candidate_volume_sign,
+                "upper_candidate_volume_sign": upper.candidate_volume_sign,
+                "lower_reference_x_momentum_sign": lower.reference_x_momentum_sign,
+                "upper_reference_x_momentum_sign": upper.reference_x_momentum_sign,
+                "lower_candidate_x_momentum_sign": lower.candidate_x_momentum_sign,
+                "upper_candidate_x_momentum_sign": upper.candidate_x_momentum_sign,
+                "reference_opposed_edges": reference_opposed,
+                "candidate_opposed_edges": candidate_opposed,
+                "matches_reference_opposition": (not reference_opposed) or candidate_opposed,
+                "lower_abs_volume_flux_delta_m3ps": lower.abs_volume_flux_delta_m3ps,
+                "upper_abs_volume_flux_delta_m3ps": upper.abs_volume_flux_delta_m3ps,
+                "lower_abs_balance_delta_m3ps2": lower.abs_balance_delta_m3ps2,
+                "upper_abs_balance_delta_m3ps2": upper.abs_balance_delta_m3ps2,
+            }
+        )
+    return tuple(pairs)
+
+
+def _face_source_audit_blocked_reasons(
+    samples: tuple[Milestone18ConstrictionFaceSourceAuditSample, ...],
+    edge_pair_summary: tuple[dict[str, object], ...],
+) -> tuple[str, ...]:
+    reasons: list[str] = []
+    if any(not sample.volume_sign_matches for sample in samples):
+        reasons.append("C++ reconstructed y-face volume flux signs do not match GeoClaw on one or more upstream edge faces.")
+    if any(not sample.x_momentum_sign_matches for sample in samples):
+        reasons.append("C++ reconstructed y-face x-momentum transport signs do not match GeoClaw.")
+    if any(sample.abs_volume_flux_delta_m3ps > sample.flux_delta_threshold_m3ps for sample in samples):
+        reasons.append("C++ reconstructed upstream lateral volume-flux deltas exceed the diagnostic threshold.")
+    if any(sample.abs_balance_delta_m3ps2 > sample.balance_delta_threshold_m3ps2 for sample in samples):
+        reasons.append("C++ reconstructed normal momentum plus bed-source balance deltas exceed the diagnostic threshold.")
+    if any(not pair.get("matches_reference_opposition", True) for pair in edge_pair_summary):
+        reasons.append("GeoClaw has opposite-signed lower/upper upstream edge fluxes that C++ still does not reproduce.")
+    return tuple(reasons)
+
+
+def _face_source_audit_next_levers(
+    samples: tuple[Milestone18ConstrictionFaceSourceAuditSample, ...],
+    edge_pair_summary: tuple[dict[str, object], ...],
+) -> tuple[str, ...]:
+    if not samples:
+        return ()
+    worst = sorted(
+        samples,
+        key=lambda sample: (
+            not sample.volume_sign_matches,
+            not sample.x_momentum_sign_matches,
+            sample.volume_ratio_to_threshold,
+            sample.balance_ratio_to_threshold,
+        ),
+        reverse=True,
+    )[0]
+    levers = [
+        (
+            f"Start with `{worst.face_role}` column {worst.column_index} rows "
+            f"{worst.south_row_index}-{worst.north_row_index}; reconstructed q delta is "
+            f"{_format_number(worst.volume_flux_delta_m3ps)} m3/s and balance delta is "
+            f"{_format_number(worst.balance_delta_m3ps2)} m3/s2."
+        ),
+        "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
+        "Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.",
+    ]
+    if any(not pair.get("matches_reference_opposition", True) for pair in edge_pair_summary):
+        levers.append(
+            "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
+        )
+    return tuple(levers)
+
+
 def _threshold_ratio(value: float, threshold: float) -> float:
     if threshold == 0.0:
         return float("inf") if value else 0.0
@@ -5898,6 +6494,57 @@ def _lateral_face_flux_sample_row(sample: Milestone18ConstrictionLateralFaceFlux
 def _lateral_face_flux_pair_row(pair: dict[str, object]) -> str:
     lower_signs = f"{pair.get('lower_reference_sign')}->{pair.get('lower_candidate_sign')}"
     upper_signs = f"{pair.get('upper_reference_sign')}->{pair.get('upper_candidate_sign')}"
+    return (
+        "| "
+        f"{pair.get('column_index')} | "
+        f"`{lower_signs}` | "
+        f"`{upper_signs}` | "
+        f"`{bool(pair.get('reference_opposed_edges'))}` | "
+        f"`{bool(pair.get('candidate_opposed_edges'))}` | "
+        f"`{bool(pair.get('matches_reference_opposition'))}` |"
+    )
+
+
+def _face_source_audit_sample_row(sample: Milestone18ConstrictionFaceSourceAuditSample) -> str:
+    reference_state = (
+        f"{_format_number(sample.reference_mean_h)}/"
+        f"{_format_number(sample.reference_mean_u)}/"
+        f"{_format_number(sample.reference_mean_v)}/"
+        f"{_format_number(sample.reference_volume_flux_m3ps)}"
+    )
+    candidate_state = (
+        f"{_format_number(sample.candidate_mean_h)}/"
+        f"{_format_number(sample.candidate_mean_u)}/"
+        f"{_format_number(sample.candidate_mean_v)}/"
+        f"{_format_number(sample.candidate_volume_flux_m3ps)}"
+    )
+    x_momentum_signs = f"{sample.reference_x_momentum_sign}->{sample.candidate_x_momentum_sign}"
+    balance = (
+        f"{_format_number(sample.normal_momentum_flux_delta_m3ps2)}/"
+        f"{_format_number(sample.bed_source_delta_m3ps2)}/"
+        f"{_format_number(sample.balance_delta_m3ps2)}"
+    )
+    ratios = f"{sample.volume_ratio_to_threshold:.6g}/{sample.balance_ratio_to_threshold:.6g}"
+    return (
+        "| "
+        f"`{sample.face_role}` | "
+        f"{sample.column_index} | "
+        f"`{sample.south_row_index}-{sample.north_row_index}` | "
+        f"{_format_number(sample.x_m)} | "
+        f"{_format_number(sample.y_face_m)} | "
+        f"{_format_number(sample.bed_step_m)} | "
+        f"`{reference_state}` | "
+        f"`{candidate_state}` | "
+        f"{_format_number(sample.volume_flux_delta_m3ps)} | "
+        f"`{x_momentum_signs}` | "
+        f"`{balance}` | "
+        f"`{ratios}` |"
+    )
+
+
+def _face_source_audit_pair_row(pair: dict[str, object]) -> str:
+    lower_signs = f"{pair.get('lower_reference_volume_sign')}->{pair.get('lower_candidate_volume_sign')}"
+    upper_signs = f"{pair.get('upper_reference_volume_sign')}->{pair.get('upper_candidate_volume_sign')}"
     return (
         "| "
         f"{pair.get('column_index')} | "
