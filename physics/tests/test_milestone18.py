@@ -10,6 +10,9 @@ from raftsim.examples.generate_milestone18_constriction_mask_alignment_report im
 from raftsim.examples.generate_milestone18_constriction_response_timing_report import (
     main as generate_constriction_response_main,
 )
+from raftsim.examples.generate_milestone18_constriction_shape_timing_report import (
+    main as generate_constriction_shape_timing_main,
+)
 from raftsim.examples.generate_milestone18_constriction_throat_shape_report import (
     main as generate_constriction_throat_main,
 )
@@ -21,12 +24,14 @@ from raftsim.milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_RESPONSE_REPORT_SCHEMA,
+    MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA,
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
     MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
     MILESTONE18_PIN_RELEASE_REPORT_SCHEMA,
     build_milestone18_constriction_mask_alignment_report,
     build_milestone18_constriction_response_timing_report,
+    build_milestone18_constriction_shape_timing_report,
     build_milestone18_constriction_throat_shape_report,
     build_milestone18_failure_triage_matrix,
     build_milestone18_parity_family_retune_report,
@@ -480,6 +485,110 @@ def test_generate_milestone18_constriction_response_timing_cli_writes_reports(tm
     assert payload["schema_version"] == MILESTONE18_CONSTRICTION_RESPONSE_REPORT_SCHEMA
     assert payload["decision"] == "BLOCKED"
     assert "Constriction Response Timing Diagnostic" in output_md.read_text(encoding="utf-8")
+
+
+def _constriction_shape_timing_inputs(tmp_path: Path) -> Path:
+    dual_manifest = _constriction_throat_inputs(tmp_path)
+    comparison_root = dual_manifest.parent
+    geoclaw_frame = tmp_path / "geoclaw" / "normalized" / "frames" / "frame_0002.npz"
+    cpp_frame = tmp_path / "cpp" / "constriction_seed_18" / "frames" / "frame_0008.csv"
+    _write_json(
+        comparison_root / "field_comparison.json",
+        {
+            "scenario_id": "constriction_seed_18",
+            "frame_comparisons": [
+                {
+                    "label": "final",
+                    "reference_frame": str(geoclaw_frame),
+                    "cpp_frame": str(cpp_frame),
+                    "field_errors": [],
+                    "slope_errors": [],
+                    "wet_mismatch_fraction": 2 / 9,
+                }
+            ],
+        },
+    )
+    _write_json(
+        comparison_root / "probe_comparison.json",
+        {
+            "scenario_id": "constriction_seed_18",
+            "point_probes": [
+                {
+                    "sample_id": "midstream_center",
+                    "kind": "point",
+                    "field_errors": [
+                        {"field": "h", "linf": 0.2},
+                        {"field": "hv", "linf": 1.4},
+                    ],
+                }
+            ],
+            "cross_sections": [
+                {
+                    "sample_id": "mid_cross_section",
+                    "kind": "cross_section",
+                    "field_errors": [
+                        {"field": "h", "linf": 0.4},
+                        {"field": "v", "linf": 1.7},
+                    ],
+                }
+            ],
+        },
+    )
+    _write_json(
+        comparison_root / "threshold_evaluation.json",
+        {
+            "scenario_id": "constriction_seed_18",
+            "passed": False,
+            "thresholds": {
+                "max_field_linf": 0.25,
+                "max_slope_linf": 0.25,
+                "max_probe_linf": 0.25,
+                "max_cross_section_linf": 0.25,
+            },
+        },
+    )
+    return dual_manifest
+
+
+def test_milestone18_constriction_shape_timing_report_records_worst_shape_samples(tmp_path):
+    dual_manifest = _constriction_shape_timing_inputs(tmp_path)
+
+    report = build_milestone18_constriction_shape_timing_report(dual_manifest)
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert payload["summary"]["max_cross_section_linf"] == 1.7
+    worst_field = payload["samples"]["field"][0]
+    assert worst_field["field"] == "v"
+    assert worst_field["column_index"] == 1
+    assert worst_field["zone_id"] == "constriction_throat"
+    assert payload["samples"]["probe"][0]["field"] == "hv"
+    assert any("cross-section" in reason for reason in payload["blocked_reasons"])
+    assert "mid-cross-section" in " ".join(payload["next_levers"])
+
+
+def test_generate_milestone18_constriction_shape_timing_cli_writes_reports(tmp_path):
+    dual_manifest = _constriction_shape_timing_inputs(tmp_path)
+    output_json = tmp_path / "reports" / "milestone18" / "constriction_shape_timing.json"
+    output_md = tmp_path / "reports" / "milestone18" / "constriction_shape_timing.md"
+
+    exit_code = generate_constriction_shape_timing_main(
+        [
+            "--dual-solver-manifest",
+            str(dual_manifest),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert "Constriction Shape/Timing Diagnostic" in output_md.read_text(encoding="utf-8")
 
 
 def test_milestone18_parity_family_retune_report_records_partial_promotion(tmp_path):
