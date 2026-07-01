@@ -13,6 +13,14 @@ from typing import Any
 import numpy as np
 
 from .analytic_validation import AnalyticCandidateKind, AnalyticValidationReport, compare_analytic_fixture_manifest
+from .comparison import (
+    CROSS_SECTION_FIELD_NAMES,
+    DEFAULT_VELOCITY_DEPTH_FLOOR,
+    FIELD_NAMES,
+    PROBE_FIELD_NAMES,
+    SLOPE_FIELD_NAMES,
+    VELOCITY_LIKE_FIELD_NAMES,
+)
 from .feature_validation import build_crew_overboard_fixtures2_5d, evaluate_crew_overboard_fixture2_5d
 from .math3d import Vec3
 from .raft_coupling2_5d import (
@@ -30,6 +38,7 @@ MILESTONE18_PIN_RELEASE_REPORT_SCHEMA = "raftsim.milestone18.pin_release_fixture
 MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA = "raftsim.milestone18.constriction_throat_shape.v0"
 MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA = "raftsim.milestone18.constriction_mask_alignment.v0"
 MILESTONE18_CONSTRICTION_RESPONSE_REPORT_SCHEMA = "raftsim.milestone18.constriction_response_timing.v0"
+MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA = "raftsim.milestone18.constriction_shape_timing.v0"
 
 _CORE_GUARDRAIL_FAMILIES = {"hydrostatic_sloping_balance", "uniform_channel", "dam_break_bore"}
 _GEOMETRY_CLOSURE_FAMILIES = {"wet_dry_shoreline", "bed_step", "constriction", "drops_ledges_tailwater"}
@@ -1165,6 +1174,185 @@ class Milestone18ConstrictionResponseTimingReport:
 
 
 @dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionShapeErrorSample:
+    """Worst observed shape/timing error for one field, slope, probe, or cross-section metric."""
+
+    category: str
+    field: str
+    source_id: str
+    value: float
+    threshold: float
+    ratio_to_threshold: float
+    frame_label: str | None = None
+    frame_index: int | None = None
+    time_s: float | None = None
+    distance_m: float | None = None
+    row_index: int | None = None
+    column_index: int | None = None
+    x_m: float | None = None
+    y_m: float | None = None
+    zone_id: str | None = None
+    reference_value: float | None = None
+    candidate_value: float | None = None
+    delta: float | None = None
+    reference_path: str | None = None
+    cpp_path: str | None = None
+
+    @property
+    def passed(self) -> bool:
+        return self.value <= self.threshold
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["passed"] = self.passed
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionShapeTimingReport:
+    """Diagnostic report locating constriction field, slope, probe, and cross-section blockers."""
+
+    dual_solver_manifest: str
+    scenario_package: str
+    scenario_id: str
+    feature: dict[str, object]
+    grid: dict[str, object]
+    wet_depth_threshold_m: float
+    velocity_depth_floor_m: float
+    zones: dict[str, tuple[int, ...]]
+    thresholds: dict[str, float]
+    field_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...]
+    slope_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...]
+    probe_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...]
+    cross_section_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...]
+    blocked_reasons: tuple[str, ...]
+    next_levers: tuple[str, ...]
+
+    @property
+    def passed(self) -> bool:
+        return not self.blocked_reasons
+
+    @property
+    def samples(self) -> tuple[Milestone18ConstrictionShapeErrorSample, ...]:
+        return self.field_samples + self.slope_samples + self.probe_samples + self.cross_section_samples
+
+    def to_json_dict(self) -> dict[str, object]:
+        sample_groups = {
+            "field": self.field_samples,
+            "slope": self.slope_samples,
+            "probe": self.probe_samples,
+            "cross_section": self.cross_section_samples,
+        }
+        return {
+            "schema_version": MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "dual_solver_manifest": self.dual_solver_manifest,
+            "scenario_package": self.scenario_package,
+            "scenario_id": self.scenario_id,
+            "feature": self.feature,
+            "grid": self.grid,
+            "wet_depth_threshold_m": self.wet_depth_threshold_m,
+            "velocity_depth_floor_m": self.velocity_depth_floor_m,
+            "zones": {zone_id: list(columns) for zone_id, columns in self.zones.items()},
+            "thresholds": self.thresholds,
+            "summary": {
+                "sample_count": len(self.samples),
+                "max_field_linf": _max_sample_value(self.field_samples),
+                "max_slope_linf": _max_sample_value(self.slope_samples),
+                "max_probe_linf": _max_sample_value(self.probe_samples),
+                "max_cross_section_linf": _max_sample_value(self.cross_section_samples),
+                "worst_overall": [sample.to_json_dict() for sample in self._worst_overall()],
+            },
+            "samples": {
+                category: [sample.to_json_dict() for sample in samples]
+                for category, samples in sample_groups.items()
+            },
+            "blocked_reasons": list(self.blocked_reasons),
+            "next_levers": list(self.next_levers),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        summary = self.to_json_dict()["summary"]
+        lines = [
+            "# Milestone 18 Constriction Shape/Timing Diagnostic",
+            "",
+            f"Schema: `{MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Scenario: `{self.scenario_id}`",
+            f"Dual solver manifest: `{self.dual_solver_manifest}`",
+            f"Scenario package: `{self.scenario_package}`",
+            f"Wet-depth threshold: `{self.wet_depth_threshold_m:.6g}` m",
+            f"Velocity depth floor: `{self.velocity_depth_floor_m:.6g}` m",
+            "",
+            "## Summary",
+            "",
+            f"- Max field Linf: `{_format_number(_float_or_none(summary.get('max_field_linf')))}`",
+            f"- Max slope Linf: `{_format_number(_float_or_none(summary.get('max_slope_linf')))}`",
+            f"- Max probe Linf: `{_format_number(_float_or_none(summary.get('max_probe_linf')))}`",
+            f"- Max cross-section Linf: `{_format_number(_float_or_none(summary.get('max_cross_section_linf')))}`",
+            "",
+            "## Zones",
+            "",
+            "| Zone | Columns |",
+            "| --- | --- |",
+        ]
+        for zone_id, columns in self.zones.items():
+            lines.append(f"| `{zone_id}` | `{_column_span(columns)}` |")
+        lines.extend(
+            [
+                "",
+                "## Worst Field And Slope Cells",
+                "",
+                "| Category | Field | Frame | Zone | Cell | x m | y m | GeoClaw | C++ | Delta | Abs error | Threshold | Ratio |",
+                "| --- | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for sample in self._worst_grid_samples():
+            lines.append(_shape_sample_grid_row(sample))
+        lines.extend(
+            [
+                "",
+                "## Worst Probe And Cross-Section Series",
+                "",
+                "| Category | Sample | Field | Time s | Distance m | Abs error | Threshold | Ratio |",
+                "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for sample in self._worst_series_samples():
+            lines.append(_shape_sample_series_row(sample))
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.next_levers:
+            lines.extend(["", "## Next Levers", ""])
+            lines.extend(f"- {lever}" for lever in self.next_levers)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+    def _worst_overall(self) -> tuple[Milestone18ConstrictionShapeErrorSample, ...]:
+        return tuple(sorted(self.samples, key=lambda sample: sample.ratio_to_threshold, reverse=True)[:12])
+
+    def _worst_grid_samples(self) -> tuple[Milestone18ConstrictionShapeErrorSample, ...]:
+        samples = self.field_samples + self.slope_samples
+        return tuple(sorted(samples, key=lambda sample: sample.ratio_to_threshold, reverse=True)[:12])
+
+    def _worst_series_samples(self) -> tuple[Milestone18ConstrictionShapeErrorSample, ...]:
+        samples = self.probe_samples + self.cross_section_samples
+        return tuple(sorted(samples, key=lambda sample: sample.ratio_to_threshold, reverse=True)[:12])
+
+
+@dataclass(frozen=True, slots=True)
 class Milestone18PinReleaseResponsePath:
     """One action timing path through the dedicated pin/release fixture."""
 
@@ -1686,6 +1874,120 @@ def build_milestone18_constriction_response_timing_report(
         cpp_snapshots=cpp_snapshots,
         zone_deltas=zone_deltas,
         thresholds=thresholds,
+        blocked_reasons=blocked_reasons,
+        next_levers=next_levers,
+    )
+
+
+def build_milestone18_constriction_shape_timing_report(
+    dual_solver_manifest: str | Path,
+    *,
+    wet_depth_threshold_m: float = 0.15,
+    velocity_depth_floor_m: float = DEFAULT_VELOCITY_DEPTH_FLOOR,
+    top_n: int = 12,
+) -> Milestone18ConstrictionShapeTimingReport:
+    """Locate the worst constriction field, slope, probe, and cross-section shape/timing errors."""
+
+    manifest_path = Path(dual_solver_manifest)
+    manifest = _load_json_report(manifest_path)
+    comparison_dir = manifest_path.parent
+    scenario_package = _resolve_path(str(manifest.get("scenario_package", "")), comparison_dir)
+    scenario = _load_json_report(scenario_package / "scenario.json")
+    features = _load_json_report(scenario_package / "features.json")
+    constriction = _constriction_feature(features)
+    grid = _scenario_grid(scenario)
+
+    initial_state_path = _scenario_array_path(scenario_package, scenario, "initial_state", "initial_state.npz")
+    initial_state = _load_npz_water_state(initial_state_path, h_key="depth")
+    zones = _constriction_response_zones(initial_state, grid, constriction, wet_depth_threshold_m)
+
+    field_report_path = comparison_dir / "field_comparison.json"
+    probe_report_path = comparison_dir / "probe_comparison.json"
+    threshold_report_path = comparison_dir / "threshold_evaluation.json"
+    field_report = _load_json_report(field_report_path)
+    probe_report = _load_json_report(probe_report_path)
+    threshold_report = _load_json_report(threshold_report_path)
+    thresholds = _shape_timing_thresholds(threshold_report)
+
+    field_samples: list[Milestone18ConstrictionShapeErrorSample] = []
+    slope_samples: list[Milestone18ConstrictionShapeErrorSample] = []
+    for frame_index, frame_record in enumerate(_records(field_report, "frame_comparisons")):
+        field_samples.extend(
+            _constriction_frame_worst_samples(
+                frame_record,
+                frame_index,
+                grid,
+                zones,
+                category="field",
+                fields=FIELD_NAMES,
+                threshold=thresholds["max_field_linf"],
+                velocity_depth_floor_m=velocity_depth_floor_m,
+            )
+        )
+        slope_samples.extend(
+            _constriction_frame_worst_samples(
+                frame_record,
+                frame_index,
+                grid,
+                zones,
+                category="slope",
+                fields=SLOPE_FIELD_NAMES,
+                threshold=thresholds["max_slope_linf"],
+                velocity_depth_floor_m=velocity_depth_floor_m,
+            )
+        )
+
+    probe_samples = tuple(
+        _shape_summary_samples(
+            _records(probe_report, "point_probes"),
+            category="probe",
+            threshold=thresholds["max_probe_linf"],
+            fields=PROBE_FIELD_NAMES,
+            top_n=top_n,
+        )
+    )
+    cross_section_samples = tuple(
+        _shape_summary_samples(
+            _records(probe_report, "cross_sections"),
+            category="cross_section",
+            threshold=thresholds["max_cross_section_linf"],
+            fields=CROSS_SECTION_FIELD_NAMES,
+            top_n=top_n,
+        )
+    )
+
+    sorted_field_samples = tuple(
+        sorted(field_samples, key=lambda sample: sample.ratio_to_threshold, reverse=True)[:top_n]
+    )
+    sorted_slope_samples = tuple(
+        sorted(slope_samples, key=lambda sample: sample.ratio_to_threshold, reverse=True)[:top_n]
+    )
+    blocked_reasons = _constriction_shape_timing_blocked_reasons(
+        sorted_field_samples,
+        sorted_slope_samples,
+        probe_samples,
+        cross_section_samples,
+    )
+    next_levers = _constriction_shape_timing_next_levers(
+        sorted_field_samples,
+        sorted_slope_samples,
+        probe_samples,
+        cross_section_samples,
+    )
+    return Milestone18ConstrictionShapeTimingReport(
+        dual_solver_manifest=str(manifest_path),
+        scenario_package=str(scenario_package),
+        scenario_id=str(manifest.get("scenario_id") or scenario.get("metadata", {}).get("scenario_id") or "unknown"),
+        feature=constriction,
+        grid=grid,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        velocity_depth_floor_m=velocity_depth_floor_m,
+        zones=zones,
+        thresholds=thresholds,
+        field_samples=sorted_field_samples,
+        slope_samples=sorted_slope_samples,
+        probe_samples=probe_samples,
+        cross_section_samples=cross_section_samples,
         blocked_reasons=blocked_reasons,
         next_levers=next_levers,
     )
@@ -2488,6 +2790,11 @@ def _froude_array(h: np.ndarray, u: np.ndarray, v: np.ndarray) -> np.ndarray:
     return froude
 
 
+def _slopes_from_eta(eta: np.ndarray, dx: float, dy: float) -> tuple[np.ndarray, np.ndarray]:
+    slope_y, slope_x = np.gradient(np.asarray(eta, dtype=float), dy, dx)
+    return slope_x, slope_y
+
+
 def _frame_paths(manifest: dict[str, Any], manifest_dir: Path) -> tuple[Path, ...]:
     frames = manifest.get("frames", [])
     if not isinstance(frames, list) or not frames:
@@ -2514,6 +2821,250 @@ def _load_water_frame(path: Path, ny: int, nx: int) -> dict[str, np.ndarray]:
     if path.suffix == ".npz":
         return _load_npz_water_state(path, h_key="h")
     return _load_cpp_water_csv(path, ny, nx)
+
+
+def _load_water_frame_fields(path: Path, ny: int, nx: int) -> dict[str, np.ndarray]:
+    if path.suffix == ".npz":
+        with np.load(path) as data:
+            h_key = "h" if "h" in data else "depth"
+            h = np.asarray(data[h_key], dtype=float)
+            fields: dict[str, np.ndarray] = {
+                "h": h,
+                "eta": np.asarray(data["eta"], dtype=float) if "eta" in data else h.copy(),
+                "u": np.asarray(data["u"], dtype=float) if "u" in data else np.zeros_like(h),
+                "v": np.asarray(data["v"], dtype=float) if "v" in data else np.zeros_like(h),
+                "hu": np.asarray(data["hu"], dtype=float) if "hu" in data else np.zeros_like(h),
+                "hv": np.asarray(data["hv"], dtype=float) if "hv" in data else np.zeros_like(h),
+                "normal_x": np.asarray(data["normal_x"], dtype=float) if "normal_x" in data else np.zeros_like(h),
+                "normal_y": np.asarray(data["normal_y"], dtype=float) if "normal_y" in data else np.zeros_like(h),
+                "normal_z": np.asarray(data["normal_z"], dtype=float) if "normal_z" in data else np.ones_like(h),
+                "froude": np.asarray(data["froude"], dtype=float) if "froude" in data else np.zeros_like(h),
+                "wet": np.asarray(data["wet"], dtype=bool) if "wet" in data else h > 0.0,
+            }
+            return fields
+
+    arrays: dict[str, np.ndarray] = {
+        "h": np.zeros((ny, nx), dtype=float),
+        "eta": np.zeros((ny, nx), dtype=float),
+        "u": np.zeros((ny, nx), dtype=float),
+        "v": np.zeros((ny, nx), dtype=float),
+        "hu": np.zeros((ny, nx), dtype=float),
+        "hv": np.zeros((ny, nx), dtype=float),
+        "normal_x": np.zeros((ny, nx), dtype=float),
+        "normal_y": np.zeros((ny, nx), dtype=float),
+        "normal_z": np.ones((ny, nx), dtype=float),
+        "froude": np.zeros((ny, nx), dtype=float),
+        "wet": np.zeros((ny, nx), dtype=bool),
+    }
+    with path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        for row in reader:
+            row_index = int(row["row"])
+            column_index = int(row["col"])
+            for field in FIELD_NAMES + ("froude",):
+                arrays[field][row_index, column_index] = float(row.get(field, 0.0))
+            arrays["wet"][row_index, column_index] = row.get("wet", "0") in {"1", "true", "True"}
+    return arrays
+
+
+def _shape_timing_thresholds(threshold_report: dict[str, Any]) -> dict[str, float]:
+    thresholds = threshold_report.get("thresholds", {})
+    if not isinstance(thresholds, dict):
+        thresholds = {}
+    return {
+        "max_field_linf": float(thresholds.get("max_field_linf", 0.25)),
+        "max_slope_linf": float(thresholds.get("max_slope_linf", 0.25)),
+        "max_probe_linf": float(thresholds.get("max_probe_linf", 0.25)),
+        "max_cross_section_linf": float(thresholds.get("max_cross_section_linf", 0.25)),
+    }
+
+
+def _constriction_frame_worst_samples(
+    frame_record: dict[str, Any],
+    frame_index: int,
+    grid: dict[str, object],
+    zones: dict[str, tuple[int, ...]],
+    *,
+    category: str,
+    fields: tuple[str, ...],
+    threshold: float,
+    velocity_depth_floor_m: float,
+) -> tuple[Milestone18ConstrictionShapeErrorSample, ...]:
+    reference_path = Path(str(frame_record.get("reference_frame") or frame_record.get("pyclaw_frame") or ""))
+    cpp_path = Path(str(frame_record.get("cpp_frame") or ""))
+    ny = int(grid["ny"])
+    nx = int(grid["nx"])
+    reference = _load_water_frame_fields(reference_path, ny, nx)
+    candidate = _load_water_frame_fields(cpp_path, ny, nx)
+    frame_label = _str_or_none(frame_record.get("label")) or f"frame_{frame_index:04d}"
+    fallback_time_s = float(frame_index)
+    time_s = _water_frame_time(reference_path, fallback_time_s)
+    if category == "slope":
+        ref_slope_x, ref_slope_y = _slopes_from_eta(reference["eta"], float(grid["dx"]), float(grid["dy"]))
+        cand_slope_x, cand_slope_y = _slopes_from_eta(candidate["eta"], float(grid["dx"]), float(grid["dy"]))
+        reference_fields = {"slope_x": ref_slope_x, "slope_y": ref_slope_y}
+        candidate_fields = {"slope_x": cand_slope_x, "slope_y": cand_slope_y}
+    else:
+        reference_fields = reference
+        candidate_fields = candidate
+
+    samples: list[Milestone18ConstrictionShapeErrorSample] = []
+    for field_name in fields:
+        if field_name not in reference_fields or field_name not in candidate_fields:
+            continue
+        mask = None
+        if field_name in VELOCITY_LIKE_FIELD_NAMES:
+            mask = (reference["h"] >= velocity_depth_floor_m) & (candidate["h"] >= velocity_depth_floor_m)
+        sample = _worst_grid_field_sample(
+            category=category,
+            field=field_name,
+            source_id=frame_label,
+            reference=np.asarray(reference_fields[field_name], dtype=float),
+            candidate=np.asarray(candidate_fields[field_name], dtype=float),
+            grid=grid,
+            zones=zones,
+            threshold=threshold,
+            mask=mask,
+            frame_label=frame_label,
+            frame_index=frame_index,
+            time_s=time_s,
+            reference_path=reference_path,
+            cpp_path=cpp_path,
+        )
+        if sample is not None:
+            samples.append(sample)
+    return tuple(samples)
+
+
+def _worst_grid_field_sample(
+    *,
+    category: str,
+    field: str,
+    source_id: str,
+    reference: np.ndarray,
+    candidate: np.ndarray,
+    grid: dict[str, object],
+    zones: dict[str, tuple[int, ...]],
+    threshold: float,
+    mask: np.ndarray | None,
+    frame_label: str,
+    frame_index: int,
+    time_s: float,
+    reference_path: Path,
+    cpp_path: Path,
+) -> Milestone18ConstrictionShapeErrorSample | None:
+    if reference.shape != candidate.shape:
+        raise ValueError(f"{field} shape mismatch: reference={reference.shape} C++={candidate.shape}")
+    diff = candidate - reference
+    abs_diff = np.abs(diff)
+    if mask is not None:
+        if mask.shape != abs_diff.shape:
+            raise ValueError(f"{field} mask shape mismatch: mask={mask.shape} field={abs_diff.shape}")
+        if not np.any(mask):
+            return None
+        abs_diff = np.where(mask, abs_diff, -1.0)
+    row_index, column_index = (int(value) for value in np.unravel_index(int(np.argmax(abs_diff)), abs_diff.shape))
+    value = float(abs(diff[row_index, column_index]))
+    return Milestone18ConstrictionShapeErrorSample(
+        category=category,
+        field=field,
+        source_id=source_id,
+        value=value,
+        threshold=threshold,
+        ratio_to_threshold=_threshold_ratio(value, threshold),
+        frame_label=frame_label,
+        frame_index=frame_index,
+        time_s=time_s,
+        row_index=row_index,
+        column_index=column_index,
+        x_m=float(grid["origin_x"]) + column_index * float(grid["dx"]),
+        y_m=float(grid["origin_y"]) + row_index * float(grid["dy"]),
+        zone_id=_constriction_zone_for_column(column_index, zones),
+        reference_value=float(reference[row_index, column_index]),
+        candidate_value=float(candidate[row_index, column_index]),
+        delta=float(diff[row_index, column_index]),
+        reference_path=str(reference_path),
+        cpp_path=str(cpp_path),
+    )
+
+
+def _shape_summary_samples(
+    series_records: list[dict[str, Any]],
+    *,
+    category: str,
+    threshold: float,
+    fields: tuple[str, ...],
+    top_n: int,
+) -> tuple[Milestone18ConstrictionShapeErrorSample, ...]:
+    field_order = {field: index for index, field in enumerate(fields)}
+    samples: list[Milestone18ConstrictionShapeErrorSample] = []
+    for record in series_records:
+        source_id = str(record.get("sample_id", "unknown"))
+        for error in _records(record, "field_errors"):
+            field = str(error.get("field", "unknown"))
+            if field_order and field not in field_order:
+                continue
+            value = _float_or_none(error.get("linf"))
+            if value is None:
+                continue
+            samples.append(
+                Milestone18ConstrictionShapeErrorSample(
+                    category=category,
+                    field=field,
+                    source_id=source_id,
+                    value=value,
+                    threshold=threshold,
+                    ratio_to_threshold=_threshold_ratio(value, threshold),
+                )
+            )
+    return tuple(
+        sorted(
+            samples,
+            key=lambda sample: (sample.ratio_to_threshold, -field_order.get(sample.field, 999)),
+            reverse=True,
+        )[:top_n]
+    )
+
+
+def _constriction_shape_timing_blocked_reasons(
+    field_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...],
+    slope_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...],
+    probe_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...],
+    cross_section_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...],
+) -> tuple[str, ...]:
+    reasons: list[str] = []
+    if _max_sample_exceeds(field_samples):
+        reasons.append("C++ constriction field Linf still exceeds the GeoClaw/C++ threshold.")
+    if _max_sample_exceeds(slope_samples):
+        reasons.append("C++ constriction free-surface slope Linf still exceeds the GeoClaw/C++ threshold.")
+    if _max_sample_exceeds(probe_samples):
+        reasons.append("C++ constriction point-probe Linf still exceeds the GeoClaw/C++ threshold.")
+    if _max_sample_exceeds(cross_section_samples):
+        reasons.append("C++ constriction cross-section Linf still exceeds the GeoClaw/C++ threshold.")
+    return tuple(reasons)
+
+
+def _constriction_shape_timing_next_levers(
+    field_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...],
+    slope_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...],
+    probe_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...],
+    cross_section_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...],
+) -> tuple[str, ...]:
+    samples = tuple(sorted(field_samples + slope_samples + probe_samples + cross_section_samples, key=lambda sample: sample.ratio_to_threshold, reverse=True))
+    if not samples:
+        return ("No shape/timing samples were available; rerun the corrected-reference comparison before retuning.",)
+    worst = samples[0]
+    levers = [
+        f"Start with `{worst.category}`/`{worst.field}` at `{worst.source_id}` because it is {_format_number(worst.ratio_to_threshold)}x the diagnostic threshold.",
+    ]
+    if any(sample.field in {"v", "hv", "slope_y"} for sample in samples[:6]):
+        levers.append("Retune lateral velocity and cross-stream surface-slope shape before adding more downstream speed.")
+    if any(sample.field in {"h", "eta", "slope_x"} for sample in samples[:6]):
+        levers.append("Retune depth/free-surface distribution by zone so field and slope errors move together.")
+    if any(sample.category == "cross_section" for sample in samples[:6]):
+        levers.append("Use the mid-cross-section profile as the acceptance surface before another full parity run.")
+    levers.append("Keep feature forcing off and rerun the Milestone 17 analytic guardrail after the next solver change.")
+    return tuple(dict.fromkeys(levers))
 
 
 def _constriction_response_zones(
@@ -3308,6 +3859,63 @@ def _column_span(columns: tuple[int, ...]) -> str:
     if len(columns) == 1:
         return str(columns[0])
     return f"{columns[0]}-{columns[-1]}"
+
+
+def _max_sample_value(samples: tuple[Milestone18ConstrictionShapeErrorSample, ...]) -> float:
+    return max((sample.value for sample in samples), default=0.0)
+
+
+def _max_sample_exceeds(samples: tuple[Milestone18ConstrictionShapeErrorSample, ...]) -> bool:
+    return any(not sample.passed for sample in samples)
+
+
+def _threshold_ratio(value: float, threshold: float) -> float:
+    if threshold == 0.0:
+        return float("inf") if value else 0.0
+    return abs(value) / abs(threshold)
+
+
+def _constriction_zone_for_column(column_index: int, zones: dict[str, tuple[int, ...]]) -> str | None:
+    for zone_id, columns in zones.items():
+        if column_index in columns:
+            return zone_id
+    return None
+
+
+def _shape_sample_grid_row(sample: Milestone18ConstrictionShapeErrorSample) -> str:
+    cell = "n/a"
+    if sample.row_index is not None and sample.column_index is not None:
+        cell = f"{sample.row_index},{sample.column_index}"
+    return (
+        "| "
+        f"`{sample.category}` | "
+        f"`{sample.field}` | "
+        f"`{sample.frame_label or sample.source_id}` | "
+        f"`{sample.zone_id or 'n/a'}` | "
+        f"`{cell}` | "
+        f"{_format_number(sample.x_m)} | "
+        f"{_format_number(sample.y_m)} | "
+        f"{_format_number(sample.reference_value)} | "
+        f"{_format_number(sample.candidate_value)} | "
+        f"{_format_number(sample.delta)} | "
+        f"{sample.value:.6g} | "
+        f"{sample.threshold:.6g} | "
+        f"{sample.ratio_to_threshold:.6g} |"
+    )
+
+
+def _shape_sample_series_row(sample: Milestone18ConstrictionShapeErrorSample) -> str:
+    return (
+        "| "
+        f"`{sample.category}` | "
+        f"`{sample.source_id}` | "
+        f"`{sample.field}` | "
+        f"{_format_number(sample.time_s)} | "
+        f"{_format_number(sample.distance_m)} | "
+        f"{sample.value:.6g} | "
+        f"{sample.threshold:.6g} | "
+        f"{sample.ratio_to_threshold:.6g} |"
+    )
 
 
 def _markdown_counter_table(label: str, counts: object) -> str:
