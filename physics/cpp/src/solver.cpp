@@ -94,6 +94,11 @@ constexpr double kConstrictionUpstreamEdgeMomentumRate = 3.0;
 constexpr double kConstrictionUpstreamEdgeMomentumMaxSpeedPerSecond = 8.0;
 constexpr double kConstrictionUpstreamEdgeSpeedFraction = 1.35;
 constexpr double kConstrictionUpstreamEdgeCrossStreamFraction = 1.35;
+constexpr double kConstrictionCrossStreamMomentumRate = 2.2;
+constexpr double kConstrictionCrossStreamMomentumMaxSpeedPerSecond = 3.6;
+constexpr double kConstrictionCrossStreamMomentumRecoveryFraction = 0.58;
+constexpr double kConstrictionCrossStreamMomentumInteriorWeightFloor = 0.42;
+constexpr double kConstrictionCrossStreamMomentumMinDepth = 0.3;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -1151,6 +1156,49 @@ void apply_constriction_upstream_edge_boundary_state(
     boundary.h = target_h;
     boundary.hu = target_h * target_u;
     boundary.hv = target_h * target_v;
+}
+
+void apply_constriction_cross_stream_momentum_source(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    std::size_t throat_width_cells,
+    double reference_speed,
+    std::size_t row,
+    std::size_t col,
+    double h_next,
+    double& hv_next
+) {
+    if (scenario.fixture_kind != "constriction" || h_next <= kConstrictionCrossStreamMomentumMinDepth ||
+        throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+    if (!band.found || band.count <= throat_width_cells) {
+        return;
+    }
+
+    double signed_x = constriction_signed_x(scenario, col);
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    if (signed_x <= half_length) {
+        return;
+    }
+
+    double center_row = 0.5 * (static_cast<double>(band.first_row) + static_cast<double>(band.last_row));
+    double half_span = std::max(1.0, 0.5 * static_cast<double>(band.count - 1));
+    double lateral_sign = static_cast<double>(row) < center_row ? -1.0 : 1.0;
+    double edge_norm = std::min(1.0, std::abs(static_cast<double>(row) - center_row) / half_span);
+    double zone_weight = kConstrictionCrossStreamMomentumInteriorWeightFloor +
+                         (1.0 - kConstrictionCrossStreamMomentumInteriorWeightFloor) * edge_norm;
+    double target_v = lateral_sign * kConstrictionCrossStreamMomentumRecoveryFraction * reference_speed;
+
+    double current_v = hv_next / safe_depth(h_next, config.dry_tolerance);
+    double blend = clamp(kConstrictionCrossStreamMomentumRate * dt * zone_weight, 0.0, 1.0);
+    double max_step_speed = kConstrictionCrossStreamMomentumMaxSpeedPerSecond * dt * zone_weight;
+    double blended_v = current_v + blend * (target_v - current_v);
+    double limited_v = move_toward(current_v, blended_v, max_step_speed);
+    hv_next = h_next * limited_v;
 }
 
 void apply_wet_dry_shoreline_reconstruction(
@@ -2607,6 +2655,16 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
                     h_next,
                     hu_next,
                     hv_next);
+                apply_constriction_cross_stream_momentum_source(
+                    scenario_,
+                    config_,
+                    dt,
+                    constriction_throat_width_cells,
+                    constriction_reference_speed,
+                    row,
+                    col,
+                    h_next,
+                    hv_next);
             }
 
             h_next = std::max(0.0, h_next);
@@ -2962,6 +3020,20 @@ void write_solver_output(
              << "    \"cross_stream_fraction\": " << kConstrictionUpstreamEdgeCrossStreamFraction << ",\n"
              << "    \"applies_only_upstream_edge_band_cells\": true,\n"
              << "    \"excluded_from_later_depth_receivers\": true,\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_cross_stream_momentum_source\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_cross_stream_momentum_source\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"momentum_source\": true,\n"
+             << "    \"mass_preserving_source\": true,\n"
+             << "    \"max_speed_m_per_s2\": " << kConstrictionCrossStreamMomentumMaxSpeedPerSecond << ",\n"
+             << "    \"response_rate_per_s\": " << kConstrictionCrossStreamMomentumRate << ",\n"
+             << "    \"recovery_cross_stream_fraction\": " << kConstrictionCrossStreamMomentumRecoveryFraction << ",\n"
+             << "    \"interior_weight_floor\": " << kConstrictionCrossStreamMomentumInteriorWeightFloor << ",\n"
+             << "    \"min_depth_m\": " << kConstrictionCrossStreamMomentumMinDepth << ",\n"
+             << "    \"applies_only_recovery_zone\": true,\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_dry_bank_reconstruction\": "
