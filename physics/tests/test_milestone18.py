@@ -829,6 +829,8 @@ def _constriction_lateral_face_flux_inputs(tmp_path: Path) -> Path:
     cpp_root = tmp_path / "cpp" / "constriction_seed_18"
     cpp_frame = cpp_root / "frames" / "frame_0008.csv"
     cpp_frame.parent.mkdir(parents=True, exist_ok=True)
+    cpp_diagnostics = cpp_root / "diagnostics" / "constriction_y_face_flux_source_audit.csv"
+    cpp_diagnostics.parent.mkdir(parents=True, exist_ok=True)
     cpp_h = geoclaw_h.copy()
     cpp_v = zeros.copy()
     cpp_v[0, 1] = -0.2
@@ -843,7 +845,29 @@ def _constriction_lateral_face_flux_inputs(tmp_path: Path) -> Path:
                 f"{row_index},{col_index},{col_index},{row_index},{h},{h + bed[row_index, col_index]},1.0,{v},{h},{h * v},{1 if h > 0 else 0},0,0,1,1.0"
             )
     cpp_frame.write_text("\n".join(rows) + "\n", encoding="utf-8")
-    _write_json(cpp_root / "manifest.json", {"scenario_id": "constriction_seed_18", "frames": ["frames/frame_0008.csv"]})
+    cpp_diagnostics.write_text(
+        "\n".join(
+            [
+                "face_role,column_index,south_row_index,north_row_index,time_s,base_flux_h_m3ps,post_left_flux_h_m3ps,hydro_left_source_hv_m3ps2,hydro_right_source_hv_m3ps2,constriction_left_source_h_m3ps,constriction_right_source_h_m3ps,south_cell_bed_slope_source_hv_per_s,north_cell_bed_slope_source_hv_per_s,hydrostatic_face_source_enabled,constriction_face_source_applied",
+                "lower_edge_face,1,0,1,6.0,-0.1,-0.1,0,0,0,0,-0.2,-0.2,0,0",
+                "upper_edge_face,1,1,2,6.0,-0.2,-0.2,0,0,0.05,0.05,-0.1,-0.1,0,1",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    _write_json(
+        cpp_root / "manifest.json",
+        {
+            "scenario_id": "constriction_seed_18",
+            "frames": ["frames/frame_0008.csv"],
+            "constriction_y_face_flux_source_audit": {
+                "present": True,
+                "path": "diagnostics/constriction_y_face_flux_source_audit.csv",
+            },
+            "diagnostics": ["diagnostics/constriction_y_face_flux_source_audit.csv"],
+        },
+    )
 
     return _write_json(
         tmp_path / "comparison" / "dual_solver_manifest.json",
@@ -909,12 +933,19 @@ def test_milestone18_constriction_face_source_audit_records_flux_source_balance(
     assert payload["summary"]["volume_sign_mismatch_count"] >= 1
     assert payload["summary"]["x_momentum_sign_mismatch_count"] >= 1
     assert payload["summary"]["opposition_mismatch_count"] >= 1
+    assert payload["summary"]["cpp_internal_audit_sample_count"] == 2
+    assert payload["summary"]["cpp_internal_source_applied_count"] == 1
+    assert payload["summary"]["cpp_internal_post_source_sign_mismatch_count"] >= 1
+    assert payload["summary"]["cpp_internal_hydrostatic_face_source_enabled_count"] == 0
     assert payload["summary"]["max_abs_balance_delta_m3ps2"] > 0.0
     worst = payload["summary"]["worst_samples"][0]
     assert worst["face_role"] == "lower_edge_face"
     assert worst["reference_volume_sign"] == 1
     assert worst["candidate_volume_sign"] == -1
     assert "bed_source_delta_m3ps2" in worst
+    assert payload["cpp_internal_audit"][0]["source_report"].endswith(
+        "diagnostics/constriction_y_face_flux_source_audit.csv"
+    )
     assert any(pair["column_index"] == 1 and pair["reference_opposed_edges"] for pair in payload["edge_pair_summary"])
     assert "face/source" in " ".join(payload["next_levers"])
 
