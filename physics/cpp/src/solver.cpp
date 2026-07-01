@@ -86,6 +86,14 @@ constexpr double kConstrictionCenterThroatCirculationMaxSpeedPerSecond = 2.4;
 constexpr double kConstrictionCenterThroatCirculationCrossStreamFraction = 0.62;
 constexpr double kConstrictionCenterThroatCirculationEdgeBoost = 2.35;
 constexpr double kConstrictionCenterThroatCirculationDownstreamSpeedFraction = 1.0;
+constexpr double kConstrictionUpstreamEdgeFluxRate = 1.0;
+constexpr double kConstrictionUpstreamEdgeFluxMaxDepthPerSecond = 0.42;
+constexpr double kConstrictionUpstreamEdgeFluxTargetDepthScale = 0.28;
+constexpr double kConstrictionUpstreamEdgeFluxMinTargetDepth = 0.32;
+constexpr double kConstrictionUpstreamEdgeMomentumRate = 3.0;
+constexpr double kConstrictionUpstreamEdgeMomentumMaxSpeedPerSecond = 8.0;
+constexpr double kConstrictionUpstreamEdgeSpeedFraction = 1.35;
+constexpr double kConstrictionUpstreamEdgeCrossStreamFraction = 1.35;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -965,6 +973,186 @@ bool inside_constriction_local_shallow_fringe(
     return row == target_first || row == target_last;
 }
 
+bool constriction_upstream_edge_cell(
+    const Scenario& scenario,
+    const ColumnWetBand& band,
+    std::size_t throat_width_cells,
+    std::size_t col,
+    std::size_t row
+) {
+    if (scenario.fixture_kind != "constriction" || !band.found || band.count <= throat_width_cells) {
+        return false;
+    }
+
+    double signed_x = constriction_signed_x(scenario, col);
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    if (signed_x >= -half_length) {
+        return false;
+    }
+
+    return row == band.first_row || row == band.last_row;
+}
+
+double constriction_upstream_edge_approach_weight(const Scenario& scenario, std::size_t col) {
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double signed_x = constriction_signed_x(scenario, col);
+    if (signed_x >= -half_length) {
+        return 0.0;
+    }
+    if (signed_x <= -2.0 * half_length) {
+        return 1.0;
+    }
+    return clamp((-signed_x - half_length) / half_length, 0.0, 1.0);
+}
+
+void apply_constriction_upstream_edge_face_flux_source(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    std::size_t throat_width_cells,
+    std::size_t south_row,
+    std::size_t north_row,
+    std::size_t col,
+    const ConservedState& south,
+    const ConservedState& north,
+    InterfaceFluxPair& flux
+) {
+    if (scenario.fixture_kind != "constriction" || throat_width_cells == 0) {
+        return;
+    }
+
+    ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+    if (!band.found || band.count <= throat_width_cells) {
+        return;
+    }
+
+    bool south_is_lower_edge = constriction_upstream_edge_cell(scenario, band, throat_width_cells, col, south_row);
+    bool north_is_upper_edge = constriction_upstream_edge_cell(scenario, band, throat_width_cells, col, north_row);
+    if (!south_is_lower_edge && !north_is_upper_edge) {
+        return;
+    }
+    if (south_is_lower_edge && south_row != band.first_row) {
+        return;
+    }
+    if (north_is_upper_edge && north_row != band.last_row) {
+        return;
+    }
+
+    double approach_weight = constriction_upstream_edge_approach_weight(scenario, col);
+    if (approach_weight <= 0.0) {
+        return;
+    }
+
+    const ConservedState& edge = south_is_lower_edge ? south : north;
+    if (edge.h <= config.dry_tolerance) {
+        return;
+    }
+
+    double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+    double target_h = std::max(kConstrictionUpstreamEdgeFluxMinTargetDepth,
+                               column_mean_depth * kConstrictionUpstreamEdgeFluxTargetDepthScale);
+    if (edge.h <= target_h) {
+        return;
+    }
+
+    double depth_rate = std::min(
+        (edge.h - target_h) * kConstrictionUpstreamEdgeFluxRate,
+        kConstrictionUpstreamEdgeFluxMaxDepthPerSecond * approach_weight);
+    if (depth_rate <= 0.0) {
+        return;
+    }
+
+    double direction = south_is_lower_edge ? 1.0 : -1.0;
+    double mass_flux = direction * depth_rate * scenario.grid.dy;
+    double edge_u = edge.hu / safe_depth(edge.h, config.dry_tolerance);
+    double edge_v = edge.hv / safe_depth(edge.h, config.dry_tolerance);
+    flux.left.h += mass_flux;
+    flux.right.h += mass_flux;
+    flux.left.hu += mass_flux * edge_u;
+    flux.right.hu += mass_flux * edge_u;
+    flux.left.hv += mass_flux * edge_v;
+    flux.right.hv += mass_flux * edge_v;
+}
+
+void apply_constriction_upstream_edge_momentum_source(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    std::size_t throat_width_cells,
+    double reference_speed,
+    std::size_t row,
+    std::size_t col,
+    double h_next,
+    double& hu_next,
+    double& hv_next
+) {
+    if (scenario.fixture_kind != "constriction" || h_next <= config.dry_tolerance ||
+        throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+    if (!constriction_upstream_edge_cell(scenario, band, throat_width_cells, col, row)) {
+        return;
+    }
+
+    double approach_weight = constriction_upstream_edge_approach_weight(scenario, col);
+    if (approach_weight <= 0.0) {
+        return;
+    }
+
+    double lateral_sign = constriction_lateral_sign(band, row);
+    double flow_sign = constriction_flow_sign(scenario);
+    double target_u = flow_sign * kConstrictionUpstreamEdgeSpeedFraction * reference_speed;
+    double target_v = -lateral_sign * kConstrictionUpstreamEdgeCrossStreamFraction * reference_speed;
+    double blend = clamp(kConstrictionUpstreamEdgeMomentumRate * dt * approach_weight, 0.0, 1.0);
+    double max_step_speed = kConstrictionUpstreamEdgeMomentumMaxSpeedPerSecond * dt * approach_weight;
+
+    double u_next = hu_next / safe_depth(h_next, config.dry_tolerance);
+    double v_next = hv_next / safe_depth(h_next, config.dry_tolerance);
+    double blended_u = u_next + blend * (target_u - u_next);
+    double blended_v = v_next + blend * (target_v - v_next);
+    double limited_u = move_toward(u_next, blended_u, max_step_speed);
+    double limited_v = move_toward(v_next, blended_v, max_step_speed);
+    hu_next = h_next * limited_u;
+    hv_next = h_next * limited_v;
+}
+
+void apply_constriction_upstream_edge_boundary_state(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    std::size_t throat_width_cells,
+    double reference_speed,
+    std::size_t row,
+    std::size_t col,
+    ConservedState& boundary
+) {
+    if (scenario.fixture_kind != "constriction" || boundary.h <= config.dry_tolerance ||
+        throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double flow_sign = constriction_flow_sign(scenario);
+    bool upstream_edge_column = flow_sign >= 0.0 ? col == 0 : col + 1 == scenario.grid.nx;
+    if (!upstream_edge_column) {
+        return;
+    }
+
+    ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+    if (!constriction_upstream_edge_cell(scenario, band, throat_width_cells, col, row)) {
+        return;
+    }
+
+    double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+    double target_h = std::max(kConstrictionUpstreamEdgeFluxMinTargetDepth,
+                               column_mean_depth * kConstrictionUpstreamEdgeFluxTargetDepthScale);
+    double lateral_sign = constriction_lateral_sign(band, row);
+    double target_u = flow_sign * kConstrictionUpstreamEdgeSpeedFraction * reference_speed;
+    double target_v = -lateral_sign * kConstrictionUpstreamEdgeCrossStreamFraction * reference_speed;
+    boundary.h = target_h;
+    boundary.hu = target_h * target_u;
+    boundary.hv = target_h * target_v;
+}
+
 void apply_wet_dry_shoreline_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -1040,7 +1228,8 @@ void apply_constriction_volume_response_reconstruction(
         }
 
         for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
-            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row) ||
+                constriction_upstream_edge_cell(scenario, band, throat_width_cells, col, row)) {
                 continue;
             }
             double current_h = next.h(row, col);
@@ -1127,7 +1316,8 @@ void apply_constriction_recovery_energy_transport_reconstruction(
             continue;
         }
         for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
-            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row) ||
+                constriction_upstream_edge_cell(scenario, band, throat_width_cells, col, row)) {
                 continue;
             }
             double current_h = next.h(row, col);
@@ -1518,7 +1708,8 @@ void apply_constriction_near_throat_support_reconstruction(
         double column_mean_depth = initial_column_mean_depth(scenario, band, col);
         double target_h = column_mean_depth * kConstrictionNearThroatReceiverDepthScale;
         for (std::size_t row = band.first_row; row <= band.last_row; ++row) {
-            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells_for_receivers, col, row)) {
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells_for_receivers, col, row) ||
+                constriction_upstream_edge_cell(scenario, band, throat_width_cells_for_receivers, col, row)) {
                 continue;
             }
             if (next.h(row, col) >= target_h) {
@@ -1608,7 +1799,8 @@ void apply_constriction_upstream_recovery_depth_distribution(
                                                : kConstrictionDepthDistributionDownstreamDepthScale;
         double target_h = column_mean_depth * receiver_scale;
         for (std::size_t row = band.first_row; row <= band.last_row; ++row) {
-            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row) ||
+                constriction_upstream_edge_cell(scenario, band, throat_width_cells, col, row)) {
                 continue;
             }
             double current_h = next.h(row, col);
@@ -1775,7 +1967,8 @@ void apply_constriction_flux_mass_froude_timing_reconstruction(
                                                : kConstrictionFluxMassTimingDownstreamReceiverDepthScale;
         double target_h = column_mean_depth * receiver_scale;
         for (std::size_t row = band.first_row; row <= band.last_row; ++row) {
-            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row) ||
+                constriction_upstream_edge_cell(scenario, band, throat_width_cells, col, row)) {
                 continue;
             }
             double current_h = next.h(row, col);
@@ -2314,6 +2507,13 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
     bool use_bed_step_face_source = scenario_.fixture_kind == "bed_step";
     bool use_wet_dry_face_source = scenario_.fixture_kind == "wet_dry_shoreline";
     bool use_hydrostatic_face_source = use_bed_step_face_source || use_wet_dry_face_source;
+    bool use_constriction_upstream_edge_source = scenario_.fixture_kind == "constriction";
+    std::size_t constriction_throat_width_cells =
+        use_constriction_upstream_edge_source ? min_initial_wet_count(scenario_) : 0;
+    double constriction_reference_speed =
+        use_constriction_upstream_edge_source
+            ? constriction_reference_throat_speed(scenario_, constriction_throat_width_cells)
+            : 0.0;
     for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
         for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
             ConservedState center = conserved_from_cell(scenario_, state_, config_, row, col);
@@ -2325,6 +2525,28 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
                                            : boundary_conserved(scenario_, state_, config_, row, col, "south");
             ConservedState north = row + 1 < scenario_.grid.ny ? conserved_from_cell(scenario_, state_, config_, row + 1, col)
                                                                : boundary_conserved(scenario_, state_, config_, row, col, "north");
+            if (use_constriction_upstream_edge_source) {
+                if (col == 0) {
+                    apply_constriction_upstream_edge_boundary_state(
+                        scenario_,
+                        config_,
+                        constriction_throat_width_cells,
+                        constriction_reference_speed,
+                        row,
+                        col,
+                        west);
+                }
+                if (col + 1 == scenario_.grid.nx) {
+                    apply_constriction_upstream_edge_boundary_state(
+                        scenario_,
+                        config_,
+                        constriction_throat_width_cells,
+                        constriction_reference_speed,
+                        row,
+                        col,
+                        east);
+                }
+            }
 
             double center_bed = scenario_.bed(row, col);
             double west_bed = col > 0 ? scenario_.bed(row, col - 1) : center_bed;
@@ -2344,6 +2566,16 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
             InterfaceFluxPair north_flux =
                 hydrostatic_flux_y(
                     center, north, center_bed, north_bed, config_, use_hydrostatic_face_source, use_wet_dry_face_source);
+            if (use_constriction_upstream_edge_source) {
+                if (row > 0) {
+                    apply_constriction_upstream_edge_face_flux_source(
+                        scenario_, config_, constriction_throat_width_cells, row - 1, row, col, south, center, south_flux);
+                }
+                if (row + 1 < scenario_.grid.ny) {
+                    apply_constriction_upstream_edge_face_flux_source(
+                        scenario_, config_, constriction_throat_width_cells, row, row + 1, col, center, north, north_flux);
+                }
+            }
             FluxState flux_w = west_flux.right;
             FluxState flux_e = east_flux.left;
             FluxState flux_s = south_flux.right;
@@ -2362,6 +2594,19 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
             }
             if (use_bed_step_face_source && east_bed - center_bed > 0.1) {
                 hu_next = std::max(hu_next, pre_step_discharge_floor(west, east));
+            }
+            if (use_constriction_upstream_edge_source) {
+                apply_constriction_upstream_edge_momentum_source(
+                    scenario_,
+                    config_,
+                    dt,
+                    constriction_throat_width_cells,
+                    constriction_reference_speed,
+                    row,
+                    col,
+                    h_next,
+                    hu_next,
+                    hv_next);
             }
 
             h_next = std::max(0.0, h_next);
@@ -2700,6 +2945,25 @@ void write_solver_output(
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "wet_dry_shoreline" ? "true" : "false") << ",\n"
              << "  \"fixture_scoped_constriction_boundary_mask\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"fixture_scoped_constriction_upstream_edge_flux_source\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_upstream_edge_flux_source\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative_lateral_face_flux\": true,\n"
+             << "    \"momentum_source\": true,\n"
+             << "    \"preconditions_inflow_edge_state\": true,\n"
+             << "    \"max_depth_m_per_s\": " << kConstrictionUpstreamEdgeFluxMaxDepthPerSecond << ",\n"
+             << "    \"flux_rate_per_s\": " << kConstrictionUpstreamEdgeFluxRate << ",\n"
+             << "    \"target_depth_scale\": " << kConstrictionUpstreamEdgeFluxTargetDepthScale << ",\n"
+             << "    \"min_target_depth_m\": " << kConstrictionUpstreamEdgeFluxMinTargetDepth << ",\n"
+             << "    \"momentum_rate_per_s\": " << kConstrictionUpstreamEdgeMomentumRate << ",\n"
+             << "    \"max_speed_m_per_s2\": " << kConstrictionUpstreamEdgeMomentumMaxSpeedPerSecond << ",\n"
+             << "    \"speed_fraction_of_authored_throat\": " << kConstrictionUpstreamEdgeSpeedFraction << ",\n"
+             << "    \"cross_stream_fraction\": " << kConstrictionUpstreamEdgeCrossStreamFraction << ",\n"
+             << "    \"applies_only_upstream_edge_band_cells\": true,\n"
+             << "    \"excluded_from_later_depth_receivers\": true,\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
              << "  \"fixture_scoped_constriction_dry_bank_reconstruction\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
              << "  \"fixture_scoped_constriction_wet_band_relaxation\": "
