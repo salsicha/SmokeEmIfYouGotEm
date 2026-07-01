@@ -1,0 +1,109 @@
+{
+  "schema": "raftsim.milestone18.constriction_retune_rejection.v0",
+  "decision": "REJECTED",
+  "scenario": "constriction_seed_16",
+  "reference_manifest": "physics/outputs/m18g/c_constrict_corrected/constriction_seed_16/normalized/manifest.json",
+  "scenario_package": "physics/outputs/m18cmp/c_constrict_center_throat_circulation/finite_volume_roe/scenario/constriction_seed_16",
+  "feature_strength_scale": 0.0,
+  "implementation_retained": false,
+  "baseline": {
+    "candidate": "finite_volume_roe_center_throat_circulation",
+    "threshold_checks": {
+      "field_linf": 3.6945464474138565,
+      "slope_linf": 0.8551613579322149,
+      "wet_mismatch_fraction": 0.2708333333333333,
+      "probe_linf": 2.2032220662534128,
+      "cross_section_linf": 1.6919211975569117,
+      "mass_drift_delta": 0.012790570203094931,
+      "energy_change_delta": 0.15908802486631607,
+      "froude_delta": 0.5040339898261341,
+      "feature_location_delta": 3.605551275463989,
+      "feature_strength_delta": 0.7798978365843654
+    }
+  },
+  "rejected_candidates": [
+    {
+      "candidate": "finite_volume_roe_edge_depth_plus_circulation",
+      "implementation": "mass-conservative upstream edge-depth redistribution plus bounded edge circulation",
+      "parameters": {
+        "depth_rate_per_s": 1.15,
+        "max_depth_m_per_s": 0.34,
+        "edge_depth_scale": 0.45,
+        "interior_receiver_depth_scale": 1.48,
+        "velocity_rate_per_s": 4.0,
+        "max_speed_m_per_s2": 6.5,
+        "upper_edge_speed_fraction": 1.18,
+        "upper_edge_cross_stream_fraction": 1.10,
+        "lower_edge_speed_fraction": 0.62,
+        "lower_edge_cross_stream_fraction": 0.24
+      },
+      "threshold_checks": {
+        "field_linf": 3.9084254184312757,
+        "slope_linf": 0.8917381894720988,
+        "wet_mismatch_fraction": 0.2708333333333333,
+        "probe_linf": 2.2032220662534128,
+        "cross_section_linf": 1.6919211975569117,
+        "mass_drift_delta": 0.014203329119650526,
+        "energy_change_delta": 0.019202646265309542,
+        "froude_delta": 1.474233716507533,
+        "feature_location_delta": 3.605551275463989,
+        "feature_strength_delta": 0.7822953433226099
+      }
+    },
+    {
+      "candidate": "finite_volume_roe_edge_depth_only",
+      "implementation": "mass-conservative upstream edge-depth redistribution with circulation disabled",
+      "parameters": {
+        "depth_rate_per_s": 3.0,
+        "max_depth_m_per_s": 0.75,
+        "edge_depth_scale": 0.45,
+        "interior_receiver_depth_scale": 1.48,
+        "velocity_rate_per_s": 0.0,
+        "max_speed_m_per_s2": 0.0
+      },
+      "threshold_checks": {
+        "field_linf": 3.694795912206564,
+        "slope_linf": 0.8500063127342407,
+        "wet_mismatch_fraction": 0.2708333333333333,
+        "probe_linf": 2.2032220662534128,
+        "cross_section_linf": 1.6919211975569117,
+        "mass_drift_delta": 0.011655485889002504,
+        "energy_change_delta": 0.15377555268452514,
+        "froude_delta": 0.6710463206395536,
+        "feature_location_delta": 3.605551275463989,
+        "feature_strength_delta": 0.7799585883284852
+      }
+    }
+  ],
+  "sample_diagnostics": [
+    {
+      "cell": [9, 1],
+      "zone": "upstream_approach_upper_edge",
+      "reference": {"h": 0.3809042274951935, "u": 3.4384281385882587, "v": -3.7274328154432057, "froude": 2.6233962742544827},
+      "baseline_cpp": {"h": 1.6277634179530305, "u": 1.0558336165842954, "v": -0.03288636802934916, "froude": 0.2643479238566239},
+      "depth_only_cpp": {"h": 1.617, "u": 1.08, "v": -0.033, "froude": 0.271},
+      "depth_plus_circulation_cpp": {"h": 1.646, "u": 1.666, "v": -0.584, "froude": 0.439},
+      "interpretation": "Column-local edge-depth redistribution barely changes the over-deep edge; adding circulation moves velocity in the right direction but keeps the cell far too deep and worsens Froude summary error."
+    },
+    {
+      "cell": [6, 6],
+      "zone": "upstream_approach_center",
+      "reference": {"h": 1.8397184610366821, "u": 0.979540425812061, "v": -0.51144124250122, "froude": 0.2601119929438743},
+      "baseline_cpp": {"h": 1.6797190996267897, "u": 1.0799091492571444, "v": 0.6369705400281875, "froude": 0.3088620083509316},
+      "depth_only_cpp": {"h": 1.686, "u": 1.112, "v": 0.622, "froude": 0.313},
+      "depth_plus_circulation_cpp": {"h": 1.760, "u": 1.644, "v": -0.236, "froude": 0.400},
+      "interpretation": "The circulation variant helps the sign of upstream center v but over-accelerates u/Froude, so it is not a clean fix."
+    }
+  ],
+  "blocked_reasons": [
+    "The depth-only redistribution is conservation-clean but too weak to change the upstream edge-depth blocker.",
+    "The coupled depth-plus-circulation variant keeps mass and energy inside threshold but worsens field, slope, and Froude errors.",
+    "Probe and cross-section blockers are unchanged because the pass does not touch the center-throat raw sample failure.",
+    "A column-local redistribution cannot reproduce GeoClaw's shallow, fast upstream edge; the next lever needs a physically coupled surface-gradient or flux treatment."
+  ],
+  "next_levers": [
+    "Do not retain this edge-depth/circulation pass.",
+    "Investigate a flux/source treatment that produces shallow, fast upstream edge flow without post-step velocity forcing.",
+    "Preserve mass, energy, throat shape, and Milestone 17 analytic guardrails before trying another constriction implementation."
+  ]
+}
