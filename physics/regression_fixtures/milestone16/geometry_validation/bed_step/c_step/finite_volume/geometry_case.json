@@ -1,0 +1,31 @@
+{
+  "case_id": "bed_step",
+  "evidence": {
+    "accepted_for_geometry": true,
+    "actual_scenario_id": "bed_step_seed_16",
+    "candidate_label": "finite_volume_augmented_topography_bed_step",
+    "comparison_dir": "outputs/m16cmp/c_step/finite_volume",
+    "diagnostic_only": false,
+    "failing_checks": [],
+    "gate_scenario_id": "bed_step",
+    "milestone18_report": "reports/milestone18/bed_step_parity_retune.json",
+    "passed": true,
+    "promoted": true,
+    "solver_mode": "finite_volume",
+    "threshold_passed": true,
+    "threshold_report": "outputs/m16cmp/c_step/finite_volume/threshold_evaluation.json"
+  },
+  "gate_scenario_id": "bed_step",
+  "milestone18_closure_report": "reports/milestone18/bed_step_parity_retune.json",
+  "passed": true,
+  "scenarios": [
+    "bed_step"
+  ],
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "solver_modes": [
+    "finite_volume",
+    "reduced"
+  ],
+  "source_report": "reports/milestone16/geometry_validation.json",
+  "title": "Bed Steps"
+}

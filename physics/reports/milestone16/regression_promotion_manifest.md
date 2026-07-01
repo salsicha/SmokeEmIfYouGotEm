@@ -4,7 +4,7 @@ Schema: `raftsim.milestone16.regression_promotion.v0`
 
 Decision: **PASS**
 
-Promoted entries: 20
+Promoted entries: 23
 
 | Category | Gate scenario | Mode | Case | Artifact |
 | --- | --- | --- | --- | --- |
@@ -14,6 +14,9 @@ Promoted entries: 20
 | geoclaw_cpp | wet_dry_shoreline | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced |
 | geoclaw_cpp | sloping_manning_channel | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced |
 | geoclaw_cpp | sloping_manning_channel | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume |
+| geometry_validation | wet_dry_shoreline | finite_volume | wet_dry_shoreline | regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/finite_volume |
+| geometry_validation | wet_dry_shoreline | reduced | wet_dry_shoreline | regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/reduced |
+| geometry_validation | bed_step | finite_volume | bed_step | regression_fixtures/milestone16/geometry_validation/bed_step/c_step/finite_volume |
 | geometry_validation | south_fork_cascading_low_runnable | geoclaw_package | stitched_reach_drop_handoffs | regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_low |
 | geometry_validation | south_fork_cascading_median_runnable | geoclaw_package | stitched_reach_drop_handoffs | regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_med |
 | geometry_validation | south_fork_cascading_high_runnable | geoclaw_package | stitched_reach_drop_handoffs | regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_high |
