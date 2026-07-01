@@ -4,6 +4,9 @@ from pathlib import Path
 import numpy as np
 
 from raftsim.analytic_fixtures import write_analytic_fixture_suite
+from raftsim.examples.generate_milestone18_constriction_mask_alignment_report import (
+    main as generate_constriction_mask_main,
+)
 from raftsim.examples.generate_milestone18_constriction_throat_shape_report import (
     main as generate_constriction_throat_main,
 )
@@ -13,10 +16,12 @@ from raftsim.examples.generate_milestone18_pin_release_fixture_report import mai
 from raftsim.examples.run_milestone18_analytic_retune_guardrail import main as guardrail_main
 from raftsim.milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
+    MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA,
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
     MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
     MILESTONE18_PIN_RELEASE_REPORT_SCHEMA,
+    build_milestone18_constriction_mask_alignment_report,
     build_milestone18_constriction_throat_shape_report,
     build_milestone18_failure_triage_matrix,
     build_milestone18_parity_family_retune_report,
@@ -390,6 +395,48 @@ def test_generate_milestone18_constriction_throat_shape_cli_writes_reports(tmp_p
     assert payload["schema_version"] == MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA
     assert payload["decision"] == "BLOCKED"
     assert "Constriction Throat Shape Diagnostic" in output_md.read_text(encoding="utf-8")
+
+
+def test_milestone18_constriction_mask_alignment_report_records_column_mismatch(tmp_path):
+    dual_manifest = _constriction_throat_inputs(tmp_path)
+
+    report = build_milestone18_constriction_mask_alignment_report(dual_manifest)
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert payload["summary"]["domain_mask_mismatch_count"] == 2
+    assert payload["summary"]["domain_mask_mismatch_fraction"] == 2 / 9
+    assert payload["summary"]["max_abs_wet_width_delta_m"] == 2.0
+    worst_column = payload["summary"]["worst_columns"][0]
+    assert worst_column["column_index"] == 1
+    assert worst_column["mask_mismatch_count"] == 2
+    assert worst_column["first_wet_row_delta"] == 1
+    assert worst_column["last_wet_row_delta"] == -1
+    assert "wet-band span" in payload["next_levers"][0]
+
+
+def test_generate_milestone18_constriction_mask_alignment_cli_writes_reports(tmp_path):
+    dual_manifest = _constriction_throat_inputs(tmp_path)
+    output_json = tmp_path / "reports" / "milestone18" / "constriction_mask.json"
+    output_md = tmp_path / "reports" / "milestone18" / "constriction_mask.md"
+
+    exit_code = generate_constriction_mask_main(
+        [
+            "--dual-solver-manifest",
+            str(dual_manifest),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert "Constriction Mask Alignment Diagnostic" in output_md.read_text(encoding="utf-8")
 
 
 def test_milestone18_parity_family_retune_report_records_partial_promotion(tmp_path):

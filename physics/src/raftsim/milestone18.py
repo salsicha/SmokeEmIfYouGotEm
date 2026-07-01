@@ -28,6 +28,7 @@ MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA = "raftsim.milestone18.analytic_ret
 MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA = "raftsim.milestone18.parity_family_retune.v0"
 MILESTONE18_PIN_RELEASE_REPORT_SCHEMA = "raftsim.milestone18.pin_release_fixture.v0"
 MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA = "raftsim.milestone18.constriction_throat_shape.v0"
+MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA = "raftsim.milestone18.constriction_mask_alignment.v0"
 
 _CORE_GUARDRAIL_FAMILIES = {"hydrostatic_sloping_balance", "uniform_channel", "dam_break_bore"}
 _GEOMETRY_CLOSURE_FAMILIES = {"wet_dry_shoreline", "bed_step", "constriction", "drops_ledges_tailwater"}
@@ -736,6 +737,238 @@ class Milestone18ConstrictionThroatShapeReport:
 
 
 @dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionColumnProfile:
+    """One lateral wet-band profile for a single constriction column."""
+
+    label: str
+    source_path: str
+    column_index: int
+    x_m: float
+    wet_depth_threshold_m: float
+    wet_cell_count: int
+    wet_width_m: float
+    first_wet_row_index: int | None
+    last_wet_row_index: int | None
+    wet_center_y_m: float | None
+    mean_wet_depth_m: float
+    max_depth_m: float
+    column_mass_m3: float
+    mean_downstream_velocity_mps: float
+    mean_cross_stream_velocity_mps: float
+    mean_wet_froude: float
+
+    def to_json_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionColumnDelta:
+    """Candidate-minus-reference delta for one constriction column."""
+
+    candidate_label: str
+    reference_label: str
+    column_index: int
+    x_m: float
+    mask_mismatch_count: int
+    mask_mismatch_fraction: float
+    wet_cell_count: int
+    wet_width_m: float
+    first_wet_row_delta: int | None
+    last_wet_row_delta: int | None
+    wet_center_y_delta_m: float | None
+    mean_wet_depth_m: float
+    max_depth_m: float
+    column_mass_m3: float
+    mean_downstream_velocity_mps: float
+    mean_cross_stream_velocity_mps: float
+    mean_wet_froude: float
+
+    def to_json_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionColumnComparison:
+    """Authored, GeoClaw, and C++ wet-band evidence for one constriction column."""
+
+    column_index: int
+    x_m: float
+    profiles: tuple[Milestone18ConstrictionColumnProfile, ...]
+    cpp_minus_geoclaw: Milestone18ConstrictionColumnDelta
+    authored_initial_minus_geoclaw: Milestone18ConstrictionColumnDelta
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "column_index": self.column_index,
+            "x_m": self.x_m,
+            "profiles": {profile.label: profile.to_json_dict() for profile in self.profiles},
+            "deltas": {
+                "cpp_minus_geoclaw": self.cpp_minus_geoclaw.to_json_dict(),
+                "authored_initial_minus_geoclaw": self.authored_initial_minus_geoclaw.to_json_dict(),
+            },
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionMaskAlignmentReport:
+    """Diagnostic report comparing constriction wet-band spans across the whole scenario window."""
+
+    dual_solver_manifest: str
+    scenario_package: str
+    scenario_id: str
+    feature: dict[str, object]
+    grid: dict[str, object]
+    wet_depth_threshold_m: float
+    domain_mask_mismatch_count: int
+    domain_mask_mismatch_fraction: float
+    comparisons: tuple[Milestone18ConstrictionColumnComparison, ...]
+    blocked_reasons: tuple[str, ...]
+    next_levers: tuple[str, ...]
+
+    @property
+    def passed(self) -> bool:
+        return not self.blocked_reasons
+
+    @property
+    def cpp_deltas(self) -> tuple[Milestone18ConstrictionColumnDelta, ...]:
+        return tuple(comparison.cpp_minus_geoclaw for comparison in self.comparisons)
+
+    def to_json_dict(self) -> dict[str, object]:
+        deltas = self.cpp_deltas
+        max_bank_row_delta = max(
+            (
+                abs(value)
+                for delta in deltas
+                for value in (delta.first_wet_row_delta, delta.last_wet_row_delta)
+                if value is not None
+            ),
+            default=0,
+        )
+        worst_columns = sorted(
+            deltas,
+            key=lambda delta: (
+                delta.mask_mismatch_fraction,
+                abs(delta.wet_width_m),
+                abs(delta.column_mass_m3),
+                abs(delta.mean_wet_depth_m),
+            ),
+            reverse=True,
+        )[:8]
+        return {
+            "schema_version": MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "dual_solver_manifest": self.dual_solver_manifest,
+            "scenario_package": self.scenario_package,
+            "scenario_id": self.scenario_id,
+            "feature": self.feature,
+            "grid": self.grid,
+            "wet_depth_threshold_m": self.wet_depth_threshold_m,
+            "summary": {
+                "column_count": len(self.comparisons),
+                "domain_mask_mismatch_count": self.domain_mask_mismatch_count,
+                "domain_mask_mismatch_fraction": self.domain_mask_mismatch_fraction,
+                "max_column_mask_mismatch_fraction": max(
+                    (delta.mask_mismatch_fraction for delta in deltas),
+                    default=0.0,
+                ),
+                "max_abs_wet_width_delta_m": max((abs(delta.wet_width_m) for delta in deltas), default=0.0),
+                "max_abs_bank_row_delta": max_bank_row_delta,
+                "max_abs_mean_wet_depth_delta_m": max(
+                    (abs(delta.mean_wet_depth_m) for delta in deltas),
+                    default=0.0,
+                ),
+                "max_abs_column_mass_delta_m3": max(
+                    (abs(delta.column_mass_m3) for delta in deltas),
+                    default=0.0,
+                ),
+                "worst_columns": [delta.to_json_dict() for delta in worst_columns],
+            },
+            "columns": [comparison.to_json_dict() for comparison in self.comparisons],
+            "blocked_reasons": list(self.blocked_reasons),
+            "next_levers": list(self.next_levers),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        payload = self.to_json_dict()
+        summary = payload["summary"]
+        lines = [
+            "# Milestone 18 Constriction Mask Alignment Diagnostic",
+            "",
+            f"Schema: `{MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Scenario: `{self.scenario_id}`",
+            f"Dual solver manifest: `{self.dual_solver_manifest}`",
+            f"Scenario package: `{self.scenario_package}`",
+            f"Wet-depth threshold: `{self.wet_depth_threshold_m:.6g}` m",
+            "",
+            "## Summary",
+            "",
+            f"- Domain wet-mask mismatch: `{self.domain_mask_mismatch_count}` cells "
+            f"(`{self.domain_mask_mismatch_fraction:.6g}` fraction)",
+            f"- Max column wet-mask mismatch fraction: `{summary['max_column_mask_mismatch_fraction']:.6g}`",
+            f"- Max wet-width delta: `{summary['max_abs_wet_width_delta_m']:.6g}` m",
+            f"- Max bank-row delta: `{summary['max_abs_bank_row_delta']}` rows",
+            f"- Max mean wet-depth delta: `{summary['max_abs_mean_wet_depth_delta_m']:.6g}` m",
+            f"- Max column-mass delta: `{summary['max_abs_column_mass_delta_m3']:.6g}` m3",
+            "",
+            "## Feature",
+            "",
+        ]
+        for key, value in sorted(self.feature.items()):
+            lines.append(f"- `{key}`: `{value}`")
+        lines.extend(
+            [
+                "",
+                "## Worst Columns",
+                "",
+                "| Column | x m | Mask mismatch | Geo rows | C++ rows | Geo wet width m | C++ wet width m | Width delta m | Mass delta m3 | Mean depth delta m |",
+                "| ---: | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        comparison_by_column = {comparison.column_index: comparison for comparison in self.comparisons}
+        for raw_delta in summary["worst_columns"]:
+            delta = raw_delta if isinstance(raw_delta, dict) else {}
+            comparison = comparison_by_column.get(int(delta.get("column_index", -1)))
+            if comparison is None:
+                continue
+            profiles = {profile.label: profile for profile in comparison.profiles}
+            geoclaw = profiles["geoclaw_final"]
+            cpp = profiles["cpp_final"]
+            lines.append(
+                "| "
+                f"{comparison.column_index} | "
+                f"{comparison.x_m:.6g} | "
+                f"{delta.get('mask_mismatch_count')}/{int(self.grid['ny'])} | "
+                f"{_row_span_markdown(geoclaw)} | "
+                f"{_row_span_markdown(cpp)} | "
+                f"{geoclaw.wet_width_m:.6g} | "
+                f"{cpp.wet_width_m:.6g} | "
+                f"{_format_number(_float_or_none(delta.get('wet_width_m')))} | "
+                f"{_format_number(_float_or_none(delta.get('column_mass_m3')))} | "
+                f"{_format_number(_float_or_none(delta.get('mean_wet_depth_m')))} |"
+            )
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.next_levers:
+            lines.extend(["", "## Next Levers", ""])
+            lines.extend(f"- {lever}" for lever in self.next_levers)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+
+@dataclass(frozen=True, slots=True)
 class Milestone18PinReleaseResponsePath:
     """One action timing path through the dedicated pin/release fixture."""
 
@@ -1063,6 +1296,118 @@ def build_milestone18_constriction_throat_shape_report(
         profiles=profiles,
         cpp_minus_geoclaw=cpp_minus_geoclaw,
         authored_initial_minus_geoclaw=authored_minus_geoclaw,
+        blocked_reasons=blocked_reasons,
+        next_levers=next_levers,
+    )
+
+
+def build_milestone18_constriction_mask_alignment_report(
+    dual_solver_manifest: str | Path,
+    *,
+    wet_depth_threshold_m: float = 0.15,
+) -> Milestone18ConstrictionMaskAlignmentReport:
+    """Compare authored, GeoClaw, and C++ wet-band spans across a constriction window."""
+
+    manifest_path = Path(dual_solver_manifest)
+    manifest = _load_json_report(manifest_path)
+    scenario_package = _resolve_path(str(manifest.get("scenario_package", "")), manifest_path.parent)
+    scenario = _load_json_report(scenario_package / "scenario.json")
+    features = _load_json_report(scenario_package / "features.json")
+    constriction = _constriction_feature(features)
+    grid = _scenario_grid(scenario)
+    nx = int(grid["nx"])
+    ny = int(grid["ny"])
+
+    geoclaw_manifest_ref = _manifest_nested_string(manifest, "geoclaw", "manifest")
+    cpp_manifest_ref = _manifest_nested_string(manifest, "cpp", "manifest")
+    geoclaw_manifest_path = _resolve_path(geoclaw_manifest_ref, manifest_path.parent)
+    cpp_manifest_path = _resolve_path(cpp_manifest_ref, manifest_path.parent)
+    geoclaw_manifest = _load_json_report(geoclaw_manifest_path)
+    cpp_manifest = _load_json_report(cpp_manifest_path)
+
+    initial_state_path = _scenario_array_path(scenario_package, scenario, "initial_state", "initial_state.npz")
+    geoclaw_frame_path = _final_frame_path(geoclaw_manifest, geoclaw_manifest_path.parent)
+    cpp_frame_path = _final_frame_path(cpp_manifest, cpp_manifest_path.parent)
+
+    initial_state = _load_npz_water_state(initial_state_path, h_key="depth")
+    geoclaw_state = _load_npz_water_state(geoclaw_frame_path, h_key="h")
+    cpp_state = _load_cpp_water_csv(cpp_frame_path, ny, nx)
+    geoclaw_mask = geoclaw_state["h"] > wet_depth_threshold_m
+    cpp_mask = cpp_state["h"] > wet_depth_threshold_m
+    domain_mask_mismatch_count = int(np.count_nonzero(cpp_mask ^ geoclaw_mask))
+    domain_cell_count = max(1, nx * ny)
+
+    comparisons: list[Milestone18ConstrictionColumnComparison] = []
+    for column_index in range(nx):
+        x_m = float(grid["origin_x"]) + column_index * float(grid["dx"])
+        profiles = (
+            _constriction_column_profile(
+                "authored_initial",
+                initial_state_path,
+                initial_state,
+                grid,
+                column_index,
+                wet_depth_threshold_m,
+            ),
+            _constriction_column_profile(
+                "geoclaw_final",
+                geoclaw_frame_path,
+                geoclaw_state,
+                grid,
+                column_index,
+                wet_depth_threshold_m,
+            ),
+            _constriction_column_profile(
+                "cpp_final",
+                cpp_frame_path,
+                cpp_state,
+                grid,
+                column_index,
+                wet_depth_threshold_m,
+            ),
+        )
+        profile_by_label = {profile.label: profile for profile in profiles}
+        comparisons.append(
+            Milestone18ConstrictionColumnComparison(
+                column_index=column_index,
+                x_m=x_m,
+                profiles=profiles,
+                cpp_minus_geoclaw=_constriction_column_delta(
+                    profile_by_label["cpp_final"],
+                    profile_by_label["geoclaw_final"],
+                    cpp_mask[:, column_index],
+                    geoclaw_mask[:, column_index],
+                ),
+                authored_initial_minus_geoclaw=_constriction_column_delta(
+                    profile_by_label["authored_initial"],
+                    profile_by_label["geoclaw_final"],
+                    initial_state["h"][:, column_index] > wet_depth_threshold_m,
+                    geoclaw_mask[:, column_index],
+                ),
+            )
+        )
+
+    blocked_reasons = _constriction_mask_blocked_reasons(
+        tuple(comparisons),
+        domain_mask_mismatch_count / domain_cell_count,
+        grid,
+    )
+    next_levers = (
+        "Fit wet-band span changes outside the narrowest throat columns before adding feature forcing.",
+        "Retune dry-bank reconstruction so non-throat columns can follow GeoClaw bank expansion, recession, and row shifts.",
+        "Recheck cross-section, slope, conservation, and Froude errors after the wet-mask spans agree.",
+        "Rerun the Milestone 17 analytic guardrail and corrected-reference constriction comparison after the next solver change.",
+    )
+    return Milestone18ConstrictionMaskAlignmentReport(
+        dual_solver_manifest=str(manifest_path),
+        scenario_package=str(scenario_package),
+        scenario_id=str(manifest.get("scenario_id") or scenario.get("metadata", {}).get("scenario_id") or "unknown"),
+        feature=constriction,
+        grid=grid,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        domain_mask_mismatch_count=domain_mask_mismatch_count,
+        domain_mask_mismatch_fraction=domain_mask_mismatch_count / domain_cell_count,
+        comparisons=tuple(comparisons),
         blocked_reasons=blocked_reasons,
         next_levers=next_levers,
     )
@@ -1933,6 +2278,139 @@ def _constriction_profile_delta(
     )
 
 
+def _constriction_column_profile(
+    label: str,
+    source_path: Path,
+    state: dict[str, np.ndarray],
+    grid: dict[str, object],
+    column_index: int,
+    wet_depth_threshold_m: float,
+) -> Milestone18ConstrictionColumnProfile:
+    h_col = state["h"][:, column_index]
+    u_col = state["u"][:, column_index]
+    v_col = state["v"][:, column_index]
+    froude_col = state["froude"][:, column_index]
+    wet_mask = h_col > wet_depth_threshold_m
+    wet_count = int(np.count_nonzero(wet_mask))
+    first_row, last_row, wet_center_y = _wet_row_span(wet_mask, grid)
+    if wet_count:
+        wet_depths = h_col[wet_mask]
+        mean_wet_depth = float(np.mean(wet_depths))
+        mean_u = float(np.mean(u_col[wet_mask]))
+        mean_v = float(np.mean(v_col[wet_mask]))
+        mean_froude = float(np.mean(froude_col[wet_mask]))
+    else:
+        mean_wet_depth = 0.0
+        mean_u = 0.0
+        mean_v = 0.0
+        mean_froude = 0.0
+    return Milestone18ConstrictionColumnProfile(
+        label=label,
+        source_path=str(source_path),
+        column_index=column_index,
+        x_m=float(grid["origin_x"]) + column_index * float(grid["dx"]),
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        wet_cell_count=wet_count,
+        wet_width_m=wet_count * float(grid["dy"]),
+        first_wet_row_index=first_row,
+        last_wet_row_index=last_row,
+        wet_center_y_m=wet_center_y,
+        mean_wet_depth_m=mean_wet_depth,
+        max_depth_m=float(np.max(h_col)) if h_col.size else 0.0,
+        column_mass_m3=float(np.sum(h_col) * float(grid["dx"]) * float(grid["dy"])),
+        mean_downstream_velocity_mps=mean_u,
+        mean_cross_stream_velocity_mps=mean_v,
+        mean_wet_froude=mean_froude,
+    )
+
+
+def _constriction_column_delta(
+    candidate: Milestone18ConstrictionColumnProfile,
+    reference: Milestone18ConstrictionColumnProfile,
+    candidate_mask: np.ndarray,
+    reference_mask: np.ndarray,
+) -> Milestone18ConstrictionColumnDelta:
+    mismatch_count = int(np.count_nonzero(candidate_mask ^ reference_mask))
+    cell_count = max(1, int(candidate_mask.size))
+    return Milestone18ConstrictionColumnDelta(
+        candidate_label=candidate.label,
+        reference_label=reference.label,
+        column_index=candidate.column_index,
+        x_m=candidate.x_m,
+        mask_mismatch_count=mismatch_count,
+        mask_mismatch_fraction=mismatch_count / cell_count,
+        wet_cell_count=candidate.wet_cell_count - reference.wet_cell_count,
+        wet_width_m=candidate.wet_width_m - reference.wet_width_m,
+        first_wet_row_delta=_optional_int_delta(candidate.first_wet_row_index, reference.first_wet_row_index),
+        last_wet_row_delta=_optional_int_delta(candidate.last_wet_row_index, reference.last_wet_row_index),
+        wet_center_y_delta_m=_optional_float_delta(candidate.wet_center_y_m, reference.wet_center_y_m),
+        mean_wet_depth_m=candidate.mean_wet_depth_m - reference.mean_wet_depth_m,
+        max_depth_m=candidate.max_depth_m - reference.max_depth_m,
+        column_mass_m3=candidate.column_mass_m3 - reference.column_mass_m3,
+        mean_downstream_velocity_mps=(
+            candidate.mean_downstream_velocity_mps - reference.mean_downstream_velocity_mps
+        ),
+        mean_cross_stream_velocity_mps=(
+            candidate.mean_cross_stream_velocity_mps - reference.mean_cross_stream_velocity_mps
+        ),
+        mean_wet_froude=candidate.mean_wet_froude - reference.mean_wet_froude,
+    )
+
+
+def _constriction_mask_blocked_reasons(
+    comparisons: tuple[Milestone18ConstrictionColumnComparison, ...],
+    domain_mask_mismatch_fraction: float,
+    grid: dict[str, object],
+) -> tuple[str, ...]:
+    reasons: list[str] = []
+    deltas = tuple(comparison.cpp_minus_geoclaw for comparison in comparisons)
+    max_width_delta = max((abs(delta.wet_width_m) for delta in deltas), default=0.0)
+    max_bank_row_delta = max(
+        (
+            abs(value)
+            for delta in deltas
+            for value in (delta.first_wet_row_delta, delta.last_wet_row_delta)
+            if value is not None
+        ),
+        default=0,
+    )
+    max_mean_depth_delta = max((abs(delta.mean_wet_depth_m) for delta in deltas), default=0.0)
+    max_column_mass_delta = max((abs(delta.column_mass_m3) for delta in deltas), default=0.0)
+    if domain_mask_mismatch_fraction > 0.02:
+        reasons.append("Final-frame C++ wet/dry mask mismatch exceeds the 0.02 comparison threshold.")
+    if max_width_delta > float(grid["dy"]):
+        reasons.append("At least one C++ constriction column differs from GeoClaw wet width by more than one lateral cell.")
+    if max_bank_row_delta > 1:
+        reasons.append("At least one C++ constriction bank span differs from GeoClaw by more than one row.")
+    if max_mean_depth_delta > 0.25:
+        reasons.append("At least one C++ constriction column differs from GeoClaw mean wet depth by more than 0.25 m.")
+    if max_column_mass_delta > 0.5 * float(grid["dx"]) * float(grid["dy"]):
+        reasons.append("At least one C++ constriction column mass differs from GeoClaw beyond the diagnostic budget.")
+    return tuple(reasons)
+
+
+def _wet_row_span(wet_mask: np.ndarray, grid: dict[str, object]) -> tuple[int | None, int | None, float | None]:
+    rows = np.flatnonzero(wet_mask)
+    if not rows.size:
+        return None, None, None
+    first_row = int(rows[0])
+    last_row = int(rows[-1])
+    wet_center_y = float(grid["origin_y"]) + ((first_row + last_row) * 0.5) * float(grid["dy"])
+    return first_row, last_row, wet_center_y
+
+
+def _optional_int_delta(candidate: int | None, reference: int | None) -> int | None:
+    if candidate is None or reference is None:
+        return None
+    return candidate - reference
+
+
+def _optional_float_delta(candidate: float | None, reference: float | None) -> float | None:
+    if candidate is None or reference is None:
+        return None
+    return candidate - reference
+
+
 def _constriction_throat_blocked_reasons(
     cpp_minus_geoclaw: Milestone18ConstrictionThroatDelta,
     grid: dict[str, object],
@@ -2327,6 +2805,12 @@ def _format_number(value: float | None) -> str:
     if value is None:
         return "n/a"
     return f"{value:.6g}"
+
+
+def _row_span_markdown(profile: Milestone18ConstrictionColumnProfile) -> str:
+    if profile.first_wet_row_index is None or profile.last_wet_row_index is None:
+        return "dry"
+    return f"{profile.first_wet_row_index}-{profile.last_wet_row_index}"
 
 
 def _markdown_counter_table(label: str, counts: object) -> str:

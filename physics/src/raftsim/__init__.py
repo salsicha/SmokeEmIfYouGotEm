@@ -55,6 +55,7 @@ from .milestone16 import (
 )
 from .milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
+    MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA,
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
     MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
@@ -62,6 +63,10 @@ from .milestone18 import (
     Milestone18AnalyticGuardrailStage,
     Milestone18AnalyticRegression,
     Milestone18AnalyticRetuneGuardrailReport,
+    Milestone18ConstrictionColumnComparison,
+    Milestone18ConstrictionColumnDelta,
+    Milestone18ConstrictionColumnProfile,
+    Milestone18ConstrictionMaskAlignmentReport,
     Milestone18ConstrictionThroatDelta,
     Milestone18ConstrictionThroatProfile,
     Milestone18ConstrictionThroatShapeReport,
@@ -72,6 +77,7 @@ from .milestone18 import (
     Milestone18PinReleaseFixtureReport,
     Milestone18PinReleaseFlowCase,
     Milestone18PinReleaseResponsePath,
+    build_milestone18_constriction_mask_alignment_report,
     build_milestone18_constriction_throat_shape_report,
     build_milestone18_failure_triage_matrix,
     build_milestone18_parity_family_retune_report,
