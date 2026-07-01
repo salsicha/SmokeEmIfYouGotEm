@@ -248,6 +248,66 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert finite_volume_wet_counts == int(wet_dry_scenario.initial_state.wet.sum())
     assert max(finite_volume_lateral_velocities) < 1.0e-9
 
+    constriction_scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="constriction", seed=26, nx=24, ny=12, duration=0.2)
+    )
+    constriction_scenario_dir = tmp_path / "scenario" / "constriction"
+    constriction_scenario.write_package(constriction_scenario_dir)
+    constriction_output_dir = tmp_path / "cpp_constriction_fv_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(constriction_scenario_dir),
+            "--output",
+            str(constriction_output_dir),
+            "--steps",
+            "12",
+            "--frame-interval",
+            "6",
+            "--solver-mode",
+            "finite_volume",
+            "--boundary-mode",
+            "scenario",
+            "--flux-scheme",
+            "roe",
+            "--feature-strength-scale",
+            "0",
+            "--roughness-scale",
+            "0.5",
+            "--bed-slope-source-scale",
+            "0.75",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    constriction_run = constriction_output_dir / constriction_scenario.metadata.scenario_id
+    constriction_manifest = json.loads((constriction_run / "manifest.json").read_text(encoding="utf-8"))
+    constriction_final_frame = constriction_run / constriction_manifest["frames"][-1]
+    constriction_features = json.loads((constriction_scenario_dir / "features.json").read_text(encoding="utf-8"))
+    constriction_scenario_json = json.loads((constriction_scenario_dir / "scenario.json").read_text(encoding="utf-8"))
+    constriction_feature = next(feature for feature in constriction_features["features"] if feature["kind"] == "constriction")
+    constriction_grid = constriction_scenario_json["grid"]
+    throat_col = round((constriction_feature["center"]["x"] - constriction_grid["origin_x"]) / constriction_grid["dx"])
+    initial_throat_wet_count = int(constriction_scenario.initial_state.wet[:, throat_col].sum())
+    final_throat_wet_count = 0
+    dry_bank_depths = []
+    with constriction_final_frame.open(newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            row_index = int(row["row"])
+            col_index = int(row["col"])
+            if col_index != throat_col:
+                continue
+            if int(row["wet"]):
+                final_throat_wet_count += 1
+            if not constriction_scenario.initial_state.wet[row_index, throat_col]:
+                dry_bank_depths.append(float(row["h"]))
+
+    assert constriction_manifest["fixture_scoped_constriction_boundary_mask"] is True
+    assert constriction_manifest["fixture_scoped_constriction_dry_bank_reconstruction"] is True
+    assert final_throat_wet_count == initial_throat_wet_count
+    assert max(dry_bank_depths) == 0.0
+
     cascading_scenario_dir = tmp_path / "scenario" / "cascading"
     cascading_output_dir = tmp_path / "cpp_cascading_output"
     cascading_package = generate_california_pool_drop_cascading_scenario2_5d(
