@@ -51,6 +51,9 @@ MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA = (
 MILESTONE18_CONSTRICTION_FACE_STATE_WIDTH_DEPTH_REPORT_SCHEMA = (
     "raftsim.milestone18.constriction_face_state_width_depth.v0"
 )
+MILESTONE18_CONSTRICTION_UPSTREAM_EDGE_BALANCE_REPORT_SCHEMA = (
+    "raftsim.milestone18.constriction_upstream_edge_balance.v0"
+)
 MILESTONE18_CONSTRICTION_HYDROSTATIC_SOURCE_DECISION_REPORT_SCHEMA = (
     "raftsim.milestone18.constriction_hydrostatic_source_decision.v0"
 )
@@ -2480,6 +2483,130 @@ class Milestone18ConstrictionFaceStateWidthDepthReport:
 
 
 @dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionUpstreamEdgeBalanceReport:
+    """Focused diagnostic coupling constriction edge geometry to y-face flux/source balance."""
+
+    face_state_width_depth_report: str
+    face_source_audit_report: str
+    scenario_id: str
+    diagnostic_scope: str
+    target_samples: tuple[dict[str, object], ...]
+    paired_edge_summary: tuple[dict[str, object], ...]
+    blocked_reasons: tuple[str, ...]
+    next_levers: tuple[str, ...]
+
+    @property
+    def passed(self) -> bool:
+        return not self.blocked_reasons
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_CONSTRICTION_UPSTREAM_EDGE_BALANCE_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "face_state_width_depth_report": self.face_state_width_depth_report,
+            "face_source_audit_report": self.face_source_audit_report,
+            "scenario_id": self.scenario_id,
+            "diagnostic_scope": self.diagnostic_scope,
+            "summary": {
+                "target_sample_count": len(self.target_samples),
+                "blocked_target_count": sum(1 for sample in self.target_samples if bool(sample.get("blocked"))),
+                "width_depth_coupled_blocker_count": sum(
+                    1 for sample in self.target_samples if bool(sample.get("width_depth_coupled_blocker"))
+                ),
+                "source_balance_blocker_count": sum(
+                    1 for sample in self.target_samples if bool(sample.get("source_balance_blocker"))
+                ),
+                "native_post_source_sign_mismatch_count": sum(
+                    1 for sample in self.target_samples if not bool(sample.get("native_post_source_sign_matches", True))
+                ),
+                "paired_edge_opposition_mismatch_count": sum(
+                    1 for pair in self.paired_edge_summary if not bool(pair.get("matches_reference_opposition", True))
+                ),
+                "max_abs_volume_flux_delta_m3ps": max(
+                    (
+                        abs(float(sample.get("volume_flux_delta_m3ps", 0.0) or 0.0))
+                        for sample in self.target_samples
+                    ),
+                    default=0.0,
+                ),
+                "max_abs_balance_delta_m3ps2": max(
+                    (
+                        abs(float(sample.get("balance_delta_m3ps2", 0.0) or 0.0))
+                        for sample in self.target_samples
+                    ),
+                    default=0.0,
+                ),
+                "primary_target": self.target_samples[0] if self.target_samples else None,
+            },
+            "target_samples": list(self.target_samples),
+            "paired_edge_summary": list(self.paired_edge_summary),
+            "blocked_reasons": list(self.blocked_reasons),
+            "next_levers": list(self.next_levers),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        summary = self.to_json_dict()["summary"]
+        lines = [
+            "# Milestone 18 Constriction Upstream Edge Balance Diagnostic",
+            "",
+            f"Schema: `{MILESTONE18_CONSTRICTION_UPSTREAM_EDGE_BALANCE_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Scenario: `{self.scenario_id}`",
+            f"Face-state width/depth report: `{self.face_state_width_depth_report}`",
+            f"Face/source audit report: `{self.face_source_audit_report}`",
+            f"Diagnostic scope: {self.diagnostic_scope}",
+            "",
+            "## Summary",
+            "",
+            f"- Target samples: `{summary['target_sample_count']}`",
+            f"- Blocked targets: `{summary['blocked_target_count']}`",
+            f"- Width/depth coupled blockers: `{summary['width_depth_coupled_blocker_count']}`",
+            f"- Source-balance blockers: `{summary['source_balance_blocker_count']}`",
+            f"- Native post-source sign mismatches: `{summary['native_post_source_sign_mismatch_count']}`",
+            f"- Paired-edge opposition mismatches: `{summary['paired_edge_opposition_mismatch_count']}`",
+            f"- Max abs volume-flux delta: `{_format_number(_float_or_none(summary['max_abs_volume_flux_delta_m3ps']))}` m3/s",
+            f"- Max abs balance delta: `{_format_number(_float_or_none(summary['max_abs_balance_delta_m3ps2']))}` m3/s2",
+            "",
+            "## Target Samples",
+            "",
+            "| Face | Column | Rows | GeoClaw q/sign | C++ q/sign | q delta | Balance delta | Width/depth deltas | Native C++ post q/sign | Native delta | Lever |",
+            "| --- | ---: | --- | --- | --- | ---: | ---: | --- | --- | ---: | --- |",
+        ]
+        for sample in self.target_samples:
+            lines.append(_upstream_edge_balance_sample_row(sample))
+        lines.extend(
+            [
+                "",
+                "## Paired Edge Summary",
+                "",
+                "| Column | Lower signs | Upper signs | GeoClaw opposed | C++ opposed | Match |",
+                "| ---: | --- | --- | --- | --- | --- |",
+            ]
+        )
+        for pair in self.paired_edge_summary:
+            lines.append(_face_state_width_depth_pair_row(pair))
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.next_levers:
+            lines.extend(["", "## Next Levers", ""])
+            lines.extend(f"- {lever}" for lever in self.next_levers)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+
+@dataclass(frozen=True, slots=True)
 class Milestone18ConstrictionHydrostaticSourceDecisionReport:
     """Decision record for the next constriction y-face source-treatment experiment."""
 
@@ -3549,6 +3676,79 @@ def build_milestone18_constriction_face_state_width_depth_report(
         column_profiles=column_profiles,
         face_state_samples=face_state_samples,
         edge_pair_summary=edge_pair_summary,
+        blocked_reasons=blocked_reasons,
+        next_levers=next_levers,
+    )
+
+
+def build_milestone18_constriction_upstream_edge_balance_report(
+    face_state_width_depth_report: str | Path,
+    face_source_audit_report: str | Path,
+    *,
+    top_n: int = 12,
+) -> Milestone18ConstrictionUpstreamEdgeBalanceReport:
+    """Couple constriction upstream edge width/depth samples to face/source audit rows."""
+
+    face_state_path = Path(face_state_width_depth_report)
+    face_source_path = Path(face_source_audit_report)
+    face_state_payload = _load_json_report(face_state_path)
+    face_source_payload = _load_json_report(face_source_path)
+
+    face_state_samples = _records(face_state_payload, "face_state_samples")
+    source_samples = _records(face_source_payload, "samples")
+    native_samples = _records(face_source_payload, "cpp_internal_audit")
+    edge_pair_summary = _records(face_state_payload, "edge_pair_summary")
+    source_by_key = {_upstream_edge_sample_key(sample): sample for sample in source_samples}
+    native_by_key = {_upstream_edge_sample_key(sample): sample for sample in native_samples}
+
+    target_samples: list[dict[str, object]] = []
+    for sample in face_state_samples:
+        source = source_by_key.get(_upstream_edge_sample_key(sample), {})
+        native = native_by_key.get(_upstream_edge_sample_key(sample), {})
+        target = _constriction_upstream_edge_balance_target(sample, source, native)
+        if bool(target.get("blocked")):
+            target_samples.append(target)
+    target_samples.sort(
+        key=lambda sample: (
+            bool(sample.get("width_depth_coupled_blocker")),
+            bool(sample.get("source_balance_blocker")),
+            not bool(sample.get("volume_sign_matches", True)),
+            not bool(sample.get("native_post_source_sign_matches", True)),
+            abs(float(sample.get("volume_flux_delta_m3ps", 0.0) or 0.0)),
+            abs(float(sample.get("balance_delta_m3ps2", 0.0) or 0.0)),
+        ),
+        reverse=True,
+    )
+    target_tuple = tuple(target_samples[:top_n])
+    paired_tuple = tuple(
+        sorted(
+            edge_pair_summary,
+            key=lambda pair: (
+                not bool(pair.get("matches_reference_opposition", True)),
+                max(
+                    float(pair.get("lower_abs_volume_flux_delta_m3ps") or 0.0),
+                    float(pair.get("upper_abs_volume_flux_delta_m3ps") or 0.0),
+                ),
+            ),
+            reverse=True,
+        )
+    )
+    blocked_reasons = _constriction_upstream_edge_balance_blocked_reasons(target_tuple, paired_tuple)
+    next_levers = _constriction_upstream_edge_balance_next_levers(target_tuple, paired_tuple)
+    return Milestone18ConstrictionUpstreamEdgeBalanceReport(
+        face_state_width_depth_report=str(face_state_path),
+        face_source_audit_report=str(face_source_path),
+        scenario_id=str(
+            face_state_payload.get("scenario_id")
+            or face_source_payload.get("scenario_id")
+            or "unknown"
+        ),
+        diagnostic_scope=(
+            "Joins constriction upstream edge face-state width/depth samples with reconstructed "
+            "face/source balance and native C++ post-source audit rows before the next solver retune."
+        ),
+        target_samples=target_tuple,
+        paired_edge_summary=paired_tuple,
         blocked_reasons=blocked_reasons,
         next_levers=next_levers,
     )
@@ -6793,6 +6993,150 @@ def _face_state_width_depth_next_levers(
     return tuple(dict.fromkeys(levers))
 
 
+def _upstream_edge_sample_key(sample: dict[str, object]) -> tuple[str, int, int, int]:
+    return (
+        str(sample.get("face_role", "")),
+        int(sample.get("column_index") or 0),
+        int(sample.get("south_row_index") or 0),
+        int(sample.get("north_row_index") or 0),
+    )
+
+
+def _constriction_upstream_edge_balance_target(
+    face_state_sample: dict[str, object],
+    source_sample: dict[str, object],
+    native_sample: dict[str, object],
+) -> dict[str, object]:
+    wet_width_delta = _float_or_none(face_state_sample.get("wet_width_delta_cells")) or 0.0
+    bank_delta = _float_or_none(face_state_sample.get("max_abs_bank_row_delta_cells")) or 0.0
+    face_depth_delta = _float_or_none(face_state_sample.get("mean_depth_delta_m")) or 0.0
+    column_depth_delta = _float_or_none(face_state_sample.get("column_mean_wet_depth_delta_m")) or 0.0
+    balance_delta = _float_or_none(source_sample.get("balance_delta_m3ps2")) or 0.0
+    balance_threshold = _float_or_none(source_sample.get("balance_delta_threshold_m3ps2")) or 0.75
+    width_depth_coupled = (
+        bool(face_state_sample.get("width_mapping_blocked"))
+        or bool(face_state_sample.get("bank_alignment_blocked"))
+        or bool(face_state_sample.get("depth_mapping_blocked"))
+        or abs(wet_width_delta) > 0.0
+        or abs(bank_delta) > 0.0
+        or abs(face_depth_delta) > 0.25
+        or abs(column_depth_delta) > 0.25
+    )
+    source_balance_blocked = (
+        bool(source_sample)
+        and (
+            not bool(source_sample.get("volume_sign_matches", True))
+            or not bool(source_sample.get("x_momentum_sign_matches", True))
+            or abs(balance_delta) > balance_threshold
+        )
+    )
+    native_sign_matches = bool(native_sample.get("post_left_sign_matches", True)) if native_sample else True
+    blocked = bool(face_state_sample.get("face_state_blocked")) or width_depth_coupled or source_balance_blocked or not native_sign_matches
+    if width_depth_coupled and source_balance_blocked:
+        lever = "upstream_edge_width_depth_flux_balance"
+    elif width_depth_coupled:
+        lever = "upstream_edge_width_depth_mapping"
+    elif source_balance_blocked or not native_sign_matches:
+        lever = "upstream_edge_y_face_flux_source_balance"
+    else:
+        lever = str(face_state_sample.get("recommended_solver_lever") or "preserve_as_guardrail")
+    return {
+        "face_role": face_state_sample.get("face_role"),
+        "column_index": face_state_sample.get("column_index"),
+        "south_row_index": face_state_sample.get("south_row_index"),
+        "north_row_index": face_state_sample.get("north_row_index"),
+        "zone_id": face_state_sample.get("zone_id"),
+        "reference_volume_flux_m3ps": face_state_sample.get("reference_volume_flux_m3ps"),
+        "candidate_volume_flux_m3ps": face_state_sample.get("candidate_volume_flux_m3ps"),
+        "volume_flux_delta_m3ps": face_state_sample.get("volume_flux_delta_m3ps"),
+        "reference_volume_sign": face_state_sample.get("reference_volume_sign"),
+        "candidate_volume_sign": face_state_sample.get("candidate_volume_sign"),
+        "volume_sign_matches": face_state_sample.get("volume_sign_matches"),
+        "reference_mean_h": face_state_sample.get("reference_mean_h"),
+        "candidate_mean_h": face_state_sample.get("candidate_mean_h"),
+        "mean_depth_delta_m": face_depth_delta,
+        "reference_mean_v": face_state_sample.get("reference_mean_v"),
+        "candidate_mean_v": face_state_sample.get("candidate_mean_v"),
+        "wet_width_delta_cells": wet_width_delta,
+        "max_abs_bank_row_delta_cells": bank_delta,
+        "column_mean_wet_depth_delta_m": column_depth_delta,
+        "source_balance_blocker": source_balance_blocked,
+        "balance_delta_m3ps2": balance_delta,
+        "balance_delta_threshold_m3ps2": balance_threshold,
+        "x_momentum_sign_matches": source_sample.get("x_momentum_sign_matches") if source_sample else None,
+        "x_momentum_flux_delta_m3ps2": source_sample.get("x_momentum_flux_delta_m3ps2") if source_sample else None,
+        "native_base_flux_h_m3ps": native_sample.get("base_flux_h_m3ps") if native_sample else None,
+        "native_post_left_flux_h_m3ps": native_sample.get("post_left_flux_h_m3ps") if native_sample else None,
+        "native_post_left_sign": native_sample.get("post_left_sign") if native_sample else None,
+        "native_post_source_sign_matches": native_sign_matches,
+        "native_post_left_flux_delta_m3ps": native_sample.get("post_left_flux_delta_m3ps") if native_sample else None,
+        "native_face_state_reconstruction_applied": native_sample.get("constriction_face_state_reconstruction_applied")
+        if native_sample
+        else None,
+        "native_constriction_source_split_applied": native_sample.get("constriction_hydrostatic_source_split_applied")
+        if native_sample
+        else None,
+        "width_depth_coupled_blocker": width_depth_coupled,
+        "blocked": blocked,
+        "recommended_solver_lever": lever,
+    }
+
+
+def _constriction_upstream_edge_balance_blocked_reasons(
+    target_samples: tuple[dict[str, object], ...],
+    paired_edge_summary: tuple[dict[str, object], ...],
+) -> tuple[str, ...]:
+    reasons: list[str] = []
+    if not target_samples:
+        reasons.append("No upstream edge balance targets were available from the focused constriction reports.")
+        return tuple(reasons)
+    if any(not bool(sample.get("volume_sign_matches", True)) for sample in target_samples):
+        reasons.append("C++ final-frame upstream edge volume-flux signs still disagree with GeoClaw.")
+    if any(bool(sample.get("source_balance_blocker")) for sample in target_samples):
+        reasons.append("Reconstructed face/source balance still blocks at one or more upstream edge faces.")
+    if any(not bool(sample.get("native_post_source_sign_matches", True)) for sample in target_samples):
+        reasons.append("Native C++ post-source y-face flux signs still disagree with GeoClaw.")
+    if any(bool(sample.get("width_depth_coupled_blocker")) for sample in target_samples):
+        reasons.append("Upstream edge face-state flux errors are coupled to wet-band width, bank-row, or depth support deltas.")
+    if any(not bool(pair.get("matches_reference_opposition", True)) for pair in paired_edge_summary):
+        reasons.append("GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states.")
+    return tuple(reasons)
+
+
+def _constriction_upstream_edge_balance_next_levers(
+    target_samples: tuple[dict[str, object], ...],
+    paired_edge_summary: tuple[dict[str, object], ...],
+) -> tuple[str, ...]:
+    if not target_samples:
+        return ("Regenerate the constriction face-state and face/source reports before the next solver retune.",)
+    primary = target_samples[0]
+    levers = [
+        (
+            f"Start with `{primary.get('face_role')}` column {primary.get('column_index')} rows "
+            f"{primary.get('south_row_index')}-{primary.get('north_row_index')}; q delta is "
+            f"{_format_number(_float_or_none(primary.get('volume_flux_delta_m3ps')))} m3/s, balance delta is "
+            f"{_format_number(_float_or_none(primary.get('balance_delta_m3ps2')))} m3/s2, native post-source delta is "
+            f"{_format_number(_float_or_none(primary.get('native_post_left_flux_delta_m3ps')))} m3/s, wet-width delta is "
+            f"{_format_number(_float_or_none(primary.get('wet_width_delta_cells')))} cells, and bank-row delta is "
+            f"{_format_number(_float_or_none(primary.get('max_abs_bank_row_delta_cells')))} cells."
+        )
+    ]
+    if any(bool(sample.get("width_depth_coupled_blocker")) for sample in target_samples):
+        levers.append(
+            "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support."
+        )
+    if any(bool(sample.get("source_balance_blocker")) for sample in target_samples):
+        levers.append(
+            "Retune y-face flux/source balance at the same face after the geometry support is corrected, not as a standalone source-strength increase."
+        )
+    if any(not bool(pair.get("matches_reference_opposition", True)) for pair in paired_edge_summary):
+        levers.append(
+            "Preserve GeoClaw's lower-positive/upper-negative edge opposition across upstream wet-band columns."
+        )
+    levers.append("Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change.")
+    return tuple(dict.fromkeys(levers))
+
+
 def _constriction_upstream_lateral_face_samples(
     initial_state: dict[str, np.ndarray],
     reference_state: dict[str, np.ndarray],
@@ -7715,6 +8059,42 @@ def _cpp_internal_face_audit_row(sample: dict[str, object]) -> str:
         f"`{bool(sample.get('constriction_hydrostatic_source_split_applied'))}` | "
         f"`{bool(sample.get('hydrostatic_face_source_enabled'))}` | "
         f"`{cell_sources}` |"
+    )
+
+
+def _upstream_edge_balance_sample_row(sample: dict[str, object]) -> str:
+    rows = f"{sample.get('south_row_index')}-{sample.get('north_row_index')}"
+    reference = (
+        f"{_format_number(_float_or_none(sample.get('reference_volume_flux_m3ps')))}/"
+        f"{sample.get('reference_volume_sign')}"
+    )
+    candidate = (
+        f"{_format_number(_float_or_none(sample.get('candidate_volume_flux_m3ps')))}/"
+        f"{sample.get('candidate_volume_sign')}"
+    )
+    width_depth = (
+        f"width={_format_number(_float_or_none(sample.get('wet_width_delta_cells')))}, "
+        f"bank={_format_number(_float_or_none(sample.get('max_abs_bank_row_delta_cells')))}, "
+        f"face_h={_format_number(_float_or_none(sample.get('mean_depth_delta_m')))}, "
+        f"column_h={_format_number(_float_or_none(sample.get('column_mean_wet_depth_delta_m')))}"
+    )
+    native = (
+        f"{_format_number(_float_or_none(sample.get('native_post_left_flux_h_m3ps')))}/"
+        f"{sample.get('native_post_left_sign')}"
+    )
+    return (
+        "| "
+        f"`{sample.get('face_role')}` | "
+        f"{sample.get('column_index')} | "
+        f"`{rows}` | "
+        f"`{reference}` | "
+        f"`{candidate}` | "
+        f"{_format_number(_float_or_none(sample.get('volume_flux_delta_m3ps')))} | "
+        f"{_format_number(_float_or_none(sample.get('balance_delta_m3ps2')))} | "
+        f"`{width_depth}` | "
+        f"`{native}` | "
+        f"{_format_number(_float_or_none(sample.get('native_post_left_flux_delta_m3ps')))} | "
+        f"`{sample.get('recommended_solver_lever')}` |"
     )
 
 
