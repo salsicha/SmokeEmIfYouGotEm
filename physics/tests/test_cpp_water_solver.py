@@ -316,6 +316,18 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["bounded"] is True
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["mass_conservative_lateral_face_flux"] is True
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["preconditions_inflow_edge_state"] is True
+    assert (
+        constriction_manifest["constriction_upstream_edge_flux_source"][
+            "recognizes_lower_edge_face_as_outside_to_first_wet"
+        ]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_upstream_edge_flux_source"][
+            "recognizes_upper_edge_face_as_next_to_last_to_last_wet"
+        ]
+        is True
+    )
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["excluded_from_later_depth_receivers"] is True
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_y_face_state_reconstruction"] is True
