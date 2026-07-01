@@ -202,6 +202,7 @@ First draft behaviors:
 - High-side, lean, and shift weight to counter pins, wraps, lateral hits, sticky holes, and flip hazards
 - Panic or miss strokes when trust is low
 - Fall out after heavy impacts or bad wave hits
+- Receive run-start swimming skill assignments, from strong swimmer to completely unable to swim, so ejection urgency, panic, self-rescue, throw-line priority, and safety scoring vary by passenger
 - Enter a swimmer state after falling out, with downstream position, fatigue/panic, audio callouts, and visibility from the guide's seat
 - Require rescue, pull-in, and re-seating/recovery before the score, trust, or safety rating collapses
 - Respond to spoken guide commands with short acknowledgments, hesitation, confusion, or urgency based on command clarity and crew state
@@ -241,8 +242,14 @@ Possible progression tracks:
 - Guide skill unlocks
 - Raft types and handling tradeoffs
 - Crew trust and passenger archetypes
+- Passenger swimming ability, including non-swimmers who need faster rescue, clearer commands, and higher safety consequences if ejected
 - River permits / route unlocks
 - Cosmetic raft, helmet, paddle, and outfitter gear
+
+Content route order:
+
+- First real-world baseline: South Fork American River, Chili Bar to Coloma, paddle-raft guide experience.
+- Second real-world target: a Colorado River rowing route with an oar rig/rowing frame, larger-volume lines, longer canyon pacing, and rowing-specific ferry, pull, back-row, rescue, and passenger-management decisions.
 
 ## Tone
 
