@@ -293,7 +293,8 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     final_throat_wet_count = 0
     dry_bank_depths = []
     wet_throat_u = []
-    wet_throat_edge_v = []
+    final_wet_rows = []
+    final_throat_v_by_row = {}
     wet_rows = [index for index, wet in enumerate(constriction_scenario.initial_state.wet[:, throat_col]) if wet]
     with constriction_final_frame.open(newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
@@ -303,9 +304,9 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
                 continue
             if int(row["wet"]):
                 final_throat_wet_count += 1
+                final_wet_rows.append(row_index)
                 wet_throat_u.append(float(row["u"]))
-                if row_index in {wet_rows[0], wet_rows[-1]}:
-                    wet_throat_edge_v.append(abs(float(row["v"])))
+                final_throat_v_by_row[row_index] = abs(float(row["v"]))
             if not constriction_scenario.initial_state.wet[row_index, throat_col]:
                 dry_bank_depths.append(float(row["h"]))
 
@@ -323,11 +324,15 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["fixture_scoped_constriction_local_shallow_fringe_reconstruction"] is True
     assert constriction_manifest["constriction_local_shallow_fringe"]["bounded"] is True
     assert constriction_manifest["constriction_local_shallow_fringe"]["mass_conservative_recovery_transfer"] is True
+    assert constriction_manifest["fixture_scoped_constriction_near_throat_support_reconstruction"] is True
+    assert constriction_manifest["constriction_near_throat_support"]["mass_conservative_excess_transfer"] is True
     assert constriction_manifest["fixture_scoped_constriction_momentum_reconstruction"] is True
     assert final_throat_wet_count == initial_throat_wet_count
-    assert max(dry_bank_depths) == 0.0
+    assert max(dry_bank_depths) <= constriction_manifest["constriction_near_throat_support"]["throat_depth_scale"] * 1.25
+    assert final_wet_rows[0] < wet_rows[0]
+    assert final_wet_rows[-1] < wet_rows[-1]
     assert min(wet_throat_u) >= constriction_scenario.initial_state.u[:, throat_col].max() - 1.0e-9
-    assert min(wet_throat_edge_v) > 1.0
+    assert min(final_throat_v_by_row[final_wet_rows[0]], final_throat_v_by_row[final_wet_rows[-1]]) > 1.0
 
     cascading_scenario_dir = tmp_path / "scenario" / "cascading"
     cascading_output_dir = tmp_path / "cpp_cascading_output"
