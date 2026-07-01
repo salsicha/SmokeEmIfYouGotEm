@@ -45,6 +45,9 @@ MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA = (
 MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA = (
     "raftsim.milestone18.constriction_lateral_face_flux.v0"
 )
+MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA = (
+    "raftsim.milestone18.drop_ledge_hydraulic_control.v0"
+)
 
 _CORE_GUARDRAIL_FAMILIES = {"hydrostatic_sloping_balance", "uniform_channel", "dam_break_bore"}
 _GEOMETRY_CLOSURE_FAMILIES = {"wet_dry_shoreline", "bed_step", "constriction", "drops_ledges_tailwater"}
@@ -1499,6 +1502,187 @@ class Milestone18ConstrictionProbeCrossSectionReport:
 
 
 @dataclass(frozen=True, slots=True)
+class Milestone18DropLedgeZoneSummary:
+    """Final-frame water-shape summary for one drop/ledge control zone."""
+
+    zone_id: str
+    columns: tuple[int, ...]
+    reference_mean_h: float
+    candidate_mean_h: float
+    mean_h_delta: float
+    reference_mean_eta: float
+    candidate_mean_eta: float
+    mean_eta_delta: float
+    reference_mean_u: float
+    candidate_mean_u: float
+    mean_u_delta: float
+    reference_mean_froude: float
+    candidate_mean_froude: float
+    mean_froude_delta: float
+    reference_wet_cell_count: int
+    candidate_wet_cell_count: int
+
+    def to_json_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18DropLedgeHydraulicControlReport:
+    """Diagnostic report locating drop/ledge hydraulic-control and tailwater blockers."""
+
+    dual_solver_manifest: str
+    scenario_package: str
+    scenario_id: str
+    ledge_feature: dict[str, object]
+    downstream_feature: dict[str, object] | None
+    grid: dict[str, object]
+    wet_depth_threshold_m: float
+    velocity_depth_floor_m: float
+    zones: dict[str, tuple[int, ...]]
+    thresholds: dict[str, float]
+    zone_summaries: tuple[Milestone18DropLedgeZoneSummary, ...]
+    field_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...]
+    probe_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...]
+    cross_section_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...]
+    blocked_reasons: tuple[str, ...]
+    next_levers: tuple[str, ...]
+
+    @property
+    def passed(self) -> bool:
+        return not self.blocked_reasons
+
+    @property
+    def raw_samples(self) -> tuple[Milestone18ConstrictionProbeCrossSectionSample, ...]:
+        return self.probe_samples + self.cross_section_samples
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "dual_solver_manifest": self.dual_solver_manifest,
+            "scenario_package": self.scenario_package,
+            "scenario_id": self.scenario_id,
+            "ledge_feature": self.ledge_feature,
+            "downstream_feature": self.downstream_feature,
+            "grid": self.grid,
+            "wet_depth_threshold_m": self.wet_depth_threshold_m,
+            "velocity_depth_floor_m": self.velocity_depth_floor_m,
+            "zones": {zone_id: list(columns) for zone_id, columns in self.zones.items()},
+            "thresholds": self.thresholds,
+            "summary": {
+                "sample_count": len(self.field_samples) + len(self.raw_samples),
+                "max_final_field_linf": _max_sample_value(self.field_samples),
+                "max_probe_linf": _max_raw_series_sample_value(self.probe_samples),
+                "max_cross_section_linf": _max_raw_series_sample_value(self.cross_section_samples),
+                "max_abs_zone_mean_eta_delta_m": max(
+                    (abs(summary.mean_eta_delta) for summary in self.zone_summaries),
+                    default=0.0,
+                ),
+                "max_abs_zone_mean_h_delta_m": max(
+                    (abs(summary.mean_h_delta) for summary in self.zone_summaries),
+                    default=0.0,
+                ),
+                "worst_final_field_samples": [sample.to_json_dict() for sample in self._worst_field_samples()],
+                "worst_raw_samples": [sample.to_json_dict() for sample in self._worst_raw_samples()],
+            },
+            "zone_summaries": [summary.to_json_dict() for summary in self.zone_summaries],
+            "samples": {
+                "final_field": [sample.to_json_dict() for sample in self.field_samples],
+                "probe": [sample.to_json_dict() for sample in self.probe_samples],
+                "cross_section": [sample.to_json_dict() for sample in self.cross_section_samples],
+            },
+            "blocked_reasons": list(self.blocked_reasons),
+            "next_levers": list(self.next_levers),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        summary = self.to_json_dict()["summary"]
+        lines = [
+            "# Milestone 18 Drop/Ledge Hydraulic-Control Diagnostic",
+            "",
+            f"Schema: `{MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Scenario: `{self.scenario_id}`",
+            f"Dual solver manifest: `{self.dual_solver_manifest}`",
+            f"Scenario package: `{self.scenario_package}`",
+            f"Wet-depth threshold: `{self.wet_depth_threshold_m:.6g}` m",
+            f"Velocity depth floor: `{self.velocity_depth_floor_m:.6g}` m",
+            "",
+            "## Summary",
+            "",
+            f"- Max final-field Linf: `{_format_number(_float_or_none(summary.get('max_final_field_linf')))}`",
+            f"- Max probe Linf: `{_format_number(_float_or_none(summary.get('max_probe_linf')))}`",
+            f"- Max cross-section Linf: `{_format_number(_float_or_none(summary.get('max_cross_section_linf')))}`",
+            f"- Max zone mean eta delta: `{_format_number(_float_or_none(summary.get('max_abs_zone_mean_eta_delta_m')))}` m",
+            "",
+            "## Zones",
+            "",
+            "| Zone | Columns |",
+            "| --- | --- |",
+        ]
+        for zone_id, columns in self.zones.items():
+            lines.append(f"| `{zone_id}` | `{_column_span(columns)}` |")
+        lines.extend(
+            [
+                "",
+                "## Final Water Shape By Zone",
+                "",
+                "| Zone | GeoClaw h/eta/u/Fr | C++ h/eta/u/Fr | Delta h/eta/u/Fr | Wet cells |",
+                "| --- | --- | --- | --- | --- |",
+            ]
+        )
+        for zone_summary in self.zone_summaries:
+            lines.append(_drop_ledge_zone_summary_row(zone_summary))
+        lines.extend(
+            [
+                "",
+                "## Worst Final-Frame Field Cells",
+                "",
+                "| Category | Field | Frame | Zone | Cell | x m | y m | GeoClaw | C++ | Delta | Abs error | Threshold | Ratio |",
+                "| --- | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for sample in self._worst_field_samples():
+            lines.append(_shape_sample_grid_row(sample))
+        lines.extend(
+            [
+                "",
+                "## Worst Raw Probe/Cross-Section Samples",
+                "",
+                "| Category | Sample | Field | Time s | Distance m | Zone | Cell | GeoClaw | C++ | Delta | Abs error | Ref h/u/v/Fr | C++ h/u/v/Fr | Threshold | Ratio |",
+                "| --- | --- | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- | --- | ---: | ---: |",
+            ]
+        )
+        for sample in self._worst_raw_samples():
+            lines.append(_probe_cross_section_sample_row(sample))
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.next_levers:
+            lines.extend(["", "## Next Levers", ""])
+            lines.extend(f"- {lever}" for lever in self.next_levers)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+    def _worst_field_samples(self) -> tuple[Milestone18ConstrictionShapeErrorSample, ...]:
+        return tuple(sorted(self.field_samples, key=lambda sample: sample.ratio_to_threshold, reverse=True)[:12])
+
+    def _worst_raw_samples(self) -> tuple[Milestone18ConstrictionProbeCrossSectionSample, ...]:
+        return tuple(sorted(self.raw_samples, key=lambda sample: sample.ratio_to_threshold, reverse=True)[:12])
+
+
+@dataclass(frozen=True, slots=True)
 class Milestone18ConstrictionLateralFaceFluxSample:
     """One upstream lateral face flux proxy comparing final GeoClaw and C++ states."""
 
@@ -2461,6 +2645,125 @@ def build_milestone18_constriction_lateral_face_flux_report(
     )
 
 
+def build_milestone18_drop_ledge_hydraulic_control_report(
+    dual_solver_manifest: str | Path,
+    *,
+    wet_depth_threshold_m: float = 0.15,
+    velocity_depth_floor_m: float = DEFAULT_VELOCITY_DEPTH_FLOOR,
+    top_n: int = 12,
+) -> Milestone18DropLedgeHydraulicControlReport:
+    """Locate drop/ledge hydraulic-control and tailwater water-shape blockers."""
+
+    manifest_path = Path(dual_solver_manifest)
+    manifest = _load_json_report(manifest_path)
+    comparison_dir = manifest_path.parent
+    scenario_package = _resolve_path(str(manifest.get("scenario_package", "")), comparison_dir)
+    scenario = _load_json_report(scenario_package / "scenario.json")
+    features = _load_json_report(scenario_package / "features.json")
+    ledge = _drop_ledge_feature(features)
+    downstream = _feature_by_kind(features, "wave_train")
+    grid = _scenario_grid(scenario)
+
+    initial_state_path = _scenario_array_path(scenario_package, scenario, "initial_state", "initial_state.npz")
+    initial_state = _load_npz_water_state(initial_state_path, h_key="depth")
+    zones = _drop_ledge_response_zones(initial_state, grid, ledge, downstream)
+
+    threshold_report = _load_json_report(comparison_dir / "threshold_evaluation.json")
+    thresholds = _shape_timing_thresholds(threshold_report)
+
+    geoclaw_manifest_ref = _manifest_nested_string(manifest, "geoclaw", "manifest")
+    cpp_manifest_ref = _manifest_nested_string(manifest, "cpp", "manifest")
+    geoclaw_manifest_path = _resolve_path(geoclaw_manifest_ref, comparison_dir)
+    cpp_manifest_path = _resolve_path(cpp_manifest_ref, comparison_dir)
+    geoclaw_manifest = _load_json_report(geoclaw_manifest_path)
+    cpp_manifest = _load_json_report(cpp_manifest_path)
+    geoclaw_root = geoclaw_manifest_path.parent
+    cpp_root = cpp_manifest_path.parent
+    geoclaw_frame_path = _final_frame_path(geoclaw_manifest, geoclaw_root)
+    cpp_frame_path = _final_frame_path(cpp_manifest, cpp_root)
+    ny = int(grid["ny"])
+    nx = int(grid["nx"])
+    geoclaw_state = _load_water_frame_fields(geoclaw_frame_path, ny, nx)
+    cpp_state = _load_water_frame_fields(cpp_frame_path, ny, nx)
+
+    field_samples = tuple(
+        sorted(
+            _constriction_frame_worst_samples(
+                {
+                    "label": "final",
+                    "reference_frame": str(geoclaw_frame_path),
+                    "cpp_frame": str(cpp_frame_path),
+                },
+                0,
+                grid,
+                zones,
+                category="field",
+                fields=FIELD_NAMES,
+                threshold=thresholds["max_field_linf"],
+                velocity_depth_floor_m=velocity_depth_floor_m,
+            ),
+            key=lambda sample: sample.ratio_to_threshold,
+            reverse=True,
+        )[:top_n]
+    )
+    probe_metadata = _sample_metadata_by_id(geoclaw_manifest, "probe_manifest")
+    cross_section_metadata = _sample_metadata_by_id(geoclaw_manifest, "cross_section_manifest")
+    probe_samples = _raw_probe_worst_samples(
+        geoclaw_root,
+        _string_list(geoclaw_manifest.get("probes")),
+        cpp_root,
+        _string_list(cpp_manifest.get("probes")),
+        probe_metadata,
+        grid,
+        zones,
+        threshold=thresholds["max_probe_linf"],
+        velocity_depth_floor_m=velocity_depth_floor_m,
+        top_n=top_n,
+    )
+    cross_section_samples = _raw_cross_section_worst_samples(
+        geoclaw_root,
+        _string_list(geoclaw_manifest.get("cross_sections")),
+        cpp_root,
+        _string_list(cpp_manifest.get("cross_sections")),
+        cross_section_metadata,
+        grid,
+        zones,
+        threshold=thresholds["max_cross_section_linf"],
+        velocity_depth_floor_m=velocity_depth_floor_m,
+        top_n=top_n,
+    )
+    zone_summaries = _drop_ledge_zone_summaries(geoclaw_state, cpp_state, zones, wet_depth_threshold_m)
+    blocked_reasons = _drop_ledge_hydraulic_control_blocked_reasons(
+        field_samples,
+        probe_samples,
+        cross_section_samples,
+    )
+    next_levers = _drop_ledge_hydraulic_control_next_levers(
+        field_samples,
+        probe_samples,
+        cross_section_samples,
+        threshold_report,
+    )
+    return Milestone18DropLedgeHydraulicControlReport(
+        dual_solver_manifest=str(manifest_path),
+        scenario_package=str(scenario_package),
+        scenario_id=str(manifest.get("scenario_id") or scenario.get("metadata", {}).get("scenario_id") or "unknown"),
+        ledge_feature=ledge,
+        downstream_feature=downstream,
+        grid=grid,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        velocity_depth_floor_m=velocity_depth_floor_m,
+        zones=zones,
+        thresholds=thresholds,
+        zone_summaries=zone_summaries,
+        field_samples=field_samples,
+        probe_samples=probe_samples,
+        cross_section_samples=cross_section_samples,
+        blocked_reasons=blocked_reasons,
+        next_levers=next_levers,
+    )
+
+
 def build_milestone18_pin_release_fixture_report(
     *,
     fixture_id: str = "midstream_wrap_pin_release",
@@ -3189,6 +3492,37 @@ def _constriction_feature(features_payload: dict[str, Any]) -> dict[str, object]
     raise ValueError("features.json does not contain a constriction feature.")
 
 
+def _feature_by_kind(features_payload: dict[str, Any], kind: str) -> dict[str, object] | None:
+    features = features_payload.get("features", [])
+    if not isinstance(features, list):
+        raise ValueError("features must be a list.")
+    for feature in features:
+        if not isinstance(feature, dict) or feature.get("kind") != kind:
+            continue
+        center = feature.get("center", {})
+        if not isinstance(center, dict):
+            center = {}
+        return {
+            "kind": kind,
+            "center_x": float(center.get("x", 0.0)),
+            "center_y": float(center.get("y", 0.0)),
+            "width_m": _float_or_none(feature.get("width")),
+            "length_m": _float_or_none(feature.get("length")),
+            "radius_m": _float_or_none(feature.get("radius")),
+            "strength": _float_or_none(feature.get("strength")),
+            "angle_rad": _float_or_none(feature.get("angle")),
+            "metadata": feature.get("metadata", {}),
+        }
+    return None
+
+
+def _drop_ledge_feature(features_payload: dict[str, Any]) -> dict[str, object]:
+    feature = _feature_by_kind(features_payload, "ledge")
+    if feature is None:
+        raise ValueError("features.json does not contain a ledge feature.")
+    return feature
+
+
 def _grid_column(x: float, grid: dict[str, object]) -> int:
     raw = int(round((x - float(grid["origin_x"])) / float(grid["dx"])))
     return max(0, min(raw, int(grid["nx"]) - 1))
@@ -3910,6 +4244,42 @@ def _constriction_response_zones(
             zones["downstream_constriction"].append(col)
         else:
             zones["recovery"].append(col)
+    return {zone_id: tuple(columns) for zone_id, columns in zones.items() if columns}
+
+
+def _drop_ledge_response_zones(
+    initial_state: dict[str, np.ndarray],
+    grid: dict[str, object],
+    ledge: dict[str, object],
+    downstream: dict[str, object] | None,
+) -> dict[str, tuple[int, ...]]:
+    nx = int(grid["nx"])
+    center_x = float(ledge["center_x"])
+    dx = float(grid["dx"])
+    control_half_width = max(float(ledge.get("width_m") or dx) * 0.5, dx)
+    flow_sign = _initial_flow_sign(initial_state)
+    downstream_extent = control_half_width + dx
+    if downstream is not None:
+        downstream_offset = abs((float(downstream["center_x"]) - center_x) * flow_sign)
+        downstream_half_length = max(float(downstream.get("length_m") or 0.0) * 0.5, dx)
+        downstream_extent = max(downstream_extent, downstream_offset + downstream_half_length)
+    zones: dict[str, list[int]] = {
+        "upstream_pool": [],
+        "hydraulic_control": [],
+        "tailwater_recovery": [],
+        "downstream_pool": [],
+    }
+    for col in range(nx):
+        x = float(grid["origin_x"]) + col * dx
+        signed_x = (x - center_x) * flow_sign
+        if signed_x < -control_half_width:
+            zones["upstream_pool"].append(col)
+        elif signed_x <= control_half_width:
+            zones["hydraulic_control"].append(col)
+        elif signed_x <= downstream_extent:
+            zones["tailwater_recovery"].append(col)
+        else:
+            zones["downstream_pool"].append(col)
     return {zone_id: tuple(columns) for zone_id, columns in zones.items() if columns}
 
 
@@ -4735,6 +5105,138 @@ def _probe_cross_section_next_levers(
     return tuple(levers)
 
 
+def _drop_ledge_zone_summaries(
+    reference_state: dict[str, np.ndarray],
+    candidate_state: dict[str, np.ndarray],
+    zones: dict[str, tuple[int, ...]],
+    wet_depth_threshold_m: float,
+) -> tuple[Milestone18DropLedgeZoneSummary, ...]:
+    summaries: list[Milestone18DropLedgeZoneSummary] = []
+    for zone_id, columns in zones.items():
+        if not columns:
+            continue
+        column_indices = np.asarray(columns, dtype=np.int64)
+        reference_h = reference_state["h"][:, column_indices]
+        candidate_h = candidate_state["h"][:, column_indices]
+        reference_eta = reference_state["eta"][:, column_indices]
+        candidate_eta = candidate_state["eta"][:, column_indices]
+        reference_u = reference_state["u"][:, column_indices]
+        candidate_u = candidate_state["u"][:, column_indices]
+        reference_froude = reference_state["froude"][:, column_indices]
+        candidate_froude = candidate_state["froude"][:, column_indices]
+        reference_wet = reference_h > wet_depth_threshold_m
+        candidate_wet = candidate_h > wet_depth_threshold_m
+        reference_mean_h = _masked_mean(reference_h, reference_wet)
+        candidate_mean_h = _masked_mean(candidate_h, candidate_wet)
+        reference_mean_eta = _masked_mean(reference_eta, reference_wet)
+        candidate_mean_eta = _masked_mean(candidate_eta, candidate_wet)
+        reference_mean_u = _masked_mean(reference_u, reference_wet)
+        candidate_mean_u = _masked_mean(candidate_u, candidate_wet)
+        reference_mean_froude = _masked_mean(reference_froude, reference_wet)
+        candidate_mean_froude = _masked_mean(candidate_froude, candidate_wet)
+        summaries.append(
+            Milestone18DropLedgeZoneSummary(
+                zone_id=zone_id,
+                columns=tuple(int(col) for col in columns),
+                reference_mean_h=reference_mean_h,
+                candidate_mean_h=candidate_mean_h,
+                mean_h_delta=candidate_mean_h - reference_mean_h,
+                reference_mean_eta=reference_mean_eta,
+                candidate_mean_eta=candidate_mean_eta,
+                mean_eta_delta=candidate_mean_eta - reference_mean_eta,
+                reference_mean_u=reference_mean_u,
+                candidate_mean_u=candidate_mean_u,
+                mean_u_delta=candidate_mean_u - reference_mean_u,
+                reference_mean_froude=reference_mean_froude,
+                candidate_mean_froude=candidate_mean_froude,
+                mean_froude_delta=candidate_mean_froude - reference_mean_froude,
+                reference_wet_cell_count=int(np.count_nonzero(reference_wet)),
+                candidate_wet_cell_count=int(np.count_nonzero(candidate_wet)),
+            )
+        )
+    return tuple(summaries)
+
+
+def _masked_mean(values: np.ndarray, mask: np.ndarray) -> float:
+    if not np.any(mask):
+        return 0.0
+    return float(np.mean(np.asarray(values, dtype=float)[mask]))
+
+
+def _drop_ledge_hydraulic_control_blocked_reasons(
+    field_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...],
+    probe_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...],
+    cross_section_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...],
+) -> tuple[str, ...]:
+    reasons: list[str] = []
+    if _max_sample_exceeds(field_samples):
+        reasons.append("C++ drop/ledge final-field Linf still exceeds the GeoClaw/C++ threshold.")
+    if _max_raw_sample_exceeds(probe_samples):
+        reasons.append("C++ drop/ledge point-probe raw samples still exceed the GeoClaw/C++ threshold.")
+    if _max_raw_sample_exceeds(cross_section_samples):
+        reasons.append("C++ drop/ledge cross-section raw samples still exceed the GeoClaw/C++ threshold.")
+    if _samples_touch_drop_control_or_tailwater(field_samples, probe_samples, cross_section_samples):
+        reasons.append("The remaining drop/ledge error is localized to hydraulic-control or tailwater-recovery water shape.")
+    return tuple(reasons)
+
+
+def _drop_ledge_hydraulic_control_next_levers(
+    field_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...],
+    probe_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...],
+    cross_section_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...],
+    threshold_report: dict[str, Any],
+) -> tuple[str, ...]:
+    samples = tuple(
+        sorted(
+            field_samples + probe_samples + cross_section_samples,
+            key=lambda sample: sample.ratio_to_threshold,
+            reverse=True,
+        )
+    )
+    if not samples:
+        return ("No drop/ledge samples were available; rerun the corrected-reference comparison before retuning.",)
+    worst = samples[0]
+    source_id = getattr(worst, "source_id", getattr(worst, "sample_id", "unknown"))
+    location = f"`{worst.category}`/`{worst.field}` at `{source_id}`"
+    if getattr(worst, "row_index", None) is not None and getattr(worst, "column_index", None) is not None:
+        location += f" cell {worst.row_index},{worst.column_index}"
+    levers = [
+        f"Start with {location}; it is {_format_number(worst.ratio_to_threshold)}x the diagnostic threshold.",
+        "Retune the ledge hydraulic-control free-surface/depth reconstruction and downstream recovery shape before adding gameplay feature forcing.",
+    ]
+    if _threshold_checks_pass(threshold_report, ("mass_drift_delta", "energy_change_delta", "froude_delta")):
+        levers.append(
+            "Preserve the passing conservation, energy, and Froude checks; this is a water-shape blocker, not permission to hide errors with forcing."
+        )
+    if any(sample.field in {"h", "eta", "hu"} for sample in samples[:6]):
+        levers.append("Inspect depth, stage, and streamwise momentum across the ledge lip and first tailwater recovery columns.")
+    if any(sample.category in {"probe", "cross_section"} for sample in samples[:6]):
+        levers.append("Use the raw probe/cross-section coordinates as the acceptance surface for the next corrected-reference parity run.")
+    levers.append("Keep `feature_strength_scale=0` and rerun the Milestone 17 analytic guardrail after the solver change.")
+    return tuple(dict.fromkeys(levers))
+
+
+def _samples_touch_drop_control_or_tailwater(
+    field_samples: tuple[Milestone18ConstrictionShapeErrorSample, ...],
+    probe_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...],
+    cross_section_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...],
+) -> bool:
+    zones = {"hydraulic_control", "tailwater_recovery"}
+    for sample in field_samples + probe_samples + cross_section_samples:
+        if not sample.passed and sample.zone_id in zones:
+            return True
+    return False
+
+
+def _threshold_checks_pass(threshold_report: dict[str, Any], names: tuple[str, ...]) -> bool:
+    remaining = set(names)
+    for check in _records(threshold_report, "checks"):
+        name = check.get("name")
+        if name in remaining and bool(check.get("passed")):
+            remaining.remove(str(name))
+    return not remaining
+
+
 def _constriction_upstream_lateral_face_samples(
     initial_state: dict[str, np.ndarray],
     reference_state: dict[str, np.ndarray],
@@ -5006,6 +5508,36 @@ def _probe_cross_section_sample_row(sample: Milestone18ConstrictionProbeCrossSec
         f"`{candidate_state}` | "
         f"{sample.threshold:.6g} | "
         f"{sample.ratio_to_threshold:.6g} |"
+    )
+
+
+def _drop_ledge_zone_summary_row(summary: Milestone18DropLedgeZoneSummary) -> str:
+    reference_state = (
+        f"{_format_number(summary.reference_mean_h)}/"
+        f"{_format_number(summary.reference_mean_eta)}/"
+        f"{_format_number(summary.reference_mean_u)}/"
+        f"{_format_number(summary.reference_mean_froude)}"
+    )
+    candidate_state = (
+        f"{_format_number(summary.candidate_mean_h)}/"
+        f"{_format_number(summary.candidate_mean_eta)}/"
+        f"{_format_number(summary.candidate_mean_u)}/"
+        f"{_format_number(summary.candidate_mean_froude)}"
+    )
+    delta_state = (
+        f"{_format_number(summary.mean_h_delta)}/"
+        f"{_format_number(summary.mean_eta_delta)}/"
+        f"{_format_number(summary.mean_u_delta)}/"
+        f"{_format_number(summary.mean_froude_delta)}"
+    )
+    wet_cells = f"{summary.reference_wet_cell_count}->{summary.candidate_wet_cell_count}"
+    return (
+        "| "
+        f"`{summary.zone_id}` | "
+        f"`{reference_state}` | "
+        f"`{candidate_state}` | "
+        f"`{delta_state}` | "
+        f"`{wet_cells}` |"
     )
 
 
