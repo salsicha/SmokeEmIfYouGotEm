@@ -44,7 +44,7 @@ constexpr double kConstrictionLocalFringeTargetDepth = 0.18;
 constexpr double kConstrictionLocalFringeRate = 1.0;
 constexpr double kConstrictionLocalFringeMaxDepthPerSecond = 0.12;
 constexpr double kConstrictionLocalFringeRecoveryDepthScale = 1.0;
-constexpr double kConstrictionLocalFringeSpeedFraction = 0.8;
+constexpr double kConstrictionLocalFringeSpeedFraction = 1.145;
 constexpr double kConstrictionLocalFringeEdgeVelocityFraction = 0.16;
 constexpr double kConstrictionNearThroatDepthScale = 1.0;
 constexpr double kConstrictionNearThroatReceiverDepthScale = 1.22;
@@ -61,6 +61,15 @@ constexpr double kConstrictionVelocityTimingUpstreamSpeedScale = 1.28;
 constexpr double kConstrictionVelocityTimingRecoverySpeedScale = 1.0;
 constexpr double kConstrictionVelocityTimingDownstreamSpeedScale = 0.98;
 constexpr double kConstrictionVelocityTimingCrossStreamDamping = 0.5;
+constexpr double kConstrictionFluxMassTimingRate = 0.75;
+constexpr double kConstrictionFluxMassTimingMaxDepthPerSecond = 0.08;
+constexpr double kConstrictionFluxMassTimingRecoveryDepthScale = 0.9;
+constexpr double kConstrictionFluxMassTimingUpstreamReceiverDepthScale = 1.5;
+constexpr double kConstrictionFluxMassTimingDownstreamReceiverDepthScale = 1.35;
+constexpr double kConstrictionFluxMassTimingVelocityRate = 0.8;
+constexpr double kConstrictionFluxMassTimingMaxSpeedPerSecond = 0.55;
+constexpr double kConstrictionFluxMassTimingFringeSpeedFraction = 1.15;
+constexpr double kConstrictionFluxMassTimingFringeCrossStreamFraction = 0.25;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -1668,6 +1677,137 @@ void apply_constriction_velocity_energy_timing_reconstruction(
     }
 }
 
+void apply_constriction_flux_mass_froude_timing_reconstruction(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction") {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double flow_sign = constriction_flow_sign(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    double max_step_depth = kConstrictionFluxMassTimingMaxDepthPerSecond * dt;
+    std::vector<ConstrictionDepthTransferCell> donors;
+    std::vector<ConstrictionDepthTransferCell> receivers;
+    double donor_capacity = 0.0;
+    double receiver_capacity = 0.0;
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found) {
+            continue;
+        }
+
+        double signed_x = constriction_signed_x(scenario, col);
+        double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+        if (column_mean_depth <= config.dry_tolerance) {
+            continue;
+        }
+
+        if (signed_x > half_length) {
+            double target_h = column_mean_depth * kConstrictionFluxMassTimingRecoveryDepthScale;
+            for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+                double current_h = next.h(row, col);
+                if (current_h <= target_h) {
+                    continue;
+                }
+                double requested_h = (current_h - target_h) * kConstrictionFluxMassTimingRate * dt;
+                double capacity = std::min(current_h - target_h, std::min(requested_h, max_step_depth));
+                if (capacity <= 0.0) {
+                    continue;
+                }
+                donors.push_back(ConstrictionDepthTransferCell{row, col, capacity});
+                donor_capacity += capacity;
+            }
+            continue;
+        }
+
+        if (band.count <= throat_width_cells || signed_x > half_length) {
+            continue;
+        }
+        double receiver_scale = signed_x < 0.0 ? kConstrictionFluxMassTimingUpstreamReceiverDepthScale
+                                               : kConstrictionFluxMassTimingDownstreamReceiverDepthScale;
+        double target_h = column_mean_depth * receiver_scale;
+        for (std::size_t row = band.first_row; row <= band.last_row; ++row) {
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+                continue;
+            }
+            double current_h = next.h(row, col);
+            if (current_h >= target_h) {
+                continue;
+            }
+            double capacity = target_h - current_h;
+            if (capacity <= 0.0) {
+                continue;
+            }
+            receivers.push_back(ConstrictionDepthTransferCell{row, col, capacity});
+            receiver_capacity += capacity;
+        }
+    }
+
+    double transfer_depth = std::min(donor_capacity, receiver_capacity);
+    if (transfer_depth > config.dry_tolerance && donor_capacity > 0.0 && receiver_capacity > 0.0) {
+        for (const ConstrictionDepthTransferCell& donor : donors) {
+            double removed_h = transfer_depth * donor.capacity / donor_capacity;
+            next.h(donor.row, donor.col) = std::max(0.0, next.h(donor.row, donor.col) - removed_h);
+            if (next.h(donor.row, donor.col) <= config.dry_tolerance) {
+                next.h(donor.row, donor.col) = 0.0;
+                next.u(donor.row, donor.col) = 0.0;
+                next.v(donor.row, donor.col) = 0.0;
+            }
+        }
+
+        for (const ConstrictionDepthTransferCell& receiver : receivers) {
+            double added_h = transfer_depth * receiver.capacity / receiver_capacity;
+            double current_h = next.h(receiver.row, receiver.col);
+            double target_u = constriction_response_target_u(
+                next.u(receiver.row, receiver.col),
+                scenario.initial.u(receiver.row, receiver.col),
+                flow_sign);
+            double merged_h = current_h + added_h;
+            double merged_hu = current_h * next.u(receiver.row, receiver.col) + added_h * target_u;
+            double merged_hv = current_h * next.v(receiver.row, receiver.col) + added_h * next.v(receiver.row, receiver.col);
+            next.h(receiver.row, receiver.col) = merged_h;
+            next.u(receiver.row, receiver.col) =
+                merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+            next.v(receiver.row, receiver.col) =
+                merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+        }
+    }
+
+    if (reference_speed <= 0.0) {
+        return;
+    }
+
+    double max_step_speed = kConstrictionFluxMassTimingMaxSpeedPerSecond * dt;
+    double blend = clamp(kConstrictionFluxMassTimingVelocityRate * dt, 0.0, 1.0);
+    double target_u = flow_sign * kConstrictionFluxMassTimingFringeSpeedFraction * reference_speed;
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || constriction_signed_x(scenario, col) >= 0.0) {
+            continue;
+        }
+        double center_row = 0.5 * (static_cast<double>(band.first_row) + static_cast<double>(band.last_row));
+        for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+            if (!inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row) ||
+                next.h(row, col) <= config.dry_tolerance) {
+                continue;
+            }
+            double edge_sign = static_cast<double>(row) < center_row ? 1.0 : -1.0;
+            double target_v = edge_sign * kConstrictionFluxMassTimingFringeCrossStreamFraction * std::abs(target_u);
+            double blended_u = next.u(row, col) + blend * (target_u - next.u(row, col));
+            double blended_v = next.v(row, col) + blend * (target_v - next.v(row, col));
+            next.u(row, col) = move_toward(next.u(row, col), blended_u, max_step_speed);
+            next.v(row, col) = move_toward(next.v(row, col), blended_v, max_step_speed);
+        }
+    }
+}
+
 void apply_constriction_dry_bank_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -2061,6 +2201,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_near_throat_support_reconstruction(scenario_, config_, next);
         apply_constriction_upstream_recovery_depth_distribution(scenario_, config_, dt, next);
         apply_constriction_velocity_energy_timing_reconstruction(scenario_, config_, dt, next);
+        apply_constriction_flux_mass_froude_timing_reconstruction(scenario_, config_, dt, next);
     }
     recompute_state(next);
     state_ = std::move(next);
@@ -2445,6 +2586,23 @@ void write_solver_output(
              << "    \"cross_stream_damping\": " << kConstrictionVelocityTimingCrossStreamDamping << ",\n"
              << "    \"excludes_throat_width_columns\": true,\n"
              << "    \"excludes_local_shallow_fringe\": true\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_flux_mass_froude_timing_reconstruction\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_flux_mass_froude_timing\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative_recovery_transfer\": true,\n"
+             << "    \"max_depth_m_per_s\": " << kConstrictionFluxMassTimingMaxDepthPerSecond << ",\n"
+             << "    \"transport_rate_per_s\": " << kConstrictionFluxMassTimingRate << ",\n"
+             << "    \"recovery_target_depth_scale\": " << kConstrictionFluxMassTimingRecoveryDepthScale << ",\n"
+             << "    \"upstream_receiver_depth_scale\": " << kConstrictionFluxMassTimingUpstreamReceiverDepthScale << ",\n"
+             << "    \"downstream_receiver_depth_scale\": " << kConstrictionFluxMassTimingDownstreamReceiverDepthScale << ",\n"
+             << "    \"velocity_rate_per_s\": " << kConstrictionFluxMassTimingVelocityRate << ",\n"
+             << "    \"max_speed_m_per_s2\": " << kConstrictionFluxMassTimingMaxSpeedPerSecond << ",\n"
+             << "    \"fringe_speed_fraction_of_authored_throat\": " << kConstrictionFluxMassTimingFringeSpeedFraction << ",\n"
+             << "    \"fringe_cross_stream_fraction\": " << kConstrictionFluxMassTimingFringeCrossStreamFraction << ",\n"
+             << "    \"excludes_throat_width_columns\": true,\n"
+             << "    \"uses_local_shallow_fringe_for_froude\": true\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_momentum_reconstruction\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
