@@ -1,0 +1,88 @@
+{
+  "schema": "raftsim.milestone18.constriction_retune_rejection.v0",
+  "decision": "REJECTED",
+  "scenario": "constriction_seed_16",
+  "dual_solver_manifest": "physics/outputs/m18cmp/c_constrict_upstream_recovery_circulation/finite_volume_roe/dual_solver_manifest.json",
+  "reference_manifest": "physics/outputs/m18g/c_constrict_corrected/constriction_seed_16/normalized/manifest.json",
+  "scenario_package": "physics/outputs/m18cmp/c_constrict_center_throat_circulation/finite_volume_roe/scenario/constriction_seed_16",
+  "feature_strength_scale": 0.0,
+  "implementation_retained": false,
+  "baseline": {
+    "candidate": "finite_volume_roe_center_throat_circulation",
+    "threshold_checks": {
+      "field_linf": 3.6945464474138565,
+      "slope_linf": 0.8551613579322149,
+      "wet_mismatch_fraction": 0.2708333333333333,
+      "probe_linf": 2.2032220662534128,
+      "cross_section_linf": 1.6919211975569117,
+      "mass_drift_delta": 0.012790570203094931,
+      "energy_change_delta": 0.15908802486631607,
+      "froude_delta": 0.5040339898261341,
+      "feature_location_delta": 3.605551275463989,
+      "feature_strength_delta": 0.7798978365843654
+    }
+  },
+  "rejected_candidate": {
+    "candidate": "finite_volume_roe_upstream_recovery_circulation_velocity_only",
+    "implementation": "fixture-scoped non-throat upstream/downstream/recovery velocity-only circulation pass after center-throat shaping",
+    "bounded": true,
+    "velocity_only": true,
+    "mass_preserving_instantaneously": true,
+    "parameters": {
+      "velocity_rate_per_s": 2.0,
+      "max_speed_m_per_s2": 4.0,
+      "upstream_core_cross_stream_fraction": 0.12,
+      "upstream_upper_edge_cross_stream_fraction": 0.58,
+      "upstream_lower_wet_edge_cross_stream_fraction": 0.14,
+      "upstream_lower_dry_edge_cross_stream_fraction": 0.36,
+      "upstream_core_speed_fraction": 0.34,
+      "upstream_edge_speed_fraction": 1.22,
+      "downstream_edge_speed_fraction": 0.05,
+      "downstream_cross_stream_fraction": 0.18,
+      "recovery_core_speed_fraction": 0.92,
+      "recovery_edge_speed_fraction": 0.72,
+      "recovery_cross_stream_fraction": 0.16
+    },
+    "threshold_checks": {
+      "field_linf": 3.642762406772284,
+      "slope_linf": 0.8953071373864321,
+      "wet_mismatch_fraction": 0.2777777777777778,
+      "probe_linf": 2.2032220662534128,
+      "cross_section_linf": 1.6919211975569117,
+      "mass_drift_delta": 0.057596904254481204,
+      "energy_change_delta": 0.1116705714805033,
+      "froude_delta": 1.4858524576421501,
+      "feature_location_delta": 3.0,
+      "feature_strength_delta": 0.9197889827075079
+    }
+  },
+  "sample_diagnostics": [
+    {
+      "cell": [9, 1],
+      "zone": "upstream_approach_upper_edge",
+      "reference": {"h": 0.3809042274951935, "u": 3.4384281385882587, "v": -3.7274328154432057, "froude": 2.6233962742544827},
+      "baseline_cpp": {"h": 1.6277634179530305, "u": 1.0558336165842954, "v": -0.03288636802934916, "froude": 0.2643479238566239},
+      "rejected_cpp": {"h": 1.658, "u": 1.663, "v": -0.296, "froude": 0.419},
+      "interpretation": "The velocity-only pass moved the sign and speed in the right direction but left the edge cell far too deep, so the Froude-class error remains structural."
+    },
+    {
+      "cell": [6, 18],
+      "zone": "recovery_center",
+      "reference": {"h": 1.2504020929336548, "u": 2.979729401848561, "v": 0.515689714297645, "froude": 0.8634276104878718},
+      "baseline_cpp": {"h": 1.0377739599759426, "u": 1.6979114304718512, "v": -0.6110374623092167, "froude": 0.5655543097219088},
+      "rejected_cpp": {"h": 0.764, "u": 2.25, "v": 0.157, "froude": 0.824},
+      "interpretation": "The velocity-only pass corrected the recovery velocity sign but drove recovery depth and mass timing away from the GeoClaw reference."
+    }
+  ],
+  "blocked_reasons": [
+    "Mass-drift delta regressed from a passing 0.0127906 to failing 0.0575969.",
+    "Froude delta regressed from near-threshold 0.504034 to 1.48585.",
+    "Wet-mask and slope errors worsened while probe and cross-section blockers were unchanged.",
+    "The main upstream edge blocker is coupled depth plus velocity, so velocity-only circulation is insufficient."
+  ],
+  "next_levers": [
+    "Do not retain a velocity-only upstream/recovery circulation pass unless mass drift and Froude stay inside threshold.",
+    "Use a mass-balanced edge-depth and circulation reconstruction that shallows over-deep upstream edge cells while redistributing water to under-depth interior/support cells.",
+    "Preserve the center-throat diagnostic and Milestone 17 analytic guardrails before rerunning the full constriction threshold report."
+  ]
+}
