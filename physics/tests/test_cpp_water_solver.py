@@ -318,6 +318,16 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["preconditions_inflow_edge_state"] is True
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["excluded_from_later_depth_receivers"] is True
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_y_face_state_reconstruction"] is True
+    assert constriction_manifest["constriction_y_face_state_reconstruction"]["bounded"] is True
+    assert constriction_manifest["constriction_y_face_state_reconstruction"]["predictor_state_only"] is True
+    assert (
+        constriction_manifest["constriction_y_face_state_reconstruction"][
+            "applies_before_y_face_riemann_solve"
+        ]
+        is True
+    )
+    assert constriction_manifest["constriction_y_face_state_reconstruction"]["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_y_face_hydrostatic_source_split"] is True
     assert constriction_manifest["constriction_y_face_hydrostatic_source_split"]["bounded"] is True
     assert constriction_manifest["constriction_y_face_hydrostatic_source_split"]["uses_predictor_riemann_state"] is True
@@ -371,6 +381,7 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["fixture_scoped_constriction_momentum_reconstruction"] is True
     assert constriction_manifest["constriction_y_face_flux_source_audit"]["present"] is True
     assert constriction_manifest["constriction_y_face_flux_source_audit"]["uses_internal_cpp_riemann_flux"] is True
+    assert constriction_manifest["constriction_y_face_flux_source_audit"]["records_constriction_face_state_reconstruction"] is True
     assert constriction_manifest["constriction_y_face_flux_source_audit"]["records_hydrostatic_face_source_terms"] is True
     assert (
         constriction_manifest["constriction_y_face_flux_source_audit"][
@@ -389,7 +400,9 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert any(int(row["constriction_face_source_applied"]) == 1 for row in audit_rows)
     assert any(int(row["constriction_hydrostatic_source_split_applied"]) == 1 for row in audit_rows)
     assert any(int(row["hydrostatic_face_source_enabled"]) == 1 for row in audit_rows)
+    assert any(int(row["constriction_face_state_reconstruction_applied"]) == 1 for row in audit_rows)
     assert all("post_left_flux_h_m3ps" in row for row in audit_rows)
+    assert all("face_state_north_v" in row for row in audit_rows)
     assert all("constriction_source_split_left_hv_m3ps2" in row for row in audit_rows)
     assert all("south_cell_bed_slope_source_hv_per_s" in row for row in audit_rows)
     assert final_throat_wet_count == initial_throat_wet_count
