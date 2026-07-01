@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from raftsim.analytic_fixtures import write_analytic_fixture_suite
 from raftsim.examples.generate_milestone18_constriction_mask_alignment_report import (
@@ -22,6 +23,9 @@ from raftsim.examples.generate_milestone18_constriction_shape_timing_report impo
 from raftsim.examples.generate_milestone18_constriction_throat_shape_report import (
     main as generate_constriction_throat_main,
 )
+from raftsim.examples.generate_milestone18_drop_ledge_hydraulic_control_report import (
+    main as generate_drop_ledge_hydraulic_control_main,
+)
 from raftsim.examples.generate_milestone18_failure_triage_matrix import main as generate_triage_main
 from raftsim.examples.generate_milestone18_parity_family_retune_report import main as generate_retune_main
 from raftsim.examples.generate_milestone18_pin_release_fixture_report import main as generate_pin_release_main
@@ -34,6 +38,7 @@ from raftsim.milestone18 import (
     MILESTONE18_CONSTRICTION_RESPONSE_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA,
+    MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA,
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
     MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
     MILESTONE18_PIN_RELEASE_REPORT_SCHEMA,
@@ -43,6 +48,7 @@ from raftsim.milestone18 import (
     build_milestone18_constriction_response_timing_report,
     build_milestone18_constriction_shape_timing_report,
     build_milestone18_constriction_throat_shape_report,
+    build_milestone18_drop_ledge_hydraulic_control_report,
     build_milestone18_failure_triage_matrix,
     build_milestone18_parity_family_retune_report,
     build_milestone18_pin_release_fixture_report,
@@ -876,6 +882,262 @@ def test_generate_milestone18_constriction_lateral_face_flux_cli_writes_reports(
     assert payload["schema_version"] == MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA
     assert payload["decision"] == "BLOCKED"
     assert "Constriction Lateral Face Flux Diagnostic" in output_md.read_text(encoding="utf-8")
+
+
+def _drop_ledge_hydraulic_control_inputs(tmp_path: Path) -> Path:
+    scenario_root = tmp_path / "scenario" / "drop_ledge_seed_18"
+    _write_json(
+        scenario_root / "scenario.json",
+        {
+            "array_files": {"initial_state": "initial_state.npz", "features": "features.json"},
+            "grid": {"nx": 5, "ny": 3, "dx": 1.0, "dy": 1.0, "origin_x": 0.0, "origin_y": 0.0},
+            "metadata": {"scenario_id": "drop_ledge_seed_18"},
+        },
+    )
+    _write_json(
+        scenario_root / "features.json",
+        {
+            "features": [
+                {
+                    "kind": "ledge",
+                    "center": {"x": 2.0, "y": 1.0},
+                    "width": 2.0,
+                    "length": 3.0,
+                    "radius": 0.0,
+                    "strength": 0.45,
+                    "angle": 0.0,
+                },
+                {
+                    "kind": "wave_train",
+                    "center": {"x": 3.5, "y": 1.0},
+                    "width": 2.0,
+                    "length": 2.0,
+                    "radius": 0.5,
+                    "strength": 0.65,
+                    "angle": 0.0,
+                },
+            ]
+        },
+    )
+    h = np.ones((3, 5), dtype=float)
+    zeros = np.zeros((3, 5), dtype=float)
+    np.savez(
+        scenario_root / "initial_state.npz",
+        depth=h,
+        eta=h,
+        u=np.ones((3, 5), dtype=float),
+        v=zeros,
+        hu=h,
+        hv=zeros,
+        wet=h > 0.0,
+    )
+
+    geoclaw_root = tmp_path / "geoclaw" / "normalized"
+    geoclaw_frame = geoclaw_root / "frames" / "frame_0002.npz"
+    geoclaw_frame.parent.mkdir(parents=True, exist_ok=True)
+    geoclaw_h = np.ones((3, 5), dtype=float)
+    geoclaw_h[:, 2] = 1.35
+    geoclaw_eta = geoclaw_h + 0.1
+    geoclaw_u = np.full((3, 5), 1.2, dtype=float)
+    geoclaw_froude = np.full((3, 5), 0.45, dtype=float)
+    np.savez(
+        geoclaw_frame,
+        h=geoclaw_h,
+        eta=geoclaw_eta,
+        u=geoclaw_u,
+        v=zeros,
+        hu=geoclaw_h * geoclaw_u,
+        hv=zeros,
+        wet=geoclaw_h > 0.0,
+        normal_x=zeros,
+        normal_y=zeros,
+        normal_z=np.ones((3, 5), dtype=float),
+        froude=geoclaw_froude,
+    )
+    _write_json(
+        geoclaw_root / "manifest.json",
+        {
+            "scenario_id": "drop_ledge_seed_18",
+            "frames": ["frames/frame_0002.npz"],
+            "probes": ["probes/control_probe.csv"],
+            "probe_manifest": [
+                {
+                    "probe_id": "control_probe",
+                    "kind": "point",
+                    "sample_count": 2,
+                    "metadata": {"position": [2.0, 1.0], "column": 2, "row": 1},
+                }
+            ],
+            "cross_sections": ["cross_sections/control_section.npz"],
+            "cross_section_manifest": [
+                {
+                    "probe_id": "control_section",
+                    "time_count": 2,
+                    "distance_count": 3,
+                    "metadata": {"position": [2.0, 1.0], "normal": [0.0, 1.0], "length": 2.0},
+                }
+            ],
+        },
+    )
+
+    cpp_root = tmp_path / "cpp" / "drop_ledge_seed_18"
+    cpp_frame = cpp_root / "frames" / "frame_0008.csv"
+    cpp_frame.parent.mkdir(parents=True, exist_ok=True)
+    cpp_h = geoclaw_h.copy()
+    cpp_h[1, 2] = 0.55
+    rows = ["row,col,x,y,h,eta,u,v,hu,hv,wet,normal_x,normal_y,normal_z,froude"]
+    for row_index in range(3):
+        for col_index in range(5):
+            h_value = cpp_h[row_index, col_index]
+            eta = h_value + 0.1
+            u = 1.2
+            rows.append(
+                f"{row_index},{col_index},{col_index},{row_index},{h_value},{eta},{u},0.0,{h_value * u},0.0,1,0,0,1,0.45"
+            )
+    cpp_frame.write_text("\n".join(rows) + "\n", encoding="utf-8")
+    _write_json(
+        cpp_root / "manifest.json",
+        {
+            "scenario_id": "drop_ledge_seed_18",
+            "frames": ["frames/frame_0008.csv"],
+            "probes": ["probes/control_probe.csv"],
+            "cross_sections": ["cross_sections/control_section.csv"],
+        },
+    )
+
+    geoclaw_probe_dir = geoclaw_root / "probes"
+    cpp_probe_dir = cpp_root / "probes"
+    geoclaw_probe_dir.mkdir(parents=True, exist_ok=True)
+    cpp_probe_dir.mkdir(parents=True, exist_ok=True)
+    (geoclaw_probe_dir / "control_probe.csv").write_text(
+        "\n".join(
+            [
+                "time,h,eta,u,v,hu,hv,wet,froude",
+                "0,1.0,1.1,1.0,0.0,1.0,0.0,1,0.3",
+                "3,1.35,1.45,1.2,0.0,1.62,0.0,1,0.45",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (cpp_probe_dir / "control_probe.csv").write_text(
+        "\n".join(
+            [
+                "time,h,eta,u,v,hu,hv,wet,froude",
+                "0,1.0,1.1,1.0,0.0,1.0,0.0,1,0.3",
+                "3,0.55,0.65,1.2,0.0,0.66,0.0,1,0.45",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    geoclaw_cross_dir = geoclaw_root / "cross_sections"
+    cpp_cross_dir = cpp_root / "cross_sections"
+    geoclaw_cross_dir.mkdir(parents=True, exist_ok=True)
+    cpp_cross_dir.mkdir(parents=True, exist_ok=True)
+    times = np.array([0.0, 3.0], dtype=float)
+    distance = np.array([-1.0, 0.0, 1.0], dtype=float)
+    cross_h = np.ones((2, 3), dtype=float)
+    cross_eta = cross_h + 0.1
+    cross_u = np.ones((2, 3), dtype=float)
+    cross_v = np.zeros((2, 3), dtype=float)
+    cross_froude = np.full((2, 3), 0.3, dtype=float)
+    cross_h[1, 1] = 1.35
+    cross_eta[1, 1] = 1.45
+    cross_u[1, :] = 1.2
+    cross_froude[1, :] = 0.45
+    np.savez(
+        geoclaw_cross_dir / "control_section.npz",
+        times=times,
+        distance=distance,
+        h=cross_h,
+        eta=cross_eta,
+        u=cross_u,
+        v=cross_v,
+        froude=cross_froude,
+    )
+    cross_rows = ["time,distance,h,eta,u,v,froude"]
+    for time_index, time in enumerate(times):
+        for distance_index, dist in enumerate(distance):
+            h_value = 0.65 if (time_index, distance_index) == (1, 1) else cross_h[time_index, distance_index]
+            cross_rows.append(f"{time},{dist},{h_value},{h_value + 0.1},{cross_u[time_index, distance_index]},0.0,0.45")
+    (cpp_cross_dir / "control_section.csv").write_text("\n".join(cross_rows) + "\n", encoding="utf-8")
+
+    comparison_root = tmp_path / "comparison"
+    _write_json(
+        comparison_root / "threshold_evaluation.json",
+        {
+            "scenario_id": "drop_ledge_seed_18",
+            "passed": False,
+            "thresholds": {
+                "max_field_linf": 0.25,
+                "max_slope_linf": 0.25,
+                "max_probe_linf": 0.25,
+                "max_cross_section_linf": 0.25,
+            },
+            "checks": [
+                {"name": "field_linf", "passed": False, "value": 0.8, "threshold": 0.25},
+                {"name": "probe_linf", "passed": False, "value": 0.96, "threshold": 0.25},
+                {"name": "cross_section_linf", "passed": False, "value": 0.7, "threshold": 0.25},
+                {"name": "mass_drift_delta", "passed": True, "value": 0.01, "threshold": 0.05},
+                {"name": "energy_change_delta", "passed": True, "value": 0.02, "threshold": 0.25},
+                {"name": "froude_delta", "passed": True, "value": 0.1, "threshold": 0.5},
+            ],
+        },
+    )
+    return _write_json(
+        comparison_root / "dual_solver_manifest.json",
+        {
+            "scenario_id": "drop_ledge_seed_18",
+            "scenario_package": "../scenario/drop_ledge_seed_18",
+            "geoclaw": {"manifest": "../geoclaw/normalized/manifest.json"},
+            "cpp": {"manifest": "../cpp/drop_ledge_seed_18/manifest.json"},
+        },
+    )
+
+
+def test_milestone18_drop_ledge_hydraulic_control_report_records_control_blockers(tmp_path):
+    dual_manifest = _drop_ledge_hydraulic_control_inputs(tmp_path)
+
+    report = build_milestone18_drop_ledge_hydraulic_control_report(dual_manifest)
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert payload["zones"]["hydraulic_control"] == [1, 2, 3]
+    assert payload["summary"]["max_final_field_linf"] == pytest.approx(0.96)
+    assert payload["summary"]["max_probe_linf"] == pytest.approx(0.96)
+    worst_field = payload["summary"]["worst_final_field_samples"][0]
+    assert worst_field["field"] == "hu"
+    assert worst_field["zone_id"] == "hydraulic_control"
+    worst_raw = payload["summary"]["worst_raw_samples"][0]
+    assert worst_raw["sample_id"] == "control_probe"
+    assert worst_raw["zone_id"] == "hydraulic_control"
+    assert "hydraulic-control" in " ".join(payload["blocked_reasons"])
+
+
+def test_generate_milestone18_drop_ledge_hydraulic_control_cli_writes_reports(tmp_path):
+    dual_manifest = _drop_ledge_hydraulic_control_inputs(tmp_path)
+    output_json = tmp_path / "reports" / "milestone18" / "drop_ledge_hydraulic_control.json"
+    output_md = tmp_path / "reports" / "milestone18" / "drop_ledge_hydraulic_control.md"
+
+    exit_code = generate_drop_ledge_hydraulic_control_main(
+        [
+            "--dual-solver-manifest",
+            str(dual_manifest),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert "Drop/Ledge Hydraulic-Control Diagnostic" in output_md.read_text(encoding="utf-8")
 
 
 def test_milestone18_parity_family_retune_report_records_partial_promotion(tmp_path):
