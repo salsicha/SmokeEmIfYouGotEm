@@ -90,6 +90,9 @@ constexpr double kConstrictionUpstreamEdgeFluxRate = 1.0;
 constexpr double kConstrictionUpstreamEdgeFluxMaxDepthPerSecond = 0.42;
 constexpr double kConstrictionUpstreamEdgeFluxTargetDepthScale = 0.28;
 constexpr double kConstrictionUpstreamEdgeFluxMinTargetDepth = 0.32;
+constexpr double kConstrictionYFaceOppositionFluxTargetDepthScale = 0.92;
+constexpr double kConstrictionYFaceOppositionFluxCrossStreamFraction = 1.2;
+constexpr double kConstrictionYFaceOppositionFluxMaxReferenceScale = 0.45;
 constexpr double kConstrictionUpstreamEdgeMomentumRate = 3.0;
 constexpr double kConstrictionUpstreamEdgeMomentumMaxSpeedPerSecond = 8.0;
 constexpr double kConstrictionUpstreamEdgeSpeedFraction = 1.35;
@@ -1293,6 +1296,31 @@ void apply_constriction_upstream_edge_face_flux_source(
     flux.right.hu += mass_flux * edge_u;
     flux.left.hv += mass_flux * edge_v;
     flux.right.hv += mass_flux * edge_v;
+
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (reference_speed <= 0.0) {
+        return;
+    }
+    double opposition_target_h = std::max(
+        kConstrictionYFaceStateMinDepth,
+        column_mean_depth * kConstrictionYFaceOppositionFluxTargetDepthScale);
+    double target_flux_h =
+        direction * opposition_target_h * kConstrictionYFaceOppositionFluxCrossStreamFraction * reference_speed;
+    double max_flux_correction =
+        kConstrictionYFaceOppositionFluxMaxReferenceScale * reference_speed * approach_weight;
+    double correction_h = clamp(target_flux_h - flux.left.h, -max_flux_correction, max_flux_correction);
+    if (std::abs(correction_h) <= 1.0e-12) {
+        return;
+    }
+    double flow_sign = constriction_flow_sign(scenario);
+    double target_u = flow_sign * kConstrictionYFaceStateDownstreamSpeedFraction * reference_speed;
+    double target_v = direction * kConstrictionYFaceOppositionFluxCrossStreamFraction * reference_speed;
+    flux.left.h += correction_h;
+    flux.right.h += correction_h;
+    flux.left.hu += correction_h * target_u;
+    flux.right.hu += correction_h * target_u;
+    flux.left.hv += correction_h * target_v;
+    flux.right.hv += correction_h * target_v;
 }
 
 void apply_constriction_upstream_edge_momentum_source(
@@ -3767,6 +3795,11 @@ void write_solver_output(
              << "    \"flux_rate_per_s\": " << kConstrictionUpstreamEdgeFluxRate << ",\n"
              << "    \"target_depth_scale\": " << kConstrictionUpstreamEdgeFluxTargetDepthScale << ",\n"
              << "    \"min_target_depth_m\": " << kConstrictionUpstreamEdgeFluxMinTargetDepth << ",\n"
+             << "    \"conservative_y_face_opposition_flux\": true,\n"
+             << "    \"opposition_flux_target_depth_scale\": " << kConstrictionYFaceOppositionFluxTargetDepthScale << ",\n"
+             << "    \"opposition_flux_cross_stream_fraction\": " << kConstrictionYFaceOppositionFluxCrossStreamFraction << ",\n"
+             << "    \"opposition_flux_max_reference_scale\": " << kConstrictionYFaceOppositionFluxMaxReferenceScale << ",\n"
+             << "    \"opposition_flux_preserves_lower_positive_upper_negative_signs\": true,\n"
              << "    \"momentum_rate_per_s\": " << kConstrictionUpstreamEdgeMomentumRate << ",\n"
              << "    \"max_speed_m_per_s2\": " << kConstrictionUpstreamEdgeMomentumMaxSpeedPerSecond << ",\n"
              << "    \"speed_fraction_of_authored_throat\": " << kConstrictionUpstreamEdgeSpeedFraction << ",\n"
