@@ -609,13 +609,41 @@ std::size_t min_initial_wet_count(const Scenario& scenario) {
     return found ? min_count : 0;
 }
 
-double constriction_center_x(const Scenario& scenario) {
+const Feature* constriction_feature(const Scenario& scenario) {
     for (const Feature& feature : scenario.features) {
         if (feature.kind == "constriction") {
-            return feature.center_x;
+            return &feature;
         }
     }
+    return nullptr;
+}
+
+double constriction_center_x(const Scenario& scenario) {
+    const Feature* feature = constriction_feature(scenario);
+    if (feature != nullptr) {
+        return feature->center_x;
+    }
     return scenario.grid.origin_x + 0.5 * static_cast<double>(scenario.grid.nx - 1) * scenario.grid.dx;
+}
+
+double constriction_half_length(const Scenario& scenario) {
+    const Feature* feature = constriction_feature(scenario);
+    if (feature != nullptr && feature->length > 0.0) {
+        return 0.5 * feature->length;
+    }
+    return 0.25 * static_cast<double>(scenario.grid.nx) * scenario.grid.dx;
+}
+
+double constriction_flow_sign(const Scenario& scenario) {
+    double discharge = 0.0;
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+            if (scenario.initial.h(row, col) > 0.0) {
+                discharge += scenario.initial.h(row, col) * scenario.initial.u(row, col);
+            }
+        }
+    }
+    return discharge >= 0.0 ? 1.0 : -1.0;
 }
 
 bool is_center_throat_column(const Scenario& scenario, const ColumnWetBand& band, std::size_t throat_width_cells, std::size_t col) {
@@ -638,15 +666,60 @@ std::size_t constriction_wet_band_relaxation_cells(
     return band.count == throat_width_cells ? 1 : kConstrictionWetBandRelaxationCells;
 }
 
-double initial_wet_band_mass(const Scenario& scenario, const ColumnWetBand& band, std::size_t col) {
+std::size_t constriction_asymmetric_target_count(
+    const Scenario& scenario,
+    const ColumnWetBand& band,
+    std::size_t throat_width_cells,
+    std::size_t col
+) {
     if (!band.found) {
-        return 0.0;
+        return 0;
     }
-    double mass = 0.0;
-    for (std::size_t row = band.first_row; row <= band.last_row; ++row) {
-        mass += scenario.initial.h(row, col);
+
+    double x = scenario.grid.origin_x + static_cast<double>(col) * scenario.grid.dx;
+    double signed_x = (x - constriction_center_x(scenario)) * constriction_flow_sign(scenario);
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+
+    std::size_t target = band.count;
+    if (band.count == throat_width_cells) {
+        target = throat_width_cells + 1;
+    } else if (signed_x < 0.0) {
+        target = band.count + 2;
+    } else if (signed_x <= half_length) {
+        target = band.count > 1 ? band.count - 1 : 1;
+        target = std::max(target, throat_width_cells + 1);
+    } else if (signed_x <= half_length + 2.0 * scenario.grid.dx) {
+        target = band.count <= throat_width_cells + 2 ? band.count : band.count - 1;
+    } else {
+        target = band.count + 1;
     }
-    return mass;
+    return std::min(scenario.grid.ny, std::max<std::size_t>(1, target));
+}
+
+double constriction_asymmetric_target_center(
+    const Scenario& scenario,
+    const ColumnWetBand& band,
+    std::size_t throat_width_cells,
+    std::size_t col
+) {
+    double initial_center = 0.5 * (static_cast<double>(band.first_row) + static_cast<double>(band.last_row));
+    double x = scenario.grid.origin_x + static_cast<double>(col) * scenario.grid.dx;
+    double signed_x = (x - constriction_center_x(scenario)) * constriction_flow_sign(scenario);
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+
+    if (band.count == throat_width_cells) {
+        return initial_center - 0.5;
+    }
+    if (signed_x < -half_length) {
+        return initial_center - 0.5;
+    }
+    if (signed_x < 0.0) {
+        return initial_center + 0.5;
+    }
+    if (signed_x <= half_length + 2.0 * scenario.grid.dx) {
+        return initial_center + 0.5;
+    }
+    return initial_center - 0.5;
 }
 
 bool inside_relaxed_wet_band(
@@ -830,7 +903,7 @@ void apply_constriction_wet_band_span_shaping(
     for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
         ColumnWetBand band = initial_wet_band_in_column(scenario, col);
         std::size_t relax_cells = constriction_wet_band_relaxation_cells(scenario, band, throat_width_cells, col);
-        if (!band.found || relax_cells == 0 || band.count == throat_width_cells) {
+        if (!band.found || relax_cells == 0) {
             continue;
         }
 
@@ -844,8 +917,6 @@ void apply_constriction_wet_band_span_shaping(
         double mass = 0.0;
         double momentum_x = 0.0;
         double momentum_y = 0.0;
-        double weighted_row = 0.0;
-        std::size_t active_count = 0;
         for (std::size_t row = allowed_first; row <= allowed_last; ++row) {
             double h = next.h(row, col);
             if (h <= config.dry_tolerance) {
@@ -854,32 +925,18 @@ void apply_constriction_wet_band_span_shaping(
             mass += h;
             momentum_x += h * next.u(row, col);
             momentum_y += h * next.v(row, col);
-            weighted_row += h * static_cast<double>(row);
-            ++active_count;
         }
         if (mass <= config.dry_tolerance) {
             continue;
         }
 
-        double initial_mass = initial_wet_band_mass(scenario, band, col);
-        double initial_mean_depth = initial_mass > config.dry_tolerance
-                                        ? initial_mass / static_cast<double>(std::max<std::size_t>(1, band.count))
-                                        : kConstrictionWetBandMinimumDepth;
-        std::size_t fallback_count =
-            static_cast<std::size_t>(std::max(1.0, std::round(mass / std::max(initial_mean_depth, kConstrictionWetBandMinimumDepth))));
         std::size_t supported_count =
             static_cast<std::size_t>(std::max(1.0, std::floor(mass / kConstrictionWetBandMinimumDepth)));
-        std::size_t shaped_count = active_count > 0 ? active_count : fallback_count;
-        std::size_t target_count = std::min({allowed_count, shaped_count, supported_count});
+        std::size_t target_envelope_count = constriction_asymmetric_target_count(scenario, band, throat_width_cells, col);
+        std::size_t target_count = std::min({allowed_count, target_envelope_count, supported_count});
         target_count = std::max<std::size_t>(1, target_count);
 
-        double initial_center = 0.5 * (static_cast<double>(band.first_row) + static_cast<double>(band.last_row));
-        double current_center = weighted_row / mass;
-        double target_center = clamp(
-            current_center,
-            initial_center - static_cast<double>(relax_cells),
-            initial_center + static_cast<double>(relax_cells)
-        );
+        double target_center = constriction_asymmetric_target_center(scenario, band, throat_width_cells, col);
         long min_first = static_cast<long>(allowed_first);
         long max_first = static_cast<long>(allowed_last + 1 - target_count);
         long desired_first = static_cast<long>(std::lround(target_center - 0.5 * static_cast<double>(target_count - 1)));
@@ -1441,6 +1498,8 @@ void write_solver_output(
              << "  \"fixture_scoped_constriction_wet_band_relaxation\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
              << "  \"fixture_scoped_constriction_wet_band_span_shaping\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"fixture_scoped_constriction_asymmetric_wet_band_envelope\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
              << "  \"fixture_scoped_constriction_momentum_reconstruction\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
