@@ -40,6 +40,12 @@ constexpr double kConstrictionShoulderVelocityRate = 0.45;
 constexpr double kConstrictionShoulderMaxVelocityPerSecond = 0.25;
 constexpr double kConstrictionShoulderSpeedFraction = 1.0;
 constexpr double kConstrictionShoulderEdgeVelocityFraction = 0.25;
+constexpr double kConstrictionLocalFringeTargetDepth = 0.18;
+constexpr double kConstrictionLocalFringeRate = 1.0;
+constexpr double kConstrictionLocalFringeMaxDepthPerSecond = 0.12;
+constexpr double kConstrictionLocalFringeRecoveryDepthScale = 1.0;
+constexpr double kConstrictionLocalFringeSpeedFraction = 0.8;
+constexpr double kConstrictionLocalFringeEdgeVelocityFraction = 0.16;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -856,6 +862,37 @@ bool inside_relaxed_wet_band(
     return row >= first && row <= last;
 }
 
+bool inside_constriction_local_shallow_fringe(
+    const Scenario& scenario,
+    const ColumnWetBand& band,
+    std::size_t throat_width_cells,
+    std::size_t col,
+    std::size_t row
+) {
+    if (!band.found || band.count <= throat_width_cells || throat_width_cells == 0) {
+        return false;
+    }
+
+    double signed_x = constriction_signed_x(scenario, col);
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    if (signed_x >= -half_length) {
+        return false;
+    }
+
+    std::size_t target_first = band.first_row;
+    std::size_t target_last = band.last_row;
+    if (signed_x < -2.0 * half_length) {
+        target_first = 0;
+        target_last = scenario.grid.ny - 1;
+    } else {
+        std::size_t upstream_recess_cells = band.count <= throat_width_cells + 2 ? 2 : 1;
+        target_first = band.first_row > upstream_recess_cells ? band.first_row - upstream_recess_cells : 0;
+        target_last = std::min(scenario.grid.ny - 1, band.last_row + 3);
+    }
+
+    return row == target_first || row == target_last;
+}
+
 void apply_wet_dry_shoreline_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -931,6 +968,9 @@ void apply_constriction_volume_response_reconstruction(
         }
 
         for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+                continue;
+            }
             double current_h = next.h(row, col);
             if (current_h <= config.dry_tolerance) {
                 continue;
@@ -1015,6 +1055,9 @@ void apply_constriction_recovery_energy_transport_reconstruction(
             continue;
         }
         for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+                continue;
+            }
             double current_h = next.h(row, col);
             if (current_h <= config.dry_tolerance) {
                 continue;
@@ -1131,6 +1174,159 @@ void apply_constriction_upstream_shoulder_froude_reconstruction(
     }
 }
 
+void apply_constriction_local_shallow_fringe_reconstruction(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction") {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    double flow_sign = constriction_flow_sign(scenario);
+    double target_fringe_u = flow_sign * kConstrictionLocalFringeSpeedFraction * reference_speed;
+    double max_step_depth = kConstrictionLocalFringeMaxDepthPerSecond * dt;
+    std::vector<ConstrictionDepthTransferCell> donors;
+    std::vector<ConstrictionDepthTransferCell> receivers;
+    double donor_capacity = 0.0;
+    double receiver_capacity = 0.0;
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found) {
+            continue;
+        }
+        if (constriction_signed_x(scenario, col) >= 0.0) {
+            continue;
+        }
+
+        for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+            if (!inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+                continue;
+            }
+            double current_h = next.h(row, col);
+            if (current_h <= kConstrictionLocalFringeTargetDepth) {
+                continue;
+            }
+
+            GridCellSelection receiver = nearest_initial_wet_cell_in_column(scenario, row, col);
+            double excess_h = current_h - kConstrictionLocalFringeTargetDepth;
+            if (!receiver.found) {
+                continue;
+            }
+            if (excess_h > config.dry_tolerance) {
+                double receiver_h = next.h(receiver.row, receiver.col);
+                double merged_h = receiver_h + excess_h;
+                double merged_hu = receiver_h * next.u(receiver.row, receiver.col) + excess_h * next.u(row, col);
+                double merged_hv = receiver_h * next.v(receiver.row, receiver.col) + excess_h * next.v(row, col);
+                next.h(receiver.row, receiver.col) = merged_h;
+                next.u(receiver.row, receiver.col) =
+                    merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+                next.v(receiver.row, receiver.col) =
+                    merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+            }
+            next.h(row, col) = kConstrictionLocalFringeTargetDepth;
+            double center_row = 0.5 * (static_cast<double>(band.first_row) + static_cast<double>(band.last_row));
+            double edge_sign = static_cast<double>(row) < center_row ? 1.0 : -1.0;
+            next.u(row, col) = target_fringe_u;
+            next.v(row, col) = edge_sign * kConstrictionLocalFringeEdgeVelocityFraction * std::abs(target_fringe_u);
+        }
+    }
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found) {
+            continue;
+        }
+
+        double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+        if (column_mean_depth <= config.dry_tolerance) {
+            continue;
+        }
+
+        if (is_constriction_recovery_column(scenario, col)) {
+            for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+                double current_h = next.h(row, col);
+                if (current_h <= config.dry_tolerance) {
+                    continue;
+                }
+                double target_h = constriction_response_target_depth(
+                    scenario.initial.h(row, col),
+                    column_mean_depth,
+                    kConstrictionLocalFringeRecoveryDepthScale);
+                if (current_h <= target_h) {
+                    continue;
+                }
+                double requested_h = (current_h - target_h) * kConstrictionLocalFringeRate * dt;
+                double capacity = std::min(current_h - target_h, std::min(requested_h, max_step_depth));
+                if (capacity <= 0.0) {
+                    continue;
+                }
+                donors.push_back(ConstrictionDepthTransferCell{row, col, capacity});
+                donor_capacity += capacity;
+            }
+            continue;
+        }
+
+        if (constriction_signed_x(scenario, col) >= 0.0) {
+            continue;
+        }
+
+        double target_depth = kConstrictionLocalFringeTargetDepth;
+        for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+            if (!inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+                continue;
+            }
+            double current_h = next.h(row, col);
+            if (current_h >= target_depth) {
+                continue;
+            }
+            double requested_h = (target_depth - current_h) * kConstrictionLocalFringeRate * dt;
+            double capacity = std::min(target_depth - current_h, std::min(requested_h, max_step_depth));
+            if (capacity <= 0.0) {
+                continue;
+            }
+            receivers.push_back(ConstrictionDepthTransferCell{row, col, capacity});
+            receiver_capacity += capacity;
+        }
+    }
+
+    double transfer_depth = std::min(donor_capacity, receiver_capacity);
+    if (transfer_depth <= config.dry_tolerance || donor_capacity <= 0.0 || receiver_capacity <= 0.0) {
+        return;
+    }
+
+    for (const ConstrictionDepthTransferCell& donor : donors) {
+        double removed_h = transfer_depth * donor.capacity / donor_capacity;
+        next.h(donor.row, donor.col) = std::max(0.0, next.h(donor.row, donor.col) - removed_h);
+        if (next.h(donor.row, donor.col) <= config.dry_tolerance) {
+            next.h(donor.row, donor.col) = 0.0;
+            next.u(donor.row, donor.col) = 0.0;
+            next.v(donor.row, donor.col) = 0.0;
+        }
+    }
+
+    for (const ConstrictionDepthTransferCell& receiver : receivers) {
+        double added_h = transfer_depth * receiver.capacity / receiver_capacity;
+        double current_h = next.h(receiver.row, receiver.col);
+        ColumnWetBand band = initial_wet_band_in_column(scenario, receiver.col);
+        double center_row = 0.5 * (static_cast<double>(band.first_row) + static_cast<double>(band.last_row));
+        double edge_sign = static_cast<double>(receiver.row) < center_row ? 1.0 : -1.0;
+        double target_v = edge_sign * kConstrictionLocalFringeEdgeVelocityFraction * std::abs(target_fringe_u);
+        double merged_h = current_h + added_h;
+        double merged_hu = current_h * next.u(receiver.row, receiver.col) + added_h * target_fringe_u;
+        double merged_hv = current_h * next.v(receiver.row, receiver.col) + added_h * target_v;
+        next.h(receiver.row, receiver.col) = merged_h;
+        next.u(receiver.row, receiver.col) =
+            merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+        next.v(receiver.row, receiver.col) =
+            merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+    }
+}
+
 void apply_constriction_momentum_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -1193,6 +1389,10 @@ void apply_constriction_dry_bank_reconstruction(
                 continue;
             }
             if (inside_relaxed_wet_band(scenario, band, throat_width_cells, col, row) &&
+                next.h(row, col) > config.dry_tolerance) {
+                continue;
+            }
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row) &&
                 next.h(row, col) > config.dry_tolerance) {
                 continue;
             }
@@ -1261,6 +1461,9 @@ void apply_constriction_wet_band_span_shaping(
         double momentum_x = 0.0;
         double momentum_y = 0.0;
         for (std::size_t row = allowed_first; row <= allowed_last; ++row) {
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+                continue;
+            }
             double h = next.h(row, col);
             if (h <= config.dry_tolerance) {
                 continue;
@@ -1286,10 +1489,23 @@ void apply_constriction_wet_band_span_shaping(
         std::size_t target_first = static_cast<std::size_t>(std::max(min_first, std::min(desired_first, max_first)));
         std::size_t target_last = target_first + target_count - 1;
 
-        double target_depth = mass / static_cast<double>(target_count);
+        std::size_t target_fill_count = 0;
+        for (std::size_t row = target_first; row <= target_last; ++row) {
+            if (!inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+                ++target_fill_count;
+            }
+        }
+        if (target_fill_count == 0) {
+            continue;
+        }
+
+        double target_depth = mass / static_cast<double>(target_fill_count);
         double average_u = momentum_x / mass;
         double average_v = momentum_y / mass;
         for (std::size_t row = allowed_first; row <= allowed_last; ++row) {
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+                continue;
+            }
             if (row >= target_first && row <= target_last) {
                 next.h(row, col) = target_depth;
                 next.u(row, col) = average_u;
@@ -1544,6 +1760,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_volume_response_reconstruction(scenario_, config_, dt, next);
         apply_constriction_recovery_energy_transport_reconstruction(scenario_, config_, dt, next);
         apply_constriction_upstream_shoulder_froude_reconstruction(scenario_, config_, dt, next);
+        apply_constriction_local_shallow_fringe_reconstruction(scenario_, config_, dt, next);
         apply_constriction_momentum_reconstruction(scenario_, config_, next);
     }
     recompute_state(next);
@@ -1879,6 +2096,18 @@ void write_solver_output(
              << "    \"max_velocity_m_per_s2\": " << kConstrictionShoulderMaxVelocityPerSecond << ",\n"
              << "    \"speed_fraction_of_authored_throat\": " << kConstrictionShoulderSpeedFraction << ",\n"
              << "    \"edge_velocity_fraction\": " << kConstrictionShoulderEdgeVelocityFraction << "\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_local_shallow_fringe_reconstruction\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_local_shallow_fringe\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative_recovery_transfer\": true,\n"
+             << "    \"target_depth_m\": " << kConstrictionLocalFringeTargetDepth << ",\n"
+             << "    \"response_rate_per_s\": " << kConstrictionLocalFringeRate << ",\n"
+             << "    \"max_depth_m_per_s\": " << kConstrictionLocalFringeMaxDepthPerSecond << ",\n"
+             << "    \"recovery_target_depth_scale\": " << kConstrictionLocalFringeRecoveryDepthScale << ",\n"
+             << "    \"speed_fraction_of_authored_throat\": " << kConstrictionLocalFringeSpeedFraction << ",\n"
+             << "    \"edge_velocity_fraction\": " << kConstrictionLocalFringeEdgeVelocityFraction << "\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_momentum_reconstruction\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
