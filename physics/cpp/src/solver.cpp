@@ -55,6 +55,12 @@ constexpr double kConstrictionDepthDistributionMaxDepthPerSecond = 0.14;
 constexpr double kConstrictionDepthDistributionRecoveryDepthScale = 0.93;
 constexpr double kConstrictionDepthDistributionUpstreamDepthScale = 1.42;
 constexpr double kConstrictionDepthDistributionDownstreamDepthScale = 1.28;
+constexpr double kConstrictionVelocityTimingRate = 0.7;
+constexpr double kConstrictionVelocityTimingMaxSpeedPerSecond = 0.35;
+constexpr double kConstrictionVelocityTimingUpstreamSpeedScale = 1.28;
+constexpr double kConstrictionVelocityTimingRecoverySpeedScale = 1.0;
+constexpr double kConstrictionVelocityTimingDownstreamSpeedScale = 0.98;
+constexpr double kConstrictionVelocityTimingCrossStreamDamping = 0.5;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -1599,6 +1605,69 @@ void apply_constriction_upstream_recovery_depth_distribution(
     }
 }
 
+void apply_constriction_velocity_energy_timing_reconstruction(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction") {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double flow_sign = constriction_flow_sign(scenario);
+    double max_step_speed = kConstrictionVelocityTimingMaxSpeedPerSecond * dt;
+    double blend = clamp(kConstrictionVelocityTimingRate * dt, 0.0, 1.0);
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count <= throat_width_cells) {
+            continue;
+        }
+
+        double signed_x = constriction_signed_x(scenario, col);
+        bool upstream = signed_x < 0.0;
+        bool downstream_constriction = signed_x >= 0.0 && signed_x <= half_length;
+        bool recovery = signed_x > half_length;
+        if (!upstream && !downstream_constriction && !recovery) {
+            continue;
+        }
+
+        double speed_scale = kConstrictionVelocityTimingUpstreamSpeedScale;
+        if (downstream_constriction) {
+            speed_scale = kConstrictionVelocityTimingDownstreamSpeedScale;
+        } else if (recovery) {
+            speed_scale = kConstrictionVelocityTimingRecoverySpeedScale;
+        }
+
+        for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+                continue;
+            }
+            if (next.h(row, col) <= config.dry_tolerance) {
+                continue;
+            }
+
+            double initial_u = scenario.initial.u(row, col);
+            double target_sign = std::abs(initial_u) > 1.0e-9 ? (initial_u >= 0.0 ? 1.0 : -1.0) : flow_sign;
+            double target_abs_u = std::abs(initial_u) * speed_scale;
+            if (upstream) {
+                target_abs_u = std::max(target_abs_u, std::abs(next.u(row, col)));
+            }
+            double blended_u = next.u(row, col) + blend * (target_sign * target_abs_u - next.u(row, col));
+            next.u(row, col) = move_toward(next.u(row, col), blended_u, max_step_speed);
+
+            if (!upstream) {
+                double target_v = next.v(row, col) * kConstrictionVelocityTimingCrossStreamDamping;
+                double blended_v = next.v(row, col) + blend * (target_v - next.v(row, col));
+                next.v(row, col) = move_toward(next.v(row, col), blended_v, max_step_speed);
+            }
+        }
+    }
+}
+
 void apply_constriction_dry_bank_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -1991,6 +2060,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_momentum_reconstruction(scenario_, config_, next);
         apply_constriction_near_throat_support_reconstruction(scenario_, config_, next);
         apply_constriction_upstream_recovery_depth_distribution(scenario_, config_, dt, next);
+        apply_constriction_velocity_energy_timing_reconstruction(scenario_, config_, dt, next);
     }
     recompute_state(next);
     state_ = std::move(next);
@@ -2359,6 +2429,21 @@ void write_solver_output(
              << "    \"upstream_receiver_depth_scale\": " << kConstrictionDepthDistributionUpstreamDepthScale << ",\n"
              << "    \"downstream_receiver_depth_scale\": " << kConstrictionDepthDistributionDownstreamDepthScale << ",\n"
              << "    \"excludes_throat_columns\": true,\n"
+             << "    \"excludes_local_shallow_fringe\": true\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_velocity_energy_timing_reconstruction\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_velocity_energy_timing\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"velocity_only\": true,\n"
+             << "    \"mass_preserving\": true,\n"
+             << "    \"max_speed_m_per_s2\": " << kConstrictionVelocityTimingMaxSpeedPerSecond << ",\n"
+             << "    \"response_rate_per_s\": " << kConstrictionVelocityTimingRate << ",\n"
+             << "    \"upstream_speed_scale\": " << kConstrictionVelocityTimingUpstreamSpeedScale << ",\n"
+             << "    \"downstream_speed_scale\": " << kConstrictionVelocityTimingDownstreamSpeedScale << ",\n"
+             << "    \"recovery_speed_scale\": " << kConstrictionVelocityTimingRecoverySpeedScale << ",\n"
+             << "    \"cross_stream_damping\": " << kConstrictionVelocityTimingCrossStreamDamping << ",\n"
+             << "    \"excludes_throat_width_columns\": true,\n"
              << "    \"excludes_local_shallow_fringe\": true\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_momentum_reconstruction\": "
