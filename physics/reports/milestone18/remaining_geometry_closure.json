@@ -18,6 +18,42 @@
       "focused_evidence": [
         {
           "blocked_reasons": [
+            "C++ upstream edge face-state signs still disagree with GeoClaw.",
+            "C++ upstream edge face-state volume-flux deltas exceed the diagnostic threshold.",
+            "GeoClaw lower/upper edge opposition is still missing from the C++ face states.",
+            "C++ constriction wet-band width still differs from GeoClaw beyond the mapping threshold.",
+            "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
+          ],
+          "decision": "BLOCKED",
+          "next_levers": [
+            "Start with `upper_edge_face` column 6 rows 8-9; q delta is 2.72633 m3/s, face mean-depth delta is 0.719562 m, wet-width delta is 1 cells, and max bank-row delta is 0 cells.",
+            "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
+            "Use the authored initial -> GeoClaw final -> C++ final column profiles to retune constriction width/depth mapping before accepting any face-state change.",
+            "Preserve GeoClaw's lower/upper edge opposition in the upstream wet band; a single-sign lateral state remains a blocker.",
+            "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
+          ],
+          "passed": false,
+          "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
+          "source_report": "reports/milestone18/constriction_face_state_width_depth_diagnostic.json",
+          "summary": {
+            "bank_alignment_blocker_count": 0,
+            "column_profile_count": 14,
+            "depth_mapping_blocker_count": 3,
+            "edge_opposition_mismatch_count": 10,
+            "face_sign_mismatch_count": 13,
+            "face_state_blocker_count": 19,
+            "face_state_sample_count": 20,
+            "max_abs_bank_row_delta_cells": 1,
+            "max_abs_face_mean_depth_delta_m": 0.8281262252449393,
+            "max_abs_volume_flux_delta_m3ps": 2.726334428935486,
+            "max_abs_wet_width_delta_cells": 2,
+            "recommended_levers_count": 3,
+            "width_mapping_blocker_count": 1,
+            "worst_face_state_samples_count": 12
+          }
+        },
+        {
+          "blocked_reasons": [
             "C++ upstream lateral face velocity signs do not match GeoClaw on one or more edge faces.",
             "C++ upstream lateral face volume-flux proxy deltas exceed the diagnostic threshold.",
             "GeoClaw shows opposite-signed lower/upper upstream edge faces that C++ does not reproduce."
@@ -110,6 +146,11 @@
         }
       ],
       "next_levers": [
+        "Start with `upper_edge_face` column 6 rows 8-9; q delta is 2.72633 m3/s, face mean-depth delta is 0.719562 m, wet-width delta is 1 cells, and max bank-row delta is 0 cells.",
+        "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
+        "Use the authored initial -> GeoClaw final -> C++ final column profiles to retune constriction width/depth mapping before accepting any face-state change.",
+        "Preserve GeoClaw's lower/upper edge opposition in the upstream wet band; a single-sign lateral state remains a blocker.",
+        "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail.",
         "Start with `upper_edge_face` column 6 rows 8-9; the GeoClaw/C++ lateral flux proxy differs by 2.72825 m3/s.",
         "Instrument or reconstruct the actual finite-volume lateral face flux/source balance before adding another post-step velocity or depth transport.",
         "Preserve GeoClaw's opposite-signed lower/upper upstream edge behavior; a single-sign lateral transport will keep damaging Froude shape.",
@@ -316,6 +357,7 @@
   ],
   "decision": "BLOCKED",
   "focused_report_paths": [
+    "reports/milestone18/constriction_face_state_width_depth_diagnostic.json",
     "reports/milestone18/constriction_lateral_face_flux_diagnostic.json",
     "reports/milestone18/constriction_face_source_audit_diagnostic.json",
     "reports/milestone18/constriction_hydrostatic_source_decision.json",
