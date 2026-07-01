@@ -30,6 +30,9 @@ constexpr double kConstrictionVolumeResponseMaxDepthPerSecond = 0.16;
 constexpr double kConstrictionUpstreamVolumeDepthScale = 1.22;
 constexpr double kConstrictionThroatVolumeDepthScale = 0.95;
 constexpr double kConstrictionDownstreamVolumeDepthScale = 1.05;
+constexpr double kConstrictionRecoveryTransportRate = 0.8;
+constexpr double kConstrictionRecoveryTransportMaxDepthPerSecond = 0.14;
+constexpr double kConstrictionRecoveryTransportDepthScale = 1.0;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -71,6 +74,12 @@ struct ColumnWetBand {
     std::size_t first_row = 0;
     std::size_t last_row = 0;
     std::size_t count = 0;
+};
+
+struct ConstrictionDepthTransferCell {
+    std::size_t row = 0;
+    std::size_t col = 0;
+    double capacity = 0.0;
 };
 
 double gradient_x(const Array2D& array, const Scenario& scenario, std::size_t row, std::size_t col) {
@@ -651,6 +660,16 @@ double constriction_flow_sign(const Scenario& scenario) {
     return discharge >= 0.0 ? 1.0 : -1.0;
 }
 
+double constriction_signed_x(const Scenario& scenario, std::size_t col) {
+    double x = scenario.grid.origin_x + static_cast<double>(col) * scenario.grid.dx;
+    return (x - constriction_center_x(scenario)) * constriction_flow_sign(scenario);
+}
+
+bool is_constriction_recovery_column(const Scenario& scenario, std::size_t col) {
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    return constriction_signed_x(scenario, col) > half_length;
+}
+
 bool is_center_throat_column(const Scenario& scenario, const ColumnWetBand& band, std::size_t throat_width_cells, std::size_t col) {
     if (!band.found || band.count != throat_width_cells) {
         return false;
@@ -740,8 +759,7 @@ double constriction_zone_volume_depth_scale(
         return kConstrictionThroatVolumeDepthScale;
     }
 
-    double x = scenario.grid.origin_x + static_cast<double>(col) * scenario.grid.dx;
-    double signed_x = (x - constriction_center_x(scenario)) * constriction_flow_sign(scenario);
+    double signed_x = constriction_signed_x(scenario, col);
     double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
     if (signed_x < 0.0) {
         return kConstrictionUpstreamVolumeDepthScale;
@@ -767,6 +785,10 @@ double constriction_response_target_u(double current_u, double initial_u, double
     double target_sign = std::abs(initial_u) > 1.0e-9 ? (initial_u >= 0.0 ? 1.0 : -1.0) : flow_sign;
     double target_abs_u = std::max(std::abs(current_u), std::abs(initial_u));
     return target_sign * target_abs_u;
+}
+
+double constriction_response_target_depth(double authored_h, double column_mean_depth, double depth_scale) {
+    return std::max(authored_h, column_mean_depth) * depth_scale;
 }
 
 bool inside_relaxed_wet_band(
@@ -866,7 +888,7 @@ void apply_constriction_volume_response_reconstruction(
             }
 
             double authored_h = scenario.initial.h(row, col);
-            double target_h = std::max(authored_h, column_mean_depth) * depth_scale;
+            double target_h = constriction_response_target_depth(authored_h, column_mean_depth, depth_scale);
             if (target_h <= current_h) {
                 continue;
             }
@@ -885,6 +907,108 @@ void apply_constriction_volume_response_reconstruction(
             next.u(row, col) = merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
             next.v(row, col) = merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
         }
+    }
+}
+
+void apply_constriction_recovery_energy_transport_reconstruction(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction") {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    std::vector<ConstrictionDepthTransferCell> donors;
+    std::vector<ConstrictionDepthTransferCell> receivers;
+    double donor_capacity = 0.0;
+    double receiver_capacity = 0.0;
+    double max_step_depth = kConstrictionRecoveryTransportMaxDepthPerSecond * dt;
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found) {
+            continue;
+        }
+        double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+        if (column_mean_depth <= config.dry_tolerance) {
+            continue;
+        }
+
+        if (is_constriction_recovery_column(scenario, col)) {
+            for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+                double current_h = next.h(row, col);
+                if (current_h <= config.dry_tolerance) {
+                    continue;
+                }
+                double target_h = constriction_response_target_depth(
+                    scenario.initial.h(row, col),
+                    column_mean_depth,
+                    kConstrictionRecoveryTransportDepthScale);
+                if (current_h <= target_h) {
+                    continue;
+                }
+                double requested_h = (current_h - target_h) * kConstrictionRecoveryTransportRate * dt;
+                double capacity = std::min(current_h - target_h, std::min(requested_h, max_step_depth));
+                if (capacity <= 0.0) {
+                    continue;
+                }
+                donors.push_back(ConstrictionDepthTransferCell{row, col, capacity});
+                donor_capacity += capacity;
+            }
+            continue;
+        }
+
+        double depth_scale = constriction_zone_volume_depth_scale(scenario, band, throat_width_cells, col);
+        if (depth_scale <= 0.0) {
+            continue;
+        }
+        for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+            double current_h = next.h(row, col);
+            if (current_h <= config.dry_tolerance) {
+                continue;
+            }
+            double target_h = constriction_response_target_depth(scenario.initial.h(row, col), column_mean_depth, depth_scale);
+            if (target_h <= current_h) {
+                continue;
+            }
+            double capacity = target_h - current_h;
+            receivers.push_back(ConstrictionDepthTransferCell{row, col, capacity});
+            receiver_capacity += capacity;
+        }
+    }
+
+    double transfer_depth = std::min(donor_capacity, receiver_capacity);
+    if (transfer_depth <= config.dry_tolerance) {
+        return;
+    }
+
+    for (const ConstrictionDepthTransferCell& donor : donors) {
+        double removed_h = transfer_depth * donor.capacity / donor_capacity;
+        next.h(donor.row, donor.col) = std::max(0.0, next.h(donor.row, donor.col) - removed_h);
+        if (next.h(donor.row, donor.col) <= config.dry_tolerance) {
+            next.h(donor.row, donor.col) = 0.0;
+            next.u(donor.row, donor.col) = 0.0;
+            next.v(donor.row, donor.col) = 0.0;
+        }
+    }
+
+    double flow_sign = constriction_flow_sign(scenario);
+    for (const ConstrictionDepthTransferCell& receiver : receivers) {
+        double added_h = transfer_depth * receiver.capacity / receiver_capacity;
+        double current_h = next.h(receiver.row, receiver.col);
+        double target_u =
+            constriction_response_target_u(next.u(receiver.row, receiver.col), scenario.initial.u(receiver.row, receiver.col), flow_sign);
+        double merged_h = current_h + added_h;
+        double merged_hu = current_h * next.u(receiver.row, receiver.col) + added_h * target_u;
+        double merged_hv = current_h * next.v(receiver.row, receiver.col) + added_h * next.v(receiver.row, receiver.col);
+        next.h(receiver.row, receiver.col) = merged_h;
+        next.u(receiver.row, receiver.col) =
+            merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+        next.v(receiver.row, receiver.col) =
+            merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
     }
 }
 
@@ -1299,6 +1423,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_dry_bank_reconstruction(scenario_, config_, next);
         apply_constriction_wet_band_span_shaping(scenario_, config_, next);
         apply_constriction_volume_response_reconstruction(scenario_, config_, dt, next);
+        apply_constriction_recovery_energy_transport_reconstruction(scenario_, config_, dt, next);
         apply_constriction_momentum_reconstruction(scenario_, config_, next);
     }
     recompute_state(next);
@@ -1612,6 +1737,15 @@ void write_solver_output(
              << "    \"throat_depth_scale\": " << kConstrictionThroatVolumeDepthScale << ",\n"
              << "    \"downstream_depth_scale\": " << kConstrictionDownstreamVolumeDepthScale << ",\n"
              << "    \"recovery_depth_scale\": 0\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_recovery_energy_transport_reconstruction\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_recovery_energy_transport\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative\": true,\n"
+             << "    \"max_depth_m_per_s\": " << kConstrictionRecoveryTransportMaxDepthPerSecond << ",\n"
+             << "    \"transport_rate_per_s\": " << kConstrictionRecoveryTransportRate << ",\n"
+             << "    \"recovery_target_depth_scale\": " << kConstrictionRecoveryTransportDepthScale << "\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_momentum_reconstruction\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
