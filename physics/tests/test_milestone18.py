@@ -11,6 +11,9 @@ from raftsim.examples.generate_milestone18_constriction_mask_alignment_report im
 from raftsim.examples.generate_milestone18_constriction_lateral_face_flux_report import (
     main as generate_constriction_lateral_face_flux_main,
 )
+from raftsim.examples.generate_milestone18_constriction_face_source_audit_report import (
+    main as generate_constriction_face_source_audit_main,
+)
 from raftsim.examples.generate_milestone18_constriction_probe_cross_section_report import (
     main as generate_constriction_probe_cross_section_main,
 )
@@ -35,6 +38,7 @@ from raftsim.examples.generate_milestone18_remaining_geometry_closure_report imp
 from raftsim.examples.run_milestone18_analytic_retune_guardrail import main as guardrail_main
 from raftsim.milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
+    MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA,
@@ -46,6 +50,7 @@ from raftsim.milestone18 import (
     MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
     MILESTONE18_PIN_RELEASE_REPORT_SCHEMA,
     MILESTONE18_REMAINING_GEOMETRY_CLOSURE_REPORT_SCHEMA,
+    build_milestone18_constriction_face_source_audit_report,
     build_milestone18_constriction_lateral_face_flux_report,
     build_milestone18_constriction_mask_alignment_report,
     build_milestone18_constriction_probe_cross_section_report,
@@ -785,10 +790,13 @@ def _constriction_lateral_face_flux_inputs(tmp_path: Path) -> Path:
     initial_h[1, 2] = 1.0
     initial_h[1:3, 3] = 1.0
     zeros = np.zeros((4, 4), dtype=float)
+    bed = np.zeros((4, 4), dtype=float)
+    bed[2:, :] = 0.15
+    np.save(scenario_root / "bed.npy", bed)
     np.savez(
         scenario_root / "initial_state.npz",
         depth=initial_h,
-        eta=initial_h,
+        eta=initial_h + bed,
         u=np.ones((4, 4), dtype=float),
         v=zeros,
         hu=initial_h,
@@ -808,7 +816,7 @@ def _constriction_lateral_face_flux_inputs(tmp_path: Path) -> Path:
     np.savez(
         geoclaw_frame,
         h=geoclaw_h,
-        eta=geoclaw_h,
+        eta=geoclaw_h + bed,
         u=np.ones((4, 4), dtype=float),
         v=geoclaw_v,
         hu=geoclaw_h,
@@ -832,7 +840,7 @@ def _constriction_lateral_face_flux_inputs(tmp_path: Path) -> Path:
             h = cpp_h[row_index, col_index]
             v = cpp_v[row_index, col_index]
             rows.append(
-                f"{row_index},{col_index},{col_index},{row_index},{h},{h},1.0,{v},{h},{h * v},{1 if h > 0 else 0},0,0,1,1.0"
+                f"{row_index},{col_index},{col_index},{row_index},{h},{h + bed[row_index, col_index]},1.0,{v},{h},{h * v},{1 if h > 0 else 0},0,0,1,1.0"
             )
     cpp_frame.write_text("\n".join(rows) + "\n", encoding="utf-8")
     _write_json(cpp_root / "manifest.json", {"scenario_id": "constriction_seed_18", "frames": ["frames/frame_0008.csv"]})
@@ -887,6 +895,51 @@ def test_generate_milestone18_constriction_lateral_face_flux_cli_writes_reports(
     assert payload["schema_version"] == MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA
     assert payload["decision"] == "BLOCKED"
     assert "Constriction Lateral Face Flux Diagnostic" in output_md.read_text(encoding="utf-8")
+
+
+def test_milestone18_constriction_face_source_audit_records_flux_source_balance(tmp_path):
+    dual_manifest = _constriction_lateral_face_flux_inputs(tmp_path)
+
+    report = build_milestone18_constriction_face_source_audit_report(dual_manifest, top_n=8)
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert "not internal per-timestep Riemann telemetry" in payload["diagnostic_scope"]
+    assert payload["summary"]["volume_sign_mismatch_count"] >= 1
+    assert payload["summary"]["x_momentum_sign_mismatch_count"] >= 1
+    assert payload["summary"]["opposition_mismatch_count"] >= 1
+    assert payload["summary"]["max_abs_balance_delta_m3ps2"] > 0.0
+    worst = payload["summary"]["worst_samples"][0]
+    assert worst["face_role"] == "lower_edge_face"
+    assert worst["reference_volume_sign"] == 1
+    assert worst["candidate_volume_sign"] == -1
+    assert "bed_source_delta_m3ps2" in worst
+    assert any(pair["column_index"] == 1 and pair["reference_opposed_edges"] for pair in payload["edge_pair_summary"])
+    assert "face/source" in " ".join(payload["next_levers"])
+
+
+def test_generate_milestone18_constriction_face_source_audit_cli_writes_reports(tmp_path):
+    dual_manifest = _constriction_lateral_face_flux_inputs(tmp_path)
+    output_json = tmp_path / "reports" / "milestone18" / "constriction_face_source_audit.json"
+    output_md = tmp_path / "reports" / "milestone18" / "constriction_face_source_audit.md"
+
+    exit_code = generate_constriction_face_source_audit_main(
+        [
+            "--dual-solver-manifest",
+            str(dual_manifest),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert "Constriction Face/Source Audit" in output_md.read_text(encoding="utf-8")
 
 
 def _drop_ledge_hydraulic_control_inputs(tmp_path: Path) -> Path:
