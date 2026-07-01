@@ -317,6 +317,12 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["preconditions_inflow_edge_state"] is True
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["excluded_from_later_depth_receivers"] is True
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_cross_stream_momentum_source"] is True
+    assert constriction_manifest["constriction_cross_stream_momentum_source"]["bounded"] is True
+    assert constriction_manifest["constriction_cross_stream_momentum_source"]["mass_preserving_source"] is True
+    assert constriction_manifest["constriction_cross_stream_momentum_source"]["min_depth_m"] == pytest.approx(0.3)
+    assert constriction_manifest["constriction_cross_stream_momentum_source"]["applies_only_recovery_zone"] is True
+    assert constriction_manifest["constriction_cross_stream_momentum_source"]["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_dry_bank_reconstruction"] is True
     assert constriction_manifest["fixture_scoped_constriction_wet_band_relaxation"] is True
     assert constriction_manifest["fixture_scoped_constriction_wet_band_span_shaping"] is True
