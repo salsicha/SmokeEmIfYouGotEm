@@ -1,0 +1,94 @@
+{
+  "schema": "raftsim.milestone18.constriction_retune_rejection.v0",
+  "decision": "REJECTED",
+  "scenario": "constriction_seed_16",
+  "reference_manifest": "physics/outputs/m18g/c_constrict_corrected/constriction_seed_16/normalized/manifest.json",
+  "scenario_package": "physics/outputs/m18cmp/c_constrict_localized_circulation/finite_volume_roe/scenario/constriction_seed_16",
+  "candidate_output_manifest": "physics/outputs/m18cmp/c_constrict_upstream_lateral_transport/finite_volume_roe/dual_solver_manifest.json",
+  "feature_strength_scale": 0.0,
+  "implementation_retained": false,
+  "baseline": {
+    "candidate": "finite_volume_roe_localized_circulation",
+    "threshold_checks": {
+      "field_linf": 3.699425067228226,
+      "slope_linf": 0.9523765051691914,
+      "wet_mismatch_fraction": 0.2708333333333333,
+      "probe_linf": 2.1565553995867464,
+      "cross_section_linf": 1.6623013906504807,
+      "mass_drift_delta": 0.014229473746360799,
+      "energy_change_delta": 0.021246449331011052,
+      "froude_delta": 0.5040339898261341,
+      "feature_location_delta": 3.605551275463989,
+      "feature_strength_delta": 0.7855739930363903
+    }
+  },
+  "rejected_candidate": {
+    "candidate": "finite_volume_roe_upstream_lateral_transport",
+    "implementation": "bounded upstream approach upper-shoulder depth donor with lower-fringe/interior receiver rows and coupled donor/receiver momentum targets",
+    "parameters": {
+      "transport_rate_per_s": 1.0,
+      "max_depth_m_per_s": 0.24,
+      "donor_depth_scale": 0.24,
+      "min_donor_depth_m": 0.32,
+      "receiver_depth_scale": 1.42,
+      "fringe_receiver_depth_scale": 0.6,
+      "donor_shoulder_norm_floor": 0.9,
+      "receiver_shoulder_norm_floor": 0.42,
+      "velocity_rate_per_s": 2.4,
+      "max_speed_m_per_s2": 3.6,
+      "donor_speed_fraction_of_authored_throat": 2.45,
+      "receiver_speed_fraction_of_authored_throat": 1.95,
+      "donor_cross_stream_fraction": 2.4,
+      "receiver_cross_stream_fraction": 1.25
+    },
+    "threshold_checks": {
+      "field_linf": 3.8648678106263555,
+      "slope_linf": 0.9977328051346294,
+      "wet_mismatch_fraction": 0.2708333333333333,
+      "probe_linf": 2.1565553995867464,
+      "cross_section_linf": 1.6623013906504807,
+      "mass_drift_delta": 0.033017888722828794,
+      "energy_change_delta": 0.0532742691483603,
+      "froude_delta": 1.4499954901180435,
+      "feature_location_delta": 3.605551275463989,
+      "feature_strength_delta": 0.7876987174528505
+    }
+  },
+  "sample_diagnostics": [
+    {
+      "cell": [9, 1],
+      "zone": "upstream_approach_upper_edge",
+      "reference": {"h": 0.3809042274951935, "u": 3.4384281385882587, "v": -3.7274328154432057, "froude": 2.6233962742544827},
+      "baseline_cpp": {"h": 1.492937, "u": 1.802075, "v": -0.028008, "froude": 0.470945},
+      "candidate_cpp": {"h": 1.463363, "u": 2.107957, "v": -0.493718, "froude": 0.571410},
+      "interpretation": "The target upper-edge velocity moves in the correct sign direction, but the cell remains far too deep and low-Froude compared with GeoClaw."
+    },
+    {
+      "cell": [1, 1],
+      "zone": "upstream_approach_lower_fringe",
+      "reference": {"h": 0.302, "u": 3.854, "v": 3.457},
+      "baseline_cpp": {"h": 0.22, "u": 1.782189, "v": -0.010740, "froude": 1.213154},
+      "candidate_cpp": {"h": 0.221500, "u": 2.052471, "v": -0.382840, "froude": 1.416389},
+      "interpretation": "The coupled transport turns the lower upstream fringe farther away from GeoClaw's positive cross-stream velocity, creating the new field Linf blocker."
+    },
+    {
+      "cell": [9, 5],
+      "zone": "upstream_approach_upper_edge_near_throat",
+      "reference": {"h": 0.417236, "u": 3.397, "v": -1.974},
+      "baseline_cpp": {"h": 1.870152, "u": 1.735489, "v": 0.439837},
+      "candidate_cpp": {"h": 1.953131, "u": 1.853232, "v": -0.235117},
+      "interpretation": "The sign improves, but the depth/slope error worsens, so the transport is not solving the shallow fast edge state."
+    }
+  ],
+  "blocked_reasons": [
+    "Mass and energy stay inside threshold, but both regress versus the retained localized-circulation baseline.",
+    "Field, slope, and Froude errors get worse; Froude moves from a 0.504 near-miss to 1.45.",
+    "Probe and cross-section blockers are unchanged, so the pass does not address the center-throat sampled failure.",
+    "The temporary lower-fringe receiver coupling drives the lower upstream cross-stream velocity in the wrong sign direction."
+  ],
+  "next_levers": [
+    "Do not retain this upstream lateral transport pass.",
+    "Before another C++ retune, diagnose GeoClaw's face-level lateral flux/source balance in the upstream approach rows that produce opposite-signed lower and upper edge velocities.",
+    "Keep feature forcing off and keep Milestone 17 analytic guardrails as preflight/postflight checks for the next constriction attempt."
+  ]
+}
