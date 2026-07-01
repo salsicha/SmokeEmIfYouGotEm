@@ -318,6 +318,8 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["constriction_volume_response"]["bounded"] is True
     assert constriction_manifest["fixture_scoped_constriction_recovery_energy_transport_reconstruction"] is True
     assert constriction_manifest["constriction_recovery_energy_transport"]["mass_conservative"] is True
+    assert constriction_manifest["fixture_scoped_constriction_upstream_shoulder_froude_reconstruction"] is True
+    assert constriction_manifest["constriction_upstream_shoulder_froude"]["mass_conservative_depth_taper"] is True
     assert constriction_manifest["fixture_scoped_constriction_momentum_reconstruction"] is True
     assert final_throat_wet_count == initial_throat_wet_count
     assert max(dry_bank_depths) == 0.0

@@ -28,11 +28,18 @@ constexpr double kConstrictionWetBandMinimumDepth = 0.15;
 constexpr double kConstrictionVolumeResponseRate = 0.75;
 constexpr double kConstrictionVolumeResponseMaxDepthPerSecond = 0.16;
 constexpr double kConstrictionUpstreamVolumeDepthScale = 1.22;
-constexpr double kConstrictionThroatVolumeDepthScale = 0.95;
+constexpr double kConstrictionThroatVolumeDepthScale = 0.9;
 constexpr double kConstrictionDownstreamVolumeDepthScale = 1.05;
 constexpr double kConstrictionRecoveryTransportRate = 0.8;
 constexpr double kConstrictionRecoveryTransportMaxDepthPerSecond = 0.14;
 constexpr double kConstrictionRecoveryTransportDepthScale = 1.0;
+constexpr double kConstrictionShoulderDepthTaperRate = 0.45;
+constexpr double kConstrictionShoulderEdgeWeight = 0.22;
+constexpr double kConstrictionShoulderInteriorWeight = 1.35;
+constexpr double kConstrictionShoulderVelocityRate = 0.45;
+constexpr double kConstrictionShoulderMaxVelocityPerSecond = 0.25;
+constexpr double kConstrictionShoulderSpeedFraction = 1.0;
+constexpr double kConstrictionShoulderEdgeVelocityFraction = 0.25;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -44,6 +51,13 @@ std::size_t idx(const Scenario& scenario, std::size_t row, std::size_t col) {
 
 double safe_depth(double h, double dry_tolerance) {
     return std::max(h, dry_tolerance);
+}
+
+double move_toward(double current, double target, double max_delta) {
+    if (target > current) {
+        return std::min(target, current + max_delta);
+    }
+    return std::max(target, current - max_delta);
 }
 
 struct ConservedState {
@@ -601,6 +615,27 @@ ColumnWetBand initial_wet_band_in_column(const Scenario& scenario, std::size_t c
     return band;
 }
 
+ColumnWetBand active_wet_band_in_column(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    const WaterState& state,
+    std::size_t col
+) {
+    ColumnWetBand band;
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        if (state.h(row, col) <= config.dry_tolerance) {
+            continue;
+        }
+        if (!band.found) {
+            band.found = true;
+            band.first_row = row;
+        }
+        band.last_row = row;
+        ++band.count;
+    }
+    return band;
+}
+
 std::size_t max_initial_wet_count(const Scenario& scenario) {
     std::size_t max_count = 0;
     for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
@@ -789,6 +824,20 @@ double constriction_response_target_u(double current_u, double initial_u, double
 
 double constriction_response_target_depth(double authored_h, double column_mean_depth, double depth_scale) {
     return std::max(authored_h, column_mean_depth) * depth_scale;
+}
+
+double constriction_reference_throat_speed(const Scenario& scenario, std::size_t throat_width_cells) {
+    double speed = 0.0;
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count != throat_width_cells) {
+            continue;
+        }
+        for (std::size_t row = band.first_row; row <= band.last_row; ++row) {
+            speed = std::max(speed, std::abs(scenario.initial.u(row, col)));
+        }
+    }
+    return speed;
 }
 
 bool inside_relaxed_wet_band(
@@ -1009,6 +1058,76 @@ void apply_constriction_recovery_energy_transport_reconstruction(
             merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
         next.v(receiver.row, receiver.col) =
             merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+    }
+}
+
+void apply_constriction_upstream_shoulder_froude_reconstruction(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction") {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double flow_sign = constriction_flow_sign(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (reference_speed <= 0.0) {
+        return;
+    }
+
+    double depth_blend = clamp(kConstrictionShoulderDepthTaperRate * dt, 0.0, 1.0);
+    double velocity_blend = clamp(kConstrictionShoulderVelocityRate * dt, 0.0, 1.0);
+    double max_velocity_step = kConstrictionShoulderMaxVelocityPerSecond * dt;
+    double target_u = flow_sign * kConstrictionShoulderSpeedFraction * reference_speed;
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand initial_band = initial_wet_band_in_column(scenario, col);
+        if (!initial_band.found || initial_band.count <= throat_width_cells ||
+            constriction_signed_x(scenario, col) >= -2.0 * half_length) {
+            continue;
+        }
+
+        ColumnWetBand active_band = active_wet_band_in_column(scenario, config, next, col);
+        if (!active_band.found || active_band.count < 3) {
+            continue;
+        }
+
+        double column_mass = 0.0;
+        double weight_sum = 0.0;
+        double center_row = 0.5 * (static_cast<double>(active_band.first_row) + static_cast<double>(active_band.last_row));
+        double half_span = std::max(0.5, 0.5 * static_cast<double>(active_band.last_row - active_band.first_row));
+        for (std::size_t row = active_band.first_row; row <= active_band.last_row; ++row) {
+            double edge_norm = std::min(1.0, std::abs(static_cast<double>(row) - center_row) / half_span);
+            double interior = std::pow(1.0 - edge_norm, 1.35);
+            weight_sum += kConstrictionShoulderEdgeWeight + kConstrictionShoulderInteriorWeight * interior;
+            column_mass += next.h(row, col);
+        }
+        if (column_mass <= config.dry_tolerance || weight_sum <= 0.0) {
+            continue;
+        }
+
+        for (std::size_t row = active_band.first_row; row <= active_band.last_row; ++row) {
+            double edge_norm = std::min(1.0, std::abs(static_cast<double>(row) - center_row) / half_span);
+            double interior = std::pow(1.0 - edge_norm, 1.35);
+            double weight = kConstrictionShoulderEdgeWeight + kConstrictionShoulderInteriorWeight * interior;
+            double tapered_h = column_mass * weight / weight_sum;
+            next.h(row, col) = std::max(config.dry_tolerance, next.h(row, col) + depth_blend * (tapered_h - next.h(row, col)));
+
+            bool edge_cell = row == active_band.first_row || row == active_band.first_row + 1 ||
+                             row + 1 == active_band.last_row || row == active_band.last_row;
+            if (!edge_cell) {
+                continue;
+            }
+            double edge_sign = static_cast<double>(row) < center_row ? 1.0 : -1.0;
+            double target_v = edge_sign * kConstrictionShoulderEdgeVelocityFraction * std::abs(target_u);
+            double limited_u = next.u(row, col) + velocity_blend * (target_u - next.u(row, col));
+            double limited_v = next.v(row, col) + velocity_blend * (target_v - next.v(row, col));
+            next.u(row, col) = move_toward(next.u(row, col), limited_u, max_velocity_step);
+            next.v(row, col) = move_toward(next.v(row, col), limited_v, max_velocity_step);
+        }
     }
 }
 
@@ -1424,6 +1543,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_wet_band_span_shaping(scenario_, config_, next);
         apply_constriction_volume_response_reconstruction(scenario_, config_, dt, next);
         apply_constriction_recovery_energy_transport_reconstruction(scenario_, config_, dt, next);
+        apply_constriction_upstream_shoulder_froude_reconstruction(scenario_, config_, dt, next);
         apply_constriction_momentum_reconstruction(scenario_, config_, next);
     }
     recompute_state(next);
@@ -1746,6 +1866,19 @@ void write_solver_output(
              << "    \"max_depth_m_per_s\": " << kConstrictionRecoveryTransportMaxDepthPerSecond << ",\n"
              << "    \"transport_rate_per_s\": " << kConstrictionRecoveryTransportRate << ",\n"
              << "    \"recovery_target_depth_scale\": " << kConstrictionRecoveryTransportDepthScale << "\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_upstream_shoulder_froude_reconstruction\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_upstream_shoulder_froude\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative_depth_taper\": true,\n"
+             << "    \"depth_taper_rate_per_s\": " << kConstrictionShoulderDepthTaperRate << ",\n"
+             << "    \"edge_weight\": " << kConstrictionShoulderEdgeWeight << ",\n"
+             << "    \"interior_weight\": " << kConstrictionShoulderInteriorWeight << ",\n"
+             << "    \"velocity_rate_per_s\": " << kConstrictionShoulderVelocityRate << ",\n"
+             << "    \"max_velocity_m_per_s2\": " << kConstrictionShoulderMaxVelocityPerSecond << ",\n"
+             << "    \"speed_fraction_of_authored_throat\": " << kConstrictionShoulderSpeedFraction << ",\n"
+             << "    \"edge_velocity_fraction\": " << kConstrictionShoulderEdgeVelocityFraction << "\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_momentum_reconstruction\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
