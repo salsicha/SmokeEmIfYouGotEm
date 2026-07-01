@@ -29,6 +29,7 @@ MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA = "raftsim.milestone18.parity_family_ret
 MILESTONE18_PIN_RELEASE_REPORT_SCHEMA = "raftsim.milestone18.pin_release_fixture.v0"
 MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA = "raftsim.milestone18.constriction_throat_shape.v0"
 MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA = "raftsim.milestone18.constriction_mask_alignment.v0"
+MILESTONE18_CONSTRICTION_RESPONSE_REPORT_SCHEMA = "raftsim.milestone18.constriction_response_timing.v0"
 
 _CORE_GUARDRAIL_FAMILIES = {"hydrostatic_sloping_balance", "uniform_channel", "dam_break_bore"}
 _GEOMETRY_CLOSURE_FAMILIES = {"wet_dry_shoreline", "bed_step", "constriction", "drops_ledges_tailwater"}
@@ -969,6 +970,201 @@ class Milestone18ConstrictionMaskAlignmentReport:
 
 
 @dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionZoneSnapshot:
+    """One solver/frame summary for a constriction response zone."""
+
+    solver_label: str
+    zone_id: str
+    frame_index: int
+    source_path: str
+    time_s: float
+    column_indices: tuple[int, ...]
+    wet_cell_count: int
+    total_mass_m3: float
+    mean_wet_depth_m: float
+    max_depth_m: float
+    mean_downstream_velocity_mps: float
+    mean_cross_stream_velocity_mps: float
+    kinetic_energy_like_j: float
+    max_froude: float
+    mean_wet_froude: float
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["column_indices"] = list(self.column_indices)
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionZoneDelta:
+    """C++ minus GeoClaw final and peak timing deltas for one constriction zone."""
+
+    zone_id: str
+    column_indices: tuple[int, ...]
+    final_mass_delta_m3: float
+    final_mean_wet_depth_delta_m: float
+    final_max_depth_delta_m: float
+    final_kinetic_energy_delta_j: float
+    final_max_froude_delta: float
+    peak_mass_delta_m3: float
+    peak_mass_time_delta_s: float
+    peak_energy_delta_j: float
+    peak_energy_time_delta_s: float
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["column_indices"] = list(self.column_indices)
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionResponseTimingReport:
+    """Diagnostic report for constriction depth, mass, energy, and timing response."""
+
+    dual_solver_manifest: str
+    scenario_package: str
+    scenario_id: str
+    feature: dict[str, object]
+    grid: dict[str, object]
+    wet_depth_threshold_m: float
+    zones: dict[str, tuple[int, ...]]
+    geoclaw_snapshots: tuple[Milestone18ConstrictionZoneSnapshot, ...]
+    cpp_snapshots: tuple[Milestone18ConstrictionZoneSnapshot, ...]
+    zone_deltas: tuple[Milestone18ConstrictionZoneDelta, ...]
+    thresholds: dict[str, float]
+    blocked_reasons: tuple[str, ...]
+    next_levers: tuple[str, ...]
+
+    @property
+    def passed(self) -> bool:
+        return not self.blocked_reasons
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_CONSTRICTION_RESPONSE_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "dual_solver_manifest": self.dual_solver_manifest,
+            "scenario_package": self.scenario_package,
+            "scenario_id": self.scenario_id,
+            "feature": self.feature,
+            "grid": self.grid,
+            "wet_depth_threshold_m": self.wet_depth_threshold_m,
+            "zones": {zone_id: list(columns) for zone_id, columns in self.zones.items()},
+            "thresholds": self.thresholds,
+            "summary": {
+                "zone_count": len(self.zone_deltas),
+                "max_abs_final_mass_delta_m3": max(
+                    (abs(delta.final_mass_delta_m3) for delta in self.zone_deltas),
+                    default=0.0,
+                ),
+                "max_abs_final_mean_wet_depth_delta_m": max(
+                    (abs(delta.final_mean_wet_depth_delta_m) for delta in self.zone_deltas),
+                    default=0.0,
+                ),
+                "max_abs_final_kinetic_energy_delta_j": max(
+                    (abs(delta.final_kinetic_energy_delta_j) for delta in self.zone_deltas),
+                    default=0.0,
+                ),
+                "max_abs_peak_energy_time_delta_s": max(
+                    (abs(delta.peak_energy_time_delta_s) for delta in self.zone_deltas),
+                    default=0.0,
+                ),
+                "max_abs_peak_energy_delta_j": max(
+                    (abs(delta.peak_energy_delta_j) for delta in self.zone_deltas),
+                    default=0.0,
+                ),
+                "max_abs_final_froude_delta": max(
+                    (abs(delta.final_max_froude_delta) for delta in self.zone_deltas),
+                    default=0.0,
+                ),
+                "worst_zones": [delta.to_json_dict() for delta in self._worst_zones()],
+            },
+            "zone_deltas": [delta.to_json_dict() for delta in self.zone_deltas],
+            "snapshots": {
+                "geoclaw": [snapshot.to_json_dict() for snapshot in self.geoclaw_snapshots],
+                "cpp": [snapshot.to_json_dict() for snapshot in self.cpp_snapshots],
+            },
+            "blocked_reasons": list(self.blocked_reasons),
+            "next_levers": list(self.next_levers),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = [
+            "# Milestone 18 Constriction Response Timing Diagnostic",
+            "",
+            f"Schema: `{MILESTONE18_CONSTRICTION_RESPONSE_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Scenario: `{self.scenario_id}`",
+            f"Dual solver manifest: `{self.dual_solver_manifest}`",
+            f"Scenario package: `{self.scenario_package}`",
+            f"Wet-depth threshold: `{self.wet_depth_threshold_m:.6g}` m",
+            "",
+            "## Zones",
+            "",
+            "| Zone | Columns |",
+            "| --- | --- |",
+        ]
+        for zone_id, columns in self.zones.items():
+            lines.append(f"| `{zone_id}` | `{_column_span(columns)}` |")
+        lines.extend(
+            [
+                "",
+                "## Final And Peak Deltas",
+                "",
+                "| Zone | Final mass m3 | Final mean depth m | Final max depth m | Final energy | Peak mass m3 | Peak mass time s | Peak energy | Peak energy time s | Final max Froude |",
+                "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for delta in self.zone_deltas:
+            lines.append(
+                "| "
+                f"`{delta.zone_id}` | "
+                f"{delta.final_mass_delta_m3:.6g} | "
+                f"{delta.final_mean_wet_depth_delta_m:.6g} | "
+                f"{delta.final_max_depth_delta_m:.6g} | "
+                f"{delta.final_kinetic_energy_delta_j:.6g} | "
+                f"{delta.peak_mass_delta_m3:.6g} | "
+                f"{delta.peak_mass_time_delta_s:.6g} | "
+                f"{delta.peak_energy_delta_j:.6g} | "
+                f"{delta.peak_energy_time_delta_s:.6g} | "
+                f"{delta.final_max_froude_delta:.6g} |"
+            )
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.next_levers:
+            lines.extend(["", "## Next Levers", ""])
+            lines.extend(f"- {lever}" for lever in self.next_levers)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+    def _worst_zones(self) -> tuple[Milestone18ConstrictionZoneDelta, ...]:
+        return tuple(
+            sorted(
+                self.zone_deltas,
+                key=lambda delta: (
+                    abs(delta.final_mass_delta_m3),
+                    abs(delta.final_kinetic_energy_delta_j),
+                    abs(delta.peak_energy_time_delta_s),
+                    abs(delta.final_mean_wet_depth_delta_m),
+                ),
+                reverse=True,
+            )[:4]
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class Milestone18PinReleaseResponsePath:
     """One action timing path through the dedicated pin/release fixture."""
 
@@ -1408,6 +1604,88 @@ def build_milestone18_constriction_mask_alignment_report(
         domain_mask_mismatch_count=domain_mask_mismatch_count,
         domain_mask_mismatch_fraction=domain_mask_mismatch_count / domain_cell_count,
         comparisons=tuple(comparisons),
+        blocked_reasons=blocked_reasons,
+        next_levers=next_levers,
+    )
+
+
+def build_milestone18_constriction_response_timing_report(
+    dual_solver_manifest: str | Path,
+    *,
+    wet_depth_threshold_m: float = 0.15,
+) -> Milestone18ConstrictionResponseTimingReport:
+    """Compare constriction depth, mass, energy, and response timing by flow zone."""
+
+    manifest_path = Path(dual_solver_manifest)
+    manifest = _load_json_report(manifest_path)
+    scenario_package = _resolve_path(str(manifest.get("scenario_package", "")), manifest_path.parent)
+    scenario = _load_json_report(scenario_package / "scenario.json")
+    features = _load_json_report(scenario_package / "features.json")
+    constriction = _constriction_feature(features)
+    grid = _scenario_grid(scenario)
+    nx = int(grid["nx"])
+    ny = int(grid["ny"])
+    duration_s = float(scenario.get("duration", 0.0) or 0.0)
+
+    geoclaw_manifest_ref = _manifest_nested_string(manifest, "geoclaw", "manifest")
+    cpp_manifest_ref = _manifest_nested_string(manifest, "cpp", "manifest")
+    geoclaw_manifest_path = _resolve_path(geoclaw_manifest_ref, manifest_path.parent)
+    cpp_manifest_path = _resolve_path(cpp_manifest_ref, manifest_path.parent)
+    geoclaw_manifest = _load_json_report(geoclaw_manifest_path)
+    cpp_manifest = _load_json_report(cpp_manifest_path)
+
+    initial_state_path = _scenario_array_path(scenario_package, scenario, "initial_state", "initial_state.npz")
+    initial_state = _load_npz_water_state(initial_state_path, h_key="depth")
+    zones = _constriction_response_zones(initial_state, grid, constriction, wet_depth_threshold_m)
+
+    geoclaw_snapshots = _constriction_zone_snapshots(
+        "geoclaw",
+        geoclaw_manifest,
+        geoclaw_manifest_path.parent,
+        grid,
+        zones,
+        wet_depth_threshold_m,
+        default_duration_s=duration_s,
+    )
+    cpp_snapshots = _constriction_zone_snapshots(
+        "cpp",
+        cpp_manifest,
+        cpp_manifest_path.parent,
+        grid,
+        zones,
+        wet_depth_threshold_m,
+        default_duration_s=duration_s,
+    )
+    zone_deltas = tuple(
+        _constriction_zone_delta(zone_id, columns, geoclaw_snapshots, cpp_snapshots)
+        for zone_id, columns in zones.items()
+        if columns
+    )
+    thresholds = {
+        "max_abs_final_mass_delta_m3": 1.0,
+        "max_abs_final_mean_wet_depth_delta_m": 0.25,
+        "max_abs_peak_energy_time_delta_s": 1.0,
+        "max_abs_peak_energy_delta_j": 25.0,
+        "max_abs_final_froude_delta": 0.5,
+    }
+    blocked_reasons = _constriction_response_blocked_reasons(zone_deltas, thresholds)
+    next_levers = (
+        "Retune constriction water volume and depth response now that wet-mask shape is closer to GeoClaw.",
+        "Compare peak mass and energy timing before adding gameplay feature forcing.",
+        "Add a bounded source/flux response only if it preserves Milestone 17 guardrails and does not hide conservation failures.",
+    )
+    return Milestone18ConstrictionResponseTimingReport(
+        dual_solver_manifest=str(manifest_path),
+        scenario_package=str(scenario_package),
+        scenario_id=str(manifest.get("scenario_id") or scenario.get("metadata", {}).get("scenario_id") or "unknown"),
+        feature=constriction,
+        grid=grid,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        zones=zones,
+        geoclaw_snapshots=geoclaw_snapshots,
+        cpp_snapshots=cpp_snapshots,
+        zone_deltas=zone_deltas,
+        thresholds=thresholds,
         blocked_reasons=blocked_reasons,
         next_levers=next_levers,
     )
@@ -2210,6 +2488,217 @@ def _froude_array(h: np.ndarray, u: np.ndarray, v: np.ndarray) -> np.ndarray:
     return froude
 
 
+def _frame_paths(manifest: dict[str, Any], manifest_dir: Path) -> tuple[Path, ...]:
+    frames = manifest.get("frames", [])
+    if not isinstance(frames, list) or not frames:
+        raise ValueError("solver manifest must include at least one frame.")
+    paths: list[Path] = []
+    for frame in frames:
+        if not isinstance(frame, str):
+            raise ValueError("solver manifest frame entries must be strings.")
+        paths.append(_resolve_path(frame, manifest_dir))
+    return tuple(paths)
+
+
+def _water_frame_time(path: Path, fallback_time_s: float) -> float:
+    if path.suffix == ".npz":
+        with np.load(path) as data:
+            if "time" in data:
+                time_value = np.asarray(data["time"], dtype=float)
+                if time_value.size:
+                    return float(time_value.reshape(-1)[0])
+    return float(fallback_time_s)
+
+
+def _load_water_frame(path: Path, ny: int, nx: int) -> dict[str, np.ndarray]:
+    if path.suffix == ".npz":
+        return _load_npz_water_state(path, h_key="h")
+    return _load_cpp_water_csv(path, ny, nx)
+
+
+def _constriction_response_zones(
+    initial_state: dict[str, np.ndarray],
+    grid: dict[str, object],
+    feature: dict[str, object],
+    wet_depth_threshold_m: float,
+) -> dict[str, tuple[int, ...]]:
+    nx = int(grid["nx"])
+    h = initial_state["h"]
+    wet_counts = [int(np.count_nonzero(h[:, col] > wet_depth_threshold_m)) for col in range(nx)]
+    positive_counts = [count for count in wet_counts if count > 0]
+    throat_count = min(positive_counts) if positive_counts else 0
+    center_x = float(feature["center_x"])
+    half_length = max(float(feature.get("length_m") or 0.0) * 0.5, float(grid["dx"]))
+    flow_sign = _initial_flow_sign(initial_state)
+    zones: dict[str, list[int]] = {
+        "upstream_approach": [],
+        "constriction_throat": [],
+        "downstream_constriction": [],
+        "recovery": [],
+    }
+    for col in range(nx):
+        x = float(grid["origin_x"]) + col * float(grid["dx"])
+        signed_x = (x - center_x) * flow_sign
+        if wet_counts[col] == throat_count and wet_counts[col] > 0:
+            zones["constriction_throat"].append(col)
+        elif signed_x < 0.0:
+            zones["upstream_approach"].append(col)
+        elif signed_x <= half_length:
+            zones["downstream_constriction"].append(col)
+        else:
+            zones["recovery"].append(col)
+    return {zone_id: tuple(columns) for zone_id, columns in zones.items() if columns}
+
+
+def _initial_flow_sign(initial_state: dict[str, np.ndarray]) -> float:
+    discharge = float(np.sum(initial_state["h"] * initial_state["u"]))
+    return 1.0 if discharge >= 0.0 else -1.0
+
+
+def _constriction_zone_snapshots(
+    solver_label: str,
+    manifest: dict[str, Any],
+    manifest_dir: Path,
+    grid: dict[str, object],
+    zones: dict[str, tuple[int, ...]],
+    wet_depth_threshold_m: float,
+    *,
+    default_duration_s: float,
+) -> tuple[Milestone18ConstrictionZoneSnapshot, ...]:
+    frame_paths = _frame_paths(manifest, manifest_dir)
+    ny = int(grid["ny"])
+    nx = int(grid["nx"])
+    snapshots: list[Milestone18ConstrictionZoneSnapshot] = []
+    denominator = max(1, len(frame_paths) - 1)
+    for frame_index, frame_path in enumerate(frame_paths):
+        fallback_time_s = default_duration_s if len(frame_paths) == 1 else default_duration_s * frame_index / denominator
+        state = _load_water_frame(frame_path, ny, nx)
+        time_s = _water_frame_time(frame_path, fallback_time_s)
+        for zone_id, columns in zones.items():
+            snapshots.append(
+                _constriction_zone_snapshot(
+                    solver_label,
+                    zone_id,
+                    frame_index,
+                    frame_path,
+                    time_s,
+                    columns,
+                    state,
+                    grid,
+                    wet_depth_threshold_m,
+                )
+            )
+    return tuple(snapshots)
+
+
+def _constriction_zone_snapshot(
+    solver_label: str,
+    zone_id: str,
+    frame_index: int,
+    source_path: Path,
+    time_s: float,
+    columns: tuple[int, ...],
+    state: dict[str, np.ndarray],
+    grid: dict[str, object],
+    wet_depth_threshold_m: float,
+) -> Milestone18ConstrictionZoneSnapshot:
+    h = state["h"][:, list(columns)]
+    u = state["u"][:, list(columns)]
+    v = state["v"][:, list(columns)]
+    froude = state["froude"][:, list(columns)]
+    cell_area = float(grid["dx"]) * float(grid["dy"])
+    wet_mask = h > wet_depth_threshold_m
+    wet_count = int(np.count_nonzero(wet_mask))
+    wet_h = h[wet_mask]
+    weights = np.where(wet_mask, h, 0.0)
+    wet_mass = float(np.sum(weights))
+    if wet_count and wet_mass > 0.0:
+        mean_depth = float(np.mean(wet_h))
+        mean_u = float(np.sum(u * weights) / wet_mass)
+        mean_v = float(np.sum(v * weights) / wet_mass)
+        max_froude = float(np.max(froude[wet_mask]))
+        mean_froude = float(np.mean(froude[wet_mask]))
+    else:
+        mean_depth = 0.0
+        mean_u = 0.0
+        mean_v = 0.0
+        max_froude = 0.0
+        mean_froude = 0.0
+    return Milestone18ConstrictionZoneSnapshot(
+        solver_label=solver_label,
+        zone_id=zone_id,
+        frame_index=frame_index,
+        source_path=str(source_path),
+        time_s=float(time_s),
+        column_indices=columns,
+        wet_cell_count=wet_count,
+        total_mass_m3=float(np.sum(h) * cell_area),
+        mean_wet_depth_m=mean_depth,
+        max_depth_m=float(np.max(h)) if h.size else 0.0,
+        mean_downstream_velocity_mps=mean_u,
+        mean_cross_stream_velocity_mps=mean_v,
+        kinetic_energy_like_j=float(np.sum(0.5 * h * (u * u + v * v)) * cell_area),
+        max_froude=max_froude,
+        mean_wet_froude=mean_froude,
+    )
+
+
+def _constriction_zone_delta(
+    zone_id: str,
+    columns: tuple[int, ...],
+    geoclaw_snapshots: tuple[Milestone18ConstrictionZoneSnapshot, ...],
+    cpp_snapshots: tuple[Milestone18ConstrictionZoneSnapshot, ...],
+) -> Milestone18ConstrictionZoneDelta:
+    geoclaw_zone = tuple(snapshot for snapshot in geoclaw_snapshots if snapshot.zone_id == zone_id)
+    cpp_zone = tuple(snapshot for snapshot in cpp_snapshots if snapshot.zone_id == zone_id)
+    if not geoclaw_zone or not cpp_zone:
+        raise ValueError(f"Missing snapshots for constriction zone {zone_id}.")
+    geoclaw_final = max(geoclaw_zone, key=lambda snapshot: snapshot.time_s)
+    cpp_final = max(cpp_zone, key=lambda snapshot: snapshot.time_s)
+    geoclaw_peak_mass = max(geoclaw_zone, key=lambda snapshot: snapshot.total_mass_m3)
+    cpp_peak_mass = max(cpp_zone, key=lambda snapshot: snapshot.total_mass_m3)
+    geoclaw_peak_energy = max(geoclaw_zone, key=lambda snapshot: snapshot.kinetic_energy_like_j)
+    cpp_peak_energy = max(cpp_zone, key=lambda snapshot: snapshot.kinetic_energy_like_j)
+    return Milestone18ConstrictionZoneDelta(
+        zone_id=zone_id,
+        column_indices=columns,
+        final_mass_delta_m3=cpp_final.total_mass_m3 - geoclaw_final.total_mass_m3,
+        final_mean_wet_depth_delta_m=cpp_final.mean_wet_depth_m - geoclaw_final.mean_wet_depth_m,
+        final_max_depth_delta_m=cpp_final.max_depth_m - geoclaw_final.max_depth_m,
+        final_kinetic_energy_delta_j=cpp_final.kinetic_energy_like_j - geoclaw_final.kinetic_energy_like_j,
+        final_max_froude_delta=cpp_final.max_froude - geoclaw_final.max_froude,
+        peak_mass_delta_m3=cpp_peak_mass.total_mass_m3 - geoclaw_peak_mass.total_mass_m3,
+        peak_mass_time_delta_s=cpp_peak_mass.time_s - geoclaw_peak_mass.time_s,
+        peak_energy_delta_j=cpp_peak_energy.kinetic_energy_like_j - geoclaw_peak_energy.kinetic_energy_like_j,
+        peak_energy_time_delta_s=cpp_peak_energy.time_s - geoclaw_peak_energy.time_s,
+    )
+
+
+def _constriction_response_blocked_reasons(
+    zone_deltas: tuple[Milestone18ConstrictionZoneDelta, ...],
+    thresholds: dict[str, float],
+) -> tuple[str, ...]:
+    if not zone_deltas:
+        return ("No constriction response zones were available for timing diagnostics.",)
+    max_mass = max(abs(delta.final_mass_delta_m3) for delta in zone_deltas)
+    max_depth = max(abs(delta.final_mean_wet_depth_delta_m) for delta in zone_deltas)
+    max_peak_time = max(abs(delta.peak_energy_time_delta_s) for delta in zone_deltas)
+    max_peak_energy = max(abs(delta.peak_energy_delta_j) for delta in zone_deltas)
+    max_froude = max(abs(delta.final_max_froude_delta) for delta in zone_deltas)
+    reasons: list[str] = []
+    if max_mass > thresholds["max_abs_final_mass_delta_m3"]:
+        reasons.append("C++ final constriction-zone mass differs from GeoClaw beyond the diagnostic budget.")
+    if max_depth > thresholds["max_abs_final_mean_wet_depth_delta_m"]:
+        reasons.append("C++ final mean wet depth differs from GeoClaw beyond the diagnostic budget.")
+    if max_peak_time > thresholds["max_abs_peak_energy_time_delta_s"]:
+        reasons.append("C++ peak-energy timing differs from GeoClaw beyond the diagnostic budget.")
+    if max_peak_energy > thresholds["max_abs_peak_energy_delta_j"]:
+        reasons.append("C++ peak-energy magnitude differs from GeoClaw beyond the diagnostic budget.")
+    if max_froude > thresholds["max_abs_final_froude_delta"]:
+        reasons.append("C++ final zone Froude envelope differs from GeoClaw beyond the diagnostic budget.")
+    return tuple(reasons)
+
+
 def _constriction_throat_profile(
     label: str,
     source_path: Path,
@@ -2811,6 +3300,14 @@ def _row_span_markdown(profile: Milestone18ConstrictionColumnProfile) -> str:
     if profile.first_wet_row_index is None or profile.last_wet_row_index is None:
         return "dry"
     return f"{profile.first_wet_row_index}-{profile.last_wet_row_index}"
+
+
+def _column_span(columns: tuple[int, ...]) -> str:
+    if not columns:
+        return "none"
+    if len(columns) == 1:
+        return str(columns[0])
+    return f"{columns[0]}-{columns[-1]}"
 
 
 def _markdown_counter_table(label: str, counts: object) -> str:
