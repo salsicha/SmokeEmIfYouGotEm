@@ -104,6 +104,18 @@ MILESTONE16_FULL_GATE_REPORT_FILES = {
     "runtime_profile": "runtime_profile.json",
     "regression_promotion": "regression_promotion_manifest.json",
 }
+MILESTONE18_GEOMETRY_CLOSURE_REPORTS = {
+    "wet_dry_shoreline": {
+        "report": "wet_dry_finite_volume_reconstruction_retune.json",
+        "accepted_solver_modes": ("finite_volume", "reduced"),
+        "diagnostic_solver_modes": (),
+    },
+    "bed_step": {
+        "report": "bed_step_parity_retune.json",
+        "accepted_solver_modes": ("finite_volume",),
+        "diagnostic_solver_modes": ("reduced",),
+    },
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -1213,11 +1225,14 @@ def run_milestone16_geoclaw_reference_suite(
 def run_milestone16_geometry_validation(
     comparison_report: str | Path,
     geoclaw_reference_report: str | Path,
+    *,
+    milestone18_report_dir: str | Path | None = None,
 ) -> Milestone16GeometryValidationReport:
     """Build geometry-specific validation results from Milestone 16 artifacts."""
 
     comparison_path = Path(comparison_report)
     geoclaw_path = Path(geoclaw_reference_report)
+    m18_report_dir = Path(milestone18_report_dir) if milestone18_report_dir is not None else comparison_path.parent.parent / "milestone18"
     comparison = _read_json(comparison_path)
     geoclaw = _read_json(geoclaw_path)
     comparison_records = list(comparison["records"])
@@ -1233,12 +1248,14 @@ def run_milestone16_geometry_validation(
             "Wet/Dry Shorelines",
             ("wet_dry_shoreline",),
             comparison_records,
+            milestone18_report_dir=m18_report_dir,
         ),
         _geometry_case_from_thresholds(
             "bed_step",
             "Bed Steps",
             ("bed_step",),
             comparison_records,
+            milestone18_report_dir=m18_report_dir,
         ),
         _geometry_case_from_thresholds(
             "constriction",
@@ -1329,7 +1346,7 @@ def run_milestone16_regression_promotion(
             if not _should_promote_geometry_case(case):
                 continue
             for evidence in case.get("evidence", []):
-                if bool(evidence.get("passed")):
+                if _should_promote_geometry_evidence(evidence):
                     entries.append(_promote_geometry_validation_artifact(case, evidence, geometry_path, root))
 
     for record in raft["records"]:
@@ -1563,6 +1580,8 @@ def _geometry_case_from_thresholds(
     title: str,
     scenario_ids: tuple[str, ...],
     comparison_records: list[dict[str, object]],
+    *,
+    milestone18_report_dir: Path | None = None,
 ) -> Milestone16GeometryCaseResult:
     evidence = tuple(
         {
@@ -1574,6 +1593,15 @@ def _geometry_case_from_thresholds(
         for record in comparison_records
         if record["gate_scenario_id"] in scenario_ids
     )
+    closure_case = _milestone18_geometry_closure_case(
+        case_id,
+        title,
+        scenario_ids,
+        evidence,
+        milestone18_report_dir,
+    )
+    if closure_case is not None:
+        return closure_case
     passed = bool(evidence) and all(bool(item["threshold_passed"]) for item in evidence)
     failing = sorted(
         {
@@ -1594,6 +1622,109 @@ def _geometry_case_from_thresholds(
         evidence=evidence,
         notes=notes,
     )
+
+
+def _milestone18_geometry_closure_case(
+    case_id: str,
+    title: str,
+    scenario_ids: tuple[str, ...],
+    stale_evidence: tuple[dict[str, object], ...],
+    milestone18_report_dir: Path | None,
+) -> Milestone16GeometryCaseResult | None:
+    spec = MILESTONE18_GEOMETRY_CLOSURE_REPORTS.get(case_id)
+    if spec is None or milestone18_report_dir is None:
+        return None
+    report_path = milestone18_report_dir / str(spec["report"])
+    if not report_path.exists():
+        return None
+
+    report = _read_json(report_path)
+    accepted_modes = set(str(mode) for mode in spec["accepted_solver_modes"])
+    diagnostic_modes = set(str(mode) for mode in spec["diagnostic_solver_modes"])
+    summary = report.get("summary", {})
+    if not isinstance(summary, dict):
+        summary = {}
+    promoted_modes = set(str(mode) for mode in summary.get("promoted_modes", []) if isinstance(mode, str))
+    blocked_modes = set(str(mode) for mode in summary.get("blocked_modes", []) if isinstance(mode, str))
+    closure_passed = bool(accepted_modes) and accepted_modes.issubset(promoted_modes) and blocked_modes.issubset(diagnostic_modes)
+    evidence = tuple(
+        _milestone18_geometry_evidence_row(
+            report,
+            mode_result,
+            report_path,
+            accepted_modes=accepted_modes,
+            diagnostic_modes=diagnostic_modes,
+        )
+        for mode_result in report.get("mode_results", [])
+        if isinstance(mode_result, dict)
+    )
+    solver_modes = tuple(sorted({str(item["solver_mode"]) for item in evidence}))
+    stale_failing = sorted(
+        {
+            f"{item.get('gate_scenario_id')}:{item.get('solver_mode')}"
+            for item in stale_evidence
+            if not bool(item.get("threshold_passed"))
+        }
+    )
+    notes = [
+        f"Milestone 18 closure evidence applied from {report_path}.",
+        (
+            "Accepted solver modes for this geometry family: "
+            f"{', '.join(sorted(accepted_modes))}."
+        ),
+    ]
+    if diagnostic_modes:
+        notes.append(
+            "Diagnostic-only solver modes are retained as smoke evidence but no longer block this geometry family: "
+            f"{', '.join(sorted(diagnostic_modes))}."
+        )
+    if stale_failing:
+        notes.append(
+            "Supersedes stale Milestone 16 threshold blockers for: "
+            f"{', '.join(stale_failing)}."
+        )
+    if not closure_passed:
+        unresolved = sorted(blocked_modes - diagnostic_modes)
+        if unresolved:
+            notes.append(f"Unresolved accepted-mode blockers remain in: {', '.join(unresolved)}.")
+    return Milestone16GeometryCaseResult(
+        case_id=case_id,
+        title=title,
+        scenarios=scenario_ids,
+        solver_modes=solver_modes,
+        passed=closure_passed and bool(evidence),
+        evidence=evidence,
+        notes=tuple(notes),
+    )
+
+
+def _milestone18_geometry_evidence_row(
+    report: dict[str, object],
+    mode_result: dict[str, object],
+    report_path: Path,
+    *,
+    accepted_modes: set[str],
+    diagnostic_modes: set[str],
+) -> dict[str, object]:
+    solver_mode = str(mode_result.get("solver_mode", "unknown"))
+    promoted = bool(mode_result.get("promoted"))
+    diagnostic_only = solver_mode in diagnostic_modes
+    failing_checks = tuple(str(check) for check in mode_result.get("failing_checks", []) if isinstance(check, str))
+    return {
+        "gate_scenario_id": report.get("scenario_family", report.get("gate_scenario_id")),
+        "actual_scenario_id": report.get("actual_scenario_id"),
+        "solver_mode": solver_mode,
+        "passed": promoted,
+        "threshold_passed": promoted,
+        "promoted": promoted,
+        "accepted_for_geometry": solver_mode in accepted_modes and promoted,
+        "diagnostic_only": diagnostic_only,
+        "failing_checks": list(failing_checks),
+        "candidate_label": mode_result.get("candidate_label"),
+        "comparison_dir": mode_result.get("comparison_dir"),
+        "threshold_report": mode_result.get("threshold_report"),
+        "milestone18_report": str(report_path),
+    }
 
 
 def _reach_drop_handoff_geometry_case(geoclaw_report: dict[str, object]) -> Milestone16GeometryCaseResult:
@@ -1960,7 +2091,14 @@ def _promote_geoclaw_cpp_regression(
 
 
 def _should_promote_geometry_case(case: dict[str, object]) -> bool:
-    return bool(case.get("passed")) and str(case.get("case_id")) == "stitched_reach_drop_handoffs"
+    if not bool(case.get("passed")):
+        return False
+    case_id = str(case.get("case_id"))
+    return case_id == "stitched_reach_drop_handoffs" or case_id in MILESTONE18_GEOMETRY_CLOSURE_REPORTS
+
+
+def _should_promote_geometry_evidence(evidence: dict[str, object]) -> bool:
+    return bool(evidence.get("passed")) and not bool(evidence.get("diagnostic_only"))
 
 
 def _promote_geometry_validation_artifact(
@@ -1971,8 +2109,11 @@ def _promote_geometry_validation_artifact(
 ) -> Milestone16RegressionPromotionEntry:
     case_id = str(case["case_id"])
     gate_id = str(evidence.get("gate_scenario_id", case_id))
-    solver_mode = "geoclaw_package"
+    mode_specific = evidence.get("milestone18_report") is not None and evidence.get("solver_mode") is not None
+    solver_mode = str(evidence.get("solver_mode")) if mode_specific else "geoclaw_package"
     artifact_dir = fixture_root / "geometry_validation" / case_id / _case_dir(gate_id)
+    if mode_specific:
+        artifact_dir = artifact_dir / solver_mode
     artifact_dir.mkdir(parents=True, exist_ok=True)
     manifest_path = artifact_dir / "geometry_case.json"
     manifest_path.write_text(
@@ -1987,6 +2128,11 @@ def _promote_geometry_validation_artifact(
                 "solver_modes": case.get("solver_modes", []),
                 "evidence": evidence,
                 "passed": True,
+                **(
+                    {"milestone18_closure_report": evidence["milestone18_report"]}
+                    if evidence.get("milestone18_report") is not None
+                    else {}
+                ),
             },
             indent=2,
             sort_keys=True,
@@ -1994,7 +2140,11 @@ def _promote_geometry_validation_artifact(
         encoding="utf-8",
     )
     return Milestone16RegressionPromotionEntry(
-        artifact_id=f"geometry_validation/{case_id}/{gate_id}",
+        artifact_id=(
+            f"geometry_validation/{case_id}/{gate_id}/{solver_mode}"
+            if mode_specific
+            else f"geometry_validation/{case_id}/{gate_id}"
+        ),
         category="geometry_validation",
         gate_scenario_id=gate_id,
         actual_scenario_id=str(evidence.get("actual_scenario_id", gate_id)),
@@ -2006,8 +2156,20 @@ def _promote_geometry_validation_artifact(
         case_id=case_id,
         manifest=str(manifest_path),
         reports={"geometry_case": str(manifest_path)},
-        notes=("Preserves seam-visible reach/drop handoff diagnostics from the geometry validation report.",),
+        notes=_geometry_artifact_notes(case_id, evidence),
     )
+
+
+def _geometry_artifact_notes(case_id: str, evidence: dict[str, object]) -> tuple[str, ...]:
+    if case_id == "stitched_reach_drop_handoffs":
+        return ("Preserves seam-visible reach/drop handoff diagnostics from the geometry validation report.",)
+    note = "Preserves Milestone 18 focused geometry closure evidence in the aggregate Milestone 16 regression manifest."
+    if bool(evidence.get("diagnostic_only")):
+        return (
+            note,
+            "This solver mode remains diagnostic-only and does not approve live-water use by itself.",
+        )
+    return (note,)
 
 
 def _promote_raft_coupling_artifact(

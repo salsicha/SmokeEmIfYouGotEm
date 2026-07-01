@@ -140,6 +140,66 @@
       "suite": "canonical"
     },
     {
+      "actual_scenario_id": "wet_dry_shoreline_seed_16",
+      "artifact_dir": "regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/finite_volume",
+      "artifact_id": "geometry_validation/wet_dry_shoreline/wet_dry_shoreline/finite_volume",
+      "case_id": "wet_dry_shoreline",
+      "category": "geometry_validation",
+      "gate_scenario_id": "wet_dry_shoreline",
+      "manifest": "regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/finite_volume/geometry_case.json",
+      "notes": [
+        "Preserves Milestone 18 focused geometry closure evidence in the aggregate Milestone 16 regression manifest."
+      ],
+      "passed": true,
+      "reports": {
+        "geometry_case": "regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/finite_volume/geometry_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/geometry_validation.json",
+      "suite": "geometry"
+    },
+    {
+      "actual_scenario_id": "wet_dry_shoreline_seed_16",
+      "artifact_dir": "regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/reduced",
+      "artifact_id": "geometry_validation/wet_dry_shoreline/wet_dry_shoreline/reduced",
+      "case_id": "wet_dry_shoreline",
+      "category": "geometry_validation",
+      "gate_scenario_id": "wet_dry_shoreline",
+      "manifest": "regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/reduced/geometry_case.json",
+      "notes": [
+        "Preserves Milestone 18 focused geometry closure evidence in the aggregate Milestone 16 regression manifest."
+      ],
+      "passed": true,
+      "reports": {
+        "geometry_case": "regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/reduced/geometry_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "reduced",
+      "source_report": "reports/milestone16/geometry_validation.json",
+      "suite": "geometry"
+    },
+    {
+      "actual_scenario_id": "bed_step_seed_16",
+      "artifact_dir": "regression_fixtures/milestone16/geometry_validation/bed_step/c_step/finite_volume",
+      "artifact_id": "geometry_validation/bed_step/bed_step/finite_volume",
+      "case_id": "bed_step",
+      "category": "geometry_validation",
+      "gate_scenario_id": "bed_step",
+      "manifest": "regression_fixtures/milestone16/geometry_validation/bed_step/c_step/finite_volume/geometry_case.json",
+      "notes": [
+        "Preserves Milestone 18 focused geometry closure evidence in the aggregate Milestone 16 regression manifest."
+      ],
+      "passed": true,
+      "reports": {
+        "geometry_case": "regression_fixtures/milestone16/geometry_validation/bed_step/c_step/finite_volume/geometry_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/geometry_validation.json",
+      "suite": "geometry"
+    },
+    {
       "actual_scenario_id": "south_fork_cascading_low_runnable",
       "artifact_dir": "regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_low",
       "artifact_id": "geometry_validation/stitched_reach_drop_handoffs/south_fork_cascading_low_runnable",
@@ -420,7 +480,7 @@
       "suite": "cascading"
     }
   ],
-  "entry_count": 20,
+  "entry_count": 23,
   "geometry_validation_report": "reports/milestone16/geometry_validation.json",
   "raft_coupling_report": "reports/milestone16/raft_coupling_validation.json",
   "schema_version": "raftsim.milestone16.regression_registry.v0"

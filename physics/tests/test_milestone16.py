@@ -1,3 +1,5 @@
+import json
+
 from raftsim.milestone16 import (
     MILESTONE16_FULL_CPP_VALIDATION_GATE_REPORT_SCHEMA,
     Milestone16ComparisonRecord,
@@ -13,6 +15,7 @@ from raftsim.milestone16 import (
     Milestone16RuntimeProfileRecord,
     Milestone16RuntimeProfileReport,
     build_milestone16_full_cpp_validation_gate_report,
+    run_milestone16_geometry_validation,
     run_milestone16_regression_promotion,
 )
 from raftsim.examples.generate_milestone16_full_cpp_validation_gate import main as generate_full_gate_main
@@ -158,6 +161,92 @@ def test_milestone16_geometry_report_blocks_on_failed_case():
     assert payload["cases"][0]["case_id"] == "wet_dry_shoreline"
 
 
+def test_milestone16_geometry_validation_applies_milestone18_focused_closure(tmp_path):
+    report_root = tmp_path / "reports"
+    milestone16_dir = report_root / "milestone16"
+    milestone18_dir = report_root / "milestone18"
+    milestone16_dir.mkdir(parents=True)
+    milestone18_dir.mkdir(parents=True)
+    comparison_report = milestone16_dir / "geoclaw_cpp_comparisons.json"
+    comparison_report.write_text(
+        json.dumps(
+            {
+                "records": [
+                    {
+                        "gate_scenario_id": "wet_dry_shoreline",
+                        "solver_mode": "reduced",
+                        "threshold_passed": True,
+                        "failing_checks": [],
+                    },
+                    {
+                        "gate_scenario_id": "wet_dry_shoreline",
+                        "solver_mode": "finite_volume",
+                        "threshold_passed": False,
+                        "failing_checks": ["field_linf", "wet_mismatch_fraction"],
+                    },
+                    {
+                        "gate_scenario_id": "bed_step",
+                        "solver_mode": "reduced",
+                        "threshold_passed": False,
+                        "failing_checks": ["field_linf", "mass_drift_delta"],
+                    },
+                    {
+                        "gate_scenario_id": "bed_step",
+                        "solver_mode": "finite_volume",
+                        "threshold_passed": True,
+                        "failing_checks": [],
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    geoclaw_report = milestone16_dir / "geoclaw_reference_runs.json"
+    geoclaw_report.write_text(json.dumps({"records": []}), encoding="utf-8")
+    (milestone18_dir / "wet_dry_finite_volume_reconstruction_retune.json").write_text(
+        json.dumps(
+            {
+                "scenario_family": "wet_dry_shoreline",
+                "gate_scenario_id": "wet_dry_shoreline_seed_16",
+                "actual_scenario_id": "wet_dry_shoreline_seed_16",
+                "summary": {"promoted_modes": ["finite_volume", "reduced"], "blocked_modes": []},
+                "mode_results": [
+                    {"solver_mode": "finite_volume", "promoted": True, "failing_checks": []},
+                    {"solver_mode": "reduced", "promoted": True, "failing_checks": []},
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (milestone18_dir / "bed_step_parity_retune.json").write_text(
+        json.dumps(
+            {
+                "scenario_family": "bed_step",
+                "gate_scenario_id": "bed_step",
+                "actual_scenario_id": "bed_step_seed_16",
+                "summary": {"promoted_modes": ["finite_volume"], "blocked_modes": ["reduced"]},
+                "mode_results": [
+                    {"solver_mode": "finite_volume", "promoted": True, "failing_checks": []},
+                    {"solver_mode": "reduced", "promoted": False, "failing_checks": ["field_linf"]},
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    report = run_milestone16_geometry_validation(
+        comparison_report,
+        geoclaw_report,
+        milestone18_report_dir=milestone18_dir,
+    )
+    cases = {case.case_id: case.to_json_dict() for case in report.cases}
+
+    assert cases["wet_dry_shoreline"]["passed"] is True
+    assert cases["bed_step"]["passed"] is True
+    assert any(row["diagnostic_only"] for row in cases["bed_step"]["evidence"])
+    assert any("Supersedes stale Milestone 16 threshold blockers" in note for note in cases["wet_dry_shoreline"]["notes"])
+
+
 def test_milestone16_raft_coupling_report_blocks_on_force_delta():
     record = Milestone16RaftCouplingRecord(
         gate_scenario_id="south_fork_cascading_low_runnable",
@@ -289,6 +378,79 @@ def test_milestone16_regression_promotion_writes_fixtures_and_artifacts(tmp_path
         / "reduced"
         / "shallow_shelf_pivot_release"
         / "raft_coupling_case.json"
+    ).exists()
+
+
+def test_milestone16_regression_promotion_keeps_mode_specific_geometry_closure_artifacts(tmp_path):
+    comparison_report = tmp_path / "comparison_report.json"
+    comparison_report.write_text(json.dumps({"records": []}), encoding="utf-8")
+    raft_report = tmp_path / "raft_report.json"
+    raft_report.write_text(json.dumps({"records": []}), encoding="utf-8")
+    geometry_report = tmp_path / "geometry_report.json"
+    geometry_report.write_text(
+        json.dumps(
+            {
+                "cases": [
+                    {
+                        "case_id": "wet_dry_shoreline",
+                        "title": "Wet/Dry Shorelines",
+                        "scenarios": ["wet_dry_shoreline"],
+                        "solver_modes": ["finite_volume", "reduced"],
+                        "passed": True,
+                        "evidence": [
+                            {
+                                "gate_scenario_id": "wet_dry_shoreline",
+                                "actual_scenario_id": "wet_dry_shoreline_seed_16",
+                                "solver_mode": "finite_volume",
+                                "passed": True,
+                                "accepted_for_geometry": True,
+                                "milestone18_report": "reports/milestone18/wet_dry.json",
+                            },
+                            {
+                                "gate_scenario_id": "wet_dry_shoreline",
+                                "actual_scenario_id": "wet_dry_shoreline_seed_16",
+                                "solver_mode": "reduced",
+                                "passed": True,
+                                "accepted_for_geometry": True,
+                                "milestone18_report": "reports/milestone18/wet_dry.json",
+                            },
+                        ],
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    report = run_milestone16_regression_promotion(
+        comparison_report,
+        raft_report,
+        geometry_report=geometry_report,
+        fixture_root=tmp_path / "fixtures",
+    )
+    artifact_ids = [entry.artifact_id for entry in report.entries]
+
+    assert artifact_ids == [
+        "geometry_validation/wet_dry_shoreline/wet_dry_shoreline/finite_volume",
+        "geometry_validation/wet_dry_shoreline/wet_dry_shoreline/reduced",
+    ]
+    assert (
+        tmp_path
+        / "fixtures"
+        / "geometry_validation"
+        / "wet_dry_shoreline"
+        / "c_wetdry"
+        / "finite_volume"
+        / "geometry_case.json"
+    ).exists()
+    assert (
+        tmp_path
+        / "fixtures"
+        / "geometry_validation"
+        / "wet_dry_shoreline"
+        / "c_wetdry"
+        / "reduced"
+        / "geometry_case.json"
     ).exists()
 
 

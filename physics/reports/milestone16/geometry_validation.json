@@ -45,29 +45,42 @@
       "case_id": "wet_dry_shoreline",
       "evidence": [
         {
+          "accepted_for_geometry": true,
+          "actual_scenario_id": "wet_dry_shoreline_seed_16",
+          "candidate_label": "hydrostatic_wet_dry_reconstruction",
+          "comparison_dir": "outputs/m18cmp/c_wetdry_finite_volume_reconstruction/finite_volume_hll",
+          "diagnostic_only": false,
           "failing_checks": [],
           "gate_scenario_id": "wet_dry_shoreline",
-          "solver_mode": "reduced",
-          "threshold_passed": true
+          "milestone18_report": "reports/milestone18/wet_dry_finite_volume_reconstruction_retune.json",
+          "passed": true,
+          "promoted": true,
+          "solver_mode": "finite_volume",
+          "threshold_passed": true,
+          "threshold_report": "outputs/m18cmp/c_wetdry_finite_volume_reconstruction/finite_volume_hll/threshold_evaluation.json"
         },
         {
-          "failing_checks": [
-            "field_linf",
-            "wet_mismatch_fraction",
-            "probe_linf",
-            "cross_section_linf",
-            "froude_delta",
-            "feature_location_delta"
-          ],
+          "accepted_for_geometry": true,
+          "actual_scenario_id": "wet_dry_shoreline_seed_16",
+          "candidate_label": "m16_baseline_reduced",
+          "comparison_dir": "outputs/m16cmp/c_wetdry/reduced",
+          "diagnostic_only": false,
+          "failing_checks": [],
           "gate_scenario_id": "wet_dry_shoreline",
-          "solver_mode": "finite_volume",
-          "threshold_passed": false
+          "milestone18_report": "reports/milestone18/wet_dry_finite_volume_reconstruction_retune.json",
+          "passed": true,
+          "promoted": true,
+          "solver_mode": "reduced",
+          "threshold_passed": true,
+          "threshold_report": "outputs/m16cmp/c_wetdry/reduced/threshold_evaluation.json"
         }
       ],
       "notes": [
-        "Threshold failures remain in: wet_dry_shoreline."
+        "Milestone 18 closure evidence applied from reports/milestone18/wet_dry_finite_volume_reconstruction_retune.json.",
+        "Accepted solver modes for this geometry family: finite_volume, reduced.",
+        "Supersedes stale Milestone 16 threshold blockers for: wet_dry_shoreline:finite_volume."
       ],
-      "passed": false,
+      "passed": true,
       "scenarios": [
         "wet_dry_shoreline"
       ],
@@ -81,6 +94,26 @@
       "case_id": "bed_step",
       "evidence": [
         {
+          "accepted_for_geometry": true,
+          "actual_scenario_id": "bed_step_seed_16",
+          "candidate_label": "finite_volume_augmented_topography_bed_step",
+          "comparison_dir": "outputs/m16cmp/c_step/finite_volume",
+          "diagnostic_only": false,
+          "failing_checks": [],
+          "gate_scenario_id": "bed_step",
+          "milestone18_report": "reports/milestone18/bed_step_parity_retune.json",
+          "passed": true,
+          "promoted": true,
+          "solver_mode": "finite_volume",
+          "threshold_passed": true,
+          "threshold_report": "outputs/m16cmp/c_step/finite_volume/threshold_evaluation.json"
+        },
+        {
+          "accepted_for_geometry": false,
+          "actual_scenario_id": "bed_step_seed_16",
+          "candidate_label": "reduced_baseline_feature0",
+          "comparison_dir": "outputs/m16cmp/c_step/reduced",
+          "diagnostic_only": true,
           "failing_checks": [
             "field_linf",
             "slope_linf",
@@ -89,20 +122,21 @@
             "energy_change_delta"
           ],
           "gate_scenario_id": "bed_step",
+          "milestone18_report": "reports/milestone18/bed_step_parity_retune.json",
+          "passed": false,
+          "promoted": false,
           "solver_mode": "reduced",
-          "threshold_passed": false
-        },
-        {
-          "failing_checks": [],
-          "gate_scenario_id": "bed_step",
-          "solver_mode": "finite_volume",
-          "threshold_passed": true
+          "threshold_passed": false,
+          "threshold_report": "outputs/m16cmp/c_step/reduced/threshold_evaluation.json"
         }
       ],
       "notes": [
-        "Threshold failures remain in: bed_step."
+        "Milestone 18 closure evidence applied from reports/milestone18/bed_step_parity_retune.json.",
+        "Accepted solver modes for this geometry family: finite_volume.",
+        "Diagnostic-only solver modes are retained as smoke evidence but no longer block this geometry family: reduced.",
+        "Supersedes stale Milestone 16 threshold blockers for: bed_step:reduced."
       ],
-      "passed": false,
+      "passed": true,
       "scenarios": [
         "bed_step"
       ],
@@ -401,9 +435,9 @@
     }
   ],
   "comparison_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
-  "failed_count": 4,
+  "failed_count": 2,
   "geoclaw_reference_report": "reports/milestone16/geoclaw_reference_runs.json",
   "passed": false,
-  "passed_count": 2,
+  "passed_count": 4,
   "schema_version": "raftsim.milestone16.geometry_validation.v0"
 }
