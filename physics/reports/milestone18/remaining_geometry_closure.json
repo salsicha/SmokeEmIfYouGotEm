@@ -82,6 +82,32 @@
             "worst_samples_count": 12,
             "x_momentum_sign_mismatch_count": 11
           }
+        },
+        {
+          "blocked_reasons": [
+            "Native C++ constriction y-face flux signs still disagree with GeoClaw after current source handling.",
+            "Hydrostatic y-face source treatment is absent for the audited constriction faces.",
+            "The next change must not be promoted until full geometry checks pass or improve without hiding conservation failures."
+          ],
+          "decision": "TEST_REQUIRED",
+          "next_levers": [
+            "Implement a fixture-scoped constriction y-face hydrostatic/source-splitting experiment at the audited `upper_edge_face` column 6 rows 8-9 target first.",
+            "Apply the treatment inside the finite-volume face/source update, not as final velocity/depth transport or gameplay forcing.",
+            "Promote only if the face/source report, throat/shape/timing diagnostics, Milestone 17 guardrail, and threshold report all support the change.",
+            "If the split worsens field, slope, wet-mask, probe, cross-section, Froude, mass, or energy checks, reject it and move to geometry width/depth mapping."
+          ],
+          "passed": false,
+          "schema_version": "raftsim.milestone18.constriction_hydrostatic_source_decision.v0",
+          "source_report": "reports/milestone18/constriction_hydrostatic_source_decision.json",
+          "summary": {
+            "cpp_internal_audit_sample_count": 96,
+            "cpp_internal_hydrostatic_face_source_enabled_count": 0,
+            "cpp_internal_max_abs_post_source_delta_m3ps": 5.056101953096378,
+            "cpp_internal_post_source_sign_mismatch_count": 65,
+            "cpp_internal_source_applied_count": 16,
+            "source_audit_decision": "BLOCKED",
+            "target_post_source_delta_m3ps": 2.613404403269023
+          }
         }
       ],
       "next_levers": [
@@ -92,8 +118,11 @@
         "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
         "Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.",
         "Use the exported C++ internal audit at `upper_edge_face` column 6 rows 8-9; post-source q delta is 2.6134 m3/s.",
-        "Decide whether constriction y-faces need hydrostatic reconstruction/source splitting instead of relying on cell-centered bed-slope source terms.",
         "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible.",
+        "Implement a fixture-scoped constriction y-face hydrostatic/source-splitting experiment at the audited `upper_edge_face` column 6 rows 8-9 target first.",
+        "Apply the treatment inside the finite-volume face/source update, not as final velocity/depth transport or gameplay forcing.",
+        "Promote only if the face/source report, throat/shape/timing diagnostics, Milestone 17 guardrail, and threshold report all support the change.",
+        "If the split worsens field, slope, wet-mask, probe, cross-section, Froude, mass, or energy checks, reject it and move to geometry width/depth mapping.",
         "Close constriction field, slope, probe, cross-section, and wet-mask parity before treating raft coupling as actionable.",
         "Preserve or restore conservation and energy checks before accepting any visual/gameplay forcing."
       ],
@@ -291,6 +320,7 @@
   "focused_report_paths": [
     "reports/milestone18/constriction_lateral_face_flux_diagnostic.json",
     "reports/milestone18/constriction_face_source_audit_diagnostic.json",
+    "reports/milestone18/constriction_hydrostatic_source_decision.json",
     "reports/milestone18/drop_ledge_hydraulic_control_diagnostic.json"
   ],
   "geometry_report": "reports/milestone16/geometry_validation.json",

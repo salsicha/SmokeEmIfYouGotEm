@@ -5,7 +5,7 @@ Schema: `raftsim.milestone18.remaining_geometry_closure.v0`
 Decision: **BLOCKED**
 
 Geometry report: `reports/milestone16/geometry_validation.json`
-Focused reports: `reports/milestone18/constriction_lateral_face_flux_diagnostic.json, reports/milestone18/constriction_face_source_audit_diagnostic.json, reports/milestone18/drop_ledge_hydraulic_control_diagnostic.json`
+Focused reports: `reports/milestone18/constriction_lateral_face_flux_diagnostic.json, reports/milestone18/constriction_face_source_audit_diagnostic.json, reports/milestone18/constriction_hydrostatic_source_decision.json, reports/milestone18/drop_ledge_hydraulic_control_diagnostic.json`
 
 ## Summary
 
@@ -17,7 +17,7 @@ Focused reports: `reports/milestone18/constriction_lateral_face_flux_diagnostic.
 
 | Priority | Case | Status | Failing checks | Focused evidence | Next lever |
 | ---: | --- | --- | --- | --- | --- |
-| 1 | `constriction` | BLOCKED | cross_section_linf=2, energy_change_delta=1, feature_location_delta=2, feature_strength_delta=2, field_linf=2, froude_delta=2, mass_drift_delta=1, probe_linf=2, slope_linf=2, wet_mismatch_fraction=1 | reports/milestone18/constriction_lateral_face_flux_diagnostic.json, reports/milestone18/constriction_face_source_audit_diagnostic.json | Start with `upper_edge_face` column 6 rows 8-9; the GeoClaw/C++ lateral flux proxy differs by 2.72825 m3/s. |
+| 1 | `constriction` | BLOCKED | cross_section_linf=2, energy_change_delta=1, feature_location_delta=2, feature_strength_delta=2, field_linf=2, froude_delta=2, mass_drift_delta=1, probe_linf=2, slope_linf=2, wet_mismatch_fraction=1 | reports/milestone18/constriction_lateral_face_flux_diagnostic.json, reports/milestone18/constriction_face_source_audit_diagnostic.json, reports/milestone18/constriction_hydrostatic_source_decision.json | Start with `upper_edge_face` column 6 rows 8-9; the GeoClaw/C++ lateral flux proxy differs by 2.72825 m3/s. |
 | 2 | `drops_ledges_tailwater` | BLOCKED | cross_section_linf=7, energy_change_delta=7, feature_location_delta=6, feature_strength_delta=6, field_linf=8, froude_delta=8, mass_drift_delta=4, probe_linf=8, slope_linf=8, wet_mismatch_fraction=3 | reports/milestone18/drop_ledge_hydraulic_control_diagnostic.json | Start with `field`/`u` at `final` cell 0,10; it is 3.32137x the diagnostic threshold. |
 | 3 | `stitched_reach_drop_handoffs` | PASS | none | none | Preserve this geometry family as a guardrail while retuning active blockers. |
 | 10 | `wet_dry_shoreline` | PASS | none | none | Preserve this geometry family as a guardrail while retuning active blockers. |
@@ -41,8 +41,11 @@ Next levers:
 - Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.
 - Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.
 - Use the exported C++ internal audit at `upper_edge_face` column 6 rows 8-9; post-source q delta is 2.6134 m3/s.
-- Decide whether constriction y-faces need hydrostatic reconstruction/source splitting instead of relying on cell-centered bed-slope source terms.
 - Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible.
+- Implement a fixture-scoped constriction y-face hydrostatic/source-splitting experiment at the audited `upper_edge_face` column 6 rows 8-9 target first.
+- Apply the treatment inside the finite-volume face/source update, not as final velocity/depth transport or gameplay forcing.
+- Promote only if the face/source report, throat/shape/timing diagnostics, Milestone 17 guardrail, and threshold report all support the change.
+- If the split worsens field, slope, wet-mask, probe, cross-section, Froude, mass, or energy checks, reject it and move to geometry width/depth mapping.
 - Close constriction field, slope, probe, cross-section, and wet-mask parity before treating raft coupling as actionable.
 - Preserve or restore conservation and energy checks before accepting any visual/gameplay forcing.
 
