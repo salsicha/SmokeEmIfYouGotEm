@@ -14,6 +14,9 @@ from raftsim.examples.generate_milestone18_constriction_lateral_face_flux_report
 from raftsim.examples.generate_milestone18_constriction_face_source_audit_report import (
     main as generate_constriction_face_source_audit_main,
 )
+from raftsim.examples.generate_milestone18_constriction_face_state_width_depth_report import (
+    main as generate_constriction_face_state_width_depth_main,
+)
 from raftsim.examples.generate_milestone18_constriction_hydrostatic_source_decision_report import (
     main as generate_constriction_hydrostatic_source_decision_main,
 )
@@ -42,6 +45,7 @@ from raftsim.examples.run_milestone18_analytic_retune_guardrail import main as g
 from raftsim.milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA,
+    MILESTONE18_CONSTRICTION_FACE_STATE_WIDTH_DEPTH_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_HYDROSTATIC_SOURCE_DECISION_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA,
@@ -55,6 +59,7 @@ from raftsim.milestone18 import (
     MILESTONE18_PIN_RELEASE_REPORT_SCHEMA,
     MILESTONE18_REMAINING_GEOMETRY_CLOSURE_REPORT_SCHEMA,
     build_milestone18_constriction_face_source_audit_report,
+    build_milestone18_constriction_face_state_width_depth_report,
     build_milestone18_constriction_hydrostatic_source_decision_report,
     build_milestone18_constriction_lateral_face_flux_report,
     build_milestone18_constriction_mask_alignment_report,
@@ -977,6 +982,51 @@ def test_generate_milestone18_constriction_face_source_audit_cli_writes_reports(
     assert payload["schema_version"] == MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA
     assert payload["decision"] == "BLOCKED"
     assert "Constriction Face/Source Audit" in output_md.read_text(encoding="utf-8")
+
+
+def test_milestone18_constriction_face_state_width_depth_report_separates_geometry_from_face_state(tmp_path):
+    dual_manifest = _constriction_lateral_face_flux_inputs(tmp_path)
+
+    report = build_milestone18_constriction_face_state_width_depth_report(dual_manifest)
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_FACE_STATE_WIDTH_DEPTH_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert payload["summary"]["face_state_blocker_count"] >= 1
+    assert payload["summary"]["face_sign_mismatch_count"] >= 1
+    assert payload["summary"]["edge_opposition_mismatch_count"] >= 1
+    assert payload["summary"]["width_mapping_blocker_count"] == 0
+    assert payload["summary"]["bank_alignment_blocker_count"] == 0
+    assert "geometry_aware_face_state_reconstruction" in payload["summary"]["recommended_levers"]
+    worst = payload["summary"]["worst_face_state_samples"][0]
+    assert worst["face_role"] == "lower_edge_face"
+    assert worst["reference_volume_sign"] == 1
+    assert worst["candidate_volume_sign"] == -1
+    assert worst["recommended_solver_lever"] == "geometry_aware_face_state_reconstruction"
+    assert "source split alone" in " ".join(payload["next_levers"])
+
+
+def test_generate_milestone18_constriction_face_state_width_depth_cli_writes_reports(tmp_path):
+    dual_manifest = _constriction_lateral_face_flux_inputs(tmp_path)
+    output_json = tmp_path / "reports" / "milestone18" / "constriction_face_state_width_depth.json"
+    output_md = tmp_path / "reports" / "milestone18" / "constriction_face_state_width_depth.md"
+
+    exit_code = generate_constriction_face_state_width_depth_main(
+        [
+            "--dual-solver-manifest",
+            str(dual_manifest),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_FACE_STATE_WIDTH_DEPTH_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert "Face-State Width/Depth Diagnostic" in output_md.read_text(encoding="utf-8")
 
 
 def test_milestone18_constriction_hydrostatic_source_decision_records_next_experiment(tmp_path):

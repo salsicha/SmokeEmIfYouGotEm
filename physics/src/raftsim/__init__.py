@@ -56,6 +56,7 @@ from .milestone16 import (
 from .milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA,
+    MILESTONE18_CONSTRICTION_FACE_STATE_WIDTH_DEPTH_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_HYDROSTATIC_SOURCE_DECISION_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA,
@@ -73,6 +74,7 @@ from .milestone18 import (
     Milestone18ConstrictionColumnProfile,
     Milestone18ConstrictionFaceSourceAuditReport,
     Milestone18ConstrictionFaceSourceAuditSample,
+    Milestone18ConstrictionFaceStateWidthDepthReport,
     Milestone18ConstrictionHydrostaticSourceDecisionReport,
     Milestone18ConstrictionLateralFaceFluxReport,
     Milestone18ConstrictionLateralFaceFluxSample,
@@ -92,6 +94,7 @@ from .milestone18 import (
     Milestone18RemainingGeometryClosureCase,
     Milestone18RemainingGeometryClosureReport,
     build_milestone18_constriction_face_source_audit_report,
+    build_milestone18_constriction_face_state_width_depth_report,
     build_milestone18_constriction_hydrostatic_source_decision_report,
     build_milestone18_constriction_lateral_face_flux_report,
     build_milestone18_constriction_mask_alignment_report,

@@ -48,6 +48,9 @@ MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA = (
 MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA = (
     "raftsim.milestone18.constriction_face_source_audit.v0"
 )
+MILESTONE18_CONSTRICTION_FACE_STATE_WIDTH_DEPTH_REPORT_SCHEMA = (
+    "raftsim.milestone18.constriction_face_state_width_depth.v0"
+)
 MILESTONE18_CONSTRICTION_HYDROSTATIC_SOURCE_DECISION_REPORT_SCHEMA = (
     "raftsim.milestone18.constriction_hydrostatic_source_decision.v0"
 )
@@ -2258,6 +2261,219 @@ class Milestone18ConstrictionFaceSourceAuditReport:
 
 
 @dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionFaceStateWidthDepthReport:
+    """Diagnostic report deciding between constriction face-state and width/depth fixes."""
+
+    dual_solver_manifest: str
+    scenario_package: str
+    scenario_id: str
+    feature: dict[str, object]
+    grid: dict[str, object]
+    diagnostic_scope: str
+    wet_depth_threshold_m: float
+    velocity_sign_floor_mps: float
+    flux_delta_threshold_m3ps: float
+    depth_delta_threshold_m: float
+    wet_width_delta_threshold_cells: int
+    bank_row_delta_threshold_cells: int
+    zones: dict[str, tuple[int, ...]]
+    column_profiles: tuple[dict[str, object], ...]
+    face_state_samples: tuple[dict[str, object], ...]
+    edge_pair_summary: tuple[dict[str, object], ...]
+    blocked_reasons: tuple[str, ...]
+    next_levers: tuple[str, ...]
+
+    @property
+    def passed(self) -> bool:
+        return not self.blocked_reasons
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_CONSTRICTION_FACE_STATE_WIDTH_DEPTH_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "dual_solver_manifest": self.dual_solver_manifest,
+            "scenario_package": self.scenario_package,
+            "scenario_id": self.scenario_id,
+            "feature": self.feature,
+            "grid": self.grid,
+            "diagnostic_scope": self.diagnostic_scope,
+            "wet_depth_threshold_m": self.wet_depth_threshold_m,
+            "velocity_sign_floor_mps": self.velocity_sign_floor_mps,
+            "flux_delta_threshold_m3ps": self.flux_delta_threshold_m3ps,
+            "depth_delta_threshold_m": self.depth_delta_threshold_m,
+            "wet_width_delta_threshold_cells": self.wet_width_delta_threshold_cells,
+            "bank_row_delta_threshold_cells": self.bank_row_delta_threshold_cells,
+            "zones": {zone_id: list(columns) for zone_id, columns in self.zones.items()},
+            "summary": {
+                "column_profile_count": len(self.column_profiles),
+                "face_state_sample_count": len(self.face_state_samples),
+                "face_state_blocker_count": sum(
+                    1 for sample in self.face_state_samples if bool(sample.get("face_state_blocked"))
+                ),
+                "face_sign_mismatch_count": sum(
+                    1 for sample in self.face_state_samples if not bool(sample.get("volume_sign_matches", True))
+                ),
+                "width_mapping_blocker_count": sum(
+                    1 for profile in self.column_profiles if bool(profile.get("width_mapping_blocked"))
+                ),
+                "bank_alignment_blocker_count": sum(
+                    1 for profile in self.column_profiles if bool(profile.get("bank_alignment_blocked"))
+                ),
+                "depth_mapping_blocker_count": sum(
+                    1 for profile in self.column_profiles if bool(profile.get("depth_mapping_blocked"))
+                ),
+                "edge_opposition_mismatch_count": sum(
+                    1 for pair in self.edge_pair_summary if not bool(pair.get("matches_reference_opposition", True))
+                ),
+                "max_abs_volume_flux_delta_m3ps": max(
+                    (
+                        abs(float(sample.get("volume_flux_delta_m3ps", 0.0) or 0.0))
+                        for sample in self.face_state_samples
+                    ),
+                    default=0.0,
+                ),
+                "max_abs_face_mean_depth_delta_m": max(
+                    (
+                        abs(float(sample.get("mean_depth_delta_m", 0.0) or 0.0))
+                        for sample in self.face_state_samples
+                    ),
+                    default=0.0,
+                ),
+                "max_abs_wet_width_delta_cells": max(
+                    (
+                        abs(int(delta))
+                        for delta in (
+                            _nested_value(profile, "cpp_minus_geoclaw", "wet_width_delta_cells")
+                            for profile in self.column_profiles
+                        )
+                        if delta is not None
+                    ),
+                    default=0,
+                ),
+                "max_abs_bank_row_delta_cells": max(
+                    (
+                        abs(int(delta))
+                        for delta in (
+                            _nested_value(profile, "cpp_minus_geoclaw", "max_abs_bank_row_delta_cells")
+                            for profile in self.column_profiles
+                        )
+                        if delta is not None
+                    ),
+                    default=0,
+                ),
+                "recommended_levers": sorted(
+                    {
+                        str(sample.get("recommended_solver_lever"))
+                        for sample in self.face_state_samples
+                        if sample.get("recommended_solver_lever")
+                    }
+                ),
+                "worst_face_state_samples": list(self._worst_face_state_samples()),
+            },
+            "column_profiles": list(self.column_profiles),
+            "edge_pair_summary": list(self.edge_pair_summary),
+            "face_state_samples": list(self.face_state_samples),
+            "blocked_reasons": list(self.blocked_reasons),
+            "next_levers": list(self.next_levers),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        summary = self.to_json_dict()["summary"]
+        lines = [
+            "# Milestone 18 Constriction Face-State Width/Depth Diagnostic",
+            "",
+            f"Schema: `{MILESTONE18_CONSTRICTION_FACE_STATE_WIDTH_DEPTH_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Scenario: `{self.scenario_id}`",
+            f"Dual solver manifest: `{self.dual_solver_manifest}`",
+            f"Scenario package: `{self.scenario_package}`",
+            f"Diagnostic scope: {self.diagnostic_scope}",
+            f"Wet-depth threshold: `{self.wet_depth_threshold_m:.6g}` m",
+            f"Velocity sign floor: `{self.velocity_sign_floor_mps:.6g}` m/s",
+            f"Flux delta threshold: `{self.flux_delta_threshold_m3ps:.6g}` m3/s",
+            f"Depth delta threshold: `{self.depth_delta_threshold_m:.6g}` m",
+            f"Wet-width delta threshold: `{self.wet_width_delta_threshold_cells}` cells",
+            f"Bank-row delta threshold: `{self.bank_row_delta_threshold_cells}` cells",
+            "",
+            "## Summary",
+            "",
+            f"- Face-state blockers: `{summary['face_state_blocker_count']}`",
+            f"- Face sign mismatches: `{summary['face_sign_mismatch_count']}`",
+            f"- Width mapping blockers: `{summary['width_mapping_blocker_count']}`",
+            f"- Bank alignment blockers: `{summary['bank_alignment_blocker_count']}`",
+            f"- Depth mapping blockers: `{summary['depth_mapping_blocker_count']}`",
+            f"- Edge opposition mismatches: `{summary['edge_opposition_mismatch_count']}`",
+            f"- Max abs volume-flux delta: `{_format_number(_float_or_none(summary['max_abs_volume_flux_delta_m3ps']))}` m3/s",
+            f"- Max abs face mean-depth delta: `{_format_number(_float_or_none(summary['max_abs_face_mean_depth_delta_m']))}` m",
+            f"- Max abs wet-width delta: `{summary['max_abs_wet_width_delta_cells']}` cells",
+            f"- Max abs bank-row delta: `{summary['max_abs_bank_row_delta_cells']}` cells",
+            f"- Recommended levers: `{summary['recommended_levers']}`",
+            "",
+            "## Worst Face-State Samples",
+            "",
+            "| Face | Column | Rows | Zone | GeoClaw h/v/q/sign | C++ h/v/q/sign | q delta | Depth delta | Width/bank deltas | Blockers | Lever |",
+            "| --- | ---: | --- | --- | --- | --- | ---: | ---: | --- | --- | --- |",
+        ]
+        for sample in self._worst_face_state_samples():
+            lines.append(_face_state_width_depth_sample_row(sample))
+        lines.extend(
+            [
+                "",
+                "## Column Profiles",
+                "",
+                "| Column | Zone | Authored width/banks/depth | GeoClaw width/banks/depth | C++ width/banks/depth | C++ minus GeoClaw | Blockers |",
+                "| ---: | --- | --- | --- | --- | --- | --- |",
+            ]
+        )
+        for profile in self.column_profiles:
+            lines.append(_face_state_width_depth_column_row(profile))
+        lines.extend(
+            [
+                "",
+                "## Edge Pair Summary",
+                "",
+                "| Column | Lower signs | Upper signs | GeoClaw opposed | C++ opposed | Match |",
+                "| ---: | --- | --- | --- | --- | --- |",
+            ]
+        )
+        for pair in self.edge_pair_summary:
+            lines.append(_face_state_width_depth_pair_row(pair))
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.next_levers:
+            lines.extend(["", "## Next Levers", ""])
+            lines.extend(f"- {lever}" for lever in self.next_levers)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+    def _worst_face_state_samples(self) -> tuple[dict[str, object], ...]:
+        return tuple(
+            sorted(
+                self.face_state_samples,
+                key=lambda sample: (
+                    bool(sample.get("face_state_blocked")),
+                    not bool(sample.get("volume_sign_matches", True)),
+                    abs(float(sample.get("volume_flux_delta_m3ps", 0.0) or 0.0)),
+                    abs(float(sample.get("mean_depth_delta_m", 0.0) or 0.0)),
+                ),
+                reverse=True,
+            )[:12]
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class Milestone18ConstrictionHydrostaticSourceDecisionReport:
     """Decision record for the next constriction y-face source-treatment experiment."""
 
@@ -3227,6 +3443,106 @@ def build_milestone18_constriction_face_source_audit_report(
         samples=sorted_samples,
         edge_pair_summary=edge_pair_summary,
         cpp_internal_audit=cpp_internal_audit,
+        blocked_reasons=blocked_reasons,
+        next_levers=next_levers,
+    )
+
+
+def build_milestone18_constriction_face_state_width_depth_report(
+    dual_solver_manifest: str | Path,
+    *,
+    wet_depth_threshold_m: float = 0.15,
+    velocity_sign_floor_mps: float = 0.05,
+    flux_delta_threshold_m3ps: float = 0.25,
+    depth_delta_threshold_m: float = 0.25,
+    wet_width_delta_threshold_cells: int = 1,
+    bank_row_delta_threshold_cells: int = 1,
+) -> Milestone18ConstrictionFaceStateWidthDepthReport:
+    """Decide whether the constriction blocker is face-state reconstruction, width/depth mapping, or both."""
+
+    manifest_path = Path(dual_solver_manifest)
+    manifest = _load_json_report(manifest_path)
+    comparison_dir = manifest_path.parent
+    scenario_package = _resolve_path(str(manifest.get("scenario_package", "")), comparison_dir)
+    scenario = _load_json_report(scenario_package / "scenario.json")
+    features = _load_json_report(scenario_package / "features.json")
+    constriction = _constriction_feature(features)
+    grid = _scenario_grid(scenario)
+    ny = int(grid["ny"])
+    nx = int(grid["nx"])
+
+    initial_state_path = _scenario_array_path(scenario_package, scenario, "initial_state", "initial_state.npz")
+    initial_state = _load_npz_water_state(initial_state_path, h_key="depth")
+    zones = _constriction_response_zones(initial_state, grid, constriction, wet_depth_threshold_m)
+
+    geoclaw_manifest_ref = _manifest_nested_string(manifest, "geoclaw", "manifest")
+    cpp_manifest_ref = _manifest_nested_string(manifest, "cpp", "manifest")
+    geoclaw_manifest_path = _resolve_path(geoclaw_manifest_ref, comparison_dir)
+    cpp_manifest_path = _resolve_path(cpp_manifest_ref, comparison_dir)
+    geoclaw_manifest = _load_json_report(geoclaw_manifest_path)
+    cpp_manifest = _load_json_report(cpp_manifest_path)
+    geoclaw_frame_path = _final_frame_path(geoclaw_manifest, geoclaw_manifest_path.parent)
+    cpp_frame_path = _final_frame_path(cpp_manifest, cpp_manifest_path.parent)
+    geoclaw_state = _load_water_frame_fields(geoclaw_frame_path, ny, nx)
+    cpp_state = _load_water_frame_fields(cpp_frame_path, ny, nx)
+
+    column_profiles = _constriction_face_state_width_depth_column_profiles(
+        initial_state,
+        geoclaw_state,
+        cpp_state,
+        grid,
+        zones,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        depth_delta_threshold_m=depth_delta_threshold_m,
+        wet_width_delta_threshold_cells=wet_width_delta_threshold_cells,
+        bank_row_delta_threshold_cells=bank_row_delta_threshold_cells,
+    )
+    lateral_samples = _constriction_upstream_lateral_face_samples(
+        initial_state,
+        geoclaw_state,
+        cpp_state,
+        grid,
+        zones,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        velocity_sign_floor_mps=velocity_sign_floor_mps,
+        flux_delta_threshold_m3ps=flux_delta_threshold_m3ps,
+    )
+    face_state_samples = _constriction_face_state_width_depth_samples(
+        lateral_samples,
+        column_profiles,
+        depth_delta_threshold_m=depth_delta_threshold_m,
+    )
+    edge_pair_summary = _constriction_face_state_width_depth_edge_pair_summary(face_state_samples)
+    blocked_reasons = _face_state_width_depth_blocked_reasons(
+        column_profiles,
+        face_state_samples,
+        edge_pair_summary,
+    )
+    next_levers = _face_state_width_depth_next_levers(
+        column_profiles,
+        face_state_samples,
+        edge_pair_summary,
+    )
+    return Milestone18ConstrictionFaceStateWidthDepthReport(
+        dual_solver_manifest=str(manifest_path),
+        scenario_package=str(scenario_package),
+        scenario_id=str(manifest.get("scenario_id") or scenario.get("metadata", {}).get("scenario_id") or "unknown"),
+        feature=constriction,
+        grid=grid,
+        diagnostic_scope=(
+            "Compares authored, GeoClaw final, and C++ final wet-band columns while checking "
+            "GeoClaw/C++ upstream edge face states before the next constriction solver change."
+        ),
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        velocity_sign_floor_mps=velocity_sign_floor_mps,
+        flux_delta_threshold_m3ps=flux_delta_threshold_m3ps,
+        depth_delta_threshold_m=depth_delta_threshold_m,
+        wet_width_delta_threshold_cells=wet_width_delta_threshold_cells,
+        bank_row_delta_threshold_cells=bank_row_delta_threshold_cells,
+        zones=zones,
+        column_profiles=column_profiles,
+        face_state_samples=face_state_samples,
+        edge_pair_summary=edge_pair_summary,
         blocked_reasons=blocked_reasons,
         next_levers=next_levers,
     )
@@ -6165,6 +6481,312 @@ def _threshold_checks_pass(threshold_report: dict[str, Any], names: tuple[str, .
     return not remaining
 
 
+def _nested_value(record: dict[str, object], *keys: str) -> object | None:
+    current: object = record
+    for key in keys:
+        if not isinstance(current, dict):
+            return None
+        current = current.get(key)
+    return current
+
+
+def _constriction_face_state_width_depth_column_profiles(
+    initial_state: dict[str, np.ndarray],
+    reference_state: dict[str, np.ndarray],
+    candidate_state: dict[str, np.ndarray],
+    grid: dict[str, object],
+    zones: dict[str, tuple[int, ...]],
+    *,
+    wet_depth_threshold_m: float,
+    depth_delta_threshold_m: float,
+    wet_width_delta_threshold_cells: int,
+    bank_row_delta_threshold_cells: int,
+) -> tuple[dict[str, object], ...]:
+    columns = sorted(set(zones.get("upstream_approach", ()) + zones.get("constriction_throat", ())))
+    profiles: list[dict[str, object]] = []
+    for col in columns:
+        authored = _wet_band_column_profile(initial_state, grid, col, wet_depth_threshold_m)
+        reference = _wet_band_column_profile(reference_state, grid, col, wet_depth_threshold_m)
+        candidate = _wet_band_column_profile(candidate_state, grid, col, wet_depth_threshold_m)
+        cpp_minus_geoclaw = _wet_band_profile_delta(candidate, reference)
+        authored_minus_geoclaw = _wet_band_profile_delta(authored, reference)
+        wet_width_delta = int(cpp_minus_geoclaw.get("wet_width_delta_cells") or 0)
+        bank_row_delta = int(cpp_minus_geoclaw.get("max_abs_bank_row_delta_cells") or 0)
+        mean_depth_delta = float(cpp_minus_geoclaw.get("mean_wet_depth_delta_m") or 0.0)
+        profiles.append(
+            {
+                "column_index": col,
+                "zone_id": _constriction_zone_for_column(col, zones),
+                "x_m": float(grid["origin_x"]) + col * float(grid["dx"]),
+                "authored_initial": authored,
+                "geoclaw_final": reference,
+                "cpp_final": candidate,
+                "cpp_minus_geoclaw": cpp_minus_geoclaw,
+                "authored_initial_minus_geoclaw": authored_minus_geoclaw,
+                "width_mapping_blocked": abs(wet_width_delta) > wet_width_delta_threshold_cells,
+                "bank_alignment_blocked": bank_row_delta > bank_row_delta_threshold_cells,
+                "depth_mapping_blocked": abs(mean_depth_delta) > depth_delta_threshold_m,
+            }
+        )
+    return tuple(profiles)
+
+
+def _wet_band_column_profile(
+    state: dict[str, np.ndarray],
+    grid: dict[str, object],
+    column_index: int,
+    wet_depth_threshold_m: float,
+) -> dict[str, object]:
+    h = np.asarray(state["h"])[:, column_index]
+    eta = np.asarray(state.get("eta", state["h"]))[:, column_index]
+    wet_rows = np.flatnonzero(h > wet_depth_threshold_m)
+    cell_area_m2 = float(grid["dx"]) * float(grid["dy"])
+    if wet_rows.size == 0:
+        return {
+            "wet_width_cell_count": 0,
+            "first_wet_row": None,
+            "last_wet_row": None,
+            "mean_wet_depth_m": 0.0,
+            "max_wet_depth_m": 0.0,
+            "mean_wet_eta_m": None,
+            "column_water_volume_m3": float(np.sum(h) * cell_area_m2),
+        }
+    wet_h = h[wet_rows]
+    wet_eta = eta[wet_rows]
+    return {
+        "wet_width_cell_count": int(wet_rows.size),
+        "first_wet_row": int(wet_rows[0]),
+        "last_wet_row": int(wet_rows[-1]),
+        "mean_wet_depth_m": float(np.mean(wet_h)),
+        "max_wet_depth_m": float(np.max(wet_h)),
+        "mean_wet_eta_m": float(np.mean(wet_eta)),
+        "column_water_volume_m3": float(np.sum(h) * cell_area_m2),
+    }
+
+
+def _wet_band_profile_delta(candidate: dict[str, object], reference: dict[str, object]) -> dict[str, object]:
+    first_delta = _optional_int_delta(candidate.get("first_wet_row"), reference.get("first_wet_row"))
+    last_delta = _optional_int_delta(candidate.get("last_wet_row"), reference.get("last_wet_row"))
+    bank_deltas = [abs(delta) for delta in (first_delta, last_delta) if delta is not None]
+    return {
+        "wet_width_delta_cells": int(candidate.get("wet_width_cell_count") or 0)
+        - int(reference.get("wet_width_cell_count") or 0),
+        "first_wet_row_delta_cells": first_delta,
+        "last_wet_row_delta_cells": last_delta,
+        "max_abs_bank_row_delta_cells": max(bank_deltas, default=0),
+        "mean_wet_depth_delta_m": float(candidate.get("mean_wet_depth_m") or 0.0)
+        - float(reference.get("mean_wet_depth_m") or 0.0),
+        "max_wet_depth_delta_m": float(candidate.get("max_wet_depth_m") or 0.0)
+        - float(reference.get("max_wet_depth_m") or 0.0),
+        "column_water_volume_delta_m3": float(candidate.get("column_water_volume_m3") or 0.0)
+        - float(reference.get("column_water_volume_m3") or 0.0),
+    }
+
+
+def _optional_int_delta(candidate: object, reference: object) -> int | None:
+    if candidate is None or reference is None:
+        return None
+    return int(candidate) - int(reference)
+
+
+def _constriction_face_state_width_depth_samples(
+    samples: tuple[Milestone18ConstrictionLateralFaceFluxSample, ...],
+    column_profiles: tuple[dict[str, object], ...],
+    *,
+    depth_delta_threshold_m: float,
+) -> tuple[dict[str, object], ...]:
+    profile_by_column = {int(profile["column_index"]): profile for profile in column_profiles}
+    records: list[dict[str, object]] = []
+    for sample in samples:
+        profile = profile_by_column.get(sample.column_index, {})
+        column_delta = _nested_value(profile, "cpp_minus_geoclaw") or {}
+        if not isinstance(column_delta, dict):
+            column_delta = {}
+        mean_depth_delta = sample.candidate_mean_h - sample.reference_mean_h
+        face_state_blocked = (
+            not sample.sign_matches
+            or sample.abs_flux_delta_m3ps > sample.flux_delta_threshold_m3ps
+            or abs(mean_depth_delta) > depth_delta_threshold_m
+        )
+        width_mapping_blocked = bool(profile.get("width_mapping_blocked"))
+        bank_alignment_blocked = bool(profile.get("bank_alignment_blocked"))
+        depth_mapping_blocked = bool(profile.get("depth_mapping_blocked"))
+        records.append(
+            {
+                "face_role": sample.face_role,
+                "column_index": sample.column_index,
+                "south_row_index": sample.south_row_index,
+                "north_row_index": sample.north_row_index,
+                "zone_id": profile.get("zone_id"),
+                "x_m": sample.x_m,
+                "y_face_m": sample.y_face_m,
+                "reference_mean_h": sample.reference_mean_h,
+                "candidate_mean_h": sample.candidate_mean_h,
+                "mean_depth_delta_m": mean_depth_delta,
+                "reference_mean_v": sample.reference_mean_v,
+                "candidate_mean_v": sample.candidate_mean_v,
+                "reference_volume_flux_m3ps": sample.reference_lateral_volume_flux_m3ps,
+                "candidate_volume_flux_m3ps": sample.candidate_lateral_volume_flux_m3ps,
+                "volume_flux_delta_m3ps": sample.flux_delta_m3ps,
+                "abs_volume_flux_delta_m3ps": sample.abs_flux_delta_m3ps,
+                "flux_delta_threshold_m3ps": sample.flux_delta_threshold_m3ps,
+                "reference_volume_sign": sample.reference_sign,
+                "candidate_volume_sign": sample.candidate_sign,
+                "volume_sign_matches": sample.sign_matches,
+                "wet_width_delta_cells": column_delta.get("wet_width_delta_cells"),
+                "first_wet_row_delta_cells": column_delta.get("first_wet_row_delta_cells"),
+                "last_wet_row_delta_cells": column_delta.get("last_wet_row_delta_cells"),
+                "max_abs_bank_row_delta_cells": column_delta.get("max_abs_bank_row_delta_cells"),
+                "column_mean_wet_depth_delta_m": column_delta.get("mean_wet_depth_delta_m"),
+                "face_state_blocked": face_state_blocked,
+                "width_mapping_blocked": width_mapping_blocked,
+                "bank_alignment_blocked": bank_alignment_blocked,
+                "depth_mapping_blocked": depth_mapping_blocked,
+                "recommended_solver_lever": _face_state_width_depth_solver_lever(
+                    face_state_blocked,
+                    width_mapping_blocked or bank_alignment_blocked or depth_mapping_blocked,
+                ),
+            }
+        )
+    return tuple(
+        sorted(
+            records,
+            key=lambda sample: (
+                bool(sample.get("face_state_blocked")),
+                not bool(sample.get("volume_sign_matches", True)),
+                abs(float(sample.get("volume_flux_delta_m3ps", 0.0) or 0.0)),
+            ),
+            reverse=True,
+        )
+    )
+
+
+def _face_state_width_depth_solver_lever(face_state_blocked: bool, geometry_blocked: bool) -> str:
+    if face_state_blocked and geometry_blocked:
+        return "geometry_aware_face_state_reconstruction_with_width_depth_mapping_check"
+    if face_state_blocked:
+        return "geometry_aware_face_state_reconstruction"
+    if geometry_blocked:
+        return "width_depth_mapping"
+    return "preserve_as_guardrail"
+
+
+def _constriction_face_state_width_depth_edge_pair_summary(
+    samples: tuple[dict[str, object], ...],
+) -> tuple[dict[str, object], ...]:
+    by_col: dict[int, dict[str, dict[str, object]]] = {}
+    for sample in samples:
+        by_col.setdefault(int(sample["column_index"]), {})[str(sample["face_role"])] = sample
+    pairs: list[dict[str, object]] = []
+    for col, faces in sorted(by_col.items()):
+        lower = faces.get("lower_edge_face")
+        upper = faces.get("upper_edge_face")
+        if lower is None or upper is None:
+            continue
+        lower_reference_sign = int(lower.get("reference_volume_sign") or 0)
+        upper_reference_sign = int(upper.get("reference_volume_sign") or 0)
+        lower_candidate_sign = int(lower.get("candidate_volume_sign") or 0)
+        upper_candidate_sign = int(upper.get("candidate_volume_sign") or 0)
+        reference_opposed = (
+            lower_reference_sign != 0
+            and upper_reference_sign != 0
+            and lower_reference_sign == -upper_reference_sign
+        )
+        candidate_opposed = (
+            lower_candidate_sign != 0
+            and upper_candidate_sign != 0
+            and lower_candidate_sign == -upper_candidate_sign
+        )
+        pairs.append(
+            {
+                "column_index": col,
+                "lower_reference_volume_sign": lower_reference_sign,
+                "upper_reference_volume_sign": upper_reference_sign,
+                "lower_candidate_volume_sign": lower_candidate_sign,
+                "upper_candidate_volume_sign": upper_candidate_sign,
+                "reference_opposed_edges": reference_opposed,
+                "candidate_opposed_edges": candidate_opposed,
+                "matches_reference_opposition": (not reference_opposed) or candidate_opposed,
+                "lower_abs_volume_flux_delta_m3ps": abs(float(lower.get("volume_flux_delta_m3ps", 0.0) or 0.0)),
+                "upper_abs_volume_flux_delta_m3ps": abs(float(upper.get("volume_flux_delta_m3ps", 0.0) or 0.0)),
+                "wet_width_delta_cells": _nested_value(lower, "wet_width_delta_cells"),
+                "max_abs_bank_row_delta_cells": _nested_value(lower, "max_abs_bank_row_delta_cells"),
+            }
+        )
+    return tuple(pairs)
+
+
+def _face_state_width_depth_blocked_reasons(
+    column_profiles: tuple[dict[str, object], ...],
+    face_state_samples: tuple[dict[str, object], ...],
+    edge_pair_summary: tuple[dict[str, object], ...],
+) -> tuple[str, ...]:
+    reasons: list[str] = []
+    if not face_state_samples:
+        reasons.append("No upstream edge face-state samples were available for the constriction diagnostic.")
+    if any(not bool(sample.get("volume_sign_matches", True)) for sample in face_state_samples):
+        reasons.append("C++ upstream edge face-state signs still disagree with GeoClaw.")
+    if any(
+        abs(float(sample.get("volume_flux_delta_m3ps", 0.0) or 0.0))
+        > float(sample.get("flux_delta_threshold_m3ps", 0.0) or 0.0)
+        for sample in face_state_samples
+    ):
+        reasons.append("C++ upstream edge face-state volume-flux deltas exceed the diagnostic threshold.")
+    if any(not bool(pair.get("matches_reference_opposition", True)) for pair in edge_pair_summary):
+        reasons.append("GeoClaw lower/upper edge opposition is still missing from the C++ face states.")
+    if any(bool(profile.get("width_mapping_blocked")) for profile in column_profiles):
+        reasons.append("C++ constriction wet-band width still differs from GeoClaw beyond the mapping threshold.")
+    if any(bool(profile.get("bank_alignment_blocked")) for profile in column_profiles):
+        reasons.append("C++ constriction bank row placement still differs from GeoClaw beyond the mapping threshold.")
+    if any(bool(profile.get("depth_mapping_blocked")) for profile in column_profiles):
+        reasons.append("C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold.")
+    return tuple(reasons)
+
+
+def _face_state_width_depth_next_levers(
+    column_profiles: tuple[dict[str, object], ...],
+    face_state_samples: tuple[dict[str, object], ...],
+    edge_pair_summary: tuple[dict[str, object], ...],
+) -> tuple[str, ...]:
+    if not face_state_samples:
+        return ("Regenerate the constriction comparison with upstream wet-band edge samples before changing the solver.",)
+    worst = face_state_samples[0]
+    wet_width_delta = _format_number(_float_or_none(worst.get("wet_width_delta_cells")))
+    bank_delta = _format_number(_float_or_none(worst.get("max_abs_bank_row_delta_cells")))
+    levers = [
+        (
+            f"Start with `{worst.get('face_role')}` column {worst.get('column_index')} rows "
+            f"{worst.get('south_row_index')}-{worst.get('north_row_index')}; q delta is "
+            f"{_format_number(_float_or_none(worst.get('volume_flux_delta_m3ps')))} m3/s, face mean-depth delta is "
+            f"{_format_number(_float_or_none(worst.get('mean_depth_delta_m')))} m, wet-width delta is "
+            f"{wet_width_delta} cells, and max bank-row delta is {bank_delta} cells."
+        )
+    ]
+    has_face_state_blocker = any(bool(sample.get("face_state_blocked")) for sample in face_state_samples)
+    has_geometry_blocker = any(
+        bool(profile.get("width_mapping_blocked"))
+        or bool(profile.get("bank_alignment_blocked"))
+        or bool(profile.get("depth_mapping_blocked"))
+        for profile in column_profiles
+    )
+    if has_face_state_blocker:
+        levers.append(
+            "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs."
+        )
+    if has_geometry_blocker:
+        levers.append(
+            "Use the authored initial -> GeoClaw final -> C++ final column profiles to retune constriction width/depth mapping before accepting any face-state change."
+        )
+    if any(not bool(pair.get("matches_reference_opposition", True)) for pair in edge_pair_summary):
+        levers.append(
+            "Preserve GeoClaw's lower/upper edge opposition in the upstream wet band; a single-sign lateral state remains a blocker."
+        )
+    levers.append(
+        "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
+    )
+    return tuple(dict.fromkeys(levers))
+
+
 def _constriction_upstream_lateral_face_samples(
     initial_state: dict[str, np.ndarray],
     reference_state: dict[str, np.ndarray],
@@ -7077,6 +7699,101 @@ def _cpp_internal_face_audit_row(sample: dict[str, object]) -> str:
         f"`{bool(sample.get('constriction_hydrostatic_source_split_applied'))}` | "
         f"`{bool(sample.get('hydrostatic_face_source_enabled'))}` | "
         f"`{cell_sources}` |"
+    )
+
+
+def _face_state_width_depth_sample_row(sample: dict[str, object]) -> str:
+    rows = f"{sample.get('south_row_index')}-{sample.get('north_row_index')}"
+    reference_state = (
+        f"{_format_number(_float_or_none(sample.get('reference_mean_h')))}/"
+        f"{_format_number(_float_or_none(sample.get('reference_mean_v')))}/"
+        f"{_format_number(_float_or_none(sample.get('reference_volume_flux_m3ps')))}/"
+        f"{sample.get('reference_volume_sign')}"
+    )
+    candidate_state = (
+        f"{_format_number(_float_or_none(sample.get('candidate_mean_h')))}/"
+        f"{_format_number(_float_or_none(sample.get('candidate_mean_v')))}/"
+        f"{_format_number(_float_or_none(sample.get('candidate_volume_flux_m3ps')))}/"
+        f"{sample.get('candidate_volume_sign')}"
+    )
+    width_bank = (
+        f"{_format_number(_float_or_none(sample.get('wet_width_delta_cells')))}/"
+        f"{_format_number(_float_or_none(sample.get('first_wet_row_delta_cells')))}/"
+        f"{_format_number(_float_or_none(sample.get('last_wet_row_delta_cells')))}"
+    )
+    blockers = (
+        f"face={bool(sample.get('face_state_blocked'))}, "
+        f"width={bool(sample.get('width_mapping_blocked'))}, "
+        f"bank={bool(sample.get('bank_alignment_blocked'))}, "
+        f"depth={bool(sample.get('depth_mapping_blocked'))}"
+    )
+    return (
+        "| "
+        f"`{sample.get('face_role')}` | "
+        f"{sample.get('column_index')} | "
+        f"`{rows}` | "
+        f"`{sample.get('zone_id') or 'n/a'}` | "
+        f"`{reference_state}` | "
+        f"`{candidate_state}` | "
+        f"{_format_number(_float_or_none(sample.get('volume_flux_delta_m3ps')))} | "
+        f"{_format_number(_float_or_none(sample.get('mean_depth_delta_m')))} | "
+        f"`{width_bank}` | "
+        f"`{blockers}` | "
+        f"`{sample.get('recommended_solver_lever')}` |"
+    )
+
+
+def _face_state_width_depth_column_row(profile: dict[str, object]) -> str:
+    authored = _wet_band_profile_markdown(profile.get("authored_initial"))
+    reference = _wet_band_profile_markdown(profile.get("geoclaw_final"))
+    candidate = _wet_band_profile_markdown(profile.get("cpp_final"))
+    delta = profile.get("cpp_minus_geoclaw")
+    delta_state = "n/a"
+    if isinstance(delta, dict):
+        delta_state = (
+            f"{_format_number(_float_or_none(delta.get('wet_width_delta_cells')))}/"
+            f"{_format_number(_float_or_none(delta.get('first_wet_row_delta_cells')))}/"
+            f"{_format_number(_float_or_none(delta.get('last_wet_row_delta_cells')))}/"
+            f"{_format_number(_float_or_none(delta.get('mean_wet_depth_delta_m')))}"
+        )
+    blockers = (
+        f"width={bool(profile.get('width_mapping_blocked'))}, "
+        f"bank={bool(profile.get('bank_alignment_blocked'))}, "
+        f"depth={bool(profile.get('depth_mapping_blocked'))}"
+    )
+    return (
+        "| "
+        f"{profile.get('column_index')} | "
+        f"`{profile.get('zone_id') or 'n/a'}` | "
+        f"`{authored}` | "
+        f"`{reference}` | "
+        f"`{candidate}` | "
+        f"`{delta_state}` | "
+        f"`{blockers}` |"
+    )
+
+
+def _wet_band_profile_markdown(profile: object) -> str:
+    if not isinstance(profile, dict):
+        return "n/a"
+    return (
+        f"{profile.get('wet_width_cell_count')}/"
+        f"{profile.get('first_wet_row')}-{profile.get('last_wet_row')}/"
+        f"{_format_number(_float_or_none(profile.get('mean_wet_depth_m')))}"
+    )
+
+
+def _face_state_width_depth_pair_row(pair: dict[str, object]) -> str:
+    lower_signs = f"{pair.get('lower_reference_volume_sign')}->{pair.get('lower_candidate_volume_sign')}"
+    upper_signs = f"{pair.get('upper_reference_volume_sign')}->{pair.get('upper_candidate_volume_sign')}"
+    return (
+        "| "
+        f"{pair.get('column_index')} | "
+        f"`{lower_signs}` | "
+        f"`{upper_signs}` | "
+        f"`{bool(pair.get('reference_opposed_edges'))}` | "
+        f"`{bool(pair.get('candidate_opposed_edges'))}` | "
+        f"`{bool(pair.get('matches_reference_opposition'))}` |"
     )
 
 
