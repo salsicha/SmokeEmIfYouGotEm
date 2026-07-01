@@ -37,15 +37,14 @@ Next levers:
 - Start with `upper_edge_face` column 6 rows 8-9; the GeoClaw/C++ lateral flux proxy differs by 2.72825 m3/s.
 - Instrument or reconstruct the actual finite-volume lateral face flux/source balance before adding another post-step velocity or depth transport.
 - Preserve GeoClaw's opposite-signed lower/upper upstream edge behavior; a single-sign lateral transport will keep damaging Froude shape.
-- Start with `upper_edge_face` column 6 rows 8-9; reconstructed q delta is 2.72825 m3/s and balance delta is 8.87381 m3/s2.
+- Start with `upper_edge_face` column 6 rows 8-9; reconstructed q delta is 2.72633 m3/s and balance delta is 8.87096 m3/s2.
 - Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.
 - Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.
-- Use the exported C++ internal audit at `upper_edge_face` column 6 rows 8-9; post-source q delta is 2.6134 m3/s.
+- Use the exported C++ internal audit at `upper_edge_face` column 6 rows 8-9; post-source q delta is 2.61144 m3/s.
 - Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible.
-- Implement a fixture-scoped constriction y-face hydrostatic/source-splitting experiment at the audited `upper_edge_face` column 6 rows 8-9 target first.
-- Apply the treatment inside the finite-volume face/source update, not as final velocity/depth transport or gameplay forcing.
-- Promote only if the face/source report, throat/shape/timing diagnostics, Milestone 17 guardrail, and threshold report all support the change.
-- If the split worsens field, slope, wet-mask, probe, cross-section, Froude, mass, or energy checks, reject it and move to geometry width/depth mapping.
+- Do not promote the current constriction y-face source split by itself; it is manifest-recorded and audited on 32 faces but still leaves 65 post-source sign mismatches.
+- Move the next constriction attempt to geometry-aware face-state reconstruction or width/depth mapping instead of increasing source-split strength.
+- Keep the split bounded and feature forcing off unless a future geometry/state reconstruction report proves it helps without regressing conservation, Froude, or sampled fields.
 - Close constriction field, slope, probe, cross-section, and wet-mask parity before treating raft coupling as actionable.
 - Preserve or restore conservation and energy checks before accepting any visual/gameplay forcing.
 
