@@ -284,6 +284,7 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     constriction_run = constriction_output_dir / constriction_scenario.metadata.scenario_id
     constriction_manifest = json.loads((constriction_run / "manifest.json").read_text(encoding="utf-8"))
     constriction_final_frame = constriction_run / constriction_manifest["frames"][-1]
+    constriction_audit_path = constriction_run / constriction_manifest["constriction_y_face_flux_source_audit"]["path"]
     constriction_features = json.loads((constriction_scenario_dir / "features.json").read_text(encoding="utf-8"))
     constriction_scenario_json = json.loads((constriction_scenario_dir / "scenario.json").read_text(encoding="utf-8"))
     constriction_feature = next(feature for feature in constriction_features["features"] if feature["kind"] == "constriction")
@@ -358,6 +359,20 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["constriction_localized_circulation"]["upstream_component_disabled_for_froude_guard"] is True
     assert constriction_manifest["constriction_localized_circulation"]["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_momentum_reconstruction"] is True
+    assert constriction_manifest["constriction_y_face_flux_source_audit"]["present"] is True
+    assert constriction_manifest["constriction_y_face_flux_source_audit"]["uses_internal_cpp_riemann_flux"] is True
+    assert constriction_manifest["constriction_y_face_flux_source_audit"]["records_hydrostatic_face_source_terms"] is True
+    assert constriction_manifest["constriction_y_face_flux_source_audit"]["records_constriction_face_source_delta"] is True
+    assert constriction_audit_path.exists()
+    with constriction_audit_path.open(newline="", encoding="utf-8") as handle:
+        audit_rows = list(csv.DictReader(handle))
+    assert audit_rows
+    assert {"lower_edge_face", "upper_edge_face", "lower_inner_source_face", "upper_outer_face"}.issubset(
+        {row["face_role"] for row in audit_rows}
+    )
+    assert any(int(row["constriction_face_source_applied"]) == 1 for row in audit_rows)
+    assert all("post_left_flux_h_m3ps" in row for row in audit_rows)
+    assert all("south_cell_bed_slope_source_hv_per_s" in row for row in audit_rows)
     assert final_throat_wet_count == initial_throat_wet_count
     assert max(dry_bank_depths) <= constriction_manifest["constriction_near_throat_support"]["throat_depth_scale"] * 1.25
     assert final_wet_rows[0] < wet_rows[0]
