@@ -942,6 +942,7 @@ def test_milestone18_constriction_face_source_audit_records_flux_source_balance(
     assert payload["summary"]["cpp_internal_source_applied_count"] == 1
     assert payload["summary"]["cpp_internal_post_source_sign_mismatch_count"] >= 1
     assert payload["summary"]["cpp_internal_hydrostatic_face_source_enabled_count"] == 0
+    assert payload["summary"]["cpp_internal_constriction_source_split_applied_count"] == 0
     assert payload["summary"]["max_abs_balance_delta_m3ps2"] > 0.0
     worst = payload["summary"]["worst_samples"][0]
     assert worst["face_role"] == "lower_edge_face"
@@ -991,6 +992,7 @@ def test_milestone18_constriction_hydrostatic_source_decision_records_next_exper
     assert payload["passed"] is False
     assert payload["summary"]["cpp_internal_audit_sample_count"] == 2
     assert payload["summary"]["cpp_internal_hydrostatic_face_source_enabled_count"] == 0
+    assert payload["summary"]["cpp_internal_constriction_source_split_applied_count"] == 0
     assert payload["target_face"]["face_role"] == "lower_edge_face"
     assert payload["target_face"]["post_left_sign_matches"] is False
     assert "feature/gameplay forcing disabled" in " ".join(payload["acceptance_constraints"])

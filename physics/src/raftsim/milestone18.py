@@ -2142,6 +2142,11 @@ class Milestone18ConstrictionFaceSourceAuditReport:
                 "cpp_internal_hydrostatic_face_source_enabled_count": sum(
                     1 for sample in self.cpp_internal_audit if bool(sample.get("hydrostatic_face_source_enabled"))
                 ),
+                "cpp_internal_constriction_source_split_applied_count": sum(
+                    1
+                    for sample in self.cpp_internal_audit
+                    if bool(sample.get("constriction_hydrostatic_source_split_applied"))
+                ),
                 "cpp_internal_post_source_sign_mismatch_count": sum(
                     1 for sample in self.cpp_internal_audit if not bool(sample.get("post_left_sign_matches", True))
                 ),
@@ -2196,6 +2201,7 @@ class Milestone18ConstrictionFaceSourceAuditReport:
             f"- Max abs flux/source balance delta: `{_format_number(_float_or_none(summary['max_abs_balance_delta_m3ps2']))}` m3/s2",
             f"- C++ internal audit samples: `{summary['cpp_internal_audit_sample_count']}`",
             f"- C++ internal post-source sign mismatches: `{summary['cpp_internal_post_source_sign_mismatch_count']}`",
+            f"- C++ internal constriction source-split applications: `{summary['cpp_internal_constriction_source_split_applied_count']}`",
             "",
             "## Worst Face/Source Samples",
             "",
@@ -2210,8 +2216,8 @@ class Milestone18ConstrictionFaceSourceAuditReport:
                     "",
                     "## C++ Internal Y-Face Audit",
                     "",
-                    "| Face | Column | Rows | GeoClaw q/sign | C++ base q | C++ post-source q/sign | Delta | Source Applied | Hydro Face Source | Cell bed-source S/N |",
-                    "| --- | ---: | --- | --- | ---: | --- | ---: | --- | --- | --- |",
+                    "| Face | Column | Rows | GeoClaw q/sign | C++ base q | C++ post-source q/sign | Delta | Source Applied | Split Applied | Hydro Face Source | Cell bed-source S/N |",
+                    "| --- | ---: | --- | --- | ---: | --- | ---: | --- | --- | --- | --- |",
                 ]
             )
             for sample in self.cpp_internal_audit[:12]:
@@ -3360,6 +3366,7 @@ def build_milestone18_constriction_hydrostatic_source_decision_report(
     internal_count = int(summary.get("cpp_internal_audit_sample_count", len(internal_samples)) or 0)
     post_source_mismatch_count = int(summary.get("cpp_internal_post_source_sign_mismatch_count", 0) or 0)
     hydrostatic_enabled_count = int(summary.get("cpp_internal_hydrostatic_face_source_enabled_count", 0) or 0)
+    source_split_count = int(summary.get("cpp_internal_constriction_source_split_applied_count", 0) or 0)
     constriction_source_count = int(summary.get("cpp_internal_source_applied_count", 0) or 0)
     max_delta = _float_or_none(summary.get("cpp_internal_max_abs_post_source_delta_m3ps"))
     target_delta = _float_or_none(target_face.get("post_left_flux_delta_m3ps"))
@@ -3380,7 +3387,8 @@ def build_milestone18_constriction_hydrostatic_source_decision_report(
         (
             f"Hydrostatic y-face source terms are enabled on {hydrostatic_enabled_count} of "
             f"{internal_count} audited samples, while constriction face sources are applied on "
-            f"{constriction_source_count} samples."
+            f"{constriction_source_count} samples and constriction source splitting is applied on "
+            f"{source_split_count} samples."
         ),
         (
             "The selected target remains wrong after current source handling: "
@@ -3411,6 +3419,11 @@ def build_milestone18_constriction_hydrostatic_source_decision_report(
                 else ""
             ),
             (
+                "A constriction y-face source split is present, but post-source face signs still disagree with GeoClaw."
+                if source_split_count > 0 and post_source_mismatch_count > 0
+                else ""
+            ),
+            (
                 "The next change must not be promoted until full geometry checks pass or improve without hiding conservation failures."
                 if decision != "PASS"
                 else ""
@@ -3418,21 +3431,33 @@ def build_milestone18_constriction_hydrostatic_source_decision_report(
         )
         if reason
     )
-    next_levers = (
-        (
-            "Implement a fixture-scoped constriction y-face hydrostatic/source-splitting experiment at the audited "
-            f"`{target_face.get('face_role', 'unknown')}` column {target_face.get('column_index', 'unknown')} "
-            f"rows {target_face.get('south_row_index', 'unknown')}-{target_face.get('north_row_index', 'unknown')} target first."
-        ),
-        "Apply the treatment inside the finite-volume face/source update, not as final velocity/depth transport or gameplay forcing.",
-        "Promote only if the face/source report, throat/shape/timing diagnostics, Milestone 17 guardrail, and threshold report all support the change.",
-        "If the split worsens field, slope, wet-mask, probe, cross-section, Froude, mass, or energy checks, reject it and move to geometry width/depth mapping.",
-    )
+    if source_split_count > 0:
+        next_levers = (
+            (
+                "Do not promote the current constriction y-face source split by itself; it is manifest-recorded and "
+                f"audited on {source_split_count} faces but still leaves "
+                f"{post_source_mismatch_count} post-source sign mismatches."
+            ),
+            "Move the next constriction attempt to geometry-aware face-state reconstruction or width/depth mapping instead of increasing source-split strength.",
+            "Keep the split bounded and feature forcing off unless a future geometry/state reconstruction report proves it helps without regressing conservation, Froude, or sampled fields.",
+        )
+    else:
+        next_levers = (
+            (
+                "Implement a fixture-scoped constriction y-face hydrostatic/source-splitting experiment at the audited "
+                f"`{target_face.get('face_role', 'unknown')}` column {target_face.get('column_index', 'unknown')} "
+                f"rows {target_face.get('south_row_index', 'unknown')}-{target_face.get('north_row_index', 'unknown')} target first."
+            ),
+            "Apply the treatment inside the finite-volume face/source update, not as final velocity/depth transport or gameplay forcing.",
+            "Promote only if the face/source report, throat/shape/timing diagnostics, Milestone 17 guardrail, and threshold report all support the change.",
+            "If the split worsens field, slope, wet-mask, probe, cross-section, Froude, mass, or energy checks, reject it and move to geometry width/depth mapping.",
+        )
     report_summary = {
         "source_audit_decision": str(payload.get("decision", "UNKNOWN")),
         "cpp_internal_audit_sample_count": internal_count,
         "cpp_internal_post_source_sign_mismatch_count": post_source_mismatch_count,
         "cpp_internal_hydrostatic_face_source_enabled_count": hydrostatic_enabled_count,
+        "cpp_internal_constriction_source_split_applied_count": source_split_count,
         "cpp_internal_source_applied_count": constriction_source_count,
         "cpp_internal_max_abs_post_source_delta_m3ps": max_delta,
         "target_post_source_delta_m3ps": target_delta,
@@ -6583,11 +6608,14 @@ def _hydrostatic_source_decision_target_face(payload: dict[str, Any]) -> dict[st
         "post_left_sign_matches",
         "hydro_left_source_hv_m3ps2",
         "hydro_right_source_hv_m3ps2",
+        "constriction_source_split_left_hv_m3ps2",
+        "constriction_source_split_right_hv_m3ps2",
         "constriction_left_source_h_m3ps",
         "constriction_right_source_h_m3ps",
         "south_cell_bed_slope_source_hv_per_s",
         "north_cell_bed_slope_source_hv_per_s",
         "hydrostatic_face_source_enabled",
+        "constriction_hydrostatic_source_split_applied",
         "constriction_face_source_applied",
     )
     return {key: target[key] for key in keep_keys if key in target}
@@ -6747,10 +6775,16 @@ def _load_cpp_constriction_y_face_audit(
                     "post_left_flux_delta_m3ps": post_left_flux - reference_flux,
                     "post_left_sign": post_sign,
                     "post_left_sign_matches": reference_sign == 0 or post_sign == reference_sign,
-                    "hydro_left_source_hv_m3ps2": _float_from_csv(row, "hydro_left_source_hv_m3ps2"),
-                    "hydro_right_source_hv_m3ps2": _float_from_csv(row, "hydro_right_source_hv_m3ps2"),
-                    "constriction_left_source_h_m3ps": _float_from_csv(row, "constriction_left_source_h_m3ps"),
-                    "constriction_right_source_h_m3ps": _float_from_csv(row, "constriction_right_source_h_m3ps"),
+                "hydro_left_source_hv_m3ps2": _float_from_csv(row, "hydro_left_source_hv_m3ps2"),
+                "hydro_right_source_hv_m3ps2": _float_from_csv(row, "hydro_right_source_hv_m3ps2"),
+                "constriction_source_split_left_hv_m3ps2": _float_from_csv(
+                    row, "constriction_source_split_left_hv_m3ps2"
+                ),
+                "constriction_source_split_right_hv_m3ps2": _float_from_csv(
+                    row, "constriction_source_split_right_hv_m3ps2"
+                ),
+                "constriction_left_source_h_m3ps": _float_from_csv(row, "constriction_left_source_h_m3ps"),
+                "constriction_right_source_h_m3ps": _float_from_csv(row, "constriction_right_source_h_m3ps"),
                     "south_cell_bed_slope_source_hv_per_s": _float_from_csv(
                         row, "south_cell_bed_slope_source_hv_per_s"
                     ),
@@ -6758,6 +6792,9 @@ def _load_cpp_constriction_y_face_audit(
                         row, "north_cell_bed_slope_source_hv_per_s"
                     ),
                     "hydrostatic_face_source_enabled": _bool_from_csv(row, "hydrostatic_face_source_enabled"),
+                    "constriction_hydrostatic_source_split_applied": _bool_from_csv(
+                        row, "constriction_hydrostatic_source_split_applied"
+                    ),
                     "constriction_face_source_applied": _bool_from_csv(row, "constriction_face_source_applied"),
                 }
             )
@@ -7037,6 +7074,7 @@ def _cpp_internal_face_audit_row(sample: dict[str, object]) -> str:
         f"`{post}` | "
         f"{_format_number(_float_or_none(sample.get('post_left_flux_delta_m3ps')))} | "
         f"`{bool(sample.get('constriction_face_source_applied'))}` | "
+        f"`{bool(sample.get('constriction_hydrostatic_source_split_applied'))}` | "
         f"`{bool(sample.get('hydrostatic_face_source_enabled'))}` | "
         f"`{cell_sources}` |"
     )
