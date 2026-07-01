@@ -363,6 +363,16 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         is True
     )
     assert constriction_manifest["constriction_upstream_edge_support"]["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_lower_edge_width_depth_balance"] is True
+    assert constriction_manifest["constriction_lower_edge_width_depth_balance"]["bounded"] is True
+    assert (
+        constriction_manifest["constriction_lower_edge_width_depth_balance"]["mass_conservative_depth_transfer"]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_lower_edge_width_depth_balance"]["requires_feature_forcing"]
+        is False
+    )
     assert constriction_manifest["fixture_scoped_constriction_y_face_hydrostatic_source_split"] is True
     assert constriction_manifest["constriction_y_face_hydrostatic_source_split"]["bounded"] is True
     assert constriction_manifest["constriction_y_face_hydrostatic_source_split"]["uses_predictor_riemann_state"] is True
