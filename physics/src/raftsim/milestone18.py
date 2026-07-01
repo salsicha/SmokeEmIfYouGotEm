@@ -48,6 +48,9 @@ MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA = (
 MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA = (
     "raftsim.milestone18.constriction_face_source_audit.v0"
 )
+MILESTONE18_CONSTRICTION_HYDROSTATIC_SOURCE_DECISION_REPORT_SCHEMA = (
+    "raftsim.milestone18.constriction_hydrostatic_source_decision.v0"
+)
 MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA = (
     "raftsim.milestone18.drop_ledge_hydraulic_control.v0"
 )
@@ -2249,6 +2252,92 @@ class Milestone18ConstrictionFaceSourceAuditReport:
 
 
 @dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionHydrostaticSourceDecisionReport:
+    """Decision record for the next constriction y-face source-treatment experiment."""
+
+    face_source_audit_report: str
+    scenario_id: str
+    decision: str
+    diagnostic_scope: str
+    summary: dict[str, object]
+    target_face: dict[str, object]
+    rationale: tuple[str, ...]
+    acceptance_constraints: tuple[str, ...]
+    blocked_reasons: tuple[str, ...]
+    next_levers: tuple[str, ...]
+
+    @property
+    def passed(self) -> bool:
+        return self.decision == "PASS"
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_CONSTRICTION_HYDROSTATIC_SOURCE_DECISION_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": self.decision,
+            "face_source_audit_report": self.face_source_audit_report,
+            "scenario_id": self.scenario_id,
+            "diagnostic_scope": self.diagnostic_scope,
+            "summary": self.summary,
+            "target_face": self.target_face,
+            "rationale": list(self.rationale),
+            "acceptance_constraints": list(self.acceptance_constraints),
+            "blocked_reasons": list(self.blocked_reasons),
+            "next_levers": list(self.next_levers),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = [
+            "# Milestone 18 Constriction Hydrostatic Source Decision",
+            "",
+            f"Schema: `{MILESTONE18_CONSTRICTION_HYDROSTATIC_SOURCE_DECISION_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{self.decision}**",
+            "",
+            f"Scenario: `{self.scenario_id}`",
+            f"Face/source audit: `{self.face_source_audit_report}`",
+            f"Diagnostic scope: {self.diagnostic_scope}",
+            "",
+            "## Summary",
+            "",
+        ]
+        for key, value in self.summary.items():
+            lines.append(f"- {key}: `{_format_number(_float_or_none(value)) if isinstance(value, (int, float)) else value}`")
+        lines.extend(
+            [
+                "",
+                "## Target Face",
+                "",
+                "| Face | Column | Rows | Reference q | Base q | Post-source q | Post-source delta | Hydrostatic source enabled | Constriction source applied | Cell bed-source S/N |",
+                "| --- | ---: | --- | ---: | ---: | ---: | ---: | --- | --- | --- |",
+                _hydrostatic_source_decision_target_row(self.target_face),
+            ]
+        )
+        if self.rationale:
+            lines.extend(["", "## Rationale", ""])
+            lines.extend(f"- {item}" for item in self.rationale)
+        if self.acceptance_constraints:
+            lines.extend(["", "## Acceptance Constraints", ""])
+            lines.extend(f"- {item}" for item in self.acceptance_constraints)
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.next_levers:
+            lines.extend(["", "## Next Levers", ""])
+            lines.extend(f"- {lever}" for lever in self.next_levers)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+
+@dataclass(frozen=True, slots=True)
 class Milestone18PinReleaseResponsePath:
     """One action timing path through the dedicated pin/release fixture."""
 
@@ -3251,6 +3340,115 @@ def build_milestone18_drop_ledge_hydraulic_control_report(
         field_samples=field_samples,
         probe_samples=probe_samples,
         cross_section_samples=cross_section_samples,
+        blocked_reasons=blocked_reasons,
+        next_levers=next_levers,
+    )
+
+
+def build_milestone18_constriction_hydrostatic_source_decision_report(
+    face_source_audit_report: str | Path,
+) -> Milestone18ConstrictionHydrostaticSourceDecisionReport:
+    """Record the next constriction y-face source-treatment decision from the native audit."""
+
+    report_path = Path(face_source_audit_report)
+    payload = _load_json_report(report_path)
+    summary_payload = payload.get("summary", {})
+    summary = summary_payload if isinstance(summary_payload, dict) else {}
+    internal_samples = _records(payload, "cpp_internal_audit")
+    target_face = _hydrostatic_source_decision_target_face(payload)
+
+    internal_count = int(summary.get("cpp_internal_audit_sample_count", len(internal_samples)) or 0)
+    post_source_mismatch_count = int(summary.get("cpp_internal_post_source_sign_mismatch_count", 0) or 0)
+    hydrostatic_enabled_count = int(summary.get("cpp_internal_hydrostatic_face_source_enabled_count", 0) or 0)
+    constriction_source_count = int(summary.get("cpp_internal_source_applied_count", 0) or 0)
+    max_delta = _float_or_none(summary.get("cpp_internal_max_abs_post_source_delta_m3ps"))
+    target_delta = _float_or_none(target_face.get("post_left_flux_delta_m3ps"))
+
+    decision = "TEST_REQUIRED"
+    if internal_count == 0:
+        decision = "AUDIT_REQUIRED"
+    elif post_source_mismatch_count == 0 and hydrostatic_enabled_count > 0:
+        decision = "PASS"
+    elif hydrostatic_enabled_count > 0:
+        decision = "REVISE_OR_REJECT"
+
+    rationale = (
+        (
+            f"The C++ internal audit has {post_source_mismatch_count} post-source sign mismatches "
+            f"across {internal_count} constriction y-face samples."
+        ),
+        (
+            f"Hydrostatic y-face source terms are enabled on {hydrostatic_enabled_count} of "
+            f"{internal_count} audited samples, while constriction face sources are applied on "
+            f"{constriction_source_count} samples."
+        ),
+        (
+            "The selected target remains wrong after current source handling: "
+            f"`{target_face.get('face_role', 'unknown')}` column {target_face.get('column_index', 'unknown')} "
+            f"rows {target_face.get('south_row_index', 'unknown')}-{target_face.get('north_row_index', 'unknown')} "
+            f"has post-source q delta {_format_number(target_delta)} m3/s."
+        ),
+    )
+    acceptance_constraints = (
+        "Keep feature/gameplay forcing disabled for this fixture; this is a finite-volume water-solver treatment test.",
+        "Manifest-record the y-face source-split parameters, target face set, conservation deltas, and feature-forcing scale.",
+        "Compare against the corrected GeoClaw `user`-boundary constriction reference and rerun the face/source audit.",
+        "Preserve or improve visible mass, energy, Froude, wet-mask, field, slope, probe, and cross-section checks.",
+        "Run Milestone 17 analytic guardrails before and after the solver attempt; reject the change if guardrails regress.",
+    )
+    blocked_reasons = tuple(
+        reason
+        for reason in (
+            "No native C++ y-face audit exists yet." if internal_count == 0 else "",
+            (
+                "Native C++ constriction y-face flux signs still disagree with GeoClaw after current source handling."
+                if post_source_mismatch_count > 0
+                else ""
+            ),
+            (
+                "Hydrostatic y-face source treatment is absent for the audited constriction faces."
+                if internal_count > 0 and hydrostatic_enabled_count == 0
+                else ""
+            ),
+            (
+                "The next change must not be promoted until full geometry checks pass or improve without hiding conservation failures."
+                if decision != "PASS"
+                else ""
+            ),
+        )
+        if reason
+    )
+    next_levers = (
+        (
+            "Implement a fixture-scoped constriction y-face hydrostatic/source-splitting experiment at the audited "
+            f"`{target_face.get('face_role', 'unknown')}` column {target_face.get('column_index', 'unknown')} "
+            f"rows {target_face.get('south_row_index', 'unknown')}-{target_face.get('north_row_index', 'unknown')} target first."
+        ),
+        "Apply the treatment inside the finite-volume face/source update, not as final velocity/depth transport or gameplay forcing.",
+        "Promote only if the face/source report, throat/shape/timing diagnostics, Milestone 17 guardrail, and threshold report all support the change.",
+        "If the split worsens field, slope, wet-mask, probe, cross-section, Froude, mass, or energy checks, reject it and move to geometry width/depth mapping.",
+    )
+    report_summary = {
+        "source_audit_decision": str(payload.get("decision", "UNKNOWN")),
+        "cpp_internal_audit_sample_count": internal_count,
+        "cpp_internal_post_source_sign_mismatch_count": post_source_mismatch_count,
+        "cpp_internal_hydrostatic_face_source_enabled_count": hydrostatic_enabled_count,
+        "cpp_internal_source_applied_count": constriction_source_count,
+        "cpp_internal_max_abs_post_source_delta_m3ps": max_delta,
+        "target_post_source_delta_m3ps": target_delta,
+    }
+    return Milestone18ConstrictionHydrostaticSourceDecisionReport(
+        face_source_audit_report=str(report_path),
+        scenario_id=str(payload.get("scenario_id", "unknown")),
+        decision=decision,
+        diagnostic_scope=(
+            "Decision artifact derived from the exported C++ internal constriction y-face audit; "
+            "it does not change solver behavior by itself."
+        ),
+        summary=report_summary,
+        target_face=target_face,
+        rationale=rationale,
+        acceptance_constraints=acceptance_constraints,
         blocked_reasons=blocked_reasons,
         next_levers=next_levers,
     )
@@ -5884,8 +6082,19 @@ def _remaining_geometry_next_levers(
     if not failing_counts:
         return ("Preserve this geometry family as a guardrail while retuning active blockers.",)
     levers: list[str] = []
+    has_hydrostatic_source_decision = any(
+        "constriction_hydrostatic_source_decision" in str(evidence.get("schema_version", ""))
+        for evidence in focused_evidence
+    )
     for evidence in focused_evidence:
-        levers.extend(str(lever) for lever in evidence.get("next_levers", ()) if isinstance(lever, str))
+        for lever in evidence.get("next_levers", ()):
+            if not isinstance(lever, str):
+                continue
+            if has_hydrostatic_source_decision and lever.startswith(
+                "Decide whether constriction y-faces need hydrostatic"
+            ):
+                continue
+            levers.append(lever)
     if case_id == "constriction":
         levers.append(
             "Close constriction field, slope, probe, cross-section, and wet-mask parity before treating raft coupling as actionable."
@@ -6336,6 +6545,72 @@ def _constriction_face_source_edge_pair_summary(
             }
         )
     return tuple(pairs)
+
+
+def _hydrostatic_source_decision_target_face(payload: dict[str, Any]) -> dict[str, object]:
+    internal_samples = _records(payload, "cpp_internal_audit")
+    if not internal_samples:
+        return {}
+    known_blockers = [
+        sample
+        for sample in internal_samples
+        if sample.get("face_role") == "upper_edge_face"
+        and sample.get("column_index") == 6
+        and sample.get("south_row_index") == 8
+        and sample.get("north_row_index") == 9
+    ]
+    candidates = known_blockers or [
+        sample for sample in internal_samples if not bool(sample.get("post_left_sign_matches", True))
+    ] or internal_samples
+    target = sorted(
+        candidates,
+        key=lambda sample: abs(float(sample.get("post_left_flux_delta_m3ps", 0.0) or 0.0)),
+        reverse=True,
+    )[0]
+    keep_keys = (
+        "source_report",
+        "face_role",
+        "column_index",
+        "south_row_index",
+        "north_row_index",
+        "time_s",
+        "reference_volume_flux_m3ps",
+        "base_flux_h_m3ps",
+        "post_left_flux_h_m3ps",
+        "post_left_flux_delta_m3ps",
+        "reference_sign",
+        "post_left_sign",
+        "post_left_sign_matches",
+        "hydro_left_source_hv_m3ps2",
+        "hydro_right_source_hv_m3ps2",
+        "constriction_left_source_h_m3ps",
+        "constriction_right_source_h_m3ps",
+        "south_cell_bed_slope_source_hv_per_s",
+        "north_cell_bed_slope_source_hv_per_s",
+        "hydrostatic_face_source_enabled",
+        "constriction_face_source_applied",
+    )
+    return {key: target[key] for key in keep_keys if key in target}
+
+
+def _hydrostatic_source_decision_target_row(target: dict[str, object]) -> str:
+    if not target:
+        return "| none | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a |"
+    rows = f"{target.get('south_row_index', 'n/a')}-{target.get('north_row_index', 'n/a')}"
+    cell_sources = (
+        f"{_format_number(_float_or_none(target.get('south_cell_bed_slope_source_hv_per_s')))} / "
+        f"{_format_number(_float_or_none(target.get('north_cell_bed_slope_source_hv_per_s')))}"
+    )
+    return (
+        f"| `{_escape_table(str(target.get('face_role', 'unknown')))}` | "
+        f"{target.get('column_index', 'n/a')} | {rows} | "
+        f"{_format_number(_float_or_none(target.get('reference_volume_flux_m3ps')))} | "
+        f"{_format_number(_float_or_none(target.get('base_flux_h_m3ps')))} | "
+        f"{_format_number(_float_or_none(target.get('post_left_flux_h_m3ps')))} | "
+        f"{_format_number(_float_or_none(target.get('post_left_flux_delta_m3ps')))} | "
+        f"`{bool(target.get('hydrostatic_face_source_enabled'))}` | "
+        f"`{bool(target.get('constriction_face_source_applied'))}` | {cell_sources} |"
+    )
 
 
 def _face_source_audit_blocked_reasons(

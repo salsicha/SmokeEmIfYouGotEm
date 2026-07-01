@@ -14,6 +14,9 @@ from raftsim.examples.generate_milestone18_constriction_lateral_face_flux_report
 from raftsim.examples.generate_milestone18_constriction_face_source_audit_report import (
     main as generate_constriction_face_source_audit_main,
 )
+from raftsim.examples.generate_milestone18_constriction_hydrostatic_source_decision_report import (
+    main as generate_constriction_hydrostatic_source_decision_main,
+)
 from raftsim.examples.generate_milestone18_constriction_probe_cross_section_report import (
     main as generate_constriction_probe_cross_section_main,
 )
@@ -39,6 +42,7 @@ from raftsim.examples.run_milestone18_analytic_retune_guardrail import main as g
 from raftsim.milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA,
+    MILESTONE18_CONSTRICTION_HYDROSTATIC_SOURCE_DECISION_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA,
@@ -51,6 +55,7 @@ from raftsim.milestone18 import (
     MILESTONE18_PIN_RELEASE_REPORT_SCHEMA,
     MILESTONE18_REMAINING_GEOMETRY_CLOSURE_REPORT_SCHEMA,
     build_milestone18_constriction_face_source_audit_report,
+    build_milestone18_constriction_hydrostatic_source_decision_report,
     build_milestone18_constriction_lateral_face_flux_report,
     build_milestone18_constriction_mask_alignment_report,
     build_milestone18_constriction_probe_cross_section_report,
@@ -971,6 +976,50 @@ def test_generate_milestone18_constriction_face_source_audit_cli_writes_reports(
     assert payload["schema_version"] == MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA
     assert payload["decision"] == "BLOCKED"
     assert "Constriction Face/Source Audit" in output_md.read_text(encoding="utf-8")
+
+
+def test_milestone18_constriction_hydrostatic_source_decision_records_next_experiment(tmp_path):
+    dual_manifest = _constriction_lateral_face_flux_inputs(tmp_path)
+    audit_report = build_milestone18_constriction_face_source_audit_report(dual_manifest, top_n=8)
+    audit_json = audit_report.write_json(tmp_path / "reports" / "milestone18" / "constriction_face_source_audit.json")
+
+    report = build_milestone18_constriction_hydrostatic_source_decision_report(audit_json)
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_HYDROSTATIC_SOURCE_DECISION_REPORT_SCHEMA
+    assert payload["decision"] == "TEST_REQUIRED"
+    assert payload["passed"] is False
+    assert payload["summary"]["cpp_internal_audit_sample_count"] == 2
+    assert payload["summary"]["cpp_internal_hydrostatic_face_source_enabled_count"] == 0
+    assert payload["target_face"]["face_role"] == "lower_edge_face"
+    assert payload["target_face"]["post_left_sign_matches"] is False
+    assert "feature/gameplay forcing disabled" in " ".join(payload["acceptance_constraints"])
+    assert "finite-volume face/source update" in " ".join(payload["next_levers"])
+
+
+def test_generate_milestone18_constriction_hydrostatic_source_decision_cli_writes_reports(tmp_path):
+    dual_manifest = _constriction_lateral_face_flux_inputs(tmp_path)
+    audit_report = build_milestone18_constriction_face_source_audit_report(dual_manifest, top_n=8)
+    audit_json = audit_report.write_json(tmp_path / "reports" / "milestone18" / "constriction_face_source_audit.json")
+    output_json = tmp_path / "reports" / "milestone18" / "constriction_hydrostatic_source_decision.json"
+    output_md = tmp_path / "reports" / "milestone18" / "constriction_hydrostatic_source_decision.md"
+
+    exit_code = generate_constriction_hydrostatic_source_decision_main(
+        [
+            "--face-source-audit-report",
+            str(audit_json),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_HYDROSTATIC_SOURCE_DECISION_REPORT_SCHEMA
+    assert payload["decision"] == "TEST_REQUIRED"
+    assert "Hydrostatic Source Decision" in output_md.read_text(encoding="utf-8")
 
 
 def _drop_ledge_hydraulic_control_inputs(tmp_path: Path) -> Path:
