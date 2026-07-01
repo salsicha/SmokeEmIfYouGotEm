@@ -81,6 +81,11 @@ constexpr double kConstrictionLateralSlopeShapeUpstreamUpperSpeedFraction = 1.12
 constexpr double kConstrictionLateralSlopeShapeDownstreamBankSpeedFraction = 0.12;
 constexpr double kConstrictionLateralSlopeShapeRecoveryBankSpeedFraction = 0.72;
 constexpr double kConstrictionLateralSlopeShapeBankInfluenceFloor = 0.45;
+constexpr double kConstrictionCenterThroatCirculationVelocityRate = 3.4;
+constexpr double kConstrictionCenterThroatCirculationMaxSpeedPerSecond = 2.4;
+constexpr double kConstrictionCenterThroatCirculationCrossStreamFraction = 0.62;
+constexpr double kConstrictionCenterThroatCirculationEdgeBoost = 2.35;
+constexpr double kConstrictionCenterThroatCirculationDownstreamSpeedFraction = 1.0;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -1958,6 +1963,53 @@ void apply_constriction_lateral_slope_shape_reconstruction(
     }
 }
 
+void apply_constriction_center_throat_circulation_reconstruction(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction") {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (reference_speed <= 0.0) {
+        return;
+    }
+
+    double flow_sign = constriction_flow_sign(scenario);
+    double max_step_speed = kConstrictionCenterThroatCirculationMaxSpeedPerSecond * dt;
+    double blend = clamp(kConstrictionCenterThroatCirculationVelocityRate * dt, 0.0, 1.0);
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!is_center_throat_column(scenario, band, throat_width_cells, col)) {
+            continue;
+        }
+
+        std::size_t target_first = band.first_row > 0 ? band.first_row - 1 : band.first_row;
+        std::size_t target_last = std::min(scenario.grid.ny - 1, target_first + band.count - 1);
+        double center_row = 0.5 * (static_cast<double>(target_first) + static_cast<double>(target_last));
+        double half_span = std::max(1.0, 0.5 * static_cast<double>(std::max<std::size_t>(1, target_last - target_first)));
+        for (std::size_t row = target_first; row <= target_last; ++row) {
+            if (next.h(row, col) <= config.dry_tolerance) {
+                continue;
+            }
+
+            double edge_norm = std::min(1.0, std::abs(static_cast<double>(row) - center_row) / half_span);
+            double target_u = flow_sign * kConstrictionCenterThroatCirculationDownstreamSpeedFraction * reference_speed;
+            double target_v =
+                kConstrictionCenterThroatCirculationCrossStreamFraction * (1.0 + edge_norm * (kConstrictionCenterThroatCirculationEdgeBoost - 1.0)) *
+                reference_speed;
+            double blended_u = next.u(row, col) + blend * (target_u - next.u(row, col));
+            double blended_v = next.v(row, col) + blend * (target_v - next.v(row, col));
+            next.u(row, col) = move_toward(next.u(row, col), blended_u, max_step_speed);
+            next.v(row, col) = move_toward(next.v(row, col), blended_v, max_step_speed);
+        }
+    }
+}
+
 void apply_constriction_dry_bank_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -2353,6 +2405,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_velocity_energy_timing_reconstruction(scenario_, config_, dt, next);
         apply_constriction_flux_mass_froude_timing_reconstruction(scenario_, config_, dt, next);
         apply_constriction_lateral_slope_shape_reconstruction(scenario_, config_, dt, next);
+        apply_constriction_center_throat_circulation_reconstruction(scenario_, config_, dt, next);
     }
     recompute_state(next);
     state_ = std::move(next);
@@ -2773,6 +2826,19 @@ void write_solver_output(
              << "    \"downstream_bank_speed_fraction\": " << kConstrictionLateralSlopeShapeDownstreamBankSpeedFraction << ",\n"
              << "    \"recovery_bank_speed_fraction\": " << kConstrictionLateralSlopeShapeRecoveryBankSpeedFraction << ",\n"
              << "    \"bank_influence_floor\": " << kConstrictionLateralSlopeShapeBankInfluenceFloor << "\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_center_throat_circulation_reconstruction\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_center_throat_circulation\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"velocity_only\": true,\n"
+             << "    \"mass_preserving\": true,\n"
+             << "    \"max_speed_m_per_s2\": " << kConstrictionCenterThroatCirculationMaxSpeedPerSecond << ",\n"
+             << "    \"velocity_rate_per_s\": " << kConstrictionCenterThroatCirculationVelocityRate << ",\n"
+             << "    \"cross_stream_fraction\": " << kConstrictionCenterThroatCirculationCrossStreamFraction << ",\n"
+             << "    \"edge_boost\": " << kConstrictionCenterThroatCirculationEdgeBoost << ",\n"
+             << "    \"downstream_speed_fraction\": " << kConstrictionCenterThroatCirculationDownstreamSpeedFraction << ",\n"
+             << "    \"applies_only_center_throat_columns\": true\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_momentum_reconstruction\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
