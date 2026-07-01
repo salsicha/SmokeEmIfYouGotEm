@@ -39,6 +39,9 @@ MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA = "raftsim.milestone18.constrictio
 MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA = "raftsim.milestone18.constriction_mask_alignment.v0"
 MILESTONE18_CONSTRICTION_RESPONSE_REPORT_SCHEMA = "raftsim.milestone18.constriction_response_timing.v0"
 MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA = "raftsim.milestone18.constriction_shape_timing.v0"
+MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA = (
+    "raftsim.milestone18.constriction_probe_cross_section.v0"
+)
 
 _CORE_GUARDRAIL_FAMILIES = {"hydrostatic_sloping_balance", "uniform_channel", "dam_break_bore"}
 _GEOMETRY_CLOSURE_FAMILIES = {"wet_dry_shoreline", "bed_step", "constriction", "drops_ledges_tailwater"}
@@ -1353,6 +1356,146 @@ class Milestone18ConstrictionShapeTimingReport:
 
 
 @dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionProbeCrossSectionSample:
+    """Worst raw point-probe or cross-section mismatch for one sampled field."""
+
+    category: str
+    sample_id: str
+    field: str
+    value: float
+    threshold: float
+    ratio_to_threshold: float
+    time_s: float
+    reference_value: float
+    candidate_value: float
+    delta: float
+    reference_h: float
+    candidate_h: float
+    reference_u: float
+    candidate_u: float
+    reference_v: float
+    candidate_v: float
+    reference_froude: float
+    candidate_froude: float
+    distance_m: float | None = None
+    x_m: float | None = None
+    y_m: float | None = None
+    row_index: int | None = None
+    column_index: int | None = None
+    zone_id: str | None = None
+    reference_path: str | None = None
+    cpp_path: str | None = None
+
+    @property
+    def passed(self) -> bool:
+        return self.value <= self.threshold
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["passed"] = self.passed
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionProbeCrossSectionReport:
+    """Diagnostic report locating raw constriction probe and cross-section blocker samples."""
+
+    dual_solver_manifest: str
+    scenario_package: str
+    scenario_id: str
+    feature: dict[str, object]
+    grid: dict[str, object]
+    velocity_depth_floor_m: float
+    zones: dict[str, tuple[int, ...]]
+    thresholds: dict[str, float]
+    probe_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...]
+    cross_section_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...]
+    blocked_reasons: tuple[str, ...]
+    next_levers: tuple[str, ...]
+
+    @property
+    def passed(self) -> bool:
+        return not self.blocked_reasons
+
+    @property
+    def samples(self) -> tuple[Milestone18ConstrictionProbeCrossSectionSample, ...]:
+        return self.probe_samples + self.cross_section_samples
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "dual_solver_manifest": self.dual_solver_manifest,
+            "scenario_package": self.scenario_package,
+            "scenario_id": self.scenario_id,
+            "feature": self.feature,
+            "grid": self.grid,
+            "velocity_depth_floor_m": self.velocity_depth_floor_m,
+            "zones": {zone_id: list(columns) for zone_id, columns in self.zones.items()},
+            "thresholds": self.thresholds,
+            "summary": {
+                "sample_count": len(self.samples),
+                "max_probe_linf": _max_raw_series_sample_value(self.probe_samples),
+                "max_cross_section_linf": _max_raw_series_sample_value(self.cross_section_samples),
+                "worst_overall": [sample.to_json_dict() for sample in self._worst_overall()],
+            },
+            "samples": {
+                "probe": [sample.to_json_dict() for sample in self.probe_samples],
+                "cross_section": [sample.to_json_dict() for sample in self.cross_section_samples],
+            },
+            "blocked_reasons": list(self.blocked_reasons),
+            "next_levers": list(self.next_levers),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        summary = self.to_json_dict()["summary"]
+        lines = [
+            "# Milestone 18 Constriction Probe/Cross-Section Diagnostic",
+            "",
+            f"Schema: `{MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Scenario: `{self.scenario_id}`",
+            f"Dual solver manifest: `{self.dual_solver_manifest}`",
+            f"Scenario package: `{self.scenario_package}`",
+            f"Velocity depth floor: `{self.velocity_depth_floor_m:.6g}` m",
+            "",
+            "## Summary",
+            "",
+            f"- Max probe Linf: `{_format_number(_float_or_none(summary.get('max_probe_linf')))}`",
+            f"- Max cross-section Linf: `{_format_number(_float_or_none(summary.get('max_cross_section_linf')))}`",
+            "",
+            "## Worst Raw Samples",
+            "",
+            "| Category | Sample | Field | Time s | Distance m | Zone | Cell | GeoClaw | C++ | Delta | Abs error | Ref h/u/v/Fr | C++ h/u/v/Fr | Threshold | Ratio |",
+            "| --- | --- | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- | --- | ---: | ---: |",
+        ]
+        for sample in self._worst_overall():
+            lines.append(_probe_cross_section_sample_row(sample))
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.next_levers:
+            lines.extend(["", "## Next Levers", ""])
+            lines.extend(f"- {lever}" for lever in self.next_levers)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+    def _worst_overall(self) -> tuple[Milestone18ConstrictionProbeCrossSectionSample, ...]:
+        return tuple(sorted(self.samples, key=lambda sample: sample.ratio_to_threshold, reverse=True)[:12])
+
+
+@dataclass(frozen=True, slots=True)
 class Milestone18PinReleaseResponsePath:
     """One action timing path through the dedicated pin/release fixture."""
 
@@ -1986,6 +2129,86 @@ def build_milestone18_constriction_shape_timing_report(
         thresholds=thresholds,
         field_samples=sorted_field_samples,
         slope_samples=sorted_slope_samples,
+        probe_samples=probe_samples,
+        cross_section_samples=cross_section_samples,
+        blocked_reasons=blocked_reasons,
+        next_levers=next_levers,
+    )
+
+
+def build_milestone18_constriction_probe_cross_section_report(
+    dual_solver_manifest: str | Path,
+    *,
+    wet_depth_threshold_m: float = 0.15,
+    velocity_depth_floor_m: float = DEFAULT_VELOCITY_DEPTH_FLOOR,
+    top_n: int = 12,
+) -> Milestone18ConstrictionProbeCrossSectionReport:
+    """Locate the exact raw point-probe and cross-section samples blocking constriction parity."""
+
+    manifest_path = Path(dual_solver_manifest)
+    manifest = _load_json_report(manifest_path)
+    comparison_dir = manifest_path.parent
+    scenario_package = _resolve_path(str(manifest.get("scenario_package", "")), comparison_dir)
+    scenario = _load_json_report(scenario_package / "scenario.json")
+    features = _load_json_report(scenario_package / "features.json")
+    constriction = _constriction_feature(features)
+    grid = _scenario_grid(scenario)
+
+    initial_state_path = _scenario_array_path(scenario_package, scenario, "initial_state", "initial_state.npz")
+    initial_state = _load_npz_water_state(initial_state_path, h_key="depth")
+    zones = _constriction_response_zones(initial_state, grid, constriction, wet_depth_threshold_m)
+
+    threshold_report = _load_json_report(comparison_dir / "threshold_evaluation.json")
+    thresholds = _shape_timing_thresholds(threshold_report)
+
+    geoclaw_record = manifest.get("geoclaw", {})
+    cpp_record = manifest.get("cpp", {})
+    if not isinstance(geoclaw_record, dict) or not isinstance(cpp_record, dict):
+        raise ValueError("dual solver manifest must include geoclaw and cpp records.")
+    geoclaw_manifest_path = _resolve_path(str(geoclaw_record.get("manifest", "")), comparison_dir)
+    cpp_manifest_path = _resolve_path(str(cpp_record.get("manifest", "")), comparison_dir)
+    geoclaw_manifest = _load_json_report(geoclaw_manifest_path)
+    cpp_manifest = _load_json_report(cpp_manifest_path)
+    geoclaw_root = geoclaw_manifest_path.parent
+    cpp_root = cpp_manifest_path.parent
+
+    probe_metadata = _sample_metadata_by_id(geoclaw_manifest, "probe_manifest")
+    cross_section_metadata = _sample_metadata_by_id(geoclaw_manifest, "cross_section_manifest")
+    probe_samples = _raw_probe_worst_samples(
+        geoclaw_root,
+        _string_list(geoclaw_manifest.get("probes")),
+        cpp_root,
+        _string_list(cpp_manifest.get("probes")),
+        probe_metadata,
+        grid,
+        zones,
+        threshold=thresholds["max_probe_linf"],
+        velocity_depth_floor_m=velocity_depth_floor_m,
+        top_n=top_n,
+    )
+    cross_section_samples = _raw_cross_section_worst_samples(
+        geoclaw_root,
+        _string_list(geoclaw_manifest.get("cross_sections")),
+        cpp_root,
+        _string_list(cpp_manifest.get("cross_sections")),
+        cross_section_metadata,
+        grid,
+        zones,
+        threshold=thresholds["max_cross_section_linf"],
+        velocity_depth_floor_m=velocity_depth_floor_m,
+        top_n=top_n,
+    )
+    blocked_reasons = _probe_cross_section_blocked_reasons(probe_samples, cross_section_samples)
+    next_levers = _probe_cross_section_next_levers(probe_samples, cross_section_samples)
+    return Milestone18ConstrictionProbeCrossSectionReport(
+        dual_solver_manifest=str(manifest_path),
+        scenario_package=str(scenario_package),
+        scenario_id=str(manifest.get("scenario_id") or scenario.get("metadata", {}).get("scenario_id") or "unknown"),
+        feature=constriction,
+        grid=grid,
+        velocity_depth_floor_m=velocity_depth_floor_m,
+        zones=zones,
+        thresholds=thresholds,
         probe_samples=probe_samples,
         cross_section_samples=cross_section_samples,
         blocked_reasons=blocked_reasons,
@@ -2877,6 +3100,350 @@ def _shape_timing_thresholds(threshold_report: dict[str, Any]) -> dict[str, floa
         "max_probe_linf": float(thresholds.get("max_probe_linf", 0.25)),
         "max_cross_section_linf": float(thresholds.get("max_cross_section_linf", 0.25)),
     }
+
+
+def _string_list(value: object) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, str)]
+
+
+def _sample_metadata_by_id(manifest: dict[str, Any], key: str) -> dict[str, dict[str, Any]]:
+    records = manifest.get(key, [])
+    if not isinstance(records, list):
+        return {}
+    by_id: dict[str, dict[str, Any]] = {}
+    for record in records:
+        if not isinstance(record, dict):
+            continue
+        sample_id = record.get("probe_id")
+        if isinstance(sample_id, str):
+            by_id[sample_id] = record
+    return by_id
+
+
+def _matched_sample_files(
+    reference_root: Path,
+    reference_files: list[str],
+    candidate_root: Path,
+    candidate_files: list[str],
+) -> tuple[tuple[str, Path, Path], ...]:
+    candidate_by_id = {Path(path).stem: candidate_root / path for path in candidate_files}
+    matched: list[tuple[str, Path, Path]] = []
+    for path in reference_files:
+        sample_id = Path(path).stem
+        candidate_path = candidate_by_id.get(sample_id)
+        if candidate_path is not None:
+            matched.append((sample_id, reference_root / path, candidate_path))
+    return tuple(matched)
+
+
+def _load_milestone18_probe_csv(path: Path) -> dict[str, np.ndarray]:
+    rows: list[dict[str, str]] = []
+    with path.open(encoding="utf-8", newline="") as handle:
+        rows.extend(csv.DictReader(handle))
+    if not rows:
+        raise ValueError(f"Probe CSV is empty: {path}")
+    return {
+        column: np.asarray([float(row[column]) for row in rows], dtype=float)
+        for column in rows[0].keys()
+    }
+
+
+def _load_milestone18_reference_cross_section(path: Path) -> dict[str, np.ndarray]:
+    with np.load(path) as data:
+        return {
+            "times": np.asarray(data["times"], dtype=float),
+            "distance": np.asarray(data["distance"], dtype=float),
+            "h": np.asarray(data["h"], dtype=float),
+            "eta": np.asarray(data["eta"], dtype=float),
+            "u": np.asarray(data["u"], dtype=float),
+            "v": np.asarray(data["v"], dtype=float),
+            "froude": np.asarray(data["froude"], dtype=float),
+        }
+
+
+def _load_milestone18_cpp_cross_section(path: Path) -> dict[str, np.ndarray]:
+    rows: list[dict[str, str]] = []
+    with path.open(encoding="utf-8", newline="") as handle:
+        rows.extend(csv.DictReader(handle))
+    if not rows:
+        raise ValueError(f"Cross-section CSV is empty: {path}")
+    times = np.asarray(sorted({float(row["time"]) for row in rows}), dtype=float)
+    distances = np.asarray(sorted({float(row["distance"]) for row in rows}), dtype=float)
+    time_index = {value: index for index, value in enumerate(times)}
+    distance_index = {value: index for index, value in enumerate(distances)}
+    result: dict[str, np.ndarray] = {
+        "times": times,
+        "distance": distances,
+    }
+    for field in CROSS_SECTION_FIELD_NAMES:
+        result[field] = np.zeros((len(times), len(distances)), dtype=float)
+    for row in rows:
+        time_slot = time_index[float(row["time"])]
+        distance_slot = distance_index[float(row["distance"])]
+        for field in CROSS_SECTION_FIELD_NAMES:
+            result[field][time_slot, distance_slot] = float(row[field])
+    return result
+
+
+def _nearest_sample_indices(reference: np.ndarray, candidate: np.ndarray) -> tuple[np.ndarray, float]:
+    if reference.size == 0 or candidate.size == 0:
+        raise ValueError("Cannot align empty sample arrays.")
+    indices = np.zeros(reference.shape, dtype=np.int64)
+    max_delta = 0.0
+    for index, value in np.ndenumerate(reference):
+        nearest = int(np.argmin(np.abs(candidate - value)))
+        indices[index] = nearest
+        max_delta = max(max_delta, abs(float(candidate[nearest]) - float(value)))
+    return indices, max_delta
+
+
+def _series_velocity_mask(
+    reference_h: np.ndarray,
+    candidate_h: np.ndarray,
+    velocity_depth_floor_m: float,
+) -> np.ndarray:
+    return (np.asarray(reference_h, dtype=float) >= velocity_depth_floor_m) & (
+        np.asarray(candidate_h, dtype=float) >= velocity_depth_floor_m
+    )
+
+
+def _metadata_position(metadata_by_id: dict[str, dict[str, Any]], sample_id: str) -> tuple[float | None, float | None]:
+    metadata = metadata_by_id.get(sample_id, {}).get("metadata", {})
+    if not isinstance(metadata, dict):
+        return None, None
+    position = metadata.get("position")
+    if isinstance(position, list) and len(position) >= 2:
+        return float(position[0]), float(position[1])
+    return None, None
+
+
+def _metadata_normal(metadata_by_id: dict[str, dict[str, Any]], sample_id: str) -> tuple[float, float]:
+    metadata = metadata_by_id.get(sample_id, {}).get("metadata", {})
+    if not isinstance(metadata, dict):
+        return 0.0, 1.0
+    normal = metadata.get("normal")
+    if isinstance(normal, list) and len(normal) >= 2:
+        return float(normal[0]), float(normal[1])
+    return 0.0, 1.0
+
+
+def _zone_for_column(zones: dict[str, tuple[int, ...]], column_index: int | None) -> str | None:
+    if column_index is None:
+        return None
+    for zone_id, columns in zones.items():
+        if column_index in columns:
+            return zone_id
+    return None
+
+
+def _raw_probe_worst_samples(
+    reference_root: Path,
+    reference_files: list[str],
+    candidate_root: Path,
+    candidate_files: list[str],
+    metadata_by_id: dict[str, dict[str, Any]],
+    grid: dict[str, object],
+    zones: dict[str, tuple[int, ...]],
+    *,
+    threshold: float,
+    velocity_depth_floor_m: float,
+    top_n: int,
+) -> tuple[Milestone18ConstrictionProbeCrossSectionSample, ...]:
+    samples: list[Milestone18ConstrictionProbeCrossSectionSample] = []
+    for sample_id, reference_path, cpp_path in _matched_sample_files(
+        reference_root,
+        reference_files,
+        candidate_root,
+        candidate_files,
+    ):
+        reference = _load_milestone18_probe_csv(reference_path)
+        candidate = _load_milestone18_probe_csv(cpp_path)
+        time_indices, _ = _nearest_sample_indices(reference["time"], candidate["time"])
+        aligned_candidate = {
+            field: candidate[field][time_indices]
+            for field in candidate
+            if field != "time" and field in reference
+        }
+        x_m, y_m = _metadata_position(metadata_by_id, sample_id)
+        row_index = _grid_row(y_m, grid) if y_m is not None else None
+        column_index = _grid_column(x_m, grid) if x_m is not None else None
+        zone_id = _zone_for_column(zones, column_index)
+        for field in PROBE_FIELD_NAMES:
+            if field not in reference or field not in aligned_candidate:
+                continue
+            mask = (
+                _series_velocity_mask(reference["h"], aligned_candidate["h"], velocity_depth_floor_m)
+                if field in VELOCITY_LIKE_FIELD_NAMES
+                else np.ones(reference[field].shape, dtype=bool)
+            )
+            sample = _raw_series_worst_sample(
+                "probe",
+                sample_id,
+                field,
+                reference[field],
+                aligned_candidate[field],
+                mask,
+                threshold,
+                reference,
+                aligned_candidate,
+                time_s=reference["time"],
+                distance_m=None,
+                x_m=x_m,
+                y_m=y_m,
+                row_index=row_index,
+                column_index=column_index,
+                zone_id=zone_id,
+                reference_path=reference_path,
+                cpp_path=cpp_path,
+            )
+            if sample is not None:
+                samples.append(sample)
+    return tuple(sorted(samples, key=lambda sample: sample.ratio_to_threshold, reverse=True)[:top_n])
+
+
+def _raw_cross_section_worst_samples(
+    reference_root: Path,
+    reference_files: list[str],
+    candidate_root: Path,
+    candidate_files: list[str],
+    metadata_by_id: dict[str, dict[str, Any]],
+    grid: dict[str, object],
+    zones: dict[str, tuple[int, ...]],
+    *,
+    threshold: float,
+    velocity_depth_floor_m: float,
+    top_n: int,
+) -> tuple[Milestone18ConstrictionProbeCrossSectionSample, ...]:
+    samples: list[Milestone18ConstrictionProbeCrossSectionSample] = []
+    for sample_id, reference_path, cpp_path in _matched_sample_files(
+        reference_root,
+        reference_files,
+        candidate_root,
+        candidate_files,
+    ):
+        reference = _load_milestone18_reference_cross_section(reference_path)
+        candidate = _load_milestone18_cpp_cross_section(cpp_path)
+        time_indices, _ = _nearest_sample_indices(reference["times"], candidate["times"])
+        distance_indices, _ = _nearest_sample_indices(reference["distance"], candidate["distance"])
+        aligned_candidate = {
+            field: candidate[field][np.ix_(time_indices, distance_indices)]
+            for field in CROSS_SECTION_FIELD_NAMES
+        }
+        origin_x, origin_y = _metadata_position(metadata_by_id, sample_id)
+        normal_x, normal_y = _metadata_normal(metadata_by_id, sample_id)
+        for field in CROSS_SECTION_FIELD_NAMES:
+            mask = (
+                _series_velocity_mask(reference["h"], aligned_candidate["h"], velocity_depth_floor_m)
+                if field in VELOCITY_LIKE_FIELD_NAMES
+                else np.ones(reference[field].shape, dtype=bool)
+            )
+            sample = _raw_series_worst_sample(
+                "cross_section",
+                sample_id,
+                field,
+                reference[field],
+                aligned_candidate[field],
+                mask,
+                threshold,
+                reference,
+                aligned_candidate,
+                time_s=reference["times"],
+                distance_m=reference["distance"],
+                x_m=origin_x,
+                y_m=origin_y,
+                row_index=None,
+                column_index=None,
+                zone_id=None,
+                reference_path=reference_path,
+                cpp_path=cpp_path,
+                cross_section_normal=(normal_x, normal_y),
+                grid=grid,
+                zones=zones,
+            )
+            if sample is not None:
+                samples.append(sample)
+    return tuple(sorted(samples, key=lambda sample: sample.ratio_to_threshold, reverse=True)[:top_n])
+
+
+def _raw_series_worst_sample(
+    category: str,
+    sample_id: str,
+    field: str,
+    reference_values: np.ndarray,
+    candidate_values: np.ndarray,
+    mask: np.ndarray,
+    threshold: float,
+    reference_context: dict[str, np.ndarray],
+    candidate_context: dict[str, np.ndarray],
+    *,
+    time_s: np.ndarray,
+    distance_m: np.ndarray | None,
+    x_m: float | None,
+    y_m: float | None,
+    row_index: int | None,
+    column_index: int | None,
+    zone_id: str | None,
+    reference_path: Path,
+    cpp_path: Path,
+    cross_section_normal: tuple[float, float] | None = None,
+    grid: dict[str, object] | None = None,
+    zones: dict[str, tuple[int, ...]] | None = None,
+) -> Milestone18ConstrictionProbeCrossSectionSample | None:
+    valid_indices = np.argwhere(mask)
+    if valid_indices.size == 0:
+        return None
+    deltas = np.abs(reference_values - candidate_values)
+    masked_errors = np.asarray([deltas[tuple(index)] for index in valid_indices], dtype=float)
+    worst_slot = int(np.argmax(masked_errors))
+    index_tuple = tuple(int(value) for value in valid_indices[worst_slot])
+    if len(index_tuple) == 1:
+        sample_time = float(time_s[index_tuple[0]])
+        sample_distance = None
+        sample_x = x_m
+        sample_y = y_m
+    else:
+        sample_time = float(time_s[index_tuple[0]])
+        sample_distance = float(distance_m[index_tuple[1]]) if distance_m is not None else None
+        normal_x, normal_y = cross_section_normal or (0.0, 1.0)
+        sample_x = x_m + normal_x * sample_distance if x_m is not None and sample_distance is not None else x_m
+        sample_y = y_m + normal_y * sample_distance if y_m is not None and sample_distance is not None else y_m
+        if grid is not None and sample_x is not None and sample_y is not None:
+            row_index = _grid_row(sample_y, grid)
+            column_index = _grid_column(sample_x, grid)
+            zone_id = _zone_for_column(zones or {}, column_index)
+    reference_value = float(reference_values[index_tuple])
+    candidate_value = float(candidate_values[index_tuple])
+    value = abs(reference_value - candidate_value)
+    return Milestone18ConstrictionProbeCrossSectionSample(
+        category=category,
+        sample_id=sample_id,
+        field=field,
+        value=value,
+        threshold=threshold,
+        ratio_to_threshold=value / threshold if threshold > 0.0 else float("inf"),
+        time_s=sample_time,
+        reference_value=reference_value,
+        candidate_value=candidate_value,
+        delta=candidate_value - reference_value,
+        reference_h=float(reference_context["h"][index_tuple]),
+        candidate_h=float(candidate_context["h"][index_tuple]),
+        reference_u=float(reference_context["u"][index_tuple]),
+        candidate_u=float(candidate_context["u"][index_tuple]),
+        reference_v=float(reference_context["v"][index_tuple]),
+        candidate_v=float(candidate_context["v"][index_tuple]),
+        reference_froude=float(reference_context["froude"][index_tuple]),
+        candidate_froude=float(candidate_context["froude"][index_tuple]),
+        distance_m=sample_distance,
+        x_m=sample_x,
+        y_m=sample_y,
+        row_index=row_index,
+        column_index=column_index,
+        zone_id=zone_id,
+        reference_path=str(reference_path),
+        cpp_path=str(cpp_path),
+    )
 
 
 def _constriction_frame_worst_samples(
@@ -3865,8 +4432,62 @@ def _max_sample_value(samples: tuple[Milestone18ConstrictionShapeErrorSample, ..
     return max((sample.value for sample in samples), default=0.0)
 
 
+def _max_raw_series_sample_value(samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...]) -> float:
+    return max((sample.value for sample in samples), default=0.0)
+
+
 def _max_sample_exceeds(samples: tuple[Milestone18ConstrictionShapeErrorSample, ...]) -> bool:
     return any(not sample.passed for sample in samples)
+
+
+def _max_raw_sample_exceeds(samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...]) -> bool:
+    return any(not sample.passed for sample in samples)
+
+
+def _probe_cross_section_blocked_reasons(
+    probe_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...],
+    cross_section_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...],
+) -> tuple[str, ...]:
+    reasons: list[str] = []
+    if _max_raw_sample_exceeds(probe_samples):
+        reasons.append("C++ constriction point-probe raw samples still exceed the GeoClaw/C++ threshold.")
+    if _max_raw_sample_exceeds(cross_section_samples):
+        reasons.append("C++ constriction cross-section raw samples still exceed the GeoClaw/C++ threshold.")
+    if any(sample.field in {"v", "hv"} and not sample.passed for sample in probe_samples + cross_section_samples):
+        reasons.append("Cross-stream velocity or momentum has the wrong magnitude/sign at sampled constriction locations.")
+    if any(sample.field == "froude" and not sample.passed for sample in probe_samples + cross_section_samples):
+        reasons.append("Froude mismatch is still present in the sampled constriction section.")
+    return tuple(reasons)
+
+
+def _probe_cross_section_next_levers(
+    probe_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...],
+    cross_section_samples: tuple[Milestone18ConstrictionProbeCrossSectionSample, ...],
+) -> tuple[str, ...]:
+    samples = tuple(
+        sorted(probe_samples + cross_section_samples, key=lambda sample: sample.ratio_to_threshold, reverse=True)
+    )
+    if not samples:
+        return ()
+    levers = [
+        (
+            f"Retune from `{samples[0].category}` `{samples[0].sample_id}` field `{samples[0].field}` "
+            f"at t={samples[0].time_s:.6g}s because it is {samples[0].ratio_to_threshold:.6g}x threshold."
+        )
+    ]
+    if any(sample.field in {"v", "hv"} for sample in samples[:6]):
+        levers.append(
+            "Correct cross-stream circulation sign and magnitude at the sampled constriction centerline before changing more depth volume."
+        )
+    if any(sample.field == "froude" for sample in samples[:6]):
+        levers.append(
+            "Preserve the Froude envelope while changing lateral circulation; the previous shape pass regressed Froude just over threshold."
+        )
+    if any(sample.category == "cross_section" for sample in samples[:6]):
+        levers.append(
+            "Use the recorded cross-section distance and cell coordinates to tune section shape, not only whole-field Linf cells."
+        )
+    return tuple(levers)
 
 
 def _threshold_ratio(value: float, threshold: float) -> float:
@@ -3913,6 +4534,42 @@ def _shape_sample_series_row(sample: Milestone18ConstrictionShapeErrorSample) ->
         f"{_format_number(sample.time_s)} | "
         f"{_format_number(sample.distance_m)} | "
         f"{sample.value:.6g} | "
+        f"{sample.threshold:.6g} | "
+        f"{sample.ratio_to_threshold:.6g} |"
+    )
+
+
+def _probe_cross_section_sample_row(sample: Milestone18ConstrictionProbeCrossSectionSample) -> str:
+    cell = "n/a"
+    if sample.row_index is not None and sample.column_index is not None:
+        cell = f"{sample.row_index},{sample.column_index}"
+    reference_state = (
+        f"{_format_number(sample.reference_h)}/"
+        f"{_format_number(sample.reference_u)}/"
+        f"{_format_number(sample.reference_v)}/"
+        f"{_format_number(sample.reference_froude)}"
+    )
+    candidate_state = (
+        f"{_format_number(sample.candidate_h)}/"
+        f"{_format_number(sample.candidate_u)}/"
+        f"{_format_number(sample.candidate_v)}/"
+        f"{_format_number(sample.candidate_froude)}"
+    )
+    return (
+        "| "
+        f"`{sample.category}` | "
+        f"`{sample.sample_id}` | "
+        f"`{sample.field}` | "
+        f"{_format_number(sample.time_s)} | "
+        f"{_format_number(sample.distance_m)} | "
+        f"`{sample.zone_id or 'n/a'}` | "
+        f"`{cell}` | "
+        f"{_format_number(sample.reference_value)} | "
+        f"{_format_number(sample.candidate_value)} | "
+        f"{_format_number(sample.delta)} | "
+        f"{sample.value:.6g} | "
+        f"`{reference_state}` | "
+        f"`{candidate_state}` | "
         f"{sample.threshold:.6g} | "
         f"{sample.ratio_to_threshold:.6g} |"
     )
