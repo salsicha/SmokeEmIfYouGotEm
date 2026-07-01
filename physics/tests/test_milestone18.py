@@ -7,6 +7,9 @@ from raftsim.analytic_fixtures import write_analytic_fixture_suite
 from raftsim.examples.generate_milestone18_constriction_mask_alignment_report import (
     main as generate_constriction_mask_main,
 )
+from raftsim.examples.generate_milestone18_constriction_probe_cross_section_report import (
+    main as generate_constriction_probe_cross_section_main,
+)
 from raftsim.examples.generate_milestone18_constriction_response_timing_report import (
     main as generate_constriction_response_main,
 )
@@ -23,6 +26,7 @@ from raftsim.examples.run_milestone18_analytic_retune_guardrail import main as g
 from raftsim.milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA,
+    MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_RESPONSE_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA,
@@ -30,6 +34,7 @@ from raftsim.milestone18 import (
     MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
     MILESTONE18_PIN_RELEASE_REPORT_SCHEMA,
     build_milestone18_constriction_mask_alignment_report,
+    build_milestone18_constriction_probe_cross_section_report,
     build_milestone18_constriction_response_timing_report,
     build_milestone18_constriction_shape_timing_report,
     build_milestone18_constriction_throat_shape_report,
@@ -589,6 +594,147 @@ def test_generate_milestone18_constriction_shape_timing_cli_writes_reports(tmp_p
     assert payload["schema_version"] == MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA
     assert payload["decision"] == "BLOCKED"
     assert "Constriction Shape/Timing Diagnostic" in output_md.read_text(encoding="utf-8")
+
+
+def _constriction_probe_cross_section_inputs(tmp_path: Path) -> Path:
+    dual_manifest = _constriction_shape_timing_inputs(tmp_path)
+    geoclaw_root = tmp_path / "geoclaw" / "normalized"
+    cpp_root = tmp_path / "cpp" / "constriction_seed_18"
+
+    geoclaw_probe_dir = geoclaw_root / "probes"
+    cpp_probe_dir = cpp_root / "probes"
+    geoclaw_probe_dir.mkdir(parents=True, exist_ok=True)
+    cpp_probe_dir.mkdir(parents=True, exist_ok=True)
+    geoclaw_probe = geoclaw_probe_dir / "midstream_center.csv"
+    cpp_probe = cpp_probe_dir / "midstream_center.csv"
+    geoclaw_probe.write_text(
+        "\n".join(
+            [
+                "time,h,eta,u,v,hu,hv,wet,froude",
+                "0,1.0,1.0,1.0,0.0,1.0,0.0,1,0.3",
+                "3,1.0,1.0,1.0,1.2,1.0,1.5,1,0.5",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    cpp_probe.write_text(
+        "\n".join(
+            [
+                "time,h,eta,u,v,hu,hv,wet,froude",
+                "0,1.0,1.0,1.0,0.0,1.0,0.0,1,0.3",
+                "1.5,1.0,1.0,1.0,0.0,1.0,0.0,1,0.3",
+                "3,1.0,1.0,1.0,-0.8,1.0,-1.0,1,0.4",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    geoclaw_cross_dir = geoclaw_root / "cross_sections"
+    cpp_cross_dir = cpp_root / "cross_sections"
+    geoclaw_cross_dir.mkdir(parents=True, exist_ok=True)
+    cpp_cross_dir.mkdir(parents=True, exist_ok=True)
+    times = np.array([0.0, 3.0], dtype=float)
+    distance = np.array([-1.0, 0.0, 1.0], dtype=float)
+    h = np.ones((2, 3), dtype=float)
+    u = np.ones((2, 3), dtype=float)
+    v = np.array([[0.0, 0.0, 0.0], [0.0, 0.5, 2.8]], dtype=float)
+    froude = np.array([[0.3, 0.3, 0.3], [0.3, 0.7, 2.0]], dtype=float)
+    np.savez(
+        geoclaw_cross_dir / "mid_cross_section.npz",
+        times=times,
+        distance=distance,
+        h=h,
+        eta=h,
+        u=u,
+        v=v,
+        froude=froude,
+    )
+    rows = ["time,distance,h,eta,u,v,froude"]
+    for time_index, time in enumerate(times):
+        for distance_index, dist in enumerate(distance):
+            candidate_v = -0.2 if (time_index, distance_index) == (1, 2) else v[time_index, distance_index]
+            rows.append(f"{time},{dist},1.0,1.0,1.0,{candidate_v},0.6")
+    (cpp_cross_dir / "mid_cross_section.csv").write_text("\n".join(rows) + "\n", encoding="utf-8")
+
+    geoclaw_manifest = json.loads((geoclaw_root / "manifest.json").read_text(encoding="utf-8"))
+    geoclaw_manifest.update(
+        {
+            "probes": ["probes/midstream_center.csv"],
+            "probe_manifest": [
+                {
+                    "probe_id": "midstream_center",
+                    "kind": "point",
+                    "sample_count": 2,
+                    "metadata": {"position": [1.0, 1.0], "column": 1, "row": 1},
+                }
+            ],
+            "cross_sections": ["cross_sections/mid_cross_section.npz"],
+            "cross_section_manifest": [
+                {
+                    "probe_id": "mid_cross_section",
+                    "time_count": 2,
+                    "distance_count": 3,
+                    "metadata": {"position": [1.0, 1.0], "normal": [0.0, 1.0], "length": 2.0},
+                }
+            ],
+        }
+    )
+    _write_json(geoclaw_root / "manifest.json", geoclaw_manifest)
+
+    cpp_manifest = json.loads((cpp_root / "manifest.json").read_text(encoding="utf-8"))
+    cpp_manifest.update(
+        {
+            "probes": ["probes/midstream_center.csv"],
+            "cross_sections": ["cross_sections/mid_cross_section.csv"],
+        }
+    )
+    _write_json(cpp_root / "manifest.json", cpp_manifest)
+    return dual_manifest
+
+
+def test_milestone18_constriction_probe_cross_section_report_records_raw_locations(tmp_path):
+    dual_manifest = _constriction_probe_cross_section_inputs(tmp_path)
+
+    report = build_milestone18_constriction_probe_cross_section_report(dual_manifest)
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    worst = payload["summary"]["worst_overall"][0]
+    assert worst["category"] == "cross_section"
+    assert worst["field"] == "v"
+    assert worst["time_s"] == 3.0
+    assert worst["distance_m"] == 1.0
+    assert worst["row_index"] == 2
+    assert worst["column_index"] == 1
+    assert worst["zone_id"] == "constriction_throat"
+    assert payload["samples"]["probe"][0]["field"] == "hv"
+    assert "Cross-stream velocity" in " ".join(payload["blocked_reasons"])
+
+
+def test_generate_milestone18_constriction_probe_cross_section_cli_writes_reports(tmp_path):
+    dual_manifest = _constriction_probe_cross_section_inputs(tmp_path)
+    output_json = tmp_path / "reports" / "milestone18" / "constriction_probe_cross_section.json"
+    output_md = tmp_path / "reports" / "milestone18" / "constriction_probe_cross_section.md"
+
+    exit_code = generate_constriction_probe_cross_section_main(
+        [
+            "--dual-solver-manifest",
+            str(dual_manifest),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert "Constriction Probe/Cross-Section Diagnostic" in output_md.read_text(encoding="utf-8")
 
 
 def test_milestone18_parity_family_retune_report_records_partial_promotion(tmp_path):
