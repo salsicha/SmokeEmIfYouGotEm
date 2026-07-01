@@ -22,6 +22,7 @@ constexpr double kPi = 3.14159265358979323846;
 constexpr double kBedStepFaceSourceBoost = 1.26;
 constexpr double kBedStepPreStepDischargeFloor = 0.66;
 constexpr double kBedStepTopographyRedistributionRate = 0.47;
+constexpr double kConstrictionEdgeVelocityFraction = 0.41;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -56,6 +57,13 @@ struct GridCellSelection {
     bool found = false;
     std::size_t row = 0;
     std::size_t col = 0;
+};
+
+struct ColumnWetBand {
+    bool found = false;
+    std::size_t first_row = 0;
+    std::size_t last_row = 0;
+    std::size_t count = 0;
 };
 
 double gradient_x(const Array2D& array, const Scenario& scenario, std::size_t row, std::size_t col) {
@@ -561,6 +569,44 @@ GridCellSelection nearest_initial_wet_cell_in_column(const Scenario& scenario, s
     return best;
 }
 
+ColumnWetBand initial_wet_band_in_column(const Scenario& scenario, std::size_t col) {
+    ColumnWetBand band;
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        if (!scenario.initial.wet(row, col)) {
+            continue;
+        }
+        if (!band.found) {
+            band.found = true;
+            band.first_row = row;
+        }
+        band.last_row = row;
+        ++band.count;
+    }
+    return band;
+}
+
+std::size_t max_initial_wet_count(const Scenario& scenario) {
+    std::size_t max_count = 0;
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        max_count = std::max(max_count, initial_wet_band_in_column(scenario, col).count);
+    }
+    return max_count;
+}
+
+std::size_t min_initial_wet_count(const Scenario& scenario) {
+    std::size_t min_count = scenario.grid.ny;
+    bool found = false;
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found) {
+            continue;
+        }
+        min_count = found ? std::min(min_count, band.count) : band.count;
+        found = true;
+    }
+    return found ? min_count : 0;
+}
+
 void apply_wet_dry_shoreline_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -606,6 +652,51 @@ void apply_wet_dry_shoreline_reconstruction(
                 next.v(row, col) = 0.0;
             } else {
                 next.v(row, col) = 0.0;
+            }
+        }
+    }
+}
+
+void apply_constriction_momentum_reconstruction(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction") {
+        return;
+    }
+
+    std::size_t reference_width_cells = max_initial_wet_count(scenario);
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    if (reference_width_cells == 0) {
+        return;
+    }
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count != throat_width_cells || band.count >= reference_width_cells) {
+            continue;
+        }
+        double center_row = 0.5 * (static_cast<double>(band.first_row) + static_cast<double>(band.last_row));
+        for (std::size_t row = band.first_row; row <= band.last_row; ++row) {
+            if (!scenario.initial.wet(row, col) || next.h(row, col) <= config.dry_tolerance) {
+                continue;
+            }
+
+            double initial_u = scenario.initial.u(row, col);
+            if (std::abs(next.u(row, col)) < std::abs(initial_u)) {
+                next.u(row, col) = initial_u;
+            }
+
+            bool edge_cell = row == band.first_row || row == band.last_row;
+            if (!edge_cell || band.count < 2) {
+                continue;
+            }
+            double edge_sign = static_cast<double>(row) < center_row ? 1.0 : -1.0;
+            double target_v = edge_sign * kConstrictionEdgeVelocityFraction *
+                              std::max(std::abs(next.u(row, col)), std::abs(initial_u));
+            if (std::abs(next.v(row, col)) < std::abs(target_v)) {
+                next.v(row, col) = target_v;
             }
         }
     }
@@ -899,6 +990,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
     }
     if (scenario_.fixture_kind == "constriction") {
         apply_constriction_dry_bank_reconstruction(scenario_, config_, next);
+        apply_constriction_momentum_reconstruction(scenario_, config_, next);
     }
     recompute_state(next);
     state_ = std::move(next);
@@ -1194,6 +1286,8 @@ void write_solver_output(
              << "  \"fixture_scoped_constriction_boundary_mask\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
              << "  \"fixture_scoped_constriction_dry_bank_reconstruction\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"fixture_scoped_constriction_momentum_reconstruction\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
              << "  \"cascading\": {\n"
              << "    \"present\": " << (scenario.cascading.present ? "true" : "false") << ",\n"
