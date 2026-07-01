@@ -1235,21 +1235,19 @@ void apply_constriction_upstream_edge_face_flux_source(
     if (scenario.fixture_kind != "constriction" || throat_width_cells == 0) {
         return;
     }
+    (void)south;
 
     ColumnWetBand band = initial_wet_band_in_column(scenario, col);
     if (!band.found || band.count <= throat_width_cells) {
         return;
     }
 
-    bool south_is_lower_edge = constriction_upstream_edge_cell(scenario, band, throat_width_cells, col, south_row);
-    bool north_is_upper_edge = constriction_upstream_edge_cell(scenario, band, throat_width_cells, col, north_row);
-    if (!south_is_lower_edge && !north_is_upper_edge) {
+    if (south_row + 1 != north_row) {
         return;
     }
-    if (south_is_lower_edge && south_row != band.first_row) {
-        return;
-    }
-    if (north_is_upper_edge && north_row != band.last_row) {
+    bool lower_edge_face = north_row == band.first_row;
+    bool upper_edge_face = north_row == band.last_row;
+    if (!lower_edge_face && !upper_edge_face) {
         return;
     }
 
@@ -1258,7 +1256,7 @@ void apply_constriction_upstream_edge_face_flux_source(
         return;
     }
 
-    const ConservedState& edge = south_is_lower_edge ? south : north;
+    const ConservedState& edge = north;
     if (edge.h <= config.dry_tolerance) {
         return;
     }
@@ -1277,7 +1275,7 @@ void apply_constriction_upstream_edge_face_flux_source(
         return;
     }
 
-    double direction = south_is_lower_edge ? 1.0 : -1.0;
+    double direction = lower_edge_face ? 1.0 : -1.0;
     double mass_flux = direction * depth_rate * scenario.grid.dy;
     double edge_u = edge.hu / safe_depth(edge.h, config.dry_tolerance);
     double edge_v = edge.hv / safe_depth(edge.h, config.dry_tolerance);
@@ -3632,6 +3630,8 @@ void write_solver_output(
              << "    \"mass_conservative_lateral_face_flux\": true,\n"
              << "    \"momentum_source\": true,\n"
              << "    \"preconditions_inflow_edge_state\": true,\n"
+             << "    \"recognizes_lower_edge_face_as_outside_to_first_wet\": true,\n"
+             << "    \"recognizes_upper_edge_face_as_next_to_last_to_last_wet\": true,\n"
              << "    \"max_depth_m_per_s\": " << kConstrictionUpstreamEdgeFluxMaxDepthPerSecond << ",\n"
              << "    \"flux_rate_per_s\": " << kConstrictionUpstreamEdgeFluxRate << ",\n"
              << "    \"target_depth_scale\": " << kConstrictionUpstreamEdgeFluxTargetDepthScale << ",\n"
