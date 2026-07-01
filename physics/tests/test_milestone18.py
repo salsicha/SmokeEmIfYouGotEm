@@ -7,6 +7,9 @@ from raftsim.analytic_fixtures import write_analytic_fixture_suite
 from raftsim.examples.generate_milestone18_constriction_mask_alignment_report import (
     main as generate_constriction_mask_main,
 )
+from raftsim.examples.generate_milestone18_constriction_lateral_face_flux_report import (
+    main as generate_constriction_lateral_face_flux_main,
+)
 from raftsim.examples.generate_milestone18_constriction_probe_cross_section_report import (
     main as generate_constriction_probe_cross_section_main,
 )
@@ -25,6 +28,7 @@ from raftsim.examples.generate_milestone18_pin_release_fixture_report import mai
 from raftsim.examples.run_milestone18_analytic_retune_guardrail import main as guardrail_main
 from raftsim.milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
+    MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_RESPONSE_REPORT_SCHEMA,
@@ -33,6 +37,7 @@ from raftsim.milestone18 import (
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
     MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
     MILESTONE18_PIN_RELEASE_REPORT_SCHEMA,
+    build_milestone18_constriction_lateral_face_flux_report,
     build_milestone18_constriction_mask_alignment_report,
     build_milestone18_constriction_probe_cross_section_report,
     build_milestone18_constriction_response_timing_report,
@@ -735,6 +740,142 @@ def test_generate_milestone18_constriction_probe_cross_section_cli_writes_report
     assert payload["schema_version"] == MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA
     assert payload["decision"] == "BLOCKED"
     assert "Constriction Probe/Cross-Section Diagnostic" in output_md.read_text(encoding="utf-8")
+
+
+def _constriction_lateral_face_flux_inputs(tmp_path: Path) -> Path:
+    scenario_root = tmp_path / "scenario" / "constriction_seed_18"
+    _write_json(
+        scenario_root / "scenario.json",
+        {
+            "array_files": {"initial_state": "initial_state.npz", "features": "features.json"},
+            "grid": {"nx": 4, "ny": 4, "dx": 1.0, "dy": 1.0, "origin_x": 0.0, "origin_y": 0.0},
+            "metadata": {"scenario_id": "constriction_seed_18"},
+        },
+    )
+    _write_json(
+        scenario_root / "features.json",
+        {
+            "features": [
+                {
+                    "kind": "constriction",
+                    "center": {"x": 2.0, "y": 1.5},
+                    "width": 1.0,
+                    "length": 3.0,
+                    "radius": 0.5,
+                    "strength": 2.0,
+                    "angle": 0.0,
+                }
+            ]
+        },
+    )
+    initial_h = np.zeros((4, 4), dtype=float)
+    initial_h[1:3, 0] = 1.0
+    initial_h[1:3, 1] = 1.0
+    initial_h[1, 2] = 1.0
+    initial_h[1:3, 3] = 1.0
+    zeros = np.zeros((4, 4), dtype=float)
+    np.savez(
+        scenario_root / "initial_state.npz",
+        depth=initial_h,
+        eta=initial_h,
+        u=np.ones((4, 4), dtype=float),
+        v=zeros,
+        hu=initial_h,
+        hv=zeros,
+        wet=initial_h > 0.0,
+    )
+
+    geoclaw_root = tmp_path / "geoclaw" / "normalized"
+    geoclaw_frame = geoclaw_root / "frames" / "frame_0002.npz"
+    geoclaw_frame.parent.mkdir(parents=True, exist_ok=True)
+    geoclaw_h = initial_h.copy()
+    geoclaw_h[0, 1] = 0.3
+    geoclaw_v = zeros.copy()
+    geoclaw_v[0, 1] = 3.0
+    geoclaw_v[1, 1] = 0.8
+    geoclaw_v[2, 1] = -3.0
+    np.savez(
+        geoclaw_frame,
+        h=geoclaw_h,
+        eta=geoclaw_h,
+        u=np.ones((4, 4), dtype=float),
+        v=geoclaw_v,
+        hu=geoclaw_h,
+        hv=geoclaw_h * geoclaw_v,
+        wet=geoclaw_h > 0.0,
+        froude=np.ones((4, 4), dtype=float),
+    )
+    _write_json(geoclaw_root / "manifest.json", {"scenario_id": "constriction_seed_18", "frames": ["frames/frame_0002.npz"]})
+
+    cpp_root = tmp_path / "cpp" / "constriction_seed_18"
+    cpp_frame = cpp_root / "frames" / "frame_0008.csv"
+    cpp_frame.parent.mkdir(parents=True, exist_ok=True)
+    cpp_h = geoclaw_h.copy()
+    cpp_v = zeros.copy()
+    cpp_v[0, 1] = -0.2
+    cpp_v[1, 1] = -0.1
+    cpp_v[2, 1] = -0.05
+    rows = ["row,col,x,y,h,eta,u,v,hu,hv,wet,normal_x,normal_y,normal_z,froude"]
+    for row_index in range(4):
+        for col_index in range(4):
+            h = cpp_h[row_index, col_index]
+            v = cpp_v[row_index, col_index]
+            rows.append(
+                f"{row_index},{col_index},{col_index},{row_index},{h},{h},1.0,{v},{h},{h * v},{1 if h > 0 else 0},0,0,1,1.0"
+            )
+    cpp_frame.write_text("\n".join(rows) + "\n", encoding="utf-8")
+    _write_json(cpp_root / "manifest.json", {"scenario_id": "constriction_seed_18", "frames": ["frames/frame_0008.csv"]})
+
+    return _write_json(
+        tmp_path / "comparison" / "dual_solver_manifest.json",
+        {
+            "scenario_id": "constriction_seed_18",
+            "scenario_package": "../scenario/constriction_seed_18",
+            "geoclaw": {"manifest": "../geoclaw/normalized/manifest.json"},
+            "cpp": {"manifest": "../cpp/constriction_seed_18/manifest.json"},
+        },
+    )
+
+
+def test_milestone18_constriction_lateral_face_flux_report_records_edge_signs(tmp_path):
+    dual_manifest = _constriction_lateral_face_flux_inputs(tmp_path)
+
+    report = build_milestone18_constriction_lateral_face_flux_report(dual_manifest, top_n=8)
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert payload["summary"]["sign_mismatch_count"] >= 1
+    assert payload["summary"]["opposition_mismatch_count"] >= 1
+    worst = payload["summary"]["worst_samples"][0]
+    assert worst["face_role"] == "lower_edge_face"
+    assert worst["reference_sign"] == 1
+    assert worst["candidate_sign"] == -1
+    assert any(pair["column_index"] == 1 and pair["reference_opposed_edges"] for pair in payload["edge_pair_summary"])
+    assert "opposite-signed" in " ".join(payload["blocked_reasons"])
+
+
+def test_generate_milestone18_constriction_lateral_face_flux_cli_writes_reports(tmp_path):
+    dual_manifest = _constriction_lateral_face_flux_inputs(tmp_path)
+    output_json = tmp_path / "reports" / "milestone18" / "constriction_lateral_face_flux.json"
+    output_md = tmp_path / "reports" / "milestone18" / "constriction_lateral_face_flux.md"
+
+    exit_code = generate_constriction_lateral_face_flux_main(
+        [
+            "--dual-solver-manifest",
+            str(dual_manifest),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert "Constriction Lateral Face Flux Diagnostic" in output_md.read_text(encoding="utf-8")
 
 
 def test_milestone18_parity_family_retune_report_records_partial_promotion(tmp_path):
