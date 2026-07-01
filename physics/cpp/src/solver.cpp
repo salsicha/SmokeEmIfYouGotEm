@@ -25,6 +25,11 @@ constexpr double kBedStepTopographyRedistributionRate = 0.47;
 constexpr double kConstrictionEdgeVelocityFraction = 0.41;
 constexpr std::size_t kConstrictionWetBandRelaxationCells = 2;
 constexpr double kConstrictionWetBandMinimumDepth = 0.15;
+constexpr double kConstrictionVolumeResponseRate = 0.75;
+constexpr double kConstrictionVolumeResponseMaxDepthPerSecond = 0.16;
+constexpr double kConstrictionUpstreamVolumeDepthScale = 1.22;
+constexpr double kConstrictionThroatVolumeDepthScale = 0.95;
+constexpr double kConstrictionDownstreamVolumeDepthScale = 1.05;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -722,6 +727,48 @@ double constriction_asymmetric_target_center(
     return initial_center - 0.5;
 }
 
+double constriction_zone_volume_depth_scale(
+    const Scenario& scenario,
+    const ColumnWetBand& band,
+    std::size_t throat_width_cells,
+    std::size_t col
+) {
+    if (!band.found) {
+        return 0.0;
+    }
+    if (band.count == throat_width_cells) {
+        return kConstrictionThroatVolumeDepthScale;
+    }
+
+    double x = scenario.grid.origin_x + static_cast<double>(col) * scenario.grid.dx;
+    double signed_x = (x - constriction_center_x(scenario)) * constriction_flow_sign(scenario);
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    if (signed_x < 0.0) {
+        return kConstrictionUpstreamVolumeDepthScale;
+    }
+    if (signed_x <= half_length) {
+        return kConstrictionDownstreamVolumeDepthScale;
+    }
+    return 0.0;
+}
+
+double initial_column_mean_depth(const Scenario& scenario, const ColumnWetBand& band, std::size_t col) {
+    if (!band.found || band.count == 0) {
+        return 0.0;
+    }
+    double total_depth = 0.0;
+    for (std::size_t row = band.first_row; row <= band.last_row; ++row) {
+        total_depth += scenario.initial.h(row, col);
+    }
+    return total_depth / static_cast<double>(band.count);
+}
+
+double constriction_response_target_u(double current_u, double initial_u, double flow_sign) {
+    double target_sign = std::abs(initial_u) > 1.0e-9 ? (initial_u >= 0.0 ? 1.0 : -1.0) : flow_sign;
+    double target_abs_u = std::max(std::abs(current_u), std::abs(initial_u));
+    return target_sign * target_abs_u;
+}
+
 bool inside_relaxed_wet_band(
     const Scenario& scenario,
     const ColumnWetBand& band,
@@ -784,6 +831,59 @@ void apply_wet_dry_shoreline_reconstruction(
             } else {
                 next.v(row, col) = 0.0;
             }
+        }
+    }
+}
+
+void apply_constriction_volume_response_reconstruction(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction") {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double flow_sign = constriction_flow_sign(scenario);
+    double max_step_depth = kConstrictionVolumeResponseMaxDepthPerSecond * dt;
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        double depth_scale = constriction_zone_volume_depth_scale(scenario, band, throat_width_cells, col);
+        if (depth_scale <= 0.0) {
+            continue;
+        }
+        double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+        if (column_mean_depth <= config.dry_tolerance) {
+            continue;
+        }
+
+        for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+            double current_h = next.h(row, col);
+            if (current_h <= config.dry_tolerance) {
+                continue;
+            }
+
+            double authored_h = scenario.initial.h(row, col);
+            double target_h = std::max(authored_h, column_mean_depth) * depth_scale;
+            if (target_h <= current_h) {
+                continue;
+            }
+
+            double requested_h = (target_h - current_h) * kConstrictionVolumeResponseRate * dt;
+            double added_h = std::min(target_h - current_h, std::min(requested_h, max_step_depth));
+            if (added_h <= 0.0) {
+                continue;
+            }
+
+            double target_u = constriction_response_target_u(next.u(row, col), scenario.initial.u(row, col), flow_sign);
+            double merged_h = current_h + added_h;
+            double merged_hu = current_h * next.u(row, col) + added_h * target_u;
+            double merged_hv = current_h * next.v(row, col) + added_h * next.v(row, col);
+            next.h(row, col) = merged_h;
+            next.u(row, col) = merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+            next.v(row, col) = merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
         }
     }
 }
@@ -1198,6 +1298,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
     if (scenario_.fixture_kind == "constriction") {
         apply_constriction_dry_bank_reconstruction(scenario_, config_, next);
         apply_constriction_wet_band_span_shaping(scenario_, config_, next);
+        apply_constriction_volume_response_reconstruction(scenario_, config_, dt, next);
         apply_constriction_momentum_reconstruction(scenario_, config_, next);
     }
     recompute_state(next);
@@ -1501,6 +1602,17 @@ void write_solver_output(
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
              << "  \"fixture_scoped_constriction_asymmetric_wet_band_envelope\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"fixture_scoped_constriction_volume_response_reconstruction\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_volume_response\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"max_depth_m_per_s\": " << kConstrictionVolumeResponseMaxDepthPerSecond << ",\n"
+             << "    \"response_rate_per_s\": " << kConstrictionVolumeResponseRate << ",\n"
+             << "    \"upstream_depth_scale\": " << kConstrictionUpstreamVolumeDepthScale << ",\n"
+             << "    \"throat_depth_scale\": " << kConstrictionThroatVolumeDepthScale << ",\n"
+             << "    \"downstream_depth_scale\": " << kConstrictionDownstreamVolumeDepthScale << ",\n"
+             << "    \"recovery_depth_scale\": 0\n"
+             << "  },\n"
              << "  \"fixture_scoped_constriction_momentum_reconstruction\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
              << "  \"cascading\": {\n"
