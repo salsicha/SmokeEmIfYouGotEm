@@ -29,6 +29,9 @@ from raftsim.examples.generate_milestone18_drop_ledge_hydraulic_control_report i
 from raftsim.examples.generate_milestone18_failure_triage_matrix import main as generate_triage_main
 from raftsim.examples.generate_milestone18_parity_family_retune_report import main as generate_retune_main
 from raftsim.examples.generate_milestone18_pin_release_fixture_report import main as generate_pin_release_main
+from raftsim.examples.generate_milestone18_remaining_geometry_closure_report import (
+    main as generate_remaining_geometry_closure_main,
+)
 from raftsim.examples.run_milestone18_analytic_retune_guardrail import main as guardrail_main
 from raftsim.milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
@@ -42,6 +45,7 @@ from raftsim.milestone18 import (
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
     MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
     MILESTONE18_PIN_RELEASE_REPORT_SCHEMA,
+    MILESTONE18_REMAINING_GEOMETRY_CLOSURE_REPORT_SCHEMA,
     build_milestone18_constriction_lateral_face_flux_report,
     build_milestone18_constriction_mask_alignment_report,
     build_milestone18_constriction_probe_cross_section_report,
@@ -52,6 +56,7 @@ from raftsim.milestone18 import (
     build_milestone18_failure_triage_matrix,
     build_milestone18_parity_family_retune_report,
     build_milestone18_pin_release_fixture_report,
+    build_milestone18_remaining_geometry_closure_report,
     run_milestone18_analytic_retune_guardrail,
 )
 
@@ -1138,6 +1143,163 @@ def test_generate_milestone18_drop_ledge_hydraulic_control_cli_writes_reports(tm
     assert payload["schema_version"] == MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA
     assert payload["decision"] == "BLOCKED"
     assert "Drop/Ledge Hydraulic-Control Diagnostic" in output_md.read_text(encoding="utf-8")
+
+
+def _remaining_geometry_closure_inputs(tmp_path: Path) -> tuple[Path, Path, Path]:
+    geometry_report = _write_json(
+        tmp_path / "reports" / "milestone16" / "geometry_validation.json",
+        {
+            "schema_version": "raftsim.milestone16.geometry_validation.v0",
+            "passed": False,
+            "comparison_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+            "geoclaw_reference_report": "reports/milestone16/geoclaw_reference_runs.json",
+            "cases": [
+                {
+                    "case_id": "bed_step",
+                    "title": "Bed Steps",
+                    "passed": True,
+                    "scenarios": ["bed_step"],
+                    "solver_modes": ["finite_volume", "reduced"],
+                    "evidence": [
+                        {
+                            "gate_scenario_id": "bed_step",
+                            "solver_mode": "finite_volume",
+                            "threshold_passed": True,
+                            "failing_checks": [],
+                        },
+                        {
+                            "gate_scenario_id": "bed_step",
+                            "solver_mode": "reduced",
+                            "threshold_passed": False,
+                            "diagnostic_only": True,
+                            "failing_checks": ["field_linf", "mass_drift_delta"],
+                        },
+                    ],
+                    "notes": ["Reduced mode is diagnostic-only."],
+                },
+                {
+                    "case_id": "constriction",
+                    "title": "Constrictions",
+                    "passed": False,
+                    "scenarios": ["constriction"],
+                    "solver_modes": ["finite_volume", "reduced"],
+                    "evidence": [
+                        {
+                            "gate_scenario_id": "constriction",
+                            "solver_mode": "finite_volume",
+                            "threshold_passed": False,
+                            "failing_checks": ["field_linf", "probe_linf"],
+                        }
+                    ],
+                    "notes": ["Threshold failures remain in: constriction."],
+                },
+                {
+                    "case_id": "drops_ledges_tailwater",
+                    "title": "Drops, Ledges, And Tailwater",
+                    "passed": False,
+                    "scenarios": [
+                        "drop_ledge",
+                        "south_fork_cascading_low_runnable",
+                    ],
+                    "solver_modes": ["finite_volume", "reduced"],
+                    "evidence": [
+                        {
+                            "gate_scenario_id": "drop_ledge",
+                            "solver_mode": "finite_volume",
+                            "threshold_passed": False,
+                            "failing_checks": ["field_linf", "probe_linf"],
+                        },
+                        {
+                            "gate_scenario_id": "south_fork_cascading_low_runnable",
+                            "solver_mode": "finite_volume",
+                            "threshold_passed": False,
+                            "failing_checks": ["field_linf", "mass_drift_delta"],
+                        },
+                    ],
+                    "notes": ["Threshold failures remain in: drop_ledge, south_fork_cascading_low_runnable."],
+                },
+                {
+                    "case_id": "stitched_reach_drop_handoffs",
+                    "title": "Stitched Reach/Drop Boundary Handoffs",
+                    "passed": True,
+                    "scenarios": ["south_fork_cascading_low_runnable"],
+                    "solver_modes": ["geoclaw", "package"],
+                    "evidence": [{"gate_scenario_id": "south_fork_cascading_low_runnable", "passed": True}],
+                    "notes": [],
+                },
+            ],
+        },
+    )
+    constriction_report = _write_json(
+        tmp_path / "reports" / "milestone18" / "constriction_lateral_face_flux_diagnostic.json",
+        {
+            "schema_version": "raftsim.milestone18.constriction_lateral_face_flux.v0",
+            "decision": "BLOCKED",
+            "passed": False,
+            "summary": {"sign_mismatch_count": 2},
+            "blocked_reasons": ["C++ upstream lateral face velocity signs do not match GeoClaw."],
+            "next_levers": ["Instrument constriction lateral face flux/source balance."],
+        },
+    )
+    drop_report = _write_json(
+        tmp_path / "reports" / "milestone18" / "drop_ledge_hydraulic_control_diagnostic.json",
+        {
+            "schema_version": "raftsim.milestone18.drop_ledge_hydraulic_control.v0",
+            "decision": "BLOCKED",
+            "passed": False,
+            "summary": {"max_final_field_linf": 0.83},
+            "blocked_reasons": ["C++ drop/ledge final-field Linf still exceeds the GeoClaw/C++ threshold."],
+            "next_levers": ["Retune the ledge hydraulic-control reconstruction."],
+        },
+    )
+    return geometry_report, constriction_report, drop_report
+
+
+def test_milestone18_remaining_geometry_closure_report_records_active_blockers(tmp_path):
+    geometry_report, constriction_report, drop_report = _remaining_geometry_closure_inputs(tmp_path)
+
+    report = build_milestone18_remaining_geometry_closure_report(
+        geometry_report,
+        focused_reports=(constriction_report, drop_report),
+    )
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_REMAINING_GEOMETRY_CLOSURE_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert payload["summary"]["active_blockers"] == ["constriction", "drops_ledges_tailwater"]
+    assert payload["summary"]["next_case"] == "constriction"
+    cases = {case["case_id"]: case for case in payload["cases"]}
+    assert cases["bed_step"]["promotion_ready"] is True
+    assert cases["constriction"]["focused_evidence"][0]["source_report"] == str(constriction_report)
+    assert cases["drops_ledges_tailwater"]["failing_check_counts"]["field_linf"] == 2
+    assert "whole-window water-field parity" in " ".join(cases["drops_ledges_tailwater"]["notes"])
+
+
+def test_generate_milestone18_remaining_geometry_closure_cli_writes_reports(tmp_path):
+    geometry_report, constriction_report, drop_report = _remaining_geometry_closure_inputs(tmp_path)
+    output_json = tmp_path / "reports" / "milestone18" / "remaining_geometry_closure.json"
+    output_md = tmp_path / "reports" / "milestone18" / "remaining_geometry_closure.md"
+
+    exit_code = generate_remaining_geometry_closure_main(
+        [
+            "--geometry-report",
+            str(geometry_report),
+            "--focused-report",
+            str(constriction_report),
+            "--focused-report",
+            str(drop_report),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_REMAINING_GEOMETRY_CLOSURE_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert "Remaining Geometry Closure" in output_md.read_text(encoding="utf-8")
 
 
 def test_milestone18_parity_family_retune_report_records_partial_promotion(tmp_path):
