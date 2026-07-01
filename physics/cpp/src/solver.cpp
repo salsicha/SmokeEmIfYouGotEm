@@ -46,6 +46,10 @@ constexpr double kConstrictionLocalFringeMaxDepthPerSecond = 0.12;
 constexpr double kConstrictionLocalFringeRecoveryDepthScale = 1.0;
 constexpr double kConstrictionLocalFringeSpeedFraction = 0.8;
 constexpr double kConstrictionLocalFringeEdgeVelocityFraction = 0.16;
+constexpr double kConstrictionNearThroatDepthScale = 1.0;
+constexpr double kConstrictionNearThroatReceiverDepthScale = 1.22;
+constexpr double kConstrictionNearThroatSpeedFraction = 1.0;
+constexpr double kConstrictionNearThroatEdgeVelocityFraction = 0.41;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -748,8 +752,10 @@ std::size_t constriction_asymmetric_target_count(
     std::size_t target = band.count;
     if (band.count == throat_width_cells) {
         target = throat_width_cells + 1;
-    } else if (signed_x < 0.0) {
+    } else if (signed_x < -half_length) {
         target = band.count + 2;
+    } else if (signed_x < 0.0) {
+        target = band.count + 1;
     } else if (signed_x <= half_length) {
         target = band.count > 1 ? band.count - 1 : 1;
         target = std::max(target, throat_width_cells + 1);
@@ -1372,6 +1378,118 @@ void apply_constriction_momentum_reconstruction(
     }
 }
 
+void apply_constriction_near_throat_support_reconstruction(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction") {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double flow_sign = constriction_flow_sign(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    double target_u = flow_sign * kConstrictionNearThroatSpeedFraction * reference_speed;
+    double transferable_mass = 0.0;
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found) {
+            continue;
+        }
+
+        if (!is_center_throat_column(scenario, band, throat_width_cells, col) || band.first_row == 0) {
+            continue;
+        }
+
+        std::size_t target_first = band.first_row - 1;
+        std::size_t target_last = target_first + band.count - 1;
+        if (target_last >= scenario.grid.ny) {
+            continue;
+        }
+        std::size_t source_first = std::min(target_first, band.first_row);
+        std::size_t source_last = std::max(target_last, band.last_row);
+
+        double current_mass = 0.0;
+        for (std::size_t row = source_first; row <= source_last; ++row) {
+            current_mass += next.h(row, col);
+        }
+        if (current_mass <= config.dry_tolerance) {
+            continue;
+        }
+
+        double target_mass = initial_column_mean_depth(scenario, band, col) *
+                             static_cast<double>(band.count) * kConstrictionNearThroatDepthScale;
+        double retained_mass = std::min(current_mass, target_mass);
+        transferable_mass += current_mass - retained_mass;
+        double target_depth = retained_mass / static_cast<double>(band.count);
+        double center_row = 0.5 * (static_cast<double>(target_first) + static_cast<double>(target_last));
+
+        for (std::size_t row = source_first; row <= source_last; ++row) {
+            if (row < target_first || row > target_last) {
+                next.h(row, col) = 0.0;
+                next.u(row, col) = 0.0;
+                next.v(row, col) = 0.0;
+                continue;
+            }
+
+            double edge_sign = static_cast<double>(row) < center_row ? 1.0 : -1.0;
+            bool edge_cell = row == target_first || row == target_last;
+            next.h(row, col) = target_depth;
+            next.u(row, col) = target_u;
+            next.v(row, col) = edge_cell ? edge_sign * kConstrictionNearThroatEdgeVelocityFraction * std::abs(target_u) : 0.0;
+        }
+    }
+
+    if (transferable_mass <= config.dry_tolerance) {
+        return;
+    }
+
+    std::size_t throat_width_cells_for_receivers = throat_width_cells;
+    std::vector<ConstrictionDepthTransferCell> receivers;
+    double receiver_capacity = 0.0;
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count <= throat_width_cells_for_receivers || constriction_signed_x(scenario, col) >= 0.0) {
+            continue;
+        }
+        double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+        double target_h = column_mean_depth * kConstrictionNearThroatReceiverDepthScale;
+        for (std::size_t row = band.first_row; row <= band.last_row; ++row) {
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells_for_receivers, col, row)) {
+                continue;
+            }
+            if (next.h(row, col) >= target_h) {
+                continue;
+            }
+            double capacity = target_h - next.h(row, col);
+            receivers.push_back(ConstrictionDepthTransferCell{row, col, capacity});
+            receiver_capacity += capacity;
+        }
+    }
+
+    double transfer_mass = std::min(transferable_mass, receiver_capacity);
+    if (transfer_mass <= config.dry_tolerance || receiver_capacity <= 0.0) {
+        return;
+    }
+
+    for (const ConstrictionDepthTransferCell& receiver : receivers) {
+        double added_h = transfer_mass * receiver.capacity / receiver_capacity;
+        double current_h = next.h(receiver.row, receiver.col);
+        double target_receiver_u =
+            constriction_response_target_u(next.u(receiver.row, receiver.col), scenario.initial.u(receiver.row, receiver.col), flow_sign);
+        double merged_h = current_h + added_h;
+        double merged_hu = current_h * next.u(receiver.row, receiver.col) + added_h * target_receiver_u;
+        double merged_hv = current_h * next.v(receiver.row, receiver.col) + added_h * next.v(receiver.row, receiver.col);
+        next.h(receiver.row, receiver.col) = merged_h;
+        next.u(receiver.row, receiver.col) =
+            merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+        next.v(receiver.row, receiver.col) =
+            merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+    }
+}
+
 void apply_constriction_dry_bank_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -1762,6 +1880,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_upstream_shoulder_froude_reconstruction(scenario_, config_, dt, next);
         apply_constriction_local_shallow_fringe_reconstruction(scenario_, config_, dt, next);
         apply_constriction_momentum_reconstruction(scenario_, config_, next);
+        apply_constriction_near_throat_support_reconstruction(scenario_, config_, next);
     }
     recompute_state(next);
     state_ = std::move(next);
@@ -2108,6 +2227,16 @@ void write_solver_output(
              << "    \"recovery_target_depth_scale\": " << kConstrictionLocalFringeRecoveryDepthScale << ",\n"
              << "    \"speed_fraction_of_authored_throat\": " << kConstrictionLocalFringeSpeedFraction << ",\n"
              << "    \"edge_velocity_fraction\": " << kConstrictionLocalFringeEdgeVelocityFraction << "\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_near_throat_support_reconstruction\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_near_throat_support\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative_excess_transfer\": true,\n"
+             << "    \"throat_depth_scale\": " << kConstrictionNearThroatDepthScale << ",\n"
+             << "    \"receiver_depth_scale\": " << kConstrictionNearThroatReceiverDepthScale << ",\n"
+             << "    \"speed_fraction_of_authored_throat\": " << kConstrictionNearThroatSpeedFraction << ",\n"
+             << "    \"edge_velocity_fraction\": " << kConstrictionNearThroatEdgeVelocityFraction << "\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_momentum_reconstruction\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
