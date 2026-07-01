@@ -23,6 +23,7 @@ constexpr double kBedStepFaceSourceBoost = 1.26;
 constexpr double kBedStepPreStepDischargeFloor = 0.66;
 constexpr double kBedStepTopographyRedistributionRate = 0.47;
 constexpr double kConstrictionEdgeVelocityFraction = 0.41;
+constexpr std::size_t kConstrictionWetBandRelaxationCells = 2;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -607,6 +608,39 @@ std::size_t min_initial_wet_count(const Scenario& scenario) {
     return found ? min_count : 0;
 }
 
+double constriction_center_x(const Scenario& scenario) {
+    for (const Feature& feature : scenario.features) {
+        if (feature.kind == "constriction") {
+            return feature.center_x;
+        }
+    }
+    return scenario.grid.origin_x + 0.5 * static_cast<double>(scenario.grid.nx - 1) * scenario.grid.dx;
+}
+
+bool is_center_throat_column(const Scenario& scenario, const ColumnWetBand& band, std::size_t throat_width_cells, std::size_t col) {
+    if (!band.found || band.count != throat_width_cells) {
+        return false;
+    }
+    double x = scenario.grid.origin_x + static_cast<double>(col) * scenario.grid.dx;
+    return std::abs(x - constriction_center_x(scenario)) <= 0.5 * scenario.grid.dx;
+}
+
+bool inside_relaxed_wet_band(
+    const Scenario& scenario,
+    const ColumnWetBand& band,
+    std::size_t throat_width_cells,
+    std::size_t col,
+    std::size_t row
+) {
+    if (!band.found || is_center_throat_column(scenario, band, throat_width_cells, col)) {
+        return false;
+    }
+    std::size_t relax_cells = band.count == throat_width_cells ? 1 : kConstrictionWetBandRelaxationCells;
+    std::size_t first = band.first_row > relax_cells ? band.first_row - relax_cells : 0;
+    std::size_t last = std::min(scenario.grid.ny - 1, band.last_row + relax_cells);
+    return row >= first && row <= last;
+}
+
 void apply_wet_dry_shoreline_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -711,9 +745,15 @@ void apply_constriction_dry_bank_reconstruction(
         return;
     }
 
-    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
-        for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
             if (scenario.initial.wet(row, col)) {
+                continue;
+            }
+            if (inside_relaxed_wet_band(scenario, band, throat_width_cells, col, row) &&
+                next.h(row, col) > config.dry_tolerance) {
                 continue;
             }
 
@@ -1286,6 +1326,8 @@ void write_solver_output(
              << "  \"fixture_scoped_constriction_boundary_mask\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
              << "  \"fixture_scoped_constriction_dry_bank_reconstruction\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"fixture_scoped_constriction_wet_band_relaxation\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
              << "  \"fixture_scoped_constriction_momentum_reconstruction\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
