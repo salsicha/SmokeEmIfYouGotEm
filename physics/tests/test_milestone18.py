@@ -945,6 +945,7 @@ def test_milestone18_constriction_face_source_audit_records_flux_source_balance(
     assert payload["summary"]["opposition_mismatch_count"] >= 1
     assert payload["summary"]["cpp_internal_audit_sample_count"] == 2
     assert payload["summary"]["cpp_internal_source_applied_count"] == 1
+    assert payload["summary"]["cpp_internal_face_state_reconstruction_applied_count"] == 0
     assert payload["summary"]["cpp_internal_post_source_sign_mismatch_count"] >= 1
     assert payload["summary"]["cpp_internal_hydrostatic_face_source_enabled_count"] == 0
     assert payload["summary"]["cpp_internal_constriction_source_split_applied_count"] == 0

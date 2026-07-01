@@ -2142,6 +2142,11 @@ class Milestone18ConstrictionFaceSourceAuditReport:
                 "cpp_internal_source_applied_count": sum(
                     1 for sample in self.cpp_internal_audit if bool(sample.get("constriction_face_source_applied"))
                 ),
+                "cpp_internal_face_state_reconstruction_applied_count": sum(
+                    1
+                    for sample in self.cpp_internal_audit
+                    if bool(sample.get("constriction_face_state_reconstruction_applied"))
+                ),
                 "cpp_internal_hydrostatic_face_source_enabled_count": sum(
                     1 for sample in self.cpp_internal_audit if bool(sample.get("hydrostatic_face_source_enabled"))
                 ),
@@ -2204,6 +2209,7 @@ class Milestone18ConstrictionFaceSourceAuditReport:
             f"- Max abs flux/source balance delta: `{_format_number(_float_or_none(summary['max_abs_balance_delta_m3ps2']))}` m3/s2",
             f"- C++ internal audit samples: `{summary['cpp_internal_audit_sample_count']}`",
             f"- C++ internal post-source sign mismatches: `{summary['cpp_internal_post_source_sign_mismatch_count']}`",
+            f"- C++ internal face-state reconstruction applications: `{summary['cpp_internal_face_state_reconstruction_applied_count']}`",
             f"- C++ internal constriction source-split applications: `{summary['cpp_internal_constriction_source_split_applied_count']}`",
             "",
             "## Worst Face/Source Samples",
@@ -2219,8 +2225,8 @@ class Milestone18ConstrictionFaceSourceAuditReport:
                     "",
                     "## C++ Internal Y-Face Audit",
                     "",
-                    "| Face | Column | Rows | GeoClaw q/sign | C++ base q | C++ post-source q/sign | Delta | Source Applied | Split Applied | Hydro Face Source | Cell bed-source S/N |",
-                    "| --- | ---: | --- | --- | ---: | --- | ---: | --- | --- | --- | --- |",
+                    "| Face | Column | Rows | GeoClaw q/sign | C++ base q | C++ post-source q/sign | Delta | State Reconstructed | Source Applied | Split Applied | Hydro Face Source | Cell bed-source S/N |",
+                    "| --- | ---: | --- | --- | ---: | --- | ---: | --- | --- | --- | --- | --- |",
                 ]
             )
             for sample in self.cpp_internal_audit[:12]:
@@ -7397,21 +7403,30 @@ def _load_cpp_constriction_y_face_audit(
                     "post_left_flux_delta_m3ps": post_left_flux - reference_flux,
                     "post_left_sign": post_sign,
                     "post_left_sign_matches": reference_sign == 0 or post_sign == reference_sign,
-                "hydro_left_source_hv_m3ps2": _float_from_csv(row, "hydro_left_source_hv_m3ps2"),
-                "hydro_right_source_hv_m3ps2": _float_from_csv(row, "hydro_right_source_hv_m3ps2"),
-                "constriction_source_split_left_hv_m3ps2": _float_from_csv(
-                    row, "constriction_source_split_left_hv_m3ps2"
-                ),
-                "constriction_source_split_right_hv_m3ps2": _float_from_csv(
-                    row, "constriction_source_split_right_hv_m3ps2"
-                ),
-                "constriction_left_source_h_m3ps": _float_from_csv(row, "constriction_left_source_h_m3ps"),
-                "constriction_right_source_h_m3ps": _float_from_csv(row, "constriction_right_source_h_m3ps"),
+                    "face_state_south_h": _float_from_csv(row, "face_state_south_h"),
+                    "face_state_south_u": _float_from_csv(row, "face_state_south_u"),
+                    "face_state_south_v": _float_from_csv(row, "face_state_south_v"),
+                    "face_state_north_h": _float_from_csv(row, "face_state_north_h"),
+                    "face_state_north_u": _float_from_csv(row, "face_state_north_u"),
+                    "face_state_north_v": _float_from_csv(row, "face_state_north_v"),
+                    "hydro_left_source_hv_m3ps2": _float_from_csv(row, "hydro_left_source_hv_m3ps2"),
+                    "hydro_right_source_hv_m3ps2": _float_from_csv(row, "hydro_right_source_hv_m3ps2"),
+                    "constriction_source_split_left_hv_m3ps2": _float_from_csv(
+                        row, "constriction_source_split_left_hv_m3ps2"
+                    ),
+                    "constriction_source_split_right_hv_m3ps2": _float_from_csv(
+                        row, "constriction_source_split_right_hv_m3ps2"
+                    ),
+                    "constriction_left_source_h_m3ps": _float_from_csv(row, "constriction_left_source_h_m3ps"),
+                    "constriction_right_source_h_m3ps": _float_from_csv(row, "constriction_right_source_h_m3ps"),
                     "south_cell_bed_slope_source_hv_per_s": _float_from_csv(
                         row, "south_cell_bed_slope_source_hv_per_s"
                     ),
                     "north_cell_bed_slope_source_hv_per_s": _float_from_csv(
                         row, "north_cell_bed_slope_source_hv_per_s"
+                    ),
+                    "constriction_face_state_reconstruction_applied": _bool_from_csv(
+                        row, "constriction_face_state_reconstruction_applied"
                     ),
                     "hydrostatic_face_source_enabled": _bool_from_csv(row, "hydrostatic_face_source_enabled"),
                     "constriction_hydrostatic_source_split_applied": _bool_from_csv(
@@ -7695,6 +7710,7 @@ def _cpp_internal_face_audit_row(sample: dict[str, object]) -> str:
         f"{_format_number(_float_or_none(sample.get('base_flux_h_m3ps')))} | "
         f"`{post}` | "
         f"{_format_number(_float_or_none(sample.get('post_left_flux_delta_m3ps')))} | "
+        f"`{bool(sample.get('constriction_face_state_reconstruction_applied'))}` | "
         f"`{bool(sample.get('constriction_face_source_applied'))}` | "
         f"`{bool(sample.get('constriction_hydrostatic_source_split_applied'))}` | "
         f"`{bool(sample.get('hydrostatic_face_source_enabled'))}` | "
