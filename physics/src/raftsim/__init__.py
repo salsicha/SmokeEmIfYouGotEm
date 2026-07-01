@@ -62,6 +62,7 @@ from .milestone18 import (
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
     MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
     MILESTONE18_PIN_RELEASE_REPORT_SCHEMA,
+    MILESTONE18_REMAINING_GEOMETRY_CLOSURE_REPORT_SCHEMA,
     Milestone18AnalyticGuardrailStage,
     Milestone18AnalyticRegression,
     Milestone18AnalyticRetuneGuardrailReport,
@@ -83,6 +84,8 @@ from .milestone18 import (
     Milestone18PinReleaseFixtureReport,
     Milestone18PinReleaseFlowCase,
     Milestone18PinReleaseResponsePath,
+    Milestone18RemainingGeometryClosureCase,
+    Milestone18RemainingGeometryClosureReport,
     build_milestone18_constriction_lateral_face_flux_report,
     build_milestone18_constriction_mask_alignment_report,
     build_milestone18_constriction_throat_shape_report,
@@ -90,6 +93,7 @@ from .milestone18 import (
     build_milestone18_failure_triage_matrix,
     build_milestone18_parity_family_retune_report,
     build_milestone18_pin_release_fixture_report,
+    build_milestone18_remaining_geometry_closure_report,
     run_milestone18_analytic_retune_guardrail,
 )
 from .raft2d import (
@@ -654,6 +658,7 @@ __all__ = [
     "build_milestone18_drop_ledge_hydraulic_control_report",
     "build_milestone18_parity_family_retune_report",
     "build_milestone18_pin_release_fixture_report",
+    "build_milestone18_remaining_geometry_closure_report",
     "build_rapid_review_editor_workflow",
     "build_rapid_review_flow_difficulty_mapping",
     "build_readiness_report",

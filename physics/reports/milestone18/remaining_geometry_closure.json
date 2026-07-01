@@ -1,0 +1,260 @@
+{
+  "cases": [
+    {
+      "case_id": "constriction",
+      "failing_check_counts": {
+        "cross_section_linf": 2,
+        "energy_change_delta": 1,
+        "feature_location_delta": 2,
+        "feature_strength_delta": 2,
+        "field_linf": 2,
+        "froude_delta": 2,
+        "mass_drift_delta": 1,
+        "probe_linf": 2,
+        "slope_linf": 2,
+        "wet_mismatch_fraction": 1
+      },
+      "failing_scenario_count": 1,
+      "focused_evidence": [
+        {
+          "blocked_reasons": [
+            "C++ upstream lateral face velocity signs do not match GeoClaw on one or more edge faces.",
+            "C++ upstream lateral face volume-flux proxy deltas exceed the diagnostic threshold.",
+            "GeoClaw shows opposite-signed lower/upper upstream edge faces that C++ does not reproduce."
+          ],
+          "decision": "BLOCKED",
+          "next_levers": [
+            "Start with `upper_edge_face` column 6 rows 8-9; the GeoClaw/C++ lateral flux proxy differs by 2.72825 m3/s.",
+            "Instrument or reconstruct the actual finite-volume lateral face flux/source balance before adding another post-step velocity or depth transport.",
+            "Preserve GeoClaw's opposite-signed lower/upper upstream edge behavior; a single-sign lateral transport will keep damaging Froude shape."
+          ],
+          "passed": false,
+          "schema_version": "raftsim.milestone18.constriction_lateral_face_flux.v0",
+          "source_report": "reports/milestone18/constriction_lateral_face_flux_diagnostic.json",
+          "summary": {
+            "candidate_opposed_edge_column_count": 0,
+            "max_abs_flux_delta_m3ps": 2.728245087487932,
+            "opposition_mismatch_count": 10,
+            "reference_opposed_edge_column_count": 10,
+            "sample_count": 16,
+            "sign_mismatch_count": 13,
+            "worst_samples_count": 12
+          }
+        }
+      ],
+      "next_levers": [
+        "Start with `upper_edge_face` column 6 rows 8-9; the GeoClaw/C++ lateral flux proxy differs by 2.72825 m3/s.",
+        "Instrument or reconstruct the actual finite-volume lateral face flux/source balance before adding another post-step velocity or depth transport.",
+        "Preserve GeoClaw's opposite-signed lower/upper upstream edge behavior; a single-sign lateral transport will keep damaging Froude shape.",
+        "Close constriction field, slope, probe, cross-section, and wet-mask parity before treating raft coupling as actionable.",
+        "Preserve or restore conservation and energy checks before accepting any visual/gameplay forcing."
+      ],
+      "notes": [
+        "Threshold failures remain in: constriction."
+      ],
+      "passed": false,
+      "priority": 1,
+      "promotion_ready": false,
+      "scenarios": [
+        "constriction"
+      ],
+      "solver_modes": [
+        "finite_volume",
+        "reduced"
+      ],
+      "title": "Constrictions"
+    },
+    {
+      "case_id": "drops_ledges_tailwater",
+      "failing_check_counts": {
+        "cross_section_linf": 7,
+        "energy_change_delta": 7,
+        "feature_location_delta": 6,
+        "feature_strength_delta": 6,
+        "field_linf": 8,
+        "froude_delta": 8,
+        "mass_drift_delta": 4,
+        "probe_linf": 8,
+        "slope_linf": 8,
+        "wet_mismatch_fraction": 3
+      },
+      "failing_scenario_count": 4,
+      "focused_evidence": [
+        {
+          "blocked_reasons": [
+            "C++ drop/ledge final-field Linf still exceeds the GeoClaw/C++ threshold.",
+            "C++ drop/ledge point-probe raw samples still exceed the GeoClaw/C++ threshold.",
+            "The remaining drop/ledge error is localized to hydraulic-control or tailwater-recovery water shape."
+          ],
+          "decision": "BLOCKED",
+          "next_levers": [
+            "Start with `field`/`u` at `final` cell 0,10; it is 3.32137x the diagnostic threshold.",
+            "Retune the ledge hydraulic-control free-surface/depth reconstruction and downstream recovery shape before adding gameplay feature forcing.",
+            "Preserve the passing conservation, energy, and Froude checks; this is a water-shape blocker, not permission to hide errors with forcing.",
+            "Inspect depth, stage, and streamwise momentum across the ledge lip and first tailwater recovery columns.",
+            "Use the raw probe/cross-section coordinates as the acceptance surface for the next corrected-reference parity run.",
+            "Keep `feature_strength_scale=0` and rerun the Milestone 17 analytic guardrail after the solver change."
+          ],
+          "passed": false,
+          "schema_version": "raftsim.milestone18.drop_ledge_hydraulic_control.v0",
+          "source_report": "reports/milestone18/drop_ledge_hydraulic_control_diagnostic.json",
+          "summary": {
+            "max_abs_zone_mean_eta_delta_m": 0.11779257287633271,
+            "max_abs_zone_mean_h_delta_m": 0.11779257287633271,
+            "max_cross_section_linf": 0.1854177862203923,
+            "max_final_field_linf": 0.8303419363690829,
+            "max_probe_linf": 0.4176103870740251,
+            "sample_count": 26,
+            "worst_final_field_samples_count": 9,
+            "worst_raw_samples_count": 12
+          }
+        }
+      ],
+      "next_levers": [
+        "Start with `field`/`u` at `final` cell 0,10; it is 3.32137x the diagnostic threshold.",
+        "Retune the ledge hydraulic-control free-surface/depth reconstruction and downstream recovery shape before adding gameplay feature forcing.",
+        "Preserve the passing conservation, energy, and Froude checks; this is a water-shape blocker, not permission to hide errors with forcing.",
+        "Inspect depth, stage, and streamwise momentum across the ledge lip and first tailwater recovery columns.",
+        "Use the raw probe/cross-section coordinates as the acceptance surface for the next corrected-reference parity run.",
+        "Keep `feature_strength_scale=0` and rerun the Milestone 17 analytic guardrail after the solver change.",
+        "Retune the single drop/ledge hydraulic-control lane before folding the fix into cascading South Fork flows.",
+        "Use stitched whole-window cascading comparisons for acceptance; reach-local seams already pass and cannot hide water-field errors.",
+        "Preserve or restore conservation and energy checks before accepting any visual/gameplay forcing."
+      ],
+      "notes": [
+        "Threshold failures remain in: drop_ledge, south_fork_cascading_high_runnable, south_fork_cascading_low_runnable, south_fork_cascading_median_runnable.",
+        "Cascading reach/drop handoff checks pass separately; these failures are whole-window water-field parity blockers: south_fork_cascading_high_runnable, south_fork_cascading_low_runnable, south_fork_cascading_median_runnable."
+      ],
+      "passed": false,
+      "priority": 2,
+      "promotion_ready": false,
+      "scenarios": [
+        "drop_ledge",
+        "south_fork_cascading_low_runnable",
+        "south_fork_cascading_median_runnable",
+        "south_fork_cascading_high_runnable"
+      ],
+      "solver_modes": [
+        "finite_volume",
+        "reduced"
+      ],
+      "title": "Drops, Ledges, And Tailwater"
+    },
+    {
+      "case_id": "stitched_reach_drop_handoffs",
+      "failing_check_counts": {},
+      "failing_scenario_count": 0,
+      "focused_evidence": [],
+      "next_levers": [
+        "Preserve this geometry family as a guardrail while retuning active blockers."
+      ],
+      "notes": [
+        "Keep this passing stitched-window seam evidence as a guardrail while retuning cascading water fields."
+      ],
+      "passed": true,
+      "priority": 3,
+      "promotion_ready": true,
+      "scenarios": [
+        "south_fork_cascading_low_runnable",
+        "south_fork_cascading_median_runnable",
+        "south_fork_cascading_high_runnable"
+      ],
+      "solver_modes": [
+        "geoclaw",
+        "package"
+      ],
+      "title": "Stitched Reach/Drop Boundary Handoffs"
+    },
+    {
+      "case_id": "wet_dry_shoreline",
+      "failing_check_counts": {},
+      "failing_scenario_count": 0,
+      "focused_evidence": [],
+      "next_levers": [
+        "Preserve this geometry family as a guardrail while retuning active blockers."
+      ],
+      "notes": [
+        "Milestone 18 closure evidence applied from reports/milestone18/wet_dry_finite_volume_reconstruction_retune.json.",
+        "Accepted solver modes for this geometry family: finite_volume, reduced.",
+        "Supersedes stale Milestone 16 threshold blockers for: wet_dry_shoreline:finite_volume."
+      ],
+      "passed": true,
+      "priority": 10,
+      "promotion_ready": true,
+      "scenarios": [
+        "wet_dry_shoreline"
+      ],
+      "solver_modes": [
+        "finite_volume",
+        "reduced"
+      ],
+      "title": "Wet/Dry Shorelines"
+    },
+    {
+      "case_id": "bed_step",
+      "failing_check_counts": {},
+      "failing_scenario_count": 0,
+      "focused_evidence": [],
+      "next_levers": [
+        "Preserve this geometry family as a guardrail while retuning active blockers."
+      ],
+      "notes": [
+        "Milestone 18 closure evidence applied from reports/milestone18/bed_step_parity_retune.json.",
+        "Accepted solver modes for this geometry family: finite_volume.",
+        "Diagnostic-only solver modes are retained as smoke evidence but no longer block this geometry family: reduced.",
+        "Supersedes stale Milestone 16 threshold blockers for: bed_step:reduced."
+      ],
+      "passed": true,
+      "priority": 11,
+      "promotion_ready": true,
+      "scenarios": [
+        "bed_step"
+      ],
+      "solver_modes": [
+        "finite_volume",
+        "reduced"
+      ],
+      "title": "Bed Steps"
+    },
+    {
+      "case_id": "hydrostatic_sloping_balance",
+      "failing_check_counts": {},
+      "failing_scenario_count": 0,
+      "focused_evidence": [],
+      "next_levers": [
+        "Preserve this geometry family as a guardrail while retuning active blockers."
+      ],
+      "notes": [],
+      "passed": true,
+      "priority": 12,
+      "promotion_ready": true,
+      "scenarios": [
+        "flat_pool",
+        "sloping_manning_channel"
+      ],
+      "solver_modes": [
+        "finite_volume",
+        "reduced"
+      ],
+      "title": "Hydrostatic And Sloping Balance"
+    }
+  ],
+  "decision": "BLOCKED",
+  "focused_report_paths": [
+    "reports/milestone18/constriction_lateral_face_flux_diagnostic.json",
+    "reports/milestone18/drop_ledge_hydraulic_control_diagnostic.json"
+  ],
+  "geometry_report": "reports/milestone16/geometry_validation.json",
+  "passed": false,
+  "schema_version": "raftsim.milestone18.remaining_geometry_closure.v0",
+  "summary": {
+    "active_blockers": [
+      "constriction",
+      "drops_ledges_tailwater"
+    ],
+    "blocker_count": 2,
+    "case_count": 6,
+    "next_case": "constriction",
+    "promotion_ready_count": 4
+  }
+}

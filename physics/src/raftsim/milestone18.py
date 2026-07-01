@@ -48,6 +48,9 @@ MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA = (
 MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA = (
     "raftsim.milestone18.drop_ledge_hydraulic_control.v0"
 )
+MILESTONE18_REMAINING_GEOMETRY_CLOSURE_REPORT_SCHEMA = (
+    "raftsim.milestone18.remaining_geometry_closure.v0"
+)
 
 _CORE_GUARDRAIL_FAMILIES = {"hydrostatic_sloping_balance", "uniform_channel", "dam_break_bore"}
 _GEOMETRY_CLOSURE_FAMILIES = {"wet_dry_shoreline", "bed_step", "constriction", "drops_ledges_tailwater"}
@@ -1683,6 +1686,138 @@ class Milestone18DropLedgeHydraulicControlReport:
 
 
 @dataclass(frozen=True, slots=True)
+class Milestone18RemainingGeometryClosureCase:
+    """One remaining geometry-validation family and its closure state."""
+
+    case_id: str
+    title: str
+    passed: bool
+    priority: int
+    scenarios: tuple[str, ...]
+    solver_modes: tuple[str, ...]
+    failing_check_counts: dict[str, int]
+    failing_scenario_count: int
+    focused_evidence: tuple[dict[str, object], ...] = ()
+    notes: tuple[str, ...] = ()
+    next_levers: tuple[str, ...] = ()
+
+    @property
+    def promotion_ready(self) -> bool:
+        return self.passed and not self.failing_check_counts
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "case_id": self.case_id,
+            "title": self.title,
+            "passed": self.passed,
+            "promotion_ready": self.promotion_ready,
+            "priority": self.priority,
+            "scenarios": list(self.scenarios),
+            "solver_modes": list(self.solver_modes),
+            "failing_check_counts": dict(self.failing_check_counts),
+            "failing_scenario_count": self.failing_scenario_count,
+            "focused_evidence": list(self.focused_evidence),
+            "notes": list(self.notes),
+            "next_levers": list(self.next_levers),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18RemainingGeometryClosureReport:
+    """Closure queue for remaining Milestone 18 geometry-specific blockers."""
+
+    geometry_report: str
+    focused_report_paths: tuple[str, ...]
+    cases: tuple[Milestone18RemainingGeometryClosureCase, ...]
+
+    @property
+    def passed(self) -> bool:
+        return bool(self.cases) and all(case.promotion_ready for case in self.cases)
+
+    @property
+    def blockers(self) -> tuple[Milestone18RemainingGeometryClosureCase, ...]:
+        return tuple(case for case in self.cases if not case.promotion_ready)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_REMAINING_GEOMETRY_CLOSURE_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "geometry_report": self.geometry_report,
+            "focused_report_paths": list(self.focused_report_paths),
+            "summary": {
+                "case_count": len(self.cases),
+                "blocker_count": len(self.blockers),
+                "promotion_ready_count": sum(1 for case in self.cases if case.promotion_ready),
+                "active_blockers": [case.case_id for case in self.blockers],
+                "next_case": self.blockers[0].case_id if self.blockers else None,
+            },
+            "cases": [case.to_json_dict() for case in self.cases],
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        summary = self.to_json_dict()["summary"]
+        lines = [
+            "# Milestone 18 Remaining Geometry Closure",
+            "",
+            f"Schema: `{MILESTONE18_REMAINING_GEOMETRY_CLOSURE_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Geometry report: `{self.geometry_report}`",
+            f"Focused reports: `{', '.join(self.focused_report_paths) if self.focused_report_paths else 'none'}`",
+            "",
+            "## Summary",
+            "",
+            f"- Blocker count: `{summary['blocker_count']}`",
+            f"- Promotion-ready count: `{summary['promotion_ready_count']}`",
+            f"- Next case: `{summary['next_case'] or 'none'}`",
+            "",
+            "## Closure Queue",
+            "",
+            "| Priority | Case | Status | Failing checks | Focused evidence | Next lever |",
+            "| ---: | --- | --- | --- | --- | --- |",
+        ]
+        for case in self.cases:
+            evidence = ", ".join(_escape_table(str(item.get("source_report", "unknown"))) for item in case.focused_evidence)
+            first_lever = case.next_levers[0] if case.next_levers else "Preserve as guardrail."
+            lines.append(
+                "| "
+                f"{case.priority} | "
+                f"`{case.case_id}` | "
+                f"{'PASS' if case.promotion_ready else 'BLOCKED'} | "
+                f"{_escape_table(_counter_markdown(case.failing_check_counts))} | "
+                f"{evidence or 'none'} | "
+                f"{_escape_table(first_lever)} |"
+            )
+        if self.blockers:
+            lines.extend(["", "## Active Blockers", ""])
+            for case in self.blockers:
+                lines.append(f"### {case.title}")
+                lines.append("")
+                lines.append(f"- Case ID: `{case.case_id}`")
+                lines.append(f"- Scenarios: `{', '.join(case.scenarios)}`")
+                lines.append(f"- Failing checks: `{_counter_markdown(case.failing_check_counts)}`")
+                if case.notes:
+                    lines.extend(f"- {note}" for note in case.notes)
+                if case.next_levers:
+                    lines.append("")
+                    lines.append("Next levers:")
+                    lines.extend(f"- {lever}" for lever in case.next_levers)
+                lines.append("")
+        output_path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+        return output_path
+
+
+@dataclass(frozen=True, slots=True)
 class Milestone18ConstrictionLateralFaceFluxSample:
     """One upstream lateral face flux proxy comparing final GeoClaw and C++ states."""
 
@@ -2761,6 +2896,47 @@ def build_milestone18_drop_ledge_hydraulic_control_report(
         cross_section_samples=cross_section_samples,
         blocked_reasons=blocked_reasons,
         next_levers=next_levers,
+    )
+
+
+def build_milestone18_remaining_geometry_closure_report(
+    geometry_report: str | Path,
+    *,
+    focused_reports: tuple[str | Path, ...] = (),
+) -> Milestone18RemainingGeometryClosureReport:
+    """Build the ordered Milestone 18 queue for remaining geometry-specific blockers."""
+
+    geometry_path = Path(geometry_report)
+    geometry = _load_json_report(geometry_path)
+    focused_by_case = _focused_geometry_evidence_by_case(focused_reports)
+    cases: list[Milestone18RemainingGeometryClosureCase] = []
+    for case_payload in _records(geometry, "cases"):
+        case_id = str(case_payload.get("case_id", "unknown_geometry_case"))
+        evidence_records = _records(case_payload, "evidence")
+        failing_counts = _geometry_failing_check_counts(evidence_records)
+        focused = focused_by_case.get(case_id, ())
+        passed = bool(case_payload.get("passed")) and not failing_counts
+        notes = tuple(str(note) for note in case_payload.get("notes", []) if isinstance(note, str))
+        cases.append(
+            Milestone18RemainingGeometryClosureCase(
+                case_id=case_id,
+                title=str(case_payload.get("title", case_id)),
+                passed=passed,
+                priority=_remaining_geometry_priority(case_id),
+                scenarios=tuple(str(item) for item in case_payload.get("scenarios", []) if isinstance(item, str)),
+                solver_modes=tuple(str(item) for item in case_payload.get("solver_modes", []) if isinstance(item, str)),
+                failing_check_counts=failing_counts,
+                failing_scenario_count=_geometry_failing_scenario_count(evidence_records),
+                focused_evidence=focused,
+                notes=_remaining_geometry_notes(case_id, notes, evidence_records),
+                next_levers=_remaining_geometry_next_levers(case_id, focused, failing_counts, evidence_records),
+            )
+        )
+    sorted_cases = tuple(sorted(cases, key=lambda case: (case.promotion_ready, case.priority, case.case_id)))
+    return Milestone18RemainingGeometryClosureReport(
+        geometry_report=str(geometry_path),
+        focused_report_paths=tuple(str(Path(path)) for path in focused_reports),
+        cases=sorted_cases,
     )
 
 
@@ -5214,6 +5390,156 @@ def _drop_ledge_hydraulic_control_next_levers(
         levers.append("Use the raw probe/cross-section coordinates as the acceptance surface for the next corrected-reference parity run.")
     levers.append("Keep `feature_strength_scale=0` and rerun the Milestone 17 analytic guardrail after the solver change.")
     return tuple(dict.fromkeys(levers))
+
+
+def _focused_geometry_evidence_by_case(
+    focused_reports: tuple[str | Path, ...],
+) -> dict[str, tuple[dict[str, object], ...]]:
+    by_case: dict[str, list[dict[str, object]]] = {}
+    for report_ref in focused_reports:
+        path = Path(report_ref)
+        if not path.exists():
+            continue
+        payload = _load_json_report(path)
+        case_id = _focused_geometry_case_id(payload, path)
+        if case_id is None:
+            continue
+        summary = payload.get("summary", {})
+        if not isinstance(summary, dict):
+            summary = {}
+        by_case.setdefault(case_id, []).append(
+            {
+                "source_report": str(path),
+                "schema_version": str(payload.get("schema_version", "unknown")),
+                "decision": str(payload.get("decision", "UNKNOWN")),
+                "passed": bool(payload.get("passed")),
+                "blocked_reasons": tuple(str(reason) for reason in payload.get("blocked_reasons", []) if isinstance(reason, str)),
+                "next_levers": tuple(str(lever) for lever in payload.get("next_levers", []) if isinstance(lever, str)),
+                "summary": _compact_report_summary(summary),
+            }
+        )
+    return {case_id: tuple(records) for case_id, records in by_case.items()}
+
+
+def _compact_report_summary(summary: dict[str, object]) -> dict[str, object]:
+    compact: dict[str, object] = {}
+    for key, value in summary.items():
+        if value is None or isinstance(value, (str, int, float, bool)):
+            compact[key] = value
+        elif isinstance(value, list):
+            compact[f"{key}_count"] = len(value)
+        elif isinstance(value, dict):
+            compact[f"{key}_key_count"] = len(value)
+    return compact
+
+
+def _focused_geometry_case_id(payload: dict[str, Any], path: Path) -> str | None:
+    schema = str(payload.get("schema_version", ""))
+    haystack = f"{schema} {path}".lower()
+    if "constriction" in haystack:
+        return "constriction"
+    if "drop_ledge" in haystack or "drop/ledge" in haystack:
+        return "drops_ledges_tailwater"
+    return None
+
+
+def _geometry_failing_check_counts(evidence_records: list[dict[str, Any]]) -> dict[str, int]:
+    counts: Counter[str] = Counter()
+    for record in evidence_records:
+        if bool(record.get("diagnostic_only")):
+            continue
+        if bool(record.get("threshold_passed")) or bool(record.get("passed")):
+            continue
+        for check in record.get("failing_checks", []):
+            if isinstance(check, str):
+                counts[check] += 1
+    return dict(sorted(counts.items()))
+
+
+def _geometry_failing_scenario_count(evidence_records: list[dict[str, Any]]) -> int:
+    scenarios = {
+        str(record.get("gate_scenario_id"))
+        for record in evidence_records
+        if (
+            not bool(record.get("diagnostic_only"))
+            and not bool(record.get("threshold_passed"))
+            and not bool(record.get("passed"))
+        )
+        and record.get("gate_scenario_id")
+    }
+    return len(scenarios)
+
+
+def _remaining_geometry_priority(case_id: str) -> int:
+    return {
+        "constriction": 1,
+        "drops_ledges_tailwater": 2,
+        "stitched_reach_drop_handoffs": 3,
+        "wet_dry_shoreline": 10,
+        "bed_step": 11,
+        "hydrostatic_sloping_balance": 12,
+    }.get(case_id, 50)
+
+
+def _remaining_geometry_notes(
+    case_id: str,
+    notes: tuple[str, ...],
+    evidence_records: list[dict[str, Any]],
+) -> tuple[str, ...]:
+    result = list(notes)
+    if case_id == "drops_ledges_tailwater":
+        cascading_failures = sorted(
+            {
+                str(record.get("gate_scenario_id"))
+                for record in evidence_records
+                if str(record.get("gate_scenario_id", "")).startswith("south_fork_cascading")
+                and not bool(record.get("threshold_passed"))
+            }
+        )
+        if cascading_failures:
+            result.append(
+                "Cascading reach/drop handoff checks pass separately; these failures are whole-window water-field parity blockers: "
+                + ", ".join(cascading_failures)
+                + "."
+            )
+    if case_id == "stitched_reach_drop_handoffs":
+        result.append("Keep this passing stitched-window seam evidence as a guardrail while retuning cascading water fields.")
+    return tuple(dict.fromkeys(result))
+
+
+def _remaining_geometry_next_levers(
+    case_id: str,
+    focused_evidence: tuple[dict[str, object], ...],
+    failing_counts: dict[str, int],
+    evidence_records: list[dict[str, Any]],
+) -> tuple[str, ...]:
+    if not failing_counts:
+        return ("Preserve this geometry family as a guardrail while retuning active blockers.",)
+    levers: list[str] = []
+    for evidence in focused_evidence:
+        levers.extend(str(lever) for lever in evidence.get("next_levers", ()) if isinstance(lever, str))
+    if case_id == "constriction":
+        levers.append(
+            "Close constriction field, slope, probe, cross-section, and wet-mask parity before treating raft coupling as actionable."
+        )
+    elif case_id == "drops_ledges_tailwater":
+        if any(str(record.get("gate_scenario_id", "")).startswith("drop_ledge") for record in evidence_records):
+            levers.append("Retune the single drop/ledge hydraulic-control lane before folding the fix into cascading South Fork flows.")
+        if any(str(record.get("gate_scenario_id", "")).startswith("south_fork_cascading") for record in evidence_records):
+            levers.append(
+                "Use stitched whole-window cascading comparisons for acceptance; reach-local seams already pass and cannot hide water-field errors."
+            )
+    else:
+        levers.append("Regenerate focused evidence for this geometry family before attempting promotion.")
+    if "mass_drift_delta" in failing_counts or "energy_change_delta" in failing_counts:
+        levers.append("Preserve or restore conservation and energy checks before accepting any visual/gameplay forcing.")
+    return tuple(dict.fromkeys(levers))
+
+
+def _counter_markdown(counts: dict[str, int]) -> str:
+    if not counts:
+        return "none"
+    return ", ".join(f"{key}={value}" for key, value in counts.items())
 
 
 def _samples_touch_drop_control_or_tailwater(
