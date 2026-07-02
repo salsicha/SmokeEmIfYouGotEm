@@ -703,6 +703,24 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert upper_edge_profile["edge_cross_stream_fraction"] == pytest.approx(2.05)
     assert upper_edge_profile["immediate_shelf_cross_stream_fraction"] == pytest.approx(0.85)
     assert upper_edge_profile["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_throat_edge_relief"] is True
+    throat_edge_relief = constriction_manifest["constriction_throat_edge_relief"]
+    assert throat_edge_relief["bounded"] is True
+    assert throat_edge_relief["mass_conservative_edge_to_interior_depth_transfer"] is True
+    assert throat_edge_relief["velocity_only_after_depth_transfer"] is True
+    assert throat_edge_relief["applies_only_narrow_throat_columns"] is True
+    assert throat_edge_relief["uses_duration_normalized_final_response"] is True
+    assert throat_edge_relief["response_start_fraction"] == pytest.approx(0.995)
+    assert throat_edge_relief["support_rate_per_s"] == pytest.approx(12.0)
+    assert throat_edge_relief["max_depth_m_per_s"] == pytest.approx(3.0)
+    assert throat_edge_relief["donor_floor_depth_scale"] == pytest.approx(0.28)
+    assert throat_edge_relief["interior_target_depth_scale"] == pytest.approx(1.36)
+    assert throat_edge_relief["velocity_rate_per_s"] == pytest.approx(30.0)
+    assert throat_edge_relief["max_speed_m_per_s2"] == pytest.approx(24.0)
+    assert throat_edge_relief["edge_speed_fraction"] == pytest.approx(0.88)
+    assert throat_edge_relief["upstream_upper_cross_stream_fraction"] == pytest.approx(1.0)
+    assert throat_edge_relief["downstream_lower_cross_stream_fraction"] == pytest.approx(0.72)
+    assert throat_edge_relief["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_upper_edge_opposition_balance"] is True
     assert constriction_manifest["constriction_upper_edge_opposition_balance"]["bounded"] is True
     assert (
