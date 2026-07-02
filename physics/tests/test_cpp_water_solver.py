@@ -583,23 +583,23 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     )
     assert (
         constriction_manifest["constriction_upstream_boundary_upper_edge_velocity_shape"]["rate_per_s"]
-        == pytest.approx(8.0)
+        == pytest.approx(10.0)
     )
     assert (
         constriction_manifest["constriction_upstream_boundary_upper_edge_velocity_shape"]["max_speed_m_per_s2"]
-        == pytest.approx(4.0)
+        == pytest.approx(5.0)
     )
     assert (
         constriction_manifest["constriction_upstream_boundary_upper_edge_velocity_shape"][
             "cross_stream_fraction"
         ]
-        == pytest.approx(1.15)
+        == pytest.approx(1.25)
     )
     assert (
         constriction_manifest["constriction_upstream_boundary_upper_edge_velocity_shape"][
             "interior_cross_stream_fraction"
         ]
-        == pytest.approx(0.55)
+        == pytest.approx(0.40)
     )
     assert (
         constriction_manifest["constriction_upstream_boundary_upper_edge_velocity_shape"][
