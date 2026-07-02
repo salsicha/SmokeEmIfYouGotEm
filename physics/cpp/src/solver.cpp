@@ -233,6 +233,12 @@ constexpr double kConstrictionUpperEdgeFluxMagnitudeMaxSpeedPerSecond = 5.0;
 constexpr double kConstrictionUpperEdgeFluxMagnitudeSpeedFraction = 0.82;
 constexpr double kConstrictionUpperEdgeFluxMagnitudeCrossStreamFraction = 1.08;
 constexpr double kConstrictionUpperEdgeFluxMagnitudeInteriorCrossStreamFraction = 0.48;
+constexpr double kConstrictionUpstreamBoundaryUpperEdgeShapeRate = 8.0;
+constexpr double kConstrictionUpstreamBoundaryUpperEdgeShapeMaxSpeedPerSecond = 4.0;
+constexpr double kConstrictionUpstreamBoundaryUpperEdgeShapeSpeedFraction = 0.82;
+constexpr double kConstrictionUpstreamBoundaryUpperEdgeShapeCrossStreamFraction = 1.15;
+constexpr double kConstrictionUpstreamBoundaryUpperEdgeShapeInteriorCrossStreamFraction = 0.55;
+constexpr std::size_t kConstrictionUpstreamBoundaryUpperEdgeShapeWindowCells = 2;
 constexpr double kConstrictionCrossStreamMomentumRate = 2.2;
 constexpr double kConstrictionCrossStreamMomentumMaxSpeedPerSecond = 3.6;
 constexpr double kConstrictionCrossStreamMomentumRecoveryFraction = 0.58;
@@ -4026,6 +4032,62 @@ void apply_constriction_upper_edge_flux_magnitude_balance(
     }
 }
 
+void apply_constriction_upstream_boundary_upper_edge_velocity_shape(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double flow_sign = constriction_flow_sign(scenario);
+    double max_speed_step = kConstrictionUpstreamBoundaryUpperEdgeShapeMaxSpeedPerSecond * dt;
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        std::size_t upstream_distance_cells =
+            flow_sign >= 0.0 ? col : (scenario.grid.nx - 1 - col);
+        if (upstream_distance_cells > kConstrictionUpstreamBoundaryUpperEdgeShapeWindowCells) {
+            continue;
+        }
+
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count <= throat_width_cells || band.last_row == 0) {
+            continue;
+        }
+
+        double approach_weight = constriction_upper_edge_balance_weight(scenario, col);
+        if (approach_weight <= 0.0) {
+            continue;
+        }
+
+        auto shape_row = [&](std::size_t row, double cross_stream_fraction) {
+            if (next.h(row, col) <= config.dry_tolerance) {
+                return;
+            }
+            double target_u = flow_sign * kConstrictionUpstreamBoundaryUpperEdgeShapeSpeedFraction * reference_speed;
+            double target_v = -cross_stream_fraction * reference_speed;
+            double blend =
+                clamp(kConstrictionUpstreamBoundaryUpperEdgeShapeRate * dt * approach_weight, 0.0, 1.0);
+            double blended_u = next.u(row, col) + blend * (target_u - next.u(row, col));
+            double blended_v = next.v(row, col) + blend * (target_v - next.v(row, col));
+            next.u(row, col) = move_toward(next.u(row, col), blended_u, max_speed_step * approach_weight);
+            next.v(row, col) = move_toward(next.v(row, col), blended_v, max_speed_step * approach_weight);
+        };
+
+        if (band.last_row > band.first_row) {
+            shape_row(band.last_row - 1, kConstrictionUpstreamBoundaryUpperEdgeShapeInteriorCrossStreamFraction);
+        }
+        shape_row(band.last_row, kConstrictionUpstreamBoundaryUpperEdgeShapeCrossStreamFraction);
+    }
+}
+
 void apply_constriction_dry_bank_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -5061,6 +5123,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_upstream_boundary_column_support(scenario_, config_, dt, next);
         apply_constriction_upstream_shelf_balance(scenario_, config_, dt, next);
         apply_constriction_upstream_centerline_timing_balance(scenario_, config_, dt, time_, next);
+        apply_constriction_upstream_boundary_upper_edge_velocity_shape(scenario_, config_, dt, next);
         apply_constriction_lower_edge_flux_magnitude_balance(scenario_, config_, dt, next);
         apply_constriction_downstream_return_current_balance(scenario_, config_, dt, time_, next);
     }
@@ -5555,6 +5618,23 @@ void write_solver_output(
              << "    \"late_edge_cross_stream_velocity_only\": true,\n"
              << "    \"edge_cross_stream_fraction\": "
              << kConstrictionUpstreamCenterlineTimingEdgeCrossStreamFraction << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_upstream_boundary_upper_edge_velocity_shape\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_upstream_boundary_upper_edge_velocity_shape\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"velocity_only\": true,\n"
+             << "    \"mass_preserving\": true,\n"
+             << "    \"applies_only_upstream_boundary_window\": true,\n"
+             << "    \"runs_after_upstream_centerline_timing\": true,\n"
+             << "    \"window_cells\": " << kConstrictionUpstreamBoundaryUpperEdgeShapeWindowCells << ",\n"
+             << "    \"rate_per_s\": " << kConstrictionUpstreamBoundaryUpperEdgeShapeRate << ",\n"
+             << "    \"max_speed_m_per_s2\": " << kConstrictionUpstreamBoundaryUpperEdgeShapeMaxSpeedPerSecond << ",\n"
+             << "    \"speed_fraction\": " << kConstrictionUpstreamBoundaryUpperEdgeShapeSpeedFraction << ",\n"
+             << "    \"cross_stream_fraction\": " << kConstrictionUpstreamBoundaryUpperEdgeShapeCrossStreamFraction << ",\n"
+             << "    \"interior_cross_stream_fraction\": "
+             << kConstrictionUpstreamBoundaryUpperEdgeShapeInteriorCrossStreamFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_upper_edge_opposition_balance\": "
