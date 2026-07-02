@@ -1,0 +1,31 @@
+{
+  "schema_version": "raftsim.milestone18.material_wet_mask_validation.v0",
+  "decision": "RETAIN",
+  "scenario": "constriction_seed_16",
+  "comparison_manifest": "physics/outputs/m18cmp/c_constrict_material_wet_mask_validation/finite_volume_roe/dual_solver_manifest.json",
+  "threshold_report": "physics/outputs/m18cmp/c_constrict_material_wet_mask_validation/finite_volume_roe/threshold_evaluation.json",
+  "depth_floor_m": 0.15,
+  "previous_raw_wet_mismatch_fraction": 0.2569444444444444,
+  "material_wet_mismatch_fraction": 0.003472222222222222,
+  "wet_mismatch_threshold": 0.02,
+  "feature_strength_scale": 0.0,
+  "remaining_failed_checks": [
+    "field_linf",
+    "slope_linf",
+    "probe_linf"
+  ],
+  "passing_checks_after_change": [
+    "wet_mismatch_fraction",
+    "cross_section_linf",
+    "mass_drift_delta",
+    "energy_change_delta",
+    "froude_delta",
+    "feature_location_delta",
+    "feature_strength_delta"
+  ],
+  "notes": [
+    "GeoClaw final-frame raw wet flags include sub-0.15 m numerical films that the Milestone 18 focused geometry diagnostics already exclude with the wet-depth threshold.",
+    "The dual-solver wet-mask threshold now scores material wetness from depth using the same 0.15 m floor used for velocity and Froude comparison masks.",
+    "This is a validation semantics fix only; it does not promote the constriction lane because field, slope, and probe errors still exceed thresholds."
+  ]
+}
