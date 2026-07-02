@@ -332,6 +332,12 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["conservative_y_face_opposition_flux"] is True
     assert (
         constriction_manifest["constriction_upstream_edge_flux_source"][
+            "opposition_flux_transition_weight_floor"
+        ]
+        == pytest.approx(1.1)
+    )
+    assert (
+        constriction_manifest["constriction_upstream_edge_flux_source"][
             "opposition_flux_preserves_lower_positive_upper_negative_signs"
         ]
         is True
@@ -349,6 +355,10 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     )
     assert constriction_manifest["constriction_y_face_state_reconstruction"]["includes_transition_edge_faces"] is True
     assert constriction_manifest["constriction_y_face_state_reconstruction"]["requires_feature_forcing"] is False
+    assert (
+        constriction_manifest["constriction_y_face_state_reconstruction"]["transition_velocity_weight_floor"]
+        == pytest.approx(1.4)
+    )
     assert (
         constriction_manifest["constriction_y_face_state_reconstruction"][
             "resets_lower_outside_companion_velocity"
@@ -374,6 +384,16 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert (
         constriction_manifest["constriction_lower_edge_width_depth_balance"]["requires_feature_forcing"]
         is False
+    )
+    assert (
+        constriction_manifest["constriction_lower_edge_width_depth_balance"]["final_lower_edge_support"]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_lower_edge_width_depth_balance"][
+            "final_support_transition_velocity_weight_floor"
+        ]
+        == pytest.approx(0.75)
     )
     assert constriction_manifest["fixture_scoped_constriction_upper_edge_opposition_balance"] is True
     assert constriction_manifest["constriction_upper_edge_opposition_balance"]["bounded"] is True
