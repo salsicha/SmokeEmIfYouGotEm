@@ -55,6 +55,7 @@ from .milestone16 import (
 )
 from .milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
+    MILESTONE18_CONSTRICTION_FIELD_PROFILE_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_FACE_STATE_WIDTH_DEPTH_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_HYDROSTATIC_SOURCE_DECISION_REPORT_SCHEMA,
@@ -73,6 +74,9 @@ from .milestone18 import (
     Milestone18ConstrictionColumnComparison,
     Milestone18ConstrictionColumnDelta,
     Milestone18ConstrictionColumnProfile,
+    Milestone18ConstrictionFieldProfileBin,
+    Milestone18ConstrictionFieldProfileCell,
+    Milestone18ConstrictionFieldProfileReport,
     Milestone18ConstrictionFaceSourceAuditReport,
     Milestone18ConstrictionFaceSourceAuditSample,
     Milestone18ConstrictionFaceStateWidthDepthReport,
@@ -97,6 +101,7 @@ from .milestone18 import (
     Milestone18RemainingGeometryClosureReport,
     build_milestone18_constriction_face_source_audit_report,
     build_milestone18_constriction_face_state_width_depth_report,
+    build_milestone18_constriction_field_profile_report,
     build_milestone18_constriction_hydrostatic_source_decision_report,
     build_milestone18_constriction_lateral_face_flux_report,
     build_milestone18_constriction_mask_alignment_report,
@@ -678,6 +683,7 @@ __all__ = [
     "build_milestone18_failure_triage_matrix",
     "build_milestone18_constriction_face_source_audit_report",
     "build_milestone18_constriction_face_state_width_depth_report",
+    "build_milestone18_constriction_field_profile_report",
     "build_milestone18_constriction_hydrostatic_source_decision_report",
     "build_milestone18_constriction_lateral_face_flux_report",
     "build_milestone18_constriction_upstream_edge_balance_report",
