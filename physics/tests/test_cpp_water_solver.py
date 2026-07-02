@@ -801,6 +801,18 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         == pytest.approx(0.23)
     )
     assert constriction_manifest["constriction_recovery_edge_balance"]["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_recovery_final_lower_edge_shear_balance"] is True
+    final_lower_edge_shear = constriction_manifest["constriction_recovery_final_lower_edge_shear_balance"]
+    assert final_lower_edge_shear["bounded"] is True
+    assert final_lower_edge_shear["velocity_only"] is True
+    assert final_lower_edge_shear["mass_preserving"] is True
+    assert final_lower_edge_shear["runs_after_recovery_edge_balance"] is True
+    assert final_lower_edge_shear["uses_duration_normalized_final_response"] is True
+    assert final_lower_edge_shear["applies_only_recovery_lower_edge_row"] is True
+    assert final_lower_edge_shear["response_start_fraction"] == pytest.approx(0.995)
+    assert final_lower_edge_shear["near_speed_fraction"] == pytest.approx(-0.18)
+    assert final_lower_edge_shear["far_speed_fraction"] == pytest.approx(0.16)
+    assert final_lower_edge_shear["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_downstream_return_current_balance"] is True
     assert constriction_manifest["constriction_downstream_return_current_balance"]["bounded"] is True
     assert constriction_manifest["constriction_downstream_return_current_balance"]["velocity_only"] is True
