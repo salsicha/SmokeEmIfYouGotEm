@@ -1552,7 +1552,19 @@ bool constriction_upstream_edge_cell(
         return false;
     }
 
-    return row == band.first_row || row == band.last_row;
+    if (row == band.first_row || row == band.last_row) {
+        return true;
+    }
+    if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row)) {
+        return true;
+    }
+    if (band.first_row > 0 && row + 1 == band.first_row) {
+        return true;
+    }
+    if (band.last_row + 1 < scenario.grid.ny && row == band.last_row + 1) {
+        return true;
+    }
+    return false;
 }
 
 double constriction_upstream_edge_approach_weight(const Scenario& scenario, std::size_t col) {
@@ -6943,7 +6955,9 @@ void write_solver_output(
              << kConstrictionLowerEdgeTransitionMomentumWeightFloor << ",\n"
              << "    \"lower_edge_transition_momentum_window_cells\": "
              << kConstrictionLowerEdgeTransitionMomentumWindowCells << ",\n"
-             << "    \"applies_only_upstream_edge_band_cells\": true,\n"
+             << "    \"applies_original_upstream_edge_band_cells\": true,\n"
+             << "    \"includes_immediate_shallow_shelf_rows\": true,\n"
+             << "    \"includes_local_shallow_fringe_rows\": true,\n"
              << "    \"excluded_from_later_depth_receivers\": true,\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"

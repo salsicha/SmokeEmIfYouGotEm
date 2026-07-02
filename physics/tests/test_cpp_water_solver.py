@@ -345,6 +345,24 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["includes_transition_edge_faces"] is True
     assert (
         constriction_manifest["constriction_upstream_edge_flux_source"][
+            "applies_original_upstream_edge_band_cells"
+        ]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_upstream_edge_flux_source"][
+            "includes_immediate_shallow_shelf_rows"
+        ]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_upstream_edge_flux_source"][
+            "includes_local_shallow_fringe_rows"
+        ]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_upstream_edge_flux_source"][
             "lower_edge_transition_momentum_source"
         ]
         is True
