@@ -116,6 +116,7 @@ Each river-validation annotation should record its anchor location, source/prove
 - Emit manifests for solver mode, timestep, CFL policy, dry tolerance, roughness mapping, bed-slope source scale, feature forcing, damping, reach/drop metadata, and executable version.
 - Emit feature-forcing manifests for active feature kinds, flow-response curve IDs, gain scales, conservation deltas, raft-coupling modifiers, and visual-only parameters.
 - Compare C++ fields, probes, cross sections, diagnostics, and raft samples against the GeoClaw reference runs.
+- Score wet/dry threshold parity with a material wet mask, `h >= velocity_depth_floor`, rather than raw solver wet flags. Raw wet flags remain exported for diagnostics, but sub-floor GeoClaw numerical films must not block geometry closure unless they also affect depth, velocity, Froude, raft sampling, or field errors.
 - Record failures by scenario family so tuning does not improve one rapid feature while regressing canonical shallow-water behavior.
 
 ## Phase 3: Geometry-Specific Shallow-Water Validation
