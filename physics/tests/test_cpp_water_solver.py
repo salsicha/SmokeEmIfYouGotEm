@@ -835,6 +835,31 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert throat_entry_final["upper_edge_cross_stream_fraction"] == pytest.approx(0.43)
     assert throat_entry_final["interior_cross_stream_fraction"] == pytest.approx(0.20)
     assert throat_entry_final["requires_feature_forcing"] is False
+    assert (
+        constriction_manifest["fixture_scoped_constriction_downstream_interior_final_acceleration"]
+        is True
+    )
+    downstream_interior_acceleration = constriction_manifest[
+        "constriction_downstream_interior_final_acceleration"
+    ]
+    assert downstream_interior_acceleration["bounded"] is True
+    assert downstream_interior_acceleration["velocity_only"] is True
+    assert downstream_interior_acceleration["mass_preserving"] is True
+    assert (
+        downstream_interior_acceleration[
+            "applies_only_downstream_constriction_lower_center_interior_rows"
+        ]
+        is True
+    )
+    assert downstream_interior_acceleration["uses_duration_normalized_final_response"] is True
+    assert downstream_interior_acceleration["runs_after_throat_entry_final_depth_balance"] is True
+    assert downstream_interior_acceleration["response_start_fraction"] == pytest.approx(0.995)
+    assert downstream_interior_acceleration["velocity_rate_per_s"] == pytest.approx(260.0)
+    assert downstream_interior_acceleration["max_speed_m_per_s2"] == pytest.approx(220.0)
+    assert downstream_interior_acceleration["speed_fraction"] == pytest.approx(1.08)
+    assert downstream_interior_acceleration["cross_stream_fraction"] == pytest.approx(0.24)
+    assert downstream_interior_acceleration["interior_edge_norm"] == pytest.approx(0.65)
+    assert downstream_interior_acceleration["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_throat_edge_relief"] is True
     throat_edge_relief = constriction_manifest["constriction_throat_edge_relief"]
     assert throat_edge_relief["bounded"] is True
