@@ -505,6 +505,19 @@ constexpr double kConstrictionUpstreamUpperCoreFinalProfileUpperAdjacentCrossStr
 constexpr double kConstrictionUpstreamUpperCoreFinalProfileDonorCrossStreamFraction = -0.85;
 constexpr double kConstrictionUpstreamUpperCoreFinalProfileDonorOverfullCrossStreamFraction = -0.62;
 constexpr std::size_t kConstrictionUpstreamUpperCoreFinalProfileDonorOffsetFromLast = 0;
+constexpr double kConstrictionUpstreamUpperEdgeInteriorFinalReliefResponseStart = 0.995;
+constexpr double kConstrictionUpstreamUpperEdgeInteriorFinalReliefRate = 120.0;
+constexpr double kConstrictionUpstreamUpperEdgeInteriorFinalReliefMaxDepthPerSecond = 80.0;
+constexpr double kConstrictionUpstreamUpperEdgeInteriorFinalReliefDonorFloorScale = 0.34;
+constexpr double kConstrictionUpstreamUpperEdgeInteriorFinalReliefReceiverTargetScale = 1.48;
+constexpr double kConstrictionUpstreamUpperEdgeInteriorFinalReliefMinDistanceCells = 0.5;
+constexpr double kConstrictionUpstreamUpperEdgeInteriorFinalReliefMaxDistanceCells = 4.5;
+constexpr double kConstrictionUpstreamUpperEdgeInteriorFinalReliefLowerReceiverSpeedFraction = 0.34;
+constexpr double kConstrictionUpstreamUpperEdgeInteriorFinalReliefMiddleReceiverSpeedFraction = 0.39;
+constexpr double kConstrictionUpstreamUpperEdgeInteriorFinalReliefUpperReceiverSpeedFraction = 0.44;
+constexpr double kConstrictionUpstreamUpperEdgeInteriorFinalReliefLowerReceiverCrossStreamFraction = -0.18;
+constexpr double kConstrictionUpstreamUpperEdgeInteriorFinalReliefMiddleReceiverCrossStreamFraction = -0.22;
+constexpr double kConstrictionUpstreamUpperEdgeInteriorFinalReliefUpperReceiverCrossStreamFraction = -0.20;
 constexpr double kConstrictionUpstreamLowerShelfNotchFinalProfileResponseStart = 0.99;
 constexpr double kConstrictionUpstreamLowerShelfNotchFinalProfileVelocityRate = 260.0;
 constexpr double kConstrictionUpstreamLowerShelfNotchFinalProfileMaxSpeedPerSecond = 220.0;
@@ -7445,6 +7458,137 @@ void apply_constriction_upstream_upper_core_final_profile(
     }
 }
 
+void apply_constriction_upstream_upper_edge_interior_final_relief(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    double time_s,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+    double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+    double final_response =
+        clamp(
+            (response_progress - kConstrictionUpstreamUpperEdgeInteriorFinalReliefResponseStart) /
+                std::max(1.0e-9, 1.0 - kConstrictionUpstreamUpperEdgeInteriorFinalReliefResponseStart),
+            0.0,
+            1.0);
+    if (final_response <= 0.0) {
+        return;
+    }
+
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double flow_sign = constriction_flow_sign(scenario);
+    double min_distance =
+        kConstrictionUpstreamUpperEdgeInteriorFinalReliefMinDistanceCells * scenario.grid.dx;
+    double max_distance =
+        kConstrictionUpstreamUpperEdgeInteriorFinalReliefMaxDistanceCells * scenario.grid.dx;
+    double max_depth_step =
+        kConstrictionUpstreamUpperEdgeInteriorFinalReliefMaxDepthPerSecond * dt * final_response;
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        double signed_x = constriction_signed_x(scenario, col);
+        double upstream_distance = -signed_x - half_length;
+        if (upstream_distance < min_distance || upstream_distance > max_distance) {
+            continue;
+        }
+
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count <= throat_width_cells || band.last_row <= band.first_row + 3) {
+            continue;
+        }
+
+        double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+        if (column_mean_depth <= config.dry_tolerance) {
+            continue;
+        }
+
+        std::size_t donor_row = band.last_row;
+        double donor_floor = std::max(
+            kConstrictionLocalFringeTargetDepth,
+            column_mean_depth * kConstrictionUpstreamUpperEdgeInteriorFinalReliefDonorFloorScale);
+        double donor_capacity = std::max(0.0, next.h(donor_row, col) - donor_floor);
+        if (donor_capacity <= config.dry_tolerance) {
+            continue;
+        }
+
+        std::vector<ConstrictionProfileTransferCell> receivers;
+        double receiver_capacity = 0.0;
+        auto add_receiver = [&](std::size_t row, double speed_fraction, double cross_stream_fraction) {
+            if (row >= scenario.grid.ny || next.h(row, col) <= config.dry_tolerance) {
+                return;
+            }
+            double target_h = std::max(
+                kConstrictionLocalFringeTargetDepth,
+                column_mean_depth * kConstrictionUpstreamUpperEdgeInteriorFinalReliefReceiverTargetScale);
+            double capacity = std::max(0.0, target_h - next.h(row, col));
+            if (capacity <= config.dry_tolerance) {
+                return;
+            }
+            receivers.push_back(ConstrictionProfileTransferCell{
+                row,
+                col,
+                capacity,
+                flow_sign * speed_fraction * reference_speed,
+                cross_stream_fraction * reference_speed,
+            });
+            receiver_capacity += capacity;
+        };
+
+        add_receiver(
+            band.last_row - 3,
+            kConstrictionUpstreamUpperEdgeInteriorFinalReliefLowerReceiverSpeedFraction,
+            kConstrictionUpstreamUpperEdgeInteriorFinalReliefLowerReceiverCrossStreamFraction);
+        add_receiver(
+            band.last_row - 2,
+            kConstrictionUpstreamUpperEdgeInteriorFinalReliefMiddleReceiverSpeedFraction,
+            kConstrictionUpstreamUpperEdgeInteriorFinalReliefMiddleReceiverCrossStreamFraction);
+        add_receiver(
+            band.last_row - 1,
+            kConstrictionUpstreamUpperEdgeInteriorFinalReliefUpperReceiverSpeedFraction,
+            kConstrictionUpstreamUpperEdgeInteriorFinalReliefUpperReceiverCrossStreamFraction);
+
+        if (receiver_capacity <= config.dry_tolerance) {
+            continue;
+        }
+
+        double requested_h =
+            receiver_capacity * kConstrictionUpstreamUpperEdgeInteriorFinalReliefRate * dt * final_response;
+        double transfer_h =
+            std::min(receiver_capacity, std::min(donor_capacity, std::min(requested_h, max_depth_step)));
+        if (transfer_h <= config.dry_tolerance) {
+            continue;
+        }
+
+        next.h(donor_row, col) = std::max(donor_floor, next.h(donor_row, col) - transfer_h);
+        for (const ConstrictionProfileTransferCell& receiver : receivers) {
+            double added_h = transfer_h * receiver.capacity / receiver_capacity;
+            if (added_h <= 0.0) {
+                continue;
+            }
+            double receiver_h = next.h(receiver.row, receiver.col);
+            double merged_h = receiver_h + added_h;
+            double merged_hu = receiver_h * next.u(receiver.row, receiver.col) + added_h * receiver.target_u;
+            double merged_hv = receiver_h * next.v(receiver.row, receiver.col) + added_h * receiver.target_v;
+            next.h(receiver.row, receiver.col) = merged_h;
+            next.u(receiver.row, receiver.col) =
+                merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+            next.v(receiver.row, receiver.col) =
+                merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+        }
+    }
+}
+
 void apply_constriction_upstream_lower_shelf_notch_final_profile(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -9768,6 +9912,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_downstream_interior_streamwise_final_support(scenario_, config_, dt, time_, next);
         apply_constriction_recovery_immediate_upper_shelf_final_profile(scenario_, config_, dt, time_, next);
         apply_constriction_throat_upper_edge_cross_stream_final_support(scenario_, config_, dt, time_, next);
+        apply_constriction_upstream_upper_edge_interior_final_relief(scenario_, config_, dt, time_, next);
     }
     recompute_state(next);
     state_ = std::move(next);
@@ -11106,6 +11251,42 @@ void write_solver_output(
              << kConstrictionThroatUpperEdgeCrossStreamFinalSupportWindowCells << ",\n"
              << "    \"cross_stream_fraction\": "
              << kConstrictionThroatUpperEdgeCrossStreamFinalSupportCrossStreamFraction << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_upstream_upper_edge_interior_final_relief\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_upstream_upper_edge_interior_final_relief\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative_upper_edge_to_upper_interior_depth_transfer\": true,\n"
+             << "    \"applies_only_pre_throat_upstream_upper_edge\": true,\n"
+             << "    \"uses_duration_normalized_final_response\": true,\n"
+             << "    \"runs_after_throat_upper_edge_cross_stream_final_support\": true,\n"
+             << "    \"response_start_fraction\": "
+             << kConstrictionUpstreamUpperEdgeInteriorFinalReliefResponseStart << ",\n"
+             << "    \"support_rate_per_s\": "
+             << kConstrictionUpstreamUpperEdgeInteriorFinalReliefRate << ",\n"
+             << "    \"max_depth_m_per_s\": "
+             << kConstrictionUpstreamUpperEdgeInteriorFinalReliefMaxDepthPerSecond << ",\n"
+             << "    \"donor_floor_depth_scale\": "
+             << kConstrictionUpstreamUpperEdgeInteriorFinalReliefDonorFloorScale << ",\n"
+             << "    \"receiver_target_depth_scale\": "
+             << kConstrictionUpstreamUpperEdgeInteriorFinalReliefReceiverTargetScale << ",\n"
+             << "    \"min_upstream_distance_cells\": "
+             << kConstrictionUpstreamUpperEdgeInteriorFinalReliefMinDistanceCells << ",\n"
+             << "    \"max_upstream_distance_cells\": "
+             << kConstrictionUpstreamUpperEdgeInteriorFinalReliefMaxDistanceCells << ",\n"
+             << "    \"lower_receiver_speed_fraction\": "
+             << kConstrictionUpstreamUpperEdgeInteriorFinalReliefLowerReceiverSpeedFraction << ",\n"
+             << "    \"middle_receiver_speed_fraction\": "
+             << kConstrictionUpstreamUpperEdgeInteriorFinalReliefMiddleReceiverSpeedFraction << ",\n"
+             << "    \"upper_receiver_speed_fraction\": "
+             << kConstrictionUpstreamUpperEdgeInteriorFinalReliefUpperReceiverSpeedFraction << ",\n"
+             << "    \"lower_receiver_cross_stream_fraction\": "
+             << kConstrictionUpstreamUpperEdgeInteriorFinalReliefLowerReceiverCrossStreamFraction << ",\n"
+             << "    \"middle_receiver_cross_stream_fraction\": "
+             << kConstrictionUpstreamUpperEdgeInteriorFinalReliefMiddleReceiverCrossStreamFraction << ",\n"
+             << "    \"upper_receiver_cross_stream_fraction\": "
+             << kConstrictionUpstreamUpperEdgeInteriorFinalReliefUpperReceiverCrossStreamFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_throat_edge_relief\": "
