@@ -17,6 +17,9 @@ from raftsim.examples.generate_milestone18_constriction_face_source_audit_report
 from raftsim.examples.generate_milestone18_constriction_face_state_width_depth_report import (
     main as generate_constriction_face_state_width_depth_main,
 )
+from raftsim.examples.generate_milestone18_constriction_field_profile_report import (
+    main as generate_constriction_field_profile_main,
+)
 from raftsim.examples.generate_milestone18_constriction_hydrostatic_source_decision_report import (
     main as generate_constriction_hydrostatic_source_decision_main,
 )
@@ -49,6 +52,7 @@ from raftsim.milestone18 import (
     MILESTONE18_ANALYTIC_GUARDRAIL_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_FACE_SOURCE_AUDIT_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_FACE_STATE_WIDTH_DEPTH_REPORT_SCHEMA,
+    MILESTONE18_CONSTRICTION_FIELD_PROFILE_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_HYDROSTATIC_SOURCE_DECISION_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_LATERAL_FACE_FLUX_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA,
@@ -64,6 +68,7 @@ from raftsim.milestone18 import (
     MILESTONE18_REMAINING_GEOMETRY_CLOSURE_REPORT_SCHEMA,
     build_milestone18_constriction_face_source_audit_report,
     build_milestone18_constriction_face_state_width_depth_report,
+    build_milestone18_constriction_field_profile_report,
     build_milestone18_constriction_hydrostatic_source_decision_report,
     build_milestone18_constriction_lateral_face_flux_report,
     build_milestone18_constriction_mask_alignment_report,
@@ -1033,6 +1038,50 @@ def test_generate_milestone18_constriction_face_state_width_depth_cli_writes_rep
     assert payload["schema_version"] == MILESTONE18_CONSTRICTION_FACE_STATE_WIDTH_DEPTH_REPORT_SCHEMA
     assert payload["decision"] == "BLOCKED"
     assert "Face-State Width/Depth Diagnostic" in output_md.read_text(encoding="utf-8")
+
+
+def test_milestone18_constriction_field_profile_report_records_profile_blockers(tmp_path):
+    dual_manifest = _constriction_lateral_face_flux_inputs(tmp_path)
+
+    report = build_milestone18_constriction_field_profile_report(dual_manifest)
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_FIELD_PROFILE_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert payload["summary"]["max_abs_v_delta"] > 0.25
+    worst = payload["summary"]["worst_cells"][0]
+    assert worst["field"] == "v"
+    assert worst["zone_id"] == "upstream_approach"
+    assert worst["profile_role"] == "lower_shelf"
+    assert any(
+        profile_bin["profile_role"] == "lower_shelf" and profile_bin["max_abs_v_delta"] > 0.25
+        for profile_bin in payload["profile_bins"]
+    )
+    assert "Cross-stream" in " ".join(payload["blocked_reasons"])
+    assert "feature forcing off" in " ".join(payload["next_levers"])
+
+
+def test_generate_milestone18_constriction_field_profile_cli_writes_reports(tmp_path):
+    dual_manifest = _constriction_lateral_face_flux_inputs(tmp_path)
+    output_json = tmp_path / "reports" / "milestone18" / "constriction_field_profile.json"
+    output_md = tmp_path / "reports" / "milestone18" / "constriction_field_profile.md"
+
+    exit_code = generate_constriction_field_profile_main(
+        [
+            "--dual-solver-manifest",
+            str(dual_manifest),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_CONSTRICTION_FIELD_PROFILE_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert "Constriction Field-Profile Diagnostic" in output_md.read_text(encoding="utf-8")
 
 
 def test_milestone18_constriction_upstream_edge_balance_joins_focused_reports(tmp_path):
