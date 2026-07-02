@@ -1557,10 +1557,22 @@ def _remaining_geometry_closure_inputs(tmp_path: Path) -> tuple[Path, Path, Path
 
 def test_milestone18_remaining_geometry_closure_report_records_active_blockers(tmp_path):
     geometry_report, constriction_report, drop_report = _remaining_geometry_closure_inputs(tmp_path)
+    passing_drop_report = _write_json(
+        tmp_path / "reports" / "milestone18" / "drop_ledge_hydraulic_control_balance.json",
+        {
+            "schema_version": "raftsim.milestone18.drop_ledge_hydraulic_control.v0",
+            "decision": "PASS",
+            "passed": True,
+            "scenario_id": "drop_ledge_seed_16",
+            "summary": {"max_final_field_linf": 0.1946, "max_probe_linf": 0.1890},
+            "blocked_reasons": [],
+            "next_levers": ["Promote the finite-volume drop/ledge lane as a guardrail."],
+        },
+    )
 
     report = build_milestone18_remaining_geometry_closure_report(
         geometry_report,
-        focused_reports=(constriction_report, drop_report),
+        focused_reports=(constriction_report, drop_report, passing_drop_report),
     )
     payload = report.to_json_dict()
 
@@ -1571,8 +1583,11 @@ def test_milestone18_remaining_geometry_closure_report_records_active_blockers(t
     cases = {case["case_id"]: case for case in payload["cases"]}
     assert cases["bed_step"]["promotion_ready"] is True
     assert cases["constriction"]["focused_evidence"][0]["source_report"] == str(constriction_report)
-    assert cases["drops_ledges_tailwater"]["failing_check_counts"]["field_linf"] == 2
-    assert "whole-window water-field parity" in " ".join(cases["drops_ledges_tailwater"]["notes"])
+    assert cases["drops_ledges_tailwater"]["failing_check_counts"]["field_linf"] == 1
+    drop_notes = " ".join(cases["drops_ledges_tailwater"]["notes"])
+    assert "Threshold failures remain in: south_fork_cascading_low_runnable." in drop_notes
+    assert "Focused passing evidence supersedes stale aggregate failures for: drop_ledge." in drop_notes
+    assert "whole-window water-field parity" in drop_notes
 
 
 def test_generate_milestone18_remaining_geometry_closure_cli_writes_reports(tmp_path):

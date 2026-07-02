@@ -1008,6 +1008,58 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert final_throat_u_by_row[final_wet_rows[0]] < min(final_throat_u_by_row[row] for row in wet_rows)
     assert min(final_throat_v_by_row[final_wet_rows[0]], final_throat_v_by_row[final_wet_rows[-1]]) > 1.0
 
+    drop_scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="drop_ledge", seed=16, nx=24, ny=12, duration=0.2)
+    )
+    drop_scenario_dir = tmp_path / "scenario" / "drop_ledge"
+    drop_scenario.write_package(drop_scenario_dir)
+    drop_output_dir = tmp_path / "cpp_drop_ledge_fv_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(drop_scenario_dir),
+            "--output",
+            str(drop_output_dir),
+            "--steps",
+            "12",
+            "--frame-interval",
+            "6",
+            "--solver-mode",
+            "finite_volume",
+            "--boundary-mode",
+            "scenario",
+            "--flux-scheme",
+            "roe",
+            "--feature-strength-scale",
+            "0",
+            "--roughness-scale",
+            "0.5",
+            "--bed-slope-source-scale",
+            "0.75",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    drop_manifest = json.loads(
+        (drop_output_dir / drop_scenario.metadata.scenario_id / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert drop_manifest["fixture_scoped_drop_ledge_hydraulic_control_balance"] is True
+    drop_balance = drop_manifest["drop_ledge_hydraulic_control_balance"]
+    assert drop_balance["bounded"] is True
+    assert drop_balance["mass_conservative_depth_transfer"] is True
+    assert drop_balance["velocity_only_after_depth_transfer"] is True
+    assert drop_balance["uses_duration_normalized_late_response"] is True
+    assert drop_balance["applies_only_drop_ledge_fixture"] is True
+    assert drop_balance["response_start_fraction"] == pytest.approx(0.45)
+    assert drop_balance["control_depth_scale"] == pytest.approx(0.68)
+    assert drop_balance["tailwater_depth_scale"] == pytest.approx(1.25)
+    assert drop_balance["upstream_speed_fraction"] == pytest.approx(1.68)
+    assert drop_balance["lip_speed_fraction"] == pytest.approx(2.20)
+    assert drop_balance["tailwater_speed_fraction"] == pytest.approx(1.22)
+    assert drop_balance["tailwater_mid_pulse_strength"] == pytest.approx(3.0)
+    assert drop_balance["requires_feature_forcing"] is False
+
     cascading_scenario_dir = tmp_path / "scenario" / "cascading"
     cascading_output_dir = tmp_path / "cpp_cascading_output"
     cascading_package = generate_california_pool_drop_cascading_scenario2_5d(

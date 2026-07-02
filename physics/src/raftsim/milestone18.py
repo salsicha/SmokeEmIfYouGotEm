@@ -4320,8 +4320,13 @@ def build_milestone18_remaining_geometry_closure_report(
     for case_payload in _records(geometry, "cases"):
         case_id = str(case_payload.get("case_id", "unknown_geometry_case"))
         evidence_records = _records(case_payload, "evidence")
-        failing_counts = _geometry_failing_check_counts(evidence_records)
         focused = focused_by_case.get(case_id, ())
+        focused_passed_scenarios = _focused_geometry_passed_scenarios(focused)
+        effective_evidence_records = _retire_superseded_geometry_evidence(
+            evidence_records,
+            focused_passed_scenarios,
+        )
+        failing_counts = _geometry_failing_check_counts(effective_evidence_records)
         passed = bool(case_payload.get("passed")) and not failing_counts
         notes = tuple(str(note) for note in case_payload.get("notes", []) if isinstance(note, str))
         cases.append(
@@ -4333,10 +4338,20 @@ def build_milestone18_remaining_geometry_closure_report(
                 scenarios=tuple(str(item) for item in case_payload.get("scenarios", []) if isinstance(item, str)),
                 solver_modes=tuple(str(item) for item in case_payload.get("solver_modes", []) if isinstance(item, str)),
                 failing_check_counts=failing_counts,
-                failing_scenario_count=_geometry_failing_scenario_count(evidence_records),
+                failing_scenario_count=_geometry_failing_scenario_count(effective_evidence_records),
                 focused_evidence=focused,
-                notes=_remaining_geometry_notes(case_id, notes, evidence_records),
-                next_levers=_remaining_geometry_next_levers(case_id, focused, failing_counts, evidence_records),
+                notes=_remaining_geometry_notes(
+                    case_id,
+                    notes,
+                    effective_evidence_records,
+                    focused_passed_scenarios=focused_passed_scenarios,
+                ),
+                next_levers=_remaining_geometry_next_levers(
+                    case_id,
+                    focused,
+                    failing_counts,
+                    effective_evidence_records,
+                ),
             )
         )
     sorted_cases = tuple(sorted(cases, key=lambda case: (case.promotion_ready, case.priority, case.case_id)))
@@ -6831,6 +6846,8 @@ def _focused_geometry_evidence_by_case(
                 "schema_version": str(payload.get("schema_version", "unknown")),
                 "decision": str(payload.get("decision", "UNKNOWN")),
                 "passed": bool(payload.get("passed")),
+                "scenario_id": str(payload.get("scenario_id", "")),
+                "gate_scenario_id": _focused_geometry_gate_scenario_id(payload, path),
                 "blocked_reasons": tuple(str(reason) for reason in payload.get("blocked_reasons", []) if isinstance(reason, str)),
                 "next_levers": tuple(str(lever) for lever in payload.get("next_levers", []) if isinstance(lever, str)),
                 "summary": _compact_report_summary(summary),
@@ -6859,6 +6876,43 @@ def _focused_geometry_case_id(payload: dict[str, Any], path: Path) -> str | None
     if "drop_ledge" in haystack or "drop/ledge" in haystack:
         return "drops_ledges_tailwater"
     return None
+
+
+def _focused_geometry_gate_scenario_id(payload: dict[str, Any], path: Path) -> str:
+    schema = str(payload.get("schema_version", "")).lower()
+    scenario_id = str(payload.get("scenario_id", ""))
+    haystack = f"{schema} {path} {scenario_id}".lower()
+    if "drop_ledge" in haystack or "drop/ledge" in haystack:
+        return "drop_ledge"
+    if "constriction" in haystack:
+        return "constriction"
+    return scenario_id
+
+
+def _focused_geometry_passed_scenarios(
+    focused_evidence: tuple[dict[str, object], ...],
+) -> frozenset[str]:
+    passed: set[str] = set()
+    for evidence in focused_evidence:
+        if not bool(evidence.get("passed")):
+            continue
+        gate_scenario_id = str(evidence.get("gate_scenario_id", ""))
+        if gate_scenario_id:
+            passed.add(gate_scenario_id)
+    return frozenset(passed)
+
+
+def _retire_superseded_geometry_evidence(
+    evidence_records: list[dict[str, Any]],
+    focused_passed_scenarios: frozenset[str],
+) -> list[dict[str, Any]]:
+    if not focused_passed_scenarios:
+        return evidence_records
+    return [
+        record
+        for record in evidence_records
+        if str(record.get("gate_scenario_id", "")) not in focused_passed_scenarios
+    ]
 
 
 def _geometry_failing_check_counts(evidence_records: list[dict[str, Any]]) -> dict[str, int]:
@@ -6903,8 +6957,28 @@ def _remaining_geometry_notes(
     case_id: str,
     notes: tuple[str, ...],
     evidence_records: list[dict[str, Any]],
+    *,
+    focused_passed_scenarios: frozenset[str] = frozenset(),
 ) -> tuple[str, ...]:
-    result = list(notes)
+    result: list[str] = []
+    for note in notes:
+        if focused_passed_scenarios and note.startswith("Threshold failures remain in:"):
+            prefix, _, scenario_text = note.partition(":")
+            remaining = [
+                item.strip().rstrip(".")
+                for item in scenario_text.split(",")
+                if item.strip().rstrip(".") and item.strip().rstrip(".") not in focused_passed_scenarios
+            ]
+            if remaining:
+                result.append(f"{prefix}: " + ", ".join(remaining) + ".")
+            continue
+        result.append(note)
+    if focused_passed_scenarios:
+        result.append(
+            "Focused passing evidence supersedes stale aggregate failures for: "
+            + ", ".join(sorted(focused_passed_scenarios))
+            + "."
+        )
     if case_id == "drops_ledges_tailwater":
         cascading_failures = sorted(
             {
@@ -6938,7 +7012,12 @@ def _remaining_geometry_next_levers(
         "constriction_hydrostatic_source_decision" in str(evidence.get("schema_version", ""))
         for evidence in focused_evidence
     )
+    focused_passed_scenarios = _focused_geometry_passed_scenarios(focused_evidence)
     for evidence in reversed(focused_evidence):
+        if bool(evidence.get("passed")):
+            continue
+        if str(evidence.get("gate_scenario_id", "")) in focused_passed_scenarios:
+            continue
         for lever in evidence.get("next_levers", ()):
             if not isinstance(lever, str):
                 continue
