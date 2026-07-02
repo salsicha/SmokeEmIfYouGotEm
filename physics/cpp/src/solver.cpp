@@ -215,6 +215,13 @@ constexpr double kConstrictionUpstreamUpperInteriorCrossStreamFinalSupportMaxSpe
 constexpr double kConstrictionUpstreamUpperInteriorCrossStreamFinalSupportCenterPostInletCell = 2.0;
 constexpr double kConstrictionUpstreamUpperInteriorCrossStreamFinalSupportPeakWidthCells = 0.75;
 constexpr double kConstrictionUpstreamUpperInteriorCrossStreamFinalSupportCrossStreamFraction = 0.14;
+constexpr double kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportResponseStart = 0.995;
+constexpr double kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportVelocityRate = 260.0;
+constexpr double kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportMaxSpeedPerSecond = 220.0;
+constexpr std::size_t kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportFirstPostInletCell = 3;
+constexpr std::size_t kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportLastPostInletCell = 5;
+constexpr double kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportEdgeTaperCells = 0.45;
+constexpr double kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportSpeedFraction = 0.95;
 constexpr double kConstrictionUpstreamInteriorCrossStreamFinalSupportResponseStart = 0.995;
 constexpr double kConstrictionUpstreamInteriorCrossStreamFinalSupportVelocityRate = 260.0;
 constexpr double kConstrictionUpstreamInteriorCrossStreamFinalSupportMaxSpeedPerSecond = 220.0;
@@ -7971,6 +7978,88 @@ void apply_constriction_upstream_upper_interior_cross_stream_final_support(
     }
 }
 
+void apply_constriction_upstream_upper_edge_streamwise_final_support(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    double time_s,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+    double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+    double final_response =
+        clamp(
+            (response_progress - kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportResponseStart) /
+                std::max(1.0e-9, 1.0 - kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportResponseStart),
+            0.0,
+            1.0);
+    if (final_response <= 0.0) {
+        return;
+    }
+
+    double flow_sign = constriction_flow_sign(scenario);
+    double max_speed_step =
+        kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportMaxSpeedPerSecond * dt * final_response;
+    double taper_width =
+        std::max(
+            scenario.grid.dx * 1.0e-6,
+            kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportEdgeTaperCells * scenario.grid.dx);
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        std::size_t post_inlet_cell =
+            flow_sign >= 0.0 ? col : (scenario.grid.nx - 1 - col);
+        double support_weight = final_response;
+        if (post_inlet_cell < kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportFirstPostInletCell) {
+            double distance =
+                static_cast<double>(kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportFirstPostInletCell -
+                                    post_inlet_cell) *
+                scenario.grid.dx;
+            double normalized = distance / taper_width;
+            support_weight *= std::exp(-(normalized * normalized));
+        } else if (post_inlet_cell > kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportLastPostInletCell) {
+            double distance =
+                static_cast<double>(post_inlet_cell -
+                                    kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportLastPostInletCell) *
+                scenario.grid.dx;
+            double normalized = distance / taper_width;
+            support_weight *= std::exp(-(normalized * normalized));
+        }
+        if (support_weight <= 1.0e-6) {
+            continue;
+        }
+
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count <= throat_width_cells) {
+            continue;
+        }
+
+        std::size_t row = band.last_row;
+        if (next.h(row, col) <= config.dry_tolerance) {
+            continue;
+        }
+
+        double target_u =
+            flow_sign * kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportSpeedFraction * reference_speed;
+        double velocity_blend =
+            clamp(
+                kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportVelocityRate * dt * support_weight,
+                0.0,
+                1.0);
+        double blended_u = next.u(row, col) + velocity_blend * (target_u - next.u(row, col));
+        next.u(row, col) = move_toward(next.u(row, col), blended_u, max_speed_step * support_weight);
+    }
+}
+
 void apply_constriction_upstream_lower_shelf_notch_final_profile(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -10299,6 +10388,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_throat_lower_edge_final_support(scenario_, config_, dt, time_, next);
         apply_constriction_upstream_upper_shelf_reverse_final_support(scenario_, config_, dt, time_, next);
         apply_constriction_upstream_upper_interior_cross_stream_final_support(scenario_, config_, dt, time_, next);
+        apply_constriction_upstream_upper_edge_streamwise_final_support(scenario_, config_, dt, time_, next);
     }
     recompute_state(next);
     state_ = std::move(next);
@@ -11783,6 +11873,33 @@ void write_solver_output(
              << kConstrictionUpstreamUpperInteriorCrossStreamFinalSupportPeakWidthCells << ",\n"
              << "    \"cross_stream_fraction\": "
              << kConstrictionUpstreamUpperInteriorCrossStreamFinalSupportCrossStreamFraction << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_upstream_upper_edge_streamwise_final_support\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_upstream_upper_edge_streamwise_final_support\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"velocity_only\": true,\n"
+             << "    \"streamwise_only\": true,\n"
+             << "    \"leaves_cross_stream_velocity_unchanged\": true,\n"
+             << "    \"mass_preserving\": true,\n"
+             << "    \"applies_only_far_upstream_upper_edge_row\": true,\n"
+             << "    \"uses_duration_normalized_final_response\": true,\n"
+             << "    \"runs_after_upstream_upper_interior_cross_stream_final_support\": true,\n"
+             << "    \"response_start_fraction\": "
+             << kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportResponseStart << ",\n"
+             << "    \"velocity_rate_per_s\": "
+             << kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportVelocityRate << ",\n"
+             << "    \"max_speed_m_per_s2\": "
+             << kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportMaxSpeedPerSecond << ",\n"
+             << "    \"first_post_inlet_cell\": "
+             << kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportFirstPostInletCell << ",\n"
+             << "    \"last_post_inlet_cell\": "
+             << kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportLastPostInletCell << ",\n"
+             << "    \"edge_taper_cells\": "
+             << kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportEdgeTaperCells << ",\n"
+             << "    \"speed_fraction\": "
+             << kConstrictionUpstreamUpperEdgeStreamwiseFinalSupportSpeedFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_throat_edge_relief\": "
