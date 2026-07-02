@@ -1,0 +1,49 @@
+{
+  "blocked_reasons": [
+    "The final recovery-edge velocity-only shape rejected as a promotion lever: it improved edge/shelf rows but worsened field Linf from 2.24265 to 2.575 and probe Linf from 0.350027 to 0.636084.",
+    "The stronger existing recovery edge-balance retune rejected as a promotion lever: it pushed recovery interior momentum into reverse/under-speed and worsened field Linf to 3.89581.",
+    "The remaining recovery blocker requires split treatment of edge/shelf overdepth and center/interior streamwise momentum, not a global velocity-rate or speed-fraction increase."
+  ],
+  "decision": "BLOCKED",
+  "diagnostic_scope": "Compares the committed upstream upper-edge immediate shelf-release baseline against two rejected recovery retune trials before the next constriction solver change.",
+  "passed": false,
+  "scenario_id": "constriction_seed_16",
+  "schema_version": "raftsim.milestone18.constriction_recovery_retune_rejection.v0",
+  "summary": {
+    "baseline_energy_delta": 0.12045238200374353,
+    "baseline_field_linf": 2.24265096364317,
+    "baseline_froude_delta": 0.02404715520194667,
+    "baseline_mass_drift_delta": 0.0021782795330803073,
+    "baseline_probe_linf": 0.35002734353285936,
+    "baseline_wet_mismatch_fraction": 0.003472222222222222,
+    "edge_shape_field_linf": 2.5749991138271553,
+    "edge_shape_probe_linf": 0.6360836157609726,
+    "edge_shape_rejected": true,
+    "fast_interior_field_linf": 3.895805694704823,
+    "fast_interior_probe_linf": 0.5784050603617702,
+    "fast_interior_rejected": true,
+    "rejected_trial_count": 2
+  },
+  "trial_reports": [
+    {
+      "field_linf": 2.5749991138271553,
+      "name": "recovery_edge_final_shape_trial",
+      "output_dir": "physics/outputs/m18cmp/c_constrict_recovery_edge_final_shape_trial/finite_volume_roe",
+      "probe_linf": 0.6360836157609726,
+      "rejected_reason": "Over-damped recovery interior momentum after improving edge/shelf rows."
+    },
+    {
+      "field_linf": 3.895805694704823,
+      "name": "recovery_edge_balance_fast_interior_trial",
+      "output_dir": "physics/outputs/m18cmp/c_constrict_recovery_edge_balance_fast_interior_trial/finite_volume_roe",
+      "probe_linf": 0.5784050603617702,
+      "rejected_reason": "Stronger global recovery edge-balance response created reverse/under-speed centerline errors."
+    }
+  ],
+  "next_levers": [
+    "Do not promote a velocity-only final recovery-edge shape; it hides edge errors by creating larger recovery-interior momentum failures.",
+    "Do not globally raise the recovery edge-balance rate/max speed or far-interior speed fraction; the existing recovery balance needs profile-split treatment.",
+    "Retune recovery edge/shelf depth relief separately from center/interior streamwise acceleration, then rerun field-profile, face-state, face/source, threshold, and analytic guardrail reports.",
+    "Keep feature forcing off for the next water-field closure pass."
+  ]
+}

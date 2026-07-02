@@ -3830,9 +3830,47 @@
             "target_sample_count": 12,
             "width_depth_coupled_blocker_count": 9
           }
+        },
+        {
+          "blocked_reasons": [
+            "The final recovery-edge velocity-only shape rejected as a promotion lever: it improved edge/shelf rows but worsened field Linf from 2.24265 to 2.575 and probe Linf from 0.350027 to 0.636084.",
+            "The stronger existing recovery edge-balance retune rejected as a promotion lever: it pushed recovery interior momentum into reverse/under-speed and worsened field Linf to 3.89581.",
+            "The remaining recovery blocker requires split treatment of edge/shelf overdepth and center/interior streamwise momentum, not a global velocity-rate or speed-fraction increase."
+          ],
+          "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
+          "next_levers": [
+            "Do not promote a velocity-only final recovery-edge shape; it hides edge errors by creating larger recovery-interior momentum failures.",
+            "Do not globally raise the recovery edge-balance rate/max speed or far-interior speed fraction; the existing recovery balance needs profile-split treatment.",
+            "Retune recovery edge/shelf depth relief separately from center/interior streamwise acceleration, then rerun field-profile, face-state, face/source, threshold, and analytic guardrail reports.",
+            "Keep feature forcing off for the next water-field closure pass."
+          ],
+          "passed": false,
+          "scenario_id": "constriction_seed_16",
+          "schema_version": "raftsim.milestone18.constriction_recovery_retune_rejection.v0",
+          "source_report": "physics/reports/milestone18/constriction_recovery_retune_rejection_diagnostic.json",
+          "summary": {
+            "baseline_energy_delta": 0.12045238200374353,
+            "baseline_field_linf": 2.24265096364317,
+            "baseline_froude_delta": 0.02404715520194667,
+            "baseline_mass_drift_delta": 0.0021782795330803073,
+            "baseline_probe_linf": 0.35002734353285936,
+            "baseline_wet_mismatch_fraction": 0.003472222222222222,
+            "edge_shape_field_linf": 2.5749991138271553,
+            "edge_shape_probe_linf": 0.6360836157609726,
+            "edge_shape_rejected": true,
+            "fast_interior_field_linf": 3.895805694704823,
+            "fast_interior_probe_linf": 0.5784050603617702,
+            "fast_interior_rejected": true,
+            "rejected_trial_count": 2
+          }
         }
       ],
       "next_levers": [
+        "Do not promote a velocity-only final recovery-edge shape; it hides edge errors by creating larger recovery-interior momentum failures.",
+        "Do not globally raise the recovery edge-balance rate/max speed or far-interior speed fraction; the existing recovery balance needs profile-split treatment.",
+        "Retune recovery edge/shelf depth relief separately from center/interior streamwise acceleration, then rerun field-profile, face-state, face/source, threshold, and analytic guardrail reports.",
+        "Keep feature forcing off for the next water-field closure pass.",
         "Start with `lower_edge_face` column 5 rows 1-2; q delta is -0.777682 m3/s, balance delta is -9.85657 m3/s2, native post-source delta is 0.180913 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
         "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
         "Retune y-face flux/source balance at the same face after the geometry support is corrected, not as a standalone source-strength increase.",
@@ -4291,7 +4329,8 @@
     "physics/reports/milestone18/constriction_upper_edge_immediate_shelf_release_field_profile.json",
     "physics/reports/milestone18/constriction_upper_edge_immediate_shelf_release_face_source_audit.json",
     "physics/reports/milestone18/constriction_upper_edge_immediate_shelf_release_face_state_width_depth.json",
-    "physics/reports/milestone18/constriction_upper_edge_immediate_shelf_release_upstream_edge_balance.json"
+    "physics/reports/milestone18/constriction_upper_edge_immediate_shelf_release_upstream_edge_balance.json",
+    "physics/reports/milestone18/constriction_recovery_retune_rejection_diagnostic.json"
   ],
   "geometry_report": "physics/reports/milestone16/geometry_validation.json",
   "passed": false,
