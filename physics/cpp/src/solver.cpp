@@ -98,6 +98,7 @@ constexpr double kConstrictionThroatEdgeReliefResponseStart = 0.995;
 constexpr double kConstrictionThroatEdgeReliefRate = 12.0;
 constexpr double kConstrictionThroatEdgeReliefMaxDepthPerSecond = 3.0;
 constexpr double kConstrictionThroatEdgeReliefDonorFloorScale = 0.28;
+constexpr double kConstrictionThroatEdgeReliefLowerEdgeReceiverTargetScale = 1.20;
 constexpr double kConstrictionThroatEdgeReliefInteriorTargetScale = 1.36;
 constexpr double kConstrictionThroatEdgeReliefVelocityRate = 30.0;
 constexpr double kConstrictionThroatEdgeReliefMaxSpeedPerSecond = 24.0;
@@ -2461,21 +2462,36 @@ void apply_constriction_throat_edge_relief(
                 donor_capacity += capacity;
             }
         }
-        for (std::size_t donor_row : {band.first_row, band.last_row}) {
-            double capacity = std::max(0.0, next.h(donor_row, col) - donor_floor);
-            if (capacity <= config.dry_tolerance) {
-                continue;
-            }
-            donors.push_back(ConstrictionDepthTransferCell{donor_row, col, capacity});
-            donor_capacity += capacity;
+        double upper_edge_capacity = std::max(0.0, next.h(band.last_row, col) - donor_floor);
+        if (upper_edge_capacity > config.dry_tolerance) {
+            donors.push_back(ConstrictionDepthTransferCell{band.last_row, col, upper_edge_capacity});
+            donor_capacity += upper_edge_capacity;
         }
 
         std::vector<ConstrictionProfileTransferCell> receivers;
         double receiver_capacity = 0.0;
+        double lower_edge_target_h =
+            std::max(kConstrictionLocalFringeTargetDepth,
+                     column_mean_depth * kConstrictionThroatEdgeReliefLowerEdgeReceiverTargetScale);
         double interior_target_h =
             std::max(kConstrictionLocalFringeTargetDepth,
                      column_mean_depth * kConstrictionThroatEdgeReliefInteriorTargetScale);
         double interior_cross_stream_sign = signed_x < 0.0 ? -1.0 : 1.0;
+        double lower_edge_target_v =
+            (signed_x < 0.0 ? kConstrictionThroatEdgeReliefUpstreamLowerCrossStreamFraction
+                             : kConstrictionThroatEdgeReliefDownstreamLowerCrossStreamFraction) *
+            reference_speed;
+        double lower_edge_capacity = std::max(0.0, lower_edge_target_h - next.h(band.first_row, col));
+        if (lower_edge_capacity > config.dry_tolerance) {
+            receivers.push_back(ConstrictionProfileTransferCell{
+                band.first_row,
+                col,
+                lower_edge_capacity,
+                flow_sign * kConstrictionThroatEdgeReliefInteriorSpeedFraction * reference_speed,
+                lower_edge_target_v,
+            });
+            receiver_capacity += lower_edge_capacity;
+        }
         for (std::size_t row = band.first_row + 1; row < band.last_row; ++row) {
             double capacity = std::max(0.0, interior_target_h - next.h(row, col));
             if (capacity <= config.dry_tolerance) {
@@ -2536,10 +2552,6 @@ void apply_constriction_throat_edge_relief(
             next.v(row, col) = move_toward(next.v(row, col), blended_v, max_speed_step);
         };
 
-        double lower_edge_target_v =
-            (signed_x < 0.0 ? kConstrictionThroatEdgeReliefUpstreamLowerCrossStreamFraction
-                             : kConstrictionThroatEdgeReliefDownstreamLowerCrossStreamFraction) *
-            reference_speed;
         double upper_edge_target_v =
             (signed_x < 0.0 ? -kConstrictionThroatEdgeReliefUpstreamUpperCrossStreamFraction
                              : kConstrictionThroatEdgeReliefDownstreamUpperCrossStreamFraction) *
@@ -6932,6 +6944,8 @@ void write_solver_output(
              << "    \"bounded\": true,\n"
              << "    \"mass_conservative_edge_to_interior_depth_transfer\": true,\n"
              << "    \"includes_lower_shelf_donor\": true,\n"
+             << "    \"uses_lower_edge_as_donor\": false,\n"
+             << "    \"includes_lower_edge_receiver\": true,\n"
              << "    \"velocity_only_after_depth_transfer\": true,\n"
              << "    \"applies_only_narrow_throat_columns\": true,\n"
              << "    \"runs_after_upstream_boundary_upper_edge_profile_release\": true,\n"
@@ -6941,6 +6955,8 @@ void write_solver_output(
              << "    \"support_rate_per_s\": " << kConstrictionThroatEdgeReliefRate << ",\n"
              << "    \"max_depth_m_per_s\": " << kConstrictionThroatEdgeReliefMaxDepthPerSecond << ",\n"
              << "    \"donor_floor_depth_scale\": " << kConstrictionThroatEdgeReliefDonorFloorScale << ",\n"
+             << "    \"lower_edge_receiver_target_depth_scale\": "
+             << kConstrictionThroatEdgeReliefLowerEdgeReceiverTargetScale << ",\n"
              << "    \"interior_target_depth_scale\": " << kConstrictionThroatEdgeReliefInteriorTargetScale << ",\n"
              << "    \"velocity_rate_per_s\": " << kConstrictionThroatEdgeReliefVelocityRate << ",\n"
              << "    \"max_speed_m_per_s2\": " << kConstrictionThroatEdgeReliefMaxSpeedPerSecond << ",\n"
