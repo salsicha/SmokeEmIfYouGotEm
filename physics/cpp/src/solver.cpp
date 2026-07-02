@@ -615,6 +615,18 @@ constexpr double kConstrictionUpstreamLowerShelfNotchFinalProfileUpstreamWidthHa
 constexpr double kConstrictionUpstreamLowerShelfNotchFinalProfileDownstreamWidthHalfLengthScale = 0.18;
 constexpr double kConstrictionUpstreamLowerShelfNotchFinalProfileSpeedFraction = 1.55;
 constexpr double kConstrictionUpstreamLowerShelfNotchFinalProfileCrossStreamFraction = 0.30;
+constexpr double kConstrictionUpstreamLowerShelfPocketFinalReliefResponseStart = 0.995;
+constexpr double kConstrictionUpstreamLowerShelfPocketFinalReliefDepthRate = 260.0;
+constexpr double kConstrictionUpstreamLowerShelfPocketFinalReliefMaxDepthPerSecond = 220.0;
+constexpr double kConstrictionUpstreamLowerShelfPocketFinalReliefVelocityRate = 260.0;
+constexpr double kConstrictionUpstreamLowerShelfPocketFinalReliefMaxSpeedPerSecond = 220.0;
+constexpr double kConstrictionUpstreamLowerShelfPocketFinalReliefCenterDistanceCells = 1.5;
+constexpr double kConstrictionUpstreamLowerShelfPocketFinalReliefPeakWidthCells = 0.75;
+constexpr double kConstrictionUpstreamLowerShelfPocketFinalReliefDonorFloorScale = 0.25;
+constexpr double kConstrictionUpstreamLowerShelfPocketFinalReliefOuterShelfTargetScale = 0.24;
+constexpr double kConstrictionUpstreamLowerShelfPocketFinalReliefLowerEdgeTargetScale = 1.34;
+constexpr double kConstrictionUpstreamLowerShelfPocketFinalReliefLowerInteriorTargetScale = 1.40;
+constexpr double kConstrictionUpstreamLowerShelfPocketFinalReliefLowerShelfSpeedFraction = 2.75;
 constexpr double kConstrictionUpstreamTransitionLowerShelfFinalProfileResponseStart = 0.99;
 constexpr double kConstrictionUpstreamTransitionLowerShelfFinalProfileDepthRate = 80.0;
 constexpr double kConstrictionUpstreamTransitionLowerShelfFinalProfileMaxDepthPerSecond = 40.0;
@@ -8985,6 +8997,146 @@ void apply_constriction_upstream_lower_shelf_notch_final_profile(
     }
 }
 
+void apply_constriction_upstream_lower_shelf_pocket_final_relief(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    double time_s,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+    double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+    double final_response =
+        clamp(
+            (response_progress - kConstrictionUpstreamLowerShelfPocketFinalReliefResponseStart) /
+                std::max(1.0e-9, 1.0 - kConstrictionUpstreamLowerShelfPocketFinalReliefResponseStart),
+            0.0,
+            1.0);
+    if (final_response <= 0.0) {
+        return;
+    }
+
+    double flow_sign = constriction_flow_sign(scenario);
+    double max_depth_step =
+        kConstrictionUpstreamLowerShelfPocketFinalReliefMaxDepthPerSecond * dt * final_response;
+    double max_speed_step =
+        kConstrictionUpstreamLowerShelfPocketFinalReliefMaxSpeedPerSecond * dt * final_response;
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        std::size_t upstream_distance_cells =
+            flow_sign >= 0.0 ? col : (scenario.grid.nx - 1 - col);
+        double normalized_distance =
+            (static_cast<double>(upstream_distance_cells) -
+             kConstrictionUpstreamLowerShelfPocketFinalReliefCenterDistanceCells) /
+            std::max(
+                1.0e-9,
+                kConstrictionUpstreamLowerShelfPocketFinalReliefPeakWidthCells);
+        double support_weight = final_response * std::exp(-(normalized_distance * normalized_distance));
+        if (support_weight <= 1.0e-6) {
+            continue;
+        }
+
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count <= throat_width_cells || band.first_row == 0 ||
+            band.first_row + 1 > band.last_row) {
+            continue;
+        }
+
+        std::size_t lower_shelf_row = band.first_row - 1;
+        if (next.h(lower_shelf_row, col) <= config.dry_tolerance) {
+            continue;
+        }
+
+        double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+        if (column_mean_depth <= config.dry_tolerance) {
+            continue;
+        }
+
+        double donor_floor = std::max(
+            kConstrictionLocalFringeTargetDepth,
+            column_mean_depth * kConstrictionUpstreamLowerShelfPocketFinalReliefDonorFloorScale);
+        double donor_capacity = std::max(0.0, next.h(lower_shelf_row, col) - donor_floor);
+
+        std::vector<ConstrictionDepthTransferCell> receivers;
+        double receiver_capacity = 0.0;
+        auto add_receiver = [&](std::size_t row, double target_scale) {
+            if (row >= scenario.grid.ny || next.h(row, col) <= config.dry_tolerance) {
+                return;
+            }
+            double target_h = std::max(
+                kConstrictionLocalFringeTargetDepth,
+                column_mean_depth * target_scale);
+            double capacity = std::max(0.0, target_h - next.h(row, col));
+            if (capacity > config.dry_tolerance) {
+                receivers.push_back(ConstrictionDepthTransferCell{row, col, capacity});
+                receiver_capacity += capacity;
+            }
+        };
+
+        if (lower_shelf_row > 0) {
+            add_receiver(
+                lower_shelf_row - 1,
+                kConstrictionUpstreamLowerShelfPocketFinalReliefOuterShelfTargetScale);
+        }
+        add_receiver(
+            band.first_row,
+            kConstrictionUpstreamLowerShelfPocketFinalReliefLowerEdgeTargetScale);
+        add_receiver(
+            band.first_row + 1,
+            kConstrictionUpstreamLowerShelfPocketFinalReliefLowerInteriorTargetScale);
+
+        double transfer_h = 0.0;
+        if (donor_capacity > config.dry_tolerance && receiver_capacity > config.dry_tolerance) {
+            double requested_h =
+                receiver_capacity * kConstrictionUpstreamLowerShelfPocketFinalReliefDepthRate * dt *
+                support_weight;
+            transfer_h =
+                std::min(receiver_capacity, std::min(donor_capacity, std::min(requested_h, max_depth_step)));
+        }
+
+        if (transfer_h > config.dry_tolerance) {
+            next.h(lower_shelf_row, col) =
+                std::max(donor_floor, next.h(lower_shelf_row, col) - transfer_h);
+
+            for (const ConstrictionDepthTransferCell& receiver : receivers) {
+                double added_h = transfer_h * receiver.capacity / receiver_capacity;
+                if (added_h <= 0.0) {
+                    continue;
+                }
+                double receiver_h = next.h(receiver.row, receiver.col);
+                double merged_h = receiver_h + added_h;
+                next.h(receiver.row, receiver.col) = merged_h;
+            }
+        }
+
+        if (next.h(lower_shelf_row, col) <= config.dry_tolerance) {
+            continue;
+        }
+
+        double velocity_blend =
+            clamp(
+                kConstrictionUpstreamLowerShelfPocketFinalReliefVelocityRate * dt * support_weight,
+                0.0,
+                1.0);
+        double target_u =
+            flow_sign * kConstrictionUpstreamLowerShelfPocketFinalReliefLowerShelfSpeedFraction *
+            reference_speed;
+        double blended_u = next.u(lower_shelf_row, col) + velocity_blend * (target_u - next.u(lower_shelf_row, col));
+        next.u(lower_shelf_row, col) =
+            move_toward(next.u(lower_shelf_row, col), blended_u, max_speed_step * support_weight);
+    }
+}
+
 void apply_constriction_throat_entry_final_depth_balance(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -11452,6 +11604,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_downstream_throat_interior_final_support(scenario_, config_, dt, time_, next);
         apply_constriction_recovery_lower_interior_slowdown_final_support(scenario_, config_, dt, time_, next);
         apply_constriction_recovery_upper_interior_streamwise_final_support(scenario_, config_, dt, time_, next);
+        apply_constriction_upstream_lower_shelf_pocket_final_relief(scenario_, config_, dt, time_, next);
     }
     recompute_state(next);
     state_ = std::move(next);
@@ -13731,6 +13884,42 @@ void write_solver_output(
              << kConstrictionRecoveryUpperInteriorStreamwiseFinalSupportPeakWidthCells << ",\n"
              << "    \"speed_fraction\": "
              << kConstrictionRecoveryUpperInteriorStreamwiseFinalSupportSpeedFraction << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_upstream_lower_shelf_pocket_final_relief\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_upstream_lower_shelf_pocket_final_relief\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative_lower_shelf_to_lower_edge_interior_transfer\": true,\n"
+             << "    \"velocity_only_after_depth_transfer\": true,\n"
+             << "    \"receiver_velocities_remain_unchanged\": true,\n"
+             << "    \"runs_after_recovery_upper_interior_streamwise_final_support\": true,\n"
+             << "    \"uses_duration_normalized_final_response\": true,\n"
+             << "    \"applies_only_first_upstream_lower_shelf_pocket\": true,\n"
+             << "    \"response_start_fraction\": "
+             << kConstrictionUpstreamLowerShelfPocketFinalReliefResponseStart << ",\n"
+             << "    \"depth_rate_per_s\": "
+             << kConstrictionUpstreamLowerShelfPocketFinalReliefDepthRate << ",\n"
+             << "    \"max_depth_m_per_s\": "
+             << kConstrictionUpstreamLowerShelfPocketFinalReliefMaxDepthPerSecond << ",\n"
+             << "    \"velocity_rate_per_s\": "
+             << kConstrictionUpstreamLowerShelfPocketFinalReliefVelocityRate << ",\n"
+             << "    \"max_speed_m_per_s2\": "
+             << kConstrictionUpstreamLowerShelfPocketFinalReliefMaxSpeedPerSecond << ",\n"
+             << "    \"center_distance_cells\": "
+             << kConstrictionUpstreamLowerShelfPocketFinalReliefCenterDistanceCells << ",\n"
+             << "    \"peak_width_cells\": "
+             << kConstrictionUpstreamLowerShelfPocketFinalReliefPeakWidthCells << ",\n"
+             << "    \"donor_floor_depth_scale\": "
+             << kConstrictionUpstreamLowerShelfPocketFinalReliefDonorFloorScale << ",\n"
+             << "    \"outer_shelf_target_depth_scale\": "
+             << kConstrictionUpstreamLowerShelfPocketFinalReliefOuterShelfTargetScale << ",\n"
+             << "    \"lower_edge_target_depth_scale\": "
+             << kConstrictionUpstreamLowerShelfPocketFinalReliefLowerEdgeTargetScale << ",\n"
+             << "    \"lower_interior_target_depth_scale\": "
+             << kConstrictionUpstreamLowerShelfPocketFinalReliefLowerInteriorTargetScale << ",\n"
+             << "    \"lower_shelf_speed_fraction\": "
+             << kConstrictionUpstreamLowerShelfPocketFinalReliefLowerShelfSpeedFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_recovery_final_lower_edge_shear_balance\": "
