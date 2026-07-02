@@ -778,6 +778,29 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["constriction_recovery_centerline_timing"]["depth_donor_scope"] == "upper_recovery_shelf_row"
     assert constriction_manifest["constriction_recovery_centerline_timing"]["applies_only_near_recovery_centerline"] is True
     assert constriction_manifest["constriction_recovery_centerline_timing"]["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_recovery_edge_balance"] is True
+    assert constriction_manifest["constriction_recovery_edge_balance"]["bounded"] is True
+    assert constriction_manifest["constriction_recovery_edge_balance"]["mass_conservative_depth_transfer"] is True
+    assert constriction_manifest["constriction_recovery_edge_balance"]["velocity_only_after_depth_transfer"] is True
+    assert constriction_manifest["constriction_recovery_edge_balance"]["uses_duration_normalized_late_response"] is True
+    assert constriction_manifest["constriction_recovery_edge_balance"]["applies_only_recovery_columns"] is True
+    assert (
+        constriction_manifest["constriction_recovery_edge_balance"]["upper_edge_target_depth_scale"]
+        == pytest.approx(0.30)
+    )
+    assert (
+        constriction_manifest["constriction_recovery_edge_balance"]["lower_edge_target_depth_scale"]
+        == pytest.approx(0.96)
+    )
+    assert (
+        constriction_manifest["constriction_recovery_edge_balance"]["near_edge_speed_fraction"]
+        == pytest.approx(-0.12)
+    )
+    assert (
+        constriction_manifest["constriction_recovery_edge_balance"]["far_edge_speed_fraction"]
+        == pytest.approx(0.23)
+    )
+    assert constriction_manifest["constriction_recovery_edge_balance"]["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_downstream_return_current_balance"] is True
     assert constriction_manifest["constriction_downstream_return_current_balance"]["bounded"] is True
     assert constriction_manifest["constriction_downstream_return_current_balance"]["velocity_only"] is True
