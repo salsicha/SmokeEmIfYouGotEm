@@ -152,6 +152,12 @@ constexpr double kConstrictionUpperEdgeOppositionBalanceMaxSpeedPerSecond = 6.0;
 constexpr double kConstrictionUpperEdgeOppositionBalanceSpeedFraction = 0.82;
 constexpr double kConstrictionUpperEdgeOppositionBalanceCrossStreamFraction = 0.72;
 constexpr double kConstrictionUpperEdgeOppositionBalanceInteriorCrossStreamFraction = 0.36;
+constexpr double kConstrictionUpperOutsideShelfSupportRate = 8.0;
+constexpr double kConstrictionUpperOutsideShelfSupportMaxDepthPerSecond = 2.0;
+constexpr double kConstrictionUpperOutsideShelfSupportTargetDepthScale = 0.2;
+constexpr double kConstrictionUpperOutsideShelfSupportDonorFloorScale = 0.45;
+constexpr double kConstrictionUpperOutsideShelfSupportSpeedFraction = 0.92;
+constexpr double kConstrictionUpperOutsideShelfSupportCrossStreamFraction = 0.78;
 constexpr double kConstrictionCrossStreamMomentumRate = 2.2;
 constexpr double kConstrictionCrossStreamMomentumMaxSpeedPerSecond = 3.6;
 constexpr double kConstrictionCrossStreamMomentumRecoveryFraction = 0.58;
@@ -2904,6 +2910,7 @@ void apply_constriction_upper_edge_opposition_balance(
 
     double flow_sign = constriction_flow_sign(scenario);
     double max_depth_step = kConstrictionUpperEdgeOppositionBalanceMaxDepthPerSecond * dt;
+    double max_shelf_depth_step = kConstrictionUpperOutsideShelfSupportMaxDepthPerSecond * dt;
     double max_speed_step = kConstrictionUpperEdgeOppositionBalanceMaxSpeedPerSecond * dt;
 
     for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
@@ -2960,6 +2967,51 @@ void apply_constriction_upper_edge_opposition_balance(
             }
         }
 
+        if (band.last_row + 1 < scenario.grid.ny) {
+            std::size_t shelf_row = std::min(scenario.grid.ny - 1, band.last_row + 2);
+            if (shelf_row > band.last_row &&
+                inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, shelf_row)) {
+                double shelf_target_h = std::max(
+                    kConstrictionLocalFringeTargetDepth,
+                    column_mean_depth * kConstrictionUpperOutsideShelfSupportTargetDepthScale);
+                double shelf_capacity = std::max(0.0, shelf_target_h - next.h(shelf_row, col));
+                double donor_floor = std::max(
+                    kConstrictionLocalFringeTargetDepth,
+                    column_mean_depth * kConstrictionUpperOutsideShelfSupportDonorFloorScale);
+                double donor_capacity = std::max(0.0, next.h(band.last_row, col) - donor_floor);
+                if (shelf_capacity > config.dry_tolerance && donor_capacity > config.dry_tolerance) {
+                    double requested_h =
+                        shelf_capacity * kConstrictionUpperOutsideShelfSupportRate * dt * approach_weight;
+                    double transfer_h = std::min(
+                        shelf_capacity,
+                        std::min(donor_capacity, std::min(requested_h, max_shelf_depth_step * approach_weight)));
+                    if (transfer_h > config.dry_tolerance) {
+                        double donor_h = next.h(band.last_row, col);
+                        next.h(band.last_row, col) = std::max(0.0, donor_h - transfer_h);
+                        if (next.h(band.last_row, col) <= config.dry_tolerance) {
+                            next.h(band.last_row, col) = 0.0;
+                            next.u(band.last_row, col) = 0.0;
+                            next.v(band.last_row, col) = 0.0;
+                        }
+
+                        double target_u = flow_sign * kConstrictionUpperOutsideShelfSupportSpeedFraction * reference_speed;
+                        double target_v = -kConstrictionUpperOutsideShelfSupportCrossStreamFraction * reference_speed;
+                        double receiver_h = next.h(shelf_row, col);
+                        double merged_h = receiver_h + transfer_h;
+                        double merged_hu = receiver_h * next.u(shelf_row, col) + transfer_h * target_u;
+                        double merged_hv = receiver_h * next.v(shelf_row, col) + transfer_h * target_v;
+                        next.h(shelf_row, col) = merged_h;
+                        next.u(shelf_row, col) =
+                            merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance)
+                                                            : 0.0;
+                        next.v(shelf_row, col) =
+                            merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance)
+                                                            : 0.0;
+                    }
+                }
+            }
+        }
+
         auto shape_upper_row = [&](std::size_t row, double cross_stream_fraction) {
             double h = next.h(row, col);
             if (h <= config.dry_tolerance) {
@@ -2979,6 +3031,14 @@ void apply_constriction_upper_edge_opposition_balance(
             shape_upper_row(band.last_row - 1, kConstrictionUpperEdgeOppositionBalanceInteriorCrossStreamFraction);
         }
         shape_upper_row(band.last_row, 1.0);
+        if (band.last_row + 1 < scenario.grid.ny) {
+            std::size_t shelf_row = std::min(scenario.grid.ny - 1, band.last_row + 2);
+            if (shelf_row > band.last_row &&
+                inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, shelf_row)) {
+                shape_upper_row(shelf_row, kConstrictionUpperOutsideShelfSupportCrossStreamFraction /
+                                               kConstrictionUpperEdgeOppositionBalanceCrossStreamFraction);
+            }
+        }
     }
 }
 
@@ -4412,6 +4472,13 @@ void write_solver_output(
              << "    \"interior_cross_stream_fraction\": " << kConstrictionUpperEdgeOppositionBalanceInteriorCrossStreamFraction << ",\n"
              << "    \"uses_transition_aware_weight\": true,\n"
              << "    \"transition_edge_face_weight_scale\": " << kConstrictionTransitionEdgeFaceWeightScale << ",\n"
+             << "    \"supports_upper_outside_shelf\": true,\n"
+             << "    \"upper_outside_shelf_rate_per_s\": " << kConstrictionUpperOutsideShelfSupportRate << ",\n"
+             << "    \"upper_outside_shelf_max_depth_m_per_s\": " << kConstrictionUpperOutsideShelfSupportMaxDepthPerSecond << ",\n"
+             << "    \"upper_outside_shelf_target_depth_scale\": " << kConstrictionUpperOutsideShelfSupportTargetDepthScale << ",\n"
+             << "    \"upper_outside_shelf_donor_floor_depth_scale\": " << kConstrictionUpperOutsideShelfSupportDonorFloorScale << ",\n"
+             << "    \"upper_outside_shelf_speed_fraction\": " << kConstrictionUpperOutsideShelfSupportSpeedFraction << ",\n"
+             << "    \"upper_outside_shelf_cross_stream_fraction\": " << kConstrictionUpperOutsideShelfSupportCrossStreamFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_y_face_hydrostatic_source_split\": "
