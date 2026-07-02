@@ -373,6 +373,20 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         constriction_manifest["constriction_lower_edge_width_depth_balance"]["requires_feature_forcing"]
         is False
     )
+    assert constriction_manifest["fixture_scoped_constriction_upper_edge_opposition_balance"] is True
+    assert constriction_manifest["constriction_upper_edge_opposition_balance"]["bounded"] is True
+    assert (
+        constriction_manifest["constriction_upper_edge_opposition_balance"]["mass_conservative_depth_transfer"]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_upper_edge_opposition_balance"]["velocity_only_after_depth_transfer"]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_upper_edge_opposition_balance"]["requires_feature_forcing"]
+        is False
+    )
     assert constriction_manifest["fixture_scoped_constriction_y_face_hydrostatic_source_split"] is True
     assert constriction_manifest["constriction_y_face_hydrostatic_source_split"]["bounded"] is True
     assert constriction_manifest["constriction_y_face_hydrostatic_source_split"]["uses_predictor_riemann_state"] is True
@@ -392,6 +406,24 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["fixture_scoped_constriction_dry_bank_reconstruction"] is True
     assert constriction_manifest["fixture_scoped_constriction_wet_band_relaxation"] is True
     assert constriction_manifest["fixture_scoped_constriction_wet_band_span_shaping"] is True
+    assert constriction_manifest["fixture_scoped_constriction_wet_band_profile_relaxation"] is True
+    assert constriction_manifest["constriction_wet_band_profile_relaxation"]["bounded"] is True
+    assert (
+        constriction_manifest["constriction_wet_band_profile_relaxation"]["mass_conservative_depth_transfer"]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_wet_band_profile_relaxation"]["requires_feature_forcing"]
+        is False
+    )
+    assert constriction_manifest["fixture_scoped_constriction_upstream_interior_velocity_relaxation"] is True
+    assert constriction_manifest["constriction_upstream_interior_velocity_relaxation"]["bounded"] is True
+    assert constriction_manifest["constriction_upstream_interior_velocity_relaxation"]["velocity_only"] is True
+    assert constriction_manifest["constriction_upstream_interior_velocity_relaxation"]["mass_preserving"] is True
+    assert (
+        constriction_manifest["constriction_upstream_interior_velocity_relaxation"]["requires_feature_forcing"]
+        is False
+    )
     assert constriction_manifest["fixture_scoped_constriction_asymmetric_wet_band_envelope"] is True
     assert constriction_manifest["fixture_scoped_constriction_volume_response_reconstruction"] is True
     assert constriction_manifest["constriction_volume_response"]["bounded"] is True
