@@ -841,6 +841,28 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert upstream_upper_core["donor_cross_stream_fraction"] == pytest.approx(-0.85)
     assert upstream_upper_core["donor_overfull_cross_stream_fraction"] == pytest.approx(-0.62)
     assert upstream_upper_core["requires_feature_forcing"] is False
+    assert (
+        constriction_manifest["fixture_scoped_constriction_upstream_lower_shelf_notch_final_profile"]
+        is True
+    )
+    upstream_lower_shelf_notch = constriction_manifest[
+        "constriction_upstream_lower_shelf_notch_final_profile"
+    ]
+    assert upstream_lower_shelf_notch["bounded"] is True
+    assert upstream_lower_shelf_notch["velocity_only"] is True
+    assert upstream_lower_shelf_notch["mass_preserving"] is True
+    assert upstream_lower_shelf_notch["applies_only_far_upstream_one_cell_lower_shelf"] is True
+    assert upstream_lower_shelf_notch["uses_duration_normalized_final_response"] is True
+    assert upstream_lower_shelf_notch["runs_after_upstream_upper_core_final_profile"] is True
+    assert upstream_lower_shelf_notch["response_start_fraction"] == pytest.approx(0.99)
+    assert upstream_lower_shelf_notch["velocity_rate_per_s"] == pytest.approx(260.0)
+    assert upstream_lower_shelf_notch["max_speed_m_per_s2"] == pytest.approx(220.0)
+    assert upstream_lower_shelf_notch["center_half_length_scale"] == pytest.approx(1.74)
+    assert upstream_lower_shelf_notch["upstream_width_half_length_scale"] == pytest.approx(0.35)
+    assert upstream_lower_shelf_notch["downstream_width_half_length_scale"] == pytest.approx(0.18)
+    assert upstream_lower_shelf_notch["speed_fraction"] == pytest.approx(1.55)
+    assert upstream_lower_shelf_notch["cross_stream_fraction"] == pytest.approx(0.30)
+    assert upstream_lower_shelf_notch["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_throat_entry_final_depth_balance"] is True
     throat_entry_final = constriction_manifest["constriction_throat_entry_final_depth_balance"]
     assert throat_entry_final["bounded"] is True
