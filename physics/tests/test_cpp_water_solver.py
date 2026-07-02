@@ -710,13 +710,14 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert throat_edge_relief["includes_lower_shelf_donor"] is True
     assert throat_edge_relief["uses_lower_edge_as_donor"] is False
     assert throat_edge_relief["includes_lower_edge_receiver"] is True
+    assert throat_edge_relief["off_center_depth_transfer_only"] is True
     assert throat_edge_relief["velocity_only_after_depth_transfer"] is True
     assert throat_edge_relief["applies_only_narrow_throat_columns"] is True
     assert throat_edge_relief["uses_duration_normalized_final_response"] is True
     assert throat_edge_relief["response_start_fraction"] == pytest.approx(0.995)
-    assert throat_edge_relief["support_rate_per_s"] == pytest.approx(12.0)
-    assert throat_edge_relief["max_depth_m_per_s"] == pytest.approx(3.0)
-    assert throat_edge_relief["donor_floor_depth_scale"] == pytest.approx(0.28)
+    assert throat_edge_relief["support_rate_per_s"] == pytest.approx(30.0)
+    assert throat_edge_relief["max_depth_m_per_s"] == pytest.approx(12.0)
+    assert throat_edge_relief["donor_floor_depth_scale"] == pytest.approx(0.24)
     assert throat_edge_relief["lower_edge_receiver_target_depth_scale"] == pytest.approx(1.20)
     assert throat_edge_relief["interior_target_depth_scale"] == pytest.approx(1.36)
     assert throat_edge_relief["velocity_rate_per_s"] == pytest.approx(30.0)
