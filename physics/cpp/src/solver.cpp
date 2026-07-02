@@ -126,6 +126,7 @@ constexpr double kConstrictionYFaceStateCompanionDepthFraction = 0.5;
 constexpr double kConstrictionYFaceStateOutsideCompanionDepthFraction = 0.5;
 constexpr double kConstrictionYFaceStateDownstreamSpeedFraction = 1.15;
 constexpr double kConstrictionYFaceStateCrossStreamFraction = 1.25;
+constexpr double kConstrictionTransitionEdgeFaceWeightScale = 0.75;
 constexpr double kConstrictionUpstreamEdgeSupportRate = 1.2;
 constexpr double kConstrictionUpstreamEdgeSupportMaxDepthPerSecond = 0.24;
 constexpr double kConstrictionUpstreamEdgeSupportTargetDepthScale = 0.92;
@@ -1134,6 +1135,18 @@ double constriction_upstream_edge_approach_weight(const Scenario& scenario, std:
     return clamp((-signed_x - half_length) / half_length, 0.0, 1.0);
 }
 
+double constriction_transition_edge_face_weight(const Scenario& scenario, std::size_t col) {
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double signed_x = constriction_signed_x(scenario, col);
+    if (signed_x < -half_length) {
+        return constriction_upstream_edge_approach_weight(scenario, col);
+    }
+    if (signed_x >= 0.0) {
+        return 0.0;
+    }
+    return kConstrictionTransitionEdgeFaceWeightScale * clamp(-signed_x / half_length, 0.0, 1.0);
+}
+
 double bed_slope_source_y_per_s(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -1187,8 +1200,8 @@ bool apply_constriction_y_face_state_reconstruction(
         return false;
     }
 
-    double approach_weight = constriction_upstream_edge_approach_weight(scenario, col);
-    if (approach_weight <= 0.0) {
+    double face_weight = constriction_transition_edge_face_weight(scenario, col);
+    if (face_weight <= 0.0) {
         return false;
     }
 
@@ -1202,8 +1215,8 @@ bool apply_constriction_y_face_state_reconstruction(
     double target_u = flow_sign * kConstrictionYFaceStateDownstreamSpeedFraction * reference_speed;
     double target_v = -edge_lateral_sign * kConstrictionYFaceStateCrossStreamFraction * reference_speed;
     double edge_target_h = std::max(kConstrictionYFaceStateMinDepth, column_mean_depth * kConstrictionYFaceStateDepthScale);
-    double blend = clamp(kConstrictionYFaceStateBlend * approach_weight, 0.0, 1.0);
-    double max_speed_delta = kConstrictionYFaceStateMaxSpeedDelta * approach_weight;
+    double blend = clamp(kConstrictionYFaceStateBlend * face_weight, 0.0, 1.0);
+    double max_speed_delta = kConstrictionYFaceStateMaxSpeedDelta * face_weight;
     bool changed = false;
 
     auto reconstruct_state = [&](ConservedState& q, double depth_fraction, double velocity_fraction, bool reset_velocity) {
@@ -1312,8 +1325,8 @@ void apply_constriction_upstream_edge_face_flux_source(
         return;
     }
 
-    double approach_weight = constriction_upstream_edge_approach_weight(scenario, col);
-    if (approach_weight <= 0.0) {
+    double face_weight = constriction_transition_edge_face_weight(scenario, col);
+    if (face_weight <= 0.0) {
         return;
     }
 
@@ -1331,7 +1344,7 @@ void apply_constriction_upstream_edge_face_flux_source(
 
     double depth_rate = std::min(
         (edge.h - target_h) * kConstrictionUpstreamEdgeFluxRate,
-        kConstrictionUpstreamEdgeFluxMaxDepthPerSecond * approach_weight);
+        kConstrictionUpstreamEdgeFluxMaxDepthPerSecond * face_weight);
     if (depth_rate <= 0.0) {
         return;
     }
@@ -1357,7 +1370,7 @@ void apply_constriction_upstream_edge_face_flux_source(
     double target_flux_h =
         direction * opposition_target_h * kConstrictionYFaceOppositionFluxCrossStreamFraction * reference_speed;
     double max_flux_correction =
-        kConstrictionYFaceOppositionFluxMaxReferenceScale * reference_speed * approach_weight;
+        kConstrictionYFaceOppositionFluxMaxReferenceScale * reference_speed * face_weight;
     double correction_h = clamp(target_flux_h - flux.left.h, -max_flux_correction, max_flux_correction);
     if (std::abs(correction_h) <= 1.0e-12) {
         return;
@@ -4308,6 +4321,8 @@ void write_solver_output(
              << "    \"opposition_flux_cross_stream_fraction\": " << kConstrictionYFaceOppositionFluxCrossStreamFraction << ",\n"
              << "    \"opposition_flux_max_reference_scale\": " << kConstrictionYFaceOppositionFluxMaxReferenceScale << ",\n"
              << "    \"opposition_flux_preserves_lower_positive_upper_negative_signs\": true,\n"
+             << "    \"includes_transition_edge_faces\": true,\n"
+             << "    \"transition_edge_face_weight_scale\": " << kConstrictionTransitionEdgeFaceWeightScale << ",\n"
              << "    \"momentum_rate_per_s\": " << kConstrictionUpstreamEdgeMomentumRate << ",\n"
              << "    \"max_speed_m_per_s2\": " << kConstrictionUpstreamEdgeMomentumMaxSpeedPerSecond << ",\n"
              << "    \"speed_fraction_of_authored_throat\": " << kConstrictionUpstreamEdgeSpeedFraction << ",\n"
@@ -4323,6 +4338,8 @@ void write_solver_output(
              << "    \"predictor_state_only\": true,\n"
              << "    \"applies_before_y_face_riemann_solve\": true,\n"
              << "    \"applies_only_upstream_edge_y_faces\": true,\n"
+             << "    \"includes_transition_edge_faces\": true,\n"
+             << "    \"transition_edge_face_weight_scale\": " << kConstrictionTransitionEdgeFaceWeightScale << ",\n"
              << "    \"state_blend\": " << kConstrictionYFaceStateBlend << ",\n"
              << "    \"max_speed_delta_m_per_s\": " << kConstrictionYFaceStateMaxSpeedDelta << ",\n"
              << "    \"target_depth_scale\": " << kConstrictionYFaceStateDepthScale << ",\n"
