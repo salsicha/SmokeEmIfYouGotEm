@@ -184,6 +184,17 @@ constexpr double kConstrictionLowerEdgeFinalSupportMaxSpeedPerSecond = 3.5;
 constexpr double kConstrictionLowerEdgeFinalSupportCrossStreamFraction = 0.95;
 constexpr double kConstrictionLowerEdgeFinalSupportInteriorCrossStreamFraction = 0.55;
 constexpr double kConstrictionLowerEdgeFinalSupportTransitionVelocityWeightFloor = 0.75;
+constexpr double kConstrictionLowerEdgeFinalSupportFarApproachStart = 0.45;
+constexpr double kConstrictionLowerEdgeFinalSupportFarResponseStart = 0.98;
+constexpr double kConstrictionLowerEdgeFinalSupportFarVelocityRate = 45.0;
+constexpr double kConstrictionLowerEdgeFinalSupportFarMaxSpeedPerSecond = 24.0;
+constexpr double kConstrictionLowerEdgeFinalSupportInletShelfSpeedFraction = 0.90;
+constexpr double kConstrictionLowerEdgeFinalSupportOuterShelfSpeedFraction = 1.20;
+constexpr double kConstrictionLowerEdgeFinalSupportLowerShelfSpeedFraction = 1.20;
+constexpr double kConstrictionLowerEdgeFinalSupportFirstWetSpeedFraction = 0.52;
+constexpr double kConstrictionLowerEdgeFinalSupportOuterShelfCrossStreamFraction = 0.30;
+constexpr double kConstrictionLowerEdgeFinalSupportLowerShelfCrossStreamFraction = 1.12;
+constexpr double kConstrictionLowerEdgeFinalSupportFirstWetCrossStreamFraction = 0.28;
 constexpr double kConstrictionLowerEdgeFluxMagnitudeRate = 8.0;
 constexpr double kConstrictionLowerEdgeFluxMagnitudeMaxSpeedPerSecond = 5.0;
 constexpr double kConstrictionLowerEdgeFluxMagnitudeShelfSpeedFraction = 0.78;
@@ -3986,6 +3997,7 @@ void apply_constriction_lower_edge_final_support(
     const Scenario& scenario,
     const SolverConfig& config,
     double dt,
+    double time_s,
     WaterState& next
 ) {
     if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
@@ -4081,6 +4093,70 @@ void apply_constriction_lower_edge_final_support(
             shape_lower_row(band.first_row - 1, 1.0);
         }
         shape_lower_row(band.first_row, kConstrictionLowerEdgeFinalSupportInteriorCrossStreamFraction);
+
+        double far_approach_weight =
+            clamp(
+                (approach_weight - kConstrictionLowerEdgeFinalSupportFarApproachStart) /
+                    std::max(1.0e-9, 1.0 - kConstrictionLowerEdgeFinalSupportFarApproachStart),
+                0.0,
+                1.0);
+        double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+        double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+        double far_response =
+            clamp(
+                (response_progress - kConstrictionLowerEdgeFinalSupportFarResponseStart) /
+                    std::max(1.0e-9, 1.0 - kConstrictionLowerEdgeFinalSupportFarResponseStart),
+                0.0,
+                1.0);
+        double far_weight = far_approach_weight * far_response;
+        if (far_weight <= 0.0) {
+            continue;
+        }
+
+        std::size_t upstream_distance_cells =
+            constriction_flow_sign(scenario) >= 0.0 ? col : (scenario.grid.nx - 1 - col);
+        double inlet_ramp = clamp(static_cast<double>(upstream_distance_cells), 0.0, 1.0);
+        double outer_shelf_speed_fraction =
+            kConstrictionLowerEdgeFinalSupportInletShelfSpeedFraction +
+            inlet_ramp *
+                (kConstrictionLowerEdgeFinalSupportOuterShelfSpeedFraction -
+                 kConstrictionLowerEdgeFinalSupportInletShelfSpeedFraction);
+        double far_response_step =
+            kConstrictionLowerEdgeFinalSupportFarMaxSpeedPerSecond * dt * far_weight;
+        double far_response_blend =
+            clamp(kConstrictionLowerEdgeFinalSupportFarVelocityRate * dt * far_weight, 0.0, 1.0);
+        auto shape_far_upstream_lower_shelf_row =
+            [&](std::size_t row, double speed_fraction, double cross_stream_fraction) {
+                if (next.h(row, col) <= config.dry_tolerance) {
+                    return;
+                }
+                double target_u = constriction_flow_sign(scenario) * speed_fraction * reference_speed;
+                double target_v = cross_stream_fraction * reference_speed;
+                double blended_u = next.u(row, col) + far_response_blend * (target_u - next.u(row, col));
+                double blended_v = next.v(row, col) + far_response_blend * (target_v - next.v(row, col));
+                next.u(row, col) = move_toward(next.u(row, col), blended_u, far_response_step);
+                next.v(row, col) = move_toward(next.v(row, col), blended_v, far_response_step);
+            };
+
+        if (band.first_row > 1) {
+            std::size_t outer_shelf_row = band.first_row - 2;
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, outer_shelf_row)) {
+                shape_far_upstream_lower_shelf_row(
+                    outer_shelf_row,
+                    outer_shelf_speed_fraction,
+                    kConstrictionLowerEdgeFinalSupportOuterShelfCrossStreamFraction);
+            }
+        }
+        if (band.first_row > 0) {
+            shape_far_upstream_lower_shelf_row(
+                band.first_row - 1,
+                kConstrictionLowerEdgeFinalSupportLowerShelfSpeedFraction,
+                kConstrictionLowerEdgeFinalSupportLowerShelfCrossStreamFraction);
+        }
+        shape_far_upstream_lower_shelf_row(
+            band.first_row,
+            kConstrictionLowerEdgeFinalSupportFirstWetSpeedFraction,
+            kConstrictionLowerEdgeFinalSupportFirstWetCrossStreamFraction);
     }
 }
 
@@ -5739,7 +5815,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_upper_edge_opposition_balance(scenario_, config_, dt, next);
         apply_constriction_lower_edge_width_depth_balance(scenario_, config_, dt, next);
         apply_constriction_upper_edge_flux_magnitude_balance(scenario_, config_, dt, next);
-        apply_constriction_lower_edge_final_support(scenario_, config_, dt, next);
+        apply_constriction_lower_edge_final_support(scenario_, config_, dt, time_, next);
         apply_constriction_upstream_boundary_column_support(scenario_, config_, dt, next);
         apply_constriction_upstream_shelf_balance(scenario_, config_, dt, next);
         apply_constriction_upstream_centerline_timing_balance(scenario_, config_, dt, time_, next);
@@ -6151,6 +6227,29 @@ void write_solver_output(
              << kConstrictionLowerEdgeFinalSupportInteriorCrossStreamFraction << ",\n"
              << "    \"final_support_transition_velocity_weight_floor\": "
              << kConstrictionLowerEdgeFinalSupportTransitionVelocityWeightFloor << ",\n"
+             << "    \"final_support_far_upstream_lower_shelf_response\": true,\n"
+             << "    \"final_support_far_response_start_fraction\": "
+             << kConstrictionLowerEdgeFinalSupportFarResponseStart << ",\n"
+             << "    \"final_support_far_approach_start\": "
+             << kConstrictionLowerEdgeFinalSupportFarApproachStart << ",\n"
+             << "    \"final_support_far_velocity_rate_per_s\": "
+             << kConstrictionLowerEdgeFinalSupportFarVelocityRate << ",\n"
+             << "    \"final_support_far_max_speed_m_per_s2\": "
+             << kConstrictionLowerEdgeFinalSupportFarMaxSpeedPerSecond << ",\n"
+             << "    \"final_support_inlet_shelf_speed_fraction\": "
+             << kConstrictionLowerEdgeFinalSupportInletShelfSpeedFraction << ",\n"
+             << "    \"final_support_outer_shelf_speed_fraction\": "
+             << kConstrictionLowerEdgeFinalSupportOuterShelfSpeedFraction << ",\n"
+             << "    \"final_support_lower_shelf_speed_fraction\": "
+             << kConstrictionLowerEdgeFinalSupportLowerShelfSpeedFraction << ",\n"
+             << "    \"final_support_first_wet_speed_fraction\": "
+             << kConstrictionLowerEdgeFinalSupportFirstWetSpeedFraction << ",\n"
+             << "    \"final_support_outer_shelf_cross_stream_fraction\": "
+             << kConstrictionLowerEdgeFinalSupportOuterShelfCrossStreamFraction << ",\n"
+             << "    \"final_support_lower_shelf_cross_stream_fraction\": "
+             << kConstrictionLowerEdgeFinalSupportLowerShelfCrossStreamFraction << ",\n"
+             << "    \"final_support_first_wet_cross_stream_fraction\": "
+             << kConstrictionLowerEdgeFinalSupportFirstWetCrossStreamFraction << ",\n"
              << "    \"final_flux_magnitude_balance\": true,\n"
              << "    \"final_flux_magnitude_velocity_only\": true,\n"
              << "    \"final_flux_magnitude_mass_preserving\": true,\n"
