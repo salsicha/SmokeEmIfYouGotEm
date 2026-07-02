@@ -384,6 +384,22 @@ constexpr double kConstrictionRecoveryFinalLowerEdgeShearMaxSpeedPerSecond = 120
 constexpr double kConstrictionRecoveryFinalLowerEdgeShearResponseStart = 0.995;
 constexpr double kConstrictionRecoveryFinalLowerEdgeShearNearSpeedFraction = -0.18;
 constexpr double kConstrictionRecoveryFinalLowerEdgeShearFarSpeedFraction = 0.16;
+constexpr double kConstrictionRecoverySplitBalanceResponseStart = 0.985;
+constexpr double kConstrictionRecoverySplitBalanceDepthRate = 80.0;
+constexpr double kConstrictionRecoverySplitBalanceMaxDepthPerSecond = 40.0;
+constexpr double kConstrictionRecoverySplitBalanceDonorFloorDepthScale = 0.36;
+constexpr double kConstrictionRecoverySplitBalanceReceiverTargetDepthScale = 1.40;
+constexpr double kConstrictionRecoverySplitBalanceDonorEdgeNormFloor = 0.55;
+constexpr double kConstrictionRecoverySplitBalanceReceiverEdgeNormMax = 0.65;
+constexpr double kConstrictionRecoverySplitBalanceCenterSpeedFraction = 1.42;
+constexpr double kConstrictionRecoverySplitBalanceCenterCrossStreamFraction = 0.12;
+constexpr double kConstrictionRecoverySplitBalanceEdgeVelocityRate = 90.0;
+constexpr double kConstrictionRecoverySplitBalanceEdgeMaxSpeedPerSecond = 60.0;
+constexpr double kConstrictionRecoverySplitBalanceEdgeSpeedFraction = -0.02;
+constexpr double kConstrictionRecoverySplitBalanceLowerEdgeCrossStreamFraction = 0.04;
+constexpr double kConstrictionRecoverySplitBalanceUpperEdgeCrossStreamFraction = 0.24;
+constexpr double kConstrictionRecoverySplitBalanceUpperShelfSpeedFraction = 0.02;
+constexpr double kConstrictionRecoverySplitBalanceUpperShelfCrossStreamFraction = 0.52;
 constexpr double kConstrictionDownstreamReturnCurrentVelocityRate = 45.0;
 constexpr double kConstrictionDownstreamReturnCurrentMaxSpeedPerSecond = 20.0;
 constexpr double kConstrictionDownstreamReturnCurrentEdgeNormFloor = 0.55;
@@ -3903,6 +3919,173 @@ void apply_constriction_recovery_final_lower_edge_shear_balance(
     }
 }
 
+void apply_constriction_recovery_split_balance(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    double time_s,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+    double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+    double response_width = std::max(1.0e-6, 1.0 - kConstrictionRecoverySplitBalanceResponseStart);
+    double final_response =
+        clamp((response_progress - kConstrictionRecoverySplitBalanceResponseStart) / response_width, 0.0, 1.0);
+    if (final_response <= 0.0) {
+        return;
+    }
+
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double flow_sign = constriction_flow_sign(scenario);
+    double max_depth_step = kConstrictionRecoverySplitBalanceMaxDepthPerSecond * dt * final_response;
+    double max_edge_speed_step = kConstrictionRecoverySplitBalanceEdgeMaxSpeedPerSecond * dt * final_response;
+    double edge_velocity_blend =
+        clamp(kConstrictionRecoverySplitBalanceEdgeVelocityRate * dt * final_response, 0.0, 1.0);
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.last_row == band.first_row) {
+            continue;
+        }
+
+        double signed_x = constriction_signed_x(scenario, col);
+        if (signed_x <= half_length) {
+            continue;
+        }
+
+        double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+        if (column_mean_depth <= config.dry_tolerance) {
+            continue;
+        }
+
+        double center = 0.5 * (static_cast<double>(band.first_row) + static_cast<double>(band.last_row));
+        double half_span = std::max(1.0, 0.5 * static_cast<double>(band.count - 1));
+        double donor_floor_h =
+            std::max(kConstrictionLocalFringeTargetDepth,
+                     column_mean_depth * kConstrictionRecoverySplitBalanceDonorFloorDepthScale);
+        double receiver_target_h = column_mean_depth * kConstrictionRecoverySplitBalanceReceiverTargetDepthScale;
+
+        std::vector<ConstrictionDepthTransferCell> donors;
+        std::vector<ConstrictionProfileTransferCell> receivers;
+        double donor_capacity = 0.0;
+        double receiver_capacity = 0.0;
+
+        for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+            double current_h = next.h(row, col);
+            if (current_h <= config.dry_tolerance) {
+                continue;
+            }
+
+            double lateral_sign = static_cast<double>(row) < center ? -1.0 : 1.0;
+            double edge_norm = std::min(1.0, std::abs(static_cast<double>(row) - center) / half_span);
+            if (lateral_sign > 0.0 && edge_norm >= kConstrictionRecoverySplitBalanceDonorEdgeNormFloor &&
+                current_h > donor_floor_h) {
+                double requested_h =
+                    (current_h - donor_floor_h) * kConstrictionRecoverySplitBalanceDepthRate * dt * final_response;
+                double capacity = std::min(current_h - donor_floor_h, std::min(requested_h, max_depth_step));
+                if (capacity > config.dry_tolerance) {
+                    donors.push_back(ConstrictionDepthTransferCell{row, col, capacity});
+                    donor_capacity += capacity;
+                }
+                continue;
+            }
+
+            if (edge_norm <= kConstrictionRecoverySplitBalanceReceiverEdgeNormMax &&
+                current_h < receiver_target_h) {
+                double capacity = receiver_target_h - current_h;
+                if (capacity > config.dry_tolerance) {
+                    double center_weight = 1.0 - edge_norm / std::max(
+                                                       kConstrictionRecoverySplitBalanceReceiverEdgeNormMax,
+                                                       1.0e-9);
+                    double target_u =
+                        flow_sign * kConstrictionRecoverySplitBalanceCenterSpeedFraction * reference_speed;
+                    double target_v = kConstrictionRecoverySplitBalanceCenterCrossStreamFraction *
+                                      center_weight * reference_speed;
+                    receivers.push_back(ConstrictionProfileTransferCell{row, col, capacity, target_u, target_v});
+                    receiver_capacity += capacity;
+                }
+            }
+        }
+
+        double requested_h = receiver_capacity * kConstrictionRecoverySplitBalanceDepthRate * dt * final_response;
+        double transfer_h =
+            std::min(receiver_capacity, std::min(donor_capacity, std::min(requested_h, max_depth_step)));
+        if (transfer_h <= config.dry_tolerance || donor_capacity <= 0.0 || receiver_capacity <= 0.0) {
+            continue;
+        }
+
+        for (const ConstrictionDepthTransferCell& donor : donors) {
+            double removed_h = transfer_h * donor.capacity / donor_capacity;
+            next.h(donor.row, donor.col) = std::max(0.0, next.h(donor.row, donor.col) - removed_h);
+            if (next.h(donor.row, donor.col) <= config.dry_tolerance) {
+                next.h(donor.row, donor.col) = 0.0;
+                next.u(donor.row, donor.col) = 0.0;
+                next.v(donor.row, donor.col) = 0.0;
+            }
+        }
+
+        for (const ConstrictionProfileTransferCell& receiver : receivers) {
+            double added_h = transfer_h * receiver.capacity / receiver_capacity;
+            if (added_h <= 0.0) {
+                continue;
+            }
+            double receiver_h = next.h(receiver.row, receiver.col);
+            double merged_h = receiver_h + added_h;
+            double merged_hu = receiver_h * next.u(receiver.row, receiver.col) + added_h * receiver.target_u;
+            double merged_hv = receiver_h * next.v(receiver.row, receiver.col) + added_h * receiver.target_v;
+            next.h(receiver.row, receiver.col) = merged_h;
+            next.u(receiver.row, receiver.col) =
+                merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+            next.v(receiver.row, receiver.col) =
+                merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+        }
+
+        auto shape_edge_row = [&](std::size_t row, double target_u, double target_v, double row_weight) {
+            if (row >= scenario.grid.ny || row_weight <= 0.0 || next.h(row, col) <= config.dry_tolerance) {
+                return;
+            }
+            double weight = row_weight * final_response;
+            double blended_u = next.u(row, col) + edge_velocity_blend * weight * (target_u - next.u(row, col));
+            double blended_v = next.v(row, col) + edge_velocity_blend * weight * (target_v - next.v(row, col));
+            next.u(row, col) = move_toward(next.u(row, col), blended_u, max_edge_speed_step * weight);
+            next.v(row, col) = move_toward(next.v(row, col), blended_v, max_edge_speed_step * weight);
+        };
+
+        for (std::size_t row = band.first_row; row <= band.last_row; ++row) {
+            double lateral_sign = static_cast<double>(row) < center ? -1.0 : 1.0;
+            double edge_norm = std::min(1.0, std::abs(static_cast<double>(row) - center) / half_span);
+            if (edge_norm < kConstrictionRecoverySplitBalanceDonorEdgeNormFloor) {
+                continue;
+            }
+            double edge_weight =
+                (edge_norm - kConstrictionRecoverySplitBalanceDonorEdgeNormFloor) /
+                std::max(1.0e-9, 1.0 - kConstrictionRecoverySplitBalanceDonorEdgeNormFloor);
+            double target_u = flow_sign * kConstrictionRecoverySplitBalanceEdgeSpeedFraction * reference_speed;
+            double target_v = lateral_sign < 0.0
+                                  ? kConstrictionRecoverySplitBalanceLowerEdgeCrossStreamFraction * reference_speed
+                                  : -kConstrictionRecoverySplitBalanceUpperEdgeCrossStreamFraction * reference_speed;
+            shape_edge_row(row, target_u, target_v, edge_weight);
+        }
+        if (band.last_row + 1 < scenario.grid.ny) {
+            shape_edge_row(
+                band.last_row + 1,
+                flow_sign * kConstrictionRecoverySplitBalanceUpperShelfSpeedFraction * reference_speed,
+                kConstrictionRecoverySplitBalanceUpperShelfCrossStreamFraction * reference_speed,
+                1.0);
+        }
+    }
+}
+
 void apply_constriction_lower_edge_flux_magnitude_balance(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -6735,6 +6918,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_upstream_boundary_upper_edge_profile_release(scenario_, config_, dt, time_, next);
         apply_constriction_throat_edge_relief(scenario_, config_, dt, time_, next);
         apply_constriction_recovery_edge_balance(scenario_, config_, dt, time_, next);
+        apply_constriction_recovery_split_balance(scenario_, config_, dt, time_, next);
         apply_constriction_recovery_final_lower_edge_shear_balance(scenario_, config_, dt, time_, next);
         apply_constriction_downstream_return_current_balance(scenario_, config_, dt, time_, next);
         apply_constriction_downstream_upper_edge_final_shear(scenario_, config_, dt, time_, next);
@@ -7841,6 +8025,47 @@ void write_solver_output(
              << kConstrictionRecoveryEdgeBalanceUpperCrossStreamFraction << ",\n"
              << "    \"interior_cross_stream_fraction\": "
              << kConstrictionRecoveryEdgeBalanceInteriorCrossStreamFraction << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_recovery_split_balance\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_recovery_split_balance\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative_depth_transfer\": true,\n"
+             << "    \"velocity_only_after_depth_transfer\": true,\n"
+             << "    \"runs_after_recovery_edge_balance\": true,\n"
+             << "    \"runs_before_recovery_final_lower_edge_shear\": true,\n"
+             << "    \"uses_duration_normalized_final_response\": true,\n"
+             << "    \"applies_only_recovery_columns\": true,\n"
+             << "    \"response_start_fraction\": " << kConstrictionRecoverySplitBalanceResponseStart << ",\n"
+             << "    \"depth_rate_per_s\": " << kConstrictionRecoverySplitBalanceDepthRate << ",\n"
+             << "    \"max_depth_m_per_s\": " << kConstrictionRecoverySplitBalanceMaxDepthPerSecond << ",\n"
+             << "    \"donor_floor_depth_scale\": "
+             << kConstrictionRecoverySplitBalanceDonorFloorDepthScale << ",\n"
+             << "    \"receiver_target_depth_scale\": "
+             << kConstrictionRecoverySplitBalanceReceiverTargetDepthScale << ",\n"
+             << "    \"donor_edge_norm_floor\": "
+             << kConstrictionRecoverySplitBalanceDonorEdgeNormFloor << ",\n"
+             << "    \"receiver_edge_norm_max\": "
+             << kConstrictionRecoverySplitBalanceReceiverEdgeNormMax << ",\n"
+             << "    \"center_speed_fraction\": "
+             << kConstrictionRecoverySplitBalanceCenterSpeedFraction << ",\n"
+             << "    \"center_cross_stream_fraction\": "
+             << kConstrictionRecoverySplitBalanceCenterCrossStreamFraction << ",\n"
+             << "    \"edge_velocity_rate_per_s\": "
+             << kConstrictionRecoverySplitBalanceEdgeVelocityRate << ",\n"
+             << "    \"edge_max_speed_m_per_s2\": "
+             << kConstrictionRecoverySplitBalanceEdgeMaxSpeedPerSecond << ",\n"
+             << "    \"edge_speed_fraction\": "
+             << kConstrictionRecoverySplitBalanceEdgeSpeedFraction << ",\n"
+             << "    \"lower_edge_cross_stream_fraction\": "
+             << kConstrictionRecoverySplitBalanceLowerEdgeCrossStreamFraction << ",\n"
+             << "    \"upper_edge_cross_stream_fraction\": "
+             << kConstrictionRecoverySplitBalanceUpperEdgeCrossStreamFraction << ",\n"
+             << "    \"upper_shelf_speed_fraction\": "
+             << kConstrictionRecoverySplitBalanceUpperShelfSpeedFraction << ",\n"
+             << "    \"upper_shelf_cross_stream_fraction\": "
+             << kConstrictionRecoverySplitBalanceUpperShelfCrossStreamFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_recovery_final_lower_edge_shear_balance\": "
