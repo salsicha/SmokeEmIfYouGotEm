@@ -387,6 +387,7 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     )
     assert constriction_manifest["constriction_upper_edge_opposition_balance"]["uses_transition_aware_weight"] is True
     assert constriction_manifest["constriction_upper_edge_opposition_balance"]["supports_upper_outside_shelf"] is True
+    assert constriction_manifest["constriction_upper_edge_opposition_balance"]["final_flux_magnitude_balance"] is True
     assert (
         constriction_manifest["constriction_upper_edge_opposition_balance"]["requires_feature_forcing"]
         is False
