@@ -39,6 +39,9 @@ MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA = "raftsim.milestone18.constrictio
 MILESTONE18_CONSTRICTION_MASK_REPORT_SCHEMA = "raftsim.milestone18.constriction_mask_alignment.v0"
 MILESTONE18_CONSTRICTION_RESPONSE_REPORT_SCHEMA = "raftsim.milestone18.constriction_response_timing.v0"
 MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA = "raftsim.milestone18.constriction_shape_timing.v0"
+MILESTONE18_CONSTRICTION_FIELD_PROFILE_REPORT_SCHEMA = (
+    "raftsim.milestone18.constriction_field_profile.v0"
+)
 MILESTONE18_CONSTRICTION_PROBE_CROSS_SECTION_REPORT_SCHEMA = (
     "raftsim.milestone18.constriction_probe_cross_section.v0"
 )
@@ -1374,6 +1377,228 @@ class Milestone18ConstrictionShapeTimingReport:
     def _worst_series_samples(self) -> tuple[Milestone18ConstrictionShapeErrorSample, ...]:
         samples = self.probe_samples + self.cross_section_samples
         return tuple(sorted(samples, key=lambda sample: sample.ratio_to_threshold, reverse=True)[:12])
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionFieldProfileBin:
+    """Final-frame field mismatch summary for one constriction zone/profile role."""
+
+    zone_id: str
+    profile_role: str
+    sample_count: int
+    velocity_sample_count: int
+    reference_mean_h: float
+    candidate_mean_h: float
+    mean_h_delta: float
+    max_abs_h_delta: float
+    reference_mean_u: float
+    candidate_mean_u: float
+    mean_u_delta: float
+    max_abs_u_delta: float
+    reference_mean_v: float
+    candidate_mean_v: float
+    mean_v_delta: float
+    max_abs_v_delta: float
+    reference_mean_hu: float
+    candidate_mean_hu: float
+    mean_hu_delta: float
+    max_abs_hu_delta: float
+    reference_mean_hv: float
+    candidate_mean_hv: float
+    mean_hv_delta: float
+    max_abs_hv_delta: float
+    reference_mass_m3: float
+    candidate_mass_m3: float
+    mass_delta_m3: float
+    material_wet_mismatch_fraction: float
+    threshold: float
+
+    @property
+    def max_abs_field_delta(self) -> float:
+        return max(
+            self.max_abs_h_delta,
+            self.max_abs_u_delta,
+            self.max_abs_v_delta,
+            self.max_abs_hu_delta,
+            self.max_abs_hv_delta,
+        )
+
+    @property
+    def ratio_to_threshold(self) -> float:
+        return _threshold_ratio(self.max_abs_field_delta, self.threshold)
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["max_abs_field_delta"] = self.max_abs_field_delta
+        data["ratio_to_threshold"] = self.ratio_to_threshold
+        data["passed"] = self.max_abs_field_delta <= self.threshold
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionFieldProfileCell:
+    """Worst final-frame field mismatch cell used to anchor a profile bin."""
+
+    field: str
+    row_index: int
+    column_index: int
+    x_m: float
+    y_m: float
+    zone_id: str
+    profile_role: str
+    reference_value: float
+    candidate_value: float
+    delta: float
+    abs_delta: float
+    reference_h: float
+    candidate_h: float
+    threshold: float
+
+    @property
+    def ratio_to_threshold(self) -> float:
+        return _threshold_ratio(self.abs_delta, self.threshold)
+
+    def to_json_dict(self) -> dict[str, object]:
+        data = asdict(self)
+        data["ratio_to_threshold"] = self.ratio_to_threshold
+        data["passed"] = self.abs_delta <= self.threshold
+        return data
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18ConstrictionFieldProfileReport:
+    """Diagnostic report for the final-frame constriction edge/interior field profile."""
+
+    dual_solver_manifest: str
+    scenario_package: str
+    scenario_id: str
+    feature: dict[str, object]
+    grid: dict[str, object]
+    wet_depth_threshold_m: float
+    velocity_depth_floor_m: float
+    zones: dict[str, tuple[int, ...]]
+    thresholds: dict[str, float]
+    profile_bins: tuple[Milestone18ConstrictionFieldProfileBin, ...]
+    worst_cells: tuple[Milestone18ConstrictionFieldProfileCell, ...]
+    blocked_reasons: tuple[str, ...]
+    next_levers: tuple[str, ...]
+
+    @property
+    def passed(self) -> bool:
+        return not self.blocked_reasons
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_CONSTRICTION_FIELD_PROFILE_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "dual_solver_manifest": self.dual_solver_manifest,
+            "scenario_package": self.scenario_package,
+            "scenario_id": self.scenario_id,
+            "feature": self.feature,
+            "grid": self.grid,
+            "wet_depth_threshold_m": self.wet_depth_threshold_m,
+            "velocity_depth_floor_m": self.velocity_depth_floor_m,
+            "zones": {zone_id: list(columns) for zone_id, columns in self.zones.items()},
+            "thresholds": self.thresholds,
+            "summary": {
+                "profile_bin_count": len(self.profile_bins),
+                "worst_cell_count": len(self.worst_cells),
+                "max_abs_field_delta": max((sample.abs_delta for sample in self.worst_cells), default=0.0),
+                "max_abs_h_delta": max((bin.max_abs_h_delta for bin in self.profile_bins), default=0.0),
+                "max_abs_u_delta": max((bin.max_abs_u_delta for bin in self.profile_bins), default=0.0),
+                "max_abs_v_delta": max((bin.max_abs_v_delta for bin in self.profile_bins), default=0.0),
+                "max_abs_hu_delta": max((bin.max_abs_hu_delta for bin in self.profile_bins), default=0.0),
+                "max_abs_hv_delta": max((bin.max_abs_hv_delta for bin in self.profile_bins), default=0.0),
+                "max_abs_mass_delta_m3": max((abs(bin.mass_delta_m3) for bin in self.profile_bins), default=0.0),
+                "max_material_wet_mismatch_fraction": max(
+                    (bin.material_wet_mismatch_fraction for bin in self.profile_bins),
+                    default=0.0,
+                ),
+                "worst_profile_bins": [bin.to_json_dict() for bin in self._worst_profile_bins()],
+                "worst_cells": [sample.to_json_dict() for sample in self.worst_cells],
+            },
+            "profile_bins": [bin.to_json_dict() for bin in self.profile_bins],
+            "worst_cells": [sample.to_json_dict() for sample in self.worst_cells],
+            "blocked_reasons": list(self.blocked_reasons),
+            "next_levers": list(self.next_levers),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        summary = self.to_json_dict()["summary"]
+        lines = [
+            "# Milestone 18 Constriction Field-Profile Diagnostic",
+            "",
+            f"Schema: `{MILESTONE18_CONSTRICTION_FIELD_PROFILE_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Scenario: `{self.scenario_id}`",
+            f"Dual solver manifest: `{self.dual_solver_manifest}`",
+            f"Scenario package: `{self.scenario_package}`",
+            f"Wet-depth threshold: `{self.wet_depth_threshold_m:.6g}` m",
+            f"Velocity depth floor: `{self.velocity_depth_floor_m:.6g}` m",
+            "",
+            "## Summary",
+            "",
+            f"- Max field delta: `{_format_number(_float_or_none(summary.get('max_abs_field_delta')))}`",
+            f"- Max h/u/v/hu/hv delta: "
+            f"`{_format_number(_float_or_none(summary.get('max_abs_h_delta')))}` / "
+            f"`{_format_number(_float_or_none(summary.get('max_abs_u_delta')))}` / "
+            f"`{_format_number(_float_or_none(summary.get('max_abs_v_delta')))}` / "
+            f"`{_format_number(_float_or_none(summary.get('max_abs_hu_delta')))}` / "
+            f"`{_format_number(_float_or_none(summary.get('max_abs_hv_delta')))}`",
+            f"- Max profile mass delta: `{_format_number(_float_or_none(summary.get('max_abs_mass_delta_m3')))}` m3",
+            f"- Max material wet mismatch fraction: "
+            f"`{_format_number(_float_or_none(summary.get('max_material_wet_mismatch_fraction')))}`",
+            "",
+            "## Worst Profile Bins",
+            "",
+            "| Zone | Profile | Samples | h delta/max | u delta/max | v delta/max | hu delta/max | hv delta/max | Mass delta | Wet mismatch | Ratio |",
+            "| --- | --- | ---: | --- | --- | --- | --- | --- | ---: | ---: | ---: |",
+        ]
+        for profile_bin in self._worst_profile_bins():
+            lines.append(_field_profile_bin_row(profile_bin))
+        lines.extend(
+            [
+                "",
+                "## Worst Final-Frame Cells",
+                "",
+                "| Field | Zone | Profile | Cell | x m | y m | GeoClaw | C++ | Delta | Abs error | Threshold | Ratio |",
+                "| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for cell in self.worst_cells:
+            lines.append(_field_profile_cell_row(cell))
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.next_levers:
+            lines.extend(["", "## Next Levers", ""])
+            lines.extend(f"- {lever}" for lever in self.next_levers)
+        output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return output_path
+
+    def _worst_profile_bins(self) -> tuple[Milestone18ConstrictionFieldProfileBin, ...]:
+        return tuple(
+            sorted(
+                self.profile_bins,
+                key=lambda profile_bin: (
+                    profile_bin.ratio_to_threshold,
+                    abs(profile_bin.mass_delta_m3),
+                    profile_bin.material_wet_mismatch_fraction,
+                ),
+                reverse=True,
+            )[:12]
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -3328,6 +3553,86 @@ def build_milestone18_constriction_shape_timing_report(
         slope_samples=sorted_slope_samples,
         probe_samples=probe_samples,
         cross_section_samples=cross_section_samples,
+        blocked_reasons=blocked_reasons,
+        next_levers=next_levers,
+    )
+
+
+def build_milestone18_constriction_field_profile_report(
+    dual_solver_manifest: str | Path,
+    *,
+    wet_depth_threshold_m: float = 0.15,
+    velocity_depth_floor_m: float = DEFAULT_VELOCITY_DEPTH_FLOOR,
+    top_n: int = 16,
+) -> Milestone18ConstrictionFieldProfileReport:
+    """Summarize final-frame constriction edge/interior field-profile blockers."""
+
+    manifest_path = Path(dual_solver_manifest)
+    manifest = _load_json_report(manifest_path)
+    comparison_dir = manifest_path.parent
+    scenario_package = _resolve_path(str(manifest.get("scenario_package", "")), comparison_dir)
+    scenario = _load_json_report(scenario_package / "scenario.json")
+    features = _load_json_report(scenario_package / "features.json")
+    constriction = _constriction_feature(features)
+    grid = _scenario_grid(scenario)
+    ny = int(grid["ny"])
+    nx = int(grid["nx"])
+
+    initial_state_path = _scenario_array_path(scenario_package, scenario, "initial_state", "initial_state.npz")
+    initial_state = _load_npz_water_state(initial_state_path, h_key="depth")
+    zones = _constriction_response_zones(initial_state, grid, constriction, wet_depth_threshold_m)
+
+    geoclaw_manifest_ref = _manifest_nested_string(manifest, "geoclaw", "manifest")
+    cpp_manifest_ref = _manifest_nested_string(manifest, "cpp", "manifest")
+    geoclaw_manifest_path = _resolve_path(geoclaw_manifest_ref, comparison_dir)
+    cpp_manifest_path = _resolve_path(cpp_manifest_ref, comparison_dir)
+    geoclaw_manifest = _load_json_report(geoclaw_manifest_path)
+    cpp_manifest = _load_json_report(cpp_manifest_path)
+    geoclaw_frame_path = _final_frame_path(geoclaw_manifest, geoclaw_manifest_path.parent)
+    cpp_frame_path = _final_frame_path(cpp_manifest, cpp_manifest_path.parent)
+    geoclaw_state = _load_water_frame_fields(geoclaw_frame_path, ny, nx)
+    cpp_state = _load_water_frame_fields(cpp_frame_path, ny, nx)
+
+    threshold_report_path = comparison_dir / "threshold_evaluation.json"
+    threshold_report = _load_json_report(threshold_report_path) if threshold_report_path.exists() else {}
+    thresholds = _shape_timing_thresholds(threshold_report)
+    field_threshold = thresholds["max_field_linf"]
+
+    profile_bins = _constriction_field_profile_bins(
+        initial_state,
+        geoclaw_state,
+        cpp_state,
+        grid,
+        zones,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        velocity_depth_floor_m=velocity_depth_floor_m,
+        threshold=field_threshold,
+    )
+    worst_cells = _constriction_field_profile_worst_cells(
+        initial_state,
+        geoclaw_state,
+        cpp_state,
+        grid,
+        zones,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        velocity_depth_floor_m=velocity_depth_floor_m,
+        threshold=field_threshold,
+        top_n=top_n,
+    )
+    blocked_reasons = _field_profile_blocked_reasons(profile_bins, worst_cells, field_threshold)
+    next_levers = _field_profile_next_levers(profile_bins, worst_cells)
+    return Milestone18ConstrictionFieldProfileReport(
+        dual_solver_manifest=str(manifest_path),
+        scenario_package=str(scenario_package),
+        scenario_id=str(manifest.get("scenario_id") or scenario.get("metadata", {}).get("scenario_id") or "unknown"),
+        feature=constriction,
+        grid=grid,
+        wet_depth_threshold_m=wet_depth_threshold_m,
+        velocity_depth_floor_m=velocity_depth_floor_m,
+        zones=zones,
+        thresholds=thresholds,
+        profile_bins=profile_bins,
+        worst_cells=worst_cells,
         blocked_reasons=blocked_reasons,
         next_levers=next_levers,
     )
@@ -7834,6 +8139,288 @@ def _constriction_zone_for_column(column_index: int, zones: dict[str, tuple[int,
         if column_index in columns:
             return zone_id
     return None
+
+
+def _constriction_profile_role(
+    initial_state: dict[str, np.ndarray],
+    row_index: int,
+    column_index: int,
+    wet_depth_threshold_m: float,
+) -> str:
+    initial_h = initial_state["h"]
+    wet_rows = np.flatnonzero(initial_h[:, column_index] > wet_depth_threshold_m)
+    if wet_rows.size == 0:
+        return "dry_column"
+    first_row = int(wet_rows[0])
+    last_row = int(wet_rows[-1])
+    if row_index < first_row:
+        return "lower_shelf"
+    if row_index == first_row:
+        return "lower_edge"
+    if row_index == last_row:
+        return "upper_edge"
+    if row_index > last_row:
+        return "upper_shelf"
+    return "interior"
+
+
+def _constriction_field_profile_bins(
+    initial_state: dict[str, np.ndarray],
+    reference_state: dict[str, np.ndarray],
+    candidate_state: dict[str, np.ndarray],
+    grid: dict[str, object],
+    zones: dict[str, tuple[int, ...]],
+    *,
+    wet_depth_threshold_m: float,
+    velocity_depth_floor_m: float,
+    threshold: float,
+) -> tuple[Milestone18ConstrictionFieldProfileBin, ...]:
+    ny = int(grid["ny"])
+    nx = int(grid["nx"])
+    dx = float(grid["dx"])
+    dy = float(grid["dy"])
+    groups: dict[tuple[str, str], list[tuple[int, int]]] = {}
+    reference_material_wet = reference_state["h"] >= velocity_depth_floor_m
+    candidate_material_wet = candidate_state["h"] >= velocity_depth_floor_m
+    material_union = reference_material_wet | candidate_material_wet
+    for row_index in range(ny):
+        for column_index in range(nx):
+            if not material_union[row_index, column_index]:
+                continue
+            zone_id = _constriction_zone_for_column(column_index, zones) or "unclassified"
+            profile_role = _constriction_profile_role(
+                initial_state,
+                row_index,
+                column_index,
+                wet_depth_threshold_m,
+            )
+            groups.setdefault((zone_id, profile_role), []).append((row_index, column_index))
+
+    profile_bins: list[Milestone18ConstrictionFieldProfileBin] = []
+    cell_area = dx * dy
+    for (zone_id, profile_role), cells in sorted(groups.items()):
+        rows = np.asarray([cell[0] for cell in cells], dtype=int)
+        cols = np.asarray([cell[1] for cell in cells], dtype=int)
+        velocity_mask = reference_material_wet[rows, cols] & candidate_material_wet[rows, cols]
+        velocity_rows = rows[velocity_mask]
+        velocity_cols = cols[velocity_mask]
+
+        def values(state: dict[str, np.ndarray], field: str) -> np.ndarray:
+            return np.asarray(state[field][rows, cols], dtype=float)
+
+        def velocity_values(state: dict[str, np.ndarray], field: str) -> np.ndarray:
+            if velocity_rows.size == 0:
+                return np.asarray([], dtype=float)
+            return np.asarray(state[field][velocity_rows, velocity_cols], dtype=float)
+
+        reference_h = values(reference_state, "h")
+        candidate_h = values(candidate_state, "h")
+        reference_u = velocity_values(reference_state, "u")
+        candidate_u = velocity_values(candidate_state, "u")
+        reference_v = velocity_values(reference_state, "v")
+        candidate_v = velocity_values(candidate_state, "v")
+        reference_hu = values(reference_state, "hu")
+        candidate_hu = values(candidate_state, "hu")
+        reference_hv = values(reference_state, "hv")
+        candidate_hv = values(candidate_state, "hv")
+        wet_mismatch = reference_material_wet[rows, cols] != candidate_material_wet[rows, cols]
+
+        profile_bins.append(
+            Milestone18ConstrictionFieldProfileBin(
+                zone_id=zone_id,
+                profile_role=profile_role,
+                sample_count=len(cells),
+                velocity_sample_count=int(velocity_mask.sum()),
+                reference_mean_h=_mean_or_zero(reference_h),
+                candidate_mean_h=_mean_or_zero(candidate_h),
+                mean_h_delta=_mean_or_zero(candidate_h - reference_h),
+                max_abs_h_delta=_max_abs_or_zero(candidate_h - reference_h),
+                reference_mean_u=_mean_or_zero(reference_u),
+                candidate_mean_u=_mean_or_zero(candidate_u),
+                mean_u_delta=_mean_or_zero(candidate_u - reference_u),
+                max_abs_u_delta=_max_abs_or_zero(candidate_u - reference_u),
+                reference_mean_v=_mean_or_zero(reference_v),
+                candidate_mean_v=_mean_or_zero(candidate_v),
+                mean_v_delta=_mean_or_zero(candidate_v - reference_v),
+                max_abs_v_delta=_max_abs_or_zero(candidate_v - reference_v),
+                reference_mean_hu=_mean_or_zero(reference_hu),
+                candidate_mean_hu=_mean_or_zero(candidate_hu),
+                mean_hu_delta=_mean_or_zero(candidate_hu - reference_hu),
+                max_abs_hu_delta=_max_abs_or_zero(candidate_hu - reference_hu),
+                reference_mean_hv=_mean_or_zero(reference_hv),
+                candidate_mean_hv=_mean_or_zero(candidate_hv),
+                mean_hv_delta=_mean_or_zero(candidate_hv - reference_hv),
+                max_abs_hv_delta=_max_abs_or_zero(candidate_hv - reference_hv),
+                reference_mass_m3=float(reference_h.sum() * cell_area),
+                candidate_mass_m3=float(candidate_h.sum() * cell_area),
+                mass_delta_m3=float((candidate_h - reference_h).sum() * cell_area),
+                material_wet_mismatch_fraction=float(np.mean(wet_mismatch)) if wet_mismatch.size else 0.0,
+                threshold=threshold,
+            )
+        )
+    return tuple(profile_bins)
+
+
+def _constriction_field_profile_worst_cells(
+    initial_state: dict[str, np.ndarray],
+    reference_state: dict[str, np.ndarray],
+    candidate_state: dict[str, np.ndarray],
+    grid: dict[str, object],
+    zones: dict[str, tuple[int, ...]],
+    *,
+    wet_depth_threshold_m: float,
+    velocity_depth_floor_m: float,
+    threshold: float,
+    top_n: int,
+) -> tuple[Milestone18ConstrictionFieldProfileCell, ...]:
+    ny = int(grid["ny"])
+    nx = int(grid["nx"])
+    origin_x = float(grid["origin_x"])
+    origin_y = float(grid["origin_y"])
+    dx = float(grid["dx"])
+    dy = float(grid["dy"])
+    reference_material_wet = reference_state["h"] >= velocity_depth_floor_m
+    candidate_material_wet = candidate_state["h"] >= velocity_depth_floor_m
+    material_union = reference_material_wet | candidate_material_wet
+    velocity_intersection = reference_material_wet & candidate_material_wet
+    cells: list[Milestone18ConstrictionFieldProfileCell] = []
+    for field_name in ("h", "u", "v", "hu", "hv"):
+        field_mask = velocity_intersection if field_name in {"u", "v"} else material_union
+        for row_index in range(ny):
+            for column_index in range(nx):
+                if not field_mask[row_index, column_index]:
+                    continue
+                reference_value = float(reference_state[field_name][row_index, column_index])
+                candidate_value = float(candidate_state[field_name][row_index, column_index])
+                delta = candidate_value - reference_value
+                cells.append(
+                    Milestone18ConstrictionFieldProfileCell(
+                        field=field_name,
+                        row_index=row_index,
+                        column_index=column_index,
+                        x_m=origin_x + column_index * dx,
+                        y_m=origin_y + row_index * dy,
+                        zone_id=_constriction_zone_for_column(column_index, zones) or "unclassified",
+                        profile_role=_constriction_profile_role(
+                            initial_state,
+                            row_index,
+                            column_index,
+                            wet_depth_threshold_m,
+                        ),
+                        reference_value=reference_value,
+                        candidate_value=candidate_value,
+                        delta=delta,
+                        abs_delta=abs(delta),
+                        reference_h=float(reference_state["h"][row_index, column_index]),
+                        candidate_h=float(candidate_state["h"][row_index, column_index]),
+                        threshold=threshold,
+                    )
+                )
+    return tuple(sorted(cells, key=lambda cell: cell.ratio_to_threshold, reverse=True)[:top_n])
+
+
+def _field_profile_blocked_reasons(
+    profile_bins: tuple[Milestone18ConstrictionFieldProfileBin, ...],
+    worst_cells: tuple[Milestone18ConstrictionFieldProfileCell, ...],
+    threshold: float,
+) -> tuple[str, ...]:
+    reasons: list[str] = []
+    if any(cell.abs_delta > threshold for cell in worst_cells):
+        worst = max(worst_cells, key=lambda cell: cell.ratio_to_threshold)
+        reasons.append(
+            f"Final-frame `{worst.field}` field remains {worst.ratio_to_threshold:.2f}x over threshold at "
+            f"`{worst.zone_id}/{worst.profile_role}` cell {worst.row_index},{worst.column_index}."
+        )
+    if any(bin.max_abs_h_delta > threshold for bin in profile_bins):
+        worst_h = max(profile_bins, key=lambda bin: bin.max_abs_h_delta)
+        reasons.append(
+            f"Depth/profile mismatch is still active in `{worst_h.zone_id}/{worst_h.profile_role}` "
+            f"(max h delta `{worst_h.max_abs_h_delta:.6g}` m)."
+        )
+    if any(max(bin.max_abs_u_delta, bin.max_abs_hu_delta) > threshold for bin in profile_bins):
+        worst_u = max(profile_bins, key=lambda bin: max(bin.max_abs_u_delta, bin.max_abs_hu_delta))
+        reasons.append(
+            f"Streamwise shear/momentum mismatch is still active in `{worst_u.zone_id}/{worst_u.profile_role}` "
+            f"(max u/hu delta `{worst_u.max_abs_u_delta:.6g}`/`{worst_u.max_abs_hu_delta:.6g}`)."
+        )
+    if any(max(bin.max_abs_v_delta, bin.max_abs_hv_delta) > threshold for bin in profile_bins):
+        worst_v = max(profile_bins, key=lambda bin: max(bin.max_abs_v_delta, bin.max_abs_hv_delta))
+        reasons.append(
+            f"Cross-stream shear/momentum mismatch is still active in `{worst_v.zone_id}/{worst_v.profile_role}` "
+            f"(max v/hv delta `{worst_v.max_abs_v_delta:.6g}`/`{worst_v.max_abs_hv_delta:.6g}`)."
+        )
+    return tuple(reasons)
+
+
+def _field_profile_next_levers(
+    profile_bins: tuple[Milestone18ConstrictionFieldProfileBin, ...],
+    worst_cells: tuple[Milestone18ConstrictionFieldProfileCell, ...],
+) -> tuple[str, ...]:
+    levers: list[str] = []
+    if worst_cells:
+        worst = worst_cells[0]
+        levers.append(
+            f"Start with `{worst.zone_id}/{worst.profile_role}` cell {worst.row_index},{worst.column_index}; "
+            f"`{worst.field}` delta is `{worst.delta:.6g}` with reference h `{worst.reference_h:.6g}` m "
+            f"and C++ h `{worst.candidate_h:.6g}` m."
+        )
+    if any(bin.profile_role in {"lower_edge", "upper_edge"} and bin.max_abs_h_delta > bin.threshold for bin in profile_bins):
+        levers.append(
+            "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker."
+        )
+    if any(bin.max_abs_u_delta > bin.threshold or bin.max_abs_hu_delta > bin.threshold for bin in profile_bins):
+        levers.append(
+            "Retune streamwise shear/reverse-flow profile together with depth so hu does not remain the dominant Linf error."
+        )
+    if any(bin.max_abs_v_delta > bin.threshold or bin.max_abs_hv_delta > bin.threshold for bin in profile_bins):
+        levers.append(
+            "Retune cross-stream circulation/sign by zone and profile role, then rerun face-state and face/source audits."
+        )
+    levers.append("Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence.")
+    return tuple(dict.fromkeys(levers))
+
+
+def _mean_or_zero(values: np.ndarray) -> float:
+    return float(np.mean(values)) if values.size else 0.0
+
+
+def _max_abs_or_zero(values: np.ndarray) -> float:
+    return float(np.max(np.abs(values))) if values.size else 0.0
+
+
+def _field_profile_bin_row(profile_bin: Milestone18ConstrictionFieldProfileBin) -> str:
+    return (
+        "| "
+        f"`{profile_bin.zone_id}` | "
+        f"`{profile_bin.profile_role}` | "
+        f"{profile_bin.sample_count} | "
+        f"{profile_bin.mean_h_delta:.6g} / {profile_bin.max_abs_h_delta:.6g} | "
+        f"{profile_bin.mean_u_delta:.6g} / {profile_bin.max_abs_u_delta:.6g} | "
+        f"{profile_bin.mean_v_delta:.6g} / {profile_bin.max_abs_v_delta:.6g} | "
+        f"{profile_bin.mean_hu_delta:.6g} / {profile_bin.max_abs_hu_delta:.6g} | "
+        f"{profile_bin.mean_hv_delta:.6g} / {profile_bin.max_abs_hv_delta:.6g} | "
+        f"{profile_bin.mass_delta_m3:.6g} | "
+        f"{profile_bin.material_wet_mismatch_fraction:.6g} | "
+        f"{profile_bin.ratio_to_threshold:.6g} |"
+    )
+
+
+def _field_profile_cell_row(cell: Milestone18ConstrictionFieldProfileCell) -> str:
+    return (
+        "| "
+        f"`{cell.field}` | "
+        f"`{cell.zone_id}` | "
+        f"`{cell.profile_role}` | "
+        f"`{cell.row_index},{cell.column_index}` | "
+        f"{cell.x_m:.6g} | "
+        f"{cell.y_m:.6g} | "
+        f"{cell.reference_value:.6g} | "
+        f"{cell.candidate_value:.6g} | "
+        f"{cell.delta:.6g} | "
+        f"{cell.abs_delta:.6g} | "
+        f"{cell.threshold:.6g} | "
+        f"{cell.ratio_to_threshold:.6g} |"
+    )
 
 
 def _shape_sample_grid_row(sample: Milestone18ConstrictionShapeErrorSample) -> str:
