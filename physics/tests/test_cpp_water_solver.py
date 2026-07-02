@@ -1050,6 +1050,28 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert throat_shelf_edge_final["receiver_inner_cross_stream_fraction"] == pytest.approx(0.29)
     assert throat_shelf_edge_final["receiver_edge_cross_stream_fraction"] == pytest.approx(0.20)
     assert throat_shelf_edge_final["requires_feature_forcing"] is False
+    assert (
+        constriction_manifest["fixture_scoped_constriction_upstream_outer_upper_shelf_final_profile"]
+        is True
+    )
+    upstream_outer_upper_shelf = constriction_manifest[
+        "constriction_upstream_outer_upper_shelf_final_profile"
+    ]
+    assert upstream_outer_upper_shelf["bounded"] is True
+    assert upstream_outer_upper_shelf["velocity_only"] is True
+    assert upstream_outer_upper_shelf["mass_preserving"] is True
+    assert upstream_outer_upper_shelf["applies_only_far_upstream_outer_upper_shelf_row"] is True
+    assert upstream_outer_upper_shelf["uses_duration_normalized_final_response"] is True
+    assert upstream_outer_upper_shelf["runs_after_throat_shelf_edge_final_relief"] is True
+    assert upstream_outer_upper_shelf["response_start_fraction"] == pytest.approx(0.99)
+    assert upstream_outer_upper_shelf["velocity_rate_per_s"] == pytest.approx(260.0)
+    assert upstream_outer_upper_shelf["max_speed_m_per_s2"] == pytest.approx(220.0)
+    assert upstream_outer_upper_shelf["window_cells"] == 3
+    assert upstream_outer_upper_shelf["inlet_speed_fraction"] == pytest.approx(0.80)
+    assert upstream_outer_upper_shelf["outer_speed_fraction"] == pytest.approx(1.20)
+    assert upstream_outer_upper_shelf["inlet_cross_stream_fraction"] == pytest.approx(0.08)
+    assert upstream_outer_upper_shelf["outer_cross_stream_fraction"] == pytest.approx(0.16)
+    assert upstream_outer_upper_shelf["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_throat_edge_relief"] is True
     throat_edge_relief = constriction_manifest["constriction_throat_edge_relief"]
     assert throat_edge_relief["bounded"] is True
