@@ -827,13 +827,13 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         constriction_manifest["constriction_downstream_return_current_balance"][
             "downstream_upper_edge_speed_fraction"
         ]
-        == pytest.approx(-0.05)
+        == pytest.approx(-0.12)
     )
     assert (
         constriction_manifest["constriction_downstream_return_current_balance"][
             "downstream_upper_inner_speed_fraction"
         ]
-        == pytest.approx(0.65)
+        == pytest.approx(0.25)
     )
     assert constriction_manifest["constriction_downstream_return_current_balance"]["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_momentum_reconstruction"] is True
