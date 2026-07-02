@@ -813,6 +813,34 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert upstream_final_profile["lower_outer_shelf_speed_fraction"] == pytest.approx(0.95)
     assert upstream_final_profile["lower_outer_shelf_cross_stream_fraction"] == pytest.approx(0.40)
     assert upstream_final_profile["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_upstream_upper_core_final_profile"] is True
+    upstream_upper_core = constriction_manifest["constriction_upstream_upper_core_final_profile"]
+    assert upstream_upper_core["bounded"] is True
+    assert upstream_upper_core["mass_conservative_depth_transfer"] is True
+    assert upstream_upper_core["velocity_only_after_depth_transfer"] is True
+    assert upstream_upper_core["applies_only_far_upstream_upper_core_rows"] is True
+    assert upstream_upper_core["uses_duration_normalized_final_response"] is True
+    assert upstream_upper_core["runs_after_upstream_approach_final_profile_balance"] is True
+    assert upstream_upper_core["donor_offset_from_last_initial_wet_row"] == 0
+    assert upstream_upper_core["response_start_fraction"] == pytest.approx(0.99)
+    assert upstream_upper_core["depth_rate_per_s"] == pytest.approx(80.0)
+    assert upstream_upper_core["max_depth_m_per_s"] == pytest.approx(40.0)
+    assert upstream_upper_core["donor_floor_depth_scale"] == pytest.approx(0.34)
+    assert upstream_upper_core["interior_target_depth_scale"] == pytest.approx(1.44)
+    assert upstream_upper_core["velocity_rate_per_s"] == pytest.approx(260.0)
+    assert upstream_upper_core["max_speed_m_per_s2"] == pytest.approx(220.0)
+    assert upstream_upper_core["lower_interior_speed_fraction"] == pytest.approx(0.20)
+    assert upstream_upper_core["center_speed_fraction"] == pytest.approx(0.02)
+    assert upstream_upper_core["upper_interior_speed_fraction"] == pytest.approx(0.22)
+    assert upstream_upper_core["upper_adjacent_speed_fraction"] == pytest.approx(0.35)
+    assert upstream_upper_core["donor_speed_fraction"] == pytest.approx(0.75)
+    assert upstream_upper_core["lower_cross_stream_fraction"] == pytest.approx(0.04)
+    assert upstream_upper_core["center_cross_stream_fraction"] == pytest.approx(0.0)
+    assert upstream_upper_core["upper_cross_stream_fraction"] == pytest.approx(-0.05)
+    assert upstream_upper_core["upper_adjacent_cross_stream_fraction"] == pytest.approx(-0.05)
+    assert upstream_upper_core["donor_cross_stream_fraction"] == pytest.approx(-0.85)
+    assert upstream_upper_core["donor_overfull_cross_stream_fraction"] == pytest.approx(-0.62)
+    assert upstream_upper_core["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_throat_entry_final_depth_balance"] is True
     throat_entry_final = constriction_manifest["constriction_throat_entry_final_depth_balance"]
     assert throat_entry_final["bounded"] is True
