@@ -95,9 +95,9 @@ constexpr double kConstrictionNearThroatLowerShelfCrossStreamFraction = 1.0;
 constexpr double kConstrictionNearThroatLateLowerShelfCrossStreamFraction = 0.41;
 constexpr double kConstrictionNearThroatUpperShelfCrossStreamFraction = 0.36;
 constexpr double kConstrictionThroatEdgeReliefResponseStart = 0.995;
-constexpr double kConstrictionThroatEdgeReliefRate = 12.0;
-constexpr double kConstrictionThroatEdgeReliefMaxDepthPerSecond = 3.0;
-constexpr double kConstrictionThroatEdgeReliefDonorFloorScale = 0.28;
+constexpr double kConstrictionThroatEdgeReliefRate = 30.0;
+constexpr double kConstrictionThroatEdgeReliefMaxDepthPerSecond = 12.0;
+constexpr double kConstrictionThroatEdgeReliefDonorFloorScale = 0.24;
 constexpr double kConstrictionThroatEdgeReliefLowerEdgeReceiverTargetScale = 1.20;
 constexpr double kConstrictionThroatEdgeReliefInteriorTargetScale = 1.36;
 constexpr double kConstrictionThroatEdgeReliefVelocityRate = 30.0;
@@ -2444,6 +2444,7 @@ void apply_constriction_throat_edge_relief(
         if (std::abs(signed_x) > half_length) {
             continue;
         }
+        bool allow_depth_transfer = std::abs(signed_x) >= scenario.grid.dx;
 
         double column_mean_depth = initial_column_mean_depth(scenario, band, col);
         if (column_mean_depth <= config.dry_tolerance) {
@@ -2509,7 +2510,9 @@ void apply_constriction_throat_edge_relief(
         }
 
         double transfer_h = 0.0;
-        if (donor_capacity > config.dry_tolerance && receiver_capacity > config.dry_tolerance) {
+        if (allow_depth_transfer &&
+            donor_capacity > config.dry_tolerance &&
+            receiver_capacity > config.dry_tolerance) {
             double requested_h =
                 receiver_capacity * kConstrictionThroatEdgeReliefRate * dt * final_response;
             transfer_h =
@@ -6946,6 +6949,7 @@ void write_solver_output(
              << "    \"includes_lower_shelf_donor\": true,\n"
              << "    \"uses_lower_edge_as_donor\": false,\n"
              << "    \"includes_lower_edge_receiver\": true,\n"
+             << "    \"off_center_depth_transfer_only\": true,\n"
              << "    \"velocity_only_after_depth_transfer\": true,\n"
              << "    \"applies_only_narrow_throat_columns\": true,\n"
              << "    \"runs_after_upstream_boundary_upper_edge_profile_release\": true,\n"
