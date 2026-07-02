@@ -1,0 +1,39 @@
+{
+  "blocked_reasons": [],
+  "decision": "PASS",
+  "manifest_path": "physics/data/validation/milestone17/analytic_fixtures/manifest.json",
+  "output_dir": "physics/reports/milestone18/analytic_retune_guardrails/constriction_throat_edge_speed_soft/baseline_scenario_guardrail",
+  "passed": true,
+  "postflight": {
+    "candidate_kind": "scenario",
+    "candidate_label": "baseline_scenario_guardrail_postflight",
+    "candidate_root": null,
+    "failed_count": 0,
+    "failing_metrics": [],
+    "fixture_count": 7,
+    "frame_index": 0,
+    "passed": true,
+    "passed_count": 7,
+    "report_json": "physics/reports/milestone18/analytic_retune_guardrails/constriction_throat_edge_speed_soft/baseline_scenario_guardrail/postflight_analytic_validation.json",
+    "report_markdown": "physics/reports/milestone18/analytic_retune_guardrails/constriction_throat_edge_speed_soft/baseline_scenario_guardrail/postflight_analytic_validation.md",
+    "stage": "postflight"
+  },
+  "preflight": {
+    "candidate_kind": "scenario",
+    "candidate_label": "baseline_scenario_guardrail_preflight",
+    "candidate_root": null,
+    "failed_count": 0,
+    "failing_metrics": [],
+    "fixture_count": 7,
+    "frame_index": 0,
+    "passed": true,
+    "passed_count": 7,
+    "report_json": "physics/reports/milestone18/analytic_retune_guardrails/constriction_throat_edge_speed_soft/baseline_scenario_guardrail/preflight_analytic_validation.json",
+    "report_markdown": "physics/reports/milestone18/analytic_retune_guardrails/constriction_throat_edge_speed_soft/baseline_scenario_guardrail/preflight_analytic_validation.md",
+    "stage": "preflight"
+  },
+  "regression_count": 0,
+  "regressions": [],
+  "retune_batch_id": "baseline_scenario_guardrail",
+  "schema_version": "raftsim.milestone18.analytic_retune_guardrail.v0"
+}
