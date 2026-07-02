@@ -145,6 +145,8 @@ constexpr double kConstrictionUpstreamEdgeMomentumRate = 3.0;
 constexpr double kConstrictionUpstreamEdgeMomentumMaxSpeedPerSecond = 8.0;
 constexpr double kConstrictionUpstreamEdgeSpeedFraction = 1.35;
 constexpr double kConstrictionUpstreamEdgeCrossStreamFraction = 1.35;
+constexpr double kConstrictionLowerEdgeTransitionMomentumWeightFloor = 2.0;
+constexpr double kConstrictionLowerEdgeTransitionMomentumWindowCells = 2.0;
 constexpr double kConstrictionYFaceSourceSplitFraction = 0.06;
 constexpr double kConstrictionYFaceSourceSplitMaxSpeedPerSecond = 0.45;
 constexpr double kConstrictionYFaceStateBlend = 0.34;
@@ -1251,6 +1253,33 @@ double constriction_upper_edge_balance_weight(const Scenario& scenario, std::siz
     return std::max(constriction_upstream_edge_approach_weight(scenario, col), transition_weight);
 }
 
+double constriction_lower_edge_transition_momentum_weight(
+    const Scenario& scenario,
+    const ColumnWetBand& band,
+    std::size_t row,
+    std::size_t col
+) {
+    if (!band.found || row != band.first_row) {
+        return 0.0;
+    }
+
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double signed_x = constriction_signed_x(scenario, col);
+    if (signed_x >= -half_length) {
+        return 0.0;
+    }
+
+    double transition_distance = -half_length - signed_x;
+    double transition_window =
+        std::max(scenario.grid.dx, kConstrictionLowerEdgeTransitionMomentumWindowCells * scenario.grid.dx);
+    if (transition_distance < 0.0 || transition_distance > transition_window) {
+        return 0.0;
+    }
+
+    double transition_weight = 1.0 - transition_distance / transition_window;
+    return kConstrictionLowerEdgeTransitionMomentumWeightFloor * clamp(transition_weight, 0.0, 1.0);
+}
+
 double bed_slope_source_y_per_s(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -1515,6 +1544,8 @@ void apply_constriction_upstream_edge_momentum_source(
     }
 
     double approach_weight = constriction_upstream_edge_approach_weight(scenario, col);
+    double transition_weight = constriction_lower_edge_transition_momentum_weight(scenario, band, row, col);
+    approach_weight = std::max(approach_weight, transition_weight);
     if (approach_weight <= 0.0) {
         return;
     }
@@ -5360,6 +5391,11 @@ void write_solver_output(
              << "    \"max_speed_m_per_s2\": " << kConstrictionUpstreamEdgeMomentumMaxSpeedPerSecond << ",\n"
              << "    \"speed_fraction_of_authored_throat\": " << kConstrictionUpstreamEdgeSpeedFraction << ",\n"
              << "    \"cross_stream_fraction\": " << kConstrictionUpstreamEdgeCrossStreamFraction << ",\n"
+             << "    \"lower_edge_transition_momentum_source\": true,\n"
+             << "    \"lower_edge_transition_momentum_weight_floor\": "
+             << kConstrictionLowerEdgeTransitionMomentumWeightFloor << ",\n"
+             << "    \"lower_edge_transition_momentum_window_cells\": "
+             << kConstrictionLowerEdgeTransitionMomentumWindowCells << ",\n"
              << "    \"applies_only_upstream_edge_band_cells\": true,\n"
              << "    \"excluded_from_later_depth_receivers\": true,\n"
              << "    \"requires_feature_forcing\": false\n"
