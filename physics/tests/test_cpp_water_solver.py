@@ -395,6 +395,36 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         ]
         == pytest.approx(0.75)
     )
+    assert (
+        constriction_manifest["constriction_lower_edge_width_depth_balance"]["final_flux_magnitude_balance"]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_lower_edge_width_depth_balance"]["final_flux_magnitude_velocity_only"]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_lower_edge_width_depth_balance"]["final_flux_magnitude_mass_preserving"]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_lower_edge_width_depth_balance"][
+            "final_flux_magnitude_runs_after_upstream_centerline_timing"
+        ]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_lower_edge_width_depth_balance"][
+            "final_flux_magnitude_shelf_cross_stream_fraction"
+        ]
+        == pytest.approx(0.82)
+    )
+    assert (
+        constriction_manifest["constriction_lower_edge_width_depth_balance"][
+            "final_flux_magnitude_first_wet_cross_stream_fraction"
+        ]
+        == pytest.approx(0.88)
+    )
     assert constriction_manifest["fixture_scoped_constriction_upstream_boundary_column_support"] is True
     assert constriction_manifest["constriction_upstream_boundary_column_support"]["bounded"] is True
     assert (

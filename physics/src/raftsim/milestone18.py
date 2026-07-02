@@ -6633,7 +6633,7 @@ def _remaining_geometry_next_levers(
         "constriction_hydrostatic_source_decision" in str(evidence.get("schema_version", ""))
         for evidence in focused_evidence
     )
-    for evidence in focused_evidence:
+    for evidence in reversed(focused_evidence):
         for lever in evidence.get("next_levers", ()):
             if not isinstance(lever, str):
                 continue
