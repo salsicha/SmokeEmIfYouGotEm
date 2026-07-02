@@ -1015,6 +1015,41 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert downstream_upper_return["inner_speed_fraction"] == pytest.approx(0.46)
     assert downstream_upper_return["inner_cross_stream_fraction"] == pytest.approx(0.27)
     assert downstream_upper_return["requires_feature_forcing"] is False
+    assert (
+        constriction_manifest["fixture_scoped_constriction_throat_shelf_edge_final_relief"]
+        is True
+    )
+    throat_shelf_edge_final = constriction_manifest[
+        "constriction_throat_shelf_edge_final_relief"
+    ]
+    assert throat_shelf_edge_final["bounded"] is True
+    assert (
+        throat_shelf_edge_final[
+            "mass_conservative_throat_shelf_edge_to_recovery_depth_transfer"
+        ]
+        is True
+    )
+    assert throat_shelf_edge_final["velocity_only_after_depth_transfer"] is True
+    assert (
+        throat_shelf_edge_final[
+            "applies_only_off_center_downstream_throat_lower_shelf_and_upper_edge_donors"
+        ]
+        is True
+    )
+    assert throat_shelf_edge_final["receiver_scope"] == "first_recovery_upper_rows"
+    assert throat_shelf_edge_final["uses_duration_normalized_final_response"] is True
+    assert throat_shelf_edge_final["runs_after_downstream_upper_edge_final_return_profile"] is True
+    assert throat_shelf_edge_final["response_start_fraction"] == pytest.approx(0.99)
+    assert throat_shelf_edge_final["support_rate_per_s"] == pytest.approx(120.0)
+    assert throat_shelf_edge_final["max_depth_m_per_s"] == pytest.approx(80.0)
+    assert throat_shelf_edge_final["donor_floor_depth_scale"] == pytest.approx(0.22)
+    assert throat_shelf_edge_final["receiver_target_depth_scale"] == pytest.approx(1.0)
+    assert throat_shelf_edge_final["receiver_window_cells"] == 2
+    assert throat_shelf_edge_final["receiver_inner_speed_fraction"] == pytest.approx(0.58)
+    assert throat_shelf_edge_final["receiver_edge_speed_fraction"] == pytest.approx(0.05)
+    assert throat_shelf_edge_final["receiver_inner_cross_stream_fraction"] == pytest.approx(0.29)
+    assert throat_shelf_edge_final["receiver_edge_cross_stream_fraction"] == pytest.approx(0.20)
+    assert throat_shelf_edge_final["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_throat_edge_relief"] is True
     throat_edge_relief = constriction_manifest["constriction_throat_edge_relief"]
     assert throat_edge_relief["bounded"] is True
