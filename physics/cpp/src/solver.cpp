@@ -79,7 +79,21 @@ constexpr double kConstrictionLocalFringeEdgeVelocityFraction = 0.16;
 constexpr double kConstrictionNearThroatDepthScale = 1.0;
 constexpr double kConstrictionNearThroatReceiverDepthScale = 1.22;
 constexpr double kConstrictionNearThroatSpeedFraction = 1.0;
+constexpr double kConstrictionNearThroatLateInteriorSpeedFraction = 1.07;
 constexpr double kConstrictionNearThroatEdgeVelocityFraction = 0.41;
+constexpr double kConstrictionNearThroatInteriorCrossStreamFraction = 0.18;
+constexpr double kConstrictionNearThroatLateInteriorCrossStreamFraction = 0.04;
+constexpr double kConstrictionNearThroatLowerShelfDepthWeight = 0.16;
+constexpr double kConstrictionNearThroatInteriorLowerDepthWeight = 1.25;
+constexpr double kConstrictionNearThroatInteriorCenterDepthWeight = 1.25;
+constexpr double kConstrictionNearThroatInteriorUpperDepthWeight = 1.15;
+constexpr double kConstrictionNearThroatUpperShelfDepthWeight = 0.10;
+constexpr double kConstrictionNearThroatLateLowerShelfDepthWeight = 0.31;
+constexpr double kConstrictionNearThroatLowerShelfSpeedFraction = 0.62;
+constexpr double kConstrictionNearThroatLateLowerShelfSpeedFraction = 0.95;
+constexpr double kConstrictionNearThroatLowerShelfCrossStreamFraction = 1.0;
+constexpr double kConstrictionNearThroatLateLowerShelfCrossStreamFraction = 0.41;
+constexpr double kConstrictionNearThroatUpperShelfCrossStreamFraction = 0.36;
 constexpr double kConstrictionDepthDistributionRate = 1.0;
 constexpr double kConstrictionDepthDistributionMaxDepthPerSecond = 0.14;
 constexpr double kConstrictionDepthDistributionRecoveryDepthScale = 0.93;
@@ -200,6 +214,16 @@ constexpr double kConstrictionLocalizedCirculationThroatCrossStreamFraction = 0.
 constexpr double kConstrictionLocalizedCirculationRecoveryCrossStreamFraction = 0.42;
 constexpr double kConstrictionLocalizedCirculationMinDepth = 0.15;
 constexpr double kConstrictionLocalizedCirculationInteriorWeightFloor = 0.55;
+constexpr double kConstrictionRecoveryCenterlineTimingRate = 60.0;
+constexpr double kConstrictionRecoveryCenterlineTimingMaxSpeedPerSecond = 60.0;
+constexpr double kConstrictionRecoveryCenterlineTimingLateSpeedFraction = 1.08;
+constexpr double kConstrictionRecoveryCenterlineTimingLateCrossStreamFraction = 0.26;
+constexpr double kConstrictionRecoveryCenterlineTimingInteriorEdgeNorm = 0.55;
+constexpr double kConstrictionRecoveryCenterlineTimingDepthRate = 60.0;
+constexpr double kConstrictionRecoveryCenterlineTimingMaxDepthPerSecond = 20.0;
+constexpr double kConstrictionRecoveryCenterlineTimingLateDepthScale = 1.0;
+constexpr double kConstrictionRecoveryCenterlineTimingDepthInteriorEdgeNorm = 0.25;
+constexpr double kConstrictionRecoveryCenterlineTimingDonorFloorScale = 0.12;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -2036,6 +2060,7 @@ void apply_constriction_momentum_reconstruction(
 void apply_constriction_near_throat_support_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
+    double time_s,
     WaterState& next
 ) {
     if (scenario.fixture_kind != "constriction") {
@@ -2046,6 +2071,34 @@ void apply_constriction_near_throat_support_reconstruction(
     double flow_sign = constriction_flow_sign(scenario);
     double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
     double target_u = flow_sign * kConstrictionNearThroatSpeedFraction * reference_speed;
+    double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+    double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+    double late_response = clamp((response_progress - 0.5) / 0.5, 0.0, 1.0);
+    double lower_shelf_depth_weight =
+        kConstrictionNearThroatLowerShelfDepthWeight +
+        late_response *
+            (kConstrictionNearThroatLateLowerShelfDepthWeight -
+             kConstrictionNearThroatLowerShelfDepthWeight);
+    double lower_shelf_speed_fraction =
+        kConstrictionNearThroatLowerShelfSpeedFraction +
+        late_response *
+            (kConstrictionNearThroatLateLowerShelfSpeedFraction -
+             kConstrictionNearThroatLowerShelfSpeedFraction);
+    double lower_shelf_cross_stream_fraction =
+        kConstrictionNearThroatLowerShelfCrossStreamFraction +
+        late_response *
+            (kConstrictionNearThroatLateLowerShelfCrossStreamFraction -
+             kConstrictionNearThroatLowerShelfCrossStreamFraction);
+    double interior_speed_fraction =
+        kConstrictionNearThroatSpeedFraction +
+        late_response *
+            (kConstrictionNearThroatLateInteriorSpeedFraction -
+             kConstrictionNearThroatSpeedFraction);
+    double interior_cross_stream_fraction =
+        kConstrictionNearThroatInteriorCrossStreamFraction +
+        late_response *
+            (kConstrictionNearThroatLateInteriorCrossStreamFraction -
+             kConstrictionNearThroatInteriorCrossStreamFraction);
     double transferable_mass = 0.0;
 
     for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
@@ -2059,8 +2112,8 @@ void apply_constriction_near_throat_support_reconstruction(
         }
 
         std::size_t target_first = band.first_row - 1;
-        std::size_t target_last = target_first + band.count - 1;
-        if (target_last >= scenario.grid.ny) {
+        std::size_t target_last = band.last_row;
+        if (target_last >= scenario.grid.ny || target_last < target_first) {
             continue;
         }
         std::size_t source_first = std::min(target_first, band.first_row);
@@ -2078,8 +2131,35 @@ void apply_constriction_near_throat_support_reconstruction(
                              static_cast<double>(band.count) * kConstrictionNearThroatDepthScale;
         double retained_mass = std::min(current_mass, target_mass);
         transferable_mass += current_mass - retained_mass;
-        double target_depth = retained_mass / static_cast<double>(band.count);
-        double center_row = 0.5 * (static_cast<double>(target_first) + static_cast<double>(target_last));
+        auto profile_weight = [&](std::size_t row) {
+            if (row < band.first_row) {
+                return lower_shelf_depth_weight;
+            }
+            if (row >= band.last_row) {
+                return kConstrictionNearThroatUpperShelfDepthWeight;
+            }
+            double relative = static_cast<double>(row - band.first_row);
+            double interior_span = std::max(1.0, static_cast<double>(band.count - 2));
+            double t = clamp(relative / interior_span, 0.0, 1.0);
+            if (t <= 0.5) {
+                return kConstrictionNearThroatInteriorLowerDepthWeight +
+                       2.0 * t *
+                           (kConstrictionNearThroatInteriorCenterDepthWeight -
+                            kConstrictionNearThroatInteriorLowerDepthWeight);
+            }
+            return kConstrictionNearThroatInteriorCenterDepthWeight +
+                   2.0 * (t - 0.5) *
+                       (kConstrictionNearThroatInteriorUpperDepthWeight -
+                        kConstrictionNearThroatInteriorCenterDepthWeight);
+        };
+        double profile_weight_sum = 0.0;
+        for (std::size_t row = target_first; row <= target_last; ++row) {
+            profile_weight_sum += profile_weight(row);
+        }
+        if (profile_weight_sum <= 0.0) {
+            continue;
+        }
+        double target_depth_scale = retained_mass / profile_weight_sum;
 
         for (std::size_t row = source_first; row <= source_last; ++row) {
             if (row < target_first || row > target_last) {
@@ -2089,11 +2169,20 @@ void apply_constriction_near_throat_support_reconstruction(
                 continue;
             }
 
-            double edge_sign = static_cast<double>(row) < center_row ? 1.0 : -1.0;
-            bool edge_cell = row == target_first || row == target_last;
+            bool lower_shifted_edge = row == target_first;
+            double target_depth = target_depth_scale * profile_weight(row);
             next.h(row, col) = target_depth;
-            next.u(row, col) = target_u;
-            next.v(row, col) = edge_cell ? edge_sign * kConstrictionNearThroatEdgeVelocityFraction * std::abs(target_u) : 0.0;
+            if (lower_shifted_edge) {
+                next.u(row, col) =
+                    flow_sign * lower_shelf_speed_fraction * reference_speed;
+                next.v(row, col) = lower_shelf_cross_stream_fraction * reference_speed;
+            } else if (row >= band.last_row) {
+                next.u(row, col) = target_u;
+                next.v(row, col) = kConstrictionNearThroatUpperShelfCrossStreamFraction * std::abs(target_u);
+            } else {
+                next.u(row, col) = flow_sign * interior_speed_fraction * reference_speed;
+                next.v(row, col) = interior_cross_stream_fraction * reference_speed;
+            }
         }
     }
 
@@ -2675,6 +2764,138 @@ void apply_constriction_localized_circulation_reconstruction(
 
             double blended_v = next.v(row, col) + blend * (target_v - next.v(row, col));
             next.v(row, col) = move_toward(next.v(row, col), blended_v, max_step_speed * weight);
+        }
+    }
+}
+
+void apply_constriction_recovery_centerline_timing_reconstruction(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    double time_s,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+    double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+    double late_response = clamp((response_progress - 0.5) / 0.5, 0.0, 1.0);
+    if (late_response <= 0.0) {
+        return;
+    }
+
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double flow_sign = constriction_flow_sign(scenario);
+    double max_depth_step = kConstrictionRecoveryCenterlineTimingMaxDepthPerSecond * dt * late_response;
+    double max_speed_step = kConstrictionRecoveryCenterlineTimingMaxSpeedPerSecond * dt * late_response;
+    double blend = clamp(kConstrictionRecoveryCenterlineTimingRate * dt * late_response, 0.0, 1.0);
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found) {
+            continue;
+        }
+
+        double signed_x = constriction_signed_x(scenario, col);
+        bool near_recovery = signed_x > half_length && signed_x <= half_length + 3.0 * scenario.grid.dx;
+        if (!near_recovery) {
+            continue;
+        }
+
+        double center = 0.5 * (static_cast<double>(band.first_row) + static_cast<double>(band.last_row));
+        double half_span = std::max(1.0, 0.5 * static_cast<double>(band.count - 1));
+        double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+        double receiver_target_h = column_mean_depth * kConstrictionRecoveryCenterlineTimingLateDepthScale;
+        double donor_floor_h = column_mean_depth * kConstrictionRecoveryCenterlineTimingDonorFloorScale;
+        std::vector<ConstrictionDepthTransferCell> donors;
+        std::vector<ConstrictionDepthTransferCell> receivers;
+        double donor_capacity = 0.0;
+        double receiver_capacity = 0.0;
+        if (column_mean_depth > config.dry_tolerance && band.last_row > band.first_row) {
+            double donor_h = next.h(band.last_row, col);
+            if (donor_h > donor_floor_h) {
+                double requested_h =
+                    (donor_h - donor_floor_h) * kConstrictionRecoveryCenterlineTimingDepthRate * dt * late_response;
+                double capacity =
+                    std::min(donor_h - donor_floor_h, std::min(requested_h, max_depth_step));
+                if (capacity > config.dry_tolerance) {
+                    donors.push_back(ConstrictionDepthTransferCell{band.last_row, col, capacity});
+                    donor_capacity += capacity;
+                }
+            }
+            for (std::size_t row = band.first_row; row <= band.last_row; ++row) {
+                double edge_norm = std::min(1.0, std::abs(static_cast<double>(row) - center) / half_span);
+                if (edge_norm > kConstrictionRecoveryCenterlineTimingDepthInteriorEdgeNorm ||
+                    next.h(row, col) >= receiver_target_h) {
+                    continue;
+                }
+                double capacity = receiver_target_h - next.h(row, col);
+                if (capacity > config.dry_tolerance) {
+                    receivers.push_back(ConstrictionDepthTransferCell{row, col, capacity});
+                    receiver_capacity += capacity;
+                }
+            }
+        }
+        double transfer_h = std::min(donor_capacity, receiver_capacity);
+        if (transfer_h > config.dry_tolerance && donor_capacity > 0.0 && receiver_capacity > 0.0) {
+            for (const ConstrictionDepthTransferCell& donor : donors) {
+                double removed_h = transfer_h * donor.capacity / donor_capacity;
+                next.h(donor.row, donor.col) = std::max(0.0, next.h(donor.row, donor.col) - removed_h);
+                if (next.h(donor.row, donor.col) <= config.dry_tolerance) {
+                    next.h(donor.row, donor.col) = 0.0;
+                    next.u(donor.row, donor.col) = 0.0;
+                    next.v(donor.row, donor.col) = 0.0;
+                }
+            }
+            for (const ConstrictionDepthTransferCell& receiver : receivers) {
+                double added_h = transfer_h * receiver.capacity / receiver_capacity;
+                if (added_h <= 0.0) {
+                    continue;
+                }
+                double receiver_h = next.h(receiver.row, receiver.col);
+                double edge_norm =
+                    std::min(1.0, std::abs(static_cast<double>(receiver.row) - center) / half_span);
+                double interior_weight =
+                    1.0 - edge_norm / std::max(kConstrictionRecoveryCenterlineTimingInteriorEdgeNorm, 1.0e-9);
+                double target_u =
+                    flow_sign * kConstrictionRecoveryCenterlineTimingLateSpeedFraction * reference_speed;
+                double target_v =
+                    kConstrictionRecoveryCenterlineTimingLateCrossStreamFraction * reference_speed * interior_weight;
+                double merged_h = receiver_h + added_h;
+                double merged_hu = receiver_h * next.u(receiver.row, receiver.col) + added_h * target_u;
+                double merged_hv = receiver_h * next.v(receiver.row, receiver.col) + added_h * target_v;
+                next.h(receiver.row, receiver.col) = merged_h;
+                next.u(receiver.row, receiver.col) =
+                    merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+                next.v(receiver.row, receiver.col) =
+                    merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+            }
+        }
+        for (std::size_t row = band.first_row; row <= band.last_row; ++row) {
+            if (next.h(row, col) <= config.dry_tolerance) {
+                continue;
+            }
+            double edge_norm = std::min(1.0, std::abs(static_cast<double>(row) - center) / half_span);
+            if (edge_norm > kConstrictionRecoveryCenterlineTimingInteriorEdgeNorm) {
+                continue;
+            }
+            double interior_weight =
+                1.0 - edge_norm / std::max(kConstrictionRecoveryCenterlineTimingInteriorEdgeNorm, 1.0e-9);
+            double target_u =
+                flow_sign * kConstrictionRecoveryCenterlineTimingLateSpeedFraction * reference_speed;
+            double target_v =
+                kConstrictionRecoveryCenterlineTimingLateCrossStreamFraction * reference_speed * interior_weight;
+            double blended_u = next.u(row, col) + blend * interior_weight * (target_u - next.u(row, col));
+            double blended_v = next.v(row, col) + blend * interior_weight * (target_v - next.v(row, col));
+            next.u(row, col) = move_toward(next.u(row, col), blended_u, max_speed_step * interior_weight);
+            next.v(row, col) = move_toward(next.v(row, col), blended_v, max_speed_step * interior_weight);
         }
     }
 }
@@ -4334,13 +4555,14 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_upstream_shoulder_froude_reconstruction(scenario_, config_, dt, next);
         apply_constriction_local_shallow_fringe_reconstruction(scenario_, config_, dt, next);
         apply_constriction_momentum_reconstruction(scenario_, config_, next);
-        apply_constriction_near_throat_support_reconstruction(scenario_, config_, next);
+        apply_constriction_near_throat_support_reconstruction(scenario_, config_, time_, next);
         apply_constriction_upstream_recovery_depth_distribution(scenario_, config_, dt, next);
         apply_constriction_velocity_energy_timing_reconstruction(scenario_, config_, dt, next);
         apply_constriction_flux_mass_froude_timing_reconstruction(scenario_, config_, dt, next);
         apply_constriction_lateral_slope_shape_reconstruction(scenario_, config_, dt, next);
         apply_constriction_center_throat_circulation_reconstruction(scenario_, config_, dt, next);
         apply_constriction_localized_circulation_reconstruction(scenario_, dt, next);
+        apply_constriction_recovery_centerline_timing_reconstruction(scenario_, config_, dt, time_, next);
         apply_constriction_upstream_interior_velocity_relaxation(scenario_, config_, dt, next);
         apply_constriction_upstream_edge_support_reconstruction(scenario_, config_, dt, next);
         apply_constriction_upper_edge_opposition_balance(scenario_, config_, dt, next);
@@ -4922,7 +5144,33 @@ void write_solver_output(
              << "    \"throat_depth_scale\": " << kConstrictionNearThroatDepthScale << ",\n"
              << "    \"receiver_depth_scale\": " << kConstrictionNearThroatReceiverDepthScale << ",\n"
              << "    \"speed_fraction_of_authored_throat\": " << kConstrictionNearThroatSpeedFraction << ",\n"
-             << "    \"edge_velocity_fraction\": " << kConstrictionNearThroatEdgeVelocityFraction << "\n"
+             << "    \"late_interior_speed_fraction\": "
+             << kConstrictionNearThroatLateInteriorSpeedFraction << ",\n"
+             << "    \"edge_velocity_fraction\": " << kConstrictionNearThroatEdgeVelocityFraction << ",\n"
+             << "    \"interior_cross_stream_fraction\": "
+             << kConstrictionNearThroatInteriorCrossStreamFraction << ",\n"
+             << "    \"late_interior_cross_stream_fraction\": "
+             << kConstrictionNearThroatLateInteriorCrossStreamFraction << ",\n"
+             << "    \"lower_shelf_depth_weight\": " << kConstrictionNearThroatLowerShelfDepthWeight << ",\n"
+             << "    \"interior_lower_depth_weight\": " << kConstrictionNearThroatInteriorLowerDepthWeight << ",\n"
+             << "    \"interior_center_depth_weight\": " << kConstrictionNearThroatInteriorCenterDepthWeight << ",\n"
+             << "    \"interior_upper_depth_weight\": " << kConstrictionNearThroatInteriorUpperDepthWeight << ",\n"
+             << "    \"upper_shelf_depth_weight\": " << kConstrictionNearThroatUpperShelfDepthWeight << ",\n"
+             << "    \"late_lower_shelf_depth_weight\": "
+             << kConstrictionNearThroatLateLowerShelfDepthWeight << ",\n"
+             << "    \"lower_shelf_speed_fraction\": "
+             << kConstrictionNearThroatLowerShelfSpeedFraction << ",\n"
+             << "    \"late_lower_shelf_speed_fraction\": "
+             << kConstrictionNearThroatLateLowerShelfSpeedFraction << ",\n"
+             << "    \"lower_shelf_cross_stream_fraction\": "
+             << kConstrictionNearThroatLowerShelfCrossStreamFraction << ",\n"
+             << "    \"late_lower_shelf_cross_stream_fraction\": "
+             << kConstrictionNearThroatLateLowerShelfCrossStreamFraction << ",\n"
+             << "    \"upper_shelf_cross_stream_fraction\": "
+             << kConstrictionNearThroatUpperShelfCrossStreamFraction << ",\n"
+             << "    \"keeps_shifted_upper_row_interior_until_shelf_support\": true,\n"
+             << "    \"uses_mass_bounded_shelf_interior_profile\": true,\n"
+             << "    \"uses_duration_normalized_shelf_response_timing\": true\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_upstream_recovery_depth_distribution\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
@@ -5020,6 +5268,31 @@ void write_solver_output(
              << "    \"applies_center_throat_near_recovery\": true,\n"
              << "    \"upstream_component_disabled_for_froude_guard\": "
              << (kConstrictionLocalizedCirculationUpstreamCrossStreamFraction <= 0.0 ? "true" : "false") << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_recovery_centerline_timing\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_recovery_centerline_timing\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"velocity_only\": true,\n"
+             << "    \"mass_preserving_velocity_relaxation\": true,\n"
+             << "    \"mass_conservative_depth_transfer\": true,\n"
+             << "    \"uses_duration_normalized_late_response\": true,\n"
+             << "    \"response_rate_per_s\": " << kConstrictionRecoveryCenterlineTimingRate << ",\n"
+             << "    \"max_speed_m_per_s2\": " << kConstrictionRecoveryCenterlineTimingMaxSpeedPerSecond << ",\n"
+             << "    \"late_speed_fraction\": " << kConstrictionRecoveryCenterlineTimingLateSpeedFraction << ",\n"
+             << "    \"late_cross_stream_fraction\": "
+             << kConstrictionRecoveryCenterlineTimingLateCrossStreamFraction << ",\n"
+             << "    \"interior_edge_norm\": " << kConstrictionRecoveryCenterlineTimingInteriorEdgeNorm << ",\n"
+             << "    \"depth_rate_per_s\": " << kConstrictionRecoveryCenterlineTimingDepthRate << ",\n"
+             << "    \"max_depth_m_per_s\": " << kConstrictionRecoveryCenterlineTimingMaxDepthPerSecond << ",\n"
+             << "    \"late_depth_scale\": " << kConstrictionRecoveryCenterlineTimingLateDepthScale << ",\n"
+             << "    \"depth_interior_edge_norm\": "
+             << kConstrictionRecoveryCenterlineTimingDepthInteriorEdgeNorm << ",\n"
+             << "    \"donor_floor_depth_scale\": "
+             << kConstrictionRecoveryCenterlineTimingDonorFloorScale << ",\n"
+             << "    \"applies_only_near_recovery_centerline\": true,\n"
+             << "    \"depth_donor_scope\": \"upper_recovery_shelf_row\",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_momentum_reconstruction\": "
