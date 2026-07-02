@@ -210,6 +210,11 @@ constexpr double kConstrictionLowerEdgeFinalSupportFirstWetSpeedFraction = 0.52;
 constexpr double kConstrictionLowerEdgeFinalSupportOuterShelfCrossStreamFraction = 0.30;
 constexpr double kConstrictionLowerEdgeFinalSupportLowerShelfCrossStreamFraction = 1.12;
 constexpr double kConstrictionLowerEdgeFinalSupportFirstWetCrossStreamFraction = 0.28;
+constexpr double kConstrictionLowerEdgeFinalSupportTransitionShelfResponseStart = 0.995;
+constexpr double kConstrictionLowerEdgeFinalSupportTransitionShelfVelocityRate = 120.0;
+constexpr double kConstrictionLowerEdgeFinalSupportTransitionShelfMaxSpeedPerSecond = 80.0;
+constexpr double kConstrictionLowerEdgeFinalSupportTransitionShelfSpeedFraction = -0.18;
+constexpr double kConstrictionLowerEdgeFinalSupportTransitionShelfCrossStreamFraction = 0.0;
 constexpr double kConstrictionLowerEdgeFluxMagnitudeRate = 8.0;
 constexpr double kConstrictionLowerEdgeFluxMagnitudeMaxSpeedPerSecond = 5.0;
 constexpr double kConstrictionLowerEdgeFluxMagnitudeShelfSpeedFraction = 0.78;
@@ -4372,14 +4377,66 @@ void apply_constriction_lower_edge_final_support(
         }
         shape_lower_row(band.first_row, kConstrictionLowerEdgeFinalSupportInteriorCrossStreamFraction);
 
+        double signed_x = constriction_signed_x(scenario, col);
+        double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+        double upstream_edge_distance = -signed_x - half_length;
+        double pre_throat_shelf_weight =
+            signed_x < -half_length
+                ? 1.0 - clamp(upstream_edge_distance / std::max(scenario.grid.dx, 1.0e-9), 0.0, 1.0)
+                : 0.0;
+        double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+        double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+        double transition_shelf_response =
+            clamp(
+                (response_progress - kConstrictionLowerEdgeFinalSupportTransitionShelfResponseStart) /
+                    std::max(1.0e-9, 1.0 - kConstrictionLowerEdgeFinalSupportTransitionShelfResponseStart),
+                0.0,
+                1.0);
+        double transition_shelf_weight = pre_throat_shelf_weight * transition_shelf_response;
+        auto shape_transition_shelf_row = [&](std::size_t shelf_row) {
+            if (next.h(shelf_row, col) > config.dry_tolerance) {
+                double target_u = constriction_flow_sign(scenario) *
+                                  kConstrictionLowerEdgeFinalSupportTransitionShelfSpeedFraction *
+                                  reference_speed;
+                double target_v =
+                    kConstrictionLowerEdgeFinalSupportTransitionShelfCrossStreamFraction * reference_speed;
+                double transition_step =
+                    kConstrictionLowerEdgeFinalSupportTransitionShelfMaxSpeedPerSecond * dt *
+                    transition_shelf_weight;
+                double transition_blend =
+                    clamp(
+                        kConstrictionLowerEdgeFinalSupportTransitionShelfVelocityRate * dt *
+                            transition_shelf_weight,
+                        0.0,
+                        1.0);
+                double blended_u =
+                    next.u(shelf_row, col) + transition_blend * (target_u - next.u(shelf_row, col));
+                double blended_v =
+                    next.v(shelf_row, col) + transition_blend * (target_v - next.v(shelf_row, col));
+                next.u(shelf_row, col) =
+                    move_toward(next.u(shelf_row, col), blended_u, transition_step);
+                next.v(shelf_row, col) =
+                    move_toward(next.v(shelf_row, col), blended_v, transition_step);
+            }
+        };
+        if (transition_shelf_weight > 0.0) {
+            if (band.first_row > 1) {
+                std::size_t outer_shelf_row = band.first_row - 2;
+                if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, outer_shelf_row)) {
+                    shape_transition_shelf_row(outer_shelf_row);
+                }
+            }
+            if (band.first_row > 0) {
+                shape_transition_shelf_row(band.first_row - 1);
+            }
+        }
+
         double far_approach_weight =
             clamp(
                 (approach_weight - kConstrictionLowerEdgeFinalSupportFarApproachStart) /
                     std::max(1.0e-9, 1.0 - kConstrictionLowerEdgeFinalSupportFarApproachStart),
                 0.0,
                 1.0);
-        double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
-        double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
         double far_response =
             clamp(
                 (response_progress - kConstrictionLowerEdgeFinalSupportFarResponseStart) /
@@ -6694,6 +6751,17 @@ void write_solver_output(
              << kConstrictionLowerEdgeFinalSupportInteriorCrossStreamFraction << ",\n"
              << "    \"final_support_transition_velocity_weight_floor\": "
              << kConstrictionLowerEdgeFinalSupportTransitionVelocityWeightFloor << ",\n"
+             << "    \"final_support_pre_throat_outer_shelf_response\": true,\n"
+             << "    \"final_support_pre_throat_response_start_fraction\": "
+             << kConstrictionLowerEdgeFinalSupportTransitionShelfResponseStart << ",\n"
+             << "    \"final_support_pre_throat_velocity_rate_per_s\": "
+             << kConstrictionLowerEdgeFinalSupportTransitionShelfVelocityRate << ",\n"
+             << "    \"final_support_pre_throat_max_speed_m_per_s2\": "
+             << kConstrictionLowerEdgeFinalSupportTransitionShelfMaxSpeedPerSecond << ",\n"
+             << "    \"final_support_pre_throat_speed_fraction\": "
+             << kConstrictionLowerEdgeFinalSupportTransitionShelfSpeedFraction << ",\n"
+             << "    \"final_support_pre_throat_cross_stream_fraction\": "
+             << kConstrictionLowerEdgeFinalSupportTransitionShelfCrossStreamFraction << ",\n"
              << "    \"final_support_far_upstream_lower_shelf_response\": true,\n"
              << "    \"final_support_far_response_start_fraction\": "
              << kConstrictionLowerEdgeFinalSupportFarResponseStart << ",\n"
