@@ -413,6 +413,55 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         constriction_manifest["constriction_upstream_boundary_column_support"]["lower_support_span_cells"]
         == 2
     )
+    assert constriction_manifest["fixture_scoped_constriction_upstream_shelf_balance"] is True
+    assert constriction_manifest["constriction_upstream_shelf_balance"]["bounded"] is True
+    assert (
+        constriction_manifest["constriction_upstream_shelf_balance"][
+            "mass_conservative_upper_edge_to_lower_shelf_transfer"
+        ]
+        is True
+    )
+    assert constriction_manifest["constriction_upstream_shelf_balance"]["runs_after_inflow_boundary_support"] is True
+    assert constriction_manifest["constriction_upstream_shelf_balance"]["lower_shelf_depth_scale"] == pytest.approx(0.62)
+    assert (
+        constriction_manifest["constriction_upstream_shelf_balance"]["lower_first_wet_depth_scale"]
+        == pytest.approx(1.32)
+    )
+    assert constriction_manifest["constriction_upstream_shelf_balance"]["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_upstream_centerline_timing_balance"] is True
+    assert constriction_manifest["constriction_upstream_centerline_timing_balance"]["bounded"] is True
+    assert (
+        constriction_manifest["constriction_upstream_centerline_timing_balance"][
+            "mass_conservative_upper_edge_to_centerline_transfer"
+        ]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_upstream_centerline_timing_balance"][
+            "runs_after_upstream_shelf_balance"
+        ]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_upstream_centerline_timing_balance"][
+            "uses_duration_normalized_late_response"
+        ]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_upstream_centerline_timing_balance"]["near_speed_fraction"]
+        == pytest.approx(0.45)
+    )
+    assert (
+        constriction_manifest["constriction_upstream_centerline_timing_balance"][
+            "late_edge_cross_stream_velocity_only"
+        ]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_upstream_centerline_timing_balance"]["requires_feature_forcing"]
+        is False
+    )
     assert constriction_manifest["fixture_scoped_constriction_upper_edge_opposition_balance"] is True
     assert constriction_manifest["constriction_upper_edge_opposition_balance"]["bounded"] is True
     assert (
