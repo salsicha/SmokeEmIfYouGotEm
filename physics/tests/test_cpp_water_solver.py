@@ -461,6 +461,30 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         constriction_manifest["constriction_upstream_boundary_column_support"]["lower_support_span_cells"]
         == 2
     )
+    assert (
+        constriction_manifest["constriction_upstream_boundary_column_support"]["support_rate_per_s"]
+        == pytest.approx(4.0)
+    )
+    assert (
+        constriction_manifest["constriction_upstream_boundary_column_support"]["max_depth_m_per_s"]
+        == pytest.approx(2.0)
+    )
+    assert (
+        constriction_manifest["constriction_upstream_boundary_column_support"]["shelf_depth_scale"]
+        == pytest.approx(0.65)
+    )
+    assert (
+        constriction_manifest["constriction_upstream_boundary_column_support"]["lower_depth_scale"]
+        == pytest.approx(1.34)
+    )
+    assert (
+        constriction_manifest["constriction_upstream_boundary_column_support"]["interior_depth_scale"]
+        == pytest.approx(1.45)
+    )
+    assert (
+        constriction_manifest["constriction_upstream_boundary_column_support"]["shelf_speed_fraction"]
+        == pytest.approx(1.65)
+    )
     assert constriction_manifest["fixture_scoped_constriction_upstream_shelf_balance"] is True
     assert constriction_manifest["constriction_upstream_shelf_balance"]["bounded"] is True
     assert (

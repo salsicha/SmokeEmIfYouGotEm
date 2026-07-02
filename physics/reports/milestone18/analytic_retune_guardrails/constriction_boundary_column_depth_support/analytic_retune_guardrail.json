@@ -1,0 +1,39 @@
+{
+  "blocked_reasons": [],
+  "decision": "PASS",
+  "manifest_path": "data/validation/milestone17/analytic_fixtures/manifest.json",
+  "output_dir": "reports/milestone18/analytic_retune_guardrails/constriction_boundary_column_depth_support",
+  "passed": true,
+  "postflight": {
+    "candidate_kind": "scenario",
+    "candidate_label": "constriction_boundary_column_depth_support_postflight",
+    "candidate_root": null,
+    "failed_count": 0,
+    "failing_metrics": [],
+    "fixture_count": 7,
+    "frame_index": 0,
+    "passed": true,
+    "passed_count": 7,
+    "report_json": "reports/milestone18/analytic_retune_guardrails/constriction_boundary_column_depth_support/postflight_analytic_validation.json",
+    "report_markdown": "reports/milestone18/analytic_retune_guardrails/constriction_boundary_column_depth_support/postflight_analytic_validation.md",
+    "stage": "postflight"
+  },
+  "preflight": {
+    "candidate_kind": "scenario",
+    "candidate_label": "constriction_boundary_column_depth_support_preflight",
+    "candidate_root": null,
+    "failed_count": 0,
+    "failing_metrics": [],
+    "fixture_count": 7,
+    "frame_index": 0,
+    "passed": true,
+    "passed_count": 7,
+    "report_json": "reports/milestone18/analytic_retune_guardrails/constriction_boundary_column_depth_support/preflight_analytic_validation.json",
+    "report_markdown": "reports/milestone18/analytic_retune_guardrails/constriction_boundary_column_depth_support/preflight_analytic_validation.md",
+    "stage": "preflight"
+  },
+  "regression_count": 0,
+  "regressions": [],
+  "retune_batch_id": "constriction_boundary_column_depth_support",
+  "schema_version": "raftsim.milestone18.analytic_retune_guardrail.v0"
+}
