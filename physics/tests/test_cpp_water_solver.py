@@ -1043,6 +1043,32 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert downstream_final_shear["max_speed_m_per_s2"] == pytest.approx(220.0)
     assert downstream_final_shear["speed_fraction"] == pytest.approx(-1.80)
     assert downstream_final_shear["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_throat_edge_spill_recovery_balance"] is True
+    throat_spill = constriction_manifest["constriction_throat_edge_spill_recovery_balance"]
+    assert throat_spill["bounded"] is True
+    assert throat_spill["mass_conservative_depth_transfer"] is True
+    assert throat_spill["velocity_only_after_depth_transfer"] is True
+    assert throat_spill["runs_after_downstream_upper_edge_final_shear"] is True
+    assert throat_spill["uses_duration_normalized_final_response"] is True
+    assert throat_spill["donor_scope"] == "off_center_downstream_throat_edge_and_shelf"
+    assert throat_spill["receiver_scope"] == "first_widened_downstream_recovery_upper_rows"
+    assert throat_spill["response_start_fraction"] == pytest.approx(0.995)
+    assert throat_spill["support_rate_per_s"] == pytest.approx(80.0)
+    assert throat_spill["max_depth_m_per_s"] == pytest.approx(40.0)
+    assert throat_spill["donor_floor_depth_scale"] == pytest.approx(0.22)
+    assert throat_spill["receiver_target_depth_scale"] == pytest.approx(0.99)
+    assert throat_spill["receiver_window_cells"] == 2
+    assert throat_spill["velocity_rate_per_s"] == pytest.approx(260.0)
+    assert throat_spill["max_speed_m_per_s2"] == pytest.approx(220.0)
+    assert throat_spill["upper_edge_speed_fraction"] == pytest.approx(0.90)
+    assert throat_spill["upper_edge_cross_stream_fraction"] == pytest.approx(0.39)
+    assert throat_spill["lower_shelf_speed_fraction"] == pytest.approx(0.94)
+    assert throat_spill["lower_shelf_cross_stream_fraction"] == pytest.approx(0.63)
+    assert throat_spill["receiver_inner_speed_fraction"] == pytest.approx(0.58)
+    assert throat_spill["receiver_edge_speed_fraction"] == pytest.approx(0.05)
+    assert throat_spill["receiver_inner_cross_stream_fraction"] == pytest.approx(0.29)
+    assert throat_spill["receiver_edge_cross_stream_fraction"] == pytest.approx(0.20)
+    assert throat_spill["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_momentum_reconstruction"] is True
     assert constriction_manifest["constriction_y_face_flux_source_audit"]["present"] is True
     assert constriction_manifest["constriction_y_face_flux_source_audit"]["uses_internal_cpp_riemann_flux"] is True
