@@ -1,0 +1,195 @@
+{
+  "actual_scenario_id": "constriction_seed_16",
+  "decision": "BLOCKED",
+  "feature_forcing_policy": "feature_strength_scale must not increase; retune candidates for core parity use 0.0 unless explicitly justified.",
+  "gate_scenario_id": "constriction",
+  "mode_results": [
+    {
+      "candidate_label": "roe_upper_outside_shelf_support",
+      "checks": [
+        {
+          "details": "Max Linf across h/eta/u/v/hu/hv/normals; u/v masked below 0.15 m.",
+          "name": "field_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 3.4671953800720714
+        },
+        {
+          "details": "Max Linf across eta slope fields.",
+          "name": "slope_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 0.7877649156403767
+        },
+        {
+          "details": "Max wet/dry mask mismatch fraction across compared frames.",
+          "name": "wet_mismatch_fraction",
+          "passed": false,
+          "threshold": 0.02,
+          "value": 0.2638888888888889
+        },
+        {
+          "details": "Max Linf across point-probe fields; u/v/Froude masked below 0.15 m.",
+          "name": "probe_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 2.1565553995867464
+        },
+        {
+          "details": "Max Linf across cross-section fields; u/v/Froude masked below 0.15 m.",
+          "name": "cross_section_linf",
+          "passed": false,
+          "threshold": 0.25,
+          "value": 1.6623013906504807
+        },
+        {
+          "details": "Absolute C++ minus reference mass-drift delta.",
+          "name": "mass_drift_delta",
+          "passed": true,
+          "threshold": 0.05,
+          "value": 0.04485691595138948
+        },
+        {
+          "details": "Absolute C++ minus reference energy-change delta.",
+          "name": "energy_change_delta",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.13357099743452994
+        },
+        {
+          "details": "Max absolute Froude summary delta for cells at or above 0.15 m.",
+          "name": "froude_delta",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.44701244431865383
+        },
+        {
+          "details": "Max observed feature response location delta.",
+          "name": "feature_location_delta",
+          "passed": true,
+          "threshold": 5.0,
+          "value": 3.605551275463989
+        },
+        {
+          "details": "Max observed feature response strength delta.",
+          "name": "feature_strength_delta",
+          "passed": true,
+          "threshold": 10.0,
+          "value": 0.7777065248866402
+        }
+      ],
+      "comparison_dir": "outputs/m18cmp/c_constrict_upper_outside_shelf_support/finite_volume_roe",
+      "failing_checks": [
+        "field_linf",
+        "slope_linf",
+        "wet_mismatch_fraction",
+        "probe_linf",
+        "cross_section_linf"
+      ],
+      "manifest": "outputs/m18cmp/c_constrict_upper_outside_shelf_support/finite_volume_roe/dual_solver_manifest.json",
+      "notes": [],
+      "promoted": false,
+      "solver_mode": "finite_volume_roe",
+      "threshold_report": "outputs/m18cmp/c_constrict_upper_outside_shelf_support/finite_volume_roe/threshold_evaluation.json",
+      "tuning_parameters": {
+        "bed_slope_source_scale": 0.75,
+        "boundary_mode": "scenario",
+        "cfl": 0.45,
+        "dry_tolerance": 1e-06,
+        "feature_strength_scale": 0,
+        "flux_scheme": "roe",
+        "preserve_initial_mass": false,
+        "roughness_scale": 0.5,
+        "solver_mode": "finite_volume"
+      }
+    }
+  ],
+  "notes": [
+    "Use bounded upper outside shelf support after the upper-edge final-balance attempt; feature forcing remains off.",
+    "Do not promote: Froude returns inside threshold and conservation stays visible, but field, slope, wet-mask, probe, and cross-section parity remain blocked."
+  ],
+  "passed": false,
+  "reference_boundary_semantics": {
+    "bc_lower": [
+      "user",
+      "wall"
+    ],
+    "bc_upper": [
+      "extrap",
+      "wall"
+    ],
+    "edges": [
+      {
+        "edge": "west",
+        "enforced_state": {
+          "depth": 1.25,
+          "stage": null,
+          "velocity": [
+            1.4,
+            0.0
+          ]
+        },
+        "geoclaw_code": "user",
+        "hydrograph_policy": "none",
+        "requires_user_boundary_adapter": true,
+        "scenario_kind": "inflow"
+      },
+      {
+        "edge": "east",
+        "enforced_state": {
+          "depth": null,
+          "stage": null,
+          "velocity": null
+        },
+        "geoclaw_code": "extrap",
+        "hydrograph_policy": "none",
+        "requires_user_boundary_adapter": false,
+        "scenario_kind": "outflow"
+      },
+      {
+        "edge": "south",
+        "enforced_state": {
+          "depth": null,
+          "stage": null,
+          "velocity": null
+        },
+        "geoclaw_code": "wall",
+        "hydrograph_policy": "none",
+        "requires_user_boundary_adapter": false,
+        "scenario_kind": "wall"
+      },
+      {
+        "edge": "north",
+        "enforced_state": {
+          "depth": null,
+          "stage": null,
+          "velocity": null
+        },
+        "geoclaw_code": "wall",
+        "hydrograph_policy": "none",
+        "requires_user_boundary_adapter": false,
+        "scenario_kind": "wall"
+      }
+    ],
+    "requires_user_boundary_adapter": true
+  },
+  "reference_manifest": "outputs/m18g/c_constrict_corrected/constriction_seed_16/normalized/manifest.json",
+  "scenario_family": "constriction",
+  "schema_version": "raftsim.milestone18.parity_family_retune.v0",
+  "summary": {
+    "blocked_modes": [
+      "finite_volume_roe"
+    ],
+    "failing_checks_by_mode": {
+      "finite_volume_roe": [
+        "field_linf",
+        "slope_linf",
+        "wet_mismatch_fraction",
+        "probe_linf",
+        "cross_section_linf"
+      ]
+    },
+    "mode_count": 1,
+    "promoted_modes": []
+  }
+}
