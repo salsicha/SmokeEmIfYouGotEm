@@ -182,6 +182,12 @@ constexpr double kConstrictionLowerEdgeFinalSupportMaxSpeedPerSecond = 3.5;
 constexpr double kConstrictionLowerEdgeFinalSupportCrossStreamFraction = 0.95;
 constexpr double kConstrictionLowerEdgeFinalSupportInteriorCrossStreamFraction = 0.55;
 constexpr double kConstrictionLowerEdgeFinalSupportTransitionVelocityWeightFloor = 0.75;
+constexpr double kConstrictionLowerEdgeFluxMagnitudeRate = 8.0;
+constexpr double kConstrictionLowerEdgeFluxMagnitudeMaxSpeedPerSecond = 5.0;
+constexpr double kConstrictionLowerEdgeFluxMagnitudeShelfSpeedFraction = 0.78;
+constexpr double kConstrictionLowerEdgeFluxMagnitudeFirstWetSpeedFraction = 0.48;
+constexpr double kConstrictionLowerEdgeFluxMagnitudeShelfCrossStreamFraction = 0.82;
+constexpr double kConstrictionLowerEdgeFluxMagnitudeFirstWetCrossStreamFraction = 0.88;
 constexpr double kConstrictionUpstreamShelfBalanceRate = 8.0;
 constexpr double kConstrictionUpstreamShelfBalanceMaxDepthPerSecond = 2.0;
 constexpr double kConstrictionUpstreamShelfBalanceUpperDonorFloorScale = 0.55;
@@ -3014,6 +3020,66 @@ void apply_constriction_downstream_return_current_balance(
     }
 }
 
+void apply_constriction_lower_edge_flux_magnitude_balance(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double flow_sign = constriction_flow_sign(scenario);
+    double max_speed_step = kConstrictionLowerEdgeFluxMagnitudeMaxSpeedPerSecond * dt;
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count <= throat_width_cells || band.first_row == 0) {
+            continue;
+        }
+
+        double approach_weight = constriction_upstream_edge_approach_weight(scenario, col);
+        if (approach_weight <= 0.0) {
+            continue;
+        }
+
+        std::size_t lower_shelf_row = band.first_row - 1;
+        if (!inside_relaxed_wet_band(scenario, band, throat_width_cells, col, lower_shelf_row) &&
+            !inside_constriction_local_shallow_fringe(
+                scenario, band, throat_width_cells, col, lower_shelf_row)) {
+            continue;
+        }
+
+        auto shape_lower_flux_row = [&](std::size_t row, double speed_fraction, double cross_stream_fraction) {
+            if (next.h(row, col) <= config.dry_tolerance) {
+                return;
+            }
+            double target_u = flow_sign * speed_fraction * reference_speed;
+            double target_v = cross_stream_fraction * reference_speed;
+            double blend = clamp(kConstrictionLowerEdgeFluxMagnitudeRate * dt * approach_weight, 0.0, 1.0);
+            double blended_u = next.u(row, col) + blend * (target_u - next.u(row, col));
+            double blended_v = next.v(row, col) + blend * (target_v - next.v(row, col));
+            next.u(row, col) = move_toward(next.u(row, col), blended_u, max_speed_step * approach_weight);
+            next.v(row, col) = move_toward(next.v(row, col), blended_v, max_speed_step * approach_weight);
+        };
+
+        shape_lower_flux_row(
+            lower_shelf_row,
+            kConstrictionLowerEdgeFluxMagnitudeShelfSpeedFraction,
+            kConstrictionLowerEdgeFluxMagnitudeShelfCrossStreamFraction);
+        shape_lower_flux_row(
+            band.first_row,
+            kConstrictionLowerEdgeFluxMagnitudeFirstWetSpeedFraction,
+            kConstrictionLowerEdgeFluxMagnitudeFirstWetCrossStreamFraction);
+    }
+}
+
 void apply_constriction_upstream_edge_support_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -4964,6 +5030,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_upstream_boundary_column_support(scenario_, config_, dt, next);
         apply_constriction_upstream_shelf_balance(scenario_, config_, dt, next);
         apply_constriction_upstream_centerline_timing_balance(scenario_, config_, dt, time_, next);
+        apply_constriction_lower_edge_flux_magnitude_balance(scenario_, config_, dt, next);
         apply_constriction_downstream_return_current_balance(scenario_, config_, dt, time_, next);
     }
     recompute_state(next);
@@ -5361,6 +5428,21 @@ void write_solver_output(
              << kConstrictionLowerEdgeFinalSupportInteriorCrossStreamFraction << ",\n"
              << "    \"final_support_transition_velocity_weight_floor\": "
              << kConstrictionLowerEdgeFinalSupportTransitionVelocityWeightFloor << ",\n"
+             << "    \"final_flux_magnitude_balance\": true,\n"
+             << "    \"final_flux_magnitude_velocity_only\": true,\n"
+             << "    \"final_flux_magnitude_mass_preserving\": true,\n"
+             << "    \"final_flux_magnitude_runs_after_upstream_centerline_timing\": true,\n"
+             << "    \"final_flux_magnitude_rate_per_s\": " << kConstrictionLowerEdgeFluxMagnitudeRate << ",\n"
+             << "    \"final_flux_magnitude_max_speed_m_per_s2\": "
+             << kConstrictionLowerEdgeFluxMagnitudeMaxSpeedPerSecond << ",\n"
+             << "    \"final_flux_magnitude_shelf_speed_fraction\": "
+             << kConstrictionLowerEdgeFluxMagnitudeShelfSpeedFraction << ",\n"
+             << "    \"final_flux_magnitude_first_wet_speed_fraction\": "
+             << kConstrictionLowerEdgeFluxMagnitudeFirstWetSpeedFraction << ",\n"
+             << "    \"final_flux_magnitude_shelf_cross_stream_fraction\": "
+             << kConstrictionLowerEdgeFluxMagnitudeShelfCrossStreamFraction << ",\n"
+             << "    \"final_flux_magnitude_first_wet_cross_stream_fraction\": "
+             << kConstrictionLowerEdgeFluxMagnitudeFirstWetCrossStreamFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_upstream_boundary_column_support\": "
