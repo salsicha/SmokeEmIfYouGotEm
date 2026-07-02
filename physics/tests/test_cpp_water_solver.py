@@ -779,6 +779,40 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert upper_edge_shelf_release["upper_shelf_speed_fraction"] == pytest.approx(0.20)
     assert upper_edge_shelf_release["upper_shelf_cross_stream_fraction"] == pytest.approx(0.72)
     assert upper_edge_shelf_release["requires_feature_forcing"] is False
+    assert (
+        constriction_manifest["fixture_scoped_constriction_upstream_approach_final_profile_balance"]
+        is True
+    )
+    upstream_final_profile = constriction_manifest["constriction_upstream_approach_final_profile_balance"]
+    assert upstream_final_profile["bounded"] is True
+    assert upstream_final_profile["mass_conservative_depth_transfer"] is True
+    assert upstream_final_profile["velocity_only_after_depth_transfer"] is True
+    assert upstream_final_profile["applies_only_far_upstream_approach_columns"] is True
+    assert upstream_final_profile["uses_duration_normalized_final_response"] is True
+    assert upstream_final_profile["runs_after_upstream_boundary_upper_edge_final_shelf_release"] is True
+    assert upstream_final_profile["response_start_fraction"] == pytest.approx(0.995)
+    assert upstream_final_profile["depth_rate_per_s"] == pytest.approx(80.0)
+    assert upstream_final_profile["max_depth_m_per_s"] == pytest.approx(40.0)
+    assert upstream_final_profile["upper_edge_donor_floor_depth_scale"] == pytest.approx(0.40)
+    assert upstream_final_profile["lower_outer_shelf_target_depth_scale"] == pytest.approx(0.24)
+    assert upstream_final_profile["lower_shelf_target_depth_scale"] == pytest.approx(0.42)
+    assert upstream_final_profile["upper_shelf_target_depth_scale"] == pytest.approx(0.42)
+    assert upstream_final_profile["velocity_rate_per_s"] == pytest.approx(260.0)
+    assert upstream_final_profile["max_speed_m_per_s2"] == pytest.approx(220.0)
+    assert upstream_final_profile["interior_center_speed_fraction"] == pytest.approx(0.0)
+    assert upstream_final_profile["interior_edge_speed_fraction"] == pytest.approx(0.25)
+    assert upstream_final_profile["interior_lower_bias_fraction"] == pytest.approx(0.12)
+    assert upstream_final_profile["interior_upper_bias_fraction"] == pytest.approx(0.45)
+    assert upstream_final_profile["interior_edge_exponent"] == pytest.approx(1.35)
+    assert upstream_final_profile["upper_edge_speed_fraction"] == pytest.approx(1.25)
+    assert upstream_final_profile["upper_edge_cross_stream_fraction"] == pytest.approx(1.30)
+    assert upstream_final_profile["upper_shelf_speed_fraction"] == pytest.approx(1.20)
+    assert upstream_final_profile["upper_shelf_cross_stream_fraction"] == pytest.approx(0.50)
+    assert upstream_final_profile["lower_shelf_speed_fraction"] == pytest.approx(1.25)
+    assert upstream_final_profile["lower_shelf_cross_stream_fraction"] == pytest.approx(1.20)
+    assert upstream_final_profile["lower_outer_shelf_speed_fraction"] == pytest.approx(0.95)
+    assert upstream_final_profile["lower_outer_shelf_cross_stream_fraction"] == pytest.approx(0.40)
+    assert upstream_final_profile["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_throat_edge_relief"] is True
     throat_edge_relief = constriction_manifest["constriction_throat_edge_relief"]
     assert throat_edge_relief["bounded"] is True
