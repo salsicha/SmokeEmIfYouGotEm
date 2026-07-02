@@ -906,6 +906,39 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert upstream_transition_lower_shelf["requires_feature_forcing"] is False
     assert (
         constriction_manifest[
+            "fixture_scoped_constriction_upstream_transition_edge_final_profile"
+        ]
+        is True
+    )
+    upstream_transition_edge = constriction_manifest[
+        "constriction_upstream_transition_edge_final_profile"
+    ]
+    assert upstream_transition_edge["bounded"] is True
+    assert upstream_transition_edge["mass_conservative_depth_transfer"] is True
+    assert upstream_transition_edge["velocity_only_after_depth_transfer"] is True
+    assert upstream_transition_edge["applies_only_immediate_upstream_transition_edge_rows"] is True
+    assert upstream_transition_edge["uses_duration_normalized_final_response"] is True
+    assert upstream_transition_edge["runs_after_upstream_transition_lower_shelf_final_profile"] is True
+    assert upstream_transition_edge["response_start_fraction"] == pytest.approx(0.99)
+    assert upstream_transition_edge["depth_rate_per_s"] == pytest.approx(80.0)
+    assert upstream_transition_edge["max_depth_m_per_s"] == pytest.approx(40.0)
+    assert upstream_transition_edge["lower_edge_donor_floor_depth_scale"] == pytest.approx(0.55)
+    assert upstream_transition_edge["upper_edge_donor_floor_depth_scale"] == pytest.approx(0.64)
+    assert upstream_transition_edge["interior_target_depth_scale"] == pytest.approx(1.42)
+    assert upstream_transition_edge["velocity_rate_per_s"] == pytest.approx(260.0)
+    assert upstream_transition_edge["max_speed_m_per_s2"] == pytest.approx(220.0)
+    assert upstream_transition_edge["lower_edge_speed_fraction"] == pytest.approx(0.36)
+    assert upstream_transition_edge["lower_edge_cross_stream_fraction"] == pytest.approx(-0.20)
+    assert upstream_transition_edge["interior_speed_fraction"] == pytest.approx(0.66)
+    assert upstream_transition_edge["interior_cross_stream_fraction"] == pytest.approx(-0.10)
+    assert upstream_transition_edge["upper_interior_speed_fraction"] == pytest.approx(0.62)
+    assert upstream_transition_edge["upper_interior_cross_stream_fraction"] == pytest.approx(-0.35)
+    assert upstream_transition_edge["upper_edge_speed_fraction"] == pytest.approx(0.16)
+    assert upstream_transition_edge["upper_edge_cross_stream_fraction"] == pytest.approx(-0.50)
+    assert upstream_transition_edge["upper_donor_min_transition_weight"] == pytest.approx(0.45)
+    assert upstream_transition_edge["requires_feature_forcing"] is False
+    assert (
+        constriction_manifest[
             "fixture_scoped_constriction_downstream_upper_edge_final_return_profile"
         ]
         is True
@@ -923,7 +956,7 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         is True
     )
     assert downstream_upper_return["uses_duration_normalized_final_response"] is True
-    assert downstream_upper_return["runs_after_upstream_transition_lower_shelf_final_profile"] is True
+    assert downstream_upper_return["runs_after_upstream_transition_edge_final_profile"] is True
     assert downstream_upper_return["response_start_fraction"] == pytest.approx(0.99)
     assert downstream_upper_return["velocity_rate_per_s"] == pytest.approx(260.0)
     assert downstream_upper_return["max_speed_m_per_s2"] == pytest.approx(260.0)
