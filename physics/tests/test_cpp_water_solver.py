@@ -745,9 +745,9 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert throat_edge_relief["applies_only_narrow_throat_columns"] is True
     assert throat_edge_relief["uses_duration_normalized_final_response"] is True
     assert throat_edge_relief["response_start_fraction"] == pytest.approx(0.995)
-    assert throat_edge_relief["support_rate_per_s"] == pytest.approx(30.0)
-    assert throat_edge_relief["max_depth_m_per_s"] == pytest.approx(12.0)
-    assert throat_edge_relief["donor_floor_depth_scale"] == pytest.approx(0.24)
+    assert throat_edge_relief["support_rate_per_s"] == pytest.approx(80.0)
+    assert throat_edge_relief["max_depth_m_per_s"] == pytest.approx(40.0)
+    assert throat_edge_relief["donor_floor_depth_scale"] == pytest.approx(0.20)
     assert throat_edge_relief["lower_edge_receiver_target_depth_scale"] == pytest.approx(1.20)
     assert throat_edge_relief["interior_target_depth_scale"] == pytest.approx(1.36)
     assert throat_edge_relief["velocity_rate_per_s"] == pytest.approx(30.0)
