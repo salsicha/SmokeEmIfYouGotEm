@@ -751,6 +751,34 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert upper_edge_profile["edge_cross_stream_fraction"] == pytest.approx(2.05)
     assert upper_edge_profile["immediate_shelf_cross_stream_fraction"] == pytest.approx(0.85)
     assert upper_edge_profile["requires_feature_forcing"] is False
+    assert (
+        constriction_manifest[
+            "fixture_scoped_constriction_upstream_boundary_upper_edge_final_shelf_release"
+        ]
+        is True
+    )
+    upper_edge_shelf_release = constriction_manifest[
+        "constriction_upstream_boundary_upper_edge_final_shelf_release"
+    ]
+    assert upper_edge_shelf_release["bounded"] is True
+    assert upper_edge_shelf_release["mass_conservative_depth_transfer"] is True
+    assert upper_edge_shelf_release["applies_only_upstream_boundary_window"] is True
+    assert upper_edge_shelf_release["uses_duration_normalized_final_response"] is True
+    assert upper_edge_shelf_release["runs_after_downstream_upper_edge_final_shear"] is True
+    assert upper_edge_shelf_release["donor_row"] == "upper_edge_last_initial_wet_row"
+    assert upper_edge_shelf_release["receiver_rows"] == "immediate_lower_and_upper_shelf_rows"
+    assert upper_edge_shelf_release["window_cells"] == 2
+    assert upper_edge_shelf_release["support_rate_per_s"] == pytest.approx(80.0)
+    assert upper_edge_shelf_release["max_depth_m_per_s"] == pytest.approx(40.0)
+    assert upper_edge_shelf_release["response_start_fraction"] == pytest.approx(0.985)
+    assert upper_edge_shelf_release["donor_floor_depth_scale"] == pytest.approx(0.34)
+    assert upper_edge_shelf_release["lower_shelf_target_depth_scale"] == pytest.approx(0.58)
+    assert upper_edge_shelf_release["upper_shelf_target_depth_scale"] == pytest.approx(0.58)
+    assert upper_edge_shelf_release["lower_shelf_speed_fraction"] == pytest.approx(0.70)
+    assert upper_edge_shelf_release["lower_shelf_cross_stream_fraction"] == pytest.approx(1.18)
+    assert upper_edge_shelf_release["upper_shelf_speed_fraction"] == pytest.approx(0.20)
+    assert upper_edge_shelf_release["upper_shelf_cross_stream_fraction"] == pytest.approx(0.72)
+    assert upper_edge_shelf_release["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_throat_edge_relief"] is True
     throat_edge_relief = constriction_manifest["constriction_throat_edge_relief"]
     assert throat_edge_relief["bounded"] is True
