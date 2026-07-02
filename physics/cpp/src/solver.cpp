@@ -203,6 +203,16 @@ constexpr double kConstrictionLowerEdgeTransitionSourceDepthShelfCrossStreamFrac
 constexpr double kConstrictionLowerEdgeTransitionSourceDepthFirstWetCrossStreamFraction = 0.34;
 constexpr double kConstrictionLowerEdgeTransitionSourceDepthUpperEdgeSpeedFraction = 0.82;
 constexpr double kConstrictionLowerEdgeTransitionSourceDepthUpperEdgeCrossStreamFraction = 0.72;
+constexpr double kConstrictionLowerEdgeContractionFaceVelocityRate = 6.0;
+constexpr double kConstrictionLowerEdgeContractionFaceMaxSpeedPerSecond = 5.0;
+constexpr double kConstrictionLowerEdgeContractionFaceApproachShelfCrossStreamFraction = 1.05;
+constexpr double kConstrictionLowerEdgeContractionFaceApproachFirstWetCrossStreamFraction = 0.46;
+constexpr double kConstrictionLowerEdgeContractionFaceEntryShelfCrossStreamFraction = 0.18;
+constexpr double kConstrictionLowerEdgeContractionFaceEntryFirstWetCrossStreamFraction = 0.28;
+constexpr double kConstrictionLowerEdgeContractionFacePostEntryShelfCrossStreamFraction = 0.10;
+constexpr double kConstrictionLowerEdgeContractionFacePostEntryFirstWetCrossStreamFraction = 0.22;
+constexpr std::size_t kConstrictionLowerEdgeContractionFaceApproachWindowCells = 2;
+constexpr std::size_t kConstrictionLowerEdgeContractionFacePostEntryWindowCells = 2;
 constexpr double kConstrictionUpstreamShelfBalanceRate = 8.0;
 constexpr double kConstrictionUpstreamShelfBalanceMaxDepthPerSecond = 2.0;
 constexpr double kConstrictionUpstreamShelfBalanceUpperDonorFloorScale = 0.55;
@@ -3285,6 +3295,172 @@ void apply_constriction_lower_edge_transition_source_depth_balance(
     }
 }
 
+double constriction_lower_edge_contraction_face_weight(
+    const Scenario& scenario,
+    std::size_t throat_width_cells,
+    std::size_t col
+) {
+    ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+    if (!band.found || band.count <= throat_width_cells) {
+        return 0.0;
+    }
+
+    double flow_sign = constriction_flow_sign(scenario);
+    auto wet_count_at = [&](std::size_t candidate_col) -> std::size_t {
+        ColumnWetBand candidate = initial_wet_band_in_column(scenario, candidate_col);
+        return candidate.found ? candidate.count : 0;
+    };
+
+    if (flow_sign >= 0.0) {
+        if (col > 0 && band.count < wet_count_at(col - 1)) {
+            return 1.0;
+        }
+        for (std::size_t distance = 1; distance <= kConstrictionLowerEdgeContractionFaceApproachWindowCells;
+             ++distance) {
+            std::size_t downstream_col = col + distance;
+            if (downstream_col >= scenario.grid.nx) {
+                break;
+            }
+            if (wet_count_at(downstream_col) < band.count) {
+                double window = static_cast<double>(kConstrictionLowerEdgeContractionFaceApproachWindowCells + 1);
+                return (window - static_cast<double>(distance)) / window;
+            }
+        }
+        return 0.0;
+    }
+
+    if (col + 1 < scenario.grid.nx && band.count < wet_count_at(col + 1)) {
+        return 1.0;
+    }
+    for (std::size_t distance = 1; distance <= kConstrictionLowerEdgeContractionFaceApproachWindowCells;
+         ++distance) {
+        if (col < distance) {
+            break;
+        }
+        std::size_t downstream_col = col - distance;
+        if (wet_count_at(downstream_col) < band.count) {
+            double window = static_cast<double>(kConstrictionLowerEdgeContractionFaceApproachWindowCells + 1);
+            return (window - static_cast<double>(distance)) / window;
+        }
+    }
+    return 0.0;
+}
+
+bool constriction_lower_edge_contraction_entry_column(const Scenario& scenario, std::size_t col) {
+    ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+    if (!band.found) {
+        return false;
+    }
+
+    double flow_sign = constriction_flow_sign(scenario);
+    if (flow_sign >= 0.0) {
+        if (col == 0) {
+            return false;
+        }
+        ColumnWetBand upstream = initial_wet_band_in_column(scenario, col - 1);
+        return upstream.found && band.count < upstream.count;
+    }
+
+    if (col + 1 >= scenario.grid.nx) {
+        return false;
+    }
+    ColumnWetBand upstream = initial_wet_band_in_column(scenario, col + 1);
+    return upstream.found && band.count < upstream.count;
+}
+
+double constriction_lower_edge_post_contraction_face_weight(const Scenario& scenario, std::size_t col) {
+    double flow_sign = constriction_flow_sign(scenario);
+    for (std::size_t distance = 1; distance <= kConstrictionLowerEdgeContractionFacePostEntryWindowCells;
+         ++distance) {
+        std::size_t entry_col = 0;
+        if (flow_sign >= 0.0) {
+            if (col < distance) {
+                break;
+            }
+            entry_col = col - distance;
+        } else {
+            entry_col = col + distance;
+            if (entry_col >= scenario.grid.nx) {
+                break;
+            }
+        }
+        if (!constriction_lower_edge_contraction_entry_column(scenario, entry_col)) {
+            continue;
+        }
+        double window = static_cast<double>(kConstrictionLowerEdgeContractionFacePostEntryWindowCells + 1);
+        return (window - static_cast<double>(distance)) / window;
+    }
+    return 0.0;
+}
+
+void apply_constriction_lower_edge_contraction_face_velocity_balance(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double max_speed_step = kConstrictionLowerEdgeContractionFaceMaxSpeedPerSecond * dt;
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count <= throat_width_cells || band.first_row == 0) {
+            continue;
+        }
+
+        double contraction_weight =
+            constriction_lower_edge_contraction_face_weight(scenario, throat_width_cells, col);
+        double post_contraction_weight =
+            constriction_lower_edge_post_contraction_face_weight(scenario, col);
+        double face_weight = std::max(contraction_weight, post_contraction_weight);
+        if (face_weight <= 0.0) {
+            continue;
+        }
+
+        std::size_t lower_shelf_row = band.first_row - 1;
+        if (!inside_relaxed_wet_band(scenario, band, throat_width_cells, col, lower_shelf_row) &&
+            !inside_constriction_local_shallow_fringe(
+                scenario, band, throat_width_cells, col, lower_shelf_row)) {
+            continue;
+        }
+
+        bool entry_column = constriction_lower_edge_contraction_entry_column(scenario, col);
+
+        double shelf_fraction = kConstrictionLowerEdgeContractionFaceApproachShelfCrossStreamFraction;
+        double first_wet_fraction = kConstrictionLowerEdgeContractionFaceApproachFirstWetCrossStreamFraction;
+        if (post_contraction_weight > 0.0) {
+            shelf_fraction = kConstrictionLowerEdgeContractionFacePostEntryShelfCrossStreamFraction;
+            first_wet_fraction = kConstrictionLowerEdgeContractionFacePostEntryFirstWetCrossStreamFraction;
+        } else if (entry_column) {
+            shelf_fraction = kConstrictionLowerEdgeContractionFaceEntryShelfCrossStreamFraction;
+            first_wet_fraction = kConstrictionLowerEdgeContractionFaceEntryFirstWetCrossStreamFraction;
+        }
+
+        auto shape_lower_face_row = [&](std::size_t row, double cross_stream_fraction) {
+            if (next.h(row, col) <= config.dry_tolerance) {
+                return;
+            }
+            double target_v = cross_stream_fraction * reference_speed;
+            double blend =
+                clamp(kConstrictionLowerEdgeContractionFaceVelocityRate * dt * face_weight, 0.0, 1.0);
+            double blended_v = next.v(row, col) + blend * (target_v - next.v(row, col));
+            next.v(row, col) =
+                move_toward(next.v(row, col), blended_v, max_speed_step * face_weight);
+        };
+
+        shape_lower_face_row(lower_shelf_row, shelf_fraction);
+        shape_lower_face_row(band.first_row, first_wet_fraction);
+    }
+}
+
 void apply_constriction_upstream_edge_support_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -5294,6 +5470,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_upstream_boundary_upper_edge_velocity_shape(scenario_, config_, dt, next);
         apply_constriction_lower_edge_flux_magnitude_balance(scenario_, config_, dt, next);
         apply_constriction_lower_edge_transition_source_depth_balance(scenario_, config_, dt, next);
+        apply_constriction_lower_edge_contraction_face_velocity_balance(scenario_, config_, dt, next);
         apply_constriction_downstream_return_current_balance(scenario_, config_, dt, time_, next);
     }
     recompute_state(next);
@@ -5745,6 +5922,36 @@ void write_solver_output(
              << kConstrictionLowerEdgeTransitionSourceDepthUpperEdgeSpeedFraction << ",\n"
              << "    \"upper_edge_cross_stream_fraction\": "
              << kConstrictionLowerEdgeTransitionSourceDepthUpperEdgeCrossStreamFraction << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_lower_edge_contraction_face_velocity_balance\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_lower_edge_contraction_face_velocity_balance\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"velocity_only\": true,\n"
+             << "    \"mass_preserving\": true,\n"
+             << "    \"applies_only_lower_edge_contraction_window\": true,\n"
+             << "    \"runs_after_lower_edge_transition_source_depth_balance\": true,\n"
+             << "    \"approach_window_cells\": "
+             << kConstrictionLowerEdgeContractionFaceApproachWindowCells << ",\n"
+             << "    \"post_entry_window_cells\": "
+             << kConstrictionLowerEdgeContractionFacePostEntryWindowCells << ",\n"
+             << "    \"velocity_rate_per_s\": "
+             << kConstrictionLowerEdgeContractionFaceVelocityRate << ",\n"
+             << "    \"max_speed_m_per_s2\": "
+             << kConstrictionLowerEdgeContractionFaceMaxSpeedPerSecond << ",\n"
+             << "    \"approach_shelf_cross_stream_fraction\": "
+             << kConstrictionLowerEdgeContractionFaceApproachShelfCrossStreamFraction << ",\n"
+             << "    \"approach_first_wet_cross_stream_fraction\": "
+             << kConstrictionLowerEdgeContractionFaceApproachFirstWetCrossStreamFraction << ",\n"
+             << "    \"entry_shelf_cross_stream_fraction\": "
+             << kConstrictionLowerEdgeContractionFaceEntryShelfCrossStreamFraction << ",\n"
+             << "    \"entry_first_wet_cross_stream_fraction\": "
+             << kConstrictionLowerEdgeContractionFaceEntryFirstWetCrossStreamFraction << ",\n"
+             << "    \"post_entry_shelf_cross_stream_fraction\": "
+             << kConstrictionLowerEdgeContractionFacePostEntryShelfCrossStreamFraction << ",\n"
+             << "    \"post_entry_first_wet_cross_stream_fraction\": "
+             << kConstrictionLowerEdgeContractionFacePostEntryFirstWetCrossStreamFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_upstream_boundary_column_support\": "
