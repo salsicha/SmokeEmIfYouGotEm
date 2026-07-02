@@ -3,8 +3,10 @@ import shutil
 import subprocess
 from pathlib import Path
 
+import numpy as np
 import pytest
 
+from raftsim import comparison
 from raftsim.comparison import (
     compare_dual_solver_diagnostics,
     compare_dual_solver_features,
@@ -42,6 +44,67 @@ def _build_cpp_solver(tmp_path: Path) -> Path:
     subprocess.run([cmake, "-S", str(physics_dir / "cpp"), "-B", str(build_dir)], check=True)
     subprocess.run([cmake, "--build", str(build_dir)], check=True)
     return build_dir / "raftsim_water_solver"
+
+
+def _write_reference_frame(path: Path, depth: np.ndarray, wet: np.ndarray) -> None:
+    zeros = np.zeros_like(depth, dtype=float)
+    np.savez(
+        path,
+        time=0.0,
+        h=depth,
+        eta=depth,
+        u=zeros,
+        v=zeros,
+        hu=zeros,
+        hv=zeros,
+        wet=wet,
+        normal_x=zeros,
+        normal_y=zeros,
+        normal_z=np.ones_like(depth, dtype=float),
+        froude=zeros,
+    )
+
+
+def _write_cpp_frame(path: Path, depth: np.ndarray, wet: np.ndarray) -> None:
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        handle.write("row,col,x,y,h,eta,u,v,hu,hv,wet,normal_x,normal_y,normal_z,froude\n")
+        for row in range(depth.shape[0]):
+            for col in range(depth.shape[1]):
+                handle.write(
+                    f"{row},{col},{col},{row},{depth[row, col]},{depth[row, col]},"
+                    f"0,0,0,0,{1 if wet[row, col] else 0},0,0,1,0\n"
+                )
+
+
+def test_field_comparison_wet_mismatch_uses_material_depth_floor(tmp_path):
+    reference_depth = np.array([[0.10, 0.20], [0.0, 1.0]], dtype=float)
+    candidate_depth = np.array([[0.0, 0.21], [0.0, 1.0]], dtype=float)
+    reference_path = tmp_path / "reference.npz"
+    candidate_path = tmp_path / "candidate.csv"
+    _write_reference_frame(reference_path, reference_depth, reference_depth > 0.0)
+    _write_cpp_frame(candidate_path, candidate_depth, candidate_depth > 0.0)
+
+    default_floor = comparison._compare_frame_pair(
+        "final",
+        reference_path,
+        candidate_path,
+        1.0,
+        1.0,
+        reference_solver="geoclaw",
+        velocity_depth_floor=0.15,
+    )
+    low_floor = comparison._compare_frame_pair(
+        "final",
+        reference_path,
+        candidate_path,
+        1.0,
+        1.0,
+        reference_solver="geoclaw",
+        velocity_depth_floor=0.05,
+    )
+
+    assert default_floor.wet_mismatch_fraction == 0.0
+    assert low_floor.wet_mismatch_fraction == pytest.approx(0.25)
 
 
 def test_dual_solver_runs_pyclaw_and_cpp_on_one_shared_package(tmp_path):

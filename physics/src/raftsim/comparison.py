@@ -602,7 +602,7 @@ def evaluate_dual_solver_thresholds(
             "wet_mismatch_fraction",
             max((comparison.wet_mismatch_fraction for comparison in field_report.frame_comparisons), default=0.0),
             limits.max_wet_mismatch_fraction,
-            "Max wet/dry mask mismatch fraction across compared frames.",
+            f"Max material wet/dry mask mismatch fraction across compared frames using h >= {limits.velocity_depth_floor:g} m.",
         ),
         _threshold_check(
             "probe_linf",
@@ -760,7 +760,9 @@ def _compare_frame_pair(
         _field_error(name, reference_slopes[index], cpp_slopes[index])
         for index, name in enumerate(SLOPE_FIELD_NAMES)
     )
-    wet_mismatch = float(np.mean(np.asarray(reference_frame["wet"], dtype=np.bool_) != np.asarray(cpp_frame["wet"], dtype=np.bool_)))
+    reference_material_wet = _material_wet_mask(reference_frame["h"], velocity_depth_floor)
+    cpp_material_wet = _material_wet_mask(cpp_frame["h"], velocity_depth_floor)
+    wet_mismatch = float(np.mean(reference_material_wet != cpp_material_wet))
     return FrameFieldComparison(
         label=label,
         reference_frame=str(reference_frame_path),
@@ -787,6 +789,10 @@ def _load_reference_npz_frame(path: Path) -> dict[str, FloatGrid | BoolGrid]:
             "normal_z": np.asarray(data["normal_z"], dtype=np.float64),
             "froude": np.asarray(data["froude"], dtype=np.float64),
         }
+
+
+def _material_wet_mask(depth: FloatGrid | BoolGrid, depth_floor: float) -> BoolGrid:
+    return np.asarray(depth, dtype=np.float64) >= depth_floor
 
 
 def _load_pyclaw_npz_frame(path: Path) -> dict[str, FloatGrid | BoolGrid]:
