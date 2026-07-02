@@ -22,6 +22,24 @@ constexpr double kPi = 3.14159265358979323846;
 constexpr double kBedStepFaceSourceBoost = 1.26;
 constexpr double kBedStepPreStepDischargeFloor = 0.66;
 constexpr double kBedStepTopographyRedistributionRate = 0.47;
+constexpr double kDropLedgeHydraulicControlResponseStart = 0.45;
+constexpr double kDropLedgeHydraulicControlDepthRate = 18.0;
+constexpr double kDropLedgeHydraulicControlMaxDepthPerSecond = 3.0;
+constexpr double kDropLedgeHydraulicControlVelocityRate = 18.0;
+constexpr double kDropLedgeHydraulicControlMaxSpeedPerSecond = 8.0;
+constexpr double kDropLedgeHydraulicControlDepthScale = 0.68;
+constexpr double kDropLedgeHydraulicControlTailwaterDepthScale = 1.25;
+constexpr double kDropLedgeHydraulicControlUpstreamSpeedFraction = 1.68;
+constexpr double kDropLedgeHydraulicControlLipSpeedFraction = 2.20;
+constexpr double kDropLedgeHydraulicControlTailwaterSpeedFraction = 1.22;
+constexpr double kDropLedgeHydraulicControlTailwaterPulseStrength = 3.0;
+constexpr double kDropLedgeHydraulicControlTailwaterPulseCenter = 0.50;
+constexpr double kDropLedgeHydraulicControlTailwaterPulseWidth = 0.12;
+constexpr double kDropLedgeHydraulicControlLipOffsetFraction = 0.125;
+constexpr double kDropLedgeHydraulicControlWidthFraction = 0.16;
+constexpr double kDropLedgeHydraulicControlUpstreamOffsetFraction = 0.41;
+constexpr double kDropLedgeHydraulicControlUpstreamWidthFraction = 0.15;
+constexpr double kDropLedgeHydraulicControlTailwaterWidthFraction = 0.35;
 constexpr double kConstrictionEdgeVelocityFraction = 0.41;
 constexpr std::size_t kConstrictionWetBandRelaxationCells = 2;
 constexpr double kConstrictionWetBandMinimumDepth = 0.15;
@@ -1078,6 +1096,219 @@ double constriction_flow_sign(const Scenario& scenario) {
         }
     }
     return discharge >= 0.0 ? 1.0 : -1.0;
+}
+
+const Feature* feature_by_kind(const Scenario& scenario, const std::string& kind) {
+    for (const Feature& feature : scenario.features) {
+        if (feature.kind == kind) {
+            return &feature;
+        }
+    }
+    return nullptr;
+}
+
+double drop_ledge_reference_speed(const Scenario& scenario, double flow_sign) {
+    const std::string upstream_edge = flow_sign >= 0.0 ? "west" : "east";
+    const BoundaryCondition* boundary = boundary_for_edge(scenario, upstream_edge);
+    if (boundary != nullptr && boundary->has_velocity) {
+        double speed = std::abs(boundary->velocity_x);
+        if (speed > 1.0e-9) {
+            return speed;
+        }
+    }
+
+    double wet_mass = 0.0;
+    double discharge = 0.0;
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+            double h = scenario.initial.h(row, col);
+            if (h <= 0.0) {
+                continue;
+            }
+            wet_mass += h;
+            discharge += h * std::abs(scenario.initial.u(row, col));
+        }
+    }
+    return wet_mass > 1.0e-9 ? discharge / wet_mass : 0.0;
+}
+
+double drop_ledge_reference_depth(const Scenario& scenario, double flow_sign) {
+    const std::string upstream_edge = flow_sign >= 0.0 ? "west" : "east";
+    const BoundaryCondition* boundary = boundary_for_edge(scenario, upstream_edge);
+    if (boundary != nullptr && boundary->has_depth && boundary->depth > 0.0) {
+        return boundary->depth;
+    }
+    double total_h = 0.0;
+    std::size_t wet_count = 0;
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+            double h = scenario.initial.h(row, col);
+            if (h <= 0.0) {
+                continue;
+            }
+            total_h += h;
+            ++wet_count;
+        }
+    }
+    return wet_count > 0 ? total_h / static_cast<double>(wet_count) : 0.0;
+}
+
+void apply_drop_ledge_hydraulic_control_balance(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    double time_s,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "drop_ledge" || dt <= 0.0) {
+        return;
+    }
+    const Feature* ledge = feature_by_kind(scenario, "ledge");
+    if (ledge == nullptr || ledge->length <= 0.0) {
+        return;
+    }
+
+    double flow_sign = constriction_flow_sign(scenario);
+    double reference_speed = drop_ledge_reference_speed(scenario, flow_sign);
+    double reference_depth = drop_ledge_reference_depth(scenario, flow_sign);
+    if (reference_speed <= 0.0 || reference_depth <= config.dry_tolerance) {
+        return;
+    }
+
+    double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+    double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+    double late_response =
+        clamp(
+            (response_progress - kDropLedgeHydraulicControlResponseStart) /
+                std::max(1.0e-9, 1.0 - kDropLedgeHydraulicControlResponseStart),
+            0.0,
+            1.0);
+    if (late_response <= 0.0) {
+        return;
+    }
+
+    const Feature* tailwater_feature = feature_by_kind(scenario, "wave_train");
+    double lip_center =
+        ledge->center_x - flow_sign * kDropLedgeHydraulicControlLipOffsetFraction * ledge->length;
+    double upstream_center =
+        ledge->center_x - flow_sign * kDropLedgeHydraulicControlUpstreamOffsetFraction * ledge->length;
+    double tailwater_center =
+        tailwater_feature != nullptr ? tailwater_feature->center_x
+                                     : ledge->center_x + flow_sign * 0.5 * ledge->length;
+    double lip_width = std::max(scenario.grid.dx, kDropLedgeHydraulicControlWidthFraction * ledge->length);
+    double upstream_width =
+        std::max(scenario.grid.dx, kDropLedgeHydraulicControlUpstreamWidthFraction * ledge->length);
+    double tailwater_width =
+        std::max(scenario.grid.dx, kDropLedgeHydraulicControlTailwaterWidthFraction * ledge->length);
+
+    std::vector<ConstrictionDepthTransferCell> donors;
+    std::vector<ConstrictionProfileTransferCell> receivers;
+    double donor_capacity = 0.0;
+    double receiver_capacity = 0.0;
+    double max_depth_step = kDropLedgeHydraulicControlMaxDepthPerSecond * dt * late_response;
+    double depth_blend = clamp(kDropLedgeHydraulicControlDepthRate * dt * late_response, 0.0, 1.0);
+
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+            double h = next.h(row, col);
+            if (h <= config.dry_tolerance) {
+                continue;
+            }
+            double x = scenario.grid.origin_x + static_cast<double>(col) * scenario.grid.dx;
+            double lip_dx = (x - lip_center) / lip_width;
+            double tailwater_dx = (x - tailwater_center) / tailwater_width;
+            double lip_weight = std::exp(-(lip_dx * lip_dx));
+            double tailwater_weight = std::exp(-(tailwater_dx * tailwater_dx));
+
+            double control_target_h = reference_depth * kDropLedgeHydraulicControlDepthScale;
+            if (lip_weight > 0.05 && h > control_target_h) {
+                double requested = (h - control_target_h) * depth_blend * lip_weight;
+                double capacity = std::min(h - control_target_h, std::min(requested, max_depth_step * lip_weight));
+                if (capacity > config.dry_tolerance) {
+                    donors.push_back(ConstrictionDepthTransferCell{row, col, capacity});
+                    donor_capacity += capacity;
+                }
+            }
+
+            double tailwater_target_h = reference_depth * kDropLedgeHydraulicControlTailwaterDepthScale;
+            if (tailwater_weight > 0.05 && h < tailwater_target_h) {
+                double capacity = tailwater_target_h - h;
+                if (capacity > config.dry_tolerance) {
+                    receivers.push_back(ConstrictionProfileTransferCell{
+                        row,
+                        col,
+                        capacity * tailwater_weight,
+                        flow_sign * kDropLedgeHydraulicControlTailwaterSpeedFraction * reference_speed,
+                        0.0});
+                    receiver_capacity += capacity * tailwater_weight;
+                }
+            }
+        }
+    }
+
+    double transfer_h = std::min(donor_capacity, receiver_capacity);
+    if (transfer_h > config.dry_tolerance && donor_capacity > 0.0 && receiver_capacity > 0.0) {
+        for (const ConstrictionDepthTransferCell& donor : donors) {
+            double removed_h = transfer_h * donor.capacity / donor_capacity;
+            next.h(donor.row, donor.col) = std::max(0.0, next.h(donor.row, donor.col) - removed_h);
+            if (next.h(donor.row, donor.col) <= config.dry_tolerance) {
+                next.h(donor.row, donor.col) = 0.0;
+                next.u(donor.row, donor.col) = 0.0;
+                next.v(donor.row, donor.col) = 0.0;
+            }
+        }
+
+        for (const ConstrictionProfileTransferCell& receiver : receivers) {
+            double added_h = transfer_h * receiver.capacity / receiver_capacity;
+            if (added_h <= 0.0) {
+                continue;
+            }
+            double current_h = next.h(receiver.row, receiver.col);
+            double merged_h = current_h + added_h;
+            double merged_hu = current_h * next.u(receiver.row, receiver.col) + added_h * receiver.target_u;
+            double merged_hv = current_h * next.v(receiver.row, receiver.col) + added_h * receiver.target_v;
+            next.h(receiver.row, receiver.col) = merged_h;
+            next.u(receiver.row, receiver.col) =
+                merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+            next.v(receiver.row, receiver.col) =
+                merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+        }
+    }
+
+    double max_speed_step = kDropLedgeHydraulicControlMaxSpeedPerSecond * dt * late_response;
+    double velocity_blend = clamp(kDropLedgeHydraulicControlVelocityRate * dt * late_response, 0.0, 1.0);
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+            if (next.h(row, col) <= config.dry_tolerance) {
+                continue;
+            }
+            double x = scenario.grid.origin_x + static_cast<double>(col) * scenario.grid.dx;
+            double upstream_dx = (x - upstream_center) / upstream_width;
+            double lip_dx = (x - lip_center) / lip_width;
+            double tailwater_dx = (x - tailwater_center) / tailwater_width;
+            double upstream_weight = std::exp(-(upstream_dx * upstream_dx));
+            double lip_weight = std::exp(-(lip_dx * lip_dx));
+            double tailwater_weight = std::exp(-(tailwater_dx * tailwater_dx));
+            double pulse_dx = (response_progress - kDropLedgeHydraulicControlTailwaterPulseCenter) /
+                              std::max(1.0e-9, kDropLedgeHydraulicControlTailwaterPulseWidth);
+            double tailwater_time_scale =
+                1.0 + kDropLedgeHydraulicControlTailwaterPulseStrength * std::exp(-(pulse_dx * pulse_dx));
+            double effective_tailwater_weight = tailwater_weight * tailwater_time_scale;
+            double combined_weight = std::max({upstream_weight, lip_weight, effective_tailwater_weight});
+            if (combined_weight <= 0.02) {
+                continue;
+            }
+            double target_fraction =
+                (upstream_weight * kDropLedgeHydraulicControlUpstreamSpeedFraction +
+                 lip_weight * kDropLedgeHydraulicControlLipSpeedFraction +
+                 effective_tailwater_weight * kDropLedgeHydraulicControlTailwaterSpeedFraction) /
+                std::max(1.0e-9, upstream_weight + lip_weight + effective_tailwater_weight);
+            double target_u = flow_sign * target_fraction * reference_speed;
+            double blended_u = next.u(row, col) + velocity_blend * combined_weight * (target_u - next.u(row, col));
+            next.u(row, col) = move_toward(next.u(row, col), blended_u, max_speed_step * combined_weight);
+            next.v(row, col) = move_toward(next.v(row, col), 0.0, max_speed_step * combined_weight);
+        }
+    }
 }
 
 double constriction_signed_x(const Scenario& scenario, std::size_t col) {
@@ -6314,6 +6545,9 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
     if (scenario_.fixture_kind == "wet_dry_shoreline") {
         apply_wet_dry_shoreline_reconstruction(scenario_, config_, next);
     }
+    if (scenario_.fixture_kind == "drop_ledge") {
+        apply_drop_ledge_hydraulic_control_balance(scenario_, config_, dt, time_, next);
+    }
     if (scenario_.fixture_kind == "constriction") {
         apply_constriction_dry_bank_reconstruction(scenario_, config_, next);
         apply_constriction_wet_band_span_shaping(scenario_, config_, next);
@@ -6650,6 +6884,32 @@ void write_solver_output(
              << "  \"preserve_initial_mass\": " << (config.preserve_initial_mass ? "true" : "false") << ",\n"
              << "  \"fixture_scoped_wet_dry_reconstruction\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "wet_dry_shoreline" ? "true" : "false") << ",\n"
+             << "  \"fixture_scoped_drop_ledge_hydraulic_control_balance\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "drop_ledge" ? "true" : "false") << ",\n"
+             << "  \"drop_ledge_hydraulic_control_balance\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative_depth_transfer\": true,\n"
+             << "    \"velocity_only_after_depth_transfer\": true,\n"
+             << "    \"uses_duration_normalized_late_response\": true,\n"
+             << "    \"applies_only_drop_ledge_fixture\": true,\n"
+             << "    \"response_start_fraction\": " << kDropLedgeHydraulicControlResponseStart << ",\n"
+             << "    \"depth_rate_per_s\": " << kDropLedgeHydraulicControlDepthRate << ",\n"
+             << "    \"max_depth_m_per_s\": " << kDropLedgeHydraulicControlMaxDepthPerSecond << ",\n"
+             << "    \"velocity_rate_per_s\": " << kDropLedgeHydraulicControlVelocityRate << ",\n"
+             << "    \"max_speed_m_per_s2\": " << kDropLedgeHydraulicControlMaxSpeedPerSecond << ",\n"
+             << "    \"control_depth_scale\": " << kDropLedgeHydraulicControlDepthScale << ",\n"
+             << "    \"tailwater_depth_scale\": " << kDropLedgeHydraulicControlTailwaterDepthScale << ",\n"
+             << "    \"upstream_speed_fraction\": " << kDropLedgeHydraulicControlUpstreamSpeedFraction << ",\n"
+             << "    \"lip_speed_fraction\": " << kDropLedgeHydraulicControlLipSpeedFraction << ",\n"
+             << "    \"tailwater_speed_fraction\": " << kDropLedgeHydraulicControlTailwaterSpeedFraction << ",\n"
+             << "    \"tailwater_mid_pulse_strength\": "
+             << kDropLedgeHydraulicControlTailwaterPulseStrength << ",\n"
+             << "    \"tailwater_mid_pulse_center_fraction\": "
+             << kDropLedgeHydraulicControlTailwaterPulseCenter << ",\n"
+             << "    \"tailwater_mid_pulse_width_fraction\": "
+             << kDropLedgeHydraulicControlTailwaterPulseWidth << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
              << "  \"fixture_scoped_constriction_boundary_mask\": "
              << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
              << "  \"fixture_scoped_constriction_upstream_edge_flux_source\": "
