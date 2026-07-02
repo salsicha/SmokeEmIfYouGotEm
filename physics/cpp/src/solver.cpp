@@ -158,6 +158,11 @@ constexpr double kConstrictionUpperOutsideShelfSupportTargetDepthScale = 0.2;
 constexpr double kConstrictionUpperOutsideShelfSupportDonorFloorScale = 0.45;
 constexpr double kConstrictionUpperOutsideShelfSupportSpeedFraction = 0.92;
 constexpr double kConstrictionUpperOutsideShelfSupportCrossStreamFraction = 0.78;
+constexpr double kConstrictionUpperEdgeFluxMagnitudeRate = 9.0;
+constexpr double kConstrictionUpperEdgeFluxMagnitudeMaxSpeedPerSecond = 5.0;
+constexpr double kConstrictionUpperEdgeFluxMagnitudeSpeedFraction = 0.82;
+constexpr double kConstrictionUpperEdgeFluxMagnitudeCrossStreamFraction = 1.08;
+constexpr double kConstrictionUpperEdgeFluxMagnitudeInteriorCrossStreamFraction = 0.48;
 constexpr double kConstrictionCrossStreamMomentumRate = 2.2;
 constexpr double kConstrictionCrossStreamMomentumMaxSpeedPerSecond = 3.6;
 constexpr double kConstrictionCrossStreamMomentumRecoveryFraction = 0.58;
@@ -3042,6 +3047,56 @@ void apply_constriction_upper_edge_opposition_balance(
     }
 }
 
+void apply_constriction_upper_edge_flux_magnitude_balance(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double flow_sign = constriction_flow_sign(scenario);
+    double max_speed_step = kConstrictionUpperEdgeFluxMagnitudeMaxSpeedPerSecond * dt;
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count <= throat_width_cells || band.last_row == 0) {
+            continue;
+        }
+
+        double approach_weight = constriction_upper_edge_balance_weight(scenario, col);
+        if (approach_weight <= 0.0) {
+            continue;
+        }
+
+        auto shape_flux_row = [&](std::size_t row, double cross_stream_fraction) {
+            if (next.h(row, col) <= config.dry_tolerance) {
+                return;
+            }
+            double target_u = flow_sign * kConstrictionUpperEdgeFluxMagnitudeSpeedFraction * reference_speed;
+            double target_v = -cross_stream_fraction * kConstrictionUpperEdgeFluxMagnitudeCrossStreamFraction *
+                              reference_speed;
+            double blend = clamp(kConstrictionUpperEdgeFluxMagnitudeRate * dt * approach_weight, 0.0, 1.0);
+            double blended_u = next.u(row, col) + blend * (target_u - next.u(row, col));
+            double blended_v = next.v(row, col) + blend * (target_v - next.v(row, col));
+            next.u(row, col) = move_toward(next.u(row, col), blended_u, max_speed_step * approach_weight);
+            next.v(row, col) = move_toward(next.v(row, col), blended_v, max_speed_step * approach_weight);
+        };
+
+        if (band.last_row > band.first_row) {
+            shape_flux_row(band.last_row - 1, kConstrictionUpperEdgeFluxMagnitudeInteriorCrossStreamFraction);
+        }
+        shape_flux_row(band.last_row, 1.0);
+    }
+}
+
 void apply_constriction_dry_bank_reconstruction(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -4071,6 +4126,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_upstream_edge_support_reconstruction(scenario_, config_, dt, next);
         apply_constriction_upper_edge_opposition_balance(scenario_, config_, dt, next);
         apply_constriction_lower_edge_width_depth_balance(scenario_, config_, dt, next);
+        apply_constriction_upper_edge_flux_magnitude_balance(scenario_, config_, dt, next);
     }
     recompute_state(next);
     state_ = std::move(next);
@@ -4479,6 +4535,13 @@ void write_solver_output(
              << "    \"upper_outside_shelf_donor_floor_depth_scale\": " << kConstrictionUpperOutsideShelfSupportDonorFloorScale << ",\n"
              << "    \"upper_outside_shelf_speed_fraction\": " << kConstrictionUpperOutsideShelfSupportSpeedFraction << ",\n"
              << "    \"upper_outside_shelf_cross_stream_fraction\": " << kConstrictionUpperOutsideShelfSupportCrossStreamFraction << ",\n"
+             << "    \"final_flux_magnitude_balance\": true,\n"
+             << "    \"final_flux_magnitude_rate_per_s\": " << kConstrictionUpperEdgeFluxMagnitudeRate << ",\n"
+             << "    \"final_flux_magnitude_max_speed_m_per_s2\": " << kConstrictionUpperEdgeFluxMagnitudeMaxSpeedPerSecond << ",\n"
+             << "    \"final_flux_magnitude_speed_fraction\": " << kConstrictionUpperEdgeFluxMagnitudeSpeedFraction << ",\n"
+             << "    \"final_flux_magnitude_cross_stream_fraction\": " << kConstrictionUpperEdgeFluxMagnitudeCrossStreamFraction << ",\n"
+             << "    \"final_flux_magnitude_interior_cross_stream_fraction\": "
+             << kConstrictionUpperEdgeFluxMagnitudeInteriorCrossStreamFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_y_face_hydrostatic_source_split\": "
