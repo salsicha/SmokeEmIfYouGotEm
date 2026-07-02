@@ -984,6 +984,30 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert recovery_split["upper_shelf_speed_fraction"] == pytest.approx(0.02)
     assert recovery_split["upper_shelf_cross_stream_fraction"] == pytest.approx(0.52)
     assert recovery_split["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_recovery_interior_shear_balance"] is True
+    recovery_interior_shear = constriction_manifest["constriction_recovery_interior_shear_balance"]
+    assert recovery_interior_shear["bounded"] is True
+    assert recovery_interior_shear["mass_conservative_depth_transfer"] is True
+    assert recovery_interior_shear["velocity_only_after_depth_transfer"] is True
+    assert recovery_interior_shear["runs_after_recovery_split_balance"] is True
+    assert recovery_interior_shear["runs_before_recovery_final_lower_edge_shear"] is True
+    assert recovery_interior_shear["uses_duration_normalized_final_response"] is True
+    assert recovery_interior_shear["applies_only_first_broad_recovery_window"] is True
+    assert recovery_interior_shear["response_start_fraction"] == pytest.approx(0.995)
+    assert recovery_interior_shear["depth_rate_per_s"] == pytest.approx(80.0)
+    assert recovery_interior_shear["max_depth_m_per_s"] == pytest.approx(40.0)
+    assert recovery_interior_shear["lower_inner_donor_floor_depth_scale"] == pytest.approx(0.46)
+    assert recovery_interior_shear["upper_inner_receiver_target_depth_scale"] == pytest.approx(0.98)
+    assert recovery_interior_shear["window_cells"] == 2
+    assert recovery_interior_shear["velocity_rate_per_s"] == pytest.approx(260.0)
+    assert recovery_interior_shear["max_speed_m_per_s2"] == pytest.approx(220.0)
+    assert recovery_interior_shear["lower_inner_speed_fraction"] == pytest.approx(0.06)
+    assert recovery_interior_shear["lower_inner_cross_stream_fraction"] == pytest.approx(0.23)
+    assert recovery_interior_shear["upper_inner_speed_fraction"] == pytest.approx(0.12)
+    assert recovery_interior_shear["upper_inner_cross_stream_fraction"] == pytest.approx(0.20)
+    assert recovery_interior_shear["upper_outer_speed_fraction"] == pytest.approx(0.08)
+    assert recovery_interior_shear["upper_outer_cross_stream_fraction"] == pytest.approx(0.30)
+    assert recovery_interior_shear["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_recovery_final_lower_edge_shear_balance"] is True
     final_lower_edge_shear = constriction_manifest["constriction_recovery_final_lower_edge_shear_balance"]
     assert final_lower_edge_shear["bounded"] is True
