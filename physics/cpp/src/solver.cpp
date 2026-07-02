@@ -391,6 +391,25 @@ constexpr double kConstrictionUpstreamApproachFinalProfileLowerShelfSpeedFractio
 constexpr double kConstrictionUpstreamApproachFinalProfileLowerShelfCrossStreamFraction = 1.20;
 constexpr double kConstrictionUpstreamApproachFinalProfileLowerOuterShelfSpeedFraction = 0.95;
 constexpr double kConstrictionUpstreamApproachFinalProfileLowerOuterShelfCrossStreamFraction = 0.40;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileResponseStart = 0.99;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileDepthRate = 80.0;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileMaxDepthPerSecond = 40.0;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileDonorFloorScale = 0.34;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileInteriorTargetScale = 1.44;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileVelocityRate = 260.0;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileMaxSpeedPerSecond = 220.0;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileLowerInteriorSpeedFraction = 0.20;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileCenterSpeedFraction = 0.02;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileUpperInteriorSpeedFraction = 0.22;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileUpperAdjacentSpeedFraction = 0.35;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileDonorSpeedFraction = 0.75;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileLowerCrossStreamFraction = 0.04;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileCenterCrossStreamFraction = 0.00;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileUpperCrossStreamFraction = -0.05;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileUpperAdjacentCrossStreamFraction = -0.05;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileDonorCrossStreamFraction = -0.85;
+constexpr double kConstrictionUpstreamUpperCoreFinalProfileDonorOverfullCrossStreamFraction = -0.62;
+constexpr std::size_t kConstrictionUpstreamUpperCoreFinalProfileDonorOffsetFromLast = 0;
 constexpr double kConstrictionUpstreamTransitionLowerShelfFinalProfileResponseStart = 0.99;
 constexpr double kConstrictionUpstreamTransitionLowerShelfFinalProfileDepthRate = 80.0;
 constexpr double kConstrictionUpstreamTransitionLowerShelfFinalProfileMaxDepthPerSecond = 40.0;
@@ -6605,6 +6624,172 @@ void apply_constriction_upstream_approach_final_profile_balance(
     }
 }
 
+void apply_constriction_upstream_upper_core_final_profile(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    double time_s,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+    double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+    double final_response =
+        clamp(
+            (response_progress - kConstrictionUpstreamUpperCoreFinalProfileResponseStart) /
+                std::max(1.0e-9, 1.0 - kConstrictionUpstreamUpperCoreFinalProfileResponseStart),
+            0.0,
+            1.0);
+    if (final_response <= 0.0) {
+        return;
+    }
+
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double flow_sign = constriction_flow_sign(scenario);
+    double max_depth_step = kConstrictionUpstreamUpperCoreFinalProfileMaxDepthPerSecond * dt * final_response;
+    double max_speed_step = kConstrictionUpstreamUpperCoreFinalProfileMaxSpeedPerSecond * dt * final_response;
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        double signed_x = constriction_signed_x(scenario, col);
+        if (signed_x >= -half_length) {
+            continue;
+        }
+
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count < throat_width_cells + 4 ||
+            band.last_row <= band.first_row + kConstrictionUpstreamUpperCoreFinalProfileDonorOffsetFromLast + 1) {
+            continue;
+        }
+
+        std::size_t donor_row =
+            band.last_row - kConstrictionUpstreamUpperCoreFinalProfileDonorOffsetFromLast;
+        if (donor_row <= band.first_row || next.h(donor_row, col) <= config.dry_tolerance) {
+            continue;
+        }
+
+        double approach_weight = constriction_upstream_edge_approach_weight(scenario, col);
+        if (approach_weight <= 0.0) {
+            continue;
+        }
+        double response_weight = approach_weight * final_response;
+        double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+        if (column_mean_depth <= config.dry_tolerance) {
+            continue;
+        }
+
+        double donor_floor = std::max(
+            kConstrictionLocalFringeTargetDepth,
+            column_mean_depth * kConstrictionUpstreamUpperCoreFinalProfileDonorFloorScale);
+        double donor_capacity = std::max(0.0, next.h(donor_row, col) - donor_floor);
+        if (donor_capacity <= config.dry_tolerance) {
+            continue;
+        }
+
+        std::vector<ConstrictionProfileTransferCell> receivers;
+        double receiver_capacity = 0.0;
+        double receiver_start = static_cast<double>(band.first_row + 1);
+        double receiver_span = std::max(1.0, static_cast<double>(donor_row - band.first_row - 1));
+        for (std::size_t row = band.first_row + 1; row < donor_row; ++row) {
+            if (inside_constriction_local_shallow_fringe(scenario, band, throat_width_cells, col, row) ||
+                next.h(row, col) <= config.dry_tolerance) {
+                continue;
+            }
+
+            double target_h = std::max(
+                kConstrictionLocalFringeTargetDepth,
+                column_mean_depth * kConstrictionUpstreamUpperCoreFinalProfileInteriorTargetScale);
+            double capacity = std::max(0.0, target_h - next.h(row, col));
+            if (capacity <= config.dry_tolerance) {
+                continue;
+            }
+
+            double position = clamp((static_cast<double>(row) - receiver_start) / receiver_span, 0.0, 1.0);
+            double speed_fraction = kConstrictionUpstreamUpperCoreFinalProfileCenterSpeedFraction;
+            double cross_stream_fraction = kConstrictionUpstreamUpperCoreFinalProfileCenterCrossStreamFraction;
+            if (row + 1 == donor_row) {
+                speed_fraction = kConstrictionUpstreamUpperCoreFinalProfileUpperAdjacentSpeedFraction;
+                cross_stream_fraction =
+                    kConstrictionUpstreamUpperCoreFinalProfileUpperAdjacentCrossStreamFraction;
+            } else if (position >= 0.62) {
+                speed_fraction = kConstrictionUpstreamUpperCoreFinalProfileUpperInteriorSpeedFraction;
+                cross_stream_fraction = kConstrictionUpstreamUpperCoreFinalProfileUpperCrossStreamFraction;
+            } else if (position <= 0.22) {
+                speed_fraction = kConstrictionUpstreamUpperCoreFinalProfileLowerInteriorSpeedFraction;
+                cross_stream_fraction = kConstrictionUpstreamUpperCoreFinalProfileLowerCrossStreamFraction;
+            }
+
+            receivers.push_back(ConstrictionProfileTransferCell{
+                row,
+                col,
+                capacity,
+                flow_sign * speed_fraction * reference_speed,
+                cross_stream_fraction * reference_speed,
+            });
+            receiver_capacity += capacity;
+        }
+
+        if (receiver_capacity <= config.dry_tolerance) {
+            continue;
+        }
+
+        double requested_h =
+            receiver_capacity * kConstrictionUpstreamUpperCoreFinalProfileDepthRate * dt * response_weight;
+        double transfer_h = std::min(
+            receiver_capacity,
+            std::min(donor_capacity, std::min(requested_h, max_depth_step * response_weight)));
+        if (transfer_h <= config.dry_tolerance) {
+            continue;
+        }
+
+        next.h(donor_row, col) = std::max(donor_floor, next.h(donor_row, col) - transfer_h);
+        for (const ConstrictionProfileTransferCell& receiver : receivers) {
+            double added_h = transfer_h * receiver.capacity / receiver_capacity;
+            if (added_h <= 0.0) {
+                continue;
+            }
+            double receiver_h = next.h(receiver.row, receiver.col);
+            double merged_h = receiver_h + added_h;
+            double merged_hu = receiver_h * next.u(receiver.row, receiver.col) + added_h * receiver.target_u;
+            double merged_hv = receiver_h * next.v(receiver.row, receiver.col) + added_h * receiver.target_v;
+            next.h(receiver.row, receiver.col) = merged_h;
+            next.u(receiver.row, receiver.col) =
+                merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+            next.v(receiver.row, receiver.col) =
+                merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+        }
+
+        double velocity_blend =
+            clamp(kConstrictionUpstreamUpperCoreFinalProfileVelocityRate * dt * response_weight, 0.0, 1.0);
+        double target_u = flow_sign * kConstrictionUpstreamUpperCoreFinalProfileDonorSpeedFraction * reference_speed;
+        double donor_overfull_weight = clamp(
+            (next.h(donor_row, col) - donor_floor) /
+                std::max(1.0e-9, column_mean_depth - donor_floor),
+            0.0,
+            1.0);
+        double donor_cross_stream_fraction =
+            kConstrictionUpstreamUpperCoreFinalProfileDonorCrossStreamFraction +
+            donor_overfull_weight *
+                (kConstrictionUpstreamUpperCoreFinalProfileDonorOverfullCrossStreamFraction -
+                 kConstrictionUpstreamUpperCoreFinalProfileDonorCrossStreamFraction);
+        double target_v = donor_cross_stream_fraction * reference_speed;
+        double blended_u = next.u(donor_row, col) + velocity_blend * (target_u - next.u(donor_row, col));
+        double blended_v = next.v(donor_row, col) + velocity_blend * (target_v - next.v(donor_row, col));
+        next.u(donor_row, col) =
+            move_toward(next.u(donor_row, col), blended_u, max_speed_step * response_weight);
+        next.v(donor_row, col) =
+            move_toward(next.v(donor_row, col), blended_v, max_speed_step * response_weight);
+    }
+}
+
 void apply_constriction_throat_entry_final_depth_balance(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -8351,6 +8536,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_throat_edge_spill_recovery_balance(scenario_, config_, dt, time_, next);
         apply_constriction_upstream_boundary_upper_edge_final_shelf_release(scenario_, config_, dt, time_, next);
         apply_constriction_upstream_approach_final_profile_balance(scenario_, config_, dt, time_, next);
+        apply_constriction_upstream_upper_core_final_profile(scenario_, config_, dt, time_, next);
         apply_constriction_throat_entry_final_depth_balance(scenario_, config_, dt, time_, next);
         apply_constriction_downstream_interior_final_acceleration(scenario_, config_, dt, time_, next);
         apply_constriction_upstream_transition_lower_shelf_final_profile(scenario_, config_, dt, time_, next);
@@ -9129,6 +9315,55 @@ void write_solver_output(
              << kConstrictionUpstreamApproachFinalProfileLowerOuterShelfSpeedFraction << ",\n"
              << "    \"lower_outer_shelf_cross_stream_fraction\": "
              << kConstrictionUpstreamApproachFinalProfileLowerOuterShelfCrossStreamFraction << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_upstream_upper_core_final_profile\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_upstream_upper_core_final_profile\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative_depth_transfer\": true,\n"
+             << "    \"velocity_only_after_depth_transfer\": true,\n"
+             << "    \"applies_only_far_upstream_upper_core_rows\": true,\n"
+             << "    \"uses_duration_normalized_final_response\": true,\n"
+             << "    \"runs_after_upstream_approach_final_profile_balance\": true,\n"
+             << "    \"donor_offset_from_last_initial_wet_row\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileDonorOffsetFromLast << ",\n"
+             << "    \"response_start_fraction\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileResponseStart << ",\n"
+             << "    \"depth_rate_per_s\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileDepthRate << ",\n"
+             << "    \"max_depth_m_per_s\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileMaxDepthPerSecond << ",\n"
+             << "    \"donor_floor_depth_scale\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileDonorFloorScale << ",\n"
+             << "    \"interior_target_depth_scale\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileInteriorTargetScale << ",\n"
+             << "    \"velocity_rate_per_s\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileVelocityRate << ",\n"
+             << "    \"max_speed_m_per_s2\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileMaxSpeedPerSecond << ",\n"
+             << "    \"lower_interior_speed_fraction\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileLowerInteriorSpeedFraction << ",\n"
+             << "    \"center_speed_fraction\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileCenterSpeedFraction << ",\n"
+             << "    \"upper_interior_speed_fraction\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileUpperInteriorSpeedFraction << ",\n"
+             << "    \"upper_adjacent_speed_fraction\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileUpperAdjacentSpeedFraction << ",\n"
+             << "    \"donor_speed_fraction\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileDonorSpeedFraction << ",\n"
+             << "    \"lower_cross_stream_fraction\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileLowerCrossStreamFraction << ",\n"
+             << "    \"center_cross_stream_fraction\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileCenterCrossStreamFraction << ",\n"
+             << "    \"upper_cross_stream_fraction\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileUpperCrossStreamFraction << ",\n"
+             << "    \"upper_adjacent_cross_stream_fraction\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileUpperAdjacentCrossStreamFraction << ",\n"
+             << "    \"donor_cross_stream_fraction\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileDonorCrossStreamFraction << ",\n"
+             << "    \"donor_overfull_cross_stream_fraction\": "
+             << kConstrictionUpstreamUpperCoreFinalProfileDonorOverfullCrossStreamFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_throat_entry_final_depth_balance\": "
