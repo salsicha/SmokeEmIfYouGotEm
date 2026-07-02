@@ -23,6 +23,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 0 rows 1-2; q delta is -1.47731 m3/s, balance delta is -11.9526 m3/s2, native post-source delta is 0.223385 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -31,6 +32,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_upstream_centerline_balance_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -53,6 +55,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; q delta is -0.676241 m3/s, face mean-depth delta is -0.11578 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -61,6 +64,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_upstream_centerline_balance_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -90,6 +94,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; reconstructed q delta is -0.676241 m3/s and balance delta is -3.50069 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -98,6 +103,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_upstream_centerline_balance_face_source_audit_diagnostic.json",
           "summary": {
@@ -125,8 +131,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_upstream_centerline_balance_retune.json",
           "summary": {
@@ -143,6 +151,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 0 rows 1-2; q delta is -1.67728 m3/s, balance delta is -13.8783 m3/s2, native post-source delta is 0.272639 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -151,6 +160,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_near_throat_recovery_timing_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -173,6 +183,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; q delta is -0.466911 m3/s, face mean-depth delta is -0.0964816 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -181,6 +192,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_near_throat_recovery_timing_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -210,6 +222,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; reconstructed q delta is -0.466911 m3/s and balance delta is -3.01781 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -218,6 +231,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_near_throat_recovery_timing_face_source_audit_diagnostic.json",
           "summary": {
@@ -245,8 +259,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_near_throat_recovery_timing_retune.json",
           "summary": {
@@ -263,6 +279,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 0 rows 1-2; q delta is -1.67734 m3/s, balance delta is -14.0552 m3/s2, native post-source delta is 0.281947 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -271,6 +288,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_upstream_boundary_interior_relax_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -293,6 +311,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; q delta is -0.465342 m3/s, face mean-depth delta is -0.100731 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -301,6 +320,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_upstream_boundary_interior_relax_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -330,6 +350,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; reconstructed q delta is -0.465342 m3/s and balance delta is -3.14467 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -338,6 +359,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_upstream_boundary_interior_relax_face_source_audit_diagnostic.json",
           "summary": {
@@ -365,8 +387,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_upstream_boundary_interior_relax_retune.json",
           "summary": {
@@ -383,6 +407,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 0 rows 1-2; q delta is -1.88858 m3/s, balance delta is -16.5518 m3/s2, native post-source delta is 0.264138 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -391,6 +416,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_transition_final_support_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -413,6 +439,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; q delta is -0.460782 m3/s, face mean-depth delta is -0.0955201 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -421,6 +448,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_transition_final_support_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -450,6 +478,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; reconstructed q delta is -0.460782 m3/s and balance delta is -2.99048 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -458,6 +487,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_transition_final_support_face_source_audit_diagnostic.json",
           "summary": {
@@ -485,8 +515,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_transition_final_support_retune.json",
           "summary": {
@@ -505,6 +537,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 0 rows 1-2; q delta is -2.02418 m3/s, balance delta is -16.4093 m3/s2, native post-source delta is -0.138502 m3/s, wet-width delta is -1 cells, and bank-row delta is 1 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -513,6 +546,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_flux_magnitude_balance_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -535,6 +569,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -2.05596 m3/s, face mean-depth delta is -0.132276 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -543,6 +578,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_flux_magnitude_balance_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -572,6 +608,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -2.05596 m3/s and balance delta is -7.75814 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -580,6 +617,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_flux_magnitude_balance_face_source_audit_diagnostic.json",
           "summary": {
@@ -607,8 +645,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_flux_magnitude_balance_retune.json",
           "summary": {
@@ -627,6 +667,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upper_edge_face` column 4 rows 8-9; q delta is 1.17248 m3/s, balance delta is 4.32016 m3/s2, native post-source delta is -0.699634 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -635,6 +676,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_outside_shelf_support_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -657,6 +699,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upper_edge_face` column 4 rows 8-9; q delta is 1.17248 m3/s, face mean-depth delta is 0.435841 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -665,6 +708,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_outside_shelf_support_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -693,6 +737,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upper_edge_face` column 4 rows 8-9; reconstructed q delta is 1.17248 m3/s and balance delta is 4.32016 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -701,6 +746,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_outside_shelf_support_face_source_audit_diagnostic.json",
           "summary": {
@@ -728,8 +774,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_outside_shelf_support_retune.json",
           "summary": {
@@ -748,6 +796,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upper_edge_face` column 4 rows 8-9; q delta is 1.17713 m3/s, balance delta is 4.40553 m3/s2, native post-source delta is -0.699467 m3/s, wet-width delta is -1 cells, and bank-row delta is 1 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -756,6 +805,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_final_balance_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -780,6 +830,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upper_edge_face` column 4 rows 8-9; q delta is 1.17713 m3/s, face mean-depth delta is 0.441478 m, wet-width delta is -1 cells, and max bank-row delta is 1 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -788,6 +839,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_final_balance_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -816,6 +868,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upper_edge_face` column 4 rows 8-9; reconstructed q delta is 1.17713 m3/s and balance delta is 4.40553 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -824,6 +877,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_final_balance_face_source_audit_diagnostic.json",
           "summary": {
@@ -851,8 +905,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_final_balance_retune.json",
           "summary": {
@@ -871,6 +927,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upper_edge_face` column 6 rows 8-9; q delta is 2.97684 m3/s, balance delta is 11.7197 m3/s2, native post-source delta is 2.05363 m3/s, wet-width delta is 1 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -879,6 +936,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_width_depth_balance_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -903,6 +961,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upper_edge_face` column 6 rows 8-9; q delta is 2.97684 m3/s, face mean-depth delta is 0.855736 m, wet-width delta is 1 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -911,6 +970,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_width_depth_balance_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -940,6 +1000,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upper_edge_face` column 6 rows 8-9; reconstructed q delta is 2.97684 m3/s and balance delta is 11.7197 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -948,6 +1009,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_width_depth_balance_face_source_audit_diagnostic.json",
           "summary": {
@@ -975,8 +1037,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_width_depth_balance_retune.json",
           "summary": {
@@ -993,6 +1057,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 0 rows 1-2; q delta is -1.4773 m3/s, balance delta is -11.9523 m3/s2, native post-source delta is 0.223368 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -1001,6 +1066,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_downstream_upper_return_current_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -1023,6 +1089,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; q delta is -0.676249 m3/s, face mean-depth delta is -0.115771 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -1031,6 +1098,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_downstream_upper_return_current_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -1060,6 +1128,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; reconstructed q delta is -0.676249 m3/s and balance delta is -3.50043 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -1068,6 +1137,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_downstream_upper_return_current_face_source_audit_diagnostic.json",
           "summary": {
@@ -1095,8 +1165,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_downstream_upper_return_current_retune.json",
           "summary": {
@@ -1113,6 +1185,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 0 rows 1-2; q delta is -1.34656 m3/s, balance delta is -11.8047 m3/s2, native post-source delta is 0.303146 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -1121,6 +1194,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_flux_magnitude_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -1143,6 +1217,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; q delta is -0.659952 m3/s, face mean-depth delta is -0.116209 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -1151,6 +1226,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_flux_magnitude_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -1180,6 +1256,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; reconstructed q delta is -0.659952 m3/s and balance delta is -3.52348 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -1188,6 +1265,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_flux_magnitude_face_source_audit_diagnostic.json",
           "summary": {
@@ -1215,8 +1293,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_flux_magnitude_retune.json",
           "summary": {
@@ -1233,6 +1313,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 0 rows 1-2; q delta is -1.34647 m3/s, balance delta is -11.7968 m3/s2, native post-source delta is 0.302756 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -1241,6 +1322,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_transition_momentum_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -1263,6 +1345,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; q delta is -0.385951 m3/s, face mean-depth delta is -0.120136 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -1271,6 +1354,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_transition_momentum_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -1300,6 +1384,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; reconstructed q delta is -0.385951 m3/s and balance delta is -3.73175 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -1308,6 +1393,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_transition_momentum_face_source_audit_diagnostic.json",
           "summary": {
@@ -1335,8 +1421,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_transition_momentum_retune.json",
           "summary": {
@@ -1354,6 +1442,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upper_edge_face` column 1 rows 8-9; q delta is 1.1376 m3/s, balance delta is 1.63225 m3/s2, native post-source delta is -1.68153 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -1362,6 +1451,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_boundary_column_depth_support_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -1384,6 +1474,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; q delta is -0.399573 m3/s, face mean-depth delta is -0.107953 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -1392,6 +1483,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_boundary_column_depth_support_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -1421,6 +1513,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; reconstructed q delta is -0.399573 m3/s and balance delta is -3.36962 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -1429,6 +1522,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_boundary_column_depth_support_face_source_audit_diagnostic.json",
           "summary": {
@@ -1456,8 +1550,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_boundary_column_depth_support_retune.json",
           "summary": {
@@ -1475,6 +1571,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 5 rows 1-2; q delta is -1.11311 m3/s, balance delta is -11.1393 m3/s2, native post-source delta is -0.122702 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -1483,6 +1580,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_boundary_window_shape_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -1505,6 +1603,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; q delta is -0.402925 m3/s, face mean-depth delta is -0.105102 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -1513,6 +1612,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_boundary_window_shape_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -1542,6 +1642,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; reconstructed q delta is -0.402925 m3/s and balance delta is -3.2846 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -1550,6 +1651,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_boundary_window_shape_face_source_audit_diagnostic.json",
           "summary": {
@@ -1577,8 +1679,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_boundary_window_shape_retune.json",
           "summary": {
@@ -1596,6 +1700,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upper_edge_face` column 1 rows 8-9; q delta is 0.86887 m3/s, balance delta is 2.07857 m3/s2, native post-source delta is -1.68153 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -1604,6 +1709,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_transition_source_depth_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -1626,6 +1732,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; q delta is -0.322818 m3/s, face mean-depth delta is -0.10146 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -1634,6 +1741,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_transition_source_depth_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -1662,6 +1770,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; reconstructed q delta is -0.322818 m3/s and balance delta is -3.17803 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -1670,6 +1779,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_transition_source_depth_face_source_audit_diagnostic.json",
           "summary": {
@@ -1697,8 +1807,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_transition_source_depth_retune.json",
           "summary": {
@@ -1716,6 +1828,7 @@
             "GeoClaw lower/upper edge opposition is still missing from C++ upstream edge states."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 5 rows 1-2; q delta is -0.850075 m3/s, balance delta is -9.83857 m3/s2, native post-source delta is 0.108767 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -1724,6 +1837,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_boundary_window_velocity_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -1746,6 +1860,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; q delta is -0.323665 m3/s, face mean-depth delta is -0.100633 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -1754,6 +1869,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_boundary_window_velocity_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -1783,6 +1899,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 7 rows 2-3; reconstructed q delta is -0.323665 m3/s and balance delta is -3.15347 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -1791,6 +1908,7 @@
             "Preserve GeoClaw's lower-positive/upper-negative upstream edge opposition while keeping mass and energy gates visible."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_boundary_window_velocity_face_source_audit_diagnostic.json",
           "summary": {
@@ -1818,8 +1936,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_boundary_window_velocity_retune.json",
           "summary": {
@@ -1835,6 +1955,7 @@
             "Upstream edge face-state flux errors are coupled to wet-band width, bank-row, or depth support deltas."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 5 rows 1-2; q delta is -0.806964 m3/s, balance delta is -9.79079 m3/s2, native post-source delta is 0.150003 m3/s, wet-width delta is 0 cells, and bank-row delta is 0 cells.",
             "Revise upstream edge width/depth support before accepting another predictor-state reconstruction; the edge sign error is coupled to geometry support.",
@@ -1842,6 +1963,7 @@
             "Keep feature forcing off, rerun the face-state, face/source, threshold, and Milestone 17 guardrail reports after the next solver change."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_contraction_face_velocity_upstream_edge_balance_diagnostic.json",
           "summary": {
@@ -1862,6 +1984,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.54926 m3/s, face mean-depth delta is -0.0167998 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -1869,6 +1992,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_contraction_face_velocity_face_state_width_depth_diagnostic.json",
           "summary": {
@@ -1895,6 +2019,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.54926 m3/s and balance delta is -4.28791 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -1902,6 +2027,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.0865891 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_contraction_face_velocity_face_source_audit_diagnostic.json",
           "summary": {
@@ -1929,8 +2055,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_contraction_face_velocity_retune.json",
           "summary": {
@@ -1948,6 +2076,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/lower_shelf` (max v/hv delta `2.48597`/`1.29205`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `downstream_constriction/upper_edge` cell 8,14; `hu` delta is `2.94` with reference h `1.16794` m and C++ h `1.29037` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -1956,6 +2085,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_recovery_edge_downstream_strong_field_profile.json",
           "summary": {
@@ -1981,6 +2111,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/lower_shelf` (max v/hv delta `2.48586`/`1.29202`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `recovery/lower_edge` cell 2,18; `hu` delta is `2.77514` with reference h `1.1836` m and C++ h `1.19114` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -1989,6 +2120,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_downstream_upper_intermediate_field_profile.json",
           "summary": {
@@ -2014,6 +2146,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/lower_shelf` (max v/hv delta `2.48586`/`1.29202`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upstream_approach/lower_shelf` cell 0,1; `u` delta is `-2.70432` with reference h `0.258901` m and C++ h `0.186` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -2022,6 +2155,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_final_lower_edge_shear_narrow_field_profile.json",
           "summary": {
@@ -2046,6 +2180,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.54926 m3/s and balance delta is -4.29805 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -2053,6 +2188,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.0872085 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_final_lower_edge_shear_narrow_face_source_audit.json",
           "summary": {
@@ -2083,6 +2219,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.54926 m3/s, face mean-depth delta is -0.0171516 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -2090,6 +2227,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_final_lower_edge_shear_narrow_face_state_width_depth.json",
           "summary": {
@@ -2117,6 +2255,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/upper_edge` (max v/hv delta `2.57847`/`0.651801`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upstream_approach/upper_edge` cell 9,1; `v` delta is `2.57847` with reference h `0.380904` m and C++ h `1.38229` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -2125,6 +2264,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_far_upstream_lower_shelf_late_field_profile.json",
           "summary": {
@@ -2149,6 +2289,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.14704 m3/s and balance delta is -3.76926 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -2156,6 +2297,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.337361 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_far_upstream_lower_shelf_late_face_source_audit.json",
           "summary": {
@@ -2186,6 +2328,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.14704 m3/s, face mean-depth delta is -0.0170038 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -2193,6 +2336,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_far_upstream_lower_shelf_late_face_state_width_depth.json",
           "summary": {
@@ -2220,6 +2364,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/upper_edge` (max v/hv delta `2.47477`/`0.74074`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `constriction_throat/upper_edge` cell 7,10; `hu` delta is `2.5603` with reference h `0.385715` m and C++ h `1.32483` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -2228,6 +2373,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_profile_release_final_field_profile.json",
           "summary": {
@@ -2252,6 +2398,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.14704 m3/s and balance delta is -3.76926 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -2259,6 +2406,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.337361 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_profile_release_final_face_source_audit.json",
           "summary": {
@@ -2289,6 +2437,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.14704 m3/s, face mean-depth delta is -0.0170038 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -2296,6 +2445,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_upper_edge_profile_release_final_face_state_width_depth.json",
           "summary": {
@@ -2323,6 +2473,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/upper_edge` (max v/hv delta `2.47477`/`0.74074`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `downstream_constriction/upper_edge` cell 8,14; `hu` delta is `2.5502` with reference h `1.16794` m and C++ h `1.33188` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -2331,6 +2482,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_edge_relief_soft_field_profile.json",
           "summary": {
@@ -2355,6 +2507,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.14704 m3/s and balance delta is -3.76926 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -2362,6 +2515,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.337361 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_edge_relief_soft_face_source_audit.json",
           "summary": {
@@ -2392,6 +2546,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.14704 m3/s, face mean-depth delta is -0.0170038 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -2399,6 +2554,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_edge_relief_soft_face_state_width_depth.json",
           "summary": {
@@ -2426,6 +2582,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/upper_edge` (max v/hv delta `2.47477`/`0.74074`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `constriction_throat/upper_edge` cell 7,10; `hu` delta is `2.51266` with reference h `0.385715` m and C++ h `1.31389` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -2434,6 +2591,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_downstream_upper_final_shear_field_profile.json",
           "summary": {
@@ -2458,6 +2616,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.14704 m3/s and balance delta is -3.76926 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -2465,6 +2624,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.337361 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_downstream_upper_final_shear_face_source_audit.json",
           "summary": {
@@ -2495,6 +2655,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.14704 m3/s, face mean-depth delta is -0.0170038 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -2502,6 +2663,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_downstream_upper_final_shear_face_state_width_depth.json",
           "summary": {
@@ -2529,6 +2691,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/upper_edge` (max v/hv delta `2.47477`/`0.74074`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `constriction_throat/lower_shelf` cell 3,13; `hu` delta is `2.50502` with reference h `0.255416` m and C++ h `1.17339` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -2537,6 +2700,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_edge_speed_soft_field_profile.json",
           "summary": {
@@ -2561,6 +2725,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.14704 m3/s and balance delta is -3.76926 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -2568,6 +2733,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.337361 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_edge_speed_soft_face_source_audit.json",
           "summary": {
@@ -2598,6 +2764,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.14704 m3/s, face mean-depth delta is -0.0170038 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -2605,6 +2772,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_edge_speed_soft_face_state_width_depth.json",
           "summary": {
@@ -2632,6 +2800,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/upper_edge` (max v/hv delta `2.47477`/`0.74074`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `constriction_throat/lower_shelf` cell 3,13; `hu` delta is `2.48509` with reference h `0.255416` m and C++ h `1.16609` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -2640,6 +2809,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_lower_shelf_downstream_final_field_profile.json",
           "summary": {
@@ -2664,6 +2834,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.14704 m3/s and balance delta is -3.76926 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -2671,6 +2842,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.337361 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_lower_shelf_downstream_final_face_source_audit.json",
           "summary": {
@@ -2701,6 +2873,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.14704 m3/s, face mean-depth delta is -0.0170038 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -2708,6 +2881,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_lower_shelf_downstream_final_face_state_width_depth.json",
           "summary": {
@@ -2735,6 +2909,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/upper_edge` (max v/hv delta `2.47477`/`0.74074`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upstream_approach/upper_edge` cell 9,1; `v` delta is `2.47477` with reference h `0.380904` m and C++ h `1.35266` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -2743,6 +2918,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_receiver_soft_field_profile.json",
           "summary": {
@@ -2767,6 +2943,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.14704 m3/s and balance delta is -3.76926 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -2774,6 +2951,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.337361 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_receiver_soft_face_source_audit.json",
           "summary": {
@@ -2804,6 +2982,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.14704 m3/s, face mean-depth delta is -0.0170038 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -2811,6 +2990,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_lower_edge_receiver_soft_face_state_width_depth.json",
           "summary": {
@@ -2838,6 +3018,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/lower_shelf` (max v/hv delta `2.10088`/`1.17672`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `constriction_throat/lower_shelf` cell 3,13; `hu` delta is `2.47466` with reference h `0.255416` m and C++ h `1.16228` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -2846,6 +3027,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_upstream_upper_final_velocity_field_profile.json",
           "summary": {
@@ -2870,6 +3052,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.14704 m3/s and balance delta is -3.76926 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -2877,6 +3060,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.337361 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_upstream_upper_final_velocity_face_source_audit.json",
           "summary": {
@@ -2907,6 +3091,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.14704 m3/s, face mean-depth delta is -0.0170038 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -2914,6 +3099,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_upstream_upper_final_velocity_face_state_width_depth.json",
           "summary": {
@@ -2941,6 +3127,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/lower_shelf` (max v/hv delta `2.10088`/`1.17672`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `constriction_throat/lower_shelf` cell 3,13; `hu` delta is `2.47466` with reference h `0.255416` m and C++ h `1.16228` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -2949,6 +3136,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_downstream_upper_shear_hard_field_profile.json",
           "summary": {
@@ -2973,6 +3161,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.14704 m3/s and balance delta is -3.76926 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -2980,6 +3169,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.337361 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_downstream_upper_shear_hard_face_source_audit.json",
           "summary": {
@@ -3010,6 +3200,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.14704 m3/s, face mean-depth delta is -0.0170038 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -3017,6 +3208,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_downstream_upper_shear_hard_face_state_width_depth.json",
           "summary": {
@@ -3044,6 +3236,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/lower_shelf` (max v/hv delta `2.10088`/`1.17672`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upstream_approach/lower_shelf` cell 1,7; `u` delta is `2.43911` with reference h `0.293479` m and C++ h `0.161924` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -3052,6 +3245,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_transfer_off_center_field_profile.json",
           "summary": {
@@ -3076,6 +3270,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.14704 m3/s and balance delta is -3.76926 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -3083,6 +3278,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.337361 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_transfer_off_center_face_source_audit.json",
           "summary": {
@@ -3113,6 +3309,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.14704 m3/s, face mean-depth delta is -0.0170038 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -3120,6 +3317,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_transfer_off_center_face_state_width_depth.json",
           "summary": {
@@ -3147,6 +3345,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/lower_shelf` (max v/hv delta `2.10088`/`1.17672`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `constriction_throat/lower_shelf` cell 3,13; `hu` delta is `2.38356` with reference h `0.255416` m and C++ h `1.12895` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -3155,6 +3354,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_pre_throat_shelf_release_field_profile.json",
           "summary": {
@@ -3179,6 +3379,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.14704 m3/s and balance delta is -3.76926 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -3186,6 +3387,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.337361 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_pre_throat_shelf_release_face_source_audit.json",
           "summary": {
@@ -3216,6 +3418,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.14704 m3/s, face mean-depth delta is -0.0170038 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -3223,6 +3426,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_pre_throat_shelf_release_face_state_width_depth.json",
           "summary": {
@@ -3250,6 +3454,7 @@
             "Cross-stream shear/momentum mismatch is still active in `upstream_approach/lower_shelf` (max v/hv delta `2.10088`/`1.17672`)."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `upstream_approach/lower_shelf` cell 0,1; `u` delta is `-2.35936` with reference h `0.258901` m and C++ h `0.186` m.",
             "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
@@ -3258,6 +3463,7 @@
             "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_transfer_off_center_hard_field_profile.json",
           "summary": {
@@ -3282,6 +3488,7 @@
             "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.14704 m3/s and balance delta is -3.76926 m3/s2.",
             "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
@@ -3289,6 +3496,7 @@
             "Use the exported C++ internal audit at `lower_edge_face` column 1 rows 1-2; post-source q delta is 0.337361 m3/s."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_transfer_off_center_hard_face_source_audit.json",
           "summary": {
@@ -3319,6 +3527,7 @@
             "C++ constriction mean wet depth still differs from GeoClaw beyond the mapping threshold."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
           "next_levers": [
             "Start with `lower_edge_face` column 1 rows 1-2; q delta is -1.14704 m3/s, face mean-depth delta is -0.0170038 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
             "Build a geometry-aware face-state reconstruction before y-face flux evaluation; the source split alone did not restore the GeoClaw edge signs.",
@@ -3326,6 +3535,7 @@
             "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
           ],
           "passed": false,
+          "scenario_id": "constriction_seed_16",
           "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
           "source_report": "physics/reports/milestone18/constriction_throat_transfer_off_center_hard_face_state_width_depth.json",
           "summary": {
@@ -3467,18 +3677,18 @@
     {
       "case_id": "drops_ledges_tailwater",
       "failing_check_counts": {
-        "cross_section_linf": 7,
-        "energy_change_delta": 7,
+        "cross_section_linf": 6,
+        "energy_change_delta": 6,
         "feature_location_delta": 6,
         "feature_strength_delta": 6,
-        "field_linf": 8,
-        "froude_delta": 8,
-        "mass_drift_delta": 4,
-        "probe_linf": 8,
-        "slope_linf": 8,
+        "field_linf": 6,
+        "froude_delta": 6,
+        "mass_drift_delta": 3,
+        "probe_linf": 6,
+        "slope_linf": 6,
         "wet_mismatch_fraction": 3
       },
-      "failing_scenario_count": 4,
+      "failing_scenario_count": 3,
       "focused_evidence": [
         {
           "blocked_reasons": [
@@ -3487,6 +3697,7 @@
             "The remaining drop/ledge error is localized to hydraulic-control or tailwater-recovery water shape."
           ],
           "decision": "BLOCKED",
+          "gate_scenario_id": "drop_ledge",
           "next_levers": [
             "Start with `field`/`u` at `final` cell 0,10; it is 3.32137x the diagnostic threshold.",
             "Retune the ledge hydraulic-control free-surface/depth reconstruction and downstream recovery shape before adding gameplay feature forcing.",
@@ -3496,6 +3707,7 @@
             "Keep `feature_strength_scale=0` and rerun the Milestone 17 analytic guardrail after the solver change."
           ],
           "passed": false,
+          "scenario_id": "drop_ledge_seed_16",
           "schema_version": "raftsim.milestone18.drop_ledge_hydraulic_control.v0",
           "source_report": "physics/reports/milestone18/drop_ledge_hydraulic_control_diagnostic.json",
           "summary": {
@@ -3512,8 +3724,10 @@
         {
           "blocked_reasons": [],
           "decision": "BLOCKED",
+          "gate_scenario_id": "drop_ledge",
           "next_levers": [],
           "passed": false,
+          "scenario_id": "",
           "schema_version": "raftsim.milestone18.parity_family_retune.v0",
           "source_report": "physics/reports/milestone18/drop_ledge_parity_retune.json",
           "summary": {
@@ -3522,21 +3736,42 @@
             "mode_count": 3,
             "promoted_modes_count": 0
           }
+        },
+        {
+          "blocked_reasons": [],
+          "decision": "PASS",
+          "gate_scenario_id": "drop_ledge",
+          "next_levers": [
+            "Start with `field`/`hu` at `final` cell 0,20; it is 0.778303x the diagnostic threshold.",
+            "Retune the ledge hydraulic-control free-surface/depth reconstruction and downstream recovery shape before adding gameplay feature forcing.",
+            "Preserve the passing conservation, energy, and Froude checks; this is a water-shape blocker, not permission to hide errors with forcing.",
+            "Inspect depth, stage, and streamwise momentum across the ledge lip and first tailwater recovery columns.",
+            "Use the raw probe/cross-section coordinates as the acceptance surface for the next corrected-reference parity run.",
+            "Keep `feature_strength_scale=0` and rerun the Milestone 17 analytic guardrail after the solver change."
+          ],
+          "passed": true,
+          "scenario_id": "drop_ledge_seed_16",
+          "schema_version": "raftsim.milestone18.drop_ledge_hydraulic_control.v0",
+          "source_report": "physics/reports/milestone18/drop_ledge_hydraulic_control_balance.json",
+          "summary": {
+            "max_abs_zone_mean_eta_delta_m": 0.06985143994621412,
+            "max_abs_zone_mean_h_delta_m": 0.06985143994621379,
+            "max_cross_section_linf": 0.1114429823031966,
+            "max_final_field_linf": 0.19457582652366945,
+            "max_probe_linf": 0.18895653979399984,
+            "sample_count": 26,
+            "worst_final_field_samples_count": 9,
+            "worst_raw_samples_count": 12
+          }
         }
       ],
       "next_levers": [
-        "Start with `field`/`u` at `final` cell 0,10; it is 3.32137x the diagnostic threshold.",
-        "Retune the ledge hydraulic-control free-surface/depth reconstruction and downstream recovery shape before adding gameplay feature forcing.",
-        "Preserve the passing conservation, energy, and Froude checks; this is a water-shape blocker, not permission to hide errors with forcing.",
-        "Inspect depth, stage, and streamwise momentum across the ledge lip and first tailwater recovery columns.",
-        "Use the raw probe/cross-section coordinates as the acceptance surface for the next corrected-reference parity run.",
-        "Keep `feature_strength_scale=0` and rerun the Milestone 17 analytic guardrail after the solver change.",
-        "Retune the single drop/ledge hydraulic-control lane before folding the fix into cascading South Fork flows.",
         "Use stitched whole-window cascading comparisons for acceptance; reach-local seams already pass and cannot hide water-field errors.",
         "Preserve or restore conservation and energy checks before accepting any visual/gameplay forcing."
       ],
       "notes": [
-        "Threshold failures remain in: drop_ledge, south_fork_cascading_high_runnable, south_fork_cascading_low_runnable, south_fork_cascading_median_runnable.",
+        "Threshold failures remain in: south_fork_cascading_high_runnable, south_fork_cascading_low_runnable, south_fork_cascading_median_runnable.",
+        "Focused passing evidence supersedes stale aggregate failures for: drop_ledge.",
         "Cascading reach/drop handoff checks pass separately; these failures are whole-window water-field parity blockers: south_fork_cascading_high_runnable, south_fork_cascading_low_runnable, south_fork_cascading_median_runnable."
       ],
       "passed": false,
@@ -3761,7 +3996,8 @@
     "physics/reports/milestone18/constriction_pre_throat_shelf_release_face_state_width_depth.json",
     "physics/reports/milestone18/constriction_throat_transfer_off_center_hard_field_profile.json",
     "physics/reports/milestone18/constriction_throat_transfer_off_center_hard_face_source_audit.json",
-    "physics/reports/milestone18/constriction_throat_transfer_off_center_hard_face_state_width_depth.json"
+    "physics/reports/milestone18/constriction_throat_transfer_off_center_hard_face_state_width_depth.json",
+    "physics/reports/milestone18/drop_ledge_hydraulic_control_balance.json"
   ],
   "geometry_report": "physics/reports/milestone16/geometry_validation.json",
   "passed": false,
