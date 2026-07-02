@@ -698,8 +698,8 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert upper_edge_profile["response_start_fraction"] == pytest.approx(0.995)
     assert upper_edge_profile["upper_interior_target_depth_scale"] == pytest.approx(1.38)
     assert upper_edge_profile["outer_shelf_inlet_bonus_depth_scale"] == pytest.approx(0.26)
-    assert upper_edge_profile["velocity_rate_per_s"] == pytest.approx(18.0)
-    assert upper_edge_profile["max_speed_m_per_s2"] == pytest.approx(14.0)
+    assert upper_edge_profile["velocity_rate_per_s"] == pytest.approx(60.0)
+    assert upper_edge_profile["max_speed_m_per_s2"] == pytest.approx(90.0)
     assert upper_edge_profile["edge_cross_stream_fraction"] == pytest.approx(2.05)
     assert upper_edge_profile["immediate_shelf_cross_stream_fraction"] == pytest.approx(0.85)
     assert upper_edge_profile["requires_feature_forcing"] is False
