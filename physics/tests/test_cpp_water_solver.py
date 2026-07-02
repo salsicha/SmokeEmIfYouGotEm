@@ -958,6 +958,32 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         == pytest.approx(0.23)
     )
     assert constriction_manifest["constriction_recovery_edge_balance"]["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_recovery_split_balance"] is True
+    recovery_split = constriction_manifest["constriction_recovery_split_balance"]
+    assert recovery_split["bounded"] is True
+    assert recovery_split["mass_conservative_depth_transfer"] is True
+    assert recovery_split["velocity_only_after_depth_transfer"] is True
+    assert recovery_split["runs_after_recovery_edge_balance"] is True
+    assert recovery_split["runs_before_recovery_final_lower_edge_shear"] is True
+    assert recovery_split["uses_duration_normalized_final_response"] is True
+    assert recovery_split["applies_only_recovery_columns"] is True
+    assert recovery_split["response_start_fraction"] == pytest.approx(0.985)
+    assert recovery_split["depth_rate_per_s"] == pytest.approx(80.0)
+    assert recovery_split["max_depth_m_per_s"] == pytest.approx(40.0)
+    assert recovery_split["donor_floor_depth_scale"] == pytest.approx(0.36)
+    assert recovery_split["receiver_target_depth_scale"] == pytest.approx(1.40)
+    assert recovery_split["donor_edge_norm_floor"] == pytest.approx(0.55)
+    assert recovery_split["receiver_edge_norm_max"] == pytest.approx(0.65)
+    assert recovery_split["center_speed_fraction"] == pytest.approx(1.42)
+    assert recovery_split["center_cross_stream_fraction"] == pytest.approx(0.12)
+    assert recovery_split["edge_velocity_rate_per_s"] == pytest.approx(90.0)
+    assert recovery_split["edge_max_speed_m_per_s2"] == pytest.approx(60.0)
+    assert recovery_split["edge_speed_fraction"] == pytest.approx(-0.02)
+    assert recovery_split["lower_edge_cross_stream_fraction"] == pytest.approx(0.04)
+    assert recovery_split["upper_edge_cross_stream_fraction"] == pytest.approx(0.24)
+    assert recovery_split["upper_shelf_speed_fraction"] == pytest.approx(0.02)
+    assert recovery_split["upper_shelf_cross_stream_fraction"] == pytest.approx(0.52)
+    assert recovery_split["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_recovery_final_lower_edge_shear_balance"] is True
     final_lower_edge_shear = constriction_manifest["constriction_recovery_final_lower_edge_shear_balance"]
     assert final_lower_edge_shear["bounded"] is True
