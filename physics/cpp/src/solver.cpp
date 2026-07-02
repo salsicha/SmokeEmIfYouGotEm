@@ -357,9 +357,9 @@ constexpr double kConstrictionDownstreamReturnCurrentEdgeNormFloor = 0.55;
 constexpr double kConstrictionDownstreamReturnCurrentDownstreamUpperEdgeSpeedFraction = -0.12;
 constexpr double kConstrictionDownstreamReturnCurrentDownstreamUpperInnerSpeedFraction = 0.25;
 constexpr double kConstrictionDownstreamUpperEdgeFinalShearResponseStart = 0.995;
-constexpr double kConstrictionDownstreamUpperEdgeFinalShearVelocityRate = 90.0;
-constexpr double kConstrictionDownstreamUpperEdgeFinalShearMaxSpeedPerSecond = 30.0;
-constexpr double kConstrictionDownstreamUpperEdgeFinalShearSpeedFraction = -0.20;
+constexpr double kConstrictionDownstreamUpperEdgeFinalShearVelocityRate = 180.0;
+constexpr double kConstrictionDownstreamUpperEdgeFinalShearMaxSpeedPerSecond = 140.0;
+constexpr double kConstrictionDownstreamUpperEdgeFinalShearSpeedFraction = -1.20;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
