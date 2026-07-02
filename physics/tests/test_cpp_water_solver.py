@@ -924,6 +924,18 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         == pytest.approx(0.25)
     )
     assert constriction_manifest["constriction_downstream_return_current_balance"]["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_downstream_upper_edge_final_shear"] is True
+    downstream_final_shear = constriction_manifest["constriction_downstream_upper_edge_final_shear"]
+    assert downstream_final_shear["bounded"] is True
+    assert downstream_final_shear["velocity_only"] is True
+    assert downstream_final_shear["mass_preserving"] is True
+    assert downstream_final_shear["runs_after_downstream_return_current_balance"] is True
+    assert downstream_final_shear["uses_duration_normalized_final_response"] is True
+    assert downstream_final_shear["response_start_fraction"] == pytest.approx(0.995)
+    assert downstream_final_shear["velocity_rate_per_s"] == pytest.approx(60.0)
+    assert downstream_final_shear["max_speed_m_per_s2"] == pytest.approx(18.0)
+    assert downstream_final_shear["speed_fraction"] == pytest.approx(-0.12)
+    assert downstream_final_shear["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_momentum_reconstruction"] is True
     assert constriction_manifest["constriction_y_face_flux_source_audit"]["present"] is True
     assert constriction_manifest["constriction_y_face_flux_source_audit"]["uses_internal_cpp_riemann_flux"] is True
