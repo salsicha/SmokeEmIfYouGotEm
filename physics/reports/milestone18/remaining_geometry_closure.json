@@ -1972,14 +1972,48 @@
             "worst_cells_count": 16,
             "worst_profile_bins_count": 12
           }
+        },
+        {
+          "blocked_reasons": [
+            "Final-frame `hu` field remains 11.10x over threshold at `recovery/lower_edge` cell 2,18.",
+            "Depth/profile mismatch is still active in `recovery/upper_edge` (max h delta `1.13531` m).",
+            "Streamwise shear/momentum mismatch is still active in `recovery/lower_edge` (max u/hu delta `2.33176`/`2.77514`).",
+            "Cross-stream shear/momentum mismatch is still active in `upstream_approach/lower_shelf` (max v/hv delta `2.48586`/`1.29202`)."
+          ],
+          "decision": "BLOCKED",
+          "next_levers": [
+            "Start with `recovery/lower_edge` cell 2,18; `hu` delta is `2.77514` with reference h `1.1836` m and C++ h `1.19114` m.",
+            "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
+            "Retune streamwise shear/reverse-flow profile together with depth so hu does not remain the dominant Linf error.",
+            "Retune cross-stream circulation/sign by zone and profile role, then rerun face-state and face/source audits.",
+            "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
+          ],
+          "passed": false,
+          "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
+          "source_report": "reports/milestone18/constriction_downstream_upper_intermediate_field_profile.json",
+          "summary": {
+            "max_abs_field_delta": 2.7751368600518926,
+            "max_abs_h_delta": 1.135314843890478,
+            "max_abs_hu_delta": 2.7751368600518926,
+            "max_abs_hv_delta": 1.7388738405751378,
+            "max_abs_mass_delta_m3": 7.037935395402391,
+            "max_abs_u_delta": 2.7043235263241447,
+            "max_abs_v_delta": 2.4858621454579692,
+            "max_material_wet_mismatch_fraction": 0.05555555555555555,
+            "profile_bin_count": 16,
+            "worst_cell_count": 16,
+            "worst_cells_count": 16,
+            "worst_profile_bins_count": 12
+          }
         }
       ],
       "next_levers": [
-        "Start with `downstream_constriction/upper_edge` cell 8,14; `hu` delta is `2.94` with reference h `1.16794` m and C++ h `1.29037` m.",
+        "Start with `recovery/lower_edge` cell 2,18; `hu` delta is `2.77514` with reference h `1.1836` m and C++ h `1.19114` m.",
         "Retune edge/interior water redistribution before another velocity-only pass; edge depths are part of the field blocker.",
         "Retune streamwise shear/reverse-flow profile together with depth so hu does not remain the dominant Linf error.",
         "Retune cross-stream circulation/sign by zone and profile role, then rerun face-state and face/source audits.",
         "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence.",
+        "Start with `downstream_constriction/upper_edge` cell 8,14; `hu` delta is `2.94` with reference h `1.16794` m and C++ h `1.29037` m.",
         "Start with `lower_edge_face` column 1 rows 1-2; reconstructed q delta is -1.54926 m3/s and balance delta is -4.28791 m3/s2.",
         "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
         "Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.",
@@ -2330,7 +2364,8 @@
     "reports/milestone18/constriction_lower_edge_contraction_face_velocity_face_state_width_depth_diagnostic.json",
     "reports/milestone18/constriction_lower_edge_contraction_face_velocity_face_source_audit_diagnostic.json",
     "reports/milestone18/constriction_lower_edge_contraction_face_velocity_retune.json",
-    "reports/milestone18/constriction_recovery_edge_downstream_strong_field_profile.json"
+    "reports/milestone18/constriction_recovery_edge_downstream_strong_field_profile.json",
+    "reports/milestone18/constriction_downstream_upper_intermediate_field_profile.json"
   ],
   "geometry_report": "reports/milestone16/geometry_validation.json",
   "passed": false,

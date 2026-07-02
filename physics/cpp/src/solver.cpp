@@ -301,11 +301,11 @@ constexpr double kConstrictionRecoveryEdgeBalanceLowerCrossStreamFraction = 0.04
 constexpr double kConstrictionRecoveryEdgeBalanceUpperCrossStreamFraction = 0.24;
 constexpr double kConstrictionRecoveryEdgeBalanceInteriorCrossStreamFraction = 0.06;
 constexpr double kConstrictionRecoveryEdgeBalanceInteriorEdgeNorm = 0.55;
-constexpr double kConstrictionDownstreamReturnCurrentVelocityRate = 20.0;
-constexpr double kConstrictionDownstreamReturnCurrentMaxSpeedPerSecond = 10.0;
+constexpr double kConstrictionDownstreamReturnCurrentVelocityRate = 45.0;
+constexpr double kConstrictionDownstreamReturnCurrentMaxSpeedPerSecond = 20.0;
 constexpr double kConstrictionDownstreamReturnCurrentEdgeNormFloor = 0.55;
-constexpr double kConstrictionDownstreamReturnCurrentDownstreamUpperEdgeSpeedFraction = -0.05;
-constexpr double kConstrictionDownstreamReturnCurrentDownstreamUpperInnerSpeedFraction = 0.65;
+constexpr double kConstrictionDownstreamReturnCurrentDownstreamUpperEdgeSpeedFraction = -0.12;
+constexpr double kConstrictionDownstreamReturnCurrentDownstreamUpperInnerSpeedFraction = 0.25;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
