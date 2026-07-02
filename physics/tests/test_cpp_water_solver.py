@@ -595,6 +595,41 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["constriction_recovery_centerline_timing"]["depth_donor_scope"] == "upper_recovery_shelf_row"
     assert constriction_manifest["constriction_recovery_centerline_timing"]["applies_only_near_recovery_centerline"] is True
     assert constriction_manifest["constriction_recovery_centerline_timing"]["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_downstream_return_current_balance"] is True
+    assert constriction_manifest["constriction_downstream_return_current_balance"]["bounded"] is True
+    assert constriction_manifest["constriction_downstream_return_current_balance"]["velocity_only"] is True
+    assert constriction_manifest["constriction_downstream_return_current_balance"]["mass_preserving"] is True
+    assert (
+        constriction_manifest["constriction_downstream_return_current_balance"][
+            "runs_after_upstream_centerline_timing_balance"
+        ]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_downstream_return_current_balance"][
+            "uses_duration_normalized_late_response"
+        ]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_downstream_return_current_balance"][
+            "applies_only_downstream_widened_upper_edge"
+        ]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_downstream_return_current_balance"][
+            "downstream_upper_edge_speed_fraction"
+        ]
+        == pytest.approx(-0.05)
+    )
+    assert (
+        constriction_manifest["constriction_downstream_return_current_balance"][
+            "downstream_upper_inner_speed_fraction"
+        ]
+        == pytest.approx(0.65)
+    )
+    assert constriction_manifest["constriction_downstream_return_current_balance"]["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_momentum_reconstruction"] is True
     assert constriction_manifest["constriction_y_face_flux_source_audit"]["present"] is True
     assert constriction_manifest["constriction_y_face_flux_source_audit"]["uses_internal_cpp_riemann_flux"] is True
