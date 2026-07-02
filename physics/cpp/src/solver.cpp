@@ -191,6 +191,17 @@ constexpr double kConstrictionUpstreamThroatLowerShelfFinalReliefDownstreamShelf
 constexpr double kConstrictionUpstreamThroatLowerShelfFinalReliefDonorCrossStreamFraction = 0.14;
 constexpr double kConstrictionUpstreamThroatLowerShelfFinalReliefInteriorCrossStreamFraction = -0.12;
 constexpr double kConstrictionUpstreamThroatLowerShelfFinalReliefDownstreamShelfCrossStreamFraction = 0.24;
+constexpr double kConstrictionThroatLowerEdgeFinalSupportResponseStart = 0.995;
+constexpr double kConstrictionThroatLowerEdgeFinalSupportRate = 180.0;
+constexpr double kConstrictionThroatLowerEdgeFinalSupportMaxDepthPerSecond = 120.0;
+constexpr double kConstrictionThroatLowerEdgeFinalSupportDonorFloorScale = 0.22;
+constexpr double kConstrictionThroatLowerEdgeFinalSupportReceiverTargetScale = 1.20;
+constexpr double kConstrictionThroatLowerEdgeFinalSupportVelocityRate = 260.0;
+constexpr double kConstrictionThroatLowerEdgeFinalSupportMaxSpeedPerSecond = 220.0;
+constexpr double kConstrictionThroatLowerEdgeFinalSupportCenterDistanceCells = 1.5;
+constexpr double kConstrictionThroatLowerEdgeFinalSupportPeakWidthCells = 0.45;
+constexpr double kConstrictionThroatLowerEdgeFinalSupportSpeedFraction = 1.12;
+constexpr double kConstrictionThroatLowerEdgeFinalSupportCrossStreamFraction = 0.12;
 constexpr double kConstrictionUpstreamInteriorCrossStreamFinalSupportResponseStart = 0.995;
 constexpr double kConstrictionUpstreamInteriorCrossStreamFinalSupportVelocityRate = 260.0;
 constexpr double kConstrictionUpstreamInteriorCrossStreamFinalSupportMaxSpeedPerSecond = 220.0;
@@ -7683,6 +7694,119 @@ void apply_constriction_upstream_lower_edge_streamwise_final_support(
     }
 }
 
+void apply_constriction_throat_lower_edge_final_support(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    double time_s,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+    double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+    double final_response =
+        clamp(
+            (response_progress - kConstrictionThroatLowerEdgeFinalSupportResponseStart) /
+                std::max(1.0e-9, 1.0 - kConstrictionThroatLowerEdgeFinalSupportResponseStart),
+            0.0,
+            1.0);
+    if (final_response <= 0.0) {
+        return;
+    }
+
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double flow_sign = constriction_flow_sign(scenario);
+    double target_distance =
+        kConstrictionThroatLowerEdgeFinalSupportCenterDistanceCells * scenario.grid.dx;
+    double peak_width =
+        std::max(
+            scenario.grid.dx * 1.0e-6,
+            kConstrictionThroatLowerEdgeFinalSupportPeakWidthCells * scenario.grid.dx);
+    double max_depth_step = kConstrictionThroatLowerEdgeFinalSupportMaxDepthPerSecond * dt * final_response;
+    double max_speed_step = kConstrictionThroatLowerEdgeFinalSupportMaxSpeedPerSecond * dt * final_response;
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        double downstream_distance = flow_sign * constriction_signed_x(scenario, col);
+        if (downstream_distance < 0.0 || downstream_distance > half_length) {
+            continue;
+        }
+
+        double normalized_distance = (downstream_distance - target_distance) / peak_width;
+        double support_weight = final_response * std::exp(-(normalized_distance * normalized_distance));
+        if (support_weight <= 1.0e-6) {
+            continue;
+        }
+
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count != throat_width_cells || band.first_row == 0) {
+            continue;
+        }
+
+        double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+        if (column_mean_depth <= config.dry_tolerance) {
+            continue;
+        }
+
+        std::size_t donor_row = band.first_row - 1;
+        std::size_t receiver_row = band.first_row;
+        if (next.h(donor_row, col) <= config.dry_tolerance ||
+            next.h(receiver_row, col) <= config.dry_tolerance) {
+            continue;
+        }
+
+        double donor_floor = std::max(
+            kConstrictionLocalFringeTargetDepth,
+            column_mean_depth * kConstrictionThroatLowerEdgeFinalSupportDonorFloorScale);
+        double donor_capacity = std::max(0.0, next.h(donor_row, col) - donor_floor);
+        double receiver_target_h = std::max(
+            kConstrictionLocalFringeTargetDepth,
+            column_mean_depth * kConstrictionThroatLowerEdgeFinalSupportReceiverTargetScale);
+        double receiver_capacity = std::max(0.0, receiver_target_h - next.h(receiver_row, col));
+        if (donor_capacity <= config.dry_tolerance || receiver_capacity <= config.dry_tolerance) {
+            continue;
+        }
+
+        double requested_h =
+            receiver_capacity * kConstrictionThroatLowerEdgeFinalSupportRate * dt * support_weight;
+        double transfer_h =
+            std::min(receiver_capacity, std::min(donor_capacity, std::min(requested_h, max_depth_step * support_weight)));
+        if (transfer_h <= config.dry_tolerance) {
+            continue;
+        }
+
+        next.h(donor_row, col) = std::max(donor_floor, next.h(donor_row, col) - transfer_h);
+        double target_u = flow_sign * kConstrictionThroatLowerEdgeFinalSupportSpeedFraction * reference_speed;
+        double target_v = kConstrictionThroatLowerEdgeFinalSupportCrossStreamFraction * reference_speed;
+        double receiver_h = next.h(receiver_row, col);
+        double merged_h = receiver_h + transfer_h;
+        double merged_hu = receiver_h * next.u(receiver_row, col) + transfer_h * target_u;
+        double merged_hv = receiver_h * next.v(receiver_row, col) + transfer_h * target_v;
+        next.h(receiver_row, col) = merged_h;
+        next.u(receiver_row, col) =
+            merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+        next.v(receiver_row, col) =
+            merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+
+        double velocity_blend =
+            clamp(kConstrictionThroatLowerEdgeFinalSupportVelocityRate * dt * support_weight, 0.0, 1.0);
+        double blended_u = next.u(receiver_row, col) + velocity_blend * (target_u - next.u(receiver_row, col));
+        double blended_v = next.v(receiver_row, col) + velocity_blend * (target_v - next.v(receiver_row, col));
+        next.u(receiver_row, col) =
+            move_toward(next.u(receiver_row, col), blended_u, max_speed_step * support_weight);
+        next.v(receiver_row, col) =
+            move_toward(next.v(receiver_row, col), blended_v, max_speed_step * support_weight);
+    }
+}
+
 void apply_constriction_upstream_lower_shelf_notch_final_profile(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -10008,6 +10132,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_throat_upper_edge_cross_stream_final_support(scenario_, config_, dt, time_, next);
         apply_constriction_upstream_upper_edge_interior_final_relief(scenario_, config_, dt, time_, next);
         apply_constriction_upstream_lower_edge_streamwise_final_support(scenario_, config_, dt, time_, next);
+        apply_constriction_throat_lower_edge_final_support(scenario_, config_, dt, time_, next);
     }
     recompute_state(next);
     state_ = std::move(next);
@@ -11409,6 +11534,39 @@ void write_solver_output(
              << kConstrictionUpstreamLowerEdgeStreamwiseFinalSupportLowerEdgeSpeedFraction << ",\n"
              << "    \"lower_shelf_speed_fraction\": "
              << kConstrictionUpstreamLowerEdgeStreamwiseFinalSupportLowerShelfSpeedFraction << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_throat_lower_edge_final_support\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_throat_lower_edge_final_support\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative_depth_transfer\": true,\n"
+             << "    \"velocity_shape_after_depth_transfer\": true,\n"
+             << "    \"applies_only_downstream_throat_lower_edge_from_lower_shelf_donor\": true,\n"
+             << "    \"uses_duration_normalized_final_response\": true,\n"
+             << "    \"runs_after_upstream_lower_edge_streamwise_final_support\": true,\n"
+             << "    \"response_start_fraction\": "
+             << kConstrictionThroatLowerEdgeFinalSupportResponseStart << ",\n"
+             << "    \"rate_per_s\": "
+             << kConstrictionThroatLowerEdgeFinalSupportRate << ",\n"
+             << "    \"max_depth_m_per_s\": "
+             << kConstrictionThroatLowerEdgeFinalSupportMaxDepthPerSecond << ",\n"
+             << "    \"donor_floor_depth_scale\": "
+             << kConstrictionThroatLowerEdgeFinalSupportDonorFloorScale << ",\n"
+             << "    \"receiver_target_depth_scale\": "
+             << kConstrictionThroatLowerEdgeFinalSupportReceiverTargetScale << ",\n"
+             << "    \"velocity_rate_per_s\": "
+             << kConstrictionThroatLowerEdgeFinalSupportVelocityRate << ",\n"
+             << "    \"max_speed_m_per_s2\": "
+             << kConstrictionThroatLowerEdgeFinalSupportMaxSpeedPerSecond << ",\n"
+             << "    \"center_distance_cells\": "
+             << kConstrictionThroatLowerEdgeFinalSupportCenterDistanceCells << ",\n"
+             << "    \"peak_width_cells\": "
+             << kConstrictionThroatLowerEdgeFinalSupportPeakWidthCells << ",\n"
+             << "    \"speed_fraction\": "
+             << kConstrictionThroatLowerEdgeFinalSupportSpeedFraction << ",\n"
+             << "    \"cross_stream_fraction\": "
+             << kConstrictionThroatLowerEdgeFinalSupportCrossStreamFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_throat_edge_relief\": "
