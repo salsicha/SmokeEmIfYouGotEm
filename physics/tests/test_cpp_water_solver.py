@@ -717,7 +717,7 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert throat_edge_relief["interior_target_depth_scale"] == pytest.approx(1.36)
     assert throat_edge_relief["velocity_rate_per_s"] == pytest.approx(30.0)
     assert throat_edge_relief["max_speed_m_per_s2"] == pytest.approx(24.0)
-    assert throat_edge_relief["edge_speed_fraction"] == pytest.approx(0.88)
+    assert throat_edge_relief["edge_speed_fraction"] == pytest.approx(0.80)
     assert throat_edge_relief["upstream_upper_cross_stream_fraction"] == pytest.approx(1.0)
     assert throat_edge_relief["downstream_lower_cross_stream_fraction"] == pytest.approx(0.72)
     assert throat_edge_relief["requires_feature_forcing"] is False
