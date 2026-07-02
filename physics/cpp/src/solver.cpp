@@ -356,9 +356,9 @@ constexpr double kConstrictionDownstreamReturnCurrentEdgeNormFloor = 0.55;
 constexpr double kConstrictionDownstreamReturnCurrentDownstreamUpperEdgeSpeedFraction = -0.12;
 constexpr double kConstrictionDownstreamReturnCurrentDownstreamUpperInnerSpeedFraction = 0.25;
 constexpr double kConstrictionDownstreamUpperEdgeFinalShearResponseStart = 0.995;
-constexpr double kConstrictionDownstreamUpperEdgeFinalShearVelocityRate = 60.0;
-constexpr double kConstrictionDownstreamUpperEdgeFinalShearMaxSpeedPerSecond = 18.0;
-constexpr double kConstrictionDownstreamUpperEdgeFinalShearSpeedFraction = -0.12;
+constexpr double kConstrictionDownstreamUpperEdgeFinalShearVelocityRate = 90.0;
+constexpr double kConstrictionDownstreamUpperEdgeFinalShearMaxSpeedPerSecond = 30.0;
+constexpr double kConstrictionDownstreamUpperEdgeFinalShearSpeedFraction = -0.20;
 
 double clamp(double value, double lo, double hi) {
     return std::max(lo, std::min(hi, value));
@@ -2454,6 +2454,13 @@ void apply_constriction_throat_edge_relief(
             column_mean_depth * kConstrictionThroatEdgeReliefDonorFloorScale);
         std::vector<ConstrictionDepthTransferCell> donors;
         double donor_capacity = 0.0;
+        if (band.first_row > 0) {
+            double capacity = std::max(0.0, next.h(band.first_row - 1, col) - donor_floor);
+            if (capacity > config.dry_tolerance) {
+                donors.push_back(ConstrictionDepthTransferCell{band.first_row - 1, col, capacity});
+                donor_capacity += capacity;
+            }
+        }
         for (std::size_t donor_row : {band.first_row, band.last_row}) {
             double capacity = std::max(0.0, next.h(donor_row, col) - donor_floor);
             if (capacity <= config.dry_tolerance) {
@@ -6924,6 +6931,7 @@ void write_solver_output(
              << "  \"constriction_throat_edge_relief\": {\n"
              << "    \"bounded\": true,\n"
              << "    \"mass_conservative_edge_to_interior_depth_transfer\": true,\n"
+             << "    \"includes_lower_shelf_donor\": true,\n"
              << "    \"velocity_only_after_depth_transfer\": true,\n"
              << "    \"applies_only_narrow_throat_columns\": true,\n"
              << "    \"runs_after_upstream_boundary_upper_edge_profile_release\": true,\n"

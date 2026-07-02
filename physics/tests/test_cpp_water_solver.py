@@ -707,6 +707,7 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     throat_edge_relief = constriction_manifest["constriction_throat_edge_relief"]
     assert throat_edge_relief["bounded"] is True
     assert throat_edge_relief["mass_conservative_edge_to_interior_depth_transfer"] is True
+    assert throat_edge_relief["includes_lower_shelf_donor"] is True
     assert throat_edge_relief["velocity_only_after_depth_transfer"] is True
     assert throat_edge_relief["applies_only_narrow_throat_columns"] is True
     assert throat_edge_relief["uses_duration_normalized_final_response"] is True
@@ -932,9 +933,9 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert downstream_final_shear["runs_after_downstream_return_current_balance"] is True
     assert downstream_final_shear["uses_duration_normalized_final_response"] is True
     assert downstream_final_shear["response_start_fraction"] == pytest.approx(0.995)
-    assert downstream_final_shear["velocity_rate_per_s"] == pytest.approx(60.0)
-    assert downstream_final_shear["max_speed_m_per_s2"] == pytest.approx(18.0)
-    assert downstream_final_shear["speed_fraction"] == pytest.approx(-0.12)
+    assert downstream_final_shear["velocity_rate_per_s"] == pytest.approx(90.0)
+    assert downstream_final_shear["max_speed_m_per_s2"] == pytest.approx(30.0)
+    assert downstream_final_shear["speed_fraction"] == pytest.approx(-0.20)
     assert downstream_final_shear["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_momentum_reconstruction"] is True
     assert constriction_manifest["constriction_y_face_flux_source_audit"]["present"] is True
