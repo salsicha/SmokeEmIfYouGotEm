@@ -1147,6 +1147,16 @@ double constriction_transition_edge_face_weight(const Scenario& scenario, std::s
     return kConstrictionTransitionEdgeFaceWeightScale * clamp(-signed_x / half_length, 0.0, 1.0);
 }
 
+double constriction_upper_edge_balance_weight(const Scenario& scenario, std::size_t col) {
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double signed_x = constriction_signed_x(scenario, col);
+    if (signed_x >= 0.0) {
+        return 0.0;
+    }
+    double transition_weight = kConstrictionTransitionEdgeFaceWeightScale * clamp(-signed_x / half_length, 0.0, 1.0);
+    return std::max(constriction_upstream_edge_approach_weight(scenario, col), transition_weight);
+}
+
 double bed_slope_source_y_per_s(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -2902,7 +2912,7 @@ void apply_constriction_upper_edge_opposition_balance(
             continue;
         }
 
-        double approach_weight = constriction_upstream_edge_approach_weight(scenario, col);
+        double approach_weight = constriction_upper_edge_balance_weight(scenario, col);
         if (approach_weight <= 0.0) {
             continue;
         }
@@ -4400,6 +4410,8 @@ void write_solver_output(
              << "    \"speed_fraction_of_authored_throat\": " << kConstrictionUpperEdgeOppositionBalanceSpeedFraction << ",\n"
              << "    \"cross_stream_fraction\": " << kConstrictionUpperEdgeOppositionBalanceCrossStreamFraction << ",\n"
              << "    \"interior_cross_stream_fraction\": " << kConstrictionUpperEdgeOppositionBalanceInteriorCrossStreamFraction << ",\n"
+             << "    \"uses_transition_aware_weight\": true,\n"
+             << "    \"transition_edge_face_weight_scale\": " << kConstrictionTransitionEdgeFaceWeightScale << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_y_face_hydrostatic_source_split\": "
