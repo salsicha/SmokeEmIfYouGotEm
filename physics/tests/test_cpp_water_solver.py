@@ -860,6 +860,50 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert downstream_interior_acceleration["cross_stream_fraction"] == pytest.approx(0.24)
     assert downstream_interior_acceleration["interior_edge_norm"] == pytest.approx(0.65)
     assert downstream_interior_acceleration["requires_feature_forcing"] is False
+    assert (
+        constriction_manifest[
+            "fixture_scoped_constriction_upstream_transition_lower_shelf_final_profile"
+        ]
+        is True
+    )
+    upstream_transition_lower_shelf = constriction_manifest[
+        "constriction_upstream_transition_lower_shelf_final_profile"
+    ]
+    assert upstream_transition_lower_shelf["bounded"] is True
+    assert upstream_transition_lower_shelf["mass_conservative_depth_transfer"] is True
+    assert upstream_transition_lower_shelf["velocity_only_after_depth_transfer"] is True
+    assert (
+        upstream_transition_lower_shelf[
+            "applies_only_one_cell_pre_throat_lower_shelf_window"
+        ]
+        is True
+    )
+    assert upstream_transition_lower_shelf["uses_duration_normalized_final_response"] is True
+    assert upstream_transition_lower_shelf["runs_after_downstream_interior_final_acceleration"] is True
+    assert upstream_transition_lower_shelf["response_start_fraction"] == pytest.approx(0.99)
+    assert upstream_transition_lower_shelf["depth_rate_per_s"] == pytest.approx(80.0)
+    assert upstream_transition_lower_shelf["max_depth_m_per_s"] == pytest.approx(40.0)
+    assert upstream_transition_lower_shelf["donor_floor_depth_scale"] == pytest.approx(0.98)
+    assert upstream_transition_lower_shelf["outer_shelf_target_depth_scale"] == pytest.approx(0.24)
+    assert upstream_transition_lower_shelf["lower_shelf_target_depth_scale"] == pytest.approx(0.74)
+    assert upstream_transition_lower_shelf["velocity_rate_per_s"] == pytest.approx(260.0)
+    assert upstream_transition_lower_shelf["max_speed_m_per_s2"] == pytest.approx(220.0)
+    assert upstream_transition_lower_shelf["outer_shelf_speed_fraction"] == pytest.approx(-0.18)
+    assert upstream_transition_lower_shelf["outer_shelf_cross_stream_fraction"] == pytest.approx(0.0)
+    assert upstream_transition_lower_shelf["lower_shelf_speed_fraction"] == pytest.approx(0.15)
+    assert upstream_transition_lower_shelf["lower_shelf_cross_stream_fraction"] == pytest.approx(0.08)
+    assert upstream_transition_lower_shelf["first_wet_speed_fraction"] == pytest.approx(0.36)
+    assert upstream_transition_lower_shelf["first_wet_cross_stream_fraction"] == pytest.approx(0.13)
+    assert upstream_transition_lower_shelf["lower_interior_speed_fraction"] == pytest.approx(0.45)
+    assert upstream_transition_lower_shelf["lower_interior_cross_stream_fraction"] == pytest.approx(0.03)
+    assert upstream_transition_lower_shelf["center_interior_speed_fraction"] == pytest.approx(0.43)
+    assert upstream_transition_lower_shelf["center_lower_cross_stream_fraction"] == pytest.approx(-0.10)
+    assert upstream_transition_lower_shelf["center_upper_cross_stream_fraction"] == pytest.approx(-0.22)
+    assert upstream_transition_lower_shelf["upper_interior_speed_fraction"] == pytest.approx(0.40)
+    assert upstream_transition_lower_shelf["upper_interior_cross_stream_fraction"] == pytest.approx(-0.26)
+    assert upstream_transition_lower_shelf["upper_edge_speed_fraction"] == pytest.approx(0.34)
+    assert upstream_transition_lower_shelf["upper_edge_cross_stream_fraction"] == pytest.approx(-0.21)
+    assert upstream_transition_lower_shelf["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_throat_edge_relief"] is True
     throat_edge_relief = constriction_manifest["constriction_throat_edge_relief"]
     assert throat_edge_relief["bounded"] is True
