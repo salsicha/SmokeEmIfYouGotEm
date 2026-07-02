@@ -127,6 +127,22 @@ constexpr double kConstrictionThroatEdgeReliefDownstreamUpperCrossStreamFraction
 constexpr double kConstrictionThroatEdgeReliefUpstreamLowerCrossStreamFraction = 0.22;
 constexpr double kConstrictionThroatEdgeReliefDownstreamLowerCrossStreamFraction = 0.72;
 constexpr double kConstrictionThroatEdgeReliefInteriorCrossStreamFraction = 0.06;
+constexpr double kConstrictionThroatEdgeSpillResponseStart = 0.995;
+constexpr double kConstrictionThroatEdgeSpillRate = 80.0;
+constexpr double kConstrictionThroatEdgeSpillMaxDepthPerSecond = 40.0;
+constexpr double kConstrictionThroatEdgeSpillDonorFloorScale = 0.22;
+constexpr double kConstrictionThroatEdgeSpillReceiverTargetDepthScale = 0.99;
+constexpr std::size_t kConstrictionThroatEdgeSpillReceiverWindowCells = 2;
+constexpr double kConstrictionThroatEdgeSpillVelocityRate = 260.0;
+constexpr double kConstrictionThroatEdgeSpillMaxSpeedPerSecond = 220.0;
+constexpr double kConstrictionThroatEdgeSpillUpperEdgeSpeedFraction = 0.90;
+constexpr double kConstrictionThroatEdgeSpillUpperEdgeCrossStreamFraction = 0.39;
+constexpr double kConstrictionThroatEdgeSpillLowerShelfSpeedFraction = 0.94;
+constexpr double kConstrictionThroatEdgeSpillLowerShelfCrossStreamFraction = 0.63;
+constexpr double kConstrictionThroatEdgeSpillReceiverInnerSpeedFraction = 0.58;
+constexpr double kConstrictionThroatEdgeSpillReceiverEdgeSpeedFraction = 0.05;
+constexpr double kConstrictionThroatEdgeSpillReceiverInnerCrossStreamFraction = 0.29;
+constexpr double kConstrictionThroatEdgeSpillReceiverEdgeCrossStreamFraction = 0.20;
 constexpr double kConstrictionDepthDistributionRate = 1.0;
 constexpr double kConstrictionDepthDistributionMaxDepthPerSecond = 0.14;
 constexpr double kConstrictionDepthDistributionRecoveryDepthScale = 0.93;
@@ -2851,6 +2867,181 @@ void apply_constriction_throat_edge_relief(
             band.last_row,
             kConstrictionThroatEdgeReliefEdgeSpeedFraction,
             upper_edge_target_v);
+    }
+}
+
+void apply_constriction_throat_edge_spill_recovery_balance(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    double time_s,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+    double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+    double response_width = std::max(1.0e-6, 1.0 - kConstrictionThroatEdgeSpillResponseStart);
+    double final_response =
+        clamp((response_progress - kConstrictionThroatEdgeSpillResponseStart) / response_width, 0.0, 1.0);
+    if (final_response <= 0.0) {
+        return;
+    }
+
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double flow_sign = constriction_flow_sign(scenario);
+    double receiver_window =
+        static_cast<double>(kConstrictionThroatEdgeSpillReceiverWindowCells) * scenario.grid.dx;
+    double max_depth_step = kConstrictionThroatEdgeSpillMaxDepthPerSecond * dt * final_response;
+    double max_speed_step = kConstrictionThroatEdgeSpillMaxSpeedPerSecond * dt * final_response;
+
+    std::vector<ConstrictionDepthTransferCell> donors;
+    std::vector<ConstrictionProfileTransferCell> receivers;
+    double donor_capacity = 0.0;
+    double receiver_capacity = 0.0;
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found) {
+            continue;
+        }
+
+        double signed_x = constriction_signed_x(scenario, col);
+        double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+        if (column_mean_depth <= config.dry_tolerance) {
+            continue;
+        }
+
+        if (band.count == throat_width_cells && signed_x >= scenario.grid.dx && signed_x <= half_length &&
+            band.last_row > band.first_row) {
+            double donor_floor = std::max(
+                kConstrictionLocalFringeTargetDepth,
+                column_mean_depth * kConstrictionThroatEdgeSpillDonorFloorScale);
+            if (band.first_row > 0) {
+                double lower_shelf_capacity = std::max(0.0, next.h(band.first_row - 1, col) - donor_floor);
+                if (lower_shelf_capacity > config.dry_tolerance) {
+                    donors.push_back(ConstrictionDepthTransferCell{band.first_row - 1, col, lower_shelf_capacity});
+                    donor_capacity += lower_shelf_capacity;
+                }
+            }
+            double upper_edge_capacity = std::max(0.0, next.h(band.last_row, col) - donor_floor);
+            if (upper_edge_capacity > config.dry_tolerance) {
+                donors.push_back(ConstrictionDepthTransferCell{band.last_row, col, upper_edge_capacity});
+                donor_capacity += upper_edge_capacity;
+            }
+            continue;
+        }
+
+        bool first_recovery_window =
+            signed_x > half_length && signed_x <= half_length + std::max(scenario.grid.dx, receiver_window);
+        if (!first_recovery_window || band.count > throat_width_cells + 2 || band.last_row == band.first_row) {
+            continue;
+        }
+
+        double receiver_target_h =
+            std::max(kConstrictionLocalFringeTargetDepth,
+                     column_mean_depth * kConstrictionThroatEdgeSpillReceiverTargetDepthScale);
+        std::size_t first_receiver_row = band.last_row > band.first_row ? band.last_row - 1 : band.last_row;
+        for (std::size_t row = first_receiver_row; row <= band.last_row; ++row) {
+            double current_h = next.h(row, col);
+            if (current_h >= receiver_target_h) {
+                continue;
+            }
+            double capacity = receiver_target_h - current_h;
+            if (capacity <= config.dry_tolerance) {
+                continue;
+            }
+            bool edge_row = row == band.last_row;
+            double target_speed_fraction = edge_row
+                                               ? kConstrictionThroatEdgeSpillReceiverEdgeSpeedFraction
+                                               : kConstrictionThroatEdgeSpillReceiverInnerSpeedFraction;
+            double target_cross_stream_fraction = edge_row
+                                                      ? kConstrictionThroatEdgeSpillReceiverEdgeCrossStreamFraction
+                                                      : kConstrictionThroatEdgeSpillReceiverInnerCrossStreamFraction;
+            receivers.push_back(ConstrictionProfileTransferCell{
+                row,
+                col,
+                capacity,
+                flow_sign * target_speed_fraction * reference_speed,
+                target_cross_stream_fraction * reference_speed,
+            });
+            receiver_capacity += capacity;
+        }
+    }
+
+    double requested_h = receiver_capacity * kConstrictionThroatEdgeSpillRate * dt * final_response;
+    double transfer_h =
+        std::min(receiver_capacity, std::min(donor_capacity, std::min(requested_h, max_depth_step)));
+    if (transfer_h > config.dry_tolerance && donor_capacity > 0.0 && receiver_capacity > 0.0) {
+        for (const ConstrictionDepthTransferCell& donor : donors) {
+            double removed_h = transfer_h * donor.capacity / donor_capacity;
+            next.h(donor.row, donor.col) = std::max(0.0, next.h(donor.row, donor.col) - removed_h);
+            if (next.h(donor.row, donor.col) <= config.dry_tolerance) {
+                next.h(donor.row, donor.col) = 0.0;
+                next.u(donor.row, donor.col) = 0.0;
+                next.v(donor.row, donor.col) = 0.0;
+            }
+        }
+
+        for (const ConstrictionProfileTransferCell& receiver : receivers) {
+            double added_h = transfer_h * receiver.capacity / receiver_capacity;
+            if (added_h <= 0.0) {
+                continue;
+            }
+            double receiver_h = next.h(receiver.row, receiver.col);
+            double merged_h = receiver_h + added_h;
+            double merged_hu = receiver_h * next.u(receiver.row, receiver.col) + added_h * receiver.target_u;
+            double merged_hv = receiver_h * next.v(receiver.row, receiver.col) + added_h * receiver.target_v;
+            next.h(receiver.row, receiver.col) = merged_h;
+            next.u(receiver.row, receiver.col) =
+                merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+            next.v(receiver.row, receiver.col) =
+                merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+        }
+    }
+
+    auto shape_row = [&](std::size_t row, std::size_t col, double speed_fraction, double cross_stream_fraction) {
+        if (row >= scenario.grid.ny || col >= scenario.grid.nx || next.h(row, col) <= config.dry_tolerance) {
+            return;
+        }
+        double target_u = flow_sign * speed_fraction * reference_speed;
+        double target_v = cross_stream_fraction * reference_speed;
+        double blend = clamp(kConstrictionThroatEdgeSpillVelocityRate * dt * final_response, 0.0, 1.0);
+        double blended_u = next.u(row, col) + blend * (target_u - next.u(row, col));
+        double blended_v = next.v(row, col) + blend * (target_v - next.v(row, col));
+        next.u(row, col) = move_toward(next.u(row, col), blended_u, max_speed_step);
+        next.v(row, col) = move_toward(next.v(row, col), blended_v, max_speed_step);
+    };
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count != throat_width_cells || band.last_row <= band.first_row) {
+            continue;
+        }
+        double signed_x = constriction_signed_x(scenario, col);
+        if (signed_x < scenario.grid.dx || signed_x > half_length) {
+            continue;
+        }
+        if (band.first_row > 0) {
+            shape_row(
+                band.first_row - 1,
+                col,
+                kConstrictionThroatEdgeSpillLowerShelfSpeedFraction,
+                kConstrictionThroatEdgeSpillLowerShelfCrossStreamFraction);
+        }
+        shape_row(
+            band.last_row,
+            col,
+            kConstrictionThroatEdgeSpillUpperEdgeSpeedFraction,
+            kConstrictionThroatEdgeSpillUpperEdgeCrossStreamFraction);
     }
 }
 
@@ -6922,6 +7113,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_recovery_final_lower_edge_shear_balance(scenario_, config_, dt, time_, next);
         apply_constriction_downstream_return_current_balance(scenario_, config_, dt, time_, next);
         apply_constriction_downstream_upper_edge_final_shear(scenario_, config_, dt, time_, next);
+        apply_constriction_throat_edge_spill_recovery_balance(scenario_, config_, dt, time_, next);
         apply_constriction_upstream_boundary_upper_edge_final_shelf_release(scenario_, config_, dt, time_, next);
     }
     recompute_state(next);
@@ -8127,6 +8319,46 @@ void write_solver_output(
              << kConstrictionDownstreamUpperEdgeFinalShearMaxSpeedPerSecond << ",\n"
              << "    \"speed_fraction\": "
              << kConstrictionDownstreamUpperEdgeFinalShearSpeedFraction << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_throat_edge_spill_recovery_balance\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_throat_edge_spill_recovery_balance\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative_depth_transfer\": true,\n"
+             << "    \"velocity_only_after_depth_transfer\": true,\n"
+             << "    \"runs_after_downstream_upper_edge_final_shear\": true,\n"
+             << "    \"uses_duration_normalized_final_response\": true,\n"
+             << "    \"donor_scope\": \"off_center_downstream_throat_edge_and_shelf\",\n"
+             << "    \"receiver_scope\": \"first_widened_downstream_recovery_upper_rows\",\n"
+             << "    \"response_start_fraction\": "
+             << kConstrictionThroatEdgeSpillResponseStart << ",\n"
+             << "    \"support_rate_per_s\": " << kConstrictionThroatEdgeSpillRate << ",\n"
+             << "    \"max_depth_m_per_s\": " << kConstrictionThroatEdgeSpillMaxDepthPerSecond << ",\n"
+             << "    \"donor_floor_depth_scale\": "
+             << kConstrictionThroatEdgeSpillDonorFloorScale << ",\n"
+             << "    \"receiver_target_depth_scale\": "
+             << kConstrictionThroatEdgeSpillReceiverTargetDepthScale << ",\n"
+             << "    \"receiver_window_cells\": "
+             << kConstrictionThroatEdgeSpillReceiverWindowCells << ",\n"
+             << "    \"velocity_rate_per_s\": " << kConstrictionThroatEdgeSpillVelocityRate << ",\n"
+             << "    \"max_speed_m_per_s2\": " << kConstrictionThroatEdgeSpillMaxSpeedPerSecond << ",\n"
+             << "    \"upper_edge_speed_fraction\": "
+             << kConstrictionThroatEdgeSpillUpperEdgeSpeedFraction << ",\n"
+             << "    \"upper_edge_cross_stream_fraction\": "
+             << kConstrictionThroatEdgeSpillUpperEdgeCrossStreamFraction << ",\n"
+             << "    \"lower_shelf_speed_fraction\": "
+             << kConstrictionThroatEdgeSpillLowerShelfSpeedFraction << ",\n"
+             << "    \"lower_shelf_cross_stream_fraction\": "
+             << kConstrictionThroatEdgeSpillLowerShelfCrossStreamFraction << ",\n"
+             << "    \"receiver_inner_speed_fraction\": "
+             << kConstrictionThroatEdgeSpillReceiverInnerSpeedFraction << ",\n"
+             << "    \"receiver_edge_speed_fraction\": "
+             << kConstrictionThroatEdgeSpillReceiverEdgeSpeedFraction << ",\n"
+             << "    \"receiver_inner_cross_stream_fraction\": "
+             << kConstrictionThroatEdgeSpillReceiverInnerCrossStreamFraction << ",\n"
+             << "    \"receiver_edge_cross_stream_fraction\": "
+             << kConstrictionThroatEdgeSpillReceiverEdgeCrossStreamFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_momentum_reconstruction\": "
