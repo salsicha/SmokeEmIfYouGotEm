@@ -470,6 +470,44 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert lower_transition_source_depth["lower_first_wet_cross_stream_fraction"] == pytest.approx(0.34)
     assert lower_transition_source_depth["upper_edge_cross_stream_fraction"] == pytest.approx(0.72)
     assert lower_transition_source_depth["requires_feature_forcing"] is False
+    assert (
+        constriction_manifest["fixture_scoped_constriction_lower_edge_contraction_face_velocity_balance"]
+        is True
+    )
+    lower_contraction_face_velocity = constriction_manifest[
+        "constriction_lower_edge_contraction_face_velocity_balance"
+    ]
+    assert lower_contraction_face_velocity["bounded"] is True
+    assert lower_contraction_face_velocity["velocity_only"] is True
+    assert lower_contraction_face_velocity["mass_preserving"] is True
+    assert lower_contraction_face_velocity["applies_only_lower_edge_contraction_window"] is True
+    assert lower_contraction_face_velocity["runs_after_lower_edge_transition_source_depth_balance"] is True
+    assert lower_contraction_face_velocity["approach_window_cells"] == 2
+    assert lower_contraction_face_velocity["post_entry_window_cells"] == 2
+    assert lower_contraction_face_velocity["velocity_rate_per_s"] == pytest.approx(6.0)
+    assert lower_contraction_face_velocity["max_speed_m_per_s2"] == pytest.approx(5.0)
+    assert (
+        lower_contraction_face_velocity["approach_shelf_cross_stream_fraction"]
+        == pytest.approx(1.05)
+    )
+    assert (
+        lower_contraction_face_velocity["approach_first_wet_cross_stream_fraction"]
+        == pytest.approx(0.46)
+    )
+    assert lower_contraction_face_velocity["entry_shelf_cross_stream_fraction"] == pytest.approx(0.18)
+    assert (
+        lower_contraction_face_velocity["entry_first_wet_cross_stream_fraction"]
+        == pytest.approx(0.28)
+    )
+    assert (
+        lower_contraction_face_velocity["post_entry_shelf_cross_stream_fraction"]
+        == pytest.approx(0.10)
+    )
+    assert (
+        lower_contraction_face_velocity["post_entry_first_wet_cross_stream_fraction"]
+        == pytest.approx(0.22)
+    )
+    assert lower_contraction_face_velocity["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_upstream_boundary_column_support"] is True
     assert constriction_manifest["constriction_upstream_boundary_column_support"]["bounded"] is True
     assert (
