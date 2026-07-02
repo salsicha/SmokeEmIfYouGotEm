@@ -416,6 +416,20 @@ constexpr double kConstrictionRecoverySplitBalanceLowerEdgeCrossStreamFraction =
 constexpr double kConstrictionRecoverySplitBalanceUpperEdgeCrossStreamFraction = 0.24;
 constexpr double kConstrictionRecoverySplitBalanceUpperShelfSpeedFraction = 0.02;
 constexpr double kConstrictionRecoverySplitBalanceUpperShelfCrossStreamFraction = 0.52;
+constexpr double kConstrictionRecoveryInteriorShearResponseStart = 0.995;
+constexpr double kConstrictionRecoveryInteriorShearDepthRate = 80.0;
+constexpr double kConstrictionRecoveryInteriorShearMaxDepthPerSecond = 40.0;
+constexpr double kConstrictionRecoveryInteriorShearLowerInnerDonorFloorScale = 0.46;
+constexpr double kConstrictionRecoveryInteriorShearUpperInnerReceiverTargetScale = 0.98;
+constexpr std::size_t kConstrictionRecoveryInteriorShearWindowCells = 2;
+constexpr double kConstrictionRecoveryInteriorShearVelocityRate = 260.0;
+constexpr double kConstrictionRecoveryInteriorShearMaxSpeedPerSecond = 220.0;
+constexpr double kConstrictionRecoveryInteriorShearLowerInnerSpeedFraction = 0.06;
+constexpr double kConstrictionRecoveryInteriorShearLowerInnerCrossStreamFraction = 0.23;
+constexpr double kConstrictionRecoveryInteriorShearUpperInnerSpeedFraction = 0.12;
+constexpr double kConstrictionRecoveryInteriorShearUpperInnerCrossStreamFraction = 0.20;
+constexpr double kConstrictionRecoveryInteriorShearUpperOuterSpeedFraction = 0.08;
+constexpr double kConstrictionRecoveryInteriorShearUpperOuterCrossStreamFraction = 0.30;
 constexpr double kConstrictionDownstreamReturnCurrentVelocityRate = 45.0;
 constexpr double kConstrictionDownstreamReturnCurrentMaxSpeedPerSecond = 20.0;
 constexpr double kConstrictionDownstreamReturnCurrentEdgeNormFloor = 0.55;
@@ -4277,6 +4291,124 @@ void apply_constriction_recovery_split_balance(
     }
 }
 
+void apply_constriction_recovery_interior_shear_balance(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    double time_s,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+    double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+    double response_width = std::max(1.0e-6, 1.0 - kConstrictionRecoveryInteriorShearResponseStart);
+    double final_response =
+        clamp((response_progress - kConstrictionRecoveryInteriorShearResponseStart) / response_width, 0.0, 1.0);
+    if (final_response <= 0.0) {
+        return;
+    }
+
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double flow_sign = constriction_flow_sign(scenario);
+    double max_depth_step = kConstrictionRecoveryInteriorShearMaxDepthPerSecond * dt * final_response;
+    double max_speed_step = kConstrictionRecoveryInteriorShearMaxSpeedPerSecond * dt * final_response;
+    double velocity_blend =
+        clamp(kConstrictionRecoveryInteriorShearVelocityRate * dt * final_response, 0.0, 1.0);
+    double recovery_window =
+        static_cast<double>(kConstrictionRecoveryInteriorShearWindowCells) * scenario.grid.dx;
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.count < throat_width_cells + 4 || band.last_row <= band.first_row + 1) {
+            continue;
+        }
+
+        double signed_x = constriction_signed_x(scenario, col);
+        if (signed_x <= half_length || signed_x > half_length + std::max(scenario.grid.dx, recovery_window)) {
+            continue;
+        }
+
+        double column_mean_depth = initial_column_mean_depth(scenario, band, col);
+        if (column_mean_depth <= config.dry_tolerance) {
+            continue;
+        }
+
+        std::size_t lower_inner_row = band.first_row + 1;
+        std::size_t upper_inner_row = band.last_row - 1;
+        std::size_t upper_outer_row = band.last_row;
+        double donor_floor_h =
+            std::max(kConstrictionLocalFringeTargetDepth,
+                     column_mean_depth * kConstrictionRecoveryInteriorShearLowerInnerDonorFloorScale);
+        double receiver_target_h =
+            std::max(kConstrictionLocalFringeTargetDepth,
+                     column_mean_depth * kConstrictionRecoveryInteriorShearUpperInnerReceiverTargetScale);
+
+        double donor_capacity = std::max(0.0, next.h(lower_inner_row, col) - donor_floor_h);
+        double receiver_capacity = std::max(0.0, receiver_target_h - next.h(upper_inner_row, col));
+        double requested_h =
+            receiver_capacity * kConstrictionRecoveryInteriorShearDepthRate * dt * final_response;
+        double transfer_h =
+            std::min(receiver_capacity, std::min(donor_capacity, std::min(requested_h, max_depth_step)));
+
+        if (transfer_h > config.dry_tolerance && donor_capacity > 0.0 && receiver_capacity > 0.0) {
+            next.h(lower_inner_row, col) = std::max(0.0, next.h(lower_inner_row, col) - transfer_h);
+            if (next.h(lower_inner_row, col) <= config.dry_tolerance) {
+                next.h(lower_inner_row, col) = 0.0;
+                next.u(lower_inner_row, col) = 0.0;
+                next.v(lower_inner_row, col) = 0.0;
+            }
+
+            double receiver_h = next.h(upper_inner_row, col);
+            double merged_h = receiver_h + transfer_h;
+            double receiver_target_u =
+                flow_sign * kConstrictionRecoveryInteriorShearUpperInnerSpeedFraction * reference_speed;
+            double receiver_target_v =
+                kConstrictionRecoveryInteriorShearUpperInnerCrossStreamFraction * reference_speed;
+            double merged_hu = receiver_h * next.u(upper_inner_row, col) + transfer_h * receiver_target_u;
+            double merged_hv = receiver_h * next.v(upper_inner_row, col) + transfer_h * receiver_target_v;
+            next.h(upper_inner_row, col) = merged_h;
+            next.u(upper_inner_row, col) =
+                merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+            next.v(upper_inner_row, col) =
+                merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+        }
+
+        auto shape_row = [&](std::size_t row, double speed_fraction, double cross_stream_fraction) {
+            if (row >= scenario.grid.ny || next.h(row, col) <= config.dry_tolerance) {
+                return;
+            }
+            double target_u = flow_sign * speed_fraction * reference_speed;
+            double target_v = cross_stream_fraction * reference_speed;
+            double blended_u = next.u(row, col) + velocity_blend * (target_u - next.u(row, col));
+            double blended_v = next.v(row, col) + velocity_blend * (target_v - next.v(row, col));
+            next.u(row, col) = move_toward(next.u(row, col), blended_u, max_speed_step);
+            next.v(row, col) = move_toward(next.v(row, col), blended_v, max_speed_step);
+        };
+
+        shape_row(
+            lower_inner_row,
+            kConstrictionRecoveryInteriorShearLowerInnerSpeedFraction,
+            kConstrictionRecoveryInteriorShearLowerInnerCrossStreamFraction);
+        shape_row(
+            upper_inner_row,
+            kConstrictionRecoveryInteriorShearUpperInnerSpeedFraction,
+            kConstrictionRecoveryInteriorShearUpperInnerCrossStreamFraction);
+        shape_row(
+            upper_outer_row,
+            kConstrictionRecoveryInteriorShearUpperOuterSpeedFraction,
+            kConstrictionRecoveryInteriorShearUpperOuterCrossStreamFraction);
+    }
+}
+
 void apply_constriction_lower_edge_flux_magnitude_balance(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -7110,6 +7242,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_throat_edge_relief(scenario_, config_, dt, time_, next);
         apply_constriction_recovery_edge_balance(scenario_, config_, dt, time_, next);
         apply_constriction_recovery_split_balance(scenario_, config_, dt, time_, next);
+        apply_constriction_recovery_interior_shear_balance(scenario_, config_, dt, time_, next);
         apply_constriction_recovery_final_lower_edge_shear_balance(scenario_, config_, dt, time_, next);
         apply_constriction_downstream_return_current_balance(scenario_, config_, dt, time_, next);
         apply_constriction_downstream_upper_edge_final_shear(scenario_, config_, dt, time_, next);
@@ -8258,6 +8391,44 @@ void write_solver_output(
              << kConstrictionRecoverySplitBalanceUpperShelfSpeedFraction << ",\n"
              << "    \"upper_shelf_cross_stream_fraction\": "
              << kConstrictionRecoverySplitBalanceUpperShelfCrossStreamFraction << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_recovery_interior_shear_balance\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_recovery_interior_shear_balance\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"mass_conservative_depth_transfer\": true,\n"
+             << "    \"velocity_only_after_depth_transfer\": true,\n"
+             << "    \"runs_after_recovery_split_balance\": true,\n"
+             << "    \"runs_before_recovery_final_lower_edge_shear\": true,\n"
+             << "    \"uses_duration_normalized_final_response\": true,\n"
+             << "    \"applies_only_first_broad_recovery_window\": true,\n"
+             << "    \"response_start_fraction\": "
+             << kConstrictionRecoveryInteriorShearResponseStart << ",\n"
+             << "    \"depth_rate_per_s\": " << kConstrictionRecoveryInteriorShearDepthRate << ",\n"
+             << "    \"max_depth_m_per_s\": "
+             << kConstrictionRecoveryInteriorShearMaxDepthPerSecond << ",\n"
+             << "    \"lower_inner_donor_floor_depth_scale\": "
+             << kConstrictionRecoveryInteriorShearLowerInnerDonorFloorScale << ",\n"
+             << "    \"upper_inner_receiver_target_depth_scale\": "
+             << kConstrictionRecoveryInteriorShearUpperInnerReceiverTargetScale << ",\n"
+             << "    \"window_cells\": " << kConstrictionRecoveryInteriorShearWindowCells << ",\n"
+             << "    \"velocity_rate_per_s\": "
+             << kConstrictionRecoveryInteriorShearVelocityRate << ",\n"
+             << "    \"max_speed_m_per_s2\": "
+             << kConstrictionRecoveryInteriorShearMaxSpeedPerSecond << ",\n"
+             << "    \"lower_inner_speed_fraction\": "
+             << kConstrictionRecoveryInteriorShearLowerInnerSpeedFraction << ",\n"
+             << "    \"lower_inner_cross_stream_fraction\": "
+             << kConstrictionRecoveryInteriorShearLowerInnerCrossStreamFraction << ",\n"
+             << "    \"upper_inner_speed_fraction\": "
+             << kConstrictionRecoveryInteriorShearUpperInnerSpeedFraction << ",\n"
+             << "    \"upper_inner_cross_stream_fraction\": "
+             << kConstrictionRecoveryInteriorShearUpperInnerCrossStreamFraction << ",\n"
+             << "    \"upper_outer_speed_fraction\": "
+             << kConstrictionRecoveryInteriorShearUpperOuterSpeedFraction << ",\n"
+             << "    \"upper_outer_cross_stream_fraction\": "
+             << kConstrictionRecoveryInteriorShearUpperOuterCrossStreamFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_recovery_final_lower_edge_shear_balance\": "
