@@ -1194,6 +1194,34 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert recovery_interior_shear["upper_outer_speed_fraction"] == pytest.approx(0.08)
     assert recovery_interior_shear["upper_outer_cross_stream_fraction"] == pytest.approx(0.30)
     assert recovery_interior_shear["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_recovery_broad_interior_final_profile"] is True
+    broad_interior_profile = constriction_manifest[
+        "constriction_recovery_broad_interior_final_profile"
+    ]
+    assert broad_interior_profile["bounded"] is True
+    assert broad_interior_profile["velocity_only"] is True
+    assert broad_interior_profile["mass_preserving"] is True
+    assert broad_interior_profile["runs_after_recovery_interior_shear_balance"] is True
+    assert broad_interior_profile["uses_duration_normalized_final_response"] is True
+    assert broad_interior_profile["applies_only_broad_recovery_interior_window"] is True
+    assert broad_interior_profile["response_start_fraction"] == pytest.approx(0.99)
+    assert broad_interior_profile["velocity_rate_per_s"] == pytest.approx(220.0)
+    assert broad_interior_profile["max_speed_m_per_s2"] == pytest.approx(220.0)
+    assert broad_interior_profile["start_offset_cells"] == pytest.approx(2.0)
+    assert broad_interior_profile["end_offset_cells"] == pytest.approx(5.0)
+    assert broad_interior_profile["lower_edge_speed_fraction"] == pytest.approx(-0.05)
+    assert broad_interior_profile["lower_inner_near_speed_fraction"] == pytest.approx(0.12)
+    assert broad_interior_profile["lower_inner_far_speed_fraction"] == pytest.approx(0.28)
+    assert broad_interior_profile["center_near_speed_fraction"] == pytest.approx(1.06)
+    assert broad_interior_profile["center_far_speed_fraction"] == pytest.approx(1.14)
+    assert broad_interior_profile["upper_inner_speed_fraction"] == pytest.approx(0.26)
+    assert broad_interior_profile["upper_edge_speed_fraction"] == pytest.approx(0.03)
+    assert broad_interior_profile["lower_cross_stream_fraction"] == pytest.approx(0.08)
+    assert broad_interior_profile["center_cross_stream_fraction"] == pytest.approx(0.16)
+    assert broad_interior_profile["upper_cross_stream_fraction"] == pytest.approx(0.12)
+    assert broad_interior_profile["lower_inner_edge_norm_floor"] == pytest.approx(0.45)
+    assert broad_interior_profile["upper_inner_edge_norm_floor"] == pytest.approx(0.25)
+    assert broad_interior_profile["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_recovery_final_lower_edge_shear_balance"] is True
     final_lower_edge_shear = constriction_manifest["constriction_recovery_final_lower_edge_shear_balance"]
     assert final_lower_edge_shear["bounded"] is True
