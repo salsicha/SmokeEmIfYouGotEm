@@ -681,6 +681,28 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         ]
         is False
     )
+    assert (
+        constriction_manifest["fixture_scoped_constriction_upstream_boundary_upper_edge_profile_release"]
+        is True
+    )
+    upper_edge_profile = constriction_manifest["constriction_upstream_boundary_upper_edge_profile_release"]
+    assert upper_edge_profile["bounded"] is True
+    assert upper_edge_profile["mass_conservative_depth_transfer"] is True
+    assert upper_edge_profile["velocity_only_after_depth_transfer"] is True
+    assert upper_edge_profile["runs_after_lower_edge_contraction_face_velocity_balance"] is True
+    assert upper_edge_profile["uses_duration_normalized_final_response"] is True
+    assert upper_edge_profile["window_cells"] == 2
+    assert upper_edge_profile["support_rate_per_s"] == pytest.approx(18.0)
+    assert upper_edge_profile["max_depth_m_per_s"] == pytest.approx(4.0)
+    assert upper_edge_profile["donor_floor_depth_scale"] == pytest.approx(0.32)
+    assert upper_edge_profile["response_start_fraction"] == pytest.approx(0.995)
+    assert upper_edge_profile["upper_interior_target_depth_scale"] == pytest.approx(1.38)
+    assert upper_edge_profile["outer_shelf_inlet_bonus_depth_scale"] == pytest.approx(0.26)
+    assert upper_edge_profile["velocity_rate_per_s"] == pytest.approx(18.0)
+    assert upper_edge_profile["max_speed_m_per_s2"] == pytest.approx(14.0)
+    assert upper_edge_profile["edge_cross_stream_fraction"] == pytest.approx(2.05)
+    assert upper_edge_profile["immediate_shelf_cross_stream_fraction"] == pytest.approx(0.85)
+    assert upper_edge_profile["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_upper_edge_opposition_balance"] is True
     assert constriction_manifest["constriction_upper_edge_opposition_balance"]["bounded"] is True
     assert (
