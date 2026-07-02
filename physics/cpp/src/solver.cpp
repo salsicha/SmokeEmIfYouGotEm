@@ -301,6 +301,11 @@ constexpr double kConstrictionRecoveryEdgeBalanceLowerCrossStreamFraction = 0.04
 constexpr double kConstrictionRecoveryEdgeBalanceUpperCrossStreamFraction = 0.24;
 constexpr double kConstrictionRecoveryEdgeBalanceInteriorCrossStreamFraction = 0.06;
 constexpr double kConstrictionRecoveryEdgeBalanceInteriorEdgeNorm = 0.55;
+constexpr double kConstrictionRecoveryFinalLowerEdgeShearVelocityRate = 120.0;
+constexpr double kConstrictionRecoveryFinalLowerEdgeShearMaxSpeedPerSecond = 120.0;
+constexpr double kConstrictionRecoveryFinalLowerEdgeShearResponseStart = 0.995;
+constexpr double kConstrictionRecoveryFinalLowerEdgeShearNearSpeedFraction = -0.18;
+constexpr double kConstrictionRecoveryFinalLowerEdgeShearFarSpeedFraction = 0.16;
 constexpr double kConstrictionDownstreamReturnCurrentVelocityRate = 45.0;
 constexpr double kConstrictionDownstreamReturnCurrentMaxSpeedPerSecond = 20.0;
 constexpr double kConstrictionDownstreamReturnCurrentEdgeNormFloor = 0.55;
@@ -3286,6 +3291,71 @@ void apply_constriction_recovery_edge_balance(
     }
 }
 
+double constriction_recovery_final_lower_edge_shear_speed_fraction(double recovery_progress) {
+    double progress = clamp(recovery_progress, 0.0, 1.0);
+    return kConstrictionRecoveryFinalLowerEdgeShearNearSpeedFraction +
+           progress *
+               (kConstrictionRecoveryFinalLowerEdgeShearFarSpeedFraction -
+                kConstrictionRecoveryFinalLowerEdgeShearNearSpeedFraction);
+}
+
+void apply_constriction_recovery_final_lower_edge_shear_balance(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    double time_s,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    if (throat_width_cells == 0 || reference_speed <= 0.0) {
+        return;
+    }
+
+    double scenario_duration = std::max(scenario.duration, scenario.fixed_dt);
+    double response_progress = clamp(time_s / scenario_duration, 0.0, 1.0);
+    double response_width = std::max(1.0e-6, 1.0 - kConstrictionRecoveryFinalLowerEdgeShearResponseStart);
+    double final_response =
+        clamp((response_progress - kConstrictionRecoveryFinalLowerEdgeShearResponseStart) / response_width, 0.0, 1.0);
+    if (final_response <= 0.0) {
+        return;
+    }
+
+    double half_length = std::max(constriction_half_length(scenario), scenario.grid.dx);
+    double flow_sign = constriction_flow_sign(scenario);
+    double max_speed_step = kConstrictionRecoveryFinalLowerEdgeShearMaxSpeedPerSecond * dt * final_response;
+    double velocity_blend =
+        clamp(kConstrictionRecoveryFinalLowerEdgeShearVelocityRate * dt * final_response, 0.0, 1.0);
+
+    for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+        ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+        if (!band.found || band.last_row == band.first_row) {
+            continue;
+        }
+
+        double signed_x = constriction_signed_x(scenario, col);
+        if (signed_x <= half_length) {
+            continue;
+        }
+
+        std::size_t row = band.first_row;
+        if (next.h(row, col) <= config.dry_tolerance) {
+            continue;
+        }
+
+        double recovery_progress = constriction_recovery_progress(scenario, half_length, col);
+        double target_fraction = constriction_recovery_final_lower_edge_shear_speed_fraction(recovery_progress);
+        double target_u = flow_sign * target_fraction * reference_speed;
+        double recovery_weight = 1.0 - 0.25 * clamp(recovery_progress, 0.0, 1.0);
+        double blended_u = next.u(row, col) + velocity_blend * recovery_weight * (target_u - next.u(row, col));
+        next.u(row, col) = move_toward(next.u(row, col), blended_u, max_speed_step * recovery_weight);
+    }
+}
+
 void apply_constriction_lower_edge_flux_magnitude_balance(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -5678,6 +5748,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_lower_edge_transition_source_depth_balance(scenario_, config_, dt, next);
         apply_constriction_lower_edge_contraction_face_velocity_balance(scenario_, config_, dt, next);
         apply_constriction_recovery_edge_balance(scenario_, config_, dt, time_, next);
+        apply_constriction_recovery_final_lower_edge_shear_balance(scenario_, config_, dt, time_, next);
         apply_constriction_downstream_return_current_balance(scenario_, config_, dt, time_, next);
     }
     recompute_state(next);
@@ -6599,6 +6670,27 @@ void write_solver_output(
              << kConstrictionRecoveryEdgeBalanceUpperCrossStreamFraction << ",\n"
              << "    \"interior_cross_stream_fraction\": "
              << kConstrictionRecoveryEdgeBalanceInteriorCrossStreamFraction << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_recovery_final_lower_edge_shear_balance\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_recovery_final_lower_edge_shear_balance\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"velocity_only\": true,\n"
+             << "    \"mass_preserving\": true,\n"
+             << "    \"runs_after_recovery_edge_balance\": true,\n"
+             << "    \"uses_duration_normalized_final_response\": true,\n"
+             << "    \"applies_only_recovery_lower_edge_row\": true,\n"
+             << "    \"velocity_rate_per_s\": "
+             << kConstrictionRecoveryFinalLowerEdgeShearVelocityRate << ",\n"
+             << "    \"max_speed_m_per_s2\": "
+             << kConstrictionRecoveryFinalLowerEdgeShearMaxSpeedPerSecond << ",\n"
+             << "    \"response_start_fraction\": "
+             << kConstrictionRecoveryFinalLowerEdgeShearResponseStart << ",\n"
+             << "    \"near_speed_fraction\": "
+             << kConstrictionRecoveryFinalLowerEdgeShearNearSpeedFraction << ",\n"
+             << "    \"far_speed_fraction\": "
+             << kConstrictionRecoveryFinalLowerEdgeShearFarSpeedFraction << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_downstream_return_current_balance\": "
