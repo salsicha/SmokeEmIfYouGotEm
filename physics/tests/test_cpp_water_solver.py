@@ -293,8 +293,8 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     initial_throat_wet_count = int(constriction_scenario.initial_state.wet[:, throat_col].sum())
     final_throat_wet_count = 0
     dry_bank_depths = []
-    wet_throat_u = []
     final_wet_rows = []
+    final_throat_u_by_row = {}
     final_throat_v_by_row = {}
     wet_rows = [index for index, wet in enumerate(constriction_scenario.initial_state.wet[:, throat_col]) if wet]
     with constriction_final_frame.open(newline="", encoding="utf-8") as handle:
@@ -306,7 +306,7 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
             if int(row["wet"]):
                 final_throat_wet_count += 1
                 final_wet_rows.append(row_index)
-                wet_throat_u.append(float(row["u"]))
+                final_throat_u_by_row[row_index] = float(row["u"])
                 final_throat_v_by_row[row_index] = abs(float(row["v"]))
             if not constriction_scenario.initial_state.wet[row_index, throat_col]:
                 dry_bank_depths.append(float(row["h"]))
@@ -479,6 +479,44 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["constriction_local_shallow_fringe"]["mass_conservative_recovery_transfer"] is True
     assert constriction_manifest["fixture_scoped_constriction_near_throat_support_reconstruction"] is True
     assert constriction_manifest["constriction_near_throat_support"]["mass_conservative_excess_transfer"] is True
+    assert (
+        constriction_manifest["constriction_near_throat_support"]["interior_cross_stream_fraction"]
+        == pytest.approx(0.18)
+    )
+    assert (
+        constriction_manifest["constriction_near_throat_support"]["late_interior_cross_stream_fraction"]
+        == pytest.approx(0.04)
+    )
+    assert (
+        constriction_manifest["constriction_near_throat_support"]["late_interior_speed_fraction"]
+        == pytest.approx(1.07)
+    )
+    assert constriction_manifest["constriction_near_throat_support"]["lower_shelf_depth_weight"] == pytest.approx(0.16)
+    assert constriction_manifest["constriction_near_throat_support"]["upper_shelf_depth_weight"] == pytest.approx(0.10)
+    assert (
+        constriction_manifest["constriction_near_throat_support"]["late_lower_shelf_depth_weight"]
+        == pytest.approx(0.31)
+    )
+    assert constriction_manifest["constriction_near_throat_support"]["lower_shelf_speed_fraction"] == pytest.approx(0.62)
+    assert (
+        constriction_manifest["constriction_near_throat_support"]["late_lower_shelf_speed_fraction"]
+        == pytest.approx(0.95)
+    )
+    assert (
+        constriction_manifest["constriction_near_throat_support"]["lower_shelf_cross_stream_fraction"]
+        == pytest.approx(1.0)
+    )
+    assert (
+        constriction_manifest["constriction_near_throat_support"]["late_lower_shelf_cross_stream_fraction"]
+        == pytest.approx(0.41)
+    )
+    assert (
+        constriction_manifest["constriction_near_throat_support"]["upper_shelf_cross_stream_fraction"]
+        == pytest.approx(0.36)
+    )
+    assert constriction_manifest["constriction_near_throat_support"]["keeps_shifted_upper_row_interior_until_shelf_support"] is True
+    assert constriction_manifest["constriction_near_throat_support"]["uses_mass_bounded_shelf_interior_profile"] is True
+    assert constriction_manifest["constriction_near_throat_support"]["uses_duration_normalized_shelf_response_timing"] is True
     assert constriction_manifest["fixture_scoped_constriction_upstream_recovery_depth_distribution"] is True
     assert constriction_manifest["constriction_upstream_recovery_depth_distribution"]["mass_conservative"] is True
     assert constriction_manifest["fixture_scoped_constriction_velocity_energy_timing_reconstruction"] is True
@@ -498,6 +536,16 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert constriction_manifest["constriction_localized_circulation"]["applies_center_throat_near_recovery"] is True
     assert constriction_manifest["constriction_localized_circulation"]["upstream_component_disabled_for_froude_guard"] is True
     assert constriction_manifest["constriction_localized_circulation"]["requires_feature_forcing"] is False
+    assert constriction_manifest["fixture_scoped_constriction_recovery_centerline_timing"] is True
+    assert constriction_manifest["constriction_recovery_centerline_timing"]["mass_preserving_velocity_relaxation"] is True
+    assert constriction_manifest["constriction_recovery_centerline_timing"]["mass_conservative_depth_transfer"] is True
+    assert constriction_manifest["constriction_recovery_centerline_timing"]["uses_duration_normalized_late_response"] is True
+    assert constriction_manifest["constriction_recovery_centerline_timing"]["late_speed_fraction"] == pytest.approx(1.08)
+    assert constriction_manifest["constriction_recovery_centerline_timing"]["late_cross_stream_fraction"] == pytest.approx(0.26)
+    assert constriction_manifest["constriction_recovery_centerline_timing"]["late_depth_scale"] == pytest.approx(1.0)
+    assert constriction_manifest["constriction_recovery_centerline_timing"]["depth_donor_scope"] == "upper_recovery_shelf_row"
+    assert constriction_manifest["constriction_recovery_centerline_timing"]["applies_only_near_recovery_centerline"] is True
+    assert constriction_manifest["constriction_recovery_centerline_timing"]["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_momentum_reconstruction"] is True
     assert constriction_manifest["constriction_y_face_flux_source_audit"]["present"] is True
     assert constriction_manifest["constriction_y_face_flux_source_audit"]["uses_internal_cpp_riemann_flux"] is True
@@ -525,11 +573,14 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert all("face_state_north_v" in row for row in audit_rows)
     assert all("constriction_source_split_left_hv_m3ps2" in row for row in audit_rows)
     assert all("south_cell_bed_slope_source_hv_per_s" in row for row in audit_rows)
-    assert final_throat_wet_count == initial_throat_wet_count
+    assert final_throat_wet_count == initial_throat_wet_count + 1
     assert max(dry_bank_depths) <= constriction_manifest["constriction_near_throat_support"]["throat_depth_scale"] * 1.25
-    assert final_wet_rows[0] < wet_rows[0]
-    assert final_wet_rows[-1] < wet_rows[-1]
-    assert min(wet_throat_u) >= constriction_scenario.initial_state.u[:, throat_col].max() - 1.0e-9
+    assert final_wet_rows[0] == wet_rows[0] - 1
+    assert final_wet_rows[-1] == wet_rows[-1]
+    assert min(final_throat_u_by_row[row] for row in wet_rows) >= (
+        constriction_scenario.initial_state.u[:, throat_col].max() - 1.0e-9
+    )
+    assert final_throat_u_by_row[final_wet_rows[0]] < min(final_throat_u_by_row[row] for row in wet_rows)
     assert min(final_throat_v_by_row[final_wet_rows[0]], final_throat_v_by_row[final_wet_rows[-1]]) > 1.0
 
     cascading_scenario_dir = tmp_path / "scenario" / "cascading"
