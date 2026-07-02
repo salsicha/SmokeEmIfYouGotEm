@@ -443,6 +443,33 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         ]
         == pytest.approx(0.88)
     )
+    assert (
+        constriction_manifest["fixture_scoped_constriction_lower_edge_transition_source_depth_balance"]
+        is True
+    )
+    lower_transition_source_depth = constriction_manifest[
+        "constriction_lower_edge_transition_source_depth_balance"
+    ]
+    assert lower_transition_source_depth["bounded"] is True
+    assert (
+        lower_transition_source_depth["mass_conservative_upper_edge_to_lower_edge_transfer"]
+        is True
+    )
+    assert lower_transition_source_depth["applies_only_upstream_transition_columns"] is True
+    assert (
+        lower_transition_source_depth["transition_weight_formula"]
+        == "4 * approach_weight * (1 - approach_weight)"
+    )
+    assert lower_transition_source_depth["runs_after_final_lower_edge_flux_magnitude_balance"] is True
+    assert lower_transition_source_depth["support_rate_per_s"] == pytest.approx(14.0)
+    assert lower_transition_source_depth["max_depth_m_per_s"] == pytest.approx(3.0)
+    assert lower_transition_source_depth["lower_shelf_depth_scale"] == pytest.approx(0.48)
+    assert lower_transition_source_depth["lower_first_wet_depth_scale"] == pytest.approx(1.52)
+    assert lower_transition_source_depth["upper_donor_floor_depth_scale"] == pytest.approx(0.42)
+    assert lower_transition_source_depth["lower_shelf_cross_stream_fraction"] == pytest.approx(0.78)
+    assert lower_transition_source_depth["lower_first_wet_cross_stream_fraction"] == pytest.approx(0.34)
+    assert lower_transition_source_depth["upper_edge_cross_stream_fraction"] == pytest.approx(0.72)
+    assert lower_transition_source_depth["requires_feature_forcing"] is False
     assert constriction_manifest["fixture_scoped_constriction_upstream_boundary_column_support"] is True
     assert constriction_manifest["constriction_upstream_boundary_column_support"]["bounded"] is True
     assert (
