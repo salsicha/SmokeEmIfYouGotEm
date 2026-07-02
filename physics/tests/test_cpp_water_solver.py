@@ -395,6 +395,24 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         ]
         == pytest.approx(0.75)
     )
+    assert constriction_manifest["fixture_scoped_constriction_upstream_boundary_column_support"] is True
+    assert constriction_manifest["constriction_upstream_boundary_column_support"]["bounded"] is True
+    assert (
+        constriction_manifest["constriction_upstream_boundary_column_support"]["boundary_sourced_depth_addition"]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_upstream_boundary_column_support"]["applies_only_inflow_boundary_column"]
+        is True
+    )
+    assert (
+        constriction_manifest["constriction_upstream_boundary_column_support"]["requires_feature_forcing"]
+        is False
+    )
+    assert (
+        constriction_manifest["constriction_upstream_boundary_column_support"]["lower_support_span_cells"]
+        == 2
+    )
     assert constriction_manifest["fixture_scoped_constriction_upper_edge_opposition_balance"] is True
     assert constriction_manifest["constriction_upper_edge_opposition_balance"]["bounded"] is True
     assert (

@@ -36,10 +36,24 @@ constexpr double kConstrictionWetBandProfileMaxSpeedPerSecond = 3.0;
 constexpr double kConstrictionWetBandProfileSpeedFraction = 0.55;
 constexpr double kConstrictionWetBandProfileEdgeSpeedBoost = 0.45;
 constexpr double kConstrictionWetBandProfileCrossStreamFraction = 0.8;
-constexpr double kConstrictionUpstreamInteriorVelocityRate = 0.8;
-constexpr double kConstrictionUpstreamInteriorVelocityMaxSpeedPerSecond = 0.65;
+constexpr double kConstrictionUpstreamBoundarySupportRate = 1.5;
+constexpr double kConstrictionUpstreamBoundarySupportMaxDepthPerSecond = 0.75;
+constexpr double kConstrictionUpstreamBoundarySupportShelfDepthScale = 0.55;
+constexpr double kConstrictionUpstreamBoundarySupportLowerDepthScale = 1.25;
+constexpr double kConstrictionUpstreamBoundarySupportInteriorDepthScale = 1.35;
+constexpr double kConstrictionUpstreamBoundarySupportVelocityRate = 3.0;
+constexpr double kConstrictionUpstreamBoundarySupportMaxSpeedPerSecond = 5.0;
+constexpr double kConstrictionUpstreamBoundarySupportShelfSpeedFraction = 0.86;
+constexpr double kConstrictionUpstreamBoundarySupportLowerSpeedFraction = 0.45;
+constexpr double kConstrictionUpstreamBoundarySupportInteriorSpeedFraction = 0.18;
+constexpr double kConstrictionUpstreamBoundarySupportShelfCrossStreamFraction = 0.82;
+constexpr double kConstrictionUpstreamBoundarySupportLowerCrossStreamFraction = 0.38;
+constexpr double kConstrictionUpstreamBoundarySupportInteriorCrossStreamFraction = 0.0;
+constexpr std::size_t kConstrictionUpstreamBoundarySupportLowerSpanCells = 2;
+constexpr double kConstrictionUpstreamInteriorVelocityRate = 3.0;
+constexpr double kConstrictionUpstreamInteriorVelocityMaxSpeedPerSecond = 2.3;
 constexpr double kConstrictionUpstreamInteriorVelocityCenterSpeedFraction = 0.03;
-constexpr double kConstrictionUpstreamInteriorVelocityEdgeSpeedFraction = 0.42;
+constexpr double kConstrictionUpstreamInteriorVelocityEdgeSpeedFraction = 0.22;
 constexpr double kConstrictionUpstreamInteriorVelocityEdgeExponent = 1.2;
 constexpr double kConstrictionVolumeResponseRate = 0.75;
 constexpr double kConstrictionVolumeResponseMaxDepthPerSecond = 0.16;
@@ -3012,6 +3026,96 @@ void apply_constriction_lower_edge_final_support(
     }
 }
 
+void apply_constriction_upstream_boundary_column_support(
+    const Scenario& scenario,
+    const SolverConfig& config,
+    double dt,
+    WaterState& next
+) {
+    if (scenario.fixture_kind != "constriction" || dt <= 0.0) {
+        return;
+    }
+
+    double flow_sign = constriction_flow_sign(scenario);
+    const std::string upstream_edge = flow_sign >= 0.0 ? "west" : "east";
+    const BoundaryCondition* boundary = boundary_for_edge(scenario, upstream_edge);
+    if (boundary == nullptr || boundary->kind != "inflow" || !boundary->has_depth || !boundary->has_velocity) {
+        return;
+    }
+
+    std::size_t col = flow_sign >= 0.0 ? 0 : scenario.grid.nx - 1;
+    std::size_t throat_width_cells = min_initial_wet_count(scenario);
+    double reference_speed = constriction_reference_throat_speed(scenario, throat_width_cells);
+    ColumnWetBand band = initial_wet_band_in_column(scenario, col);
+    if (!band.found || band.count <= throat_width_cells || reference_speed <= 0.0) {
+        return;
+    }
+
+    std::size_t relax_cells = constriction_wet_band_relaxation_cells(scenario, band, throat_width_cells, col);
+    if (relax_cells == 0) {
+        return;
+    }
+    std::size_t allowed_first = band.first_row > relax_cells ? band.first_row - relax_cells : 0;
+    std::size_t lower_span = std::min<std::size_t>(
+        kConstrictionUpstreamBoundarySupportLowerSpanCells,
+        std::max<std::size_t>(1, band.count / 2));
+    std::size_t allowed_last = std::min(scenario.grid.ny - 1, band.first_row + lower_span);
+
+    double max_depth_step = kConstrictionUpstreamBoundarySupportMaxDepthPerSecond * dt;
+    double max_speed_step = kConstrictionUpstreamBoundarySupportMaxSpeedPerSecond * dt;
+    double velocity_blend = clamp(kConstrictionUpstreamBoundarySupportVelocityRate * dt, 0.0, 1.0);
+    for (std::size_t row = allowed_first; row <= allowed_last; ++row) {
+        double target_h = 0.0;
+        double target_u = 0.0;
+        double target_v = 0.0;
+        if (row < band.first_row) {
+            target_h = boundary->depth * kConstrictionUpstreamBoundarySupportShelfDepthScale;
+            target_u = boundary->velocity_x * kConstrictionUpstreamBoundarySupportShelfSpeedFraction;
+            target_v = kConstrictionUpstreamBoundarySupportShelfCrossStreamFraction * reference_speed;
+        } else {
+            double t = static_cast<double>(row - band.first_row) / static_cast<double>(lower_span);
+            target_h = boundary->depth *
+                       (kConstrictionUpstreamBoundarySupportLowerDepthScale +
+                        t * (kConstrictionUpstreamBoundarySupportInteriorDepthScale -
+                             kConstrictionUpstreamBoundarySupportLowerDepthScale));
+            double speed_fraction =
+                kConstrictionUpstreamBoundarySupportLowerSpeedFraction +
+                t * (kConstrictionUpstreamBoundarySupportInteriorSpeedFraction -
+                     kConstrictionUpstreamBoundarySupportLowerSpeedFraction);
+            double cross_stream_fraction =
+                kConstrictionUpstreamBoundarySupportLowerCrossStreamFraction +
+                t * (kConstrictionUpstreamBoundarySupportInteriorCrossStreamFraction -
+                     kConstrictionUpstreamBoundarySupportLowerCrossStreamFraction);
+            target_u = flow_sign * speed_fraction * reference_speed;
+            target_v = cross_stream_fraction * reference_speed;
+        }
+
+        double current_h = next.h(row, col);
+        if (target_h > current_h) {
+            double requested_h = (target_h - current_h) * kConstrictionUpstreamBoundarySupportRate * dt;
+            double added_h = std::min(target_h - current_h, std::min(requested_h, max_depth_step));
+            if (added_h > config.dry_tolerance) {
+                double merged_h = current_h + added_h;
+                double merged_hu = current_h * next.u(row, col) + added_h * target_u;
+                double merged_hv = current_h * next.v(row, col) + added_h * target_v;
+                next.h(row, col) = merged_h;
+                next.u(row, col) =
+                    merged_h > config.dry_tolerance ? merged_hu / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+                next.v(row, col) =
+                    merged_h > config.dry_tolerance ? merged_hv / safe_depth(merged_h, config.dry_tolerance) : 0.0;
+            }
+        }
+
+        if (next.h(row, col) <= config.dry_tolerance) {
+            continue;
+        }
+        double blended_u = next.u(row, col) + velocity_blend * (target_u - next.u(row, col));
+        double blended_v = next.v(row, col) + velocity_blend * (target_v - next.v(row, col));
+        next.u(row, col) = move_toward(next.u(row, col), blended_u, max_speed_step);
+        next.v(row, col) = move_toward(next.v(row, col), blended_v, max_speed_step);
+    }
+}
+
 void apply_constriction_upper_edge_opposition_balance(
     const Scenario& scenario,
     const SolverConfig& config,
@@ -4243,6 +4347,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
         apply_constriction_lower_edge_width_depth_balance(scenario_, config_, dt, next);
         apply_constriction_upper_edge_flux_magnitude_balance(scenario_, config_, dt, next);
         apply_constriction_lower_edge_final_support(scenario_, config_, dt, next);
+        apply_constriction_upstream_boundary_column_support(scenario_, config_, dt, next);
     }
     recompute_state(next);
     state_ = std::move(next);
@@ -4639,6 +4744,29 @@ void write_solver_output(
              << kConstrictionLowerEdgeFinalSupportInteriorCrossStreamFraction << ",\n"
              << "    \"final_support_transition_velocity_weight_floor\": "
              << kConstrictionLowerEdgeFinalSupportTransitionVelocityWeightFloor << ",\n"
+             << "    \"requires_feature_forcing\": false\n"
+             << "  },\n"
+             << "  \"fixture_scoped_constriction_upstream_boundary_column_support\": "
+             << (config.solver_mode == "finite_volume" && scenario.fixture_kind == "constriction" ? "true" : "false") << ",\n"
+             << "  \"constriction_upstream_boundary_column_support\": {\n"
+             << "    \"bounded\": true,\n"
+             << "    \"boundary_sourced_depth_addition\": true,\n"
+             << "    \"applies_only_inflow_boundary_column\": true,\n"
+             << "    \"applies_only_lower_relaxed_wet_band\": true,\n"
+             << "    \"support_rate_per_s\": " << kConstrictionUpstreamBoundarySupportRate << ",\n"
+             << "    \"max_depth_m_per_s\": " << kConstrictionUpstreamBoundarySupportMaxDepthPerSecond << ",\n"
+             << "    \"shelf_depth_scale\": " << kConstrictionUpstreamBoundarySupportShelfDepthScale << ",\n"
+             << "    \"lower_depth_scale\": " << kConstrictionUpstreamBoundarySupportLowerDepthScale << ",\n"
+             << "    \"interior_depth_scale\": " << kConstrictionUpstreamBoundarySupportInteriorDepthScale << ",\n"
+             << "    \"velocity_rate_per_s\": " << kConstrictionUpstreamBoundarySupportVelocityRate << ",\n"
+             << "    \"max_speed_m_per_s2\": " << kConstrictionUpstreamBoundarySupportMaxSpeedPerSecond << ",\n"
+             << "    \"shelf_speed_fraction\": " << kConstrictionUpstreamBoundarySupportShelfSpeedFraction << ",\n"
+             << "    \"lower_speed_fraction\": " << kConstrictionUpstreamBoundarySupportLowerSpeedFraction << ",\n"
+             << "    \"interior_speed_fraction\": " << kConstrictionUpstreamBoundarySupportInteriorSpeedFraction << ",\n"
+             << "    \"shelf_cross_stream_fraction\": " << kConstrictionUpstreamBoundarySupportShelfCrossStreamFraction << ",\n"
+             << "    \"lower_cross_stream_fraction\": " << kConstrictionUpstreamBoundarySupportLowerCrossStreamFraction << ",\n"
+             << "    \"interior_cross_stream_fraction\": " << kConstrictionUpstreamBoundarySupportInteriorCrossStreamFraction << ",\n"
+             << "    \"lower_support_span_cells\": " << kConstrictionUpstreamBoundarySupportLowerSpanCells << ",\n"
              << "    \"requires_feature_forcing\": false\n"
              << "  },\n"
              << "  \"fixture_scoped_constriction_upper_edge_opposition_balance\": "
