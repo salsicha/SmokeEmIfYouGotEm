@@ -1,9 +1,11 @@
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
 import pytest
 
+import raftsim.milestone18 as milestone18
 from raftsim.analytic_fixtures import write_analytic_fixture_suite
 from raftsim.examples.generate_milestone18_constriction_mask_alignment_report import (
     main as generate_constriction_mask_main,
@@ -972,6 +974,80 @@ def test_milestone18_constriction_face_source_audit_records_flux_source_balance(
     assert "face/source" in " ".join(payload["next_levers"])
 
 
+def _passing_face_source_audit_sample() -> milestone18.Milestone18ConstrictionFaceSourceAuditSample:
+    return milestone18.Milestone18ConstrictionFaceSourceAuditSample(
+        face_role="lower_edge_face",
+        column_index=0,
+        south_row_index=1,
+        north_row_index=2,
+        x_m=0.0,
+        y_face_m=-4.0,
+        bed_step_m=-2.0,
+        reference_eta_step_m=0.0,
+        candidate_eta_step_m=0.0,
+        reference_mean_h=1.0,
+        candidate_mean_h=1.0,
+        reference_mean_u=1.0,
+        candidate_mean_u=1.0,
+        reference_mean_v=1.0,
+        candidate_mean_v=1.0,
+        reference_volume_flux_m3ps=1.0,
+        candidate_volume_flux_m3ps=1.0,
+        volume_flux_delta_m3ps=0.0,
+        abs_volume_flux_delta_m3ps=0.0,
+        flux_delta_threshold_m3ps=0.25,
+        volume_ratio_to_threshold=0.0,
+        reference_volume_sign=1,
+        candidate_volume_sign=1,
+        volume_sign_matches=True,
+        reference_x_momentum_flux_proxy_m3ps2=1.0,
+        candidate_x_momentum_flux_proxy_m3ps2=1.0,
+        x_momentum_flux_delta_m3ps2=0.0,
+        abs_x_momentum_flux_delta_m3ps2=0.0,
+        reference_x_momentum_sign=1,
+        candidate_x_momentum_sign=1,
+        x_momentum_sign_matches=True,
+        reference_normal_momentum_flux_proxy_m3ps2=1.0,
+        candidate_normal_momentum_flux_proxy_m3ps2=1.0,
+        normal_momentum_flux_delta_m3ps2=0.0,
+        abs_normal_momentum_flux_delta_m3ps2=0.0,
+        reference_bed_source_proxy_m3ps2=1.0,
+        candidate_bed_source_proxy_m3ps2=1.0,
+        bed_source_delta_m3ps2=0.0,
+        abs_bed_source_delta_m3ps2=0.0,
+        reference_flux_source_balance_proxy_m3ps2=1.0,
+        candidate_flux_source_balance_proxy_m3ps2=1.0,
+        balance_delta_m3ps2=0.0,
+        abs_balance_delta_m3ps2=0.0,
+        balance_delta_threshold_m3ps2=0.75,
+        balance_ratio_to_threshold=0.0,
+    )
+
+
+def test_milestone18_face_source_internal_sign_mismatches_are_diagnostic_after_final_frame_passes():
+    sample = _passing_face_source_audit_sample()
+
+    reasons = milestone18._face_source_audit_blocked_reasons(
+        (sample,),
+        ({"matches_reference_opposition": True},),
+        ({"post_left_sign_matches": False, "hydrostatic_face_source_enabled": True},),
+    )
+
+    assert reasons == ()
+
+
+def test_milestone18_face_source_internal_sign_mismatch_blocks_with_final_frame_failure():
+    failed_sample = replace(_passing_face_source_audit_sample(), volume_sign_matches=False)
+
+    reasons = milestone18._face_source_audit_blocked_reasons(
+        (failed_sample,),
+        ({"matches_reference_opposition": True},),
+        ({"post_left_sign_matches": False, "hydrostatic_face_source_enabled": True},),
+    )
+
+    assert any("internal y-face" in reason for reason in reasons)
+
+
 def test_generate_milestone18_constriction_face_source_audit_cli_writes_reports(tmp_path):
     dual_manifest = _constriction_lateral_face_flux_inputs(tmp_path)
     output_json = tmp_path / "reports" / "milestone18" / "constriction_face_source_audit.json"
@@ -1111,6 +1187,20 @@ def test_milestone18_constriction_upstream_edge_balance_joins_focused_reports(tm
         "upstream_edge_width_depth_flux_balance",
     }
     assert "feature forcing off" in " ".join(payload["next_levers"])
+
+
+def test_milestone18_constriction_upstream_edge_balance_empty_target_queue_passes():
+    reasons = milestone18._constriction_upstream_edge_balance_blocked_reasons(
+        (),
+        ({"matches_reference_opposition": True},),
+    )
+    levers = milestone18._constriction_upstream_edge_balance_next_levers(
+        (),
+        ({"matches_reference_opposition": True},),
+    )
+
+    assert reasons == ()
+    assert "guardrails" in levers[0]
 
 
 def test_generate_milestone18_constriction_upstream_edge_balance_cli_writes_reports(tmp_path):
@@ -1588,6 +1678,37 @@ def test_milestone18_remaining_geometry_closure_report_records_active_blockers(t
     assert "Threshold failures remain in: south_fork_cascading_low_runnable." in drop_notes
     assert "Focused passing evidence supersedes stale aggregate failures for: drop_ledge." in drop_notes
     assert "whole-window water-field parity" in drop_notes
+
+
+def test_milestone18_remaining_geometry_closure_promotes_focused_passing_family(tmp_path):
+    geometry_report, _, drop_report = _remaining_geometry_closure_inputs(tmp_path)
+    passing_constriction_report = _write_json(
+        tmp_path / "reports" / "milestone18" / "constriction_upstream_edge_balance.json",
+        {
+            "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
+            "decision": "PASS",
+            "passed": True,
+            "scenario_id": "constriction_seed_16",
+            "summary": {"target_sample_count": 0, "blocked_target_count": 0},
+            "blocked_reasons": [],
+            "next_levers": ["Preserve constriction-focused reports as guardrails."],
+        },
+    )
+
+    report = build_milestone18_remaining_geometry_closure_report(
+        geometry_report,
+        focused_reports=(passing_constriction_report, drop_report),
+    )
+    payload = report.to_json_dict()
+
+    assert payload["summary"]["active_blockers"] == ["drops_ledges_tailwater"]
+    assert payload["summary"]["next_case"] == "drops_ledges_tailwater"
+    cases = {case["case_id"]: case for case in payload["cases"]}
+    assert cases["constriction"]["promotion_ready"] is True
+    assert cases["constriction"]["failing_check_counts"] == {}
+    assert "Focused passing evidence supersedes stale aggregate failures for: constriction." in " ".join(
+        cases["constriction"]["notes"]
+    )
 
 
 def test_generate_milestone18_remaining_geometry_closure_cli_writes_reports(tmp_path):

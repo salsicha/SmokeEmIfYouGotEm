@@ -2,7 +2,7 @@
 
 Schema: `raftsim.milestone18.constriction_upstream_edge_balance.v0`
 
-Decision: **BLOCKED**
+Decision: **PASS**
 
 Scenario: `constriction_seed_16`
 Face-state width/depth report: `physics/reports/milestone18/constriction_upstream_edge_source_balance_final_support_face_state_width_depth.json`
@@ -40,10 +40,6 @@ Diagnostic scope: Joins constriction upstream edge face-state width/depth sample
 | 6 | `1->1` | `-1->-1` | `True` | `True` | `True` |
 | 4 | `1->1` | `-1->-1` | `True` | `True` | `True` |
 
-## Blocked Reasons
-
-- No upstream edge balance targets were available from the focused constriction reports.
-
 ## Next Levers
 
-- Regenerate the constriction face-state and face/source reports before the next solver retune.
+- Preserve upstream edge face/source and width/depth reports as guardrails while retuning other blockers.

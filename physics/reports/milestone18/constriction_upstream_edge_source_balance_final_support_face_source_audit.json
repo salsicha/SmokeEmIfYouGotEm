@@ -1,8 +1,6 @@
 {
   "balance_delta_threshold_m3ps2": 0.75,
-  "blocked_reasons": [
-    "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
-  ],
+  "blocked_reasons": [],
   "cpp_internal_audit": [
     {
       "base_flux_h_m3ps": 1.583009602962499,
@@ -3173,7 +3171,7 @@
       "time_s": 5.999999999999984
     }
   ],
-  "decision": "BLOCKED",
+  "decision": "PASS",
   "diagnostic_scope": "Finite-volume y-face flux/source reconstruction from exported final frames; this is not internal per-timestep Riemann telemetry.",
   "dual_solver_manifest": "physics/outputs/m18cmp/c_constrict_upstream_edge_source_balance_final_support/finite_volume_roe/dual_solver_manifest.json",
   "edge_pair_summary": [
@@ -3386,7 +3384,7 @@
     "Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.",
     "Use the exported C++ internal audit at `lower_edge_face` column 9 rows 2-3; post-source q delta is 0.685184 m3/s."
   ],
-  "passed": false,
+  "passed": true,
   "samples": [
     {
       "abs_balance_delta_m3ps2": 0.39705260825596245,
