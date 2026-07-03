@@ -72,8 +72,9 @@ def main(argv: list[str] | None = None) -> int:
 
     root = args.output_dir.resolve()
     root.mkdir(parents=True, exist_ok=True)
+    cpp_scenario_input = args.scenario_dir if args.scenario_dir is not None else scenario
     cpp_result = run_cpp_solver_scenario(
-        scenario,
+        cpp_scenario_input,
         output_dir=root,
         config=CppSolverRunConfig(
             executable=args.cpp_solver,

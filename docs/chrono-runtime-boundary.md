@@ -19,7 +19,7 @@ See [Chaos And Jolt Runtime Evaluation](chaos-jolt-runtime-evaluation.md) for th
 
 ## Integration Rule
 
-The custom C++ water solver remains the primary Unreal runtime candidate, as frozen in [Custom Water Runtime Baseline](custom-water-runtime-baseline.md), but live custom water still depends on the Milestone 18 validation closure described in [Custom C++ Engine Full Validation Plan](custom-cpp-engine-validation-plan.md). The selected raft/contact runtime receives sampled water/contact inputs and returns raft transforms, velocities, contacts, and force telemetry. If Chaos and Jolt both miss authority gates, the fallback is a reduced custom rigid-body integrator using the same schemas and water query API, not a replacement of the water solver.
+The custom C++ water solver remains the primary Unreal runtime candidate, as frozen in [Custom Water Runtime Baseline](custom-water-runtime-baseline.md), but live custom water still depends on the Milestone 18 closure evidence being consumed by a regenerated full validation/readiness gate as described in [Custom C++ Engine Full Validation Plan](custom-cpp-engine-validation-plan.md). The selected raft/contact runtime receives sampled water/contact inputs and returns raft transforms, velocities, contacts, and force telemetry. If Chaos and Jolt both miss authority gates, the fallback is a reduced custom rigid-body integrator using the same schemas and water query API, not a replacement of the water solver.
 
 The detailed coupling strategy is captured in [Chrono Water And Raft Coupling Plan](chrono-water-raft-coupling-plan.md). Rock contacts should use partially elastic rubber-raft collision presets, while riverbed grounding should use low-restitution, high-damping inelastic contact presets.
 

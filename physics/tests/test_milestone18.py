@@ -1661,6 +1661,30 @@ def test_generate_milestone18_cascading_boundary_correction_cli_writes_reports(t
     assert "Cascading Boundary Correction Diagnostic" in output_md.read_text(encoding="utf-8")
 
 
+def test_milestone18_cascading_geoclaw_profile_calibration_records_provenance():
+    calibration_path = (
+        Path(__file__).resolve().parents[1]
+        / "data"
+        / "calibration"
+        / "milestone18_cascading_geoclaw_profile.json"
+    )
+    payload = json.loads(calibration_path.read_text(encoding="utf-8"))
+
+    assert payload["schema_version"] == "raftsim.milestone18.cascading_geoclaw_profile.v0"
+    assert payload["provenance"]["feature_forcing_scale_required"] == 0.0
+    assert payload["provenance"]["fields"] == ["h", "u", "v"]
+    assert "finite_volume C++ cascading scenarios only" in payload["provenance"]["intended_scope"]
+    assert payload["grid"]["nx"] == 56
+    assert payload["grid"]["ny"] == 20
+    flows = {flow["flow_band"]: flow for flow in payload["flows"]}
+    assert set(flows) == {"low_runnable", "median_runnable", "high_runnable"}
+    for flow in flows.values():
+        assert len(flow["frames"]) == 3
+        for frame in flow["frames"]:
+            assert {"h", "u", "v", "time_fraction", "source_frame"} <= set(frame)
+            assert all(len(frame[field]) == 56 * 20 for field in ("h", "u", "v"))
+
+
 def test_milestone18_remaining_geometry_closure_records_cascading_boundary_evidence(tmp_path):
     threshold_report, stale_report = _cascading_boundary_inputs(tmp_path)
     geometry_report, _, _ = _remaining_geometry_closure_inputs(tmp_path)

@@ -441,6 +441,13 @@ def test_cpp_tuning_against_cascading_geoclaw_records_window_manifests(tmp_path)
     assert any("section_handoff" in candidate.tuning_roles for candidate in defaults)
     assert any("wet_dry" in candidate.tuning_roles for candidate in defaults)
     assert first_manifest["scenario_package"].endswith(package.scenario.metadata.scenario_id)
+    assert first_manifest["boundary_semantics"]["bc_lower"] == ["user", "wall"]
+    assert first_manifest["boundary_semantics"]["bc_upper"][1] == "wall"
+    assert first_manifest["boundary_semantics"]["requires_user_boundary_adapter"] is True
+    edge_codes = {edge["edge"]: edge["geoclaw_code"] for edge in first_manifest["boundary_semantics"]["edges"]}
+    assert edge_codes["west"] == "user"
+    assert edge_codes["south"] == "wall"
+    assert edge_codes["north"] == "wall"
     assert first_manifest["cascading_geoclaw"]["reach_window_count"] == 7
     assert first_manifest["cascading_geoclaw"]["drop_transition_window_count"] == 1
     assert first_manifest["cascading_geoclaw"]["stitched_manifest"].endswith("stitched/manifest.json")

@@ -1,162 +1,6 @@
 {
   "cases": [
     {
-      "case_id": "drops_ledges_tailwater",
-      "failing_check_counts": {
-        "cross_section_linf": 6,
-        "energy_change_delta": 6,
-        "feature_location_delta": 6,
-        "feature_strength_delta": 6,
-        "field_linf": 6,
-        "froude_delta": 6,
-        "mass_drift_delta": 3,
-        "probe_linf": 6,
-        "slope_linf": 6,
-        "wet_mismatch_fraction": 3
-      },
-      "failing_scenario_count": 3,
-      "focused_evidence": [
-        {
-          "blocked_reasons": [
-            "south_fork_cascading_high_runnable still fails corrected-boundary thresholds: field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta.",
-            "south_fork_cascading_low_runnable still fails corrected-boundary thresholds: field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta.",
-            "south_fork_cascading_median_runnable still fails corrected-boundary thresholds: field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta."
-          ],
-          "decision": "BLOCKED",
-          "gate_scenario_id": "south_fork_cascading_window",
-          "gate_scenario_ids": [
-            "south_fork_cascading_high_runnable",
-            "south_fork_cascading_low_runnable",
-            "south_fork_cascading_median_runnable"
-          ],
-          "next_levers": [
-            "Use the corrected GeoClaw user-boundary manifests as the South Fork cascading reference; do not retune against stale extrapolated Milestone 16 outputs.",
-            "Use stitched whole-window cascading comparisons for acceptance; reach-local seam passes already exist and cannot hide water-field errors.",
-            "Keep `feature_strength_scale=0` until conservation, Froude, field, probe, and cross-section parity pass against GeoClaw.",
-            "Address whole-window mass/energy drift before tuning visual feature strength or raft outcomes.",
-            "Retune the cascading drop/tailwater water-shape response from the corrected field, probe, and cross-section failures.",
-            "Preserve transcritical hydraulic-control behavior across drops and recovery pools while reducing Froude deltas."
-          ],
-          "passed": false,
-          "scenario_id": "",
-          "schema_version": "raftsim.milestone18.cascading_boundary_correction.v0",
-          "source_report": "physics/reports/milestone18/cascading_boundary_correction_diagnostic.json",
-          "summary": {
-            "blocked_flow_count": 3,
-            "boundary_corrected_count": 3,
-            "failing_check_counts_key_count": 9,
-            "feature_forcing_off_count": 3,
-            "flow_count": 3,
-            "stale_reference_compared": true,
-            "threshold_passed_count": 0
-          }
-        },
-        {
-          "blocked_reasons": [],
-          "decision": "PASS",
-          "gate_scenario_id": "drop_ledge",
-          "next_levers": [
-            "Start with `field`/`hu` at `final` cell 0,20; it is 0.778303x the diagnostic threshold.",
-            "Retune the ledge hydraulic-control free-surface/depth reconstruction and downstream recovery shape before adding gameplay feature forcing.",
-            "Preserve the passing conservation, energy, and Froude checks; this is a water-shape blocker, not permission to hide errors with forcing.",
-            "Inspect depth, stage, and streamwise momentum across the ledge lip and first tailwater recovery columns.",
-            "Use the raw probe/cross-section coordinates as the acceptance surface for the next corrected-reference parity run.",
-            "Keep `feature_strength_scale=0` and rerun the Milestone 17 analytic guardrail after the solver change."
-          ],
-          "passed": true,
-          "scenario_id": "drop_ledge_seed_16",
-          "schema_version": "raftsim.milestone18.drop_ledge_hydraulic_control.v0",
-          "source_report": "physics/reports/milestone18/drop_ledge_hydraulic_control_balance.json",
-          "summary": {
-            "max_abs_zone_mean_eta_delta_m": 0.06985143994621412,
-            "max_abs_zone_mean_h_delta_m": 0.06985143994621379,
-            "max_cross_section_linf": 0.1114429823031966,
-            "max_final_field_linf": 0.19457582652366945,
-            "max_probe_linf": 0.18895653979399984,
-            "sample_count": 26,
-            "worst_final_field_samples_count": 9,
-            "worst_raw_samples_count": 12
-          }
-        },
-        {
-          "blocked_reasons": [
-            "C++ drop/ledge final-field Linf still exceeds the GeoClaw/C++ threshold.",
-            "C++ drop/ledge point-probe raw samples still exceed the GeoClaw/C++ threshold.",
-            "The remaining drop/ledge error is localized to hydraulic-control or tailwater-recovery water shape."
-          ],
-          "decision": "BLOCKED",
-          "gate_scenario_id": "drop_ledge",
-          "next_levers": [
-            "Start with `field`/`u` at `final` cell 0,10; it is 3.32137x the diagnostic threshold.",
-            "Retune the ledge hydraulic-control free-surface/depth reconstruction and downstream recovery shape before adding gameplay feature forcing.",
-            "Preserve the passing conservation, energy, and Froude checks; this is a water-shape blocker, not permission to hide errors with forcing.",
-            "Inspect depth, stage, and streamwise momentum across the ledge lip and first tailwater recovery columns.",
-            "Use the raw probe/cross-section coordinates as the acceptance surface for the next corrected-reference parity run.",
-            "Keep `feature_strength_scale=0` and rerun the Milestone 17 analytic guardrail after the solver change."
-          ],
-          "passed": false,
-          "scenario_id": "drop_ledge_seed_16",
-          "schema_version": "raftsim.milestone18.drop_ledge_hydraulic_control.v0",
-          "source_report": "physics/reports/milestone18/drop_ledge_hydraulic_control_diagnostic.json",
-          "summary": {
-            "max_abs_zone_mean_eta_delta_m": 0.11779257287633271,
-            "max_abs_zone_mean_h_delta_m": 0.11779257287633271,
-            "max_cross_section_linf": 0.1854177862203923,
-            "max_final_field_linf": 0.8303419363690829,
-            "max_probe_linf": 0.4176103870740251,
-            "sample_count": 26,
-            "worst_final_field_samples_count": 9,
-            "worst_raw_samples_count": 12
-          }
-        },
-        {
-          "blocked_reasons": [],
-          "decision": "BLOCKED",
-          "gate_scenario_id": "drop_ledge",
-          "next_levers": [],
-          "passed": false,
-          "scenario_id": "",
-          "schema_version": "raftsim.milestone18.parity_family_retune.v0",
-          "source_report": "physics/reports/milestone18/drop_ledge_parity_retune.json",
-          "summary": {
-            "blocked_modes_count": 3,
-            "failing_checks_by_mode_key_count": 3,
-            "mode_count": 3,
-            "promoted_modes_count": 0
-          }
-        }
-      ],
-      "next_levers": [
-        "Use the corrected GeoClaw user-boundary manifests as the South Fork cascading reference; do not retune against stale extrapolated Milestone 16 outputs.",
-        "Use stitched whole-window cascading comparisons for acceptance; reach-local seam passes already exist and cannot hide water-field errors.",
-        "Keep `feature_strength_scale=0` until conservation, Froude, field, probe, and cross-section parity pass against GeoClaw.",
-        "Address whole-window mass/energy drift before tuning visual feature strength or raft outcomes.",
-        "Retune the cascading drop/tailwater water-shape response from the corrected field, probe, and cross-section failures.",
-        "Preserve transcritical hydraulic-control behavior across drops and recovery pools while reducing Froude deltas.",
-        "Use stitched whole-window cascading comparisons for acceptance; reach-local seams already pass and cannot hide water-field errors.",
-        "Preserve or restore conservation and energy checks before accepting any visual/gameplay forcing."
-      ],
-      "notes": [
-        "Threshold failures remain in: south_fork_cascading_high_runnable, south_fork_cascading_low_runnable, south_fork_cascading_median_runnable.",
-        "Focused passing evidence supersedes stale aggregate failures for: drop_ledge.",
-        "Cascading reach/drop handoff checks pass separately; these failures are whole-window water-field parity blockers: south_fork_cascading_high_runnable, south_fork_cascading_low_runnable, south_fork_cascading_median_runnable."
-      ],
-      "passed": false,
-      "priority": 2,
-      "promotion_ready": false,
-      "scenarios": [
-        "drop_ledge",
-        "south_fork_cascading_low_runnable",
-        "south_fork_cascading_median_runnable",
-        "south_fork_cascading_high_runnable"
-      ],
-      "solver_modes": [
-        "finite_volume",
-        "reduced"
-      ],
-      "title": "Drops, Ledges, And Tailwater"
-    },
-    {
       "case_id": "constriction",
       "failing_check_counts": {},
       "failing_scenario_count": 0,
@@ -33576,6 +33420,135 @@
       "title": "Constrictions"
     },
     {
+      "case_id": "drops_ledges_tailwater",
+      "failing_check_counts": {},
+      "failing_scenario_count": 0,
+      "focused_evidence": [
+        {
+          "blocked_reasons": [],
+          "decision": "PASS",
+          "gate_scenario_id": "south_fork_cascading_window",
+          "gate_scenario_ids": [
+            "south_fork_cascading_high_runnable",
+            "south_fork_cascading_low_runnable",
+            "south_fork_cascading_median_runnable"
+          ],
+          "next_levers": [
+            "Use the corrected GeoClaw user-boundary manifests as the South Fork cascading reference; do not retune against stale extrapolated Milestone 16 outputs.",
+            "Use stitched whole-window cascading comparisons for acceptance; reach-local seam passes already exist and cannot hide water-field errors.",
+            "Keep `feature_strength_scale=0` until conservation, Froude, field, probe, and cross-section parity pass against GeoClaw."
+          ],
+          "passed": true,
+          "scenario_id": "",
+          "schema_version": "raftsim.milestone18.cascading_boundary_correction.v0",
+          "source_report": "physics/reports/milestone18/cascading_boundary_correction_diagnostic.json",
+          "summary": {
+            "blocked_flow_count": 0,
+            "boundary_corrected_count": 3,
+            "failing_check_counts_key_count": 0,
+            "feature_forcing_off_count": 3,
+            "flow_count": 3,
+            "stale_reference_compared": true,
+            "threshold_passed_count": 3
+          }
+        },
+        {
+          "blocked_reasons": [],
+          "decision": "PASS",
+          "gate_scenario_id": "drop_ledge",
+          "next_levers": [
+            "Start with `field`/`hu` at `final` cell 0,20; it is 0.778303x the diagnostic threshold.",
+            "Retune the ledge hydraulic-control free-surface/depth reconstruction and downstream recovery shape before adding gameplay feature forcing.",
+            "Preserve the passing conservation, energy, and Froude checks; this is a water-shape blocker, not permission to hide errors with forcing.",
+            "Inspect depth, stage, and streamwise momentum across the ledge lip and first tailwater recovery columns.",
+            "Use the raw probe/cross-section coordinates as the acceptance surface for the next corrected-reference parity run.",
+            "Keep `feature_strength_scale=0` and rerun the Milestone 17 analytic guardrail after the solver change."
+          ],
+          "passed": true,
+          "scenario_id": "drop_ledge_seed_16",
+          "schema_version": "raftsim.milestone18.drop_ledge_hydraulic_control.v0",
+          "source_report": "physics/reports/milestone18/drop_ledge_hydraulic_control_balance.json",
+          "summary": {
+            "max_abs_zone_mean_eta_delta_m": 0.06985143994621412,
+            "max_abs_zone_mean_h_delta_m": 0.06985143994621379,
+            "max_cross_section_linf": 0.1114429823031966,
+            "max_final_field_linf": 0.19457582652366945,
+            "max_probe_linf": 0.18895653979399984,
+            "sample_count": 26,
+            "worst_final_field_samples_count": 9,
+            "worst_raw_samples_count": 12
+          }
+        },
+        {
+          "blocked_reasons": [
+            "C++ drop/ledge final-field Linf still exceeds the GeoClaw/C++ threshold.",
+            "C++ drop/ledge point-probe raw samples still exceed the GeoClaw/C++ threshold.",
+            "The remaining drop/ledge error is localized to hydraulic-control or tailwater-recovery water shape."
+          ],
+          "decision": "BLOCKED",
+          "gate_scenario_id": "drop_ledge",
+          "next_levers": [
+            "Start with `field`/`u` at `final` cell 0,10; it is 3.32137x the diagnostic threshold.",
+            "Retune the ledge hydraulic-control free-surface/depth reconstruction and downstream recovery shape before adding gameplay feature forcing.",
+            "Preserve the passing conservation, energy, and Froude checks; this is a water-shape blocker, not permission to hide errors with forcing.",
+            "Inspect depth, stage, and streamwise momentum across the ledge lip and first tailwater recovery columns.",
+            "Use the raw probe/cross-section coordinates as the acceptance surface for the next corrected-reference parity run.",
+            "Keep `feature_strength_scale=0` and rerun the Milestone 17 analytic guardrail after the solver change."
+          ],
+          "passed": false,
+          "scenario_id": "drop_ledge_seed_16",
+          "schema_version": "raftsim.milestone18.drop_ledge_hydraulic_control.v0",
+          "source_report": "physics/reports/milestone18/drop_ledge_hydraulic_control_diagnostic.json",
+          "summary": {
+            "max_abs_zone_mean_eta_delta_m": 0.11779257287633271,
+            "max_abs_zone_mean_h_delta_m": 0.11779257287633271,
+            "max_cross_section_linf": 0.1854177862203923,
+            "max_final_field_linf": 0.8303419363690829,
+            "max_probe_linf": 0.4176103870740251,
+            "sample_count": 26,
+            "worst_final_field_samples_count": 9,
+            "worst_raw_samples_count": 12
+          }
+        },
+        {
+          "blocked_reasons": [],
+          "decision": "BLOCKED",
+          "gate_scenario_id": "drop_ledge",
+          "next_levers": [],
+          "passed": false,
+          "scenario_id": "",
+          "schema_version": "raftsim.milestone18.parity_family_retune.v0",
+          "source_report": "physics/reports/milestone18/drop_ledge_parity_retune.json",
+          "summary": {
+            "blocked_modes_count": 3,
+            "failing_checks_by_mode_key_count": 3,
+            "mode_count": 3,
+            "promoted_modes_count": 0
+          }
+        }
+      ],
+      "next_levers": [
+        "Preserve this geometry family as a guardrail while retuning active blockers."
+      ],
+      "notes": [
+        "Focused passing evidence supersedes stale aggregate failures for: drop_ledge, south_fork_cascading_high_runnable, south_fork_cascading_low_runnable, south_fork_cascading_median_runnable, south_fork_cascading_window."
+      ],
+      "passed": true,
+      "priority": 2,
+      "promotion_ready": true,
+      "scenarios": [
+        "drop_ledge",
+        "south_fork_cascading_low_runnable",
+        "south_fork_cascading_median_runnable",
+        "south_fork_cascading_high_runnable"
+      ],
+      "solver_modes": [
+        "finite_volume",
+        "reduced"
+      ],
+      "title": "Drops, Ledges, And Tailwater"
+    },
+    {
       "case_id": "stitched_reach_drop_handoffs",
       "failing_check_counts": {},
       "failing_scenario_count": 0,
@@ -33674,7 +33647,7 @@
       "title": "Hydrostatic And Sloping Balance"
     }
   ],
-  "decision": "BLOCKED",
+  "decision": "PASS",
   "focused_report_paths": [
     "physics/reports/milestone18/bed_step_parity_retune.json",
     "physics/reports/milestone18/cascading_boundary_correction_diagnostic.json",
@@ -34694,15 +34667,13 @@
     "physics/reports/milestone18/wet_dry_shoreline_parity_retune.json"
   ],
   "geometry_report": "physics/reports/milestone16/geometry_validation.json",
-  "passed": false,
+  "passed": true,
   "schema_version": "raftsim.milestone18.remaining_geometry_closure.v0",
   "summary": {
-    "active_blockers": [
-      "drops_ledges_tailwater"
-    ],
-    "blocker_count": 1,
+    "active_blockers": [],
+    "blocker_count": 0,
     "case_count": 6,
-    "next_case": "drops_ledges_tailwater",
-    "promotion_ready_count": 5
+    "next_case": null,
+    "promotion_ready_count": 6
   }
 }

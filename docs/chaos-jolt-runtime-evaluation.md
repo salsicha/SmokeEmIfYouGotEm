@@ -11,7 +11,7 @@ Use a split/hybrid plan for now:
 
 No engine can own scoring-critical raft, crew, swimmer, pin, release, rescue, or flip outcomes until it passes the shared fixture suite in `unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json`.
 
-This evaluation follows the Milestone 18 custom-water validation closure. Until the C++ water solver is approved for live Unreal use, Chaos/Jolt fixtures may use frozen water snapshots and telemetry for runtime comparison, but they must not imply that live custom water has passed the GeoClaw/C++ gate.
+This evaluation follows the Milestone 18 custom-water validation closure and regenerated readiness gate. Until the C++ water solver is approved for live Unreal use, Chaos/Jolt fixtures may use frozen water snapshots and telemetry for runtime comparison, but they must not imply that live custom water has passed the GeoClaw/C++ gate.
 
 ## Why This Split
 
