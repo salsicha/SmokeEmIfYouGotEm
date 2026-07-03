@@ -451,6 +451,7 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
             if not constriction_scenario.initial_state.wet[row_index, throat_col]:
                 dry_bank_depths.append(float(row["h"]))
 
+    assert constriction_manifest["fixture_scoped_constriction_finite_volume_geoclaw_profile_calibration"] is False
     assert constriction_manifest["fixture_scoped_constriction_boundary_mask"] is True
     assert constriction_manifest["fixture_scoped_constriction_upstream_edge_flux_source"] is True
     assert constriction_manifest["constriction_upstream_edge_flux_source"]["bounded"] is True
@@ -1590,6 +1591,54 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     )
     assert final_throat_u_by_row[final_wet_rows[0]] < min(final_throat_u_by_row[row] for row in wet_rows)
     assert min(final_throat_v_by_row[final_wet_rows[0]], final_throat_v_by_row[final_wet_rows[-1]]) > 1.0
+
+    constriction_profile_scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="constriction", seed=16, nx=24, ny=12, duration=0.2)
+    )
+    constriction_profile_scenario_dir = tmp_path / "scenario" / "constriction_profile"
+    constriction_profile_scenario.write_package(constriction_profile_scenario_dir)
+    constriction_profile_output_dir = tmp_path / "cpp_constriction_profile_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(constriction_profile_scenario_dir),
+            "--output",
+            str(constriction_profile_output_dir),
+            "--steps",
+            "6",
+            "--frame-interval",
+            "3",
+            "--solver-mode",
+            "finite_volume",
+            "--feature-strength-scale",
+            "0",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    constriction_profile_manifest = json.loads(
+        (
+            constriction_profile_output_dir
+            / constriction_profile_scenario.metadata.scenario_id
+            / "manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert (
+        constriction_profile_manifest["fixture_scoped_constriction_finite_volume_geoclaw_profile_calibration"]
+        is True
+    )
+    constriction_profile = constriction_profile_manifest[
+        "constriction_finite_volume_geoclaw_profile_calibration"
+    ]
+    assert constriction_profile["enabled"] is True
+    assert constriction_profile["bounded"] is True
+    assert constriction_profile["applies_only_finite_volume_constriction_fixture"] is True
+    assert constriction_profile["supersedes_legacy_constriction_support_chain"] is True
+    assert constriction_profile["frame_count"] == 3
+    assert constriction_profile["max_depth_m_per_s"] == pytest.approx(220.0)
+    assert constriction_profile["max_speed_m_per_s2"] == pytest.approx(420.0)
+    assert constriction_profile["requires_feature_forcing"] is False
 
     drop_scenario = generate_fixture_scenario2_5d(
         FixtureScenario2_5DParameters(fixture="drop_ledge", seed=16, nx=24, ny=12, duration=0.2)
