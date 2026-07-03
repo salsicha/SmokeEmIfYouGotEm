@@ -1,0 +1,363 @@
+{
+  "aggregate_field_errors": [
+    {
+      "field": "eta",
+      "max_l1": 1.1956841045273787e-08,
+      "max_l2": 9.88114936885908e-08,
+      "max_linf": 9.90882313089969e-07
+    },
+    {
+      "field": "h",
+      "max_l1": 1.1956841044183776e-08,
+      "max_l2": 9.881149368859101e-08,
+      "max_linf": 9.90882313089969e-07
+    },
+    {
+      "field": "hu",
+      "max_l1": 1.679141583154809e-08,
+      "max_l2": 3.179963971369983e-08,
+      "max_linf": 1.1919401998738977e-07
+    },
+    {
+      "field": "hv",
+      "max_l1": 2.3208425408226748e-10,
+      "max_l2": 1.9803830963529945e-09,
+      "max_linf": 5.758249188581033e-08
+    },
+    {
+      "field": "normal_x",
+      "max_l1": 6.696827626474795e-09,
+      "max_l2": 3.687396800430848e-08,
+      "max_linf": 4.661433996439035e-07
+    },
+    {
+      "field": "normal_y",
+      "max_l1": 7.923721225695347e-09,
+      "max_l2": 4.944904794920319e-08,
+      "max_linf": 4.900628250564809e-07
+    },
+    {
+      "field": "normal_z",
+      "max_l1": 3.2339482278012677e-09,
+      "max_l2": 1.849554664522461e-08,
+      "max_linf": 1.7826647102925364e-07
+    },
+    {
+      "field": "u",
+      "max_l1": 4.935325463410892e-08,
+      "max_l2": 6.286017105336699e-08,
+      "max_linf": 2.0696984925905326e-07
+    },
+    {
+      "field": "v",
+      "max_l1": 7.893717315419685e-10,
+      "max_l2": 4.657913210098308e-09,
+      "max_linf": 9.834854297618989e-08
+    }
+  ],
+  "aggregate_slope_errors": [
+    {
+      "field": "slope_x",
+      "max_l1": 8.436112525930979e-09,
+      "max_l2": 5.7920447232670506e-08,
+      "max_linf": 4.954411565519234e-07
+    },
+    {
+      "field": "slope_y",
+      "max_l1": 1.1957006992045942e-08,
+      "max_l2": 6.987026880377287e-08,
+      "max_linf": 4.954411565449846e-07
+    }
+  ],
+  "frame_comparisons": [
+    {
+      "cpp_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_waves/finite_volume/cpp_solver/cascading_wave_train_seed_17/frames/frame_0000.csv",
+      "field_errors": [
+        {
+          "candidate_max": 1.7609062191552487,
+          "candidate_min": 0.0,
+          "compared_count": 2592,
+          "field": "h",
+          "l1": 1.0114663239641901e-08,
+          "l2": 1.8262425103189946e-08,
+          "linf": 5.954022985754648e-08,
+          "reference_max": 1.7609062194824219,
+          "reference_min": 0.0,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 3.6281322174228454,
+          "candidate_min": -0.07799999999999985,
+          "compared_count": 2592,
+          "field": "eta",
+          "l1": 1.0114663240198726e-08,
+          "l2": 1.8262425103696055e-08,
+          "linf": 5.954022985754648e-08,
+          "reference_max": 3.6281322174228454,
+          "reference_min": -0.07800002748837886,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 3.2700184953924176,
+          "candidate_min": 0.7516019301417238,
+          "compared_count": 1177,
+          "field": "u",
+          "l1": 4.935325463410892e-08,
+          "l2": 6.286017105336699e-08,
+          "linf": 2.0696984925905326e-07,
+          "reference_max": 3.2700182884225684,
+          "reference_min": 0.75160192377989,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.11649095060331445,
+          "candidate_min": -0.9975551263388293,
+          "compared_count": 1177,
+          "field": "v",
+          "l1": 7.893717315419685e-10,
+          "l2": 4.657913210098308e-09,
+          "linf": 9.834854297618989e-08,
+          "reference_max": 0.11649095519954444,
+          "reference_min": -0.9975552246873722,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 3.4879809603891103,
+          "candidate_min": 0.0,
+          "compared_count": 2592,
+          "field": "hu",
+          "l1": 1.679141583154809e-08,
+          "l2": 3.179963971369983e-08,
+          "linf": 1.1919401998738977e-07,
+          "reference_max": 3.487980842590332,
+          "reference_min": 0.0,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.07852473490391638,
+          "candidate_min": -1.0441396629519115,
+          "compared_count": 2592,
+          "field": "hv",
+          "l1": 2.3208425408226748e-10,
+          "l2": 1.9803830963529945e-09,
+          "linf": 5.758249188581033e-08,
+          "reference_max": 0.07852473855018616,
+          "reference_min": -1.0441396236419678,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.7046188688235884,
+          "candidate_min": -0.6960539251825745,
+          "compared_count": 2592,
+          "field": "normal_x",
+          "l1": 6.696827626474795e-09,
+          "l2": 1.3022820347574498e-08,
+          "linf": 9.451948200858706e-08,
+          "reference_max": 0.7046188753010539,
+          "reference_min": -0.6960539240757241,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.713821234500464,
+          "candidate_min": -0.713821234500464,
+          "compared_count": 2592,
+          "field": "normal_y",
+          "l1": 6.41177963447583e-09,
+          "l2": 1.2296449999925144e-08,
+          "linf": 5.8068684970926584e-08,
+          "reference_max": 0.7138212321979622,
+          "reference_min": -0.7138212395226501,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.9998633446498701,
+          "candidate_min": 0.573487384298488,
+          "compared_count": 2592,
+          "field": "normal_z",
+          "l1": 4.807411562028304e-10,
+          "l2": 1.2622230840031036e-09,
+          "linf": 1.006201644226934e-08,
+          "reference_max": 0.9998633446498701,
+          "reference_min": 0.5734873858897572,
+          "sample_count": 2592
+        }
+      ],
+      "label": "initial",
+      "pyclaw_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_waves/normalized/frames/frame_0000.npz",
+      "reference_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_waves/normalized/frames/frame_0000.npz",
+      "reference_solver": "geoclaw",
+      "slope_errors": [
+        {
+          "candidate_max": 0.984857586198044,
+          "candidate_min": -1.0195737021136768,
+          "compared_count": 2592,
+          "field": "slope_x",
+          "l1": 7.1063987880987725e-09,
+          "l2": 1.3348911668716948e-08,
+          "linf": 9.456542193753137e-08,
+          "reference_max": 0.9848575980195962,
+          "reference_min": -1.0195737054236924,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 1.0201621721920298,
+          "candidate_min": -1.0201621721920298,
+          "compared_count": 2592,
+          "field": "slope_y",
+          "l1": 7.100379964327773e-09,
+          "l2": 1.2777040371949626e-08,
+          "linf": 5.8078091336177806e-08,
+          "reference_max": 1.0201621868262516,
+          "reference_min": -1.020162165482736,
+          "sample_count": 2592
+        }
+      ],
+      "wet_mismatch_fraction": 0.0
+    },
+    {
+      "cpp_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_waves/finite_volume/cpp_solver/cascading_wave_train_seed_17/frames/frame_0008.csv",
+      "field_errors": [
+        {
+          "candidate_max": 1.7754592895507812,
+          "candidate_min": 0.0,
+          "compared_count": 2592,
+          "field": "h",
+          "l1": 1.1956841044183776e-08,
+          "l2": 9.881149368859101e-08,
+          "linf": 9.90882313089969e-07,
+          "reference_max": 1.7754592895507812,
+          "reference_min": 0.0,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 3.944647494674614,
+          "candidate_min": -0.8914571878331641,
+          "compared_count": 2592,
+          "field": "eta",
+          "l1": 1.1956841045273787e-08,
+          "l2": 9.88114936885908e-08,
+          "linf": 9.90882313089969e-07,
+          "reference_max": 3.944647494674614,
+          "reference_min": -0.8914571878331647,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 3.756686932241883,
+          "candidate_min": -1.8376814845764473,
+          "compared_count": 1255,
+          "field": "u",
+          "l1": 2.635266983879948e-15,
+          "l2": 3.674307624874174e-15,
+          "linf": 1.8207657603852567e-14,
+          "reference_max": 3.7566869322418848,
+          "reference_min": -1.8376814845764542,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 3.5633129589262467,
+          "candidate_min": -4.860802729201702,
+          "compared_count": 1255,
+          "field": "v",
+          "l1": 2.421433029048558e-15,
+          "l2": 3.454778344749072e-15,
+          "linf": 2.609024107869118e-14,
+          "reference_max": 3.5633129589262658,
+          "reference_min": -4.860802729201705,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 3.528301477432252,
+          "candidate_min": -0.9129581451416058,
+          "compared_count": 2592,
+          "field": "hu",
+          "l1": 1.210633345336603e-15,
+          "l2": 2.3255821993611913e-15,
+          "linf": 1.6764367671839864e-14,
+          "reference_max": 3.528301477432251,
+          "reference_min": -0.9129581451416016,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 1.4961562156677262,
+          "candidate_min": -1.4991459846496553,
+          "compared_count": 2592,
+          "field": "hv",
+          "l1": 1.1604954694468762e-15,
+          "l2": 2.3210470125960985e-15,
+          "linf": 1.4988010832439613e-14,
+          "reference_max": 1.4961562156677246,
+          "reference_min": -1.4991459846496582,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.8263992970056835,
+          "candidate_min": -0.8561473679628819,
+          "compared_count": 2592,
+          "field": "normal_x",
+          "l1": 5.134196264816465e-09,
+          "l2": 3.687396800430848e-08,
+          "linf": 4.661433996439035e-07,
+          "reference_max": 0.8263992970056835,
+          "reference_min": -0.8561473679628818,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.8565304439033046,
+          "candidate_min": -0.8596155047478073,
+          "compared_count": 2592,
+          "field": "normal_y",
+          "l1": 7.923721225695347e-09,
+          "l2": 4.944904794920319e-08,
+          "linf": 4.900628250564809e-07,
+          "reference_max": 0.8565304439033046,
+          "reference_min": -0.8596155047478073,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.9999995931694793,
+          "candidate_min": 0.3792286104470407,
+          "compared_count": 2592,
+          "field": "normal_z",
+          "l1": 3.2339482278012677e-09,
+          "l2": 1.849554664522461e-08,
+          "linf": 1.7826647102925364e-07,
+          "reference_max": 0.9999995931694793,
+          "reference_min": 0.3792286104470407,
+          "sample_count": 2592
+        }
+      ],
+      "label": "final",
+      "pyclaw_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_waves/normalized/frames/frame_0002.npz",
+      "reference_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_waves/normalized/frames/frame_0002.npz",
+      "reference_solver": "geoclaw",
+      "slope_errors": [
+        {
+          "candidate_max": 1.7270411776798378,
+          "candidate_min": -1.557254744239038,
+          "compared_count": 2592,
+          "field": "slope_x",
+          "l1": 8.436112525930979e-09,
+          "l2": 5.7920447232670506e-08,
+          "linf": 4.954411565519234e-07,
+          "reference_max": 1.7270411776798378,
+          "reference_min": -1.5572547442390383,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 1.7459717809751114,
+          "candidate_min": -1.6728689226072464,
+          "compared_count": 2592,
+          "field": "slope_y",
+          "l1": 1.1957006992045942e-08,
+          "l2": 6.987026880377287e-08,
+          "linf": 4.954411565449846e-07,
+          "reference_max": 1.7459717809751114,
+          "reference_min": -1.6728689226072464,
+          "sample_count": 2592
+        }
+      ],
+      "wet_mismatch_fraction": 0.0
+    }
+  ],
+  "scenario_id": "cascading_wave_train_seed_17"
+}
