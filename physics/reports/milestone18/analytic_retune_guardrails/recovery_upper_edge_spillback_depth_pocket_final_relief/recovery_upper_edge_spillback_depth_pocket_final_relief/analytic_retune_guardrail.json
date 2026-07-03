@@ -1,0 +1,39 @@
+{
+  "blocked_reasons": [],
+  "decision": "PASS",
+  "manifest_path": "physics/data/validation/milestone17/analytic_fixtures/manifest.json",
+  "output_dir": "physics/reports/milestone18/analytic_retune_guardrails/recovery_upper_edge_spillback_depth_pocket_final_relief/recovery_upper_edge_spillback_depth_pocket_final_relief",
+  "passed": true,
+  "postflight": {
+    "candidate_kind": "scenario",
+    "candidate_label": "recovery_upper_edge_spillback_depth_pocket_final_relief_postflight",
+    "candidate_root": null,
+    "failed_count": 0,
+    "failing_metrics": [],
+    "fixture_count": 7,
+    "frame_index": 0,
+    "passed": true,
+    "passed_count": 7,
+    "report_json": "physics/reports/milestone18/analytic_retune_guardrails/recovery_upper_edge_spillback_depth_pocket_final_relief/recovery_upper_edge_spillback_depth_pocket_final_relief/postflight_analytic_validation.json",
+    "report_markdown": "physics/reports/milestone18/analytic_retune_guardrails/recovery_upper_edge_spillback_depth_pocket_final_relief/recovery_upper_edge_spillback_depth_pocket_final_relief/postflight_analytic_validation.md",
+    "stage": "postflight"
+  },
+  "preflight": {
+    "candidate_kind": "scenario",
+    "candidate_label": "recovery_upper_edge_spillback_depth_pocket_final_relief_preflight",
+    "candidate_root": null,
+    "failed_count": 0,
+    "failing_metrics": [],
+    "fixture_count": 7,
+    "frame_index": 0,
+    "passed": true,
+    "passed_count": 7,
+    "report_json": "physics/reports/milestone18/analytic_retune_guardrails/recovery_upper_edge_spillback_depth_pocket_final_relief/recovery_upper_edge_spillback_depth_pocket_final_relief/preflight_analytic_validation.json",
+    "report_markdown": "physics/reports/milestone18/analytic_retune_guardrails/recovery_upper_edge_spillback_depth_pocket_final_relief/recovery_upper_edge_spillback_depth_pocket_final_relief/preflight_analytic_validation.md",
+    "stage": "preflight"
+  },
+  "regression_count": 0,
+  "regressions": [],
+  "retune_batch_id": "recovery_upper_edge_spillback_depth_pocket_final_relief",
+  "schema_version": "raftsim.milestone18.analytic_retune_guardrail.v0"
+}
