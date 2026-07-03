@@ -141,6 +141,29 @@
     },
     {
       "actual_scenario_id": "bed_step_seed_16",
+      "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced",
+      "artifact_id": "geoclaw_cpp/bed_step/reduced",
+      "case_id": null,
+      "category": "geoclaw_cpp",
+      "gate_scenario_id": "bed_step",
+      "manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/dual_solver_manifest.json",
+      "notes": [],
+      "passed": true,
+      "reports": {
+        "diagnostic_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/diagnostic_comparison.json",
+        "dual_solver_manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/dual_solver_manifest.json",
+        "feature_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/feature_comparison.json",
+        "field_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/field_comparison.json",
+        "probe_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/probe_comparison.json",
+        "threshold_evaluation": "regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/threshold_evaluation.json"
+      },
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/scenario",
+      "solver_mode": "reduced",
+      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+      "suite": "canonical"
+    },
+    {
+      "actual_scenario_id": "bed_step_seed_16",
       "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_step/finite_volume",
       "artifact_id": "geoclaw_cpp/bed_step/finite_volume",
       "case_id": null,
@@ -807,7 +830,7 @@
       "suite": "cascading"
     }
   ],
-  "entry_count": 38,
+  "entry_count": 39,
   "geometry_validation_report": "reports/milestone16/geometry_validation.json",
   "raft_coupling_report": "reports/milestone16/raft_coupling_validation.json",
   "schema_version": "raftsim.milestone16.regression_registry.v0"

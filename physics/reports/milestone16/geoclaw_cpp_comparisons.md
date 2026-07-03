@@ -14,7 +14,7 @@ Comparison count: 40
 | canonical | uniform_channel | finite_volume | production_candidate | PASS | none | n/a |
 | canonical | dam_break | reduced | unreal_prototype | PASS | none | n/a |
 | canonical | dam_break | finite_volume | unreal_prototype | PASS | none | n/a |
-| canonical | bed_step | reduced | unreal_prototype | FAIL | field_linf, slope_linf, probe_linf, mass_drift_delta, energy_change_delta | n/a |
+| canonical | bed_step | reduced | unreal_prototype | PASS | none | n/a |
 | canonical | bed_step | finite_volume | unreal_prototype | PASS | none | n/a |
 | canonical | constriction | reduced | unreal_prototype | FAIL | field_linf, slope_linf, wet_mismatch_fraction, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_strength_delta | n/a |
 | canonical | constriction | finite_volume | unreal_prototype | FAIL | field_linf, slope_linf, feature_strength_delta | n/a |

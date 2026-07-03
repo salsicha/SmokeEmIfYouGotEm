@@ -12,14 +12,14 @@ Current packaged Milestone 16 GeoClaw/C++ gate artifacts from the last full-gate
 
 - `geoclaw_reference_summary.json`: 20 of 20 full GeoClaw fixed-grid reference runs passed.
 - `cpp_solver_summary.json`: 40 of 40 reduced and finite-volume C++ runs completed with manifests.
-- `geoclaw_cpp_comparison_summary.json`: 15 of 40 GeoClaw/C++ threshold comparisons pass, so the comparison gate blocks.
+- `geoclaw_cpp_comparison_summary.json`: 16 of 40 GeoClaw/C++ threshold comparisons pass, so the comparison gate blocks.
 - `geometry_validation_summary.json`: 6 of 6 geometry families pass after Milestone 18 focused closure evidence is consumed by the aggregate gate.
 - `raft_coupling_validation_summary.json`: 15 of 50 raft-coupling comparisons pass, so force, outcome, and transition agreement still block.
-- `runtime_profile_summary.json`: 30 of 30 promoted C++ profile repetitions pass local desktop, VR, and handheld water-solver budgets, and 15 of 15 deterministic replay groups match.
-- `regression_promotion_summary.json`: 38 passing artifacts were promoted as regression fixtures or manifests in the latest packaged readiness snapshot.
+- `runtime_profile_summary.json`: 32 of 32 promoted C++ profile repetitions pass local desktop, VR, and handheld water-solver budgets, and 16 of 16 deterministic replay groups match.
+- `regression_promotion_summary.json`: 39 passing artifacts were promoted as regression fixtures or manifests in the latest packaged readiness snapshot.
 - `geoclaw_to_unreal_readiness_report.json` and `.md`: final Milestone 16 decision; live custom water is blocked.
 
-Milestone 18 source reports are now consumed by the packaged readiness snapshot: `physics/reports/milestone18/remaining_geometry_closure.json` passes with six of six geometry families promotion-ready, `physics/reports/milestone18/uniform_channel_reduced_slope_profile_balance.json` closes the reduced uniform-channel aggregate row, `physics/reports/milestone18/dam_break_finite_volume_profile_calibration.json` and `physics/reports/milestone18/dam_break_reduced_profile_calibration.json` close both dam-break aggregate rows, `physics/reports/milestone16/geoclaw_cpp_comparisons.json` records 15 of 40 threshold comparisons passing, and `physics/reports/milestone16/raft_coupling_validation.json` has 15 of 50 raft-coupling comparisons passing. The refreshed `physics/reports/milestone16/full_cpp_validation_gate.json` and packaged GeoClaw-to-Unreal readiness report remain blocked by aggregate GeoClaw/C++ comparison and raft-coupling failures, not by the geometry-family gate.
+Milestone 18 source reports are now consumed by the packaged readiness snapshot: `physics/reports/milestone18/remaining_geometry_closure.json` passes with six of six geometry families promotion-ready, `physics/reports/milestone18/uniform_channel_reduced_slope_profile_balance.json` closes the reduced uniform-channel aggregate row, `physics/reports/milestone18/dam_break_finite_volume_profile_calibration.json` and `physics/reports/milestone18/dam_break_reduced_profile_calibration.json` close both dam-break aggregate rows, and `physics/reports/milestone18/bed_step_reduced_profile_calibration.json` closes the reduced bed-step aggregate row. `physics/reports/milestone16/geoclaw_cpp_comparisons.json` records 16 of 40 threshold comparisons passing, and `physics/reports/milestone16/raft_coupling_validation.json` has 15 of 50 raft-coupling comparisons passing. The refreshed `physics/reports/milestone16/full_cpp_validation_gate.json` and packaged GeoClaw-to-Unreal readiness report remain blocked by aggregate GeoClaw/C++ comparison and raft-coupling failures, not by the geometry-family gate.
 
 Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 
@@ -51,7 +51,7 @@ Milestone 18 closure actions:
 - Build the failure triage matrix from the current GeoClaw/C++ comparison, geometry, raft-coupling, and full-gate reports.
 - Run Milestone 17 analytic fixtures before and after every retune batch.
 - Fix GeoClaw/C++ parity failures before accepting raft-outcome tuning.
-- Carry reduced-mode bed-step as diagnostic/smoke-only evidence unless a separate reduced-dynamics redesign is opened; finite-volume bed-step is the strict discontinuous-bed parity lane for Milestone 18 readiness.
+- Keep both promoted bed-step rows guarded: finite-volume bed-step uses the discontinuous-bed Roe/topography lane, and reduced bed-step uses the bounded fixture-scoped GeoClaw profile calibration with `feature_strength_scale=0`.
 - Preserve focused constriction closure as a guardrail while broader aggregate comparison failures remain visible.
 - Preserve focused drop/ledge hydraulic-control and South Fork cascading whole-window closure as guardrails while broader aggregate comparison failures remain visible.
 - Keep wet/dry, bed-step, constriction, drop/ledge, tailwater, and stitched reach/drop geometry families closed in every future full-gate rerun.
