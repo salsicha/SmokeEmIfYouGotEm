@@ -1,0 +1,395 @@
+{
+  "cross_sections": [
+    {
+      "candidate_sample_count": 108,
+      "field_errors": [
+        {
+          "candidate_max": 1.5220748700040916,
+          "candidate_min": 1.2529039400000004,
+          "compared_count": 36,
+          "field": "h",
+          "l1": 1.7836243667209335e-08,
+          "l2": 2.968902561058029e-08,
+          "linf": 5.139294656508753e-08,
+          "reference_max": 1.522074818611145,
+          "reference_min": 1.252903938293457,
+          "sample_count": 36
+        },
+        {
+          "candidate_max": 1.1059999999999999,
+          "candidate_min": 0.8368290699959087,
+          "compared_count": 36,
+          "field": "eta",
+          "l1": 1.7836243667209335e-08,
+          "l2": 2.968902561058029e-08,
+          "linf": 5.139294656508753e-08,
+          "reference_max": 1.1059999486070533,
+          "reference_min": 0.8368290682893653,
+          "sample_count": 36
+        },
+        {
+          "candidate_max": 2.0059106799999995,
+          "candidate_min": 1.591717474010171,
+          "compared_count": 36,
+          "field": "u",
+          "l1": 4.512183382487933e-08,
+          "l2": 7.372858453520773e-08,
+          "linf": 1.2758236178633808e-07,
+          "reference_max": 2.0059106841786774,
+          "reference_min": 1.5917176015925327,
+          "sample_count": 36
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 36,
+          "field": "v",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 36
+        },
+        {
+          "candidate_max": 0.5721609310719915,
+          "candidate_min": 0.41192056310007596,
+          "compared_count": 36,
+          "field": "froude",
+          "l1": 1.4211358404884559e-08,
+          "l2": 2.3103933776591958e-08,
+          "linf": 3.997130088029266e-08,
+          "reference_max": 0.5721609326535688,
+          "reference_min": 0.41192060307137685,
+          "sample_count": 36
+        }
+      ],
+      "kind": "cross_section",
+      "max_distance_delta": 0.0,
+      "max_time_delta": 1.5987211554602254e-14,
+      "reference_sample_count": 36,
+      "sample_id": "mid_cross_section"
+    }
+  ],
+  "point_probes": [
+    {
+      "candidate_sample_count": 9,
+      "field_errors": [
+        {
+          "candidate_max": 1.2518315619721532,
+          "candidate_min": 0.9572942900000009,
+          "compared_count": 3,
+          "field": "h",
+          "l1": 1.190418027115688e-08,
+          "l2": 1.7790267008073006e-08,
+          "linf": 3.044749496972088e-08,
+          "reference_max": 1.2518315315246582,
+          "reference_min": 0.9572942852973938,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 1.178,
+          "candidate_min": 0.8834627280278476,
+          "compared_count": 3,
+          "field": "eta",
+          "l1": 1.190418027115688e-08,
+          "l2": 1.7790267008073006e-08,
+          "linf": 3.044749496972088e-08,
+          "reference_max": 1.177999969552505,
+          "reference_min": 0.8834627233252406,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 2.3507626999999975,
+          "candidate_min": 1.4012536024164959,
+          "compared_count": 3,
+          "field": "u",
+          "l1": 7.2175044459517794e-09,
+          "l2": 9.492559031473806e-09,
+          "linf": 1.5767614769401916e-08,
+          "reference_max": 2.3507626955756002,
+          "reference_min": 1.4012536181841106,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 3,
+          "field": "v",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 2.2503717098549827,
+          "candidate_min": 1.7541334858321485,
+          "compared_count": 3,
+          "field": "hu",
+          "l1": 1.3637182420348873e-08,
+          "l2": 1.5986102033559632e-08,
+          "linf": 2.2926264664491214e-08,
+          "reference_max": 2.2503716945648193,
+          "reference_min": 1.7541334629058838,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 3,
+          "field": "hv",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 1.0,
+          "candidate_min": 1.0,
+          "compared_count": 3,
+          "field": "wet",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 1.0,
+          "reference_min": 1.0,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 0.7670992411772332,
+          "candidate_min": 0.3998612229254404,
+          "compared_count": 3,
+          "field": "froude",
+          "l1": 3.367024677588167e-09,
+          "l2": 5.414002597015155e-09,
+          "linf": 9.362224828723953e-09,
+          "reference_max": 0.7670992416176139,
+          "reference_min": 0.39986123228766524,
+          "sample_count": 3
+        }
+      ],
+      "kind": "point",
+      "max_distance_delta": null,
+      "max_time_delta": 1.5987211554602254e-14,
+      "reference_sample_count": 3,
+      "sample_id": "upstream_center"
+    },
+    {
+      "candidate_sample_count": 9,
+      "field_errors": [
+        {
+          "candidate_max": 1.5220748700040916,
+          "candidate_min": 1.2529039400000004,
+          "compared_count": 3,
+          "field": "h",
+          "l1": 1.7836243667209335e-08,
+          "l2": 2.968902561058029e-08,
+          "linf": 5.139294656508753e-08,
+          "reference_max": 1.522074818611145,
+          "reference_min": 1.252903938293457,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 1.1059999999999999,
+          "candidate_min": 0.8368290699959087,
+          "compared_count": 3,
+          "field": "eta",
+          "l1": 1.7836243667209335e-08,
+          "l2": 2.968902561058029e-08,
+          "linf": 5.139294656508753e-08,
+          "reference_max": 1.1059999486070533,
+          "reference_min": 0.8368290682893653,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 2.0059106799999995,
+          "candidate_min": 1.591717474010171,
+          "compared_count": 3,
+          "field": "u",
+          "l1": 4.512183382487933e-08,
+          "l2": 7.372858453520773e-08,
+          "linf": 1.2758236178633808e-07,
+          "reference_max": 2.0059106841786774,
+          "reference_min": 1.5917176015925327,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 3,
+          "field": "v",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 2.513213394260079,
+          "candidate_min": 2.422713167337272,
+          "compared_count": 3,
+          "field": "hu",
+          "l1": 3.939927584184488e-08,
+          "l2": 6.49360651894738e-08,
+          "linf": 1.12386849160373e-07,
+          "reference_max": 2.5132133960723877,
+          "reference_min": 2.422713279724121,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 3,
+          "field": "hv",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 1.0,
+          "candidate_min": 1.0,
+          "compared_count": 3,
+          "field": "wet",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 1.0,
+          "reference_min": 1.0,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 0.5721609310719915,
+          "candidate_min": 0.41192056310007596,
+          "compared_count": 3,
+          "field": "froude",
+          "l1": 1.4211358404884559e-08,
+          "l2": 2.3103933776591955e-08,
+          "linf": 3.997130088029266e-08,
+          "reference_max": 0.5721609326535688,
+          "reference_min": 0.41192060307137685,
+          "sample_count": 3
+        }
+      ],
+      "kind": "point",
+      "max_distance_delta": null,
+      "max_time_delta": 1.5987211554602254e-14,
+      "reference_sample_count": 3,
+      "sample_id": "midstream_center"
+    },
+    {
+      "candidate_sample_count": 9,
+      "field_errors": [
+        {
+          "candidate_max": 1.6915879548716877,
+          "candidate_min": 1.5666755400000003,
+          "compared_count": 3,
+          "field": "h",
+          "l1": 1.258184253079738e-08,
+          "l2": 1.75648255202182e-08,
+          "linf": 2.991441228061831e-08,
+          "reference_max": 1.6915879249572754,
+          "reference_min": 1.5666755437850952,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 1.034,
+          "candidate_min": 0.9090875851283127,
+          "compared_count": 3,
+          "field": "eta",
+          "l1": 1.258184253079738e-08,
+          "l2": 1.75648255202182e-08,
+          "linf": 2.991441228061831e-08,
+          "reference_max": 1.0339999700855877,
+          "reference_min": 0.9090875889134076,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 1.707537635864925,
+          "candidate_min": 1.6081398300000003,
+          "compared_count": 3,
+          "field": "u",
+          "l1": 2.1430819341361484e-08,
+          "l2": 3.4027652697049757e-08,
+          "linf": 5.880997022700285e-08,
+          "reference_max": 1.7075376946748952,
+          "reference_min": 1.608139832772945,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 3,
+          "field": "v",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 2.888450097319185,
+          "candidate_min": 2.5217995535066207,
+          "compared_count": 3,
+          "field": "hu",
+          "l1": 2.3253147259557256e-08,
+          "l2": 2.9274020777769886e-08,
+          "linf": 4.840225065194659e-08,
+          "reference_max": 2.8884501457214355,
+          "reference_min": 2.5217995643615723,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 3,
+          "field": "hv",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 1.0,
+          "candidate_min": 1.0,
+          "compared_count": 3,
+          "field": "wet",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 1.0,
+          "reference_min": 1.0,
+          "sample_count": 3
+        },
+        {
+          "candidate_max": 0.4216807120688172,
+          "candidate_min": 0.4100113956123923,
+          "compared_count": 3,
+          "field": "froude",
+          "l1": 6.167627057222329e-09,
+          "l2": 1.0475938481946961e-08,
+          "linf": 1.8143073710064073e-08,
+          "reference_max": 0.4216807122505755,
+          "reference_min": 0.41001139579044144,
+          "sample_count": 3
+        }
+      ],
+      "kind": "point",
+      "max_distance_delta": null,
+      "max_time_delta": 1.5987211554602254e-14,
+      "reference_sample_count": 3,
+      "sample_id": "downstream_center"
+    }
+  ],
+  "scenario_id": "drop_ledge_seed_16"
+}

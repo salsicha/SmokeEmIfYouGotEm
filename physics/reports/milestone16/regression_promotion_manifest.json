@@ -325,6 +325,29 @@
     },
     {
       "actual_scenario_id": "drop_ledge_seed_16",
+      "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced",
+      "artifact_id": "geoclaw_cpp/drop_ledge/reduced",
+      "case_id": null,
+      "category": "geoclaw_cpp",
+      "gate_scenario_id": "drop_ledge",
+      "manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/dual_solver_manifest.json",
+      "notes": [],
+      "passed": true,
+      "reports": {
+        "diagnostic_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/diagnostic_comparison.json",
+        "dual_solver_manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/dual_solver_manifest.json",
+        "feature_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/feature_comparison.json",
+        "field_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/field_comparison.json",
+        "probe_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/probe_comparison.json",
+        "threshold_evaluation": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/threshold_evaluation.json"
+      },
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/scenario",
+      "solver_mode": "reduced",
+      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+      "suite": "canonical"
+    },
+    {
+      "actual_scenario_id": "drop_ledge_seed_16",
       "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume",
       "artifact_id": "geoclaw_cpp/drop_ledge/finite_volume",
       "case_id": null,
@@ -876,9 +899,9 @@
       "suite": "cascading"
     }
   ],
-  "entry_count": 41,
+  "entry_count": 42,
   "fixture_root": "regression_fixtures/milestone16",
-  "geoclaw_cpp_fixture_count": 18,
+  "geoclaw_cpp_fixture_count": 19,
   "geometry_artifact_count": 8,
   "geometry_validation_report": "reports/milestone16/geometry_validation.json",
   "notes": [

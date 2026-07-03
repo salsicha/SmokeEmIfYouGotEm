@@ -2568,6 +2568,8 @@ def _cpp_config_for_mode(
         preserve_initial_mass = False
     if not finite_volume and gate_scenario_id == "constriction":
         preserve_initial_mass = False
+    if not finite_volume and gate_scenario_id == "drop_ledge":
+        preserve_initial_mass = False
     if finite_volume and gate_scenario_id == "bed_step":
         flux_scheme = "roe"
     return CppSolverRunConfig(

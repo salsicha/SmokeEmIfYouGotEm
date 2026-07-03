@@ -1,0 +1,363 @@
+{
+  "aggregate_field_errors": [
+    {
+      "field": "eta",
+      "max_l1": 3.026372676536345e-08,
+      "max_l2": 3.451958480403023e-08,
+      "max_linf": 5.758425225543817e-08
+    },
+    {
+      "field": "h",
+      "max_l1": 3.026372676536345e-08,
+      "max_l2": 3.451958480403023e-08,
+      "max_linf": 5.758425225543817e-08
+    },
+    {
+      "field": "hu",
+      "max_l1": 4.043029669387188e-08,
+      "max_l2": 5.161354325411508e-08,
+      "max_linf": 1.12386849160373e-07
+    },
+    {
+      "field": "hv",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "normal_x",
+      "max_l1": 2.354656642561924e-08,
+      "max_l2": 2.8978813643954992e-08,
+      "max_linf": 7.717407659972586e-08
+    },
+    {
+      "field": "normal_y",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    },
+    {
+      "field": "normal_z",
+      "max_l1": 2.82558883698177e-10,
+      "max_l2": 3.477460502892399e-10,
+      "max_linf": 9.260917588349571e-10
+    },
+    {
+      "field": "u",
+      "max_l1": 4.718441155386147e-08,
+      "max_l2": 5.667557291404412e-08,
+      "max_linf": 1.2758236178633808e-07
+    },
+    {
+      "field": "v",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    }
+  ],
+  "aggregate_slope_errors": [
+    {
+      "field": "slope_x",
+      "max_l1": 2.3551652669762113e-08,
+      "max_l2": 2.8985073303077244e-08,
+      "max_linf": 7.719074690548666e-08
+    },
+    {
+      "field": "slope_y",
+      "max_l1": 0.0,
+      "max_l2": 0.0,
+      "max_linf": 0.0
+    }
+  ],
+  "frame_comparisons": [
+    {
+      "cpp_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_drop/reduced/cpp_solver/drop_ledge_seed_16/frames/frame_0000.csv",
+      "field_errors": [
+        {
+          "candidate_max": 1.7359847462962545,
+          "candidate_min": 1.2500045584959414,
+          "compared_count": 288,
+          "field": "h",
+          "l1": 3.026372676536345e-08,
+          "l2": 3.451958480403023e-08,
+          "linf": 5.758425225543817e-08,
+          "reference_max": 1.7359848022460938,
+          "reference_min": 1.250004529953003,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.25,
+          "candidate_min": 0.9739999999999999,
+          "compared_count": 288,
+          "field": "eta",
+          "l1": 3.026372676536345e-08,
+          "l2": 3.451958480403023e-08,
+          "linf": 5.758425225543817e-08,
+          "reference_max": 1.2499999714570615,
+          "reference_min": 0.9739999787590922,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.7079968799627778,
+          "candidate_min": 1.4000031200372218,
+          "compared_count": 288,
+          "field": "u",
+          "l1": 4.718441155386147e-08,
+          "l2": 5.667557291404412e-08,
+          "linf": 1.2758236178633808e-07,
+          "reference_max": 1.7079968450557204,
+          "reference_min": 1.400003128040422,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "v",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 2.9650472237997585,
+          "candidate_min": 1.7500102819550678,
+          "compared_count": 288,
+          "field": "hu",
+          "l1": 4.043029669387188e-08,
+          "l2": 5.161354325411508e-08,
+          "linf": 1.12386849160373e-07,
+          "reference_max": 2.9650471210479736,
+          "reference_min": 1.7500102519989014,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "hv",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.011999136093300925,
+          "candidate_min": 0.011999136093300703,
+          "compared_count": 288,
+          "field": "normal_x",
+          "l1": 2.354656642561924e-08,
+          "l2": 2.8978813643954992e-08,
+          "linf": 7.717407659972586e-08,
+          "reference_max": 0.011999213267377525,
+          "reference_min": 0.01199909411761707,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": -0.0,
+          "candidate_min": -0.0,
+          "compared_count": 288,
+          "field": "normal_y",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": -0.0,
+          "reference_min": -0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.999928007775067,
+          "candidate_min": 0.999928007775067,
+          "compared_count": 288,
+          "field": "normal_z",
+          "l1": 2.82558883698177e-10,
+          "l2": 3.477460502892399e-10,
+          "linf": 9.260917588349571e-10,
+          "reference_max": 0.9999280082787744,
+          "reference_min": 0.9999280068489752,
+          "sample_count": 288
+        }
+      ],
+      "label": "initial",
+      "pyclaw_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_drop/normalized/frames/frame_0000.npz",
+      "reference_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_drop/normalized/frames/frame_0000.npz",
+      "reference_solver": "geoclaw",
+      "slope_errors": [
+        {
+          "candidate_max": -0.0119999999999999,
+          "candidate_min": -0.012000000000000122,
+          "compared_count": 288,
+          "field": "slope_x",
+          "l1": 2.3551652669762113e-08,
+          "l2": 2.8985073303077244e-08,
+          "linf": 7.719074690548666e-08,
+          "reference_max": -0.011999958015249224,
+          "reference_min": -0.012000077190747027,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "slope_y",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        }
+      ],
+      "wet_mismatch_fraction": 0.0
+    },
+    {
+      "cpp_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_drop/reduced/cpp_solver/drop_ledge_seed_16/frames/frame_0008.csv",
+      "field_errors": [
+        {
+          "candidate_max": 1.68391347,
+          "candidate_min": 0.8548300300000011,
+          "compared_count": 288,
+          "field": "h",
+          "l1": 1.856441606921481e-09,
+          "l2": 2.2917562889118983e-09,
+          "linf": 4.7380056544810145e-09,
+          "reference_max": 1.6839134693145752,
+          "reference_min": 0.8548300266265869,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 1.108489721504059,
+          "candidate_min": 0.6527385442871407,
+          "compared_count": 288,
+          "field": "eta",
+          "l1": 1.856441606921481e-09,
+          "l2": 2.2917562889118983e-09,
+          "linf": 4.7380056544810145e-09,
+          "reference_max": 1.1084897232728574,
+          "reference_min": 0.6527385409137265,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 2.863917639999997,
+          "candidate_min": 1.50467595,
+          "compared_count": 288,
+          "field": "u",
+          "l1": 2.5278703019715465e-09,
+          "l2": 2.9408771326111918e-09,
+          "linf": 4.952650067835407e-09,
+          "reference_max": 2.8639176419367676,
+          "reference_min": 1.5046759485731316,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "v",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 2.5337441001900465,
+          "candidate_min": 1.9899455311417484,
+          "compared_count": 288,
+          "field": "hu",
+          "l1": 5.167648475801201e-09,
+          "l2": 6.609397378405935e-09,
+          "linf": 1.5290163357661868e-08,
+          "reference_max": 2.5337440967559814,
+          "reference_min": 1.9899455308914185,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "hv",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.060188786163156316,
+          "candidate_min": -0.09165780419185124,
+          "compared_count": 288,
+          "field": "normal_x",
+          "l1": 1.5276965328982091e-09,
+          "l2": 1.828310085039422e-09,
+          "linf": 3.7233485947196776e-09,
+          "reference_max": 0.060188783494314245,
+          "reference_min": -0.09165780501480603,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": -0.0,
+          "candidate_min": -0.0,
+          "compared_count": 288,
+          "field": "normal_y",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": -0.0,
+          "reference_min": -0.0,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.9999981730381649,
+          "candidate_min": 0.9957905637887559,
+          "compared_count": 288,
+          "field": "normal_z",
+          "l1": 4.828596781673392e-11,
+          "l2": 7.459026678008188e-11,
+          "linf": 2.1545476514006623e-10,
+          "reference_max": 0.9999981730407992,
+          "reference_min": 0.9957905637130068,
+          "sample_count": 288
+        }
+      ],
+      "label": "final",
+      "pyclaw_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_drop/normalized/frames/frame_0002.npz",
+      "reference_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_drop/normalized/frames/frame_0002.npz",
+      "reference_solver": "geoclaw",
+      "slope_errors": [
+        {
+          "candidate_max": 0.09204526285438397,
+          "candidate_min": -0.06029810593297852,
+          "compared_count": 288,
+          "field": "slope_x",
+          "l1": 1.5312004442158411e-09,
+          "l2": 1.8328828044847082e-09,
+          "linf": 3.742065435297093e-09,
+          "reference_max": 0.0920452636878194,
+          "reference_min": -0.060298103249567914,
+          "sample_count": 288
+        },
+        {
+          "candidate_max": 0.0,
+          "candidate_min": 0.0,
+          "compared_count": 288,
+          "field": "slope_y",
+          "l1": 0.0,
+          "l2": 0.0,
+          "linf": 0.0,
+          "reference_max": 0.0,
+          "reference_min": 0.0,
+          "sample_count": 288
+        }
+      ],
+      "wet_mismatch_fraction": 0.0
+    }
+  ],
+  "scenario_id": "drop_ledge_seed_16"
+}

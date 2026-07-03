@@ -1,0 +1,114 @@
+{
+  "cpp": {
+    "energy_final": 1525.9303139658596,
+    "energy_initial": 1985.848885556164,
+    "energy_relative_change": -0.23159797048781888,
+    "frame_count": 9,
+    "froude_max": 0.9889768723443821,
+    "froude_mean_wet": 0.5872088010375344,
+    "hole_retention": {
+      "centroid_x": null,
+      "centroid_y": null,
+      "hole_count": 0,
+      "retained_area": 0.0
+    },
+    "hydraulic_jump": {
+      "value": 0.19903695499999963,
+      "x": 11.0,
+      "y": -5.5
+    },
+    "mass_final": 362.67163548000013,
+    "mass_initial": 424.4463286029029,
+    "mass_relative_drift": 0.14554182463125273,
+    "solver": "cpp",
+    "wave_crest": {
+      "value": 1.108489721504059,
+      "x": 0.0,
+      "y": -5.5
+    },
+    "wave_trough": {
+      "value": 0.6527385442871407,
+      "x": 10.0,
+      "y": -5.5
+    }
+  },
+  "delta": {
+    "energy_relative_change_delta": -7.030287824116854e-09,
+    "froude_max_delta": -2.620210493020636e-09,
+    "froude_mean_wet_delta": 3.8715586292425996e-11,
+    "hole_centroid_distance": null,
+    "hole_retained_area_delta": 0.0,
+    "hydraulic_jump_distance": 0.0,
+    "mass_relative_drift_delta": 2.591507231031187e-09,
+    "wave_crest_distance": 0.0,
+    "wave_trough_distance": 0.0
+  },
+  "pyclaw": {
+    "energy_final": 1525.9303125463025,
+    "energy_initial": 1985.8488655397591,
+    "energy_relative_change": -0.23159796345753106,
+    "frame_count": 3,
+    "froude_max": 0.9889768749645926,
+    "froude_mean_wet": 0.5872088009988188,
+    "hole_retention": {
+      "centroid_x": null,
+      "centroid_y": null,
+      "hole_count": 0,
+      "retained_area": 0.0
+    },
+    "hydraulic_jump": {
+      "value": 0.19903695583343506,
+      "x": 11.0,
+      "y": -5.5
+    },
+    "mass_final": 362.671635389328,
+    "mass_initial": 424.44632720947266,
+    "mass_relative_drift": 0.1455418220397455,
+    "solver": "geoclaw",
+    "wave_crest": {
+      "value": 1.1084897232728574,
+      "x": 0.0,
+      "y": -5.5
+    },
+    "wave_trough": {
+      "value": 0.6527385409137265,
+      "x": 10.0,
+      "y": -5.5
+    }
+  },
+  "reference": {
+    "energy_final": 1525.9303125463025,
+    "energy_initial": 1985.8488655397591,
+    "energy_relative_change": -0.23159796345753106,
+    "frame_count": 3,
+    "froude_max": 0.9889768749645926,
+    "froude_mean_wet": 0.5872088009988188,
+    "hole_retention": {
+      "centroid_x": null,
+      "centroid_y": null,
+      "hole_count": 0,
+      "retained_area": 0.0
+    },
+    "hydraulic_jump": {
+      "value": 0.19903695583343506,
+      "x": 11.0,
+      "y": -5.5
+    },
+    "mass_final": 362.671635389328,
+    "mass_initial": 424.44632720947266,
+    "mass_relative_drift": 0.1455418220397455,
+    "solver": "geoclaw",
+    "wave_crest": {
+      "value": 1.1084897232728574,
+      "x": 0.0,
+      "y": -5.5
+    },
+    "wave_trough": {
+      "value": 0.6527385409137265,
+      "x": 10.0,
+      "y": -5.5
+    }
+  },
+  "reference_solver": "geoclaw",
+  "scenario_id": "drop_ledge_seed_16"
+}
