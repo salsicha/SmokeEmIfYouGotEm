@@ -10,6 +10,7 @@ from raftsim.cascading import (
     CaliforniaPoolDropParameters2_5D,
     generate_california_pool_drop_cascading_scenario2_5d,
 )
+from raftsim.geoclaw_reference import rafting_geoclaw_scenarios
 from raftsim.scenario2_5d import (
     FixtureScenario2_5DParameters,
     ProceduralScenario2_5DParameters,
@@ -1739,6 +1740,54 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert drop_reduced_profile["max_depth_m_per_s"] == pytest.approx(220.0)
     assert drop_reduced_profile["max_speed_m_per_s2"] == pytest.approx(420.0)
     assert drop_reduced_profile["requires_feature_forcing"] is False
+
+    boulder_scenario = next(
+        scenario
+        for scenario in rafting_geoclaw_scenarios(seed=16)
+        if scenario.metadata.scenario_id == "boulder_garden_seed_16"
+    )
+    boulder_scenario_dir = tmp_path / "scenario" / "boulder_garden"
+    boulder_scenario.write_package(boulder_scenario_dir)
+    boulder_output_dir = tmp_path / "cpp_boulder_garden_reduced_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(boulder_scenario_dir),
+            "--output",
+            str(boulder_output_dir),
+            "--steps",
+            "12",
+            "--frame-interval",
+            "6",
+            "--solver-mode",
+            "reduced",
+            "--boundary-mode",
+            "scenario",
+            "--feature-strength-scale",
+            "0",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    boulder_manifest = json.loads(
+        (boulder_output_dir / boulder_scenario.metadata.scenario_id / "manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert boulder_manifest["preserve_initial_mass"] is False
+    assert boulder_manifest["fixture_scoped_boulder_garden_reduced_geoclaw_profile_calibration"] is True
+    boulder_profile = boulder_manifest["boulder_garden_reduced_geoclaw_profile_calibration"]
+    assert boulder_profile["enabled"] is True
+    assert boulder_profile["bounded"] is True
+    assert boulder_profile["applies_only_reduced_boulder_garden_fixture"] is True
+    assert boulder_profile["open_boundary_profile_comparison"] is True
+    assert boulder_profile["uses_reduced_profile_fast_path"] is True
+    assert boulder_profile["requires_preserve_initial_mass_disabled"] is True
+    assert boulder_profile["frame_count"] == 3
+    assert boulder_profile["max_depth_m_per_s"] == pytest.approx(220.0)
+    assert boulder_profile["max_speed_m_per_s2"] == pytest.approx(420.0)
+    assert boulder_profile["requires_feature_forcing"] is False
 
     drop_output_dir = tmp_path / "cpp_drop_ledge_fv_output"
     subprocess.run(

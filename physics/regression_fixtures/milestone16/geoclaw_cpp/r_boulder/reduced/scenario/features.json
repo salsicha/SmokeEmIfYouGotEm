@@ -1,0 +1,232 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 6.0,
+        "y": 4.136591259350768
+      },
+      "kind": "shallow",
+      "length": 5.173551527162692,
+      "metadata": {
+        "generated": true,
+        "source_index": 0,
+        "station_fraction": 0.08
+      },
+      "radius": 1.7689548176768894,
+      "strength": 1.6661622372115723,
+      "width": 2.543242211048278
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 13.0,
+        "y": 2.917446431317615
+      },
+      "kind": "strainer",
+      "length": 4.517878703310786,
+      "metadata": {
+        "generated": true,
+        "source_index": 1,
+        "station_fraction": 0.18042454724709953
+      },
+      "radius": 1.5119553843256188,
+      "strength": 1.334700139522961,
+      "width": 3.3112416529400748
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 22.0,
+        "y": 7.719099988815083
+      },
+      "kind": "lateral",
+      "length": 8.179134500369956,
+      "metadata": {
+        "generated": true,
+        "source_index": 2,
+        "station_fraction": 0.3069081258317263
+      },
+      "radius": 3.2397503313200566,
+      "strength": 1.1004495037991362,
+      "width": 5.0089739207318535
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 28.0,
+        "y": 0.0980926224648615
+      },
+      "kind": "constriction",
+      "length": 6.8194009137674945,
+      "metadata": {
+        "generated": true,
+        "source_index": 3,
+        "station_fraction": 0.3996004959167438
+      },
+      "radius": 2.3734002143237114,
+      "strength": 1.2930760385692723,
+      "width": 4.463791332030525
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 33.0,
+        "y": 2.211496386888206
+      },
+      "kind": "wave_train",
+      "length": 3.9788570620434633,
+      "metadata": {
+        "generated": true,
+        "source_index": 4,
+        "station_fraction": 0.4708523571363087
+      },
+      "radius": 1.4858954766887724,
+      "strength": 1.1112722754863917,
+      "width": 2.860476824219249
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 42.0,
+        "y": -0.4831868312249417
+      },
+      "kind": "boil",
+      "length": 5.1230750984860665,
+      "metadata": {
+        "generated": true,
+        "source_index": 5,
+        "station_fraction": 0.5871485535223913
+      },
+      "radius": 1.476582376717296,
+      "strength": 1.2159814397323077,
+      "width": 3.1845827954351145
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 52.0,
+        "y": -2.0278219119300673
+      },
+      "kind": "hole",
+      "length": 5.332555912985408,
+      "metadata": {
+        "generated": true,
+        "source_index": 6,
+        "station_fraction": 0.725500453519875
+      },
+      "radius": 2.8509206612851266,
+      "strength": 1.4238408351176457,
+      "width": 8.028287346715164
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 55.0,
+        "y": 2.2153737658123958
+      },
+      "kind": "rock",
+      "length": 13.52155075527099,
+      "metadata": {
+        "generated": true,
+        "source_index": 7,
+        "station_fraction": 0.7704707576703003
+      },
+      "radius": 3.732184888954723,
+      "strength": 1.431589992357335,
+      "width": 10.914784823684275
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 62.0,
+        "y": -2.2754626938272557
+      },
+      "kind": "ledge",
+      "length": 7.97404312846391,
+      "metadata": {
+        "generated": true,
+        "source_index": 8,
+        "station_fraction": 0.8673118694703681
+      },
+      "radius": 3.0085632412126637,
+      "strength": 1.3325577910861388,
+      "width": 7.631112027718036
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 22.72,
+        "y": -3.15
+      },
+      "kind": "rock",
+      "length": 0.0,
+      "metadata": {
+        "geoclaw_case_role": "boulder_garden"
+      },
+      "radius": 2.45,
+      "strength": 1.25,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 29.82,
+        "y": 3.15
+      },
+      "kind": "rock",
+      "length": 0.0,
+      "metadata": {
+        "geoclaw_case_role": "boulder_garden"
+      },
+      "radius": 2.45,
+      "strength": 1.25,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 36.92,
+        "y": -3.15
+      },
+      "kind": "rock",
+      "length": 0.0,
+      "metadata": {
+        "geoclaw_case_role": "boulder_garden"
+      },
+      "radius": 2.45,
+      "strength": 1.25,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 44.019999999999996,
+        "y": 3.15
+      },
+      "kind": "rock",
+      "length": 0.0,
+      "metadata": {
+        "geoclaw_case_role": "boulder_garden"
+      },
+      "radius": 2.45,
+      "strength": 1.25,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 51.12,
+        "y": -3.15
+      },
+      "kind": "rock",
+      "length": 0.0,
+      "metadata": {
+        "geoclaw_case_role": "boulder_garden"
+      },
+      "radius": 2.45,
+      "strength": 1.25,
+      "width": 0.0
+    }
+  ]
+}
