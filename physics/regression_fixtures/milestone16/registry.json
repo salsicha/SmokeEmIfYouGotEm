@@ -186,6 +186,29 @@
       "suite": "canonical"
     },
     {
+      "actual_scenario_id": "drop_ledge_seed_16",
+      "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume",
+      "artifact_id": "geoclaw_cpp/drop_ledge/finite_volume",
+      "case_id": null,
+      "category": "geoclaw_cpp",
+      "gate_scenario_id": "drop_ledge",
+      "manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/dual_solver_manifest.json",
+      "notes": [],
+      "passed": true,
+      "reports": {
+        "diagnostic_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/diagnostic_comparison.json",
+        "dual_solver_manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/dual_solver_manifest.json",
+        "feature_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/feature_comparison.json",
+        "field_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/field_comparison.json",
+        "probe_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/probe_comparison.json",
+        "threshold_evaluation": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/threshold_evaluation.json"
+      },
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/scenario",
+      "solver_mode": "finite_volume",
+      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+      "suite": "canonical"
+    },
+    {
       "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
       "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume",
       "artifact_id": "geoclaw_cpp/south_fork_cascading_low_runnable/finite_volume",
@@ -715,7 +738,7 @@
       "suite": "cascading"
     }
   ],
-  "entry_count": 34,
+  "entry_count": 35,
   "geometry_validation_report": "reports/milestone16/geometry_validation.json",
   "raft_coupling_report": "reports/milestone16/raft_coupling_validation.json",
   "schema_version": "raftsim.milestone16.regression_registry.v0"

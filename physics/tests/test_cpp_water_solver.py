@@ -1501,6 +1501,11 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert drop_balance["lip_speed_fraction"] == pytest.approx(2.20)
     assert drop_balance["tailwater_speed_fraction"] == pytest.approx(1.22)
     assert drop_balance["tailwater_mid_pulse_strength"] == pytest.approx(3.0)
+    assert drop_balance["lip_slope_balance"] is True
+    assert drop_balance["lip_slope_balance_mass_conservative"] is True
+    assert drop_balance["lip_slope_balance_response_start_fraction"] == pytest.approx(0.85)
+    assert drop_balance["lip_slope_balance_receiver_depth_scale"] == pytest.approx(0.86)
+    assert drop_balance["lip_slope_balance_donor_depth_scale"] == pytest.approx(1.08)
     assert drop_balance["requires_feature_forcing"] is False
 
     cascading_scenario_dir = tmp_path / "scenario" / "cascading"
