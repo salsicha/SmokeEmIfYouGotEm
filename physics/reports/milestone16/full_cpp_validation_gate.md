@@ -8,16 +8,15 @@ Decision: **BLOCKED**
 | --- | --- | ---: | ---: | ---: | --- |
 | GeoClaw Reference Runs | PASS | 20 | 0 | 20 | `reports/milestone16/geoclaw_reference_runs.json` |
 | C++ Solver Runs | PASS | 40 | 0 | 40 | `reports/milestone16/cpp_solver_runs.json` |
-| GeoClaw/C++ Threshold Comparisons | BLOCKED | 21 | 19 | 40 | `reports/milestone16/geoclaw_cpp_comparisons.json` |
+| GeoClaw/C++ Threshold Comparisons | BLOCKED | 22 | 18 | 40 | `reports/milestone16/geoclaw_cpp_comparisons.json` |
 | Geometry-Specific Validation | PASS | 6 | 0 | 6 | `reports/milestone16/geometry_validation.json` |
 | Raft Coupling Validation | BLOCKED | 15 | 35 | 50 | `reports/milestone16/raft_coupling_validation.json` |
-| Runtime Profile And Determinism | PASS | 63 | 0 | 63 | `reports/milestone16/runtime_profile.json` |
-| Regression Promotion | PASS | 44 | 0 | 44 | `reports/milestone16/regression_promotion_manifest.json` |
+| Runtime Profile And Determinism | PASS | 66 | 0 | 66 | `reports/milestone16/runtime_profile.json` |
+| Regression Promotion | PASS | 45 | 0 | 45 | `reports/milestone16/regression_promotion_manifest.json` |
 
 ## Blockers
 
 ### GeoClaw/C++ Threshold Comparisons
-- cascading_wave_train: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
 - cascading_wave_train: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
 - hydraulic_hole_downstream_boil: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
 - hydraulic_hole_downstream_boil: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
@@ -25,11 +24,12 @@ Decision: **BLOCKED**
 - lateral_wave: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
 - eddy_line_shear: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
 - eddy_line_shear: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
+- shallow_shelf: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
 
 ### Raft Coupling Validation
 - boulder_impacts: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)
 - boulder_impacts: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)
-- wave_train_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Canonical feature outcomes differ., Force delta exceeds the weight-normalized threshold.)
+- wave_train_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)
 - wave_train_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Canonical feature outcomes differ.)
 - hydraulic_hole_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)
 - downstream_boil_recovery: raft coupling comparison failed (C++ raft feature checks are not passing., Force delta exceeds the weight-normalized threshold., Torque delta exceeds the inertia-normalized threshold.)
