@@ -14,6 +14,7 @@ from raftsim.milestone16 import (
     Milestone16RaftCouplingReport,
     Milestone16RuntimeProfileRecord,
     Milestone16RuntimeProfileReport,
+    _cpp_config_for_mode,
     build_milestone16_full_cpp_validation_gate_report,
     run_milestone16_geometry_validation,
     run_milestone16_regression_promotion,
@@ -106,6 +107,33 @@ def test_milestone16_cpp_run_report_requires_manifest_settings():
     assert report.passed is True
     assert payload["run_count"] == 1
     assert payload["records"][0]["passed"] is True
+
+
+def test_milestone16_cpp_config_applies_uniform_channel_finite_volume_override():
+    uniform = _cpp_config_for_mode(
+        "/tmp/raftsim-water-m16-build/raftsim_water_solver",
+        "finite_volume",
+        gate_scenario_id="uniform_channel",
+    )
+    generic = _cpp_config_for_mode(
+        "/tmp/raftsim-water-m16-build/raftsim_water_solver",
+        "finite_volume",
+        gate_scenario_id="drop_ledge",
+    )
+    reduced = _cpp_config_for_mode(
+        "/tmp/raftsim-water-m16-build/raftsim_water_solver",
+        "reduced",
+        gate_scenario_id="uniform_channel",
+    )
+
+    assert uniform.flux_scheme == "hll"
+    assert uniform.feature_strength_scale == 0.0
+    assert uniform.roughness_scale == 0.35
+    assert uniform.bed_slope_source_scale == 0.65
+    assert generic.roughness_scale == 0.5
+    assert generic.bed_slope_source_scale == 0.75
+    assert reduced.roughness_scale == 1.0
+    assert reduced.bed_slope_source_scale == 0.0
 
 
 def test_milestone16_comparison_report_tracks_threshold_failures():
