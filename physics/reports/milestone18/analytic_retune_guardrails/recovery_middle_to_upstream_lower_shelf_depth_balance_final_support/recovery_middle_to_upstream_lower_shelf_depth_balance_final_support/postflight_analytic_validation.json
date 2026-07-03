@@ -1,0 +1,252 @@
+{
+  "candidate_kind": "cpp",
+  "candidate_label": "recovery_middle_to_upstream_lower_shelf_depth_balance_final_support",
+  "candidate_root": "physics/outputs/m18cmp/c_constrict_recovery_middle_to_upstream_lower_shelf_depth_balance_final_support/finite_volume_roe/cpp_solver/constriction_seed_16",
+  "comparisons": [
+    {
+      "candidate_kind": "cpp",
+      "candidate_source": "physics/outputs/m18cmp/c_constrict_recovery_middle_to_upstream_lower_shelf_depth_balance_final_support/finite_volume_roe/cpp_solver/constriction_seed_16/manifest.json",
+      "fixture_id": "lake_at_rest_balance",
+      "metrics": [
+        {
+          "details": "linf difference for eta",
+          "field": "eta",
+          "fixture_id": "lake_at_rest_balance",
+          "metric_id": "surface_linf",
+          "norm": "linf",
+          "passed": false,
+          "threshold": 1e-09,
+          "units": "m",
+          "value": 1.573254483055765
+        },
+        {
+          "details": "linf difference for speed",
+          "field": "speed",
+          "fixture_id": "lake_at_rest_balance",
+          "metric_id": "speed_linf",
+          "norm": "linf",
+          "passed": false,
+          "threshold": 1e-09,
+          "units": "m/s",
+          "value": 5.187975203254049
+        }
+      ],
+      "passed": false,
+      "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/lake_at_rest_balance/reference.json",
+      "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/lake_at_rest_balance/scenario",
+      "title": "Lake At Rest Over Uneven Bed",
+      "tolerance_tier": "well_balanced"
+    },
+    {
+      "candidate_kind": "cpp",
+      "candidate_source": "physics/outputs/m18cmp/c_constrict_recovery_middle_to_upstream_lower_shelf_depth_balance_final_support/finite_volume_roe/cpp_solver/constriction_seed_16/manifest.json",
+      "fixture_id": "sloping_channel_friction",
+      "metrics": [
+        {
+          "details": "linf difference for u",
+          "field": "u",
+          "fixture_id": "sloping_channel_friction",
+          "metric_id": "normal_velocity_linf",
+          "norm": "linf",
+          "passed": false,
+          "threshold": 0.025,
+          "units": "m/s",
+          "value": 2.3424955362134856
+        },
+        {
+          "details": "linf difference for hu",
+          "field": "hu",
+          "fixture_id": "sloping_channel_friction",
+          "metric_id": "unit_discharge_linf",
+          "norm": "linf",
+          "passed": false,
+          "threshold": 0.03,
+          "units": "m2/s",
+          "value": 2.9918193911769464
+        }
+      ],
+      "passed": false,
+      "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/sloping_channel_friction/reference.json",
+      "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/sloping_channel_friction/scenario",
+      "title": "Sloping Manning Channel",
+      "tolerance_tier": "analytic"
+    },
+    {
+      "candidate_kind": "cpp",
+      "candidate_source": "physics/outputs/m18cmp/c_constrict_recovery_middle_to_upstream_lower_shelf_depth_balance_final_support/finite_volume_roe/cpp_solver/constriction_seed_16/manifest.json",
+      "fixture_id": "wet_dry_shoreline",
+      "metrics": [
+        {
+          "details": "wet mask mismatched cells",
+          "field": "wet",
+          "fixture_id": "wet_dry_shoreline",
+          "metric_id": "wet_mask_mismatch_count",
+          "norm": "count",
+          "passed": false,
+          "threshold": 0.0,
+          "units": "cells",
+          "value": 462.0
+        },
+        {
+          "details": "mean shoreline y-position difference",
+          "field": "shoreline_y",
+          "fixture_id": "wet_dry_shoreline",
+          "metric_id": "shoreline_position_abs",
+          "norm": "abs",
+          "passed": false,
+          "threshold": 0.5,
+          "units": "m",
+          "value": 0.7083333333333333
+        }
+      ],
+      "passed": false,
+      "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/wet_dry_shoreline/reference.json",
+      "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/wet_dry_shoreline/scenario",
+      "title": "Planar Wet/Dry Shoreline",
+      "tolerance_tier": "well_balanced"
+    },
+    {
+      "candidate_kind": "cpp",
+      "candidate_source": "physics/outputs/m18cmp/c_constrict_recovery_middle_to_upstream_lower_shelf_depth_balance_final_support/finite_volume_roe/cpp_solver/constriction_seed_16/manifest.json",
+      "fixture_id": "bed_step_subcritical",
+      "metrics": [
+        {
+          "details": "linf difference for h",
+          "field": "h",
+          "fixture_id": "bed_step_subcritical",
+          "metric_id": "depth_linf",
+          "norm": "linf",
+          "passed": false,
+          "threshold": 0.04,
+          "units": "m",
+          "value": 1.2
+        },
+        {
+          "details": "maximum specific-energy difference",
+          "field": "specific_energy",
+          "fixture_id": "bed_step_subcritical",
+          "metric_id": "specific_energy_abs",
+          "norm": "abs",
+          "passed": false,
+          "threshold": 0.05,
+          "units": "m",
+          "value": 2.642201834862385e+16
+        }
+      ],
+      "passed": false,
+      "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/bed_step_subcritical/reference.json",
+      "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/bed_step_subcritical/scenario",
+      "title": "Subcritical Bed Step",
+      "tolerance_tier": "analytic"
+    },
+    {
+      "candidate_kind": "cpp",
+      "candidate_source": "physics/outputs/m18cmp/c_constrict_recovery_middle_to_upstream_lower_shelf_depth_balance_final_support/finite_volume_roe/cpp_solver/constriction_seed_16/manifest.json",
+      "fixture_id": "dam_break_bore",
+      "metrics": [
+        {
+          "details": "linf difference for h",
+          "field": "h",
+          "fixture_id": "dam_break_bore",
+          "metric_id": "initial_depth_linf",
+          "norm": "linf",
+          "passed": false,
+          "threshold": 1e-12,
+          "units": "m",
+          "value": 2.0
+        },
+        {
+          "details": "candidate mass relative to analytic reference mass",
+          "field": "mass",
+          "fixture_id": "dam_break_bore",
+          "metric_id": "mass_relative_drift",
+          "norm": "relative",
+          "passed": false,
+          "threshold": 0.0005,
+          "units": "ratio",
+          "value": 0.8667889745186218
+        }
+      ],
+      "passed": false,
+      "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/dam_break_bore/reference.json",
+      "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/dam_break_bore/scenario",
+      "title": "Dam-Break Bore Riemann Initial State",
+      "tolerance_tier": "diagnostic"
+    },
+    {
+      "candidate_kind": "cpp",
+      "candidate_source": "physics/outputs/m18cmp/c_constrict_recovery_middle_to_upstream_lower_shelf_depth_balance_final_support/finite_volume_roe/cpp_solver/constriction_seed_16/manifest.json",
+      "fixture_id": "hydraulic_jump_conjugate_depth",
+      "metrics": [
+        {
+          "details": "downstream/upstream depth-ratio difference",
+          "field": "h2_over_h1",
+          "fixture_id": "hydraulic_jump_conjugate_depth",
+          "metric_id": "conjugate_depth_ratio_abs",
+          "norm": "abs",
+          "passed": false,
+          "threshold": 0.06,
+          "units": "ratio",
+          "value": 3.772001872658765
+        },
+        {
+          "details": "wet-cell Froude class mismatch count",
+          "field": "froude",
+          "fixture_id": "hydraulic_jump_conjugate_depth",
+          "metric_id": "froude_class_agreement",
+          "norm": "class",
+          "passed": false,
+          "threshold": 0.0,
+          "units": "class_mismatch_count",
+          "value": 712.0
+        }
+      ],
+      "passed": false,
+      "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/hydraulic_jump_conjugate_depth/reference.json",
+      "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/hydraulic_jump_conjugate_depth/scenario",
+      "title": "Hydraulic Jump Conjugate Depth",
+      "tolerance_tier": "analytic"
+    },
+    {
+      "candidate_kind": "cpp",
+      "candidate_source": "physics/outputs/m18cmp/c_constrict_recovery_middle_to_upstream_lower_shelf_depth_balance_final_support/finite_volume_roe/cpp_solver/constriction_seed_16/manifest.json",
+      "fixture_id": "transcritical_bump",
+      "metrics": [
+        {
+          "details": "linf difference for hu",
+          "field": "hu",
+          "fixture_id": "transcritical_bump",
+          "metric_id": "unit_discharge_linf",
+          "norm": "linf",
+          "passed": false,
+          "threshold": 0.04,
+          "units": "m2/s",
+          "value": 3.766337191810192
+        },
+        {
+          "details": "mean crest Froude difference",
+          "field": "froude",
+          "fixture_id": "transcritical_bump",
+          "metric_id": "crest_froude_abs",
+          "norm": "abs",
+          "passed": false,
+          "threshold": 0.2,
+          "units": "ratio",
+          "value": 1.1478805557553893
+        }
+      ],
+      "passed": false,
+      "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/transcritical_bump/reference.json",
+      "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/transcritical_bump/scenario",
+      "title": "Transcritical Flow Over Bump",
+      "tolerance_tier": "analytic"
+    }
+  ],
+  "failed_count": 7,
+  "fixture_count": 7,
+  "frame_index": 8,
+  "manifest_path": "physics/data/validation/milestone17/analytic_fixtures/manifest.json",
+  "passed": false,
+  "passed_count": 0,
+  "schema_version": "raftsim.milestone17.analytic_validation_report.v0"
+}
