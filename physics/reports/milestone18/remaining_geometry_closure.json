@@ -21036,6 +21036,125 @@
         },
         {
           "blocked_reasons": [
+            "C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow."
+          ],
+          "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
+          "next_levers": [
+            "Start with `lower_edge_face` column 9 rows 2-3; reconstructed q delta is 0.207968 m3/s and balance delta is 0.397053 m3/s2.",
+            "Export or inspect internal C++ y-face Riemann fluxes and hydrostatic bed-source terms at this face to verify the reconstructed final-frame audit.",
+            "Move the upstream shallow-fast edge behavior into finite-volume face/source treatment rather than final velocity, depth, or gameplay forcing.",
+            "Use the exported C++ internal audit at `lower_edge_face` column 9 rows 2-3; post-source q delta is 0.685184 m3/s."
+          ],
+          "passed": false,
+          "scenario_id": "constriction_seed_16",
+          "schema_version": "raftsim.milestone18.constriction_face_source_audit.v0",
+          "source_report": "physics/reports/milestone18/constriction_upstream_edge_source_balance_final_support_face_source_audit.json",
+          "summary": {
+            "candidate_opposed_edge_column_count": 10,
+            "cpp_internal_audit_sample_count": 96,
+            "cpp_internal_constriction_source_split_applied_count": 32,
+            "cpp_internal_face_state_reconstruction_applied_count": 20,
+            "cpp_internal_hydrostatic_face_source_enabled_count": 32,
+            "cpp_internal_max_abs_post_source_delta_m3ps": 3.539108636161935,
+            "cpp_internal_post_source_sign_mismatch_count": 35,
+            "cpp_internal_source_applied_count": 20,
+            "max_abs_balance_delta_m3ps2": 0.7429169465404684,
+            "max_abs_bed_source_delta_m3ps2": 0.46807517251253117,
+            "max_abs_normal_momentum_flux_delta_m3ps2": 0.5698789295613622,
+            "max_abs_volume_flux_delta_m3ps": 0.2079676591288803,
+            "max_abs_x_momentum_flux_delta_m3ps2": 0.48560433311426254,
+            "opposition_mismatch_count": 0,
+            "reference_opposed_edge_column_count": 10,
+            "sample_count": 16,
+            "volume_sign_mismatch_count": 0,
+            "worst_samples_count": 12,
+            "x_momentum_sign_mismatch_count": 0
+          }
+        },
+        {
+          "blocked_reasons": [],
+          "decision": "PASS",
+          "gate_scenario_id": "constriction",
+          "next_levers": [
+            "Start with `lower_edge_face` column 9 rows 2-3; q delta is 0.207968 m3/s, face mean-depth delta is 0.00849284 m, wet-width delta is 0 cells, and max bank-row delta is 0 cells.",
+            "Keep feature forcing and stronger source-split tuning off, then rerun the face/source audit, mask/throat diagnostics, threshold report, and Milestone 17 guardrail."
+          ],
+          "passed": true,
+          "scenario_id": "constriction_seed_16",
+          "schema_version": "raftsim.milestone18.constriction_face_state_width_depth.v0",
+          "source_report": "physics/reports/milestone18/constriction_upstream_edge_source_balance_final_support_face_state_width_depth.json",
+          "summary": {
+            "bank_alignment_blocker_count": 0,
+            "column_profile_count": 14,
+            "depth_mapping_blocker_count": 0,
+            "edge_opposition_mismatch_count": 0,
+            "face_sign_mismatch_count": 0,
+            "face_state_blocker_count": 0,
+            "face_state_sample_count": 20,
+            "max_abs_bank_row_delta_cells": 0,
+            "max_abs_face_mean_depth_delta_m": 0.0996471167113433,
+            "max_abs_volume_flux_delta_m3ps": 0.2079676591288803,
+            "max_abs_wet_width_delta_cells": 0,
+            "recommended_levers_count": 1,
+            "width_mapping_blocker_count": 0,
+            "worst_face_state_samples_count": 12
+          }
+        },
+        {
+          "blocked_reasons": [],
+          "decision": "PASS",
+          "gate_scenario_id": "constriction",
+          "next_levers": [
+            "Start with `downstream_constriction/interior` cell 5,14; `hu` delta is `0.248846` with reference h `1.20314` m and C++ h `1.33955` m.",
+            "Keep feature forcing off; this report is a water-field closure target, not gameplay forcing evidence."
+          ],
+          "passed": true,
+          "scenario_id": "constriction_seed_16",
+          "schema_version": "raftsim.milestone18.constriction_field_profile.v0",
+          "source_report": "physics/reports/milestone18/constriction_upstream_edge_source_balance_final_support_field_profile.json",
+          "summary": {
+            "max_abs_field_delta": 0.24884627251165092,
+            "max_abs_h_delta": 0.24588228415790958,
+            "max_abs_hu_delta": 0.24884627251165092,
+            "max_abs_hv_delta": 0.22697284819940658,
+            "max_abs_mass_delta_m3": 2.911969824533281,
+            "max_abs_u_delta": 0.24596675538909274,
+            "max_abs_v_delta": 0.2390442424561272,
+            "max_material_wet_mismatch_fraction": 0.0,
+            "profile_bin_count": 16,
+            "worst_cell_count": 16,
+            "worst_cells_count": 16,
+            "worst_profile_bins_count": 12
+          }
+        },
+        {
+          "blocked_reasons": [
+            "No upstream edge balance targets were available from the focused constriction reports."
+          ],
+          "decision": "BLOCKED",
+          "gate_scenario_id": "constriction",
+          "next_levers": [
+            "Regenerate the constriction face-state and face/source reports before the next solver retune."
+          ],
+          "passed": false,
+          "scenario_id": "constriction_seed_16",
+          "schema_version": "raftsim.milestone18.constriction_upstream_edge_balance.v0",
+          "source_report": "physics/reports/milestone18/constriction_upstream_edge_source_balance_final_support_upstream_edge_balance.json",
+          "summary": {
+            "blocked_target_count": 0,
+            "max_abs_balance_delta_m3ps2": 0.0,
+            "max_abs_volume_flux_delta_m3ps": 0.0,
+            "native_post_source_sign_mismatch_count": 0,
+            "paired_edge_opposition_mismatch_count": 0,
+            "primary_target": null,
+            "source_balance_blocker_count": 0,
+            "target_sample_count": 0,
+            "width_depth_coupled_blocker_count": 0
+          }
+        },
+        {
+          "blocked_reasons": [
             "C++ reconstructed y-face volume flux signs do not match GeoClaw on one or more upstream edge faces.",
             "C++ reconstructed y-face x-momentum transport signs do not match GeoClaw.",
             "C++ reconstructed upstream lateral volume-flux deltas exceed the diagnostic threshold.",
@@ -34160,6 +34279,10 @@
     "physics/reports/milestone18/constriction_upstream_edge_flux_source_shape_diagnostic.json",
     "physics/reports/milestone18/constriction_upstream_edge_flux_source_throat_diagnostic.json",
     "physics/reports/milestone18/constriction_upstream_edge_flux_source_timing_diagnostic.json",
+    "physics/reports/milestone18/constriction_upstream_edge_source_balance_final_support_face_source_audit.json",
+    "physics/reports/milestone18/constriction_upstream_edge_source_balance_final_support_face_state_width_depth.json",
+    "physics/reports/milestone18/constriction_upstream_edge_source_balance_final_support_field_profile.json",
+    "physics/reports/milestone18/constriction_upstream_edge_source_balance_final_support_upstream_edge_balance.json",
     "physics/reports/milestone18/constriction_upstream_edge_support_face_source_audit_diagnostic.json",
     "physics/reports/milestone18/constriction_upstream_edge_support_face_state_width_depth_diagnostic.json",
     "physics/reports/milestone18/constriction_upstream_edge_support_retune.json",
