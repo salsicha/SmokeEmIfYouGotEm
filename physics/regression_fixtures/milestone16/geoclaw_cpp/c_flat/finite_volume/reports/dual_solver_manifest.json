@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_flat/finite_volume/cpp_solver/flat_pool_seed_16/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_flat/finite_volume/cpp_solver/flat_pool_seed_16",
     "returncode": 0,
-    "runtime_seconds": 0.10142262500085053,
+    "runtime_seconds": 0.0972385419991042,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_flat/finite_volume/cpp_solver/flat_pool_seed_16/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_flat/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.10142262500085053,
-    "cpp_seconds_per_simulated_second": 0.01690377083347509,
+    "cpp_runtime_seconds": 0.0972385419991042,
+    "cpp_seconds_per_simulated_second": 0.016206423666517367,
     "geoclaw_runtime_seconds": 1.0653290410009504,
     "geoclaw_seconds_per_simulated_second": 0.17755484016682507,
     "simulated_duration_seconds": 6.0

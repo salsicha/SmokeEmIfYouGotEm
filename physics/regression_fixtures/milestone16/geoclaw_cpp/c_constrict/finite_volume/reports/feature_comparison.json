@@ -1,0 +1,36 @@
+{
+  "comparisons": [
+    {
+      "authored_strength": 2.060119640661019,
+      "authored_x": 11.5,
+      "authored_y": 0.0,
+      "cpp": {
+        "distance_to_authored": 1.5811388300841898,
+        "strength": 4.831651011176813,
+        "x": 11.0,
+        "y": 1.5
+      },
+      "feature_index": 0,
+      "kind": "constriction",
+      "location_delta": 0.0,
+      "pyclaw": {
+        "distance_to_authored": 1.5811388300841898,
+        "strength": 4.831651010966458,
+        "x": 11.0,
+        "y": 1.5
+      },
+      "reference": {
+        "distance_to_authored": 1.5811388300841898,
+        "strength": 4.831651010966458,
+        "x": 11.0,
+        "y": 1.5
+      },
+      "reference_solver": "geoclaw",
+      "strength_delta": 2.1035528874335796e-10
+    }
+  ],
+  "feature_count": 1,
+  "max_abs_strength_delta": 2.1035528874335796e-10,
+  "max_location_delta": 0.0,
+  "scenario_id": "constriction_seed_16"
+}

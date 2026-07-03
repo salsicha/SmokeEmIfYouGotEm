@@ -10,7 +10,6 @@
     "milestone18_report": "reports/milestone18/remaining_geometry_closure.json",
     "passed": true,
     "superseded_stale_blockers": [
-      "constriction:finite_volume",
       "constriction:reduced"
     ],
     "threshold_passed": true
