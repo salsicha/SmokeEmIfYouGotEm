@@ -1,11 +1,11 @@
 {
   "cpp": {
-    "energy_final": 2730.0260257473815,
+    "energy_final": 2727.2415681383686,
     "energy_initial": 2353.5162,
-    "energy_relative_change": 0.15997757982179237,
+    "energy_relative_change": 0.15879447447116302,
     "frame_count": 9,
-    "froude_max": 0.5198065614613256,
-    "froude_mean_wet": 0.41279010542500305,
+    "froude_max": 0.5356719866832362,
+    "froude_mean_wet": 0.4186126009304619,
     "hole_retention": {
       "centroid_x": null,
       "centroid_y": null,
@@ -13,43 +13,43 @@
       "retained_area": 0.0
     },
     "hydraulic_jump": {
-      "value": 0.17840549996974853,
+      "value": 0.19498529532818593,
       "x": 11.0,
       "y": -5.5
     },
-    "mass_final": 324.8785493733535,
+    "mass_final": 324.1242211493035,
     "mass_initial": 295.2,
-    "mass_relative_drift": 0.10053709137314878,
+    "mass_relative_drift": 0.09798177896105519,
     "solver": "cpp",
     "wave_crest": {
-      "value": 1.428504605078262,
-      "x": 12.0,
+      "value": 1.3953660475070182,
+      "x": 13.0,
       "y": -5.5
     },
     "wave_trough": {
-      "value": 1.2091660631408065,
+      "value": 1.2056249335935885,
       "x": 11.0,
       "y": -5.5
     }
   },
   "delta": {
-    "energy_relative_change_delta": 0.0350211176140051,
-    "froude_max_delta": 0.01859138055829057,
-    "froude_mean_wet_delta": 0.03368575173792698,
+    "energy_relative_change_delta": 0.010758106019132657,
+    "froude_max_delta": 0.02693997170070772,
+    "froude_mean_wet_delta": 0.033037877467447074,
     "hole_centroid_distance": null,
     "hole_retained_area_delta": 0.0,
     "hydraulic_jump_distance": 0.0,
-    "mass_relative_drift_delta": 0.005648602988703205,
-    "wave_crest_distance": 2.0,
+    "mass_relative_drift_delta": -0.007502423535441255,
+    "wave_crest_distance": 3.0,
     "wave_trough_distance": 0.0
   },
   "pyclaw": {
-    "energy_final": 2647.6032809699536,
+    "energy_final": 2701.9222146794523,
     "energy_initial": 2353.5162203289988,
-    "energy_relative_change": 0.12495646220778726,
+    "energy_relative_change": 0.14803636845203036,
     "frame_count": 3,
-    "froude_max": 0.5012151809030351,
-    "froude_mean_wet": 0.37910435368707607,
+    "froude_max": 0.5087320149825285,
+    "froude_mean_wet": 0.3855747234630148,
     "hole_retention": {
       "centroid_x": null,
       "centroid_y": null,
@@ -57,32 +57,32 @@
       "retained_area": 0.0
     },
     "hydraulic_jump": {
-      "value": 0.25816860795021057,
+      "value": 0.2601078450679779,
       "x": 11.0,
       "y": -5.5
     },
-    "mass_final": 323.211083650589,
+    "mass_final": 326.33893847465515,
     "mass_initial": 295.20000171661377,
-    "mass_relative_drift": 0.09488848838444558,
+    "mass_relative_drift": 0.10548420249649644,
     "solver": "geoclaw",
     "wave_crest": {
-      "value": 1.394144058227539,
+      "value": 1.407667636871338,
       "x": 10.0,
       "y": -5.5
     },
     "wave_trough": {
-      "value": 1.1489017009735107,
+      "value": 1.1609286069869995,
       "x": 11.0,
       "y": -5.5
     }
   },
   "reference": {
-    "energy_final": 2647.6032809699536,
+    "energy_final": 2701.9222146794523,
     "energy_initial": 2353.5162203289988,
-    "energy_relative_change": 0.12495646220778726,
+    "energy_relative_change": 0.14803636845203036,
     "frame_count": 3,
-    "froude_max": 0.5012151809030351,
-    "froude_mean_wet": 0.37910435368707607,
+    "froude_max": 0.5087320149825285,
+    "froude_mean_wet": 0.3855747234630148,
     "hole_retention": {
       "centroid_x": null,
       "centroid_y": null,
@@ -90,21 +90,21 @@
       "retained_area": 0.0
     },
     "hydraulic_jump": {
-      "value": 0.25816860795021057,
+      "value": 0.2601078450679779,
       "x": 11.0,
       "y": -5.5
     },
-    "mass_final": 323.211083650589,
+    "mass_final": 326.33893847465515,
     "mass_initial": 295.20000171661377,
-    "mass_relative_drift": 0.09488848838444558,
+    "mass_relative_drift": 0.10548420249649644,
     "solver": "geoclaw",
     "wave_crest": {
-      "value": 1.394144058227539,
+      "value": 1.407667636871338,
       "x": 10.0,
       "y": -5.5
     },
     "wave_trough": {
-      "value": 1.1489017009735107,
+      "value": 1.1609286069869995,
       "x": 11.0,
       "y": -5.5
     }

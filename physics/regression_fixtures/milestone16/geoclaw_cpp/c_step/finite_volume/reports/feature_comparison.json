@@ -6,7 +6,7 @@
       "authored_y": 0.0,
       "cpp": {
         "distance_to_authored": 0.7071067811865476,
-        "strength": 0.4488832415242846,
+        "strength": 0.4848411476130867,
         "x": 12.0,
         "y": -0.5
       },
@@ -15,22 +15,22 @@
       "location_delta": 0.0,
       "pyclaw": {
         "distance_to_authored": 0.7071067811865476,
-        "strength": 0.6054309368133545,
+        "strength": 0.6078091919422149,
         "x": 12.0,
         "y": -0.5
       },
       "reference": {
         "distance_to_authored": 0.7071067811865476,
-        "strength": 0.6054309368133545,
+        "strength": 0.6078091919422149,
         "x": 12.0,
         "y": -0.5
       },
       "reference_solver": "geoclaw",
-      "strength_delta": -0.15654769528906987
+      "strength_delta": -0.12296804432912822
     }
   ],
   "feature_count": 1,
-  "max_abs_strength_delta": 0.15654769528906987,
+  "max_abs_strength_delta": 0.12296804432912822,
   "max_location_delta": 0.0,
   "scenario_id": "bed_step_seed_16"
 }

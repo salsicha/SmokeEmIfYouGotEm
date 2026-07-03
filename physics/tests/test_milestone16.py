@@ -120,6 +120,11 @@ def test_milestone16_cpp_config_applies_uniform_channel_finite_volume_override()
         "finite_volume",
         gate_scenario_id="drop_ledge",
     )
+    bed_step = _cpp_config_for_mode(
+        "/tmp/raftsim-water-m16-build/raftsim_water_solver",
+        "finite_volume",
+        gate_scenario_id="bed_step",
+    )
     reduced = _cpp_config_for_mode(
         "/tmp/raftsim-water-m16-build/raftsim_water_solver",
         "reduced",
@@ -132,6 +137,9 @@ def test_milestone16_cpp_config_applies_uniform_channel_finite_volume_override()
     assert uniform.bed_slope_source_scale == 0.65
     assert generic.roughness_scale == 0.5
     assert generic.bed_slope_source_scale == 0.75
+    assert bed_step.flux_scheme == "roe"
+    assert bed_step.roughness_scale == 0.5
+    assert bed_step.bed_slope_source_scale == 0.75
     assert reduced.roughness_scale == 1.0
     assert reduced.bed_slope_source_scale == 0.0
 

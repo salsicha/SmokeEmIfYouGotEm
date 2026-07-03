@@ -5,17 +5,17 @@
       "name": "field_linf",
       "passed": true,
       "threshold": 0.35,
-      "value": 0.29588109112914696
+      "value": 0.3201042453354419
     },
     {
       "details": "Max Linf across eta slope fields.",
       "name": "slope_linf",
       "passed": true,
       "threshold": 0.08,
-      "value": 0.07976310798046204
+      "value": 0.06512254973979203
     },
     {
-      "details": "Max wet/dry mask mismatch fraction across compared frames.",
+      "details": "Max material wet/dry mask mismatch fraction across compared frames using h >= 0.15 m.",
       "name": "wet_mismatch_fraction",
       "passed": true,
       "threshold": 0.1,
@@ -26,35 +26,35 @@
       "name": "probe_linf",
       "passed": true,
       "threshold": 0.35,
-      "value": 0.2568969461419527
+      "value": 0.24083877724082614
     },
     {
       "details": "Max Linf across cross-section fields; u/v/Froude masked below 0.15 m.",
       "name": "cross_section_linf",
       "passed": true,
       "threshold": 0.35,
-      "value": 0.10069776275114406
+      "value": 0.142582052192175
     },
     {
       "details": "Absolute C++ minus reference mass-drift delta.",
       "name": "mass_drift_delta",
       "passed": true,
       "threshold": 0.04,
-      "value": 0.005648602988703205
+      "value": 0.007502423535441255
     },
     {
       "details": "Absolute C++ minus reference energy-change delta.",
       "name": "energy_change_delta",
       "passed": true,
       "threshold": 0.15,
-      "value": 0.0350211176140051
+      "value": 0.010758106019132657
     },
     {
       "details": "Max absolute Froude summary delta for cells at or above 0.15 m.",
       "name": "froude_delta",
       "passed": true,
       "threshold": 0.1,
-      "value": 0.03368575173792698
+      "value": 0.033037877467447074
     },
     {
       "details": "Max observed feature response location delta.",
@@ -68,7 +68,7 @@
       "name": "feature_strength_delta",
       "passed": true,
       "threshold": 0.55,
-      "value": 0.15654769528906987
+      "value": 0.12296804432912822
     }
   ],
   "passed": true,
