@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_dam/finite_volume/cpp_solver/dam_break_seed_16/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_dam/finite_volume/cpp_solver/dam_break_seed_16",
     "returncode": 0,
-    "runtime_seconds": 0.1050797500029148,
+    "runtime_seconds": 0.12723070900028688,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_dam/finite_volume/cpp_solver/dam_break_seed_16/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_dam/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.1050797500029148,
-    "cpp_seconds_per_simulated_second": 0.01751329166715247,
+    "cpp_runtime_seconds": 0.12723070900028688,
+    "cpp_seconds_per_simulated_second": 0.02120511816671448,
     "geoclaw_runtime_seconds": 0.8529597500000818,
     "geoclaw_seconds_per_simulated_second": 0.14215995833334696,
     "simulated_duration_seconds": 6.0

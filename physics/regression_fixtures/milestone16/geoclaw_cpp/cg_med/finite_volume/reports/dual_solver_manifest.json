@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
     "returncode": 2,
-    "runtime_seconds": 0.3841142499986745,
+    "runtime_seconds": 0.4308790830000362,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/cg_med/normalized_cascading/stitched/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.3841142499986745,
-    "cpp_seconds_per_simulated_second": 0.04801428124983431,
+    "cpp_runtime_seconds": 0.4308790830000362,
+    "cpp_seconds_per_simulated_second": 0.053859885375004524,
     "geoclaw_runtime_seconds": 0.9368430829999852,
     "geoclaw_seconds_per_simulated_second": 0.11710538537499815,
     "simulated_duration_seconds": 8.0

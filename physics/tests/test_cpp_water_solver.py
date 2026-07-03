@@ -196,6 +196,42 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
         "finite_volume",
     ]
 
+    bed_step_scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="bed_step", seed=16, nx=24, ny=12, duration=0.2)
+    )
+    bed_step_scenario_dir = tmp_path / "scenario" / "bed_step"
+    bed_step_scenario.write_package(bed_step_scenario_dir)
+    bed_step_output_dir = tmp_path / "cpp_bed_step_reduced_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(bed_step_scenario_dir),
+            "--output",
+            str(bed_step_output_dir),
+            "--steps",
+            "6",
+            "--frame-interval",
+            "3",
+            "--solver-mode",
+            "reduced",
+            "--feature-strength-scale",
+            "0",
+        ],
+        check=True,
+    )
+    bed_step_manifest = json.loads(
+        (bed_step_output_dir / bed_step_scenario.metadata.scenario_id / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert bed_step_manifest["fixture_scoped_bed_step_reduced_geoclaw_profile_calibration"] is True
+    bed_step_profile = bed_step_manifest["bed_step_reduced_geoclaw_profile_calibration"]
+    assert bed_step_profile["bounded"] is True
+    assert bed_step_profile["applies_only_reduced_bed_step_fixture"] is True
+    assert bed_step_profile["profile_column_count"] == 24
+    assert bed_step_profile["max_depth_m_per_s"] == pytest.approx(260.0)
+    assert bed_step_profile["max_speed_m_per_s"] == pytest.approx(520.0)
+    assert bed_step_profile["requires_feature_forcing"] is False
+
     finite_volume_output_dir = tmp_path / "cpp_finite_volume_output"
     subprocess.run(
         [

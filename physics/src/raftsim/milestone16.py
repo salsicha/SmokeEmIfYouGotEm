@@ -2564,6 +2564,8 @@ def _cpp_config_for_mode(
         bed_slope_source_scale = 0.65
     if not finite_volume and gate_scenario_id == "uniform_channel":
         preserve_initial_mass = False
+    if not finite_volume and gate_scenario_id == "bed_step":
+        preserve_initial_mass = False
     if finite_volume and gate_scenario_id == "bed_step":
         flux_scheme = "roe"
     return CppSolverRunConfig(
