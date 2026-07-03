@@ -1,0 +1,19 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 11.5,
+        "y": 0.0
+      },
+      "kind": "ledge",
+      "length": 11.0,
+      "metadata": {
+        "fixture_role": "initial_depth_discontinuity"
+      },
+      "radius": 0.0,
+      "strength": 1.0,
+      "width": 0.0
+    }
+  ]
+}

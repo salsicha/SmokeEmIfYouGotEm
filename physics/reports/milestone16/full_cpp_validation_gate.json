@@ -31,19 +31,19 @@
     {
       "blockers": [
         "dam_break: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
-        "dam_break: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "bed_step: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, mass_drift_delta)",
         "constriction: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, wet_mismatch_fraction, probe_linf)",
         "constriction: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, feature_strength_delta)",
         "drop_ledge: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "boulder_garden: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, wet_mismatch_fraction, probe_linf)",
-        "boulder_garden: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)"
+        "boulder_garden: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
+        "cascading_wave_train: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)"
       ],
       "component_id": "geoclaw_cpp_comparisons",
-      "failed_count": 27,
+      "failed_count": 26,
       "notes": [],
       "passed": false,
-      "passed_count": 13,
+      "passed_count": 14,
       "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
       "title": "GeoClaw/C++ Threshold Comparisons",
       "total_count": 40
@@ -87,10 +87,10 @@
       "failed_count": 0,
       "notes": [],
       "passed": true,
-      "passed_count": 39,
+      "passed_count": 42,
       "source_report": "reports/milestone16/runtime_profile.json",
       "title": "Runtime Profile And Determinism",
-      "total_count": 39
+      "total_count": 42
     },
     {
       "blockers": [],
@@ -102,10 +102,10 @@
         "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs."
       ],
       "passed": true,
-      "passed_count": 36,
+      "passed_count": 37,
       "source_report": "reports/milestone16/regression_promotion_manifest.json",
       "title": "Regression Promotion",
-      "total_count": 36
+      "total_count": 37
     }
   ],
   "decision": "BLOCKED",
