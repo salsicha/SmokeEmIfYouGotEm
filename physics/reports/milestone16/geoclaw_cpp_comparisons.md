@@ -25,7 +25,7 @@ Comparison count: 40
 | canonical | drop_ledge | reduced | unreal_prototype | PASS | none | n/a |
 | canonical | drop_ledge | finite_volume | unreal_prototype | PASS | none | n/a |
 | rafting | boulder_garden | reduced | research_accepted | PASS | none | n/a |
-| rafting | boulder_garden | finite_volume | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta, froude_delta, feature_strength_delta | n/a |
+| rafting | boulder_garden | finite_volume | research_accepted | PASS | none | n/a |
 | rafting | cascading_wave_train | reduced | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta | n/a |
 | rafting | cascading_wave_train | finite_volume | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, feature_strength_delta | n/a |
 | rafting | hydraulic_hole_downstream_boil | reduced | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, energy_change_delta, froude_delta, feature_strength_delta | n/a |

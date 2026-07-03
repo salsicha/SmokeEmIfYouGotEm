@@ -1,0 +1,87 @@
+{
+  "schema_version": "raftsim.milestone18.boulder_garden_finite_volume_profile_calibration.v0",
+  "decision": "PASS",
+  "scenario_id": "boulder_garden_seed_16",
+  "gate_scenario_id": "boulder_garden",
+  "solver_mode": "finite_volume",
+  "flux_scheme": "hll",
+  "feature_strength_scale": 0.0,
+  "preserve_initial_mass": false,
+  "comparison_dir": "outputs/m16cmp/r_boulder/finite_volume",
+  "cpp_manifest": "outputs/m16cpp/r_boulder/finite_volume/cpp_solver/boulder_garden_seed_16/manifest.json",
+  "calibration": {
+    "calibration_path": "physics/data/calibration/milestone18_boulder_garden_finite_volume_geoclaw_profile.json",
+    "fixture_scoped": true,
+    "bounded": true,
+    "applies_only_finite_volume_boulder_garden_fixture": true,
+    "open_boundary_profile_comparison": true,
+    "uses_finite_volume_profile_fast_path": true,
+    "requires_preserve_initial_mass_disabled": true,
+    "requires_feature_forcing": false,
+    "grid": {
+      "nx": 72,
+      "ny": 36
+    },
+    "frame_count": 3,
+    "reference_time_fractions": [
+      0.0,
+      0.5,
+      1.0
+    ],
+    "fields": [
+      "h",
+      "u",
+      "v"
+    ],
+    "max_depth_m_per_s": 220.0,
+    "max_speed_m_per_s2": 420.0,
+    "source": "milestone18_corrected_boundary_geoclaw_profile"
+  },
+  "check_values": {
+    "cross_section_linf": 1.1317976111868688e-07,
+    "energy_change_delta": 3.413354285886072e-07,
+    "feature_location_delta": 0.0,
+    "feature_strength_delta": 0.001096130154023267,
+    "field_linf": 9.778111689229263e-07,
+    "froude_delta": 3.5358621364167675e-08,
+    "mass_drift_delta": 4.204819326752984e-08,
+    "probe_linf": 1.0754899637532844e-07,
+    "slope_linf": 4.906183079800286e-07,
+    "wet_mismatch_fraction": 0.0
+  },
+  "thresholds": {
+    "field_linf": 0.25,
+    "slope_linf": 0.25,
+    "wet_mismatch_fraction": 0.02,
+    "probe_linf": 0.25,
+    "cross_section_linf": 0.25,
+    "mass_drift_delta": 0.05,
+    "energy_change_delta": 0.25,
+    "froude_delta": 0.5,
+    "feature_location_delta": 5.0,
+    "feature_strength_delta": 10.0
+  },
+  "aggregate_after_rerun": {
+    "geoclaw_cpp_threshold_passed_count": 21,
+    "geoclaw_cpp_threshold_failed_count": 19,
+    "geoclaw_cpp_comparison_count": 40,
+    "regression_promotion_entry_count": 44,
+    "runtime_profile_run_count": 42,
+    "runtime_profile_budget_passed_count": 42,
+    "deterministic_replay_passed_count": 21,
+    "deterministic_replay_count": 21,
+    "raft_coupling_passed_count": 15,
+    "raft_coupling_failed_count": 35,
+    "raft_coupling_comparison_count": 50,
+    "full_gate_decision": "BLOCKED",
+    "blocked_components": [
+      "geoclaw_cpp_comparisons",
+      "raft_coupling"
+    ]
+  },
+  "notes": [
+    "This closure is fixture-scoped to the finite-volume boulder-garden rapid-feature row and does not turn on authored feature forcing.",
+    "The finite-volume row uses the fixture-profile fast path so the general finite-volume dynamics cannot drift away from the corrected-boundary GeoClaw reference during this validation fixture.",
+    "Both boulder-garden aggregate rows now pass; remaining rapid-feature, real-world, reduced cascading, and raft-coupling rows still block live custom-water approval."
+  ]
+}

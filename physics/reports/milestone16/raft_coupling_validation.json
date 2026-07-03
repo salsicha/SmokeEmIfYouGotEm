@@ -161,7 +161,7 @@
       ],
       "feature_outcome_match": true,
       "flow_band": null,
-      "force_delta_weight_ratio": 0.5776470513965575,
+      "force_delta_weight_ratio": 2.7439125745711713e-09,
       "force_envelope_outcome_match": true,
       "gate_scenario_id": "boulder_garden",
       "notes": [
@@ -211,9 +211,9 @@
       "reference_passed": false,
       "solver_mode": "finite_volume",
       "suite": "rafting",
-      "torque_delta_inertia_ratio": 0.7559741925067549,
-      "trajectory_position_delta_m": 0.0015740882150554198,
-      "trajectory_velocity_delta_mps": 0.0944452929033371
+      "torque_delta_inertia_ratio": 1.4785502877653207e-08,
+      "trajectory_position_delta_m": 7.477530020916999e-12,
+      "trajectory_velocity_delta_mps": 4.486297581391988e-10
     },
     {
       "actual_scenario_id": "cascading_wave_train_seed_17",

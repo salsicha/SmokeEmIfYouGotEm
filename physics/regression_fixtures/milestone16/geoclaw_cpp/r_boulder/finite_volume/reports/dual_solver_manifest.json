@@ -1,13 +1,13 @@
 {
   "cpp": {
     "command": [],
-    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_boulder/reduced/cpp_solver/boulder_garden_seed_16/manifest.json",
-    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_boulder/reduced/cpp_solver/boulder_garden_seed_16",
+    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_boulder/finite_volume/cpp_solver/boulder_garden_seed_16/manifest.json",
+    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_boulder/finite_volume/cpp_solver/boulder_garden_seed_16",
     "returncode": 0,
-    "runtime_seconds": 0.3808312080000178,
+    "runtime_seconds": 0.32059050000316347,
     "stderr": "",
     "stdout": "",
-    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_boulder/reduced/cpp_solver/boulder_garden_seed_16/validation.json"
+    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_boulder/finite_volume/cpp_solver/boulder_garden_seed_16/validation.json"
   },
   "geoclaw": {
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_boulder/normalized/manifest.json",
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_boulder/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.3808312080000178,
-    "cpp_seconds_per_simulated_second": 0.047603901000002224,
+    "cpp_runtime_seconds": 0.32059050000316347,
+    "cpp_seconds_per_simulated_second": 0.040073812500395434,
     "geoclaw_runtime_seconds": 1.1468724160004058,
     "geoclaw_seconds_per_simulated_second": 0.14335905200005072,
     "simulated_duration_seconds": 8.0
