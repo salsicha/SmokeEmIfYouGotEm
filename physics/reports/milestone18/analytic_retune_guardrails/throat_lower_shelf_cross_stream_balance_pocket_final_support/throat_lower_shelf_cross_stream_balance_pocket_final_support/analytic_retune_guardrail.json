@@ -1,0 +1,268 @@
+{
+  "blocked_reasons": [
+    "Preflight analytic fixtures are already failing; retuning cannot start from this baseline.",
+    "Postflight analytic fixtures failed; reject the retune batch."
+  ],
+  "decision": "BLOCKED",
+  "manifest_path": "physics/data/validation/milestone17/analytic_fixtures/manifest.json",
+  "output_dir": "physics/reports/milestone18/analytic_retune_guardrails/throat_lower_shelf_cross_stream_balance_pocket_final_support/throat_lower_shelf_cross_stream_balance_pocket_final_support",
+  "passed": false,
+  "postflight": {
+    "candidate_kind": "cpp",
+    "candidate_label": "throat_lower_shelf_cross_stream_balance_pocket_final_support",
+    "candidate_root": "physics/outputs/m18cmp/c_constrict_throat_lower_shelf_cross_stream_balance_pocket_final_support/finite_volume_roe/cpp_solver/constriction_seed_16",
+    "failed_count": 7,
+    "failing_metrics": [
+      {
+        "field": "eta",
+        "fixture_id": "lake_at_rest_balance",
+        "metric_id": "surface_linf",
+        "threshold": 1e-09,
+        "units": "m",
+        "value": 1.35
+      },
+      {
+        "field": "speed",
+        "fixture_id": "lake_at_rest_balance",
+        "metric_id": "speed_linf",
+        "threshold": 1e-09,
+        "units": "m/s",
+        "value": 2.8841674969254267
+      },
+      {
+        "field": "u",
+        "fixture_id": "sloping_channel_friction",
+        "metric_id": "normal_velocity_linf",
+        "threshold": 0.025,
+        "units": "m/s",
+        "value": 1.5222889096665868
+      },
+      {
+        "field": "hu",
+        "fixture_id": "sloping_channel_friction",
+        "metric_id": "unit_discharge_linf",
+        "threshold": 0.03,
+        "units": "m2/s",
+        "value": 1.9306915705235377
+      },
+      {
+        "field": "wet",
+        "fixture_id": "wet_dry_shoreline",
+        "metric_id": "wet_mask_mismatch_count",
+        "threshold": 0.0,
+        "units": "cells",
+        "value": 476.0
+      },
+      {
+        "field": "shoreline_y",
+        "fixture_id": "wet_dry_shoreline",
+        "metric_id": "shoreline_position_abs",
+        "threshold": 0.5,
+        "units": "m",
+        "value": 0.5833333333333335
+      },
+      {
+        "field": "h",
+        "fixture_id": "bed_step_subcritical",
+        "metric_id": "depth_linf",
+        "threshold": 0.04,
+        "units": "m",
+        "value": 1.2
+      },
+      {
+        "field": "specific_energy",
+        "fixture_id": "bed_step_subcritical",
+        "metric_id": "specific_energy_abs",
+        "threshold": 0.05,
+        "units": "m",
+        "value": 2.642201834862385e+16
+      },
+      {
+        "field": "h",
+        "fixture_id": "dam_break_bore",
+        "metric_id": "initial_depth_linf",
+        "threshold": 1e-12,
+        "units": "m",
+        "value": 2.0
+      },
+      {
+        "field": "mass",
+        "fixture_id": "dam_break_bore",
+        "metric_id": "mass_relative_drift",
+        "threshold": 0.0005,
+        "units": "ratio",
+        "value": 0.8864140070921985
+      },
+      {
+        "field": "h2_over_h1",
+        "fixture_id": "hydraulic_jump_conjugate_depth",
+        "metric_id": "conjugate_depth_ratio_abs",
+        "threshold": 0.06,
+        "units": "ratio",
+        "value": 3.772001872658765
+      },
+      {
+        "field": "froude",
+        "fixture_id": "hydraulic_jump_conjugate_depth",
+        "metric_id": "froude_class_agreement",
+        "threshold": 0.0,
+        "units": "class_mismatch_count",
+        "value": 768.0
+      },
+      {
+        "field": "hu",
+        "fixture_id": "transcritical_bump",
+        "metric_id": "unit_discharge_linf",
+        "threshold": 0.04,
+        "units": "m2/s",
+        "value": 2.7052093711567835
+      },
+      {
+        "field": "froude",
+        "fixture_id": "transcritical_bump",
+        "metric_id": "crest_froude_abs",
+        "threshold": 0.2,
+        "units": "ratio",
+        "value": 1.1478805557553893
+      }
+    ],
+    "fixture_count": 7,
+    "frame_index": 0,
+    "passed": false,
+    "passed_count": 0,
+    "report_json": "physics/reports/milestone18/analytic_retune_guardrails/throat_lower_shelf_cross_stream_balance_pocket_final_support/throat_lower_shelf_cross_stream_balance_pocket_final_support/postflight_analytic_validation.json",
+    "report_markdown": "physics/reports/milestone18/analytic_retune_guardrails/throat_lower_shelf_cross_stream_balance_pocket_final_support/throat_lower_shelf_cross_stream_balance_pocket_final_support/postflight_analytic_validation.md",
+    "stage": "postflight"
+  },
+  "preflight": {
+    "candidate_kind": "cpp",
+    "candidate_label": "recovery_upper_interior_streamwise_balance_pocket_final_support",
+    "candidate_root": "physics/outputs/m18cmp/c_constrict_recovery_upper_interior_streamwise_balance_pocket_final_support/finite_volume_roe/cpp_solver/constriction_seed_16",
+    "failed_count": 7,
+    "failing_metrics": [
+      {
+        "field": "eta",
+        "fixture_id": "lake_at_rest_balance",
+        "metric_id": "surface_linf",
+        "threshold": 1e-09,
+        "units": "m",
+        "value": 1.35
+      },
+      {
+        "field": "speed",
+        "fixture_id": "lake_at_rest_balance",
+        "metric_id": "speed_linf",
+        "threshold": 1e-09,
+        "units": "m/s",
+        "value": 2.8841674969254267
+      },
+      {
+        "field": "u",
+        "fixture_id": "sloping_channel_friction",
+        "metric_id": "normal_velocity_linf",
+        "threshold": 0.025,
+        "units": "m/s",
+        "value": 1.5222889096665868
+      },
+      {
+        "field": "hu",
+        "fixture_id": "sloping_channel_friction",
+        "metric_id": "unit_discharge_linf",
+        "threshold": 0.03,
+        "units": "m2/s",
+        "value": 1.9306915705235377
+      },
+      {
+        "field": "wet",
+        "fixture_id": "wet_dry_shoreline",
+        "metric_id": "wet_mask_mismatch_count",
+        "threshold": 0.0,
+        "units": "cells",
+        "value": 476.0
+      },
+      {
+        "field": "shoreline_y",
+        "fixture_id": "wet_dry_shoreline",
+        "metric_id": "shoreline_position_abs",
+        "threshold": 0.5,
+        "units": "m",
+        "value": 0.5833333333333335
+      },
+      {
+        "field": "h",
+        "fixture_id": "bed_step_subcritical",
+        "metric_id": "depth_linf",
+        "threshold": 0.04,
+        "units": "m",
+        "value": 1.2
+      },
+      {
+        "field": "specific_energy",
+        "fixture_id": "bed_step_subcritical",
+        "metric_id": "specific_energy_abs",
+        "threshold": 0.05,
+        "units": "m",
+        "value": 2.642201834862385e+16
+      },
+      {
+        "field": "h",
+        "fixture_id": "dam_break_bore",
+        "metric_id": "initial_depth_linf",
+        "threshold": 1e-12,
+        "units": "m",
+        "value": 2.0
+      },
+      {
+        "field": "mass",
+        "fixture_id": "dam_break_bore",
+        "metric_id": "mass_relative_drift",
+        "threshold": 0.0005,
+        "units": "ratio",
+        "value": 0.8864140070921985
+      },
+      {
+        "field": "h2_over_h1",
+        "fixture_id": "hydraulic_jump_conjugate_depth",
+        "metric_id": "conjugate_depth_ratio_abs",
+        "threshold": 0.06,
+        "units": "ratio",
+        "value": 3.772001872658765
+      },
+      {
+        "field": "froude",
+        "fixture_id": "hydraulic_jump_conjugate_depth",
+        "metric_id": "froude_class_agreement",
+        "threshold": 0.0,
+        "units": "class_mismatch_count",
+        "value": 768.0
+      },
+      {
+        "field": "hu",
+        "fixture_id": "transcritical_bump",
+        "metric_id": "unit_discharge_linf",
+        "threshold": 0.04,
+        "units": "m2/s",
+        "value": 2.7052093711567835
+      },
+      {
+        "field": "froude",
+        "fixture_id": "transcritical_bump",
+        "metric_id": "crest_froude_abs",
+        "threshold": 0.2,
+        "units": "ratio",
+        "value": 1.1478805557553893
+      }
+    ],
+    "fixture_count": 7,
+    "frame_index": 0,
+    "passed": false,
+    "passed_count": 0,
+    "report_json": "physics/reports/milestone18/analytic_retune_guardrails/throat_lower_shelf_cross_stream_balance_pocket_final_support/throat_lower_shelf_cross_stream_balance_pocket_final_support/preflight_analytic_validation.json",
+    "report_markdown": "physics/reports/milestone18/analytic_retune_guardrails/throat_lower_shelf_cross_stream_balance_pocket_final_support/throat_lower_shelf_cross_stream_balance_pocket_final_support/preflight_analytic_validation.md",
+    "stage": "preflight"
+  },
+  "regression_count": 0,
+  "regressions": [],
+  "retune_batch_id": "throat_lower_shelf_cross_stream_balance_pocket_final_support",
+  "schema_version": "raftsim.milestone18.analytic_retune_guardrail.v0"
+}
