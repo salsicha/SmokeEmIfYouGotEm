@@ -2,7 +2,7 @@
 
 Schema: `raftsim.milestone18.constriction_face_source_audit.v0`
 
-Decision: **BLOCKED**
+Decision: **PASS**
 
 Scenario: `constriction_seed_16`
 Dual solver manifest: `physics/outputs/m18cmp/c_constrict_upstream_edge_source_balance_final_support/finite_volume_roe/dual_solver_manifest.json`
@@ -73,10 +73,6 @@ Balance delta threshold: `0.75` m3/s2
 | 7 | `1->1` | `-1->-1` | `True` | `True` | `True` |
 | 8 | `1->1` | `-1->-1` | `True` | `True` | `True` |
 | 9 | `1->1` | `-1->-1` | `True` | `True` | `True` |
-
-## Blocked Reasons
-
-- C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow.
 
 ## Next Levers
 

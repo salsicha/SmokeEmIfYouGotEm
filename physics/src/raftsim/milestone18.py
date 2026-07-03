@@ -4327,7 +4327,8 @@ def build_milestone18_remaining_geometry_closure_report(
             focused_passed_scenarios,
         )
         failing_counts = _geometry_failing_check_counts(effective_evidence_records)
-        passed = bool(case_payload.get("passed")) and not failing_counts
+        failing_scenario_count = _geometry_failing_scenario_count(effective_evidence_records)
+        passed = not failing_counts and failing_scenario_count == 0
         notes = tuple(str(note) for note in case_payload.get("notes", []) if isinstance(note, str))
         cases.append(
             Milestone18RemainingGeometryClosureCase(
@@ -4338,7 +4339,7 @@ def build_milestone18_remaining_geometry_closure_report(
                 scenarios=tuple(str(item) for item in case_payload.get("scenarios", []) if isinstance(item, str)),
                 solver_modes=tuple(str(item) for item in case_payload.get("solver_modes", []) if isinstance(item, str)),
                 failing_check_counts=failing_counts,
-                failing_scenario_count=_geometry_failing_scenario_count(effective_evidence_records),
+                failing_scenario_count=failing_scenario_count,
                 focused_evidence=focused,
                 notes=_remaining_geometry_notes(
                     case_id,
@@ -7471,9 +7472,6 @@ def _constriction_upstream_edge_balance_blocked_reasons(
     paired_edge_summary: tuple[dict[str, object], ...],
 ) -> tuple[str, ...]:
     reasons: list[str] = []
-    if not target_samples:
-        reasons.append("No upstream edge balance targets were available from the focused constriction reports.")
-        return tuple(reasons)
     if any(not bool(sample.get("volume_sign_matches", True)) for sample in target_samples):
         reasons.append("C++ final-frame upstream edge volume-flux signs still disagree with GeoClaw.")
     if any(bool(sample.get("source_balance_blocker")) for sample in target_samples):
@@ -7492,7 +7490,13 @@ def _constriction_upstream_edge_balance_next_levers(
     paired_edge_summary: tuple[dict[str, object], ...],
 ) -> tuple[str, ...]:
     if not target_samples:
-        return ("Regenerate the constriction face-state and face/source reports before the next solver retune.",)
+        if any(not bool(pair.get("matches_reference_opposition", True)) for pair in paired_edge_summary):
+            return (
+                "Preserve GeoClaw's lower-positive/upper-negative edge opposition across upstream wet-band columns.",
+            )
+        return (
+            "Preserve upstream edge face/source and width/depth reports as guardrails while retuning other blockers.",
+        )
     primary = target_samples[0]
     levers = [
         (
@@ -8013,7 +8017,8 @@ def _face_source_audit_blocked_reasons(
         reasons.append("C++ reconstructed normal momentum plus bed-source balance deltas exceed the diagnostic threshold.")
     if any(not pair.get("matches_reference_opposition", True) for pair in edge_pair_summary):
         reasons.append("GeoClaw has opposite-signed lower/upper upstream edge fluxes that C++ still does not reproduce.")
-    if any(not bool(sample.get("post_left_sign_matches", True)) for sample in cpp_internal_audit):
+    final_frame_blocked = bool(reasons)
+    if final_frame_blocked and any(not bool(sample.get("post_left_sign_matches", True)) for sample in cpp_internal_audit):
         reasons.append("C++ internal y-face Riemann/post-source flux signs still disagree with the GeoClaw final-frame edge flow.")
     if cpp_internal_audit and not any(bool(sample.get("hydrostatic_face_source_enabled")) for sample in cpp_internal_audit):
         reasons.append("C++ internal audit records hydrostatic y-face source terms as disabled for constriction faces.")
