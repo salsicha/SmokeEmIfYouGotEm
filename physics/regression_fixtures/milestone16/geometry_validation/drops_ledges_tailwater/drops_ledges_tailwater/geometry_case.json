@@ -10,7 +10,6 @@
     "milestone18_report": "reports/milestone18/remaining_geometry_closure.json",
     "passed": true,
     "superseded_stale_blockers": [
-      "drop_ledge:reduced",
       "south_fork_cascading_high_runnable:reduced",
       "south_fork_cascading_low_runnable:reduced",
       "south_fork_cascading_median_runnable:reduced"

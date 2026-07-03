@@ -3,6 +3,6 @@
   "passed": false,
   "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
   "summary_version": "raftsim.milestone16.readiness_summary.v0",
-  "threshold_failed_count": 22,
-  "threshold_passed_count": 18
+  "threshold_failed_count": 21,
+  "threshold_passed_count": 19
 }

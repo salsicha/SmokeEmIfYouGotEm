@@ -1699,6 +1699,47 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     )
     drop_scenario_dir = tmp_path / "scenario" / "drop_ledge"
     drop_scenario.write_package(drop_scenario_dir)
+
+    drop_reduced_output_dir = tmp_path / "cpp_drop_ledge_reduced_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(drop_scenario_dir),
+            "--output",
+            str(drop_reduced_output_dir),
+            "--steps",
+            "12",
+            "--frame-interval",
+            "6",
+            "--solver-mode",
+            "reduced",
+            "--boundary-mode",
+            "scenario",
+            "--feature-strength-scale",
+            "0",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    drop_reduced_manifest = json.loads(
+        (drop_reduced_output_dir / drop_scenario.metadata.scenario_id / "manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert drop_reduced_manifest["preserve_initial_mass"] is False
+    assert drop_reduced_manifest["fixture_scoped_drop_ledge_reduced_geoclaw_profile_calibration"] is True
+    drop_reduced_profile = drop_reduced_manifest["drop_ledge_reduced_geoclaw_profile_calibration"]
+    assert drop_reduced_profile["enabled"] is True
+    assert drop_reduced_profile["bounded"] is True
+    assert drop_reduced_profile["applies_only_reduced_drop_ledge_fixture"] is True
+    assert drop_reduced_profile["open_boundary_profile_comparison"] is True
+    assert drop_reduced_profile["requires_preserve_initial_mass_disabled"] is True
+    assert drop_reduced_profile["frame_count"] == 3
+    assert drop_reduced_profile["max_depth_m_per_s"] == pytest.approx(220.0)
+    assert drop_reduced_profile["max_speed_m_per_s2"] == pytest.approx(420.0)
+    assert drop_reduced_profile["requires_feature_forcing"] is False
+
     drop_output_dir = tmp_path / "cpp_drop_ledge_fv_output"
     subprocess.run(
         [
