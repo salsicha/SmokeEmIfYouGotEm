@@ -295,14 +295,14 @@
           "name": "cross_section_linf",
           "passed": true,
           "threshold": 0.15,
-          "value": 0.11942834184168527
+          "value": 0.1274115072197135
         },
         "energy_change_delta": {
           "details": "Absolute C++ minus reference energy-change delta.",
           "name": "energy_change_delta",
           "passed": true,
           "threshold": 0.08,
-          "value": 0.021119016641740262
+          "value": 0.020792511415572756
         },
         "feature_location_delta": {
           "details": "Max observed feature response location delta.",
@@ -321,37 +321,37 @@
         "field_linf": {
           "details": "Max Linf across h/eta/u/v/hu/hv/normals; u/v masked below 0.15 m.",
           "name": "field_linf",
-          "passed": false,
+          "passed": true,
           "threshold": 0.15,
-          "value": 0.15053875608560396
+          "value": 0.14397658840119454
         },
         "froude_delta": {
           "details": "Max absolute Froude summary delta for cells at or above 0.15 m.",
           "name": "froude_delta",
           "passed": true,
           "threshold": 0.04,
-          "value": 0.031066146672655115
+          "value": 0.0339268267578432
         },
         "mass_drift_delta": {
           "details": "Absolute C++ minus reference mass-drift delta.",
           "name": "mass_drift_delta",
           "passed": true,
           "threshold": 0.02,
-          "value": 0.005224873631714724
+          "value": 0.004007946406344824
         },
         "probe_linf": {
           "details": "Max Linf across point-probe fields; u/v/Froude masked below 0.15 m.",
           "name": "probe_linf",
           "passed": true,
           "threshold": 0.15,
-          "value": 0.11942834184168527
+          "value": 0.1274115072197135
         },
         "slope_linf": {
           "details": "Max Linf across eta slope fields.",
           "name": "slope_linf",
           "passed": true,
           "threshold": 0.035,
-          "value": 0.012544622403281247
+          "value": 0.012626337138296528
         },
         "wet_mismatch_fraction": {
           "details": "Max material wet/dry mask mismatch fraction across compared frames using h >= 0.15 m.",
@@ -364,9 +364,7 @@
       "compared": true,
       "comparison_dir": "outputs/m16cmp/c_uniform/finite_volume",
       "cross_sections": 1,
-      "failing_checks": [
-        "field_linf"
-      ],
+      "failing_checks": [],
       "feature_count": 0,
       "frame_comparisons": 2,
       "gate_scenario_id": "uniform_channel",
@@ -377,7 +375,7 @@
       },
       "solver_mode": "finite_volume",
       "suite": "canonical",
-      "threshold_passed": false,
+      "threshold_passed": true,
       "threshold_report": "outputs/m16cmp/c_uniform/finite_volume/threshold_evaluation.json",
       "threshold_tier": "production_candidate"
     },
@@ -3944,6 +3942,6 @@
     }
   ],
   "schema_version": "raftsim.milestone16.geoclaw_cpp_comparisons.v0",
-  "threshold_failed_count": 31,
-  "threshold_passed_count": 9
+  "threshold_failed_count": 30,
+  "threshold_passed_count": 10
 }

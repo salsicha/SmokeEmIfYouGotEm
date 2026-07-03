@@ -1,0 +1,89 @@
+{
+  "checks": [
+    {
+      "details": "Max Linf across h/eta/u/v/hu/hv/normals; u/v masked below 0.15 m.",
+      "name": "field_linf",
+      "passed": true,
+      "threshold": 0.15,
+      "value": 0.14397658840119454
+    },
+    {
+      "details": "Max Linf across eta slope fields.",
+      "name": "slope_linf",
+      "passed": true,
+      "threshold": 0.035,
+      "value": 0.012626337138296528
+    },
+    {
+      "details": "Max material wet/dry mask mismatch fraction across compared frames using h >= 0.15 m.",
+      "name": "wet_mismatch_fraction",
+      "passed": true,
+      "threshold": 0.04,
+      "value": 0.0
+    },
+    {
+      "details": "Max Linf across point-probe fields; u/v/Froude masked below 0.15 m.",
+      "name": "probe_linf",
+      "passed": true,
+      "threshold": 0.15,
+      "value": 0.1274115072197135
+    },
+    {
+      "details": "Max Linf across cross-section fields; u/v/Froude masked below 0.15 m.",
+      "name": "cross_section_linf",
+      "passed": true,
+      "threshold": 0.15,
+      "value": 0.1274115072197135
+    },
+    {
+      "details": "Absolute C++ minus reference mass-drift delta.",
+      "name": "mass_drift_delta",
+      "passed": true,
+      "threshold": 0.02,
+      "value": 0.004007946406344824
+    },
+    {
+      "details": "Absolute C++ minus reference energy-change delta.",
+      "name": "energy_change_delta",
+      "passed": true,
+      "threshold": 0.08,
+      "value": 0.020792511415572756
+    },
+    {
+      "details": "Max absolute Froude summary delta for cells at or above 0.15 m.",
+      "name": "froude_delta",
+      "passed": true,
+      "threshold": 0.04,
+      "value": 0.0339268267578432
+    },
+    {
+      "details": "Max observed feature response location delta.",
+      "name": "feature_location_delta",
+      "passed": true,
+      "threshold": 1.25,
+      "value": 0.0
+    },
+    {
+      "details": "Max observed feature response strength delta.",
+      "name": "feature_strength_delta",
+      "passed": true,
+      "threshold": 0.25,
+      "value": 0.0
+    }
+  ],
+  "passed": true,
+  "scenario_id": "uniform_channel_seed_16",
+  "thresholds": {
+    "max_cross_section_linf": 0.15,
+    "max_energy_change_delta": 0.08,
+    "max_feature_location_delta": 1.25,
+    "max_feature_strength_delta": 0.25,
+    "max_field_linf": 0.15,
+    "max_froude_delta": 0.04,
+    "max_mass_drift_delta": 0.02,
+    "max_probe_linf": 0.15,
+    "max_slope_linf": 0.035,
+    "max_wet_mismatch_fraction": 0.04,
+    "velocity_depth_floor": 0.15
+  }
+}

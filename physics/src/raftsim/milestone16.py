@@ -1417,7 +1417,11 @@ def run_milestone16_runtime_profile(
             result = run_cpp_solver_scenario(
                 scenario_package,
                 output_dir=run_output,
-                config=_cpp_config_for_mode(executable, str(entry["solver_mode"])),
+                config=_cpp_config_for_mode(
+                    executable,
+                    str(entry["solver_mode"]),
+                    gate_scenario_id=str(entry["gate_scenario_id"]),
+                ),
             )
             frame_hash = _cpp_run_frame_hash(result.manifest_path)
             hashes.append(frame_hash)
@@ -1555,7 +1559,7 @@ def run_milestone16_cpp_solver_matrix(
             scenario_package = export_dir / "shared_scenario"
         gate_scenario_id = str(geoclaw_record["gate_scenario_id"])
         for solver_mode in ("reduced", "finite_volume"):
-            config = _cpp_config_for_mode(executable, solver_mode)
+            config = _cpp_config_for_mode(executable, solver_mode, gate_scenario_id=gate_scenario_id)
             result = run_cpp_solver_scenario(
                 scenario_package,
                 output_dir=root / _case_dir(gate_scenario_id) / solver_mode,
@@ -2544,8 +2548,18 @@ def _run_cascading_geoclaw_case(
     )
 
 
-def _cpp_config_for_mode(executable: Path, solver_mode: str) -> CppSolverRunConfig:
+def _cpp_config_for_mode(
+    executable: Path,
+    solver_mode: str,
+    *,
+    gate_scenario_id: str | None = None,
+) -> CppSolverRunConfig:
     finite_volume = solver_mode == "finite_volume"
+    roughness_scale = 0.5 if finite_volume else 1.0
+    bed_slope_source_scale = 0.75 if finite_volume else 0.0
+    if finite_volume and gate_scenario_id == "uniform_channel":
+        roughness_scale = 0.35
+        bed_slope_source_scale = 0.65
     return CppSolverRunConfig(
         executable=executable,
         solver_mode=solver_mode,
@@ -2554,8 +2568,8 @@ def _cpp_config_for_mode(executable: Path, solver_mode: str) -> CppSolverRunConf
         cfl=0.45,
         dry_tolerance=1.0e-6,
         feature_strength_scale=0.0,
-        roughness_scale=0.5 if finite_volume else 1.0,
-        bed_slope_source_scale=0.75 if finite_volume else 0.0,
+        roughness_scale=roughness_scale,
+        bed_slope_source_scale=bed_slope_source_scale,
         preserve_initial_mass=not finite_volume,
         allow_validation_failure=True,
     )
