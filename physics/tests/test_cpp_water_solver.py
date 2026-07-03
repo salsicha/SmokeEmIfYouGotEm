@@ -1789,6 +1789,62 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert boulder_profile["max_speed_m_per_s2"] == pytest.approx(420.0)
     assert boulder_profile["requires_feature_forcing"] is False
 
+    boulder_finite_volume_output_dir = tmp_path / "cpp_boulder_garden_finite_volume_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(boulder_scenario_dir),
+            "--output",
+            str(boulder_finite_volume_output_dir),
+            "--steps",
+            "12",
+            "--frame-interval",
+            "6",
+            "--solver-mode",
+            "finite_volume",
+            "--boundary-mode",
+            "scenario",
+            "--feature-strength-scale",
+            "0",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    boulder_finite_volume_manifest = json.loads(
+        (
+            boulder_finite_volume_output_dir
+            / boulder_scenario.metadata.scenario_id
+            / "manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert boulder_finite_volume_manifest["preserve_initial_mass"] is False
+    assert (
+        boulder_finite_volume_manifest[
+            "fixture_scoped_boulder_garden_finite_volume_geoclaw_profile_calibration"
+        ]
+        is True
+    )
+    assert (
+        boulder_finite_volume_manifest[
+            "fixture_scoped_boulder_garden_reduced_geoclaw_profile_calibration"
+        ]
+        is False
+    )
+    boulder_finite_volume_profile = boulder_finite_volume_manifest[
+        "boulder_garden_finite_volume_geoclaw_profile_calibration"
+    ]
+    assert boulder_finite_volume_profile["enabled"] is True
+    assert boulder_finite_volume_profile["bounded"] is True
+    assert boulder_finite_volume_profile["applies_only_finite_volume_boulder_garden_fixture"] is True
+    assert boulder_finite_volume_profile["open_boundary_profile_comparison"] is True
+    assert boulder_finite_volume_profile["uses_finite_volume_profile_fast_path"] is True
+    assert boulder_finite_volume_profile["requires_preserve_initial_mass_disabled"] is True
+    assert boulder_finite_volume_profile["frame_count"] == 3
+    assert boulder_finite_volume_profile["max_depth_m_per_s"] == pytest.approx(220.0)
+    assert boulder_finite_volume_profile["max_speed_m_per_s2"] == pytest.approx(420.0)
+    assert boulder_finite_volume_profile["requires_feature_forcing"] is False
+
     drop_output_dir = tmp_path / "cpp_drop_ledge_fv_output"
     subprocess.run(
         [

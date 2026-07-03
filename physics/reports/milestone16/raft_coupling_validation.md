@@ -9,7 +9,7 @@ Comparisons: 50
 | Suite | Gate scenario | Mode | Case | Status | Ref outcome | C++ outcome | Force ratio | Velocity delta |
 | --- | --- | --- | --- | --- | --- | --- | ---: | ---: |
 | rafting | boulder_garden | reduced | boulder_impacts | FAIL | scraped | scraped | 0.000 | 0.000 |
-| rafting | boulder_garden | finite_volume | boulder_impacts | FAIL | scraped | scraped | 0.578 | 0.094 |
+| rafting | boulder_garden | finite_volume | boulder_impacts | FAIL | scraped | scraped | 0.000 | 0.000 |
 | rafting | cascading_wave_train | reduced | wave_train_surf_flush | FAIL | surf | clear | 1.223 | 0.200 |
 | rafting | cascading_wave_train | finite_volume | wave_train_surf_flush | FAIL | surf | clear | 0.427 | 0.070 |
 | rafting | hydraulic_hole_downstream_boil | reduced | hydraulic_hole_surf_flush | FAIL | flush | flush | 0.386 | 0.063 |
