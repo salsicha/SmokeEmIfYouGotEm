@@ -15,37 +15,37 @@
         {
           "details": "Grounding contacts should include a submerged rock tag.",
           "name": "rock_contact",
-          "passed": true,
+          "passed": false,
           "threshold": 1.0,
-          "value": 14.0
+          "value": 0.0
         },
         {
           "details": "Rock contact should happen below the water surface.",
           "name": "submerged_depth",
           "passed": false,
           "threshold": 0.1,
-          "value": 0.006441649319491429
+          "value": 0.0
         },
         {
           "details": "Rock contact should scrape opposite raft travel.",
           "name": "scrape_drag",
-          "passed": true,
+          "passed": false,
           "threshold": 1.0,
-          "value": 14.864921465968589
+          "value": 0.0
         },
         {
           "details": "Rock contact should kick the raft upward.",
           "name": "launch_acceleration",
-          "passed": true,
+          "passed": false,
           "threshold": 1.0,
-          "value": 13.059109947643977
+          "value": 0.0
         },
         {
           "details": "Off-center rock contact should pitch the raft during launch.",
           "name": "pitch_launch",
           "passed": false,
           "threshold": 0.3,
-          "value": 0.25793070172943794
+          "value": 0.0
         }
       ],
       "candidate_frame": "outputs/m16cpp/r_boulder/reduced/cpp_solver/boulder_garden_seed_16/frames/frame_0008.csv",
@@ -58,14 +58,12 @@
       ],
       "feature_outcome_match": true,
       "flow_band": null,
-      "force_delta_weight_ratio": 2.4564768047758005,
-      "force_envelope_outcome_match": false,
+      "force_delta_weight_ratio": 2.7439125745711713e-09,
+      "force_envelope_outcome_match": true,
       "gate_scenario_id": "boulder_garden",
       "notes": [
         "GeoClaw-derived raft feature checks are not passing.",
-        "C++ raft feature checks are not passing.",
-        "Force-envelope outcomes differ.",
-        "Force delta exceeds the weight-normalized threshold."
+        "C++ raft feature checks are not passing."
       ],
       "passed": false,
       "reference_checks": [
@@ -110,9 +108,9 @@
       "reference_passed": false,
       "solver_mode": "reduced",
       "suite": "rafting",
-      "torque_delta_inertia_ratio": 0.15516557594184902,
-      "trajectory_position_delta_m": 0.006693899293014159,
-      "trajectory_velocity_delta_mps": 0.4016339575808436
+      "torque_delta_inertia_ratio": 1.4785502877653207e-08,
+      "trajectory_position_delta_m": 7.477530020916999e-12,
+      "trajectory_velocity_delta_mps": 4.486297581391988e-10
     },
     {
       "actual_scenario_id": "boulder_garden_seed_16",

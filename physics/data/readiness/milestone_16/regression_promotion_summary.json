@@ -1,6 +1,6 @@
 {
-  "entry_count": 42,
-  "geoclaw_cpp_fixture_count": 19,
+  "entry_count": 43,
+  "geoclaw_cpp_fixture_count": 20,
   "passed": true,
   "raft_artifact_count": 15,
   "source_report": "reports/milestone16/regression_promotion_manifest.json",
