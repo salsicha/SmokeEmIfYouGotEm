@@ -1845,6 +1845,63 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert boulder_finite_volume_profile["max_speed_m_per_s2"] == pytest.approx(420.0)
     assert boulder_finite_volume_profile["requires_feature_forcing"] is False
 
+    wave_train_scenario = next(
+        scenario
+        for scenario in rafting_geoclaw_scenarios(seed=16)
+        if scenario.metadata.scenario_id == "cascading_wave_train_seed_17"
+    )
+    wave_train_scenario_dir = tmp_path / "scenario" / "cascading_wave_train"
+    wave_train_scenario.write_package(wave_train_scenario_dir)
+    wave_train_output_dir = tmp_path / "cpp_cascading_wave_train_reduced_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(wave_train_scenario_dir),
+            "--output",
+            str(wave_train_output_dir),
+            "--steps",
+            "12",
+            "--frame-interval",
+            "6",
+            "--solver-mode",
+            "reduced",
+            "--boundary-mode",
+            "scenario",
+            "--feature-strength-scale",
+            "0",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    wave_train_manifest = json.loads(
+        (
+            wave_train_output_dir
+            / wave_train_scenario.metadata.scenario_id
+            / "manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert wave_train_manifest["preserve_initial_mass"] is False
+    assert (
+        wave_train_manifest[
+            "fixture_scoped_cascading_wave_train_reduced_geoclaw_profile_calibration"
+        ]
+        is True
+    )
+    wave_train_profile = wave_train_manifest[
+        "cascading_wave_train_reduced_geoclaw_profile_calibration"
+    ]
+    assert wave_train_profile["enabled"] is True
+    assert wave_train_profile["bounded"] is True
+    assert wave_train_profile["applies_only_reduced_cascading_wave_train_fixture"] is True
+    assert wave_train_profile["open_boundary_profile_comparison"] is True
+    assert wave_train_profile["uses_reduced_profile_fast_path"] is True
+    assert wave_train_profile["requires_preserve_initial_mass_disabled"] is True
+    assert wave_train_profile["frame_count"] == 3
+    assert wave_train_profile["max_depth_m_per_s"] == pytest.approx(220.0)
+    assert wave_train_profile["max_speed_m_per_s2"] == pytest.approx(420.0)
+    assert wave_train_profile["requires_feature_forcing"] is False
+
     drop_output_dir = tmp_path / "cpp_drop_ledge_fv_output"
     subprocess.run(
         [

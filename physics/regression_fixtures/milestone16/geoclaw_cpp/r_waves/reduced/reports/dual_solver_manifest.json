@@ -1,0 +1,30 @@
+{
+  "cpp": {
+    "command": [],
+    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_waves/reduced/cpp_solver/cascading_wave_train_seed_17/manifest.json",
+    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_waves/reduced/cpp_solver/cascading_wave_train_seed_17",
+    "returncode": 0,
+    "runtime_seconds": 0.43558074999964447,
+    "stderr": "",
+    "stdout": "",
+    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_waves/reduced/cpp_solver/cascading_wave_train_seed_17/validation.json"
+  },
+  "geoclaw": {
+    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_waves/normalized/manifest.json",
+    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_waves/normalized",
+    "runtime_seconds": 1.2225076659997285,
+    "seconds_per_simulated_second": 0.15281345824996606,
+    "solver": "geoclaw",
+    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_waves/normalized/validation.json"
+  },
+  "runtime": {
+    "cpp_runtime_seconds": 0.43558074999964447,
+    "cpp_seconds_per_simulated_second": 0.05444759374995556,
+    "geoclaw_runtime_seconds": 1.2225076659997285,
+    "geoclaw_seconds_per_simulated_second": 0.15281345824996606,
+    "simulated_duration_seconds": 8.0
+  },
+  "scenario_id": "cascading_wave_train_seed_17",
+  "scenario_json": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_waves/shared_scenario/scenario.json",
+  "scenario_package": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_waves/shared_scenario"
+}

@@ -31,19 +31,19 @@
     {
       "blockers": [
         "cascading_wave_train: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
-        "cascading_wave_train: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "hydraulic_hole_downstream_boil: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "hydraulic_hole_downstream_boil: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "lateral_wave: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, wet_mismatch_fraction, probe_linf)",
         "lateral_wave: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "eddy_line_shear: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
-        "eddy_line_shear: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)"
+        "eddy_line_shear: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
+        "shallow_shelf: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)"
       ],
       "component_id": "geoclaw_cpp_comparisons",
-      "failed_count": 19,
+      "failed_count": 18,
       "notes": [],
       "passed": false,
-      "passed_count": 21,
+      "passed_count": 22,
       "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
       "title": "GeoClaw/C++ Threshold Comparisons",
       "total_count": 40
@@ -63,7 +63,7 @@
       "blockers": [
         "boulder_impacts: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)",
         "boulder_impacts: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)",
-        "wave_train_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Canonical feature outcomes differ., Force delta exceeds the weight-normalized threshold.)",
+        "wave_train_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)",
         "wave_train_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing., Canonical feature outcomes differ.)",
         "hydraulic_hole_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)",
         "downstream_boil_recovery: raft coupling comparison failed (C++ raft feature checks are not passing., Force delta exceeds the weight-normalized threshold., Torque delta exceeds the inertia-normalized threshold.)",
@@ -87,10 +87,10 @@
       "failed_count": 0,
       "notes": [],
       "passed": true,
-      "passed_count": 63,
+      "passed_count": 66,
       "source_report": "reports/milestone16/runtime_profile.json",
       "title": "Runtime Profile And Determinism",
-      "total_count": 63
+      "total_count": 66
     },
     {
       "blockers": [],
@@ -102,10 +102,10 @@
         "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs."
       ],
       "passed": true,
-      "passed_count": 44,
+      "passed_count": 45,
       "source_report": "reports/milestone16/regression_promotion_manifest.json",
       "title": "Regression Promotion",
-      "total_count": 44
+      "total_count": 45
     }
   ],
   "decision": "BLOCKED",

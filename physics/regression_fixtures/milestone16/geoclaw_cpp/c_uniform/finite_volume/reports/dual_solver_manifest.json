@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_uniform/finite_volume/cpp_solver/uniform_channel_seed_16/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_uniform/finite_volume/cpp_solver/uniform_channel_seed_16",
     "returncode": 0,
-    "runtime_seconds": 0.1257302920021175,
+    "runtime_seconds": 0.14506450000044424,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_uniform/finite_volume/cpp_solver/uniform_channel_seed_16/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_uniform/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.1257302920021175,
-    "cpp_seconds_per_simulated_second": 0.020955048667019582,
+    "cpp_runtime_seconds": 0.14506450000044424,
+    "cpp_seconds_per_simulated_second": 0.024177416666740708,
     "geoclaw_runtime_seconds": 1.181088125000315,
     "geoclaw_seconds_per_simulated_second": 0.19684802083338582,
     "simulated_duration_seconds": 6.0
