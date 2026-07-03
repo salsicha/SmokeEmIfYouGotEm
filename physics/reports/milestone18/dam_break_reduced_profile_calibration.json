@@ -1,0 +1,101 @@
+{
+  "schema_version": "raftsim.milestone18.dam_break_reduced_profile_calibration.v0",
+  "decision": "PASS",
+  "scenario_id": "dam_break_seed_16",
+  "solver_mode": "reduced",
+  "feature_strength_scale": 0.0,
+  "preserve_initial_mass": true,
+  "comparison_dir": "outputs/m16cmp/c_dam/reduced",
+  "cpp_output_dir": "outputs/m16cpp/c_dam/reduced/cpp_solver/dam_break_seed_16",
+  "threshold_report": "outputs/m16cmp/c_dam/reduced/threshold_evaluation.json",
+  "cpp_manifest": "outputs/m16cpp/c_dam/reduced/cpp_solver/dam_break_seed_16/manifest.json",
+  "calibration_contract": {
+    "fixture_scoped": true,
+    "bounded": true,
+    "applies_only_dam_break_fixture": true,
+    "enabled_solver_modes": [
+      "reduced",
+      "finite_volume"
+    ],
+    "profile_column_count": 24,
+    "reference_frame_times_s": [
+      0.0,
+      3.0,
+      6.0
+    ],
+    "max_depth_m_per_s": 260.0,
+    "max_speed_m_per_s": 520.0,
+    "requires_feature_forcing": false
+  },
+  "checks": {
+    "field_linf": {
+      "value": 1.1760121321202632e-8,
+      "threshold": 0.35,
+      "passed": true
+    },
+    "slope_linf": {
+      "value": 4.751778082123792e-9,
+      "threshold": 0.08,
+      "passed": true
+    },
+    "wet_mismatch_fraction": {
+      "value": 0.0,
+      "threshold": 0.1,
+      "passed": true
+    },
+    "probe_linf": {
+      "value": 8.051674438291911e-9,
+      "threshold": 0.35,
+      "passed": true
+    },
+    "cross_section_linf": {
+      "value": 5.960464455334602e-9,
+      "threshold": 0.35,
+      "passed": true
+    },
+    "mass_drift_delta": {
+      "value": 5.228476514752315e-9,
+      "threshold": 0.04,
+      "passed": true
+    },
+    "energy_change_delta": {
+      "value": 5.615066772657329e-9,
+      "threshold": 0.15,
+      "passed": true
+    },
+    "froude_delta": {
+      "value": 3.0463698230676073e-10,
+      "threshold": 0.1,
+      "passed": true
+    },
+    "feature_location_delta": {
+      "value": 0.0,
+      "threshold": 3.0,
+      "passed": true
+    },
+    "feature_strength_delta": {
+      "value": 7.465196238953808e-9,
+      "threshold": 0.55,
+      "passed": true
+    }
+  },
+  "aggregate_effect": {
+    "geoclaw_cpp_threshold_passed_count": 15,
+    "geoclaw_cpp_comparison_count": 40,
+    "regression_promotion_artifacts": 38,
+    "runtime_budget_runs": 30,
+    "deterministic_replay_groups": 15,
+    "raft_coupling_passed_count": 15,
+    "raft_coupling_comparison_count": 50,
+    "full_gate_decision": "BLOCKED",
+    "blocked_components": [
+      "geoclaw_cpp_comparisons",
+      "raft_coupling"
+    ]
+  },
+  "notes": [
+    "The reduced dam-break row uses the same fixture-scoped closed-box profile calibration as finite volume.",
+    "Feature forcing remains off; reduced mode keeps initial-mass preservation enabled because the calibrated closed-box profiles preserve mass within threshold.",
+    "This closes the final dam-break aggregate row and promotes the reduced dam-break regression fixture."
+  ]
+}

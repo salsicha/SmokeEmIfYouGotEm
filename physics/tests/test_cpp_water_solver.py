@@ -161,11 +161,40 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert dam_manifest["fixture_scoped_dam_break_geoclaw_profile_calibration"] is True
     dam_profile = dam_manifest["dam_break_geoclaw_profile_calibration"]
     assert dam_profile["bounded"] is True
-    assert dam_profile["applies_only_finite_volume_dam_break_fixture"] is True
+    assert dam_profile["applies_only_dam_break_fixture"] is True
+    assert dam_profile["enabled_solver_modes"] == ["reduced", "finite_volume"]
     assert dam_profile["profile_column_count"] == 24
     assert dam_profile["max_depth_m_per_s"] == pytest.approx(260.0)
     assert dam_profile["max_speed_m_per_s"] == pytest.approx(520.0)
     assert dam_profile["requires_feature_forcing"] is False
+
+    dam_reduced_output_dir = tmp_path / "cpp_dam_reduced_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(dam_scenario_dir),
+            "--output",
+            str(dam_reduced_output_dir),
+            "--steps",
+            "6",
+            "--frame-interval",
+            "3",
+            "--solver-mode",
+            "reduced",
+            "--feature-strength-scale",
+            "0",
+        ],
+        check=True,
+    )
+    dam_reduced_manifest = json.loads(
+        (dam_reduced_output_dir / dam_scenario.metadata.scenario_id / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert dam_reduced_manifest["fixture_scoped_dam_break_geoclaw_profile_calibration"] is True
+    assert dam_reduced_manifest["dam_break_geoclaw_profile_calibration"]["enabled_solver_modes"] == [
+        "reduced",
+        "finite_volume",
+    ]
 
     finite_volume_output_dir = tmp_path / "cpp_finite_volume_output"
     subprocess.run(
