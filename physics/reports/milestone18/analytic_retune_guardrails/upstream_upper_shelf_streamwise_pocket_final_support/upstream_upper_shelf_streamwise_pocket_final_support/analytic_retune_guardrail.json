@@ -1,0 +1,39 @@
+{
+  "blocked_reasons": [],
+  "decision": "PASS",
+  "manifest_path": "physics/data/validation/milestone17/analytic_fixtures/manifest.json",
+  "output_dir": "physics/reports/milestone18/analytic_retune_guardrails/upstream_upper_shelf_streamwise_pocket_final_support/upstream_upper_shelf_streamwise_pocket_final_support",
+  "passed": true,
+  "postflight": {
+    "candidate_kind": "scenario",
+    "candidate_label": "upstream_upper_shelf_streamwise_pocket_final_support_postflight",
+    "candidate_root": null,
+    "failed_count": 0,
+    "failing_metrics": [],
+    "fixture_count": 7,
+    "frame_index": 0,
+    "passed": true,
+    "passed_count": 7,
+    "report_json": "physics/reports/milestone18/analytic_retune_guardrails/upstream_upper_shelf_streamwise_pocket_final_support/upstream_upper_shelf_streamwise_pocket_final_support/postflight_analytic_validation.json",
+    "report_markdown": "physics/reports/milestone18/analytic_retune_guardrails/upstream_upper_shelf_streamwise_pocket_final_support/upstream_upper_shelf_streamwise_pocket_final_support/postflight_analytic_validation.md",
+    "stage": "postflight"
+  },
+  "preflight": {
+    "candidate_kind": "scenario",
+    "candidate_label": "upstream_upper_shelf_streamwise_pocket_final_support_preflight",
+    "candidate_root": null,
+    "failed_count": 0,
+    "failing_metrics": [],
+    "fixture_count": 7,
+    "frame_index": 0,
+    "passed": true,
+    "passed_count": 7,
+    "report_json": "physics/reports/milestone18/analytic_retune_guardrails/upstream_upper_shelf_streamwise_pocket_final_support/upstream_upper_shelf_streamwise_pocket_final_support/preflight_analytic_validation.json",
+    "report_markdown": "physics/reports/milestone18/analytic_retune_guardrails/upstream_upper_shelf_streamwise_pocket_final_support/upstream_upper_shelf_streamwise_pocket_final_support/preflight_analytic_validation.md",
+    "stage": "preflight"
+  },
+  "regression_count": 0,
+  "regressions": [],
+  "retune_batch_id": "upstream_upper_shelf_streamwise_pocket_final_support",
+  "schema_version": "raftsim.milestone18.analytic_retune_guardrail.v0"
+}
