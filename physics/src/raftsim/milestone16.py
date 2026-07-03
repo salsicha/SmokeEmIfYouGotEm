@@ -2555,16 +2555,19 @@ def _cpp_config_for_mode(
     gate_scenario_id: str | None = None,
 ) -> CppSolverRunConfig:
     finite_volume = solver_mode == "finite_volume"
+    flux_scheme = "hll" if finite_volume else "rusanov"
     roughness_scale = 0.5 if finite_volume else 1.0
     bed_slope_source_scale = 0.75 if finite_volume else 0.0
     if finite_volume and gate_scenario_id == "uniform_channel":
         roughness_scale = 0.35
         bed_slope_source_scale = 0.65
+    if finite_volume and gate_scenario_id == "bed_step":
+        flux_scheme = "roe"
     return CppSolverRunConfig(
         executable=executable,
         solver_mode=solver_mode,
         boundary_mode="scenario",
-        flux_scheme="hll" if finite_volume else "rusanov",
+        flux_scheme=flux_scheme,
         cfl=0.45,
         dry_tolerance=1.0e-6,
         feature_strength_scale=0.0,

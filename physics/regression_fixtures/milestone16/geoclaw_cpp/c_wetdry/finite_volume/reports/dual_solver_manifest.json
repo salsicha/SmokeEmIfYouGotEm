@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_wetdry/finite_volume/cpp_solver/wet_dry_shoreline_seed_16/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_wetdry/finite_volume/cpp_solver/wet_dry_shoreline_seed_16",
     "returncode": 0,
-    "runtime_seconds": 0.10898533299950941,
+    "runtime_seconds": 0.20003904099939973,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_wetdry/finite_volume/cpp_solver/wet_dry_shoreline_seed_16/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_wetdry/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.10898533299950941,
-    "cpp_seconds_per_simulated_second": 0.018164222166584903,
+    "cpp_runtime_seconds": 0.20003904099939973,
+    "cpp_seconds_per_simulated_second": 0.033339840166566624,
     "geoclaw_runtime_seconds": 0.85502012500001,
     "geoclaw_seconds_per_simulated_second": 0.14250335416666834,
     "simulated_duration_seconds": 6.0

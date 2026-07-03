@@ -133,7 +133,7 @@
         "Milestone 18 closure evidence applied from reports/milestone18/bed_step_parity_retune.json.",
         "Accepted solver modes for this geometry family: finite_volume.",
         "Diagnostic-only solver modes are retained as smoke evidence but no longer block this geometry family: reduced.",
-        "Supersedes stale Milestone 16 threshold blockers for: bed_step:finite_volume, bed_step:reduced."
+        "Supersedes stale Milestone 16 threshold blockers for: bed_step:reduced."
       ],
       "passed": true,
       "scenarios": [
