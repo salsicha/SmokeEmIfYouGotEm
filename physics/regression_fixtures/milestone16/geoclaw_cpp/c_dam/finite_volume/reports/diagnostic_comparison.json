@@ -1,0 +1,114 @@
+{
+  "cpp": {
+    "energy_final": 3621.7750229365834,
+    "energy_initial": 4501.0242,
+    "energy_relative_change": -0.19534424566377948,
+    "frame_count": 9,
+    "froude_max": 0.6885749481282539,
+    "froude_mean_wet": 0.2532265465317855,
+    "hole_retention": {
+      "centroid_x": null,
+      "centroid_y": null,
+      "hole_count": 0,
+      "retained_area": 0.0
+    },
+    "hydraulic_jump": {
+      "value": 0.5282677689999971,
+      "x": 14.0,
+      "y": -5.5
+    },
+    "mass_final": 410.400001236,
+    "mass_initial": 410.4,
+    "mass_relative_drift": 3.0116959132337125e-09,
+    "solver": "cpp",
+    "wave_crest": {
+      "value": 2.3559174499999997,
+      "x": 23.0,
+      "y": -5.5
+    },
+    "wave_trough": {
+      "value": 0.8579769730000053,
+      "x": 0.0,
+      "y": -5.5
+    }
+  },
+  "delta": {
+    "energy_relative_change_delta": -8.646413307555889e-10,
+    "froude_max_delta": -9.77657399481302e-10,
+    "froude_mean_wet_delta": -7.668354840006941e-11,
+    "hole_centroid_distance": null,
+    "hole_retained_area_delta": 0.0,
+    "hydraulic_jump_distance": 0.0,
+    "mass_relative_drift_delta": -2.2167817095774495e-09,
+    "wave_crest_distance": 0.0,
+    "wave_trough_distance": 0.0
+  },
+  "pyclaw": {
+    "energy_final": 3621.775024457038,
+    "energy_initial": 4501.024197053004,
+    "energy_relative_change": -0.19534424479913814,
+    "frame_count": 3,
+    "froude_max": 0.6885749491059113,
+    "froude_mean_wet": 0.25322654660846905,
+    "hole_retention": {
+      "centroid_x": null,
+      "centroid_y": null,
+      "hole_count": 0,
+      "retained_area": 0.0
+    },
+    "hydraulic_jump": {
+      "value": 0.5282677710056305,
+      "x": 14.0,
+      "y": -5.5
+    },
+    "mass_final": 410.4000012874603,
+    "mass_initial": 410.3999991416931,
+    "mass_relative_drift": 5.228477622811162e-09,
+    "solver": "geoclaw",
+    "wave_crest": {
+      "value": 2.355917453765869,
+      "x": 23.0,
+      "y": -5.5
+    },
+    "wave_trough": {
+      "value": 0.8579769730567932,
+      "x": 0.0,
+      "y": -5.5
+    }
+  },
+  "reference": {
+    "energy_final": 3621.775024457038,
+    "energy_initial": 4501.024197053004,
+    "energy_relative_change": -0.19534424479913814,
+    "frame_count": 3,
+    "froude_max": 0.6885749491059113,
+    "froude_mean_wet": 0.25322654660846905,
+    "hole_retention": {
+      "centroid_x": null,
+      "centroid_y": null,
+      "hole_count": 0,
+      "retained_area": 0.0
+    },
+    "hydraulic_jump": {
+      "value": 0.5282677710056305,
+      "x": 14.0,
+      "y": -5.5
+    },
+    "mass_final": 410.4000012874603,
+    "mass_initial": 410.3999991416931,
+    "mass_relative_drift": 5.228477622811162e-09,
+    "solver": "geoclaw",
+    "wave_crest": {
+      "value": 2.355917453765869,
+      "x": 23.0,
+      "y": -5.5
+    },
+    "wave_trough": {
+      "value": 0.8579769730567932,
+      "x": 0.0,
+      "y": -5.5
+    }
+  },
+  "reference_solver": "geoclaw",
+  "scenario_id": "dam_break_seed_16"
+}

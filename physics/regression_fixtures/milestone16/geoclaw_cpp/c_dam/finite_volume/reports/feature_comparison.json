@@ -1,0 +1,36 @@
+{
+  "comparisons": [
+    {
+      "authored_strength": 1.0,
+      "authored_x": 11.5,
+      "authored_y": 0.0,
+      "cpp": {
+        "distance_to_authored": 1.5811388300841898,
+        "strength": 1.8311939219999962,
+        "x": 13.0,
+        "y": -0.5
+      },
+      "feature_index": 0,
+      "kind": "ledge",
+      "location_delta": 0.0,
+      "pyclaw": {
+        "distance_to_authored": 1.5811388300841898,
+        "strength": 1.8311939239501953,
+        "x": 13.0,
+        "y": -0.5
+      },
+      "reference": {
+        "distance_to_authored": 1.5811388300841898,
+        "strength": 1.8311939239501953,
+        "x": 13.0,
+        "y": -0.5
+      },
+      "reference_solver": "geoclaw",
+      "strength_delta": -1.9501991133097363e-09
+    }
+  ],
+  "feature_count": 1,
+  "max_abs_strength_delta": 1.9501991133097363e-09,
+  "max_location_delta": 0.0,
+  "scenario_id": "dam_break_seed_16"
+}

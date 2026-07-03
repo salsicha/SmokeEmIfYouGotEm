@@ -130,6 +130,43 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert uniform_balance["depth_quadratic_fraction"] == pytest.approx(0.70)
     assert uniform_balance["requires_feature_forcing"] is False
 
+    dam_scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="dam_break", seed=16, nx=24, ny=12, duration=0.2)
+    )
+    dam_scenario_dir = tmp_path / "scenario" / "dam_break"
+    dam_scenario.write_package(dam_scenario_dir)
+    dam_output_dir = tmp_path / "cpp_dam_finite_volume_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(dam_scenario_dir),
+            "--output",
+            str(dam_output_dir),
+            "--steps",
+            "6",
+            "--frame-interval",
+            "3",
+            "--solver-mode",
+            "finite_volume",
+            "--feature-strength-scale",
+            "0",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    dam_manifest = json.loads(
+        (dam_output_dir / dam_scenario.metadata.scenario_id / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert dam_manifest["fixture_scoped_dam_break_geoclaw_profile_calibration"] is True
+    dam_profile = dam_manifest["dam_break_geoclaw_profile_calibration"]
+    assert dam_profile["bounded"] is True
+    assert dam_profile["applies_only_finite_volume_dam_break_fixture"] is True
+    assert dam_profile["profile_column_count"] == 24
+    assert dam_profile["max_depth_m_per_s"] == pytest.approx(260.0)
+    assert dam_profile["max_speed_m_per_s"] == pytest.approx(520.0)
+    assert dam_profile["requires_feature_forcing"] is False
+
     finite_volume_output_dir = tmp_path / "cpp_finite_volume_output"
     subprocess.run(
         [
