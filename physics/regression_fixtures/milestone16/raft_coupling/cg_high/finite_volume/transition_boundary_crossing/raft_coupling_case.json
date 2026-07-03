@@ -28,14 +28,14 @@
         "name": "crossing_speed",
         "passed": true,
         "threshold": 2.0,
-        "value": 5.104637340549179
+        "value": 5.707271586696807
       },
       {
         "details": "",
         "name": "crossing_surface_fall",
         "passed": true,
         "threshold": 0.1,
-        "value": 2.121685830376085
+        "value": 2.294845683124473
       }
     ],
     "candidate_frame": "outputs/m16cpp/cg_high/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
@@ -47,7 +47,7 @@
     ],
     "feature_outcome_match": true,
     "flow_band": "high_runnable",
-    "force_delta_weight_ratio": 0.7957433293091983,
+    "force_delta_weight_ratio": 1.8858805011433727e-09,
     "force_envelope_outcome_match": true,
     "gate_scenario_id": "south_fork_cascading_high_runnable",
     "notes": [],
@@ -79,14 +79,14 @@
         "name": "crossing_speed",
         "passed": true,
         "threshold": 2.0,
-        "value": 5.699126243141125
+        "value": 5.707271588760281
       },
       {
         "details": "",
         "name": "crossing_surface_fall",
         "passed": true,
         "threshold": 0.1,
-        "value": 2.3028791509006337
+        "value": 2.2948456814746527
       }
     ],
     "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
@@ -94,9 +94,9 @@
     "reference_passed": true,
     "solver_mode": "finite_volume",
     "suite": "cascading",
-    "torque_delta_inertia_ratio": 1.4011431614647925,
-    "trajectory_position_delta_m": 0.0021684005723666246,
-    "trajectory_velocity_delta_mps": 0.1301040343420541
+    "torque_delta_inertia_ratio": 5.609070400221291e-09,
+    "trajectory_position_delta_m": 5.141295883987521e-12,
+    "trajectory_velocity_delta_mps": 3.083414812492523e-10
   },
   "schema_version": "raftsim.milestone16.regression_registry.v0",
   "source_report": "reports/milestone16/raft_coupling_validation.json"

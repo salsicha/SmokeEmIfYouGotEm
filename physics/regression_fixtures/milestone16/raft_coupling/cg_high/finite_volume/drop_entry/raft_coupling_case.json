@@ -1,0 +1,117 @@
+{
+  "record": {
+    "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+    "candidate_checks": [
+      {
+        "details": "",
+        "name": "drop_transition",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "ledge_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "entry_speed",
+        "passed": true,
+        "threshold": 2.0,
+        "value": 3.9836073066671966
+      },
+      {
+        "details": "",
+        "name": "surface_fall",
+        "passed": true,
+        "threshold": 0.15,
+        "value": 3.483654316431016
+      },
+      {
+        "details": "",
+        "name": "tailwater_depth",
+        "passed": true,
+        "threshold": 0.45,
+        "value": 0.9362423969752101
+      },
+      {
+        "details": "",
+        "name": "bounded_entry_lift",
+        "passed": true,
+        "threshold": 8.0,
+        "value": 1.7989140326742354
+      }
+    ],
+    "candidate_frame": "outputs/m16cpp/cg_high/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+    "candidate_outcome": "flushed",
+    "candidate_passed": true,
+    "case_id": "drop_entry",
+    "expected_outcomes": [
+      "flushed"
+    ],
+    "feature_outcome_match": true,
+    "flow_band": "high_runnable",
+    "force_delta_weight_ratio": 2.6681391782156894e-09,
+    "force_envelope_outcome_match": true,
+    "gate_scenario_id": "south_fork_cascading_high_runnable",
+    "notes": [],
+    "passed": true,
+    "reference_checks": [
+      {
+        "details": "",
+        "name": "drop_transition",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "ledge_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "entry_speed",
+        "passed": true,
+        "threshold": 2.0,
+        "value": 3.9836073091946878
+      },
+      {
+        "details": "",
+        "name": "surface_fall",
+        "passed": true,
+        "threshold": 0.15,
+        "value": 3.483654314283427
+      },
+      {
+        "details": "",
+        "name": "tailwater_depth",
+        "passed": true,
+        "threshold": 0.45,
+        "value": 0.936242397457234
+      },
+      {
+        "details": "",
+        "name": "bounded_entry_lift",
+        "passed": true,
+        "threshold": 8.0,
+        "value": 1.7989140325305604
+      }
+    ],
+    "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+    "reference_outcome": "flushed",
+    "reference_passed": true,
+    "solver_mode": "finite_volume",
+    "suite": "cascading",
+    "torque_delta_inertia_ratio": 1.3977489555763392e-08,
+    "trajectory_position_delta_m": 7.269928453517606e-12,
+    "trajectory_velocity_delta_mps": 4.3624075180027456e-10
+  },
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "source_report": "reports/milestone16/raft_coupling_validation.json"
+}

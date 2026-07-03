@@ -1,0 +1,89 @@
+{
+  "checks": [
+    {
+      "details": "Max Linf across h/eta/u/v/hu/hv/normals; u/v masked below 0.15 m.",
+      "name": "field_linf",
+      "passed": true,
+      "threshold": 0.35,
+      "value": 9.553111794957658e-07
+    },
+    {
+      "details": "Max Linf across eta slope fields.",
+      "name": "slope_linf",
+      "passed": true,
+      "threshold": 0.08,
+      "value": 2.3882779487394146e-07
+    },
+    {
+      "details": "Max material wet/dry mask mismatch fraction across compared frames using h >= 0.15 m.",
+      "name": "wet_mismatch_fraction",
+      "passed": true,
+      "threshold": 0.1,
+      "value": 0.0
+    },
+    {
+      "details": "Max Linf across point-probe fields; u/v/Froude masked below 0.15 m.",
+      "name": "probe_linf",
+      "passed": true,
+      "threshold": 0.35,
+      "value": 1.6329891217026216e-07
+    },
+    {
+      "details": "Max Linf across cross-section fields; u/v/Froude masked below 0.15 m.",
+      "name": "cross_section_linf",
+      "passed": true,
+      "threshold": 0.35,
+      "value": 1.6041787231912963e-07
+    },
+    {
+      "details": "Absolute C++ minus reference mass-drift delta.",
+      "name": "mass_drift_delta",
+      "passed": true,
+      "threshold": 0.04,
+      "value": 4.806719466898812e-09
+    },
+    {
+      "details": "Absolute C++ minus reference energy-change delta.",
+      "name": "energy_change_delta",
+      "passed": true,
+      "threshold": 0.15,
+      "value": 4.774425299558516e-09
+    },
+    {
+      "details": "Max absolute Froude summary delta for cells at or above 0.15 m.",
+      "name": "froude_delta",
+      "passed": true,
+      "threshold": 0.1,
+      "value": 1.6667362601197055e-08
+    },
+    {
+      "details": "Max observed feature response location delta.",
+      "name": "feature_location_delta",
+      "passed": true,
+      "threshold": 3.0,
+      "value": 0.0
+    },
+    {
+      "details": "Max observed feature response strength delta.",
+      "name": "feature_strength_delta",
+      "passed": true,
+      "threshold": 0.55,
+      "value": 5.018618409735609e-09
+    }
+  ],
+  "passed": true,
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+  "thresholds": {
+    "max_cross_section_linf": 0.35,
+    "max_energy_change_delta": 0.15,
+    "max_feature_location_delta": 3.0,
+    "max_feature_strength_delta": 0.55,
+    "max_field_linf": 0.35,
+    "max_froude_delta": 0.1,
+    "max_mass_drift_delta": 0.04,
+    "max_probe_linf": 0.35,
+    "max_slope_linf": 0.08,
+    "max_wet_mismatch_fraction": 0.1,
+    "velocity_depth_floor": 0.15
+  }
+}

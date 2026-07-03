@@ -1,0 +1,177 @@
+{
+  "counts": {
+    "cross_sections": 9,
+    "fields": 10,
+    "probes": 7,
+    "raft_transition_checkpoints": 8
+  },
+  "drop_transition_index": {
+    "0": "ledge_drop_001"
+  },
+  "field_summaries": [
+    {
+      "dtype": "float64",
+      "field_name": "bed_elevation_m",
+      "max_value": 3.2759003143460244,
+      "mean_value": -0.7467074110098253,
+      "min_value": -4.0554059197957635,
+      "npz_key": "bed",
+      "shape": [
+        20,
+        56
+      ],
+      "units": "m"
+    },
+    {
+      "dtype": "float64",
+      "field_name": "water_depth_m",
+      "max_value": 1.4402351835680023,
+      "mean_value": 0.550883247546197,
+      "min_value": 0.0,
+      "npz_key": "depth",
+      "shape": [
+        20,
+        56
+      ],
+      "units": "m"
+    },
+    {
+      "dtype": "float64",
+      "field_name": "surface_elevation_m",
+      "max_value": 3.2759003143460244,
+      "mean_value": -0.19582416346362838,
+      "min_value": -2.9675944127043996,
+      "npz_key": "eta",
+      "shape": [
+        20,
+        56
+      ],
+      "units": "m"
+    },
+    {
+      "dtype": "float64",
+      "field_name": "velocity_u_m_s",
+      "max_value": 1.965862462634076,
+      "mean_value": 0.5133704607059039,
+      "min_value": 0.0,
+      "npz_key": "u",
+      "shape": [
+        20,
+        56
+      ],
+      "units": "m/s"
+    },
+    {
+      "dtype": "float64",
+      "field_name": "velocity_v_m_s",
+      "max_value": 0.1424585376439192,
+      "mean_value": 0.0020454996981344588,
+      "min_value": -0.020083362703050642,
+      "npz_key": "v",
+      "shape": [
+        20,
+        56
+      ],
+      "units": "m/s"
+    },
+    {
+      "dtype": "float64",
+      "field_name": "momentum_hu_m2_s",
+      "max_value": 1.7719917978038688,
+      "mean_value": 0.47709834369021037,
+      "min_value": 0.0,
+      "npz_key": "hu",
+      "shape": [
+        20,
+        56
+      ],
+      "units": "m^2/s"
+    },
+    {
+      "dtype": "float64",
+      "field_name": "momentum_hv_m2_s",
+      "max_value": 0.14251469436955516,
+      "mean_value": 0.002011176494072653,
+      "min_value": -0.022116460431472675,
+      "npz_key": "hv",
+      "shape": [
+        20,
+        56
+      ],
+      "units": "m^2/s"
+    },
+    {
+      "dtype": "bool",
+      "field_name": "wet_mask",
+      "max_value": 1.0,
+      "mean_value": 0.5696428571428571,
+      "min_value": 0.0,
+      "npz_key": "wet",
+      "shape": [
+        20,
+        56
+      ],
+      "units": "boolean"
+    },
+    {
+      "dtype": "int32",
+      "field_name": "reach_id_grid",
+      "max_value": 6.0,
+      "mean_value": 3.0535714285714284,
+      "min_value": 0.0,
+      "npz_key": "reach_id_grid",
+      "shape": [
+        20,
+        56
+      ],
+      "units": "index"
+    },
+    {
+      "dtype": "int32",
+      "field_name": "drop_transition_id_grid",
+      "max_value": 0.0,
+      "mean_value": -0.9285714285714286,
+      "min_value": -1.0,
+      "npz_key": "drop_transition_id_grid",
+      "shape": [
+        20,
+        56
+      ],
+      "units": "index"
+    }
+  ],
+  "files": {
+    "conservation_summary": "conservation_summary.json",
+    "cross_sections": "cross_sections.json",
+    "fields": "fields.npz",
+    "probes": "probes.json",
+    "raft_transition_checkpoints": "raft_transition_checkpoints.json"
+  },
+  "grid": {
+    "dx": 4.0,
+    "dy": 2.0,
+    "nx": 56,
+    "ny": 20,
+    "origin_x": 0.0,
+    "origin_y": -19.0
+  },
+  "reach_index": {
+    "0": "pool_001",
+    "1": "tongue_001",
+    "2": "drop_001",
+    "3": "wave_train_001",
+    "4": "eddy_recovery_001",
+    "5": "boulder_garden_001",
+    "6": "pool_002"
+  },
+  "river_id": "american_south_fork",
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+  "schema_version": "raftsim.stitched_whole_window_validation.v0",
+  "section_id": "chili_bar_to_coloma",
+  "validation_scope": {
+    "consumer_contract": "GeoClaw/C++/Unreal must compare this stitched export, not isolated reach chunks.",
+    "covers_reach_local_grids": true,
+    "seams_visible_to_validators": true,
+    "storage": "stitched_whole_window"
+  }
+}

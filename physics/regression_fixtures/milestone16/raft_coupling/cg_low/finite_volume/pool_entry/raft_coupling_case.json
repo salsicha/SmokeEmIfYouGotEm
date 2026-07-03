@@ -14,21 +14,21 @@
         "name": "entry_depth",
         "passed": true,
         "threshold": 0.8,
-        "value": 1.4360680858065018
+        "value": 1.4409586432502206
       },
       {
         "details": "",
         "name": "pool_slower_than_tongue",
         "passed": true,
-        "threshold": 1.7994179594423834,
-        "value": 0.7640164391822086
+        "threshold": 2.1784681260085432,
+        "value": 1.0953597152168177
       },
       {
         "details": "",
         "name": "bounded_lift",
         "passed": true,
         "threshold": 5.0,
-        "value": 2.003775778693306
+        "value": 2.003787466907378
       }
     ],
     "candidate_frame": "outputs/m16cpp/cg_low/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
@@ -40,7 +40,7 @@
     ],
     "feature_outcome_match": true,
     "flow_band": "low_runnable",
-    "force_delta_weight_ratio": 0.8326382968664514,
+    "force_delta_weight_ratio": 3.623377658457741e-09,
     "force_envelope_outcome_match": true,
     "gate_scenario_id": "south_fork_cascading_low_runnable",
     "notes": [],
@@ -58,21 +58,21 @@
         "name": "entry_depth",
         "passed": true,
         "threshold": 0.8,
-        "value": 1.2608861888011464
+        "value": 1.440958642543361
       },
       {
         "details": "",
         "name": "pool_slower_than_tongue",
         "passed": true,
-        "threshold": 2.177110006431442,
-        "value": 0.9403136891285476
+        "threshold": 2.17846812683348,
+        "value": 1.095359715358051
       },
       {
         "details": "",
         "name": "bounded_lift",
         "passed": true,
         "threshold": 5.0,
-        "value": 2.0046719451494215
+        "value": 2.0037874669736992
       }
     ],
     "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
@@ -80,9 +80,9 @@
     "reference_passed": true,
     "solver_mode": "finite_volume",
     "suite": "cascading",
-    "torque_delta_inertia_ratio": 0.02796412836652249,
-    "trajectory_position_delta_m": 0.002268939358961038,
-    "trajectory_velocity_delta_mps": 0.13613636153766476
+    "torque_delta_inertia_ratio": 7.047875516415603e-09,
+    "trajectory_position_delta_m": 9.873920356502473e-12,
+    "trajectory_velocity_delta_mps": 5.924222750534642e-10
   },
   "schema_version": "raftsim.milestone16.regression_registry.v0",
   "source_report": "reports/milestone16/raft_coupling_validation.json"

@@ -1,0 +1,275 @@
+{
+  "cross_sections": [
+    {
+      "center": {
+        "x": 70.88570106505523,
+        "y": 0.0
+      },
+      "column": 18,
+      "drop_transition_id": "ledge_drop_001",
+      "length_m": 17.23090976281462,
+      "mass_flux_proxy_m3_s": 106.48338370603402,
+      "max_depth_m": 1.1379297201963765,
+      "max_speed_m_s": 9.631864879428814,
+      "mean_depth_m": 0.6146437892429065,
+      "mean_surface_elevation_m": 1.4152054577692774,
+      "metadata": {
+        "drop_transition_id": "ledge_drop_001"
+      },
+      "min_bed_elevation_m": -0.5950925243130878,
+      "momentum_flux_proxy_m4_s2": 933.4066577510912,
+      "reach_id": "drop_001",
+      "sample_count": 10,
+      "sample_direction": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "section_id": "main_drop_cross_section",
+      "station_m": 70.88570106505523,
+      "wet_sample_count": 6,
+      "wetted_width_m": 12.0
+    },
+    {
+      "center": {
+        "x": 23.37938889514287,
+        "y": 0.0
+      },
+      "column": 6,
+      "drop_transition_id": null,
+      "length_m": 28.542717926406656,
+      "mass_flux_proxy_m3_s": 104.9287827550804,
+      "max_depth_m": 1.6527375349089908,
+      "max_speed_m_s": 3.091104674006279,
+      "mean_depth_m": 1.2295655232592044,
+      "mean_surface_elevation_m": 1.8718192298064422,
+      "metadata": {
+        "reach_id": "pool_001",
+        "source": "stitched_validation_default"
+      },
+      "min_bed_elevation_m": -0.05200724244040167,
+      "momentum_flux_proxy_m4_s2": 285.985675105126,
+      "reach_id": "pool_001",
+      "sample_count": 16,
+      "sample_direction": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "section_id": "pool_001_validation_cross_section",
+      "station_m": 23.37938889514287,
+      "wet_sample_count": 14,
+      "wetted_width_m": 28.0
+    },
+    {
+      "center": {
+        "x": 58.82223942767048,
+        "y": 0.0
+      },
+      "column": 15,
+      "drop_transition_id": null,
+      "length_m": 23.266900196731672,
+      "mass_flux_proxy_m3_s": 133.02160796739832,
+      "max_depth_m": 1.26487221354093,
+      "max_speed_m_s": 7.427432580501389,
+      "mean_depth_m": 0.7866855989610777,
+      "mean_surface_elevation_m": 1.6229730557614557,
+      "metadata": {
+        "reach_id": "tongue_001",
+        "source": "stitched_validation_default"
+      },
+      "min_bed_elevation_m": -0.31163088704398556,
+      "momentum_flux_proxy_m4_s2": 883.7798226532914,
+      "reach_id": "tongue_001",
+      "sample_count": 13,
+      "sample_direction": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "section_id": "tongue_001_validation_cross_section",
+      "station_m": 58.82223942767048,
+      "wet_sample_count": 9,
+      "wetted_width_m": 18.0
+    },
+    {
+      "center": {
+        "x": 79.236219940622,
+        "y": 0.0
+      },
+      "column": 20,
+      "drop_transition_id": "ledge_drop_001",
+      "length_m": 17.23090976281462,
+      "mass_flux_proxy_m3_s": 102.71712053768248,
+      "max_depth_m": 1.3890224348674993,
+      "max_speed_m_s": 6.355843457975291,
+      "mean_depth_m": 0.9108146262223522,
+      "mean_surface_elevation_m": -0.22884166100992345,
+      "metadata": {
+        "reach_id": "drop_001",
+        "source": "stitched_validation_default"
+      },
+      "min_bed_elevation_m": -2.053478519367445,
+      "momentum_flux_proxy_m4_s2": 589.3018791051153,
+      "reach_id": "drop_001",
+      "sample_count": 10,
+      "sample_direction": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "section_id": "drop_001_validation_cross_section",
+      "station_m": 79.236219940622,
+      "wet_sample_count": 8,
+      "wetted_width_m": 16.0
+    },
+    {
+      "center": {
+        "x": 105.67268098350971,
+        "y": 0.0
+      },
+      "column": 26,
+      "drop_transition_id": null,
+      "length_m": 22.09016061750338,
+      "mass_flux_proxy_m3_s": 122.68652518835164,
+      "max_depth_m": 1.2596617580383682,
+      "max_speed_m_s": 5.823844534555674,
+      "mean_depth_m": 0.9248859348023443,
+      "mean_surface_elevation_m": -1.5690300559374752,
+      "metadata": {
+        "reach_id": "wave_train_001",
+        "source": "stitched_validation_default"
+      },
+      "min_bed_elevation_m": -3.162317019583475,
+      "momentum_flux_proxy_m4_s2": 639.539732301628,
+      "reach_id": "wave_train_001",
+      "sample_count": 13,
+      "sample_direction": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "section_id": "wave_train_001_validation_cross_section",
+      "station_m": 105.67268098350971,
+      "wet_sample_count": 11,
+      "wetted_width_m": 22.0
+    },
+    {
+      "center": {
+        "x": 136.51533774752173,
+        "y": 0.0
+      },
+      "column": 34,
+      "drop_transition_id": null,
+      "length_m": 26.719991411562393,
+      "mass_flux_proxy_m3_s": 116.05893330946552,
+      "max_depth_m": 1.5198690428787023,
+      "max_speed_m_s": 3.747895278210849,
+      "mean_depth_m": 1.163739369927939,
+      "mean_surface_elevation_m": -1.957957343216027,
+      "metadata": {
+        "reach_id": "eddy_recovery_001",
+        "source": "stitched_validation_default"
+      },
+      "min_bed_elevation_m": -3.7652156489689297,
+      "momentum_flux_proxy_m4_s2": 393.82217984677493,
+      "reach_id": "eddy_recovery_001",
+      "sample_count": 15,
+      "sample_direction": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "section_id": "eddy_recovery_001_validation_cross_section",
+      "station_m": 136.51533774752173,
+      "wet_sample_count": 13,
+      "wetted_width_m": 26.0
+    },
+    {
+      "center": {
+        "x": 168.10990217397557,
+        "y": 0.0
+      },
+      "column": 42,
+      "drop_transition_id": null,
+      "length_m": 22.032111056962687,
+      "mass_flux_proxy_m3_s": 116.0125780167314,
+      "max_depth_m": 1.1049559395257673,
+      "max_speed_m_s": 7.230567697090886,
+      "mean_depth_m": 0.7105130452429939,
+      "mean_surface_elevation_m": -2.6867193405244807,
+      "metadata": {
+        "reach_id": "boulder_garden_001",
+        "source": "stitched_validation_default"
+      },
+      "min_bed_elevation_m": -4.123630202748611,
+      "momentum_flux_proxy_m4_s2": 741.0324801364138,
+      "reach_id": "boulder_garden_001",
+      "sample_count": 13,
+      "sample_direction": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "section_id": "boulder_garden_001_validation_cross_section",
+      "station_m": 168.10990217397557,
+      "wet_sample_count": 11,
+      "wetted_width_m": 22.0
+    },
+    {
+      "center": {
+        "x": 203.47387600186917,
+        "y": 0.0
+      },
+      "column": 51,
+      "drop_transition_id": null,
+      "length_m": 31.27719882565546,
+      "mass_flux_proxy_m3_s": 114.73242180013213,
+      "max_depth_m": 1.7626521774362527,
+      "max_speed_m_s": 2.780936146522692,
+      "mean_depth_m": 1.3686207176813747,
+      "mean_surface_elevation_m": -2.8646969598433882,
+      "metadata": {
+        "reach_id": "pool_002",
+        "source": "stitched_validation_default"
+      },
+      "min_bed_elevation_m": -4.880797286494469,
+      "momentum_flux_proxy_m4_s2": 287.50326816337883,
+      "reach_id": "pool_002",
+      "sample_count": 17,
+      "sample_direction": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "section_id": "pool_002_validation_cross_section",
+      "station_m": 203.47387600186917,
+      "wet_sample_count": 15,
+      "wetted_width_m": 30.0
+    },
+    {
+      "center": {
+        "x": 70.88570106505523,
+        "y": 0.0
+      },
+      "column": 18,
+      "drop_transition_id": "ledge_drop_001",
+      "length_m": 23.266900196731672,
+      "mass_flux_proxy_m3_s": 128.4041543204695,
+      "max_depth_m": 1.1379297201963765,
+      "max_speed_m_s": 9.631864879428814,
+      "mean_depth_m": 0.560335970201957,
+      "mean_surface_elevation_m": 1.561466805557021,
+      "metadata": {
+        "drop_transition_id": "ledge_drop_001",
+        "source": "stitched_validation_default"
+      },
+      "min_bed_elevation_m": -0.5950925243130878,
+      "momentum_flux_proxy_m4_s2": 1144.5445583622873,
+      "reach_id": "drop_001",
+      "sample_count": 13,
+      "sample_direction": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "section_id": "ledge_drop_001_validation_cross_section",
+      "station_m": 70.88570106505523,
+      "wet_sample_count": 7,
+      "wetted_width_m": 14.0
+    }
+  ],
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+  "schema_version": "raftsim.stitched_whole_window_validation.v0"
+}

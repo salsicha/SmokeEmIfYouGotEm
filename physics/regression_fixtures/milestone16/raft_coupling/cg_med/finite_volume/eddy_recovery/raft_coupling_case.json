@@ -21,14 +21,14 @@
         "name": "speed_recovery",
         "passed": true,
         "threshold": 0.25,
-        "value": 1.2479631157597402
+        "value": 1.6906844983583573
       },
       {
         "details": "",
         "name": "lateral_shear",
         "passed": true,
         "threshold": 0.15,
-        "value": 0.44063715609576115
+        "value": 0.46221949508647026
       }
     ],
     "candidate_frame": "outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
@@ -40,7 +40,7 @@
     ],
     "feature_outcome_match": true,
     "flow_band": "median_runnable",
-    "force_delta_weight_ratio": 0.537402025787273,
+    "force_delta_weight_ratio": 1.5275281426474457e-09,
     "force_envelope_outcome_match": true,
     "gate_scenario_id": "south_fork_cascading_median_runnable",
     "notes": [],
@@ -65,14 +65,14 @@
         "name": "speed_recovery",
         "passed": true,
         "threshold": 0.25,
-        "value": 1.6494845583068365
+        "value": 1.6906844978912519
       },
       {
         "details": "",
         "name": "lateral_shear",
         "passed": true,
         "threshold": 0.15,
-        "value": 0.4851192525423252
+        "value": 0.46221949538410906
       }
     ],
     "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
@@ -80,9 +80,9 @@
     "reference_passed": true,
     "solver_mode": "finite_volume",
     "suite": "cascading",
-    "torque_delta_inertia_ratio": 0.4158244019207191,
-    "trajectory_position_delta_m": 0.001464420520264257,
-    "trajectory_velocity_delta_mps": 0.08786523121621898
+    "torque_delta_inertia_ratio": 1.3449314456607036e-08,
+    "trajectory_position_delta_m": 4.164839839827994e-12,
+    "trajectory_velocity_delta_mps": 2.497510429602212e-10
   },
   "schema_version": "raftsim.milestone16.regression_registry.v0",
   "source_report": "reports/milestone16/raft_coupling_validation.json"
