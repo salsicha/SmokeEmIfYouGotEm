@@ -1,8 +1,7 @@
 {
-  "blocked_component_count": 3,
+  "blocked_component_count": 2,
   "blocked_component_ids": [
     "geoclaw_cpp_comparisons",
-    "geometry",
     "raft_coupling"
   ],
   "component_count": 7,
@@ -50,17 +49,12 @@
       "total_count": 40
     },
     {
-      "blockers": [
-        "wet_dry_shoreline: geometry family is blocked",
-        "bed_step: geometry family is blocked",
-        "constriction: geometry family is blocked",
-        "drops_ledges_tailwater: geometry family is blocked"
-      ],
+      "blockers": [],
       "component_id": "geometry",
-      "failed_count": 4,
+      "failed_count": 0,
       "notes": [],
-      "passed": false,
-      "passed_count": 2,
+      "passed": true,
+      "passed_count": 6,
       "source_report": "reports/milestone16/geometry_validation.json",
       "title": "Geometry-Specific Validation",
       "total_count": 6
@@ -108,15 +102,15 @@
         "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs."
       ],
       "passed": true,
-      "passed_count": 20,
+      "passed_count": 23,
       "source_report": "reports/milestone16/regression_promotion_manifest.json",
       "title": "Regression Promotion",
-      "total_count": 20
+      "total_count": 23
     }
   ],
   "decision": "BLOCKED",
   "passed": false,
-  "passed_component_count": 4,
+  "passed_component_count": 5,
   "report_dir": "reports/milestone16",
   "schema_version": "raftsim.milestone16.full_cpp_validation_gate.v0"
 }

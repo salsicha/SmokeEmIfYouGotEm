@@ -12,11 +12,11 @@ The full Milestone 16 gate was regenerated, but live Unreal custom water remains
 | --- | --- | --- |
 | Milestone 16 GeoClaw Reference Runs | PASS | 20 of 20 scenarios have full GeoClaw frames. |
 | Milestone 16 C++ Solver Runs | PASS | 40 of 40 C++ runs completed with manifests. |
-| Milestone 16 GeoClaw/C++ Thresholds | FAILED | 4 of 40 threshold comparisons pass. |
-| Milestone 16 Geometry Validation | FAILED | 2 of 6 geometry families pass. |
-| Milestone 16 Raft Coupling | FAILED | 7 of 50 raft comparisons pass. |
+| Milestone 16 GeoClaw/C++ Thresholds | FAILED | 6 of 40 threshold comparisons pass. |
+| Milestone 16 Geometry Validation | PASS | 6 of 6 geometry families pass. |
+| Milestone 16 Raft Coupling | FAILED | 11 of 50 raft comparisons pass. |
 | Milestone 16 Runtime Profile | PASS | 8 of 8 promoted C++ profile repetitions pass runtime budgets. |
-| Milestone 16 Regression Promotion | PASS | 11 passing artifacts promoted. |
+| Milestone 16 Regression Promotion | PASS | 23 passing artifacts promoted. |
 
 ## Runtime Choices
 
@@ -31,14 +31,14 @@ The full Milestone 16 gate was regenerated, but live Unreal custom water remains
 - Fix GeoClaw/C++ threshold failures outside flat-pool and sloping-channel cases.
 - Retune wet/dry, bed-step, constriction, drop/ledge, and cascading reach/drop dynamics until geometry families pass.
 - Retune raft coupling against GeoClaw and C++ fields until force envelopes, outcomes, and transition cases pass.
-- Add a distinct pin/release fixture beyond the current shallow-shelf and boulder proxy evidence.
+- Keep the distinct Milestone 18 pin/release fixture separate from the raft-coupling water-field agreement gate.
 
 ## Accepted Model Limitations
 
 - 2.5D shallow-water/height-field flow remains the intended runtime model; full 3D CFD is out of scope.
 - GeoClaw remains offline reference infrastructure and does not ship inside Unreal.
 - Promoted fixtures are passing subsets, not proof that the full live-water gate has passed.
-- Current pin/release evidence is proxy coverage until a dedicated strainer/wrap fixture is added.
+- Dedicated pin/release evidence remains a separate Milestone 18 fixture until the full readiness gate is rerun.
 
 ## Risks
 

@@ -1,11 +1,11 @@
 {
   "comparison_count": 50,
-  "failed_count": 43,
+  "failed_count": 39,
   "notes": [
-    "Pin/release remains represented by shallow-shelf pivot/release and high-flow boulder/pin proxies; a distinct strainer or wrap fixture is still needed before production acceptance."
+    "Distinct pin/release closure evidence is tracked separately in the Milestone 18 pin_release_fixture report; this report only compares raft coupling over GeoClaw-derived and C++ water fields."
   ],
   "passed": false,
-  "passed_count": 7,
+  "passed_count": 11,
   "source_report": "reports/milestone16/raft_coupling_validation.json",
   "summary_version": "raftsim.milestone16.readiness_summary.v0"
 }
