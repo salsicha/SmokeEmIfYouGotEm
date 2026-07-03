@@ -1,0 +1,135 @@
+{
+  "probes": [
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 18.0,
+        "y": 0.0
+      },
+      "probe_id": "upstream_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 35.5,
+        "y": 0.0
+      },
+      "probe_id": "midstream_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 54.0,
+        "y": 0.0
+      },
+      "probe_id": "downstream_center"
+    },
+    {
+      "kind": "cross_section",
+      "length": 35.0,
+      "metadata": {},
+      "normal": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "position": {
+        "x": 35.5,
+        "y": 0.0
+      },
+      "probe_id": "mid_cross_section"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "feature_kind": "constriction",
+        "source_index": 0
+      },
+      "normal": null,
+      "position": {
+        "x": 6.0,
+        "y": 1.418218986925051
+      },
+      "probe_id": "feature_0_constriction"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "feature_kind": "hole",
+        "source_index": 1
+      },
+      "normal": null,
+      "position": {
+        "x": 15.0,
+        "y": 1.2484796784220573
+      },
+      "probe_id": "feature_1_hole"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "feature_kind": "rock",
+        "source_index": 2
+      },
+      "normal": null,
+      "position": {
+        "x": 20.0,
+        "y": 6.063514342399954
+      },
+      "probe_id": "feature_2_rock"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "feature_kind": "ledge",
+        "source_index": 3
+      },
+      "normal": null,
+      "position": {
+        "x": 27.0,
+        "y": 0.736439668056076
+      },
+      "probe_id": "feature_3_ledge"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "feature_kind": "strainer",
+        "source_index": 4
+      },
+      "normal": null,
+      "position": {
+        "x": 36.0,
+        "y": -4.287921978710647
+      },
+      "probe_id": "feature_4_strainer"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "feature_kind": "boil",
+        "source_index": 5
+      },
+      "normal": null,
+      "position": {
+        "x": 43.0,
+        "y": 4.966525868911496
+      },
+      "probe_id": "feature_5_boil"
+    }
+  ]
+}

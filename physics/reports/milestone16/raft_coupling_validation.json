@@ -300,14 +300,14 @@
           "name": "crest_lift",
           "passed": false,
           "threshold": 0.05,
-          "value": 0.048027040236709895
+          "value": 0.0324826093054732
         },
         {
           "details": "Standing wave lift should remain finite and non-negative.",
           "name": "bounded_vertical_force",
           "passed": true,
           "threshold": 6.0,
-          "value": 1.8773022389933436
+          "value": 1.9678908094770777
         },
         {
           "details": "Outcome must be one of the standing-wave labels.",
@@ -318,7 +318,7 @@
         }
       ],
       "candidate_frame": "outputs/m16cpp/r_waves/finite_volume/cpp_solver/cascading_wave_train_seed_17/frames/frame_0008.csv",
-      "candidate_outcome": "clear",
+      "candidate_outcome": "surf",
       "candidate_passed": false,
       "case_id": "wave_train_surf_flush",
       "expected_outcomes": [
@@ -327,15 +327,14 @@
         "surfed",
         "flushed"
       ],
-      "feature_outcome_match": false,
+      "feature_outcome_match": true,
       "flow_band": null,
-      "force_delta_weight_ratio": 0.42713360790982174,
+      "force_delta_weight_ratio": 2.589154788526678e-15,
       "force_envelope_outcome_match": true,
       "gate_scenario_id": "cascading_wave_train",
       "notes": [
         "GeoClaw-derived raft feature checks are not passing.",
-        "C++ raft feature checks are not passing.",
-        "Canonical feature outcomes differ."
+        "C++ raft feature checks are not passing."
       ],
       "passed": false,
       "reference_checks": [
@@ -366,9 +365,9 @@
       "reference_passed": false,
       "solver_mode": "finite_volume",
       "suite": "rafting",
-      "torque_delta_inertia_ratio": 1.3093757298647566,
-      "trajectory_position_delta_m": 0.0011639390815591554,
-      "trajectory_velocity_delta_mps": 0.06983634489325606
+      "torque_delta_inertia_ratio": 1.8920181674538937e-15,
+      "trajectory_position_delta_m": 7.05981306231723e-18,
+      "trajectory_velocity_delta_mps": 4.126162952233366e-16
     },
     {
       "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",

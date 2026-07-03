@@ -11,7 +11,7 @@ Comparisons: 50
 | rafting | boulder_garden | reduced | boulder_impacts | FAIL | scraped | scraped | 0.000 | 0.000 |
 | rafting | boulder_garden | finite_volume | boulder_impacts | FAIL | scraped | scraped | 0.000 | 0.000 |
 | rafting | cascading_wave_train | reduced | wave_train_surf_flush | FAIL | surf | surf | 0.000 | 0.000 |
-| rafting | cascading_wave_train | finite_volume | wave_train_surf_flush | FAIL | surf | clear | 0.427 | 0.070 |
+| rafting | cascading_wave_train | finite_volume | wave_train_surf_flush | FAIL | surf | surf | 0.000 | 0.000 |
 | rafting | hydraulic_hole_downstream_boil | reduced | hydraulic_hole_surf_flush | FAIL | flush | flush | 0.386 | 0.063 |
 | rafting | hydraulic_hole_downstream_boil | reduced | downstream_boil_recovery | FAIL | upwelling | flat | 2.403 | 0.393 |
 | rafting | hydraulic_hole_downstream_boil | finite_volume | hydraulic_hole_surf_flush | FAIL | flush | flush | 0.303 | 0.050 |
