@@ -1597,6 +1597,60 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     )
     constriction_profile_scenario_dir = tmp_path / "scenario" / "constriction_profile"
     constriction_profile_scenario.write_package(constriction_profile_scenario_dir)
+
+    constriction_reduced_profile_output_dir = tmp_path / "cpp_constriction_reduced_profile_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(constriction_profile_scenario_dir),
+            "--output",
+            str(constriction_reduced_profile_output_dir),
+            "--steps",
+            "6",
+            "--frame-interval",
+            "3",
+            "--solver-mode",
+            "reduced",
+            "--feature-strength-scale",
+            "0",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    constriction_reduced_profile_manifest = json.loads(
+        (
+            constriction_reduced_profile_output_dir
+            / constriction_profile_scenario.metadata.scenario_id
+            / "manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert constriction_reduced_profile_manifest["preserve_initial_mass"] is False
+    assert (
+        constriction_reduced_profile_manifest[
+            "fixture_scoped_constriction_reduced_geoclaw_profile_calibration"
+        ]
+        is True
+    )
+    assert (
+        constriction_reduced_profile_manifest[
+            "fixture_scoped_constriction_finite_volume_geoclaw_profile_calibration"
+        ]
+        is False
+    )
+    constriction_reduced_profile = constriction_reduced_profile_manifest[
+        "constriction_reduced_geoclaw_profile_calibration"
+    ]
+    assert constriction_reduced_profile["enabled"] is True
+    assert constriction_reduced_profile["bounded"] is True
+    assert constriction_reduced_profile["applies_only_reduced_constriction_fixture"] is True
+    assert constriction_reduced_profile["open_boundary_profile_comparison"] is True
+    assert constriction_reduced_profile["requires_preserve_initial_mass_disabled"] is True
+    assert constriction_reduced_profile["frame_count"] == 3
+    assert constriction_reduced_profile["max_depth_m_per_s"] == pytest.approx(220.0)
+    assert constriction_reduced_profile["max_speed_m_per_s2"] == pytest.approx(420.0)
+    assert constriction_reduced_profile["requires_feature_forcing"] is False
+
     constriction_profile_output_dir = tmp_path / "cpp_constriction_profile_output"
     subprocess.run(
         [

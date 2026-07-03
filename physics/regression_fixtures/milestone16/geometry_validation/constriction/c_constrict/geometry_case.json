@@ -9,9 +9,7 @@
     "gate_scenario_id": "constriction",
     "milestone18_report": "reports/milestone18/remaining_geometry_closure.json",
     "passed": true,
-    "superseded_stale_blockers": [
-      "constriction:reduced"
-    ],
+    "superseded_stale_blockers": [],
     "threshold_passed": true
   },
   "gate_scenario_id": "constriction",

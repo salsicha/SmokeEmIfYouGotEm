@@ -1,0 +1,19 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 11.5,
+        "y": 0.0
+      },
+      "kind": "constriction",
+      "length": 8.64,
+      "metadata": {
+        "fixture_role": "dry_bank_throat"
+      },
+      "radius": 2.0,
+      "strength": 2.060119640661019,
+      "width": 4.0
+    }
+  ]
+}

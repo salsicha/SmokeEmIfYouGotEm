@@ -156,16 +156,13 @@
           "gate_scenario_id": "constriction",
           "milestone18_report": "reports/milestone18/remaining_geometry_closure.json",
           "passed": true,
-          "superseded_stale_blockers": [
-            "constriction:reduced"
-          ],
+          "superseded_stale_blockers": [],
           "threshold_passed": true
         }
       ],
       "notes": [
         "Milestone 18 remaining-geometry closure evidence applied from reports/milestone18/remaining_geometry_closure.json.",
         "Uses compact rollup evidence; detailed focused diagnostics remain in the Milestone 18 report.",
-        "Supersedes stale Milestone 16 threshold blockers for: constriction:reduced.",
         "Focused passing evidence supersedes stale aggregate failures for: constriction."
       ],
       "passed": true,
