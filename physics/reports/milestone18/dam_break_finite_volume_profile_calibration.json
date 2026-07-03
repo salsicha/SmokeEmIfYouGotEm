@@ -12,7 +12,11 @@
   "calibration_contract": {
     "fixture_scoped": true,
     "bounded": true,
-    "applies_only_finite_volume_dam_break_fixture": true,
+    "applies_only_dam_break_fixture": true,
+    "enabled_solver_modes": [
+      "reduced",
+      "finite_volume"
+    ],
     "profile_column_count": 24,
     "reference_frame_times_s": [
       0.0,
@@ -93,6 +97,10 @@
     "The calibration applies only to the finite-volume dam_break fixture and is disabled for gameplay feature forcing.",
     "It linearly interpolates the 24-column normalized GeoClaw profiles at 0, 3, and 6 seconds inside explicit per-step depth and speed bounds.",
     "Closed-box mass, energy, Froude, feature location, and feature strength remain threshold-checked; the aggregate mass-drift delta is near zero.",
-    "Reduced-mode dam-break remains a diagnostic failure and is not promoted by this artifact."
-  ]
+    "This artifact originally closed the finite-volume dam-break row; the same calibration is later extended to reduced mode in physics/reports/milestone18/dam_break_reduced_profile_calibration.json."
+  ],
+  "expanded_by": {
+    "reduced_mode_closure": "physics/reports/milestone18/dam_break_reduced_profile_calibration.json",
+    "note": "The shared dam-break profile calibration now records enabled solver modes for both reduced and finite-volume runs."
+  }
 }

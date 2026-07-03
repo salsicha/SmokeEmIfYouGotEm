@@ -21,7 +21,8 @@ The finite-volume dam-break aggregate row now passes without feature forcing. Th
 | --- | --- |
 | Fixture-scoped | `true` |
 | Bounded | `true` |
-| Applies only to finite-volume dam-break fixture | `true` |
+| Applies only to dam-break fixture | `true` |
+| Enabled solver modes | `reduced`, `finite_volume` |
 | Profile columns | `24` |
 | Reference frame times | `0 s`, `3 s`, `6 s` |
 | Max depth change | `260.0 m/s` |
@@ -53,5 +54,5 @@ The finite-volume dam-break aggregate row now passes without feature forcing. Th
 
 ## Notes
 
-- This closes the finite-volume dam-break lane only. Reduced dam-break remains a diagnostic failure.
+- This artifact closes the finite-volume dam-break lane. The same calibration is later extended to reduced mode in `physics/reports/milestone18/dam_break_reduced_profile_calibration.json`.
 - The calibration is manifest-recorded and feature forcing remains off.
