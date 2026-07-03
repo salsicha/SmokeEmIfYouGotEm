@@ -532,6 +532,7 @@ def _write_geoclaw_dual_solver_manifest(
 ) -> Path:
     scenario_dir = root / "scenario" / scenario.metadata.scenario_id
     scenario.write_package(scenario_dir)
+    boundary_semantics = _geoclaw_boundary_semantics_from_normalized_reference(geoclaw_normalized)
     manifest = {
         "scenario_id": scenario.metadata.scenario_id,
         "scenario_package": _relative_or_absolute(scenario_dir, root),
@@ -553,6 +554,8 @@ def _write_geoclaw_dual_solver_manifest(
             "cpp_seconds_per_simulated_second": cpp_result.runtime_seconds / max(scenario.duration, 1.0e-12),
         },
     }
+    if boundary_semantics is not None:
+        manifest["boundary_semantics"] = boundary_semantics
     manifest_path = root / "dual_solver_manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
     return manifest_path
@@ -622,6 +625,46 @@ def _last_manifest_file(manifest_path: Path, key: str) -> Path:
     if not isinstance(values, list) or not values:
         raise ValueError(f"manifest {manifest_path} does not contain {key}.")
     return Path(str(values[-1]))
+
+
+def _geoclaw_boundary_semantics_from_normalized_reference(geoclaw_normalized) -> dict[str, object] | None:
+    manifest_ref = getattr(geoclaw_normalized, "manifest_path", None)
+    if manifest_ref is None:
+        return None
+    manifest_path = Path(manifest_ref)
+    if not manifest_path.exists():
+        return None
+    try:
+        normalized_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    source_manifest_path = _geoclaw_source_manifest_path(manifest_path, normalized_manifest)
+    if source_manifest_path is None or not source_manifest_path.exists():
+        return None
+    try:
+        source_manifest = json.loads(source_manifest_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    boundary_semantics = source_manifest.get("boundary_semantics")
+    if not isinstance(boundary_semantics, dict):
+        return None
+    return dict(boundary_semantics)
+
+
+def _geoclaw_source_manifest_path(manifest_path: Path, normalized_manifest: dict[str, object]) -> Path | None:
+    if normalized_manifest.get("schema") == "raftsim.geoclaw_export.v1":
+        return manifest_path
+    source_ref = normalized_manifest.get("source_export_manifest")
+    if not isinstance(source_ref, str):
+        return None
+    source_path = Path(source_ref)
+    if source_path.is_absolute():
+        return source_path
+    candidates = (manifest_path.parent / source_path, Path.cwd() / source_path)
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
 
 
 def _default_fit_state(scenario: Scenario2_5D, water: WaterField2_5D) -> RaftState6DoF:
