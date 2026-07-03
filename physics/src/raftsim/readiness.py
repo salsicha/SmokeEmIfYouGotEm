@@ -565,22 +565,38 @@ def build_milestone16_geoclaw_readiness_report(
     )
     blocking_failures = tuple(check for check in checks if not check.passed and check.status == "failed")
     approved = not blocking_failures
+    failed_check_ids = {check.check_id for check in blocking_failures}
+    blocked_titles = ", ".join(check.title for check in blocking_failures)
+    blocked_actions: list[str] = []
+    if "milestone16_geoclaw_cpp_thresholds" in failed_check_ids:
+        blocked_actions.append("Fix remaining GeoClaw/C++ threshold failures outside accepted guardrail rows.")
+    if "milestone16_geometry_validation" in failed_check_ids:
+        blocked_actions.append(
+            "Retune wet/dry, bed-step, constriction, drop/ledge, and cascading reach/drop dynamics until geometry families pass."
+        )
+    if "milestone16_raft_coupling" in failed_check_ids:
+        blocked_actions.append(
+            "Retune raft coupling against GeoClaw and C++ fields until force envelopes, outcomes, and transition cases pass."
+        )
+    if "milestone16_runtime_profile" in failed_check_ids:
+        blocked_actions.append("Bring promoted C++ water configurations back under the runtime and deterministic replay budgets.")
+    if "milestone16_regression_promotion" in failed_check_ids:
+        blocked_actions.append("Promote every passing comparison, geometry, and raft artifact required by the full gate.")
+    if blocking_failures:
+        blocked_actions.append(
+            "Keep the distinct Milestone 18 pin/release fixture separate from the raft-coupling water-field agreement gate."
+        )
     decision = ReadinessGateDecision(
         status="approved" if approved else "blocked",
         approved_for_unreal_production_start=approved,
         reason=(
             "The full Milestone 16 GeoClaw/C++/raft/runtime gate passed; live Unreal custom water can proceed after target-hardware confirmation."
             if approved
-            else "The full Milestone 16 gate was regenerated, but live Unreal custom water remains blocked by failed GeoClaw/C++ geometry or raft validation checks."
+            else f"The full Milestone 16 gate was regenerated, but live Unreal custom water remains blocked by: {blocked_titles}."
         ),
         required_next_actions=(
-            (
-                "Fix GeoClaw/C++ threshold failures outside flat-pool and sloping-channel cases.",
-                "Retune wet/dry, bed-step, constriction, drop/ledge, and cascading reach/drop dynamics until geometry families pass.",
-                "Retune raft coupling against GeoClaw and C++ fields until force envelopes, outcomes, and transition cases pass.",
-                "Keep the distinct Milestone 18 pin/release fixture separate from the raft-coupling water-field agreement gate.",
-            )
-            if not approved
+            tuple(blocked_actions)
+            if blocking_failures
             else (
                 "Lock the accepted Milestone 16 report set and regression fixtures before live-water Unreal integration.",
                 "Repeat runtime profiling on target desktop, VR, and handheld hardware.",

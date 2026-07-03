@@ -92,6 +92,44 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     )
     assert uncorrected_manifest["preserve_initial_mass"] is False
 
+    uniform_scenario = generate_fixture_scenario2_5d(
+        FixtureScenario2_5DParameters(fixture="uniform_channel", seed=16, nx=24, ny=12, duration=0.2)
+    )
+    uniform_scenario_dir = tmp_path / "scenario" / "uniform_channel"
+    uniform_scenario.write_package(uniform_scenario_dir)
+    uniform_output_dir = tmp_path / "cpp_uniform_reduced_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(uniform_scenario_dir),
+            "--output",
+            str(uniform_output_dir),
+            "--steps",
+            "12",
+            "--frame-interval",
+            "6",
+            "--feature-strength-scale",
+            "0",
+        ],
+        check=True,
+    )
+    uniform_manifest = json.loads(
+        (uniform_output_dir / uniform_scenario.metadata.scenario_id / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert uniform_manifest["fixture_scoped_uniform_channel_reduced_slope_profile_balance"] is True
+    uniform_balance = uniform_manifest["uniform_channel_reduced_slope_profile_balance"]
+    assert uniform_balance["bounded"] is True
+    assert uniform_balance["row_mass_preserving"] is False
+    assert uniform_balance["open_boundary_exchange_model"] is True
+    assert uniform_balance["target_derived_from_inflow_and_bed_drop"] is True
+    assert uniform_balance["applies_only_reduced_uniform_channel_fixture"] is True
+    assert uniform_balance["max_depth_m_per_s"] == pytest.approx(8.0)
+    assert uniform_balance["max_speed_m_per_s"] == pytest.approx(28.0)
+    assert uniform_balance["depth_upstream_fraction"] == pytest.approx(0.35)
+    assert uniform_balance["depth_quadratic_fraction"] == pytest.approx(0.70)
+    assert uniform_balance["requires_feature_forcing"] is False
+
     finite_volume_output_dir = tmp_path / "cpp_finite_volume_output"
     subprocess.run(
         [

@@ -57,5 +57,5 @@ Reference manifest: `/private/tmp/m18_uniform_corrected_after_cpp/geoclaw_export
 ## Notes
 
 - Corrected GeoClaw reference uses generated user-boundary bc2amr.f90 for the authored west inflow.
-- Finite-volume mode is promoted for the uniform-channel family; reduced mode remains blocked and should not be used as the strict parity lane for this family until its reduced dynamics are redesigned or scoped down.
-
+- Finite-volume mode is promoted for the uniform-channel family in this artifact.
+- Superseded note: reduced mode is later closed by `physics/reports/milestone18/uniform_channel_reduced_slope_profile_balance.json`, which promotes the aggregate reduced uniform-channel row without feature forcing.

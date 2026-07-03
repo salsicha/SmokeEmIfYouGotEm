@@ -199,7 +199,8 @@
   ],
   "notes": [
     "Corrected GeoClaw reference uses generated user-boundary bc2amr.f90 for the authored west inflow.",
-    "Finite-volume mode is promoted for the uniform-channel family; reduced mode remains blocked and should not be used as the strict parity lane for this family until its reduced dynamics are redesigned or scoped down."
+    "Finite-volume mode is promoted for the uniform-channel family in this artifact.",
+    "Superseded note: reduced mode is later closed by physics/reports/milestone18/uniform_channel_reduced_slope_profile_balance.json, which promotes the aggregate reduced uniform-channel row without feature forcing."
   ],
   "passed": false,
   "reference_boundary_semantics": {
@@ -269,6 +270,10 @@
   "reference_manifest": "/private/tmp/m18_uniform_corrected_after_cpp/geoclaw_export/uniform_channel_seed_16/normalized/manifest.json",
   "scenario_family": "uniform_channel",
   "schema_version": "raftsim.milestone18.parity_family_retune.v0",
+  "superseded_by": {
+    "reduced_mode_closure": "physics/reports/milestone18/uniform_channel_reduced_slope_profile_balance.json",
+    "note": "This original retune artifact promoted finite-volume mode only; the aggregate reduced uniform-channel row is later closed without feature forcing by the slope-profile balance artifact."
+  },
   "summary": {
     "blocked_modes": [
       "reduced"

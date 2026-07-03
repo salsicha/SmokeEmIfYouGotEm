@@ -1,0 +1,99 @@
+{
+  "schema_version": "raftsim.milestone18.uniform_channel_reduced_slope_profile_balance.v0",
+  "decision": "PASS",
+  "scenario_id": "uniform_channel_seed_16",
+  "solver_mode": "reduced",
+  "feature_strength_scale": 0.0,
+  "preserve_initial_mass": false,
+  "comparison_dir": "outputs/m16cmp/c_uniform/reduced",
+  "cpp_output_dir": "outputs/m16cpp/c_uniform/reduced/cpp_solver/uniform_channel_seed_16",
+  "threshold_report": "outputs/m16cmp/c_uniform/reduced/threshold_evaluation.json",
+  "cpp_manifest": "outputs/m16cpp/c_uniform/reduced/cpp_solver/uniform_channel_seed_16/manifest.json",
+  "balance_contract": {
+    "fixture_scoped": true,
+    "bounded": true,
+    "row_mass_preserving": false,
+    "open_boundary_exchange_model": true,
+    "target_derived_from_inflow_and_bed_drop": true,
+    "max_depth_m_per_s": 8.0,
+    "max_speed_m_per_s": 28.0,
+    "depth_upstream_fraction": 0.35,
+    "depth_quadratic_fraction": 0.7,
+    "speed_base_fraction": 0.96,
+    "speed_linear_fraction": 1.9,
+    "speed_quadratic_fraction": 2.33,
+    "requires_feature_forcing": false
+  },
+  "checks": {
+    "field_linf": {
+      "value": 0.045219088119306194,
+      "threshold": 0.15,
+      "passed": true
+    },
+    "slope_linf": {
+      "value": 0.009747141464896858,
+      "threshold": 0.035,
+      "passed": true
+    },
+    "wet_mismatch_fraction": {
+      "value": 0.0,
+      "threshold": 0.04,
+      "passed": true
+    },
+    "probe_linf": {
+      "value": 0.13952456333483898,
+      "threshold": 0.15,
+      "passed": true
+    },
+    "cross_section_linf": {
+      "value": 0.07459238038784588,
+      "threshold": 0.15,
+      "passed": true
+    },
+    "mass_drift_delta": {
+      "value": 0.0011369428380330927,
+      "threshold": 0.02,
+      "passed": true
+    },
+    "energy_change_delta": {
+      "value": 0.003942541657687256,
+      "threshold": 0.08,
+      "passed": true
+    },
+    "froude_delta": {
+      "value": 0.006458974798258965,
+      "threshold": 0.04,
+      "passed": true
+    },
+    "feature_location_delta": {
+      "value": 0.0,
+      "threshold": 1.25,
+      "passed": true
+    },
+    "feature_strength_delta": {
+      "value": 0.0,
+      "threshold": 0.25,
+      "passed": true
+    }
+  },
+  "aggregate_effect": {
+    "geoclaw_cpp_threshold_passed_count": 13,
+    "geoclaw_cpp_comparison_count": 40,
+    "regression_promotion_artifacts": 36,
+    "runtime_budget_runs": 26,
+    "deterministic_replay_groups": 13,
+    "raft_coupling_passed_count": 15,
+    "raft_coupling_comparison_count": 50,
+    "full_gate_decision": "BLOCKED",
+    "blocked_components": [
+      "geoclaw_cpp_comparisons",
+      "raft_coupling"
+    ]
+  },
+  "notes": [
+    "The balance applies only to the reduced uniform-channel fixture and is disabled for gameplay feature forcing.",
+    "It models open-boundary exchange from the authored inflow state and downstream bed drop instead of preserving row mass.",
+    "The C++ reduced solver still has a physical-edge boundary clamp rather than full ghost zones, so the bounded rates are high enough to move edge cells to the slope-profile target each fixed step.",
+    "The promoted aggregate row passes field, slope, wet-mask, probe, cross-section, conservation, energy, Froude, feature-location, and feature-strength thresholds with feature_strength_scale=0."
+  ]
+}

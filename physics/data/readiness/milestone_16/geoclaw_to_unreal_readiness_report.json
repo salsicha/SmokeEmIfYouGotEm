@@ -51,7 +51,7 @@
         "geoclaw_cpp_comparison_summary.json"
       ],
       "check_id": "milestone16_geoclaw_cpp_thresholds",
-      "details": "12 of 40 threshold comparisons pass.",
+      "details": "13 of 40 threshold comparisons pass.",
       "passed": false,
       "status": "failed",
       "title": "Milestone 16 GeoClaw/C++ Thresholds"
@@ -81,7 +81,7 @@
         "runtime_profile_summary.json"
       ],
       "check_id": "milestone16_runtime_profile",
-      "details": "24 of 24 promoted C++ profile repetitions pass runtime budgets.",
+      "details": "26 of 26 promoted C++ profile repetitions pass runtime budgets.",
       "passed": true,
       "status": "passed",
       "title": "Milestone 16 Runtime Profile"
@@ -91,7 +91,7 @@
         "regression_promotion_summary.json"
       ],
       "check_id": "milestone16_regression_promotion",
-      "details": "35 passing artifacts promoted.",
+      "details": "36 passing artifacts promoted.",
       "passed": true,
       "status": "passed",
       "title": "Milestone 16 Regression Promotion"
@@ -99,10 +99,9 @@
   ],
   "decision": {
     "approved_for_unreal_production_start": false,
-    "reason": "The full Milestone 16 gate was regenerated, but live Unreal custom water remains blocked by failed GeoClaw/C++ geometry or raft validation checks.",
+    "reason": "The full Milestone 16 gate was regenerated, but live Unreal custom water remains blocked by: Milestone 16 GeoClaw/C++ Thresholds, Milestone 16 Raft Coupling.",
     "required_next_actions": [
-      "Fix GeoClaw/C++ threshold failures outside flat-pool and sloping-channel cases.",
-      "Retune wet/dry, bed-step, constriction, drop/ledge, and cascading reach/drop dynamics until geometry families pass.",
+      "Fix remaining GeoClaw/C++ threshold failures outside accepted guardrail rows.",
       "Retune raft coupling against GeoClaw and C++ fields until force envelopes, outcomes, and transition cases pass.",
       "Keep the distinct Milestone 18 pin/release fixture separate from the raft-coupling water-field agreement gate."
     ],
