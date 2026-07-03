@@ -63,6 +63,9 @@ MILESTONE18_CONSTRICTION_HYDROSTATIC_SOURCE_DECISION_REPORT_SCHEMA = (
 MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA = (
     "raftsim.milestone18.drop_ledge_hydraulic_control.v0"
 )
+MILESTONE18_CASCADING_BOUNDARY_CORRECTION_REPORT_SCHEMA = (
+    "raftsim.milestone18.cascading_boundary_correction.v0"
+)
 MILESTONE18_REMAINING_GEOMETRY_CLOSURE_REPORT_SCHEMA = (
     "raftsim.milestone18.remaining_geometry_closure.v0"
 )
@@ -1920,6 +1923,180 @@ class Milestone18DropLedgeHydraulicControlReport:
 
     def _worst_raw_samples(self) -> tuple[Milestone18ConstrictionProbeCrossSectionSample, ...]:
         return tuple(sorted(self.raw_samples, key=lambda sample: sample.ratio_to_threshold, reverse=True)[:12])
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18CascadingBoundaryCheck:
+    """One corrected-reference threshold check with optional stale-reference context."""
+
+    name: str
+    corrected_value: float
+    threshold: float
+    passed: bool
+    stale_value: float | None = None
+    stale_passed: bool | None = None
+
+    @property
+    def stale_to_corrected_delta(self) -> float | None:
+        if self.stale_value is None:
+            return None
+        return self.corrected_value - self.stale_value
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "name": self.name,
+            "corrected_value": self.corrected_value,
+            "threshold": self.threshold,
+            "passed": self.passed,
+            "stale_value": self.stale_value,
+            "stale_passed": self.stale_passed,
+            "stale_to_corrected_delta": self.stale_to_corrected_delta,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18CascadingBoundaryFlowResult:
+    """Corrected-boundary South Fork cascading comparison for one flow band."""
+
+    flow_band: str
+    gate_scenario_id: str
+    scenario_id: str
+    threshold_report: str
+    dual_solver_manifest: str
+    comparison_dir: str
+    boundary_semantics: dict[str, object]
+    boundary_corrected: bool
+    feature_strength_scale: float | None
+    cpp_solver_returncode: int | None
+    checks: tuple[Milestone18CascadingBoundaryCheck, ...]
+
+    @property
+    def threshold_passed(self) -> bool:
+        return all(check.passed for check in self.checks)
+
+    @property
+    def feature_forcing_off(self) -> bool:
+        return self.feature_strength_scale is not None and abs(self.feature_strength_scale) <= 1.0e-12
+
+    @property
+    def passed(self) -> bool:
+        return self.boundary_corrected and self.feature_forcing_off and self.threshold_passed
+
+    @property
+    def failed_checks(self) -> tuple[str, ...]:
+        return tuple(check.name for check in self.checks if not check.passed)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "flow_band": self.flow_band,
+            "gate_scenario_id": self.gate_scenario_id,
+            "scenario_id": self.scenario_id,
+            "threshold_report": self.threshold_report,
+            "dual_solver_manifest": self.dual_solver_manifest,
+            "comparison_dir": self.comparison_dir,
+            "boundary_semantics": self.boundary_semantics,
+            "boundary_corrected": self.boundary_corrected,
+            "feature_strength_scale": self.feature_strength_scale,
+            "feature_forcing_off": self.feature_forcing_off,
+            "cpp_solver_returncode": self.cpp_solver_returncode,
+            "threshold_passed": self.threshold_passed,
+            "passed": self.passed,
+            "failed_checks": list(self.failed_checks),
+            "checks": [check.to_json_dict() for check in self.checks],
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone18CascadingBoundaryCorrectionReport:
+    """Corrected GeoClaw boundary-semantics evidence for South Fork cascading runs."""
+
+    corrected_threshold_reports: tuple[str, ...]
+    stale_comparison_report: str | None
+    flow_results: tuple[Milestone18CascadingBoundaryFlowResult, ...]
+    blocked_reasons: tuple[str, ...]
+    next_levers: tuple[str, ...]
+
+    @property
+    def passed(self) -> bool:
+        return not self.blocked_reasons and bool(self.flow_results)
+
+    def to_json_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": MILESTONE18_CASCADING_BOUNDARY_CORRECTION_REPORT_SCHEMA,
+            "passed": self.passed,
+            "decision": "PASS" if self.passed else "BLOCKED",
+            "stale_comparison_report": self.stale_comparison_report,
+            "corrected_threshold_reports": list(self.corrected_threshold_reports),
+            "summary": {
+                "flow_count": len(self.flow_results),
+                "boundary_corrected_count": sum(1 for result in self.flow_results if result.boundary_corrected),
+                "feature_forcing_off_count": sum(1 for result in self.flow_results if result.feature_forcing_off),
+                "threshold_passed_count": sum(1 for result in self.flow_results if result.threshold_passed),
+                "blocked_flow_count": sum(1 for result in self.flow_results if not result.passed),
+                "failing_check_counts": _counter_json(
+                    check_name for result in self.flow_results for check_name in result.failed_checks
+                ),
+                "stale_reference_compared": self.stale_comparison_report is not None,
+            },
+            "flow_results": [result.to_json_dict() for result in self.flow_results],
+            "blocked_reasons": list(self.blocked_reasons),
+            "next_levers": list(self.next_levers),
+        }
+
+    def write_json(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(self.to_json_dict(), indent=2, sort_keys=True), encoding="utf-8")
+        return output_path
+
+    def write_markdown(self, path: str | Path) -> Path:
+        output_path = Path(path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        summary = self.to_json_dict()["summary"]
+        lines = [
+            "# Milestone 18 Cascading Boundary Correction Diagnostic",
+            "",
+            f"Schema: `{MILESTONE18_CASCADING_BOUNDARY_CORRECTION_REPORT_SCHEMA}`",
+            "",
+            f"Decision: **{'PASS' if self.passed else 'BLOCKED'}**",
+            "",
+            f"Stale comparison report: `{self.stale_comparison_report or 'none'}`",
+            f"Corrected threshold reports: `{', '.join(self.corrected_threshold_reports)}`",
+            "",
+            "## Summary",
+            "",
+            f"- Boundary-corrected flows: `{summary['boundary_corrected_count']}` of `{summary['flow_count']}`",
+            f"- Feature-forcing-off flows: `{summary['feature_forcing_off_count']}` of `{summary['flow_count']}`",
+            f"- Threshold-passing flows: `{summary['threshold_passed_count']}` of `{summary['flow_count']}`",
+            f"- Failing checks: `{_counter_markdown(summary['failing_check_counts'])}`",
+            "",
+            "## Flow Results",
+            "",
+            "| Flow | Gate scenario | Boundary | Feature forcing | Threshold | Corrected failures | Key stale -> corrected deltas |",
+            "| --- | --- | --- | ---: | --- | --- | --- |",
+        ]
+        for result in self.flow_results:
+            boundary = "corrected" if result.boundary_corrected else "stale_or_unknown"
+            threshold = "PASS" if result.threshold_passed else "BLOCKED"
+            failures = ", ".join(f"`{name}`" for name in result.failed_checks) or "none"
+            lines.append(
+                "| "
+                f"`{result.flow_band}` | "
+                f"`{result.gate_scenario_id}` | "
+                f"{boundary} | "
+                f"`{_format_number(result.feature_strength_scale)}` | "
+                f"{threshold} | "
+                f"{failures} | "
+                f"{_escape_table(_cascading_boundary_markdown_deltas(result))} |"
+            )
+        if self.blocked_reasons:
+            lines.extend(["", "## Blocked Reasons", ""])
+            lines.extend(f"- {reason}" for reason in self.blocked_reasons)
+        if self.next_levers:
+            lines.extend(["", "## Next Levers", ""])
+            lines.extend(f"- {lever}" for lever in self.next_levers)
+        output_path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+        return output_path
 
 
 @dataclass(frozen=True, slots=True)
@@ -4175,6 +4352,60 @@ def build_milestone18_drop_ledge_hydraulic_control_report(
         cross_section_samples=cross_section_samples,
         blocked_reasons=blocked_reasons,
         next_levers=next_levers,
+    )
+
+
+def build_milestone18_cascading_boundary_correction_report(
+    corrected_threshold_reports: tuple[str | Path, ...],
+    *,
+    stale_comparison_report: str | Path | None = None,
+) -> Milestone18CascadingBoundaryCorrectionReport:
+    """Record South Fork cascading parity against corrected GeoClaw user-boundary references."""
+
+    threshold_paths = tuple(Path(path) for path in corrected_threshold_reports)
+    if not threshold_paths:
+        raise ValueError("At least one corrected cascading threshold report is required.")
+    stale_records = _stale_cascading_records(stale_comparison_report)
+    flow_results: list[Milestone18CascadingBoundaryFlowResult] = []
+    for threshold_path in sorted(threshold_paths, key=lambda path: str(path)):
+        threshold_report = _load_json_report(threshold_path)
+        comparison_dir = threshold_path.parent
+        manifest_path = comparison_dir / "dual_solver_manifest.json"
+        manifest = _load_json_report(manifest_path)
+        scenario_id = str(
+            threshold_report.get("scenario_id") or manifest.get("scenario_id") or "unknown_cascading_scenario"
+        )
+        flow_band = _cascading_flow_band(scenario_id)
+        gate_scenario_id = _cascading_gate_scenario_id(flow_band)
+        boundary_semantics = manifest.get("boundary_semantics")
+        if not isinstance(boundary_semantics, dict):
+            boundary_semantics = {}
+        cpp = manifest.get("cpp", {})
+        cpp_returncode = None
+        if isinstance(cpp, dict) and isinstance(cpp.get("returncode"), int):
+            cpp_returncode = int(cpp["returncode"])
+        flow_results.append(
+            Milestone18CascadingBoundaryFlowResult(
+                flow_band=flow_band,
+                gate_scenario_id=gate_scenario_id,
+                scenario_id=scenario_id,
+                threshold_report=str(threshold_path),
+                dual_solver_manifest=str(manifest_path),
+                comparison_dir=str(comparison_dir),
+                boundary_semantics=dict(boundary_semantics),
+                boundary_corrected=_cascading_boundary_semantics_corrected(boundary_semantics),
+                feature_strength_scale=_cascading_feature_strength_scale(manifest),
+                cpp_solver_returncode=cpp_returncode,
+                checks=_cascading_boundary_checks(threshold_report, stale_records.get(gate_scenario_id)),
+            )
+        )
+    result_tuple = tuple(flow_results)
+    return Milestone18CascadingBoundaryCorrectionReport(
+        corrected_threshold_reports=tuple(str(path) for path in threshold_paths),
+        stale_comparison_report=str(stale_comparison_report) if stale_comparison_report is not None else None,
+        flow_results=result_tuple,
+        blocked_reasons=_cascading_boundary_blocked_reasons(result_tuple),
+        next_levers=_cascading_boundary_next_levers(result_tuple),
     )
 
 
@@ -6826,6 +7057,171 @@ def _drop_ledge_hydraulic_control_next_levers(
     return tuple(dict.fromkeys(levers))
 
 
+def _stale_cascading_records(stale_comparison_report: str | Path | None) -> dict[str, dict[str, Any]]:
+    if stale_comparison_report is None:
+        return {}
+    report = _load_json_report(Path(stale_comparison_report))
+    records: dict[str, dict[str, Any]] = {}
+    for record in _records(report, "records"):
+        gate_scenario_id = str(record.get("gate_scenario_id", ""))
+        if not gate_scenario_id.startswith("south_fork_cascading"):
+            continue
+        if str(record.get("solver_mode", "")) != "finite_volume":
+            continue
+        records[gate_scenario_id] = record
+    return records
+
+
+def _cascading_boundary_checks(
+    threshold_report: dict[str, Any],
+    stale_record: dict[str, Any] | None,
+) -> tuple[Milestone18CascadingBoundaryCheck, ...]:
+    stale_check_values = stale_record.get("check_values", {}) if isinstance(stale_record, dict) else {}
+    if not isinstance(stale_check_values, dict):
+        stale_check_values = {}
+    checks: list[Milestone18CascadingBoundaryCheck] = []
+    for check in _records(threshold_report, "checks"):
+        name = str(check.get("name", "unknown_check"))
+        stale_check = stale_check_values.get(name, {})
+        if not isinstance(stale_check, dict):
+            stale_check = {}
+        checks.append(
+            Milestone18CascadingBoundaryCheck(
+                name=name,
+                corrected_value=float(check.get("value", 0.0) or 0.0),
+                threshold=float(check.get("threshold", 0.0) or 0.0),
+                passed=bool(check.get("passed")),
+                stale_value=_float_or_none(stale_check.get("value")),
+                stale_passed=bool(stale_check.get("passed")) if "passed" in stale_check else None,
+            )
+        )
+    return tuple(checks)
+
+
+def _cascading_flow_band(scenario_id: str) -> str:
+    lowered = scenario_id.lower()
+    if "low_runnable" in lowered:
+        return "low_runnable"
+    if "median_runnable" in lowered:
+        return "median_runnable"
+    if "high_runnable" in lowered:
+        return "high_runnable"
+    return "unknown"
+
+
+def _cascading_gate_scenario_id(flow_band: str) -> str:
+    if flow_band == "unknown":
+        return "south_fork_cascading_unknown"
+    return f"south_fork_cascading_{flow_band}"
+
+
+def _cascading_boundary_semantics_corrected(boundary_semantics: dict[str, object]) -> bool:
+    if boundary_semantics.get("bc_lower") != ["user", "wall"]:
+        return False
+    if boundary_semantics.get("bc_upper") != ["user", "wall"]:
+        return False
+    if not bool(boundary_semantics.get("requires_user_boundary_adapter")):
+        return False
+    edges = {
+        str(edge.get("edge")): edge
+        for edge in boundary_semantics.get("edges", [])
+        if isinstance(edge, dict) and edge.get("edge")
+    }
+    return (
+        _cascading_edge_code(edges, "west", "inflow") == "user"
+        and _cascading_edge_code(edges, "east", "outflow") == "user"
+        and _cascading_edge_code(edges, "south", "bank") == "wall"
+        and _cascading_edge_code(edges, "north", "bank") == "wall"
+    )
+
+
+def _cascading_edge_code(edges: dict[str, dict[str, object]], edge_name: str, scenario_kind: str) -> str | None:
+    edge = edges.get(edge_name, {})
+    if str(edge.get("scenario_kind")) != scenario_kind:
+        return None
+    return str(edge.get("geoclaw_code"))
+
+
+def _cascading_feature_strength_scale(manifest: dict[str, Any]) -> float | None:
+    cpp = manifest.get("cpp", {})
+    command = cpp.get("command") if isinstance(cpp, dict) else None
+    if not isinstance(command, list):
+        return None
+    return _command_option_float(tuple(str(item) for item in command), "--feature-strength-scale")
+
+
+def _command_option_float(command: tuple[str, ...], option: str) -> float | None:
+    for index, item in enumerate(command[:-1]):
+        if item != option:
+            continue
+        try:
+            return float(command[index + 1])
+        except ValueError:
+            return None
+    return None
+
+
+def _cascading_boundary_blocked_reasons(
+    flow_results: tuple[Milestone18CascadingBoundaryFlowResult, ...],
+) -> tuple[str, ...]:
+    reasons: list[str] = []
+    if not flow_results:
+        return ("No corrected South Fork cascading threshold reports were provided.",)
+    for result in flow_results:
+        if not result.boundary_corrected:
+            reasons.append(
+                f"{result.gate_scenario_id} does not prove corrected GeoClaw user-boundary semantics."
+            )
+        if not result.feature_forcing_off:
+            reasons.append(
+                f"{result.gate_scenario_id} uses feature forcing scale `{_format_number(result.feature_strength_scale)}`."
+            )
+        if not result.threshold_passed:
+            reasons.append(
+                f"{result.gate_scenario_id} still fails corrected-boundary thresholds: "
+                + ", ".join(result.failed_checks)
+                + "."
+            )
+    return tuple(dict.fromkeys(reasons))
+
+
+def _cascading_boundary_next_levers(
+    flow_results: tuple[Milestone18CascadingBoundaryFlowResult, ...],
+) -> tuple[str, ...]:
+    failing_counts = Counter(check_name for result in flow_results for check_name in result.failed_checks)
+    levers = [
+        "Use the corrected GeoClaw user-boundary manifests as the South Fork cascading reference; do not retune against stale extrapolated Milestone 16 outputs.",
+        "Use stitched whole-window cascading comparisons for acceptance; reach-local seam passes already exist and cannot hide water-field errors.",
+        "Keep `feature_strength_scale=0` until conservation, Froude, field, probe, and cross-section parity pass against GeoClaw.",
+    ]
+    if failing_counts.get("mass_drift_delta") or failing_counts.get("energy_change_delta"):
+        levers.append("Address whole-window mass/energy drift before tuning visual feature strength or raft outcomes.")
+    if failing_counts.get("field_linf") or failing_counts.get("probe_linf") or failing_counts.get("cross_section_linf"):
+        levers.append("Retune the cascading drop/tailwater water-shape response from the corrected field, probe, and cross-section failures.")
+    if failing_counts.get("froude_delta"):
+        levers.append("Preserve transcritical hydraulic-control behavior across drops and recovery pools while reducing Froude deltas.")
+    return tuple(dict.fromkeys(levers))
+
+
+def _cascading_boundary_markdown_deltas(result: Milestone18CascadingBoundaryFlowResult) -> str:
+    names = (
+        "field_linf",
+        "wet_mismatch_fraction",
+        "mass_drift_delta",
+        "energy_change_delta",
+        "froude_delta",
+        "feature_strength_delta",
+    )
+    by_name = {check.name: check for check in result.checks}
+    parts: list[str] = []
+    for name in names:
+        check = by_name.get(name)
+        if check is None or check.stale_value is None:
+            continue
+        parts.append(f"{name} {_format_number(check.stale_value)} -> {_format_number(check.corrected_value)}")
+    return "; ".join(parts) if parts else "n/a"
+
+
 def _focused_geometry_evidence_by_case(
     focused_reports: tuple[str | Path, ...],
 ) -> dict[str, tuple[dict[str, object], ...]]:
@@ -6841,19 +7237,22 @@ def _focused_geometry_evidence_by_case(
         summary = payload.get("summary", {})
         if not isinstance(summary, dict):
             summary = {}
-        by_case.setdefault(case_id, []).append(
-            {
-                "source_report": str(path),
-                "schema_version": str(payload.get("schema_version", "unknown")),
-                "decision": str(payload.get("decision", "UNKNOWN")),
-                "passed": bool(payload.get("passed")),
-                "scenario_id": str(payload.get("scenario_id", "")),
-                "gate_scenario_id": _focused_geometry_gate_scenario_id(payload, path),
-                "blocked_reasons": tuple(str(reason) for reason in payload.get("blocked_reasons", []) if isinstance(reason, str)),
-                "next_levers": tuple(str(lever) for lever in payload.get("next_levers", []) if isinstance(lever, str)),
-                "summary": _compact_report_summary(summary),
-            }
-        )
+        gate_scenario_id = _focused_geometry_gate_scenario_id(payload, path)
+        gate_scenario_ids = _focused_geometry_gate_scenario_ids(payload, path)
+        focused_record: dict[str, object] = {
+            "source_report": str(path),
+            "schema_version": str(payload.get("schema_version", "unknown")),
+            "decision": str(payload.get("decision", "UNKNOWN")),
+            "passed": bool(payload.get("passed")),
+            "scenario_id": str(payload.get("scenario_id", "")),
+            "gate_scenario_id": gate_scenario_id,
+            "blocked_reasons": tuple(str(reason) for reason in payload.get("blocked_reasons", []) if isinstance(reason, str)),
+            "next_levers": tuple(str(lever) for lever in payload.get("next_levers", []) if isinstance(lever, str)),
+            "summary": _compact_report_summary(summary),
+        }
+        if len(gate_scenario_ids) > 1 or gate_scenario_id == "south_fork_cascading_window":
+            focused_record["gate_scenario_ids"] = list(gate_scenario_ids)
+        by_case.setdefault(case_id, []).append(focused_record)
     return {case_id: tuple(records) for case_id, records in by_case.items()}
 
 
@@ -6876,6 +7275,8 @@ def _focused_geometry_case_id(payload: dict[str, Any], path: Path) -> str | None
         return "constriction"
     if "drop_ledge" in haystack or "drop/ledge" in haystack:
         return "drops_ledges_tailwater"
+    if "cascading_boundary" in haystack or "south_fork_cascading" in haystack:
+        return "drops_ledges_tailwater"
     return None
 
 
@@ -6885,9 +7286,25 @@ def _focused_geometry_gate_scenario_id(payload: dict[str, Any], path: Path) -> s
     haystack = f"{schema} {path} {scenario_id}".lower()
     if "drop_ledge" in haystack or "drop/ledge" in haystack:
         return "drop_ledge"
+    if "cascading_boundary" in haystack or "south_fork_cascading" in haystack:
+        return "south_fork_cascading_window"
     if "constriction" in haystack:
         return "constriction"
     return scenario_id
+
+
+def _focused_geometry_gate_scenario_ids(payload: dict[str, Any], path: Path) -> tuple[str, ...]:
+    schema = str(payload.get("schema_version", "")).lower()
+    haystack = f"{schema} {path}".lower()
+    if "cascading_boundary" in haystack:
+        ids = [
+            str(result.get("gate_scenario_id"))
+            for result in _records(payload, "flow_results")
+            if result.get("gate_scenario_id")
+        ]
+        return tuple(dict.fromkeys(ids))
+    gate_scenario_id = _focused_geometry_gate_scenario_id(payload, path)
+    return (gate_scenario_id,) if gate_scenario_id else ()
 
 
 def _focused_geometry_passed_scenarios(
@@ -6897,6 +7314,9 @@ def _focused_geometry_passed_scenarios(
     for evidence in focused_evidence:
         if not bool(evidence.get("passed")):
             continue
+        gate_scenario_ids = evidence.get("gate_scenario_ids", ())
+        if isinstance(gate_scenario_ids, (list, tuple)):
+            passed.update(str(item) for item in gate_scenario_ids if item)
         gate_scenario_id = str(evidence.get("gate_scenario_id", ""))
         if gate_scenario_id:
             passed.add(gate_scenario_id)

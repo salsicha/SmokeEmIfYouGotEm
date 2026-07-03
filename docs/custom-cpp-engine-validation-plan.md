@@ -1002,6 +1002,8 @@ The upstream-edge source-balance final support keeps feature forcing off and add
 
 The refreshed remaining-geometry queue now also includes the upstream-edge source-balance field, face/source, face-state width/depth, and upstream-edge balance reports and records 1015 focused reports. The face/source report now passes at max source-balance delta 0.742917 while still recording 35 internal C++ y-face Riemann/post-source sign mismatches as diagnostic telemetry; internal per-step signs do not block once final-frame reconstructed signs, opposition, flux, and source balance pass. The upstream-edge balance rollup also passes with target_sample_count 0, source_balance_blocker_count 0, width_depth_coupled_blocker_count 0, and zero paired-edge opposition mismatches. The remaining-geometry closure report now treats constriction as a focused guardrail and advances the next active case to `drops_ledges_tailwater`, with feature forcing still off.
 
+The corrected-boundary South Fork cascading diagnostic is `physics/reports/milestone18/cascading_boundary_correction_diagnostic.json` with a companion Markdown report. It compares low, median, and high runnable whole-window runs against regenerated GeoClaw references using west/east `user` boundaries and north/south walls, with `feature_strength_scale=0`. The boundary correction clears wet-mask mismatch for all three flows and greatly reduces stale-reference field/mass errors, but parity remains blocked across the stitched whole-window field, slope, probe, cross-section, conservation, energy, Froude, feature-location, and feature-strength metrics. The refreshed remaining-geometry closure report now has only `drops_ledges_tailwater` active; reach-local seam passes stay guardrails and cannot be used as acceptance for the failing whole-window water fields.
+
 Each family should be promoted into regression artifacts when it passes. Do not tune a whitewater feature by sacrificing lake-at-rest, sloping-channel, wet/dry, bed-step, bore, hydraulic-jump, or transcritical-bump guardrails.
 
 ### 3. Raft Coupling Agreement Over C++ Water
@@ -1039,7 +1041,7 @@ After parity, geometry, raft-coupling, pin/release, and analytic-guardrail check
 - Whether the first accepted runtime remains CPU-only or starts a GPU path after correctness is established.
 - Exact numerical thresholds for research-accepted, Unreal-prototype, and production-candidate tiers.
 - Exact schema fields and acceptance thresholds for river validation annotations and guide-review signoff.
-- Exact report schema for any future Milestone 18 closure artifacts beyond the failure triage, parity retune, analytic guardrail, pin/release fixture, and constriction throat/mask reports.
+- Exact report schema for future Milestone 18 closure artifacts beyond the failure triage, parity retune, analytic guardrail, pin/release fixture, constriction diagnostics, and cascading boundary-correction reports.
 
 ## Related Docs
 

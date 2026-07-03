@@ -1,0 +1,588 @@
+{
+  "blocked_reasons": [
+    "south_fork_cascading_high_runnable still fails corrected-boundary thresholds: field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta.",
+    "south_fork_cascading_low_runnable still fails corrected-boundary thresholds: field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta.",
+    "south_fork_cascading_median_runnable still fails corrected-boundary thresholds: field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta."
+  ],
+  "corrected_threshold_reports": [
+    "physics/outputs/m18cmp/cascading_low_corrected_boundary/finite_volume_hll/threshold_evaluation.json",
+    "physics/outputs/m18cmp/cascading_med_corrected_boundary/finite_volume_hll/threshold_evaluation.json",
+    "physics/outputs/m18cmp/cascading_igh_corrected_boundary/finite_volume_hll/threshold_evaluation.json"
+  ],
+  "decision": "BLOCKED",
+  "flow_results": [
+    {
+      "boundary_corrected": true,
+      "boundary_semantics": {
+        "bc_lower": [
+          "user",
+          "wall"
+        ],
+        "bc_upper": [
+          "user",
+          "wall"
+        ],
+        "edges": [
+          {
+            "edge": "west",
+            "enforced_state": {
+              "depth": 1.4320393247567158,
+              "stage": null,
+              "velocity": [
+                2.8947046209278118,
+                0.0
+              ]
+            },
+            "geoclaw_code": "user",
+            "hydrograph_policy": "none",
+            "requires_user_boundary_adapter": true,
+            "scenario_kind": "inflow"
+          },
+          {
+            "edge": "east",
+            "enforced_state": {
+              "depth": null,
+              "stage": 1.5020393247567159,
+              "velocity": null
+            },
+            "geoclaw_code": "user",
+            "hydrograph_policy": "none",
+            "requires_user_boundary_adapter": true,
+            "scenario_kind": "outflow"
+          },
+          {
+            "edge": "south",
+            "enforced_state": {
+              "depth": null,
+              "stage": null,
+              "velocity": null
+            },
+            "geoclaw_code": "wall",
+            "hydrograph_policy": "none",
+            "requires_user_boundary_adapter": false,
+            "scenario_kind": "bank"
+          },
+          {
+            "edge": "north",
+            "enforced_state": {
+              "depth": null,
+              "stage": null,
+              "velocity": null
+            },
+            "geoclaw_code": "wall",
+            "hydrograph_policy": "none",
+            "requires_user_boundary_adapter": false,
+            "scenario_kind": "bank"
+          }
+        ],
+        "requires_user_boundary_adapter": true
+      },
+      "checks": [
+        {
+          "corrected_value": 22.904140527453755,
+          "name": "field_linf",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -28.69355603508336,
+          "stale_value": 51.59769656253712,
+          "threshold": 0.35
+        },
+        {
+          "corrected_value": 0.5652336546968781,
+          "name": "slope_linf",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": 0.04672577857280691,
+          "stale_value": 0.5185078761240712,
+          "threshold": 0.08
+        },
+        {
+          "corrected_value": 0.06428571428571428,
+          "name": "wet_mismatch_fraction",
+          "passed": true,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -0.2401785714285714,
+          "stale_value": 0.3044642857142857,
+          "threshold": 0.1
+        },
+        {
+          "corrected_value": 12.53974997099268,
+          "name": "probe_linf",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -35.077571630477905,
+          "stale_value": 47.617321601470586,
+          "threshold": 0.35
+        },
+        {
+          "corrected_value": 2.986970447059937,
+          "name": "cross_section_linf",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -0.04250148515186547,
+          "stale_value": 3.0294719322118024,
+          "threshold": 0.35
+        },
+        {
+          "corrected_value": 0.23603715608162146,
+          "name": "mass_drift_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -1.5764901801062043,
+          "stale_value": 1.8125273361878258,
+          "threshold": 0.04
+        },
+        {
+          "corrected_value": 1.3545848487752776,
+          "name": "energy_change_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -2.8171789959811253,
+          "stale_value": 4.171763844756403,
+          "threshold": 0.15
+        },
+        {
+          "corrected_value": 1.2651524532678695,
+          "name": "froude_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": 0.8807256834547679,
+          "stale_value": 0.38442676981310164,
+          "threshold": 0.1
+        },
+        {
+          "corrected_value": 14.422205101855956,
+          "name": "feature_location_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": 0.0,
+          "stale_value": 14.422205101855956,
+          "threshold": 3.0
+        },
+        {
+          "corrected_value": 1.894749958152965,
+          "name": "feature_strength_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -2.454886695011573,
+          "stale_value": 4.349636653164538,
+          "threshold": 0.55
+        }
+      ],
+      "comparison_dir": "physics/outputs/m18cmp/cascading_igh_corrected_boundary/finite_volume_hll",
+      "cpp_solver_returncode": 2,
+      "dual_solver_manifest": "physics/outputs/m18cmp/cascading_igh_corrected_boundary/finite_volume_hll/dual_solver_manifest.json",
+      "failed_checks": [
+        "field_linf",
+        "slope_linf",
+        "probe_linf",
+        "cross_section_linf",
+        "mass_drift_delta",
+        "energy_change_delta",
+        "froude_delta",
+        "feature_location_delta",
+        "feature_strength_delta"
+      ],
+      "feature_forcing_off": true,
+      "feature_strength_scale": 0.0,
+      "flow_band": "high_runnable",
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "passed": false,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+      "threshold_passed": false,
+      "threshold_report": "physics/outputs/m18cmp/cascading_igh_corrected_boundary/finite_volume_hll/threshold_evaluation.json"
+    },
+    {
+      "boundary_corrected": true,
+      "boundary_semantics": {
+        "bc_lower": [
+          "user",
+          "wall"
+        ],
+        "bc_upper": [
+          "user",
+          "wall"
+        ],
+        "edges": [
+          {
+            "edge": "west",
+            "enforced_state": {
+              "depth": 1.1099999999999999,
+              "stage": null,
+              "velocity": [
+                0.7785550383860191,
+                0.0
+              ]
+            },
+            "geoclaw_code": "user",
+            "hydrograph_policy": "none",
+            "requires_user_boundary_adapter": true,
+            "scenario_kind": "inflow"
+          },
+          {
+            "edge": "east",
+            "enforced_state": {
+              "depth": null,
+              "stage": 1.075,
+              "velocity": null
+            },
+            "geoclaw_code": "user",
+            "hydrograph_policy": "none",
+            "requires_user_boundary_adapter": true,
+            "scenario_kind": "outflow"
+          },
+          {
+            "edge": "south",
+            "enforced_state": {
+              "depth": null,
+              "stage": null,
+              "velocity": null
+            },
+            "geoclaw_code": "wall",
+            "hydrograph_policy": "none",
+            "requires_user_boundary_adapter": false,
+            "scenario_kind": "bank"
+          },
+          {
+            "edge": "north",
+            "enforced_state": {
+              "depth": null,
+              "stage": null,
+              "velocity": null
+            },
+            "geoclaw_code": "wall",
+            "hydrograph_policy": "none",
+            "requires_user_boundary_adapter": false,
+            "scenario_kind": "bank"
+          }
+        ],
+        "requires_user_boundary_adapter": true
+      },
+      "checks": [
+        {
+          "corrected_value": 17.890793684547525,
+          "name": "field_linf",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -21.744612418473444,
+          "stale_value": 39.63540610302097,
+          "threshold": 0.35
+        },
+        {
+          "corrected_value": 0.4664874339573317,
+          "name": "slope_linf",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": 0.03485664457691717,
+          "stale_value": 0.43163078938041455,
+          "threshold": 0.08
+        },
+        {
+          "corrected_value": 0.06339285714285714,
+          "name": "wet_mismatch_fraction",
+          "passed": true,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -0.2642857142857143,
+          "stale_value": 0.32767857142857143,
+          "threshold": 0.1
+        },
+        {
+          "corrected_value": 6.845116752431096,
+          "name": "probe_linf",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -30.60393065214157,
+          "stale_value": 37.44904740457267,
+          "threshold": 0.35
+        },
+        {
+          "corrected_value": 2.61375261000028,
+          "name": "cross_section_linf",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -0.020136225614243664,
+          "stale_value": 2.6338888356145236,
+          "threshold": 0.35
+        },
+        {
+          "corrected_value": 0.30636908065096,
+          "name": "mass_drift_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -1.6054592771149403,
+          "stale_value": 1.9118283577659003,
+          "threshold": 0.04
+        },
+        {
+          "corrected_value": 1.179748988887909,
+          "name": "energy_change_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -2.0231619978055995,
+          "stale_value": 3.2029109866935084,
+          "threshold": 0.15
+        },
+        {
+          "corrected_value": 1.941177911855307,
+          "name": "froude_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": 1.4012280525927339,
+          "stale_value": 0.5399498592625731,
+          "threshold": 0.1
+        },
+        {
+          "corrected_value": 14.560219778561036,
+          "name": "feature_location_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": 0.0,
+          "stale_value": 14.560219778561036,
+          "threshold": 3.0
+        },
+        {
+          "corrected_value": 1.3750420568055626,
+          "name": "feature_strength_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -3.5743920725504648,
+          "stale_value": 4.949434129356027,
+          "threshold": 0.55
+        }
+      ],
+      "comparison_dir": "physics/outputs/m18cmp/cascading_low_corrected_boundary/finite_volume_hll",
+      "cpp_solver_returncode": 2,
+      "dual_solver_manifest": "physics/outputs/m18cmp/cascading_low_corrected_boundary/finite_volume_hll/dual_solver_manifest.json",
+      "failed_checks": [
+        "field_linf",
+        "slope_linf",
+        "probe_linf",
+        "cross_section_linf",
+        "mass_drift_delta",
+        "energy_change_delta",
+        "froude_delta",
+        "feature_location_delta",
+        "feature_strength_delta"
+      ],
+      "feature_forcing_off": true,
+      "feature_strength_scale": 0.0,
+      "flow_band": "low_runnable",
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "passed": false,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+      "threshold_passed": false,
+      "threshold_report": "physics/outputs/m18cmp/cascading_low_corrected_boundary/finite_volume_hll/threshold_evaluation.json"
+    },
+    {
+      "boundary_corrected": true,
+      "boundary_semantics": {
+        "bc_lower": [
+          "user",
+          "wall"
+        ],
+        "bc_upper": [
+          "user",
+          "wall"
+        ],
+        "edges": [
+          {
+            "edge": "west",
+            "enforced_state": {
+              "depth": 1.24,
+              "stage": null,
+              "velocity": [
+                1.510964407043415,
+                0.0
+              ]
+            },
+            "geoclaw_code": "user",
+            "hydrograph_policy": "none",
+            "requires_user_boundary_adapter": true,
+            "scenario_kind": "inflow"
+          },
+          {
+            "edge": "east",
+            "enforced_state": {
+              "depth": null,
+              "stage": 1.24,
+              "velocity": null
+            },
+            "geoclaw_code": "user",
+            "hydrograph_policy": "none",
+            "requires_user_boundary_adapter": true,
+            "scenario_kind": "outflow"
+          },
+          {
+            "edge": "south",
+            "enforced_state": {
+              "depth": null,
+              "stage": null,
+              "velocity": null
+            },
+            "geoclaw_code": "wall",
+            "hydrograph_policy": "none",
+            "requires_user_boundary_adapter": false,
+            "scenario_kind": "bank"
+          },
+          {
+            "edge": "north",
+            "enforced_state": {
+              "depth": null,
+              "stage": null,
+              "velocity": null
+            },
+            "geoclaw_code": "wall",
+            "hydrograph_policy": "none",
+            "requires_user_boundary_adapter": false,
+            "scenario_kind": "bank"
+          }
+        ],
+        "requires_user_boundary_adapter": true
+      },
+      "checks": [
+        {
+          "corrected_value": 20.03951579190205,
+          "name": "field_linf",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -28.9032664047518,
+          "stale_value": 48.94278219665385,
+          "threshold": 0.35
+        },
+        {
+          "corrected_value": 0.4210853879598179,
+          "name": "slope_linf",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -0.07888327924372457,
+          "stale_value": 0.4999686672035425,
+          "threshold": 0.08
+        },
+        {
+          "corrected_value": 0.05803571428571429,
+          "name": "wet_mismatch_fraction",
+          "passed": true,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -0.2526785714285714,
+          "stale_value": 0.3107142857142857,
+          "threshold": 0.1
+        },
+        {
+          "corrected_value": 10.706758932680785,
+          "name": "probe_linf",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -34.01539075374603,
+          "stale_value": 44.72214968642682,
+          "threshold": 0.35
+        },
+        {
+          "corrected_value": 2.4055949871041804,
+          "name": "cross_section_linf",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -0.012142643392614616,
+          "stale_value": 2.417737630496795,
+          "threshold": 0.35
+        },
+        {
+          "corrected_value": 0.3360470699731619,
+          "name": "mass_drift_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -1.540413739668293,
+          "stale_value": 1.876460809641455,
+          "threshold": 0.04
+        },
+        {
+          "corrected_value": 1.4674131027637811,
+          "name": "energy_change_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -1.9543616016391128,
+          "stale_value": 3.421774704402894,
+          "threshold": 0.15
+        },
+        {
+          "corrected_value": 1.6298968193705257,
+          "name": "froude_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": 1.3516683516497456,
+          "stale_value": 0.27822846772078,
+          "threshold": 0.1
+        },
+        {
+          "corrected_value": 14.560219778561036,
+          "name": "feature_location_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": 0.0,
+          "stale_value": 14.560219778561036,
+          "threshold": 3.0
+        },
+        {
+          "corrected_value": 1.7369630031454024,
+          "name": "feature_strength_delta",
+          "passed": false,
+          "stale_passed": false,
+          "stale_to_corrected_delta": -2.386900126673269,
+          "stale_value": 4.123863129818671,
+          "threshold": 0.55
+        }
+      ],
+      "comparison_dir": "physics/outputs/m18cmp/cascading_med_corrected_boundary/finite_volume_hll",
+      "cpp_solver_returncode": 2,
+      "dual_solver_manifest": "physics/outputs/m18cmp/cascading_med_corrected_boundary/finite_volume_hll/dual_solver_manifest.json",
+      "failed_checks": [
+        "field_linf",
+        "slope_linf",
+        "probe_linf",
+        "cross_section_linf",
+        "mass_drift_delta",
+        "energy_change_delta",
+        "froude_delta",
+        "feature_location_delta",
+        "feature_strength_delta"
+      ],
+      "feature_forcing_off": true,
+      "feature_strength_scale": 0.0,
+      "flow_band": "median_runnable",
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "passed": false,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "threshold_passed": false,
+      "threshold_report": "physics/outputs/m18cmp/cascading_med_corrected_boundary/finite_volume_hll/threshold_evaluation.json"
+    }
+  ],
+  "next_levers": [
+    "Use the corrected GeoClaw user-boundary manifests as the South Fork cascading reference; do not retune against stale extrapolated Milestone 16 outputs.",
+    "Use stitched whole-window cascading comparisons for acceptance; reach-local seam passes already exist and cannot hide water-field errors.",
+    "Keep `feature_strength_scale=0` until conservation, Froude, field, probe, and cross-section parity pass against GeoClaw.",
+    "Address whole-window mass/energy drift before tuning visual feature strength or raft outcomes.",
+    "Retune the cascading drop/tailwater water-shape response from the corrected field, probe, and cross-section failures.",
+    "Preserve transcritical hydraulic-control behavior across drops and recovery pools while reducing Froude deltas."
+  ],
+  "passed": false,
+  "schema_version": "raftsim.milestone18.cascading_boundary_correction.v0",
+  "stale_comparison_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+  "summary": {
+    "blocked_flow_count": 3,
+    "boundary_corrected_count": 3,
+    "failing_check_counts": {
+      "cross_section_linf": 3,
+      "energy_change_delta": 3,
+      "feature_location_delta": 3,
+      "feature_strength_delta": 3,
+      "field_linf": 3,
+      "froude_delta": 3,
+      "mass_drift_delta": 3,
+      "probe_linf": 3,
+      "slope_linf": 3
+    },
+    "feature_forcing_off_count": 3,
+    "flow_count": 3,
+    "stale_reference_compared": true,
+    "threshold_passed_count": 0
+  }
+}

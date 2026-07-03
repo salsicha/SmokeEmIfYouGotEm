@@ -17,6 +17,41 @@
       "failing_scenario_count": 3,
       "focused_evidence": [
         {
+          "blocked_reasons": [
+            "south_fork_cascading_high_runnable still fails corrected-boundary thresholds: field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta.",
+            "south_fork_cascading_low_runnable still fails corrected-boundary thresholds: field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta.",
+            "south_fork_cascading_median_runnable still fails corrected-boundary thresholds: field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta."
+          ],
+          "decision": "BLOCKED",
+          "gate_scenario_id": "south_fork_cascading_window",
+          "gate_scenario_ids": [
+            "south_fork_cascading_high_runnable",
+            "south_fork_cascading_low_runnable",
+            "south_fork_cascading_median_runnable"
+          ],
+          "next_levers": [
+            "Use the corrected GeoClaw user-boundary manifests as the South Fork cascading reference; do not retune against stale extrapolated Milestone 16 outputs.",
+            "Use stitched whole-window cascading comparisons for acceptance; reach-local seam passes already exist and cannot hide water-field errors.",
+            "Keep `feature_strength_scale=0` until conservation, Froude, field, probe, and cross-section parity pass against GeoClaw.",
+            "Address whole-window mass/energy drift before tuning visual feature strength or raft outcomes.",
+            "Retune the cascading drop/tailwater water-shape response from the corrected field, probe, and cross-section failures.",
+            "Preserve transcritical hydraulic-control behavior across drops and recovery pools while reducing Froude deltas."
+          ],
+          "passed": false,
+          "scenario_id": "",
+          "schema_version": "raftsim.milestone18.cascading_boundary_correction.v0",
+          "source_report": "physics/reports/milestone18/cascading_boundary_correction_diagnostic.json",
+          "summary": {
+            "blocked_flow_count": 3,
+            "boundary_corrected_count": 3,
+            "failing_check_counts_key_count": 9,
+            "feature_forcing_off_count": 3,
+            "flow_count": 3,
+            "stale_reference_compared": true,
+            "threshold_passed_count": 0
+          }
+        },
+        {
           "blocked_reasons": [],
           "decision": "PASS",
           "gate_scenario_id": "drop_ledge",
@@ -92,6 +127,12 @@
         }
       ],
       "next_levers": [
+        "Use the corrected GeoClaw user-boundary manifests as the South Fork cascading reference; do not retune against stale extrapolated Milestone 16 outputs.",
+        "Use stitched whole-window cascading comparisons for acceptance; reach-local seam passes already exist and cannot hide water-field errors.",
+        "Keep `feature_strength_scale=0` until conservation, Froude, field, probe, and cross-section parity pass against GeoClaw.",
+        "Address whole-window mass/energy drift before tuning visual feature strength or raft outcomes.",
+        "Retune the cascading drop/tailwater water-shape response from the corrected field, probe, and cross-section failures.",
+        "Preserve transcritical hydraulic-control behavior across drops and recovery pools while reducing Froude deltas.",
         "Use stitched whole-window cascading comparisons for acceptance; reach-local seams already pass and cannot hide water-field errors.",
         "Preserve or restore conservation and energy checks before accepting any visual/gameplay forcing."
       ],
@@ -33636,6 +33677,7 @@
   "decision": "BLOCKED",
   "focused_report_paths": [
     "physics/reports/milestone18/bed_step_parity_retune.json",
+    "physics/reports/milestone18/cascading_boundary_correction_diagnostic.json",
     "physics/reports/milestone18/constriction_asymmetric_envelope_mask_diagnostic.json",
     "physics/reports/milestone18/constriction_asymmetric_envelope_retune.json",
     "physics/reports/milestone18/constriction_asymmetric_envelope_throat_diagnostic.json",

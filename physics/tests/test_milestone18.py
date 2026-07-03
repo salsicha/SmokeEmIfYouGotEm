@@ -40,6 +40,9 @@ from raftsim.examples.generate_milestone18_constriction_shape_timing_report impo
 from raftsim.examples.generate_milestone18_constriction_throat_shape_report import (
     main as generate_constriction_throat_main,
 )
+from raftsim.examples.generate_milestone18_cascading_boundary_correction_report import (
+    main as generate_cascading_boundary_correction_main,
+)
 from raftsim.examples.generate_milestone18_drop_ledge_hydraulic_control_report import (
     main as generate_drop_ledge_hydraulic_control_main,
 )
@@ -63,6 +66,7 @@ from raftsim.milestone18 import (
     MILESTONE18_CONSTRICTION_SHAPE_TIMING_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_THROAT_REPORT_SCHEMA,
     MILESTONE18_CONSTRICTION_UPSTREAM_EDGE_BALANCE_REPORT_SCHEMA,
+    MILESTONE18_CASCADING_BOUNDARY_CORRECTION_REPORT_SCHEMA,
     MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA,
     MILESTONE18_FAILURE_TRIAGE_REPORT_SCHEMA,
     MILESTONE18_PARITY_RETUNE_REPORT_SCHEMA,
@@ -79,6 +83,7 @@ from raftsim.milestone18 import (
     build_milestone18_constriction_shape_timing_report,
     build_milestone18_constriction_throat_shape_report,
     build_milestone18_constriction_upstream_edge_balance_report,
+    build_milestone18_cascading_boundary_correction_report,
     build_milestone18_drop_ledge_hydraulic_control_report,
     build_milestone18_failure_triage_matrix,
     build_milestone18_parity_family_retune_report,
@@ -1533,6 +1538,151 @@ def test_generate_milestone18_drop_ledge_hydraulic_control_cli_writes_reports(tm
     assert payload["schema_version"] == MILESTONE18_DROP_LEDGE_HYDRAULIC_CONTROL_REPORT_SCHEMA
     assert payload["decision"] == "BLOCKED"
     assert "Drop/Ledge Hydraulic-Control Diagnostic" in output_md.read_text(encoding="utf-8")
+
+
+def _cascading_boundary_inputs(tmp_path: Path) -> tuple[Path, Path]:
+    threshold_report = _write_json(
+        tmp_path / "outputs" / "m18cmp" / "cascading_low" / "finite_volume_hll" / "threshold_evaluation.json",
+        {
+            "passed": False,
+            "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+            "checks": [
+                {"name": "field_linf", "value": 17.0, "threshold": 0.35, "passed": False},
+                {"name": "wet_mismatch_fraction", "value": 0.06, "threshold": 0.1, "passed": True},
+                {"name": "mass_drift_delta", "value": 0.3, "threshold": 0.04, "passed": False},
+            ],
+        },
+    )
+    _write_json(
+        threshold_report.parent / "dual_solver_manifest.json",
+        {
+            "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+            "boundary_semantics": {
+                "bc_lower": ["user", "wall"],
+                "bc_upper": ["user", "wall"],
+                "requires_user_boundary_adapter": True,
+                "edges": [
+                    {
+                        "edge": "west",
+                        "scenario_kind": "inflow",
+                        "geoclaw_code": "user",
+                        "requires_user_boundary_adapter": True,
+                    },
+                    {
+                        "edge": "east",
+                        "scenario_kind": "outflow",
+                        "geoclaw_code": "user",
+                        "requires_user_boundary_adapter": True,
+                    },
+                    {"edge": "south", "scenario_kind": "bank", "geoclaw_code": "wall"},
+                    {"edge": "north", "scenario_kind": "bank", "geoclaw_code": "wall"},
+                ],
+            },
+            "cpp": {
+                "returncode": 2,
+                "command": [
+                    "raftsim_water_solver",
+                    "--feature-strength-scale",
+                    "0.0",
+                    "--boundary-mode",
+                    "scenario",
+                ],
+            },
+        },
+    )
+    stale_report = _write_json(
+        tmp_path / "reports" / "milestone16" / "geoclaw_cpp_comparisons.json",
+        {
+            "passed": False,
+            "records": [
+                {
+                    "gate_scenario_id": "south_fork_cascading_low_runnable",
+                    "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+                    "solver_mode": "finite_volume",
+                    "threshold_passed": False,
+                    "check_values": {
+                        "field_linf": {"value": 39.6, "threshold": 0.35, "passed": False},
+                        "wet_mismatch_fraction": {"value": 0.33, "threshold": 0.1, "passed": False},
+                        "mass_drift_delta": {"value": 1.91, "threshold": 0.04, "passed": False},
+                    },
+                }
+            ],
+        },
+    )
+    return threshold_report, stale_report
+
+
+def test_milestone18_cascading_boundary_correction_report_records_corrected_blockers(tmp_path):
+    threshold_report, stale_report = _cascading_boundary_inputs(tmp_path)
+
+    report = build_milestone18_cascading_boundary_correction_report(
+        (threshold_report,),
+        stale_comparison_report=stale_report,
+    )
+    payload = report.to_json_dict()
+
+    assert payload["schema_version"] == MILESTONE18_CASCADING_BOUNDARY_CORRECTION_REPORT_SCHEMA
+    assert payload["decision"] == "BLOCKED"
+    assert payload["summary"]["boundary_corrected_count"] == 1
+    assert payload["summary"]["feature_forcing_off_count"] == 1
+    assert payload["summary"]["failing_check_counts"] == {"field_linf": 1, "mass_drift_delta": 1}
+    flow = payload["flow_results"][0]
+    assert flow["gate_scenario_id"] == "south_fork_cascading_low_runnable"
+    assert flow["boundary_corrected"] is True
+    wet_check = {check["name"]: check for check in flow["checks"]}["wet_mismatch_fraction"]
+    assert wet_check["passed"] is True
+    assert wet_check["stale_value"] == pytest.approx(0.33)
+    assert wet_check["stale_to_corrected_delta"] == pytest.approx(-0.27)
+    assert "corrected-boundary thresholds" in " ".join(payload["blocked_reasons"])
+
+
+def test_generate_milestone18_cascading_boundary_correction_cli_writes_reports(tmp_path):
+    threshold_report, stale_report = _cascading_boundary_inputs(tmp_path)
+    output_json = tmp_path / "reports" / "milestone18" / "cascading_boundary_correction_diagnostic.json"
+    output_md = tmp_path / "reports" / "milestone18" / "cascading_boundary_correction_diagnostic.md"
+
+    exit_code = generate_cascading_boundary_correction_main(
+        [
+            "--corrected-threshold-report",
+            str(threshold_report),
+            "--stale-comparison-report",
+            str(stale_report),
+            "--output-json",
+            str(output_json),
+            "--output-md",
+            str(output_md),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads(output_json.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == MILESTONE18_CASCADING_BOUNDARY_CORRECTION_REPORT_SCHEMA
+    assert payload["summary"]["stale_reference_compared"] is True
+    assert "Cascading Boundary Correction Diagnostic" in output_md.read_text(encoding="utf-8")
+
+
+def test_milestone18_remaining_geometry_closure_records_cascading_boundary_evidence(tmp_path):
+    threshold_report, stale_report = _cascading_boundary_inputs(tmp_path)
+    geometry_report, _, _ = _remaining_geometry_closure_inputs(tmp_path)
+    cascading_report = build_milestone18_cascading_boundary_correction_report(
+        (threshold_report,),
+        stale_comparison_report=stale_report,
+    )
+    cascading_report_path = tmp_path / "reports" / "milestone18" / "cascading_boundary_correction_diagnostic.json"
+    cascading_report.write_json(cascading_report_path)
+
+    report = build_milestone18_remaining_geometry_closure_report(
+        geometry_report,
+        focused_reports=(cascading_report_path,),
+    )
+    payload = report.to_json_dict()
+
+    cases = {case["case_id"]: case for case in payload["cases"]}
+    evidence = cases["drops_ledges_tailwater"]["focused_evidence"][0]
+    assert evidence["source_report"] == str(cascading_report_path)
+    assert evidence["gate_scenario_id"] == "south_fork_cascading_window"
+    assert evidence["gate_scenario_ids"] == ["south_fork_cascading_low_runnable"]
+    assert "corrected-boundary thresholds" in " ".join(evidence["blocked_reasons"])
 
 
 def _remaining_geometry_closure_inputs(tmp_path: Path) -> tuple[Path, Path, Path]:
