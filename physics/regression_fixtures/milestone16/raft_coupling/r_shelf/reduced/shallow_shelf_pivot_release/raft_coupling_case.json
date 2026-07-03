@@ -21,14 +21,14 @@
         "name": "grounding_support",
         "passed": true,
         "threshold": 0.5,
-        "value": 8.011833709193011
+        "value": 8.099828614329999
       },
       {
         "details": "Off-center shelf contact should pivot the raft.",
         "name": "pivot_yaw",
         "passed": true,
         "threshold": 0.5,
-        "value": 19.67059023202619
+        "value": 20.011985841461076
       }
     ],
     "candidate_frame": "outputs/m16cpp/r_shelf/reduced/cpp_solver/shallow_shelf_seed_21/frames/frame_0008.csv",
@@ -41,7 +41,7 @@
     ],
     "feature_outcome_match": true,
     "flow_band": null,
-    "force_delta_weight_ratio": 0.317194779950093,
+    "force_delta_weight_ratio": 0.32638239164373845,
     "force_envelope_outcome_match": true,
     "gate_scenario_id": "shallow_shelf",
     "notes": [],
@@ -59,21 +59,21 @@
         "name": "shallow_depth",
         "passed": true,
         "threshold": 0.35,
-        "value": 4.2773710222263627e-07
+        "value": 4.286570824206152e-07
       },
       {
         "details": "Grounding force should support a meaningful share of raft weight.",
         "name": "grounding_support",
         "passed": true,
         "threshold": 0.5,
-        "value": 8.235987927295065
+        "value": 8.323982832432053
       },
       {
         "details": "Off-center shelf contact should pivot the raft.",
         "name": "pivot_yaw",
         "passed": true,
         "threshold": 0.5,
-        "value": 20.18441062783289
+        "value": 20.519186843334236
       }
     ],
     "reference_frame": "outputs/m16g/r_shelf/normalized/frames/frame_0002.npz",
@@ -81,9 +81,9 @@
     "reference_passed": true,
     "solver_mode": "reduced",
     "suite": "rafting",
-    "torque_delta_inertia_ratio": 1.3737552182829214,
-    "trajectory_position_delta_m": 0.0008643557753648989,
-    "trajectory_velocity_delta_mps": 0.05186134652184023
+    "torque_delta_inertia_ratio": 1.41735456999779,
+    "trajectory_position_delta_m": 0.0008893920172269509,
+    "trajectory_velocity_delta_mps": 0.053363521033751186
   },
   "schema_version": "raftsim.milestone16.regression_registry.v0",
   "source_report": "reports/milestone16/raft_coupling_validation.json"

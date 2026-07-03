@@ -21,28 +21,28 @@
         "name": "entry_speed",
         "passed": true,
         "threshold": 2.0,
-        "value": 2.8039198754037815
+        "value": 3.69810763306172
       },
       {
         "details": "",
         "name": "surface_fall",
         "passed": true,
         "threshold": 0.15,
-        "value": 1.7633757149807612
+        "value": 1.801796499074192
       },
       {
         "details": "",
         "name": "tailwater_depth",
         "passed": true,
         "threshold": 0.45,
-        "value": 1.0948674377511032
+        "value": 1.153707830418498
       },
       {
         "details": "",
         "name": "bounded_entry_lift",
         "passed": true,
         "threshold": 8.0,
-        "value": 1.750346309293445
+        "value": 1.8533885861900274
       }
     ],
     "candidate_frame": "outputs/m16cpp/cg_low/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
@@ -54,7 +54,7 @@
     ],
     "feature_outcome_match": true,
     "flow_band": "low_runnable",
-    "force_delta_weight_ratio": 0.3355815320191972,
+    "force_delta_weight_ratio": 6.519959979080404e-09,
     "force_envelope_outcome_match": true,
     "gate_scenario_id": "south_fork_cascading_low_runnable",
     "notes": [],
@@ -79,28 +79,28 @@
         "name": "entry_speed",
         "passed": true,
         "threshold": 2.0,
-        "value": 3.7009240716748404
+        "value": 3.698107635767672
       },
       {
         "details": "",
         "name": "surface_fall",
         "passed": true,
         "threshold": 0.15,
-        "value": 1.7943508705832079
+        "value": 1.8017964970668647
       },
       {
         "details": "",
         "name": "tailwater_depth",
         "passed": true,
         "threshold": 0.45,
-        "value": 1.1540689122528776
+        "value": 1.1537078284591478
       },
       {
         "details": "",
         "name": "bounded_entry_lift",
         "passed": true,
         "threshold": 8.0,
-        "value": 1.855406934293517
+        "value": 1.8533885870548432
       }
     ],
     "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
@@ -108,9 +108,9 @@
     "reference_passed": true,
     "solver_mode": "finite_volume",
     "suite": "cascading",
-    "torque_delta_inertia_ratio": 0.20759902140882594,
-    "trajectory_position_delta_m": 0.0009144596747510438,
-    "trajectory_velocity_delta_mps": 0.054867580485138866
+    "torque_delta_inertia_ratio": 1.8003234721913093e-08,
+    "trajectory_position_delta_m": 1.7766493153419074e-11,
+    "trajectory_velocity_delta_mps": 1.0660134886748227e-09
   },
   "schema_version": "raftsim.milestone16.regression_registry.v0",
   "source_report": "reports/milestone16/raft_coupling_validation.json"

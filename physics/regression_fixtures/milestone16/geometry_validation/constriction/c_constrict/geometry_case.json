@@ -1,0 +1,31 @@
+{
+  "case_id": "constriction",
+  "evidence": {
+    "accepted_for_geometry": true,
+    "diagnostic_only": false,
+    "failing_checks": [],
+    "focused_evidence_count": 1008,
+    "focused_pass_count": 26,
+    "gate_scenario_id": "constriction",
+    "milestone18_report": "reports/milestone18/remaining_geometry_closure.json",
+    "passed": true,
+    "superseded_stale_blockers": [
+      "constriction:finite_volume",
+      "constriction:reduced"
+    ],
+    "threshold_passed": true
+  },
+  "gate_scenario_id": "constriction",
+  "milestone18_closure_report": "reports/milestone18/remaining_geometry_closure.json",
+  "passed": true,
+  "scenarios": [
+    "constriction"
+  ],
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "solver_modes": [
+    "finite_volume",
+    "reduced"
+  ],
+  "source_report": "reports/milestone16/geometry_validation.json",
+  "title": "Constrictions"
+}

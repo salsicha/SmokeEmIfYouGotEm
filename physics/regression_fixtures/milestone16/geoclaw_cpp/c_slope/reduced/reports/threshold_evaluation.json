@@ -5,17 +5,17 @@
       "name": "field_linf",
       "passed": true,
       "threshold": 0.35,
-      "value": 0.1871855533445277
+      "value": 0.18425760889064136
     },
     {
       "details": "Max Linf across eta slope fields.",
       "name": "slope_linf",
       "passed": true,
       "threshold": 0.08,
-      "value": 0.04460923588443011
+      "value": 0.04642670071292132
     },
     {
-      "details": "Max wet/dry mask mismatch fraction across compared frames.",
+      "details": "Max material wet/dry mask mismatch fraction across compared frames using h >= 0.15 m.",
       "name": "wet_mismatch_fraction",
       "passed": true,
       "threshold": 0.1,
@@ -26,35 +26,35 @@
       "name": "probe_linf",
       "passed": true,
       "threshold": 0.35,
-      "value": 0.09850461597583648
+      "value": 0.1706608150005282
     },
     {
       "details": "Max Linf across cross-section fields; u/v/Froude masked below 0.15 m.",
       "name": "cross_section_linf",
       "passed": true,
       "threshold": 0.35,
-      "value": 0.07764844690707551
+      "value": 0.13009576011903823
     },
     {
       "details": "Absolute C++ minus reference mass-drift delta.",
       "name": "mass_drift_delta",
       "passed": true,
       "threshold": 0.04,
-      "value": 0.030511430899302003
+      "value": 0.009146066506703536
     },
     {
       "details": "Absolute C++ minus reference energy-change delta.",
       "name": "energy_change_delta",
       "passed": true,
       "threshold": 0.15,
-      "value": 0.07156548642503865
+      "value": 0.008483738550107606
     },
     {
       "details": "Max absolute Froude summary delta for cells at or above 0.15 m.",
       "name": "froude_delta",
       "passed": true,
       "threshold": 0.1,
-      "value": 0.012867448624114375
+      "value": 0.029709561776311177
     },
     {
       "details": "Max observed feature response location delta.",

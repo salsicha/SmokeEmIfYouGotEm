@@ -60,7 +60,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/c_flat/geoclaw_run_manifest.json",
-      "runtime_seconds": 4.1602530000018305,
+      "runtime_seconds": 1.0653290410009504,
       "suite": "canonical"
     },
     {
@@ -78,7 +78,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/c_uniform/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.0221902080011205,
+      "runtime_seconds": 1.181088125000315,
       "suite": "canonical"
     },
     {
@@ -96,7 +96,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/c_dam/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.021810792000906,
+      "runtime_seconds": 0.8529597500000818,
       "suite": "canonical"
     },
     {
@@ -114,7 +114,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/c_step/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.0842886669997824,
+      "runtime_seconds": 1.0148943749991304,
       "suite": "canonical"
     },
     {
@@ -132,7 +132,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/c_constrict/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.0365573329981999,
+      "runtime_seconds": 0.9488333749995945,
       "suite": "canonical"
     },
     {
@@ -150,7 +150,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/c_wetdry/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.079142957998556,
+      "runtime_seconds": 0.85502012500001,
       "suite": "canonical"
     },
     {
@@ -168,7 +168,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/c_slope/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.0493452500013518,
+      "runtime_seconds": 0.9289153329991677,
       "suite": "canonical"
     },
     {
@@ -186,7 +186,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/c_drop/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.0076394579991756,
+      "runtime_seconds": 0.9899044590001722,
       "suite": "canonical"
     },
     {
@@ -204,7 +204,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/r_boulder/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.199931375002052,
+      "runtime_seconds": 1.1468724160004058,
       "suite": "rafting"
     },
     {
@@ -222,7 +222,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/r_waves/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.1332834169988928,
+      "runtime_seconds": 1.2225076659997285,
       "suite": "rafting"
     },
     {
@@ -240,7 +240,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/r_hole/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.228597624998656,
+      "runtime_seconds": 1.2255276249998133,
       "suite": "rafting"
     },
     {
@@ -258,7 +258,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/r_lateral/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.1311087920003047,
+      "runtime_seconds": 1.193660707998788,
       "suite": "rafting"
     },
     {
@@ -276,7 +276,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/r_eddy/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.2661460419985815,
+      "runtime_seconds": 1.182894416999261,
       "suite": "rafting"
     },
     {
@@ -294,7 +294,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/r_shelf/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.1821071250014938,
+      "runtime_seconds": 1.1481677499996295,
       "suite": "rafting"
     },
     {
@@ -312,7 +312,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/rw_low/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.0044579169989447,
+      "runtime_seconds": 1.0908970000000409,
       "suite": "real_world"
     },
     {
@@ -330,7 +330,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/rw_med/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.0036940829995729,
+      "runtime_seconds": 0.9729955000002519,
       "suite": "real_world"
     },
     {
@@ -348,7 +348,7 @@
       "reach_window_count": 0,
       "returncode": 0,
       "run_manifest": "outputs/m16g/rw_high/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.0067187499989814,
+      "runtime_seconds": 0.9438933750006981,
       "suite": "real_world"
     },
     {
@@ -366,7 +366,7 @@
       "reach_window_count": 7,
       "returncode": 0,
       "run_manifest": "outputs/m16g/cg_low/geoclaw_run_manifest.json",
-      "runtime_seconds": 0.9745796249990235,
+      "runtime_seconds": 0.9198151660002623,
       "suite": "cascading"
     },
     {
@@ -384,7 +384,7 @@
       "reach_window_count": 7,
       "returncode": 0,
       "run_manifest": "outputs/m16g/cg_med/geoclaw_run_manifest.json",
-      "runtime_seconds": 1.0111885420010367,
+      "runtime_seconds": 0.9368430829999852,
       "suite": "cascading"
     },
     {
@@ -402,7 +402,7 @@
       "reach_window_count": 7,
       "returncode": 0,
       "run_manifest": "outputs/m16g/cg_high/geoclaw_run_manifest.json",
-      "runtime_seconds": 0.9898535419997643,
+      "runtime_seconds": 0.9750706249997165,
       "suite": "cascading"
     }
   ],

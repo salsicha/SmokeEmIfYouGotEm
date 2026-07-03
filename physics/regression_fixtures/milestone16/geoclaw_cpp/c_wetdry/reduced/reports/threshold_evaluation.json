@@ -15,7 +15,7 @@
       "value": 2.1674416261774354e-08
     },
     {
-      "details": "Max wet/dry mask mismatch fraction across compared frames.",
+      "details": "Max material wet/dry mask mismatch fraction across compared frames using h >= 0.15 m.",
       "name": "wet_mismatch_fraction",
       "passed": true,
       "threshold": 0.1,

@@ -21,28 +21,28 @@
         "name": "entry_speed",
         "passed": true,
         "threshold": 2.0,
-        "value": 3.301477183401971
+        "value": 3.660449410002092
       },
       {
         "details": "",
         "name": "surface_fall",
         "passed": true,
         "threshold": 0.15,
-        "value": 2.3592407334649064
+        "value": 2.5569883546610948
       },
       {
         "details": "",
         "name": "tailwater_depth",
         "passed": true,
         "threshold": 0.45,
-        "value": 0.9926940958173859
+        "value": 0.8824172825440175
       },
       {
         "details": "",
         "name": "bounded_entry_lift",
         "passed": true,
         "threshold": 8.0,
-        "value": 1.8252863618912756
+        "value": 1.7982871683594954
       }
     ],
     "candidate_frame": "outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
@@ -54,7 +54,7 @@
     ],
     "feature_outcome_match": true,
     "flow_band": "median_runnable",
-    "force_delta_weight_ratio": 0.19739262744756408,
+    "force_delta_weight_ratio": 1.0080558009748882e-09,
     "force_envelope_outcome_match": true,
     "gate_scenario_id": "south_fork_cascading_median_runnable",
     "notes": [],
@@ -79,28 +79,28 @@
         "name": "entry_speed",
         "passed": true,
         "threshold": 2.0,
-        "value": 3.6506756197343764
+        "value": 3.660449409396716
       },
       {
         "details": "",
         "name": "surface_fall",
         "passed": true,
         "threshold": 0.15,
-        "value": 2.572944899242443
+        "value": 2.556988356660307
       },
       {
         "details": "",
         "name": "tailwater_depth",
         "passed": true,
         "threshold": 0.45,
-        "value": 0.8831330094901266
+        "value": 0.8824172803489182
       },
       {
         "details": "",
         "name": "bounded_entry_lift",
         "passed": true,
         "threshold": 8.0,
-        "value": 1.7973300864243786
+        "value": 1.7982871676468926
       }
     ],
     "reference_frame": "outputs/m16g/cg_med/normalized_cascading/stitched/frames/frame_0002.npz",
@@ -108,9 +108,9 @@
     "reference_passed": true,
     "solver_mode": "finite_volume",
     "suite": "cascading",
-    "torque_delta_inertia_ratio": 0.5977419753589749,
-    "trajectory_position_delta_m": 0.000537894909793616,
-    "trajectory_velocity_delta_mps": 0.03227369458767674
+    "torque_delta_inertia_ratio": 1.3489059420236362e-08,
+    "trajectory_position_delta_m": 2.751866391219501e-12,
+    "trajectory_velocity_delta_mps": 1.6481716027918436e-10
   },
   "schema_version": "raftsim.milestone16.regression_registry.v0",
   "source_report": "reports/milestone16/raft_coupling_validation.json"

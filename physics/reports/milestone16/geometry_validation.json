@@ -77,8 +77,7 @@
       ],
       "notes": [
         "Milestone 18 closure evidence applied from reports/milestone18/wet_dry_finite_volume_reconstruction_retune.json.",
-        "Accepted solver modes for this geometry family: finite_volume, reduced.",
-        "Supersedes stale Milestone 16 threshold blockers for: wet_dry_shoreline:finite_volume."
+        "Accepted solver modes for this geometry family: finite_volume, reduced."
       ],
       "passed": true,
       "scenarios": [
@@ -134,7 +133,7 @@
         "Milestone 18 closure evidence applied from reports/milestone18/bed_step_parity_retune.json.",
         "Accepted solver modes for this geometry family: finite_volume.",
         "Diagnostic-only solver modes are retained as smoke evidence but no longer block this geometry family: reduced.",
-        "Supersedes stale Milestone 16 threshold blockers for: bed_step:reduced."
+        "Supersedes stale Milestone 16 threshold blockers for: bed_step:finite_volume, bed_step:reduced."
       ],
       "passed": true,
       "scenarios": [
@@ -196,11 +195,8 @@
           "superseded_stale_blockers": [
             "drop_ledge:finite_volume",
             "drop_ledge:reduced",
-            "south_fork_cascading_high_runnable:finite_volume",
             "south_fork_cascading_high_runnable:reduced",
-            "south_fork_cascading_low_runnable:finite_volume",
             "south_fork_cascading_low_runnable:reduced",
-            "south_fork_cascading_median_runnable:finite_volume",
             "south_fork_cascading_median_runnable:reduced"
           ],
           "threshold_passed": true
@@ -209,7 +205,7 @@
       "notes": [
         "Milestone 18 remaining-geometry closure evidence applied from reports/milestone18/remaining_geometry_closure.json.",
         "Uses compact rollup evidence; detailed focused diagnostics remain in the Milestone 18 report.",
-        "Supersedes stale Milestone 16 threshold blockers for: drop_ledge:finite_volume, drop_ledge:reduced, south_fork_cascading_high_runnable:finite_volume, south_fork_cascading_high_runnable:reduced, south_fork_cascading_low_runnable:finite_volume, south_fork_cascading_low_runnable:reduced, south_fork_cascading_median_runnable:finite_volume, south_fork_cascading_median_runnable:reduced.",
+        "Supersedes stale Milestone 16 threshold blockers for: drop_ledge:finite_volume, drop_ledge:reduced, south_fork_cascading_high_runnable:reduced, south_fork_cascading_low_runnable:reduced, south_fork_cascading_median_runnable:reduced.",
         "Focused passing evidence supersedes stale aggregate failures for: drop_ledge, south_fork_cascading_high_runnable, south_fork_cascading_low_runnable, south_fork_cascading_median_runnable, south_fork_cascading_window."
       ],
       "passed": true,

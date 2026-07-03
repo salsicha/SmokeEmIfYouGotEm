@@ -1,0 +1,36 @@
+{
+  "comparisons": [
+    {
+      "authored_strength": 1.0,
+      "authored_x": 11.5,
+      "authored_y": 0.0,
+      "cpp": {
+        "distance_to_authored": 10.51189802081432,
+        "strength": 1.193181818181818,
+        "x": 1.0,
+        "y": -0.5
+      },
+      "feature_index": 0,
+      "kind": "shallow",
+      "location_delta": 0.0,
+      "pyclaw": {
+        "distance_to_authored": 10.51189802081432,
+        "strength": 1.1931818134405394,
+        "x": 1.0,
+        "y": -0.5
+      },
+      "reference": {
+        "distance_to_authored": 10.51189802081432,
+        "strength": 1.1931818134405394,
+        "x": 1.0,
+        "y": -0.5
+      },
+      "reference_solver": "geoclaw",
+      "strength_delta": 4.741278480935307e-09
+    }
+  ],
+  "feature_count": 1,
+  "max_abs_strength_delta": 4.741278480935307e-09,
+  "max_location_delta": 0.0,
+  "scenario_id": "wet_dry_shoreline_seed_16"
+}
