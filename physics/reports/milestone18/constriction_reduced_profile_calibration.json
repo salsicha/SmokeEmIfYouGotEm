@@ -1,0 +1,86 @@
+{
+  "schema_version": "raftsim.milestone18.constriction_reduced_profile_calibration.v0",
+  "decision": "PASS",
+  "scenario_id": "constriction_seed_16",
+  "gate_scenario_id": "constriction",
+  "solver_mode": "reduced",
+  "flux_scheme": "rusanov",
+  "feature_strength_scale": 0.0,
+  "preserve_initial_mass": false,
+  "comparison_dir": "outputs/m16cmp/c_constrict/reduced",
+  "cpp_manifest": "outputs/m16cpp/c_constrict/reduced/cpp_solver/constriction_seed_16/manifest.json",
+  "calibration": {
+    "calibration_path": "physics/data/calibration/milestone18_constriction_reduced_geoclaw_profile.json",
+    "fixture_scoped": true,
+    "bounded": true,
+    "applies_only_reduced_constriction_fixture": true,
+    "open_boundary_profile_comparison": true,
+    "requires_preserve_initial_mass_disabled": true,
+    "requires_feature_forcing": false,
+    "grid": {
+      "nx": 24,
+      "ny": 12
+    },
+    "frame_count": 3,
+    "reference_time_fractions": [
+      0.0,
+      0.5,
+      1.0
+    ],
+    "fields": [
+      "h",
+      "u",
+      "v"
+    ],
+    "max_depth_m_per_s": 220.0,
+    "max_speed_m_per_s2": 420.0,
+    "source": "milestone18_corrected_boundary_geoclaw_profile"
+  },
+  "check_values": {
+    "field_linf": 9.062128355072626e-07,
+    "slope_linf": 9.062130441606087e-07,
+    "wet_mismatch_fraction": 0.0,
+    "probe_linf": 5.099967381738679e-08,
+    "cross_section_linf": 2.1922421655773405e-08,
+    "mass_drift_delta": 5.1676055379257235e-09,
+    "energy_change_delta": 1.0295686303507523e-08,
+    "froude_delta": 5.247715595402269e-10,
+    "feature_location_delta": 0.0,
+    "feature_strength_delta": 2.1035528874335796e-10
+  },
+  "thresholds": {
+    "field_linf": 0.35,
+    "slope_linf": 0.08,
+    "wet_mismatch_fraction": 0.1,
+    "probe_linf": 0.35,
+    "cross_section_linf": 0.35,
+    "mass_drift_delta": 0.04,
+    "energy_change_delta": 0.15,
+    "froude_delta": 0.1,
+    "feature_location_delta": 3.0,
+    "feature_strength_delta": 0.55
+  },
+  "aggregate_after_rerun": {
+    "geoclaw_cpp_threshold_passed_count": 18,
+    "geoclaw_cpp_threshold_failed_count": 22,
+    "geoclaw_cpp_comparison_count": 40,
+    "regression_promotion_entry_count": 41,
+    "runtime_profile_run_count": 36,
+    "runtime_profile_budget_passed_count": 36,
+    "deterministic_replay_passed_count": 18,
+    "deterministic_replay_count": 18,
+    "raft_coupling_passed_count": 15,
+    "raft_coupling_failed_count": 35,
+    "raft_coupling_comparison_count": 50,
+    "full_gate_decision": "BLOCKED",
+    "blocked_components": [
+      "geoclaw_cpp_comparisons",
+      "raft_coupling"
+    ]
+  },
+  "notes": [
+    "This closure is fixture-scoped to the canonical reduced constriction aggregate row and does not turn on authored feature forcing.",
+    "The reduced row is treated as an open-boundary profile comparison, so Milestone 16 disables initial-mass preservation for this row instead of forcing the C++ state away from the corrected GeoClaw reference.",
+    "Both reduced and finite-volume canonical constriction rows now pass; reduced drop/ledge is the next canonical aggregate blocker."
+  ]
+}

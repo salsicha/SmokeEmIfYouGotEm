@@ -187,6 +187,29 @@
     },
     {
       "actual_scenario_id": "constriction_seed_16",
+      "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced",
+      "artifact_id": "geoclaw_cpp/constriction/reduced",
+      "case_id": null,
+      "category": "geoclaw_cpp",
+      "gate_scenario_id": "constriction",
+      "manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/dual_solver_manifest.json",
+      "notes": [],
+      "passed": true,
+      "reports": {
+        "diagnostic_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/diagnostic_comparison.json",
+        "dual_solver_manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/dual_solver_manifest.json",
+        "feature_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/feature_comparison.json",
+        "field_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/field_comparison.json",
+        "probe_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/probe_comparison.json",
+        "threshold_evaluation": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/threshold_evaluation.json"
+      },
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/scenario",
+      "solver_mode": "reduced",
+      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+      "suite": "canonical"
+    },
+    {
+      "actual_scenario_id": "constriction_seed_16",
       "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/finite_volume",
       "artifact_id": "geoclaw_cpp/constriction/finite_volume",
       "case_id": null,
@@ -853,7 +876,7 @@
       "suite": "cascading"
     }
   ],
-  "entry_count": 40,
+  "entry_count": 41,
   "geometry_validation_report": "reports/milestone16/geometry_validation.json",
   "raft_coupling_report": "reports/milestone16/raft_coupling_validation.json",
   "schema_version": "raftsim.milestone16.regression_registry.v0"

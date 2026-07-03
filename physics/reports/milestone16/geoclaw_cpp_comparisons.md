@@ -16,7 +16,7 @@ Comparison count: 40
 | canonical | dam_break | finite_volume | unreal_prototype | PASS | none | n/a |
 | canonical | bed_step | reduced | unreal_prototype | PASS | none | n/a |
 | canonical | bed_step | finite_volume | unreal_prototype | PASS | none | n/a |
-| canonical | constriction | reduced | unreal_prototype | FAIL | field_linf, slope_linf, wet_mismatch_fraction, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_strength_delta | n/a |
+| canonical | constriction | reduced | unreal_prototype | PASS | none | n/a |
 | canonical | constriction | finite_volume | unreal_prototype | PASS | none | n/a |
 | canonical | wet_dry_shoreline | reduced | unreal_prototype | PASS | none | n/a |
 | canonical | wet_dry_shoreline | finite_volume | unreal_prototype | PASS | none | n/a |
