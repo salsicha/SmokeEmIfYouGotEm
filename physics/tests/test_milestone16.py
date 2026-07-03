@@ -142,6 +142,7 @@ def test_milestone16_cpp_config_applies_uniform_channel_finite_volume_override()
     assert bed_step.bed_slope_source_scale == 0.75
     assert reduced.roughness_scale == 1.0
     assert reduced.bed_slope_source_scale == 0.0
+    assert reduced.preserve_initial_mass is False
 
 
 def test_milestone16_comparison_report_tracks_threshold_failures():

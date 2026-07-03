@@ -2558,9 +2558,12 @@ def _cpp_config_for_mode(
     flux_scheme = "hll" if finite_volume else "rusanov"
     roughness_scale = 0.5 if finite_volume else 1.0
     bed_slope_source_scale = 0.75 if finite_volume else 0.0
+    preserve_initial_mass = not finite_volume
     if finite_volume and gate_scenario_id == "uniform_channel":
         roughness_scale = 0.35
         bed_slope_source_scale = 0.65
+    if not finite_volume and gate_scenario_id == "uniform_channel":
+        preserve_initial_mass = False
     if finite_volume and gate_scenario_id == "bed_step":
         flux_scheme = "roe"
     return CppSolverRunConfig(
@@ -2573,7 +2576,7 @@ def _cpp_config_for_mode(
         feature_strength_scale=0.0,
         roughness_scale=roughness_scale,
         bed_slope_source_scale=bed_slope_source_scale,
-        preserve_initial_mass=not finite_volume,
+        preserve_initial_mass=preserve_initial_mass,
         allow_validation_failure=True,
     )
 

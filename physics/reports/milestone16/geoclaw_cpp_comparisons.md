@@ -10,7 +10,7 @@ Comparison count: 40
 | --- | --- | --- | --- | --- | --- | --- |
 | canonical | flat_pool | reduced | production_candidate | PASS | none | n/a |
 | canonical | flat_pool | finite_volume | production_candidate | PASS | none | n/a |
-| canonical | uniform_channel | reduced | production_candidate | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta | n/a |
+| canonical | uniform_channel | reduced | production_candidate | PASS | none | n/a |
 | canonical | uniform_channel | finite_volume | production_candidate | PASS | none | n/a |
 | canonical | dam_break | reduced | unreal_prototype | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, energy_change_delta, froude_delta, feature_strength_delta | n/a |
 | canonical | dam_break | finite_volume | unreal_prototype | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, froude_delta | n/a |

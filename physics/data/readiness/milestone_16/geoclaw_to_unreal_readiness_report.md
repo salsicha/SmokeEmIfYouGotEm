@@ -4,7 +4,7 @@ Gate version: `raftsim.geoclaw_to_unreal_readiness.v1`
 
 Decision: **BLOCKED**
 
-The full Milestone 16 gate was regenerated, but live Unreal custom water remains blocked by failed GeoClaw/C++ geometry or raft validation checks.
+The full Milestone 16 gate was regenerated, but live Unreal custom water remains blocked by: Milestone 16 GeoClaw/C++ Thresholds, Milestone 16 Raft Coupling.
 
 ## Checks
 
@@ -12,11 +12,11 @@ The full Milestone 16 gate was regenerated, but live Unreal custom water remains
 | --- | --- | --- |
 | Milestone 16 GeoClaw Reference Runs | PASS | 20 of 20 scenarios have full GeoClaw frames. |
 | Milestone 16 C++ Solver Runs | PASS | 40 of 40 C++ runs completed with manifests. |
-| Milestone 16 GeoClaw/C++ Thresholds | FAILED | 12 of 40 threshold comparisons pass. |
+| Milestone 16 GeoClaw/C++ Thresholds | FAILED | 13 of 40 threshold comparisons pass. |
 | Milestone 16 Geometry Validation | PASS | 6 of 6 geometry families pass. |
 | Milestone 16 Raft Coupling | FAILED | 15 of 50 raft comparisons pass. |
-| Milestone 16 Runtime Profile | PASS | 24 of 24 promoted C++ profile repetitions pass runtime budgets. |
-| Milestone 16 Regression Promotion | PASS | 35 passing artifacts promoted. |
+| Milestone 16 Runtime Profile | PASS | 26 of 26 promoted C++ profile repetitions pass runtime budgets. |
+| Milestone 16 Regression Promotion | PASS | 36 passing artifacts promoted. |
 
 ## Runtime Choices
 
@@ -28,8 +28,7 @@ The full Milestone 16 gate was regenerated, but live Unreal custom water remains
 
 ## Required Next Actions
 
-- Fix GeoClaw/C++ threshold failures outside flat-pool and sloping-channel cases.
-- Retune wet/dry, bed-step, constriction, drop/ledge, and cascading reach/drop dynamics until geometry families pass.
+- Fix remaining GeoClaw/C++ threshold failures outside accepted guardrail rows.
 - Retune raft coupling against GeoClaw and C++ fields until force envelopes, outcomes, and transition cases pass.
 - Keep the distinct Milestone 18 pin/release fixture separate from the raft-coupling water-field agreement gate.
 

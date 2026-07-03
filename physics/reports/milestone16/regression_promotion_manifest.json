@@ -49,6 +49,29 @@
     },
     {
       "actual_scenario_id": "uniform_channel_seed_16",
+      "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced",
+      "artifact_id": "geoclaw_cpp/uniform_channel/reduced",
+      "case_id": null,
+      "category": "geoclaw_cpp",
+      "gate_scenario_id": "uniform_channel",
+      "manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/dual_solver_manifest.json",
+      "notes": [],
+      "passed": true,
+      "reports": {
+        "diagnostic_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/diagnostic_comparison.json",
+        "dual_solver_manifest": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/dual_solver_manifest.json",
+        "feature_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/feature_comparison.json",
+        "field_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/field_comparison.json",
+        "probe_comparison": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/probe_comparison.json",
+        "threshold_evaluation": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/threshold_evaluation.json"
+      },
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/scenario",
+      "solver_mode": "reduced",
+      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+      "suite": "canonical"
+    },
+    {
+      "actual_scenario_id": "uniform_channel_seed_16",
       "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/finite_volume",
       "artifact_id": "geoclaw_cpp/uniform_channel/finite_volume",
       "case_id": null,
@@ -738,9 +761,9 @@
       "suite": "cascading"
     }
   ],
-  "entry_count": 35,
+  "entry_count": 36,
   "fixture_root": "regression_fixtures/milestone16",
-  "geoclaw_cpp_fixture_count": 12,
+  "geoclaw_cpp_fixture_count": 13,
   "geometry_artifact_count": 8,
   "geometry_validation_report": "reports/milestone16/geometry_validation.json",
   "notes": [
