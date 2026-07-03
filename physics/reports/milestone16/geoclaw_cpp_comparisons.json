@@ -1448,7 +1448,7 @@
           "name": "energy_change_delta",
           "passed": true,
           "threshold": 0.15,
-          "value": 0.02306909383377273
+          "value": 0.02231253650307674
         },
         "feature_location_delta": {
           "details": "Max observed feature response location delta.",
@@ -1462,28 +1462,28 @@
           "name": "feature_strength_delta",
           "passed": true,
           "threshold": 0.55,
-          "value": 0.087208371565486
+          "value": 0.10481226951153477
         },
         "field_linf": {
           "details": "Max Linf across h/eta/u/v/hu/hv/normals; u/v masked below 0.15 m.",
           "name": "field_linf",
           "passed": true,
           "threshold": 0.35,
-          "value": 0.19462838148989725
+          "value": 0.19297524965842028
         },
         "froude_delta": {
           "details": "Max absolute Froude summary delta for cells at or above 0.15 m.",
           "name": "froude_delta",
           "passed": true,
           "threshold": 0.1,
-          "value": 0.06897664641870371
+          "value": 0.0827706488009674
         },
         "mass_drift_delta": {
           "details": "Absolute C++ minus reference mass-drift delta.",
           "name": "mass_drift_delta",
           "passed": true,
           "threshold": 0.04,
-          "value": 0.0038256098513995973
+          "value": 0.0038268256167793835
         },
         "probe_linf": {
           "details": "Max Linf across point-probe fields; u/v/Froude masked below 0.15 m.",
@@ -1495,9 +1495,9 @@
         "slope_linf": {
           "details": "Max Linf across eta slope fields.",
           "name": "slope_linf",
-          "passed": false,
+          "passed": true,
           "threshold": 0.08,
-          "value": 0.11832461884888068
+          "value": 0.06834652156465437
         },
         "wet_mismatch_fraction": {
           "details": "Max material wet/dry mask mismatch fraction across compared frames using h >= 0.15 m.",
@@ -1510,9 +1510,7 @@
       "compared": true,
       "comparison_dir": "outputs/m16cmp/c_drop/finite_volume",
       "cross_sections": 1,
-      "failing_checks": [
-        "slope_linf"
-      ],
+      "failing_checks": [],
       "feature_count": 2,
       "frame_comparisons": 2,
       "gate_scenario_id": "drop_ledge",
@@ -1523,7 +1521,7 @@
       },
       "solver_mode": "finite_volume",
       "suite": "canonical",
-      "threshold_passed": false,
+      "threshold_passed": true,
       "threshold_report": "outputs/m16cmp/c_drop/finite_volume/threshold_evaluation.json",
       "threshold_tier": "unreal_prototype"
     },
@@ -3940,6 +3938,6 @@
     }
   ],
   "schema_version": "raftsim.milestone16.geoclaw_cpp_comparisons.v0",
-  "threshold_failed_count": 29,
-  "threshold_passed_count": 11
+  "threshold_failed_count": 28,
+  "threshold_passed_count": 12
 }

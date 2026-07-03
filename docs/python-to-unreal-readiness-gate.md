@@ -12,14 +12,14 @@ Current packaged Milestone 16 GeoClaw/C++ gate artifacts from the last full-gate
 
 - `geoclaw_reference_summary.json`: 20 of 20 full GeoClaw fixed-grid reference runs passed.
 - `cpp_solver_summary.json`: 40 of 40 reduced and finite-volume C++ runs completed with manifests.
-- `geoclaw_cpp_comparison_summary.json`: 11 of 40 GeoClaw/C++ threshold comparisons pass, so the comparison gate blocks.
+- `geoclaw_cpp_comparison_summary.json`: 12 of 40 GeoClaw/C++ threshold comparisons pass, so the comparison gate blocks.
 - `geometry_validation_summary.json`: 6 of 6 geometry families pass after Milestone 18 focused closure evidence is consumed by the aggregate gate.
 - `raft_coupling_validation_summary.json`: 15 of 50 raft-coupling comparisons pass, so force, outcome, and transition agreement still block.
-- `runtime_profile_summary.json`: 22 of 22 promoted C++ profile repetitions pass local desktop, VR, and handheld water-solver budgets, and 11 of 11 deterministic replay groups match.
-- `regression_promotion_summary.json`: 34 passing artifacts were promoted as regression fixtures or manifests in the latest packaged readiness snapshot.
+- `runtime_profile_summary.json`: 24 of 24 promoted C++ profile repetitions pass local desktop, VR, and handheld water-solver budgets, and 12 of 12 deterministic replay groups match.
+- `regression_promotion_summary.json`: 35 passing artifacts were promoted as regression fixtures or manifests in the latest packaged readiness snapshot.
 - `geoclaw_to_unreal_readiness_report.json` and `.md`: final Milestone 16 decision; live custom water is blocked.
 
-Milestone 18 source reports are now consumed by the packaged readiness snapshot: `physics/reports/milestone18/remaining_geometry_closure.json` passes with six of six geometry families promotion-ready, `physics/reports/milestone16/geoclaw_cpp_comparisons.json` records 11 of 40 threshold comparisons passing, and `physics/reports/milestone16/raft_coupling_validation.json` has 15 of 50 raft-coupling comparisons passing. The refreshed `physics/reports/milestone16/full_cpp_validation_gate.json` and packaged GeoClaw-to-Unreal readiness report remain blocked by aggregate GeoClaw/C++ comparison and raft-coupling failures, not by the geometry-family gate.
+Milestone 18 source reports are now consumed by the packaged readiness snapshot: `physics/reports/milestone18/remaining_geometry_closure.json` passes with six of six geometry families promotion-ready, `physics/reports/milestone16/geoclaw_cpp_comparisons.json` records 12 of 40 threshold comparisons passing after the aggregate finite-volume drop/ledge lane closes, and `physics/reports/milestone16/raft_coupling_validation.json` has 15 of 50 raft-coupling comparisons passing. The refreshed `physics/reports/milestone16/full_cpp_validation_gate.json` and packaged GeoClaw-to-Unreal readiness report remain blocked by aggregate GeoClaw/C++ comparison and raft-coupling failures, not by the geometry-family gate.
 
 Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 

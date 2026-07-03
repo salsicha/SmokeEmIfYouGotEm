@@ -1,0 +1,30 @@
+{
+  "cpp": {
+    "command": [],
+    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_drop/finite_volume/cpp_solver/drop_ledge_seed_16/manifest.json",
+    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_drop/finite_volume/cpp_solver/drop_ledge_seed_16",
+    "returncode": 0,
+    "runtime_seconds": 0.09736079199865344,
+    "stderr": "",
+    "stdout": "",
+    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_drop/finite_volume/cpp_solver/drop_ledge_seed_16/validation.json"
+  },
+  "geoclaw": {
+    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_drop/normalized/manifest.json",
+    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_drop/normalized",
+    "runtime_seconds": 0.9899044590001722,
+    "seconds_per_simulated_second": 0.1649840765000287,
+    "solver": "geoclaw",
+    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_drop/normalized/validation.json"
+  },
+  "runtime": {
+    "cpp_runtime_seconds": 0.09736079199865344,
+    "cpp_seconds_per_simulated_second": 0.01622679866644224,
+    "geoclaw_runtime_seconds": 0.9899044590001722,
+    "geoclaw_seconds_per_simulated_second": 0.1649840765000287,
+    "simulated_duration_seconds": 6.0
+  },
+  "scenario_id": "drop_ledge_seed_16",
+  "scenario_json": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_drop/shared_scenario/scenario.json",
+  "scenario_package": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_drop/shared_scenario"
+}

@@ -1,0 +1,64 @@
+{
+  "comparisons": [
+    {
+      "authored_strength": 0.45,
+      "authored_x": 11.5,
+      "authored_y": 0.0,
+      "cpp": {
+        "distance_to_authored": 2.9154759474226504,
+        "strength": 0.7719509205053539,
+        "x": 9.0,
+        "y": -1.5
+      },
+      "feature_index": 0,
+      "kind": "ledge",
+      "location_delta": 0.0,
+      "pyclaw": {
+        "distance_to_authored": 2.9154759474226504,
+        "strength": 0.8767631900168886,
+        "x": 9.0,
+        "y": -1.5
+      },
+      "reference": {
+        "distance_to_authored": 2.9154759474226504,
+        "strength": 0.8767631900168886,
+        "x": 9.0,
+        "y": -1.5
+      },
+      "reference_solver": "geoclaw",
+      "strength_delta": -0.10481226951153477
+    },
+    {
+      "authored_strength": 0.65,
+      "authored_x": 14.379999999999999,
+      "authored_y": 0.0,
+      "cpp": {
+        "distance_to_authored": 2.4319539469323828,
+        "strength": 0.23364463948471956,
+        "x": 12.0,
+        "y": -0.5
+      },
+      "feature_index": 1,
+      "kind": "wave_train",
+      "location_delta": 0.0,
+      "pyclaw": {
+        "distance_to_authored": 2.4319539469323828,
+        "strength": 0.2612665375813673,
+        "x": 12.0,
+        "y": -0.5
+      },
+      "reference": {
+        "distance_to_authored": 2.4319539469323828,
+        "strength": 0.2612665375813673,
+        "x": 12.0,
+        "y": -0.5
+      },
+      "reference_solver": "geoclaw",
+      "strength_delta": -0.02762189809664775
+    }
+  ],
+  "feature_count": 2,
+  "max_abs_strength_delta": 0.10481226951153477,
+  "max_location_delta": 0.0,
+  "scenario_id": "drop_ledge_seed_16"
+}
