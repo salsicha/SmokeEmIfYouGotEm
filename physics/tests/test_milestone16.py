@@ -196,6 +196,24 @@ def test_milestone16_geometry_validation_applies_milestone18_focused_closure(tmp
                         "threshold_passed": True,
                         "failing_checks": [],
                     },
+                    {
+                        "gate_scenario_id": "constriction",
+                        "solver_mode": "finite_volume",
+                        "threshold_passed": False,
+                        "failing_checks": ["field_linf", "probe_linf"],
+                    },
+                    {
+                        "gate_scenario_id": "drop_ledge",
+                        "solver_mode": "finite_volume",
+                        "threshold_passed": False,
+                        "failing_checks": ["field_linf"],
+                    },
+                    {
+                        "gate_scenario_id": "south_fork_cascading_low_runnable",
+                        "solver_mode": "finite_volume",
+                        "threshold_passed": False,
+                        "failing_checks": ["mass_drift_delta"],
+                    },
                 ],
             }
         ),
@@ -233,6 +251,42 @@ def test_milestone16_geometry_validation_applies_milestone18_focused_closure(tmp
         ),
         encoding="utf-8",
     )
+    (milestone18_dir / "remaining_geometry_closure.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "raftsim.milestone18.remaining_geometry_closure.v0",
+                "passed": True,
+                "summary": {"active_blockers": [], "promotion_ready_count": 2},
+                "cases": [
+                    {
+                        "case_id": "constriction",
+                        "passed": True,
+                        "promotion_ready": True,
+                        "solver_modes": ["finite_volume"],
+                        "failing_check_counts": {},
+                        "focused_evidence": [
+                            {"source_report": "constriction_upstream_edge_balance.json", "passed": True}
+                        ],
+                        "notes": ["Focused passing evidence supersedes stale aggregate failures for: constriction."],
+                    },
+                    {
+                        "case_id": "drops_ledges_tailwater",
+                        "passed": True,
+                        "promotion_ready": True,
+                        "solver_modes": ["finite_volume"],
+                        "failing_check_counts": {},
+                        "focused_evidence": [
+                            {"source_report": "cascading_boundary_correction_diagnostic.json", "passed": True}
+                        ],
+                        "notes": [
+                            "Focused passing evidence supersedes stale aggregate failures for: drop_ledge, south_fork_cascading_low_runnable."
+                        ],
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
 
     report = run_milestone16_geometry_validation(
         comparison_report,
@@ -243,8 +297,15 @@ def test_milestone16_geometry_validation_applies_milestone18_focused_closure(tmp
 
     assert cases["wet_dry_shoreline"]["passed"] is True
     assert cases["bed_step"]["passed"] is True
+    assert cases["constriction"]["passed"] is True
+    assert cases["drops_ledges_tailwater"]["passed"] is True
     assert any(row["diagnostic_only"] for row in cases["bed_step"]["evidence"])
     assert any("Supersedes stale Milestone 16 threshold blockers" in note for note in cases["wet_dry_shoreline"]["notes"])
+    assert cases["constriction"]["evidence"][0]["focused_evidence_count"] == 1
+    assert any(
+        "remaining-geometry closure evidence applied" in note
+        for note in cases["drops_ledges_tailwater"]["notes"]
+    )
 
 
 def test_milestone16_raft_coupling_report_blocks_on_force_delta():

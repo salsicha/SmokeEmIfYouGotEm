@@ -3,7 +3,7 @@
     "2.5D shallow-water/height-field flow remains the intended runtime model; full 3D CFD is out of scope.",
     "GeoClaw remains offline reference infrastructure and does not ship inside Unreal.",
     "Promoted fixtures are passing subsets, not proof that the full live-water gate has passed.",
-    "Current pin/release evidence is proxy coverage until a dedicated strainer/wrap fixture is added."
+    "Dedicated pin/release evidence remains a separate Milestone 18 fixture until the full readiness gate is rerun."
   ],
   "artifact_manifest": {
     "source_reports": {
@@ -51,7 +51,7 @@
         "geoclaw_cpp_comparison_summary.json"
       ],
       "check_id": "milestone16_geoclaw_cpp_thresholds",
-      "details": "4 of 40 threshold comparisons pass.",
+      "details": "6 of 40 threshold comparisons pass.",
       "passed": false,
       "status": "failed",
       "title": "Milestone 16 GeoClaw/C++ Thresholds"
@@ -61,9 +61,9 @@
         "geometry_validation_summary.json"
       ],
       "check_id": "milestone16_geometry_validation",
-      "details": "2 of 6 geometry families pass.",
-      "passed": false,
-      "status": "failed",
+      "details": "6 of 6 geometry families pass.",
+      "passed": true,
+      "status": "passed",
       "title": "Milestone 16 Geometry Validation"
     },
     {
@@ -71,7 +71,7 @@
         "raft_coupling_validation_summary.json"
       ],
       "check_id": "milestone16_raft_coupling",
-      "details": "7 of 50 raft comparisons pass.",
+      "details": "11 of 50 raft comparisons pass.",
       "passed": false,
       "status": "failed",
       "title": "Milestone 16 Raft Coupling"
@@ -91,7 +91,7 @@
         "regression_promotion_summary.json"
       ],
       "check_id": "milestone16_regression_promotion",
-      "details": "11 passing artifacts promoted.",
+      "details": "23 passing artifacts promoted.",
       "passed": true,
       "status": "passed",
       "title": "Milestone 16 Regression Promotion"
@@ -104,7 +104,7 @@
       "Fix GeoClaw/C++ threshold failures outside flat-pool and sloping-channel cases.",
       "Retune wet/dry, bed-step, constriction, drop/ledge, and cascading reach/drop dynamics until geometry families pass.",
       "Retune raft coupling against GeoClaw and C++ fields until force envelopes, outcomes, and transition cases pass.",
-      "Add a distinct pin/release fixture beyond the current shallow-shelf and boulder proxy evidence."
+      "Keep the distinct Milestone 18 pin/release fixture separate from the raft-coupling water-field agreement gate."
     ],
     "status": "blocked"
   },

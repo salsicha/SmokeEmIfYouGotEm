@@ -116,6 +116,7 @@ MILESTONE18_GEOMETRY_CLOSURE_REPORTS = {
         "diagnostic_solver_modes": ("reduced",),
     },
 }
+MILESTONE18_REMAINING_GEOMETRY_CLOSURE_CASES = frozenset({"constriction", "drops_ledges_tailwater"})
 
 
 @dataclass(frozen=True, slots=True)
@@ -1262,6 +1263,7 @@ def run_milestone16_geometry_validation(
             "Constrictions",
             ("constriction",),
             comparison_records,
+            milestone18_report_dir=m18_report_dir,
         ),
         _geometry_case_from_thresholds(
             "drops_ledges_tailwater",
@@ -1273,6 +1275,7 @@ def run_milestone16_geometry_validation(
                 "south_fork_cascading_high_runnable",
             ),
             comparison_records,
+            milestone18_report_dir=m18_report_dir,
         ),
         _reach_drop_handoff_geometry_case(geoclaw),
     )
@@ -1593,6 +1596,15 @@ def _geometry_case_from_thresholds(
         for record in comparison_records
         if record["gate_scenario_id"] in scenario_ids
     )
+    remaining_closure_case = _milestone18_remaining_geometry_closure_case(
+        case_id,
+        title,
+        scenario_ids,
+        evidence,
+        milestone18_report_dir,
+    )
+    if remaining_closure_case is not None:
+        return remaining_closure_case
     closure_case = _milestone18_geometry_closure_case(
         case_id,
         title,
@@ -1621,6 +1633,89 @@ def _geometry_case_from_thresholds(
         passed=passed,
         evidence=evidence,
         notes=notes,
+    )
+
+
+def _milestone18_remaining_geometry_closure_case(
+    case_id: str,
+    title: str,
+    scenario_ids: tuple[str, ...],
+    stale_evidence: tuple[dict[str, object], ...],
+    milestone18_report_dir: Path | None,
+) -> Milestone16GeometryCaseResult | None:
+    if case_id not in MILESTONE18_REMAINING_GEOMETRY_CLOSURE_CASES or milestone18_report_dir is None:
+        return None
+    report_path = milestone18_report_dir / "remaining_geometry_closure.json"
+    if not report_path.exists():
+        return None
+    report = _read_json(report_path)
+    case_payload = next(
+        (
+            item
+            for item in report.get("cases", [])
+            if isinstance(item, dict) and str(item.get("case_id")) == case_id
+        ),
+        None,
+    )
+    if case_payload is None:
+        return None
+    focused_evidence = [
+        item for item in case_payload.get("focused_evidence", []) if isinstance(item, dict)
+    ]
+    failing_counts = {
+        str(key): int(value)
+        for key, value in case_payload.get("failing_check_counts", {}).items()
+        if isinstance(key, str)
+    }
+    closure_passed = bool(case_payload.get("promotion_ready")) and not failing_counts
+    stale_failing = sorted(
+        {
+            f"{item.get('gate_scenario_id')}:{item.get('solver_mode')}"
+            for item in stale_evidence
+            if not bool(item.get("threshold_passed"))
+        }
+    )
+    evidence = (
+        {
+            "gate_scenario_id": case_id,
+            "passed": closure_passed,
+            "threshold_passed": closure_passed,
+            "accepted_for_geometry": closure_passed,
+            "diagnostic_only": False,
+            "failing_checks": sorted(failing_counts),
+            "milestone18_report": str(report_path),
+            "focused_evidence_count": len(focused_evidence),
+            "focused_pass_count": sum(1 for item in focused_evidence if bool(item.get("passed"))),
+            "superseded_stale_blockers": stale_failing,
+        },
+    )
+    notes = [
+        f"Milestone 18 remaining-geometry closure evidence applied from {report_path}.",
+        "Uses compact rollup evidence; detailed focused diagnostics remain in the Milestone 18 report.",
+    ]
+    if stale_failing:
+        notes.append(
+            "Supersedes stale Milestone 16 threshold blockers for: "
+            f"{', '.join(stale_failing)}."
+        )
+    if not closure_passed:
+        notes.append("Remaining-geometry closure report is not promotion-ready for this family.")
+    for note in case_payload.get("notes", []):
+        if isinstance(note, str) and note.startswith("Focused passing evidence supersedes"):
+            notes.append(note)
+    solver_modes = tuple(
+        str(item)
+        for item in case_payload.get("solver_modes", [])
+        if isinstance(item, str)
+    ) or ("focused_closure",)
+    return Milestone16GeometryCaseResult(
+        case_id=case_id,
+        title=title,
+        scenarios=scenario_ids,
+        solver_modes=solver_modes,
+        passed=closure_passed,
+        evidence=evidence,
+        notes=tuple(dict.fromkeys(notes)),
     )
 
 
@@ -2094,7 +2189,11 @@ def _should_promote_geometry_case(case: dict[str, object]) -> bool:
     if not bool(case.get("passed")):
         return False
     case_id = str(case.get("case_id"))
-    return case_id == "stitched_reach_drop_handoffs" or case_id in MILESTONE18_GEOMETRY_CLOSURE_REPORTS
+    return (
+        case_id == "stitched_reach_drop_handoffs"
+        or case_id in MILESTONE18_GEOMETRY_CLOSURE_REPORTS
+        or case_id in MILESTONE18_REMAINING_GEOMETRY_CLOSURE_CASES
+    )
 
 
 def _should_promote_geometry_evidence(evidence: dict[str, object]) -> bool:
