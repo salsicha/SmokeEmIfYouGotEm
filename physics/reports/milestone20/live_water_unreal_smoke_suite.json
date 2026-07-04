@@ -38,7 +38,7 @@
     }
   ],
   "debug_view_count": 9,
-  "decision": "pass_text_first_unreal_smoke_gate",
+  "decision": "pass_unreal_editor_smoke_gate",
   "deterministic_replay": {
     "failed_count": 0,
     "group_count": 40,
@@ -48,9 +48,9 @@
   "gate_scope": "manifest_links_accepted_cpp_outputs_debug_views_and_target_profile_budget_evidence",
   "milestone20_closed": true,
   "notes": [
-    "This report closes the text-first Milestone 20 gate in this repo workspace.",
-    "A UE 5.8 workstation should execute the generated automation test and attach measured editor/runtime output before release or platform sign-off.",
-    "The suite is anchored to the accepted C++ report-set lock and must be regenerated if that lock changes."
+    "This report closes the Milestone 20 live-water Unreal smoke gate in this repo workspace.",
+    "The suite is anchored to the accepted C++ report-set lock and must be regenerated if that lock changes.",
+    "UE 5.8 MacEditor headless automation executed successfully; physical desktop, VR, and handheld captures remain platform sign-off evidence."
   ],
   "passed": true,
   "regression_fixture_count": 109,
@@ -80,6 +80,25 @@
       "record_count": 80
     }
   ],
-  "unreal_editor_execution_required_before_release_signoff": true,
-  "unreal_editor_execution_status": "not_run_in_text_first_workspace"
+  "unreal_editor_automation_result": {
+    "executed_at": "2026.07.04-07.46.36",
+    "log_scan": {
+      "automation_warnings": 0,
+      "deprecated_report_flag_warnings": 0,
+      "handled_ensures": 0,
+      "project_errors": 0
+    },
+    "manifest": "physics/reports/milestone20/unreal_editor_automation_result.json",
+    "platform": "MacEditor",
+    "schema": "raftsim.milestone20.unreal_editor_automation_result.v1",
+    "summary": {
+      "failed": 0,
+      "notRun": 0,
+      "succeeded": 2,
+      "succeededWithWarnings": 0,
+      "totalDuration": 0.01616591587662697
+    }
+  },
+  "unreal_editor_execution_required_before_release_signoff": false,
+  "unreal_editor_execution_status": "passed_in_unreal_editor"
 }

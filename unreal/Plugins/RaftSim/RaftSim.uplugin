@@ -9,6 +9,12 @@
   "EnabledByDefault": true,
   "CanContainContent": true,
   "IsBetaVersion": true,
+  "Plugins": [
+    {
+      "Name": "EnhancedInput",
+      "Enabled": true
+    }
+  ],
   "Modules": [
     {
       "Name": "RaftSimCore",

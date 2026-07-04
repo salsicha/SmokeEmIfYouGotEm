@@ -1,0 +1,60 @@
+{
+  "command": "UnrealEditor-Cmd unreal/SmokeEmIfYouGotEm.uproject -unattended -nop4 -nosplash -NullRHI -NoSound -ExecCmds='Automation RunTests RaftSim.Milestone20; Quit' -TestExit='Automation Test Queue Empty' -ReportExportPath='unreal/Saved/Automation/Milestone20'",
+  "device": {
+    "cpu": "Apple M5",
+    "gpu": "Apple M5",
+    "model": "Default",
+    "os_version": "macOS 26.5.1 25F80",
+    "platform": "MacEditor",
+    "ram_gb": 32,
+    "render_mode": "SM6"
+  },
+  "engine": {
+    "engine_association": "5.8",
+    "editor_binary": "/Users/Shared/Epic Games/UE_5.8/Engine/Binaries/Mac/UnrealEditor-Cmd",
+    "project": "unreal/SmokeEmIfYouGotEm.uproject"
+  },
+  "executed_at": "2026.07.04-07.46.36",
+  "log_scan": {
+    "automation_warnings": 0,
+    "deprecated_report_flag_warnings": 0,
+    "handled_ensures": 0,
+    "project_errors": 0
+  },
+  "passed": true,
+  "platform_validation": {
+    "Android": "SDK_missing_on_workstation",
+    "IOS": "VALID 26.1.1",
+    "Linux": "SDK_missing_on_workstation",
+    "LinuxArm64": "SDK_missing_on_workstation",
+    "Mac": "VALID 26.1.1",
+    "TVOS": "VALID 26.1.1",
+    "VisionOS": "VALID 26.1.1",
+    "Win64": "SDK_missing_on_workstation"
+  },
+  "report_source": "unreal/Saved/Automation/Milestone20/index.json",
+  "schema": "raftsim.milestone20.unreal_editor_automation_result.v1",
+  "summary": {
+    "failed": 0,
+    "notRun": 0,
+    "succeeded": 2,
+    "succeededWithWarnings": 0,
+    "totalDuration": 0.01616591587662697
+  },
+  "tests": [
+    {
+      "duration": 0.007998250424861908,
+      "errors": 0,
+      "fullTestPath": "RaftSim.Milestone20.LiveWaterSmokeSuiteManifest",
+      "state": "Success",
+      "warnings": 0
+    },
+    {
+      "duration": 0.00816766545176506,
+      "errors": 0,
+      "fullTestPath": "RaftSim.Milestone20.WaterRegressionImportManifest",
+      "state": "Success",
+      "warnings": 0
+    }
+  ]
+}

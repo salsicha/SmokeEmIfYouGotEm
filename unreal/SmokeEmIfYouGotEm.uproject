@@ -16,6 +16,10 @@
       "Enabled": true
     },
     {
+      "Name": "AndroidFileServer",
+      "Enabled": false
+    },
+    {
       "Name": "OpenXR",
       "Enabled": true
     },

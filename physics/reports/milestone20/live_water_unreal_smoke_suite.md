@@ -1,10 +1,18 @@
 # Milestone 20 Live-Water Unreal Smoke Suite
 
-Decision: `pass_text_first_unreal_smoke_gate`
+Decision: `pass_unreal_editor_smoke_gate`
 
 Passed: `True`
 
-Unreal editor execution status: `not_run_in_text_first_workspace`.
+Unreal editor execution status: `passed_in_unreal_editor`.
+
+## Unreal Editor Automation
+
+Evidence: `physics/reports/milestone20/unreal_editor_automation_result.json`
+
+Executed at: `2026.07.04-07.46.36` on `MacEditor`.
+
+Result: 2 succeeded, 0 succeeded with warnings, 0 failed, 0 not run.
 
 ## Checks
 
@@ -26,6 +34,6 @@ Unreal editor execution status: `not_run_in_text_first_workspace`.
 
 ## Notes
 
-- This report closes the text-first Milestone 20 gate in this repo workspace.
-- A UE 5.8 workstation should execute the generated automation test and attach measured editor/runtime output before release or platform sign-off.
+- This report closes the Milestone 20 live-water Unreal smoke gate in this repo workspace.
 - The suite is anchored to the accepted C++ report-set lock and must be regenerated if that lock changes.
+- UE 5.8 MacEditor headless automation executed successfully; physical desktop, VR, and handheld captures remain platform sign-off evidence.
