@@ -1,0 +1,657 @@
+{
+  "automation_export": {
+    "manifest": "unreal/Content/RaftSim/Physics/chaos_automation_fixtures.json",
+    "replay_dir": "physics/reports/milestone19/chaos/replays",
+    "summary": "physics/reports/milestone19/chaos/summary.json"
+  },
+  "decision": "automation_fixture_export_complete_not_authority_evidence",
+  "fixed_step_seconds": 0.0083333333,
+  "fixtures": [
+    {
+      "authoritative_evidence": false,
+      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.RaftRockAngleSweep",
+      "duration_seconds": 7.999999968000001,
+      "exports": {
+        "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/raft_rock_angle_sweep.telemetry.jsonl",
+        "replay_summary": "physics/reports/milestone19/chaos/replays/raft_rock_angle_sweep.replay_summary.json",
+        "summary": "physics/reports/milestone19/chaos/summary.json"
+      },
+      "fixed_step_seconds": 0.0083333333,
+      "fixture_id": "raft_rock_angle_sweep",
+      "metrics": [
+        "peak_contact_impulse_n_s",
+        "post_impact_heading_delta_degrees",
+        "max_roll_degrees",
+        "time_to_recover_seconds",
+        "bounce_scrape_or_pin_classification",
+        "cpu_ms_per_step"
+      ],
+      "parameter_case_count": 9,
+      "parameter_cases": [
+        {
+          "case_id": "case_000",
+          "impact_angles_degrees": 15,
+          "impact_speeds_mps": 1.5,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_001",
+          "impact_angles_degrees": 45,
+          "impact_speeds_mps": 1.5,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_002",
+          "impact_angles_degrees": 75,
+          "impact_speeds_mps": 1.5,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_003",
+          "impact_angles_degrees": 15,
+          "impact_speeds_mps": 3.0,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_004",
+          "impact_angles_degrees": 45,
+          "impact_speeds_mps": 3.0,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_005",
+          "impact_angles_degrees": 75,
+          "impact_speeds_mps": 3.0,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_006",
+          "impact_angles_degrees": 15,
+          "impact_speeds_mps": 5.0,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_007",
+          "impact_angles_degrees": 45,
+          "impact_speeds_mps": 5.0,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_008",
+          "impact_angles_degrees": 75,
+          "impact_speeds_mps": 5.0,
+          "rock_contact_preset": "rock_elastic_default"
+        }
+      ],
+      "pass_gates": [
+        "No tunneling through rock at the tested speeds.",
+        "No solver explosion or visible jitter after impact.",
+        "Replay determinism hash matches across 3 repeated runs for the same runtime.",
+        "Qualitative outcome stays in the expected scrape, bounce, deflect, or brief-pin class."
+      ],
+      "setup": {
+        "crew": "8 seated crew masses locked to seats",
+        "geometry": "single rounded rock collider plus flat downstream recovery water",
+        "raft": "standard_14ft_paddle_raft",
+        "water": "constant downstream current with sampled custom-water drag and buoyancy"
+      },
+      "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
+      "status": "ready_for_unreal_automation_execution",
+      "step_count": 960,
+      "telemetry_required": [
+        "runtime_id",
+        "fixture_id",
+        "step_index",
+        "raft_pose",
+        "raft_linear_velocity",
+        "raft_angular_velocity",
+        "contact_points",
+        "contact_impulses",
+        "contact_material",
+        "crew_state",
+        "swimmer_state",
+        "pin_state",
+        "release_state",
+        "outcome",
+        "runtime_cpu_ms",
+        "determinism_hash"
+      ],
+      "title": "Raft Hits Rock At Multiple Speeds And Angles",
+      "unreal_target": {
+        "debug_overlay_capture": "Saved/Automation/RaftSim/Chaos/raft_rock_angle_sweep_overlay.png",
+        "fixture_map": "/RaftSim/Physics/RuntimeEval/Chaos/raft_rock_angle_sweep",
+        "functional_test_actor": "BP_RaftSimChaosRuntimeFixture",
+        "runtime": "UnrealChaos",
+        "test_type": "EditorContext | EngineFilter"
+      }
+    },
+    {
+      "authoritative_evidence": false,
+      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.ShallowShelfGrounding",
+      "duration_seconds": 7.999999968000001,
+      "exports": {
+        "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/shallow_shelf_grounding.telemetry.jsonl",
+        "replay_summary": "physics/reports/milestone19/chaos/replays/shallow_shelf_grounding.replay_summary.json",
+        "summary": "physics/reports/milestone19/chaos/summary.json"
+      },
+      "fixed_step_seconds": 0.0083333333,
+      "fixture_id": "shallow_shelf_grounding",
+      "metrics": [
+        "grounding_duration_seconds",
+        "max_bed_penetration_m",
+        "scrape_impulse_n_s",
+        "yaw_pivot_degrees",
+        "release_or_stick_outcome",
+        "cpu_ms_per_step"
+      ],
+      "parameter_case_count": 9,
+      "parameter_cases": [
+        {
+          "approach_speeds_mps": 1.0,
+          "case_id": "case_000",
+          "contact_preset": "bed_grounding_inelastic_default",
+          "shelf_depth_m": 0.08
+        },
+        {
+          "approach_speeds_mps": 1.0,
+          "case_id": "case_001",
+          "contact_preset": "bed_grounding_inelastic_default",
+          "shelf_depth_m": 0.18
+        },
+        {
+          "approach_speeds_mps": 1.0,
+          "case_id": "case_002",
+          "contact_preset": "bed_grounding_inelastic_default",
+          "shelf_depth_m": 0.32
+        },
+        {
+          "approach_speeds_mps": 2.5,
+          "case_id": "case_003",
+          "contact_preset": "bed_grounding_inelastic_default",
+          "shelf_depth_m": 0.08
+        },
+        {
+          "approach_speeds_mps": 2.5,
+          "case_id": "case_004",
+          "contact_preset": "bed_grounding_inelastic_default",
+          "shelf_depth_m": 0.18
+        },
+        {
+          "approach_speeds_mps": 2.5,
+          "case_id": "case_005",
+          "contact_preset": "bed_grounding_inelastic_default",
+          "shelf_depth_m": 0.32
+        },
+        {
+          "approach_speeds_mps": 4.0,
+          "case_id": "case_006",
+          "contact_preset": "bed_grounding_inelastic_default",
+          "shelf_depth_m": 0.08
+        },
+        {
+          "approach_speeds_mps": 4.0,
+          "case_id": "case_007",
+          "contact_preset": "bed_grounding_inelastic_default",
+          "shelf_depth_m": 0.18
+        },
+        {
+          "approach_speeds_mps": 4.0,
+          "case_id": "case_008",
+          "contact_preset": "bed_grounding_inelastic_default",
+          "shelf_depth_m": 0.32
+        }
+      ],
+      "pass_gates": [
+        "Grounding contacts remain low-restitution and high-damping.",
+        "Raft can pivot or release without infinite stick unless the fixture expects a pin.",
+        "Bed penetration stays under the configured tolerance.",
+        "Replay determinism hash matches across 3 repeated runs for the same runtime."
+      ],
+      "setup": {
+        "crew": "8 seated crew masses with optional high-side input disabled for baseline",
+        "geometry": "sloped shallow shelf collider aligned with bed elevation",
+        "raft": "standard_14ft_paddle_raft",
+        "water": "thin custom-water sheet over shelf with downstream current"
+      },
+      "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
+      "status": "ready_for_unreal_automation_execution",
+      "step_count": 960,
+      "telemetry_required": [
+        "runtime_id",
+        "fixture_id",
+        "step_index",
+        "raft_pose",
+        "raft_linear_velocity",
+        "raft_angular_velocity",
+        "contact_points",
+        "contact_impulses",
+        "contact_material",
+        "crew_state",
+        "swimmer_state",
+        "pin_state",
+        "release_state",
+        "outcome",
+        "runtime_cpu_ms",
+        "determinism_hash"
+      ],
+      "title": "Raft Grounds On Shallow Shelf",
+      "unreal_target": {
+        "debug_overlay_capture": "Saved/Automation/RaftSim/Chaos/shallow_shelf_grounding_overlay.png",
+        "fixture_map": "/RaftSim/Physics/RuntimeEval/Chaos/shallow_shelf_grounding",
+        "functional_test_actor": "BP_RaftSimChaosRuntimeFixture",
+        "runtime": "UnrealChaos",
+        "test_type": "EditorContext | EngineFilter"
+      }
+    },
+    {
+      "authoritative_evidence": false,
+      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.PinReleaseWrapProxy",
+      "duration_seconds": 7.999999968000001,
+      "exports": {
+        "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/pin_release_wrap_proxy.telemetry.jsonl",
+        "replay_summary": "physics/reports/milestone19/chaos/replays/pin_release_wrap_proxy.replay_summary.json",
+        "summary": "physics/reports/milestone19/chaos/summary.json"
+      },
+      "fixed_step_seconds": 0.0083333333,
+      "fixture_id": "pin_release_wrap_proxy",
+      "metrics": [
+        "pin_entry_time_seconds",
+        "peak_pin_force_n",
+        "pin_duration_seconds",
+        "release_time_seconds",
+        "flip_or_release_outcome",
+        "crew_weight_shift_effect"
+      ],
+      "parameter_case_count": 9,
+      "parameter_cases": [
+        {
+          "case_id": "case_000",
+          "high_side_delay_seconds": 0.0,
+          "inflow_speeds_mps": 2.0,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_001",
+          "high_side_delay_seconds": 0.7,
+          "inflow_speeds_mps": 2.0,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_002",
+          "high_side_delay_seconds": 1.5,
+          "inflow_speeds_mps": 2.0,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_003",
+          "high_side_delay_seconds": 0.0,
+          "inflow_speeds_mps": 3.5,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_004",
+          "high_side_delay_seconds": 0.7,
+          "inflow_speeds_mps": 3.5,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_005",
+          "high_side_delay_seconds": 1.5,
+          "inflow_speeds_mps": 3.5,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_006",
+          "high_side_delay_seconds": 0.0,
+          "inflow_speeds_mps": 5.0,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_007",
+          "high_side_delay_seconds": 0.7,
+          "inflow_speeds_mps": 5.0,
+          "rock_contact_preset": "rock_elastic_default"
+        },
+        {
+          "case_id": "case_008",
+          "high_side_delay_seconds": 1.5,
+          "inflow_speeds_mps": 5.0,
+          "rock_contact_preset": "rock_elastic_default"
+        }
+      ],
+      "pass_gates": [
+        "Pin state is explicit and does not appear only as jittering contacts.",
+        "Release can be triggered by the scripted high-side timing in at least the on-time case.",
+        "Late high-side input produces a worse outcome than on-time input.",
+        "Runtime emits force and contact telemetry sufficient for replay/debug."
+      ],
+      "setup": {
+        "crew": "8 crew with scripted late high-side input in the release phase",
+        "geometry": "two offset rock colliders forming a wrap/pin pocket",
+        "raft": "standard_14ft_paddle_raft",
+        "water": "constant high-flow current pushing the raft into the pocket"
+      },
+      "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
+      "status": "ready_for_unreal_automation_execution",
+      "step_count": 960,
+      "telemetry_required": [
+        "runtime_id",
+        "fixture_id",
+        "step_index",
+        "raft_pose",
+        "raft_linear_velocity",
+        "raft_angular_velocity",
+        "contact_points",
+        "contact_impulses",
+        "contact_material",
+        "crew_state",
+        "swimmer_state",
+        "pin_state",
+        "release_state",
+        "outcome",
+        "runtime_cpu_ms",
+        "determinism_hash"
+      ],
+      "title": "Raft Pins Then Releases",
+      "unreal_target": {
+        "debug_overlay_capture": "Saved/Automation/RaftSim/Chaos/pin_release_wrap_proxy_overlay.png",
+        "fixture_map": "/RaftSim/Physics/RuntimeEval/Chaos/pin_release_wrap_proxy",
+        "functional_test_actor": "BP_RaftSimChaosRuntimeFixture",
+        "runtime": "UnrealChaos",
+        "test_type": "EditorContext | EngineFilter"
+      }
+    },
+    {
+      "authoritative_evidence": false,
+      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.CrewEjectionSwimmerTransition",
+      "duration_seconds": 7.999999968000001,
+      "exports": {
+        "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/crew_ejection_swimmer_transition.telemetry.jsonl",
+        "replay_summary": "physics/reports/milestone19/chaos/replays/crew_ejection_swimmer_transition.replay_summary.json",
+        "summary": "physics/reports/milestone19/chaos/summary.json"
+      },
+      "fixed_step_seconds": 0.0083333333,
+      "fixture_id": "crew_ejection_swimmer_transition",
+      "metrics": [
+        "ejection_trigger_step",
+        "crew_state_sequence",
+        "swimmer_position_error_m",
+        "time_to_water_contact_seconds",
+        "ragdoll_or_character_stability",
+        "cpu_ms_per_step"
+      ],
+      "parameter_case_count": 9,
+      "parameter_cases": [
+        {
+          "case_id": "case_000",
+          "ragdoll_visualization": "enabled",
+          "roll_impulse_scale": 0.7,
+          "swimmer_drag_scale": 0.8
+        },
+        {
+          "case_id": "case_001",
+          "ragdoll_visualization": "enabled",
+          "roll_impulse_scale": 0.7,
+          "swimmer_drag_scale": 1.0
+        },
+        {
+          "case_id": "case_002",
+          "ragdoll_visualization": "enabled",
+          "roll_impulse_scale": 0.7,
+          "swimmer_drag_scale": 1.2
+        },
+        {
+          "case_id": "case_003",
+          "ragdoll_visualization": "enabled",
+          "roll_impulse_scale": 1.0,
+          "swimmer_drag_scale": 0.8
+        },
+        {
+          "case_id": "case_004",
+          "ragdoll_visualization": "enabled",
+          "roll_impulse_scale": 1.0,
+          "swimmer_drag_scale": 1.0
+        },
+        {
+          "case_id": "case_005",
+          "ragdoll_visualization": "enabled",
+          "roll_impulse_scale": 1.0,
+          "swimmer_drag_scale": 1.2
+        },
+        {
+          "case_id": "case_006",
+          "ragdoll_visualization": "enabled",
+          "roll_impulse_scale": 1.3,
+          "swimmer_drag_scale": 0.8
+        },
+        {
+          "case_id": "case_007",
+          "ragdoll_visualization": "enabled",
+          "roll_impulse_scale": 1.3,
+          "swimmer_drag_scale": 1.0
+        },
+        {
+          "case_id": "case_008",
+          "ragdoll_visualization": "enabled",
+          "roll_impulse_scale": 1.3,
+          "swimmer_drag_scale": 1.2
+        }
+      ],
+      "pass_gates": [
+        "Gameplay state changes are explicit: seated, at-risk, falling/ejected, swimming.",
+        "Visual ragdoll may diverge aesthetically but the scoring-critical swimmer state remains replayable.",
+        "Swimmer does not penetrate raft, rock, or bank geometry.",
+        "Replay determinism hash matches for gameplay-state telemetry."
+      ],
+      "setup": {
+        "crew": "one bow passenger at ejection threshold plus seven seated crew masses",
+        "geometry": "lateral hit and low obstacle triggering a roll impulse",
+        "raft": "standard_14ft_paddle_raft",
+        "water": "custom-water lateral force snapshot plus downstream swimmer drift"
+      },
+      "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
+      "status": "ready_for_unreal_automation_execution",
+      "step_count": 960,
+      "telemetry_required": [
+        "runtime_id",
+        "fixture_id",
+        "step_index",
+        "raft_pose",
+        "raft_linear_velocity",
+        "raft_angular_velocity",
+        "contact_points",
+        "contact_impulses",
+        "contact_material",
+        "crew_state",
+        "swimmer_state",
+        "pin_state",
+        "release_state",
+        "outcome",
+        "runtime_cpu_ms",
+        "determinism_hash"
+      ],
+      "title": "Crew Falls Out And Becomes Swimmer",
+      "unreal_target": {
+        "debug_overlay_capture": "Saved/Automation/RaftSim/Chaos/crew_ejection_swimmer_transition_overlay.png",
+        "fixture_map": "/RaftSim/Physics/RuntimeEval/Chaos/crew_ejection_swimmer_transition",
+        "functional_test_actor": "BP_RaftSimChaosRuntimeFixture",
+        "runtime": "UnrealChaos",
+        "test_type": "EditorContext | EngineFilter"
+      }
+    },
+    {
+      "authoritative_evidence": false,
+      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.FixedStepReplayDeterminism",
+      "duration_seconds": 8.333333300000001,
+      "exports": {
+        "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/fixed_step_replay_determinism.telemetry.jsonl",
+        "replay_summary": "physics/reports/milestone19/chaos/replays/fixed_step_replay_determinism.replay_summary.json",
+        "summary": "physics/reports/milestone19/chaos/summary.json"
+      },
+      "fixed_step_seconds": 0.0083333333,
+      "fixture_id": "fixed_step_replay_determinism",
+      "metrics": [
+        "determinism_hash_mismatch_count",
+        "max_position_drift_m",
+        "max_orientation_drift_degrees",
+        "contact_event_sequence_mismatch_count",
+        "outcome_mismatch_count"
+      ],
+      "parameter_case_count": 1,
+      "parameter_cases": [
+        {
+          "case_id": "case_000",
+          "record_replay": true,
+          "repeat_count": 10,
+          "step_count": 1000
+        }
+      ],
+      "pass_gates": [
+        "Outcome and event sequence match across repeated runs.",
+        "Position/orientation drift stays within the fixture tolerance.",
+        "Runtime can export enough state to reproduce or explain any mismatch.",
+        "A failing runtime remains eligible for visual-only use but not authoritative scoring."
+      ],
+      "setup": {
+        "crew": "8 crew with scripted paddle, brace, and high-side intents",
+        "geometry": "flat current, one shallow shelf, one rock, and one lateral impulse zone",
+        "raft": "standard_14ft_paddle_raft",
+        "water": "deterministic recorded water samples"
+      },
+      "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
+      "status": "ready_for_unreal_automation_execution",
+      "step_count": 1000,
+      "telemetry_required": [
+        "runtime_id",
+        "fixture_id",
+        "step_index",
+        "raft_pose",
+        "raft_linear_velocity",
+        "raft_angular_velocity",
+        "contact_points",
+        "contact_impulses",
+        "contact_material",
+        "crew_state",
+        "swimmer_state",
+        "pin_state",
+        "release_state",
+        "outcome",
+        "runtime_cpu_ms",
+        "determinism_hash"
+      ],
+      "title": "Replay Determinism Over 1000 Fixed Steps",
+      "unreal_target": {
+        "debug_overlay_capture": "Saved/Automation/RaftSim/Chaos/fixed_step_replay_determinism_overlay.png",
+        "fixture_map": "/RaftSim/Physics/RuntimeEval/Chaos/fixed_step_replay_determinism",
+        "functional_test_actor": "BP_RaftSimChaosRuntimeFixture",
+        "runtime": "UnrealChaos",
+        "test_type": "EditorContext | EngineFilter"
+      }
+    },
+    {
+      "authoritative_evidence": false,
+      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.RuntimeCostCrowdedScene",
+      "duration_seconds": 29.99999988,
+      "exports": {
+        "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/runtime_cost_crowded_scene.telemetry.jsonl",
+        "replay_summary": "physics/reports/milestone19/chaos/replays/runtime_cost_crowded_scene.replay_summary.json",
+        "summary": "physics/reports/milestone19/chaos/summary.json"
+      },
+      "fixed_step_seconds": 0.0083333333,
+      "fixture_id": "runtime_cost_crowded_scene",
+      "metrics": [
+        "mean_cpu_ms_per_step",
+        "p95_cpu_ms_per_step",
+        "max_cpu_ms_per_step",
+        "contact_count",
+        "island_count",
+        "telemetry_bytes_per_second"
+      ],
+      "parameter_case_count": 2,
+      "parameter_cases": [
+        {
+          "case_id": "case_000",
+          "duration_seconds": 30.0,
+          "loose_prop_authority": "non_scoring",
+          "target_platforms": "desktop"
+        },
+        {
+          "case_id": "case_001",
+          "duration_seconds": 30.0,
+          "loose_prop_authority": "non_scoring",
+          "target_platforms": "vr"
+        }
+      ],
+      "pass_gates": [
+        "Physics cost stays inside desktop and VR budget rows recorded in docs/physics-runtime-budgets.md.",
+        "Loose props cannot alter scoring-critical raft or swimmer outcomes unless converted to deterministic hazard events.",
+        "Runtime remains stable with all representative colliders active.",
+        "Debug telemetry can identify the dominant runtime cost."
+      ],
+      "setup": {
+        "crew": "8 crew bodies with visual ragdoll proxies available",
+        "geometry": "50 rocks, 20 loose props, shallow bed shelf, and bank colliders",
+        "raft": "one standard raft",
+        "water": "custom-water snapshot with sampled buoyancy, drag, and contact inputs"
+      },
+      "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
+      "status": "ready_for_unreal_automation_execution",
+      "step_count": 3600,
+      "telemetry_required": [
+        "runtime_id",
+        "fixture_id",
+        "step_index",
+        "raft_pose",
+        "raft_linear_velocity",
+        "raft_angular_velocity",
+        "contact_points",
+        "contact_impulses",
+        "contact_material",
+        "crew_state",
+        "swimmer_state",
+        "pin_state",
+        "release_state",
+        "outcome",
+        "runtime_cpu_ms",
+        "determinism_hash"
+      ],
+      "title": "Runtime Cost With Raft, Crew, Rocks, And Loose Props",
+      "unreal_target": {
+        "debug_overlay_capture": "Saved/Automation/RaftSim/Chaos/runtime_cost_crowded_scene_overlay.png",
+        "fixture_map": "/RaftSim/Physics/RuntimeEval/Chaos/runtime_cost_crowded_scene",
+        "functional_test_actor": "BP_RaftSimChaosRuntimeFixture",
+        "runtime": "UnrealChaos",
+        "test_type": "EditorContext | EngineFilter"
+      }
+    }
+  ],
+  "global_pass_gates": [
+    "Same fixture inputs, geometry, water snapshots, material coefficients, and fixed-step schedule for both runtimes.",
+    "No runtime may directly mutate custom water state during these fixtures.",
+    "Scoring-critical outcomes must be reproducible from replay telemetry.",
+    "A runtime cannot become authoritative for raft/contact gameplay unless it passes determinism, runtime, and qualitative outcome gates."
+  ],
+  "schema": "raftsim.unreal.chaos_automation_fixtures.v1",
+  "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
+  "summary": "Unreal Chaos automation fixtures generated from the shared Chaos/Jolt runtime evaluation contract. These fixtures export schema-compatible telemetry/replay summaries but do not select Chaos as authoritative.",
+  "target_runtime": "UnrealChaos",
+  "telemetry_required": [
+    "runtime_id",
+    "fixture_id",
+    "step_index",
+    "raft_pose",
+    "raft_linear_velocity",
+    "raft_angular_velocity",
+    "contact_points",
+    "contact_impulses",
+    "contact_material",
+    "crew_state",
+    "swimmer_state",
+    "pin_state",
+    "release_state",
+    "outcome",
+    "runtime_cpu_ms",
+    "determinism_hash"
+  ],
+  "water_source": "recorded custom-water snapshot or deterministic flat/current field fixture"
+}

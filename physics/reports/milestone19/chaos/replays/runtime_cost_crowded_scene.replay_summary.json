@@ -1,0 +1,224 @@
+{
+  "authoritative_evidence": false,
+  "fixed_step_seconds": 0.0083333333,
+  "fixture_id": "runtime_cost_crowded_scene",
+  "parameter_case_count": 2,
+  "replay_reproduction": {
+    "determinism_hash_scope": "gameplay-state telemetry, contacts, raft pose, and fixture inputs",
+    "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/runtime_cost_crowded_scene.telemetry.jsonl",
+    "replace_placeholder_frames_after_unreal_run": true
+  },
+  "representative_parameter_case": {
+    "case_id": "case_000",
+    "duration_seconds": 30.0,
+    "loose_prop_authority": "non_scoring",
+    "target_platforms": "desktop"
+  },
+  "runtime_id": "UnrealChaos",
+  "sample_frames": [
+    {
+      "contact_impulses": [],
+      "contact_material": "mixed_non_authoritative_scene",
+      "contact_points": [],
+      "crew_state": {
+        "at_risk": false,
+        "scripted_high_side": false,
+        "seated": 8
+      },
+      "determinism_hash": "f3235d13bbf9390f",
+      "fixture_id": "runtime_cost_crowded_scene",
+      "outcome": "initialized",
+      "parameter_case_id": "case_000",
+      "pin_state": {
+        "active": false,
+        "load_n": 0.0
+      },
+      "raft_angular_velocity": {
+        "pitch_dps": 0.0,
+        "roll_dps": 0.0,
+        "yaw_dps": 0.25
+      },
+      "raft_linear_velocity": {
+        "x_mps": 1.5,
+        "y_mps": 0.0,
+        "z_mps": 0.0
+      },
+      "raft_pose": {
+        "pitch_deg": 0.0,
+        "roll_deg": 0.5,
+        "x_m": 0.0,
+        "y_m": 0.15,
+        "yaw_deg": 0.0,
+        "z_m": 0.0
+      },
+      "release_state": {
+        "active": false,
+        "trigger": "none"
+      },
+      "runtime_cpu_ms": 0.0,
+      "runtime_id": "UnrealChaos",
+      "sample_kind": "schema_placeholder",
+      "step_index": 0,
+      "swimmer_state": {
+        "active": false,
+        "state": "none"
+      },
+      "time_seconds": 0.0
+    },
+    {
+      "contact_impulses": [
+        15.0
+      ],
+      "contact_material": "mixed_non_authoritative_scene",
+      "contact_points": [
+        {
+          "body_a": "standard_14ft_paddle_raft",
+          "body_b": "mixed_non_authoritative_scene",
+          "normal": {
+            "x": -1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "position_m": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      ],
+      "crew_state": {
+        "at_risk": false,
+        "scripted_high_side": false,
+        "seated": 8
+      },
+      "determinism_hash": "efc7a642deb4c705",
+      "fixture_id": "runtime_cost_crowded_scene",
+      "outcome": "profiling_scene_active",
+      "parameter_case_id": "case_000",
+      "pin_state": {
+        "active": false,
+        "load_n": 0.0
+      },
+      "raft_angular_velocity": {
+        "pitch_dps": 0.0,
+        "roll_dps": 0.0,
+        "yaw_dps": 0.25
+      },
+      "raft_linear_velocity": {
+        "x_mps": 1.5,
+        "y_mps": 0.0,
+        "z_mps": 0.0
+      },
+      "raft_pose": {
+        "pitch_deg": 0.0,
+        "roll_deg": 0.5,
+        "x_m": 3.75,
+        "y_m": 0.15,
+        "yaw_deg": 36.0,
+        "z_m": 0.0
+      },
+      "release_state": {
+        "active": false,
+        "trigger": "none"
+      },
+      "runtime_cpu_ms": 0.0,
+      "runtime_id": "UnrealChaos",
+      "sample_kind": "schema_placeholder",
+      "step_index": 1800,
+      "swimmer_state": {
+        "active": false,
+        "state": "none"
+      },
+      "time_seconds": 15.0
+    },
+    {
+      "contact_impulses": [
+        15.0
+      ],
+      "contact_material": "mixed_non_authoritative_scene",
+      "contact_points": [
+        {
+          "body_a": "standard_14ft_paddle_raft",
+          "body_b": "mixed_non_authoritative_scene",
+          "normal": {
+            "x": -1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "position_m": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      ],
+      "crew_state": {
+        "at_risk": false,
+        "scripted_high_side": false,
+        "seated": 8
+      },
+      "determinism_hash": "c88e5f5a45757c80",
+      "fixture_id": "runtime_cost_crowded_scene",
+      "outcome": "profiling_scene_active",
+      "parameter_case_id": "case_000",
+      "pin_state": {
+        "active": false,
+        "load_n": 0.0
+      },
+      "raft_angular_velocity": {
+        "pitch_dps": 0.0,
+        "roll_dps": 0.0,
+        "yaw_dps": 0.25
+      },
+      "raft_linear_velocity": {
+        "x_mps": 1.5,
+        "y_mps": 0.0,
+        "z_mps": 0.0
+      },
+      "raft_pose": {
+        "pitch_deg": 0.0,
+        "roll_deg": 0.5,
+        "x_m": 7.497917,
+        "y_m": 0.15,
+        "yaw_deg": 71.98,
+        "z_m": 0.0
+      },
+      "release_state": {
+        "active": false,
+        "trigger": "none"
+      },
+      "runtime_cpu_ms": 0.0,
+      "runtime_id": "UnrealChaos",
+      "sample_kind": "schema_placeholder",
+      "step_index": 3599,
+      "swimmer_state": {
+        "active": false,
+        "state": "none"
+      },
+      "time_seconds": 29.991667
+    }
+  ],
+  "sampled_step_count": 3,
+  "schema": "raftsim.unreal.chaos_fixture_replay_summary.v1",
+  "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
+  "status": "schema_placeholder_ready_for_unreal_automation_execution",
+  "step_count": 3600,
+  "telemetry_required": [
+    "runtime_id",
+    "fixture_id",
+    "step_index",
+    "raft_pose",
+    "raft_linear_velocity",
+    "raft_angular_velocity",
+    "contact_points",
+    "contact_impulses",
+    "contact_material",
+    "crew_state",
+    "swimmer_state",
+    "pin_state",
+    "release_state",
+    "outcome",
+    "runtime_cpu_ms",
+    "determinism_hash"
+  ]
+}

@@ -271,9 +271,9 @@
   ],
   "evaluation_outputs": {
     "chaos": {
-      "automation": "future Unreal automation test map or functional test suite",
-      "summary": "outputs/runtime_eval/chaos/summary.json",
-      "replay": "outputs/runtime_eval/chaos/replays/"
+      "automation": "unreal/Content/RaftSim/Physics/chaos_automation_fixtures.json",
+      "summary": "physics/reports/milestone19/chaos/summary.json",
+      "replay": "physics/reports/milestone19/chaos/replays/"
     },
     "jolt": {
       "automation": "future native C++ or Unreal-plugin Jolt smoke harness",

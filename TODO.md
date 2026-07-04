@@ -829,7 +829,7 @@ This milestone decides whether Unreal Chaos, Jolt, Chrono, or the custom reduced
 
 - [x] Adopt the split/hybrid runtime plan: Chaos is default for Unreal-integrated visual/non-authoritative physics, Jolt is the leading portable authoritative gameplay-island candidate, Chrono remains high-fidelity reference/research, and custom C++ remains water authority.
 - [x] Add a versioned shared Chaos/Jolt fixture contract for raft-rock angle sweeps, shallow shelf grounding, pin/release, crew ejection to swimmer, 1000-step determinism, and crowded-scene runtime cost.
-- [ ] Build Unreal Chaos automation fixtures from `chaos_jolt_runtime_evaluation.json` and export matching telemetry/replay summaries.
+- [x] Build Unreal Chaos automation fixtures from `chaos_jolt_runtime_evaluation.json` and export matching telemetry/replay summaries.
 - [ ] Build a native Jolt smoke harness or Unreal plugin path from the same fixture contract and export matching telemetry/replay summaries.
 - [ ] Add a Chaos-vs-Jolt comparison report that ranks determinism, CPU cost, contact quality, outcome stability, swimmer state, and authoring/debug ergonomics.
 - [ ] Select the first authoritative raft/contact runtime for the vertical slice, or keep the custom reduced runtime fallback if neither Chaos nor Jolt passes.
@@ -996,4 +996,4 @@ This milestone turns the alpha game into a shippable Unreal build.
 - [x] Promote the reduced South Fork cascading high-flow aggregate row through a stitched whole-window GeoClaw profile catalog entry while keeping feature forcing off and disabling initial-mass preservation for the open-boundary comparison.
 - [x] Close the raft-coupling agreement gate over validated C++ water fields and promote 50 of 50 GeoClaw-vs-C++ raft-coupling artifacts while preserving matching authored feature-check misses as feature-sanity debt.
 - [x] Regenerate the Milestone 16 full C++ gate and GeoClaw-to-Unreal readiness report after the GeoClaw/C++ comparison and raft-coupling fixes; the refreshed decision is approved after target-hardware confirmation.
-- [ ] Implement the Unreal Chaos automation fixtures from the shared runtime evaluation contract.
+- [x] Implement the Unreal Chaos automation fixtures from the shared runtime evaluation contract.

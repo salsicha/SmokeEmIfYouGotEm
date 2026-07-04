@@ -62,6 +62,14 @@ Both Chaos and Jolt must run the same six fixtures with the same water snapshots
 5. Add a comparison report that ranks Chaos and Jolt per fixture by determinism, runtime cost, contact quality, and gameplay outcome stability.
 6. Keep Chrono comparison optional for high-fidelity reference cases after the Chaos/Jolt fixture loop is working.
 
+## Current Artifacts
+
+- Chaos automation fixture export: `unreal/Content/RaftSim/Physics/chaos_automation_fixtures.json`.
+- Chaos fixture summary: `physics/reports/milestone19/chaos/summary.json` and `.md`.
+- Chaos replay summaries: `physics/reports/milestone19/chaos/replays/*.replay_summary.json`.
+
+The Chaos files are automation-ready fixture exports, not authority evidence. Unreal still needs to execute the generated fixture maps/tests and replace schema placeholder frames with measured Chaos telemetry before Chaos can be ranked against Jolt.
+
 ## Current Recommendation
 
 Keep Chaos as the production default for Unreal-authored visual physics, and evaluate Jolt as the best candidate for the narrow authoritative raft/contact/swimmer gameplay island. Do not make either one authoritative for scoring-critical outcomes until the fixture suite has evidence.
