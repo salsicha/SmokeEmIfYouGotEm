@@ -21,7 +21,7 @@ Comparisons: 50
 | rafting | eddy_line_shear | reduced | eddy_recovery | PASS | eddy_coupled | eddy_coupled | 0.000 | 0.000 |
 | rafting | eddy_line_shear | finite_volume | eddy_recovery | PASS | eddy_coupled | eddy_coupled | 0.000 | 0.000 |
 | rafting | shallow_shelf | reduced | shallow_shelf_pivot_release | PASS | pivoted | pivoted | 0.000 | 0.000 |
-| rafting | shallow_shelf | finite_volume | shallow_shelf_pivot_release | FAIL | pivoted | pivoted | 2.757 | 0.451 |
+| rafting | shallow_shelf | finite_volume | shallow_shelf_pivot_release | PASS | pivoted | pivoted | 0.000 | 0.000 |
 | cascading | south_fork_cascading_low_runnable | reduced | pool_entry | FAIL | clear | stalled | 2.005 | 0.328 |
 | cascading | south_fork_cascading_low_runnable | reduced | drop_entry | FAIL | flushed | stalled | 2.484 | 0.406 |
 | cascading | south_fork_cascading_low_runnable | reduced | hydraulic_hole_surf_flush | FAIL | stalled | stalled | 4.276 | 0.699 |

@@ -1,13 +1,13 @@
 {
   "comparison_count": 50,
   "cpp_run_report": "reports/milestone16/cpp_solver_runs.json",
-  "failed_count": 33,
+  "failed_count": 32,
   "geoclaw_reference_report": "reports/milestone16/geoclaw_reference_runs.json",
   "notes": [
     "Distinct pin/release closure evidence is tracked separately in the Milestone 18 pin_release_fixture report; this report only compares raft coupling over GeoClaw-derived and C++ water fields."
   ],
   "passed": false,
-  "passed_count": 17,
+  "passed_count": 18,
   "records": [
     {
       "actual_scenario_id": "boulder_garden_seed_16",
@@ -1189,28 +1189,28 @@
           "name": "shallow_contact",
           "passed": true,
           "threshold": 1.0,
-          "value": 6.0
+          "value": 7.0
         },
         {
           "details": "Shelf contact should occur in shallow water.",
           "name": "shallow_depth",
           "passed": true,
           "threshold": 0.35,
-          "value": 0.01641540218357342
+          "value": 0.0
         },
         {
           "details": "Grounding force should support a meaningful share of raft weight.",
           "name": "grounding_support",
           "passed": true,
           "threshold": 0.5,
-          "value": 8.211905723381026
+          "value": 8.323982832432053
         },
         {
           "details": "Off-center shelf contact should pivot the raft.",
           "name": "pivot_yaw",
           "passed": true,
           "threshold": 0.5,
-          "value": 20.384155185489867
+          "value": 20.519186843334236
         }
       ],
       "candidate_frame": "outputs/m16cpp/r_shelf/finite_volume/cpp_solver/shallow_shelf_seed_21/frames/frame_0008.csv",
@@ -1223,14 +1223,11 @@
       ],
       "feature_outcome_match": true,
       "flow_band": null,
-      "force_delta_weight_ratio": 2.75673540625239,
+      "force_delta_weight_ratio": 8.825345551476705e-08,
       "force_envelope_outcome_match": true,
       "gate_scenario_id": "shallow_shelf",
-      "notes": [
-        "Force delta exceeds the weight-normalized threshold.",
-        "Torque delta exceeds the inertia-normalized threshold."
-      ],
-      "passed": false,
+      "notes": [],
+      "passed": true,
       "reference_checks": [
         {
           "details": "Grounding contacts should include a shallow shelf tag.",
@@ -1266,9 +1263,9 @@
       "reference_passed": true,
       "solver_mode": "finite_volume",
       "suite": "rafting",
-      "torque_delta_inertia_ratio": 5.383770343998329,
-      "trajectory_position_delta_m": 0.007512103982038476,
-      "trajectory_velocity_delta_mps": 0.4507262389222658
+      "torque_delta_inertia_ratio": 1.0533193311459992e-07,
+      "trajectory_position_delta_m": 2.404908878281489e-10,
+      "trajectory_velocity_delta_mps": 1.4429439974030603e-08
     },
     {
       "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",

@@ -1,10 +1,10 @@
 {
   "budget_failed_count": 0,
-  "budget_passed_count": 60,
-  "deterministic_replay_count": 30,
-  "deterministic_replay_passed_count": 30,
+  "budget_passed_count": 62,
+  "deterministic_replay_count": 31,
+  "deterministic_replay_passed_count": 31,
   "passed": true,
-  "run_count": 60,
+  "run_count": 62,
   "source_report": "reports/milestone16/runtime_profile.json",
   "summary_version": "raftsim.milestone16.readiness_summary.v0"
 }

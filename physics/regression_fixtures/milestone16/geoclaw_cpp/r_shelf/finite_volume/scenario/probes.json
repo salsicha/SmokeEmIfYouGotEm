@@ -1,0 +1,135 @@
+{
+  "probes": [
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 18.0,
+        "y": 0.0
+      },
+      "probe_id": "upstream_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 35.5,
+        "y": 0.0
+      },
+      "probe_id": "midstream_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 54.0,
+        "y": 0.0
+      },
+      "probe_id": "downstream_center"
+    },
+    {
+      "kind": "cross_section",
+      "length": 35.0,
+      "metadata": {},
+      "normal": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "position": {
+        "x": 35.5,
+        "y": 0.0
+      },
+      "probe_id": "mid_cross_section"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "feature_kind": "boil",
+        "source_index": 0
+      },
+      "normal": null,
+      "position": {
+        "x": 9.0,
+        "y": -6.109089998605486
+      },
+      "probe_id": "feature_0_boil"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "feature_kind": "rock",
+        "source_index": 1
+      },
+      "normal": null,
+      "position": {
+        "x": 16.0,
+        "y": 2.5869359603566
+      },
+      "probe_id": "feature_1_rock"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "feature_kind": "wave_train",
+        "source_index": 2
+      },
+      "normal": null,
+      "position": {
+        "x": 21.0,
+        "y": 2.672571471935087
+      },
+      "probe_id": "feature_2_wave_train"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "feature_kind": "constriction",
+        "source_index": 3
+      },
+      "normal": null,
+      "position": {
+        "x": 26.0,
+        "y": 1.2046996999292332
+      },
+      "probe_id": "feature_3_constriction"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "feature_kind": "lateral",
+        "source_index": 4
+      },
+      "normal": null,
+      "position": {
+        "x": 37.0,
+        "y": 4.231093763261992
+      },
+      "probe_id": "feature_4_lateral"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "feature_kind": "strainer",
+        "source_index": 5
+      },
+      "normal": null,
+      "position": {
+        "x": 44.0,
+        "y": -4.28400593301868
+      },
+      "probe_id": "feature_5_strainer"
+    }
+  ]
+}

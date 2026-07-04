@@ -1,11 +1,11 @@
 {
   "comparison_count": 50,
-  "failed_count": 33,
+  "failed_count": 32,
   "notes": [
     "Distinct pin/release closure evidence is tracked separately in the Milestone 18 pin_release_fixture report; this report only compares raft coupling over GeoClaw-derived and C++ water fields."
   ],
   "passed": false,
-  "passed_count": 17,
+  "passed_count": 18,
   "source_report": "reports/milestone16/raft_coupling_validation.json",
   "summary_version": "raftsim.milestone16.readiness_summary.v0"
 }

@@ -1,7 +1,7 @@
 {
   "budget_config": "config/runtime_budgets.json",
   "budget_failed_count": 0,
-  "budget_passed_count": 60,
+  "budget_passed_count": 62,
   "cpp_solver": "/private/tmp/raftsim-water-build/raftsim_water_solver",
   "deterministic_replay": [
     {
@@ -221,6 +221,14 @@
       "passed": true
     },
     {
+      "artifact_id": "geoclaw_cpp/shallow_shelf/finite_volume",
+      "hashes": [
+        "7e0e263b2bf192c8b085890a71cb4a799621990c1f23256ba37b12b9ccab903f",
+        "7e0e263b2bf192c8b085890a71cb4a799621990c1f23256ba37b12b9ccab903f"
+      ],
+      "passed": true
+    },
+    {
       "artifact_id": "geoclaw_cpp/south_fork_cascading_low_runnable/finite_volume",
       "hashes": [
         "f1dde4f4d486edd0b60d6dd0b2b3954fd2ca6c017ed1c1fe0f3e84bd0f859f87",
@@ -256,21 +264,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6606090277778599,
+          "runtime_ms_per_tick": 0.6939333333320974,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6606090277778599,
+          "runtime_ms_per_tick": 0.6939333333320974,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6606090277778599,
+          "runtime_ms_per_tick": 0.6939333333320974,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -280,8 +288,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/flat_pool/reduced/rep_00/cpp_solver/flat_pool_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.6606090277778599,
-      "runtime_seconds": 0.23781925000002957,
+      "runtime_ms_per_tick": 0.6939333333320974,
+      "runtime_seconds": 0.24981599999955506,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -297,21 +305,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6409800916723422,
+          "runtime_ms_per_tick": 0.6814770833342563,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6409800916723422,
+          "runtime_ms_per_tick": 0.6814770833342563,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6409800916723422,
+          "runtime_ms_per_tick": 0.6814770833342563,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -321,8 +329,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/flat_pool/reduced/rep_01/cpp_solver/flat_pool_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.6409800916723422,
-      "runtime_seconds": 0.2307528330020432,
+      "runtime_ms_per_tick": 0.6814770833342563,
+      "runtime_seconds": 0.24533175000033225,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -338,21 +346,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.699305788889938,
+          "runtime_ms_per_tick": 0.7443645833316421,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.699305788889938,
+          "runtime_ms_per_tick": 0.7443645833316421,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.699305788889938,
+          "runtime_ms_per_tick": 0.7443645833316421,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -362,8 +370,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/flat_pool/finite_volume/rep_00/cpp_solver/flat_pool_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.699305788889938,
-      "runtime_seconds": 0.2517500840003777,
+      "runtime_ms_per_tick": 0.7443645833316421,
+      "runtime_seconds": 0.26797124999939115,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -379,21 +387,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7039262722173589,
+          "runtime_ms_per_tick": 0.7460660888884578,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7039262722173589,
+          "runtime_ms_per_tick": 0.7460660888884578,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.7039262722173589,
+          "runtime_ms_per_tick": 0.7460660888884578,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -403,8 +411,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/flat_pool/finite_volume/rep_01/cpp_solver/flat_pool_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.7039262722173589,
-      "runtime_seconds": 0.2534134579982492,
+      "runtime_ms_per_tick": 0.7460660888884578,
+      "runtime_seconds": 0.26858379199984483,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -420,21 +428,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6565600694456306,
+          "runtime_ms_per_tick": 0.6979398166650854,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6565600694456306,
+          "runtime_ms_per_tick": 0.6979398166650854,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6565600694456306,
+          "runtime_ms_per_tick": 0.6979398166650854,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -444,8 +452,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/uniform_channel/reduced/rep_00/cpp_solver/uniform_channel_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.6565600694456306,
-      "runtime_seconds": 0.236361625000427,
+      "runtime_ms_per_tick": 0.6979398166650854,
+      "runtime_seconds": 0.25125833399943076,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -461,21 +469,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7023565972303913,
+          "runtime_ms_per_tick": 0.6996482638795796,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7023565972303913,
+          "runtime_ms_per_tick": 0.6996482638795796,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.7023565972303913,
+          "runtime_ms_per_tick": 0.6996482638795796,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -485,8 +493,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/uniform_channel/reduced/rep_01/cpp_solver/uniform_channel_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.7023565972303913,
-      "runtime_seconds": 0.2528483750029409,
+      "runtime_ms_per_tick": 0.6996482638795796,
+      "runtime_seconds": 0.25187337499664864,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -502,21 +510,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7172310194416949,
+          "runtime_ms_per_tick": 0.7637342583317756,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7172310194416949,
+          "runtime_ms_per_tick": 0.7637342583317756,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.7172310194416949,
+          "runtime_ms_per_tick": 0.7637342583317756,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -526,8 +534,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/uniform_channel/finite_volume/rep_00/cpp_solver/uniform_channel_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.7172310194416949,
-      "runtime_seconds": 0.25820316699901014,
+      "runtime_ms_per_tick": 0.7637342583317756,
+      "runtime_seconds": 0.2749443329994392,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -543,21 +551,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7188623833422348,
+          "runtime_ms_per_tick": 0.7609796277797108,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7188623833422348,
+          "runtime_ms_per_tick": 0.7609796277797108,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.7188623833422348,
+          "runtime_ms_per_tick": 0.7609796277797108,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -567,8 +575,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/uniform_channel/finite_volume/rep_01/cpp_solver/uniform_channel_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.7188623833422348,
-      "runtime_seconds": 0.25879045800320455,
+      "runtime_ms_per_tick": 0.7609796277797108,
+      "runtime_seconds": 0.2739526660006959,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_uniform/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -584,21 +592,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6648121527683138,
+          "runtime_ms_per_tick": 0.707385302777968,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6648121527683138,
+          "runtime_ms_per_tick": 0.707385302777968,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6648121527683138,
+          "runtime_ms_per_tick": 0.707385302777968,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -608,8 +616,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/dam_break/reduced/rep_00/cpp_solver/dam_break_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.6648121527683138,
-      "runtime_seconds": 0.239332374996593,
+      "runtime_ms_per_tick": 0.707385302777968,
+      "runtime_seconds": 0.2546587090000685,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_dam/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -625,21 +633,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6634420138854895,
+          "runtime_ms_per_tick": 0.7061910888902881,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6634420138854895,
+          "runtime_ms_per_tick": 0.7061910888902881,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6634420138854895,
+          "runtime_ms_per_tick": 0.7061910888902881,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -649,8 +657,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/dam_break/reduced/rep_01/cpp_solver/dam_break_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.6634420138854895,
-      "runtime_seconds": 0.23883912499877624,
+      "runtime_ms_per_tick": 0.7061910888902881,
+      "runtime_seconds": 0.25422879200050374,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_dam/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -666,21 +674,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7295118055582053,
+          "runtime_ms_per_tick": 0.7733910888924179,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7295118055582053,
+          "runtime_ms_per_tick": 0.7733910888924179,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.7295118055582053,
+          "runtime_ms_per_tick": 0.7733910888924179,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -690,8 +698,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/dam_break/finite_volume/rep_00/cpp_solver/dam_break_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.7295118055582053,
-      "runtime_seconds": 0.2626242500009539,
+      "runtime_ms_per_tick": 0.7733910888924179,
+      "runtime_seconds": 0.27842079200127046,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_dam/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -707,21 +715,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7298483805546615,
+          "runtime_ms_per_tick": 0.7745996527773968,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7298483805546615,
+          "runtime_ms_per_tick": 0.7745996527773968,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.7298483805546615,
+          "runtime_ms_per_tick": 0.7745996527773968,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -731,8 +739,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/dam_break/finite_volume/rep_01/cpp_solver/dam_break_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.7298483805546615,
-      "runtime_seconds": 0.2627454169996781,
+      "runtime_ms_per_tick": 0.7745996527773968,
+      "runtime_seconds": 0.27885587499986286,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_dam/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -748,21 +756,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6596395833285997,
+          "runtime_ms_per_tick": 0.6982923611051066,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6596395833285997,
+          "runtime_ms_per_tick": 0.6982923611051066,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6596395833285997,
+          "runtime_ms_per_tick": 0.6982923611051066,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -772,8 +780,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/bed_step/reduced/rep_00/cpp_solver/bed_step_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.6596395833285997,
-      "runtime_seconds": 0.2374702499982959,
+      "runtime_ms_per_tick": 0.6982923611051066,
+      "runtime_seconds": 0.2513852499978384,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -789,21 +797,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6705785888900411,
+          "runtime_ms_per_tick": 0.6934302083310386,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6705785888900411,
+          "runtime_ms_per_tick": 0.6934302083310386,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6705785888900411,
+          "runtime_ms_per_tick": 0.6934302083310386,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -813,8 +821,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/bed_step/reduced/rep_01/cpp_solver/bed_step_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.6705785888900411,
-      "runtime_seconds": 0.2414082920004148,
+      "runtime_ms_per_tick": 0.6934302083310386,
+      "runtime_seconds": 0.24963487499917392,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -830,21 +838,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7318130777700086,
+          "runtime_ms_per_tick": 0.7794599527692804,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7318130777700086,
+          "runtime_ms_per_tick": 0.7794599527692804,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.7318130777700086,
+          "runtime_ms_per_tick": 0.7794599527692804,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -854,8 +862,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/bed_step/finite_volume/rep_00/cpp_solver/bed_step_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.7318130777700086,
-      "runtime_seconds": 0.2634527079972031,
+      "runtime_ms_per_tick": 0.7794599527692804,
+      "runtime_seconds": 0.28060558299694094,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_step/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -871,21 +879,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7339788194460399,
+          "runtime_ms_per_tick": 0.7796034722256687,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7339788194460399,
+          "runtime_ms_per_tick": 0.7796034722256687,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.7339788194460399,
+          "runtime_ms_per_tick": 0.7796034722256687,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -895,8 +903,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/bed_step/finite_volume/rep_01/cpp_solver/bed_step_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.7339788194460399,
-      "runtime_seconds": 0.2642323750005744,
+      "runtime_ms_per_tick": 0.7796034722256687,
+      "runtime_seconds": 0.28065725000124075,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_step/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -912,21 +920,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6152785888944992,
+          "runtime_ms_per_tick": 0.6566030083376972,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6152785888944992,
+          "runtime_ms_per_tick": 0.6566030083376972,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6152785888944992,
+          "runtime_ms_per_tick": 0.6566030083376972,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -936,8 +944,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/constriction/reduced/rep_00/cpp_solver/constriction_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.6152785888944992,
-      "runtime_seconds": 0.2215002920020197,
+      "runtime_ms_per_tick": 0.6566030083376972,
+      "runtime_seconds": 0.236377083001571,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -953,21 +961,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6489991888884106,
+          "runtime_ms_per_tick": 0.6505062499955885,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6489991888884106,
+          "runtime_ms_per_tick": 0.6505062499955885,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6489991888884106,
+          "runtime_ms_per_tick": 0.6505062499955885,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -977,8 +985,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/constriction/reduced/rep_01/cpp_solver/constriction_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.6489991888884106,
-      "runtime_seconds": 0.2336397079998278,
+      "runtime_ms_per_tick": 0.6505062499955885,
+      "runtime_seconds": 0.23418224999841186,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -994,21 +1002,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6165843749941915,
+          "runtime_ms_per_tick": 0.6571930555562884,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6165843749941915,
+          "runtime_ms_per_tick": 0.6571930555562884,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6165843749941915,
+          "runtime_ms_per_tick": 0.6571930555562884,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1018,8 +1026,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/constriction/finite_volume/rep_00/cpp_solver/constriction_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.6165843749941915,
-      "runtime_seconds": 0.22197037499790895,
+      "runtime_ms_per_tick": 0.6571930555562884,
+      "runtime_seconds": 0.2365895000002638,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -1035,21 +1043,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6118721055524171,
+          "runtime_ms_per_tick": 0.6547046277773916,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6118721055524171,
+          "runtime_ms_per_tick": 0.6547046277773916,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6118721055524171,
+          "runtime_ms_per_tick": 0.6547046277773916,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1059,8 +1067,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/constriction/finite_volume/rep_01/cpp_solver/constriction_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.6118721055524171,
-      "runtime_seconds": 0.22027395799887017,
+      "runtime_ms_per_tick": 0.6547046277773916,
+      "runtime_seconds": 0.23569366599986097,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_constrict/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -1076,21 +1084,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6359929388862737,
+          "runtime_ms_per_tick": 0.6744061361132481,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6359929388862737,
+          "runtime_ms_per_tick": 0.6744061361132481,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6359929388862737,
+          "runtime_ms_per_tick": 0.6744061361132481,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1100,8 +1108,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/wet_dry_shoreline/reduced/rep_00/cpp_solver/wet_dry_shoreline_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.6359929388862737,
-      "runtime_seconds": 0.22895745799905853,
+      "runtime_ms_per_tick": 0.6744061361132481,
+      "runtime_seconds": 0.2427862090007693,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -1117,21 +1125,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.637619791672882,
+          "runtime_ms_per_tick": 0.6790765055484371,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.637619791672882,
+          "runtime_ms_per_tick": 0.6790765055484371,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.637619791672882,
+          "runtime_ms_per_tick": 0.6790765055484371,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1141,8 +1149,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/wet_dry_shoreline/reduced/rep_01/cpp_solver/wet_dry_shoreline_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.637619791672882,
-      "runtime_seconds": 0.2295431250022375,
+      "runtime_ms_per_tick": 0.6790765055484371,
+      "runtime_seconds": 0.24446754199743737,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -1158,21 +1166,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7584886555580144,
+          "runtime_ms_per_tick": 0.8000041666592652,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7584886555580144,
+          "runtime_ms_per_tick": 0.8000041666592652,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.7584886555580144,
+          "runtime_ms_per_tick": 0.8000041666592652,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1182,8 +1190,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/wet_dry_shoreline/finite_volume/rep_00/cpp_solver/wet_dry_shoreline_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.7584886555580144,
-      "runtime_seconds": 0.2730559160008852,
+      "runtime_ms_per_tick": 0.8000041666592652,
+      "runtime_seconds": 0.2880014999973355,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -1199,21 +1207,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.758472800003397,
+          "runtime_ms_per_tick": 0.7995194444447407,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.758472800003397,
+          "runtime_ms_per_tick": 0.7995194444447407,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.758472800003397,
+          "runtime_ms_per_tick": 0.7995194444447407,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1223,8 +1231,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/wet_dry_shoreline/finite_volume/rep_01/cpp_solver/wet_dry_shoreline_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.758472800003397,
-      "runtime_seconds": 0.2730502080012229,
+      "runtime_ms_per_tick": 0.7995194444447407,
+      "runtime_seconds": 0.28782700000010664,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -1240,21 +1248,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6472813666631636,
+          "runtime_ms_per_tick": 0.6965056722239953,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6472813666631636,
+          "runtime_ms_per_tick": 0.6965056722239953,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6472813666631636,
+          "runtime_ms_per_tick": 0.6965056722239953,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1264,8 +1272,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/sloping_manning_channel/reduced/rep_00/cpp_solver/sloping_manning_channel_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.6472813666631636,
-      "runtime_seconds": 0.2330212919987389,
+      "runtime_ms_per_tick": 0.6965056722239953,
+      "runtime_seconds": 0.2507420420006383,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -1281,21 +1289,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6661282416644099,
+          "runtime_ms_per_tick": 0.6895612250041773,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6661282416644099,
+          "runtime_ms_per_tick": 0.6895612250041773,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6661282416644099,
+          "runtime_ms_per_tick": 0.6895612250041773,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1305,8 +1313,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/sloping_manning_channel/reduced/rep_01/cpp_solver/sloping_manning_channel_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.6661282416644099,
-      "runtime_seconds": 0.23980616699918755,
+      "runtime_ms_per_tick": 0.6895612250041773,
+      "runtime_seconds": 0.24824204100150382,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -1322,21 +1330,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7172119222256393,
+          "runtime_ms_per_tick": 0.7555929416614364,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7172119222256393,
+          "runtime_ms_per_tick": 0.7555929416614364,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.7172119222256393,
+          "runtime_ms_per_tick": 0.7555929416614364,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1346,8 +1354,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/sloping_manning_channel/finite_volume/rep_00/cpp_solver/sloping_manning_channel_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.7172119222256393,
-      "runtime_seconds": 0.2581962920012302,
+      "runtime_ms_per_tick": 0.7555929416614364,
+      "runtime_seconds": 0.27201345899811713,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -1363,21 +1371,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7194504611106822,
+          "runtime_ms_per_tick": 0.7574798611130973,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7194504611106822,
+          "runtime_ms_per_tick": 0.7574798611130973,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.7194504611106822,
+          "runtime_ms_per_tick": 0.7574798611130973,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1387,8 +1395,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/sloping_manning_channel/finite_volume/rep_01/cpp_solver/sloping_manning_channel_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.7194504611106822,
-      "runtime_seconds": 0.2590021659998456,
+      "runtime_ms_per_tick": 0.7574798611130973,
+      "runtime_seconds": 0.272692750000715,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -1404,21 +1412,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6092510416642148,
+          "runtime_ms_per_tick": 0.6534245361055784,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6092510416642148,
+          "runtime_ms_per_tick": 0.6534245361055784,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6092510416642148,
+          "runtime_ms_per_tick": 0.6534245361055784,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1428,8 +1436,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/drop_ledge/reduced/rep_00/cpp_solver/drop_ledge_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.6092510416642148,
-      "runtime_seconds": 0.21933037499911734,
+      "runtime_ms_per_tick": 0.6534245361055784,
+      "runtime_seconds": 0.23523283299800823,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -1445,21 +1453,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6089902777805238,
+          "runtime_ms_per_tick": 0.6491318277767277,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.6089902777805238,
+          "runtime_ms_per_tick": 0.6491318277767277,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.6089902777805238,
+          "runtime_ms_per_tick": 0.6491318277767277,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1469,8 +1477,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/drop_ledge/reduced/rep_01/cpp_solver/drop_ledge_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.6089902777805238,
-      "runtime_seconds": 0.2192365000009886,
+      "runtime_ms_per_tick": 0.6491318277767277,
+      "runtime_seconds": 0.23368745799962198,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "reduced",
@@ -1486,21 +1494,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7731979166641799,
+          "runtime_ms_per_tick": 0.7745805555613414,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7731979166641799,
+          "runtime_ms_per_tick": 0.7745805555613414,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.7731979166641799,
+          "runtime_ms_per_tick": 0.7745805555613414,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1510,8 +1518,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/drop_ledge/finite_volume/rep_00/cpp_solver/drop_ledge_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.7731979166641799,
-      "runtime_seconds": 0.27835124999910477,
+      "runtime_ms_per_tick": 0.7745805555613414,
+      "runtime_seconds": 0.2788490000020829,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -1527,21 +1535,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7389475694455743,
+          "runtime_ms_per_tick": 0.7842646972272228,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.7389475694455743,
+          "runtime_ms_per_tick": 0.7842646972272228,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.7389475694455743,
+          "runtime_ms_per_tick": 0.7842646972272228,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1551,8 +1559,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/drop_ledge/finite_volume/rep_01/cpp_solver/drop_ledge_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.7389475694455743,
-      "runtime_seconds": 0.26602112500040676,
+      "runtime_ms_per_tick": 0.7842646972272228,
+      "runtime_seconds": 0.2823352910018002,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/scenario",
       "simulated_seconds": 6.0,
       "solver_mode": "finite_volume",
@@ -1568,21 +1576,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8887182291649273,
+          "runtime_ms_per_tick": 0.928609375000633,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8887182291649273,
+          "runtime_ms_per_tick": 0.928609375000633,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8887182291649273,
+          "runtime_ms_per_tick": 0.928609375000633,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1592,8 +1600,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/boulder_garden/reduced/rep_00/cpp_solver/boulder_garden_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.8887182291649273,
-      "runtime_seconds": 0.42658474999916507,
+      "runtime_ms_per_tick": 0.928609375000633,
+      "runtime_seconds": 0.44573250000030384,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_boulder/reduced/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "reduced",
@@ -1609,21 +1617,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8904463541663669,
+          "runtime_ms_per_tick": 0.9273118062537833,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8904463541663669,
+          "runtime_ms_per_tick": 0.9273118062537833,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8904463541663669,
+          "runtime_ms_per_tick": 0.9273118062537833,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1633,8 +1641,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/boulder_garden/reduced/rep_01/cpp_solver/boulder_garden_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.8904463541663669,
-      "runtime_seconds": 0.4274142499998561,
+      "runtime_ms_per_tick": 0.9273118062537833,
+      "runtime_seconds": 0.445109667001816,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_boulder/reduced/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "reduced",
@@ -1650,21 +1658,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8913858499984902,
+          "runtime_ms_per_tick": 0.9181123270839938,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8913858499984902,
+          "runtime_ms_per_tick": 0.9181123270839938,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8913858499984902,
+          "runtime_ms_per_tick": 0.9181123270839938,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1674,8 +1682,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/boulder_garden/finite_volume/rep_00/cpp_solver/boulder_garden_seed_16",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.8913858499984902,
-      "runtime_seconds": 0.4278652079992753,
+      "runtime_ms_per_tick": 0.9181123270839938,
+      "runtime_seconds": 0.440693917000317,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_boulder/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -1691,21 +1699,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.9311379333363826,
+          "runtime_ms_per_tick": 0.923440970836964,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.9311379333363826,
+          "runtime_ms_per_tick": 0.923440970836964,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.9311379333363826,
+          "runtime_ms_per_tick": 0.923440970836964,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1715,8 +1723,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/boulder_garden/finite_volume/rep_01/cpp_solver/boulder_garden_seed_16",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.9311379333363826,
-      "runtime_seconds": 0.4469462080014637,
+      "runtime_ms_per_tick": 0.923440970836964,
+      "runtime_seconds": 0.4432516660017427,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_boulder/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -1732,21 +1740,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8958397562461565,
+          "runtime_ms_per_tick": 0.9343031249954947,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8958397562461565,
+          "runtime_ms_per_tick": 0.9343031249954947,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8958397562461565,
+          "runtime_ms_per_tick": 0.9343031249954947,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1756,8 +1764,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/cascading_wave_train/reduced/rep_00/cpp_solver/cascading_wave_train_seed_17",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.8958397562461565,
-      "runtime_seconds": 0.43000308299815515,
+      "runtime_ms_per_tick": 0.9343031249954947,
+      "runtime_seconds": 0.44846549999783747,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_waves/reduced/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "reduced",
@@ -1773,21 +1781,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8898295145854718,
+          "runtime_ms_per_tick": 0.9250905374983631,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8898295145854718,
+          "runtime_ms_per_tick": 0.9250905374983631,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8898295145854718,
+          "runtime_ms_per_tick": 0.9250905374983631,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1797,8 +1805,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/cascading_wave_train/reduced/rep_01/cpp_solver/cascading_wave_train_seed_17",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.8898295145854718,
-      "runtime_seconds": 0.42711816700102645,
+      "runtime_ms_per_tick": 0.9250905374983631,
+      "runtime_seconds": 0.4440434579992143,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_waves/reduced/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "reduced",
@@ -1814,21 +1822,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8903426208310824,
+          "runtime_ms_per_tick": 0.9228375874954509,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8903426208310824,
+          "runtime_ms_per_tick": 0.9228375874954509,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8903426208310824,
+          "runtime_ms_per_tick": 0.9228375874954509,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1838,8 +1846,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/cascading_wave_train/finite_volume/rep_00/cpp_solver/cascading_wave_train_seed_17",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.8903426208310824,
-      "runtime_seconds": 0.42736445799891953,
+      "runtime_ms_per_tick": 0.9228375874954509,
+      "runtime_seconds": 0.4429620419978164,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_waves/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -1855,21 +1863,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.9168949666673143,
+          "runtime_ms_per_tick": 0.9261944437488031,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.9168949666673143,
+          "runtime_ms_per_tick": 0.9261944437488031,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.9168949666673143,
+          "runtime_ms_per_tick": 0.9261944437488031,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1879,8 +1887,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/cascading_wave_train/finite_volume/rep_01/cpp_solver/cascading_wave_train_seed_17",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.9168949666673143,
-      "runtime_seconds": 0.44010958400031086,
+      "runtime_ms_per_tick": 0.9261944437488031,
+      "runtime_seconds": 0.4445733329994255,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_waves/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -1896,21 +1904,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8941133687509742,
+          "runtime_ms_per_tick": 0.9266342020813075,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8941133687509742,
+          "runtime_ms_per_tick": 0.9266342020813075,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8941133687509742,
+          "runtime_ms_per_tick": 0.9266342020813075,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1920,8 +1928,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/hydraulic_hole_downstream_boil/reduced/rep_00/cpp_solver/hydraulic_hole_downstream_boil_seed_18",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.8941133687509742,
-      "runtime_seconds": 0.42917441700046766,
+      "runtime_ms_per_tick": 0.9266342020813075,
+      "runtime_seconds": 0.4447844169990276,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "reduced",
@@ -1937,21 +1945,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8952196187465233,
+          "runtime_ms_per_tick": 0.9376444437521059,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8952196187465233,
+          "runtime_ms_per_tick": 0.9376444437521059,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8952196187465233,
+          "runtime_ms_per_tick": 0.9376444437521059,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -1961,8 +1969,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/hydraulic_hole_downstream_boil/reduced/rep_01/cpp_solver/hydraulic_hole_downstream_boil_seed_18",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.8952196187465233,
-      "runtime_seconds": 0.4297054169983312,
+      "runtime_ms_per_tick": 0.9376444437521059,
+      "runtime_seconds": 0.4500693330010108,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "reduced",
@@ -1978,21 +1986,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8917239583373279,
+          "runtime_ms_per_tick": 0.9387608499991984,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8917239583373279,
+          "runtime_ms_per_tick": 0.9387608499991984,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8917239583373279,
+          "runtime_ms_per_tick": 0.9387608499991984,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2002,8 +2010,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/hydraulic_hole_downstream_boil/finite_volume/rep_00/cpp_solver/hydraulic_hole_downstream_boil_seed_18",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.8917239583373279,
-      "runtime_seconds": 0.42802750000191736,
+      "runtime_ms_per_tick": 0.9387608499991984,
+      "runtime_seconds": 0.45060520799961523,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_hole/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -2019,21 +2027,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.893500781247288,
+          "runtime_ms_per_tick": 0.9233782979132835,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.893500781247288,
+          "runtime_ms_per_tick": 0.9233782979132835,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.893500781247288,
+          "runtime_ms_per_tick": 0.9233782979132835,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2043,8 +2051,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/hydraulic_hole_downstream_boil/finite_volume/rep_01/cpp_solver/hydraulic_hole_downstream_boil_seed_18",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.893500781247288,
-      "runtime_seconds": 0.42888037499869824,
+      "runtime_ms_per_tick": 0.9233782979132835,
+      "runtime_seconds": 0.4432215829983761,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_hole/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -2060,21 +2068,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8929593749977963,
+          "runtime_ms_per_tick": 0.9236770833316162,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8929593749977963,
+          "runtime_ms_per_tick": 0.9236770833316162,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8929593749977963,
+          "runtime_ms_per_tick": 0.9236770833316162,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2084,8 +2092,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/lateral_wave/reduced/rep_00/cpp_solver/lateral_wave_seed_19",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.8929593749977963,
-      "runtime_seconds": 0.42862049999894225,
+      "runtime_ms_per_tick": 0.9236770833316162,
+      "runtime_seconds": 0.4433649999991758,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_lateral/reduced/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "reduced",
@@ -2101,21 +2109,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8906905375018445,
+          "runtime_ms_per_tick": 0.9190937500003807,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8906905375018445,
+          "runtime_ms_per_tick": 0.9190937500003807,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8906905375018445,
+          "runtime_ms_per_tick": 0.9190937500003807,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2125,8 +2133,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/lateral_wave/reduced/rep_01/cpp_solver/lateral_wave_seed_19",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.8906905375018445,
-      "runtime_seconds": 0.4275314580008853,
+      "runtime_ms_per_tick": 0.9190937500003807,
+      "runtime_seconds": 0.44116500000018277,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_lateral/reduced/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "reduced",
@@ -2142,21 +2150,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8909974833310722,
+          "runtime_ms_per_tick": 0.9273131937485838,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8909974833310722,
+          "runtime_ms_per_tick": 0.9273131937485838,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8909974833310722,
+          "runtime_ms_per_tick": 0.9273131937485838,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2166,8 +2174,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/lateral_wave/finite_volume/rep_00/cpp_solver/lateral_wave_seed_19",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.8909974833310722,
-      "runtime_seconds": 0.4276787919989147,
+      "runtime_ms_per_tick": 0.9273131937485838,
+      "runtime_seconds": 0.44511033299932024,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_lateral/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -2183,21 +2191,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8938970479145306,
+          "runtime_ms_per_tick": 0.9204255208336084,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8938970479145306,
+          "runtime_ms_per_tick": 0.9204255208336084,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8938970479145306,
+          "runtime_ms_per_tick": 0.9204255208336084,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2207,8 +2215,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/lateral_wave/finite_volume/rep_01/cpp_solver/lateral_wave_seed_19",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.8938970479145306,
-      "runtime_seconds": 0.4290705829989747,
+      "runtime_ms_per_tick": 0.9204255208336084,
+      "runtime_seconds": 0.441804250000132,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_lateral/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -2224,21 +2232,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8921589416634864,
+          "runtime_ms_per_tick": 0.933027343747502,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8921589416634864,
+          "runtime_ms_per_tick": 0.933027343747502,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8921589416634864,
+          "runtime_ms_per_tick": 0.933027343747502,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2248,8 +2256,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/eddy_line_shear/reduced/rep_00/cpp_solver/eddy_line_shear_seed_20",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.8921589416634864,
-      "runtime_seconds": 0.42823629199847346,
+      "runtime_ms_per_tick": 0.933027343747502,
+      "runtime_seconds": 0.4478531249988009,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_eddy/reduced/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "reduced",
@@ -2265,21 +2273,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8970923604162332,
+          "runtime_ms_per_tick": 0.928286718756984,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8970923604162332,
+          "runtime_ms_per_tick": 0.928286718756984,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8970923604162332,
+          "runtime_ms_per_tick": 0.928286718756984,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2289,8 +2297,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/eddy_line_shear/reduced/rep_01/cpp_solver/eddy_line_shear_seed_20",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.8970923604162332,
-      "runtime_seconds": 0.43060433299979195,
+      "runtime_ms_per_tick": 0.928286718756984,
+      "runtime_seconds": 0.4455776250033523,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_eddy/reduced/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "reduced",
@@ -2306,21 +2314,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8892288208395863,
+          "runtime_ms_per_tick": 0.9240934020832962,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8892288208395863,
+          "runtime_ms_per_tick": 0.9240934020832962,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8892288208395863,
+          "runtime_ms_per_tick": 0.9240934020832962,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2330,8 +2338,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/eddy_line_shear/finite_volume/rep_00/cpp_solver/eddy_line_shear_seed_20",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.8892288208395863,
-      "runtime_seconds": 0.42682983400300145,
+      "runtime_ms_per_tick": 0.9240934020832962,
+      "runtime_seconds": 0.4435648329999822,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_eddy/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -2347,21 +2355,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8948887166676892,
+          "runtime_ms_per_tick": 0.9250406250051432,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8948887166676892,
+          "runtime_ms_per_tick": 0.9250406250051432,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8948887166676892,
+          "runtime_ms_per_tick": 0.9250406250051432,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2371,8 +2379,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/eddy_line_shear/finite_volume/rep_01/cpp_solver/eddy_line_shear_seed_20",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.8948887166676892,
-      "runtime_seconds": 0.42954658400049084,
+      "runtime_ms_per_tick": 0.9250406250051432,
+      "runtime_seconds": 0.4440195000024687,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_eddy/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -2388,21 +2396,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8920848958268834,
+          "runtime_ms_per_tick": 0.9348731770842278,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.8920848958268834,
+          "runtime_ms_per_tick": 0.9348731770842278,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.8920848958268834,
+          "runtime_ms_per_tick": 0.9348731770842278,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2412,8 +2420,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/shallow_shelf/reduced/rep_00/cpp_solver/shallow_shelf_seed_21",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 0.8920848958268834,
-      "runtime_seconds": 0.42820074999690405,
+      "runtime_ms_per_tick": 0.9348731770842278,
+      "runtime_seconds": 0.44873912500042934,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_shelf/reduced/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "reduced",
@@ -2429,21 +2437,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.897077170831532,
+          "runtime_ms_per_tick": 0.9204647562455648,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 0.897077170831532,
+          "runtime_ms_per_tick": 0.9204647562455648,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 0.897077170831532,
+          "runtime_ms_per_tick": 0.9204647562455648,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2453,13 +2461,95 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/shallow_shelf/reduced/rep_01/cpp_solver/shallow_shelf_seed_21",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 0.897077170831532,
-      "runtime_seconds": 0.4305970419991354,
+      "runtime_ms_per_tick": 0.9204647562455648,
+      "runtime_seconds": 0.4418230829978711,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_shelf/reduced/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "reduced",
       "step_count": 480,
       "validation": "outputs/m16profile/geoclaw_cpp/shallow_shelf/reduced/rep_01/cpp_solver/shallow_shelf_seed_21/validation.json",
+      "validation_passed": true
+    },
+    {
+      "actual_scenario_id": "shallow_shelf_seed_21",
+      "artifact_id": "geoclaw_cpp/shallow_shelf/finite_volume",
+      "budget_results": {
+        "desktop": {
+          "max_runtime_budget_ms": 4.8,
+          "max_runtime_multiplier": 2.0,
+          "passed": true,
+          "runtime_ms_per_tick": 0.9313893229167055,
+          "water_solver_budget_ms": 2.4
+        },
+        "handheld": {
+          "max_runtime_budget_ms": 5.6,
+          "max_runtime_multiplier": 2.0,
+          "passed": true,
+          "runtime_ms_per_tick": 0.9313893229167055,
+          "water_solver_budget_ms": 2.8
+        },
+        "vr": {
+          "max_runtime_budget_ms": 2.4000000000000004,
+          "max_runtime_multiplier": 1.5,
+          "passed": true,
+          "runtime_ms_per_tick": 0.9313893229167055,
+          "water_solver_budget_ms": 1.6
+        }
+      },
+      "frame_hash": "7e0e263b2bf192c8b085890a71cb4a799621990c1f23256ba37b12b9ccab903f",
+      "gate_scenario_id": "shallow_shelf",
+      "manifest": "outputs/m16profile/geoclaw_cpp/shallow_shelf/finite_volume/rep_00/cpp_solver/shallow_shelf_seed_21/manifest.json",
+      "output_dir": "outputs/m16profile/geoclaw_cpp/shallow_shelf/finite_volume/rep_00/cpp_solver/shallow_shelf_seed_21",
+      "passed": true,
+      "repetition": 0,
+      "runtime_ms_per_tick": 0.9313893229167055,
+      "runtime_seconds": 0.4470668750000186,
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_shelf/finite_volume/scenario",
+      "simulated_seconds": 8.0,
+      "solver_mode": "finite_volume",
+      "step_count": 480,
+      "validation": "outputs/m16profile/geoclaw_cpp/shallow_shelf/finite_volume/rep_00/cpp_solver/shallow_shelf_seed_21/validation.json",
+      "validation_passed": true
+    },
+    {
+      "actual_scenario_id": "shallow_shelf_seed_21",
+      "artifact_id": "geoclaw_cpp/shallow_shelf/finite_volume",
+      "budget_results": {
+        "desktop": {
+          "max_runtime_budget_ms": 4.8,
+          "max_runtime_multiplier": 2.0,
+          "passed": true,
+          "runtime_ms_per_tick": 0.9281403645824563,
+          "water_solver_budget_ms": 2.4
+        },
+        "handheld": {
+          "max_runtime_budget_ms": 5.6,
+          "max_runtime_multiplier": 2.0,
+          "passed": true,
+          "runtime_ms_per_tick": 0.9281403645824563,
+          "water_solver_budget_ms": 2.8
+        },
+        "vr": {
+          "max_runtime_budget_ms": 2.4000000000000004,
+          "max_runtime_multiplier": 1.5,
+          "passed": true,
+          "runtime_ms_per_tick": 0.9281403645824563,
+          "water_solver_budget_ms": 1.6
+        }
+      },
+      "frame_hash": "7e0e263b2bf192c8b085890a71cb4a799621990c1f23256ba37b12b9ccab903f",
+      "gate_scenario_id": "shallow_shelf",
+      "manifest": "outputs/m16profile/geoclaw_cpp/shallow_shelf/finite_volume/rep_01/cpp_solver/shallow_shelf_seed_21/manifest.json",
+      "output_dir": "outputs/m16profile/geoclaw_cpp/shallow_shelf/finite_volume/rep_01/cpp_solver/shallow_shelf_seed_21",
+      "passed": true,
+      "repetition": 1,
+      "runtime_ms_per_tick": 0.9281403645824563,
+      "runtime_seconds": 0.44550737499957904,
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_shelf/finite_volume/scenario",
+      "simulated_seconds": 8.0,
+      "solver_mode": "finite_volume",
+      "step_count": 480,
+      "validation": "outputs/m16profile/geoclaw_cpp/shallow_shelf/finite_volume/rep_01/cpp_solver/shallow_shelf_seed_21/validation.json",
       "validation_passed": true
     },
     {
@@ -2470,21 +2560,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 1.0577854166664717,
+          "runtime_ms_per_tick": 1.0837426208354373,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 1.0577854166664717,
+          "runtime_ms_per_tick": 1.0837426208354373,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 1.0577854166664717,
+          "runtime_ms_per_tick": 1.0837426208354373,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2494,8 +2584,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/south_fork_cascading_low_runnable/finite_volume/rep_00/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 1.0577854166664717,
-      "runtime_seconds": 0.5077369999999064,
+      "runtime_ms_per_tick": 1.0837426208354373,
+      "runtime_seconds": 0.5201964580010099,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -2511,21 +2601,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 1.0544756083315103,
+          "runtime_ms_per_tick": 1.084076649999588,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 1.0544756083315103,
+          "runtime_ms_per_tick": 1.084076649999588,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 1.0544756083315103,
+          "runtime_ms_per_tick": 1.084076649999588,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2535,8 +2625,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/south_fork_cascading_low_runnable/finite_volume/rep_01/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 1.0544756083315103,
-      "runtime_seconds": 0.5061482919991249,
+      "runtime_ms_per_tick": 1.084076649999588,
+      "runtime_seconds": 0.5203567919998022,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -2552,21 +2642,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 1.0679434895791928,
+          "runtime_ms_per_tick": 1.1024695312471522,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 1.0679434895791928,
+          "runtime_ms_per_tick": 1.1024695312471522,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 1.0679434895791928,
+          "runtime_ms_per_tick": 1.1024695312471522,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2576,8 +2666,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/south_fork_cascading_median_runnable/finite_volume/rep_00/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 1.0679434895791928,
-      "runtime_seconds": 0.5126128749980126,
+      "runtime_ms_per_tick": 1.1024695312471522,
+      "runtime_seconds": 0.529185374998633,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -2593,21 +2683,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 1.0708164062483168,
+          "runtime_ms_per_tick": 1.1007627604158188,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 1.0708164062483168,
+          "runtime_ms_per_tick": 1.1007627604158188,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 1.0708164062483168,
+          "runtime_ms_per_tick": 1.1007627604158188,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2617,8 +2707,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/south_fork_cascading_median_runnable/finite_volume/rep_01/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 1.0708164062483168,
-      "runtime_seconds": 0.5139918749991921,
+      "runtime_ms_per_tick": 1.1007627604158188,
+      "runtime_seconds": 0.528366124999593,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -2634,21 +2724,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 1.069667708331205,
+          "runtime_ms_per_tick": 1.1032696187461017,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 1.069667708331205,
+          "runtime_ms_per_tick": 1.1032696187461017,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 1.069667708331205,
+          "runtime_ms_per_tick": 1.1032696187461017,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2658,8 +2748,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/south_fork_cascading_high_runnable/finite_volume/rep_00/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
       "passed": true,
       "repetition": 0,
-      "runtime_ms_per_tick": 1.069667708331205,
-      "runtime_seconds": 0.5134404999989783,
+      "runtime_ms_per_tick": 1.1032696187461017,
+      "runtime_seconds": 0.5295694169981289,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -2675,21 +2765,21 @@
           "max_runtime_budget_ms": 4.8,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 1.0733208333325213,
+          "runtime_ms_per_tick": 1.1038363708394172,
           "water_solver_budget_ms": 2.4
         },
         "handheld": {
           "max_runtime_budget_ms": 5.6,
           "max_runtime_multiplier": 2.0,
           "passed": true,
-          "runtime_ms_per_tick": 1.0733208333325213,
+          "runtime_ms_per_tick": 1.1038363708394172,
           "water_solver_budget_ms": 2.8
         },
         "vr": {
           "max_runtime_budget_ms": 2.4000000000000004,
           "max_runtime_multiplier": 1.5,
           "passed": true,
-          "runtime_ms_per_tick": 1.0733208333325213,
+          "runtime_ms_per_tick": 1.1038363708394172,
           "water_solver_budget_ms": 1.6
         }
       },
@@ -2699,8 +2789,8 @@
       "output_dir": "outputs/m16profile/geoclaw_cpp/south_fork_cascading_high_runnable/finite_volume/rep_01/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
       "passed": true,
       "repetition": 1,
-      "runtime_ms_per_tick": 1.0733208333325213,
-      "runtime_seconds": 0.5151939999996102,
+      "runtime_ms_per_tick": 1.1038363708394172,
+      "runtime_seconds": 0.5298414580029203,
       "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario",
       "simulated_seconds": 8.0,
       "solver_mode": "finite_volume",
@@ -2710,6 +2800,6 @@
     }
   ],
   "registry_path": "regression_fixtures/milestone16/registry.json",
-  "run_count": 60,
+  "run_count": 62,
   "schema_version": "raftsim.milestone16.runtime_profile.v0"
 }
