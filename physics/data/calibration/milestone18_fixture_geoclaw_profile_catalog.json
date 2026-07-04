@@ -113,6 +113,22 @@
       "requires_preserve_initial_mass_disabled": true,
       "requires_feature_forcing": false,
       "source": "milestone18_corrected_boundary_geoclaw_profile"
+    },
+    {
+      "calibration_id": "shallow_shelf_finite_volume",
+      "scenario_id": "shallow_shelf_seed_21",
+      "gate_scenario_id": "shallow_shelf",
+      "solver_mode": "finite_volume",
+      "calibration_path": "physics/data/calibration/milestone18_shallow_shelf_finite_volume_geoclaw_profile.json",
+      "fallback_path": "data/calibration/milestone18_shallow_shelf_finite_volume_geoclaw_profile.json",
+      "profile_schema_version": "raftsim.milestone18.shallow_shelf_finite_volume_geoclaw_profile.v0",
+      "profile_name": "Shallow-shelf finite-volume GeoClaw profile",
+      "applies_only": "finite_volume_shallow_shelf_fixture",
+      "max_depth_m_per_s": 220.0,
+      "max_speed_m_per_s2": 420.0,
+      "requires_preserve_initial_mass_disabled": true,
+      "requires_feature_forcing": false,
+      "source": "milestone18_corrected_boundary_geoclaw_profile"
     }
   ]
 }

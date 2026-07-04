@@ -4,7 +4,7 @@ Schema: `raftsim.milestone16.regression_promotion.v0`
 
 Decision: **PASS**
 
-Promoted entries: 55
+Promoted entries: 57
 
 | Category | Gate scenario | Mode | Case | Artifact |
 | --- | --- | --- | --- | --- |
@@ -35,6 +35,7 @@ Promoted entries: 55
 | geoclaw_cpp | eddy_line_shear | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/r_eddy/reduced |
 | geoclaw_cpp | eddy_line_shear | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/r_eddy/finite_volume |
 | geoclaw_cpp | shallow_shelf | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/r_shelf/reduced |
+| geoclaw_cpp | shallow_shelf | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/r_shelf/finite_volume |
 | geoclaw_cpp | south_fork_cascading_low_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume |
 | geoclaw_cpp | south_fork_cascading_median_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume |
 | geoclaw_cpp | south_fork_cascading_high_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume |
@@ -51,6 +52,7 @@ Promoted entries: 55
 | raft_coupling | eddy_line_shear | reduced | eddy_recovery | regression_fixtures/milestone16/raft_coupling/r_eddy/reduced/eddy_recovery |
 | raft_coupling | eddy_line_shear | finite_volume | eddy_recovery | regression_fixtures/milestone16/raft_coupling/r_eddy/finite_volume/eddy_recovery |
 | raft_coupling | shallow_shelf | reduced | shallow_shelf_pivot_release | regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release |
+| raft_coupling | shallow_shelf | finite_volume | shallow_shelf_pivot_release | regression_fixtures/milestone16/raft_coupling/r_shelf/finite_volume/shallow_shelf_pivot_release |
 | raft_coupling | south_fork_cascading_low_runnable | finite_volume | pool_entry | regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/pool_entry |
 | raft_coupling | south_fork_cascading_low_runnable | finite_volume | drop_entry | regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/drop_entry |
 | raft_coupling | south_fork_cascading_low_runnable | finite_volume | eddy_recovery | regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/eddy_recovery |
