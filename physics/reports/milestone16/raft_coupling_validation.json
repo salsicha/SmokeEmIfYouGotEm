@@ -762,21 +762,21 @@
           "name": "cross_current",
           "passed": false,
           "threshold": 0.25,
-          "value": 0.07135299389720061
+          "value": 0.0330735316381397
         },
         {
           "details": "Integrated raft forces should push the raft sideways.",
           "name": "side_impulse",
           "passed": true,
           "threshold": 0.12,
-          "value": 5.072953018066013
+          "value": 5.453227104855707
         },
         {
           "details": "Asymmetric water loading should create roll acceleration.",
           "name": "roll_torque",
           "passed": true,
           "threshold": 1.0,
-          "value": 208.46940903503207
+          "value": 210.96790204740947
         }
       ],
       "candidate_frame": "outputs/m16cpp/r_lateral/reduced/cpp_solver/lateral_wave_seed_19/frames/frame_0008.csv",
@@ -789,7 +789,7 @@
       ],
       "feature_outcome_match": true,
       "flow_band": null,
-      "force_delta_weight_ratio": 0.40182119660867055,
+      "force_delta_weight_ratio": 3.8325621869350695e-07,
       "force_envelope_outcome_match": true,
       "gate_scenario_id": "lateral_wave",
       "notes": [
@@ -832,9 +832,9 @@
       "reference_passed": false,
       "solver_mode": "reduced",
       "suite": "rafting",
-      "torque_delta_inertia_ratio": 1.4475290838176493,
-      "trajectory_position_delta_m": 0.0010949627607586044,
-      "trajectory_velocity_delta_mps": 0.06569776564551769
+      "torque_delta_inertia_ratio": 8.158680004101192e-07,
+      "trajectory_position_delta_m": 1.044375504584969e-09,
+      "trajectory_velocity_delta_mps": 6.266239171761923e-08
     },
     {
       "actual_scenario_id": "lateral_wave_seed_19",

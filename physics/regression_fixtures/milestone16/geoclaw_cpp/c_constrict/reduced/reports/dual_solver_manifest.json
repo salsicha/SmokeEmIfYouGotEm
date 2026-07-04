@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_constrict/reduced/cpp_solver/constriction_seed_16/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_constrict/reduced/cpp_solver/constriction_seed_16",
     "returncode": 0,
-    "runtime_seconds": 0.18713079200097127,
+    "runtime_seconds": 0.17226895800195052,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_constrict/reduced/cpp_solver/constriction_seed_16/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_constrict/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.18713079200097127,
-    "cpp_seconds_per_simulated_second": 0.031188465333495213,
+    "cpp_runtime_seconds": 0.17226895800195052,
+    "cpp_seconds_per_simulated_second": 0.02871149300032509,
     "geoclaw_runtime_seconds": 0.9488333749995945,
     "geoclaw_seconds_per_simulated_second": 0.15813889583326576,
     "simulated_duration_seconds": 6.0
