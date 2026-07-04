@@ -2,7 +2,7 @@
 
 Schema: `raftsim.milestone16.geoclaw_cpp_comparisons.v0`
 
-Decision: **BLOCKED**
+Decision: **PASS**
 
 Comparison count: 40
 
@@ -46,5 +46,5 @@ Comparison count: 40
 | cascading | south_fork_cascading_low_runnable | finite_volume | unreal_prototype | PASS | none | PASS |
 | cascading | south_fork_cascading_median_runnable | reduced | unreal_prototype | PASS | none | PASS |
 | cascading | south_fork_cascading_median_runnable | finite_volume | unreal_prototype | PASS | none | PASS |
-| cascading | south_fork_cascading_high_runnable | reduced | unreal_prototype | FAIL | field_linf, slope_linf, wet_mismatch_fraction, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta | PASS |
+| cascading | south_fork_cascading_high_runnable | reduced | unreal_prototype | PASS | none | PASS |
 | cascading | south_fork_cascading_high_runnable | finite_volume | unreal_prototype | PASS | none | PASS |

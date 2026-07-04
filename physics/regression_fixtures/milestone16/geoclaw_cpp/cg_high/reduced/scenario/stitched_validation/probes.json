@@ -1,0 +1,202 @@
+{
+  "probes": [
+    {
+      "bed_elevation_m": -0.05200724244040167,
+      "depth_m": 1.6527375349089908,
+      "drop_transition_id": null,
+      "froude_number": 0.7678058714194859,
+      "grid_index": {
+        "column": 6,
+        "row": 10
+      },
+      "kind": "point",
+      "metadata": {
+        "reach_id": "pool_001",
+        "reach_kind": "pool"
+      },
+      "position": {
+        "x": 23.37938889514287,
+        "y": 0.0
+      },
+      "probe_id": "pool_001_center",
+      "reach_id": "pool_001",
+      "speed_m_s": 3.091104674006279,
+      "surface_elevation_m": 1.600730292468589,
+      "velocity_m_s": {
+        "u": 3.091104674006279,
+        "v": -2.8787003186565193e-67
+      },
+      "wet": true
+    },
+    {
+      "bed_elevation_m": -0.31163088704398556,
+      "depth_m": 1.26487221354093,
+      "drop_transition_id": null,
+      "froude_number": 2.1088954726615885,
+      "grid_index": {
+        "column": 15,
+        "row": 10
+      },
+      "kind": "point",
+      "metadata": {
+        "reach_id": "tongue_001",
+        "reach_kind": "tongue"
+      },
+      "position": {
+        "x": 58.82223942767048,
+        "y": 0.0
+      },
+      "probe_id": "tongue_001_center",
+      "reach_id": "tongue_001",
+      "speed_m_s": 7.427432580501389,
+      "surface_elevation_m": 0.9532413264969445,
+      "velocity_m_s": {
+        "u": 7.427432580501389,
+        "v": -3.105443879673247e-32
+      },
+      "wet": true
+    },
+    {
+      "bed_elevation_m": -2.053478519367445,
+      "depth_m": 1.3890224348674993,
+      "drop_transition_id": "ledge_drop_001",
+      "froude_number": 1.7220994348235696,
+      "grid_index": {
+        "column": 20,
+        "row": 10
+      },
+      "kind": "point",
+      "metadata": {
+        "reach_id": "drop_001",
+        "reach_kind": "drop"
+      },
+      "position": {
+        "x": 79.236219940622,
+        "y": 0.0
+      },
+      "probe_id": "drop_001_center",
+      "reach_id": "drop_001",
+      "speed_m_s": 6.355843457975291,
+      "surface_elevation_m": -0.6644560844999459,
+      "velocity_m_s": {
+        "u": 6.355843457975291,
+        "v": -1.5454674273932545e-18
+      },
+      "wet": true
+    },
+    {
+      "bed_elevation_m": -3.162317019583475,
+      "depth_m": 1.2596617580383682,
+      "drop_transition_id": null,
+      "froude_number": 1.6569998263671921,
+      "grid_index": {
+        "column": 26,
+        "row": 10
+      },
+      "kind": "point",
+      "metadata": {
+        "reach_id": "wave_train_001",
+        "reach_kind": "wave_train"
+      },
+      "position": {
+        "x": 105.67268098350971,
+        "y": 0.0
+      },
+      "probe_id": "wave_train_001_center",
+      "reach_id": "wave_train_001",
+      "speed_m_s": 5.823844534555652,
+      "surface_elevation_m": -1.902655261545107,
+      "velocity_m_s": {
+        "u": 5.823844534555651,
+        "v": -1.5454552553748943e-07
+      },
+      "wet": true
+    },
+    {
+      "bed_elevation_m": -3.7652156489689297,
+      "depth_m": 1.5198690428787023,
+      "drop_transition_id": null,
+      "froude_number": 0.9664568012805399,
+      "grid_index": {
+        "column": 34,
+        "row": 10
+      },
+      "kind": "point",
+      "metadata": {
+        "reach_id": "eddy_recovery_001",
+        "reach_kind": "eddy_recovery"
+      },
+      "position": {
+        "x": 136.51533774752173,
+        "y": 0.0
+      },
+      "probe_id": "eddy_recovery_001_center",
+      "reach_id": "eddy_recovery_001",
+      "speed_m_s": 3.731177150049409,
+      "surface_elevation_m": -2.2453466060902274,
+      "velocity_m_s": {
+        "u": 3.7307387056103565,
+        "v": -0.05719821248597687
+      },
+      "wet": true
+    },
+    {
+      "bed_elevation_m": -3.785128747043014,
+      "depth_m": 0.7664544838201701,
+      "drop_transition_id": null,
+      "froude_number": 2.6373567153364355,
+      "grid_index": {
+        "column": 42,
+        "row": 10
+      },
+      "kind": "point",
+      "metadata": {
+        "reach_id": "boulder_garden_001",
+        "reach_kind": "boulder_garden"
+      },
+      "position": {
+        "x": 168.10990217397557,
+        "y": 0.0
+      },
+      "probe_id": "boulder_garden_001_center",
+      "reach_id": "boulder_garden_001",
+      "speed_m_s": 7.230567697090805,
+      "surface_elevation_m": -3.018674263222844,
+      "velocity_m_s": {
+        "u": 7.230567697090797,
+        "v": -3.377828359925723e-07
+      },
+      "wet": true
+    },
+    {
+      "bed_elevation_m": -4.880797286494469,
+      "depth_m": 1.7626521774362527,
+      "drop_transition_id": null,
+      "froude_number": 0.6688787031291034,
+      "grid_index": {
+        "column": 51,
+        "row": 10
+      },
+      "kind": "point",
+      "metadata": {
+        "reach_id": "pool_002",
+        "reach_kind": "pool"
+      },
+      "position": {
+        "x": 203.47387600186917,
+        "y": 0.0
+      },
+      "probe_id": "pool_002_center",
+      "reach_id": "pool_002",
+      "speed_m_s": 2.780936146522692,
+      "surface_elevation_m": -3.118145109058217,
+      "velocity_m_s": {
+        "u": 2.780936146522692,
+        "v": -1.5371618942101667e-25
+      },
+      "wet": true
+    }
+  ],
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+  "schema_version": "raftsim.stitched_whole_window_validation.v0"
+}

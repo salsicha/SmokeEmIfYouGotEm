@@ -1,0 +1,706 @@
+{
+  "annotation_files": {
+    "reach_drop_indices": "cascading_annotations.npz"
+  },
+  "base_scenario": "scenario.json",
+  "drop_transition_index": {
+    "0": "ledge_drop_001"
+  },
+  "drop_transitions": [
+    {
+      "aeration_proxy": 0.9292499999999999,
+      "bed_elevation_fall": 1.0153274487553026,
+      "control_length": 12.399999999999999,
+      "crest_station": 70.88570106505523,
+      "downstream_reach_id": "drop_001",
+      "expected_hydraulic_control": "retentive_hole",
+      "geometry_kind": "mixed",
+      "hazard_tags": [
+        "boulder_garden",
+        "constriction",
+        "hole",
+        "ledge",
+        "manual_review_required",
+        "wave_train"
+      ],
+      "ledge_length": 4.0,
+      "metadata": {
+        "difficulty": "advanced",
+        "flow_band": "high_runnable",
+        "gauge_source": "USGS 11445500 South Fork American River near Lotus, CA",
+        "generator": "california_pool_drop",
+        "pattern_role": "main_drop",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "source_crest_station_m": 1675.4802069922146,
+        "source_elevation_fall_m": 4.068235294117642,
+        "source_rapid_id": "rapid_candidate_02"
+      },
+      "ramp_length": 8.399999999999999,
+      "recirculation_risk": 0.7701,
+      "tailwater_depth": 1.3174761787761786,
+      "transition_id": "ledge_drop_001",
+      "turbulence_proxy": 1.0,
+      "upstream_reach_id": "tongue_001"
+    }
+  ],
+  "pool_controls": [
+    {
+      "depth_profile": [
+        {
+          "station": 0.0,
+          "value": 1.7757287626983276
+        },
+        {
+          "station": 46.75877779028574,
+          "value": 1.5466024707372532
+        }
+      ],
+      "eddy_controls": [
+        {
+          "center_station": 27.12009111836573,
+          "circulation_strength": 0.47209999999999996,
+          "lateral_offset": 7.149591739745129,
+          "radius": 4.39974876292008,
+          "recirculation_risk": 0.2414,
+          "zone_id": "pool_001_river_left_eddy"
+        }
+      ],
+      "mean_depth": 1.6611656167177904,
+      "metadata": {
+        "generator": "california_pool_drop",
+        "sampled_width": 23.619479151997545
+      },
+      "outflow_control": "drop_controlled",
+      "pool_id": "pool_001_control",
+      "reach_id": "pool_001",
+      "recirculation_zones": [
+        {
+          "center_station": 38.34219778803431,
+          "circulation_strength": 0.3214,
+          "lateral_offset": -3.2173162828853084,
+          "radius": 3.2998115721900594,
+          "recirculation_risk": 0.369,
+          "zone_id": "pool_001_tailout_recirculation"
+        }
+      ],
+      "residence_time_seconds": 46.15203465195857,
+      "storage_coefficient": 0.5355,
+      "tailwater_depth": 1.5466024707372532
+    },
+    {
+      "depth_profile": [
+        {
+          "station": 186.94775200373834,
+          "value": 1.6611656167177902
+        },
+        {
+          "station": 220.0,
+          "value": 1.8616511221837306
+        }
+      ],
+      "eddy_controls": [
+        {
+          "center_station": 206.1180558415701,
+          "circulation_strength": 0.47209999999999996,
+          "lateral_offset": -7.090471454408626,
+          "radius": 4.7269809696057505,
+          "recirculation_risk": 0.2414,
+          "zone_id": "pool_002_river_right_eddy"
+        }
+      ],
+      "mean_depth": 1.7614083694507605,
+      "metadata": {
+        "generator": "california_pool_drop",
+        "sampled_width": 23.619479151997545
+      },
+      "outflow_control": "tailwater_limited",
+      "pool_id": "pool_002_control",
+      "reach_id": "pool_002",
+      "recirculation_zones": [
+        {
+          "center_station": 214.0505953606729,
+          "circulation_strength": 0.3214,
+          "lateral_offset": 3.1907121544838817,
+          "radius": 3.545235727204313,
+          "recirculation_risk": 0.369,
+          "zone_id": "pool_002_tailout_recirculation"
+        }
+      ],
+      "residence_time_seconds": 32.623361151358154,
+      "storage_coefficient": 0.5355,
+      "tailwater_depth": 1.8616511221837306
+    }
+  ],
+  "reach_index": {
+    "0": "pool_001",
+    "1": "tongue_001",
+    "2": "drop_001",
+    "3": "wave_train_001",
+    "4": "eddy_recovery_001",
+    "5": "boulder_garden_001",
+    "6": "pool_002"
+  },
+  "reach_local_grids": [
+    {
+      "downstream_ghost_cells": 2,
+      "grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "nx": 14,
+        "ny": 20,
+        "origin_x": 0.0,
+        "origin_y": -19.0
+      },
+      "reach_id": "pool_001",
+      "upstream_ghost_cells": 0
+    },
+    {
+      "downstream_ghost_cells": 2,
+      "grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "nx": 10,
+        "ny": 20,
+        "origin_x": 40.0,
+        "origin_y": -19.0
+      },
+      "reach_id": "tongue_001",
+      "upstream_ghost_cells": 2
+    },
+    {
+      "downstream_ghost_cells": 2,
+      "grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "nx": 8,
+        "ny": 20,
+        "origin_x": 64.0,
+        "origin_y": -19.0
+      },
+      "reach_id": "drop_001",
+      "upstream_ghost_cells": 2
+    },
+    {
+      "downstream_ghost_cells": 2,
+      "grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "nx": 13,
+        "ny": 20,
+        "origin_x": 80.0,
+        "origin_y": -19.0
+      },
+      "reach_id": "wave_train_001",
+      "upstream_ghost_cells": 2
+    },
+    {
+      "downstream_ghost_cells": 2,
+      "grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "nx": 11,
+        "ny": 20,
+        "origin_x": 116.0,
+        "origin_y": -19.0
+      },
+      "reach_id": "eddy_recovery_001",
+      "upstream_ghost_cells": 2
+    },
+    {
+      "downstream_ghost_cells": 2,
+      "grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "nx": 13,
+        "ny": 20,
+        "origin_x": 144.0,
+        "origin_y": -19.0
+      },
+      "reach_id": "boulder_garden_001",
+      "upstream_ghost_cells": 2
+    },
+    {
+      "downstream_ghost_cells": 0,
+      "grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "nx": 11,
+        "ny": 20,
+        "origin_x": 180.0,
+        "origin_y": -19.0
+      },
+      "reach_id": "pool_002",
+      "upstream_ghost_cells": 2
+    }
+  ],
+  "reaches": [
+    {
+      "bank_shape": {
+        "left_bank_offset_m": 13.749214884125248,
+        "left_bank_slope": 0.32,
+        "right_bank_offset_m": -13.749214884125248,
+        "right_bank_slope": 0.34,
+        "shape": "vegetated"
+      },
+      "bed_roughness": 0.03977916424985325,
+      "boulder_density": 0.31549174735418645,
+      "confidence_score": 0.6,
+      "debris_flags": [],
+      "kind": "pool",
+      "length": 46.75877779028574,
+      "local_grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "lateral_origin": 0.0,
+        "origin_x": 0.0,
+        "origin_y": -19.0,
+        "rotation_degrees": 0.0,
+        "station_origin": 0.0
+      },
+      "metadata": {
+        "generator": "california_pool_drop",
+        "pattern_role": "pool",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "source_channel_width_end_m": 22.9388660011498,
+        "source_channel_width_start_m": 26.0,
+        "source_gradient_end": 0.014016033307591831,
+        "source_gradient_start": 0.010666666666666692,
+        "source_rapid_candidates": "rapid_candidate_01",
+        "source_roughness_score": 0.29919862499435573,
+        "source_station_end_m": 1105.2074750431175,
+        "source_station_start_m": 0.0
+      },
+      "reach_id": "pool_001",
+      "slope_profile": [
+        {
+          "station": 0.0,
+          "value": 0.0022225
+        },
+        {
+          "station": 46.75877779028574,
+          "value": 0.002907
+        }
+      ],
+      "station_end": 46.75877779028574,
+      "station_start": 0.0,
+      "vegetation_flags": [
+        "riparian_willow",
+        "pool_margin_grass"
+      ],
+      "width_profile": [
+        {
+          "station": 0.0,
+          "value": 28.542717926406656
+        },
+        {
+          "station": 46.75877779028574,
+          "value": 26.45414161009434
+        }
+      ]
+    },
+    {
+      "bank_shape": {
+        "left_bank_offset_m": 9.159311315791857,
+        "left_bank_slope": 0.48,
+        "right_bank_offset_m": -9.159311315791857,
+        "right_bank_slope": 0.5,
+        "shape": "bedrock"
+      },
+      "bed_roughness": 0.04,
+      "boulder_density": 0.2276,
+      "confidence_score": 0.6,
+      "debris_flags": [],
+      "kind": "tongue",
+      "length": 24.12692327476949,
+      "local_grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "lateral_origin": 0.0,
+        "origin_x": 46.75877779028574,
+        "origin_y": -19.0,
+        "rotation_degrees": 0.0,
+        "station_origin": 46.75877779028574
+      },
+      "metadata": {
+        "generator": "california_pool_drop",
+        "pattern_role": "tongue",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "source_channel_width_end_m": 22.213249625688647,
+        "source_channel_width_start_m": 22.9388660011498,
+        "source_gradient_end": 0.012206816782181468,
+        "source_gradient_start": 0.014016033307591831,
+        "source_rapid_candidates": "",
+        "source_roughness_score": 0.20892018778405988,
+        "source_station_end_m": 1675.4802069922146,
+        "source_station_start_m": 1105.2074750431175
+      },
+      "reach_id": "tongue_001",
+      "slope_profile": [
+        {
+          "station": 46.75877779028574,
+          "value": 0.01507
+        },
+        {
+          "station": 70.88570106505523,
+          "value": 0.02376
+        }
+      ],
+      "station_end": 70.88570106505523,
+      "station_start": 46.75877779028574,
+      "vegetation_flags": [],
+      "width_profile": [
+        {
+          "station": 46.75877779028574,
+          "value": 23.266900196731672
+        },
+        {
+          "station": 70.88570106505523,
+          "value": 13.370345066435757
+        }
+      ]
+    },
+    {
+      "bank_shape": {
+        "left_bank_offset_m": 7.74353429068897,
+        "left_bank_slope": 0.48,
+        "right_bank_offset_m": -7.74353429068897,
+        "right_bank_slope": 0.5,
+        "shape": "bedrock"
+      },
+      "bed_roughness": 0.05545,
+      "boulder_density": 0.6732763366469919,
+      "confidence_score": 0.6,
+      "debris_flags": [
+        "aerated_hydraulic"
+      ],
+      "kind": "drop",
+      "length": 16.701037751133512,
+      "local_grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "lateral_origin": 0.0,
+        "origin_x": 70.88570106505523,
+        "origin_y": -19.0,
+        "rotation_degrees": 0.0,
+        "station_origin": 70.88570106505523
+      },
+      "metadata": {
+        "generator": "california_pool_drop",
+        "pattern_role": "drop",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "source_channel_width_end_m": 23.3410669460881,
+        "source_channel_width_start_m": 22.213249625688647,
+        "source_gradient_end": 0.011707292428661262,
+        "source_gradient_start": 0.012206816782181468,
+        "source_rapid_candidates": "rapid_candidate_02",
+        "source_roughness_score": 0.6197178861919248,
+        "source_station_end_m": 2070.232008382643,
+        "source_station_start_m": 1675.4802069922146
+      },
+      "reach_id": "drop_001",
+      "slope_profile": [
+        {
+          "station": 70.88570106505523,
+          "value": 0.0589
+        },
+        {
+          "station": 87.58673881618874,
+          "value": 0.07228
+        }
+      ],
+      "station_end": 87.58673881618874,
+      "station_start": 70.88570106505523,
+      "vegetation_flags": [],
+      "width_profile": [
+        {
+          "station": 70.88570106505523,
+          "value": 13.743227399941263
+        },
+        {
+          "station": 87.58673881618874,
+          "value": 17.23090976281462
+        }
+      ]
+    },
+    {
+      "bank_shape": {
+        "left_bank_offset_m": 10.192955396100658,
+        "left_bank_slope": 0.48,
+        "right_bank_offset_m": -10.192955396100658,
+        "right_bank_slope": 0.5,
+        "shape": "bedrock"
+      },
+      "bed_roughness": 0.05076,
+      "boulder_density": 0.3614,
+      "confidence_score": 0.6,
+      "debris_flags": [],
+      "kind": "wave_train",
+      "length": 36.171884334641945,
+      "local_grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "lateral_origin": 0.0,
+        "origin_x": 87.58673881618874,
+        "origin_y": -19.0,
+        "rotation_degrees": 0.0,
+        "station_origin": 87.58673881618874
+      },
+      "metadata": {
+        "generator": "california_pool_drop",
+        "pattern_role": "wave_train",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "source_channel_width_end_m": 20.0283844723385,
+        "source_channel_width_start_m": 23.3410669460881,
+        "source_gradient_end": 0.01512757680478271,
+        "source_gradient_start": 0.011707292428661262,
+        "source_rapid_candidates": "rapid_candidate_03",
+        "source_roughness_score": 0.24086476536885937,
+        "source_station_end_m": 2925.2038199287254,
+        "source_station_start_m": 2070.232008382643
+      },
+      "reach_id": "wave_train_001",
+      "slope_profile": [
+        {
+          "station": 87.58673881618874,
+          "value": 0.03245
+        },
+        {
+          "station": 123.75862315083069,
+          "value": 0.024759999999999997
+        }
+      ],
+      "station_end": 123.75862315083069,
+      "station_start": 87.58673881618874,
+      "vegetation_flags": [],
+      "width_profile": [
+        {
+          "station": 87.58673881618874,
+          "value": 18.681660966899255
+        },
+        {
+          "station": 123.75862315083069,
+          "value": 22.09016061750338
+        }
+      ]
+    },
+    {
+      "bank_shape": {
+        "left_bank_offset_m": 12.79461901228786,
+        "left_bank_slope": 0.48,
+        "right_bank_offset_m": -12.79461901228786,
+        "right_bank_slope": 0.5,
+        "shape": "alluvial"
+      },
+      "bed_roughness": 0.04243535184597233,
+      "boulder_density": 0.3996168914737162,
+      "confidence_score": 0.6,
+      "debris_flags": [
+        "eddy_foam"
+      ],
+      "kind": "eddy_recovery",
+      "length": 25.51342919338208,
+      "local_grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "lateral_origin": 0.0,
+        "origin_x": 123.75862315083069,
+        "origin_y": -19.0,
+        "rotation_degrees": 0.0,
+        "station_origin": 123.75862315083069
+      },
+      "metadata": {
+        "generator": "california_pool_drop",
+        "pattern_role": "eddy_recovery",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "source_channel_width_end_m": 22.59828613824745,
+        "source_channel_width_start_m": 20.0283844723385,
+        "source_gradient_end": 0.014065291820068123,
+        "source_gradient_start": 0.01512757680478271,
+        "source_rapid_candidates": "",
+        "source_roughness_score": 0.4013596863835512,
+        "source_station_end_m": 3528.24850995412,
+        "source_station_start_m": 2925.2038199287254
+      },
+      "reach_id": "eddy_recovery_001",
+      "slope_profile": [
+        {
+          "station": 123.75862315083069,
+          "value": 0.008535000000000001
+        },
+        {
+          "station": 149.27205234421277,
+          "value": 0.00569
+        }
+      ],
+      "station_end": 149.27205234421277,
+      "station_start": 123.75862315083069,
+      "vegetation_flags": [
+        "eddy_margin_willow"
+      ],
+      "width_profile": [
+        {
+          "station": 123.75862315083069,
+          "value": 24.45848463758905
+        },
+        {
+          "station": 149.27205234421277,
+          "value": 26.719991411562393
+        }
+      ]
+    },
+    {
+      "bank_shape": {
+        "left_bank_offset_m": 10.661108938412362,
+        "left_bank_slope": 0.48,
+        "right_bank_offset_m": -10.661108938412362,
+        "right_bank_slope": 0.5,
+        "shape": "bedrock"
+      },
+      "bed_roughness": 0.06514,
+      "boulder_density": 0.6903999999999999,
+      "confidence_score": 0.6,
+      "debris_flags": [
+        "boulder_sieves",
+        "technical_moves"
+      ],
+      "kind": "boulder_garden",
+      "length": 37.67569965952558,
+      "local_grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "lateral_origin": 0.0,
+        "origin_x": 149.27205234421277,
+        "origin_y": -19.0,
+        "rotation_degrees": 0.0,
+        "station_origin": 149.27205234421277
+      },
+      "metadata": {
+        "generator": "california_pool_drop",
+        "pattern_role": "boulder_garden",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "source_channel_width_end_m": 25.358018057949785,
+        "source_channel_width_start_m": 22.59828613824745,
+        "source_gradient_end": 0.010320095957254036,
+        "source_gradient_start": 0.014065291820068123,
+        "source_rapid_candidates": "rapid_candidate_04",
+        "source_roughness_score": 0.5612959854444202,
+        "source_station_end_m": 4418.765047361087,
+        "source_station_start_m": 3528.24850995412
+      },
+      "reach_id": "boulder_garden_001",
+      "slope_profile": [
+        {
+          "station": 149.27205234421277,
+          "value": 0.022915
+        },
+        {
+          "station": 186.94775200373834,
+          "value": 0.030449999999999998
+        }
+      ],
+      "station_end": 186.94775200373834,
+      "station_start": 149.27205234421277,
+      "vegetation_flags": [],
+      "width_profile": [
+        {
+          "station": 149.27205234421277,
+          "value": 22.032111056962687
+        },
+        {
+          "station": 186.94775200373834,
+          "value": 20.612324696686763
+        }
+      ]
+    },
+    {
+      "bank_shape": {
+        "left_bank_offset_m": 14.771815530017971,
+        "left_bank_slope": 0.32,
+        "right_bank_offset_m": -14.771815530017971,
+        "right_bank_slope": 0.34,
+        "shape": "vegetated"
+      },
+      "bed_roughness": 0.03741448488033605,
+      "boulder_density": 0.23258824727582766,
+      "confidence_score": 0.6,
+      "debris_flags": [],
+      "kind": "pool",
+      "length": 33.052247996261656,
+      "local_grid": {
+        "dx": 4.0,
+        "dy": 2.0,
+        "lateral_origin": 0.0,
+        "origin_x": 186.94775200373834,
+        "origin_y": -19.0,
+        "rotation_degrees": 0.0,
+        "station_origin": 186.94775200373834
+      },
+      "metadata": {
+        "generator": "california_pool_drop",
+        "pattern_role": "pool",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "source_channel_width_end_m": 27.0,
+        "source_channel_width_start_m": 25.358018057949785,
+        "source_gradient_end": 0.011403508771929825,
+        "source_gradient_start": 0.010320095957254036,
+        "source_rapid_candidates": "",
+        "source_roughness_score": 0.2082494184744635,
+        "source_station_end_m": 5200.0,
+        "source_station_start_m": 4418.765047361087
+      },
+      "reach_id": "pool_002",
+      "slope_profile": [
+        {
+          "station": 186.94775200373834,
+          "value": 0.003476
+        },
+        {
+          "station": 220.0,
+          "value": 0.002138
+        }
+      ],
+      "station_end": 220.0,
+      "station_start": 186.94775200373834,
+      "vegetation_flags": [
+        "recovery_pool_willow"
+      ],
+      "width_profile": [
+        {
+          "station": 186.94775200373834,
+          "value": 27.81006329441642
+        },
+        {
+          "station": 220.0,
+          "value": 31.27719882565546
+        }
+      ]
+    }
+  ],
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+  "schema_version": "raftsim.cascading2_5d.v0",
+  "stitching": {
+    "drop_transition_id_grid": "drop_transition_id_grid",
+    "mode": "stitched_global_grid",
+    "reach_id_grid": "reach_id_grid"
+  },
+  "validation_outputs": {
+    "stitched_whole_window": {
+      "conservation_summary": "stitched_validation/conservation_summary.json",
+      "cross_sections": "stitched_validation/cross_sections.json",
+      "directory": "stitched_validation",
+      "fields": "stitched_validation/fields.npz",
+      "manifest": "stitched_validation/manifest.json",
+      "probes": "stitched_validation/probes.json",
+      "raft_transition_checkpoints": "stitched_validation/raft_transition_checkpoints.json",
+      "schema_version": "raftsim.stitched_whole_window_validation.v0"
+    }
+  }
+}

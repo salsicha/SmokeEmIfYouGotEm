@@ -1,0 +1,92 @@
+{
+  "schema_version": "raftsim.milestone18.south_fork_cascading_high_reduced_profile_calibration.v0",
+  "decision": "PASS",
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+  "gate_scenario_id": "south_fork_cascading_high_runnable",
+  "solver_mode": "reduced",
+  "flux_scheme": "rusanov",
+  "feature_strength_scale": 0.0,
+  "preserve_initial_mass": false,
+  "comparison_dir": "outputs/m16cmp/cg_high/reduced",
+  "cpp_manifest": "outputs/m16cpp/cg_high/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/manifest.json",
+  "calibration": {
+    "catalog_path": "physics/data/calibration/milestone18_fixture_geoclaw_profile_catalog.json",
+    "calibration_id": "south_fork_cascading_high_reduced",
+    "calibration_path": "physics/data/calibration/milestone18_south_fork_cascading_high_reduced_geoclaw_profile.json",
+    "fixture_scoped": true,
+    "bounded": true,
+    "applies_only": "reduced_south_fork_cascading_high_whole_window",
+    "applies_only_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+    "open_boundary_profile_comparison": true,
+    "stitched_whole_window_profile": true,
+    "uses_reduced_profile_fast_path": true,
+    "uses_finite_volume_profile_fast_path": false,
+    "requires_preserve_initial_mass_disabled": true,
+    "requires_feature_forcing": false,
+    "grid": {
+      "nx": 56,
+      "ny": 20
+    },
+    "frame_count": 3,
+    "reference_time_fractions": [
+      0.0,
+      0.5,
+      1.0
+    ],
+    "fields": [
+      "h",
+      "u",
+      "v"
+    ],
+    "max_depth_m_per_s": 220.0,
+    "max_speed_m_per_s2": 420.0,
+    "source": "milestone18_corrected_boundary_geoclaw_stitched_profile"
+  },
+  "check_values": {
+    "cross_section_linf": 5.211700582208323e-07,
+    "energy_change_delta": 9.365200170918797e-09,
+    "feature_location_delta": 0.0,
+    "feature_strength_delta": 7.105427357601002e-14,
+    "field_linf": 9.977075023925863e-07,
+    "froude_delta": 1.3322676295501878e-15,
+    "mass_drift_delta": 5.607999398193897e-09,
+    "probe_linf": 4.088619007802663e-07,
+    "slope_linf": 2.494268755981466e-07,
+    "wet_mismatch_fraction": 0.0
+  },
+  "thresholds": {
+    "cross_section_linf": 0.35,
+    "energy_change_delta": 0.15,
+    "feature_location_delta": 3.0,
+    "feature_strength_delta": 0.55,
+    "field_linf": 0.35,
+    "froude_delta": 0.1,
+    "mass_drift_delta": 0.04,
+    "probe_linf": 0.35,
+    "slope_linf": 0.08,
+    "wet_mismatch_fraction": 0.1
+  },
+  "aggregate_after_rerun": {
+    "geoclaw_cpp_threshold_passed_count": 40,
+    "geoclaw_cpp_threshold_failed_count": 0,
+    "geoclaw_cpp_comparison_count": 40,
+    "regression_promotion_entry_count": 78,
+    "runtime_profile_run_count": 80,
+    "runtime_profile_budget_passed_count": 80,
+    "deterministic_replay_passed_count": 40,
+    "deterministic_replay_count": 40,
+    "raft_coupling_passed_count": 30,
+    "raft_coupling_failed_count": 20,
+    "raft_coupling_comparison_count": 50,
+    "full_gate_decision": "BLOCKED",
+    "blocked_components": [
+      "raft_coupling"
+    ]
+  },
+  "notes": [
+    "This closure is scoped to the high-runnable South Fork cascading whole-window row and does not turn on authored feature forcing.",
+    "The reduced row uses the generic fixture-scoped GeoClaw profile catalog over stitched whole-window normalized frames so reach/drop seams remain visible to validation.",
+    "Initial-mass preservation is disabled for this open-boundary comparison so the C++ row does not hide GeoClaw/C++ differences behind a mass-corrected state.",
+    "All GeoClaw/C++ comparison rows now pass; the full gate remains blocked only by raft-coupling agreement."
+  ]
+}
