@@ -1,0 +1,114 @@
+{
+  "cpp": {
+    "energy_final": 12016.909011253574,
+    "energy_initial": 370.78493818461413,
+    "energy_relative_change": 31.409377441513943,
+    "frame_count": 9,
+    "froude_max": 2.5060276248858147,
+    "froude_mean_wet": 0.40987860991600844,
+    "hole_retention": {
+      "centroid_x": null,
+      "centroid_y": null,
+      "hole_count": 0,
+      "retained_area": 0.0
+    },
+    "hydraulic_jump": {
+      "value": 0.5892873594557544,
+      "x": 104.0,
+      "y": 11.0
+    },
+    "mass_final": 3888.8697441888394,
+    "mass_initial": 2963.151195636591,
+    "mass_relative_drift": 0.312410163178788,
+    "solver": "cpp",
+    "wave_crest": {
+      "value": 3.631141800967538,
+      "x": 12.0,
+      "y": -7.0
+    },
+    "wave_trough": {
+      "value": -0.7805862209438234,
+      "x": 76.0,
+      "y": 1.0
+    }
+  },
+  "delta": {
+    "energy_relative_change_delta": -3.084348482573773e-05,
+    "froude_max_delta": -5.329070518200751e-15,
+    "froude_mean_wet_delta": -7.216449660063518e-16,
+    "hole_centroid_distance": null,
+    "hole_retained_area_delta": 0.0,
+    "hydraulic_jump_distance": 0.0,
+    "mass_relative_drift_delta": -2.6715107348529443e-08,
+    "wave_crest_distance": 0.0,
+    "wave_trough_distance": 0.0
+  },
+  "pyclaw": {
+    "energy_final": 12016.910388834869,
+    "energy_initial": 370.78462782046824,
+    "energy_relative_change": 31.40940828499877,
+    "frame_count": 3,
+    "froude_max": 2.50602762488582,
+    "froude_mean_wet": 0.40987860991600916,
+    "hole_retention": {
+      "centroid_x": null,
+      "centroid_y": null,
+      "hole_count": 0,
+      "retained_area": 0.0
+    },
+    "hydraulic_jump": {
+      "value": 0.5892873594557572,
+      "x": 104.0,
+      "y": 11.0
+    },
+    "mass_final": 3888.869802041791,
+    "mass_initial": 2963.151179400851,
+    "mass_relative_drift": 0.31241018989389535,
+    "solver": "geoclaw",
+    "wave_crest": {
+      "value": 3.6311418009675394,
+      "x": 12.0,
+      "y": -7.0
+    },
+    "wave_trough": {
+      "value": -0.7805862209438234,
+      "x": 76.0,
+      "y": 1.0
+    }
+  },
+  "reference": {
+    "energy_final": 12016.910388834869,
+    "energy_initial": 370.78462782046824,
+    "energy_relative_change": 31.40940828499877,
+    "frame_count": 3,
+    "froude_max": 2.50602762488582,
+    "froude_mean_wet": 0.40987860991600916,
+    "hole_retention": {
+      "centroid_x": null,
+      "centroid_y": null,
+      "hole_count": 0,
+      "retained_area": 0.0
+    },
+    "hydraulic_jump": {
+      "value": 0.5892873594557572,
+      "x": 104.0,
+      "y": 11.0
+    },
+    "mass_final": 3888.869802041791,
+    "mass_initial": 2963.151179400851,
+    "mass_relative_drift": 0.31241018989389535,
+    "solver": "geoclaw",
+    "wave_crest": {
+      "value": 3.6311418009675394,
+      "x": 12.0,
+      "y": -7.0
+    },
+    "wave_trough": {
+      "value": -0.7805862209438234,
+      "x": 76.0,
+      "y": 1.0
+    }
+  },
+  "reference_solver": "geoclaw",
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner"
+}
