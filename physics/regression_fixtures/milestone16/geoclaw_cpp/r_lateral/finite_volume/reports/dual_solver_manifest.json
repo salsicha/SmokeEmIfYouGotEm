@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_lateral/finite_volume/cpp_solver/lateral_wave_seed_19/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_lateral/finite_volume/cpp_solver/lateral_wave_seed_19",
     "returncode": 0,
-    "runtime_seconds": 0.4491942079985165,
+    "runtime_seconds": 0.4510919169988483,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_lateral/finite_volume/cpp_solver/lateral_wave_seed_19/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_lateral/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.4491942079985165,
-    "cpp_seconds_per_simulated_second": 0.05614927599981456,
+    "cpp_runtime_seconds": 0.4510919169988483,
+    "cpp_seconds_per_simulated_second": 0.05638648962485604,
     "geoclaw_runtime_seconds": 1.193660707998788,
     "geoclaw_seconds_per_simulated_second": 0.1492075884998485,
     "simulated_duration_seconds": 8.0

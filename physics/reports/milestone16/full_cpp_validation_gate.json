@@ -31,7 +31,6 @@
     {
       "blockers": [
         "south_fork_median_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
-        "south_fork_median_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "south_fork_high_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "south_fork_high_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "south_fork_cascading_low_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, wet_mismatch_fraction, probe_linf)",
@@ -39,10 +38,10 @@
         "south_fork_cascading_high_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, wet_mismatch_fraction, probe_linf)"
       ],
       "component_id": "geoclaw_cpp_comparisons",
-      "failed_count": 7,
+      "failed_count": 6,
       "notes": [],
       "passed": false,
-      "passed_count": 33,
+      "passed_count": 34,
       "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
       "title": "GeoClaw/C++ Threshold Comparisons",
       "total_count": 40
@@ -86,10 +85,10 @@
       "failed_count": 0,
       "notes": [],
       "passed": true,
-      "passed_count": 99,
+      "passed_count": 102,
       "source_report": "reports/milestone16/runtime_profile.json",
       "title": "Runtime Profile And Determinism",
-      "total_count": 99
+      "total_count": 102
     },
     {
       "blockers": [],
@@ -101,10 +100,10 @@
         "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs."
       ],
       "passed": true,
-      "passed_count": 59,
+      "passed_count": 60,
       "source_report": "reports/milestone16/regression_promotion_manifest.json",
       "title": "Regression Promotion",
-      "total_count": 59
+      "total_count": 60
     }
   ],
   "decision": "BLOCKED",

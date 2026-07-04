@@ -692,6 +692,29 @@
       "suite": "real_world"
     },
     {
+      "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate",
+      "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced",
+      "artifact_id": "geoclaw_cpp/south_fork_median_runnable/reduced",
+      "case_id": null,
+      "category": "geoclaw_cpp",
+      "gate_scenario_id": "south_fork_median_runnable",
+      "manifest": "regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/dual_solver_manifest.json",
+      "notes": [],
+      "passed": true,
+      "reports": {
+        "diagnostic_comparison": "regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/diagnostic_comparison.json",
+        "dual_solver_manifest": "regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/dual_solver_manifest.json",
+        "feature_comparison": "regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/feature_comparison.json",
+        "field_comparison": "regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/field_comparison.json",
+        "probe_comparison": "regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/probe_comparison.json",
+        "threshold_evaluation": "regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/threshold_evaluation.json"
+      },
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/scenario",
+      "solver_mode": "reduced",
+      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+      "suite": "real_world"
+    },
+    {
       "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
       "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume",
       "artifact_id": "geoclaw_cpp/south_fork_cascading_low_runnable/finite_volume",
@@ -1281,9 +1304,9 @@
       "suite": "cascading"
     }
   ],
-  "entry_count": 59,
+  "entry_count": 60,
   "fixture_root": "regression_fixtures/milestone16",
-  "geoclaw_cpp_fixture_count": 33,
+  "geoclaw_cpp_fixture_count": 34,
   "geometry_artifact_count": 8,
   "geometry_validation_report": "reports/milestone16/geometry_validation.json",
   "notes": [
