@@ -8,13 +8,13 @@ The Unreal game should deliver the first-person guide fantasy: seated in the ste
 
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial extraction, rapid identification, seasonal flow, adaptive fluid-parameter, and river-selection work that must feed Unreal content.
 See [Free And AI Asset Policy](free-and-ai-asset-policy.md) for the current art and sound sourcing decision, and [Audio Asset Sourcing Plan](audio-asset-sourcing-plan.md) for audio-specific source research, library shortlist, field-recording plan, AI-audio limits, and asset manifest.
-See [Python-To-Unreal Readiness Gate](python-to-unreal-readiness-gate.md) for the current readiness audit. The regenerated Milestone 16/18 gate approves live custom water after target-hardware confirmation; production Unreal work should now move through the Chaos/Jolt raft/contact authority evaluation and then the Milestone 20-25 full-game production sequence.
+See [Python-To-Unreal Readiness Gate](python-to-unreal-readiness-gate.md) for the current readiness audit. The regenerated Milestone 16/18 gate approves live custom water, and the Milestone 20 report-set lock records the accepted source reports plus desktop, VR, and handheld target budget-profile confirmation. Production Unreal work should now move through the Milestone 20-25 full-game production sequence while physical device captures remain release/platform sign-off evidence.
 See [Unreal Engine Version Lock](unreal-engine-version-lock.md) for the UE 5.8 feature review and version decision.
 See [Chaos And Jolt Runtime Evaluation](chaos-jolt-runtime-evaluation.md) for the split/hybrid raft/contact runtime plan and the shared Chaos/Jolt fixture suite.
 
 ## Hard Dependency Gate
 
-Do not treat the production Unreal Engine project as ready for live custom-water gameplay until the Python/GeoClaw/C++ physics program reaches an explicit exit gate. As of the Milestone 18 closure, the custom C++ water gate passes and the remaining pre-integration work is to lock the accepted report set, repeat target-hardware profiling, and finish the Chaos/Jolt raft/contact authority evaluation.
+Do not treat the production Unreal Engine project as ready for live custom-water gameplay until the Python/GeoClaw/C++ physics program reaches an explicit exit gate. As of the Milestone 20 report-set lock, the custom C++ water gate passes, the accepted Milestone 16 source reports are locked by hash, and the committed runtime profile records pass desktop, VR, and handheld target budget profiles. Physical device captures still need to be appended before platform release sign-off.
 
 Required before Unreal production begins:
 
@@ -29,6 +29,7 @@ Required before Unreal production begins:
 - Adaptive fluid parameters are documented for river, season, flow percentile, difficulty, channel geometry, roughness, aeration/turbulence, eddy-line shear, hole retention, wave train strength, boils, shallows, raft drag, paddle catch, and damping.
 - A first real-world corridor package exists for Unreal preproduction: terrain, centerline, banks, imagery masks, rapid boundaries, hazards, flow presets, confidence metadata, and validation telemetry.
 - Unreal readiness report exists with performance budgets for desktop, VR, and handheld/portable targets.
+- Milestone 20 report-set lock exists at `physics/reports/milestone20/report_set_lock.json`; Unreal live-water bridge code must load or cite this manifest until a newer accepted lock supersedes it.
 
 Unreal can still be used for throwaway visual studies, reference capture, or material tests, but the real game project should keep live-water and scoring-critical contact work gated by the accepted validation reports and runtime fixture evidence.
 
@@ -98,7 +99,7 @@ Jolt is the leading specialized candidate for a portable authoritative raft/cont
 The TODO roadmap now carries the full Unreal game build as explicit production milestones:
 
 - Milestone 19: select the first raft/contact/swimmer authority path by comparing Unreal Chaos and Jolt against the same fixture contract.
-- Milestone 20: create the Unreal production foundation and live custom-water bridge, including fixed-step scheduling, report manifests, regression fixtures, in-engine debug views, and target-hardware profiling.
+- Milestone 20: create the Unreal production foundation and live custom-water bridge, including the accepted Milestone 16 report-set lock, fixed-step scheduling, report manifests, regression fixtures, in-engine debug views, and target-profile/hardware profiling evidence.
 - Milestone 21: build the Unreal river editor and content pipeline for geospatial imports, reach-local authoring, stitched validation exports, flow-dependent feature tuning, guide annotations, South Fork content, and the Colorado rowing/oar-rig route.
 - Milestone 22: implement authoritative raft, crew, swimmer, and rescue gameplay over the validated water and selected contact runtime.
 - Milestone 23: deliver the first-person Unreal vertical slice from launch through scoring, replay, and physics/fidelity review.

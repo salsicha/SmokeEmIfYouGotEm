@@ -1,0 +1,266 @@
+{
+  "artifacts": [
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/cpp_solver_runs.json",
+      "sha256": "5509de7d3ede2199472ee52ecd465e1cb906f664c23c8f1bc2aa287888657de2",
+      "size_bytes": 53760
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/cpp_solver_runs.md",
+      "sha256": "38ee3e5f6839e637dda03a3c8674725b89a685f5aab37e8b708cfe060f843c36",
+      "size_bytes": 3254
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/full_cpp_validation_gate.json",
+      "sha256": "485e113704cb8f3f07a9f4cf922377b491f0f21a4cfa6369f606b0aa8a0b2db0",
+      "size_bytes": 3017
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/full_cpp_validation_gate.md",
+      "sha256": "9b0e4e1c656318f5fbc7b58f94ae7a38b2bb2f21db8a6252e2a31360dfb89ece",
+      "size_bytes": 931
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+      "sha256": "487e569864a0db35c53d34939eff835027c9b66a9f61367c29659ba39fa2c22a",
+      "size_bytes": 129862
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/geoclaw_cpp_comparisons.md",
+      "sha256": "06d9aedb55192668a242f8ed8b49aae165f0386eb2c04de717f5a30ec6f5081e",
+      "size_bytes": 3815
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/geoclaw_reference_runs.json",
+      "sha256": "c2a21a339d84f2362aa13f44a4374e305529794a2d8aea6ef3b25f02bc85f06c",
+      "size_bytes": 14429
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/geoclaw_reference_runs.md",
+      "sha256": "72b1fc3bde86749c82561126b22f26a990dc79bd2ada90cc738a8ec7f36a6cca",
+      "size_bytes": 2124
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/geometry_validation.json",
+      "sha256": "b6321665397fd0d0c786605387993a2c60b674325e10efb17a8ed25a5e8bbb19",
+      "size_bytes": 11250
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/geometry_validation.md",
+      "sha256": "cefe1e978fdfed7874f80298137dbad3dbdcd05609f881395009b0a357cebacd",
+      "size_bytes": 1891
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/raft_coupling_validation.json",
+      "sha256": "c611028a9038e157a711b9ae9c2d8a4635da566789f49971f6d8098a27582640",
+      "size_bytes": 149962
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/raft_coupling_validation.md",
+      "sha256": "57bc37d7f613aef89520e1be73c5b47b80bfe10fac388bb4583b11dff7ec6334",
+      "size_bytes": 6659
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/regression_promotion_manifest.json",
+      "sha256": "c7597105b3dad2e810d9115c755c53132447ceb10782c988f96f4b96dc641560",
+      "size_bytes": 122763
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/regression_promotion_manifest.md",
+      "sha256": "6b427d999263ac0efdc940fe4373c8684a02dd1ddf9eb9575bc36fe4732783fd",
+      "size_bytes": 15496
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/runtime_profile.json",
+      "sha256": "c170b4629d5a4d8bd184b59c887ec3870bc8106292068c878de44b9a8a9d5d74",
+      "size_bytes": 158848
+    },
+    {
+      "group": "milestone16_source_report",
+      "path": "physics/reports/milestone16/runtime_profile.md",
+      "sha256": "42cfa43fa9ba38d67f49ee841795071228fa86c08c279d5803c05cc33b172b21",
+      "size_bytes": 12605
+    },
+    {
+      "group": "milestone16_readiness_package",
+      "path": "physics/data/readiness/milestone_16/cpp_solver_summary.json",
+      "sha256": "4e42f9829c81c88272c317899bc1bcaaf047c68e49d7c8f1e3ce7758f2f0c7d1",
+      "size_bytes": 234
+    },
+    {
+      "group": "milestone16_readiness_package",
+      "path": "physics/data/readiness/milestone_16/geoclaw_cpp_comparison_summary.json",
+      "sha256": "f2d304d0a0bbc23d24334a7934467bd894bb38fe59c131858491ec9ee518ce95",
+      "size_bytes": 245
+    },
+    {
+      "group": "milestone16_readiness_package",
+      "path": "physics/data/readiness/milestone_16/geoclaw_reference_summary.json",
+      "sha256": "e64a077e2b77f0f82374ec9ba9f088b38e00f04049ca8476625ebbcf79bccbab",
+      "size_bytes": 251
+    },
+    {
+      "group": "milestone16_readiness_package",
+      "path": "physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.json",
+      "sha256": "72347b373839737978654456047bd8f5b3e91c1fe926371a3e3c6424b1f4af8b",
+      "size_bytes": 5467
+    },
+    {
+      "group": "milestone16_readiness_package",
+      "path": "physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.md",
+      "sha256": "1d0038372c7bf649405151a2b0dd678a72dcbd57b7be5e765ab952b5be7d9ecc",
+      "size_bytes": 2857
+    },
+    {
+      "group": "milestone16_readiness_package",
+      "path": "physics/data/readiness/milestone_16/geometry_validation_summary.json",
+      "sha256": "e1f4613d36c3369eed862499b81272f2303736761df78a9af6779deec4003f18",
+      "size_bytes": 213
+    },
+    {
+      "group": "milestone16_readiness_package",
+      "path": "physics/data/readiness/milestone_16/raft_coupling_validation_summary.json",
+      "sha256": "c8555e02f7ce8aab86d67f45c2a09760ff0d9bbd564ffad596c51463bddf848d",
+      "size_bytes": 441
+    },
+    {
+      "group": "milestone16_readiness_package",
+      "path": "physics/data/readiness/milestone_16/regression_promotion_summary.json",
+      "sha256": "95122fd01fcc23f81b52eec827e60f80b1ca0bd1634409eca56504d27df43621",
+      "size_bytes": 247
+    },
+    {
+      "group": "milestone16_readiness_package",
+      "path": "physics/data/readiness/milestone_16/runtime_profile_summary.json",
+      "sha256": "96570850bc72a876f08e795854b5086c707dd902cb95d1dbf3115cc426dcdce5",
+      "size_bytes": 303
+    },
+    {
+      "group": "runtime_budget_contract",
+      "path": "physics/config/runtime_budgets.json",
+      "sha256": "7e16686688beae4da5744b588e11461d7452fb3101d69ac240377fe9c3de7415",
+      "size_bytes": 1008
+    },
+    {
+      "group": "runtime_budget_contract",
+      "path": "docs/physics-runtime-budgets.md",
+      "sha256": "68c1786200d1ce90c2861bb9a7a08859e1de9fbadfe6fdca2920e7ea5023d00d",
+      "size_bytes": 1757
+    }
+  ],
+  "decision": "accepted_milestone16_report_set_locked_target_profiles_pass",
+  "lock": {
+    "artifact_count": 27,
+    "hash_algorithm": "sha256",
+    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
+    "readiness_artifact_count": 9,
+    "source_report_count": 16,
+    "supporting_artifact_count": 2
+  },
+  "notes": [
+    "The lock hash covers the accepted Milestone 16 source reports, packaged readiness summaries, and runtime budget contract.",
+    "Runtime profile evidence is repeated here by evaluating every committed Milestone 16 profile record against desktop, VR, and handheld budget profiles.",
+    "This artifact is the manifest Unreal live-water bridge work should load until a newer accepted report-set lock supersedes it."
+  ],
+  "passed": true,
+  "production_use": {
+    "authoritative_water_source": "custom_cxx_shallow_water_solver",
+    "live_water_unreal_bridge_foundation_unblocked": true,
+    "physical_device_capture_policy": "Replace or extend this lock with measured desktop, VR, and handheld device telemetry before release hardening or platform sign-off. The committed evidence confirms target budget profiles, not lab hardware IDs.",
+    "physical_device_capture_status": "not_recorded_in_repo",
+    "report_manifest_loading_required": true
+  },
+  "readiness_gate": {
+    "approved_for_unreal_production_start": true,
+    "passed": true,
+    "report": "physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.json",
+    "required_next_actions": [
+      "Lock the accepted Milestone 16 report set and regression fixtures before live-water Unreal integration.",
+      "Repeat runtime profiling on target desktop, VR, and handheld hardware."
+    ],
+    "status": "approved"
+  },
+  "schema": "raftsim.milestone20.report_set_lock.v1",
+  "source_gate": {
+    "blocked_component_count": 0,
+    "component_count": 7,
+    "decision": "PASS",
+    "passed": true,
+    "passed_component_count": 7,
+    "report": "physics/reports/milestone16/full_cpp_validation_gate.json"
+  },
+  "target_profile_confirmation": {
+    "all_profiles_passed": true,
+    "budget_config": "config/runtime_budgets.json",
+    "cpp_solver": "/private/tmp/raftsim-water-build/raftsim_water_solver",
+    "deterministic_replay": {
+      "failed_count": 0,
+      "group_count": 40,
+      "passed": true,
+      "passed_count": 40
+    },
+    "evidence_scope": "committed_milestone16_runtime_records_evaluated_against_target_budget_profiles",
+    "physical_hardware_capture_status": "not_recorded_in_repo",
+    "profiles": [
+      {
+        "failed_count": 0,
+        "max_runtime_budget_ms": 4.8,
+        "max_runtime_ms_per_tick": 1.27046,
+        "mean_runtime_ms_per_tick": 0.878851,
+        "p95_runtime_ms_per_tick": 1.177184,
+        "passed": true,
+        "passed_count": 80,
+        "physics_tick_hz": 120,
+        "profile": "desktop",
+        "record_count": 80,
+        "render_target_hz": 60,
+        "water_solver_budget_ms": 2.4
+      },
+      {
+        "failed_count": 0,
+        "max_runtime_budget_ms": 5.6,
+        "max_runtime_ms_per_tick": 1.27046,
+        "mean_runtime_ms_per_tick": 0.878851,
+        "p95_runtime_ms_per_tick": 1.177184,
+        "passed": true,
+        "passed_count": 80,
+        "physics_tick_hz": 60,
+        "profile": "handheld",
+        "record_count": 80,
+        "render_target_hz": 60,
+        "water_solver_budget_ms": 2.8
+      },
+      {
+        "failed_count": 0,
+        "max_runtime_budget_ms": 2.4,
+        "max_runtime_ms_per_tick": 1.27046,
+        "mean_runtime_ms_per_tick": 0.878851,
+        "p95_runtime_ms_per_tick": 1.177184,
+        "passed": true,
+        "passed_count": 80,
+        "physics_tick_hz": 120,
+        "profile": "vr",
+        "record_count": 80,
+        "render_target_hz": 90,
+        "water_solver_budget_ms": 1.6
+      }
+    ],
+    "run_count": 80,
+    "source_report": "physics/reports/milestone16/runtime_profile.json"
+  }
+}
