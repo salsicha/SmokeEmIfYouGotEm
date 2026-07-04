@@ -31,19 +31,19 @@
     {
       "blockers": [
         "eddy_line_shear: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
-        "eddy_line_shear: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "shallow_shelf: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "shallow_shelf: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "south_fork_low_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "south_fork_low_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
         "south_fork_median_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
-        "south_fork_median_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)"
+        "south_fork_median_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)",
+        "south_fork_high_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)"
       ],
       "component_id": "geoclaw_cpp_comparisons",
-      "failed_count": 13,
+      "failed_count": 12,
       "notes": [],
       "passed": false,
-      "passed_count": 27,
+      "passed_count": 28,
       "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
       "title": "GeoClaw/C++ Threshold Comparisons",
       "total_count": 40
@@ -87,10 +87,10 @@
       "failed_count": 0,
       "notes": [],
       "passed": true,
-      "passed_count": 81,
+      "passed_count": 84,
       "source_report": "reports/milestone16/runtime_profile.json",
       "title": "Runtime Profile And Determinism",
-      "total_count": 81
+      "total_count": 84
     },
     {
       "blockers": [],
@@ -102,10 +102,10 @@
         "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs."
       ],
       "passed": true,
-      "passed_count": 51,
+      "passed_count": 52,
       "source_report": "reports/milestone16/regression_promotion_manifest.json",
       "title": "Regression Promotion",
-      "total_count": 51
+      "total_count": 52
     }
   ],
   "decision": "BLOCKED",
