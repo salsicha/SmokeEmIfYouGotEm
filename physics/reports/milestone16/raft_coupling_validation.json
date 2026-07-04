@@ -849,43 +849,41 @@
         {
           "details": "Lateral wave should expose a meaningful cross-current.",
           "name": "cross_current",
-          "passed": true,
+          "passed": false,
           "threshold": 0.25,
-          "value": 1.1159648515861385
+          "value": 0.0330735316381397
         },
         {
           "details": "Integrated raft forces should push the raft sideways.",
           "name": "side_impulse",
           "passed": true,
           "threshold": 0.12,
-          "value": 23.025818643087376
+          "value": 5.453227104855707
         },
         {
           "details": "Asymmetric water loading should create roll acceleration.",
           "name": "roll_torque",
           "passed": true,
           "threshold": 1.0,
-          "value": 241.93035241502457
+          "value": 210.96790204740947
         }
       ],
       "candidate_frame": "outputs/m16cpp/r_lateral/finite_volume/cpp_solver/lateral_wave_seed_19/frames/frame_0008.csv",
-      "candidate_outcome": "side_surf",
-      "candidate_passed": true,
+      "candidate_outcome": "clear",
+      "candidate_passed": false,
       "case_id": "lateral_wave_side_impulse",
       "expected_outcomes": [
         "clear",
         "surfed"
       ],
-      "feature_outcome_match": false,
+      "feature_outcome_match": true,
       "flow_band": null,
-      "force_delta_weight_ratio": 2.4923598586838485,
+      "force_delta_weight_ratio": 3.8325621869350695e-07,
       "force_envelope_outcome_match": true,
       "gate_scenario_id": "lateral_wave",
       "notes": [
         "GeoClaw-derived raft feature checks are not passing.",
-        "Canonical feature outcomes differ.",
-        "Force delta exceeds the weight-normalized threshold.",
-        "Torque delta exceeds the inertia-normalized threshold."
+        "C++ raft feature checks are not passing."
       ],
       "passed": false,
       "reference_checks": [
@@ -923,9 +921,9 @@
       "reference_passed": false,
       "solver_mode": "finite_volume",
       "suite": "rafting",
-      "torque_delta_inertia_ratio": 10.678567341345262,
-      "trajectory_position_delta_m": 0.006791680614912015,
-      "trajectory_velocity_delta_mps": 0.40750083689480937
+      "torque_delta_inertia_ratio": 8.158680004101192e-07,
+      "trajectory_position_delta_m": 1.044375504584969e-09,
+      "trajectory_velocity_delta_mps": 6.266239171761923e-08
     },
     {
       "actual_scenario_id": "eddy_line_shear_seed_20",

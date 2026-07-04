@@ -17,7 +17,7 @@ Comparisons: 50
 | rafting | hydraulic_hole_downstream_boil | finite_volume | hydraulic_hole_surf_flush | FAIL | flush | flush | 0.000 | 0.000 |
 | rafting | hydraulic_hole_downstream_boil | finite_volume | downstream_boil_recovery | PASS | upwelling | upwelling | 0.000 | 0.000 |
 | rafting | lateral_wave | reduced | lateral_wave_side_impulse | FAIL | clear | clear | 0.000 | 0.000 |
-| rafting | lateral_wave | finite_volume | lateral_wave_side_impulse | FAIL | clear | side_surf | 2.492 | 0.408 |
+| rafting | lateral_wave | finite_volume | lateral_wave_side_impulse | FAIL | clear | clear | 0.000 | 0.000 |
 | rafting | eddy_line_shear | reduced | eddy_recovery | PASS | eddy_coupled | eddy_coupled | 0.521 | 0.085 |
 | rafting | eddy_line_shear | finite_volume | eddy_recovery | FAIL | eddy_coupled | eddy_coupled | 0.339 | 0.055 |
 | rafting | shallow_shelf | reduced | shallow_shelf_pivot_release | PASS | pivoted | pivoted | 0.326 | 0.053 |

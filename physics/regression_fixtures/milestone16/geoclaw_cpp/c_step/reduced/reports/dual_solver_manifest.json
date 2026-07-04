@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_step/reduced/cpp_solver/bed_step_seed_16/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_step/reduced/cpp_solver/bed_step_seed_16",
     "returncode": 0,
-    "runtime_seconds": 0.18731554100304493,
+    "runtime_seconds": 0.20954574999996112,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_step/reduced/cpp_solver/bed_step_seed_16/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_step/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.18731554100304493,
-    "cpp_seconds_per_simulated_second": 0.03121925683384082,
+    "cpp_runtime_seconds": 0.20954574999996112,
+    "cpp_seconds_per_simulated_second": 0.03492429166666019,
     "geoclaw_runtime_seconds": 1.0148943749991304,
     "geoclaw_seconds_per_simulated_second": 0.16914906249985506,
     "simulated_duration_seconds": 6.0
