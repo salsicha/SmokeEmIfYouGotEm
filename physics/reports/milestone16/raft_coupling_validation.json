@@ -573,28 +573,28 @@
           "name": "depression",
           "passed": false,
           "threshold": 0.08,
-          "value": 0.01250163304635965
+          "value": 0.01853469689121723
         },
         {
           "details": "Upstream hole velocity should be slow or reversing.",
           "name": "upstream_retention",
           "passed": false,
           "threshold": 0.15,
-          "value": 0.5810794983111729
+          "value": 0.7197354690995075
         },
         {
           "details": "",
           "name": "aerated_damping",
           "passed": true,
           "threshold": 0.25,
-          "value": 0.6667362866464156
+          "value": 0.5969470622286734
         },
         {
           "details": "",
           "name": "downstream_boil_lift",
           "passed": true,
           "threshold": 0.5,
-          "value": 1.793004447546603
+          "value": 2.048828301605425
         }
       ],
       "candidate_frame": "outputs/m16cpp/r_hole/finite_volume/cpp_solver/hydraulic_hole_downstream_boil_seed_18/frames/frame_0008.csv",
@@ -608,7 +608,7 @@
       ],
       "feature_outcome_match": true,
       "flow_band": null,
-      "force_delta_weight_ratio": 0.30336604876263973,
+      "force_delta_weight_ratio": 7.188111313825746e-15,
       "force_envelope_outcome_match": true,
       "gate_scenario_id": "hydraulic_hole_downstream_boil",
       "notes": [
@@ -658,9 +658,9 @@
       "reference_passed": false,
       "solver_mode": "finite_volume",
       "suite": "rafting",
-      "torque_delta_inertia_ratio": 0.08014323756544942,
-      "trajectory_position_delta_m": 0.0008266724828785037,
-      "trajectory_velocity_delta_mps": 0.04960034897269161
+      "torque_delta_inertia_ratio": 1.4836890936956585e-15,
+      "trajectory_position_delta_m": 2.168404344971009e-18,
+      "trajectory_velocity_delta_mps": 1.1654243626381287e-15
     },
     {
       "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
@@ -677,14 +677,14 @@
           "name": "surface_dome",
           "passed": true,
           "threshold": 0.03,
-          "value": 0.21764271538776828
+          "value": 0.21963044799199502
         },
         {
           "details": "Boil should impart upward raft acceleration.",
           "name": "vertical_impulse",
           "passed": true,
           "threshold": 2.0,
-          "value": 10.277236906156658
+          "value": 8.606676373943293
         },
         {
           "details": "Repeated force sampling should return identical boil impulses.",
@@ -703,7 +703,7 @@
       ],
       "feature_outcome_match": true,
       "flow_band": null,
-      "force_delta_weight_ratio": 0.5412158284670776,
+      "force_delta_weight_ratio": 4.0142370920490455e-09,
       "force_envelope_outcome_match": true,
       "gate_scenario_id": "hydraulic_hole_downstream_boil",
       "notes": [],
@@ -743,9 +743,9 @@
       "reference_passed": true,
       "solver_mode": "finite_volume",
       "suite": "rafting",
-      "torque_delta_inertia_ratio": 0.9983500908874429,
-      "trajectory_position_delta_m": 0.0014748131325729487,
-      "trajectory_velocity_delta_mps": 0.08848878795436685
+      "torque_delta_inertia_ratio": 3.032828620429229e-08,
+      "trajectory_position_delta_m": 1.0939890729308796e-11,
+      "trajectory_velocity_delta_mps": 6.563276208732204e-10
     },
     {
       "actual_scenario_id": "lateral_wave_seed_19",

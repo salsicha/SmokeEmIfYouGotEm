@@ -14,14 +14,14 @@
         "name": "surface_dome",
         "passed": true,
         "threshold": 0.03,
-        "value": 0.21764271538776828
+        "value": 0.21963044799199502
       },
       {
         "details": "Boil should impart upward raft acceleration.",
         "name": "vertical_impulse",
         "passed": true,
         "threshold": 2.0,
-        "value": 10.277236906156658
+        "value": 8.606676373943293
       },
       {
         "details": "Repeated force sampling should return identical boil impulses.",
@@ -40,7 +40,7 @@
     ],
     "feature_outcome_match": true,
     "flow_band": null,
-    "force_delta_weight_ratio": 0.5412158284670776,
+    "force_delta_weight_ratio": 4.0142370920490455e-09,
     "force_envelope_outcome_match": true,
     "gate_scenario_id": "hydraulic_hole_downstream_boil",
     "notes": [],
@@ -80,9 +80,9 @@
     "reference_passed": true,
     "solver_mode": "finite_volume",
     "suite": "rafting",
-    "torque_delta_inertia_ratio": 0.9983500908874429,
-    "trajectory_position_delta_m": 0.0014748131325729487,
-    "trajectory_velocity_delta_mps": 0.08848878795436685
+    "torque_delta_inertia_ratio": 3.032828620429229e-08,
+    "trajectory_position_delta_m": 1.0939890729308796e-11,
+    "trajectory_velocity_delta_mps": 6.563276208732204e-10
   },
   "schema_version": "raftsim.milestone16.regression_registry.v0",
   "source_report": "reports/milestone16/raft_coupling_validation.json"

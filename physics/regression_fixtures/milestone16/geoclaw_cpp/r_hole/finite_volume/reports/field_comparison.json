@@ -1,0 +1,363 @@
+{
+  "aggregate_field_errors": [
+    {
+      "field": "eta",
+      "max_l1": 1.9827531944290107e-08,
+      "max_l2": 1.2857140017956785e-07,
+      "max_linf": 9.951770607585786e-07
+    },
+    {
+      "field": "h",
+      "max_l1": 1.982753194894034e-08,
+      "max_l2": 1.285714001795661e-07,
+      "max_linf": 9.951770607585786e-07
+    },
+    {
+      "field": "hu",
+      "max_l1": 1.737165970004056e-08,
+      "max_l2": 3.24025157766539e-08,
+      "max_linf": 1.1905319396987579e-07
+    },
+    {
+      "field": "hv",
+      "max_l1": 3.3156016243375435e-10,
+      "max_l2": 1.8181686357475495e-09,
+      "max_linf": 2.9019179503819714e-08
+    },
+    {
+      "field": "normal_x",
+      "max_l1": 7.98541337397114e-09,
+      "max_l2": 4.732380797945591e-08,
+      "max_linf": 4.880179925077516e-07
+    },
+    {
+      "field": "normal_y",
+      "max_l1": 1.2153931897059936e-08,
+      "max_l2": 6.248725812272437e-08,
+      "max_linf": 4.968300635552203e-07
+    },
+    {
+      "field": "normal_z",
+      "max_l1": 4.892422774111326e-09,
+      "max_l2": 2.3489704398412772e-08,
+      "max_linf": 2.0741194084461512e-07
+    },
+    {
+      "field": "u",
+      "max_l1": 4.658153167410988e-08,
+      "max_l2": 5.9349241331879445e-08,
+      "max_linf": 2.3019526951273406e-07
+    },
+    {
+      "field": "v",
+      "max_l1": 8.673110635595851e-10,
+      "max_l2": 3.215521937647933e-09,
+      "max_linf": 3.866072895153394e-08
+    }
+  ],
+  "aggregate_slope_errors": [
+    {
+      "field": "slope_x",
+      "max_l1": 1.2382929884525456e-08,
+      "max_l2": 6.973350230637671e-08,
+      "max_linf": 4.945506475451111e-07
+    },
+    {
+      "field": "slope_y",
+      "max_l1": 1.881803431204439e-08,
+      "max_l2": 8.874368982633457e-08,
+      "max_linf": 4.975885306013339e-07
+    }
+  ],
+  "frame_comparisons": [
+    {
+      "cpp_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_hole/finite_volume/cpp_solver/hydraulic_hole_downstream_boil_seed_18/frames/frame_0000.csv",
+      "field_errors": [
+        {
+          "candidate_max": 1.528570017895555,
+          "candidate_min": 0.0,
+          "compared_count": 2592,
+          "field": "h",
+          "l1": 1.0369289822748918e-08,
+          "l2": 1.8442739368364393e-08,
+          "linf": 5.9155877529804e-08,
+          "reference_max": 1.5285700559616089,
+          "reference_min": 0.0,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 3.591733615075904,
+          "candidate_min": -0.07799999999999985,
+          "compared_count": 2592,
+          "field": "eta",
+          "l1": 1.0369289823070163e-08,
+          "l2": 1.8442739368564035e-08,
+          "linf": 5.9155877529804e-08,
+          "reference_max": 3.591733615075904,
+          "reference_min": -0.07800005168765534,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 3.1935704799396705,
+          "candidate_min": 0.7125451302974604,
+          "compared_count": 1214,
+          "field": "u",
+          "l1": 4.658153167410988e-08,
+          "l2": 5.9349241331879445e-08,
+          "linf": 2.3019526951273406e-07,
+          "reference_max": 3.193570555870556,
+          "reference_min": 0.7125451455950375,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.22052656816437552,
+          "candidate_min": -0.7065804734401353,
+          "compared_count": 1214,
+          "field": "v",
+          "l1": 8.673110635595851e-10,
+          "l2": 3.215521937647933e-09,
+          "linf": 3.866072895153394e-08,
+          "reference_max": 0.22052657518982277,
+          "reference_min": -0.706580449783382,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 3.610892422704691,
+          "candidate_min": 0.0,
+          "compared_count": 2592,
+          "field": "hu",
+          "l1": 1.737165970004056e-08,
+          "l2": 3.24025157766539e-08,
+          "linf": 1.1905319396987579e-07,
+          "reference_max": 3.6108925342559814,
+          "reference_min": 0.0,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.2907522306301537,
+          "candidate_min": -0.9474029114054492,
+          "compared_count": 2592,
+          "field": "hv",
+          "l1": 3.3156016243375435e-10,
+          "l2": 1.8181686357475495e-09,
+          "linf": 2.9019179503819714e-08,
+          "reference_max": 0.29075223207473755,
+          "reference_min": -0.9474028944969177,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.7107500386828794,
+          "candidate_min": -0.8099032224417724,
+          "compared_count": 2592,
+          "field": "normal_x",
+          "l1": 7.140729864322755e-09,
+          "l2": 1.3526257432470804e-08,
+          "linf": 8.445799960440925e-08,
+          "reference_max": 0.7107500356193761,
+          "reference_min": -0.8099032271830491,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.7165048657170117,
+          "candidate_min": -0.7165048657170117,
+          "compared_count": 2592,
+          "field": "normal_y",
+          "l1": 6.777037403407761e-09,
+          "l2": 1.2677199838559639e-08,
+          "linf": 5.754050906660935e-08,
+          "reference_max": 0.7165048653605518,
+          "reference_min": -0.7165048683174249,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.9998380393553743,
+          "candidate_min": 0.4178018607773782,
+          "compared_count": 2592,
+          "field": "normal_z",
+          "l1": 4.737322654356793e-10,
+          "l2": 1.235930904323566e-09,
+          "linf": 1.0497505864570655e-08,
+          "reference_max": 0.9998380408756141,
+          "reference_min": 0.41780185736931474,
+          "sample_count": 2592
+        }
+      ],
+      "label": "initial",
+      "pyclaw_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_hole/normalized/frames/frame_0000.npz",
+      "reference_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_hole/normalized/frames/frame_0000.npz",
+      "reference_solver": "geoclaw",
+      "slope_errors": [
+        {
+          "candidate_max": 1.9384863938490733,
+          "candidate_min": -1.0225568173369894,
+          "compared_count": 2592,
+          "field": "slope_x",
+          "l1": 7.554178931556537e-09,
+          "l2": 1.3841182668185406e-08,
+          "linf": 8.449904931318031e-08,
+          "reference_max": 1.9384864208878945,
+          "reference_min": -1.0225568288265414,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 1.0274843499575683,
+          "candidate_min": -1.0274843499575683,
+          "compared_count": 2592,
+          "field": "slope_y",
+          "l1": 7.40587124197485e-09,
+          "l2": 1.3103658593655518e-08,
+          "linf": 5.754982990158197e-08,
+          "reference_max": 1.0274843576207267,
+          "reference_min": -1.0274843489071168,
+          "sample_count": 2592
+        }
+      ],
+      "wet_mismatch_fraction": 0.0
+    },
+    {
+      "cpp_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_hole/finite_volume/cpp_solver/hydraulic_hole_downstream_boil_seed_18/frames/frame_0008.csv",
+      "field_errors": [
+        {
+          "candidate_max": 1.7880518436431887,
+          "candidate_min": 0.0,
+          "compared_count": 2592,
+          "field": "h",
+          "l1": 1.982753194894034e-08,
+          "l2": 1.285714001795661e-07,
+          "linf": 9.951770607585786e-07,
+          "reference_max": 1.7880518436431885,
+          "reference_min": 0.0,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 4.045619310637078,
+          "candidate_min": -0.9922949723369391,
+          "compared_count": 2592,
+          "field": "eta",
+          "l1": 1.9827531944290107e-08,
+          "l2": 1.2857140017956785e-07,
+          "linf": 9.951770607585786e-07,
+          "reference_max": 4.045619310637078,
+          "reference_min": -0.9922942588650051,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 5.042729959961318,
+          "candidate_min": -2.83454991408368,
+          "compared_count": 1380,
+          "field": "u",
+          "l1": 3.3785072163405226e-15,
+          "l2": 4.55783805999033e-15,
+          "linf": 2.2648549702353193e-14,
+          "reference_max": 5.042729959961339,
+          "reference_min": -2.834549914083687,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 4.957689494257961,
+          "candidate_min": -6.579077295165141,
+          "compared_count": 1380,
+          "field": "v",
+          "l1": 2.2546829540269105e-15,
+          "l2": 3.316314815211251e-15,
+          "linf": 2.0317081350640365e-14,
+          "reference_max": 4.957689494257976,
+          "reference_min": -6.579077295165144,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 2.895415067672732,
+          "candidate_min": -1.5719168186187644,
+          "compared_count": 2592,
+          "field": "hu",
+          "l1": 1.7058003465126916e-15,
+          "l2": 2.9732792081721547e-15,
+          "linf": 1.554312234475219e-14,
+          "reference_max": 2.8954150676727295,
+          "reference_min": -1.5719168186187744,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 2.946605682373045,
+          "candidate_min": -2.4352779388427708,
+          "compared_count": 2592,
+          "field": "hv",
+          "l1": 1.0467109331611235e-15,
+          "l2": 2.060899104221656e-15,
+          "linf": 1.965094753586527e-14,
+          "reference_max": 2.946605682373047,
+          "reference_min": -2.4352779388427734,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.8502809270736031,
+          "candidate_min": -0.8433124214477739,
+          "compared_count": 2592,
+          "field": "normal_x",
+          "l1": 7.98541337397114e-09,
+          "l2": 4.732380797945591e-08,
+          "linf": 4.880179925077516e-07,
+          "reference_max": 0.8502808767698223,
+          "reference_min": -0.8433124214477739,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.8441372911685973,
+          "candidate_min": -0.8440943635530473,
+          "compared_count": 2592,
+          "field": "normal_y",
+          "l1": 1.2153931897059936e-08,
+          "l2": 6.248725812272437e-08,
+          "linf": 4.968300635552203e-07,
+          "reference_max": 0.8441372933103792,
+          "reference_min": -0.8440943635530473,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 0.999999993278482,
+          "candidate_min": 0.3111609909373872,
+          "compared_count": 2592,
+          "field": "normal_z",
+          "l1": 4.892422774111326e-09,
+          "l2": 2.3489704398412772e-08,
+          "linf": 2.0741194084461512e-07,
+          "reference_max": 0.999999993278482,
+          "reference_min": 0.3111609909373872,
+          "sample_count": 2592
+        }
+      ],
+      "label": "final",
+      "pyclaw_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_hole/normalized/frames/frame_0002.npz",
+      "reference_frame": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_hole/normalized/frames/frame_0002.npz",
+      "reference_solver": "geoclaw",
+      "slope_errors": [
+        {
+          "candidate_max": 2.70783475913424,
+          "candidate_min": -1.6940436953790927,
+          "compared_count": 2592,
+          "field": "slope_x",
+          "l1": 1.2382929884525456e-08,
+          "l2": 6.973350230637671e-08,
+          "linf": 4.945506475451111e-07,
+          "reference_max": 2.70783475913424,
+          "reference_min": -1.6940433386431257,
+          "sample_count": 2592
+        },
+        {
+          "candidate_max": 1.5746687331927867,
+          "candidate_min": -1.6751544318280762,
+          "compared_count": 2592,
+          "field": "slope_y",
+          "l1": 1.881803431204439e-08,
+          "l2": 8.874368982633457e-08,
+          "linf": 4.975885306013339e-07,
+          "reference_max": 1.5746687331927867,
+          "reference_min": -1.6751540750921092,
+          "sample_count": 2592
+        }
+      ],
+      "wet_mismatch_fraction": 0.0
+    }
+  ],
+  "scenario_id": "hydraulic_hole_downstream_boil_seed_18"
+}

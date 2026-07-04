@@ -1,0 +1,187 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 9.0,
+        "y": -3.101490125297445
+      },
+      "kind": "rock",
+      "length": 7.010133312263641,
+      "metadata": {
+        "generated": true,
+        "source_index": 0,
+        "station_fraction": 0.12707951000718118
+      },
+      "radius": 2.5504071738234124,
+      "strength": 0.8666619815687552,
+      "width": 6.87629604470167
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 13.0,
+        "y": 2.3671561745664222
+      },
+      "kind": "wave_train",
+      "length": 6.940893460141763,
+      "metadata": {
+        "generated": true,
+        "source_index": 1,
+        "station_fraction": 0.17720324568909546
+      },
+      "radius": 3.4015707733522533,
+      "strength": 0.91559798139083,
+      "width": 6.875971542083188
+    },
+    {
+      "angle": -0.0,
+      "center": {
+        "x": 21.0,
+        "y": 4.670969150833748
+      },
+      "kind": "lateral",
+      "length": 8.615456210653234,
+      "metadata": {
+        "generated": true,
+        "source_index": 2,
+        "station_fraction": 0.30054190377988566
+      },
+      "radius": 2.29960420657079,
+      "strength": 0.7598897499866127,
+      "width": 4.081220058038469
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 30.0,
+        "y": 5.534225688801743
+      },
+      "kind": "shallow",
+      "length": 7.1775622276454945,
+      "metadata": {
+        "generated": true,
+        "source_index": 3,
+        "station_fraction": 0.4158972985179345
+      },
+      "radius": 2.4581986227197437,
+      "strength": 1.5451822502055947,
+      "width": 4.708485404323569
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 34.0,
+        "y": -0.06705778860719433
+      },
+      "kind": "constriction",
+      "length": 6.614711651742672,
+      "metadata": {
+        "generated": true,
+        "source_index": 4,
+        "station_fraction": 0.47303811438152843
+      },
+      "radius": 2.13057885014197,
+      "strength": 0.8927490034825782,
+      "width": 5.268687824116437
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 41.0,
+        "y": -4.840827783737629
+      },
+      "kind": "strainer",
+      "length": 6.860485192054207,
+      "metadata": {
+        "generated": true,
+        "source_index": 5,
+        "station_fraction": 0.5762182939297663
+      },
+      "radius": 2.5133147914622724,
+      "strength": 0.8794822043427969,
+      "width": 5.970023696455287
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 52.0,
+        "y": -4.370642289415785
+      },
+      "kind": "boil",
+      "length": 7.61133368115226,
+      "metadata": {
+        "generated": true,
+        "source_index": 6,
+        "station_fraction": 0.7288617277839928
+      },
+      "radius": 2.279156289758823,
+      "strength": 1.5629525742956252,
+      "width": 6.418240499456382
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 58.0,
+        "y": -0.17587192096496412
+      },
+      "kind": "ledge",
+      "length": 8.262100816061633,
+      "metadata": {
+        "generated": true,
+        "source_index": 7,
+        "station_fraction": 0.811006548614356
+      },
+      "radius": 3.086443593477016,
+      "strength": 1.2114793538447395,
+      "width": 5.630488874987511
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 62.0,
+        "y": -0.6584307861992376
+      },
+      "kind": "hole",
+      "length": 7.940362630220108,
+      "metadata": {
+        "generated": true,
+        "source_index": 8,
+        "station_fraction": 0.8714829152676747
+      },
+      "radius": 3.2208515261466193,
+      "strength": 1.5049826244262237,
+      "width": 7.678559024774299
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 31.240000000000002,
+        "y": 0.0
+      },
+      "kind": "hole",
+      "length": 9.940000000000001,
+      "metadata": {
+        "geoclaw_case_role": "hydraulic_hole"
+      },
+      "radius": 3.0625,
+      "strength": 1.35,
+      "width": 11.200000000000001
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 41.18,
+        "y": 0.0
+      },
+      "kind": "boil",
+      "length": 11.36,
+      "metadata": {
+        "geoclaw_case_role": "downstream_boil"
+      },
+      "radius": 3.3075000000000006,
+      "strength": 1.15,
+      "width": 11.9
+    }
+  ]
+}
