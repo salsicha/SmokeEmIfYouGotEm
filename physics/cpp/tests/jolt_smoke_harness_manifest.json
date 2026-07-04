@@ -1,23 +1,18 @@
 {
-  "automation_export": {
-    "manifest": "unreal/Content/RaftSim/Physics/chaos_automation_fixtures.json",
-    "replay_dir": "physics/reports/milestone19/chaos/replays",
-    "summary": "physics/reports/milestone19/chaos/summary.json"
-  },
-  "decision": "automation_fixture_export_complete_not_authority_evidence",
+  "decision": "native_jolt_smoke_harness_export_complete_not_authority_evidence",
   "fixed_step_seconds": 0.0083333333,
   "fixtures": [
     {
       "authoritative_evidence": false,
-      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.RaftRockAngleSweep",
       "duration_seconds": 8.0,
       "exports": {
-        "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/raft_rock_angle_sweep.telemetry.jsonl",
-        "replay_summary": "physics/reports/milestone19/chaos/replays/raft_rock_angle_sweep.replay_summary.json",
-        "summary": "physics/reports/milestone19/chaos/summary.json"
+        "full_telemetry_stream": "outputs/runtime_eval/jolt/raft_rock_angle_sweep.telemetry.jsonl",
+        "replay_summary": "physics/reports/milestone19/jolt/replays/raft_rock_angle_sweep.replay_summary.json",
+        "summary": "physics/reports/milestone19/jolt/summary.json"
       },
       "fixed_step_seconds": 0.0083333333,
       "fixture_id": "raft_rock_angle_sweep",
+      "harness_case_name": "jolt::raft_rock_angle_sweep",
       "metrics": [
         "peak_contact_impulse_n_s",
         "post_impact_heading_delta_degrees",
@@ -26,6 +21,13 @@
         "bounce_scrape_or_pin_classification",
         "cpu_ms_per_step"
       ],
+      "native_target": {
+        "cmake_target": "raftsim_jolt_smoke_harness",
+        "execution": "raftsim_jolt_smoke_harness physics/cpp/tests/jolt_smoke_harness_manifest.json",
+        "runtime": "Jolt",
+        "sdk_dependency_status": "not_vendored_placeholder_path",
+        "source": "physics/cpp/tools/jolt_smoke_harness.cpp"
+      },
       "parameter_case_count": 9,
       "parameter_cases": [
         {
@@ -96,7 +98,7 @@
         "water": "constant downstream current with sampled custom-water drag and buoyancy"
       },
       "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
-      "status": "ready_for_unreal_automation_execution",
+      "status": "ready_for_native_smoke_harness_execution",
       "step_count": 960,
       "telemetry_required": [
         "runtime_id",
@@ -116,26 +118,19 @@
         "runtime_cpu_ms",
         "determinism_hash"
       ],
-      "title": "Raft Hits Rock At Multiple Speeds And Angles",
-      "unreal_target": {
-        "debug_overlay_capture": "Saved/Automation/RaftSim/Chaos/raft_rock_angle_sweep_overlay.png",
-        "fixture_map": "/RaftSim/Physics/RuntimeEval/Chaos/raft_rock_angle_sweep",
-        "functional_test_actor": "BP_RaftSimChaosRuntimeFixture",
-        "runtime": "UnrealChaos",
-        "test_type": "EditorContext | EngineFilter"
-      }
+      "title": "Raft Hits Rock At Multiple Speeds And Angles"
     },
     {
       "authoritative_evidence": false,
-      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.ShallowShelfGrounding",
       "duration_seconds": 8.0,
       "exports": {
-        "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/shallow_shelf_grounding.telemetry.jsonl",
-        "replay_summary": "physics/reports/milestone19/chaos/replays/shallow_shelf_grounding.replay_summary.json",
-        "summary": "physics/reports/milestone19/chaos/summary.json"
+        "full_telemetry_stream": "outputs/runtime_eval/jolt/shallow_shelf_grounding.telemetry.jsonl",
+        "replay_summary": "physics/reports/milestone19/jolt/replays/shallow_shelf_grounding.replay_summary.json",
+        "summary": "physics/reports/milestone19/jolt/summary.json"
       },
       "fixed_step_seconds": 0.0083333333,
       "fixture_id": "shallow_shelf_grounding",
+      "harness_case_name": "jolt::shallow_shelf_grounding",
       "metrics": [
         "grounding_duration_seconds",
         "max_bed_penetration_m",
@@ -144,6 +139,13 @@
         "release_or_stick_outcome",
         "cpu_ms_per_step"
       ],
+      "native_target": {
+        "cmake_target": "raftsim_jolt_smoke_harness",
+        "execution": "raftsim_jolt_smoke_harness physics/cpp/tests/jolt_smoke_harness_manifest.json",
+        "runtime": "Jolt",
+        "sdk_dependency_status": "not_vendored_placeholder_path",
+        "source": "physics/cpp/tools/jolt_smoke_harness.cpp"
+      },
       "parameter_case_count": 9,
       "parameter_cases": [
         {
@@ -214,7 +216,7 @@
         "water": "thin custom-water sheet over shelf with downstream current"
       },
       "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
-      "status": "ready_for_unreal_automation_execution",
+      "status": "ready_for_native_smoke_harness_execution",
       "step_count": 960,
       "telemetry_required": [
         "runtime_id",
@@ -234,26 +236,19 @@
         "runtime_cpu_ms",
         "determinism_hash"
       ],
-      "title": "Raft Grounds On Shallow Shelf",
-      "unreal_target": {
-        "debug_overlay_capture": "Saved/Automation/RaftSim/Chaos/shallow_shelf_grounding_overlay.png",
-        "fixture_map": "/RaftSim/Physics/RuntimeEval/Chaos/shallow_shelf_grounding",
-        "functional_test_actor": "BP_RaftSimChaosRuntimeFixture",
-        "runtime": "UnrealChaos",
-        "test_type": "EditorContext | EngineFilter"
-      }
+      "title": "Raft Grounds On Shallow Shelf"
     },
     {
       "authoritative_evidence": false,
-      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.PinReleaseWrapProxy",
       "duration_seconds": 8.0,
       "exports": {
-        "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/pin_release_wrap_proxy.telemetry.jsonl",
-        "replay_summary": "physics/reports/milestone19/chaos/replays/pin_release_wrap_proxy.replay_summary.json",
-        "summary": "physics/reports/milestone19/chaos/summary.json"
+        "full_telemetry_stream": "outputs/runtime_eval/jolt/pin_release_wrap_proxy.telemetry.jsonl",
+        "replay_summary": "physics/reports/milestone19/jolt/replays/pin_release_wrap_proxy.replay_summary.json",
+        "summary": "physics/reports/milestone19/jolt/summary.json"
       },
       "fixed_step_seconds": 0.0083333333,
       "fixture_id": "pin_release_wrap_proxy",
+      "harness_case_name": "jolt::pin_release_wrap_proxy",
       "metrics": [
         "pin_entry_time_seconds",
         "peak_pin_force_n",
@@ -262,6 +257,13 @@
         "flip_or_release_outcome",
         "crew_weight_shift_effect"
       ],
+      "native_target": {
+        "cmake_target": "raftsim_jolt_smoke_harness",
+        "execution": "raftsim_jolt_smoke_harness physics/cpp/tests/jolt_smoke_harness_manifest.json",
+        "runtime": "Jolt",
+        "sdk_dependency_status": "not_vendored_placeholder_path",
+        "source": "physics/cpp/tools/jolt_smoke_harness.cpp"
+      },
       "parameter_case_count": 9,
       "parameter_cases": [
         {
@@ -332,7 +334,7 @@
         "water": "constant high-flow current pushing the raft into the pocket"
       },
       "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
-      "status": "ready_for_unreal_automation_execution",
+      "status": "ready_for_native_smoke_harness_execution",
       "step_count": 960,
       "telemetry_required": [
         "runtime_id",
@@ -352,26 +354,19 @@
         "runtime_cpu_ms",
         "determinism_hash"
       ],
-      "title": "Raft Pins Then Releases",
-      "unreal_target": {
-        "debug_overlay_capture": "Saved/Automation/RaftSim/Chaos/pin_release_wrap_proxy_overlay.png",
-        "fixture_map": "/RaftSim/Physics/RuntimeEval/Chaos/pin_release_wrap_proxy",
-        "functional_test_actor": "BP_RaftSimChaosRuntimeFixture",
-        "runtime": "UnrealChaos",
-        "test_type": "EditorContext | EngineFilter"
-      }
+      "title": "Raft Pins Then Releases"
     },
     {
       "authoritative_evidence": false,
-      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.CrewEjectionSwimmerTransition",
       "duration_seconds": 8.0,
       "exports": {
-        "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/crew_ejection_swimmer_transition.telemetry.jsonl",
-        "replay_summary": "physics/reports/milestone19/chaos/replays/crew_ejection_swimmer_transition.replay_summary.json",
-        "summary": "physics/reports/milestone19/chaos/summary.json"
+        "full_telemetry_stream": "outputs/runtime_eval/jolt/crew_ejection_swimmer_transition.telemetry.jsonl",
+        "replay_summary": "physics/reports/milestone19/jolt/replays/crew_ejection_swimmer_transition.replay_summary.json",
+        "summary": "physics/reports/milestone19/jolt/summary.json"
       },
       "fixed_step_seconds": 0.0083333333,
       "fixture_id": "crew_ejection_swimmer_transition",
+      "harness_case_name": "jolt::crew_ejection_swimmer_transition",
       "metrics": [
         "ejection_trigger_step",
         "crew_state_sequence",
@@ -380,6 +375,13 @@
         "ragdoll_or_character_stability",
         "cpu_ms_per_step"
       ],
+      "native_target": {
+        "cmake_target": "raftsim_jolt_smoke_harness",
+        "execution": "raftsim_jolt_smoke_harness physics/cpp/tests/jolt_smoke_harness_manifest.json",
+        "runtime": "Jolt",
+        "sdk_dependency_status": "not_vendored_placeholder_path",
+        "source": "physics/cpp/tools/jolt_smoke_harness.cpp"
+      },
       "parameter_case_count": 9,
       "parameter_cases": [
         {
@@ -450,7 +452,7 @@
         "water": "custom-water lateral force snapshot plus downstream swimmer drift"
       },
       "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
-      "status": "ready_for_unreal_automation_execution",
+      "status": "ready_for_native_smoke_harness_execution",
       "step_count": 960,
       "telemetry_required": [
         "runtime_id",
@@ -470,26 +472,19 @@
         "runtime_cpu_ms",
         "determinism_hash"
       ],
-      "title": "Crew Falls Out And Becomes Swimmer",
-      "unreal_target": {
-        "debug_overlay_capture": "Saved/Automation/RaftSim/Chaos/crew_ejection_swimmer_transition_overlay.png",
-        "fixture_map": "/RaftSim/Physics/RuntimeEval/Chaos/crew_ejection_swimmer_transition",
-        "functional_test_actor": "BP_RaftSimChaosRuntimeFixture",
-        "runtime": "UnrealChaos",
-        "test_type": "EditorContext | EngineFilter"
-      }
+      "title": "Crew Falls Out And Becomes Swimmer"
     },
     {
       "authoritative_evidence": false,
-      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.FixedStepReplayDeterminism",
       "duration_seconds": 8.333333,
       "exports": {
-        "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/fixed_step_replay_determinism.telemetry.jsonl",
-        "replay_summary": "physics/reports/milestone19/chaos/replays/fixed_step_replay_determinism.replay_summary.json",
-        "summary": "physics/reports/milestone19/chaos/summary.json"
+        "full_telemetry_stream": "outputs/runtime_eval/jolt/fixed_step_replay_determinism.telemetry.jsonl",
+        "replay_summary": "physics/reports/milestone19/jolt/replays/fixed_step_replay_determinism.replay_summary.json",
+        "summary": "physics/reports/milestone19/jolt/summary.json"
       },
       "fixed_step_seconds": 0.0083333333,
       "fixture_id": "fixed_step_replay_determinism",
+      "harness_case_name": "jolt::fixed_step_replay_determinism",
       "metrics": [
         "determinism_hash_mismatch_count",
         "max_position_drift_m",
@@ -497,6 +492,13 @@
         "contact_event_sequence_mismatch_count",
         "outcome_mismatch_count"
       ],
+      "native_target": {
+        "cmake_target": "raftsim_jolt_smoke_harness",
+        "execution": "raftsim_jolt_smoke_harness physics/cpp/tests/jolt_smoke_harness_manifest.json",
+        "runtime": "Jolt",
+        "sdk_dependency_status": "not_vendored_placeholder_path",
+        "source": "physics/cpp/tools/jolt_smoke_harness.cpp"
+      },
       "parameter_case_count": 1,
       "parameter_cases": [
         {
@@ -519,7 +521,7 @@
         "water": "deterministic recorded water samples"
       },
       "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
-      "status": "ready_for_unreal_automation_execution",
+      "status": "ready_for_native_smoke_harness_execution",
       "step_count": 1000,
       "telemetry_required": [
         "runtime_id",
@@ -539,26 +541,19 @@
         "runtime_cpu_ms",
         "determinism_hash"
       ],
-      "title": "Replay Determinism Over 1000 Fixed Steps",
-      "unreal_target": {
-        "debug_overlay_capture": "Saved/Automation/RaftSim/Chaos/fixed_step_replay_determinism_overlay.png",
-        "fixture_map": "/RaftSim/Physics/RuntimeEval/Chaos/fixed_step_replay_determinism",
-        "functional_test_actor": "BP_RaftSimChaosRuntimeFixture",
-        "runtime": "UnrealChaos",
-        "test_type": "EditorContext | EngineFilter"
-      }
+      "title": "Replay Determinism Over 1000 Fixed Steps"
     },
     {
       "authoritative_evidence": false,
-      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.RuntimeCostCrowdedScene",
       "duration_seconds": 30.0,
       "exports": {
-        "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/runtime_cost_crowded_scene.telemetry.jsonl",
-        "replay_summary": "physics/reports/milestone19/chaos/replays/runtime_cost_crowded_scene.replay_summary.json",
-        "summary": "physics/reports/milestone19/chaos/summary.json"
+        "full_telemetry_stream": "outputs/runtime_eval/jolt/runtime_cost_crowded_scene.telemetry.jsonl",
+        "replay_summary": "physics/reports/milestone19/jolt/replays/runtime_cost_crowded_scene.replay_summary.json",
+        "summary": "physics/reports/milestone19/jolt/summary.json"
       },
       "fixed_step_seconds": 0.0083333333,
       "fixture_id": "runtime_cost_crowded_scene",
+      "harness_case_name": "jolt::runtime_cost_crowded_scene",
       "metrics": [
         "mean_cpu_ms_per_step",
         "p95_cpu_ms_per_step",
@@ -567,6 +562,13 @@
         "island_count",
         "telemetry_bytes_per_second"
       ],
+      "native_target": {
+        "cmake_target": "raftsim_jolt_smoke_harness",
+        "execution": "raftsim_jolt_smoke_harness physics/cpp/tests/jolt_smoke_harness_manifest.json",
+        "runtime": "Jolt",
+        "sdk_dependency_status": "not_vendored_placeholder_path",
+        "source": "physics/cpp/tools/jolt_smoke_harness.cpp"
+      },
       "parameter_case_count": 2,
       "parameter_cases": [
         {
@@ -595,7 +597,7 @@
         "water": "custom-water snapshot with sampled buoyancy, drag, and contact inputs"
       },
       "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
-      "status": "ready_for_unreal_automation_execution",
+      "status": "ready_for_native_smoke_harness_execution",
       "step_count": 3600,
       "telemetry_required": [
         "runtime_id",
@@ -615,14 +617,7 @@
         "runtime_cpu_ms",
         "determinism_hash"
       ],
-      "title": "Runtime Cost With Raft, Crew, Rocks, And Loose Props",
-      "unreal_target": {
-        "debug_overlay_capture": "Saved/Automation/RaftSim/Chaos/runtime_cost_crowded_scene_overlay.png",
-        "fixture_map": "/RaftSim/Physics/RuntimeEval/Chaos/runtime_cost_crowded_scene",
-        "functional_test_actor": "BP_RaftSimChaosRuntimeFixture",
-        "runtime": "UnrealChaos",
-        "test_type": "EditorContext | EngineFilter"
-      }
+      "title": "Runtime Cost With Raft, Crew, Rocks, And Loose Props"
     }
   ],
   "global_pass_gates": [
@@ -631,10 +626,18 @@
     "Scoring-critical outcomes must be reproducible from replay telemetry.",
     "A runtime cannot become authoritative for raft/contact gameplay unless it passes determinism, runtime, and qualitative outcome gates."
   ],
-  "schema": "raftsim.unreal.chaos_automation_fixtures.v1",
+  "native_harness": {
+    "cmake_target": "raftsim_jolt_smoke_harness",
+    "manifest": "physics/cpp/tests/jolt_smoke_harness_manifest.json",
+    "replay_dir": "physics/reports/milestone19/jolt/replays",
+    "sdk_dependency_status": "not_vendored_placeholder_path",
+    "source": "physics/cpp/tools/jolt_smoke_harness.cpp",
+    "summary": "physics/reports/milestone19/jolt/summary.json"
+  },
+  "schema": "raftsim.native.jolt_smoke_harness.v1",
   "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
-  "summary": "Unreal Chaos automation fixtures generated from the shared Chaos/Jolt runtime evaluation contract. These fixtures export schema-compatible telemetry/replay summaries but do not select Chaos as authoritative.",
-  "target_runtime": "UnrealChaos",
+  "summary": "Native Jolt smoke harness generated from the shared Chaos/Jolt runtime evaluation contract. The harness is source-controlled and schema-compatible, but Jolt SDK physics results are still pending.",
+  "target_runtime": "Jolt",
   "telemetry_required": [
     "runtime_id",
     "fixture_id",

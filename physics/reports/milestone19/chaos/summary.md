@@ -2,9 +2,9 @@
 
 Decision: `automation_fixture_export_complete_not_authority_evidence`
 
-Exported 6 Chaos fixtures with 39 expanded parameter cases and 6 replay summaries.
+Exported 6 UnrealChaos fixtures with 39 expanded parameter cases and 6 replay summaries.
 
-These files are automation-ready fixtures, not Chaos authority evidence. Unreal still needs to execute the generated fixtures and replace placeholder telemetry frames with measured Chaos results before Chaos can be ranked against Jolt.
+These files are automation-ready fixtures, not authority evidence. The runtime still needs to execute the generated fixtures and replace placeholder telemetry frames with measured results before it can be ranked against the other candidate.
 
 ## Fixtures
 

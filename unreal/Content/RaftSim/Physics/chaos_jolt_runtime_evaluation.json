@@ -276,9 +276,9 @@
       "replay": "physics/reports/milestone19/chaos/replays/"
     },
     "jolt": {
-      "automation": "future native C++ or Unreal-plugin Jolt smoke harness",
-      "summary": "outputs/runtime_eval/jolt/summary.json",
-      "replay": "outputs/runtime_eval/jolt/replays/"
+      "automation": "physics/cpp/tests/jolt_smoke_harness_manifest.json",
+      "summary": "physics/reports/milestone19/jolt/summary.json",
+      "replay": "physics/reports/milestone19/jolt/replays/"
     },
     "comparison": "outputs/runtime_eval/chaos_vs_jolt_comparison.json"
   },

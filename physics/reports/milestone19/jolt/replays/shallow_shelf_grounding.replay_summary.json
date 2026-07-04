@@ -1,32 +1,32 @@
 {
   "authoritative_evidence": false,
   "fixed_step_seconds": 0.0083333333,
-  "fixture_id": "crew_ejection_swimmer_transition",
+  "fixture_id": "shallow_shelf_grounding",
   "parameter_case_count": 9,
   "replay_reproduction": {
     "determinism_hash_scope": "gameplay-state telemetry, contacts, raft pose, and fixture inputs",
-    "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/crew_ejection_swimmer_transition.telemetry.jsonl",
+    "full_telemetry_stream": "outputs/runtime_eval/jolt/shallow_shelf_grounding.telemetry.jsonl",
     "replace_placeholder_frames_after_runtime_run": true
   },
   "representative_parameter_case": {
+    "approach_speeds_mps": 1.0,
     "case_id": "case_000",
-    "ragdoll_visualization": "enabled",
-    "roll_impulse_scale": 0.7,
-    "swimmer_drag_scale": 0.8
+    "contact_preset": "bed_grounding_inelastic_default",
+    "shelf_depth_m": 0.08
   },
-  "runtime_id": "UnrealChaos",
+  "runtime_id": "Jolt",
   "sample_frames": [
     {
       "contact_impulses": [],
-      "contact_material": "runtime_eval_default",
+      "contact_material": "bed_grounding_inelastic_default",
       "contact_points": [],
       "crew_state": {
-        "at_risk": true,
+        "at_risk": false,
         "scripted_high_side": false,
-        "seated": 7
+        "seated": 8
       },
-      "determinism_hash": "bbeb5e8a61c81a50",
-      "fixture_id": "crew_ejection_swimmer_transition",
+      "determinism_hash": "3888ab2f18d0845e",
+      "fixture_id": "shallow_shelf_grounding",
       "outcome": "initialized",
       "parameter_case_id": "case_000",
       "pin_state": {
@@ -36,18 +36,18 @@
       "raft_angular_velocity": {
         "pitch_dps": 0.0,
         "roll_dps": 0.0,
-        "yaw_dps": 0.15
+        "yaw_dps": 0.05
       },
       "raft_linear_velocity": {
-        "x_mps": 1.3,
+        "x_mps": 1.1,
         "y_mps": 0.0,
         "z_mps": 0.0
       },
       "raft_pose": {
         "pitch_deg": 0.0,
-        "roll_deg": 0.3,
+        "roll_deg": 0.1,
         "x_m": 0.0,
-        "y_m": 0.05,
+        "y_m": -0.05,
         "yaw_deg": 0.0,
         "z_m": 0.0
       },
@@ -56,7 +56,7 @@
         "trigger": "none"
       },
       "runtime_cpu_ms": 0.0,
-      "runtime_id": "UnrealChaos",
+      "runtime_id": "Jolt",
       "sample_kind": "schema_placeholder",
       "step_index": 0,
       "swimmer_state": {
@@ -67,13 +67,13 @@
     },
     {
       "contact_impulses": [
-        13.0
+        11.0
       ],
-      "contact_material": "runtime_eval_default",
+      "contact_material": "bed_grounding_inelastic_default",
       "contact_points": [
         {
           "body_a": "standard_14ft_paddle_raft",
-          "body_b": "runtime_eval_default",
+          "body_b": "bed_grounding_inelastic_default",
           "normal": {
             "x": -1.0,
             "y": 0.0,
@@ -87,13 +87,13 @@
         }
       ],
       "crew_state": {
-        "at_risk": true,
+        "at_risk": false,
         "scripted_high_side": false,
-        "seated": 7
+        "seated": 8
       },
-      "determinism_hash": "fa248dbdc7ccd470",
-      "fixture_id": "crew_ejection_swimmer_transition",
-      "outcome": "ejected_to_swimmer",
+      "determinism_hash": "f0b33071cac0fb2a",
+      "fixture_id": "shallow_shelf_grounding",
+      "outcome": "grounding_or_release",
       "parameter_case_id": "case_000",
       "pin_state": {
         "active": false,
@@ -102,18 +102,18 @@
       "raft_angular_velocity": {
         "pitch_dps": 0.0,
         "roll_dps": 0.0,
-        "yaw_dps": 0.15
+        "yaw_dps": 0.05
       },
       "raft_linear_velocity": {
-        "x_mps": 1.3,
+        "x_mps": 1.1,
         "y_mps": 0.0,
         "z_mps": 0.0
       },
       "raft_pose": {
         "pitch_deg": 0.0,
-        "roll_deg": 0.3,
+        "roll_deg": 0.1,
         "x_m": 1.0,
-        "y_m": 0.05,
+        "y_m": -0.05,
         "yaw_deg": 9.6,
         "z_m": 0.0
       },
@@ -122,24 +122,24 @@
         "trigger": "none"
       },
       "runtime_cpu_ms": 0.0,
-      "runtime_id": "UnrealChaos",
+      "runtime_id": "Jolt",
       "sample_kind": "schema_placeholder",
       "step_index": 480,
       "swimmer_state": {
-        "active": true,
-        "state": "swimming"
+        "active": false,
+        "state": "none"
       },
       "time_seconds": 4.0
     },
     {
       "contact_impulses": [
-        13.0
+        11.0
       ],
-      "contact_material": "runtime_eval_default",
+      "contact_material": "bed_grounding_inelastic_default",
       "contact_points": [
         {
           "body_a": "standard_14ft_paddle_raft",
-          "body_b": "runtime_eval_default",
+          "body_b": "bed_grounding_inelastic_default",
           "normal": {
             "x": -1.0,
             "y": 0.0,
@@ -153,13 +153,13 @@
         }
       ],
       "crew_state": {
-        "at_risk": true,
+        "at_risk": false,
         "scripted_high_side": false,
-        "seated": 7
+        "seated": 8
       },
-      "determinism_hash": "9bd39da97ed20d19",
-      "fixture_id": "crew_ejection_swimmer_transition",
-      "outcome": "ejected_to_swimmer",
+      "determinism_hash": "29769227b1ad0511",
+      "fixture_id": "shallow_shelf_grounding",
+      "outcome": "grounding_or_release",
       "parameter_case_id": "case_000",
       "pin_state": {
         "active": false,
@@ -168,18 +168,18 @@
       "raft_angular_velocity": {
         "pitch_dps": 0.0,
         "roll_dps": 0.0,
-        "yaw_dps": 0.15
+        "yaw_dps": 0.05
       },
       "raft_linear_velocity": {
-        "x_mps": 1.3,
+        "x_mps": 1.1,
         "y_mps": 0.0,
         "z_mps": 0.0
       },
       "raft_pose": {
         "pitch_deg": 0.0,
-        "roll_deg": 0.3,
+        "roll_deg": 0.1,
         "x_m": 1.997917,
-        "y_m": 0.05,
+        "y_m": -0.05,
         "yaw_deg": 19.18,
         "z_m": 0.0
       },
@@ -188,20 +188,20 @@
         "trigger": "none"
       },
       "runtime_cpu_ms": 0.0,
-      "runtime_id": "UnrealChaos",
+      "runtime_id": "Jolt",
       "sample_kind": "schema_placeholder",
       "step_index": 959,
       "swimmer_state": {
-        "active": true,
-        "state": "swimming"
+        "active": false,
+        "state": "none"
       },
       "time_seconds": 7.991667
     }
   ],
   "sampled_step_count": 3,
-  "schema": "raftsim.unreal.chaos_fixture_replay_summary.v1",
+  "schema": "raftsim.native.jolt_fixture_replay_summary.v1",
   "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
-  "status": "schema_placeholder_ready_for_unreal_automation_execution",
+  "status": "schema_placeholder_ready_for_native_smoke_harness_execution",
   "step_count": 960,
   "telemetry_required": [
     "runtime_id",
