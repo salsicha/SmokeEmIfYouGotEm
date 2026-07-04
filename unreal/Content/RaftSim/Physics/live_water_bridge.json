@@ -7,6 +7,7 @@
     "required": true,
     "loader": "URaftSimWaterRuntimeAdapter::LoadAcceptedReportManifest"
   },
+  "regression_fixture_import": "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json",
   "water_runtime": {
     "module": "RaftSimWater",
     "adapter_class": "URaftSimWaterRuntimeAdapter",
