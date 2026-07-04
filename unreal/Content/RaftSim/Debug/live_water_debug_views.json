@@ -1,0 +1,122 @@
+{
+  "schema": "raftsim.unreal.live_water_debug_views.v1",
+  "status": "ready_for_unreal_debug_overlay_wiring",
+  "module": "RaftSimDebug",
+  "view_set_class": "URaftSimWaterDebugViewSet",
+  "view_model_class": "URaftSimWaterDebugViewModel",
+  "source_manifests": {
+    "live_water_bridge": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
+    "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json",
+    "regression_fixture_import": "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json",
+    "runtime_budgets": "physics/config/runtime_budgets.json",
+    "report_set_lock": "physics/reports/milestone20/report_set_lock.json"
+  },
+  "views": [
+    {
+      "view_id": "depth",
+      "display_name": "Depth",
+      "render_mode": "scalar_heatmap",
+      "telemetry_fields": [
+        "water_depth_m"
+      ],
+      "units": "m",
+      "default_enabled": true
+    },
+    {
+      "view_id": "velocity",
+      "display_name": "Velocity",
+      "render_mode": "vector_arrows",
+      "telemetry_fields": [
+        "velocity_u_m_s",
+        "velocity_v_m_s",
+        "velocity_magnitude_m_s"
+      ],
+      "units": "m/s",
+      "default_enabled": true
+    },
+    {
+      "view_id": "froude",
+      "display_name": "Froude",
+      "render_mode": "scalar_heatmap_thresholded",
+      "telemetry_fields": [
+        "froude_number"
+      ],
+      "units": "dimensionless",
+      "default_enabled": false
+    },
+    {
+      "view_id": "wet_dry_mask",
+      "display_name": "Wet/Dry Mask",
+      "render_mode": "binary_mask",
+      "telemetry_fields": [
+        "wet_mask"
+      ],
+      "units": "boolean",
+      "default_enabled": false
+    },
+    {
+      "view_id": "feature_tags",
+      "display_name": "Feature Tags",
+      "render_mode": "tagged_regions",
+      "telemetry_fields": [
+        "feature_kind",
+        "feature_strength",
+        "flow_band"
+      ],
+      "units": "tags",
+      "default_enabled": false
+    },
+    {
+      "view_id": "conservation_deltas",
+      "display_name": "Conservation Deltas",
+      "render_mode": "signed_scalar_heatmap",
+      "telemetry_fields": [
+        "mass_delta_m3",
+        "momentum_delta_m4_s"
+      ],
+      "units": "mixed",
+      "default_enabled": false
+    },
+    {
+      "view_id": "raft_trajectory",
+      "display_name": "Raft Trajectory",
+      "render_mode": "polyline_with_samples",
+      "telemetry_fields": [
+        "raft_position_m",
+        "raft_orientation_deg",
+        "raft_speed_m_s"
+      ],
+      "units": "m",
+      "default_enabled": true
+    },
+    {
+      "view_id": "contact_probes",
+      "display_name": "Contact Probes",
+      "render_mode": "points_and_normals",
+      "telemetry_fields": [
+        "contact_point_m",
+        "contact_normal",
+        "contact_impulse_n_s"
+      ],
+      "units": "mixed",
+      "default_enabled": true
+    },
+    {
+      "view_id": "runtime_budgets",
+      "display_name": "Runtime Budgets",
+      "render_mode": "budget_bars",
+      "telemetry_fields": [
+        "water_runtime_ms_per_tick",
+        "raft_runtime_ms_per_tick",
+        "telemetry_runtime_ms_per_tick"
+      ],
+      "units": "ms/tick",
+      "default_enabled": true
+    }
+  ],
+  "capture_policy": {
+    "saved_overlay_root": "Saved/Automation/RaftSim/Debug",
+    "include_in_live_water_smoke_suite": true,
+    "preserve_report_manifest_hash": true
+  }
+}
