@@ -39,12 +39,12 @@ Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 - Authoritative water candidate: custom C++ reduced or finite-volume shallow-water / height-field solver.
 - Reference solver: GeoClaw after Milestone 14 transition; PyClaw artifacts are legacy regression data only.
 - Raft/contact candidate: selected after the Chaos/Jolt shared fixture evaluation, with Chrono kept as high-fidelity reference/research and the custom reduced runtime as fallback if neither candidate passes.
-- Unreal integration order: telemetry/replay playback first, Milestone 18 water-validation closure, live custom water approval, then selected raft/contact runtime coupling.
+- Unreal integration order: telemetry/replay playback first, Milestone 18 water-validation closure, live custom water approval, Milestone 19 Chaos/Jolt raft/contact authority evaluation, then Milestone 20-25 Unreal full-game production.
 - Chrono::FSI remains an optional research path, not the baseline runtime dependency.
 
 ## Next Action
 
-Lock the accepted Milestone 16 report set and regression fixtures before live-water Unreal integration, then repeat runtime profiling on target desktop, VR, and handheld hardware.
+Lock the accepted Milestone 16 report set and regression fixtures before live-water Unreal integration, then repeat runtime profiling on target desktop, VR, and handheld hardware. After Milestone 19 selects the raft/contact authority path, follow the Unreal full-game roadmap in TODO Milestones 20-25: production foundation/live-water bridge, river editor/content pipeline, raft/crew/swimmer rescue gameplay, first-person vertical slice, alpha content expansion, and platform/release hardening.
 
 Milestone 18 closure results:
 

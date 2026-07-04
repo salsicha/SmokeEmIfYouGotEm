@@ -8,13 +8,13 @@ The Unreal game should deliver the first-person guide fantasy: seated in the ste
 
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial extraction, rapid identification, seasonal flow, adaptive fluid-parameter, and river-selection work that must feed Unreal content.
 See [Free And AI Asset Policy](free-and-ai-asset-policy.md) for the current art and sound sourcing decision, and [Audio Asset Sourcing Plan](audio-asset-sourcing-plan.md) for audio-specific source research, library shortlist, field-recording plan, AI-audio limits, and asset manifest.
-See [Python-To-Unreal Readiness Gate](python-to-unreal-readiness-gate.md) for the current Milestone 10 audit. The current gate decision is approved after shallow-cell-aware velocity/Froude comparison; production Unreal work should start with telemetry/replay playback before live water, selected raft/contact runtime coupling, VR, and contact integration.
+See [Python-To-Unreal Readiness Gate](python-to-unreal-readiness-gate.md) for the current readiness audit. The regenerated Milestone 16/18 gate approves live custom water after target-hardware confirmation; production Unreal work should now move through the Chaos/Jolt raft/contact authority evaluation and then the Milestone 20-25 full-game production sequence.
 See [Unreal Engine Version Lock](unreal-engine-version-lock.md) for the UE 5.8 feature review and version decision.
 See [Chaos And Jolt Runtime Evaluation](chaos-jolt-runtime-evaluation.md) for the split/hybrid raft/contact runtime plan and the shared Chaos/Jolt fixture suite.
 
 ## Hard Dependency Gate
 
-Do not start the production Unreal Engine project until the Python physics program reaches an explicit exit gate.
+Do not treat the production Unreal Engine project as ready for live custom-water gameplay until the Python/GeoClaw/C++ physics program reaches an explicit exit gate. As of the Milestone 18 closure, the custom C++ water gate passes and the remaining pre-integration work is to lock the accepted report set, repeat target-hardware profiling, and finish the Chaos/Jolt raft/contact authority evaluation.
 
 Required before Unreal production begins:
 
@@ -30,7 +30,7 @@ Required before Unreal production begins:
 - A first real-world corridor package exists for Unreal preproduction: terrain, centerline, banks, imagery masks, rapid boundaries, hazards, flow presets, confidence metadata, and validation telemetry.
 - Unreal readiness report exists with performance budgets for desktop, VR, and handheld/portable targets.
 
-Unreal can still be used earlier for throwaway visual studies, reference capture, or material tests, but the real game project should wait until the modeling and profiling gate is passed.
+Unreal can still be used for throwaway visual studies, reference capture, or material tests, but the real game project should keep live-water and scoring-critical contact work gated by the accepted validation reports and runtime fixture evidence.
 
 ## Engine Scope
 
@@ -92,6 +92,20 @@ Jolt is the leading specialized candidate for a portable authoritative raft/cont
 - Leaderboards and challenge ghosts.
 - Scenario packs based on different river types.
 - Second real-world route target: rowing the Colorado River with an oar rig/rowing frame after the South Fork American paddle-raft baseline is proven.
+
+## Roadmap Milestone Mapping
+
+The TODO roadmap now carries the full Unreal game build as explicit production milestones:
+
+- Milestone 19: select the first raft/contact/swimmer authority path by comparing Unreal Chaos and Jolt against the same fixture contract.
+- Milestone 20: create the Unreal production foundation and live custom-water bridge, including fixed-step scheduling, report manifests, regression fixtures, in-engine debug views, and target-hardware profiling.
+- Milestone 21: build the Unreal river editor and content pipeline for geospatial imports, reach-local authoring, stitched validation exports, flow-dependent feature tuning, guide annotations, South Fork content, and the Colorado rowing/oar-rig route.
+- Milestone 22: implement authoritative raft, crew, swimmer, and rescue gameplay over the validated water and selected contact runtime.
+- Milestone 23: deliver the first-person Unreal vertical slice from launch through scoring, replay, and physics/fidelity review.
+- Milestone 24: expand alpha content, systems depth, South Fork coverage, Colorado rowing, crew AI, generated-rapid experiments, and multiplayer feasibility only after the single-player guide loop is stable.
+- Milestone 25: harden performance, platform support, QA automation, accessibility, asset/provenance workflows, release compliance, beta playtests, and patch operations.
+
+Milestones 20-25 should not relax the water evidence rules: any new river, feature-forcing tune, raft/contact change, swimmer/rescue outcome, or content pipeline export must remain traceable to manifests, validation fixtures, telemetry, and replayable Unreal evidence.
 
 ## Production Milestones
 
