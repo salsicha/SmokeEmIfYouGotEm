@@ -20,7 +20,11 @@ MILESTONE20_UNREAL_REGRESSION_IMPORT_SCHEMA = (
 MILESTONE20_TRACEABLE_DATA_ASSETS_SCHEMA = "raftsim.unreal.traceable_river_data_assets.v1"
 MILESTONE20_LIVE_WATER_SMOKE_SUITE_SCHEMA = "raftsim.unreal.live_water_smoke_suite.v1"
 MILESTONE20_LIVE_WATER_SMOKE_REPORT_SCHEMA = "raftsim.milestone20.live_water_smoke_report.v1"
-MILESTONE20_LIVE_WATER_SMOKE_DECISION = "pass_text_first_unreal_smoke_gate"
+MILESTONE20_UNREAL_EDITOR_AUTOMATION_RESULT_SCHEMA = (
+    "raftsim.milestone20.unreal_editor_automation_result.v1"
+)
+MILESTONE20_LIVE_WATER_SMOKE_TEXT_FIRST_DECISION = "pass_text_first_unreal_smoke_gate"
+MILESTONE20_LIVE_WATER_SMOKE_DECISION = "pass_unreal_editor_smoke_gate"
 
 MILESTONE16_SOURCE_REPORTS = (
     "physics/reports/milestone16/cpp_solver_runs.json",
@@ -417,6 +421,12 @@ def build_live_water_unreal_smoke_suite(repo_root: Path) -> Milestone20LiveWater
         root / "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
     )
     debug_views = _read_json(root / "unreal/Content/RaftSim/Debug/live_water_debug_views.json")
+    unreal_editor_result_path = (
+        root / "physics/reports/milestone20/unreal_editor_automation_result.json"
+    )
+    unreal_editor_result = (
+        _read_json(unreal_editor_result_path) if unreal_editor_result_path.exists() else None
+    )
 
     expected_hash = report_lock["lock"]["lock_hash"]
     required_debug_views = {
@@ -478,7 +488,18 @@ def build_live_water_unreal_smoke_suite(repo_root: Path) -> Milestone20LiveWater
             "Accepted deterministic replay groups match.",
         ),
     ]
-    passed = all(check["passed"] for check in checks)
+    contract_passed = all(check["passed"] for check in checks)
+    unreal_editor_passed = bool(unreal_editor_result and unreal_editor_result.get("passed"))
+    passed = contract_passed and (
+        unreal_editor_result is None or unreal_editor_passed
+    )
+    decision = "blocked"
+    if passed:
+        decision = (
+            MILESTONE20_LIVE_WATER_SMOKE_DECISION
+            if unreal_editor_result
+            else MILESTONE20_LIVE_WATER_SMOKE_TEXT_FIRST_DECISION
+        )
     manifest = {
         "schema": MILESTONE20_LIVE_WATER_SMOKE_SUITE_SCHEMA,
         "suite_id": "milestone20_live_water_smoke",
@@ -508,16 +529,33 @@ def build_live_water_unreal_smoke_suite(repo_root: Path) -> Milestone20LiveWater
             for profile in target_profiles
         ],
         "debug_views": sorted(actual_debug_views),
-        "status": "ready_for_unreal_automation_execution" if passed else "blocked",
+        "status": "ready_for_unreal_automation_execution" if contract_passed else "blocked",
     }
+    notes = [
+        "This report closes the Milestone 20 live-water Unreal smoke gate in this repo workspace.",
+        "The suite is anchored to the accepted C++ report-set lock and must be regenerated if that lock changes.",
+    ]
+    if unreal_editor_result:
+        notes.append(
+            "UE 5.8 MacEditor headless automation executed successfully; physical desktop, VR, and handheld captures remain platform sign-off evidence."
+        )
+    else:
+        notes.insert(
+            1,
+            "A UE 5.8 workstation should execute the generated automation test and attach measured editor/runtime output before release or platform sign-off.",
+        )
     report = {
         "schema": MILESTONE20_LIVE_WATER_SMOKE_REPORT_SCHEMA,
-        "decision": MILESTONE20_LIVE_WATER_SMOKE_DECISION if passed else "blocked",
+        "decision": decision,
         "passed": passed,
         "suite_manifest": "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json",
         "accepted_report_set_lock": "physics/reports/milestone20/report_set_lock.json",
-        "unreal_editor_execution_status": "not_run_in_text_first_workspace",
-        "unreal_editor_execution_required_before_release_signoff": True,
+        "unreal_editor_execution_status": (
+            "passed_in_unreal_editor"
+            if unreal_editor_passed
+            else "not_run_in_text_first_workspace"
+        ),
+        "unreal_editor_execution_required_before_release_signoff": not unreal_editor_passed,
         "gate_scope": "manifest_links_accepted_cpp_outputs_debug_views_and_target_profile_budget_evidence",
         "checks": checks,
         "target_profiles": manifest["target_profiles"],
@@ -526,12 +564,17 @@ def build_live_water_unreal_smoke_suite(repo_root: Path) -> Milestone20LiveWater
         "regression_fixture_count": regression_import["total_fixture_count"],
         "debug_view_count": len(actual_debug_views),
         "milestone20_closed": passed,
-        "notes": [
-            "This report closes the text-first Milestone 20 gate in this repo workspace.",
-            "A UE 5.8 workstation should execute the generated automation test and attach measured editor/runtime output before release or platform sign-off.",
-            "The suite is anchored to the accepted C++ report-set lock and must be regenerated if that lock changes.",
-        ],
+        "notes": notes,
     }
+    if unreal_editor_result:
+        report["unreal_editor_automation_result"] = {
+            "manifest": "physics/reports/milestone20/unreal_editor_automation_result.json",
+            "schema": unreal_editor_result["schema"],
+            "executed_at": unreal_editor_result["executed_at"],
+            "platform": unreal_editor_result["device"]["platform"],
+            "summary": unreal_editor_result["summary"],
+            "log_scan": unreal_editor_result["log_scan"],
+        }
     return Milestone20LiveWaterSmokeSuite(
         manifest=manifest,
         report=report,
@@ -703,9 +746,27 @@ def _live_water_smoke_markdown(report: dict[str, Any]) -> str:
         "",
         f"Unreal editor execution status: `{report['unreal_editor_execution_status']}`.",
         "",
-        "## Checks",
-        "",
     ]
+    if "unreal_editor_automation_result" in report:
+        result = report["unreal_editor_automation_result"]
+        summary = result["summary"]
+        lines.extend(
+            [
+                "## Unreal Editor Automation",
+                "",
+                f"Evidence: `{result['manifest']}`",
+                "",
+                f"Executed at: `{result['executed_at']}` on `{result['platform']}`.",
+                "",
+                (
+                    f"Result: {summary['succeeded']} succeeded, "
+                    f"{summary['succeededWithWarnings']} succeeded with warnings, "
+                    f"{summary['failed']} failed, {summary['notRun']} not run."
+                ),
+                "",
+            ]
+        )
+    lines.extend(["## Checks", ""])
     for check in report["checks"]:
         status = "PASS" if check["passed"] else "FAIL"
         lines.append(f"- `{check['check_id']}`: {status} - {check['summary']}")

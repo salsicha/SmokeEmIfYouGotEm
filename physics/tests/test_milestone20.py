@@ -12,6 +12,7 @@ from raftsim.milestone20 import (
     MILESTONE20_LIVE_WATER_SMOKE_SUITE_SCHEMA,
     MILESTONE20_TRACEABLE_DATA_ASSETS_SCHEMA,
     MILESTONE20_UNREAL_REGRESSION_IMPORT_SCHEMA,
+    MILESTONE20_UNREAL_EDITOR_AUTOMATION_RESULT_SCHEMA,
     build_live_water_unreal_smoke_suite,
     build_traceable_unreal_data_assets,
     build_unreal_regression_fixture_import,
@@ -62,6 +63,9 @@ LIVE_WATER_SMOKE_REPORT_PATH = (
 )
 LIVE_WATER_SMOKE_REPORT_MD_PATH = (
     REPO_ROOT / "physics/reports/milestone20/live_water_unreal_smoke_suite.md"
+)
+UNREAL_EDITOR_AUTOMATION_RESULT_PATH = (
+    REPO_ROOT / "physics/reports/milestone20/unreal_editor_automation_result.json"
 )
 LIVE_WATER_SMOKE_TEST_PATH = (
     REPO_ROOT
@@ -171,7 +175,7 @@ def test_unreal_production_foundation_matches_locked_project_and_modules():
         for boundary in foundation["module_boundaries"]
         for module in boundary["modules"]
     }
-    project_plugins = {plugin["Name"] for plugin in uproject["Plugins"]}
+    project_plugins = {plugin["Name"] for plugin in uproject["Plugins"] if plugin["Enabled"]}
 
     assert foundation["schema"] == "raftsim.unreal.production_foundation.v1"
     assert foundation["engine"]["engine_association"] == uproject["EngineAssociation"] == "5.8"
@@ -488,8 +492,37 @@ def test_live_water_smoke_suite_closes_text_first_gate():
     assert report["regression_fixture_count"] == 109
     assert report["stitched_whole_window_asset_count"] == 6
     assert report["debug_view_count"] == 9
-    assert report["unreal_editor_execution_status"] == "not_run_in_text_first_workspace"
-    assert report["unreal_editor_execution_required_before_release_signoff"] is True
+    assert report["unreal_editor_execution_status"] == "passed_in_unreal_editor"
+    assert report["unreal_editor_execution_required_before_release_signoff"] is False
+    assert report["unreal_editor_automation_result"]["summary"] == {
+        "failed": 0,
+        "notRun": 0,
+        "succeeded": 2,
+        "succeededWithWarnings": 0,
+        "totalDuration": 0.01616591587662697,
+    }
+
+
+def test_unreal_editor_automation_result_records_clean_milestone20_run():
+    result = json.loads(UNREAL_EDITOR_AUTOMATION_RESULT_PATH.read_text(encoding="utf-8"))
+
+    assert result["schema"] == MILESTONE20_UNREAL_EDITOR_AUTOMATION_RESULT_SCHEMA
+    assert result["passed"] is True
+    assert result["engine"]["engine_association"] == "5.8"
+    assert result["device"]["platform"] == "MacEditor"
+    assert result["summary"]["succeeded"] == 2
+    assert result["summary"]["failed"] == 0
+    assert result["summary"]["succeededWithWarnings"] == 0
+    assert result["log_scan"] == {
+        "automation_warnings": 0,
+        "deprecated_report_flag_warnings": 0,
+        "handled_ensures": 0,
+        "project_errors": 0,
+    }
+    assert {test["fullTestPath"] for test in result["tests"]} == {
+        "RaftSim.Milestone20.LiveWaterSmokeSuiteManifest",
+        "RaftSim.Milestone20.WaterRegressionImportManifest",
+    }
 
 
 def test_unreal_live_water_smoke_automation_test_loads_suite_manifest():

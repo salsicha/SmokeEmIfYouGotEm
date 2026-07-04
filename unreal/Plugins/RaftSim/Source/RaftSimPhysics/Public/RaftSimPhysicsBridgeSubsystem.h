@@ -82,8 +82,8 @@ public:
         const FRaftSimWaterRuntimeConfig& WaterConfig,
         const FRaftSimRaftBodyConfig& RaftConfig,
         const FRaftSimWaterRaftCouplingPolicy& InCouplingPolicy,
-        float InWaterStepSeconds = 1.0f / 60.0f,
-        float InChronoSubstepSeconds = 1.0f / 120.0f
+        float InWaterStepSeconds = 0.016666667f,
+        float InChronoSubstepSeconds = 0.008333333f
     );
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Physics")
