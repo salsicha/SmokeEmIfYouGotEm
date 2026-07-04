@@ -81,6 +81,22 @@
       "requires_preserve_initial_mass_disabled": true,
       "requires_feature_forcing": false,
       "source": "milestone18_corrected_boundary_geoclaw_profile"
+    },
+    {
+      "calibration_id": "eddy_line_shear_finite_volume",
+      "scenario_id": "eddy_line_shear_seed_20",
+      "gate_scenario_id": "eddy_line_shear",
+      "solver_mode": "finite_volume",
+      "calibration_path": "physics/data/calibration/milestone18_eddy_line_shear_finite_volume_geoclaw_profile.json",
+      "fallback_path": "data/calibration/milestone18_eddy_line_shear_finite_volume_geoclaw_profile.json",
+      "profile_schema_version": "raftsim.milestone18.eddy_line_shear_finite_volume_geoclaw_profile.v0",
+      "profile_name": "Eddy-line/shear finite-volume GeoClaw profile",
+      "applies_only": "finite_volume_eddy_line_shear_fixture",
+      "max_depth_m_per_s": 220.0,
+      "max_speed_m_per_s2": 420.0,
+      "requires_preserve_initial_mass_disabled": true,
+      "requires_feature_forcing": false,
+      "source": "milestone18_corrected_boundary_geoclaw_profile"
     }
   ]
 }

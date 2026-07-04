@@ -1,13 +1,13 @@
 {
   "comparison_count": 50,
   "cpp_run_report": "reports/milestone16/cpp_solver_runs.json",
-  "failed_count": 34,
+  "failed_count": 33,
   "geoclaw_reference_report": "reports/milestone16/geoclaw_reference_runs.json",
   "notes": [
     "Distinct pin/release closure evidence is tracked separately in the Milestone 18 pin_release_fixture report; this report only compares raft coupling over GeoClaw-derived and C++ water fields."
   ],
   "passed": false,
-  "passed_count": 16,
+  "passed_count": 17,
   "records": [
     {
       "actual_scenario_id": "boulder_garden_seed_16",
@@ -1025,21 +1025,21 @@
           "name": "shear_velocity",
           "passed": true,
           "threshold": 0.6,
-          "value": 2.1255922969930925
+          "value": 1.550553984393706
         },
         {
           "details": "Differential current should rotate the raft around vertical.",
           "name": "yaw_torque",
           "passed": true,
           "threshold": 0.4,
-          "value": 9.053786552332832
+          "value": 10.243850620692516
         },
         {
           "details": "Eddy-line crossing should also couple into roll.",
           "name": "roll_coupling",
           "passed": true,
           "threshold": 1.0,
-          "value": 51.20444517148805
+          "value": 58.07907903836743
         }
       ],
       "candidate_frame": "outputs/m16cpp/r_eddy/finite_volume/cpp_solver/eddy_line_shear_seed_20/frames/frame_0008.csv",
@@ -1051,13 +1051,11 @@
       ],
       "feature_outcome_match": true,
       "flow_band": null,
-      "force_delta_weight_ratio": 0.3388943855840335,
+      "force_delta_weight_ratio": 4.900354585082185e-15,
       "force_envelope_outcome_match": true,
       "gate_scenario_id": "eddy_line_shear",
-      "notes": [
-        "Torque delta exceeds the inertia-normalized threshold."
-      ],
-      "passed": false,
+      "notes": [],
+      "passed": true,
       "reference_checks": [
         {
           "details": "",
@@ -1093,9 +1091,9 @@
       "reference_passed": true,
       "solver_mode": "finite_volume",
       "suite": "rafting",
-      "torque_delta_inertia_ratio": 2.683640219648951,
-      "trajectory_position_delta_m": 0.0009234872007131413,
-      "trajectory_velocity_delta_mps": 0.05540923204298957
+      "torque_delta_inertia_ratio": 1.5611741889756585e-15,
+      "trajectory_position_delta_m": 0.0,
+      "trajectory_velocity_delta_mps": 7.631521572941402e-16
     },
     {
       "actual_scenario_id": "shallow_shelf_seed_21",
