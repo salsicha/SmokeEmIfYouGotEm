@@ -1,0 +1,152 @@
+{
+  "all_fixture_samples_match_required_telemetry": true,
+  "authority_selection_allowed": false,
+  "automation_manifest": "unreal/Content/RaftSim/Physics/chaos_automation_fixtures.json",
+  "decision": "automation_fixture_export_complete_not_authority_evidence",
+  "expanded_parameter_case_count": 39,
+  "fixture_count": 6,
+  "fixtures": [
+    {
+      "authoritative_evidence": false,
+      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.RaftRockAngleSweep",
+      "fixture_id": "raft_rock_angle_sweep",
+      "metrics": [
+        "peak_contact_impulse_n_s",
+        "post_impact_heading_delta_degrees",
+        "max_roll_degrees",
+        "time_to_recover_seconds",
+        "bounce_scrape_or_pin_classification",
+        "cpu_ms_per_step"
+      ],
+      "parameter_case_count": 9,
+      "pass_gate_count": 4,
+      "replay_summary": "physics/reports/milestone19/chaos/replays/raft_rock_angle_sweep.replay_summary.json",
+      "status": "ready_for_unreal_automation_execution",
+      "step_count": 960,
+      "telemetry_fields_present_in_schema_samples": true
+    },
+    {
+      "authoritative_evidence": false,
+      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.ShallowShelfGrounding",
+      "fixture_id": "shallow_shelf_grounding",
+      "metrics": [
+        "grounding_duration_seconds",
+        "max_bed_penetration_m",
+        "scrape_impulse_n_s",
+        "yaw_pivot_degrees",
+        "release_or_stick_outcome",
+        "cpu_ms_per_step"
+      ],
+      "parameter_case_count": 9,
+      "pass_gate_count": 4,
+      "replay_summary": "physics/reports/milestone19/chaos/replays/shallow_shelf_grounding.replay_summary.json",
+      "status": "ready_for_unreal_automation_execution",
+      "step_count": 960,
+      "telemetry_fields_present_in_schema_samples": true
+    },
+    {
+      "authoritative_evidence": false,
+      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.PinReleaseWrapProxy",
+      "fixture_id": "pin_release_wrap_proxy",
+      "metrics": [
+        "pin_entry_time_seconds",
+        "peak_pin_force_n",
+        "pin_duration_seconds",
+        "release_time_seconds",
+        "flip_or_release_outcome",
+        "crew_weight_shift_effect"
+      ],
+      "parameter_case_count": 9,
+      "pass_gate_count": 4,
+      "replay_summary": "physics/reports/milestone19/chaos/replays/pin_release_wrap_proxy.replay_summary.json",
+      "status": "ready_for_unreal_automation_execution",
+      "step_count": 960,
+      "telemetry_fields_present_in_schema_samples": true
+    },
+    {
+      "authoritative_evidence": false,
+      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.CrewEjectionSwimmerTransition",
+      "fixture_id": "crew_ejection_swimmer_transition",
+      "metrics": [
+        "ejection_trigger_step",
+        "crew_state_sequence",
+        "swimmer_position_error_m",
+        "time_to_water_contact_seconds",
+        "ragdoll_or_character_stability",
+        "cpu_ms_per_step"
+      ],
+      "parameter_case_count": 9,
+      "pass_gate_count": 4,
+      "replay_summary": "physics/reports/milestone19/chaos/replays/crew_ejection_swimmer_transition.replay_summary.json",
+      "status": "ready_for_unreal_automation_execution",
+      "step_count": 960,
+      "telemetry_fields_present_in_schema_samples": true
+    },
+    {
+      "authoritative_evidence": false,
+      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.FixedStepReplayDeterminism",
+      "fixture_id": "fixed_step_replay_determinism",
+      "metrics": [
+        "determinism_hash_mismatch_count",
+        "max_position_drift_m",
+        "max_orientation_drift_degrees",
+        "contact_event_sequence_mismatch_count",
+        "outcome_mismatch_count"
+      ],
+      "parameter_case_count": 1,
+      "pass_gate_count": 4,
+      "replay_summary": "physics/reports/milestone19/chaos/replays/fixed_step_replay_determinism.replay_summary.json",
+      "status": "ready_for_unreal_automation_execution",
+      "step_count": 1000,
+      "telemetry_fields_present_in_schema_samples": true
+    },
+    {
+      "authoritative_evidence": false,
+      "automation_test_name": "Project.RaftSim.Milestone19.Chaos.RuntimeCostCrowdedScene",
+      "fixture_id": "runtime_cost_crowded_scene",
+      "metrics": [
+        "mean_cpu_ms_per_step",
+        "p95_cpu_ms_per_step",
+        "max_cpu_ms_per_step",
+        "contact_count",
+        "island_count",
+        "telemetry_bytes_per_second"
+      ],
+      "parameter_case_count": 2,
+      "pass_gate_count": 4,
+      "replay_summary": "physics/reports/milestone19/chaos/replays/runtime_cost_crowded_scene.replay_summary.json",
+      "status": "ready_for_unreal_automation_execution",
+      "step_count": 3600,
+      "telemetry_fields_present_in_schema_samples": true
+    }
+  ],
+  "notes": [
+    "This artifact completes the Chaos automation fixture export, not the Chaos authority decision.",
+    "Unreal must execute the generated fixture map/tests and replace schema placeholder telemetry before Chaos can be ranked against Jolt.",
+    "The custom C++ water solver remains authoritative water; Chaos consumes water snapshots and may not mutate water state."
+  ],
+  "replay_summary_count": 6,
+  "runtime_id": "UnrealChaos",
+  "runtime_passed_fixture_suite": false,
+  "schema": "raftsim.unreal.chaos_fixture_summary.v1",
+  "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
+  "status": "ready_for_unreal_automation_execution",
+  "telemetry_required": [
+    "runtime_id",
+    "fixture_id",
+    "step_index",
+    "raft_pose",
+    "raft_linear_velocity",
+    "raft_angular_velocity",
+    "contact_points",
+    "contact_impulses",
+    "contact_material",
+    "crew_state",
+    "swimmer_state",
+    "pin_state",
+    "release_state",
+    "outcome",
+    "runtime_cpu_ms",
+    "determinism_hash"
+  ]
+}
