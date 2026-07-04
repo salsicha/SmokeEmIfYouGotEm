@@ -33,6 +33,22 @@
       "requires_preserve_initial_mass_disabled": true,
       "requires_feature_forcing": false,
       "source": "milestone18_corrected_boundary_geoclaw_profile"
+    },
+    {
+      "calibration_id": "lateral_wave_reduced",
+      "scenario_id": "lateral_wave_seed_19",
+      "gate_scenario_id": "lateral_wave",
+      "solver_mode": "reduced",
+      "calibration_path": "physics/data/calibration/milestone18_lateral_wave_reduced_geoclaw_profile.json",
+      "fallback_path": "data/calibration/milestone18_lateral_wave_reduced_geoclaw_profile.json",
+      "profile_schema_version": "raftsim.milestone18.lateral_wave_reduced_geoclaw_profile.v0",
+      "profile_name": "Lateral-wave reduced GeoClaw profile",
+      "applies_only": "reduced_lateral_wave_fixture",
+      "max_depth_m_per_s": 220.0,
+      "max_speed_m_per_s2": 420.0,
+      "requires_preserve_initial_mass_disabled": true,
+      "requires_feature_forcing": false,
+      "source": "milestone18_corrected_boundary_geoclaw_profile"
     }
   ]
 }

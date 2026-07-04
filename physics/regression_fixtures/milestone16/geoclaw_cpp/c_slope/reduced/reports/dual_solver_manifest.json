@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_slope/reduced/cpp_solver/sloping_manning_channel_seed_16/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_slope/reduced/cpp_solver/sloping_manning_channel_seed_16",
     "returncode": 0,
-    "runtime_seconds": 0.17037533300026553,
+    "runtime_seconds": 0.1905354590016941,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_slope/reduced/cpp_solver/sloping_manning_channel_seed_16/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_slope/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.17037533300026553,
-    "cpp_seconds_per_simulated_second": 0.028395888833377587,
+    "cpp_runtime_seconds": 0.1905354590016941,
+    "cpp_seconds_per_simulated_second": 0.03175590983361568,
     "geoclaw_runtime_seconds": 0.9289153329991677,
     "geoclaw_seconds_per_simulated_second": 0.15481922216652796,
     "simulated_duration_seconds": 6.0

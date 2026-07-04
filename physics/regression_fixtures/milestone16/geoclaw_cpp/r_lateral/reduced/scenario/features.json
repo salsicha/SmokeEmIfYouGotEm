@@ -1,0 +1,172 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8.0,
+        "y": -1.8317351127058716
+      },
+      "kind": "constriction",
+      "length": 8.100192279800437,
+      "metadata": {
+        "generated": true,
+        "source_index": 0,
+        "station_fraction": 0.10664997188952194
+      },
+      "radius": 2.357503212256632,
+      "strength": 1.6818193920696267,
+      "width": 6.399702400082264
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 16.0,
+        "y": -6.872803689982435
+      },
+      "kind": "rock",
+      "length": 10.884996293276076,
+      "metadata": {
+        "generated": true,
+        "source_index": 1,
+        "station_fraction": 0.22780410104822035
+      },
+      "radius": 3.0028563193677495,
+      "strength": 1.5966005236348915,
+      "width": 4.785398949951043
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 21.0,
+        "y": -7.320975708197008
+      },
+      "kind": "shallow",
+      "length": 8.356990088406004,
+      "metadata": {
+        "generated": true,
+        "source_index": 2,
+        "station_fraction": 0.2968924884289453
+      },
+      "radius": 2.6102634505527638,
+      "strength": 0.8487847189855151,
+      "width": 7.007584621005858
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 28.0,
+        "y": 1.7089425856830813
+      },
+      "kind": "boil",
+      "length": 5.992837377381198,
+      "metadata": {
+        "generated": true,
+        "source_index": 3,
+        "station_fraction": 0.39272443317488653
+      },
+      "radius": 1.7449571445850245,
+      "strength": 1.6308828419946628,
+      "width": 4.792240612974813
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 38.0,
+        "y": -5.4192518692728555
+      },
+      "kind": "lateral",
+      "length": 4.579622718494837,
+      "metadata": {
+        "generated": true,
+        "source_index": 4,
+        "station_fraction": 0.5317740512523615
+      },
+      "radius": 2.2273150192663733,
+      "strength": 0.8568014017836287,
+      "width": 3.8433942179437426
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 41.0,
+        "y": -0.027945941014525567
+      },
+      "kind": "wave_train",
+      "length": 8.679203761374263,
+      "metadata": {
+        "generated": true,
+        "source_index": 5,
+        "station_fraction": 0.5744258069533275
+      },
+      "radius": 2.3423501834842324,
+      "strength": 1.1927885322546197,
+      "width": 6.886617657184315
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 50.0,
+        "y": 0.11266360689187004
+      },
+      "kind": "ledge",
+      "length": 9.609999082378247,
+      "metadata": {
+        "generated": true,
+        "source_index": 6,
+        "station_fraction": 0.7065892926483296
+      },
+      "radius": 3.7801003459540263,
+      "strength": 1.2272478629942207,
+      "width": 8.77501665536217
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 55.0,
+        "y": -2.8288615695273256
+      },
+      "kind": "hole",
+      "length": 5.483123895894194,
+      "metadata": {
+        "generated": true,
+        "source_index": 7,
+        "station_fraction": 0.7778449628676283
+      },
+      "radius": 2.1138016166275264,
+      "strength": 1.2003724727121785,
+      "width": 5.387802249692849
+    },
+    {
+      "angle": -0.0,
+      "center": {
+        "x": 65.0,
+        "y": -4.394038888749876
+      },
+      "kind": "strainer",
+      "length": 3.9430855974813417,
+      "metadata": {
+        "generated": true,
+        "source_index": 8,
+        "station_fraction": 0.9106702684492293
+      },
+      "radius": 1.9951854657950376,
+      "strength": 1.0345977879632133,
+      "width": 4.281294534403999
+    },
+    {
+      "angle": -0.55,
+      "center": {
+        "x": 35.5,
+        "y": 5.95
+      },
+      "kind": "lateral",
+      "length": 14.200000000000001,
+      "metadata": {
+        "geoclaw_case_role": "lateral_wave"
+      },
+      "radius": 2.94,
+      "strength": 1.35,
+      "width": 13.3
+    }
+  ]
+}
