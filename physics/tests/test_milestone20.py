@@ -20,6 +20,14 @@ RAFTSIM_PLUGIN_PATH = REPO_ROOT / "unreal/Plugins/RaftSim/RaftSim.uplugin"
 PRODUCTION_FOUNDATION_PATH = (
     REPO_ROOT / "unreal/Content/RaftSim/Production/production_foundation.json"
 )
+LIVE_WATER_BRIDGE_PATH = REPO_ROOT / "unreal/Content/RaftSim/Physics/live_water_bridge.json"
+WATER_RUNTIME_CANDIDATE_PATH = (
+    REPO_ROOT / "unreal/Content/RaftSim/Physics/water_runtime_candidate.json"
+)
+FIXED_STEP_BRIDGE_PATH = REPO_ROOT / "unreal/Content/RaftSim/Physics/fixed_step_bridge.json"
+RENDER_INTERPOLATION_PATH = (
+    REPO_ROOT / "unreal/Content/RaftSim/Physics/fixed_step_render_interpolation.json"
+)
 REQUIRED_PRODUCTION_MODULES = {
     "RaftSimCore",
     "RaftSimPhysics",
@@ -150,3 +158,68 @@ def test_raftsim_production_modules_have_source_skeletons():
         assert (module_root / f"{module_name}.Build.cs").exists()
         assert (module_root / "Public" / f"{module_name}Module.h").exists()
         assert (module_root / "Private" / f"{module_name}Module.cpp").exists()
+
+
+def test_live_water_bridge_manifest_uses_locked_report_and_water_module():
+    report_lock = json.loads(REPORT_SET_LOCK_PATH.read_text(encoding="utf-8"))
+    live_bridge = json.loads(LIVE_WATER_BRIDGE_PATH.read_text(encoding="utf-8"))
+    candidate = json.loads(WATER_RUNTIME_CANDIDATE_PATH.read_text(encoding="utf-8"))
+    fixed_step = json.loads(FIXED_STEP_BRIDGE_PATH.read_text(encoding="utf-8"))
+    interpolation = json.loads(RENDER_INTERPOLATION_PATH.read_text(encoding="utf-8"))
+
+    assert live_bridge["schema"] == "raftsim.unreal.live_water_bridge.v1"
+    assert live_bridge["accepted_report_set_lock"]["manifest"] == (
+        "physics/reports/milestone20/report_set_lock.json"
+    )
+    assert live_bridge["accepted_report_set_lock"]["lock_hash"] == report_lock["lock"]["lock_hash"]
+    assert live_bridge["accepted_report_set_lock"]["required"] is True
+    assert live_bridge["water_runtime"]["module"] == "RaftSimWater"
+    assert live_bridge["water_runtime"]["authority"] == "custom_cxx_shallow_water_solver"
+    assert live_bridge["fixed_step_scheduling"]["subsystem"] == "URaftSimPhysicsBridgeSubsystem"
+    assert live_bridge["deterministic_capture"]["enabled_by_default"] is True
+    assert live_bridge["render_interpolation"]["enabled_by_default"] is True
+
+    assert candidate["unreal_adapter"]["module"] == "RaftSimWater"
+    assert candidate["accepted_report_set_lock"]["lock_hash"] == report_lock["lock"]["lock_hash"]
+    assert fixed_step["authority"]["water_module"] == "RaftSimWater"
+    assert fixed_step["accepted_report_set_lock"] == "physics/reports/milestone20/report_set_lock.json"
+    assert fixed_step["deterministic_capture"]["enabled"] is True
+    assert interpolation["water_runtime_adapter"] == "URaftSimWaterRuntimeAdapter"
+
+
+def test_live_water_adapter_lives_in_water_module_with_manifest_capture_contract():
+    water_header = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimWater/Public/RaftSimWaterRuntimeAdapter.h"
+    )
+    water_cpp = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimWater/Private/RaftSimWaterRuntimeAdapter.cpp"
+    )
+    old_physics_header = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Public/RaftSimWaterRuntimeAdapter.h"
+    )
+    physics_build = (
+        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimPhysics/RaftSimPhysics.Build.cs"
+    ).read_text(encoding="utf-8")
+    water_build = (
+        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimWater/RaftSimWater.Build.cs"
+    ).read_text(encoding="utf-8")
+    header_text = water_header.read_text(encoding="utf-8")
+    cpp_text = water_cpp.read_text(encoding="utf-8")
+
+    assert water_header.exists()
+    assert water_cpp.exists()
+    assert not old_physics_header.exists()
+    assert "RaftSimWater" in physics_build
+    assert "RAFTSIM_WATER_RUNTIME_NAME" in water_build
+    assert "physics/cpp/include" in water_build
+    assert "FRaftSimWaterReportManifestState" in header_text
+    assert "FRaftSimWaterDeterministicCaptureState" in header_text
+    assert "AcceptedReportSetManifestPath" in header_text
+    assert "ExpectedReportSetLockHash" in header_text
+    assert "bEnableRenderInterpolation" in header_text
+    assert "LoadAcceptedReportManifest" in cpp_text
+    assert "AppendDeterministicCaptureFrame" in cpp_text
+    assert "ResolveRepoRelativePath" in cpp_text

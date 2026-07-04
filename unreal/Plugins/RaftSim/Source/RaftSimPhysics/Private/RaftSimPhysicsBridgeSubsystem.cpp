@@ -31,7 +31,9 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
 
     if (WaterRuntime)
     {
-        WaterRuntime->Configure(WaterConfig);
+        FRaftSimWaterRuntimeConfig RuntimeWaterConfig = WaterConfig;
+        RuntimeWaterConfig.FixedStepSeconds = WaterStepSeconds;
+        WaterRuntime->Configure(RuntimeWaterConfig);
     }
 
     if (RaftRuntime)
@@ -60,7 +62,10 @@ void URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick()
         return;
     }
 
-    WaterRuntime->StepWater(WaterStepSeconds);
+    if (!WaterRuntime->StepWater(WaterStepSeconds))
+    {
+        return;
+    }
 
     const int32 Substeps = FMath::Max(1, FMath::CeilToInt(WaterStepSeconds / ChronoSubstepSeconds));
     const float ActualSubstep = WaterStepSeconds / static_cast<float>(Substeps);
