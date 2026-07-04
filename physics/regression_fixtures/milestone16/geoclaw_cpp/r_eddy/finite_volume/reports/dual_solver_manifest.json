@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_eddy/finite_volume/cpp_solver/eddy_line_shear_seed_20/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_eddy/finite_volume/cpp_solver/eddy_line_shear_seed_20",
     "returncode": 0,
-    "runtime_seconds": 0.4509470839984715,
+    "runtime_seconds": 0.44979937500102096,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_eddy/finite_volume/cpp_solver/eddy_line_shear_seed_20/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_eddy/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.4509470839984715,
-    "cpp_seconds_per_simulated_second": 0.05636838549980894,
+    "cpp_runtime_seconds": 0.44979937500102096,
+    "cpp_seconds_per_simulated_second": 0.05622492187512762,
     "geoclaw_runtime_seconds": 1.182894416999261,
     "geoclaw_seconds_per_simulated_second": 0.14786180212490763,
     "simulated_duration_seconds": 8.0
