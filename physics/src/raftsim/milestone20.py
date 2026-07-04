@@ -17,6 +17,7 @@ MILESTONE20_REPORT_SET_LOCK_DECISION = (
 MILESTONE20_UNREAL_REGRESSION_IMPORT_SCHEMA = (
     "raftsim.unreal.regression_fixture_import.v1"
 )
+MILESTONE20_TRACEABLE_DATA_ASSETS_SCHEMA = "raftsim.unreal.traceable_river_data_assets.v1"
 
 MILESTONE16_SOURCE_REPORTS = (
     "physics/reports/milestone16/cpp_solver_runs.json",
@@ -77,6 +78,15 @@ MILESTONE18_UNREAL_IMPORT_REPORTS = (
     ),
 )
 
+MILESTONE20_CASCADING_DATA_ASSETS = (
+    ("low_runnable", "reduced", "cg_low/reduced"),
+    ("low_runnable", "finite_volume", "cg_low/finite_volume"),
+    ("median_runnable", "reduced", "cg_med/reduced"),
+    ("median_runnable", "finite_volume", "cg_med/finite_volume"),
+    ("high_runnable", "reduced", "cg_high/reduced"),
+    ("high_runnable", "finite_volume", "cg_high/finite_volume"),
+)
+
 
 @dataclass(frozen=True, slots=True)
 class Milestone20ReportSetLock:
@@ -89,6 +99,13 @@ class Milestone20ReportSetLock:
 @dataclass(frozen=True, slots=True)
 class Milestone20UnrealRegressionImport:
     """Generated Unreal automation import manifest for accepted water fixtures."""
+
+    manifest: dict[str, Any]
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone20TraceableDataAssets:
+    """Generated Unreal traceable river data asset manifest."""
 
     manifest: dict[str, Any]
 
@@ -271,6 +288,110 @@ def write_unreal_regression_fixture_import(
     return generated
 
 
+def build_traceable_unreal_data_assets(repo_root: Path) -> Milestone20TraceableDataAssets:
+    """Build the Unreal traceable river data-asset manifest."""
+
+    root = repo_root.resolve()
+    report_lock = _read_json(root / "physics/reports/milestone20/report_set_lock.json")
+    regression_import = _read_json(
+        root / "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json"
+    )
+    assets: list[dict[str, Any]] = [
+        {
+            "asset_id": "solver_neutral_milestone16_registry",
+            "asset_class": "URaftSimTraceableRiverDataAsset",
+            "kind": "solver_neutral_scenario_collection",
+            "display_name": "Milestone 16 Solver-Neutral Regression Scenario Registry",
+            "source_paths": [
+                "physics/regression_fixtures/milestone16/registry.json",
+                "physics/reports/milestone16/regression_promotion_manifest.json",
+            ],
+            "fixture_count": regression_import["source_milestones"]["milestone16"]["fixture_count"],
+            "category_counts": regression_import["source_milestones"]["milestone16"]["categories"],
+            "traceability": {
+                "accepted_report_set_lock": "physics/reports/milestone20/report_set_lock.json",
+                "unreal_regression_import": "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json",
+            },
+        }
+    ]
+    assets.extend(_cascading_data_asset(root, flow_band, solver_mode, scenario_slug) for flow_band, solver_mode, scenario_slug in MILESTONE20_CASCADING_DATA_ASSETS)
+    assets.extend(
+        [
+            {
+                "asset_id": "south_fork_american_source_manifest",
+                "asset_class": "URaftSimTraceableRiverDataAsset",
+                "kind": "geospatial_source_manifest",
+                "display_name": "South Fork American Chili Bar Source Manifest",
+                "source_paths": [
+                    "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json"
+                ],
+                "coordinate_reference_systems": _read_json(
+                    root
+                    / "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json"
+                ).get("coordinate_reference_systems", {}),
+                "traceability": {
+                    "corridor_package": "physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json",
+                    "validation_matrix": "physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json",
+                },
+            },
+            {
+                "asset_id": "south_fork_american_unreal_corridor_package",
+                "asset_class": "URaftSimTraceableRiverDataAsset",
+                "kind": "unreal_corridor_package",
+                "display_name": "South Fork American Chili Bar Unreal Corridor Package",
+                "source_paths": [
+                    "physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json"
+                ],
+                "unreal_ready_artifacts": _read_json(
+                    root
+                    / "physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json"
+                ).get("unreal_ready_artifacts", {}),
+                "traceability": {
+                    "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json",
+                    "validation_matrix": "physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json",
+                },
+            },
+        ]
+    )
+
+    manifest = {
+        "schema": MILESTONE20_TRACEABLE_DATA_ASSETS_SCHEMA,
+        "asset_class": "URaftSimTraceableRiverDataAsset",
+        "accepted_report_set_lock": {
+            "manifest": "physics/reports/milestone20/report_set_lock.json",
+            "lock_hash": report_lock["lock"]["lock_hash"],
+        },
+        "source_manifests": {
+            "regression_import": "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json",
+            "live_water_bridge": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
+            "production_foundation": "unreal/Content/RaftSim/Production/production_foundation.json",
+        },
+        "data_assets": assets,
+        "asset_count": len(assets),
+        "traceability_rules": [
+            "Every data asset must point back to repo-relative source paths and the accepted report-set lock.",
+            "Reach-local grid assets must include ghost-zone metadata and stitched whole-window validation outputs.",
+            "Geospatial and corridor package assets must preserve CRS/provenance and validation-matrix paths.",
+            "Unreal may cache or convert these assets, but converted assets cannot replace the source manifests.",
+        ],
+        "status": "ready_for_unreal_data_asset_loading",
+    }
+    return Milestone20TraceableDataAssets(manifest=manifest)
+
+
+def write_traceable_unreal_data_assets(
+    *,
+    repo_root: Path,
+    output_json: Path,
+) -> Milestone20TraceableDataAssets:
+    """Generate and write the Unreal traceable river data-asset manifest."""
+
+    generated = build_traceable_unreal_data_assets(repo_root)
+    output_json.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(output_json, generated.manifest)
+    return generated
+
+
 def _artifact_entries(root: Path, paths: tuple[str, ...], *, group: str) -> list[dict[str, Any]]:
     return [_artifact_entry(root, path, group=group) for path in paths]
 
@@ -340,6 +461,61 @@ def _m18_unreal_fixture(root: Path, fixture_id: str, category: str, source_repor
             "unreal_replay_summary_vs_closure_report",
             "live_water_summary_vs_closure_report",
         ],
+    }
+
+
+def _cascading_data_asset(
+    root: Path, flow_band: str, solver_mode: str, scenario_slug: str
+) -> dict[str, Any]:
+    scenario_root = (
+        Path("physics/regression_fixtures/milestone16/geoclaw_cpp")
+        / scenario_slug
+        / "scenario"
+    )
+    metadata_path = scenario_root / "cascading_metadata.json"
+    metadata = _read_json(root / metadata_path)
+    stitched = metadata["validation_outputs"]["stitched_whole_window"]
+    reach_grids = metadata["reach_local_grids"]
+    upstream_ghost_cells = [int(grid["upstream_ghost_cells"]) for grid in reach_grids]
+    downstream_ghost_cells = [int(grid["downstream_ghost_cells"]) for grid in reach_grids]
+    asset_id = f"south_fork_cascading_{flow_band}_{solver_mode}"
+    return {
+        "asset_id": asset_id,
+        "asset_class": "URaftSimTraceableRiverDataAsset",
+        "kind": "reach_local_grid_with_stitched_validation",
+        "display_name": f"South Fork Cascading {flow_band} {solver_mode}",
+        "flow_band": flow_band,
+        "solver_mode": solver_mode,
+        "source_paths": [
+            str(scenario_root / "scenario.json"),
+            str(metadata_path),
+            str(scenario_root / stitched["manifest"]),
+        ],
+        "scenario_package": str(scenario_root),
+        "reach_local_grid_count": len(reach_grids),
+        "reach_ids": [grid["reach_id"] for grid in reach_grids],
+        "ghost_zone_policy": {
+            "min_upstream_ghost_cells": min(upstream_ghost_cells),
+            "max_upstream_ghost_cells": max(upstream_ghost_cells),
+            "min_downstream_ghost_cells": min(downstream_ghost_cells),
+            "max_downstream_ghost_cells": max(downstream_ghost_cells),
+            "source": str(metadata_path),
+        },
+        "stitched_validation": {
+            "required": True,
+            "schema_version": stitched["schema_version"],
+            "manifest": str(scenario_root / stitched["manifest"]),
+            "fields": str(scenario_root / stitched["fields"]),
+            "conservation_summary": str(scenario_root / stitched["conservation_summary"]),
+            "probes": str(scenario_root / stitched["probes"]),
+            "raft_transition_checkpoints": str(
+                scenario_root / stitched["raft_transition_checkpoints"]
+            ),
+        },
+        "traceability": {
+            "regression_registry": "physics/regression_fixtures/milestone16/registry.json",
+            "source_report": "physics/reports/milestone16/regression_promotion_manifest.json",
+        },
     }
 
 

@@ -1,0 +1,356 @@
+{
+  "accepted_report_set_lock": {
+    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
+    "manifest": "physics/reports/milestone20/report_set_lock.json"
+  },
+  "asset_class": "URaftSimTraceableRiverDataAsset",
+  "asset_count": 9,
+  "data_assets": [
+    {
+      "asset_class": "URaftSimTraceableRiverDataAsset",
+      "asset_id": "solver_neutral_milestone16_registry",
+      "category_counts": {
+        "geoclaw_cpp": 40,
+        "geometry_validation": 8,
+        "raft_coupling": 50
+      },
+      "display_name": "Milestone 16 Solver-Neutral Regression Scenario Registry",
+      "fixture_count": 98,
+      "kind": "solver_neutral_scenario_collection",
+      "source_paths": [
+        "physics/regression_fixtures/milestone16/registry.json",
+        "physics/reports/milestone16/regression_promotion_manifest.json"
+      ],
+      "traceability": {
+        "accepted_report_set_lock": "physics/reports/milestone20/report_set_lock.json",
+        "unreal_regression_import": "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json"
+      }
+    },
+    {
+      "asset_class": "URaftSimTraceableRiverDataAsset",
+      "asset_id": "south_fork_cascading_low_runnable_reduced",
+      "display_name": "South Fork Cascading low_runnable reduced",
+      "flow_band": "low_runnable",
+      "ghost_zone_policy": {
+        "max_downstream_ghost_cells": 2,
+        "max_upstream_ghost_cells": 2,
+        "min_downstream_ghost_cells": 0,
+        "min_upstream_ghost_cells": 0,
+        "source": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/cascading_metadata.json"
+      },
+      "kind": "reach_local_grid_with_stitched_validation",
+      "reach_ids": [
+        "pool_001",
+        "tongue_001",
+        "drop_001",
+        "wave_train_001",
+        "eddy_recovery_001",
+        "boulder_garden_001",
+        "pool_002"
+      ],
+      "reach_local_grid_count": 7,
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario",
+      "solver_mode": "reduced",
+      "source_paths": [
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/scenario.json",
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/cascading_metadata.json",
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/manifest.json"
+      ],
+      "stitched_validation": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/raft_transition_checkpoints.json",
+        "required": true,
+        "schema_version": "raftsim.stitched_whole_window_validation.v0"
+      },
+      "traceability": {
+        "regression_registry": "physics/regression_fixtures/milestone16/registry.json",
+        "source_report": "physics/reports/milestone16/regression_promotion_manifest.json"
+      }
+    },
+    {
+      "asset_class": "URaftSimTraceableRiverDataAsset",
+      "asset_id": "south_fork_cascading_low_runnable_finite_volume",
+      "display_name": "South Fork Cascading low_runnable finite_volume",
+      "flow_band": "low_runnable",
+      "ghost_zone_policy": {
+        "max_downstream_ghost_cells": 2,
+        "max_upstream_ghost_cells": 2,
+        "min_downstream_ghost_cells": 0,
+        "min_upstream_ghost_cells": 0,
+        "source": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/cascading_metadata.json"
+      },
+      "kind": "reach_local_grid_with_stitched_validation",
+      "reach_ids": [
+        "pool_001",
+        "tongue_001",
+        "drop_001",
+        "wave_train_001",
+        "eddy_recovery_001",
+        "boulder_garden_001",
+        "pool_002"
+      ],
+      "reach_local_grid_count": 7,
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario",
+      "solver_mode": "finite_volume",
+      "source_paths": [
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/scenario.json",
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/cascading_metadata.json",
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/manifest.json"
+      ],
+      "stitched_validation": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/raft_transition_checkpoints.json",
+        "required": true,
+        "schema_version": "raftsim.stitched_whole_window_validation.v0"
+      },
+      "traceability": {
+        "regression_registry": "physics/regression_fixtures/milestone16/registry.json",
+        "source_report": "physics/reports/milestone16/regression_promotion_manifest.json"
+      }
+    },
+    {
+      "asset_class": "URaftSimTraceableRiverDataAsset",
+      "asset_id": "south_fork_cascading_median_runnable_reduced",
+      "display_name": "South Fork Cascading median_runnable reduced",
+      "flow_band": "median_runnable",
+      "ghost_zone_policy": {
+        "max_downstream_ghost_cells": 2,
+        "max_upstream_ghost_cells": 2,
+        "min_downstream_ghost_cells": 0,
+        "min_upstream_ghost_cells": 0,
+        "source": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/cascading_metadata.json"
+      },
+      "kind": "reach_local_grid_with_stitched_validation",
+      "reach_ids": [
+        "pool_001",
+        "tongue_001",
+        "drop_001",
+        "wave_train_001",
+        "eddy_recovery_001",
+        "boulder_garden_001",
+        "pool_002"
+      ],
+      "reach_local_grid_count": 7,
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario",
+      "solver_mode": "reduced",
+      "source_paths": [
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/scenario.json",
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/cascading_metadata.json",
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/manifest.json"
+      ],
+      "stitched_validation": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/raft_transition_checkpoints.json",
+        "required": true,
+        "schema_version": "raftsim.stitched_whole_window_validation.v0"
+      },
+      "traceability": {
+        "regression_registry": "physics/regression_fixtures/milestone16/registry.json",
+        "source_report": "physics/reports/milestone16/regression_promotion_manifest.json"
+      }
+    },
+    {
+      "asset_class": "URaftSimTraceableRiverDataAsset",
+      "asset_id": "south_fork_cascading_median_runnable_finite_volume",
+      "display_name": "South Fork Cascading median_runnable finite_volume",
+      "flow_band": "median_runnable",
+      "ghost_zone_policy": {
+        "max_downstream_ghost_cells": 2,
+        "max_upstream_ghost_cells": 2,
+        "min_downstream_ghost_cells": 0,
+        "min_upstream_ghost_cells": 0,
+        "source": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/cascading_metadata.json"
+      },
+      "kind": "reach_local_grid_with_stitched_validation",
+      "reach_ids": [
+        "pool_001",
+        "tongue_001",
+        "drop_001",
+        "wave_train_001",
+        "eddy_recovery_001",
+        "boulder_garden_001",
+        "pool_002"
+      ],
+      "reach_local_grid_count": 7,
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario",
+      "solver_mode": "finite_volume",
+      "source_paths": [
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/scenario.json",
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/cascading_metadata.json",
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/manifest.json"
+      ],
+      "stitched_validation": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/raft_transition_checkpoints.json",
+        "required": true,
+        "schema_version": "raftsim.stitched_whole_window_validation.v0"
+      },
+      "traceability": {
+        "regression_registry": "physics/regression_fixtures/milestone16/registry.json",
+        "source_report": "physics/reports/milestone16/regression_promotion_manifest.json"
+      }
+    },
+    {
+      "asset_class": "URaftSimTraceableRiverDataAsset",
+      "asset_id": "south_fork_cascading_high_runnable_reduced",
+      "display_name": "South Fork Cascading high_runnable reduced",
+      "flow_band": "high_runnable",
+      "ghost_zone_policy": {
+        "max_downstream_ghost_cells": 2,
+        "max_upstream_ghost_cells": 2,
+        "min_downstream_ghost_cells": 0,
+        "min_upstream_ghost_cells": 0,
+        "source": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/cascading_metadata.json"
+      },
+      "kind": "reach_local_grid_with_stitched_validation",
+      "reach_ids": [
+        "pool_001",
+        "tongue_001",
+        "drop_001",
+        "wave_train_001",
+        "eddy_recovery_001",
+        "boulder_garden_001",
+        "pool_002"
+      ],
+      "reach_local_grid_count": 7,
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario",
+      "solver_mode": "reduced",
+      "source_paths": [
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/scenario.json",
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/cascading_metadata.json",
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/manifest.json"
+      ],
+      "stitched_validation": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/raft_transition_checkpoints.json",
+        "required": true,
+        "schema_version": "raftsim.stitched_whole_window_validation.v0"
+      },
+      "traceability": {
+        "regression_registry": "physics/regression_fixtures/milestone16/registry.json",
+        "source_report": "physics/reports/milestone16/regression_promotion_manifest.json"
+      }
+    },
+    {
+      "asset_class": "URaftSimTraceableRiverDataAsset",
+      "asset_id": "south_fork_cascading_high_runnable_finite_volume",
+      "display_name": "South Fork Cascading high_runnable finite_volume",
+      "flow_band": "high_runnable",
+      "ghost_zone_policy": {
+        "max_downstream_ghost_cells": 2,
+        "max_upstream_ghost_cells": 2,
+        "min_downstream_ghost_cells": 0,
+        "min_upstream_ghost_cells": 0,
+        "source": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/cascading_metadata.json"
+      },
+      "kind": "reach_local_grid_with_stitched_validation",
+      "reach_ids": [
+        "pool_001",
+        "tongue_001",
+        "drop_001",
+        "wave_train_001",
+        "eddy_recovery_001",
+        "boulder_garden_001",
+        "pool_002"
+      ],
+      "reach_local_grid_count": 7,
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario",
+      "solver_mode": "finite_volume",
+      "source_paths": [
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/scenario.json",
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/cascading_metadata.json",
+        "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/manifest.json"
+      ],
+      "stitched_validation": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/raft_transition_checkpoints.json",
+        "required": true,
+        "schema_version": "raftsim.stitched_whole_window_validation.v0"
+      },
+      "traceability": {
+        "regression_registry": "physics/regression_fixtures/milestone16/registry.json",
+        "source_report": "physics/reports/milestone16/regression_promotion_manifest.json"
+      }
+    },
+    {
+      "asset_class": "URaftSimTraceableRiverDataAsset",
+      "asset_id": "south_fork_american_source_manifest",
+      "coordinate_reference_systems": {
+        "solver": "local meters: x downstream, y river-left positive",
+        "source": "EPSG:4326",
+        "unreal": "georeferenced corridor transform derived from the working CRS",
+        "working": "local projected CRS selected per section at extraction time"
+      },
+      "display_name": "South Fork American Chili Bar Source Manifest",
+      "kind": "geospatial_source_manifest",
+      "source_paths": [
+        "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json"
+      ],
+      "traceability": {
+        "corridor_package": "physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json",
+        "validation_matrix": "physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json"
+      }
+    },
+    {
+      "asset_class": "URaftSimTraceableRiverDataAsset",
+      "asset_id": "south_fork_american_unreal_corridor_package",
+      "display_name": "South Fork American Chili Bar Unreal Corridor Package",
+      "kind": "unreal_corridor_package",
+      "source_paths": [
+        "physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json"
+      ],
+      "traceability": {
+        "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json",
+        "validation_matrix": "physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json"
+      },
+      "unreal_ready_artifacts": {
+        "banks": "hydrography/banks.geojson",
+        "centerline": "hydrography/centerline.geojson",
+        "confidence_metadata": "confidence.json",
+        "course_elevation_extraction": "course_elevation_extraction.json",
+        "flow_presets": "hydrology/flow_presets.json",
+        "hazards": "review/rapid_review_labels.json",
+        "imagery_masks": [
+          "imagery/water_mask.tif",
+          "imagery/foam_texture_mask.tif"
+        ],
+        "rapid_review_editor_workflow": "rapid_review_editor_workflow.json",
+        "rapid_review_flow_difficulty_mapping": "rapid_review_flow_difficulty_mapping.json",
+        "rapids": "review/rapid_candidates.geojson",
+        "terrain": "terrain/solver_bed_grid.npy",
+        "validation_matrix": "validation_matrix.json"
+      }
+    }
+  ],
+  "schema": "raftsim.unreal.traceable_river_data_assets.v1",
+  "source_manifests": {
+    "live_water_bridge": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
+    "production_foundation": "unreal/Content/RaftSim/Production/production_foundation.json",
+    "regression_import": "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json"
+  },
+  "status": "ready_for_unreal_data_asset_loading",
+  "traceability_rules": [
+    "Every data asset must point back to repo-relative source paths and the accepted report-set lock.",
+    "Reach-local grid assets must include ghost-zone metadata and stitched whole-window validation outputs.",
+    "Geospatial and corridor package assets must preserve CRS/provenance and validation-matrix paths.",
+    "Unreal may cache or convert these assets, but converted assets cannot replace the source manifests."
+  ]
+}
