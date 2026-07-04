@@ -31,7 +31,7 @@ The accepted closure evidence is:
 - Raft coupling now passes as water-field agreement: GeoClaw-derived and C++ outcomes, force envelopes, trajectories, and feature-check pass/fail signatures agree over all 50 cases.
 - The distinct pin/release fixture remains separate from shallow-shelf or boulder proxy evidence.
 
-Next work should lock the accepted report set, repeat runtime profiling on target desktop, VR, and handheld hardware, and continue Chaos/Jolt raft/contact/swimmer authority evaluation over the approved custom water outputs.
+Next work should lock the accepted report set, repeat runtime profiling on target desktop, VR, and handheld hardware, continue Chaos/Jolt raft/contact/swimmer authority evaluation over the approved custom water outputs, and then follow the Milestone 20-25 Unreal full-game production roadmap.
 
 ## Authored Feature Forcing Decision
 

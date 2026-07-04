@@ -834,6 +834,78 @@ This milestone decides whether Unreal Chaos, Jolt, Chrono, or the custom reduced
 - [ ] Add a Chaos-vs-Jolt comparison report that ranks determinism, CPU cost, contact quality, outcome stability, swimmer state, and authoring/debug ergonomics.
 - [ ] Select the first authoritative raft/contact runtime for the vertical slice, or keep the custom reduced runtime fallback if neither Chaos nor Jolt passes.
 
+## Milestone 20: Unreal Production Foundation And Live Water Bridge
+
+This milestone starts the real Unreal production project after the custom C++ water gate is approved and Milestone 19 identifies the first raft/contact authority path.
+
+- [ ] Lock the accepted Milestone 16 report set and repeat water/raft runtime profiling on target desktop, VR, and handheld hardware before live integration is treated as production-ready.
+- [ ] Create or refresh the production Unreal project from the locked UE version with modules/plugins for core game data, water, river/geospatial content, raft/contact physics, crew, input, audio, UI, debug, and automation.
+- [ ] Integrate the approved custom C++ water solver as the authoritative live-water Unreal plugin path with fixed-step scheduling, render interpolation, deterministic run capture, and report-manifest loading.
+- [ ] Import the promoted Milestone 16/17/18 regression fixtures into Unreal automation so replayed and live water fields can be compared against accepted C++ outputs inside the engine.
+- [ ] Load solver-neutral scenarios, reach-local grids, stitched validation outputs, geospatial source manifests, and Unreal corridor packages as traceable Unreal data assets.
+- [ ] Add in-engine debug views for depth, velocity, Froude, wet/dry masks, feature tags, conservation deltas, raft trajectories, contact probes, and runtime budgets.
+- [ ] Gate the milestone on a live-water Unreal smoke suite that matches the accepted C++ reports, preserves stitched whole-window validation evidence, and meets target-hardware budgets.
+
+## Milestone 21: Unreal River Editor And Content Pipeline
+
+This milestone turns the validated river-data contracts into the level editor and content pipeline needed to design, review, tune, and stream real rapids.
+
+- [ ] Build the Unreal rapid/river editor for station pins, reach/drop spans, polygons, raft lines, footage timecodes, gauge-history snippets, aerial imagery references, guide notes, confidence, rights/provenance, and expected surf/flush/pin/release/flip outcomes.
+- [ ] Implement the canonical geospatial import path for JSON source manifests, GeoJSON/GeoPackage vectors, GeoTIFF/COG rasters, LAS/LAZ/COPC point clouds, gauge-history tables, solver arrays, and converted Unreal corridor assets.
+- [ ] Support reach-local authoring and streaming with overlap/ghost-zone metadata while requiring stitched whole-window validation exports for every playable river window.
+- [ ] Expose flow bands, discharge-dependent feature-forcing gains, hole stickiness/washout curves, eddy-line/lateral/wave-train tuning, boulder push/damping, shallow shelves, pins/releases, and visual/audio-only parameters as editor-tunable but manifest-recorded data.
+- [ ] Build the South Fork American first-river editor pass with reviewed rapids, source manifests, low/median/high flow presets, validation overlays, and guide-feedback annotations.
+- [ ] Draft the Colorado River rowing/oar-rig route as the second real-world river target with source manifest, flow bands, rowing-frame controls, guide review, and validation annotation needs.
+- [ ] Add round-trip validation that exported Unreal river data can regenerate solver packages, GeoClaw/C++ comparison inputs, and fidelity-review overlays without losing CRS, provenance, or flow-response metadata.
+
+## Milestone 22: Authoritative Raft, Crew, Swimmer, And Rescue Gameplay
+
+This milestone wires the selected raft/contact runtime, validated water fields, and crew safety systems into scoring-critical gameplay.
+
+- [ ] Integrate the Milestone 19 selected raft/contact authority path over approved custom C++ water, keeping Chaos for visual/non-authoritative physics unless it wins the scoring-critical fixture suite.
+- [ ] Implement raft-rock, bank, ledge, shallow-shelf, bed-grounding, boulder-garden, pin/release, surf/flush, and flip contacts with telemetry for restitution, damping, friction, stick/slip, contact loading, and release thresholds.
+- [ ] Implement crew seating, weight distribution, brace, lean, and high-side mechanics that shift center of gravity and change pin/flip/release outcomes.
+- [ ] Implement crew-overboard safety states: seated, at-risk, falling/ejected, swimming, rescue-targeted, rescued, re-seated/recovered, and failed-rescue.
+- [ ] Assign passenger swimming skill per run or roster entry, including non-swimmers who cannot self-rescue and require faster guide or crew intervention.
+- [ ] Add swimmer drift, visibility, callouts, rescue target selection, reach/paddle grab, throw-line support where available, pull-in timing, re-seat/recovery, fatigue, trust changes, and failed-rescue consequences.
+- [ ] Add gameplay telemetry and scoring for safety, line choice, boat angle, paddle efficiency, command timing, high-side/brace timing, swims, rescue method, time in water, and crew recovery.
+
+## Milestone 23: First-Person Unreal Vertical Slice
+
+This milestone delivers the first complete playable Unreal slice from launch to score screen.
+
+- [ ] Build the stern guide camera for flat-screen and VR with seated recentering, comfort settings, haptics, visible hands/paddle, raft context, and accessibility options.
+- [ ] Implement paddle, oar, guide-command, brace, high-side, rescue, and recovery inputs with manual parity for keyboard/mouse, gamepad, and VR controllers.
+- [ ] Add local voice-command recognition and deterministic command-intent routing for paddle, brace, hold-on, high-side, swimmer, rescue, and recovery commands with confidence/fallback behavior.
+- [ ] Build one training section and one technical rapid using validated river data, live custom water, selected raft/contact authority, crew safety states, scoring, restart, replay, and after-action feedback.
+- [ ] Integrate readable water visuals, foam, spray, wet rocks, raft contact cues, paddle cues, weather, 3D spatial audio, ambisonic ambience, reverb/occlusion, and rescue cues driven by solver/runtime telemetry.
+- [ ] Add basic menus, settings, river/section/season/flow/difficulty/raft/crew selection, save data, telemetry replay review, and debug overlays.
+- [ ] Gate the milestone on a vertical-slice build that can be completed, failed, restarted, replayed, scored, profiled, and reviewed against physics and river-fidelity evidence.
+
+## Milestone 24: Alpha Content Expansion And Systems Depth
+
+This milestone expands beyond the vertical slice while preserving the validated water/runtime contracts.
+
+- [ ] Expand the South Fork American content set with additional linked rapids, scouting/eddy/recovery-pool flow, seasonal flow variants, difficulty presets, and guide-reviewed fidelity notes.
+- [ ] Prototype the Colorado River rowing/oar-rig route as the second real-world river style with rowing-frame controls, large-volume water reading, canyon pacing, longer rescue windows, and guide-review annotations.
+- [ ] Add more raft types, handling profiles, passenger archetypes, crew trust/fear/fatigue/skill progression, training lessons, challenge variants, and generated-rapid experiments where validation support exists.
+- [ ] Expand local AI crew conversations and barks for calm water, eddies, scouting, recovery pools, swims, rescues, and debriefs while keeping rapid commands and safety cues deterministic and prioritized.
+- [ ] Evaluate networked human crew multiplayer only after the single-player guide loop, raft/contact authority, local voice commands, rescue loop, and replay/debug tools remain stable.
+- [ ] Expand manifest-approved art, audio, VFX, haptics, UI, accessibility, and platform scalability coverage for additional rivers, seasons, flow levels, raft setups, weather, and biomes.
+- [ ] Gate alpha expansion on automated content validation, physics regression replay, river-source provenance checks, and playable end-to-end river-section runs.
+
+## Milestone 25: Optimization, Platform Hardening, And Release Readiness
+
+This milestone turns the alpha game into a shippable Unreal build.
+
+- [ ] Profile and optimize custom water, selected raft/contact runtime, game thread, render thread, GPU water/VFX, World Partition streaming, audio, local AI, memory, and save/replay systems across target desktop, VR, and handheld tiers.
+- [ ] Add scalability modes for water, raft/contact authority, visual physics, VFX, lighting, audio spatialization, local voice, crew conversation, and fallback/manual command paths.
+- [ ] Lock release-quality asset, audio, AI-generation, source-manifest, attribution, license, credits, platform-rights, localization, and store-compliance workflows.
+- [ ] Harden QA automation for physics regressions, Unreal river import/export, feature-forcing manifests, raft/contact fixtures, rescue outcomes, replay determinism, VR comfort, input devices, accessibility, and crash/performance capture.
+- [ ] Polish onboarding, training, scoring, after-action feedback, menus, settings, save data, accessibility, subtitles, microphone/privacy controls, haptics, and final audio mix.
+- [ ] Decide whether Wwise/FMOD, paid asset libraries, professional field recordings, generated-river shipping features, multiplayer, and additional local AI features are required for release or deferred.
+- [ ] Gate release on beta playtests, guide feedback, target-platform performance captures, legal/provenance review, content validation, release branch lock, and patch workflow.
+
 ## Technical Notes To Revisit
 
 - [ ] Decide when to physically remove legacy 2D code, tests, examples, and videos from the repo.
