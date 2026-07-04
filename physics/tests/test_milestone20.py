@@ -46,6 +46,10 @@ TRACEABLE_DATA_ASSET_HEADER_PATH = (
     REPO_ROOT
     / "unreal/Plugins/RaftSim/Source/RaftSimGeo/Public/RaftSimTraceableRiverDataAsset.h"
 )
+LIVE_WATER_DEBUG_VIEWS_PATH = REPO_ROOT / "unreal/Content/RaftSim/Debug/live_water_debug_views.json"
+WATER_DEBUG_VIEWS_HEADER_PATH = (
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimDebug/Public/RaftSimWaterDebugViews.h"
+)
 REQUIRED_PRODUCTION_MODULES = {
     "RaftSimCore",
     "RaftSimPhysics",
@@ -159,6 +163,9 @@ def test_unreal_production_foundation_matches_locked_project_and_modules():
     )
     assert foundation["project"]["traceable_river_data_assets"] == (
         "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
+    )
+    assert foundation["project"]["live_water_debug_views"] == (
+        "unreal/Content/RaftSim/Debug/live_water_debug_views.json"
     )
     assert REPORT_SET_LOCK_PATH.exists()
     assert set(foundation["enabled_project_plugins"]) == project_plugins
@@ -361,3 +368,58 @@ def test_traceable_river_data_asset_contract_exists():
     assert "FRaftSimTraceableSourcePath" in header_text
     assert "bRequiresStitchedWholeWindowValidation" in header_text
     assert "AcceptedReportSetLockHash" in header_text
+
+
+def test_live_water_debug_views_cover_required_overlays():
+    manifest = json.loads(LIVE_WATER_DEBUG_VIEWS_PATH.read_text(encoding="utf-8"))
+    view_ids = {view["view_id"] for view in manifest["views"]}
+
+    assert manifest["schema"] == "raftsim.unreal.live_water_debug_views.v1"
+    assert manifest["module"] == "RaftSimDebug"
+    assert manifest["view_set_class"] == "URaftSimWaterDebugViewSet"
+    assert manifest["view_model_class"] == "URaftSimWaterDebugViewModel"
+    assert manifest["capture_policy"]["include_in_live_water_smoke_suite"] is True
+    assert view_ids == {
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "conservation_deltas",
+        "raft_trajectory",
+        "contact_probes",
+        "runtime_budgets",
+    }
+    assert manifest["source_manifests"]["traceable_river_data_assets"] == (
+        "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
+    )
+    assert manifest["source_manifests"]["runtime_budgets"] == "physics/config/runtime_budgets.json"
+    for view in manifest["views"]:
+        assert view["telemetry_fields"]
+        assert view["render_mode"]
+
+
+def test_live_water_debug_view_contract_matches_manifest():
+    header_text = WATER_DEBUG_VIEWS_HEADER_PATH.read_text(encoding="utf-8")
+    build_text = (
+        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimDebug/RaftSimDebug.Build.cs"
+    ).read_text(encoding="utf-8")
+
+    for enum_value in (
+        "Depth",
+        "Velocity",
+        "Froude",
+        "WetDryMask",
+        "FeatureTags",
+        "ConservationDeltas",
+        "RaftTrajectory",
+        "ContactProbes",
+        "RuntimeBudgets",
+    ):
+        assert enum_value in header_text
+    assert "URaftSimWaterDebugViewSet" in header_text
+    assert "URaftSimWaterDebugViewModel" in header_text
+    assert "SetViewEnabled" in header_text
+    assert "IsViewEnabled" in header_text
+    assert "RaftSimWater" in build_text
+    assert "RaftSimGeo" in build_text
