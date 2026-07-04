@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_waves/finite_volume/cpp_solver/cascading_wave_train_seed_17/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_waves/finite_volume/cpp_solver/cascading_wave_train_seed_17",
     "returncode": 0,
-    "runtime_seconds": 0.4601394590026757,
+    "runtime_seconds": 0.46432062500025495,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_waves/finite_volume/cpp_solver/cascading_wave_train_seed_17/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_waves/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.4601394590026757,
-    "cpp_seconds_per_simulated_second": 0.057517432375334465,
+    "cpp_runtime_seconds": 0.46432062500025495,
+    "cpp_seconds_per_simulated_second": 0.05804007812503187,
     "geoclaw_runtime_seconds": 1.2225076659997285,
     "geoclaw_seconds_per_simulated_second": 0.15281345824996606,
     "simulated_duration_seconds": 8.0
