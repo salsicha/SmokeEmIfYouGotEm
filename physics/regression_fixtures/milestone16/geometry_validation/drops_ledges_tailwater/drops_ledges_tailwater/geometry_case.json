@@ -9,9 +9,7 @@
     "gate_scenario_id": "drops_ledges_tailwater",
     "milestone18_report": "reports/milestone18/remaining_geometry_closure.json",
     "passed": true,
-    "superseded_stale_blockers": [
-      "south_fork_cascading_high_runnable:reduced"
-    ],
+    "superseded_stale_blockers": [],
     "threshold_passed": true
   },
   "gate_scenario_id": "drops_ledges_tailwater",

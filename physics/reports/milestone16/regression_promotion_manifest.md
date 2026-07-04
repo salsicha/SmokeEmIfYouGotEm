@@ -4,7 +4,7 @@ Schema: `raftsim.milestone16.regression_promotion.v0`
 
 Decision: **PASS**
 
-Promoted entries: 73
+Promoted entries: 78
 
 | Category | Gate scenario | Mode | Case | Artifact |
 | --- | --- | --- | --- | --- |
@@ -46,6 +46,7 @@ Promoted entries: 73
 | geoclaw_cpp | south_fork_cascading_low_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume |
 | geoclaw_cpp | south_fork_cascading_median_runnable | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced |
 | geoclaw_cpp | south_fork_cascading_median_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume |
+| geoclaw_cpp | south_fork_cascading_high_runnable | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced |
 | geoclaw_cpp | south_fork_cascading_high_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume |
 | geometry_validation | wet_dry_shoreline | finite_volume | wet_dry_shoreline | regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/finite_volume |
 | geometry_validation | wet_dry_shoreline | reduced | wet_dry_shoreline | regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/reduced |
@@ -77,6 +78,10 @@ Promoted entries: 73
 | raft_coupling | south_fork_cascading_median_runnable | finite_volume | drop_entry | regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/drop_entry |
 | raft_coupling | south_fork_cascading_median_runnable | finite_volume | eddy_recovery | regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/eddy_recovery |
 | raft_coupling | south_fork_cascading_median_runnable | finite_volume | transition_boundary_crossing | regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/transition_boundary_crossing |
+| raft_coupling | south_fork_cascading_high_runnable | reduced | pool_entry | regression_fixtures/milestone16/raft_coupling/cg_high/reduced/pool_entry |
+| raft_coupling | south_fork_cascading_high_runnable | reduced | drop_entry | regression_fixtures/milestone16/raft_coupling/cg_high/reduced/drop_entry |
+| raft_coupling | south_fork_cascading_high_runnable | reduced | eddy_recovery | regression_fixtures/milestone16/raft_coupling/cg_high/reduced/eddy_recovery |
+| raft_coupling | south_fork_cascading_high_runnable | reduced | transition_boundary_crossing | regression_fixtures/milestone16/raft_coupling/cg_high/reduced/transition_boundary_crossing |
 | raft_coupling | south_fork_cascading_high_runnable | finite_volume | pool_entry | regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/pool_entry |
 | raft_coupling | south_fork_cascading_high_runnable | finite_volume | drop_entry | regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/drop_entry |
 | raft_coupling | south_fork_cascading_high_runnable | finite_volume | eddy_recovery | regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/eddy_recovery |

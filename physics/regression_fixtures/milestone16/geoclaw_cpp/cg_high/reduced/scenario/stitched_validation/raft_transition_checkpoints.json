@@ -1,0 +1,308 @@
+{
+  "raft_transition_checkpoints": [
+    {
+      "bed_elevation_fall_m": 1.0153274487553026,
+      "checkpoint_id": "ledge_drop_001_upstream_entry",
+      "depth_m": 1.1723154713619364,
+      "downstream_reach_id": "drop_001",
+      "drop_transition_id": "ledge_drop_001",
+      "expected_hydraulic_control": "retentive_hole",
+      "froude_number": 2.8459563425736736,
+      "grid_index": {
+        "column": 17,
+        "row": 10
+      },
+      "hazard_tags": [
+        "boulder_garden",
+        "constriction",
+        "hole",
+        "ledge",
+        "manual_review_required",
+        "wave_train"
+      ],
+      "metadata": {
+        "aeration_proxy": 0.9292499999999999,
+        "geometry_kind": "mixed",
+        "recirculation_risk": 0.7701,
+        "turbulence_proxy": 1.0
+      },
+      "phase": "upstream_entry",
+      "position": {
+        "x": 66.88570106505523,
+        "y": 0.0
+      },
+      "sampled_drop_transition_id": null,
+      "sampled_reach_id": "tongue_001",
+      "speed_m_s": 9.649633519158394,
+      "station_m": 66.88570106505523,
+      "surface_elevation_m": 0.6960917475831948,
+      "transition_id": "ledge_drop_001",
+      "upstream_reach_id": "tongue_001",
+      "velocity_m_s": {
+        "u": 9.649633519158394,
+        "v": -2.918163917829694e-26
+      },
+      "wet": true
+    },
+    {
+      "bed_elevation_fall_m": 1.0153274487553026,
+      "checkpoint_id": "ledge_drop_001_crest",
+      "depth_m": 1.1379297201963765,
+      "downstream_reach_id": "drop_001",
+      "drop_transition_id": "ledge_drop_001",
+      "expected_hydraulic_control": "retentive_hole",
+      "froude_number": 2.8833165412925994,
+      "grid_index": {
+        "column": 18,
+        "row": 10
+      },
+      "hazard_tags": [
+        "boulder_garden",
+        "constriction",
+        "hole",
+        "ledge",
+        "manual_review_required",
+        "wave_train"
+      ],
+      "metadata": {
+        "aeration_proxy": 0.9292499999999999,
+        "geometry_kind": "mixed",
+        "recirculation_risk": 0.7701,
+        "turbulence_proxy": 1.0
+      },
+      "phase": "crest",
+      "position": {
+        "x": 70.88570106505523,
+        "y": 0.0
+      },
+      "sampled_drop_transition_id": "ledge_drop_001",
+      "sampled_reach_id": "drop_001",
+      "speed_m_s": 9.631864879428814,
+      "station_m": 70.88570106505523,
+      "surface_elevation_m": 0.5428371958832887,
+      "transition_id": "ledge_drop_001",
+      "upstream_reach_id": "tongue_001",
+      "velocity_m_s": {
+        "u": 9.631864879428814,
+        "v": -1.6013892818474955e-23
+      },
+      "wet": true
+    },
+    {
+      "bed_elevation_fall_m": 1.0153274487553026,
+      "checkpoint_id": "ledge_drop_001_downstream_recovery",
+      "depth_m": 1.5319900119540502,
+      "downstream_reach_id": "drop_001",
+      "drop_transition_id": "ledge_drop_001",
+      "expected_hydraulic_control": "retentive_hole",
+      "froude_number": 1.426691029547816,
+      "grid_index": {
+        "column": 21,
+        "row": 10
+      },
+      "hazard_tags": [
+        "boulder_garden",
+        "constriction",
+        "hole",
+        "ledge",
+        "manual_review_required",
+        "wave_train"
+      ],
+      "metadata": {
+        "aeration_proxy": 0.9292499999999999,
+        "geometry_kind": "mixed",
+        "recirculation_risk": 0.7701,
+        "turbulence_proxy": 1.0
+      },
+      "phase": "downstream_recovery",
+      "position": {
+        "x": 83.28570106505524,
+        "y": 0.0
+      },
+      "sampled_drop_transition_id": null,
+      "sampled_reach_id": "drop_001",
+      "speed_m_s": 5.529912191838146,
+      "station_m": 83.28570106505524,
+      "surface_elevation_m": -1.0111403889609272,
+      "transition_id": "ledge_drop_001",
+      "upstream_reach_id": "tongue_001",
+      "velocity_m_s": {
+        "u": 5.529912191838146,
+        "v": -2.717913061847306e-16
+      },
+      "wet": true
+    },
+    {
+      "bed_elevation_fall_m": 0.0,
+      "checkpoint_id": "reach_boundary_pool_001_to_tongue_001_continuity",
+      "depth_m": 1.3970549351355266,
+      "downstream_reach_id": "tongue_001",
+      "drop_transition_id": null,
+      "expected_hydraulic_control": "unknown",
+      "froude_number": 1.2001138467139425,
+      "grid_index": {
+        "column": 12,
+        "row": 10
+      },
+      "hazard_tags": [],
+      "metadata": {
+        "source": "stitched_validation_reach_boundary"
+      },
+      "phase": "reach_boundary_continuity",
+      "position": {
+        "x": 46.75877779028574,
+        "y": 0.0
+      },
+      "sampled_drop_transition_id": null,
+      "sampled_reach_id": "tongue_001",
+      "speed_m_s": 4.442112224761378,
+      "station_m": 46.75877779028574,
+      "surface_elevation_m": 1.2794787316007161,
+      "transition_id": "reach_boundary_pool_001_to_tongue_001",
+      "upstream_reach_id": "pool_001",
+      "velocity_m_s": {
+        "u": 4.442112224761378,
+        "v": -1.9820557426687798e-42
+      },
+      "wet": true
+    },
+    {
+      "bed_elevation_fall_m": 0.0,
+      "checkpoint_id": "reach_boundary_drop_001_to_wave_train_001_continuity",
+      "depth_m": 1.3498500326699296,
+      "downstream_reach_id": "wave_train_001",
+      "drop_transition_id": null,
+      "expected_hydraulic_control": "unknown",
+      "froude_number": 1.5117742339931852,
+      "grid_index": {
+        "column": 22,
+        "row": 10
+      },
+      "hazard_tags": [],
+      "metadata": {
+        "source": "stitched_validation_reach_boundary"
+      },
+      "phase": "reach_boundary_continuity",
+      "position": {
+        "x": 87.58673881618874,
+        "y": 0.0
+      },
+      "sampled_drop_transition_id": null,
+      "sampled_reach_id": "wave_train_001",
+      "speed_m_s": 5.500346353616971,
+      "station_m": 87.58673881618874,
+      "surface_elevation_m": -1.3114440609605647,
+      "transition_id": "reach_boundary_drop_001_to_wave_train_001",
+      "upstream_reach_id": "drop_001",
+      "velocity_m_s": {
+        "u": 5.500346353616971,
+        "v": -3.270951380814371e-14
+      },
+      "wet": true
+    },
+    {
+      "bed_elevation_fall_m": 0.0,
+      "checkpoint_id": "reach_boundary_wave_train_001_to_eddy_recovery_001_continuity",
+      "depth_m": 1.4631426099428098,
+      "downstream_reach_id": "eddy_recovery_001",
+      "drop_transition_id": null,
+      "expected_hydraulic_control": "unknown",
+      "froude_number": 1.0558394071647732,
+      "grid_index": {
+        "column": 31,
+        "row": 10
+      },
+      "hazard_tags": [],
+      "metadata": {
+        "source": "stitched_validation_reach_boundary"
+      },
+      "phase": "reach_boundary_continuity",
+      "position": {
+        "x": 123.75862315083069,
+        "y": 0.0
+      },
+      "sampled_drop_transition_id": null,
+      "sampled_reach_id": "eddy_recovery_001",
+      "speed_m_s": 3.9994616244641636,
+      "station_m": 123.75862315083069,
+      "surface_elevation_m": -2.1984908884357957,
+      "transition_id": "reach_boundary_wave_train_001_to_eddy_recovery_001",
+      "upstream_reach_id": "wave_train_001",
+      "velocity_m_s": {
+        "u": 3.9994560286327814,
+        "v": -0.006690335897941441
+      },
+      "wet": true
+    },
+    {
+      "bed_elevation_fall_m": 0.0,
+      "checkpoint_id": "reach_boundary_eddy_recovery_001_to_boulder_garden_001_continuity",
+      "depth_m": 1.5406890570784693,
+      "downstream_reach_id": "boulder_garden_001",
+      "drop_transition_id": null,
+      "expected_hydraulic_control": "unknown",
+      "froude_number": 0.8756833191605099,
+      "grid_index": {
+        "column": 37,
+        "row": 10
+      },
+      "hazard_tags": [],
+      "metadata": {
+        "source": "stitched_validation_reach_boundary"
+      },
+      "phase": "reach_boundary_continuity",
+      "position": {
+        "x": 149.27205234421277,
+        "y": 0.0
+      },
+      "sampled_drop_transition_id": null,
+      "sampled_reach_id": "eddy_recovery_001",
+      "speed_m_s": 3.4038068951053484,
+      "station_m": 149.27205234421277,
+      "surface_elevation_m": -2.303943641914855,
+      "transition_id": "reach_boundary_eddy_recovery_001_to_boulder_garden_001",
+      "upstream_reach_id": "eddy_recovery_001",
+      "velocity_m_s": {
+        "u": 3.4037637185294822,
+        "v": -0.017144316523646213
+      },
+      "wet": true
+    },
+    {
+      "bed_elevation_fall_m": 0.0,
+      "checkpoint_id": "reach_boundary_boulder_garden_001_to_pool_002_continuity",
+      "depth_m": 1.630584221424755,
+      "downstream_reach_id": "pool_002",
+      "drop_transition_id": null,
+      "expected_hydraulic_control": "unknown",
+      "froude_number": 0.770762565003577,
+      "grid_index": {
+        "column": 47,
+        "row": 10
+      },
+      "hazard_tags": [],
+      "metadata": {
+        "source": "stitched_validation_reach_boundary"
+      },
+      "phase": "reach_boundary_continuity",
+      "position": {
+        "x": 186.94775200373834,
+        "y": 0.0
+      },
+      "sampled_drop_transition_id": null,
+      "sampled_reach_id": "pool_002",
+      "speed_m_s": 3.08214146975228,
+      "station_m": 186.94775200373834,
+      "surface_elevation_m": -3.170142525109135,
+      "transition_id": "reach_boundary_boulder_garden_001_to_pool_002",
+      "upstream_reach_id": "boulder_garden_001",
+      "velocity_m_s": {
+        "u": 3.08214146975228,
+        "v": -9.68400302593572e-16
+      },
+      "wet": true
+    }
+  ],
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+  "schema_version": "raftsim.stitched_whole_window_validation.v0"
+}

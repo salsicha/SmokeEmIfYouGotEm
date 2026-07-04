@@ -1,0 +1,118 @@
+{
+  "probes": [
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "reach_id": "pool_001",
+        "reach_kind": "pool"
+      },
+      "normal": null,
+      "position": {
+        "x": 23.37938889514287,
+        "y": 0.0
+      },
+      "probe_id": "pool_001_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "reach_id": "tongue_001",
+        "reach_kind": "tongue"
+      },
+      "normal": null,
+      "position": {
+        "x": 58.82223942767048,
+        "y": 0.0
+      },
+      "probe_id": "tongue_001_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "reach_id": "drop_001",
+        "reach_kind": "drop"
+      },
+      "normal": null,
+      "position": {
+        "x": 79.236219940622,
+        "y": 0.0
+      },
+      "probe_id": "drop_001_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "reach_id": "wave_train_001",
+        "reach_kind": "wave_train"
+      },
+      "normal": null,
+      "position": {
+        "x": 105.67268098350971,
+        "y": 0.0
+      },
+      "probe_id": "wave_train_001_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "reach_id": "eddy_recovery_001",
+        "reach_kind": "eddy_recovery"
+      },
+      "normal": null,
+      "position": {
+        "x": 136.51533774752173,
+        "y": 0.0
+      },
+      "probe_id": "eddy_recovery_001_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "reach_id": "boulder_garden_001",
+        "reach_kind": "boulder_garden"
+      },
+      "normal": null,
+      "position": {
+        "x": 168.10990217397557,
+        "y": 0.0
+      },
+      "probe_id": "boulder_garden_001_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "reach_id": "pool_002",
+        "reach_kind": "pool"
+      },
+      "normal": null,
+      "position": {
+        "x": 203.47387600186917,
+        "y": 0.0
+      },
+      "probe_id": "pool_002_center"
+    },
+    {
+      "kind": "cross_section",
+      "length": 17.23090976281462,
+      "metadata": {
+        "drop_transition_id": "ledge_drop_001"
+      },
+      "normal": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "position": {
+        "x": 70.88570106505523,
+        "y": 0.0
+      },
+      "probe_id": "main_drop_cross_section"
+    }
+  ]
+}

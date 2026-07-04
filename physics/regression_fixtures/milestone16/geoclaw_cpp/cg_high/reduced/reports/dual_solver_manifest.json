@@ -1,0 +1,30 @@
+{
+  "cpp": {
+    "command": [],
+    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/cg_high/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/manifest.json",
+    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/cg_high/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+    "returncode": 2,
+    "runtime_seconds": 0.3573973330021545,
+    "stderr": "",
+    "stdout": "",
+    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/cg_high/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/validation.json"
+  },
+  "geoclaw": {
+    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/cg_high/normalized_cascading/stitched/manifest.json",
+    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/cg_high/normalized_cascading/stitched",
+    "runtime_seconds": 0.9750706249997165,
+    "seconds_per_simulated_second": 0.12188382812496457,
+    "solver": "geoclaw",
+    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/cg_high/normalized_cascading/stitched/validation.json"
+  },
+  "runtime": {
+    "cpp_runtime_seconds": 0.3573973330021545,
+    "cpp_seconds_per_simulated_second": 0.04467466662526931,
+    "geoclaw_runtime_seconds": 0.9750706249997165,
+    "geoclaw_seconds_per_simulated_second": 0.12188382812496457,
+    "simulated_duration_seconds": 8.0
+  },
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+  "scenario_json": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/cg_high/shared_cascading_package/scenario.json",
+  "scenario_package": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/cg_high/shared_cascading_package"
+}

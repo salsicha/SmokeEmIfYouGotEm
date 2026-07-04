@@ -1,0 +1,89 @@
+{
+  "record": {
+    "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+    "candidate_checks": [
+      {
+        "details": "",
+        "name": "eddy_recovery_reach",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "eddy_line_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "speed_recovery",
+        "passed": true,
+        "threshold": 0.25,
+        "value": 0.4719024323896086
+      },
+      {
+        "details": "",
+        "name": "lateral_shear",
+        "passed": true,
+        "threshold": 0.15,
+        "value": 1.8671261998959143
+      }
+    ],
+    "candidate_frame": "outputs/m16cpp/cg_high/reduced/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+    "candidate_outcome": "clear",
+    "candidate_passed": true,
+    "case_id": "eddy_recovery",
+    "expected_outcomes": [
+      "clear"
+    ],
+    "feature_outcome_match": true,
+    "flow_band": "high_runnable",
+    "force_delta_weight_ratio": 6.001665744105852e-15,
+    "force_envelope_outcome_match": true,
+    "gate_scenario_id": "south_fork_cascading_high_runnable",
+    "notes": [],
+    "passed": true,
+    "reference_checks": [
+      {
+        "details": "",
+        "name": "eddy_recovery_reach",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "eddy_line_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "speed_recovery",
+        "passed": true,
+        "threshold": 0.25,
+        "value": 0.47190243238959884
+      },
+      {
+        "details": "",
+        "name": "lateral_shear",
+        "passed": true,
+        "threshold": 0.15,
+        "value": 1.8671261998959157
+      }
+    ],
+    "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+    "reference_outcome": "clear",
+    "reference_passed": true,
+    "solver_mode": "reduced",
+    "suite": "cascading",
+    "torque_delta_inertia_ratio": 3.83336356273484e-15,
+    "trajectory_position_delta_m": 0.0,
+    "trajectory_velocity_delta_mps": 9.305364597889227e-16
+  },
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "source_report": "reports/milestone16/raft_coupling_validation.json"
+}
