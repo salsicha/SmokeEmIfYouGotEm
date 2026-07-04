@@ -6,68 +6,70 @@ Decision: **PASS**
 
 | Artifact | Mode | Rep | ms/tick | Desktop | VR | Handheld | Replay hash |
 | --- | --- | ---: | ---: | --- | --- | --- | --- |
-| geoclaw_cpp/flat_pool/reduced | reduced | 0 | 0.6939 | PASS | PASS | PASS | `41fd98410faa` |
-| geoclaw_cpp/flat_pool/reduced | reduced | 1 | 0.6815 | PASS | PASS | PASS | `41fd98410faa` |
-| geoclaw_cpp/flat_pool/finite_volume | finite_volume | 0 | 0.7444 | PASS | PASS | PASS | `41fd98410faa` |
-| geoclaw_cpp/flat_pool/finite_volume | finite_volume | 1 | 0.7461 | PASS | PASS | PASS | `41fd98410faa` |
-| geoclaw_cpp/uniform_channel/reduced | reduced | 0 | 0.6979 | PASS | PASS | PASS | `6654f124f858` |
-| geoclaw_cpp/uniform_channel/reduced | reduced | 1 | 0.6996 | PASS | PASS | PASS | `6654f124f858` |
-| geoclaw_cpp/uniform_channel/finite_volume | finite_volume | 0 | 0.7637 | PASS | PASS | PASS | `57b88376e2b0` |
-| geoclaw_cpp/uniform_channel/finite_volume | finite_volume | 1 | 0.7610 | PASS | PASS | PASS | `57b88376e2b0` |
-| geoclaw_cpp/dam_break/reduced | reduced | 0 | 0.7074 | PASS | PASS | PASS | `80fe5c254357` |
-| geoclaw_cpp/dam_break/reduced | reduced | 1 | 0.7062 | PASS | PASS | PASS | `80fe5c254357` |
-| geoclaw_cpp/dam_break/finite_volume | finite_volume | 0 | 0.7734 | PASS | PASS | PASS | `a8c17d4d14cc` |
-| geoclaw_cpp/dam_break/finite_volume | finite_volume | 1 | 0.7746 | PASS | PASS | PASS | `a8c17d4d14cc` |
-| geoclaw_cpp/bed_step/reduced | reduced | 0 | 0.6983 | PASS | PASS | PASS | `c785c35de3a2` |
-| geoclaw_cpp/bed_step/reduced | reduced | 1 | 0.6934 | PASS | PASS | PASS | `c785c35de3a2` |
-| geoclaw_cpp/bed_step/finite_volume | finite_volume | 0 | 0.7795 | PASS | PASS | PASS | `0c1dd5102349` |
-| geoclaw_cpp/bed_step/finite_volume | finite_volume | 1 | 0.7796 | PASS | PASS | PASS | `0c1dd5102349` |
-| geoclaw_cpp/constriction/reduced | reduced | 0 | 0.6566 | PASS | PASS | PASS | `8b00406e0e22` |
-| geoclaw_cpp/constriction/reduced | reduced | 1 | 0.6505 | PASS | PASS | PASS | `8b00406e0e22` |
-| geoclaw_cpp/constriction/finite_volume | finite_volume | 0 | 0.6572 | PASS | PASS | PASS | `8b00406e0e22` |
-| geoclaw_cpp/constriction/finite_volume | finite_volume | 1 | 0.6547 | PASS | PASS | PASS | `8b00406e0e22` |
-| geoclaw_cpp/wet_dry_shoreline/reduced | reduced | 0 | 0.6744 | PASS | PASS | PASS | `19a9beaf451d` |
-| geoclaw_cpp/wet_dry_shoreline/reduced | reduced | 1 | 0.6791 | PASS | PASS | PASS | `19a9beaf451d` |
-| geoclaw_cpp/wet_dry_shoreline/finite_volume | finite_volume | 0 | 0.8000 | PASS | PASS | PASS | `6b40d1ce3ab4` |
-| geoclaw_cpp/wet_dry_shoreline/finite_volume | finite_volume | 1 | 0.7995 | PASS | PASS | PASS | `6b40d1ce3ab4` |
-| geoclaw_cpp/sloping_manning_channel/reduced | reduced | 0 | 0.6965 | PASS | PASS | PASS | `d19f8a9161db` |
-| geoclaw_cpp/sloping_manning_channel/reduced | reduced | 1 | 0.6896 | PASS | PASS | PASS | `d19f8a9161db` |
-| geoclaw_cpp/sloping_manning_channel/finite_volume | finite_volume | 0 | 0.7556 | PASS | PASS | PASS | `9816ca338c88` |
-| geoclaw_cpp/sloping_manning_channel/finite_volume | finite_volume | 1 | 0.7575 | PASS | PASS | PASS | `9816ca338c88` |
-| geoclaw_cpp/drop_ledge/reduced | reduced | 0 | 0.6534 | PASS | PASS | PASS | `64acc38547f1` |
-| geoclaw_cpp/drop_ledge/reduced | reduced | 1 | 0.6491 | PASS | PASS | PASS | `64acc38547f1` |
-| geoclaw_cpp/drop_ledge/finite_volume | finite_volume | 0 | 0.7746 | PASS | PASS | PASS | `052822709f8c` |
-| geoclaw_cpp/drop_ledge/finite_volume | finite_volume | 1 | 0.7843 | PASS | PASS | PASS | `052822709f8c` |
-| geoclaw_cpp/boulder_garden/reduced | reduced | 0 | 0.9286 | PASS | PASS | PASS | `718dbcc050df` |
-| geoclaw_cpp/boulder_garden/reduced | reduced | 1 | 0.9273 | PASS | PASS | PASS | `718dbcc050df` |
-| geoclaw_cpp/boulder_garden/finite_volume | finite_volume | 0 | 0.9181 | PASS | PASS | PASS | `718dbcc050df` |
-| geoclaw_cpp/boulder_garden/finite_volume | finite_volume | 1 | 0.9234 | PASS | PASS | PASS | `718dbcc050df` |
-| geoclaw_cpp/cascading_wave_train/reduced | reduced | 0 | 0.9343 | PASS | PASS | PASS | `fb2dc4d5cfb9` |
-| geoclaw_cpp/cascading_wave_train/reduced | reduced | 1 | 0.9251 | PASS | PASS | PASS | `fb2dc4d5cfb9` |
-| geoclaw_cpp/cascading_wave_train/finite_volume | finite_volume | 0 | 0.9228 | PASS | PASS | PASS | `fb2dc4d5cfb9` |
-| geoclaw_cpp/cascading_wave_train/finite_volume | finite_volume | 1 | 0.9262 | PASS | PASS | PASS | `fb2dc4d5cfb9` |
-| geoclaw_cpp/hydraulic_hole_downstream_boil/reduced | reduced | 0 | 0.9266 | PASS | PASS | PASS | `550cd3799d8d` |
-| geoclaw_cpp/hydraulic_hole_downstream_boil/reduced | reduced | 1 | 0.9376 | PASS | PASS | PASS | `550cd3799d8d` |
-| geoclaw_cpp/hydraulic_hole_downstream_boil/finite_volume | finite_volume | 0 | 0.9388 | PASS | PASS | PASS | `550cd3799d8d` |
-| geoclaw_cpp/hydraulic_hole_downstream_boil/finite_volume | finite_volume | 1 | 0.9234 | PASS | PASS | PASS | `550cd3799d8d` |
-| geoclaw_cpp/lateral_wave/reduced | reduced | 0 | 0.9237 | PASS | PASS | PASS | `5918bb4fa3a9` |
-| geoclaw_cpp/lateral_wave/reduced | reduced | 1 | 0.9191 | PASS | PASS | PASS | `5918bb4fa3a9` |
-| geoclaw_cpp/lateral_wave/finite_volume | finite_volume | 0 | 0.9273 | PASS | PASS | PASS | `5918bb4fa3a9` |
-| geoclaw_cpp/lateral_wave/finite_volume | finite_volume | 1 | 0.9204 | PASS | PASS | PASS | `5918bb4fa3a9` |
-| geoclaw_cpp/eddy_line_shear/reduced | reduced | 0 | 0.9330 | PASS | PASS | PASS | `98bff2647418` |
-| geoclaw_cpp/eddy_line_shear/reduced | reduced | 1 | 0.9283 | PASS | PASS | PASS | `98bff2647418` |
-| geoclaw_cpp/eddy_line_shear/finite_volume | finite_volume | 0 | 0.9241 | PASS | PASS | PASS | `98bff2647418` |
-| geoclaw_cpp/eddy_line_shear/finite_volume | finite_volume | 1 | 0.9250 | PASS | PASS | PASS | `98bff2647418` |
-| geoclaw_cpp/shallow_shelf/reduced | reduced | 0 | 0.9349 | PASS | PASS | PASS | `7e0e263b2bf1` |
-| geoclaw_cpp/shallow_shelf/reduced | reduced | 1 | 0.9205 | PASS | PASS | PASS | `7e0e263b2bf1` |
-| geoclaw_cpp/shallow_shelf/finite_volume | finite_volume | 0 | 0.9314 | PASS | PASS | PASS | `7e0e263b2bf1` |
-| geoclaw_cpp/shallow_shelf/finite_volume | finite_volume | 1 | 0.9281 | PASS | PASS | PASS | `7e0e263b2bf1` |
-| geoclaw_cpp/south_fork_cascading_low_runnable/finite_volume | finite_volume | 0 | 1.0837 | PASS | PASS | PASS | `f1dde4f4d486` |
-| geoclaw_cpp/south_fork_cascading_low_runnable/finite_volume | finite_volume | 1 | 1.0841 | PASS | PASS | PASS | `f1dde4f4d486` |
-| geoclaw_cpp/south_fork_cascading_median_runnable/finite_volume | finite_volume | 0 | 1.1025 | PASS | PASS | PASS | `51867977a426` |
-| geoclaw_cpp/south_fork_cascading_median_runnable/finite_volume | finite_volume | 1 | 1.1008 | PASS | PASS | PASS | `51867977a426` |
-| geoclaw_cpp/south_fork_cascading_high_runnable/finite_volume | finite_volume | 0 | 1.1033 | PASS | PASS | PASS | `32e4cef8287f` |
-| geoclaw_cpp/south_fork_cascading_high_runnable/finite_volume | finite_volume | 1 | 1.1038 | PASS | PASS | PASS | `32e4cef8287f` |
+| geoclaw_cpp/flat_pool/reduced | reduced | 0 | 0.7034 | PASS | PASS | PASS | `41fd98410faa` |
+| geoclaw_cpp/flat_pool/reduced | reduced | 1 | 0.6918 | PASS | PASS | PASS | `41fd98410faa` |
+| geoclaw_cpp/flat_pool/finite_volume | finite_volume | 0 | 0.7479 | PASS | PASS | PASS | `41fd98410faa` |
+| geoclaw_cpp/flat_pool/finite_volume | finite_volume | 1 | 0.7568 | PASS | PASS | PASS | `41fd98410faa` |
+| geoclaw_cpp/uniform_channel/reduced | reduced | 0 | 0.7057 | PASS | PASS | PASS | `6654f124f858` |
+| geoclaw_cpp/uniform_channel/reduced | reduced | 1 | 0.7053 | PASS | PASS | PASS | `6654f124f858` |
+| geoclaw_cpp/uniform_channel/finite_volume | finite_volume | 0 | 0.7627 | PASS | PASS | PASS | `57b88376e2b0` |
+| geoclaw_cpp/uniform_channel/finite_volume | finite_volume | 1 | 0.7667 | PASS | PASS | PASS | `57b88376e2b0` |
+| geoclaw_cpp/dam_break/reduced | reduced | 0 | 0.7161 | PASS | PASS | PASS | `80fe5c254357` |
+| geoclaw_cpp/dam_break/reduced | reduced | 1 | 0.7136 | PASS | PASS | PASS | `80fe5c254357` |
+| geoclaw_cpp/dam_break/finite_volume | finite_volume | 0 | 0.7871 | PASS | PASS | PASS | `a8c17d4d14cc` |
+| geoclaw_cpp/dam_break/finite_volume | finite_volume | 1 | 0.7789 | PASS | PASS | PASS | `a8c17d4d14cc` |
+| geoclaw_cpp/bed_step/reduced | reduced | 0 | 0.7027 | PASS | PASS | PASS | `c785c35de3a2` |
+| geoclaw_cpp/bed_step/reduced | reduced | 1 | 0.7006 | PASS | PASS | PASS | `c785c35de3a2` |
+| geoclaw_cpp/bed_step/finite_volume | finite_volume | 0 | 0.7816 | PASS | PASS | PASS | `0c1dd5102349` |
+| geoclaw_cpp/bed_step/finite_volume | finite_volume | 1 | 0.7791 | PASS | PASS | PASS | `0c1dd5102349` |
+| geoclaw_cpp/constriction/reduced | reduced | 0 | 0.6599 | PASS | PASS | PASS | `8b00406e0e22` |
+| geoclaw_cpp/constriction/reduced | reduced | 1 | 0.6675 | PASS | PASS | PASS | `8b00406e0e22` |
+| geoclaw_cpp/constriction/finite_volume | finite_volume | 0 | 0.6638 | PASS | PASS | PASS | `8b00406e0e22` |
+| geoclaw_cpp/constriction/finite_volume | finite_volume | 1 | 0.6603 | PASS | PASS | PASS | `8b00406e0e22` |
+| geoclaw_cpp/wet_dry_shoreline/reduced | reduced | 0 | 0.6819 | PASS | PASS | PASS | `19a9beaf451d` |
+| geoclaw_cpp/wet_dry_shoreline/reduced | reduced | 1 | 0.6853 | PASS | PASS | PASS | `19a9beaf451d` |
+| geoclaw_cpp/wet_dry_shoreline/finite_volume | finite_volume | 0 | 0.8041 | PASS | PASS | PASS | `6b40d1ce3ab4` |
+| geoclaw_cpp/wet_dry_shoreline/finite_volume | finite_volume | 1 | 0.8143 | PASS | PASS | PASS | `6b40d1ce3ab4` |
+| geoclaw_cpp/sloping_manning_channel/reduced | reduced | 0 | 0.7010 | PASS | PASS | PASS | `d19f8a9161db` |
+| geoclaw_cpp/sloping_manning_channel/reduced | reduced | 1 | 0.6994 | PASS | PASS | PASS | `d19f8a9161db` |
+| geoclaw_cpp/sloping_manning_channel/finite_volume | finite_volume | 0 | 0.7665 | PASS | PASS | PASS | `9816ca338c88` |
+| geoclaw_cpp/sloping_manning_channel/finite_volume | finite_volume | 1 | 0.7641 | PASS | PASS | PASS | `9816ca338c88` |
+| geoclaw_cpp/drop_ledge/reduced | reduced | 0 | 0.6558 | PASS | PASS | PASS | `64acc38547f1` |
+| geoclaw_cpp/drop_ledge/reduced | reduced | 1 | 0.6565 | PASS | PASS | PASS | `64acc38547f1` |
+| geoclaw_cpp/drop_ledge/finite_volume | finite_volume | 0 | 0.7904 | PASS | PASS | PASS | `052822709f8c` |
+| geoclaw_cpp/drop_ledge/finite_volume | finite_volume | 1 | 0.7886 | PASS | PASS | PASS | `052822709f8c` |
+| geoclaw_cpp/boulder_garden/reduced | reduced | 0 | 0.9355 | PASS | PASS | PASS | `718dbcc050df` |
+| geoclaw_cpp/boulder_garden/reduced | reduced | 1 | 0.9437 | PASS | PASS | PASS | `718dbcc050df` |
+| geoclaw_cpp/boulder_garden/finite_volume | finite_volume | 0 | 0.9333 | PASS | PASS | PASS | `718dbcc050df` |
+| geoclaw_cpp/boulder_garden/finite_volume | finite_volume | 1 | 0.9286 | PASS | PASS | PASS | `718dbcc050df` |
+| geoclaw_cpp/cascading_wave_train/reduced | reduced | 0 | 0.9398 | PASS | PASS | PASS | `fb2dc4d5cfb9` |
+| geoclaw_cpp/cascading_wave_train/reduced | reduced | 1 | 0.9391 | PASS | PASS | PASS | `fb2dc4d5cfb9` |
+| geoclaw_cpp/cascading_wave_train/finite_volume | finite_volume | 0 | 0.9284 | PASS | PASS | PASS | `fb2dc4d5cfb9` |
+| geoclaw_cpp/cascading_wave_train/finite_volume | finite_volume | 1 | 0.9381 | PASS | PASS | PASS | `fb2dc4d5cfb9` |
+| geoclaw_cpp/hydraulic_hole_downstream_boil/reduced | reduced | 0 | 0.9649 | PASS | PASS | PASS | `550cd3799d8d` |
+| geoclaw_cpp/hydraulic_hole_downstream_boil/reduced | reduced | 1 | 0.9366 | PASS | PASS | PASS | `550cd3799d8d` |
+| geoclaw_cpp/hydraulic_hole_downstream_boil/finite_volume | finite_volume | 0 | 0.9378 | PASS | PASS | PASS | `550cd3799d8d` |
+| geoclaw_cpp/hydraulic_hole_downstream_boil/finite_volume | finite_volume | 1 | 0.9337 | PASS | PASS | PASS | `550cd3799d8d` |
+| geoclaw_cpp/lateral_wave/reduced | reduced | 0 | 0.9337 | PASS | PASS | PASS | `5918bb4fa3a9` |
+| geoclaw_cpp/lateral_wave/reduced | reduced | 1 | 0.9306 | PASS | PASS | PASS | `5918bb4fa3a9` |
+| geoclaw_cpp/lateral_wave/finite_volume | finite_volume | 0 | 0.9373 | PASS | PASS | PASS | `5918bb4fa3a9` |
+| geoclaw_cpp/lateral_wave/finite_volume | finite_volume | 1 | 0.9320 | PASS | PASS | PASS | `5918bb4fa3a9` |
+| geoclaw_cpp/eddy_line_shear/reduced | reduced | 0 | 0.9349 | PASS | PASS | PASS | `98bff2647418` |
+| geoclaw_cpp/eddy_line_shear/reduced | reduced | 1 | 0.9332 | PASS | PASS | PASS | `98bff2647418` |
+| geoclaw_cpp/eddy_line_shear/finite_volume | finite_volume | 0 | 0.9308 | PASS | PASS | PASS | `98bff2647418` |
+| geoclaw_cpp/eddy_line_shear/finite_volume | finite_volume | 1 | 0.9303 | PASS | PASS | PASS | `98bff2647418` |
+| geoclaw_cpp/shallow_shelf/reduced | reduced | 0 | 0.9372 | PASS | PASS | PASS | `7e0e263b2bf1` |
+| geoclaw_cpp/shallow_shelf/reduced | reduced | 1 | 0.9305 | PASS | PASS | PASS | `7e0e263b2bf1` |
+| geoclaw_cpp/shallow_shelf/finite_volume | finite_volume | 0 | 0.9346 | PASS | PASS | PASS | `7e0e263b2bf1` |
+| geoclaw_cpp/shallow_shelf/finite_volume | finite_volume | 1 | 0.9359 | PASS | PASS | PASS | `7e0e263b2bf1` |
+| geoclaw_cpp/south_fork_low_runnable/reduced | reduced | 0 | 0.5595 | PASS | PASS | PASS | `7b52727eb1fd` |
+| geoclaw_cpp/south_fork_low_runnable/reduced | reduced | 1 | 0.5594 | PASS | PASS | PASS | `7b52727eb1fd` |
+| geoclaw_cpp/south_fork_cascading_low_runnable/finite_volume | finite_volume | 0 | 1.0930 | PASS | PASS | PASS | `f1dde4f4d486` |
+| geoclaw_cpp/south_fork_cascading_low_runnable/finite_volume | finite_volume | 1 | 1.0997 | PASS | PASS | PASS | `f1dde4f4d486` |
+| geoclaw_cpp/south_fork_cascading_median_runnable/finite_volume | finite_volume | 0 | 1.0977 | PASS | PASS | PASS | `51867977a426` |
+| geoclaw_cpp/south_fork_cascading_median_runnable/finite_volume | finite_volume | 1 | 1.1040 | PASS | PASS | PASS | `51867977a426` |
+| geoclaw_cpp/south_fork_cascading_high_runnable/finite_volume | finite_volume | 0 | 1.1078 | PASS | PASS | PASS | `32e4cef8287f` |
+| geoclaw_cpp/south_fork_cascading_high_runnable/finite_volume | finite_volume | 1 | 1.1157 | PASS | PASS | PASS | `32e4cef8287f` |
 
 ## Deterministic Replay
 
@@ -101,6 +103,7 @@ Decision: **PASS**
 | geoclaw_cpp/eddy_line_shear/finite_volume | PASS | `98bff2647418, 98bff2647418` |
 | geoclaw_cpp/shallow_shelf/reduced | PASS | `7e0e263b2bf1, 7e0e263b2bf1` |
 | geoclaw_cpp/shallow_shelf/finite_volume | PASS | `7e0e263b2bf1, 7e0e263b2bf1` |
+| geoclaw_cpp/south_fork_low_runnable/reduced | PASS | `7b52727eb1fd, 7b52727eb1fd` |
 | geoclaw_cpp/south_fork_cascading_low_runnable/finite_volume | PASS | `f1dde4f4d486, f1dde4f4d486` |
 | geoclaw_cpp/south_fork_cascading_median_runnable/finite_volume | PASS | `51867977a426, 51867977a426` |
 | geoclaw_cpp/south_fork_cascading_high_runnable/finite_volume | PASS | `32e4cef8287f, 32e4cef8287f` |

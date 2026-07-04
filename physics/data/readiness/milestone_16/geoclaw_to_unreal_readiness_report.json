@@ -51,7 +51,7 @@
         "geoclaw_cpp_comparison_summary.json"
       ],
       "check_id": "milestone16_geoclaw_cpp_thresholds",
-      "details": "31 of 40 threshold comparisons pass.",
+      "details": "32 of 40 threshold comparisons pass.",
       "passed": false,
       "status": "failed",
       "title": "Milestone 16 GeoClaw/C++ Thresholds"
@@ -81,7 +81,7 @@
         "runtime_profile_summary.json"
       ],
       "check_id": "milestone16_runtime_profile",
-      "details": "62 of 62 promoted C++ profile repetitions pass runtime budgets.",
+      "details": "64 of 64 promoted C++ profile repetitions pass runtime budgets.",
       "passed": true,
       "status": "passed",
       "title": "Milestone 16 Runtime Profile"
@@ -91,7 +91,7 @@
         "regression_promotion_summary.json"
       ],
       "check_id": "milestone16_regression_promotion",
-      "details": "57 passing artifacts promoted.",
+      "details": "58 passing artifacts promoted.",
       "passed": true,
       "status": "passed",
       "title": "Milestone 16 Regression Promotion"

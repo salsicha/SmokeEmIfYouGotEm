@@ -129,6 +129,22 @@
       "requires_preserve_initial_mass_disabled": true,
       "requires_feature_forcing": false,
       "source": "milestone18_corrected_boundary_geoclaw_profile"
+    },
+    {
+      "calibration_id": "south_fork_low_reduced",
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner",
+      "gate_scenario_id": "south_fork_low_runnable",
+      "solver_mode": "reduced",
+      "calibration_path": "physics/data/calibration/milestone18_south_fork_low_reduced_geoclaw_profile.json",
+      "fallback_path": "data/calibration/milestone18_south_fork_low_reduced_geoclaw_profile.json",
+      "profile_schema_version": "raftsim.milestone18.south_fork_low_reduced_geoclaw_profile.v0",
+      "profile_name": "South Fork low-flow reduced GeoClaw profile",
+      "applies_only": "reduced_south_fork_low_single_reach",
+      "max_depth_m_per_s": 220.0,
+      "max_speed_m_per_s2": 420.0,
+      "requires_preserve_initial_mass_disabled": true,
+      "requires_feature_forcing": false,
+      "source": "milestone18_corrected_boundary_geoclaw_profile"
     }
   ]
 }
