@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_shelf/finite_volume/cpp_solver/shallow_shelf_seed_21/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_shelf/finite_volume/cpp_solver/shallow_shelf_seed_21",
     "returncode": 0,
-    "runtime_seconds": 0.45241708300090977,
+    "runtime_seconds": 0.4553488749988901,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_shelf/finite_volume/cpp_solver/shallow_shelf_seed_21/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_shelf/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.45241708300090977,
-    "cpp_seconds_per_simulated_second": 0.05655213537511372,
+    "cpp_runtime_seconds": 0.4553488749988901,
+    "cpp_seconds_per_simulated_second": 0.05691860937486126,
     "geoclaw_runtime_seconds": 1.1481677499996295,
     "geoclaw_seconds_per_simulated_second": 0.14352096874995368,
     "simulated_duration_seconds": 8.0

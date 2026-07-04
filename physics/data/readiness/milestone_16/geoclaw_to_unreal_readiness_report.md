@@ -12,11 +12,11 @@ The full Milestone 16 gate was regenerated, but live Unreal custom water remains
 | --- | --- | --- |
 | Milestone 16 GeoClaw Reference Runs | PASS | 20 of 20 scenarios have full GeoClaw frames. |
 | Milestone 16 C++ Solver Runs | PASS | 40 of 40 C++ runs completed with manifests. |
-| Milestone 16 GeoClaw/C++ Thresholds | FAILED | 33 of 40 threshold comparisons pass. |
+| Milestone 16 GeoClaw/C++ Thresholds | FAILED | 34 of 40 threshold comparisons pass. |
 | Milestone 16 Geometry Validation | PASS | 6 of 6 geometry families pass. |
 | Milestone 16 Raft Coupling | FAILED | 18 of 50 raft comparisons pass. |
-| Milestone 16 Runtime Profile | PASS | 66 of 66 promoted C++ profile repetitions pass runtime budgets. |
-| Milestone 16 Regression Promotion | PASS | 59 passing artifacts promoted. |
+| Milestone 16 Runtime Profile | PASS | 68 of 68 promoted C++ profile repetitions pass runtime budgets. |
+| Milestone 16 Regression Promotion | PASS | 60 passing artifacts promoted. |
 
 ## Runtime Choices
 
