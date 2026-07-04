@@ -188,8 +188,7 @@
           "milestone18_report": "reports/milestone18/remaining_geometry_closure.json",
           "passed": true,
           "superseded_stale_blockers": [
-            "south_fork_cascading_high_runnable:reduced",
-            "south_fork_cascading_median_runnable:reduced"
+            "south_fork_cascading_high_runnable:reduced"
           ],
           "threshold_passed": true
         }
@@ -197,7 +196,7 @@
       "notes": [
         "Milestone 18 remaining-geometry closure evidence applied from reports/milestone18/remaining_geometry_closure.json.",
         "Uses compact rollup evidence; detailed focused diagnostics remain in the Milestone 18 report.",
-        "Supersedes stale Milestone 16 threshold blockers for: south_fork_cascading_high_runnable:reduced, south_fork_cascading_median_runnable:reduced.",
+        "Supersedes stale Milestone 16 threshold blockers for: south_fork_cascading_high_runnable:reduced.",
         "Focused passing evidence supersedes stale aggregate failures for: drop_ledge, south_fork_cascading_high_runnable, south_fork_cascading_low_runnable, south_fork_cascading_median_runnable, south_fork_cascading_window."
       ],
       "passed": true,
