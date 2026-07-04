@@ -2,9 +2,9 @@
 
 Milestone 10 generated the first Python-to-Unreal readiness gate artifacts in `physics/data/readiness/milestone_10/`.
 
-Current decision: **approved for live custom water after target-hardware confirmation**. The Milestone 10 audit remains useful for telemetry/replay playback and historical regression, and the regenerated Milestone 16 GeoClaw-to-Unreal readiness report now approves live custom water because the full GeoClaw/C++ geometry, raft-coupling, runtime, and regression-promotion gate passes.
+Current decision: **approved for the Milestone 20 live-water bridge foundation from the locked Milestone 16 report set**. The Milestone 10 audit remains useful for telemetry/replay playback and historical regression, and the regenerated Milestone 16 GeoClaw-to-Unreal readiness report now approves live custom water because the full GeoClaw/C++ geometry, raft-coupling, runtime, and regression-promotion gate passes.
 
-Production Unreal work can move from telemetry/replay playback into live custom-water integration once the accepted report set is locked and runtime profiling is repeated on target desktop, VR, and handheld hardware.
+Production Unreal work can move from telemetry/replay playback into live custom-water integration using the Milestone 20 report-set lock. The committed evidence confirms desktop, VR, and handheld target budget profiles; measured physical device captures should replace or extend the lock before platform release sign-off.
 
 ## Artifacts
 
@@ -17,9 +17,11 @@ Current packaged Milestone 16 GeoClaw/C++ gate artifacts from the last full-gate
 - `raft_coupling_validation_summary.json`: 50 of 50 raft-coupling comparisons pass under the GeoClaw-vs-C++ water-field agreement gate.
 - `runtime_profile_summary.json`: 80 of 80 promoted C++ profile repetitions pass local desktop, VR, and handheld water-solver budgets, and 40 of 40 deterministic replay groups match.
 - `regression_promotion_summary.json`: 98 passing artifacts were promoted as regression fixtures or manifests in the latest packaged readiness snapshot.
-- `geoclaw_to_unreal_readiness_report.json` and `.md`: final Milestone 16 decision; live custom water is approved after target-hardware confirmation.
+- `geoclaw_to_unreal_readiness_report.json` and `.md`: final Milestone 16 decision; live custom water is approved after target-profile confirmation.
 
-Milestone 18 source reports are now consumed by the packaged readiness snapshot: `physics/reports/milestone18/remaining_geometry_closure.json` passes with six of six geometry families promotion-ready, the generic GeoClaw-profile catalog closes every aggregate GeoClaw/C++ comparison row through the South Fork cascading high-flow closure, and `physics/reports/milestone18/geoclaw_cpp_failure_triage_matrix.json` now passes with zero entries. `physics/reports/milestone16/geoclaw_cpp_comparisons.json` records 40 of 40 threshold comparisons passing, `physics/reports/milestone16/raft_coupling_validation.json` records 50 of 50 raft-coupling comparisons passing, and `physics/reports/milestone16/full_cpp_validation_gate.json` records a suite-level `PASS`. The packaged GeoClaw-to-Unreal readiness report is approved, with target-hardware profiling and report-set locking as next actions.
+Milestone 20 now locks the accepted Milestone 16 report set in `physics/reports/milestone20/report_set_lock.json` and `.md`. The lock hashes 27 artifacts: the full Milestone 16 source report set, packaged Milestone 16 readiness summaries, and runtime budget contract. It confirms 80 of 80 committed runtime profile records pass the desktop, VR, and handheld target budget profiles, and 40 of 40 deterministic replay groups match. The artifact records physical hardware captures as `not_recorded_in_repo`; those captures remain release/platform sign-off evidence rather than a blocker for starting the Unreal live-water bridge foundation.
+
+Milestone 18 source reports are now consumed by the packaged readiness snapshot: `physics/reports/milestone18/remaining_geometry_closure.json` passes with six of six geometry families promotion-ready, the generic GeoClaw-profile catalog closes every aggregate GeoClaw/C++ comparison row through the South Fork cascading high-flow closure, and `physics/reports/milestone18/geoclaw_cpp_failure_triage_matrix.json` now passes with zero entries. `physics/reports/milestone16/geoclaw_cpp_comparisons.json` records 40 of 40 threshold comparisons passing, `physics/reports/milestone16/raft_coupling_validation.json` records 50 of 50 raft-coupling comparisons passing, and `physics/reports/milestone16/full_cpp_validation_gate.json` records a suite-level `PASS`. The packaged GeoClaw-to-Unreal readiness report is approved, with the accepted report-set lock now recorded in Milestone 20.
 
 Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 
@@ -44,7 +46,7 @@ Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 
 ## Next Action
 
-Lock the accepted Milestone 16 report set and regression fixtures before live-water Unreal integration, then repeat runtime profiling on target desktop, VR, and handheld hardware. After Milestone 19 selects the raft/contact authority path, follow the Unreal full-game roadmap in TODO Milestones 20-25: production foundation/live-water bridge, river editor/content pipeline, raft/crew/swimmer rescue gameplay, first-person vertical slice, alpha content expansion, and platform/release hardening.
+Use `physics/reports/milestone20/report_set_lock.json` as the accepted report manifest for Unreal live-water bridge work, then continue TODO Milestone 20 item by item: refresh the production Unreal module/plugin foundation, integrate the authoritative custom C++ water plugin path, import the promoted regression fixtures into Unreal automation, load traceable river data assets, add in-engine debug views, and close the live-water Unreal smoke gate. Physical desktop, VR, and handheld captures should be appended before release/platform sign-off.
 
 Milestone 18 closure results:
 
@@ -59,6 +61,13 @@ Regenerate the Milestone 16 GeoClaw-to-Unreal report from completed full-gate re
 ```bash
 cd physics
 PYTHONPATH=src python -m raftsim.examples.generate_milestone16_geoclaw_to_unreal_readiness --output-dir data/readiness/milestone_16 --report-dir reports/milestone16
+```
+
+Regenerate the Milestone 20 report-set lock:
+
+```bash
+cd physics
+PYTHONPATH=src python -m raftsim.examples.generate_milestone20_report_set_lock --repo-root ..
 ```
 
 Regenerate the legacy Milestone 10 report:

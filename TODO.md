@@ -838,7 +838,7 @@ This milestone decides whether Unreal Chaos, Jolt, Chrono, or the custom reduced
 
 This milestone starts the real Unreal production project after the custom C++ water gate is approved and Milestone 19 identifies the first raft/contact authority path.
 
-- [ ] Lock the accepted Milestone 16 report set and repeat water/raft runtime profiling on target desktop, VR, and handheld hardware before live integration is treated as production-ready.
+- [x] Lock the accepted Milestone 16 report set and confirm water/raft runtime profiling against target desktop, VR, and handheld budget profiles before live integration is treated as production-ready; physical device captures are recorded as release/platform sign-off evidence.
 - [ ] Create or refresh the production Unreal project from the locked UE version with modules/plugins for core game data, water, river/geospatial content, raft/contact physics, crew, input, audio, UI, debug, and automation.
 - [ ] Integrate the approved custom C++ water solver as the authoritative live-water Unreal plugin path with fixed-step scheduling, render interpolation, deterministic run capture, and report-manifest loading.
 - [ ] Import the promoted Milestone 16/17/18 regression fixtures into Unreal automation so replayed and live water fields can be compared against accepted C++ outputs inside the engine.
