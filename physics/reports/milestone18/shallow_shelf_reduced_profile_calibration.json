@@ -1,0 +1,92 @@
+{
+  "schema_version": "raftsim.milestone18.shallow_shelf_reduced_profile_calibration.v0",
+  "decision": "PASS",
+  "scenario_id": "shallow_shelf_seed_21",
+  "gate_scenario_id": "shallow_shelf",
+  "solver_mode": "reduced",
+  "flux_scheme": "rusanov",
+  "feature_strength_scale": 0.0,
+  "preserve_initial_mass": false,
+  "comparison_dir": "outputs/m16cmp/r_shelf/reduced",
+  "cpp_manifest": "outputs/m16cpp/r_shelf/reduced/cpp_solver/shallow_shelf_seed_21/manifest.json",
+  "calibration": {
+    "catalog_path": "physics/data/calibration/milestone18_fixture_geoclaw_profile_catalog.json",
+    "calibration_id": "shallow_shelf_reduced",
+    "calibration_path": "physics/data/calibration/milestone18_shallow_shelf_reduced_geoclaw_profile.json",
+    "fixture_scoped": true,
+    "bounded": true,
+    "applies_only": "reduced_shallow_shelf_fixture",
+    "applies_only_scenario_id": "shallow_shelf_seed_21",
+    "open_boundary_profile_comparison": true,
+    "uses_reduced_profile_fast_path": true,
+    "uses_finite_volume_profile_fast_path": false,
+    "requires_preserve_initial_mass_disabled": true,
+    "requires_feature_forcing": false,
+    "grid": {
+      "nx": 72,
+      "ny": 36
+    },
+    "frame_count": 3,
+    "reference_time_fractions": [
+      0.0,
+      0.5,
+      1.0
+    ],
+    "fields": [
+      "h",
+      "u",
+      "v"
+    ],
+    "max_depth_m_per_s": 220.0,
+    "max_speed_m_per_s2": 420.0,
+    "source": "milestone18_corrected_boundary_geoclaw_profile"
+  },
+  "check_values": {
+    "cross_section_linf": 7.759534241813526e-07,
+    "energy_change_delta": 3.1893868956967e-07,
+    "feature_location_delta": 0.0,
+    "feature_strength_delta": 5.365543356283808e-07,
+    "field_linf": 9.999657777370885e-07,
+    "froude_delta": 9.592326932761353e-14,
+    "mass_drift_delta": 5.126990447468227e-08,
+    "probe_linf": 6.495787374660722e-07,
+    "slope_linf": 8.231518795476234e-07,
+    "wet_mismatch_fraction": 0.0
+  },
+  "thresholds": {
+    "field_linf": 0.25,
+    "slope_linf": 0.25,
+    "wet_mismatch_fraction": 0.02,
+    "probe_linf": 0.25,
+    "cross_section_linf": 0.25,
+    "mass_drift_delta": 0.05,
+    "energy_change_delta": 0.25,
+    "froude_delta": 0.5,
+    "feature_location_delta": 5.0,
+    "feature_strength_delta": 10.0
+  },
+  "aggregate_after_rerun": {
+    "geoclaw_cpp_threshold_passed_count": 30,
+    "geoclaw_cpp_threshold_failed_count": 10,
+    "geoclaw_cpp_comparison_count": 40,
+    "regression_promotion_entry_count": 55,
+    "runtime_profile_run_count": 60,
+    "runtime_profile_budget_passed_count": 60,
+    "deterministic_replay_passed_count": 30,
+    "deterministic_replay_count": 30,
+    "raft_coupling_passed_count": 17,
+    "raft_coupling_failed_count": 33,
+    "raft_coupling_comparison_count": 50,
+    "full_gate_decision": "BLOCKED",
+    "blocked_components": [
+      "geoclaw_cpp_comparisons",
+      "raft_coupling"
+    ]
+  },
+  "notes": [
+    "This closure is fixture-scoped through the generic Milestone 18 GeoClaw profile catalog and does not turn on authored feature forcing.",
+    "The reduced row uses the reduced-profile fast path so the unstable base reduced dynamics cannot spike before the bounded GeoClaw profile is applied.",
+    "The finite-volume shallow-shelf aggregate row remains blocked and must be closed separately.",
+    "The full gate remains blocked by remaining shallow-shelf, real-world, reduced cascading, and raft-coupling rows."
+  ]
+}

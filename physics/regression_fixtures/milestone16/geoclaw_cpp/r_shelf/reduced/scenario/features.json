@@ -1,0 +1,172 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 9.0,
+        "y": -6.109089998605486
+      },
+      "kind": "boil",
+      "length": 6.147788839684228,
+      "metadata": {
+        "generated": true,
+        "source_index": 0,
+        "station_fraction": 0.1201882462965149
+      },
+      "radius": 3.2039280287293814,
+      "strength": 1.1641352826016016,
+      "width": 8.577698180185859
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 16.0,
+        "y": 2.5869359603566
+      },
+      "kind": "rock",
+      "length": 7.9965674349762885,
+      "metadata": {
+        "generated": true,
+        "source_index": 1,
+        "station_fraction": 0.22950465050554758
+      },
+      "radius": 2.426479303372894,
+      "strength": 1.7080627296224353,
+      "width": 5.07499950254392
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 21.0,
+        "y": 2.672571471935087
+      },
+      "kind": "wave_train",
+      "length": 9.891152854362952,
+      "metadata": {
+        "generated": true,
+        "source_index": 2,
+        "station_fraction": 0.29592881830323414
+      },
+      "radius": 3.2672151579336344,
+      "strength": 1.4189648736272873,
+      "width": 9.78350656350372
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 26.0,
+        "y": 1.2046996999292332
+      },
+      "kind": "constriction",
+      "length": 3.0401217632936026,
+      "metadata": {
+        "generated": true,
+        "source_index": 3,
+        "station_fraction": 0.36662569076446383
+      },
+      "radius": 1.8503379398941617,
+      "strength": 1.528959768659608,
+      "width": 3.097220774802566
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 37.0,
+        "y": 4.231093763261992
+      },
+      "kind": "lateral",
+      "length": 5.2847499172731895,
+      "metadata": {
+        "generated": true,
+        "source_index": 4,
+        "station_fraction": 0.5159920650273897
+      },
+      "radius": 1.5077968309851606,
+      "strength": 0.7891168316652954,
+      "width": 2.7129372300534227
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 44.0,
+        "y": -4.28400593301868
+      },
+      "kind": "strainer",
+      "length": 8.04690603128696,
+      "metadata": {
+        "generated": true,
+        "source_index": 5,
+        "station_fraction": 0.6196181544945867
+      },
+      "radius": 2.181635504561936,
+      "strength": 1.3845178038987962,
+      "width": 6.382522187871645
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 52.0,
+        "y": -4.965205425859957
+      },
+      "kind": "shallow",
+      "length": 6.329219323490102,
+      "metadata": {
+        "generated": true,
+        "source_index": 6,
+        "station_fraction": 0.7342173405072318
+      },
+      "radius": 3.098951052762482,
+      "strength": 1.5466103435464278,
+      "width": 9.201977711819012
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 59.0,
+        "y": -0.4302925607349849
+      },
+      "kind": "hole",
+      "length": 5.65897710239843,
+      "metadata": {
+        "generated": true,
+        "source_index": 7,
+        "station_fraction": 0.8271291801147731
+      },
+      "radius": 2.311002531615533,
+      "strength": 1.1863174412092574,
+      "width": 7.14384644589014
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 63.0,
+        "y": -2.2811050389863667
+      },
+      "kind": "ledge",
+      "length": 6.790106054861228,
+      "metadata": {
+        "generated": true,
+        "source_index": 8,
+        "station_fraction": 0.8920615293726275
+      },
+      "radius": 1.794325201807575,
+      "strength": 1.4421507708925163,
+      "width": 4.025063131129222
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 39.05,
+        "y": 7.0
+      },
+      "kind": "shallow",
+      "length": 21.3,
+      "metadata": {
+        "geoclaw_case_role": "shallow_shelf"
+      },
+      "radius": 3.9200000000000004,
+      "strength": 1.3,
+      "width": 10.5
+    }
+  ]
+}

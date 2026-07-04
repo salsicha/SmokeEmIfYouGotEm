@@ -34,7 +34,7 @@ Comparison count: 40
 | rafting | lateral_wave | finite_volume | research_accepted | PASS | none | n/a |
 | rafting | eddy_line_shear | reduced | research_accepted | PASS | none | n/a |
 | rafting | eddy_line_shear | finite_volume | research_accepted | PASS | none | n/a |
-| rafting | shallow_shelf | reduced | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta | n/a |
+| rafting | shallow_shelf | reduced | research_accepted | PASS | none | n/a |
 | rafting | shallow_shelf | finite_volume | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, froude_delta, feature_location_delta, feature_strength_delta | n/a |
 | real_world | south_fork_low_runnable | reduced | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta | n/a |
 | real_world | south_fork_low_runnable | finite_volume | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, energy_change_delta, feature_strength_delta | n/a |
