@@ -1,0 +1,232 @@
+{
+  "comparisons": [
+    {
+      "authored_strength": 0.36240843478260854,
+      "authored_x": 21.93846153846154,
+      "authored_y": 0.0,
+      "cpp": {
+        "distance_to_authored": 6.763301599123763,
+        "strength": 2.6493942607559147,
+        "x": 28.0,
+        "y": 3.0
+      },
+      "feature_index": 0,
+      "kind": "constriction",
+      "location_delta": 0.0,
+      "pyclaw": {
+        "distance_to_authored": 6.763301599123763,
+        "strength": 2.6493942607559218,
+        "x": 28.0,
+        "y": 3.0
+      },
+      "reference": {
+        "distance_to_authored": 6.763301599123763,
+        "strength": 2.6493942607559218,
+        "x": 28.0,
+        "y": 3.0
+      },
+      "reference_solver": "geoclaw",
+      "strength_delta": -7.105427357601002e-15
+    },
+    {
+      "authored_strength": 0.25368590434782595,
+      "authored_x": 29.93846153846154,
+      "authored_y": 0.0,
+      "cpp": {
+        "distance_to_authored": 7.297255705291022,
+        "strength": 0.5951785091186439,
+        "x": 32.0,
+        "y": -7.0
+      },
+      "feature_index": 1,
+      "kind": "wave_train",
+      "location_delta": 0.0,
+      "pyclaw": {
+        "distance_to_authored": 7.297255705291022,
+        "strength": 0.5951785091186446,
+        "x": 32.0,
+        "y": -7.0
+      },
+      "reference": {
+        "distance_to_authored": 7.297255705291022,
+        "strength": 0.5951785091186446,
+        "x": 32.0,
+        "y": -7.0
+      },
+      "reference_solver": "geoclaw",
+      "strength_delta": -6.661338147750939e-16
+    },
+    {
+      "authored_strength": 0.36624899999999994,
+      "authored_x": 44.83076923076923,
+      "authored_y": 0.0,
+      "cpp": {
+        "distance_to_authored": 1.3000682731275672,
+        "strength": 2.3412851213297587,
+        "x": 44.0,
+        "y": 1.0
+      },
+      "feature_index": 2,
+      "kind": "constriction",
+      "location_delta": 0.0,
+      "pyclaw": {
+        "distance_to_authored": 1.3000682731275672,
+        "strength": 2.3412851213297614,
+        "x": 44.0,
+        "y": 1.0
+      },
+      "reference": {
+        "distance_to_authored": 1.3000682731275672,
+        "strength": 2.3412851213297614,
+        "x": 44.0,
+        "y": 1.0
+      },
+      "reference_solver": "geoclaw",
+      "strength_delta": -2.6645352591003757e-15
+    },
+    {
+      "authored_strength": 0.25637429999999994,
+      "authored_x": 52.83076923076923,
+      "authored_y": 0.0,
+      "cpp": {
+        "distance_to_authored": 7.0491260107046525,
+        "strength": 1.567217879699388,
+        "x": 52.0,
+        "y": 7.0
+      },
+      "feature_index": 3,
+      "kind": "wave_train",
+      "location_delta": 0.0,
+      "pyclaw": {
+        "distance_to_authored": 7.0491260107046525,
+        "strength": 1.5672178796993896,
+        "x": 52.0,
+        "y": 7.0
+      },
+      "reference": {
+        "distance_to_authored": 7.0491260107046525,
+        "strength": 1.5672178796993896,
+        "x": 52.0,
+        "y": 7.0
+      },
+      "reference_solver": "geoclaw",
+      "strength_delta": -1.5543122344752192e-15
+    },
+    {
+      "authored_strength": 0.3305486576576578,
+      "authored_x": 69.63076923076923,
+      "authored_y": 0.0,
+      "cpp": {
+        "distance_to_authored": 3.4145875715851357,
+        "strength": 2.868427114020651,
+        "x": 68.0,
+        "y": 3.0
+      },
+      "feature_index": 4,
+      "kind": "rock",
+      "location_delta": 0.0,
+      "pyclaw": {
+        "distance_to_authored": 3.4145875715851357,
+        "strength": 2.868427114020649,
+        "x": 68.0,
+        "y": 3.0
+      },
+      "reference": {
+        "distance_to_authored": 3.4145875715851357,
+        "strength": 2.868427114020649,
+        "x": 68.0,
+        "y": 3.0
+      },
+      "reference_solver": "geoclaw",
+      "strength_delta": 2.220446049250313e-15
+    },
+    {
+      "authored_strength": 0.23138406036036044,
+      "authored_x": 77.63076923076923,
+      "authored_y": 0.0,
+      "cpp": {
+        "distance_to_authored": 1.912957993272114,
+        "strength": 2.1272240527027515,
+        "x": 76.0,
+        "y": 1.0
+      },
+      "feature_index": 5,
+      "kind": "wave_train",
+      "location_delta": 0.0,
+      "pyclaw": {
+        "distance_to_authored": 1.912957993272114,
+        "strength": 2.127224052702752,
+        "x": 76.0,
+        "y": 1.0
+      },
+      "reference": {
+        "distance_to_authored": 1.912957993272114,
+        "strength": 2.127224052702752,
+        "x": 76.0,
+        "y": 1.0
+      },
+      "reference_solver": "geoclaw",
+      "strength_delta": -4.440892098500626e-16
+    },
+    {
+      "authored_strength": 0.33704518071519796,
+      "authored_x": 96.57692307692308,
+      "authored_y": 0.0,
+      "cpp": {
+        "distance_to_authored": 6.059493016853947,
+        "strength": 3.7258831627710447,
+        "x": 100.0,
+        "y": 5.0
+      },
+      "feature_index": 6,
+      "kind": "constriction",
+      "location_delta": 0.0,
+      "pyclaw": {
+        "distance_to_authored": 6.059493016853947,
+        "strength": 3.7258831627710625,
+        "x": 100.0,
+        "y": 5.0
+      },
+      "reference": {
+        "distance_to_authored": 6.059493016853947,
+        "strength": 3.7258831627710625,
+        "x": 100.0,
+        "y": 5.0
+      },
+      "reference_solver": "geoclaw",
+      "strength_delta": -1.7763568394002505e-14
+    },
+    {
+      "authored_strength": 0.23593162650063856,
+      "authored_x": 104.57692307692308,
+      "authored_y": 0.0,
+      "cpp": {
+        "distance_to_authored": 8.635022262128551,
+        "strength": 1.7439775957147814,
+        "x": 96.0,
+        "y": 1.0
+      },
+      "feature_index": 7,
+      "kind": "wave_train",
+      "location_delta": 0.0,
+      "pyclaw": {
+        "distance_to_authored": 8.635022262128551,
+        "strength": 1.7439775957147867,
+        "x": 96.0,
+        "y": 1.0
+      },
+      "reference": {
+        "distance_to_authored": 8.635022262128551,
+        "strength": 1.7439775957147867,
+        "x": 96.0,
+        "y": 1.0
+      },
+      "reference_solver": "geoclaw",
+      "strength_delta": -5.329070518200751e-15
+    }
+  ],
+  "feature_count": 8,
+  "max_abs_strength_delta": 1.7763568394002505e-14,
+  "max_location_delta": 0.0,
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate"
+}

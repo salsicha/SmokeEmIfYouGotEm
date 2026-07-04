@@ -4,7 +4,7 @@ Schema: `raftsim.milestone16.regression_promotion.v0`
 
 Decision: **PASS**
 
-Promoted entries: 60
+Promoted entries: 61
 
 | Category | Gate scenario | Mode | Case | Artifact |
 | --- | --- | --- | --- | --- |
@@ -39,6 +39,7 @@ Promoted entries: 60
 | geoclaw_cpp | south_fork_low_runnable | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/rw_low/reduced |
 | geoclaw_cpp | south_fork_low_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/rw_low/finite_volume |
 | geoclaw_cpp | south_fork_median_runnable | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced |
+| geoclaw_cpp | south_fork_median_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/rw_med/finite_volume |
 | geoclaw_cpp | south_fork_cascading_low_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume |
 | geoclaw_cpp | south_fork_cascading_median_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume |
 | geoclaw_cpp | south_fork_cascading_high_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume |
