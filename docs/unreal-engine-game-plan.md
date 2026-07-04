@@ -309,17 +309,20 @@ Deliverable:
 
 Recommended modules/plugins:
 
-- `RaftsimCore`: shared game types, units, data schemas, telemetry types.
-- `RaftsimPhysics`: native physics runtime bridge, Chrono/reduced model integration.
-- `RaftsimRiver`: river data assets, scenario loading, flow visualization, hazard volumes.
-- `RaftsimGeo`: optional geospatial import/conversion tooling for source manifests, coordinate transforms, terrain/corridor packages, imagery masks, and rapid annotations.
-- `RaftsimRaft`: raft actor, passenger attachment points, animation hooks, damage/safety state.
-- `RaftsimInput`: flat-screen, gamepad, VR controller, paddle, command, and accessibility mappings.
-- `RaftsimAudio`: asset manifest ingest, runtime audio states, 3D attenuation/spatialization presets, ambisonic beds, reverb/occlusion routing, MetaSounds/middleware events, water/raft/crew mix routing, source provenance, voice-chat spatial mix, and debug meters.
-- `RaftsimVoice`: microphone capture, local speech recognition integration, command grammar, intent confidence, push-to-talk/open-mic modes, subtitles, and fallback routing.
-- `RaftsimCrewAI`: passenger persona state, command interpretation, conversation state, crew memory, local dialogue generation/selection, and safety-critical dialogue priority.
-- `RaftsimUI`: menus, HUD, replay, scoring, training feedback.
-- `RaftsimDebug`: force vectors, current fields, contacts, profiling views, replay inspectors.
+- `RaftSimCore`: shared game types, units, data schemas, telemetry types.
+- `RaftSimPhysics`: native raft/contact runtime bridge, replay, coupling, and selected runtime integration.
+- `RaftSimWater`: authoritative custom C++ live-water bridge, accepted report manifest, fixed-step water scheduling, interpolation contracts, and solver telemetry.
+- `RaftSimRiver`: river data assets, scenario loading, flow visualization, hazard volumes.
+- `RaftSimGeo`: geospatial import/conversion tooling for source manifests, coordinate transforms, terrain/corridor packages, imagery masks, reach-local grids, stitched validation exports, and rapid annotations.
+- `RaftSimRaft`: raft actor, passenger attachment points, animation hooks, damage/safety state.
+- `RaftSimInput`: flat-screen, gamepad, VR controller, paddle, command, and accessibility mappings.
+- `RaftSimAI`: guide command grammar, local AI interfaces, passenger persona/dialogue hooks, and voice-intent confidence.
+- `RaftSimCrew`: passenger safety state, swimming skill assignment, ejection, swimmer drift, rescue, high-side, and weight-distribution gameplay.
+- `RaftSimAudio`: asset manifest ingest, runtime audio states, 3D attenuation/spatialization presets, ambisonic beds, reverb/occlusion routing, MetaSounds/middleware events, water/raft/crew mix routing, source provenance, voice-chat spatial mix, and debug meters.
+- `RaftSimUI`: menus, HUD, replay, scoring, training feedback.
+- `RaftSimDebug`: force vectors, current fields, contacts, profiling views, replay inspectors.
+- `RaftSimAutomation`: regression fixture import, live-water smoke suites, report-lock checks, and Unreal automation contracts.
+- `RaftSimNetwork`: future multiplayer session, replication, prediction, voice, and scoring contracts.
 
 ### Data Assets
 
