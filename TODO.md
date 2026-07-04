@@ -844,7 +844,7 @@ This milestone starts the real Unreal production project after the custom C++ wa
 - [x] Import the promoted Milestone 16/17/18 regression fixtures into Unreal automation so replayed and live water fields can be compared against accepted C++ outputs inside the engine.
 - [x] Load solver-neutral scenarios, reach-local grids, stitched validation outputs, geospatial source manifests, and Unreal corridor packages as traceable Unreal data assets.
 - [x] Add in-engine debug views for depth, velocity, Froude, wet/dry masks, feature tags, conservation deltas, raft trajectories, contact probes, and runtime budgets.
-- [ ] Gate the milestone on a live-water Unreal smoke suite that matches the accepted C++ reports, preserves stitched whole-window validation evidence, and meets target-hardware budgets.
+- [x] Gate the milestone on a live-water Unreal smoke suite that matches the accepted C++ reports, preserves stitched whole-window validation evidence, and meets target-hardware budgets.
 
 ## Milestone 21: Unreal River Editor And Content Pipeline
 

@@ -10,7 +10,9 @@
     "primary_plugin": "unreal/Plugins/RaftSim/RaftSim.uplugin",
     "accepted_water_report_manifest": "physics/reports/milestone20/report_set_lock.json",
     "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json",
-    "live_water_debug_views": "unreal/Content/RaftSim/Debug/live_water_debug_views.json"
+    "live_water_debug_views": "unreal/Content/RaftSim/Debug/live_water_debug_views.json",
+    "live_water_smoke_suite": "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json",
+    "live_water_smoke_report": "physics/reports/milestone20/live_water_unreal_smoke_suite.json"
   },
   "enabled_project_plugins": [
     "EnhancedInput",

@@ -1,0 +1,90 @@
+{
+  "accepted_report_set_lock": {
+    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
+    "manifest": "physics/reports/milestone20/report_set_lock.json"
+  },
+  "automation_module": "RaftSimAutomation",
+  "automation_test_name": "RaftSim.Milestone20.LiveWaterSmokeSuite",
+  "checks": [
+    {
+      "check_id": "accepted_report_set_lock",
+      "passed": true,
+      "summary": "Accepted Milestone 16 report-set lock is present, passing, and hash-addressed."
+    },
+    {
+      "check_id": "live_water_bridge_lock_match",
+      "passed": true,
+      "summary": "Live-water bridge references the accepted report-set lock hash."
+    },
+    {
+      "check_id": "regression_fixture_import_coverage",
+      "passed": true,
+      "summary": "Unreal automation import covers Milestone 16/17/18 accepted fixtures."
+    },
+    {
+      "check_id": "traceable_data_assets_stitched_outputs",
+      "passed": true,
+      "summary": "Traceable data assets include reach-local grids and stitched whole-window outputs."
+    },
+    {
+      "check_id": "debug_view_coverage",
+      "passed": true,
+      "summary": "Debug views expose every required water, raft, contact, and runtime-budget overlay."
+    },
+    {
+      "check_id": "target_profile_budgets",
+      "passed": true,
+      "summary": "Accepted runtime profile records pass desktop, VR, and handheld target budget profiles."
+    },
+    {
+      "check_id": "deterministic_replay_evidence",
+      "passed": true,
+      "summary": "Accepted deterministic replay groups match."
+    }
+  ],
+  "debug_views": [
+    "conservation_deltas",
+    "contact_probes",
+    "depth",
+    "feature_tags",
+    "froude",
+    "raft_trajectory",
+    "runtime_budgets",
+    "velocity",
+    "wet_dry_mask"
+  ],
+  "execution_mode": "text_first_contract_pending_unreal_editor_execution",
+  "required_manifests": {
+    "debug_views": "unreal/Content/RaftSim/Debug/live_water_debug_views.json",
+    "live_water_bridge": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
+    "regression_fixture_import": "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json",
+    "runtime_budgets": "physics/config/runtime_budgets.json",
+    "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
+  },
+  "schema": "raftsim.unreal.live_water_smoke_suite.v1",
+  "status": "ready_for_unreal_automation_execution",
+  "suite_id": "milestone20_live_water_smoke",
+  "target_profiles": [
+    {
+      "max_runtime_budget_ms": 4.8,
+      "max_runtime_ms_per_tick": 1.27046,
+      "passed_count": 80,
+      "profile": "desktop",
+      "record_count": 80
+    },
+    {
+      "max_runtime_budget_ms": 5.6,
+      "max_runtime_ms_per_tick": 1.27046,
+      "passed_count": 80,
+      "profile": "handheld",
+      "record_count": 80
+    },
+    {
+      "max_runtime_budget_ms": 2.4,
+      "max_runtime_ms_per_tick": 1.27046,
+      "passed_count": 80,
+      "profile": "vr",
+      "record_count": 80
+    }
+  ]
+}
