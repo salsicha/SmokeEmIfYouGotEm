@@ -1,0 +1,22 @@
+{
+  "schema_version": "raftsim.milestone18.fixture_geoclaw_profile_catalog.v0",
+  "description": "Data-driven fixture-scoped GeoClaw profile calibrations used by Milestone 18 parity closures.",
+  "profiles": [
+    {
+      "calibration_id": "hydraulic_hole_downstream_boil_reduced",
+      "scenario_id": "hydraulic_hole_downstream_boil_seed_18",
+      "gate_scenario_id": "hydraulic_hole_downstream_boil",
+      "solver_mode": "reduced",
+      "calibration_path": "physics/data/calibration/milestone18_hydraulic_hole_downstream_boil_reduced_geoclaw_profile.json",
+      "fallback_path": "data/calibration/milestone18_hydraulic_hole_downstream_boil_reduced_geoclaw_profile.json",
+      "profile_schema_version": "raftsim.milestone18.hydraulic_hole_downstream_boil_reduced_geoclaw_profile.v0",
+      "profile_name": "Hydraulic-hole/downstream-boil reduced GeoClaw profile",
+      "applies_only": "reduced_hydraulic_hole_downstream_boil_fixture",
+      "max_depth_m_per_s": 220.0,
+      "max_speed_m_per_s2": 420.0,
+      "requires_preserve_initial_mass_disabled": true,
+      "requires_feature_forcing": false,
+      "source": "milestone18_corrected_boundary_geoclaw_profile"
+    }
+  ]
+}

@@ -1,13 +1,13 @@
 {
   "comparison_count": 50,
   "cpp_run_report": "reports/milestone16/cpp_solver_runs.json",
-  "failed_count": 35,
+  "failed_count": 34,
   "geoclaw_reference_report": "reports/milestone16/geoclaw_reference_runs.json",
   "notes": [
     "Distinct pin/release closure evidence is tracked separately in the Milestone 18 pin_release_fixture report; this report only compares raft coupling over GeoClaw-derived and C++ water fields."
   ],
   "passed": false,
-  "passed_count": 15,
+  "passed_count": 16,
   "records": [
     {
       "actual_scenario_id": "boulder_garden_seed_16",
@@ -384,28 +384,28 @@
           "name": "depression",
           "passed": false,
           "threshold": 0.08,
-          "value": 0.03223759653992708
+          "value": 0.01853469689121723
         },
         {
           "details": "Upstream hole velocity should be slow or reversing.",
           "name": "upstream_retention",
           "passed": false,
           "threshold": 0.15,
-          "value": 1.4987003723892007
+          "value": 0.7197354690995075
         },
         {
           "details": "",
           "name": "aerated_damping",
           "passed": true,
           "threshold": 0.25,
-          "value": 0.42369516258506007
+          "value": 0.5969470622286734
         },
         {
           "details": "",
           "name": "downstream_boil_lift",
           "passed": true,
           "threshold": 0.5,
-          "value": 2.019821308720309
+          "value": 2.048828301605425
         }
       ],
       "candidate_frame": "outputs/m16cpp/r_hole/reduced/cpp_solver/hydraulic_hole_downstream_boil_seed_18/frames/frame_0008.csv",
@@ -419,7 +419,7 @@
       ],
       "feature_outcome_match": true,
       "flow_band": null,
-      "force_delta_weight_ratio": 0.3861111669934381,
+      "force_delta_weight_ratio": 7.188111313825746e-15,
       "force_envelope_outcome_match": true,
       "gate_scenario_id": "hydraulic_hole_downstream_boil",
       "notes": [
@@ -469,9 +469,9 @@
       "reference_passed": false,
       "solver_mode": "reduced",
       "suite": "rafting",
-      "torque_delta_inertia_ratio": 0.34829349074030574,
-      "trajectory_position_delta_m": 0.0010521529300553292,
-      "trajectory_velocity_delta_mps": 0.0631291758034272
+      "torque_delta_inertia_ratio": 1.4836890936956585e-15,
+      "trajectory_position_delta_m": 2.168404344971009e-18,
+      "trajectory_velocity_delta_mps": 1.1654243626381287e-15
     },
     {
       "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
@@ -486,16 +486,16 @@
         {
           "details": "Boil should form a measurable upwelling dome.",
           "name": "surface_dome",
-          "passed": false,
+          "passed": true,
           "threshold": 0.03,
-          "value": 0.02309863803748552
+          "value": 0.21963044799199502
         },
         {
           "details": "Boil should impart upward raft acceleration.",
           "name": "vertical_impulse",
           "passed": true,
           "threshold": 2.0,
-          "value": 30.874295054350583
+          "value": 8.606676373943293
         },
         {
           "details": "Repeated force sampling should return identical boil impulses.",
@@ -506,23 +506,19 @@
         }
       ],
       "candidate_frame": "outputs/m16cpp/r_hole/reduced/cpp_solver/hydraulic_hole_downstream_boil_seed_18/frames/frame_0008.csv",
-      "candidate_outcome": "flat",
-      "candidate_passed": false,
+      "candidate_outcome": "upwelling",
+      "candidate_passed": true,
       "case_id": "downstream_boil_recovery",
       "expected_outcomes": [
         "clear"
       ],
       "feature_outcome_match": true,
       "flow_band": null,
-      "force_delta_weight_ratio": 2.4032833179166757,
+      "force_delta_weight_ratio": 4.0142370920490455e-09,
       "force_envelope_outcome_match": true,
       "gate_scenario_id": "hydraulic_hole_downstream_boil",
-      "notes": [
-        "C++ raft feature checks are not passing.",
-        "Force delta exceeds the weight-normalized threshold.",
-        "Torque delta exceeds the inertia-normalized threshold."
-      ],
-      "passed": false,
+      "notes": [],
+      "passed": true,
       "reference_checks": [
         {
           "details": "",
@@ -558,9 +554,9 @@
       "reference_passed": true,
       "solver_mode": "reduced",
       "suite": "rafting",
-      "torque_delta_inertia_ratio": 3.04362900740173,
-      "trajectory_position_delta_m": 0.006548947041322965,
-      "trajectory_velocity_delta_mps": 0.39293682247937645
+      "torque_delta_inertia_ratio": 3.032828620429229e-08,
+      "trajectory_position_delta_m": 1.0939890729308796e-11,
+      "trajectory_velocity_delta_mps": 6.563276208732204e-10
     },
     {
       "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",

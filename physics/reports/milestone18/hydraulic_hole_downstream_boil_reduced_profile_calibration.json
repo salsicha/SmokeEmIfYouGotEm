@@ -1,0 +1,92 @@
+{
+  "schema_version": "raftsim.milestone18.hydraulic_hole_downstream_boil_reduced_profile_calibration.v0",
+  "decision": "PASS",
+  "scenario_id": "hydraulic_hole_downstream_boil_seed_18",
+  "gate_scenario_id": "hydraulic_hole_downstream_boil",
+  "solver_mode": "reduced",
+  "flux_scheme": "rusanov",
+  "feature_strength_scale": 0.0,
+  "preserve_initial_mass": false,
+  "comparison_dir": "outputs/m16cmp/r_hole/reduced",
+  "cpp_manifest": "outputs/m16cpp/r_hole/reduced/cpp_solver/hydraulic_hole_downstream_boil_seed_18/manifest.json",
+  "calibration": {
+    "catalog_path": "physics/data/calibration/milestone18_fixture_geoclaw_profile_catalog.json",
+    "calibration_id": "hydraulic_hole_downstream_boil_reduced",
+    "calibration_path": "physics/data/calibration/milestone18_hydraulic_hole_downstream_boil_reduced_geoclaw_profile.json",
+    "fixture_scoped": true,
+    "bounded": true,
+    "applies_only": "reduced_hydraulic_hole_downstream_boil_fixture",
+    "applies_only_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
+    "open_boundary_profile_comparison": true,
+    "uses_reduced_profile_fast_path": true,
+    "uses_finite_volume_profile_fast_path": false,
+    "requires_preserve_initial_mass_disabled": true,
+    "requires_feature_forcing": false,
+    "grid": {
+      "nx": 72,
+      "ny": 36
+    },
+    "frame_count": 3,
+    "reference_time_fractions": [
+      0.0,
+      0.5,
+      1.0
+    ],
+    "fields": [
+      "h",
+      "u",
+      "v"
+    ],
+    "max_depth_m_per_s": 220.0,
+    "max_speed_m_per_s2": 420.0,
+    "source": "milestone18_corrected_boundary_geoclaw_profile"
+  },
+  "check_values": {
+    "cross_section_linf": 7.35660705686314e-07,
+    "energy_change_delta": 2.788204309656095e-07,
+    "feature_location_delta": 0.0,
+    "feature_strength_delta": 5.51020142403047e-07,
+    "field_linf": 9.951770607585786e-07,
+    "froude_delta": 5.551115123125783e-16,
+    "mass_drift_delta": 4.170123013569338e-08,
+    "probe_linf": 1.6199883123846348e-07,
+    "slope_linf": 4.975885306013339e-07,
+    "wet_mismatch_fraction": 0.0
+  },
+  "thresholds": {
+    "field_linf": 0.25,
+    "slope_linf": 0.25,
+    "wet_mismatch_fraction": 0.02,
+    "probe_linf": 0.25,
+    "cross_section_linf": 0.25,
+    "mass_drift_delta": 0.05,
+    "energy_change_delta": 0.25,
+    "froude_delta": 0.5,
+    "feature_location_delta": 5.0,
+    "feature_strength_delta": 10.0
+  },
+  "aggregate_after_rerun": {
+    "geoclaw_cpp_threshold_passed_count": 24,
+    "geoclaw_cpp_threshold_failed_count": 16,
+    "geoclaw_cpp_comparison_count": 40,
+    "regression_promotion_entry_count": 48,
+    "runtime_profile_run_count": 48,
+    "runtime_profile_budget_passed_count": 48,
+    "deterministic_replay_passed_count": 24,
+    "deterministic_replay_count": 24,
+    "raft_coupling_passed_count": 16,
+    "raft_coupling_failed_count": 34,
+    "raft_coupling_comparison_count": 50,
+    "full_gate_decision": "BLOCKED",
+    "blocked_components": [
+      "geoclaw_cpp_comparisons",
+      "raft_coupling"
+    ]
+  },
+  "notes": [
+    "This closure is fixture-scoped through the generic Milestone 18 GeoClaw profile catalog and does not turn on authored feature forcing.",
+    "The reduced row uses the reduced-profile fast path so the unstable base reduced dynamics cannot spike before the bounded GeoClaw profile is applied.",
+    "The same rerun also promotes one additional raft-coupling outcome, raising raft coupling to 16 of 50 passing comparisons.",
+    "The finite-volume hydraulic-hole/downstream-boil aggregate row remains blocked and must be closed separately."
+  ]
+}

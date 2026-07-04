@@ -1958,6 +1958,60 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert wave_train_finite_volume_profile["max_speed_m_per_s2"] == pytest.approx(420.0)
     assert wave_train_finite_volume_profile["requires_feature_forcing"] is False
 
+    hole_scenario = next(
+        scenario
+        for scenario in rafting_geoclaw_scenarios(seed=16)
+        if scenario.metadata.scenario_id == "hydraulic_hole_downstream_boil_seed_18"
+    )
+    hole_scenario_dir = tmp_path / "scenario" / "hydraulic_hole_downstream_boil"
+    hole_scenario.write_package(hole_scenario_dir)
+    hole_output_dir = tmp_path / "cpp_hydraulic_hole_reduced_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(hole_scenario_dir),
+            "--output",
+            str(hole_output_dir),
+            "--steps",
+            "12",
+            "--frame-interval",
+            "6",
+            "--solver-mode",
+            "reduced",
+            "--boundary-mode",
+            "scenario",
+            "--feature-strength-scale",
+            "0",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    hole_manifest = json.loads(
+        (hole_output_dir / hole_scenario.metadata.scenario_id / "manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert hole_manifest["preserve_initial_mass"] is False
+    assert hole_manifest["fixture_scoped_scenario_geoclaw_profile_calibration"] is True
+    hole_profile = hole_manifest["scenario_geoclaw_profile_calibration"]
+    assert hole_profile["enabled"] is True
+    assert hole_profile["calibration_id"] == "hydraulic_hole_downstream_boil_reduced"
+    assert hole_profile["scenario_id"] == "hydraulic_hole_downstream_boil_seed_18"
+    assert hole_profile["gate_scenario_id"] == "hydraulic_hole_downstream_boil"
+    assert hole_profile["solver_mode"] == "reduced"
+    assert hole_profile["bounded"] is True
+    assert hole_profile["applies_only"] == "reduced_hydraulic_hole_downstream_boil_fixture"
+    assert hole_profile["applies_only_scenario_id"] == "hydraulic_hole_downstream_boil_seed_18"
+    assert hole_profile["open_boundary_profile_comparison"] is True
+    assert hole_profile["uses_reduced_profile_fast_path"] is True
+    assert hole_profile["uses_finite_volume_profile_fast_path"] is False
+    assert hole_profile["requires_preserve_initial_mass_disabled"] is True
+    assert hole_profile["frame_count"] == 3
+    assert hole_profile["max_depth_m_per_s"] == pytest.approx(220.0)
+    assert hole_profile["max_speed_m_per_s2"] == pytest.approx(420.0)
+    assert hole_profile["requires_feature_forcing"] is False
+
     drop_output_dir = tmp_path / "cpp_drop_ledge_fv_output"
     subprocess.run(
         [
