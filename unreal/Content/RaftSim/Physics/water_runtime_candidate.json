@@ -8,17 +8,27 @@
     "raftsim_water/scenario.hpp",
     "raftsim_water/chrono_coupling.hpp"
   ],
+  "accepted_report_set_lock": {
+    "manifest": "physics/reports/milestone20/report_set_lock.json",
+    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
+    "required_for_live_bridge": true
+  },
   "unreal_adapter": {
-    "module": "RaftSimPhysics",
+    "module": "RaftSimWater",
     "class": "URaftSimWaterRuntimeAdapter",
     "config_struct": "FRaftSimWaterRuntimeConfig",
-    "sample_struct": "FRaftSimWaterSample"
+    "sample_struct": "FRaftSimWaterSample",
+    "deterministic_capture_struct": "FRaftSimWaterDeterministicCaptureState",
+    "report_manifest_state_struct": "FRaftSimWaterReportManifestState"
   },
   "runtime_policy": {
     "authority": "custom_cxx_shallow_water_solver",
     "mode": "one_way_water_to_raft_first",
     "fixed_step_seconds": 0.0166666667,
-    "unreal_water_system_role": "visual_only"
+    "unreal_water_system_role": "visual_only",
+    "feature_forcing_default": "off",
+    "report_manifest_required": true
   },
-  "status": "source_integrated_pending_editor_compile"
+  "live_bridge_manifest": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
+  "status": "authoritative_live_water_path_integrated_text_first_pending_editor_compile"
 }

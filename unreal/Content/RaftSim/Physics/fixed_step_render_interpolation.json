@@ -1,6 +1,7 @@
 {
   "schema": "raftsim.unreal.fixed_step_render_interpolation.v1",
   "physics_clock": "URaftSimPhysicsClockSubsystem",
+  "water_runtime_adapter": "URaftSimWaterRuntimeAdapter",
   "fixed_frames": {
     "water_dt_seconds": 0.0166666667,
     "raft_contact_substep_seconds": 0.0083333333,
@@ -9,6 +10,7 @@
   "render_policy": {
     "variable_render_delta": true,
     "interpolate_between_last_two_committed_physics_poses": true,
-    "never_advance_authoritative_physics_from_render_tick": true
+    "never_advance_authoritative_physics_from_render_tick": true,
+    "enabled_by_water_config": "FRaftSimWaterRuntimeConfig::bEnableRenderInterpolation"
   }
 }

@@ -4,6 +4,7 @@
   "chrono_substep_seconds": 0.0083333333,
   "authority": {
     "water": "URaftSimWaterRuntimeAdapter",
+    "water_module": "RaftSimWater",
     "raft_kinematics": "CustomReducedRigidBody",
     "unreal_rendering": "interpolated_consumer_only"
   },
@@ -17,7 +18,15 @@
     "publish_authoritative_raft_state"
   ],
   "subsystem": "URaftSimPhysicsBridgeSubsystem",
+  "live_water_bridge_manifest": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
+  "accepted_report_set_lock": "physics/reports/milestone20/report_set_lock.json",
+  "deterministic_capture": {
+    "enabled": true,
+    "path": "Saved/Automation/RaftSim/Water/live_water_capture.jsonl",
+    "frame_hash_scope": "water_runtime_name_scenario_report_lock_seed_frame_dt_time"
+  },
+  "render_interpolation_manifest": "unreal/Content/RaftSim/Physics/fixed_step_render_interpolation.json",
   "evaluation_manifest": "chaos_jolt_runtime_evaluation.json",
   "authority_selection_report": "physics/reports/milestone19/runtime_authority_selection.json",
-  "status": "custom_reduced_fallback_selected_pending_measured_chaos_jolt_fixture_results"
+  "status": "custom_cxx_water_authoritative_custom_reduced_raft_fallback_selected_pending_measured_chaos_jolt_fixture_results"
 }
