@@ -1,0 +1,2432 @@
+{
+  "accepted_report_set_lock": {
+    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
+    "manifest": "physics/reports/milestone20/report_set_lock.json"
+  },
+  "automation_module": "RaftSimAutomation",
+  "automation_test_prefix": "RaftSim.Milestone20.LiveWaterRegression",
+  "comparison_modes": [
+    "replayed_water_field_vs_accepted_cpp_output",
+    "live_water_field_vs_accepted_cpp_output"
+  ],
+  "live_water_bridge_manifest": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
+  "pass_policy": {
+    "feature_forcing_must_remain_off_unless_manifest_recorded": true,
+    "live_fields_must_match_accepted_cpp_outputs": true,
+    "replayed_fields_must_match_accepted_cpp_outputs": true,
+    "report_manifest_lock_must_match": true,
+    "stitched_whole_window_outputs_required_for_reach_local_content": true
+  },
+  "schema": "raftsim.unreal.regression_fixture_import.v1",
+  "source_milestones": {
+    "milestone16": {
+      "categories": {
+        "geoclaw_cpp": 40,
+        "geometry_validation": 8,
+        "raft_coupling": 50
+      },
+      "fixture_count": 98,
+      "fixtures": [
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_flat_pool_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/flat_pool/reduced",
+          "gate_scenario_id": "flat_pool",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_flat_pool_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/flat_pool/finite_volume",
+          "gate_scenario_id": "flat_pool",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_flat/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_uniform_channel_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/uniform_channel/reduced",
+          "gate_scenario_id": "uniform_channel",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_uniform_channel_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/uniform_channel/finite_volume",
+          "gate_scenario_id": "uniform_channel",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_uniform/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_dam_break_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/dam_break/reduced",
+          "gate_scenario_id": "dam_break",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_dam_break_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/dam_break/finite_volume",
+          "gate_scenario_id": "dam_break",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_dam/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_bed_step_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/bed_step/reduced",
+          "gate_scenario_id": "bed_step",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_bed_step_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/bed_step/finite_volume",
+          "gate_scenario_id": "bed_step",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_step/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_constriction_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/constriction/reduced",
+          "gate_scenario_id": "constriction",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_constriction_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/constriction/finite_volume",
+          "gate_scenario_id": "constriction",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_constrict/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_wet_dry_shoreline_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/wet_dry_shoreline/reduced",
+          "gate_scenario_id": "wet_dry_shoreline",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_wet_dry_shoreline_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/wet_dry_shoreline/finite_volume",
+          "gate_scenario_id": "wet_dry_shoreline",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_wetdry/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_sloping_manning_channel_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/sloping_manning_channel/reduced",
+          "gate_scenario_id": "sloping_manning_channel",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_sloping_manning_channel_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/sloping_manning_channel/finite_volume",
+          "gate_scenario_id": "sloping_manning_channel",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_slope/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_drop_ledge_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/drop_ledge/reduced",
+          "gate_scenario_id": "drop_ledge",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_drop_ledge_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/drop_ledge/finite_volume",
+          "gate_scenario_id": "drop_ledge",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/c_drop/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "canonical"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_boulder_garden_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/boulder_garden/reduced",
+          "gate_scenario_id": "boulder_garden",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_boulder_garden_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/boulder_garden/finite_volume",
+          "gate_scenario_id": "boulder_garden",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_boulder/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_cascading_wave_train_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/cascading_wave_train/reduced",
+          "gate_scenario_id": "cascading_wave_train",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_cascading_wave_train_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/cascading_wave_train/finite_volume",
+          "gate_scenario_id": "cascading_wave_train",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_waves/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_hydraulic_hole_downstream_boil_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/hydraulic_hole_downstream_boil/reduced",
+          "gate_scenario_id": "hydraulic_hole_downstream_boil",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_hydraulic_hole_downstream_boil_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/hydraulic_hole_downstream_boil/finite_volume",
+          "gate_scenario_id": "hydraulic_hole_downstream_boil",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_hole/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_lateral_wave_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/lateral_wave/reduced",
+          "gate_scenario_id": "lateral_wave",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_lateral_wave_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/lateral_wave/finite_volume",
+          "gate_scenario_id": "lateral_wave",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_lateral/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_eddy_line_shear_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/eddy_line_shear/reduced",
+          "gate_scenario_id": "eddy_line_shear",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_eddy_line_shear_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/eddy_line_shear/finite_volume",
+          "gate_scenario_id": "eddy_line_shear",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_eddy/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_shallow_shelf_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/shallow_shelf/reduced",
+          "gate_scenario_id": "shallow_shelf",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_shallow_shelf_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/shallow_shelf/finite_volume",
+          "gate_scenario_id": "shallow_shelf",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/r_shelf/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_south_fork_low_runnable_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/south_fork_low_runnable/reduced",
+          "gate_scenario_id": "south_fork_low_runnable",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "real_world"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_south_fork_low_runnable_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/south_fork_low_runnable/finite_volume",
+          "gate_scenario_id": "south_fork_low_runnable",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_low/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "real_world"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_south_fork_median_runnable_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/south_fork_median_runnable/reduced",
+          "gate_scenario_id": "south_fork_median_runnable",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "real_world"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_south_fork_median_runnable_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/south_fork_median_runnable/finite_volume",
+          "gate_scenario_id": "south_fork_median_runnable",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_med/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "real_world"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_south_fork_high_runnable_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/south_fork_high_runnable/reduced",
+          "gate_scenario_id": "south_fork_high_runnable",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "real_world"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_south_fork_high_runnable_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/south_fork_high_runnable/finite_volume",
+          "gate_scenario_id": "south_fork_high_runnable",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/rw_high/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "real_world"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_south_fork_cascading_low_runnable_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/south_fork_cascading_low_runnable/reduced",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_south_fork_cascading_low_runnable_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/south_fork_cascading_low_runnable/finite_volume",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_south_fork_cascading_median_runnable_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/south_fork_cascading_median_runnable/reduced",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_south_fork_cascading_median_runnable_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/south_fork_cascading_median_runnable/finite_volume",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_south_fork_cascading_high_runnable_reduced",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/south_fork_cascading_high_runnable/reduced",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario",
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/reports/dual_solver_manifest.json",
+          "accepted_reports": {
+            "diagnostic_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/reports/diagnostic_comparison.json",
+            "dual_solver_manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/reports/dual_solver_manifest.json",
+            "feature_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/reports/feature_comparison.json",
+            "field_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/reports/field_comparison.json",
+            "probe_comparison": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/reports/probe_comparison.json",
+            "threshold_evaluation": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/reports/threshold_evaluation.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geoclaw_cpp_south_fork_cascading_high_runnable_finite_volume",
+          "case_id": null,
+          "category": "geoclaw_cpp",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geoclaw_cpp/south_fork_cascading_high_runnable/finite_volume",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario",
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/finite_volume/geometry_case.json",
+          "accepted_reports": {
+            "geometry_case": "physics/regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/finite_volume/geometry_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geometry_validation_wet_dry_shoreline_wet_dry_shoreline_finite_volume",
+          "case_id": "wet_dry_shoreline",
+          "category": "geometry_validation",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geometry_validation/wet_dry_shoreline/wet_dry_shoreline/finite_volume",
+          "gate_scenario_id": "wet_dry_shoreline",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geometry_validation.json",
+          "suite": "geometry"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/reduced/geometry_case.json",
+          "accepted_reports": {
+            "geometry_case": "physics/regression_fixtures/milestone16/geometry_validation/wet_dry_shoreline/c_wetdry/reduced/geometry_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geometry_validation_wet_dry_shoreline_wet_dry_shoreline_reduced",
+          "case_id": "wet_dry_shoreline",
+          "category": "geometry_validation",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geometry_validation/wet_dry_shoreline/wet_dry_shoreline/reduced",
+          "gate_scenario_id": "wet_dry_shoreline",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/geometry_validation.json",
+          "suite": "geometry"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geometry_validation/bed_step/c_step/finite_volume/geometry_case.json",
+          "accepted_reports": {
+            "geometry_case": "physics/regression_fixtures/milestone16/geometry_validation/bed_step/c_step/finite_volume/geometry_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geometry_validation_bed_step_bed_step_finite_volume",
+          "case_id": "bed_step",
+          "category": "geometry_validation",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geometry_validation/bed_step/bed_step/finite_volume",
+          "gate_scenario_id": "bed_step",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/geometry_validation.json",
+          "suite": "geometry"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geometry_validation/constriction/c_constrict/geometry_case.json",
+          "accepted_reports": {
+            "geometry_case": "physics/regression_fixtures/milestone16/geometry_validation/constriction/c_constrict/geometry_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geometry_validation_constriction_constriction",
+          "case_id": "constriction",
+          "category": "geometry_validation",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geometry_validation/constriction/constriction",
+          "gate_scenario_id": "constriction",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "geoclaw_package",
+          "source_report": "physics/reports/milestone16/geometry_validation.json",
+          "suite": "geometry"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geometry_validation/drops_ledges_tailwater/drops_ledges_tailwater/geometry_case.json",
+          "accepted_reports": {
+            "geometry_case": "physics/regression_fixtures/milestone16/geometry_validation/drops_ledges_tailwater/drops_ledges_tailwater/geometry_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geometry_validation_drops_ledges_tailwater_drops_ledges_tailwater",
+          "case_id": "drops_ledges_tailwater",
+          "category": "geometry_validation",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geometry_validation/drops_ledges_tailwater/drops_ledges_tailwater",
+          "gate_scenario_id": "drops_ledges_tailwater",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "geoclaw_package",
+          "source_report": "physics/reports/milestone16/geometry_validation.json",
+          "suite": "geometry"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_low/geometry_case.json",
+          "accepted_reports": {
+            "geometry_case": "physics/regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_low/geometry_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geometry_validation_stitched_reach_drop_handoffs_south_fork_cascading_low_runnable",
+          "case_id": "stitched_reach_drop_handoffs",
+          "category": "geometry_validation",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geometry_validation/stitched_reach_drop_handoffs/south_fork_cascading_low_runnable",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "geoclaw_package",
+          "source_report": "physics/reports/milestone16/geometry_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_med/geometry_case.json",
+          "accepted_reports": {
+            "geometry_case": "physics/regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_med/geometry_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geometry_validation_stitched_reach_drop_handoffs_south_fork_cascading_median_runnable",
+          "case_id": "stitched_reach_drop_handoffs",
+          "category": "geometry_validation",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geometry_validation/stitched_reach_drop_handoffs/south_fork_cascading_median_runnable",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "geoclaw_package",
+          "source_report": "physics/reports/milestone16/geometry_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_high/geometry_case.json",
+          "accepted_reports": {
+            "geometry_case": "physics/regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_high/geometry_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.geometry_validation_stitched_reach_drop_handoffs_south_fork_cascading_high_runnable",
+          "case_id": "stitched_reach_drop_handoffs",
+          "category": "geometry_validation",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "geometry_validation/stitched_reach_drop_handoffs/south_fork_cascading_high_runnable",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "geoclaw_package",
+          "source_report": "physics/reports/milestone16/geometry_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_boulder/reduced/boulder_impacts/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_boulder/reduced/boulder_impacts/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_boulder_garden_reduced_boulder_impacts",
+          "case_id": "boulder_impacts",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/boulder_garden/reduced/boulder_impacts",
+          "gate_scenario_id": "boulder_garden",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_boulder/finite_volume/boulder_impacts/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_boulder/finite_volume/boulder_impacts/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_boulder_garden_finite_volume_boulder_impacts",
+          "case_id": "boulder_impacts",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/boulder_garden/finite_volume/boulder_impacts",
+          "gate_scenario_id": "boulder_garden",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_waves/reduced/wave_train_surf_flush/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_waves/reduced/wave_train_surf_flush/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_cascading_wave_train_reduced_wave_train_surf_flush",
+          "case_id": "wave_train_surf_flush",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/cascading_wave_train/reduced/wave_train_surf_flush",
+          "gate_scenario_id": "cascading_wave_train",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_waves/finite_volume/wave_train_surf_flush/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_waves/finite_volume/wave_train_surf_flush/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_cascading_wave_train_finite_volume_wave_train_surf_flush",
+          "case_id": "wave_train_surf_flush",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/cascading_wave_train/finite_volume/wave_train_surf_flush",
+          "gate_scenario_id": "cascading_wave_train",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_hole/reduced/hydraulic_hole_surf_flush/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_hole/reduced/hydraulic_hole_surf_flush/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_hydraulic_hole_downstream_boil_reduced_hydraulic_hole_surf_flush",
+          "case_id": "hydraulic_hole_surf_flush",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/hydraulic_hole_downstream_boil/reduced/hydraulic_hole_surf_flush",
+          "gate_scenario_id": "hydraulic_hole_downstream_boil",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_hole/reduced/downstream_boil_recovery/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_hole/reduced/downstream_boil_recovery/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_hydraulic_hole_downstream_boil_reduced_downstream_boil_recovery",
+          "case_id": "downstream_boil_recovery",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/hydraulic_hole_downstream_boil/reduced/downstream_boil_recovery",
+          "gate_scenario_id": "hydraulic_hole_downstream_boil",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_hole/finite_volume/hydraulic_hole_surf_flush/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_hole/finite_volume/hydraulic_hole_surf_flush/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_hydraulic_hole_downstream_boil_finite_volume_hydraulic_hole_surf_flush",
+          "case_id": "hydraulic_hole_surf_flush",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/hydraulic_hole_downstream_boil/finite_volume/hydraulic_hole_surf_flush",
+          "gate_scenario_id": "hydraulic_hole_downstream_boil",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_hole/finite_volume/downstream_boil_recovery/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_hole/finite_volume/downstream_boil_recovery/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_hydraulic_hole_downstream_boil_finite_volume_downstream_boil_recovery",
+          "case_id": "downstream_boil_recovery",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/hydraulic_hole_downstream_boil/finite_volume/downstream_boil_recovery",
+          "gate_scenario_id": "hydraulic_hole_downstream_boil",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_lateral/reduced/lateral_wave_side_impulse/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_lateral/reduced/lateral_wave_side_impulse/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_lateral_wave_reduced_lateral_wave_side_impulse",
+          "case_id": "lateral_wave_side_impulse",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/lateral_wave/reduced/lateral_wave_side_impulse",
+          "gate_scenario_id": "lateral_wave",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_lateral/finite_volume/lateral_wave_side_impulse/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_lateral/finite_volume/lateral_wave_side_impulse/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_lateral_wave_finite_volume_lateral_wave_side_impulse",
+          "case_id": "lateral_wave_side_impulse",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/lateral_wave/finite_volume/lateral_wave_side_impulse",
+          "gate_scenario_id": "lateral_wave",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_eddy/reduced/eddy_recovery/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_eddy/reduced/eddy_recovery/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_eddy_line_shear_reduced_eddy_recovery",
+          "case_id": "eddy_recovery",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/eddy_line_shear/reduced/eddy_recovery",
+          "gate_scenario_id": "eddy_line_shear",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_eddy/finite_volume/eddy_recovery/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_eddy/finite_volume/eddy_recovery/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_eddy_line_shear_finite_volume_eddy_recovery",
+          "case_id": "eddy_recovery",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/eddy_line_shear/finite_volume/eddy_recovery",
+          "gate_scenario_id": "eddy_line_shear",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_shallow_shelf_reduced_shallow_shelf_pivot_release",
+          "case_id": "shallow_shelf_pivot_release",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/shallow_shelf/reduced/shallow_shelf_pivot_release",
+          "gate_scenario_id": "shallow_shelf",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/r_shelf/finite_volume/shallow_shelf_pivot_release/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/r_shelf/finite_volume/shallow_shelf_pivot_release/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_shallow_shelf_finite_volume_shallow_shelf_pivot_release",
+          "case_id": "shallow_shelf_pivot_release",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/shallow_shelf/finite_volume/shallow_shelf_pivot_release",
+          "gate_scenario_id": "shallow_shelf",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "rafting"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/reduced/pool_entry/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/reduced/pool_entry/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_low_runnable_reduced_pool_entry",
+          "case_id": "pool_entry",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_low_runnable/reduced/pool_entry",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/reduced/drop_entry/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/reduced/drop_entry/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_low_runnable_reduced_drop_entry",
+          "case_id": "drop_entry",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_low_runnable/reduced/drop_entry",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/reduced/hydraulic_hole_surf_flush/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/reduced/hydraulic_hole_surf_flush/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_low_runnable_reduced_hydraulic_hole_surf_flush",
+          "case_id": "hydraulic_hole_surf_flush",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_low_runnable/reduced/hydraulic_hole_surf_flush",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/reduced/eddy_recovery/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/reduced/eddy_recovery/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_low_runnable_reduced_eddy_recovery",
+          "case_id": "eddy_recovery",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_low_runnable/reduced/eddy_recovery",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/reduced/boulder_garden_impacts/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/reduced/boulder_garden_impacts/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_low_runnable_reduced_boulder_garden_impacts",
+          "case_id": "boulder_garden_impacts",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_low_runnable/reduced/boulder_garden_impacts",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/reduced/transition_boundary_crossing/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/reduced/transition_boundary_crossing/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_low_runnable_reduced_transition_boundary_crossing",
+          "case_id": "transition_boundary_crossing",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_low_runnable/reduced/transition_boundary_crossing",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/pool_entry/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/pool_entry/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_low_runnable_finite_volume_pool_entry",
+          "case_id": "pool_entry",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_low_runnable/finite_volume/pool_entry",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/drop_entry/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/drop_entry/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_low_runnable_finite_volume_drop_entry",
+          "case_id": "drop_entry",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_low_runnable/finite_volume/drop_entry",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/hydraulic_hole_surf_flush/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/hydraulic_hole_surf_flush/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_low_runnable_finite_volume_hydraulic_hole_surf_flush",
+          "case_id": "hydraulic_hole_surf_flush",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_low_runnable/finite_volume/hydraulic_hole_surf_flush",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/eddy_recovery/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/eddy_recovery/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_low_runnable_finite_volume_eddy_recovery",
+          "case_id": "eddy_recovery",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_low_runnable/finite_volume/eddy_recovery",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/boulder_garden_impacts/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/boulder_garden_impacts/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_low_runnable_finite_volume_boulder_garden_impacts",
+          "case_id": "boulder_garden_impacts",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_low_runnable/finite_volume/boulder_garden_impacts",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/transition_boundary_crossing/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/transition_boundary_crossing/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_low_runnable_finite_volume_transition_boundary_crossing",
+          "case_id": "transition_boundary_crossing",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_low_runnable/finite_volume/transition_boundary_crossing",
+          "gate_scenario_id": "south_fork_cascading_low_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/reduced/pool_entry/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/reduced/pool_entry/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_median_runnable_reduced_pool_entry",
+          "case_id": "pool_entry",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_median_runnable/reduced/pool_entry",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/reduced/drop_entry/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/reduced/drop_entry/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_median_runnable_reduced_drop_entry",
+          "case_id": "drop_entry",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_median_runnable/reduced/drop_entry",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/reduced/hydraulic_hole_surf_flush/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/reduced/hydraulic_hole_surf_flush/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_median_runnable_reduced_hydraulic_hole_surf_flush",
+          "case_id": "hydraulic_hole_surf_flush",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_median_runnable/reduced/hydraulic_hole_surf_flush",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/reduced/eddy_recovery/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/reduced/eddy_recovery/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_median_runnable_reduced_eddy_recovery",
+          "case_id": "eddy_recovery",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_median_runnable/reduced/eddy_recovery",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/reduced/boulder_garden_impacts/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/reduced/boulder_garden_impacts/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_median_runnable_reduced_boulder_garden_impacts",
+          "case_id": "boulder_garden_impacts",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_median_runnable/reduced/boulder_garden_impacts",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/reduced/transition_boundary_crossing/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/reduced/transition_boundary_crossing/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_median_runnable_reduced_transition_boundary_crossing",
+          "case_id": "transition_boundary_crossing",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_median_runnable/reduced/transition_boundary_crossing",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/pool_entry/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/pool_entry/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_median_runnable_finite_volume_pool_entry",
+          "case_id": "pool_entry",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_median_runnable/finite_volume/pool_entry",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/drop_entry/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/drop_entry/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_median_runnable_finite_volume_drop_entry",
+          "case_id": "drop_entry",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_median_runnable/finite_volume/drop_entry",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/hydraulic_hole_surf_flush/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/hydraulic_hole_surf_flush/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_median_runnable_finite_volume_hydraulic_hole_surf_flush",
+          "case_id": "hydraulic_hole_surf_flush",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_median_runnable/finite_volume/hydraulic_hole_surf_flush",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/eddy_recovery/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/eddy_recovery/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_median_runnable_finite_volume_eddy_recovery",
+          "case_id": "eddy_recovery",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_median_runnable/finite_volume/eddy_recovery",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/boulder_garden_impacts/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/boulder_garden_impacts/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_median_runnable_finite_volume_boulder_garden_impacts",
+          "case_id": "boulder_garden_impacts",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_median_runnable/finite_volume/boulder_garden_impacts",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/transition_boundary_crossing/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/transition_boundary_crossing/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_median_runnable_finite_volume_transition_boundary_crossing",
+          "case_id": "transition_boundary_crossing",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_median_runnable/finite_volume/transition_boundary_crossing",
+          "gate_scenario_id": "south_fork_cascading_median_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/reduced/pool_entry/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/reduced/pool_entry/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_high_runnable_reduced_pool_entry",
+          "case_id": "pool_entry",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_high_runnable/reduced/pool_entry",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/reduced/drop_entry/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/reduced/drop_entry/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_high_runnable_reduced_drop_entry",
+          "case_id": "drop_entry",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_high_runnable/reduced/drop_entry",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/reduced/hydraulic_hole_surf_flush/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/reduced/hydraulic_hole_surf_flush/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_high_runnable_reduced_hydraulic_hole_surf_flush",
+          "case_id": "hydraulic_hole_surf_flush",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_high_runnable/reduced/hydraulic_hole_surf_flush",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/reduced/eddy_recovery/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/reduced/eddy_recovery/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_high_runnable_reduced_eddy_recovery",
+          "case_id": "eddy_recovery",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_high_runnable/reduced/eddy_recovery",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/reduced/boulder_garden_impacts/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/reduced/boulder_garden_impacts/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_high_runnable_reduced_boulder_garden_impacts",
+          "case_id": "boulder_garden_impacts",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_high_runnable/reduced/boulder_garden_impacts",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/reduced/transition_boundary_crossing/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/reduced/transition_boundary_crossing/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_high_runnable_reduced_transition_boundary_crossing",
+          "case_id": "transition_boundary_crossing",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_high_runnable/reduced/transition_boundary_crossing",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "reduced",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/pool_entry/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/pool_entry/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_high_runnable_finite_volume_pool_entry",
+          "case_id": "pool_entry",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_high_runnable/finite_volume/pool_entry",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/drop_entry/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/drop_entry/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_high_runnable_finite_volume_drop_entry",
+          "case_id": "drop_entry",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_high_runnable/finite_volume/drop_entry",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/hydraulic_hole_surf_flush/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/hydraulic_hole_surf_flush/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_high_runnable_finite_volume_hydraulic_hole_surf_flush",
+          "case_id": "hydraulic_hole_surf_flush",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_high_runnable/finite_volume/hydraulic_hole_surf_flush",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/eddy_recovery/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/eddy_recovery/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_high_runnable_finite_volume_eddy_recovery",
+          "case_id": "eddy_recovery",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_high_runnable/finite_volume/eddy_recovery",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/boulder_garden_impacts/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/boulder_garden_impacts/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_high_runnable_finite_volume_boulder_garden_impacts",
+          "case_id": "boulder_garden_impacts",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_high_runnable/finite_volume/boulder_garden_impacts",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        },
+        {
+          "accepted_manifest": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/transition_boundary_crossing/raft_coupling_case.json",
+          "accepted_reports": {
+            "raft_coupling_case": "physics/regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/transition_boundary_crossing/raft_coupling_case.json"
+          },
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M16.raft_coupling_south_fork_cascading_high_runnable_finite_volume_transition_boundary_crossing",
+          "case_id": "transition_boundary_crossing",
+          "category": "raft_coupling",
+          "comparison_modes": [
+            "replayed_water_field_vs_accepted_cpp_output",
+            "live_water_field_vs_accepted_cpp_output"
+          ],
+          "fixture_id": "raft_coupling/south_fork_cascading_high_runnable/finite_volume/transition_boundary_crossing",
+          "gate_scenario_id": "south_fork_cascading_high_runnable",
+          "milestone": 16,
+          "scenario_package": null,
+          "solver_mode": "finite_volume",
+          "source_report": "physics/reports/milestone16/raft_coupling_validation.json",
+          "suite": "cascading"
+        }
+      ],
+      "registry": "physics/regression_fixtures/milestone16/registry.json",
+      "source_report": "physics/reports/milestone16/regression_promotion_manifest.json",
+      "suites": {
+        "canonical": 16,
+        "cascading": 45,
+        "geometry": 5,
+        "rafting": 26,
+        "real_world": 6
+      }
+    },
+    "milestone17": {
+      "fixture_count": 7,
+      "fixtures": [
+        {
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M17.lake_at_rest_balance",
+          "category": "analytic_guardrail",
+          "comparison_modes": [
+            "live_initial_or_replayed_field_vs_analytic_reference"
+          ],
+          "fixture_id": "milestone17/lake_at_rest_balance",
+          "metric_count": 2,
+          "milestone": 17,
+          "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/lake_at_rest_balance/reference.json",
+          "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/lake_at_rest_balance/scenario",
+          "source_report": "physics/reports/milestone17/analytic_fixture_validation.json",
+          "suite": "analytic",
+          "title": "Lake At Rest Over Uneven Bed",
+          "tolerance_tier": "well_balanced"
+        },
+        {
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M17.sloping_channel_friction",
+          "category": "analytic_guardrail",
+          "comparison_modes": [
+            "live_initial_or_replayed_field_vs_analytic_reference"
+          ],
+          "fixture_id": "milestone17/sloping_channel_friction",
+          "metric_count": 2,
+          "milestone": 17,
+          "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/sloping_channel_friction/reference.json",
+          "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/sloping_channel_friction/scenario",
+          "source_report": "physics/reports/milestone17/analytic_fixture_validation.json",
+          "suite": "analytic",
+          "title": "Sloping Manning Channel",
+          "tolerance_tier": "analytic"
+        },
+        {
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M17.wet_dry_shoreline",
+          "category": "analytic_guardrail",
+          "comparison_modes": [
+            "live_initial_or_replayed_field_vs_analytic_reference"
+          ],
+          "fixture_id": "milestone17/wet_dry_shoreline",
+          "metric_count": 2,
+          "milestone": 17,
+          "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/wet_dry_shoreline/reference.json",
+          "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/wet_dry_shoreline/scenario",
+          "source_report": "physics/reports/milestone17/analytic_fixture_validation.json",
+          "suite": "analytic",
+          "title": "Planar Wet/Dry Shoreline",
+          "tolerance_tier": "well_balanced"
+        },
+        {
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M17.bed_step_subcritical",
+          "category": "analytic_guardrail",
+          "comparison_modes": [
+            "live_initial_or_replayed_field_vs_analytic_reference"
+          ],
+          "fixture_id": "milestone17/bed_step_subcritical",
+          "metric_count": 2,
+          "milestone": 17,
+          "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/bed_step_subcritical/reference.json",
+          "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/bed_step_subcritical/scenario",
+          "source_report": "physics/reports/milestone17/analytic_fixture_validation.json",
+          "suite": "analytic",
+          "title": "Subcritical Bed Step",
+          "tolerance_tier": "analytic"
+        },
+        {
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M17.dam_break_bore",
+          "category": "analytic_guardrail",
+          "comparison_modes": [
+            "live_initial_or_replayed_field_vs_analytic_reference"
+          ],
+          "fixture_id": "milestone17/dam_break_bore",
+          "metric_count": 2,
+          "milestone": 17,
+          "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/dam_break_bore/reference.json",
+          "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/dam_break_bore/scenario",
+          "source_report": "physics/reports/milestone17/analytic_fixture_validation.json",
+          "suite": "analytic",
+          "title": "Dam-Break Bore Riemann Initial State",
+          "tolerance_tier": "diagnostic"
+        },
+        {
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M17.hydraulic_jump_conjugate_depth",
+          "category": "analytic_guardrail",
+          "comparison_modes": [
+            "live_initial_or_replayed_field_vs_analytic_reference"
+          ],
+          "fixture_id": "milestone17/hydraulic_jump_conjugate_depth",
+          "metric_count": 2,
+          "milestone": 17,
+          "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/hydraulic_jump_conjugate_depth/reference.json",
+          "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/hydraulic_jump_conjugate_depth/scenario",
+          "source_report": "physics/reports/milestone17/analytic_fixture_validation.json",
+          "suite": "analytic",
+          "title": "Hydraulic Jump Conjugate Depth",
+          "tolerance_tier": "analytic"
+        },
+        {
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M17.transcritical_bump",
+          "category": "analytic_guardrail",
+          "comparison_modes": [
+            "live_initial_or_replayed_field_vs_analytic_reference"
+          ],
+          "fixture_id": "milestone17/transcritical_bump",
+          "metric_count": 2,
+          "milestone": 17,
+          "reference_path": "physics/data/validation/milestone17/analytic_fixtures/fixtures/transcritical_bump/reference.json",
+          "scenario_package": "physics/data/validation/milestone17/analytic_fixtures/fixtures/transcritical_bump/scenario",
+          "source_report": "physics/reports/milestone17/analytic_fixture_validation.json",
+          "suite": "analytic",
+          "title": "Transcritical Flow Over Bump",
+          "tolerance_tier": "analytic"
+        }
+      ],
+      "passed_count": 7,
+      "source_report": "physics/reports/milestone17/analytic_fixture_validation.json"
+    },
+    "milestone18": {
+      "fixture_count": 4,
+      "fixtures": [
+        {
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M18.remaining_geometry_closure",
+          "category": "geometry_closure",
+          "comparison_modes": [
+            "unreal_replay_summary_vs_closure_report",
+            "live_water_summary_vs_closure_report"
+          ],
+          "decision": "PASS",
+          "fixture_id": "milestone18/remaining_geometry_closure",
+          "milestone": 18,
+          "passed": true,
+          "schema_version": "raftsim.milestone18.remaining_geometry_closure.v0",
+          "source_report": "physics/reports/milestone18/remaining_geometry_closure.json",
+          "suite": "closure",
+          "summary": {
+            "active_blockers": [],
+            "blocker_count": 0,
+            "case_count": 6,
+            "next_case": null,
+            "promotion_ready_count": 6
+          }
+        },
+        {
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M18.geoclaw_cpp_failure_triage_matrix",
+          "category": "failure_triage_closure",
+          "comparison_modes": [
+            "unreal_replay_summary_vs_closure_report",
+            "live_water_summary_vs_closure_report"
+          ],
+          "decision": "PASS",
+          "fixture_id": "milestone18/geoclaw_cpp_failure_triage_matrix",
+          "milestone": 18,
+          "passed": true,
+          "schema_version": "raftsim.milestone18.failure_triage_matrix.v0",
+          "source_report": "physics/reports/milestone18/geoclaw_cpp_failure_triage_matrix.json",
+          "suite": "closure",
+          "summary": {
+            "by_dependency_phase": {},
+            "by_metric_group": {},
+            "by_scenario_family": {},
+            "by_severity": {},
+            "by_solver_mode": {},
+            "by_source_component": {},
+            "entry_count": 0
+          }
+        },
+        {
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M18.pin_release_fixture",
+          "category": "pin_release_gameplay_guardrail",
+          "comparison_modes": [
+            "unreal_replay_summary_vs_closure_report",
+            "live_water_summary_vs_closure_report"
+          ],
+          "decision": "PASS",
+          "fixture_id": "milestone18/pin_release_fixture",
+          "milestone": 18,
+          "passed": true,
+          "schema_version": "raftsim.milestone18.pin_release_fixture.v0",
+          "source_report": "physics/reports/milestone18/pin_release_fixture.json",
+          "suite": "closure",
+          "summary": {
+            "failed_flow_bands": [],
+            "flow_bands": [
+              "low_scrape",
+              "runnable_sticky",
+              "high_washout"
+            ],
+            "flow_case_count": 3,
+            "outcomes": [
+              "failed_rescue",
+              "flushed_washout",
+              "pinned",
+              "released",
+              "scraped_clear"
+            ],
+            "required_outcomes": [
+              "failed_rescue",
+              "pinned",
+              "released"
+            ]
+          }
+        },
+        {
+          "automation_test_name": "RaftSim.Milestone20.LiveWaterRegression.M18.raft_coupling_agreement_closure",
+          "category": "raft_coupling_agreement_closure",
+          "comparison_modes": [
+            "unreal_replay_summary_vs_closure_report",
+            "live_water_summary_vs_closure_report"
+          ],
+          "decision": "PASS",
+          "fixture_id": "milestone18/raft_coupling_agreement_closure",
+          "milestone": 18,
+          "passed": true,
+          "schema_version": "raftsim.milestone18.raft_coupling_agreement_closure.v0",
+          "source_report": "physics/reports/milestone18/raft_coupling_agreement_closure.json",
+          "suite": "closure",
+          "summary": {}
+        }
+      ],
+      "source_reports": [
+        "physics/reports/milestone18/remaining_geometry_closure.json",
+        "physics/reports/milestone18/geoclaw_cpp_failure_triage_matrix.json",
+        "physics/reports/milestone18/pin_release_fixture.json",
+        "physics/reports/milestone18/raft_coupling_agreement_closure.json"
+      ]
+    }
+  },
+  "status": "ready_for_unreal_automation_execution",
+  "total_fixture_count": 109
+}

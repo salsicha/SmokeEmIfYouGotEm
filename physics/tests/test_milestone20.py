@@ -7,6 +7,8 @@ from raftsim.milestone20 import (
     MILESTONE20_REPORT_SET_LOCK_DECISION,
     MILESTONE20_REPORT_SET_LOCK_SCHEMA,
     MILESTONE20_SUPPORTING_ARTIFACTS,
+    MILESTONE20_UNREAL_REGRESSION_IMPORT_SCHEMA,
+    build_unreal_regression_fixture_import,
     build_report_set_lock,
     write_report_set_lock,
 )
@@ -27,6 +29,13 @@ WATER_RUNTIME_CANDIDATE_PATH = (
 FIXED_STEP_BRIDGE_PATH = REPO_ROOT / "unreal/Content/RaftSim/Physics/fixed_step_bridge.json"
 RENDER_INTERPOLATION_PATH = (
     REPO_ROOT / "unreal/Content/RaftSim/Physics/fixed_step_render_interpolation.json"
+)
+WATER_REGRESSION_IMPORT_PATH = (
+    REPO_ROOT / "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json"
+)
+WATER_REGRESSION_IMPORT_TEST_PATH = (
+    REPO_ROOT
+    / "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterRegressionImportTest.cpp"
 )
 REQUIRED_PRODUCTION_MODULES = {
     "RaftSimCore",
@@ -173,6 +182,9 @@ def test_live_water_bridge_manifest_uses_locked_report_and_water_module():
     )
     assert live_bridge["accepted_report_set_lock"]["lock_hash"] == report_lock["lock"]["lock_hash"]
     assert live_bridge["accepted_report_set_lock"]["required"] is True
+    assert live_bridge["regression_fixture_import"] == (
+        "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json"
+    )
     assert live_bridge["water_runtime"]["module"] == "RaftSimWater"
     assert live_bridge["water_runtime"]["authority"] == "custom_cxx_shallow_water_solver"
     assert live_bridge["fixed_step_scheduling"]["subsystem"] == "URaftSimPhysicsBridgeSubsystem"
@@ -223,3 +235,57 @@ def test_live_water_adapter_lives_in_water_module_with_manifest_capture_contract
     assert "LoadAcceptedReportManifest" in cpp_text
     assert "AppendDeterministicCaptureFrame" in cpp_text
     assert "ResolveRepoRelativePath" in cpp_text
+
+
+def test_unreal_regression_fixture_import_matches_generator():
+    expected = build_unreal_regression_fixture_import(REPO_ROOT).manifest
+    committed = json.loads(WATER_REGRESSION_IMPORT_PATH.read_text(encoding="utf-8"))
+
+    assert committed == expected
+    assert committed["schema"] == MILESTONE20_UNREAL_REGRESSION_IMPORT_SCHEMA
+    assert committed["status"] == "ready_for_unreal_automation_execution"
+
+
+def test_unreal_regression_fixture_import_covers_milestone16_17_18():
+    manifest = json.loads(WATER_REGRESSION_IMPORT_PATH.read_text(encoding="utf-8"))
+    source = manifest["source_milestones"]
+    report_lock = json.loads(REPORT_SET_LOCK_PATH.read_text(encoding="utf-8"))
+
+    assert manifest["accepted_report_set_lock"]["lock_hash"] == report_lock["lock"]["lock_hash"]
+    assert manifest["automation_module"] == "RaftSimAutomation"
+    assert manifest["live_water_bridge_manifest"] == (
+        "unreal/Content/RaftSim/Physics/live_water_bridge.json"
+    )
+    assert manifest["comparison_modes"] == [
+        "replayed_water_field_vs_accepted_cpp_output",
+        "live_water_field_vs_accepted_cpp_output",
+    ]
+    assert manifest["total_fixture_count"] == 109
+    assert source["milestone16"]["fixture_count"] == 98
+    assert source["milestone16"]["categories"] == {
+        "geoclaw_cpp": 40,
+        "geometry_validation": 8,
+        "raft_coupling": 50,
+    }
+    assert source["milestone17"]["fixture_count"] == 7
+    assert source["milestone17"]["passed_count"] == 7
+    assert source["milestone18"]["fixture_count"] == 4
+    assert {
+        fixture["fixture_id"] for fixture in source["milestone18"]["fixtures"]
+    } == {
+        "milestone18/remaining_geometry_closure",
+        "milestone18/geoclaw_cpp_failure_triage_matrix",
+        "milestone18/pin_release_fixture",
+        "milestone18/raft_coupling_agreement_closure",
+    }
+    assert manifest["pass_policy"]["replayed_fields_must_match_accepted_cpp_outputs"] is True
+    assert manifest["pass_policy"]["live_fields_must_match_accepted_cpp_outputs"] is True
+
+
+def test_unreal_automation_test_loads_regression_import_manifest():
+    test_text = WATER_REGRESSION_IMPORT_TEST_PATH.read_text(encoding="utf-8")
+
+    assert "RaftSim/Automation/water_regression_fixture_import.json" in test_text
+    assert "raftsim.unreal.regression_fixture_import.v1" in test_text
+    assert "total_fixture_count" in test_text
+    assert "Milestone 16 fixture count" in test_text
