@@ -280,7 +280,7 @@
       "summary": "physics/reports/milestone19/jolt/summary.json",
       "replay": "physics/reports/milestone19/jolt/replays/"
     },
-    "comparison": "outputs/runtime_eval/chaos_vs_jolt_comparison.json"
+    "comparison": "physics/reports/milestone19/chaos_vs_jolt_comparison.json"
   },
   "current_decision": {
     "default": "Use Chaos for Unreal-integrated visual physics and non-authoritative props while the evaluation is pending.",

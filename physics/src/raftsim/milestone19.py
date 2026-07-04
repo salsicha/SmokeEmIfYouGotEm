@@ -20,6 +20,16 @@ JOLT_REPLAY_SUMMARY_SCHEMA = "raftsim.native.jolt_fixture_replay_summary.v1"
 JOLT_SUMMARY_SCHEMA = "raftsim.native.jolt_fixture_summary.v1"
 JOLT_RUNTIME_ID = "Jolt"
 JOLT_EXPORT_DECISION = "native_jolt_smoke_harness_export_complete_not_authority_evidence"
+CHAOS_JOLT_COMPARISON_SCHEMA = "raftsim.runtime_eval.chaos_vs_jolt_comparison.v1"
+CHAOS_JOLT_COMPARISON_DECISION = "blocked_pending_measured_runtime_telemetry"
+COMPARISON_DIMENSIONS = (
+    "determinism",
+    "cpu_cost",
+    "contact_quality",
+    "outcome_stability",
+    "swimmer_state",
+    "authoring_debug_ergonomics",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,6 +45,12 @@ class JoltSmokeHarnessExport:
     manifest: dict[str, Any]
     summary: dict[str, Any]
     replays: tuple[dict[str, Any], ...]
+    markdown: str
+
+
+@dataclass(frozen=True, slots=True)
+class ChaosJoltComparisonReport:
+    report: dict[str, Any]
     markdown: str
 
 
@@ -437,6 +453,118 @@ def write_jolt_smoke_harness_export(
     return export
 
 
+def build_chaos_jolt_comparison_report(
+    *,
+    contract: dict[str, Any],
+    chaos_summary: dict[str, Any],
+    jolt_summary: dict[str, Any],
+    source_contract_path: str = "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
+    chaos_summary_path: str = "physics/reports/milestone19/chaos/summary.json",
+    jolt_summary_path: str = "physics/reports/milestone19/jolt/summary.json",
+) -> ChaosJoltComparisonReport:
+    """Compare Chaos and Jolt fixture exports without selecting authority."""
+
+    contract_fixture_ids = tuple(fixture["fixture_id"] for fixture in contract["fixtures"])
+    chaos_fixtures = {fixture["fixture_id"]: fixture for fixture in chaos_summary["fixtures"]}
+    jolt_fixtures = {fixture["fixture_id"]: fixture for fixture in jolt_summary["fixtures"]}
+    fixture_rows = []
+    for fixture_id in contract_fixture_ids:
+        chaos_fixture = chaos_fixtures[fixture_id]
+        jolt_fixture = jolt_fixtures[fixture_id]
+        fixture_rows.append(
+            {
+                "fixture_id": fixture_id,
+                "chaos_status": chaos_fixture["status"],
+                "jolt_status": jolt_fixture["status"],
+                "parameter_case_count_match": (
+                    chaos_fixture["parameter_case_count"] == jolt_fixture["parameter_case_count"]
+                ),
+                "step_count_match": chaos_fixture["step_count"] == jolt_fixture["step_count"],
+                "metrics_match": tuple(chaos_fixture["metrics"]) == tuple(jolt_fixture["metrics"]),
+                "ready_for_measured_runtime_comparison": (
+                    chaos_fixture["telemetry_fields_present_in_schema_samples"]
+                    and jolt_fixture["telemetry_fields_present_in_schema_samples"]
+                ),
+                "evidence_state": "schema_placeholder_only",
+            }
+        )
+
+    fixture_coverage_match = (
+        set(chaos_fixtures) == set(jolt_fixtures) == set(contract_fixture_ids)
+    )
+    measured_evidence_available = (
+        chaos_summary.get("runtime_passed_fixture_suite", False)
+        and jolt_summary.get("runtime_passed_fixture_suite", False)
+        and chaos_summary.get("authority_selection_allowed", False)
+        and jolt_summary.get("authority_selection_allowed", False)
+    )
+    dimension_rankings = [
+        _pending_dimension_ranking(dimension, chaos_summary, jolt_summary)
+        for dimension in COMPARISON_DIMENSIONS
+    ]
+    report = {
+        "schema": CHAOS_JOLT_COMPARISON_SCHEMA,
+        "source_contract": source_contract_path,
+        "inputs": {
+            "chaos_summary": chaos_summary_path,
+            "jolt_summary": jolt_summary_path,
+        },
+        "decision": CHAOS_JOLT_COMPARISON_DECISION,
+        "fixture_coverage_match": fixture_coverage_match,
+        "measured_evidence_available": measured_evidence_available,
+        "authority_selection_allowed": False,
+        "runtime_passed_fixture_suite": False,
+        "fixture_count": len(contract_fixture_ids),
+        "fixtures": fixture_rows,
+        "dimension_rankings": dimension_rankings,
+        "overall_ranking": [
+            {
+                "runtime": CHAOS_RUNTIME_ID,
+                "rank": "tie_pending_measured_telemetry",
+                "can_be_authoritative_now": False,
+                "reason": "Chaos has fixture exports but no measured Chaos telemetry suite yet.",
+            },
+            {
+                "runtime": JOLT_RUNTIME_ID,
+                "rank": "tie_pending_measured_telemetry",
+                "can_be_authoritative_now": False,
+                "reason": "Jolt has a native smoke harness path but no measured Jolt SDK telemetry suite yet.",
+            },
+        ],
+        "recommendation": (
+            "Do not select Chaos or Jolt for scoring-critical raft/contact/swimmer authority yet. "
+            "Run the generated Chaos automation fixtures and native Jolt smoke harness, replace "
+            "placeholder frames with measured telemetry, then regenerate this comparison."
+        ),
+    }
+    return ChaosJoltComparisonReport(report=report, markdown=_comparison_markdown(report))
+
+
+def write_chaos_jolt_comparison_report(
+    *,
+    contract_path: Path,
+    chaos_summary_path: Path,
+    jolt_summary_path: Path,
+    output_json: Path,
+    output_md: Path,
+) -> ChaosJoltComparisonReport:
+    """Generate and write the Chaos-vs-Jolt comparison report."""
+
+    report = build_chaos_jolt_comparison_report(
+        contract=load_runtime_evaluation_contract(contract_path),
+        chaos_summary=json.loads(chaos_summary_path.read_text(encoding="utf-8")),
+        jolt_summary=json.loads(jolt_summary_path.read_text(encoding="utf-8")),
+        source_contract_path=_display_path(contract_path),
+        chaos_summary_path=_display_path(chaos_summary_path),
+        jolt_summary_path=_display_path(jolt_summary_path),
+    )
+    output_json.parent.mkdir(parents=True, exist_ok=True)
+    output_md.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(output_json, report.report)
+    output_md.write_text(report.markdown, encoding="utf-8")
+    return report
+
+
 def _expand_parameter_sweep(sweep: dict[str, Any]) -> list[dict[str, Any]]:
     if not sweep:
         return [{}]
@@ -692,6 +820,101 @@ def _summary_markdown(
             "## Notes",
             "",
             *[f"- {note}" for note in summary["notes"]],
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def _pending_dimension_ranking(
+    dimension: str, chaos_summary: dict[str, Any], jolt_summary: dict[str, Any]
+) -> dict[str, Any]:
+    return {
+        "dimension": dimension,
+        "winner": "insufficient_measured_evidence",
+        "rankings": [
+            {
+                "runtime": chaos_summary["runtime_id"],
+                "rank": "tie_pending_measured_telemetry",
+                "score": None,
+                "evidence_state": "schema_placeholder_only",
+            },
+            {
+                "runtime": jolt_summary["runtime_id"],
+                "rank": "tie_pending_measured_telemetry",
+                "score": None,
+                "evidence_state": "schema_placeholder_only",
+            },
+        ],
+        "required_next_evidence": _dimension_next_evidence(dimension),
+    }
+
+
+def _dimension_next_evidence(dimension: str) -> tuple[str, ...]:
+    requirements = {
+        "determinism": (
+            "determinism_hash_mismatch_count",
+            "contact_event_sequence_mismatch_count",
+            "outcome_mismatch_count",
+        ),
+        "cpu_cost": (
+            "mean_cpu_ms_per_step",
+            "p95_cpu_ms_per_step",
+            "max_cpu_ms_per_step",
+            "telemetry_bytes_per_second",
+        ),
+        "contact_quality": (
+            "peak_contact_impulse_n_s",
+            "max_bed_penetration_m",
+            "scrape_impulse_n_s",
+            "pin_duration_seconds",
+        ),
+        "outcome_stability": (
+            "bounce_scrape_or_pin_classification",
+            "release_or_stick_outcome",
+            "flip_or_release_outcome",
+            "outcome_mismatch_count",
+        ),
+        "swimmer_state": (
+            "ejection_trigger_step",
+            "crew_state_sequence",
+            "swimmer_position_error_m",
+            "time_to_water_contact_seconds",
+        ),
+        "authoring_debug_ergonomics": (
+            "debug_overlay_capture",
+            "headless_summary",
+            "fixture_iteration_time",
+            "replay_explainability",
+        ),
+    }
+    return requirements[dimension]
+
+
+def _comparison_markdown(report: dict[str, Any]) -> str:
+    lines = [
+        "# Milestone 19 Chaos-vs-Jolt Comparison",
+        "",
+        f"Decision: `{report['decision']}`",
+        "",
+        report["recommendation"],
+        "",
+        "## Dimension Rankings",
+        "",
+    ]
+    for dimension in report["dimension_rankings"]:
+        lines.append(
+            f"- `{dimension['dimension']}`: {dimension['winner']} "
+            f"({', '.join(dimension['required_next_evidence'])})."
+        )
+    lines.extend(
+        [
+            "",
+            "## Fixture Coverage",
+            "",
+            f"- Fixture coverage match: `{report['fixture_coverage_match']}`.",
+            f"- Measured evidence available: `{report['measured_evidence_available']}`.",
+            f"- Authority selection allowed: `{report['authority_selection_allowed']}`.",
             "",
         ]
     )
