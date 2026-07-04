@@ -22,6 +22,9 @@ JOLT_RUNTIME_ID = "Jolt"
 JOLT_EXPORT_DECISION = "native_jolt_smoke_harness_export_complete_not_authority_evidence"
 CHAOS_JOLT_COMPARISON_SCHEMA = "raftsim.runtime_eval.chaos_vs_jolt_comparison.v1"
 CHAOS_JOLT_COMPARISON_DECISION = "blocked_pending_measured_runtime_telemetry"
+AUTHORITY_SELECTION_SCHEMA = "raftsim.runtime_eval.authority_selection.v1"
+AUTHORITY_SELECTION_DECISION = "custom_reduced_runtime_fallback_selected_for_vertical_slice"
+FALLBACK_RUNTIME_ID = "CustomReducedRigidBody"
 COMPARISON_DIMENSIONS = (
     "determinism",
     "cpu_cost",
@@ -50,6 +53,12 @@ class JoltSmokeHarnessExport:
 
 @dataclass(frozen=True, slots=True)
 class ChaosJoltComparisonReport:
+    report: dict[str, Any]
+    markdown: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeAuthoritySelectionReport:
     report: dict[str, Any]
     markdown: str
 
@@ -565,6 +574,79 @@ def write_chaos_jolt_comparison_report(
     return report
 
 
+def build_runtime_authority_selection_report(
+    *,
+    comparison_report: dict[str, Any],
+    comparison_report_path: str = "physics/reports/milestone19/chaos_vs_jolt_comparison.json",
+) -> RuntimeAuthoritySelectionReport:
+    """Select the first vertical-slice runtime authority from current evidence."""
+
+    chaos_or_jolt_ready = (
+        comparison_report.get("authority_selection_allowed", False)
+        and comparison_report.get("runtime_passed_fixture_suite", False)
+        and comparison_report.get("measured_evidence_available", False)
+    )
+    if chaos_or_jolt_ready:
+        decision = "runtime_candidate_ready_for_manual_selection"
+        selected_runtime = "manual_review_required"
+        selection_basis = "Measured Chaos/Jolt fixture evidence is available."
+    else:
+        decision = AUTHORITY_SELECTION_DECISION
+        selected_runtime = FALLBACK_RUNTIME_ID
+        selection_basis = (
+            "Chaos and Jolt fixture exports exist, but the comparison report blocks "
+            "authority selection because measured runtime telemetry has not replaced "
+            "schema placeholder frames."
+        )
+
+    report = {
+        "schema": AUTHORITY_SELECTION_SCHEMA,
+        "decision": decision,
+        "selected_runtime": selected_runtime,
+        "selection_scope": "first_unreal_vertical_slice_raft_contact_swimmer_authority",
+        "water_authority": "custom_cxx_shallow_water_solver",
+        "comparison_report": comparison_report_path,
+        "selection_basis": selection_basis,
+        "chaos_status": "visual_and_non_authoritative_only_pending_measured_fixture_results",
+        "jolt_status": "candidate_pending_measured_jolt_sdk_fixture_results",
+        "custom_reduced_status": "selected_fallback_until_chaos_or_jolt_passes_measured_fixture_suite",
+        "chrono_status": "high_fidelity_reference_and_research_only",
+        "chaos_or_jolt_authority_selection_allowed": chaos_or_jolt_ready,
+        "milestone19_closed": not chaos_or_jolt_ready,
+        "replacement_conditions": [
+            "Run measured Unreal Chaos automation fixtures over the shared contract.",
+            "Run measured native Jolt SDK/plugin fixtures over the shared contract.",
+            "Regenerate the Chaos-vs-Jolt comparison with non-placeholder telemetry.",
+            "Select Chaos or Jolt only if the comparison report allows scoring-critical authority.",
+        ],
+        "unreal_manifest_updates": {
+            "raft_dynamics_runtime": "unreal/Content/RaftSim/Physics/raft_dynamics_runtime.json",
+            "physics_authority_policy": "unreal/Content/RaftSim/Physics/physics_authority_policy.json",
+            "fixed_step_bridge": "unreal/Content/RaftSim/Physics/fixed_step_bridge.json",
+        },
+    }
+    return RuntimeAuthoritySelectionReport(report=report, markdown=_selection_markdown(report))
+
+
+def write_runtime_authority_selection_report(
+    *,
+    comparison_report_path: Path,
+    output_json: Path,
+    output_md: Path,
+) -> RuntimeAuthoritySelectionReport:
+    """Generate and write the Milestone 19 runtime authority decision."""
+
+    report = build_runtime_authority_selection_report(
+        comparison_report=json.loads(comparison_report_path.read_text(encoding="utf-8")),
+        comparison_report_path=_display_path(comparison_report_path),
+    )
+    output_json.parent.mkdir(parents=True, exist_ok=True)
+    output_md.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(output_json, report.report)
+    output_md.write_text(report.markdown, encoding="utf-8")
+    return report
+
+
 def _expand_parameter_sweep(sweep: dict[str, Any]) -> list[dict[str, Any]]:
     if not sweep:
         return [{}]
@@ -918,6 +1000,31 @@ def _comparison_markdown(report: dict[str, Any]) -> str:
             "",
         ]
     )
+    return "\n".join(lines)
+
+
+def _selection_markdown(report: dict[str, Any]) -> str:
+    lines = [
+        "# Milestone 19 Runtime Authority Selection",
+        "",
+        f"Decision: `{report['decision']}`",
+        "",
+        f"Selected runtime: `{report['selected_runtime']}`",
+        "",
+        report["selection_basis"],
+        "",
+        "## Runtime Status",
+        "",
+        f"- Chaos: {report['chaos_status']}.",
+        f"- Jolt: {report['jolt_status']}.",
+        f"- Custom reduced: {report['custom_reduced_status']}.",
+        f"- Chrono: {report['chrono_status']}.",
+        "",
+        "## Replacement Conditions",
+        "",
+        *[f"- {condition}" for condition in report["replacement_conditions"]],
+        "",
+    ]
     return "\n".join(lines)
 
 

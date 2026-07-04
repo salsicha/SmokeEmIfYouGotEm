@@ -2,8 +2,8 @@
   "schema": "raftsim.unreal.physics_authority_policy.v1",
   "authoritative": {
     "water_state": "custom_cxx_shallow_water_solver",
-    "raft_kinematics": "runtime_selected_after_chaos_jolt_fixture_evaluation",
-    "contacts": "runtime_selected_after_chaos_jolt_fixture_evaluation",
+    "raft_kinematics": "CustomReducedRigidBody",
+    "contacts": "CustomReducedRigidBody",
     "paddle_forces": "fixed_step_physics_bridge"
   },
   "unreal_chaos": {
@@ -26,7 +26,7 @@
     ]
   },
   "jolt": {
-    "role": "candidate_portable_authoritative_raft_contact_and_swimmer_gameplay_island",
+    "role": "candidate_portable_authoritative_raft_contact_and_swimmer_gameplay_island_pending_measured_fixture_results",
     "allowed_when_evaluation_passes": [
       "raft_rock_collision_response",
       "raft_bed_grounding",
@@ -40,8 +40,21 @@
       "visual_only_unreal_ragdoll_authoring_without_exporting_gameplay_state"
     ]
   },
+  "custom_reduced": {
+    "role": "selected_vertical_slice_fallback_until_chaos_or_jolt_passes_measured_fixture_suite",
+    "allowed": [
+      "raft_transform_authority",
+      "raft_contact_response",
+      "paddle_force_transfer",
+      "fixed_step_replay",
+      "shared_water_query_and_telemetry_schema"
+    ],
+    "replacement_condition": "Chaos or Jolt may replace this fallback only after measured fixture telemetry allows scoring-critical authority selection."
+  },
   "evaluation": {
     "manifest": "chaos_jolt_runtime_evaluation.json",
+    "comparison_report": "physics/reports/milestone19/chaos_vs_jolt_comparison.json",
+    "authority_selection_report": "physics/reports/milestone19/runtime_authority_selection.json",
     "required_before_scoring_authority": [
       "raft_rock_angle_sweep",
       "shallow_shelf_grounding",

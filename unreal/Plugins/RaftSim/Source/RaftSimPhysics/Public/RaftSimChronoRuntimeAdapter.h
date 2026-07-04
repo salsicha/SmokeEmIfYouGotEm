@@ -19,7 +19,7 @@ struct FRaftSimRaftBodyConfig
     GENERATED_BODY()
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
-    ERaftSimRaftDynamicsRuntime Runtime = ERaftSimRaftDynamicsRuntime::ProjectChrono;
+    ERaftSimRaftDynamicsRuntime Runtime = ERaftSimRaftDynamicsRuntime::CustomReducedRigidBody;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
     float MassKg = 170.0f;

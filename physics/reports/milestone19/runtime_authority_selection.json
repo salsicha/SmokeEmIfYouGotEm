@@ -1,0 +1,26 @@
+{
+  "chaos_or_jolt_authority_selection_allowed": false,
+  "chaos_status": "visual_and_non_authoritative_only_pending_measured_fixture_results",
+  "chrono_status": "high_fidelity_reference_and_research_only",
+  "comparison_report": "physics/reports/milestone19/chaos_vs_jolt_comparison.json",
+  "custom_reduced_status": "selected_fallback_until_chaos_or_jolt_passes_measured_fixture_suite",
+  "decision": "custom_reduced_runtime_fallback_selected_for_vertical_slice",
+  "jolt_status": "candidate_pending_measured_jolt_sdk_fixture_results",
+  "milestone19_closed": true,
+  "replacement_conditions": [
+    "Run measured Unreal Chaos automation fixtures over the shared contract.",
+    "Run measured native Jolt SDK/plugin fixtures over the shared contract.",
+    "Regenerate the Chaos-vs-Jolt comparison with non-placeholder telemetry.",
+    "Select Chaos or Jolt only if the comparison report allows scoring-critical authority."
+  ],
+  "schema": "raftsim.runtime_eval.authority_selection.v1",
+  "selected_runtime": "CustomReducedRigidBody",
+  "selection_basis": "Chaos and Jolt fixture exports exist, but the comparison report blocks authority selection because measured runtime telemetry has not replaced schema placeholder frames.",
+  "selection_scope": "first_unreal_vertical_slice_raft_contact_swimmer_authority",
+  "unreal_manifest_updates": {
+    "fixed_step_bridge": "unreal/Content/RaftSim/Physics/fixed_step_bridge.json",
+    "physics_authority_policy": "unreal/Content/RaftSim/Physics/physics_authority_policy.json",
+    "raft_dynamics_runtime": "unreal/Content/RaftSim/Physics/raft_dynamics_runtime.json"
+  },
+  "water_authority": "custom_cxx_shallow_water_solver"
+}

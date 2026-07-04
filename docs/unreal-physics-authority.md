@@ -5,10 +5,10 @@ The raft and river physics are not authored as Unreal Chaos gameplay physics.
 ## Authoritative Systems
 
 - Custom C++ shallow-water solver owns water state.
-- A selected raft/contact runtime owns raft kinematics, contact impulses, rock impacts, bed grounding, and paddle-force transfer only after passing the Chaos/Jolt shared fixture suite.
+- `CustomReducedRigidBody` owns first vertical-slice raft kinematics, contact impulses, rock impacts, bed grounding, and paddle-force transfer as the fallback selected by the Milestone 19 authority report.
 - Unreal consumes fixed-step states for rendering, VR camera motion, audio/VFX cues, debug overlays, replay, and UI.
 
-The current plan is a split/hybrid evaluation. Chaos is the default Unreal-integrated path for visual and non-authoritative physics. Jolt is the leading portable candidate for a narrow authoritative raft/contact/swimmer gameplay island. Chrono remains a high-fidelity reference/research path. See [Chaos And Jolt Runtime Evaluation](chaos-jolt-runtime-evaluation.md).
+The current plan is a split/hybrid evaluation with a fallback authority choice. Chaos is the default Unreal-integrated path for visual and non-authoritative physics. Jolt is the leading portable candidate for a narrow authoritative raft/contact/swimmer gameplay island. `CustomReducedRigidBody` is selected for the first vertical slice until measured Chaos/Jolt fixture telemetry allows either candidate to replace it. Chrono remains a high-fidelity reference/research path. See [Chaos And Jolt Runtime Evaluation](chaos-jolt-runtime-evaluation.md).
 
 ## Chaos Policy
 
@@ -42,3 +42,13 @@ Jolt may become the authoritative raft/contact/swimmer gameplay island only if i
 - Crowded runtime-cost fixture with one raft, eight crew, fifty rocks, and twenty loose props.
 
 Jolt must consume the same custom-water query API and emit the same telemetry/replay schema as Chaos and the reduced custom runtime.
+
+## Custom Reduced Fallback
+
+`CustomReducedRigidBody` is the selected first vertical-slice raft/contact/swimmer authority because the Milestone 19 comparison report currently blocks Chaos or Jolt selection pending measured runtime telemetry.
+
+The fallback may be replaced only after:
+
+- Unreal Chaos automation fixtures are run with measured telemetry.
+- The native Jolt SDK/plugin harness is run with measured telemetry.
+- The Chaos-vs-Jolt comparison report allows scoring-critical authority selection.

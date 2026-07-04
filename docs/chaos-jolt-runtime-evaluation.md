@@ -71,9 +71,10 @@ Both Chaos and Jolt must run the same six fixtures with the same water snapshots
 - Jolt fixture summary: `physics/reports/milestone19/jolt/summary.json` and `.md`.
 - Jolt replay summaries: `physics/reports/milestone19/jolt/replays/*.replay_summary.json`.
 - Chaos-vs-Jolt comparison report: `physics/reports/milestone19/chaos_vs_jolt_comparison.json` and `.md`.
+- Runtime authority selection report: `physics/reports/milestone19/runtime_authority_selection.json` and `.md`.
 
 The Chaos and Jolt files are automation-ready fixture exports, not authority evidence. Unreal/Chaos and the native Jolt harness still need to execute the generated fixtures and replace schema placeholder frames with measured telemetry before either runtime can be ranked or selected.
 
 ## Current Recommendation
 
-Keep Chaos as the production default for Unreal-authored visual physics, and evaluate Jolt as the best candidate for the narrow authoritative raft/contact/swimmer gameplay island. Do not make either one authoritative for scoring-critical outcomes until the fixture suite has evidence.
+Keep Chaos as the production default for Unreal-authored visual physics, keep Jolt as the leading portable candidate, and use `CustomReducedRigidBody` as the first vertical-slice raft/contact/swimmer authority fallback until measured Chaos/Jolt telemetry allows a stronger selection. Do not make Chaos or Jolt authoritative for scoring-critical outcomes until the fixture suite has measured evidence.
