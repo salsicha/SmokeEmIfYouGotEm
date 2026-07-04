@@ -2,14 +2,18 @@ import json
 from pathlib import Path
 
 from raftsim.milestone19 import (
+    CHAOS_JOLT_COMPARISON_DECISION,
+    COMPARISON_DIMENSIONS,
     CHAOS_EXPORT_DECISION,
     CHAOS_RUNTIME_ID,
     JOLT_EXPORT_DECISION,
     JOLT_RUNTIME_ID,
     build_chaos_automation_export,
+    build_chaos_jolt_comparison_report,
     build_jolt_smoke_harness_export,
     load_runtime_evaluation_contract,
     write_chaos_automation_export,
+    write_chaos_jolt_comparison_report,
     write_jolt_smoke_harness_export,
 )
 
@@ -20,6 +24,7 @@ CHAOS_MANIFEST_PATH = REPO_ROOT / "unreal/Content/RaftSim/Physics/chaos_automati
 CHAOS_SUMMARY_PATH = REPO_ROOT / "physics/reports/milestone19/chaos/summary.json"
 JOLT_MANIFEST_PATH = REPO_ROOT / "physics/cpp/tests/jolt_smoke_harness_manifest.json"
 JOLT_SUMMARY_PATH = REPO_ROOT / "physics/reports/milestone19/jolt/summary.json"
+COMPARISON_PATH = REPO_ROOT / "physics/reports/milestone19/chaos_vs_jolt_comparison.json"
 
 
 def test_chaos_automation_export_covers_shared_contract():
@@ -148,3 +153,56 @@ def test_committed_jolt_export_matches_contract():
     assert summary["runtime_passed_fixture_suite"] is False
     assert {fixture["fixture_id"] for fixture in manifest["fixtures"]} == contract_fixture_ids
     assert {fixture["fixture_id"] for fixture in summary["fixtures"]} == contract_fixture_ids
+
+
+def test_chaos_jolt_comparison_blocks_authority_without_measured_telemetry():
+    report = build_chaos_jolt_comparison_report(
+        contract=load_runtime_evaluation_contract(CONTRACT_PATH),
+        chaos_summary=json.loads(CHAOS_SUMMARY_PATH.read_text(encoding="utf-8")),
+        jolt_summary=json.loads(JOLT_SUMMARY_PATH.read_text(encoding="utf-8")),
+    ).report
+
+    assert report["decision"] == CHAOS_JOLT_COMPARISON_DECISION
+    assert report["fixture_coverage_match"] is True
+    assert report["measured_evidence_available"] is False
+    assert report["authority_selection_allowed"] is False
+    assert report["runtime_passed_fixture_suite"] is False
+    assert {item["dimension"] for item in report["dimension_rankings"]} == set(
+        COMPARISON_DIMENSIONS
+    )
+    assert all(
+        item["winner"] == "insufficient_measured_evidence"
+        for item in report["dimension_rankings"]
+    )
+
+
+def test_write_chaos_jolt_comparison_report_creates_json_and_markdown(tmp_path):
+    output_json = tmp_path / "chaos_vs_jolt_comparison.json"
+    output_md = tmp_path / "chaos_vs_jolt_comparison.md"
+
+    report = write_chaos_jolt_comparison_report(
+        contract_path=CONTRACT_PATH,
+        chaos_summary_path=CHAOS_SUMMARY_PATH,
+        jolt_summary_path=JOLT_SUMMARY_PATH,
+        output_json=output_json,
+        output_md=output_md,
+    )
+
+    assert output_json.exists()
+    assert output_md.exists()
+    assert report.report["decision"] == CHAOS_JOLT_COMPARISON_DECISION
+
+
+def test_committed_chaos_jolt_comparison_matches_runtime_summaries():
+    report = json.loads(COMPARISON_PATH.read_text(encoding="utf-8"))
+    chaos_summary = json.loads(CHAOS_SUMMARY_PATH.read_text(encoding="utf-8"))
+    jolt_summary = json.loads(JOLT_SUMMARY_PATH.read_text(encoding="utf-8"))
+
+    assert report["decision"] == CHAOS_JOLT_COMPARISON_DECISION
+    assert report["fixture_count"] == chaos_summary["fixture_count"] == jolt_summary["fixture_count"]
+    assert report["authority_selection_allowed"] is False
+    assert {
+        item["fixture_id"] for item in report["fixtures"]
+    } == {item["fixture_id"] for item in chaos_summary["fixtures"]} == {
+        item["fixture_id"] for item in jolt_summary["fixtures"]
+    }
