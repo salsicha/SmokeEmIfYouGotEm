@@ -1,0 +1,140 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 21.93846153846154,
+        "y": 0.0
+      },
+      "kind": "constriction",
+      "length": 10.0,
+      "metadata": {
+        "confidence": 0.8366532909698996,
+        "rapid_id": "rapid_candidate_01",
+        "signals": "boulder_density,constriction,dem_slope,foam_whitewater_texture,guide_note,high_score,roughness",
+        "source": "real_world_rapid_candidate"
+      },
+      "radius": 7.0,
+      "strength": 0.297174916521739,
+      "width": 16.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 29.93846153846154,
+        "y": 0.0
+      },
+      "kind": "wave_train",
+      "length": 18.0,
+      "metadata": {
+        "rapid_id": "rapid_candidate_01",
+        "source": "paired_wave_train"
+      },
+      "radius": 7.0,
+      "strength": 0.1279338015626086,
+      "width": 15.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 44.83076923076923,
+        "y": 0.0
+      },
+      "kind": "constriction",
+      "length": 10.0,
+      "metadata": {
+        "confidence": 0.7999029999999999,
+        "rapid_id": "rapid_candidate_02",
+        "signals": "boulder_density,constriction,foam_whitewater_texture,guide_note,high_score,roughness",
+        "source": "real_world_rapid_candidate"
+      },
+      "radius": 7.0,
+      "strength": 0.30032417999999994,
+      "width": 16.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 52.83076923076923,
+        "y": 0.0
+      },
+      "kind": "wave_train",
+      "length": 18.0,
+      "metadata": {
+        "rapid_id": "rapid_candidate_02",
+        "source": "paired_wave_train"
+      },
+      "radius": 7.0,
+      "strength": 0.12928955948999993,
+      "width": 15.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 69.63076923076923,
+        "y": 0.0
+      },
+      "kind": "rock",
+      "length": 10.0,
+      "metadata": {
+        "confidence": 0.7696950180180182,
+        "rapid_id": "rapid_candidate_03",
+        "signals": "bend_or_lateral_candidate,boulder_density,dem_slope,foam_whitewater_texture,guide_note,roughness",
+        "source": "real_world_rapid_candidate"
+      },
+      "radius": 4.0,
+      "strength": 0.2710498992792794,
+      "width": 16.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 77.63076923076923,
+        "y": 0.0
+      },
+      "kind": "wave_train",
+      "length": 18.0,
+      "metadata": {
+        "rapid_id": "rapid_candidate_03",
+        "source": "paired_wave_train"
+      },
+      "radius": 7.0,
+      "strength": 0.11668698163972975,
+      "width": 15.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 96.57692307692308,
+        "y": 0.0
+      },
+      "kind": "constriction",
+      "length": 10.0,
+      "metadata": {
+        "confidence": 0.7751920759897829,
+        "rapid_id": "rapid_candidate_04",
+        "signals": "bend_or_lateral_candidate,boulder_density,constriction,foam_whitewater_texture,guide_note,roughness",
+        "source": "real_world_rapid_candidate"
+      },
+      "radius": 7.0,
+      "strength": 0.2763770481864623,
+      "width": 16.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 104.57692307692308,
+        "y": 0.0
+      },
+      "kind": "wave_train",
+      "length": 18.0,
+      "metadata": {
+        "rapid_id": "rapid_candidate_04",
+        "source": "paired_wave_train"
+      },
+      "radius": 7.0,
+      "strength": 0.11898031924427199,
+      "width": 15.0
+    }
+  ]
+}
