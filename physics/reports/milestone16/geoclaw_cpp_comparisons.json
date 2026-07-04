@@ -2127,84 +2127,78 @@
         "cross_section_linf": {
           "details": "Max Linf across cross-section fields; u/v/Froude masked below 0.15 m.",
           "name": "cross_section_linf",
-          "passed": false,
+          "passed": true,
           "threshold": 0.75,
-          "value": 2.4350786947419922
+          "value": 9.856781844064244e-07
         },
         "energy_change_delta": {
           "details": "Absolute C++ minus reference energy-change delta.",
           "name": "energy_change_delta",
           "passed": true,
           "threshold": 0.3,
-          "value": 0.15386587491069972
+          "value": 2.822020442883044e-07
         },
         "feature_location_delta": {
           "details": "Max observed feature response location delta.",
           "name": "feature_location_delta",
           "passed": true,
           "threshold": 6.0,
-          "value": 3.605551275463989
+          "value": 0.0
         },
         "feature_strength_delta": {
           "details": "Max observed feature response strength delta.",
           "name": "feature_strength_delta",
-          "passed": false,
+          "passed": true,
           "threshold": 1.0,
-          "value": 2.2971055507113585
+          "value": 2.1316282072803006e-14
         },
         "field_linf": {
           "details": "Max Linf across h/eta/u/v/hu/hv/normals; u/v masked below 0.15 m.",
           "name": "field_linf",
-          "passed": false,
+          "passed": true,
           "threshold": 0.75,
-          "value": 3.081027356283217
+          "value": 9.856781844064244e-07
         },
         "froude_delta": {
           "details": "Max absolute Froude summary delta for cells at or above 0.15 m.",
           "name": "froude_delta",
           "passed": true,
           "threshold": 0.2,
-          "value": 0.15785129586099744
+          "value": 9.325873406851315e-15
         },
         "mass_drift_delta": {
           "details": "Absolute C++ minus reference mass-drift delta.",
           "name": "mass_drift_delta",
           "passed": true,
           "threshold": 0.08,
-          "value": 0.020084892537100503
+          "value": 3.943009940082787e-08
         },
         "probe_linf": {
           "details": "Max Linf across point-probe fields; u/v/Froude masked below 0.15 m.",
           "name": "probe_linf",
-          "passed": false,
+          "passed": true,
           "threshold": 0.75,
-          "value": 0.8788907053068326
+          "value": 1.520519736786241e-07
         },
         "slope_linf": {
           "details": "Max Linf across eta slope fields.",
           "name": "slope_linf",
-          "passed": false,
+          "passed": true,
           "threshold": 0.15,
-          "value": 0.8246639552478647
+          "value": 9.765770982994582e-07
         },
         "wet_mismatch_fraction": {
           "details": "Max material wet/dry mask mismatch fraction across compared frames using h >= 0.15 m.",
           "name": "wet_mismatch_fraction",
           "passed": true,
           "threshold": 0.2,
-          "value": 0.05324074074074074
+          "value": 0.0
         }
       },
       "compared": true,
       "comparison_dir": "outputs/m16cmp/r_lateral/finite_volume",
       "cross_sections": 1,
-      "failing_checks": [
-        "field_linf",
-        "slope_linf",
-        "probe_linf",
-        "cross_section_linf",
-        "feature_strength_delta"
-      ],
+      "failing_checks": [],
       "feature_count": 10,
       "frame_comparisons": 2,
       "gate_scenario_id": "lateral_wave",
@@ -2215,7 +2209,7 @@
       },
       "solver_mode": "finite_volume",
       "suite": "rafting",
-      "threshold_passed": false,
+      "threshold_passed": true,
       "threshold_report": "outputs/m16cmp/r_lateral/finite_volume/threshold_evaluation.json",
       "threshold_tier": "research_accepted"
     },
@@ -3834,6 +3828,6 @@
     }
   ],
   "schema_version": "raftsim.milestone16.geoclaw_cpp_comparisons.v0",
-  "threshold_failed_count": 14,
-  "threshold_passed_count": 26
+  "threshold_failed_count": 13,
+  "threshold_passed_count": 27
 }

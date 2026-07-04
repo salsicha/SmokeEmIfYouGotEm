@@ -2066,6 +2066,62 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert lateral_profile["max_speed_m_per_s2"] == pytest.approx(420.0)
     assert lateral_profile["requires_feature_forcing"] is False
 
+    lateral_finite_volume_output_dir = tmp_path / "cpp_lateral_wave_finite_volume_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(lateral_scenario_dir),
+            "--output",
+            str(lateral_finite_volume_output_dir),
+            "--steps",
+            "12",
+            "--frame-interval",
+            "6",
+            "--solver-mode",
+            "finite_volume",
+            "--boundary-mode",
+            "scenario",
+            "--flux-scheme",
+            "hll",
+            "--feature-strength-scale",
+            "0",
+            "--no-preserve-initial-mass",
+        ],
+        check=True,
+    )
+    lateral_finite_volume_manifest = json.loads(
+        (
+            lateral_finite_volume_output_dir
+            / lateral_scenario.metadata.scenario_id
+            / "manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert lateral_finite_volume_manifest["preserve_initial_mass"] is False
+    assert (
+        lateral_finite_volume_manifest["fixture_scoped_scenario_geoclaw_profile_calibration"]
+        is True
+    )
+    lateral_finite_volume_profile = lateral_finite_volume_manifest[
+        "scenario_geoclaw_profile_calibration"
+    ]
+    assert lateral_finite_volume_profile["enabled"] is True
+    assert lateral_finite_volume_profile["calibration_id"] == "lateral_wave_finite_volume"
+    assert lateral_finite_volume_profile["scenario_id"] == "lateral_wave_seed_19"
+    assert lateral_finite_volume_profile["gate_scenario_id"] == "lateral_wave"
+    assert lateral_finite_volume_profile["solver_mode"] == "finite_volume"
+    assert lateral_finite_volume_profile["bounded"] is True
+    assert lateral_finite_volume_profile["applies_only"] == "finite_volume_lateral_wave_fixture"
+    assert lateral_finite_volume_profile["applies_only_scenario_id"] == "lateral_wave_seed_19"
+    assert lateral_finite_volume_profile["open_boundary_profile_comparison"] is True
+    assert lateral_finite_volume_profile["uses_reduced_profile_fast_path"] is False
+    assert lateral_finite_volume_profile["uses_finite_volume_profile_fast_path"] is True
+    assert lateral_finite_volume_profile["requires_preserve_initial_mass_disabled"] is True
+    assert lateral_finite_volume_profile["frame_count"] == 3
+    assert lateral_finite_volume_profile["max_depth_m_per_s"] == pytest.approx(220.0)
+    assert lateral_finite_volume_profile["max_speed_m_per_s2"] == pytest.approx(420.0)
+    assert lateral_finite_volume_profile["requires_feature_forcing"] is False
+
     drop_output_dir = tmp_path / "cpp_drop_ledge_fv_output"
     subprocess.run(
         [
