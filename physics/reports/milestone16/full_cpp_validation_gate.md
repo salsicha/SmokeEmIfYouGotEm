@@ -8,22 +8,22 @@ Decision: **BLOCKED**
 | --- | --- | ---: | ---: | ---: | --- |
 | GeoClaw Reference Runs | PASS | 20 | 0 | 20 | `reports/milestone16/geoclaw_reference_runs.json` |
 | C++ Solver Runs | PASS | 40 | 0 | 40 | `reports/milestone16/cpp_solver_runs.json` |
-| GeoClaw/C++ Threshold Comparisons | BLOCKED | 24 | 16 | 40 | `reports/milestone16/geoclaw_cpp_comparisons.json` |
+| GeoClaw/C++ Threshold Comparisons | BLOCKED | 25 | 15 | 40 | `reports/milestone16/geoclaw_cpp_comparisons.json` |
 | Geometry-Specific Validation | PASS | 6 | 0 | 6 | `reports/milestone16/geometry_validation.json` |
 | Raft Coupling Validation | BLOCKED | 16 | 34 | 50 | `reports/milestone16/raft_coupling_validation.json` |
-| Runtime Profile And Determinism | PASS | 72 | 0 | 72 | `reports/milestone16/runtime_profile.json` |
-| Regression Promotion | PASS | 48 | 0 | 48 | `reports/milestone16/regression_promotion_manifest.json` |
+| Runtime Profile And Determinism | PASS | 75 | 0 | 75 | `reports/milestone16/runtime_profile.json` |
+| Regression Promotion | PASS | 49 | 0 | 49 | `reports/milestone16/regression_promotion_manifest.json` |
 
 ## Blockers
 
 ### GeoClaw/C++ Threshold Comparisons
-- hydraulic_hole_downstream_boil: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
 - lateral_wave: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, wet_mismatch_fraction, probe_linf)
 - lateral_wave: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
 - eddy_line_shear: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
 - eddy_line_shear: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
 - shallow_shelf: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
 - shallow_shelf: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
+- south_fork_low_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
 - south_fork_low_runnable: GeoClaw/C++ threshold comparison failed (field_linf, slope_linf, probe_linf, cross_section_linf)
 
 ### Raft Coupling Validation

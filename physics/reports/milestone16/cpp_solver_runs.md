@@ -8,43 +8,43 @@ Run count: 40
 
 | Suite | Gate scenario | Mode | Frames | Validation | Runtime (s) | Cascading |
 | --- | --- | --- | ---: | --- | ---: | --- |
-| canonical | flat_pool | reduced | 9 | PASS | 0.152 | no |
-| canonical | flat_pool | finite_volume | 9 | PASS | 0.175 | no |
-| canonical | uniform_channel | reduced | 9 | PASS | 0.153 | no |
-| canonical | uniform_channel | finite_volume | 9 | PASS | 0.288 | no |
-| canonical | dam_break | reduced | 9 | PASS | 0.157 | no |
-| canonical | dam_break | finite_volume | 9 | PASS | 0.182 | no |
-| canonical | bed_step | reduced | 9 | PASS | 0.162 | no |
-| canonical | bed_step | finite_volume | 9 | PASS | 0.195 | no |
-| canonical | constriction | reduced | 9 | PASS | 0.143 | no |
-| canonical | constriction | finite_volume | 9 | PASS | 0.140 | no |
-| canonical | wet_dry_shoreline | reduced | 9 | PASS | 0.151 | no |
-| canonical | wet_dry_shoreline | finite_volume | 9 | PASS | 0.202 | no |
-| canonical | sloping_manning_channel | reduced | 9 | PASS | 0.160 | no |
-| canonical | sloping_manning_channel | finite_volume | 9 | PASS | 0.186 | no |
-| canonical | drop_ledge | reduced | 9 | PASS | 0.141 | no |
-| canonical | drop_ledge | finite_volume | 9 | PASS | 0.319 | no |
-| rafting | boulder_garden | reduced | 9 | PASS | 0.383 | no |
-| rafting | boulder_garden | finite_volume | 9 | PASS | 0.382 | no |
-| rafting | cascading_wave_train | reduced | 9 | PASS | 0.382 | no |
-| rafting | cascading_wave_train | finite_volume | 9 | PASS | 0.380 | no |
-| rafting | hydraulic_hole_downstream_boil | reduced | 9 | PASS | 0.503 | no |
-| rafting | hydraulic_hole_downstream_boil | finite_volume | 9 | PASS | 0.870 | no |
-| rafting | lateral_wave | reduced | 9 | PASS | 0.511 | no |
-| rafting | lateral_wave | finite_volume | 9 | PASS | 0.982 | no |
-| rafting | eddy_line_shear | reduced | 9 | PASS | 0.523 | no |
-| rafting | eddy_line_shear | finite_volume | 9 | PASS | 0.973 | no |
-| rafting | shallow_shelf | reduced | 9 | PASS | 0.559 | no |
-| rafting | shallow_shelf | finite_volume | 9 | PASS | 0.865 | no |
-| real_world | south_fork_low_runnable | reduced | 9 | PASS | 0.207 | no |
-| real_world | south_fork_low_runnable | finite_volume | 9 | PASS | 0.310 | no |
-| real_world | south_fork_median_runnable | reduced | 9 | PASS | 0.229 | no |
-| real_world | south_fork_median_runnable | finite_volume | 9 | PASS | 0.288 | no |
-| real_world | south_fork_high_runnable | reduced | 9 | PASS | 0.211 | no |
-| real_world | south_fork_high_runnable | finite_volume | 9 | PASS | 0.282 | no |
-| cascading | south_fork_cascading_low_runnable | reduced | 9 | PASS | 0.295 | 7 reaches / 1 drops |
-| cascading | south_fork_cascading_low_runnable | finite_volume | 9 | FAIL | 0.537 | 7 reaches / 1 drops |
-| cascading | south_fork_cascading_median_runnable | reduced | 9 | PASS | 0.298 | 7 reaches / 1 drops |
-| cascading | south_fork_cascading_median_runnable | finite_volume | 9 | FAIL | 0.472 | 7 reaches / 1 drops |
-| cascading | south_fork_cascading_high_runnable | reduced | 9 | PASS | 0.298 | 7 reaches / 1 drops |
-| cascading | south_fork_cascading_high_runnable | finite_volume | 9 | FAIL | 0.553 | 7 reaches / 1 drops |
+| canonical | flat_pool | reduced | 9 | PASS | 0.235 | no |
+| canonical | flat_pool | finite_volume | 9 | PASS | 0.204 | no |
+| canonical | uniform_channel | reduced | 9 | PASS | 0.184 | no |
+| canonical | uniform_channel | finite_volume | 9 | PASS | 0.202 | no |
+| canonical | dam_break | reduced | 9 | PASS | 0.176 | no |
+| canonical | dam_break | finite_volume | 9 | PASS | 0.201 | no |
+| canonical | bed_step | reduced | 9 | PASS | 0.169 | no |
+| canonical | bed_step | finite_volume | 9 | PASS | 0.213 | no |
+| canonical | constriction | reduced | 9 | PASS | 0.187 | no |
+| canonical | constriction | finite_volume | 9 | PASS | 0.196 | no |
+| canonical | wet_dry_shoreline | reduced | 9 | PASS | 0.170 | no |
+| canonical | wet_dry_shoreline | finite_volume | 9 | PASS | 0.217 | no |
+| canonical | sloping_manning_channel | reduced | 9 | PASS | 0.170 | no |
+| canonical | sloping_manning_channel | finite_volume | 9 | PASS | 0.197 | no |
+| canonical | drop_ledge | reduced | 9 | PASS | 0.155 | no |
+| canonical | drop_ledge | finite_volume | 9 | PASS | 0.217 | no |
+| rafting | boulder_garden | reduced | 9 | PASS | 0.384 | no |
+| rafting | boulder_garden | finite_volume | 9 | PASS | 0.462 | no |
+| rafting | cascading_wave_train | reduced | 9 | PASS | 0.411 | no |
+| rafting | cascading_wave_train | finite_volume | 9 | PASS | 0.403 | no |
+| rafting | hydraulic_hole_downstream_boil | reduced | 9 | PASS | 0.392 | no |
+| rafting | hydraulic_hole_downstream_boil | finite_volume | 9 | PASS | 0.471 | no |
+| rafting | lateral_wave | reduced | 9 | PASS | 0.516 | no |
+| rafting | lateral_wave | finite_volume | 9 | PASS | 0.853 | no |
+| rafting | eddy_line_shear | reduced | 9 | PASS | 0.519 | no |
+| rafting | eddy_line_shear | finite_volume | 9 | PASS | 1.024 | no |
+| rafting | shallow_shelf | reduced | 9 | PASS | 0.527 | no |
+| rafting | shallow_shelf | finite_volume | 9 | PASS | 0.934 | no |
+| real_world | south_fork_low_runnable | reduced | 9 | PASS | 0.223 | no |
+| real_world | south_fork_low_runnable | finite_volume | 9 | PASS | 0.380 | no |
+| real_world | south_fork_median_runnable | reduced | 9 | PASS | 0.246 | no |
+| real_world | south_fork_median_runnable | finite_volume | 9 | PASS | 0.309 | no |
+| real_world | south_fork_high_runnable | reduced | 9 | PASS | 0.226 | no |
+| real_world | south_fork_high_runnable | finite_volume | 9 | PASS | 0.292 | no |
+| cascading | south_fork_cascading_low_runnable | reduced | 9 | PASS | 0.315 | 7 reaches / 1 drops |
+| cascading | south_fork_cascading_low_runnable | finite_volume | 9 | FAIL | 0.498 | 7 reaches / 1 drops |
+| cascading | south_fork_cascading_median_runnable | reduced | 9 | PASS | 0.349 | 7 reaches / 1 drops |
+| cascading | south_fork_cascading_median_runnable | finite_volume | 9 | FAIL | 0.489 | 7 reaches / 1 drops |
+| cascading | south_fork_cascading_high_runnable | reduced | 9 | PASS | 0.315 | 7 reaches / 1 drops |
+| cascading | south_fork_cascading_high_runnable | finite_volume | 9 | FAIL | 0.496 | 7 reaches / 1 drops |

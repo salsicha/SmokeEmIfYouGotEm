@@ -29,7 +29,7 @@ Comparison count: 40
 | rafting | cascading_wave_train | reduced | research_accepted | PASS | none | n/a |
 | rafting | cascading_wave_train | finite_volume | research_accepted | PASS | none | n/a |
 | rafting | hydraulic_hole_downstream_boil | reduced | research_accepted | PASS | none | n/a |
-| rafting | hydraulic_hole_downstream_boil | finite_volume | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, froude_delta, feature_strength_delta | n/a |
+| rafting | hydraulic_hole_downstream_boil | finite_volume | research_accepted | PASS | none | n/a |
 | rafting | lateral_wave | reduced | research_accepted | FAIL | field_linf, slope_linf, wet_mismatch_fraction, probe_linf, cross_section_linf, energy_change_delta, froude_delta, feature_strength_delta | n/a |
 | rafting | lateral_wave | finite_volume | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, feature_strength_delta | n/a |
 | rafting | eddy_line_shear | reduced | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, energy_change_delta, froude_delta, feature_strength_delta | n/a |
