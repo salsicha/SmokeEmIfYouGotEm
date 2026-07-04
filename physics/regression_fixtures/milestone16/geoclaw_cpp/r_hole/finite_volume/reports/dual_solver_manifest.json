@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_hole/finite_volume/cpp_solver/hydraulic_hole_downstream_boil_seed_18/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_hole/finite_volume/cpp_solver/hydraulic_hole_downstream_boil_seed_18",
     "returncode": 0,
-    "runtime_seconds": 0.39945587499823887,
+    "runtime_seconds": 0.4138324170016858,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_hole/finite_volume/cpp_solver/hydraulic_hole_downstream_boil_seed_18/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_hole/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.39945587499823887,
-    "cpp_seconds_per_simulated_second": 0.04993198437477986,
+    "cpp_runtime_seconds": 0.4138324170016858,
+    "cpp_seconds_per_simulated_second": 0.05172905212521073,
     "geoclaw_runtime_seconds": 1.2255276249998133,
     "geoclaw_seconds_per_simulated_second": 0.15319095312497666,
     "simulated_duration_seconds": 8.0
