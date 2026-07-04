@@ -7,7 +7,9 @@ from raftsim.milestone20 import (
     MILESTONE20_REPORT_SET_LOCK_DECISION,
     MILESTONE20_REPORT_SET_LOCK_SCHEMA,
     MILESTONE20_SUPPORTING_ARTIFACTS,
+    MILESTONE20_TRACEABLE_DATA_ASSETS_SCHEMA,
     MILESTONE20_UNREAL_REGRESSION_IMPORT_SCHEMA,
+    build_traceable_unreal_data_assets,
     build_unreal_regression_fixture_import,
     build_report_set_lock,
     write_report_set_lock,
@@ -36,6 +38,13 @@ WATER_REGRESSION_IMPORT_PATH = (
 WATER_REGRESSION_IMPORT_TEST_PATH = (
     REPO_ROOT
     / "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterRegressionImportTest.cpp"
+)
+TRACEABLE_DATA_ASSETS_PATH = (
+    REPO_ROOT / "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
+)
+TRACEABLE_DATA_ASSET_HEADER_PATH = (
+    REPO_ROOT
+    / "unreal/Plugins/RaftSim/Source/RaftSimGeo/Public/RaftSimTraceableRiverDataAsset.h"
 )
 REQUIRED_PRODUCTION_MODULES = {
     "RaftSimCore",
@@ -147,6 +156,9 @@ def test_unreal_production_foundation_matches_locked_project_and_modules():
     assert foundation["engine"]["engine_association"] == uproject["EngineAssociation"] == "5.8"
     assert foundation["project"]["accepted_water_report_manifest"] == (
         "physics/reports/milestone20/report_set_lock.json"
+    )
+    assert foundation["project"]["traceable_river_data_assets"] == (
+        "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
     )
     assert REPORT_SET_LOCK_PATH.exists()
     assert set(foundation["enabled_project_plugins"]) == project_plugins
@@ -289,3 +301,63 @@ def test_unreal_automation_test_loads_regression_import_manifest():
     assert "raftsim.unreal.regression_fixture_import.v1" in test_text
     assert "total_fixture_count" in test_text
     assert "Milestone 16 fixture count" in test_text
+
+
+def test_traceable_unreal_data_assets_match_generator():
+    expected = build_traceable_unreal_data_assets(REPO_ROOT).manifest
+    committed = json.loads(TRACEABLE_DATA_ASSETS_PATH.read_text(encoding="utf-8"))
+
+    assert committed == expected
+    assert committed["schema"] == MILESTONE20_TRACEABLE_DATA_ASSETS_SCHEMA
+    assert committed["status"] == "ready_for_unreal_data_asset_loading"
+
+
+def test_traceable_unreal_data_assets_cover_required_source_kinds():
+    manifest = json.loads(TRACEABLE_DATA_ASSETS_PATH.read_text(encoding="utf-8"))
+    report_lock = json.loads(REPORT_SET_LOCK_PATH.read_text(encoding="utf-8"))
+    assets = {asset["asset_id"]: asset for asset in manifest["data_assets"]}
+    kinds = {asset["kind"] for asset in assets.values()}
+
+    assert manifest["accepted_report_set_lock"]["lock_hash"] == report_lock["lock"]["lock_hash"]
+    assert manifest["asset_class"] == "URaftSimTraceableRiverDataAsset"
+    assert manifest["asset_count"] == 9
+    assert {
+        "solver_neutral_scenario_collection",
+        "reach_local_grid_with_stitched_validation",
+        "geospatial_source_manifest",
+        "unreal_corridor_package",
+    }.issubset(kinds)
+    assert assets["solver_neutral_milestone16_registry"]["fixture_count"] == 98
+    assert assets["south_fork_american_source_manifest"]["kind"] == "geospatial_source_manifest"
+    assert assets["south_fork_american_unreal_corridor_package"]["kind"] == (
+        "unreal_corridor_package"
+    )
+
+    cascading_assets = [
+        asset
+        for asset in assets.values()
+        if asset["kind"] == "reach_local_grid_with_stitched_validation"
+    ]
+    assert len(cascading_assets) == 6
+    for asset in cascading_assets:
+        assert asset["reach_local_grid_count"] == 7
+        assert asset["ghost_zone_policy"]["max_upstream_ghost_cells"] == 2
+        assert asset["ghost_zone_policy"]["max_downstream_ghost_cells"] == 2
+        assert asset["stitched_validation"]["required"] is True
+        assert asset["stitched_validation"]["schema_version"] == (
+            "raftsim.stitched_whole_window_validation.v0"
+        )
+        for path in asset["source_paths"]:
+            assert (REPO_ROOT / path).exists()
+        for key in ("manifest", "fields", "conservation_summary", "probes"):
+            assert (REPO_ROOT / asset["stitched_validation"][key]).exists()
+
+
+def test_traceable_river_data_asset_contract_exists():
+    header_text = TRACEABLE_DATA_ASSET_HEADER_PATH.read_text(encoding="utf-8")
+
+    assert "URaftSimTraceableRiverDataAsset" in header_text
+    assert "ERaftSimTraceableRiverDataKind" in header_text
+    assert "FRaftSimTraceableSourcePath" in header_text
+    assert "bRequiresStitchedWholeWindowValidation" in header_text
+    assert "AcceptedReportSetLockHash" in header_text

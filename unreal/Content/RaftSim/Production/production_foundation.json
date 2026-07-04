@@ -8,7 +8,8 @@
   "project": {
     "uproject": "unreal/SmokeEmIfYouGotEm.uproject",
     "primary_plugin": "unreal/Plugins/RaftSim/RaftSim.uplugin",
-    "accepted_water_report_manifest": "physics/reports/milestone20/report_set_lock.json"
+    "accepted_water_report_manifest": "physics/reports/milestone20/report_set_lock.json",
+    "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
   },
   "enabled_project_plugins": [
     "EnhancedInput",

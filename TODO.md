@@ -842,7 +842,7 @@ This milestone starts the real Unreal production project after the custom C++ wa
 - [x] Create or refresh the production Unreal project from the locked UE version with modules/plugins for core game data, water, river/geospatial content, raft/contact physics, crew, input, audio, UI, debug, and automation.
 - [x] Integrate the approved custom C++ water solver as the authoritative live-water Unreal plugin path with fixed-step scheduling, render interpolation, deterministic run capture, and report-manifest loading.
 - [x] Import the promoted Milestone 16/17/18 regression fixtures into Unreal automation so replayed and live water fields can be compared against accepted C++ outputs inside the engine.
-- [ ] Load solver-neutral scenarios, reach-local grids, stitched validation outputs, geospatial source manifests, and Unreal corridor packages as traceable Unreal data assets.
+- [x] Load solver-neutral scenarios, reach-local grids, stitched validation outputs, geospatial source manifests, and Unreal corridor packages as traceable Unreal data assets.
 - [ ] Add in-engine debug views for depth, velocity, Froude, wet/dry masks, feature tags, conservation deltas, raft trajectories, contact probes, and runtime budgets.
 - [ ] Gate the milestone on a live-water Unreal smoke suite that matches the accepted C++ reports, preserves stitched whole-window validation evidence, and meets target-hardware budgets.
 
