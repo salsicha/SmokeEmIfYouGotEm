@@ -67,8 +67,11 @@ Both Chaos and Jolt must run the same six fixtures with the same water snapshots
 - Chaos automation fixture export: `unreal/Content/RaftSim/Physics/chaos_automation_fixtures.json`.
 - Chaos fixture summary: `physics/reports/milestone19/chaos/summary.json` and `.md`.
 - Chaos replay summaries: `physics/reports/milestone19/chaos/replays/*.replay_summary.json`.
+- Jolt native smoke harness manifest: `physics/cpp/tests/jolt_smoke_harness_manifest.json`.
+- Jolt fixture summary: `physics/reports/milestone19/jolt/summary.json` and `.md`.
+- Jolt replay summaries: `physics/reports/milestone19/jolt/replays/*.replay_summary.json`.
 
-The Chaos files are automation-ready fixture exports, not authority evidence. Unreal still needs to execute the generated fixture maps/tests and replace schema placeholder frames with measured Chaos telemetry before Chaos can be ranked against Jolt.
+The Chaos and Jolt files are automation-ready fixture exports, not authority evidence. Unreal/Chaos and the native Jolt harness still need to execute the generated fixtures and replace schema placeholder frames with measured telemetry before either runtime can be ranked or selected.
 
 ## Current Recommendation
 

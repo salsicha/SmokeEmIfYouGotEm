@@ -5,7 +5,7 @@
   "parameter_case_count": 9,
   "replay_reproduction": {
     "determinism_hash_scope": "gameplay-state telemetry, contacts, raft pose, and fixture inputs",
-    "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/crew_ejection_swimmer_transition.telemetry.jsonl",
+    "full_telemetry_stream": "outputs/runtime_eval/jolt/crew_ejection_swimmer_transition.telemetry.jsonl",
     "replace_placeholder_frames_after_runtime_run": true
   },
   "representative_parameter_case": {
@@ -14,7 +14,7 @@
     "roll_impulse_scale": 0.7,
     "swimmer_drag_scale": 0.8
   },
-  "runtime_id": "UnrealChaos",
+  "runtime_id": "Jolt",
   "sample_frames": [
     {
       "contact_impulses": [],
@@ -25,7 +25,7 @@
         "scripted_high_side": false,
         "seated": 7
       },
-      "determinism_hash": "bbeb5e8a61c81a50",
+      "determinism_hash": "aa4fe82afeb8a69f",
       "fixture_id": "crew_ejection_swimmer_transition",
       "outcome": "initialized",
       "parameter_case_id": "case_000",
@@ -56,7 +56,7 @@
         "trigger": "none"
       },
       "runtime_cpu_ms": 0.0,
-      "runtime_id": "UnrealChaos",
+      "runtime_id": "Jolt",
       "sample_kind": "schema_placeholder",
       "step_index": 0,
       "swimmer_state": {
@@ -91,7 +91,7 @@
         "scripted_high_side": false,
         "seated": 7
       },
-      "determinism_hash": "fa248dbdc7ccd470",
+      "determinism_hash": "5d975d9b5d51d238",
       "fixture_id": "crew_ejection_swimmer_transition",
       "outcome": "ejected_to_swimmer",
       "parameter_case_id": "case_000",
@@ -122,7 +122,7 @@
         "trigger": "none"
       },
       "runtime_cpu_ms": 0.0,
-      "runtime_id": "UnrealChaos",
+      "runtime_id": "Jolt",
       "sample_kind": "schema_placeholder",
       "step_index": 480,
       "swimmer_state": {
@@ -157,7 +157,7 @@
         "scripted_high_side": false,
         "seated": 7
       },
-      "determinism_hash": "9bd39da97ed20d19",
+      "determinism_hash": "558fb4f93356931c",
       "fixture_id": "crew_ejection_swimmer_transition",
       "outcome": "ejected_to_swimmer",
       "parameter_case_id": "case_000",
@@ -188,7 +188,7 @@
         "trigger": "none"
       },
       "runtime_cpu_ms": 0.0,
-      "runtime_id": "UnrealChaos",
+      "runtime_id": "Jolt",
       "sample_kind": "schema_placeholder",
       "step_index": 959,
       "swimmer_state": {
@@ -199,9 +199,9 @@
     }
   ],
   "sampled_step_count": 3,
-  "schema": "raftsim.unreal.chaos_fixture_replay_summary.v1",
+  "schema": "raftsim.native.jolt_fixture_replay_summary.v1",
   "source_contract": "unreal/Content/RaftSim/Physics/chaos_jolt_runtime_evaluation.json",
-  "status": "schema_placeholder_ready_for_unreal_automation_execution",
+  "status": "schema_placeholder_ready_for_native_smoke_harness_execution",
   "step_count": 960,
   "telemetry_required": [
     "runtime_id",

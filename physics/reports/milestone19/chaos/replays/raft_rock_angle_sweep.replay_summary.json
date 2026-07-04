@@ -6,7 +6,7 @@
   "replay_reproduction": {
     "determinism_hash_scope": "gameplay-state telemetry, contacts, raft pose, and fixture inputs",
     "full_telemetry_stream": "Saved/Automation/RaftSim/Chaos/raft_rock_angle_sweep.telemetry.jsonl",
-    "replace_placeholder_frames_after_unreal_run": true
+    "replace_placeholder_frames_after_runtime_run": true
   },
   "representative_parameter_case": {
     "case_id": "case_000",
