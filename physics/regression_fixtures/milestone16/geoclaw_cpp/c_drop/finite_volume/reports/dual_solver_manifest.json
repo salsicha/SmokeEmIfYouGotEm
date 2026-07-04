@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_drop/finite_volume/cpp_solver/drop_ledge_seed_16/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_drop/finite_volume/cpp_solver/drop_ledge_seed_16",
     "returncode": 0,
-    "runtime_seconds": 0.29916420800145715,
+    "runtime_seconds": 0.30712866699832375,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_drop/finite_volume/cpp_solver/drop_ledge_seed_16/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_drop/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.29916420800145715,
-    "cpp_seconds_per_simulated_second": 0.049860701333576195,
+    "cpp_runtime_seconds": 0.30712866699832375,
+    "cpp_seconds_per_simulated_second": 0.051188111166387294,
     "geoclaw_runtime_seconds": 0.9899044590001722,
     "geoclaw_seconds_per_simulated_second": 0.1649840765000287,
     "simulated_duration_seconds": 6.0
