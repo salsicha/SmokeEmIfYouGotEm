@@ -38,6 +38,7 @@
     "expected_outcomes": [
       "clear"
     ],
+    "feature_check_agreement": true,
     "feature_outcome_match": true,
     "flow_band": null,
     "force_delta_weight_ratio": 4.900354585082185e-15,

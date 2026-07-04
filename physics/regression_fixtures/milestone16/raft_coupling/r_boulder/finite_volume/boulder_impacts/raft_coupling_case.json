@@ -1,0 +1,107 @@
+{
+  "record": {
+    "actual_scenario_id": "boulder_garden_seed_16",
+    "candidate_checks": [
+      {
+        "details": "Grounding contacts should include a submerged rock tag.",
+        "name": "rock_contact",
+        "passed": false,
+        "threshold": 1.0,
+        "value": 0.0
+      },
+      {
+        "details": "Rock contact should happen below the water surface.",
+        "name": "submerged_depth",
+        "passed": false,
+        "threshold": 0.1,
+        "value": 0.0
+      },
+      {
+        "details": "Rock contact should scrape opposite raft travel.",
+        "name": "scrape_drag",
+        "passed": false,
+        "threshold": 1.0,
+        "value": 0.0
+      },
+      {
+        "details": "Rock contact should kick the raft upward.",
+        "name": "launch_acceleration",
+        "passed": false,
+        "threshold": 1.0,
+        "value": 0.0
+      },
+      {
+        "details": "Off-center rock contact should pitch the raft during launch.",
+        "name": "pitch_launch",
+        "passed": false,
+        "threshold": 0.3,
+        "value": 0.0
+      }
+    ],
+    "candidate_frame": "outputs/m16cpp/r_boulder/finite_volume/cpp_solver/boulder_garden_seed_16/frames/frame_0008.csv",
+    "candidate_outcome": "scraped",
+    "candidate_passed": false,
+    "case_id": "boulder_impacts",
+    "expected_outcomes": [
+      "grounded",
+      "pinned"
+    ],
+    "feature_check_agreement": true,
+    "feature_outcome_match": true,
+    "flow_band": null,
+    "force_delta_weight_ratio": 2.7439125745711713e-09,
+    "force_envelope_outcome_match": true,
+    "gate_scenario_id": "boulder_garden",
+    "notes": [
+      "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+    ],
+    "passed": true,
+    "reference_checks": [
+      {
+        "details": "Grounding contacts should include a submerged rock tag.",
+        "name": "rock_contact",
+        "passed": false,
+        "threshold": 1.0,
+        "value": 0.0
+      },
+      {
+        "details": "Rock contact should happen below the water surface.",
+        "name": "submerged_depth",
+        "passed": false,
+        "threshold": 0.1,
+        "value": 0.0
+      },
+      {
+        "details": "Rock contact should scrape opposite raft travel.",
+        "name": "scrape_drag",
+        "passed": false,
+        "threshold": 1.0,
+        "value": 0.0
+      },
+      {
+        "details": "Rock contact should kick the raft upward.",
+        "name": "launch_acceleration",
+        "passed": false,
+        "threshold": 1.0,
+        "value": 0.0
+      },
+      {
+        "details": "Off-center rock contact should pitch the raft during launch.",
+        "name": "pitch_launch",
+        "passed": false,
+        "threshold": 0.3,
+        "value": 0.0
+      }
+    ],
+    "reference_frame": "outputs/m16g/r_boulder/normalized/frames/frame_0002.npz",
+    "reference_outcome": "scraped",
+    "reference_passed": false,
+    "solver_mode": "finite_volume",
+    "suite": "rafting",
+    "torque_delta_inertia_ratio": 1.4785502877653207e-08,
+    "trajectory_position_delta_m": 7.477530020916999e-12,
+    "trajectory_velocity_delta_mps": 4.486297581391988e-10
+  },
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "source_report": "reports/milestone16/raft_coupling_validation.json"
+}

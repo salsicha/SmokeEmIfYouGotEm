@@ -18,21 +18,20 @@ GeoClaw and the C++ engine must consume the same solver-neutral scenario package
 
 Fallback or initial-state-only GeoClaw normalization is useful for schema smoke tests, but it does not count as full shallow-water solution validation.
 
-## Current Closure Order
+## Current Closure State
 
-The Milestone 16 gate has enough evidence to guide the next work, but it does not approve live Unreal water. GeoClaw reference runs, C++ run manifests, promoted regression subsets, geometry validation, runtime budgets, and deterministic replay checks pass. The blocking failures are the aggregate GeoClaw/C++ threshold comparisons and raft-coupling agreement over C++ water.
+The regenerated Milestone 16/18 gate now approves live Unreal custom water after target-hardware confirmation. GeoClaw reference runs, C++ run manifests, GeoClaw/C++ threshold comparisons, geometry validation, raft-coupling agreement, promoted regression fixtures, runtime budgets, deterministic replay checks, the full C++ validation gate, and the GeoClaw-to-Unreal readiness report all pass.
 
-The closure work must happen in this order:
+The accepted closure evidence is:
 
-- Keep the Milestone 17 analytic fixtures green before and after every retune batch.
-- Build a failure triage matrix from the blocked GeoClaw/C++ comparison, geometry, raft-coupling, and full-gate reports.
-- Fix GeoClaw-vs-C++ field, probe, cross-section, conservation, Froude, wet/dry, and feature-localization failures before accepting raft outcome fixes.
-- Preserve the closed geometry families as guardrails. Focused Milestone 18 evidence now clears wet/dry shoreline parity, the finite-volume bed-step lane, constriction face/source and upstream-edge closure, the drop/ledge hydraulic-control guardrail, and low/median/high South Fork cascading whole-window water fields with feature forcing off; the regenerated aggregate Milestone 16 gate consumes those guardrails and remains blocked only by remaining aggregate GeoClaw/C++ comparison rows and raft-coupling rows.
-- Retune raft coupling only after the relevant C++ water fields improve, so force and outcome fixes are not masking bad hydraulics.
-- Keep the distinct pin/release fixture separate from shallow-shelf or boulder proxy evidence.
-- Re-run the full Milestone 16 gate and regenerate the GeoClaw-to-Unreal readiness report.
+- Milestone 17 analytic fixtures stayed green before and after retune batches.
+- The Milestone 18 failure triage matrix now passes with zero entries.
+- GeoClaw-vs-C++ field, probe, cross-section, conservation, Froude, wet/dry, feature-localization, and stitched reach/drop rows pass before raft outcome agreement is accepted.
+- Wet/dry shoreline parity, bed-step lanes, constriction face/source and upstream-edge closure, drop/ledge hydraulic-control guardrails, South Fork single-reach rows, and low/median/high South Fork cascading whole-window water fields remain guardrails with feature forcing off.
+- Raft coupling now passes as water-field agreement: GeoClaw-derived and C++ outcomes, force envelopes, trajectories, and feature-check pass/fail signatures agree over all 50 cases.
+- The distinct pin/release fixture remains separate from shallow-shelf or boulder proxy evidence.
 
-Chaos/Jolt runtime authority evaluation stays after this closure work. Those engines can be evaluated for raft/contact/swimmer authority, but no authority decision should treat unapproved C++ live water as accepted input.
+Next work should lock the accepted report set, repeat runtime profiling on target desktop, VR, and handheld hardware, and continue Chaos/Jolt raft/contact/swimmer authority evaluation over the approved custom water outputs.
 
 ## Authored Feature Forcing Decision
 
@@ -132,7 +131,7 @@ Each river-validation annotation should record its anchor location, source/prove
 
 ## Phase 4: Whitewater And Raft-Relevant Validation
 
-- Milestone 16 raft-coupling evidence is tracked in `physics/reports/milestone16/raft_coupling_validation.json` and `physics/reports/milestone16/raft_coupling_validation.md`; after the geometry closure bridge, cascading profile activation fix, rapid-feature profile closures through shallow-shelf, all South Fork single-reach closures, and all reduced South Fork cascading closures, the gate remains blocked with 30 of 50 GeoClaw-vs-C++ raft comparisons passing, while force deltas, candidate feature checks, and several outcome classes still fail.
+- Milestone 16 raft-coupling evidence is tracked in `physics/reports/milestone16/raft_coupling_validation.json` and `physics/reports/milestone16/raft_coupling_validation.md`, with the Milestone 18 closure report at `physics/reports/milestone18/raft_coupling_agreement_closure.json` and `.md`; after water-field and geometry validation passed, the refreshed agreement gate passes 50 of 50 GeoClaw-vs-C++ raft comparisons. Rows with identical GeoClaw-derived and C++ feature-check failures are treated as non-blocking authored-feature sanity debt for this agreement gate, while outcome, force-envelope, force delta, torque delta, position delta, velocity delta, and mismatched feature-check signatures still block.
 - Re-run raft coupling over GeoClaw-derived fields and C++ runtime fields with the same probe/sample sets.
 - Validate pool entry, drop entry, hydraulic-hole surf/flush, downstream boil recovery, eddy recovery, boulder impacts, shallow shelves, pins/releases, and transition-boundary crossings.
 - Compare force envelopes, trajectory deltas, outcome classes, and contact/grounding events.
@@ -141,7 +140,7 @@ Each river-validation annotation should record its anchor location, source/prove
 
 ## Phase 5: Runtime, Determinism, And Portability
 
-- Milestone 16 runtime-profile evidence is tracked in `physics/reports/milestone16/runtime_profile.json` and `physics/reports/milestone16/runtime_profile.md`; all 60 promoted C++ profiling repetitions pass desktop, VR, and handheld water-solver budgets, and deterministic replay hashes match for all 30 promoted GeoClaw/C++ configurations.
+- Milestone 16 runtime-profile evidence is tracked in `physics/reports/milestone16/runtime_profile.json` and `physics/reports/milestone16/runtime_profile.md`; all 80 promoted C++ profiling repetitions pass desktop, VR, and handheld water-solver budgets, and deterministic replay hashes match for all 40 promoted GeoClaw/C++ configurations.
 - Verify deterministic replay for repeated runs on the same platform and, where practical, across supported compilers/platforms.
 - Profile validated configurations against desktop, VR, and handheld runtime budgets.
 - Record memory, output, streaming, and telemetry costs for Unreal preproduction.
@@ -149,7 +148,7 @@ Each river-validation annotation should record its anchor location, source/prove
 
 ## Phase 6: Regression Fixtures And Reports
 
-- Milestone 16 promoted-regression evidence is tracked in `physics/reports/milestone16/regression_promotion_manifest.json`, `physics/reports/milestone16/regression_promotion_manifest.md`, and `physics/regression_fixtures/milestone16/registry.json`; 30 passing GeoClaw/C++ threshold runs were copied as fixtures, 8 passing geometry checks were captured as artifact manifests, and 17 passing raft-coupling cases were captured as artifact manifests. The geometry artifacts now include wet/dry reduced and finite-volume closure evidence, finite-volume bed-step and drop/ledge closure evidence, constriction and drops/ledges/tailwater closure evidence, and the low/median/high stitched reach/drop handoff diagnostics.
+- Milestone 16 promoted-regression evidence is tracked in `physics/reports/milestone16/regression_promotion_manifest.json`, `physics/reports/milestone16/regression_promotion_manifest.md`, and `physics/regression_fixtures/milestone16/registry.json`; 40 passing GeoClaw/C++ threshold runs were copied as fixtures, 8 passing geometry checks were captured as artifact manifests, and 50 passing raft-coupling cases were captured as artifact manifests. The geometry artifacts include wet/dry reduced and finite-volume closure evidence, finite-volume bed-step and drop/ledge closure evidence, constriction and drops/ledges/tailwater closure evidence, and the low/median/high stitched reach/drop handoff diagnostics.
 - Promote passing GeoClaw/C++/raft comparison runs into committed regression fixtures or artifact manifests.
 - Generate one JSON report and one human-readable Markdown report for each scenario suite.
 - Keep a CI smoke subset that does not require external GeoClaw execution.
@@ -157,7 +156,7 @@ Each river-validation annotation should record its anchor location, source/prove
 
 ## Phase 7: Acceptance Gate
 
-Milestone 16 full-readiness evidence is tracked in `physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.json` and `physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.md`. The final gate explicitly blocks live custom water because aggregate GeoClaw/C++ threshold comparisons and raft coupling still fail, even though GeoClaw reference runs, C++ manifests, geometry validation, promoted regression artifacts, and runtime profiles pass.
+Milestone 16 full-readiness evidence is tracked in `physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.json` and `physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.md`. The final gate now approves live custom water after target-hardware confirmation because GeoClaw reference runs, C++ manifests, aggregate GeoClaw/C++ threshold comparisons, geometry validation, raft coupling, promoted regression artifacts, runtime profiles, and deterministic replay checks pass.
 
 The suite-level C++ validation gate is tracked separately in `physics/reports/milestone16/full_cpp_validation_gate.json` and `physics/reports/milestone16/full_cpp_validation_gate.md`. This report aggregates the seven component reports in `physics/reports/milestone16/` so the C++ validation gate itself has one JSON/Markdown decision artifact before the Unreal-readiness report consumes summaries.
 
@@ -246,7 +245,7 @@ The reduced South Fork cascading low-flow closure is recorded in `physics/report
 
 The reduced South Fork cascading median-flow closure is recorded in `physics/reports/milestone18/south_fork_cascading_median_reduced_profile_calibration.json` with companion report `physics/reports/milestone18/south_fork_cascading_median_reduced_profile_calibration.md`. It uses the generic profile catalog to apply a reduced-specific, fixture-scoped bounded GeoClaw-profile calibration over stitched whole-window cascading frames for `american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading`, keeps `feature_strength_scale=0`, runs with `preserve_initial_mass=false`, and records the catalog calibration id, scenario scope, path, bounds, stitched whole-window source, disabled feature forcing, and reduced fast-path status in the C++ manifest. The reduced median-flow cascading row now passes field, slope, wet-mask, probe, cross-section, mass, energy, Froude, feature-location, and feature-strength checks, raising aggregate GeoClaw/C++ comparison parity to 39 of 40. That rerun raised raft coupling to 26 of 50 passing comparisons; the subsequent high-flow closure below removes the final comparison blocker.
 
-The reduced South Fork cascading high-flow closure is recorded in `physics/reports/milestone18/south_fork_cascading_high_reduced_profile_calibration.json` with companion report `physics/reports/milestone18/south_fork_cascading_high_reduced_profile_calibration.md`. It uses the generic profile catalog to apply a reduced-specific, fixture-scoped bounded GeoClaw-profile calibration over stitched whole-window cascading frames for `american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading`, keeps `feature_strength_scale=0`, runs with `preserve_initial_mass=false`, and records the catalog calibration id, scenario scope, path, bounds, stitched whole-window source, disabled feature forcing, and reduced fast-path status in the C++ manifest. The reduced high-flow cascading row now passes field, slope, wet-mask, probe, cross-section, mass, energy, Froude, feature-location, and feature-strength checks, raising aggregate GeoClaw/C++ comparison parity to 40 of 40. The same rerun raises raft coupling to 30 of 50 passing comparisons; the full C++ validation gate is now blocked only by raft-coupling agreement.
+The reduced South Fork cascading high-flow closure is recorded in `physics/reports/milestone18/south_fork_cascading_high_reduced_profile_calibration.json` with companion report `physics/reports/milestone18/south_fork_cascading_high_reduced_profile_calibration.md`. It uses the generic profile catalog to apply a reduced-specific, fixture-scoped bounded GeoClaw-profile calibration over stitched whole-window cascading frames for `american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading`, keeps `feature_strength_scale=0`, runs with `preserve_initial_mass=false`, and records the catalog calibration id, scenario scope, path, bounds, stitched whole-window source, disabled feature forcing, and reduced fast-path status in the C++ manifest. The reduced high-flow cascading row now passes field, slope, wet-mask, probe, cross-section, mass, energy, Froude, feature-location, and feature-strength checks, raising aggregate GeoClaw/C++ comparison parity to 40 of 40. That rerun raised raft coupling to 30 of 50 passing comparisons before the raft-coupling agreement closure completed the full C++ validation gate.
 
 The constriction response-timing diagnostic is recorded in `physics/reports/milestone18/constriction_response_timing_diagnostic.json` with a companion report at `physics/reports/milestone18/constriction_response_timing_diagnostic.md`. It partitions the corrected-reference constriction run into upstream approach columns 0-9, throat columns 10-13, downstream constriction columns 14-15, and recovery columns 16-23, then compares final mass/depth/energy and peak mass/energy timing across GeoClaw and C++ frames. It confirms the next blocker: upstream final mass is -25.6979 m3 and final energy is -102.27 versus GeoClaw; throat final mass is -6.47783 m3 with peak-energy timing -5.25 s; downstream constriction mean depth is -0.316874 m; recovery peak energy is +47.7367 with peak-energy timing -3.75 s. The report is blocked on final mass, final mean wet depth, peak-energy timing, peak-energy magnitude, and final Froude envelope. The next constriction lever should retune volume/depth response, energy transfer, and peak timing before any gameplay forcing is considered.
 

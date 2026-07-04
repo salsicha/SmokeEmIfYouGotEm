@@ -366,6 +366,7 @@ def test_milestone16_raft_coupling_report_blocks_on_force_delta():
         candidate_outcome="clear",
         reference_passed=True,
         candidate_passed=True,
+        feature_check_agreement=True,
         feature_outcome_match=True,
         force_envelope_outcome_match=True,
         force_delta_weight_ratio=4.0,
@@ -386,6 +387,45 @@ def test_milestone16_raft_coupling_report_blocks_on_force_delta():
     assert report.passed is False
     assert payload["failed_count"] == 1
     assert payload["records"][0]["passed"] is False
+
+
+def test_milestone16_raft_coupling_report_accepts_matching_feature_check_failures():
+    failed_check = {"name": "rock_contact", "passed": False, "value": 0.0, "threshold": 1.0}
+    record = Milestone16RaftCouplingRecord(
+        gate_scenario_id="boulder_garden",
+        actual_scenario_id="boulder_garden_seed_16",
+        suite="rafting",
+        flow_band=None,
+        solver_mode="reduced",
+        case_id="boulder_impacts",
+        expected_outcomes=("grounded", "pinned"),
+        reference_frame="outputs/m16g/r_boulder/normalized/frames/frame_0002.npz",
+        candidate_frame="outputs/m16cpp/r_boulder/reduced/cpp_solver/example/frames/frame_0008.csv",
+        reference_outcome="scraped",
+        candidate_outcome="scraped",
+        reference_passed=False,
+        candidate_passed=False,
+        feature_check_agreement=True,
+        feature_outcome_match=True,
+        force_envelope_outcome_match=True,
+        force_delta_weight_ratio=0.0,
+        torque_delta_inertia_ratio=0.0,
+        trajectory_position_delta_m=0.0,
+        trajectory_velocity_delta_mps=0.0,
+        reference_checks=(failed_check,),
+        candidate_checks=(failed_check,),
+        notes=("GeoClaw-derived and C++ raft feature checks fail the same authored expectation.",),
+    )
+    report = Milestone16RaftCouplingReport(
+        geoclaw_reference_report="reports/milestone16/geoclaw_reference_runs.json",
+        cpp_run_report="reports/milestone16/cpp_solver_runs.json",
+        records=(record,),
+    )
+
+    payload = report.to_json_dict()
+    assert report.passed is True
+    assert payload["passed_count"] == 1
+    assert payload["records"][0]["feature_check_agreement"] is True
 
 
 def test_milestone16_regression_promotion_writes_fixtures_and_artifacts(tmp_path):

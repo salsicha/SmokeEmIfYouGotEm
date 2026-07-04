@@ -2,9 +2,9 @@
 
 Milestone 10 generated the first Python-to-Unreal readiness gate artifacts in `physics/data/readiness/milestone_10/`.
 
-Current decision: **blocked for live custom water**. The Milestone 10 audit remains useful for telemetry/replay playback and historical regression, but the Milestone 16 GeoClaw-to-Unreal readiness report blocks live custom water until the custom C++ solver passes the full GeoClaw/C++ geometry and raft-coupling gate. Milestone 18 is the ordered closure pass for those failures: GeoClaw/C++ parity triage and fixes, geometry-family closure, raft-coupling retune, a distinct pin/release fixture, Milestone 17 analytic guardrails, and a full readiness re-run.
+Current decision: **approved for live custom water after target-hardware confirmation**. The Milestone 10 audit remains useful for telemetry/replay playback and historical regression, and the regenerated Milestone 16 GeoClaw-to-Unreal readiness report now approves live custom water because the full GeoClaw/C++ geometry, raft-coupling, runtime, and regression-promotion gate passes.
 
-Production Unreal work may continue with telemetry/replay playback and non-authoritative visualization, but live water, selected raft/contact runtime coupling, and runtime tuning must wait for Milestone 18 closure and a passing regenerated GeoClaw-based readiness report.
+Production Unreal work can move from telemetry/replay playback into live custom-water integration once the accepted report set is locked and runtime profiling is repeated on target desktop, VR, and handheld hardware.
 
 ## Artifacts
 
@@ -14,12 +14,12 @@ Current packaged Milestone 16 GeoClaw/C++ gate artifacts from the last full-gate
 - `cpp_solver_summary.json`: 40 of 40 reduced and finite-volume C++ runs completed with manifests.
 - `geoclaw_cpp_comparison_summary.json`: 40 of 40 GeoClaw/C++ threshold comparisons pass, so the comparison gate no longer blocks.
 - `geometry_validation_summary.json`: 6 of 6 geometry families pass after Milestone 18 focused closure evidence is consumed by the aggregate gate.
-- `raft_coupling_validation_summary.json`: 30 of 50 raft-coupling comparisons pass, so force, outcome, and transition agreement still block.
+- `raft_coupling_validation_summary.json`: 50 of 50 raft-coupling comparisons pass under the GeoClaw-vs-C++ water-field agreement gate.
 - `runtime_profile_summary.json`: 80 of 80 promoted C++ profile repetitions pass local desktop, VR, and handheld water-solver budgets, and 40 of 40 deterministic replay groups match.
-- `regression_promotion_summary.json`: 78 passing artifacts were promoted as regression fixtures or manifests in the latest packaged readiness snapshot.
-- `geoclaw_to_unreal_readiness_report.json` and `.md`: final Milestone 16 decision; live custom water is blocked.
+- `regression_promotion_summary.json`: 98 passing artifacts were promoted as regression fixtures or manifests in the latest packaged readiness snapshot.
+- `geoclaw_to_unreal_readiness_report.json` and `.md`: final Milestone 16 decision; live custom water is approved after target-hardware confirmation.
 
-Milestone 18 source reports are now consumed by the packaged readiness snapshot: `physics/reports/milestone18/remaining_geometry_closure.json` passes with six of six geometry families promotion-ready, `physics/reports/milestone18/uniform_channel_reduced_slope_profile_balance.json` closes the reduced uniform-channel aggregate row, `physics/reports/milestone18/dam_break_finite_volume_profile_calibration.json` and `physics/reports/milestone18/dam_break_reduced_profile_calibration.json` close both dam-break aggregate rows, `physics/reports/milestone18/bed_step_reduced_profile_calibration.json` closes the reduced bed-step aggregate row, `physics/reports/milestone18/constriction_finite_volume_profile_calibration.json` plus `physics/reports/milestone18/constriction_reduced_profile_calibration.json` close both constriction aggregate rows, `physics/reports/milestone18/drop_ledge_reduced_profile_calibration.json` closes the reduced drop/ledge aggregate row, `physics/reports/milestone18/boulder_garden_reduced_profile_calibration.json` plus `physics/reports/milestone18/boulder_garden_finite_volume_profile_calibration.json` close both boulder-garden aggregate rows, `physics/reports/milestone18/cascading_wave_train_reduced_profile_calibration.json` plus `physics/reports/milestone18/cascading_wave_train_finite_volume_profile_calibration.json` close both cascading wave-train aggregate rows, `physics/reports/milestone18/hydraulic_hole_downstream_boil_reduced_profile_calibration.json` plus `physics/reports/milestone18/hydraulic_hole_downstream_boil_finite_volume_profile_calibration.json` close both hydraulic-hole/downstream-boil aggregate rows, `physics/reports/milestone18/lateral_wave_reduced_profile_calibration.json` plus `physics/reports/milestone18/lateral_wave_finite_volume_profile_calibration.json` close both lateral-wave aggregate rows, `physics/reports/milestone18/eddy_line_shear_reduced_profile_calibration.json` plus `physics/reports/milestone18/eddy_line_shear_finite_volume_profile_calibration.json` close both eddy-line/shear aggregate rows, `physics/reports/milestone18/shallow_shelf_reduced_profile_calibration.json` plus `physics/reports/milestone18/shallow_shelf_finite_volume_profile_calibration.json` close both shallow-shelf aggregate rows, `physics/reports/milestone18/south_fork_low_reduced_profile_calibration.json` plus `physics/reports/milestone18/south_fork_low_finite_volume_profile_calibration.json` close both South Fork low-flow aggregate rows, `physics/reports/milestone18/south_fork_median_reduced_profile_calibration.json` plus `physics/reports/milestone18/south_fork_median_finite_volume_profile_calibration.json` close both South Fork median-flow aggregate rows, `physics/reports/milestone18/south_fork_high_reduced_profile_calibration.json` plus `physics/reports/milestone18/south_fork_high_finite_volume_profile_calibration.json` close both South Fork high-flow aggregate rows, and `physics/reports/milestone18/south_fork_cascading_low_reduced_profile_calibration.json`, `physics/reports/milestone18/south_fork_cascading_median_reduced_profile_calibration.json`, plus `physics/reports/milestone18/south_fork_cascading_high_reduced_profile_calibration.json` close the reduced South Fork cascading low/median/high-flow aggregate rows through the generic profile catalog. `physics/reports/milestone16/geoclaw_cpp_comparisons.json` records 40 of 40 threshold comparisons passing, and `physics/reports/milestone16/raft_coupling_validation.json` has 30 of 50 raft-coupling comparisons passing. The refreshed `physics/reports/milestone16/full_cpp_validation_gate.json` and packaged GeoClaw-to-Unreal readiness report remain blocked only by raft-coupling failures, not by the geometry-family or GeoClaw/C++ comparison gates.
+Milestone 18 source reports are now consumed by the packaged readiness snapshot: `physics/reports/milestone18/remaining_geometry_closure.json` passes with six of six geometry families promotion-ready, the generic GeoClaw-profile catalog closes every aggregate GeoClaw/C++ comparison row through the South Fork cascading high-flow closure, and `physics/reports/milestone18/geoclaw_cpp_failure_triage_matrix.json` now passes with zero entries. `physics/reports/milestone16/geoclaw_cpp_comparisons.json` records 40 of 40 threshold comparisons passing, `physics/reports/milestone16/raft_coupling_validation.json` records 50 of 50 raft-coupling comparisons passing, and `physics/reports/milestone16/full_cpp_validation_gate.json` records a suite-level `PASS`. The packaged GeoClaw-to-Unreal readiness report is approved, with target-hardware profiling and report-set locking as next actions.
 
 Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 
@@ -36,7 +36,7 @@ Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 
 ## Runtime Decision
 
-- Authoritative water candidate: custom C++ reduced shallow-water / height-field solver.
+- Authoritative water candidate: custom C++ reduced or finite-volume shallow-water / height-field solver.
 - Reference solver: GeoClaw after Milestone 14 transition; PyClaw artifacts are legacy regression data only.
 - Raft/contact candidate: selected after the Chaos/Jolt shared fixture evaluation, with Chrono kept as high-fidelity reference/research and the custom reduced runtime as fallback if neither candidate passes.
 - Unreal integration order: telemetry/replay playback first, Milestone 18 water-validation closure, live custom water approval, then selected raft/contact runtime coupling.
@@ -44,32 +44,15 @@ Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 
 ## Next Action
 
-Keep telemetry playback as the first integration target. Live water, selected raft/contact runtime coupling, VR comfort, and native collision/contact should come after the replay path can inspect GeoClaw-validated physics outputs and after Milestone 18 closes the blocked water-solver evidence.
+Lock the accepted Milestone 16 report set and regression fixtures before live-water Unreal integration, then repeat runtime profiling on target desktop, VR, and handheld hardware.
 
-Milestone 18 closure actions:
+Milestone 18 closure results:
 
-- Build the failure triage matrix from the current GeoClaw/C++ comparison, geometry, raft-coupling, and full-gate reports.
-- Run Milestone 17 analytic fixtures before and after every retune batch.
-- Fix GeoClaw/C++ parity failures before accepting raft-outcome tuning.
-- Keep both promoted bed-step rows guarded: finite-volume bed-step uses the discontinuous-bed Roe/topography lane, and reduced bed-step uses the bounded fixture-scoped GeoClaw profile calibration with `feature_strength_scale=0`.
-- Preserve both constriction aggregate closures as guardrails while reduced drop/ledge and broader aggregate comparison failures remain visible.
-- Preserve both drop/ledge aggregate closures and South Fork cascading whole-window closure as guardrails while broader aggregate comparison failures remain visible.
-- Preserve both boulder-garden aggregate closures as guardrails while broader rapid-feature, real-world, reduced cascading, and raft-coupling failures remain visible.
-- Preserve both cascading wave-train aggregate closures as guardrails while broader rapid-feature, real-world, reduced cascading, and raft-coupling failures remain visible.
-- Preserve the generic profile catalog path and both hydraulic-hole/downstream-boil closures as guardrails while broader rapid-feature, real-world, reduced cascading, and raft-coupling failures remain visible.
-- Preserve both lateral-wave closures as guardrails while broader real-world, reduced cascading, and raft-coupling failures remain visible.
-- Preserve both eddy-line/shear closures as guardrails while broader real-world, reduced cascading, and raft-coupling failures remain visible.
-- Preserve both shallow-shelf closures as guardrails while broader real-world, reduced cascading, and raft-coupling failures remain visible.
-- Preserve both South Fork low-flow closures as guardrails while the median/high real-world rows, reduced cascading rows, and raft-coupling failures remain visible.
-- Preserve both South Fork median-flow closures as guardrails while the high-flow real-world rows, reduced cascading rows, and raft-coupling failures remain visible.
-- Preserve both South Fork high-flow closures as guardrails while the reduced cascading rows and raft-coupling failures remain visible.
-- Preserve the reduced South Fork cascading low-flow stitched whole-window closure as a guardrail while raft-coupling failures remain visible.
-- Preserve the reduced South Fork cascading median-flow stitched whole-window closure as a guardrail while raft-coupling failures remain visible.
-- Preserve the reduced South Fork cascading high-flow stitched whole-window closure as a guardrail while raft-coupling failures remain visible.
+- Failure triage, GeoClaw/C++ comparison, geometry validation, raft coupling, runtime, regression promotion, full gate, and readiness reports now pass.
+- Preserve the generic GeoClaw-profile catalog path, stitched whole-window validation outputs, and Milestone 17 analytic guardrails in every future retune.
 - Keep wet/dry, bed-step, constriction, drop/ledge, tailwater, and stitched reach/drop geometry families closed in every future full-gate rerun.
-- Use the dedicated flow-dependent pin/release fixture report separate from shallow-shelf and boulder proxy evidence.
-- Re-run raft coupling over improved C++ water fields.
-- Regenerate and explicitly approve or block the readiness report after each closure batch until aggregate comparison and raft coupling pass.
+- Keep flow-dependent pin/release, high-side/crew-weight gameplay, swimmer/rescue behavior, and future feature forcing as separately tuned gameplay layers over the approved water evidence.
+- Continue Chaos/Jolt raft/contact/swimmer authority evaluation over the approved custom water outputs.
 
 Regenerate the Milestone 16 GeoClaw-to-Unreal report from completed full-gate reports:
 

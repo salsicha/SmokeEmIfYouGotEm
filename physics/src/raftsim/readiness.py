@@ -603,6 +603,31 @@ def build_milestone16_geoclaw_readiness_report(
             )
         ),
     )
+    accepted_model_limitations = (
+        "2.5D shallow-water/height-field flow remains the intended runtime model; full 3D CFD is out of scope.",
+        "GeoClaw remains offline reference infrastructure and does not ship inside Unreal.",
+        "The approved Milestone 16/18 gate validates the current C++ water evidence set; new authored rivers, feature-forcing defaults, and gameplay tuning must add matching regression evidence.",
+        "Flow-dependent pin/release, crew high-side, swimmer, and rescue behavior remain dedicated gameplay fixtures layered over the approved water-field agreement gate.",
+    )
+    risks = (
+        "Runtime profile passes on the local validation machine and still needs target desktop, VR, and handheld hardware confirmation.",
+        "Real-world river source licensing, guide review, field-media validation, and level-editor annotation remain production gates.",
+        "Chaos/Jolt raft/contact/swimmer authority must still be selected and validated over the approved custom water outputs.",
+        "Future feature forcing must remain bounded, manifest-recorded, GeoClaw-compared, and separate from conservation fixes.",
+    )
+    if not approved:
+        accepted_model_limitations = (
+            "2.5D shallow-water/height-field flow remains the intended runtime model; full 3D CFD is out of scope.",
+            "GeoClaw remains offline reference infrastructure and does not ship inside Unreal.",
+            "Promoted fixtures are passing subsets, not proof that the full live-water gate has passed.",
+            "Dedicated pin/release evidence remains a separate Milestone 18 fixture until the full readiness gate is rerun.",
+        )
+        risks = (
+            "Most GeoClaw/C++ threshold comparisons still fail outside hydrostatic/sloping cases.",
+            "Raft force and outcome agreement is not yet stable across hydraulics, drops, and boulder gardens.",
+            "Runtime profile passes only the promoted configurations and still needs target hardware confirmation.",
+            "Real-world river source licensing, guide review, and field-media validation remain production gates.",
+        )
     return PythonToUnrealReadinessReport(
         gate_version=GEOCLAW_READINESS_REPORT_VERSION,
         decision=decision,
@@ -610,22 +635,12 @@ def build_milestone16_geoclaw_readiness_report(
         runtime_choices={
             "authoritative_water_candidate": "custom C++ reduced or finite-volume shallow-water / height-field solver after full Milestone 16 approval",
             "reference_solver": "GeoClaw offline fixed-grid output normalized into the shared telemetry schema",
-            "raft_and_contact_candidate": "Project Chrono bridge or custom reduced raft fallback over validated custom water fields",
+            "raft_and_contact_candidate": "Chaos/Jolt runtime authority evaluation over validated custom water fields, with Chrono retained as high-fidelity reference/research",
             "unreal_integration_order": "telemetry/replay playback and promoted regression fixtures first; live custom water only after all Milestone 16 checks pass",
             "chrono_fsi": "optional research path only, not a baseline runtime dependency",
         },
-        accepted_model_limitations=(
-            "2.5D shallow-water/height-field flow remains the intended runtime model; full 3D CFD is out of scope.",
-            "GeoClaw remains offline reference infrastructure and does not ship inside Unreal.",
-            "Promoted fixtures are passing subsets, not proof that the full live-water gate has passed.",
-            "Dedicated pin/release evidence remains a separate Milestone 18 fixture until the full readiness gate is rerun.",
-        ),
-        risks=(
-            "Most GeoClaw/C++ threshold comparisons still fail outside hydrostatic/sloping cases.",
-            "Raft force and outcome agreement is not yet stable across hydraulics, drops, and boulder gardens.",
-            "Runtime profile passes only the promoted configurations and still needs target hardware confirmation.",
-            "Real-world river source licensing, guide review, and field-media validation remain production gates.",
-        ),
+        accepted_model_limitations=accepted_model_limitations,
+        risks=risks,
         artifact_manifest=artifact_manifest,
     )
 

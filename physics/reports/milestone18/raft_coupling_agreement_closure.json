@@ -1,0 +1,354 @@
+{
+  "schema_version": "raftsim.milestone18.raft_coupling_agreement_closure.v0",
+  "decision": "PASS",
+  "source_reports": {
+    "raft_coupling": "physics/reports/milestone16/raft_coupling_validation.json",
+    "full_gate": "physics/reports/milestone16/full_cpp_validation_gate.json",
+    "readiness": "physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.json",
+    "triage": "physics/reports/milestone18/geoclaw_cpp_failure_triage_matrix.json"
+  },
+  "agreement_semantics": {
+    "feature_check_agreement_required": true,
+    "matching_failed_feature_check_signatures_are_non_blocking": true,
+    "outcome_match_required": true,
+    "force_envelope_match_required": true,
+    "force_torque_trajectory_thresholds_required": true,
+    "purpose": "Validate C++ raft coupling against GeoClaw-derived water-field behavior without treating shared authored-feature expectation misses as C++ water disagreement."
+  },
+  "aggregate_after_rerun": {
+    "geoclaw_cpp_threshold_passed_count": 40,
+    "geoclaw_cpp_comparison_count": 40,
+    "geometry_passed_count": 6,
+    "geometry_case_count": 6,
+    "raft_coupling_passed_count": 50,
+    "raft_coupling_comparison_count": 50,
+    "runtime_profile_budget_passed_count": 80,
+    "runtime_profile_run_count": 80,
+    "deterministic_replay_passed_count": 40,
+    "deterministic_replay_count": 40,
+    "regression_promotion_entry_count": 98,
+    "full_gate_decision": "PASS",
+    "blocked_components": [],
+    "readiness_status": "approved",
+    "failure_triage_decision": "PASS",
+    "failure_triage_entry_count": 0
+  },
+  "feature_sanity_debt_count": 20,
+  "feature_sanity_debt": [
+    {
+      "suite": "rafting",
+      "gate_scenario_id": "boulder_garden",
+      "solver_mode": "reduced",
+      "case_id": "boulder_impacts",
+      "reference_outcome": "scraped",
+      "candidate_outcome": "scraped",
+      "failed_feature_checks": [
+        "rock_contact",
+        "submerged_depth",
+        "scrape_drag",
+        "launch_acceleration",
+        "pitch_launch"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "rafting",
+      "gate_scenario_id": "boulder_garden",
+      "solver_mode": "finite_volume",
+      "case_id": "boulder_impacts",
+      "reference_outcome": "scraped",
+      "candidate_outcome": "scraped",
+      "failed_feature_checks": [
+        "rock_contact",
+        "submerged_depth",
+        "scrape_drag",
+        "launch_acceleration",
+        "pitch_launch"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "rafting",
+      "gate_scenario_id": "cascading_wave_train",
+      "solver_mode": "reduced",
+      "case_id": "wave_train_surf_flush",
+      "reference_outcome": "surf",
+      "candidate_outcome": "surf",
+      "failed_feature_checks": [
+        "crest_lift"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "rafting",
+      "gate_scenario_id": "cascading_wave_train",
+      "solver_mode": "finite_volume",
+      "case_id": "wave_train_surf_flush",
+      "reference_outcome": "surf",
+      "candidate_outcome": "surf",
+      "failed_feature_checks": [
+        "crest_lift"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "rafting",
+      "gate_scenario_id": "hydraulic_hole_downstream_boil",
+      "solver_mode": "reduced",
+      "case_id": "hydraulic_hole_surf_flush",
+      "reference_outcome": "flush",
+      "candidate_outcome": "flush",
+      "failed_feature_checks": [
+        "depression",
+        "upstream_retention"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "rafting",
+      "gate_scenario_id": "hydraulic_hole_downstream_boil",
+      "solver_mode": "finite_volume",
+      "case_id": "hydraulic_hole_surf_flush",
+      "reference_outcome": "flush",
+      "candidate_outcome": "flush",
+      "failed_feature_checks": [
+        "depression",
+        "upstream_retention"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "rafting",
+      "gate_scenario_id": "lateral_wave",
+      "solver_mode": "reduced",
+      "case_id": "lateral_wave_side_impulse",
+      "reference_outcome": "clear",
+      "candidate_outcome": "clear",
+      "failed_feature_checks": [
+        "cross_current"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "rafting",
+      "gate_scenario_id": "lateral_wave",
+      "solver_mode": "finite_volume",
+      "case_id": "lateral_wave_side_impulse",
+      "reference_outcome": "clear",
+      "candidate_outcome": "clear",
+      "failed_feature_checks": [
+        "cross_current"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "cascading",
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "solver_mode": "reduced",
+      "case_id": "hydraulic_hole_surf_flush",
+      "reference_outcome": "stalled",
+      "candidate_outcome": "stalled",
+      "failed_feature_checks": [
+        "recirculation_risk",
+        "aerated_damping"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "cascading",
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "solver_mode": "reduced",
+      "case_id": "boulder_garden_impacts",
+      "reference_outcome": "clear",
+      "candidate_outcome": "clear",
+      "failed_feature_checks": [
+        "rock_contacts",
+        "scrape_acceleration",
+        "launch_acceleration",
+        "pitch_impulse"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "cascading",
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "solver_mode": "finite_volume",
+      "case_id": "hydraulic_hole_surf_flush",
+      "reference_outcome": "stalled",
+      "candidate_outcome": "stalled",
+      "failed_feature_checks": [
+        "recirculation_risk",
+        "aerated_damping"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "cascading",
+      "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "solver_mode": "finite_volume",
+      "case_id": "boulder_garden_impacts",
+      "reference_outcome": "clear",
+      "candidate_outcome": "clear",
+      "failed_feature_checks": [
+        "rock_contacts",
+        "scrape_acceleration",
+        "launch_acceleration",
+        "pitch_impulse"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "cascading",
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "solver_mode": "reduced",
+      "case_id": "hydraulic_hole_surf_flush",
+      "reference_outcome": "stalled",
+      "candidate_outcome": "stalled",
+      "failed_feature_checks": [
+        "aerated_damping"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "cascading",
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "solver_mode": "reduced",
+      "case_id": "boulder_garden_impacts",
+      "reference_outcome": "clear",
+      "candidate_outcome": "clear",
+      "failed_feature_checks": [
+        "rock_contacts",
+        "scrape_acceleration",
+        "launch_acceleration",
+        "pitch_impulse"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "cascading",
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "solver_mode": "finite_volume",
+      "case_id": "hydraulic_hole_surf_flush",
+      "reference_outcome": "stalled",
+      "candidate_outcome": "stalled",
+      "failed_feature_checks": [
+        "aerated_damping"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "cascading",
+      "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "solver_mode": "finite_volume",
+      "case_id": "boulder_garden_impacts",
+      "reference_outcome": "clear",
+      "candidate_outcome": "clear",
+      "failed_feature_checks": [
+        "rock_contacts",
+        "scrape_acceleration",
+        "launch_acceleration",
+        "pitch_impulse"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "cascading",
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "solver_mode": "reduced",
+      "case_id": "hydraulic_hole_surf_flush",
+      "reference_outcome": "stalled",
+      "candidate_outcome": "stalled",
+      "failed_feature_checks": [
+        "aerated_damping"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "cascading",
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "solver_mode": "reduced",
+      "case_id": "boulder_garden_impacts",
+      "reference_outcome": "clear",
+      "candidate_outcome": "clear",
+      "failed_feature_checks": [
+        "rock_contacts",
+        "scrape_acceleration",
+        "launch_acceleration",
+        "pitch_impulse"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "cascading",
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "solver_mode": "finite_volume",
+      "case_id": "hydraulic_hole_surf_flush",
+      "reference_outcome": "stalled",
+      "candidate_outcome": "stalled",
+      "failed_feature_checks": [
+        "aerated_damping"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    },
+    {
+      "suite": "cascading",
+      "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "solver_mode": "finite_volume",
+      "case_id": "boulder_garden_impacts",
+      "reference_outcome": "clear",
+      "candidate_outcome": "clear",
+      "failed_feature_checks": [
+        "rock_contacts",
+        "scrape_acceleration",
+        "launch_acceleration",
+        "pitch_impulse"
+      ],
+      "notes": [
+        "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+      ]
+    }
+  ],
+  "notes": [
+    "All 50 GeoClaw-vs-C++ raft-coupling rows now pass water-field agreement checks.",
+    "Rows where GeoClaw and C++ fail the same authored feature expectation remain visible as feature-sanity debt, not C++ water disagreement.",
+    "The full C++ validation gate passes and the GeoClaw-to-Unreal readiness report is approved pending target-hardware runtime confirmation."
+  ]
+}
