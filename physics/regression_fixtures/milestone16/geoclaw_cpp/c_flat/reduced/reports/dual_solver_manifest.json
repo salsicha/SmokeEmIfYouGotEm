@@ -4,7 +4,7 @@
     "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_flat/reduced/cpp_solver/flat_pool_seed_16/manifest.json",
     "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_flat/reduced/cpp_solver/flat_pool_seed_16",
     "returncode": 0,
-    "runtime_seconds": 0.2633535409986507,
+    "runtime_seconds": 0.2670485409980756,
     "stderr": "",
     "stdout": "",
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/c_flat/reduced/cpp_solver/flat_pool_seed_16/validation.json"
@@ -18,8 +18,8 @@
     "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/c_flat/normalized/validation.json"
   },
   "runtime": {
-    "cpp_runtime_seconds": 0.2633535409986507,
-    "cpp_seconds_per_simulated_second": 0.043892256833108455,
+    "cpp_runtime_seconds": 0.2670485409980756,
+    "cpp_seconds_per_simulated_second": 0.04450809016634594,
     "geoclaw_runtime_seconds": 1.0653290410009504,
     "geoclaw_seconds_per_simulated_second": 0.17755484016682507,
     "simulated_duration_seconds": 6.0

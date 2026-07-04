@@ -39,7 +39,7 @@ Comparison count: 40
 | real_world | south_fork_low_runnable | reduced | research_accepted | PASS | none | n/a |
 | real_world | south_fork_low_runnable | finite_volume | research_accepted | PASS | none | n/a |
 | real_world | south_fork_median_runnable | reduced | research_accepted | PASS | none | n/a |
-| real_world | south_fork_median_runnable | finite_volume | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, froude_delta, feature_location_delta, feature_strength_delta | n/a |
+| real_world | south_fork_median_runnable | finite_volume | research_accepted | PASS | none | n/a |
 | real_world | south_fork_high_runnable | reduced | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta | n/a |
 | real_world | south_fork_high_runnable | finite_volume | research_accepted | FAIL | field_linf, slope_linf, probe_linf, cross_section_linf, froude_delta, feature_location_delta | n/a |
 | cascading | south_fork_cascading_low_runnable | reduced | unreal_prototype | FAIL | field_linf, slope_linf, wet_mismatch_fraction, probe_linf, cross_section_linf, mass_drift_delta, energy_change_delta, froude_delta, feature_location_delta, feature_strength_delta | PASS |
