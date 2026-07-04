@@ -832,7 +832,7 @@ This milestone decides whether Unreal Chaos, Jolt, Chrono, or the custom reduced
 - [x] Build Unreal Chaos automation fixtures from `chaos_jolt_runtime_evaluation.json` and export matching telemetry/replay summaries.
 - [x] Build a native Jolt smoke harness or Unreal plugin path from the same fixture contract and export matching telemetry/replay summaries.
 - [x] Add a Chaos-vs-Jolt comparison report that ranks determinism, CPU cost, contact quality, outcome stability, swimmer state, and authoring/debug ergonomics.
-- [ ] Select the first authoritative raft/contact runtime for the vertical slice, or keep the custom reduced runtime fallback if neither Chaos nor Jolt passes.
+- [x] Select the first authoritative raft/contact runtime for the vertical slice, or keep the custom reduced runtime fallback if neither Chaos nor Jolt passes.
 
 ## Milestone 20: Unreal Production Foundation And Live Water Bridge
 
