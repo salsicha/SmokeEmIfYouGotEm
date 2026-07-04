@@ -1,0 +1,114 @@
+{
+  "schema": "raftsim.unreal.production_foundation.v1",
+  "engine": {
+    "engine_association": "5.8",
+    "version_lock_doc": "docs/unreal-engine-version-lock.md",
+    "project_policy": "text_first_until_unreal_editor_generates_binary_assets_intentionally"
+  },
+  "project": {
+    "uproject": "unreal/SmokeEmIfYouGotEm.uproject",
+    "primary_plugin": "unreal/Plugins/RaftSim/RaftSim.uplugin",
+    "accepted_water_report_manifest": "physics/reports/milestone20/report_set_lock.json"
+  },
+  "enabled_project_plugins": [
+    "EnhancedInput",
+    "OpenXR",
+    "OpenXRHandTracking",
+    "Niagara",
+    "PCG",
+    "Water",
+    "AudioGameplay",
+    "GeometryScripting",
+    "RaftSim"
+  ],
+  "module_boundaries": [
+    {
+      "domain": "core_game_data",
+      "modules": [
+        "RaftSimCore"
+      ],
+      "responsibility": "shared game types, versioning, deterministic ids, manifest schemas, and production data contracts"
+    },
+    {
+      "domain": "authoritative_water",
+      "modules": [
+        "RaftSimWater",
+        "RaftSimPhysics"
+      ],
+      "responsibility": "custom C++ live-water bridge, fixed-step stepping, report-manifest loading, water samples, and solver telemetry"
+    },
+    {
+      "domain": "river_geospatial_content",
+      "modules": [
+        "RaftSimRiver",
+        "RaftSimGeo"
+      ],
+      "responsibility": "river corridors, source manifests, coordinate transforms, reach-local grids, stitched validation outputs, and Unreal corridor packages"
+    },
+    {
+      "domain": "raft_contact_physics",
+      "modules": [
+        "RaftSimPhysics",
+        "RaftSimRaft"
+      ],
+      "responsibility": "selected raft/contact authority path, raft actors, patch sampling, contacts, and replayable physics telemetry"
+    },
+    {
+      "domain": "crew",
+      "modules": [
+        "RaftSimCrew",
+        "RaftSimAI"
+      ],
+      "responsibility": "crew safety state, swimming skill policy, command response, swimmer/rescue state, local AI voice hooks, and passenger personas"
+    },
+    {
+      "domain": "input",
+      "modules": [
+        "RaftSimInput"
+      ],
+      "responsibility": "Enhanced Input actions, VR/gamepad/keyboard mappings, command intents, and accessibility fallbacks"
+    },
+    {
+      "domain": "audio",
+      "modules": [
+        "RaftSimAudio"
+      ],
+      "responsibility": "interactive water audio, raft/crew cues, spatial presets, audio source manifests, and runtime audio telemetry"
+    },
+    {
+      "domain": "ui",
+      "modules": [
+        "RaftSimUI"
+      ],
+      "responsibility": "menus, river selection, replay, scoring, settings, and player-facing debug view models"
+    },
+    {
+      "domain": "debug",
+      "modules": [
+        "RaftSimDebug"
+      ],
+      "responsibility": "physics, water, river, audio, AI, replay, validation, and runtime-budget overlays"
+    },
+    {
+      "domain": "automation",
+      "modules": [
+        "RaftSimAutomation"
+      ],
+      "responsibility": "Unreal automation manifests, regression fixture imports, live-water smoke tests, and accepted-report evidence checks"
+    },
+    {
+      "domain": "network",
+      "modules": [
+        "RaftSimNetwork"
+      ],
+      "responsibility": "future multiplayer sessions, replication, latency prediction, spatial voice, scoring contracts, and network telemetry"
+    }
+  ],
+  "production_rules": [
+    "RaftSimWater remains authoritative for live water and consumes the Milestone 20 report-set lock until a newer accepted lock supersedes it.",
+    "RaftSimPhysics owns raft/contact authority only through the selected runtime path recorded by Milestone 19.",
+    "RaftSimGeo and RaftSimRiver must preserve source provenance, CRS metadata, reach-local ghost-zone metadata, and stitched whole-window validation outputs.",
+    "RaftSimAutomation must compare Unreal live/replayed fields against accepted C++ outputs before a milestone gate can close.",
+    "Editor-generated binary assets stay out of source control until intentionally created and reviewed."
+  ]
+}

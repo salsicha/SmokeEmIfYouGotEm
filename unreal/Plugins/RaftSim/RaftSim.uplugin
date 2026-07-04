@@ -21,7 +21,17 @@
       "LoadingPhase": "Default"
     },
     {
+      "Name": "RaftSimWater",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
       "Name": "RaftSimRiver",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "RaftSimGeo",
       "Type": "Runtime",
       "LoadingPhase": "Default"
     },
@@ -51,8 +61,18 @@
       "LoadingPhase": "Default"
     },
     {
+      "Name": "RaftSimCrew",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
       "Name": "RaftSimAudio",
       "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "RaftSimAutomation",
+      "Type": "DeveloperTool",
       "LoadingPhase": "Default"
     },
     {

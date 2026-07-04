@@ -4,6 +4,8 @@ This directory contains the UE 5.8 source-controlled project shell for the full 
 
 The local workstation used for this scaffolding does not currently have Unreal Editor installed, so this project is text-first: `.uproject`, C++ targets, module build rules, config, manifests, and source skeletons are committed for later editor generation and compilation.
 
+Milestone 20 production foundation state is recorded in `Content/RaftSim/Production/production_foundation.json`. That manifest binds the UE 5.8 project lock, enabled project plugins, `RaftSim` module boundaries, and accepted Milestone 20 water report-set lock before live-water integration code is treated as production work.
+
 ## Open In Unreal
 
 1. Install Unreal Engine 5.8.
