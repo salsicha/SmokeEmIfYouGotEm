@@ -462,6 +462,29 @@
       "suite": "rafting"
     },
     {
+      "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
+      "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced",
+      "artifact_id": "geoclaw_cpp/hydraulic_hole_downstream_boil/reduced",
+      "case_id": null,
+      "category": "geoclaw_cpp",
+      "gate_scenario_id": "hydraulic_hole_downstream_boil",
+      "manifest": "regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/dual_solver_manifest.json",
+      "notes": [],
+      "passed": true,
+      "reports": {
+        "diagnostic_comparison": "regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/diagnostic_comparison.json",
+        "dual_solver_manifest": "regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/dual_solver_manifest.json",
+        "feature_comparison": "regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/feature_comparison.json",
+        "field_comparison": "regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/field_comparison.json",
+        "probe_comparison": "regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/probe_comparison.json",
+        "threshold_evaluation": "regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/reports/threshold_evaluation.json"
+      },
+      "scenario_package": "regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced/scenario",
+      "solver_mode": "reduced",
+      "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
+      "suite": "rafting"
+    },
+    {
       "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
       "artifact_dir": "regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume",
       "artifact_id": "geoclaw_cpp/south_fork_cascading_low_runnable/finite_volume",
@@ -689,6 +712,26 @@
       "solver_mode": "geoclaw_package",
       "source_report": "reports/milestone16/geometry_validation.json",
       "suite": "cascading"
+    },
+    {
+      "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
+      "artifact_dir": "regression_fixtures/milestone16/raft_coupling/r_hole/reduced/downstream_boil_recovery",
+      "artifact_id": "raft_coupling/hydraulic_hole_downstream_boil/reduced/downstream_boil_recovery",
+      "case_id": "downstream_boil_recovery",
+      "category": "raft_coupling",
+      "gate_scenario_id": "hydraulic_hole_downstream_boil",
+      "manifest": "regression_fixtures/milestone16/raft_coupling/r_hole/reduced/downstream_boil_recovery/raft_coupling_case.json",
+      "notes": [
+        "Frame paths remain in generated Milestone 16 output directories."
+      ],
+      "passed": true,
+      "reports": {
+        "raft_coupling_case": "regression_fixtures/milestone16/raft_coupling/r_hole/reduced/downstream_boil_recovery/raft_coupling_case.json"
+      },
+      "scenario_package": null,
+      "solver_mode": "reduced",
+      "source_report": "reports/milestone16/raft_coupling_validation.json",
+      "suite": "rafting"
     },
     {
       "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
@@ -991,9 +1034,9 @@
       "suite": "cascading"
     }
   ],
-  "entry_count": 46,
+  "entry_count": 48,
   "fixture_root": "regression_fixtures/milestone16",
-  "geoclaw_cpp_fixture_count": 23,
+  "geoclaw_cpp_fixture_count": 24,
   "geometry_artifact_count": 8,
   "geometry_validation_report": "reports/milestone16/geometry_validation.json",
   "notes": [
@@ -1002,7 +1045,7 @@
     "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs."
   ],
   "passed": true,
-  "raft_artifact_count": 15,
+  "raft_artifact_count": 16,
   "raft_coupling_report": "reports/milestone16/raft_coupling_validation.json",
   "registry_path": "regression_fixtures/milestone16/registry.json",
   "schema_version": "raftsim.milestone16.regression_promotion.v0"

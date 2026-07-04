@@ -4,7 +4,7 @@ Schema: `raftsim.milestone16.regression_promotion.v0`
 
 Decision: **PASS**
 
-Promoted entries: 46
+Promoted entries: 48
 
 | Category | Gate scenario | Mode | Case | Artifact |
 | --- | --- | --- | --- | --- |
@@ -28,6 +28,7 @@ Promoted entries: 46
 | geoclaw_cpp | boulder_garden | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/r_boulder/finite_volume |
 | geoclaw_cpp | cascading_wave_train | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/r_waves/reduced |
 | geoclaw_cpp | cascading_wave_train | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/r_waves/finite_volume |
+| geoclaw_cpp | hydraulic_hole_downstream_boil | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/r_hole/reduced |
 | geoclaw_cpp | south_fork_cascading_low_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume |
 | geoclaw_cpp | south_fork_cascading_median_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume |
 | geoclaw_cpp | south_fork_cascading_high_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume |
@@ -39,6 +40,7 @@ Promoted entries: 46
 | geometry_validation | south_fork_cascading_low_runnable | geoclaw_package | stitched_reach_drop_handoffs | regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_low |
 | geometry_validation | south_fork_cascading_median_runnable | geoclaw_package | stitched_reach_drop_handoffs | regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_med |
 | geometry_validation | south_fork_cascading_high_runnable | geoclaw_package | stitched_reach_drop_handoffs | regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_high |
+| raft_coupling | hydraulic_hole_downstream_boil | reduced | downstream_boil_recovery | regression_fixtures/milestone16/raft_coupling/r_hole/reduced/downstream_boil_recovery |
 | raft_coupling | hydraulic_hole_downstream_boil | finite_volume | downstream_boil_recovery | regression_fixtures/milestone16/raft_coupling/r_hole/finite_volume/downstream_boil_recovery |
 | raft_coupling | eddy_line_shear | reduced | eddy_recovery | regression_fixtures/milestone16/raft_coupling/r_eddy/reduced/eddy_recovery |
 | raft_coupling | shallow_shelf | reduced | shallow_shelf_pivot_release | regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release |
