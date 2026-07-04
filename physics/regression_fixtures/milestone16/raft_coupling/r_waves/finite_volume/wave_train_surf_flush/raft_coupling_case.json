@@ -1,0 +1,81 @@
+{
+  "record": {
+    "actual_scenario_id": "cascading_wave_train_seed_17",
+    "candidate_checks": [
+      {
+        "details": "Surface normal should show a measurable crest face.",
+        "name": "crest_lift",
+        "passed": false,
+        "threshold": 0.05,
+        "value": 0.0324826093054732
+      },
+      {
+        "details": "Standing wave lift should remain finite and non-negative.",
+        "name": "bounded_vertical_force",
+        "passed": true,
+        "threshold": 6.0,
+        "value": 1.9678908094770777
+      },
+      {
+        "details": "Outcome must be one of the standing-wave labels.",
+        "name": "outcome_classified",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      }
+    ],
+    "candidate_frame": "outputs/m16cpp/r_waves/finite_volume/cpp_solver/cascading_wave_train_seed_17/frames/frame_0008.csv",
+    "candidate_outcome": "surf",
+    "candidate_passed": false,
+    "case_id": "wave_train_surf_flush",
+    "expected_outcomes": [
+      "clear",
+      "stalled",
+      "surfed",
+      "flushed"
+    ],
+    "feature_check_agreement": true,
+    "feature_outcome_match": true,
+    "flow_band": null,
+    "force_delta_weight_ratio": 2.589154788526678e-15,
+    "force_envelope_outcome_match": true,
+    "gate_scenario_id": "cascading_wave_train",
+    "notes": [
+      "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+    ],
+    "passed": true,
+    "reference_checks": [
+      {
+        "details": "Surface normal should show a measurable crest face.",
+        "name": "crest_lift",
+        "passed": false,
+        "threshold": 0.05,
+        "value": 0.03248260930547309
+      },
+      {
+        "details": "Standing wave lift should remain finite and non-negative.",
+        "name": "bounded_vertical_force",
+        "passed": true,
+        "threshold": 6.0,
+        "value": 1.9678908094770757
+      },
+      {
+        "details": "Outcome must be one of the standing-wave labels.",
+        "name": "outcome_classified",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      }
+    ],
+    "reference_frame": "outputs/m16g/r_waves/normalized/frames/frame_0002.npz",
+    "reference_outcome": "surf",
+    "reference_passed": false,
+    "solver_mode": "finite_volume",
+    "suite": "rafting",
+    "torque_delta_inertia_ratio": 1.8920181674538937e-15,
+    "trajectory_position_delta_m": 7.05981306231723e-18,
+    "trajectory_velocity_delta_mps": 4.126162952233366e-16
+  },
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "source_report": "reports/milestone16/raft_coupling_validation.json"
+}

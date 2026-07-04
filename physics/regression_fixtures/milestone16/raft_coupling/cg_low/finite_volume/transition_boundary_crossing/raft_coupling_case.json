@@ -45,6 +45,7 @@
     "expected_outcomes": [
       "flushed"
     ],
+    "feature_check_agreement": true,
     "feature_outcome_match": true,
     "flow_band": "low_runnable",
     "force_delta_weight_ratio": 4.7066199590694415e-09,

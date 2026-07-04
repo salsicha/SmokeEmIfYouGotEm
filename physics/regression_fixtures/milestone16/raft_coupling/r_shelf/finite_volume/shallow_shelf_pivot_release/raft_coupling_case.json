@@ -39,6 +39,7 @@
       "grounded",
       "pinned"
     ],
+    "feature_check_agreement": true,
     "feature_outcome_match": true,
     "flow_band": null,
     "force_delta_weight_ratio": 8.825345551476705e-08,

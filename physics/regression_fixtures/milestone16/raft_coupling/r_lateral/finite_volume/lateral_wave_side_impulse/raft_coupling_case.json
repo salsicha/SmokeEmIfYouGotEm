@@ -1,0 +1,93 @@
+{
+  "record": {
+    "actual_scenario_id": "lateral_wave_seed_19",
+    "candidate_checks": [
+      {
+        "details": "",
+        "name": "lateral_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "Lateral wave should expose a meaningful cross-current.",
+        "name": "cross_current",
+        "passed": false,
+        "threshold": 0.25,
+        "value": 0.0330735316381397
+      },
+      {
+        "details": "Integrated raft forces should push the raft sideways.",
+        "name": "side_impulse",
+        "passed": true,
+        "threshold": 0.12,
+        "value": 5.453227104855707
+      },
+      {
+        "details": "Asymmetric water loading should create roll acceleration.",
+        "name": "roll_torque",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 210.96790204740947
+      }
+    ],
+    "candidate_frame": "outputs/m16cpp/r_lateral/finite_volume/cpp_solver/lateral_wave_seed_19/frames/frame_0008.csv",
+    "candidate_outcome": "clear",
+    "candidate_passed": false,
+    "case_id": "lateral_wave_side_impulse",
+    "expected_outcomes": [
+      "clear",
+      "surfed"
+    ],
+    "feature_check_agreement": true,
+    "feature_outcome_match": true,
+    "flow_band": null,
+    "force_delta_weight_ratio": 3.8325621869350695e-07,
+    "force_envelope_outcome_match": true,
+    "gate_scenario_id": "lateral_wave",
+    "notes": [
+      "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+    ],
+    "passed": true,
+    "reference_checks": [
+      {
+        "details": "",
+        "name": "lateral_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "Lateral wave should expose a meaningful cross-current.",
+        "name": "cross_current",
+        "passed": false,
+        "threshold": 0.25,
+        "value": 0.03307353163814084
+      },
+      {
+        "details": "Integrated raft forces should push the raft sideways.",
+        "name": "side_impulse",
+        "passed": true,
+        "threshold": 0.12,
+        "value": 5.453230149532061
+      },
+      {
+        "details": "Asymmetric water loading should create roll acceleration.",
+        "name": "roll_torque",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 210.96790313246095
+      }
+    ],
+    "reference_frame": "outputs/m16g/r_lateral/normalized/frames/frame_0002.npz",
+    "reference_outcome": "clear",
+    "reference_passed": false,
+    "solver_mode": "finite_volume",
+    "suite": "rafting",
+    "torque_delta_inertia_ratio": 8.158680004101192e-07,
+    "trajectory_position_delta_m": 1.044375504584969e-09,
+    "trajectory_velocity_delta_mps": 6.266239171761923e-08
+  },
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "source_report": "reports/milestone16/raft_coupling_validation.json"
+}

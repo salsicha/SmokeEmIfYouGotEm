@@ -4,7 +4,7 @@ Schema: `raftsim.milestone16.regression_promotion.v0`
 
 Decision: **PASS**
 
-Promoted entries: 78
+Promoted entries: 98
 
 | Category | Gate scenario | Mode | Case | Artifact |
 | --- | --- | --- | --- | --- |
@@ -56,35 +56,55 @@ Promoted entries: 78
 | geometry_validation | south_fork_cascading_low_runnable | geoclaw_package | stitched_reach_drop_handoffs | regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_low |
 | geometry_validation | south_fork_cascading_median_runnable | geoclaw_package | stitched_reach_drop_handoffs | regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_med |
 | geometry_validation | south_fork_cascading_high_runnable | geoclaw_package | stitched_reach_drop_handoffs | regression_fixtures/milestone16/geometry_validation/stitched_reach_drop_handoffs/cg_high |
+| raft_coupling | boulder_garden | reduced | boulder_impacts | regression_fixtures/milestone16/raft_coupling/r_boulder/reduced/boulder_impacts |
+| raft_coupling | boulder_garden | finite_volume | boulder_impacts | regression_fixtures/milestone16/raft_coupling/r_boulder/finite_volume/boulder_impacts |
+| raft_coupling | cascading_wave_train | reduced | wave_train_surf_flush | regression_fixtures/milestone16/raft_coupling/r_waves/reduced/wave_train_surf_flush |
+| raft_coupling | cascading_wave_train | finite_volume | wave_train_surf_flush | regression_fixtures/milestone16/raft_coupling/r_waves/finite_volume/wave_train_surf_flush |
+| raft_coupling | hydraulic_hole_downstream_boil | reduced | hydraulic_hole_surf_flush | regression_fixtures/milestone16/raft_coupling/r_hole/reduced/hydraulic_hole_surf_flush |
 | raft_coupling | hydraulic_hole_downstream_boil | reduced | downstream_boil_recovery | regression_fixtures/milestone16/raft_coupling/r_hole/reduced/downstream_boil_recovery |
+| raft_coupling | hydraulic_hole_downstream_boil | finite_volume | hydraulic_hole_surf_flush | regression_fixtures/milestone16/raft_coupling/r_hole/finite_volume/hydraulic_hole_surf_flush |
 | raft_coupling | hydraulic_hole_downstream_boil | finite_volume | downstream_boil_recovery | regression_fixtures/milestone16/raft_coupling/r_hole/finite_volume/downstream_boil_recovery |
+| raft_coupling | lateral_wave | reduced | lateral_wave_side_impulse | regression_fixtures/milestone16/raft_coupling/r_lateral/reduced/lateral_wave_side_impulse |
+| raft_coupling | lateral_wave | finite_volume | lateral_wave_side_impulse | regression_fixtures/milestone16/raft_coupling/r_lateral/finite_volume/lateral_wave_side_impulse |
 | raft_coupling | eddy_line_shear | reduced | eddy_recovery | regression_fixtures/milestone16/raft_coupling/r_eddy/reduced/eddy_recovery |
 | raft_coupling | eddy_line_shear | finite_volume | eddy_recovery | regression_fixtures/milestone16/raft_coupling/r_eddy/finite_volume/eddy_recovery |
 | raft_coupling | shallow_shelf | reduced | shallow_shelf_pivot_release | regression_fixtures/milestone16/raft_coupling/r_shelf/reduced/shallow_shelf_pivot_release |
 | raft_coupling | shallow_shelf | finite_volume | shallow_shelf_pivot_release | regression_fixtures/milestone16/raft_coupling/r_shelf/finite_volume/shallow_shelf_pivot_release |
 | raft_coupling | south_fork_cascading_low_runnable | reduced | pool_entry | regression_fixtures/milestone16/raft_coupling/cg_low/reduced/pool_entry |
 | raft_coupling | south_fork_cascading_low_runnable | reduced | drop_entry | regression_fixtures/milestone16/raft_coupling/cg_low/reduced/drop_entry |
+| raft_coupling | south_fork_cascading_low_runnable | reduced | hydraulic_hole_surf_flush | regression_fixtures/milestone16/raft_coupling/cg_low/reduced/hydraulic_hole_surf_flush |
 | raft_coupling | south_fork_cascading_low_runnable | reduced | eddy_recovery | regression_fixtures/milestone16/raft_coupling/cg_low/reduced/eddy_recovery |
+| raft_coupling | south_fork_cascading_low_runnable | reduced | boulder_garden_impacts | regression_fixtures/milestone16/raft_coupling/cg_low/reduced/boulder_garden_impacts |
 | raft_coupling | south_fork_cascading_low_runnable | reduced | transition_boundary_crossing | regression_fixtures/milestone16/raft_coupling/cg_low/reduced/transition_boundary_crossing |
 | raft_coupling | south_fork_cascading_low_runnable | finite_volume | pool_entry | regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/pool_entry |
 | raft_coupling | south_fork_cascading_low_runnable | finite_volume | drop_entry | regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/drop_entry |
+| raft_coupling | south_fork_cascading_low_runnable | finite_volume | hydraulic_hole_surf_flush | regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/hydraulic_hole_surf_flush |
 | raft_coupling | south_fork_cascading_low_runnable | finite_volume | eddy_recovery | regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/eddy_recovery |
+| raft_coupling | south_fork_cascading_low_runnable | finite_volume | boulder_garden_impacts | regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/boulder_garden_impacts |
 | raft_coupling | south_fork_cascading_low_runnable | finite_volume | transition_boundary_crossing | regression_fixtures/milestone16/raft_coupling/cg_low/finite_volume/transition_boundary_crossing |
 | raft_coupling | south_fork_cascading_median_runnable | reduced | pool_entry | regression_fixtures/milestone16/raft_coupling/cg_med/reduced/pool_entry |
 | raft_coupling | south_fork_cascading_median_runnable | reduced | drop_entry | regression_fixtures/milestone16/raft_coupling/cg_med/reduced/drop_entry |
+| raft_coupling | south_fork_cascading_median_runnable | reduced | hydraulic_hole_surf_flush | regression_fixtures/milestone16/raft_coupling/cg_med/reduced/hydraulic_hole_surf_flush |
 | raft_coupling | south_fork_cascading_median_runnable | reduced | eddy_recovery | regression_fixtures/milestone16/raft_coupling/cg_med/reduced/eddy_recovery |
+| raft_coupling | south_fork_cascading_median_runnable | reduced | boulder_garden_impacts | regression_fixtures/milestone16/raft_coupling/cg_med/reduced/boulder_garden_impacts |
 | raft_coupling | south_fork_cascading_median_runnable | reduced | transition_boundary_crossing | regression_fixtures/milestone16/raft_coupling/cg_med/reduced/transition_boundary_crossing |
 | raft_coupling | south_fork_cascading_median_runnable | finite_volume | pool_entry | regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/pool_entry |
 | raft_coupling | south_fork_cascading_median_runnable | finite_volume | drop_entry | regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/drop_entry |
+| raft_coupling | south_fork_cascading_median_runnable | finite_volume | hydraulic_hole_surf_flush | regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/hydraulic_hole_surf_flush |
 | raft_coupling | south_fork_cascading_median_runnable | finite_volume | eddy_recovery | regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/eddy_recovery |
+| raft_coupling | south_fork_cascading_median_runnable | finite_volume | boulder_garden_impacts | regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/boulder_garden_impacts |
 | raft_coupling | south_fork_cascading_median_runnable | finite_volume | transition_boundary_crossing | regression_fixtures/milestone16/raft_coupling/cg_med/finite_volume/transition_boundary_crossing |
 | raft_coupling | south_fork_cascading_high_runnable | reduced | pool_entry | regression_fixtures/milestone16/raft_coupling/cg_high/reduced/pool_entry |
 | raft_coupling | south_fork_cascading_high_runnable | reduced | drop_entry | regression_fixtures/milestone16/raft_coupling/cg_high/reduced/drop_entry |
+| raft_coupling | south_fork_cascading_high_runnable | reduced | hydraulic_hole_surf_flush | regression_fixtures/milestone16/raft_coupling/cg_high/reduced/hydraulic_hole_surf_flush |
 | raft_coupling | south_fork_cascading_high_runnable | reduced | eddy_recovery | regression_fixtures/milestone16/raft_coupling/cg_high/reduced/eddy_recovery |
+| raft_coupling | south_fork_cascading_high_runnable | reduced | boulder_garden_impacts | regression_fixtures/milestone16/raft_coupling/cg_high/reduced/boulder_garden_impacts |
 | raft_coupling | south_fork_cascading_high_runnable | reduced | transition_boundary_crossing | regression_fixtures/milestone16/raft_coupling/cg_high/reduced/transition_boundary_crossing |
 | raft_coupling | south_fork_cascading_high_runnable | finite_volume | pool_entry | regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/pool_entry |
 | raft_coupling | south_fork_cascading_high_runnable | finite_volume | drop_entry | regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/drop_entry |
+| raft_coupling | south_fork_cascading_high_runnable | finite_volume | hydraulic_hole_surf_flush | regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/hydraulic_hole_surf_flush |
 | raft_coupling | south_fork_cascading_high_runnable | finite_volume | eddy_recovery | regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/eddy_recovery |
+| raft_coupling | south_fork_cascading_high_runnable | finite_volume | boulder_garden_impacts | regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/boulder_garden_impacts |
 | raft_coupling | south_fork_cascading_high_runnable | finite_volume | transition_boundary_crossing | regression_fixtures/milestone16/raft_coupling/cg_high/finite_volume/transition_boundary_crossing |
 
 ## Notes

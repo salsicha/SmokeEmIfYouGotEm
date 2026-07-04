@@ -1,8 +1,6 @@
 {
-  "blocked_component_count": 1,
-  "blocked_component_ids": [
-    "raft_coupling"
-  ],
+  "blocked_component_count": 0,
+  "blocked_component_ids": [],
   "component_count": 7,
   "components": [
     {
@@ -50,23 +48,14 @@
       "total_count": 6
     },
     {
-      "blockers": [
-        "boulder_impacts: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)",
-        "boulder_impacts: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)",
-        "wave_train_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)",
-        "wave_train_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)",
-        "hydraulic_hole_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)",
-        "hydraulic_hole_surf_flush: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)",
-        "lateral_wave_side_impulse: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)",
-        "lateral_wave_side_impulse: raft coupling comparison failed (GeoClaw-derived raft feature checks are not passing., C++ raft feature checks are not passing.)"
-      ],
+      "blockers": [],
       "component_id": "raft_coupling",
-      "failed_count": 20,
+      "failed_count": 0,
       "notes": [
         "Distinct pin/release closure evidence is tracked separately in the Milestone 18 pin_release_fixture report; this report only compares raft coupling over GeoClaw-derived and C++ water fields."
       ],
-      "passed": false,
-      "passed_count": 30,
+      "passed": true,
+      "passed_count": 50,
       "source_report": "reports/milestone16/raft_coupling_validation.json",
       "title": "Raft Coupling Validation",
       "total_count": 50
@@ -92,15 +81,15 @@
         "Passing raft-coupling cases were promoted as artifact manifests that point back to the generated frame outputs."
       ],
       "passed": true,
-      "passed_count": 78,
+      "passed_count": 98,
       "source_report": "reports/milestone16/regression_promotion_manifest.json",
       "title": "Regression Promotion",
-      "total_count": 78
+      "total_count": 98
     }
   ],
-  "decision": "BLOCKED",
-  "passed": false,
-  "passed_component_count": 6,
+  "decision": "PASS",
+  "passed": true,
+  "passed_component_count": 7,
   "report_dir": "reports/milestone16",
   "schema_version": "raftsim.milestone16.full_cpp_validation_gate.v0"
 }

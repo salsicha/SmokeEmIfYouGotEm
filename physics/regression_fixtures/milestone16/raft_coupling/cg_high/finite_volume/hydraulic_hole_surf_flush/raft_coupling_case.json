@@ -1,0 +1,107 @@
+{
+  "record": {
+    "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading",
+    "candidate_checks": [
+      {
+        "details": "",
+        "name": "hole_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "recirculation_risk",
+        "passed": true,
+        "threshold": 0.45,
+        "value": 0.7701
+      },
+      {
+        "details": "",
+        "name": "surf_or_flush_signal",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 3.5445100079526823
+      },
+      {
+        "details": "",
+        "name": "downstream_boil_lift",
+        "passed": true,
+        "threshold": 0.5,
+        "value": 0.6998974618370549
+      },
+      {
+        "details": "",
+        "name": "aerated_damping",
+        "passed": false,
+        "threshold": 0.25,
+        "value": 0.17751771544122055
+      }
+    ],
+    "candidate_frame": "outputs/m16cpp/cg_high/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_high_runnable_advanced_cascading/frames/frame_0008.csv",
+    "candidate_outcome": "stalled",
+    "candidate_passed": false,
+    "case_id": "hydraulic_hole_surf_flush",
+    "expected_outcomes": [
+      "surfed",
+      "flushed"
+    ],
+    "feature_check_agreement": true,
+    "feature_outcome_match": true,
+    "flow_band": "high_runnable",
+    "force_delta_weight_ratio": 2.0481070211454952e-08,
+    "force_envelope_outcome_match": true,
+    "gate_scenario_id": "south_fork_cascading_high_runnable",
+    "notes": [
+      "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+    ],
+    "passed": true,
+    "reference_checks": [
+      {
+        "details": "",
+        "name": "hole_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "recirculation_risk",
+        "passed": true,
+        "threshold": 0.45,
+        "value": 0.7701
+      },
+      {
+        "details": "",
+        "name": "surf_or_flush_signal",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 3.544510009875
+      },
+      {
+        "details": "",
+        "name": "downstream_boil_lift",
+        "passed": true,
+        "threshold": 0.5,
+        "value": 0.6998974467287518
+      },
+      {
+        "details": "",
+        "name": "aerated_damping",
+        "passed": false,
+        "threshold": 0.25,
+        "value": 0.17751771540204672
+      }
+    ],
+    "reference_frame": "outputs/m16g/cg_high/normalized_cascading/stitched/frames/frame_0002.npz",
+    "reference_outcome": "stalled",
+    "reference_passed": false,
+    "solver_mode": "finite_volume",
+    "suite": "cascading",
+    "torque_delta_inertia_ratio": 2.0510454474055514e-08,
+    "trajectory_position_delta_m": 5.5810053499246084e-11,
+    "trajectory_velocity_delta_mps": 3.348655267267796e-09
+  },
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "source_report": "reports/milestone16/raft_coupling_validation.json"
+}

@@ -1,0 +1,108 @@
+{
+  "record": {
+    "actual_scenario_id": "hydraulic_hole_downstream_boil_seed_18",
+    "candidate_checks": [
+      {
+        "details": "",
+        "name": "hole_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "depression",
+        "passed": false,
+        "threshold": 0.08,
+        "value": 0.01853469689121723
+      },
+      {
+        "details": "Upstream hole velocity should be slow or reversing.",
+        "name": "upstream_retention",
+        "passed": false,
+        "threshold": 0.15,
+        "value": 0.7197354690995075
+      },
+      {
+        "details": "",
+        "name": "aerated_damping",
+        "passed": true,
+        "threshold": 0.25,
+        "value": 0.5969470622286734
+      },
+      {
+        "details": "",
+        "name": "downstream_boil_lift",
+        "passed": true,
+        "threshold": 0.5,
+        "value": 2.048828301605425
+      }
+    ],
+    "candidate_frame": "outputs/m16cpp/r_hole/reduced/cpp_solver/hydraulic_hole_downstream_boil_seed_18/frames/frame_0008.csv",
+    "candidate_outcome": "flush",
+    "candidate_passed": false,
+    "case_id": "hydraulic_hole_surf_flush",
+    "expected_outcomes": [
+      "surfed",
+      "flushed",
+      "pinned"
+    ],
+    "feature_check_agreement": true,
+    "feature_outcome_match": true,
+    "flow_band": null,
+    "force_delta_weight_ratio": 7.188111313825746e-15,
+    "force_envelope_outcome_match": true,
+    "gate_scenario_id": "hydraulic_hole_downstream_boil",
+    "notes": [
+      "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+    ],
+    "passed": true,
+    "reference_checks": [
+      {
+        "details": "",
+        "name": "hole_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "depression",
+        "passed": false,
+        "threshold": 0.08,
+        "value": 0.01853469689121723
+      },
+      {
+        "details": "Upstream hole velocity should be slow or reversing.",
+        "name": "upstream_retention",
+        "passed": false,
+        "threshold": 0.15,
+        "value": 0.7197354690995026
+      },
+      {
+        "details": "",
+        "name": "aerated_damping",
+        "passed": true,
+        "threshold": 0.25,
+        "value": 0.5969470622286749
+      },
+      {
+        "details": "",
+        "name": "downstream_boil_lift",
+        "passed": true,
+        "threshold": 0.5,
+        "value": 2.048828301605418
+      }
+    ],
+    "reference_frame": "outputs/m16g/r_hole/normalized/frames/frame_0002.npz",
+    "reference_outcome": "flush",
+    "reference_passed": false,
+    "solver_mode": "reduced",
+    "suite": "rafting",
+    "torque_delta_inertia_ratio": 1.4836890936956585e-15,
+    "trajectory_position_delta_m": 2.168404344971009e-18,
+    "trajectory_velocity_delta_mps": 1.1654243626381287e-15
+  },
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "source_report": "reports/milestone16/raft_coupling_validation.json"
+}

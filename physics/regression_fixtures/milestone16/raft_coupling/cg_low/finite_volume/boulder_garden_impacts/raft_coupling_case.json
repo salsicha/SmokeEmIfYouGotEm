@@ -1,0 +1,120 @@
+{
+  "record": {
+    "actual_scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading",
+    "candidate_checks": [
+      {
+        "details": "",
+        "name": "rock_feature_count",
+        "passed": true,
+        "threshold": 3.0,
+        "value": 6.0
+      },
+      {
+        "details": "",
+        "name": "rock_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "rock_contacts",
+        "passed": false,
+        "threshold": 1.0,
+        "value": 0.0
+      },
+      {
+        "details": "",
+        "name": "scrape_acceleration",
+        "passed": false,
+        "threshold": 0.2,
+        "value": 0.0
+      },
+      {
+        "details": "",
+        "name": "launch_acceleration",
+        "passed": false,
+        "threshold": 0.2,
+        "value": 0.0
+      },
+      {
+        "details": "",
+        "name": "pitch_impulse",
+        "passed": false,
+        "threshold": 0.05,
+        "value": 0.0
+      }
+    ],
+    "candidate_frame": "outputs/m16cpp/cg_low/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_low_runnable_beginner_cascading/frames/frame_0008.csv",
+    "candidate_outcome": "clear",
+    "candidate_passed": false,
+    "case_id": "boulder_garden_impacts",
+    "expected_outcomes": [
+      "grounded"
+    ],
+    "feature_check_agreement": true,
+    "feature_outcome_match": true,
+    "flow_band": "low_runnable",
+    "force_delta_weight_ratio": 2.1709136854528794e-09,
+    "force_envelope_outcome_match": true,
+    "gate_scenario_id": "south_fork_cascading_low_runnable",
+    "notes": [
+      "GeoClaw-derived and C++ raft feature checks fail the same authored expectation; tracked as non-blocking feature-sanity debt for this agreement gate."
+    ],
+    "passed": true,
+    "reference_checks": [
+      {
+        "details": "",
+        "name": "rock_feature_count",
+        "passed": true,
+        "threshold": 3.0,
+        "value": 6.0
+      },
+      {
+        "details": "",
+        "name": "rock_tag",
+        "passed": true,
+        "threshold": 1.0,
+        "value": 1.0
+      },
+      {
+        "details": "",
+        "name": "rock_contacts",
+        "passed": false,
+        "threshold": 1.0,
+        "value": 0.0
+      },
+      {
+        "details": "",
+        "name": "scrape_acceleration",
+        "passed": false,
+        "threshold": 0.2,
+        "value": 0.0
+      },
+      {
+        "details": "",
+        "name": "launch_acceleration",
+        "passed": false,
+        "threshold": 0.2,
+        "value": 0.0
+      },
+      {
+        "details": "",
+        "name": "pitch_impulse",
+        "passed": false,
+        "threshold": 0.05,
+        "value": 0.0
+      }
+    ],
+    "reference_frame": "outputs/m16g/cg_low/normalized_cascading/stitched/frames/frame_0002.npz",
+    "reference_outcome": "clear",
+    "reference_passed": false,
+    "solver_mode": "finite_volume",
+    "suite": "cascading",
+    "torque_delta_inertia_ratio": 1.593771168886362e-08,
+    "trajectory_position_delta_m": 5.90888638481579e-12,
+    "trajectory_velocity_delta_mps": 3.549444983008435e-10
+  },
+  "schema_version": "raftsim.milestone16.regression_registry.v0",
+  "source_report": "reports/milestone16/raft_coupling_validation.json"
+}
