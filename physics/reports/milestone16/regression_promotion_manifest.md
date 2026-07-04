@@ -4,7 +4,7 @@ Schema: `raftsim.milestone16.regression_promotion.v0`
 
 Decision: **PASS**
 
-Promoted entries: 51
+Promoted entries: 52
 
 | Category | Gate scenario | Mode | Case | Artifact |
 | --- | --- | --- | --- | --- |
@@ -32,6 +32,7 @@ Promoted entries: 51
 | geoclaw_cpp | hydraulic_hole_downstream_boil | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/r_hole/finite_volume |
 | geoclaw_cpp | lateral_wave | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/r_lateral/reduced |
 | geoclaw_cpp | lateral_wave | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/r_lateral/finite_volume |
+| geoclaw_cpp | eddy_line_shear | reduced | n/a | regression_fixtures/milestone16/geoclaw_cpp/r_eddy/reduced |
 | geoclaw_cpp | south_fork_cascading_low_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume |
 | geoclaw_cpp | south_fork_cascading_median_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume |
 | geoclaw_cpp | south_fork_cascading_high_runnable | finite_volume | n/a | regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume |

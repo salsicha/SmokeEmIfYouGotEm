@@ -1,0 +1,30 @@
+{
+  "cpp": {
+    "command": [],
+    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_eddy/reduced/cpp_solver/eddy_line_shear_seed_20/manifest.json",
+    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_eddy/reduced/cpp_solver/eddy_line_shear_seed_20",
+    "returncode": 0,
+    "runtime_seconds": 0.3993559579976136,
+    "stderr": "",
+    "stdout": "",
+    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_eddy/reduced/cpp_solver/eddy_line_shear_seed_20/validation.json"
+  },
+  "geoclaw": {
+    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_eddy/normalized/manifest.json",
+    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_eddy/normalized",
+    "runtime_seconds": 1.182894416999261,
+    "seconds_per_simulated_second": 0.14786180212490763,
+    "solver": "geoclaw",
+    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_eddy/normalized/validation.json"
+  },
+  "runtime": {
+    "cpp_runtime_seconds": 0.3993559579976136,
+    "cpp_seconds_per_simulated_second": 0.0499194947497017,
+    "geoclaw_runtime_seconds": 1.182894416999261,
+    "geoclaw_seconds_per_simulated_second": 0.14786180212490763,
+    "simulated_duration_seconds": 8.0
+  },
+  "scenario_id": "eddy_line_shear_seed_20",
+  "scenario_json": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_eddy/shared_scenario/scenario.json",
+  "scenario_package": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_eddy/shared_scenario"
+}

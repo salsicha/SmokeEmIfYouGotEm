@@ -1,0 +1,89 @@
+{
+  "checks": [
+    {
+      "details": "Max Linf across h/eta/u/v/hu/hv/normals; u/v masked below 0.15 m.",
+      "name": "field_linf",
+      "passed": true,
+      "threshold": 0.75,
+      "value": 9.952672144208918e-07
+    },
+    {
+      "details": "Max Linf across eta slope fields.",
+      "name": "slope_linf",
+      "passed": true,
+      "threshold": 0.15,
+      "value": 8.135433517963975e-07
+    },
+    {
+      "details": "Max material wet/dry mask mismatch fraction across compared frames using h >= 0.15 m.",
+      "name": "wet_mismatch_fraction",
+      "passed": true,
+      "threshold": 0.2,
+      "value": 0.0
+    },
+    {
+      "details": "Max Linf across point-probe fields; u/v/Froude masked below 0.15 m.",
+      "name": "probe_linf",
+      "passed": true,
+      "threshold": 0.75,
+      "value": 2.304868580438324e-07
+    },
+    {
+      "details": "Max Linf across cross-section fields; u/v/Froude masked below 0.15 m.",
+      "name": "cross_section_linf",
+      "passed": true,
+      "threshold": 0.75,
+      "value": 1.447016133582224e-07
+    },
+    {
+      "details": "Absolute C++ minus reference mass-drift delta.",
+      "name": "mass_drift_delta",
+      "passed": true,
+      "threshold": 0.08,
+      "value": 3.554378674719416e-08
+    },
+    {
+      "details": "Absolute C++ minus reference energy-change delta.",
+      "name": "energy_change_delta",
+      "passed": true,
+      "threshold": 0.3,
+      "value": 1.863137202295917e-07
+    },
+    {
+      "details": "Max absolute Froude summary delta for cells at or above 0.15 m.",
+      "name": "froude_delta",
+      "passed": true,
+      "threshold": 0.2,
+      "value": 1.4210854715202004e-14
+    },
+    {
+      "details": "Max observed feature response location delta.",
+      "name": "feature_location_delta",
+      "passed": true,
+      "threshold": 6.0,
+      "value": 0.0
+    },
+    {
+      "details": "Max observed feature response strength delta.",
+      "name": "feature_strength_delta",
+      "passed": true,
+      "threshold": 1.0,
+      "value": 3.9019298103681876e-07
+    }
+  ],
+  "passed": true,
+  "scenario_id": "eddy_line_shear_seed_20",
+  "thresholds": {
+    "max_cross_section_linf": 0.75,
+    "max_energy_change_delta": 0.3,
+    "max_feature_location_delta": 6.0,
+    "max_feature_strength_delta": 1.0,
+    "max_field_linf": 0.75,
+    "max_froude_delta": 0.2,
+    "max_mass_drift_delta": 0.08,
+    "max_probe_linf": 0.75,
+    "max_slope_linf": 0.15,
+    "max_wet_mismatch_fraction": 0.2,
+    "velocity_depth_floor": 0.15
+  }
+}
