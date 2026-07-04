@@ -7,8 +7,12 @@ from raftsim.milestone20 import (
     MILESTONE20_REPORT_SET_LOCK_DECISION,
     MILESTONE20_REPORT_SET_LOCK_SCHEMA,
     MILESTONE20_SUPPORTING_ARTIFACTS,
+    MILESTONE20_LIVE_WATER_SMOKE_DECISION,
+    MILESTONE20_LIVE_WATER_SMOKE_REPORT_SCHEMA,
+    MILESTONE20_LIVE_WATER_SMOKE_SUITE_SCHEMA,
     MILESTONE20_TRACEABLE_DATA_ASSETS_SCHEMA,
     MILESTONE20_UNREAL_REGRESSION_IMPORT_SCHEMA,
+    build_live_water_unreal_smoke_suite,
     build_traceable_unreal_data_assets,
     build_unreal_regression_fixture_import,
     build_report_set_lock,
@@ -49,6 +53,19 @@ TRACEABLE_DATA_ASSET_HEADER_PATH = (
 LIVE_WATER_DEBUG_VIEWS_PATH = REPO_ROOT / "unreal/Content/RaftSim/Debug/live_water_debug_views.json"
 WATER_DEBUG_VIEWS_HEADER_PATH = (
     REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimDebug/Public/RaftSimWaterDebugViews.h"
+)
+LIVE_WATER_SMOKE_SUITE_PATH = (
+    REPO_ROOT / "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json"
+)
+LIVE_WATER_SMOKE_REPORT_PATH = (
+    REPO_ROOT / "physics/reports/milestone20/live_water_unreal_smoke_suite.json"
+)
+LIVE_WATER_SMOKE_REPORT_MD_PATH = (
+    REPO_ROOT / "physics/reports/milestone20/live_water_unreal_smoke_suite.md"
+)
+LIVE_WATER_SMOKE_TEST_PATH = (
+    REPO_ROOT
+    / "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimLiveWaterSmokeSuiteTest.cpp"
 )
 REQUIRED_PRODUCTION_MODULES = {
     "RaftSimCore",
@@ -166,6 +183,12 @@ def test_unreal_production_foundation_matches_locked_project_and_modules():
     )
     assert foundation["project"]["live_water_debug_views"] == (
         "unreal/Content/RaftSim/Debug/live_water_debug_views.json"
+    )
+    assert foundation["project"]["live_water_smoke_suite"] == (
+        "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json"
+    )
+    assert foundation["project"]["live_water_smoke_report"] == (
+        "physics/reports/milestone20/live_water_unreal_smoke_suite.json"
     )
     assert REPORT_SET_LOCK_PATH.exists()
     assert set(foundation["enabled_project_plugins"]) == project_plugins
@@ -423,3 +446,56 @@ def test_live_water_debug_view_contract_matches_manifest():
     assert "IsViewEnabled" in header_text
     assert "RaftSimWater" in build_text
     assert "RaftSimGeo" in build_text
+
+
+def test_live_water_smoke_suite_matches_generator():
+    expected = build_live_water_unreal_smoke_suite(REPO_ROOT)
+    committed_suite = json.loads(LIVE_WATER_SMOKE_SUITE_PATH.read_text(encoding="utf-8"))
+    committed_report = json.loads(LIVE_WATER_SMOKE_REPORT_PATH.read_text(encoding="utf-8"))
+
+    assert committed_suite == expected.manifest
+    assert committed_report == expected.report
+    assert LIVE_WATER_SMOKE_REPORT_MD_PATH.exists()
+
+
+def test_live_water_smoke_suite_closes_text_first_gate():
+    suite = json.loads(LIVE_WATER_SMOKE_SUITE_PATH.read_text(encoding="utf-8"))
+    report = json.loads(LIVE_WATER_SMOKE_REPORT_PATH.read_text(encoding="utf-8"))
+
+    assert suite["schema"] == MILESTONE20_LIVE_WATER_SMOKE_SUITE_SCHEMA
+    assert suite["status"] == "ready_for_unreal_automation_execution"
+    assert suite["execution_mode"] == "text_first_contract_pending_unreal_editor_execution"
+    assert {check["check_id"] for check in suite["checks"]} == {
+        "accepted_report_set_lock",
+        "live_water_bridge_lock_match",
+        "regression_fixture_import_coverage",
+        "traceable_data_assets_stitched_outputs",
+        "debug_view_coverage",
+        "target_profile_budgets",
+        "deterministic_replay_evidence",
+    }
+    assert all(check["passed"] for check in suite["checks"])
+    assert {profile["profile"] for profile in suite["target_profiles"]} == {
+        "desktop",
+        "handheld",
+        "vr",
+    }
+
+    assert report["schema"] == MILESTONE20_LIVE_WATER_SMOKE_REPORT_SCHEMA
+    assert report["decision"] == MILESTONE20_LIVE_WATER_SMOKE_DECISION
+    assert report["passed"] is True
+    assert report["milestone20_closed"] is True
+    assert report["regression_fixture_count"] == 109
+    assert report["stitched_whole_window_asset_count"] == 6
+    assert report["debug_view_count"] == 9
+    assert report["unreal_editor_execution_status"] == "not_run_in_text_first_workspace"
+    assert report["unreal_editor_execution_required_before_release_signoff"] is True
+
+
+def test_unreal_live_water_smoke_automation_test_loads_suite_manifest():
+    test_text = LIVE_WATER_SMOKE_TEST_PATH.read_text(encoding="utf-8")
+
+    assert "RaftSim/Automation/live_water_smoke_suite.json" in test_text
+    assert "raftsim.unreal.live_water_smoke_suite.v1" in test_text
+    assert "RaftSim.Milestone20.LiveWaterSmokeSuite" in test_text
+    assert "target_profiles" in test_text

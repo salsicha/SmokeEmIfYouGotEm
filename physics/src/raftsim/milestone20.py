@@ -18,6 +18,9 @@ MILESTONE20_UNREAL_REGRESSION_IMPORT_SCHEMA = (
     "raftsim.unreal.regression_fixture_import.v1"
 )
 MILESTONE20_TRACEABLE_DATA_ASSETS_SCHEMA = "raftsim.unreal.traceable_river_data_assets.v1"
+MILESTONE20_LIVE_WATER_SMOKE_SUITE_SCHEMA = "raftsim.unreal.live_water_smoke_suite.v1"
+MILESTONE20_LIVE_WATER_SMOKE_REPORT_SCHEMA = "raftsim.milestone20.live_water_smoke_report.v1"
+MILESTONE20_LIVE_WATER_SMOKE_DECISION = "pass_text_first_unreal_smoke_gate"
 
 MILESTONE16_SOURCE_REPORTS = (
     "physics/reports/milestone16/cpp_solver_runs.json",
@@ -108,6 +111,15 @@ class Milestone20TraceableDataAssets:
     """Generated Unreal traceable river data asset manifest."""
 
     manifest: dict[str, Any]
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone20LiveWaterSmokeSuite:
+    """Generated Unreal live-water smoke suite manifest and gate report."""
+
+    manifest: dict[str, Any]
+    report: dict[str, Any]
+    markdown: str
 
 
 def build_report_set_lock(repo_root: Path) -> Milestone20ReportSetLock:
@@ -392,6 +404,160 @@ def write_traceable_unreal_data_assets(
     return generated
 
 
+def build_live_water_unreal_smoke_suite(repo_root: Path) -> Milestone20LiveWaterSmokeSuite:
+    """Build the Milestone 20 live-water Unreal smoke suite and gate report."""
+
+    root = repo_root.resolve()
+    report_lock = _read_json(root / "physics/reports/milestone20/report_set_lock.json")
+    live_bridge = _read_json(root / "unreal/Content/RaftSim/Physics/live_water_bridge.json")
+    regression_import = _read_json(
+        root / "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json"
+    )
+    traceable_assets = _read_json(
+        root / "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
+    )
+    debug_views = _read_json(root / "unreal/Content/RaftSim/Debug/live_water_debug_views.json")
+
+    expected_hash = report_lock["lock"]["lock_hash"]
+    required_debug_views = {
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "conservation_deltas",
+        "raft_trajectory",
+        "contact_probes",
+        "runtime_budgets",
+    }
+    actual_debug_views = {view["view_id"] for view in debug_views["views"]}
+    stitched_assets = [
+        asset
+        for asset in traceable_assets["data_assets"]
+        if asset["kind"] == "reach_local_grid_with_stitched_validation"
+    ]
+    target_profiles = report_lock["target_profile_confirmation"]["profiles"]
+    checks = [
+        _smoke_check(
+            "accepted_report_set_lock",
+            bool(report_lock["passed"]) and len(expected_hash) == 64,
+            "Accepted Milestone 16 report-set lock is present, passing, and hash-addressed.",
+        ),
+        _smoke_check(
+            "live_water_bridge_lock_match",
+            live_bridge["accepted_report_set_lock"]["lock_hash"] == expected_hash,
+            "Live-water bridge references the accepted report-set lock hash.",
+        ),
+        _smoke_check(
+            "regression_fixture_import_coverage",
+            regression_import["total_fixture_count"] == 109
+            and regression_import["accepted_report_set_lock"]["lock_hash"] == expected_hash,
+            "Unreal automation import covers Milestone 16/17/18 accepted fixtures.",
+        ),
+        _smoke_check(
+            "traceable_data_assets_stitched_outputs",
+            traceable_assets["asset_count"] == 9
+            and len(stitched_assets) == 6
+            and all(asset["stitched_validation"]["required"] for asset in stitched_assets),
+            "Traceable data assets include reach-local grids and stitched whole-window outputs.",
+        ),
+        _smoke_check(
+            "debug_view_coverage",
+            actual_debug_views == required_debug_views
+            and debug_views["capture_policy"]["include_in_live_water_smoke_suite"],
+            "Debug views expose every required water, raft, contact, and runtime-budget overlay.",
+        ),
+        _smoke_check(
+            "target_profile_budgets",
+            all(profile["passed"] for profile in target_profiles),
+            "Accepted runtime profile records pass desktop, VR, and handheld target budget profiles.",
+        ),
+        _smoke_check(
+            "deterministic_replay_evidence",
+            bool(report_lock["target_profile_confirmation"]["deterministic_replay"]["passed"]),
+            "Accepted deterministic replay groups match.",
+        ),
+    ]
+    passed = all(check["passed"] for check in checks)
+    manifest = {
+        "schema": MILESTONE20_LIVE_WATER_SMOKE_SUITE_SCHEMA,
+        "suite_id": "milestone20_live_water_smoke",
+        "automation_test_name": "RaftSim.Milestone20.LiveWaterSmokeSuite",
+        "automation_module": "RaftSimAutomation",
+        "execution_mode": "text_first_contract_pending_unreal_editor_execution",
+        "accepted_report_set_lock": {
+            "manifest": "physics/reports/milestone20/report_set_lock.json",
+            "lock_hash": expected_hash,
+        },
+        "required_manifests": {
+            "live_water_bridge": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
+            "regression_fixture_import": "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json",
+            "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json",
+            "debug_views": "unreal/Content/RaftSim/Debug/live_water_debug_views.json",
+            "runtime_budgets": "physics/config/runtime_budgets.json",
+        },
+        "checks": checks,
+        "target_profiles": [
+            {
+                "profile": profile["profile"],
+                "record_count": profile["record_count"],
+                "passed_count": profile["passed_count"],
+                "max_runtime_ms_per_tick": profile["max_runtime_ms_per_tick"],
+                "max_runtime_budget_ms": profile["max_runtime_budget_ms"],
+            }
+            for profile in target_profiles
+        ],
+        "debug_views": sorted(actual_debug_views),
+        "status": "ready_for_unreal_automation_execution" if passed else "blocked",
+    }
+    report = {
+        "schema": MILESTONE20_LIVE_WATER_SMOKE_REPORT_SCHEMA,
+        "decision": MILESTONE20_LIVE_WATER_SMOKE_DECISION if passed else "blocked",
+        "passed": passed,
+        "suite_manifest": "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json",
+        "accepted_report_set_lock": "physics/reports/milestone20/report_set_lock.json",
+        "unreal_editor_execution_status": "not_run_in_text_first_workspace",
+        "unreal_editor_execution_required_before_release_signoff": True,
+        "gate_scope": "manifest_links_accepted_cpp_outputs_debug_views_and_target_profile_budget_evidence",
+        "checks": checks,
+        "target_profiles": manifest["target_profiles"],
+        "deterministic_replay": report_lock["target_profile_confirmation"]["deterministic_replay"],
+        "stitched_whole_window_asset_count": len(stitched_assets),
+        "regression_fixture_count": regression_import["total_fixture_count"],
+        "debug_view_count": len(actual_debug_views),
+        "milestone20_closed": passed,
+        "notes": [
+            "This report closes the text-first Milestone 20 gate in this repo workspace.",
+            "A UE 5.8 workstation should execute the generated automation test and attach measured editor/runtime output before release or platform sign-off.",
+            "The suite is anchored to the accepted C++ report-set lock and must be regenerated if that lock changes.",
+        ],
+    }
+    return Milestone20LiveWaterSmokeSuite(
+        manifest=manifest,
+        report=report,
+        markdown=_live_water_smoke_markdown(report),
+    )
+
+
+def write_live_water_unreal_smoke_suite(
+    *,
+    repo_root: Path,
+    suite_json: Path,
+    report_json: Path,
+    report_md: Path,
+) -> Milestone20LiveWaterSmokeSuite:
+    """Generate and write the live-water Unreal smoke suite and gate report."""
+
+    generated = build_live_water_unreal_smoke_suite(repo_root)
+    suite_json.parent.mkdir(parents=True, exist_ok=True)
+    report_json.parent.mkdir(parents=True, exist_ok=True)
+    report_md.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(suite_json, generated.manifest)
+    _write_json(report_json, generated.report)
+    report_md.write_text(generated.markdown, encoding="utf-8")
+    return generated
+
+
 def _artifact_entries(root: Path, paths: tuple[str, ...], *, group: str) -> list[dict[str, Any]]:
     return [_artifact_entry(root, path, group=group) for path in paths]
 
@@ -517,6 +683,51 @@ def _cascading_data_asset(
             "source_report": "physics/reports/milestone16/regression_promotion_manifest.json",
         },
     }
+
+
+def _smoke_check(check_id: str, passed: bool, summary: str) -> dict[str, Any]:
+    return {
+        "check_id": check_id,
+        "passed": bool(passed),
+        "summary": summary,
+    }
+
+
+def _live_water_smoke_markdown(report: dict[str, Any]) -> str:
+    lines = [
+        "# Milestone 20 Live-Water Unreal Smoke Suite",
+        "",
+        f"Decision: `{report['decision']}`",
+        "",
+        f"Passed: `{report['passed']}`",
+        "",
+        f"Unreal editor execution status: `{report['unreal_editor_execution_status']}`.",
+        "",
+        "## Checks",
+        "",
+    ]
+    for check in report["checks"]:
+        status = "PASS" if check["passed"] else "FAIL"
+        lines.append(f"- `{check['check_id']}`: {status} - {check['summary']}")
+    lines.extend(
+        [
+            "",
+            "## Target Profiles",
+            "",
+            "| Profile | Records | Passed | Max ms/tick | Budget ms/tick |",
+            "| --- | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for profile in report["target_profiles"]:
+        lines.append(
+            f"| {profile['profile']} | {profile['record_count']} | "
+            f"{profile['passed_count']} | {profile['max_runtime_ms_per_tick']:.6f} | "
+            f"{profile['max_runtime_budget_ms']:.6f} |"
+        )
+    lines.extend(["", "## Notes", ""])
+    lines.extend(f"- {note}" for note in report["notes"])
+    lines.append("")
+    return "\n".join(lines)
 
 
 def _physics_path(path: object) -> str | None:

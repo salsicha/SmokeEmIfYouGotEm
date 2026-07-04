@@ -1,0 +1,85 @@
+{
+  "accepted_report_set_lock": "physics/reports/milestone20/report_set_lock.json",
+  "checks": [
+    {
+      "check_id": "accepted_report_set_lock",
+      "passed": true,
+      "summary": "Accepted Milestone 16 report-set lock is present, passing, and hash-addressed."
+    },
+    {
+      "check_id": "live_water_bridge_lock_match",
+      "passed": true,
+      "summary": "Live-water bridge references the accepted report-set lock hash."
+    },
+    {
+      "check_id": "regression_fixture_import_coverage",
+      "passed": true,
+      "summary": "Unreal automation import covers Milestone 16/17/18 accepted fixtures."
+    },
+    {
+      "check_id": "traceable_data_assets_stitched_outputs",
+      "passed": true,
+      "summary": "Traceable data assets include reach-local grids and stitched whole-window outputs."
+    },
+    {
+      "check_id": "debug_view_coverage",
+      "passed": true,
+      "summary": "Debug views expose every required water, raft, contact, and runtime-budget overlay."
+    },
+    {
+      "check_id": "target_profile_budgets",
+      "passed": true,
+      "summary": "Accepted runtime profile records pass desktop, VR, and handheld target budget profiles."
+    },
+    {
+      "check_id": "deterministic_replay_evidence",
+      "passed": true,
+      "summary": "Accepted deterministic replay groups match."
+    }
+  ],
+  "debug_view_count": 9,
+  "decision": "pass_text_first_unreal_smoke_gate",
+  "deterministic_replay": {
+    "failed_count": 0,
+    "group_count": 40,
+    "passed": true,
+    "passed_count": 40
+  },
+  "gate_scope": "manifest_links_accepted_cpp_outputs_debug_views_and_target_profile_budget_evidence",
+  "milestone20_closed": true,
+  "notes": [
+    "This report closes the text-first Milestone 20 gate in this repo workspace.",
+    "A UE 5.8 workstation should execute the generated automation test and attach measured editor/runtime output before release or platform sign-off.",
+    "The suite is anchored to the accepted C++ report-set lock and must be regenerated if that lock changes."
+  ],
+  "passed": true,
+  "regression_fixture_count": 109,
+  "schema": "raftsim.milestone20.live_water_smoke_report.v1",
+  "stitched_whole_window_asset_count": 6,
+  "suite_manifest": "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json",
+  "target_profiles": [
+    {
+      "max_runtime_budget_ms": 4.8,
+      "max_runtime_ms_per_tick": 1.27046,
+      "passed_count": 80,
+      "profile": "desktop",
+      "record_count": 80
+    },
+    {
+      "max_runtime_budget_ms": 5.6,
+      "max_runtime_ms_per_tick": 1.27046,
+      "passed_count": 80,
+      "profile": "handheld",
+      "record_count": 80
+    },
+    {
+      "max_runtime_budget_ms": 2.4,
+      "max_runtime_ms_per_tick": 1.27046,
+      "passed_count": 80,
+      "profile": "vr",
+      "record_count": 80
+    }
+  ],
+  "unreal_editor_execution_required_before_release_signoff": true,
+  "unreal_editor_execution_status": "not_run_in_text_first_workspace"
+}
