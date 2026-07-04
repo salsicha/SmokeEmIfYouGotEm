@@ -7,7 +7,7 @@
         "name": "shallow_contact",
         "passed": true,
         "threshold": 1.0,
-        "value": 5.0
+        "value": 7.0
       },
       {
         "details": "Shelf contact should occur in shallow water.",
@@ -21,14 +21,14 @@
         "name": "grounding_support",
         "passed": true,
         "threshold": 0.5,
-        "value": 8.099828614329999
+        "value": 8.323982832432053
       },
       {
         "details": "Off-center shelf contact should pivot the raft.",
         "name": "pivot_yaw",
         "passed": true,
         "threshold": 0.5,
-        "value": 20.011985841461076
+        "value": 20.519186843334236
       }
     ],
     "candidate_frame": "outputs/m16cpp/r_shelf/reduced/cpp_solver/shallow_shelf_seed_21/frames/frame_0008.csv",
@@ -41,7 +41,7 @@
     ],
     "feature_outcome_match": true,
     "flow_band": null,
-    "force_delta_weight_ratio": 0.32638239164373845,
+    "force_delta_weight_ratio": 8.825345551476705e-08,
     "force_envelope_outcome_match": true,
     "gate_scenario_id": "shallow_shelf",
     "notes": [],
@@ -81,9 +81,9 @@
     "reference_passed": true,
     "solver_mode": "reduced",
     "suite": "rafting",
-    "torque_delta_inertia_ratio": 1.41735456999779,
-    "trajectory_position_delta_m": 0.0008893920172269509,
-    "trajectory_velocity_delta_mps": 0.053363521033751186
+    "torque_delta_inertia_ratio": 1.0533193311459992e-07,
+    "trajectory_position_delta_m": 2.404908878281489e-10,
+    "trajectory_velocity_delta_mps": 1.4429439974030603e-08
   },
   "schema_version": "raftsim.milestone16.regression_registry.v0",
   "source_report": "reports/milestone16/raft_coupling_validation.json"

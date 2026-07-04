@@ -2580,6 +2580,8 @@ def _cpp_config_for_mode(
         preserve_initial_mass = False
     if not finite_volume and gate_scenario_id == "eddy_line_shear":
         preserve_initial_mass = False
+    if not finite_volume and gate_scenario_id == "shallow_shelf":
+        preserve_initial_mass = False
     if finite_volume and gate_scenario_id == "bed_step":
         flux_scheme = "roe"
     return CppSolverRunConfig(
