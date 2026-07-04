@@ -1,0 +1,52 @@
+{
+  "conservation_summary": {
+    "handoff_report": {
+      "checks": [
+        {
+          "downstream_column": 18,
+          "downstream_reach_id": "drop_001",
+          "energy_delta": -0.10709486402194446,
+          "energy_passed": true,
+          "mass_flux_delta": 0.019632641447707336,
+          "mass_flux_passed": true,
+          "momentum_flux_delta": 0.020413792113606923,
+          "momentum_flux_passed": true,
+          "passed": true,
+          "surface_elevation_delta": 0.1268384647817667,
+          "surface_elevation_passed": true,
+          "transition_id": "ledge_drop_001",
+          "upstream_column": 17,
+          "upstream_reach_id": "tongue_001",
+          "wet_fraction_delta": 0.0,
+          "wet_front_passed": true
+        }
+      ],
+      "passed": true,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+      "thresholds": {
+        "max_energy_gain": 0.05,
+        "max_mass_flux_delta": 0.15,
+        "max_momentum_flux_delta": 0.35,
+        "max_surface_elevation_delta": 0.08,
+        "max_wet_fraction_delta": 0.35
+      }
+    },
+    "mass_proxy_kg": 5575922.424865361,
+    "max_bed_elevation_m": 3.553957532208944,
+    "max_depth_m": 1.609404555307331,
+    "max_speed_m_s": 4.328764521450926,
+    "max_surface_elevation_m": 3.553957532208944,
+    "min_bed_elevation_m": -4.495557895174224,
+    "min_depth_m": 0.0,
+    "min_surface_elevation_m": -3.282687119883581,
+    "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+    "total_cell_count": 1120,
+    "total_water_volume_m3": 5575.922424865361,
+    "wet_cell_count": 641,
+    "wet_fraction": 0.5723214285714285,
+    "x_momentum_proxy_kg_m_s": 9882501.00163054,
+    "y_momentum_proxy_kg_m_s": 43262.85131650337
+  },
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+  "schema_version": "raftsim.stitched_whole_window_validation.v0"
+}

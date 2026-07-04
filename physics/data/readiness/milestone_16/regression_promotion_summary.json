@@ -1,8 +1,8 @@
 {
-  "entry_count": 68,
-  "geoclaw_cpp_fixture_count": 38,
+  "entry_count": 73,
+  "geoclaw_cpp_fixture_count": 39,
   "passed": true,
-  "raft_artifact_count": 22,
+  "raft_artifact_count": 26,
   "source_report": "reports/milestone16/regression_promotion_manifest.json",
   "summary_version": "raftsim.milestone16.readiness_summary.v0"
 }

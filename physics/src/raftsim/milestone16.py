@@ -2590,6 +2590,8 @@ def _cpp_config_for_mode(
         preserve_initial_mass = False
     if not finite_volume and gate_scenario_id == "south_fork_cascading_low_runnable":
         preserve_initial_mass = False
+    if not finite_volume and gate_scenario_id == "south_fork_cascading_median_runnable":
+        preserve_initial_mass = False
     if finite_volume and gate_scenario_id == "bed_step":
         flux_scheme = "roe"
     return CppSolverRunConfig(
