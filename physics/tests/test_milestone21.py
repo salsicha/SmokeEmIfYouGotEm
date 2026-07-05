@@ -3,6 +3,9 @@ from pathlib import Path
 
 from raftsim.feature_forcing import FEATURE_FORCING_KINDS
 from raftsim.milestone21 import (
+    COLORADO_ROWING_FLOW_PRESETS_PATH,
+    COLORADO_ROWING_ROUTE_PATH as COLORADO_ROWING_ROUTE_MANIFEST,
+    COLORADO_ROWING_SOURCE_MANIFEST_PATH,
     EXPECTED_OUTCOMES,
     FEATURE_FORCING_DEFAULTS_PATH,
     FEATURE_TUNING_EDITOR_PATH as FEATURE_TUNING_EDITOR_MANIFEST,
@@ -10,6 +13,7 @@ from raftsim.milestone21 import (
     GEOSPATIAL_FORMAT_CONTRACT_PATH,
     GEOSPATIAL_IMPORT_PIPELINE_PATH as GEOSPATIAL_IMPORT_PIPELINE_MANIFEST,
     GEOMETRY_KINDS,
+    MILESTONE21_COLORADO_ROWING_ROUTE_SCHEMA,
     MILESTONE21_FEATURE_TUNING_EDITOR_SCHEMA,
     MILESTONE21_GEOSPATIAL_IMPORT_PIPELINE_SCHEMA,
     MILESTONE21_RAPID_RIVER_EDITOR_SCHEMA,
@@ -27,12 +31,14 @@ from raftsim.milestone21 import (
     SPATIAL_AUDIO_PRESETS_PATH,
     SOUTH_FORK_WORKFLOW_PATH,
     TRACEABLE_RIVER_DATA_ASSETS_PATH,
+    build_colorado_rowing_route_draft_manifest,
     build_feature_tuning_editor_manifest,
     build_geospatial_import_pipeline_manifest,
     build_rapid_river_editor_manifest,
     build_reach_local_streaming_manifest,
     build_south_fork_editor_pass_manifest,
     write_feature_tuning_editor_manifest,
+    write_colorado_rowing_route_draft_manifest,
     write_geospatial_import_pipeline_manifest,
     write_rapid_river_editor_manifest,
     write_reach_local_streaming_manifest,
@@ -65,6 +71,13 @@ SOUTH_FORK_EDITOR_PASS_PATH = REPO_ROOT / SOUTH_FORK_EDITOR_PASS_MANIFEST
 SOUTH_FORK_EDITOR_PASS_HEADER_PATH = (
     REPO_ROOT
     / "unreal/Plugins/RaftSim/Source/RaftSimRiver/Public/RaftSimSouthForkEditorPassConfig.h"
+)
+COLORADO_ROWING_ROUTE_PATH = REPO_ROOT / COLORADO_ROWING_ROUTE_MANIFEST
+COLORADO_ROWING_SOURCE_MANIFEST_FILE = REPO_ROOT / COLORADO_ROWING_SOURCE_MANIFEST_PATH
+COLORADO_ROWING_FLOW_PRESETS_FILE = REPO_ROOT / COLORADO_ROWING_FLOW_PRESETS_PATH
+COLORADO_ROWING_ROUTE_HEADER_PATH = (
+    REPO_ROOT
+    / "unreal/Plugins/RaftSim/Source/RaftSimRiver/Public/RaftSimColoradoRowingRouteConfig.h"
 )
 
 
@@ -508,3 +521,108 @@ def test_write_south_fork_editor_pass_manifest_creates_json(tmp_path):
 
     assert output_json.exists()
     assert json.loads(output_json.read_text(encoding="utf-8")) == generated.manifest
+
+
+def test_colorado_rowing_route_draft_files_match_generator():
+    expected = build_colorado_rowing_route_draft_manifest(REPO_ROOT)
+    committed_manifest = json.loads(COLORADO_ROWING_ROUTE_PATH.read_text(encoding="utf-8"))
+    committed_source = json.loads(COLORADO_ROWING_SOURCE_MANIFEST_FILE.read_text(encoding="utf-8"))
+    committed_flows = json.loads(COLORADO_ROWING_FLOW_PRESETS_FILE.read_text(encoding="utf-8"))
+
+    assert committed_manifest == expected.manifest
+    assert committed_source == expected.source_manifest
+    assert committed_flows == expected.flow_presets
+    assert committed_manifest["schema"] == MILESTONE21_COLORADO_ROWING_ROUTE_SCHEMA
+    assert committed_manifest["status"] == "ready_for_colorado_rowing_route_planning"
+
+
+def test_colorado_rowing_route_has_source_manifest_and_planning_flow_bands():
+    manifest = json.loads(COLORADO_ROWING_ROUTE_PATH.read_text(encoding="utf-8"))
+    source_manifest = json.loads(COLORADO_ROWING_SOURCE_MANIFEST_FILE.read_text(encoding="utf-8"))
+    flow_presets = json.loads(COLORADO_ROWING_FLOW_PRESETS_FILE.read_text(encoding="utf-8"))
+
+    assert manifest["asset_class"] == "URaftSimColoradoRowingRouteConfig"
+    assert manifest["module"] == "RaftSimRiver"
+    assert manifest["route_style"] == "rowing_oar_rig"
+    assert manifest["source_manifest"] == COLORADO_ROWING_SOURCE_MANIFEST_PATH
+    assert manifest["flow_presets"] == COLORADO_ROWING_FLOW_PRESETS_PATH
+    assert manifest["route_endpoints"]["put_in"] == "Lees Ferry"
+    assert manifest["route_endpoints"]["take_out"] == "Diamond Creek"
+    assert source_manifest["route_style"] == "rowing_oar_rig"
+    assert source_manifest["provenance"]["review_status"] == "draft_target_needs_geospatial_pull_and_guide_review"
+    assert {"usgs_09380000_lees_ferry", "usgs_09402500_near_grand_canyon", "nps_grand_canyon_river_trips"}.issubset(
+        {source["source_id"] for source in source_manifest["sources"]}
+    )
+    assert flow_presets["status"] == "planning_placeholders_require_usgs_gauge_history_and_release_context"
+    assert flow_presets["flow_band_policy"]["must_replace_placeholders"] is True
+    assert flow_presets["flow_band_policy"]["requires_gauge_history"] is True
+    assert flow_presets["flow_band_policy"]["requires_dam_release_context"] is True
+    assert {band["flow_band"] for band in flow_presets["flow_bands"]} == {
+        "low_release_planning",
+        "moderate_release_planning",
+        "high_release_planning",
+    }
+    assert [band["discharge_cfs"] for band in flow_presets["flow_bands"]] == sorted(
+        band["discharge_cfs"] for band in flow_presets["flow_bands"]
+    )
+
+
+def test_colorado_rowing_route_exposes_oar_controls_guide_review_and_annotation_needs():
+    manifest = json.loads(COLORADO_ROWING_ROUTE_PATH.read_text(encoding="utf-8"))
+    controls = {control["control_id"]: control for control in manifest["rowing_frame_controls"]}
+    needs = {need["need_id"]: need for need in manifest["validation_annotation_needs"]}
+
+    assert set(controls) == {
+        "pull_stroke",
+        "back_row",
+        "ferry_angle_hold",
+        "spin_and_pivot_correction",
+        "passenger_weight_trim",
+        "rescue_assist_rowing",
+    }
+    assert controls["pull_stroke"]["control_kind"] == "pull"
+    assert controls["back_row"]["control_kind"] == "back_row"
+    assert "swimmer_distance_m" in controls["rescue_assist_rowing"]["telemetry"]
+    assert manifest["guide_review_requirements"]["oar_rig_guide_signoff_required"] is True
+    assert manifest["guide_review_requirements"]["field_media_timecodes_required"] is True
+    assert manifest["guide_review_requirements"]["rights_cleared_guide_notes_required"] is True
+    assert manifest["guide_review_requirements"]["do_not_vendor_guidebook_text"] is True
+    assert {"river_mile_stationing", "large_volume_lines", "rowing_rescue_windows"}.issubset(needs)
+    assert "river_mile" in needs["river_mile_stationing"]["review_fields"]
+    assert "pull_back_row_plan" in needs["large_volume_lines"]["review_fields"]
+    assert "swimmer_drift_path" in needs["rowing_rescue_windows"]["review_fields"]
+    assert len(manifest["route_segments"]) >= 4
+
+
+def test_colorado_rowing_route_header_exposes_unreal_data_contract():
+    header_text = COLORADO_ROWING_ROUTE_HEADER_PATH.read_text(encoding="utf-8")
+
+    assert "URaftSimColoradoRowingRouteConfig" in header_text
+    assert "ERaftSimColoradoRowingControlKind" in header_text
+    assert "FRaftSimColoradoFlowBand" in header_text
+    assert "FRaftSimColoradoRowingControl" in header_text
+    assert "FRaftSimColoradoRouteSegment" in header_text
+    assert "FRaftSimColoradoValidationAnnotationNeed" in header_text
+    for enum_value in ("Pull", "BackRow", "FerryAngle", "SpinCorrection", "PassengerTrim", "RescueAssist"):
+        assert enum_value in header_text
+    assert "RowingFrameControls" in header_text
+    assert "ValidationAnnotationNeeds" in header_text
+    assert "bOarRigGuideSignoffRequired" in header_text
+    assert "bRequiresGaugeHistoryReplacement" in header_text
+
+
+def test_write_colorado_rowing_route_draft_manifest_creates_json(tmp_path):
+    output_json = tmp_path / "colorado_rowing_route_editor_pass.json"
+    source_json = tmp_path / "source_manifest.json"
+    flow_json = tmp_path / "flow_presets.json"
+
+    generated = write_colorado_rowing_route_draft_manifest(
+        repo_root=REPO_ROOT,
+        output_json=output_json,
+        source_manifest_json=source_json,
+        flow_presets_json=flow_json,
+    )
+
+    assert json.loads(output_json.read_text(encoding="utf-8")) == generated.manifest
+    assert json.loads(source_json.read_text(encoding="utf-8")) == generated.source_manifest
+    assert json.loads(flow_json.read_text(encoding="utf-8")) == generated.flow_presets

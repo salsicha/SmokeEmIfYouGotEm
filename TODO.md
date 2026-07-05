@@ -855,7 +855,7 @@ This milestone turns the validated river-data contracts into the level editor an
 - [x] Support reach-local authoring and streaming with overlap/ghost-zone metadata while requiring stitched whole-window validation exports for every playable river window.
 - [x] Expose flow bands, discharge-dependent feature-forcing gains, hole stickiness/washout curves, eddy-line/lateral/wave-train tuning, boulder push/damping, shallow shelves, pins/releases, and visual/audio-only parameters as editor-tunable but manifest-recorded data.
 - [x] Build the South Fork American first-river editor pass with reviewed rapids, source manifests, low/median/high flow presets, validation overlays, and guide-feedback annotations.
-- [ ] Draft the Colorado River rowing/oar-rig route as the second real-world river target with source manifest, flow bands, rowing-frame controls, guide review, and validation annotation needs.
+- [x] Draft the Colorado River rowing/oar-rig route as the second real-world river target with source manifest, flow bands, rowing-frame controls, guide review, and validation annotation needs.
 - [ ] Add round-trip validation that exported Unreal river data can regenerate solver packages, GeoClaw/C++ comparison inputs, and fidelity-review overlays without losing CRS, provenance, or flow-response metadata.
 
 ## Milestone 22: Authoritative Raft, Crew, Swimmer, And Rescue Gameplay

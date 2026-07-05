@@ -1,0 +1,282 @@
+{
+  "asset_class": "URaftSimColoradoRowingRouteConfig",
+  "editor_status": {
+    "flow_bands": "planning_placeholders",
+    "guide_review": "needs_rights_cleared_human_review",
+    "rowing_controls": "drafted",
+    "source_manifest": "drafted",
+    "validation_annotations": "needs_geospatial_and_field_media_pass"
+  },
+  "feature_tuning_editor": "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+  "flow_band_policy": {
+    "must_replace_placeholders": true,
+    "primary_gauges": [
+      "USGS-09380000",
+      "USGS-09402500"
+    ],
+    "requires_dam_release_context": true,
+    "requires_gauge_history": true,
+    "requires_guide_review": true
+  },
+  "flow_bands": [
+    {
+      "discharge_cfs": 8000.0,
+      "discharge_m3s": 226.534772736,
+      "display_name": "Low Release Planning",
+      "expected_rowing_behavior": "More exposed rocks and sharper ferry setup; slower current helps rescue but can increase wrap risk.",
+      "flow_band": "low_release_planning",
+      "review_priority": "high",
+      "runnable": true
+    },
+    {
+      "discharge_cfs": 12000.0,
+      "discharge_m3s": 339.802159104,
+      "display_name": "Moderate Release Planning",
+      "expected_rowing_behavior": "Default large-volume rowing baseline with readable tongues, lateral waves, and longer recovery pools.",
+      "flow_band": "moderate_release_planning",
+      "review_priority": "high",
+      "runnable": true
+    },
+    {
+      "discharge_cfs": 18000.0,
+      "discharge_m3s": 509.703238656,
+      "display_name": "High Release Planning",
+      "expected_rowing_behavior": "Faster big-water decisions, stronger wave trains/laterals, longer swimmer drift, and larger eddy fences.",
+      "flow_band": "high_release_planning",
+      "review_priority": "high",
+      "runnable": true
+    }
+  ],
+  "flow_presets": "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json",
+  "geospatial_import_pipeline": "unreal/Content/RaftSim/River/geospatial_import_pipeline.json",
+  "guide_review_requirements": {
+    "commercial_and_noncommercial_context_separated": true,
+    "do_not_vendor_guidebook_text": true,
+    "field_media_timecodes_required": true,
+    "oar_rig_guide_signoff_required": true,
+    "rights_cleared_guide_notes_required": true
+  },
+  "module": "RaftSimRiver",
+  "rapid_river_editor": "unreal/Content/RaftSim/River/rapid_river_editor.json",
+  "river_id": "colorado_river",
+  "route_endpoints": {
+    "nps_context_source": "nps_grand_canyon_river_trips",
+    "put_in": "Lees Ferry",
+    "stationing_mode": "river_mile_and_local_meters",
+    "take_out": "Diamond Creek"
+  },
+  "route_id": "colorado_river_grand_canyon_rowing_draft",
+  "route_segments": [
+    {
+      "review_focus": [
+        "launch_flow_context",
+        "rowing_basics",
+        "large_pool_pacing"
+      ],
+      "segment_id": "lees_ferry_launch_to_marble_canyon",
+      "status": "draft_needs_geospatial_pull"
+    },
+    {
+      "review_focus": [
+        "wave_trains",
+        "lateral_waves",
+        "eddy_fences",
+        "wind_exposure"
+      ],
+      "segment_id": "marble_canyon_to_little_colorado_context",
+      "status": "draft_needs_guide_review"
+    },
+    {
+      "review_focus": [
+        "large_rapids",
+        "oar_rig_lines",
+        "swimmer_recovery",
+        "scout_annotations"
+      ],
+      "segment_id": "inner_gorge_technical_rowing",
+      "status": "draft_needs_validation_annotations"
+    },
+    {
+      "review_focus": [
+        "takeout_logistics",
+        "permit_context",
+        "long_recovery_windows"
+      ],
+      "segment_id": "diamond_creek_takeout_context",
+      "status": "draft_needs_access_review"
+    }
+  ],
+  "route_style": "rowing_oar_rig",
+  "rowing_frame_controls": [
+    {
+      "control_id": "pull_stroke",
+      "control_kind": "pull",
+      "gameplay_role": "Drive the oar rig downstream, hold speed through wave trains, or accelerate into a ferry.",
+      "input_axes": [
+        "left_oar_pull",
+        "right_oar_pull"
+      ],
+      "telemetry": [
+        "stroke_force_n",
+        "oar_angle_deg",
+        "blade_depth_m",
+        "boat_yaw_delta"
+      ]
+    },
+    {
+      "control_id": "back_row",
+      "control_kind": "back_row",
+      "gameplay_role": "Slow the boat, square up to laterals, and create space before a large hydraulic.",
+      "input_axes": [
+        "left_oar_push",
+        "right_oar_push"
+      ],
+      "telemetry": [
+        "reverse_stroke_force_n",
+        "boat_speed_delta",
+        "line_error_m"
+      ]
+    },
+    {
+      "control_id": "ferry_angle_hold",
+      "control_kind": "ferry_angle",
+      "gameplay_role": "Maintain crossing angle across eddy fences, laterals, and wide tongues.",
+      "input_axes": [
+        "left_oar_pull",
+        "right_oar_back",
+        "guide_lean"
+      ],
+      "telemetry": [
+        "ferry_angle_deg",
+        "cross_current_velocity_mps",
+        "yaw_rate_dps"
+      ]
+    },
+    {
+      "control_id": "spin_and_pivot_correction",
+      "control_kind": "spin_correction",
+      "gameplay_role": "Recover from unexpected yaw in big-water boils, whirlpools, and lateral hits.",
+      "input_axes": [
+        "asymmetric_oar_force",
+        "passenger_weight_trim"
+      ],
+      "telemetry": [
+        "spin_rate_dps",
+        "counterstroke_timing_s",
+        "recovery_margin"
+      ]
+    },
+    {
+      "control_id": "passenger_weight_trim",
+      "control_kind": "passenger_trim",
+      "gameplay_role": "Shift load to prevent tube clipping, shallow-shelf pins, or surf/flip escalation.",
+      "input_axes": [
+        "crew_left_right_trim",
+        "crew_fore_aft_trim"
+      ],
+      "telemetry": [
+        "center_of_mass_offset_m",
+        "roll_margin_deg",
+        "pin_release_margin"
+      ]
+    },
+    {
+      "control_id": "rescue_assist_rowing",
+      "control_kind": "rescue_assist",
+      "gameplay_role": "Set boat angle and relative speed for swimmers, throw-line support, and pull-in timing.",
+      "input_axes": [
+        "back_row",
+        "ferry_angle_hold",
+        "rescue_target_select"
+      ],
+      "telemetry": [
+        "swimmer_distance_m",
+        "closing_speed_mps",
+        "rescue_window_s"
+      ]
+    }
+  ],
+  "schema": "raftsim.unreal.colorado_rowing_route.v1",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "section_name": "Lees Ferry to Diamond Creek",
+  "source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json",
+  "status": "ready_for_colorado_rowing_route_planning",
+  "validation_annotation_needs": [
+    {
+      "geometry_kind": "river_mile_pin_and_span",
+      "need_id": "river_mile_stationing",
+      "required_sources": [
+        "hydrography/river_mile_markers.geojson",
+        "guide_references"
+      ],
+      "review_fields": [
+        "river_mile",
+        "station_m",
+        "rapid_name_if_rights_clear",
+        "confidence"
+      ]
+    },
+    {
+      "geometry_kind": "raft_line",
+      "need_id": "large_volume_lines",
+      "required_sources": [
+        "guide_references",
+        "field_media",
+        "gauge_history"
+      ],
+      "review_fields": [
+        "entry_line",
+        "pull_back_row_plan",
+        "ferry_angle",
+        "missed_line_consequence"
+      ]
+    },
+    {
+      "geometry_kind": "polygon_and_span",
+      "need_id": "wave_train_lateral_hole_context",
+      "required_sources": [
+        "imagery",
+        "terrain",
+        "guide_references",
+        "flow_presets"
+      ],
+      "review_fields": [
+        "wave_train",
+        "lateral",
+        "hole",
+        "eddy_fence",
+        "flow_band_response"
+      ]
+    },
+    {
+      "geometry_kind": "reach_span",
+      "need_id": "rowing_rescue_windows",
+      "required_sources": [
+        "guide_references",
+        "field_media",
+        "flow_presets"
+      ],
+      "review_fields": [
+        "swimmer_drift_path",
+        "eddy_recovery_zone",
+        "throw_line_position",
+        "pull_in_timing"
+      ]
+    },
+    {
+      "geometry_kind": "reach_span",
+      "need_id": "canyon_pacing_and_audio",
+      "required_sources": [
+        "terrain",
+        "field_media",
+        "guide_references"
+      ],
+      "review_fields": [
+        "long_pool_pacing",
+        "wind_exposure",
+        "canyon_echo",
+        "large_water_source_audio"
+      ]
+    }
+  ]
+}

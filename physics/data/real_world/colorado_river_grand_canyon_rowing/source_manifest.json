@@ -1,0 +1,182 @@
+{
+  "artifacts": {
+    "elevation": [
+      "terrain/3dep_dem_tiles",
+      "terrain/canyon_corridor_dem.tif"
+    ],
+    "flow_presets": [
+      "flow_presets.json"
+    ],
+    "gauges": [
+      "hydrology/usgs_09380000_lees_ferry.json",
+      "hydrology/usgs_09402500_near_grand_canyon.json"
+    ],
+    "guide_references": [
+      "review/guide_review_needs.json",
+      "review/oar_line_annotations.geojson"
+    ],
+    "hydrography": [
+      "hydrography/centerline.geojson",
+      "hydrography/river_mile_markers.geojson"
+    ],
+    "unreal": [
+      "unreal/colorado_rowing_route_editor_pass.json"
+    ],
+    "validation": [
+      "validation/annotation_needs.json",
+      "validation/route_overlay_plan.json"
+    ]
+  },
+  "bounds_wgs84": {
+    "max_lat": 36.95,
+    "max_lon": -111.55,
+    "min_lat": 35.75,
+    "min_lon": -113.55,
+    "status": "draft_planning_bounds_needs_crs_review"
+  },
+  "confidence": {
+    "guide_review": 0.05,
+    "hydrography": 0.15,
+    "hydrology": 0.3,
+    "overall": 0.2,
+    "rapid_annotations": 0.05,
+    "terrain": 0.15
+  },
+  "coordinate_reference_systems": {
+    "solver": "local meters or river-mile stationing converted to meters",
+    "source": "EPSG:4326",
+    "unreal": "georeferenced canyon corridor transform derived from source CRS",
+    "working": "local projected CRS selected per canyon corridor extraction"
+  },
+  "manifest_id": "colorado_river.grand_canyon_lees_ferry_to_diamond_creek_rowing.source_manifest.v0",
+  "provenance": {
+    "generated_by": "raftsim.milestone21.build_colorado_rowing_source_manifest",
+    "processing_version": "milestone21_colorado_rowing_draft.v0",
+    "redistribution_notes": "Use official manifests and rights-cleared field media; do not vendor guidebook text.",
+    "review_status": "draft_target_needs_geospatial_pull_and_guide_review"
+  },
+  "remote_fetches": [
+    {
+      "category": "gauge",
+      "fetch_id": "colorado_lees_ferry_gauge",
+      "source_id": "usgs_09380000_lees_ferry",
+      "status": "metadata_ready",
+      "target_artifact": "hydrology/usgs_09380000_lees_ferry.json",
+      "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09380000/"
+    },
+    {
+      "category": "gauge",
+      "fetch_id": "colorado_near_grand_canyon_gauge",
+      "source_id": "usgs_09402500_near_grand_canyon",
+      "status": "metadata_ready",
+      "target_artifact": "hydrology/usgs_09402500_near_grand_canyon.json",
+      "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09402500/"
+    }
+  ],
+  "river_id": "colorado_river",
+  "route_style": "rowing_oar_rig",
+  "schema_version": "raftsim.source_manifest.v0",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "section_name": "Lees Ferry to Diamond Creek",
+  "sources": [
+    {
+      "category": "gauge",
+      "license_or_terms": "U.S. federal hydrologic data; cite USGS Water Data for the Nation and site ID.",
+      "provider": "USGS",
+      "source_id": "usgs_09380000_lees_ferry",
+      "status": "metadata_ready",
+      "title": "Colorado River at Lees Ferry, AZ - USGS-09380000",
+      "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09380000/",
+      "use_in_pipeline": [
+        "launch_flow_context",
+        "release_band_history",
+        "hydrograph_validation"
+      ]
+    },
+    {
+      "category": "gauge",
+      "license_or_terms": "U.S. federal hydrologic data; cite USGS Water Data for the Nation and site ID.",
+      "provider": "USGS",
+      "source_id": "usgs_09402500_near_grand_canyon",
+      "status": "metadata_ready",
+      "title": "Colorado River Near Grand Canyon, AZ - USGS-09402500",
+      "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09402500/",
+      "use_in_pipeline": [
+        "downstream_flow_context",
+        "travel_time_checks",
+        "hydrograph_validation"
+      ]
+    },
+    {
+      "category": "permit_context",
+      "license_or_terms": "U.S. government web content; preserve NPS attribution and page metadata.",
+      "provider": "National Park Service",
+      "source_id": "nps_grand_canyon_river_trips",
+      "status": "metadata_ready",
+      "title": "Grand Canyon River Trips and Permits",
+      "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm",
+      "use_in_pipeline": [
+        "route_endpoints",
+        "trip_style_context",
+        "permit_context",
+        "guide_review"
+      ]
+    },
+    {
+      "category": "permit_context",
+      "license_or_terms": "U.S. government web content; preserve NPS attribution and page metadata.",
+      "provider": "National Park Service",
+      "source_id": "nps_grand_canyon_weighted_lottery",
+      "status": "metadata_ready",
+      "title": "Grand Canyon Noncommercial River Permits Weighted Lottery",
+      "url": "https://www.nps.gov/grca/planyourvisit/weightedlottery.htm",
+      "use_in_pipeline": [
+        "permit_context",
+        "launch_date_context",
+        "takeout_fee_notes"
+      ]
+    },
+    {
+      "category": "elevation",
+      "license_or_terms": "U.S. federal source; confirm product-specific metadata.",
+      "provider": "USGS",
+      "source_id": "usgs_3dep",
+      "status": "planned",
+      "title": "3D Elevation Program (3DEP)",
+      "url": "https://www.usgs.gov/3d-elevation-program",
+      "use_in_pipeline": [
+        "terrain_dem",
+        "canyon_wall_context",
+        "bank_shelves"
+      ]
+    },
+    {
+      "category": "hydrography",
+      "license_or_terms": "U.S. federal source; preserve attribution and product metadata.",
+      "provider": "USGS",
+      "source_id": "usgs_3dhp_nhd",
+      "status": "planned",
+      "title": "3D Hydrography Program, NHD, and NHDPlus",
+      "url": "https://www.usgs.gov/3d-hydrography-program",
+      "use_in_pipeline": [
+        "centerline",
+        "river_mile_stationing",
+        "tributary_context"
+      ]
+    },
+    {
+      "category": "guide_reference",
+      "license_or_terms": "Do not vendor guidebook text, third-party imagery, or field media without explicit rights.",
+      "provider": "human_review",
+      "source_id": "guide_references",
+      "status": "planned",
+      "title": "Rights-cleared Colorado rowing guide review and field notes",
+      "url": "manifest_only_until_rights_clear",
+      "use_in_pipeline": [
+        "rapid_annotations",
+        "oar_line_review",
+        "rescue_context"
+      ]
+    }
+  ]
+}

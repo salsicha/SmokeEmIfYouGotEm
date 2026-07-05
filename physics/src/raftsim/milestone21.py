@@ -16,11 +16,13 @@ MILESTONE21_GEOSPATIAL_IMPORT_PIPELINE_SCHEMA = (
 MILESTONE21_REACH_LOCAL_STREAMING_SCHEMA = "raftsim.unreal.reach_local_streaming.v1"
 MILESTONE21_FEATURE_TUNING_EDITOR_SCHEMA = "raftsim.unreal.feature_tuning_editor.v1"
 MILESTONE21_SOUTH_FORK_EDITOR_PASS_SCHEMA = "raftsim.unreal.south_fork_editor_pass.v1"
+MILESTONE21_COLORADO_ROWING_ROUTE_SCHEMA = "raftsim.unreal.colorado_rowing_route.v1"
 RAPID_RIVER_EDITOR_MANIFEST_PATH = "unreal/Content/RaftSim/River/rapid_river_editor.json"
 GEOSPATIAL_IMPORT_PIPELINE_PATH = "unreal/Content/RaftSim/River/geospatial_import_pipeline.json"
 REACH_LOCAL_STREAMING_PATH = "unreal/Content/RaftSim/River/reach_local_streaming.json"
 FEATURE_TUNING_EDITOR_PATH = "unreal/Content/RaftSim/River/feature_tuning_editor.json"
 SOUTH_FORK_EDITOR_PASS_PATH = "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json"
+COLORADO_ROWING_ROUTE_PATH = "unreal/Content/RaftSim/River/colorado_rowing_route_editor_pass.json"
 FEATURE_FORCING_DEFAULTS_PATH = "physics/config/feature_forcing_defaults.json"
 RAPID_REVIEW_FLOW_DIFFICULTY_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/rapid_review_flow_difficulty_mapping.json"
@@ -32,6 +34,9 @@ SOUTH_FORK_VALIDATION_MATRIX_PATH = (
 SOUTH_FORK_RAPID_CANDIDATES_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/rapid_candidates.geojson"
 )
+COLORADO_ROWING_BASE_DIR = "physics/data/real_world/colorado_river_grand_canyon_rowing"
+COLORADO_ROWING_SOURCE_MANIFEST_PATH = f"{COLORADO_ROWING_BASE_DIR}/source_manifest.json"
+COLORADO_ROWING_FLOW_PRESETS_PATH = f"{COLORADO_ROWING_BASE_DIR}/flow_presets.json"
 SPATIAL_AUDIO_PRESETS_PATH = "unreal/Content/RaftSim/Audio/spatial_audio_presets.json"
 SOUTH_FORK_WORKFLOW_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/rapid_review_editor_workflow.json"
@@ -113,6 +118,15 @@ class Milestone21FeatureTuningEditor:
 class Milestone21SouthForkEditorPass:
     """Generated South Fork first-river editor pass manifest."""
 
+    manifest: dict[str, Any]
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone21ColoradoRowingRouteDraft:
+    """Generated Colorado River rowing/oar-rig route draft manifest."""
+
+    source_manifest: dict[str, Any]
+    flow_presets: dict[str, Any]
     manifest: dict[str, Any]
 
 
@@ -999,4 +1013,369 @@ def write_south_fork_editor_pass_manifest(
     generated = build_south_fork_editor_pass_manifest(repo_root)
     output_json.parent.mkdir(parents=True, exist_ok=True)
     output_json.write_text(json.dumps(generated.manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return generated
+
+
+def build_colorado_rowing_source_manifest() -> dict[str, Any]:
+    """Build the draft source manifest for the Colorado River rowing route."""
+
+    return {
+        "schema_version": "raftsim.source_manifest.v0",
+        "manifest_id": "colorado_river.grand_canyon_lees_ferry_to_diamond_creek_rowing.source_manifest.v0",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "section_name": "Lees Ferry to Diamond Creek",
+        "route_style": "rowing_oar_rig",
+        "bounds_wgs84": {
+            "status": "draft_planning_bounds_needs_crs_review",
+            "min_lon": -113.55,
+            "min_lat": 35.75,
+            "max_lon": -111.55,
+            "max_lat": 36.95,
+        },
+        "coordinate_reference_systems": {
+            "source": "EPSG:4326",
+            "working": "local projected CRS selected per canyon corridor extraction",
+            "solver": "local meters or river-mile stationing converted to meters",
+            "unreal": "georeferenced canyon corridor transform derived from source CRS",
+        },
+        "sources": [
+            {
+                "source_id": "usgs_09380000_lees_ferry",
+                "provider": "USGS",
+                "category": "gauge",
+                "title": "Colorado River at Lees Ferry, AZ - USGS-09380000",
+                "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09380000/",
+                "license_or_terms": "U.S. federal hydrologic data; cite USGS Water Data for the Nation and site ID.",
+                "use_in_pipeline": ["launch_flow_context", "release_band_history", "hydrograph_validation"],
+                "status": "metadata_ready",
+            },
+            {
+                "source_id": "usgs_09402500_near_grand_canyon",
+                "provider": "USGS",
+                "category": "gauge",
+                "title": "Colorado River Near Grand Canyon, AZ - USGS-09402500",
+                "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09402500/",
+                "license_or_terms": "U.S. federal hydrologic data; cite USGS Water Data for the Nation and site ID.",
+                "use_in_pipeline": ["downstream_flow_context", "travel_time_checks", "hydrograph_validation"],
+                "status": "metadata_ready",
+            },
+            {
+                "source_id": "nps_grand_canyon_river_trips",
+                "provider": "National Park Service",
+                "category": "permit_context",
+                "title": "Grand Canyon River Trips and Permits",
+                "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm",
+                "license_or_terms": "U.S. government web content; preserve NPS attribution and page metadata.",
+                "use_in_pipeline": ["route_endpoints", "trip_style_context", "permit_context", "guide_review"],
+                "status": "metadata_ready",
+            },
+            {
+                "source_id": "nps_grand_canyon_weighted_lottery",
+                "provider": "National Park Service",
+                "category": "permit_context",
+                "title": "Grand Canyon Noncommercial River Permits Weighted Lottery",
+                "url": "https://www.nps.gov/grca/planyourvisit/weightedlottery.htm",
+                "license_or_terms": "U.S. government web content; preserve NPS attribution and page metadata.",
+                "use_in_pipeline": ["permit_context", "launch_date_context", "takeout_fee_notes"],
+                "status": "metadata_ready",
+            },
+            {
+                "source_id": "usgs_3dep",
+                "provider": "USGS",
+                "category": "elevation",
+                "title": "3D Elevation Program (3DEP)",
+                "url": "https://www.usgs.gov/3d-elevation-program",
+                "license_or_terms": "U.S. federal source; confirm product-specific metadata.",
+                "use_in_pipeline": ["terrain_dem", "canyon_wall_context", "bank_shelves"],
+                "status": "planned",
+            },
+            {
+                "source_id": "usgs_3dhp_nhd",
+                "provider": "USGS",
+                "category": "hydrography",
+                "title": "3D Hydrography Program, NHD, and NHDPlus",
+                "url": "https://www.usgs.gov/3d-hydrography-program",
+                "license_or_terms": "U.S. federal source; preserve attribution and product metadata.",
+                "use_in_pipeline": ["centerline", "river_mile_stationing", "tributary_context"],
+                "status": "planned",
+            },
+            {
+                "source_id": "guide_references",
+                "provider": "human_review",
+                "category": "guide_reference",
+                "title": "Rights-cleared Colorado rowing guide review and field notes",
+                "url": "manifest_only_until_rights_clear",
+                "license_or_terms": "Do not vendor guidebook text, third-party imagery, or field media without explicit rights.",
+                "use_in_pipeline": ["rapid_annotations", "oar_line_review", "rescue_context"],
+                "status": "planned",
+            },
+        ],
+        "artifacts": {
+            "elevation": ["terrain/3dep_dem_tiles", "terrain/canyon_corridor_dem.tif"],
+            "hydrography": ["hydrography/centerline.geojson", "hydrography/river_mile_markers.geojson"],
+            "gauges": ["hydrology/usgs_09380000_lees_ferry.json", "hydrology/usgs_09402500_near_grand_canyon.json"],
+            "flow_presets": ["flow_presets.json"],
+            "guide_references": ["review/guide_review_needs.json", "review/oar_line_annotations.geojson"],
+            "validation": ["validation/annotation_needs.json", "validation/route_overlay_plan.json"],
+            "unreal": ["unreal/colorado_rowing_route_editor_pass.json"],
+        },
+        "remote_fetches": [
+            {
+                "fetch_id": "colorado_lees_ferry_gauge",
+                "source_id": "usgs_09380000_lees_ferry",
+                "category": "gauge",
+                "target_artifact": "hydrology/usgs_09380000_lees_ferry.json",
+                "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09380000/",
+                "status": "metadata_ready",
+            },
+            {
+                "fetch_id": "colorado_near_grand_canyon_gauge",
+                "source_id": "usgs_09402500_near_grand_canyon",
+                "category": "gauge",
+                "target_artifact": "hydrology/usgs_09402500_near_grand_canyon.json",
+                "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09402500/",
+                "status": "metadata_ready",
+            },
+        ],
+        "confidence": {
+            "overall": 0.2,
+            "hydrology": 0.3,
+            "terrain": 0.15,
+            "hydrography": 0.15,
+            "guide_review": 0.05,
+            "rapid_annotations": 0.05,
+        },
+        "provenance": {
+            "generated_by": "raftsim.milestone21.build_colorado_rowing_source_manifest",
+            "processing_version": "milestone21_colorado_rowing_draft.v0",
+            "review_status": "draft_target_needs_geospatial_pull_and_guide_review",
+            "redistribution_notes": "Use official manifests and rights-cleared field media; do not vendor guidebook text.",
+        },
+    }
+
+
+def build_colorado_rowing_flow_presets() -> dict[str, Any]:
+    """Build placeholder planning flow bands for Colorado rowing route authoring."""
+
+    return {
+        "schema": "raftsim.colorado_rowing_flow_presets.v0",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "source_manifest": COLORADO_ROWING_SOURCE_MANIFEST_PATH,
+        "status": "planning_placeholders_require_usgs_gauge_history_and_release_context",
+        "flow_bands": [
+            {
+                "flow_band": "low_release_planning",
+                "display_name": "Low Release Planning",
+                "discharge_cfs": 8000.0,
+                "discharge_m3s": 226.534772736,
+                "runnable": True,
+                "expected_rowing_behavior": "More exposed rocks and sharper ferry setup; slower current helps rescue but can increase wrap risk.",
+                "review_priority": "high",
+            },
+            {
+                "flow_band": "moderate_release_planning",
+                "display_name": "Moderate Release Planning",
+                "discharge_cfs": 12000.0,
+                "discharge_m3s": 339.802159104,
+                "runnable": True,
+                "expected_rowing_behavior": "Default large-volume rowing baseline with readable tongues, lateral waves, and longer recovery pools.",
+                "review_priority": "high",
+            },
+            {
+                "flow_band": "high_release_planning",
+                "display_name": "High Release Planning",
+                "discharge_cfs": 18000.0,
+                "discharge_m3s": 509.703238656,
+                "runnable": True,
+                "expected_rowing_behavior": "Faster big-water decisions, stronger wave trains/laterals, longer swimmer drift, and larger eddy fences.",
+                "review_priority": "high",
+            },
+        ],
+        "flow_band_policy": {
+            "must_replace_placeholders": True,
+            "primary_gauges": ["USGS-09380000", "USGS-09402500"],
+            "requires_gauge_history": True,
+            "requires_dam_release_context": True,
+            "requires_guide_review": True,
+        },
+    }
+
+
+def _colorado_rowing_frame_controls() -> list[dict[str, Any]]:
+    return [
+        {
+            "control_id": "pull_stroke",
+            "control_kind": "pull",
+            "gameplay_role": "Drive the oar rig downstream, hold speed through wave trains, or accelerate into a ferry.",
+            "input_axes": ["left_oar_pull", "right_oar_pull"],
+            "telemetry": ["stroke_force_n", "oar_angle_deg", "blade_depth_m", "boat_yaw_delta"],
+        },
+        {
+            "control_id": "back_row",
+            "control_kind": "back_row",
+            "gameplay_role": "Slow the boat, square up to laterals, and create space before a large hydraulic.",
+            "input_axes": ["left_oar_push", "right_oar_push"],
+            "telemetry": ["reverse_stroke_force_n", "boat_speed_delta", "line_error_m"],
+        },
+        {
+            "control_id": "ferry_angle_hold",
+            "control_kind": "ferry_angle",
+            "gameplay_role": "Maintain crossing angle across eddy fences, laterals, and wide tongues.",
+            "input_axes": ["left_oar_pull", "right_oar_back", "guide_lean"],
+            "telemetry": ["ferry_angle_deg", "cross_current_velocity_mps", "yaw_rate_dps"],
+        },
+        {
+            "control_id": "spin_and_pivot_correction",
+            "control_kind": "spin_correction",
+            "gameplay_role": "Recover from unexpected yaw in big-water boils, whirlpools, and lateral hits.",
+            "input_axes": ["asymmetric_oar_force", "passenger_weight_trim"],
+            "telemetry": ["spin_rate_dps", "counterstroke_timing_s", "recovery_margin"],
+        },
+        {
+            "control_id": "passenger_weight_trim",
+            "control_kind": "passenger_trim",
+            "gameplay_role": "Shift load to prevent tube clipping, shallow-shelf pins, or surf/flip escalation.",
+            "input_axes": ["crew_left_right_trim", "crew_fore_aft_trim"],
+            "telemetry": ["center_of_mass_offset_m", "roll_margin_deg", "pin_release_margin"],
+        },
+        {
+            "control_id": "rescue_assist_rowing",
+            "control_kind": "rescue_assist",
+            "gameplay_role": "Set boat angle and relative speed for swimmers, throw-line support, and pull-in timing.",
+            "input_axes": ["back_row", "ferry_angle_hold", "rescue_target_select"],
+            "telemetry": ["swimmer_distance_m", "closing_speed_mps", "rescue_window_s"],
+        },
+    ]
+
+
+def _colorado_validation_annotation_needs() -> list[dict[str, Any]]:
+    return [
+        {
+            "need_id": "river_mile_stationing",
+            "geometry_kind": "river_mile_pin_and_span",
+            "required_sources": ["hydrography/river_mile_markers.geojson", "guide_references"],
+            "review_fields": ["river_mile", "station_m", "rapid_name_if_rights_clear", "confidence"],
+        },
+        {
+            "need_id": "large_volume_lines",
+            "geometry_kind": "raft_line",
+            "required_sources": ["guide_references", "field_media", "gauge_history"],
+            "review_fields": ["entry_line", "pull_back_row_plan", "ferry_angle", "missed_line_consequence"],
+        },
+        {
+            "need_id": "wave_train_lateral_hole_context",
+            "geometry_kind": "polygon_and_span",
+            "required_sources": ["imagery", "terrain", "guide_references", "flow_presets"],
+            "review_fields": ["wave_train", "lateral", "hole", "eddy_fence", "flow_band_response"],
+        },
+        {
+            "need_id": "rowing_rescue_windows",
+            "geometry_kind": "reach_span",
+            "required_sources": ["guide_references", "field_media", "flow_presets"],
+            "review_fields": ["swimmer_drift_path", "eddy_recovery_zone", "throw_line_position", "pull_in_timing"],
+        },
+        {
+            "need_id": "canyon_pacing_and_audio",
+            "geometry_kind": "reach_span",
+            "required_sources": ["terrain", "field_media", "guide_references"],
+            "review_fields": ["long_pool_pacing", "wind_exposure", "canyon_echo", "large_water_source_audio"],
+        },
+    ]
+
+
+def build_colorado_rowing_route_draft_manifest(repo_root: Path) -> Milestone21ColoradoRowingRouteDraft:
+    """Build the Colorado River rowing/oar-rig route draft manifest."""
+
+    source_manifest = build_colorado_rowing_source_manifest()
+    flow_presets = build_colorado_rowing_flow_presets()
+    manifest = {
+        "schema": MILESTONE21_COLORADO_ROWING_ROUTE_SCHEMA,
+        "route_id": "colorado_river_grand_canyon_rowing_draft",
+        "module": "RaftSimRiver",
+        "asset_class": "URaftSimColoradoRowingRouteConfig",
+        "river_id": source_manifest["river_id"],
+        "section_id": source_manifest["section_id"],
+        "section_name": source_manifest["section_name"],
+        "route_style": "rowing_oar_rig",
+        "source_manifest": COLORADO_ROWING_SOURCE_MANIFEST_PATH,
+        "flow_presets": COLORADO_ROWING_FLOW_PRESETS_PATH,
+        "geospatial_import_pipeline": GEOSPATIAL_IMPORT_PIPELINE_PATH,
+        "rapid_river_editor": RAPID_RIVER_EDITOR_MANIFEST_PATH,
+        "feature_tuning_editor": FEATURE_TUNING_EDITOR_PATH,
+        "route_endpoints": {
+            "put_in": "Lees Ferry",
+            "take_out": "Diamond Creek",
+            "stationing_mode": "river_mile_and_local_meters",
+            "nps_context_source": "nps_grand_canyon_river_trips",
+        },
+        "route_segments": [
+            {
+                "segment_id": "lees_ferry_launch_to_marble_canyon",
+                "review_focus": ["launch_flow_context", "rowing_basics", "large_pool_pacing"],
+                "status": "draft_needs_geospatial_pull",
+            },
+            {
+                "segment_id": "marble_canyon_to_little_colorado_context",
+                "review_focus": ["wave_trains", "lateral_waves", "eddy_fences", "wind_exposure"],
+                "status": "draft_needs_guide_review",
+            },
+            {
+                "segment_id": "inner_gorge_technical_rowing",
+                "review_focus": ["large_rapids", "oar_rig_lines", "swimmer_recovery", "scout_annotations"],
+                "status": "draft_needs_validation_annotations",
+            },
+            {
+                "segment_id": "diamond_creek_takeout_context",
+                "review_focus": ["takeout_logistics", "permit_context", "long_recovery_windows"],
+                "status": "draft_needs_access_review",
+            },
+        ],
+        "flow_bands": flow_presets["flow_bands"],
+        "flow_band_policy": flow_presets["flow_band_policy"],
+        "rowing_frame_controls": _colorado_rowing_frame_controls(),
+        "guide_review_requirements": {
+            "oar_rig_guide_signoff_required": True,
+            "field_media_timecodes_required": True,
+            "rights_cleared_guide_notes_required": True,
+            "commercial_and_noncommercial_context_separated": True,
+            "do_not_vendor_guidebook_text": True,
+        },
+        "validation_annotation_needs": _colorado_validation_annotation_needs(),
+        "editor_status": {
+            "source_manifest": "drafted",
+            "flow_bands": "planning_placeholders",
+            "rowing_controls": "drafted",
+            "guide_review": "needs_rights_cleared_human_review",
+            "validation_annotations": "needs_geospatial_and_field_media_pass",
+        },
+        "status": "ready_for_colorado_rowing_route_planning",
+    }
+    return Milestone21ColoradoRowingRouteDraft(
+        source_manifest=source_manifest,
+        flow_presets=flow_presets,
+        manifest=manifest,
+    )
+
+
+def write_colorado_rowing_route_draft_manifest(
+    *,
+    repo_root: Path,
+    output_json: Path,
+    source_manifest_json: Path | None = None,
+    flow_presets_json: Path | None = None,
+) -> Milestone21ColoradoRowingRouteDraft:
+    """Generate and write the Colorado River rowing/oar-rig route draft files."""
+
+    generated = build_colorado_rowing_route_draft_manifest(repo_root)
+    source_output = source_manifest_json or repo_root / COLORADO_ROWING_SOURCE_MANIFEST_PATH
+    flow_output = flow_presets_json or repo_root / COLORADO_ROWING_FLOW_PRESETS_PATH
+    for path, payload in (
+        (source_output, generated.source_manifest),
+        (flow_output, generated.flow_presets),
+        (output_json, generated.manifest),
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return generated

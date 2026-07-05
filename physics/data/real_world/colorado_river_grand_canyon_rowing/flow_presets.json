@@ -1,0 +1,46 @@
+{
+  "flow_band_policy": {
+    "must_replace_placeholders": true,
+    "primary_gauges": [
+      "USGS-09380000",
+      "USGS-09402500"
+    ],
+    "requires_dam_release_context": true,
+    "requires_gauge_history": true,
+    "requires_guide_review": true
+  },
+  "flow_bands": [
+    {
+      "discharge_cfs": 8000.0,
+      "discharge_m3s": 226.534772736,
+      "display_name": "Low Release Planning",
+      "expected_rowing_behavior": "More exposed rocks and sharper ferry setup; slower current helps rescue but can increase wrap risk.",
+      "flow_band": "low_release_planning",
+      "review_priority": "high",
+      "runnable": true
+    },
+    {
+      "discharge_cfs": 12000.0,
+      "discharge_m3s": 339.802159104,
+      "display_name": "Moderate Release Planning",
+      "expected_rowing_behavior": "Default large-volume rowing baseline with readable tongues, lateral waves, and longer recovery pools.",
+      "flow_band": "moderate_release_planning",
+      "review_priority": "high",
+      "runnable": true
+    },
+    {
+      "discharge_cfs": 18000.0,
+      "discharge_m3s": 509.703238656,
+      "display_name": "High Release Planning",
+      "expected_rowing_behavior": "Faster big-water decisions, stronger wave trains/laterals, longer swimmer drift, and larger eddy fences.",
+      "flow_band": "high_release_planning",
+      "review_priority": "high",
+      "runnable": true
+    }
+  ],
+  "river_id": "colorado_river",
+  "schema": "raftsim.colorado_rowing_flow_presets.v0",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json",
+  "status": "planning_placeholders_require_usgs_gauge_history_and_release_context"
+}
