@@ -1,0 +1,193 @@
+{
+  "schema": "raftsim.unreal.vertical_slice_frontend.v1",
+  "data_asset_class": "URaftSimVerticalSliceFrontendConfig",
+  "save_game_class": "URaftSimVerticalSliceSaveGame",
+  "map": "/Game/RaftSim/Maps/L_RaftSimBoot",
+  "source_manifests": {
+    "vertical_slice": "unreal/Content/RaftSim/VerticalSlice/first_rapid_vertical_slice.json",
+    "river_selection_catalog": "unreal/Content/RaftSim/UI/river_selection_catalog.json",
+    "input_actions": "unreal/Content/RaftSim/Input/enhanced_input_actions.json",
+    "voice_accessibility": "unreal/Content/RaftSim/AI/voice_command_accessibility_settings.json",
+    "guide_camera": "unreal/Content/RaftSim/Raft/guide_camera_config.json",
+    "debug_views": "unreal/Content/RaftSim/Debug/live_water_debug_views.json",
+    "replay_manifest": "physics/data/readiness/milestone_10/unreal_visualization/manifest.json",
+    "scoring": "unreal/Content/RaftSim/Crew/gameplay_telemetry_scoring.json"
+  },
+  "screens": [
+    {
+      "screen_id": "main_menu",
+      "kind": "MainMenu",
+      "required_actions": ["start_vertical_slice", "open_settings", "open_replay_review", "quit"],
+      "default_focus": "start_vertical_slice"
+    },
+    {
+      "screen_id": "river_selection",
+      "kind": "RiverSelection",
+      "required_actions": [
+        "choose_river",
+        "choose_section",
+        "choose_season",
+        "choose_flow_band",
+        "choose_difficulty",
+        "choose_raft_setup",
+        "choose_crew_setup"
+      ],
+      "catalog": "unreal/Content/RaftSim/UI/river_selection_catalog.json",
+      "default_selection": {
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "season_id": "summer_commercial",
+        "flow_band_id": "median_runnable",
+        "difficulty_id": "intermediate",
+        "raft_setup_id": "standard_14ft_paddle_raft",
+        "crew_setup_id": "ai_training_crew",
+        "scenario_id": "first_technical_constriction_wave_train"
+      }
+    },
+    {
+      "screen_id": "settings",
+      "kind": "Settings",
+      "required_actions": ["apply", "restore_defaults", "back"],
+      "groups": [
+        {
+          "group_id": "controls",
+          "settings": ["manual_input_scheme", "controller_vibration", "vr_recenter", "motion_intensity"]
+        },
+        {
+          "group_id": "voice_commands",
+          "settings": ["voice_enabled_guided_paddle_only", "push_to_talk", "voice_sensitivity", "subtitles"]
+        },
+        {
+          "group_id": "accessibility_and_comfort",
+          "settings": ["vr_comfort_mode", "impact_filtering", "camera_vignette", "captions"]
+        },
+        {
+          "group_id": "audio_video",
+          "settings": ["master_volume", "spatial_audio_mode", "graphics_quality", "foliage_density"]
+        },
+        {
+          "group_id": "privacy_debug",
+          "settings": ["offline_voice_processing", "telemetry_replay_capture", "debug_overlays_allowed"]
+        }
+      ],
+      "default_values": {
+        "voice_enabled_guided_paddle_only": true,
+        "rowing_voice_commands_enabled": false,
+        "push_to_talk": true,
+        "subtitles": true,
+        "vr_comfort_mode": true,
+        "motion_intensity": 0.65,
+        "master_volume": 1.0,
+        "debug_overlays_allowed": false
+      }
+    },
+    {
+      "screen_id": "save_slots",
+      "kind": "SaveSlots",
+      "required_actions": ["load", "save", "delete", "back"],
+      "save_slot_prefix": "RaftSimVerticalSlice",
+      "slot_count": 3,
+      "saved_fields": [
+        "selection",
+        "settings",
+        "completed_scenario_ids",
+        "best_safety_score",
+        "best_overall_score",
+        "last_replay_manifest_path"
+      ]
+    },
+    {
+      "screen_id": "scenario_briefing",
+      "kind": "ScenarioBriefing",
+      "required_actions": ["start_training", "start_technical_rapid", "change_selection", "back"],
+      "shows": ["selected_river", "flow_band", "crew_setup", "objectives", "safety_risks", "voice_or_manual_input_policy"]
+    },
+    {
+      "screen_id": "pause_menu",
+      "kind": "PauseMenu",
+      "required_actions": ["resume", "restart", "open_settings", "open_debug_overlays", "exit_to_menu"],
+      "available_during_live_run": true
+    },
+    {
+      "screen_id": "score_after_action",
+      "kind": "ScoreAndAfterAction",
+      "required_actions": ["restart", "open_replay_review", "change_selection", "exit_to_menu"],
+      "sections": ["line_summary", "safety_summary", "command_timing", "boat_angle", "paddle_efficiency", "rescue_and_recovery"]
+    },
+    {
+      "screen_id": "replay_review",
+      "kind": "ReplayReview",
+      "required_actions": ["play_pause", "scrub", "jump_bookmark", "toggle_overlay", "export_review_capture", "back"],
+      "replay_source": "physics/data/readiness/milestone_10/unreal_visualization/manifest.json",
+      "bookmarks": [
+        {
+          "bookmark_id": "entry",
+          "time_seconds": 0.0,
+          "tags": ["line_choice", "flow_reading"]
+        },
+        {
+          "bookmark_id": "first_contact",
+          "time_seconds": 8.0,
+          "tags": ["raft_contact", "crew_weight"]
+        },
+        {
+          "bookmark_id": "command_window",
+          "time_seconds": 14.0,
+          "tags": ["voice_or_manual_command", "paddle_efficiency"]
+        },
+        {
+          "bookmark_id": "rescue_window",
+          "time_seconds": 24.0,
+          "tags": ["swimmer", "rescue"]
+        },
+        {
+          "bookmark_id": "finish",
+          "time_seconds": 36.0,
+          "tags": ["score", "after_action"]
+        }
+      ]
+    },
+    {
+      "screen_id": "debug_overlays",
+      "kind": "DebugOverlays",
+      "required_actions": ["toggle_depth", "toggle_velocity", "toggle_contacts", "toggle_runtime_budget", "toggle_replay_cues", "back"],
+      "source": "unreal/Content/RaftSim/Debug/live_water_debug_views.json",
+      "overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "conservation_deltas",
+        "raft_trajectory",
+        "contact_probes",
+        "runtime_budgets",
+        "presentation_cues",
+        "environment_quality"
+      ]
+    }
+  ],
+  "runtime_wiring": {
+    "selection_view_model": "URaftSimSelectionViewModel",
+    "replay_subsystem": "URaftSimReplaySubsystem",
+    "debug_view_model": "URaftSimWaterDebugViewModel",
+    "vertical_slice_game_mode": "ARaftSimVerticalSliceGameMode",
+    "settings_apply_targets": [
+      "ARaftSimGuidePawn",
+      "URaftSimVoiceCommandRouter",
+      "URaftSimWaterDebugViewModel",
+      "URaftSimTelemetryPresentationCueLibrary"
+    ]
+  },
+  "pass_policy": {
+    "has_main_menu": true,
+    "has_settings": true,
+    "has_river_section_season_flow_difficulty_raft_crew_selection": true,
+    "has_save_data_contract": true,
+    "has_telemetry_replay_review": true,
+    "has_debug_overlays": true,
+    "voice_commands_disabled_for_rowing": true,
+    "manual_input_parity_preserved": true
+  },
+  "status": "ready_for_umg_widget_authoring"
+}

@@ -226,6 +226,7 @@ Tasks:
 - Add scoring for safety, line, boat angle, paddle efficiency, passenger trust, and completion.
 - Add restart, replay, ghost telemetry, and after-action feedback.
 - Add basic menus and settings.
+- Add the vertical-slice frontend shell from `unreal/Content/RaftSim/UI/vertical_slice_frontend_flow.json`: main menu, settings, save slots, scenario briefing, pause, score/after-action, replay review, and debug overlay screens.
 - Add microphone, push-to-talk/open-mic, subtitles, command confirmation, voice sensitivity, privacy/offline, and fallback-control settings for guided paddle-raft voice commands.
 - Add river, section, season, flow, difficulty, and raft/crew selection backed by validated data assets.
 - Add manifest-approved free/open, first-party generated, procedural, and AI-generated audio for the vertical slice: water beds, rapid features, raft/paddle/rock Foley, guide commands, crew acknowledgments, UI, weather, and fail/safety states.
@@ -336,6 +337,7 @@ Use Unreal data assets for game-facing tuning while keeping source-of-truth expo
 
 - River section definitions
 - River catalog, region, section, season, flow, difficulty, gauge, and source-manifest definitions
+- Frontend flow, save-game fields, replay-review bookmarks, settings groups, and debug overlay toggles
 - Water field / feature metadata
 - Geospatial corridor metadata, centerlines, banks, cross sections, rapid boundaries, imagery masks, and data confidence scores
 - Vertical-slice environment corridor recipe with authored landscape, bank, rock, foliage, debris, lighting/weather, audio geometry, and water-readability layers plus desktop/VR/debug quality budgets
