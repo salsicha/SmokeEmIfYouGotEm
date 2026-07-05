@@ -37,6 +37,15 @@ enum class ERaftSimCrewSafetyState : uint8
     FailedRescue
 };
 
+UENUM(BlueprintType)
+enum class ERaftSimSwimmingSkillLevel : uint8
+{
+    NonSwimmer,
+    WeakSwimmer,
+    AverageSwimmer,
+    StrongSwimmer
+};
+
 USTRUCT(BlueprintType)
 struct FRaftSimCrewSeatOccupancy
 {
@@ -154,6 +163,51 @@ struct FRaftSimCrewSafetyTransition
     FName SourceContactEventId;
 };
 
+USTRUCT(BlueprintType)
+struct FRaftSimSwimmingSkillProfile
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    ERaftSimSwimmingSkillLevel SkillLevel = ERaftSimSwimmingSkillLevel::AverageSwimmer;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    bool bSelfRescueAllowed = true;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float PanicScalar = 0.45f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float RescuePriority = 0.55f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float PullInDifficulty = 0.9f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float TimeToCriticalSeconds = 22.0f;
+};
+
+USTRUCT(BlueprintType)
+struct FRaftSimPassengerSwimmingSkillAssignment
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    FName PassengerId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    FName SeatId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    bool bAssignedFromRoster = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    int32 AssignmentSeed = 0;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    FRaftSimSwimmingSkillProfile Profile;
+};
+
 UCLASS()
 class RAFTSIMCREW_API URaftSimCrewWeightDistributionLibrary : public UBlueprintFunctionLibrary
 {
@@ -183,5 +237,26 @@ public:
     static FRaftSimCrewSafetyStateFrame ApplySafetyTransition(
         const FRaftSimCrewSafetyStateFrame& CurrentFrame,
         const FRaftSimCrewSafetyTransition& Transition
+    );
+};
+
+UCLASS()
+class RAFTSIMCREW_API URaftSimSwimmingSkillLibrary : public UBlueprintFunctionLibrary
+{
+    GENERATED_BODY()
+
+public:
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew")
+    static FRaftSimSwimmingSkillProfile MakeSwimmingSkillProfile(
+        ERaftSimSwimmingSkillLevel SkillLevel
+    );
+
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew")
+    static FRaftSimPassengerSwimmingSkillAssignment AssignSwimmingSkillFromNormalizedValue(
+        FName PassengerId,
+        FName SeatId,
+        float NormalizedValue,
+        int32 AssignmentSeed,
+        bool bAssignedFromRoster = false
     );
 };

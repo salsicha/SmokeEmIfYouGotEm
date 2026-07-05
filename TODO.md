@@ -866,7 +866,7 @@ This milestone wires the selected raft/contact runtime, validated water fields, 
 - [x] Implement raft-rock, bank, ledge, shallow-shelf, bed-grounding, boulder-garden, pin/release, surf/flush, and flip contacts with telemetry for restitution, damping, friction, stick/slip, contact loading, and release thresholds.
 - [x] Implement crew seating, weight distribution, brace, lean, and high-side mechanics that shift center of gravity and change pin/flip/release outcomes.
 - [x] Implement crew-overboard safety states: seated, at-risk, falling/ejected, swimming, rescue-targeted, rescued, re-seated/recovered, and failed-rescue.
-- [ ] Assign passenger swimming skill per run or roster entry, including non-swimmers who cannot self-rescue and require faster guide or crew intervention.
+- [x] Assign passenger swimming skill per run or roster entry, including non-swimmers who cannot self-rescue and require faster guide or crew intervention.
 - [ ] Add swimmer drift, visibility, callouts, rescue target selection, reach/paddle grab, throw-line support where available, pull-in timing, re-seat/recovery, fatigue, trust changes, and failed-rescue consequences.
 - [ ] Add gameplay telemetry and scoring for safety, line choice, boat angle, paddle efficiency, command timing, high-side/brace timing, swims, rescue method, time in water, and crew recovery.
 

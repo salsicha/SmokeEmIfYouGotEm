@@ -1,0 +1,116 @@
+{
+  "schema": "raftsim.unreal.swimming_skill_assignment.v1",
+  "status": "passenger_swimming_skill_assignment_ready_for_run_setup",
+  "source_manifests": {
+    "crew_personas": "unreal/Content/RaftSim/AI/crew_personas.json",
+    "crew_overboard_safety_states": "unreal/Content/RaftSim/Crew/crew_overboard_safety_states.json"
+  },
+  "runtime_contract": {
+    "module": "RaftSimCrew",
+    "skill_enum": "ERaftSimSwimmingSkillLevel",
+    "profile_struct": "FRaftSimSwimmingSkillProfile",
+    "assignment_struct": "FRaftSimPassengerSwimmingSkillAssignment",
+    "assignment_library": "URaftSimSwimmingSkillLibrary::AssignSwimmingSkillFromNormalizedValue"
+  },
+  "assignment_policy": {
+    "mode": "per_run_seeded_random_or_roster_override",
+    "deterministic_seed_sources": [
+      "run_seed",
+      "river_id",
+      "section_id",
+      "passenger_id",
+      "seat_id"
+    ],
+    "default_distribution": {
+      "non_swimmer": 0.15,
+      "weak_swimmer": 0.25,
+      "average_swimmer": 0.45,
+      "strong_swimmer": 0.15
+    },
+    "record_assignment_in_replay": true
+  },
+  "skill_levels": [
+    {
+      "skill_id": "non_swimmer",
+      "display_name": "Non-swimmer",
+      "self_rescue_allowed": false,
+      "panic_scalar": 1.0,
+      "rescue_priority": 1.0,
+      "pull_in_difficulty": 1.2,
+      "time_to_critical_seconds": 8.0
+    },
+    {
+      "skill_id": "weak_swimmer",
+      "display_name": "Weak swimmer",
+      "self_rescue_allowed": true,
+      "panic_scalar": 0.75,
+      "rescue_priority": 0.8,
+      "pull_in_difficulty": 1.05,
+      "time_to_critical_seconds": 14.0
+    },
+    {
+      "skill_id": "average_swimmer",
+      "display_name": "Average swimmer",
+      "self_rescue_allowed": true,
+      "panic_scalar": 0.45,
+      "rescue_priority": 0.55,
+      "pull_in_difficulty": 0.9,
+      "time_to_critical_seconds": 22.0
+    },
+    {
+      "skill_id": "strong_swimmer",
+      "display_name": "Strong swimmer",
+      "self_rescue_allowed": true,
+      "panic_scalar": 0.25,
+      "rescue_priority": 0.35,
+      "pull_in_difficulty": 0.75,
+      "time_to_critical_seconds": 32.0
+    }
+  ],
+  "roster_entries": [
+    {
+      "passenger_id": "nervous_first_timer",
+      "display_name": "Nervous First Timer",
+      "roster_override_allowed": true,
+      "default_assignment": "per_run_seeded_random"
+    },
+    {
+      "passenger_id": "steady_returning_paddler",
+      "display_name": "Steady Returning Paddler",
+      "roster_override_allowed": true,
+      "default_assignment": "per_run_seeded_random"
+    },
+    {
+      "passenger_id": "overconfident_friend",
+      "display_name": "Overconfident Friend",
+      "roster_override_allowed": true,
+      "default_assignment": "per_run_seeded_random"
+    }
+  ],
+  "gameplay_effects": {
+    "non_swimmers_cannot_self_rescue": true,
+    "affects_panic": true,
+    "affects_rescue_priority": true,
+    "affects_pull_in_difficulty": true,
+    "affects_safety_score": true,
+    "linked_safety_state_schema": "raftsim.unreal.crew_overboard_safety_states.v1"
+  },
+  "telemetry_fields": [
+    "passenger_id",
+    "seat_id",
+    "skill_level",
+    "assigned_from_roster",
+    "assignment_seed",
+    "self_rescue_allowed",
+    "panic_scalar",
+    "rescue_priority",
+    "pull_in_difficulty",
+    "time_to_critical_seconds"
+  ],
+  "pass_policy": {
+    "non_swimmer_skill_level_required": true,
+    "non_swimmers_cannot_self_rescue": true,
+    "assignments_are_seeded_or_roster_recorded": true,
+    "skill_affects_rescue_priority_and_safety_scoring": true
+  }
+}
