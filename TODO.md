@@ -874,7 +874,7 @@ This milestone wires the selected raft/contact runtime, validated water fields, 
 
 This milestone delivers the first complete playable Unreal slice from launch to score screen.
 
-- [ ] Build the stern guide camera for flat-screen and VR with seated recentering, comfort settings, haptics, visible hands/paddle, raft context, and accessibility options.
+- [x] Build the stern guide camera for flat-screen and VR: `ARaftSimGuidePawn` now owns seated recentering, comfort settings, impact filtering, haptic pulse output, hand/paddle/raft-context anchors, and accessibility comfort mode, with `unreal/Content/RaftSim/Raft/guide_camera_config.json` documenting the authored defaults.
 - [ ] Implement paddle, oar, guide-command, brace, high-side, rescue, and recovery inputs with manual parity for keyboard/mouse, gamepad, and VR controllers; rowing/oar-rig controls stay direct/manual-only and do not route through passenger paddle voice commands.
 - [ ] Add lightweight, efficient, accurate local voice-command recognition and deterministic command-intent routing for guided passenger paddle-raft commands such as `forward paddle`, back paddle, brace, hold-on, high-side, swimmer, rescue, and recovery, with confidence/fallback behavior and manual parity through keyboard/mouse, gamepad, and VR controllers.
 - [ ] Build one training section and one technical rapid using validated river data, live custom water, selected raft/contact authority, crew safety states, scoring, restart, replay, and after-action feedback.
