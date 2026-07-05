@@ -107,3 +107,68 @@ FRaftSimCrewWeightDistributionFrame URaftSimCrewWeightDistributionLibrary::Evalu
 
     return Frame;
 }
+
+bool URaftSimCrewSafetyStateLibrary::CanTransitionSafetyState(
+    ERaftSimCrewSafetyState PreviousState,
+    ERaftSimCrewSafetyState NextState
+)
+{
+    if (PreviousState == NextState)
+    {
+        return true;
+    }
+
+    switch (PreviousState)
+    {
+        case ERaftSimCrewSafetyState::Seated:
+            return NextState == ERaftSimCrewSafetyState::AtRisk;
+        case ERaftSimCrewSafetyState::AtRisk:
+            return (
+                NextState == ERaftSimCrewSafetyState::Seated
+                || NextState == ERaftSimCrewSafetyState::FallingEjected
+            );
+        case ERaftSimCrewSafetyState::FallingEjected:
+            return NextState == ERaftSimCrewSafetyState::Swimming;
+        case ERaftSimCrewSafetyState::Swimming:
+            return (
+                NextState == ERaftSimCrewSafetyState::RescueTargeted
+                || NextState == ERaftSimCrewSafetyState::FailedRescue
+            );
+        case ERaftSimCrewSafetyState::RescueTargeted:
+            return (
+                NextState == ERaftSimCrewSafetyState::Rescued
+                || NextState == ERaftSimCrewSafetyState::FailedRescue
+            );
+        case ERaftSimCrewSafetyState::Rescued:
+            return NextState == ERaftSimCrewSafetyState::ReseatedRecovered;
+        case ERaftSimCrewSafetyState::ReseatedRecovered:
+            return NextState == ERaftSimCrewSafetyState::Seated;
+        case ERaftSimCrewSafetyState::FailedRescue:
+        default:
+            return false;
+    }
+}
+
+FRaftSimCrewSafetyStateFrame URaftSimCrewSafetyStateLibrary::ApplySafetyTransition(
+    const FRaftSimCrewSafetyStateFrame& CurrentFrame,
+    const FRaftSimCrewSafetyTransition& Transition
+)
+{
+    FRaftSimCrewSafetyStateFrame NextFrame = CurrentFrame;
+    if (!CanTransitionSafetyState(Transition.PreviousState, Transition.NextState))
+    {
+        return NextFrame;
+    }
+
+    NextFrame.CurrentState = Transition.NextState;
+    NextFrame.TimeInStateSeconds = 0.0f;
+    if (Transition.NextState == ERaftSimCrewSafetyState::Swimming)
+    {
+        NextFrame.TimeInWaterSeconds = 0.0f;
+    }
+    if (Transition.NextState == ERaftSimCrewSafetyState::FailedRescue)
+    {
+        NextFrame.FailedRescueReason = Transition.TransitionReason;
+    }
+    return NextFrame;
+}

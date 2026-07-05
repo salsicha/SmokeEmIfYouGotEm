@@ -22,6 +22,10 @@ MILESTONE22_CREW_WEIGHT_SCHEMA = "raftsim.unreal.crew_weight_distribution.v1"
 MILESTONE22_CREW_WEIGHT_STATUS = (
     "crew_seating_weight_shift_and_outcome_modifiers_ready_for_runtime_wiring"
 )
+MILESTONE22_CREW_SAFETY_SCHEMA = "raftsim.unreal.crew_overboard_safety_states.v1"
+MILESTONE22_CREW_SAFETY_STATUS = (
+    "crew_overboard_safety_states_ready_for_rescue_gameplay_wiring"
+)
 
 
 @dataclass(frozen=True)
@@ -419,6 +423,144 @@ def build_crew_weight_distribution_manifest(repo_root: Path) -> Milestone22Manif
             "brace_lean_and_high_side_shift_center_of_gravity": True,
             "weight_distribution_modifies_pin_flip_release_outcomes": True,
             "deterministic_inputs_and_voice_commands_cover_weight_shift_actions": True,
+        },
+    }
+    return Milestone22ManifestBuild(manifest=manifest)
+
+
+def build_crew_overboard_safety_states_manifest(repo_root: Path) -> Milestone22ManifestBuild:
+    """Build the Milestone 22 crew-overboard safety-state manifest."""
+
+    repo_root = repo_root.resolve()
+    contact_telemetry_path = (
+        repo_root / "unreal/Content/RaftSim/Physics/raft_contact_response_telemetry.json"
+    )
+    crew_weight_path = repo_root / "unreal/Content/RaftSim/Crew/crew_weight_distribution.json"
+    voice_grammar_path = repo_root / "unreal/Content/RaftSim/AI/guide_voice_command_grammar.json"
+
+    contact_telemetry = _load_json(contact_telemetry_path)
+    crew_weight = _load_json(crew_weight_path)
+    voice_grammar = _load_json(voice_grammar_path)
+
+    states = [
+        {
+            "state_id": "seated",
+            "description": "Passenger is in an assigned raft seat and can paddle, brace, lean, or high-side.",
+        },
+        {
+            "state_id": "at_risk",
+            "description": "Passenger remains in the raft but contact, roll, fear, or missed brace timing makes ejection possible.",
+        },
+        {
+            "state_id": "falling_ejected",
+            "description": "Passenger has left the seat and is transitioning toward water contact.",
+        },
+        {
+            "state_id": "swimming",
+            "description": "Passenger is in the river and drifting as an active rescue target candidate.",
+        },
+        {
+            "state_id": "rescue_targeted",
+            "description": "Guide or crew has selected the swimmer for reach, paddle, throw-line, or pull-in action.",
+        },
+        {
+            "state_id": "rescued",
+            "description": "Swimmer is secured at the raft or by a rescue action but not fully re-seated.",
+        },
+        {
+            "state_id": "reseated_recovered",
+            "description": "Passenger is back in a usable raft state and can resume crew actions after recovery delay.",
+        },
+        {
+            "state_id": "failed_rescue",
+            "description": "Rescue window failed or swimmer left recoverable bounds, causing safety-score collapse.",
+        },
+    ]
+
+    transitions = [
+        ["seated", "at_risk"],
+        ["at_risk", "seated"],
+        ["at_risk", "falling_ejected"],
+        ["falling_ejected", "swimming"],
+        ["swimming", "rescue_targeted"],
+        ["rescue_targeted", "rescued"],
+        ["rescued", "reseated_recovered"],
+        ["swimming", "failed_rescue"],
+        ["rescue_targeted", "failed_rescue"],
+        ["reseated_recovered", "seated"],
+    ]
+
+    manifest: dict[str, Any] = {
+        "schema": MILESTONE22_CREW_SAFETY_SCHEMA,
+        "status": MILESTONE22_CREW_SAFETY_STATUS,
+        "source_manifests": {
+            "contact_response_telemetry": (
+                "unreal/Content/RaftSim/Physics/raft_contact_response_telemetry.json"
+            ),
+            "crew_weight_distribution": "unreal/Content/RaftSim/Crew/crew_weight_distribution.json",
+            "voice_command_grammar": (
+                "unreal/Content/RaftSim/AI/guide_voice_command_grammar.json"
+            ),
+        },
+        "runtime_contract": {
+            "module": "RaftSimCrew",
+            "state_enum": "ERaftSimCrewSafetyState",
+            "frame_struct": "FRaftSimCrewSafetyStateFrame",
+            "transition_struct": "FRaftSimCrewSafetyTransition",
+            "transition_library": "URaftSimCrewSafetyStateLibrary::CanTransitionSafetyState",
+        },
+        "states": states,
+        "allowed_transitions": [
+            {"from": source, "to": target} for source, target in transitions
+        ],
+        "transition_triggers": {
+            "at_risk": [
+                "contact_loading_n_above_threshold",
+                "flip_risk_modifier_above_threshold",
+                "missed_brace_or_high_side_window",
+            ],
+            "falling_ejected": [
+                "roll_moment_n_m_above_ejection_threshold",
+                "unseated_contact_impulse",
+                "failed_hold_on_check",
+            ],
+            "swimming": ["water_contact_confirmed", "raft_separation_started"],
+            "rescue_targeted": ["guide_rescue_intent", "crew_rescue_intent"],
+            "rescued": ["reach_grab_success", "paddle_grab_success", "throw_line_success"],
+            "reseated_recovered": ["pull_in_complete", "recovery_delay_complete"],
+            "failed_rescue": [
+                "rescue_window_expired",
+                "swimmer_out_of_recoverable_bounds",
+                "critical_fatigue_or_panic",
+            ],
+        },
+        "telemetry_fields": [
+            "passenger_id",
+            "seat_id",
+            "previous_state",
+            "current_state",
+            "transition_reason",
+            "source_contact_event_id",
+            "center_of_gravity_local_m",
+            "time_in_state_seconds",
+            "time_in_water_seconds",
+            "rescue_target_priority",
+            "failed_rescue_reason",
+        ],
+        "source_contract_summary": {
+            "contact_schema": contact_telemetry["schema"],
+            "crew_weight_schema": crew_weight["schema"],
+            "voice_rescue_intents": [
+                command["crew_intent"]
+                for command in voice_grammar["commands"]
+                if command["crew_intent"] in {"crew_rescue", "crew_recovery"}
+            ],
+        },
+        "pass_policy": {
+            "all_required_states_present": True,
+            "all_state_changes_emit_transition_telemetry": True,
+            "failed_rescue_is_terminal_until_reset": True,
+            "recovered_passenger_requires_reseat_before_normal_crew_actions": True,
         },
     }
     return Milestone22ManifestBuild(manifest=manifest)

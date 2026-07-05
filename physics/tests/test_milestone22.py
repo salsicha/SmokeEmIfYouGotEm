@@ -2,12 +2,15 @@ import json
 from pathlib import Path
 
 from raftsim.milestone22 import (
+    MILESTONE22_CREW_SAFETY_SCHEMA,
+    MILESTONE22_CREW_SAFETY_STATUS,
     MILESTONE22_CREW_WEIGHT_SCHEMA,
     MILESTONE22_CREW_WEIGHT_STATUS,
     MILESTONE22_CONTACT_TELEMETRY_SCHEMA,
     MILESTONE22_CONTACT_TELEMETRY_STATUS,
     MILESTONE22_RAFT_CONTACT_AUTHORITY_SCHEMA,
     MILESTONE22_RAFT_CONTACT_AUTHORITY_STATUS,
+    build_crew_overboard_safety_states_manifest,
     build_crew_weight_distribution_manifest,
     build_raft_contact_authority_integration,
     build_raft_contact_response_telemetry,
@@ -32,6 +35,9 @@ CONTACT_TELEMETRY_PATH = (
 )
 CREW_WEIGHT_DISTRIBUTION_PATH = (
     REPO_ROOT / "unreal/Content/RaftSim/Crew/crew_weight_distribution.json"
+)
+CREW_SAFETY_STATES_PATH = (
+    REPO_ROOT / "unreal/Content/RaftSim/Crew/crew_overboard_safety_states.json"
 )
 PHYSICS_BRIDGE_HEADER_PATH = (
     REPO_ROOT
@@ -249,3 +255,82 @@ def test_unreal_crew_weight_distribution_contract_exposes_cog_and_outcome_modifi
         "ReleaseAssistModifier",
     ):
         assert field in header_text
+
+
+def test_crew_overboard_safety_states_manifest_matches_generator():
+    expected = build_crew_overboard_safety_states_manifest(REPO_ROOT).manifest
+    committed = json.loads(CREW_SAFETY_STATES_PATH.read_text(encoding="utf-8"))
+
+    assert committed == expected
+    assert committed["schema"] == MILESTONE22_CREW_SAFETY_SCHEMA
+    assert committed["status"] == MILESTONE22_CREW_SAFETY_STATUS
+
+
+def test_crew_overboard_safety_states_cover_required_state_machine():
+    manifest = json.loads(CREW_SAFETY_STATES_PATH.read_text(encoding="utf-8"))
+    state_ids = {state["state_id"] for state in manifest["states"]}
+    transitions = {
+        (transition["from"], transition["to"])
+        for transition in manifest["allowed_transitions"]
+    }
+
+    assert state_ids == {
+        "seated",
+        "at_risk",
+        "falling_ejected",
+        "swimming",
+        "rescue_targeted",
+        "rescued",
+        "reseated_recovered",
+        "failed_rescue",
+    }
+    assert ("at_risk", "falling_ejected") in transitions
+    assert ("falling_ejected", "swimming") in transitions
+    assert ("swimming", "rescue_targeted") in transitions
+    assert ("rescue_targeted", "rescued") in transitions
+    assert ("rescued", "reseated_recovered") in transitions
+    assert ("swimming", "failed_rescue") in transitions
+
+
+def test_crew_overboard_safety_states_require_transition_telemetry():
+    manifest = json.loads(CREW_SAFETY_STATES_PATH.read_text(encoding="utf-8"))
+    fields = set(manifest["telemetry_fields"])
+
+    assert {
+        "passenger_id",
+        "seat_id",
+        "previous_state",
+        "current_state",
+        "transition_reason",
+        "time_in_water_seconds",
+        "rescue_target_priority",
+        "failed_rescue_reason",
+    }.issubset(fields)
+    assert manifest["pass_policy"]["failed_rescue_is_terminal_until_reset"] is True
+    assert manifest["source_contract_summary"]["voice_rescue_intents"] == [
+        "crew_rescue",
+        "crew_recovery",
+    ]
+
+
+def test_unreal_crew_safety_state_contract_exposes_overboard_state_machine():
+    header_text = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimCrew/Public/RaftSimCrewStateContracts.h"
+    ).read_text(encoding="utf-8")
+
+    assert "ERaftSimCrewSafetyState" in header_text
+    for state in (
+        "Seated",
+        "AtRisk",
+        "FallingEjected",
+        "Swimming",
+        "RescueTargeted",
+        "Rescued",
+        "ReseatedRecovered",
+        "FailedRescue",
+    ):
+        assert state in header_text
+    assert "FRaftSimCrewSafetyStateFrame" in header_text
+    assert "FRaftSimCrewSafetyTransition" in header_text
+    assert "CanTransitionSafetyState" in header_text
