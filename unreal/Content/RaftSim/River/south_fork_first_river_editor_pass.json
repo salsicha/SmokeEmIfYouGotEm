@@ -3,6 +3,7 @@
     "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
     "manifest": "physics/reports/milestone20/report_set_lock.json"
   },
+  "alpha_content_expansion": "unreal/Content/RaftSim/River/south_fork_alpha_content_expansion.json",
   "asset_class": "URaftSimSouthForkEditorPassConfig",
   "corridor_package": "physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json",
   "corridor_package_version": "raftsim.real_world_corridor.v0",

@@ -8,11 +8,19 @@
       "river_name": "South Fork American River",
       "section_id": "chili_bar_to_coloma",
       "section_name": "Chili Bar to Coloma",
+      "content_expansion": "unreal/Content/RaftSim/River/south_fork_alpha_content_expansion.json",
       "region": "California Sierra Nevada",
-      "difficulty_presets": ["beginner", "intermediate", "advanced", "expert"],
+      "difficulty_presets": ["commercial_training", "beginner", "intermediate", "technical_scouting", "advanced", "expert", "expert_linked_run"],
       "difficulty_range": ["class_ii", "class_iii"],
-      "seasons": ["late_summer_low_water", "spring_runoff_or_release", "summer_commercial"],
+      "seasons": ["fall_private_low_water", "late_summer_low_water", "spring_runoff_or_release", "summer_commercial", "storm_response"],
       "flow_bands": [
+        {
+          "flow_band": "shoulder_season_low",
+          "season": "fall_private_low_water",
+          "discharge_cfs": 650.0,
+          "confidence": 0.2,
+          "requires_validation_before_playable": true
+        },
         {
           "flow_band": "low_runnable",
           "season": "late_summer_low_water",
@@ -30,6 +38,20 @@
           "season": "spring_runoff_or_release",
           "discharge_cfs": 3000.0,
           "confidence": 0.25
+        },
+        {
+          "flow_band": "spring_release_peak",
+          "season": "spring_runoff_or_release",
+          "discharge_cfs": 4200.0,
+          "confidence": 0.18,
+          "requires_validation_before_playable": true
+        },
+        {
+          "flow_band": "post_storm_high",
+          "season": "storm_response",
+          "discharge_cfs": 5200.0,
+          "confidence": 0.12,
+          "requires_validation_before_playable": true
         }
       ],
       "raft_setups": ["standard_14ft_paddle_raft", "heavier_training_raft"],
