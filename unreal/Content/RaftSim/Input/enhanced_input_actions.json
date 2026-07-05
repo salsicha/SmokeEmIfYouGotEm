@@ -1,10 +1,30 @@
 {
   "schema": "raftsim.unreal.enhanced_input_actions.v1",
+  "manual_input_policy": {
+    "manual_parity_required_devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+    "guided_paddle_raft_voice_eligible_actions": [
+      "GuideCommandForwardPaddle",
+      "GuideCommandBackPaddle",
+      "GuideCommandLeftPaddle",
+      "GuideCommandRightPaddle",
+      "GuideCommandStop",
+      "PaddleBrace",
+      "HighSide",
+      "HoldOn",
+      "ReseatCrew"
+    ],
+    "rowing_oar_rig_voice_commands_enabled": false
+  },
   "mapping_contexts": [
     {
       "context_id": "IMC_GuideFlatScreen",
       "priority": 10,
       "devices": ["keyboard_mouse", "gamepad"]
+    },
+    {
+      "context_id": "IMC_RowingOarRig",
+      "priority": 15,
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"]
     },
     {
       "context_id": "IMC_GuideVR",
@@ -22,85 +42,177 @@
       "action_id": "PaddleStroke",
       "value_type": "Axis3D",
       "devices": ["vr_motion_controllers", "keyboard_mouse", "gamepad"],
-      "deterministic_intent": "guide_paddle_stroke"
+      "gameplay_mode": "guided_paddle_raft",
+      "deterministic_intent": "guide_paddle_stroke",
+      "voice_command_eligible": false
     },
     {
       "action_id": "PaddleBrace",
       "value_type": "Boolean",
       "devices": ["vr_motion_controllers", "keyboard_mouse", "gamepad"],
-      "deterministic_intent": "guide_brace"
+      "gameplay_mode": "shared_safety",
+      "deterministic_intent": "guide_brace",
+      "voice_command_eligible": true
     },
     {
       "action_id": "PaddleDraw",
       "value_type": "Axis2D",
       "devices": ["vr_motion_controllers", "keyboard_mouse", "gamepad"],
-      "deterministic_intent": "guide_draw_or_rudder"
+      "gameplay_mode": "guided_paddle_raft",
+      "deterministic_intent": "guide_draw_or_rudder",
+      "voice_command_eligible": false
+    },
+    {
+      "action_id": "OarLeftStroke",
+      "value_type": "Axis2D",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "gameplay_mode": "rowing_oar_rig",
+      "deterministic_intent": "rowing_left_oar_stroke",
+      "voice_command_eligible": false
+    },
+    {
+      "action_id": "OarRightStroke",
+      "value_type": "Axis2D",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "gameplay_mode": "rowing_oar_rig",
+      "deterministic_intent": "rowing_right_oar_stroke",
+      "voice_command_eligible": false
+    },
+    {
+      "action_id": "OarFeather",
+      "value_type": "Axis1D",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "gameplay_mode": "rowing_oar_rig",
+      "deterministic_intent": "rowing_oar_feather",
+      "voice_command_eligible": false
+    },
+    {
+      "action_id": "GuideCommandForwardPaddle",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "gameplay_mode": "guided_paddle_raft",
+      "deterministic_intent": "crew_forward_paddle",
+      "voice_command_eligible": true
+    },
+    {
+      "action_id": "GuideCommandBackPaddle",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "gameplay_mode": "guided_paddle_raft",
+      "deterministic_intent": "crew_back_paddle",
+      "voice_command_eligible": true
+    },
+    {
+      "action_id": "GuideCommandLeftPaddle",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "gameplay_mode": "guided_paddle_raft",
+      "deterministic_intent": "crew_left_paddle",
+      "voice_command_eligible": true
+    },
+    {
+      "action_id": "GuideCommandRightPaddle",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "gameplay_mode": "guided_paddle_raft",
+      "deterministic_intent": "crew_right_paddle",
+      "voice_command_eligible": true
+    },
+    {
+      "action_id": "GuideCommandStop",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "gameplay_mode": "guided_paddle_raft",
+      "deterministic_intent": "crew_stop",
+      "voice_command_eligible": true
     },
     {
       "action_id": "HighSide",
       "value_type": "Boolean",
-      "devices": ["keyboard_mouse", "gamepad"],
-      "deterministic_intent": "crew_high_side"
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "gameplay_mode": "shared_safety",
+      "deterministic_intent": "crew_high_side",
+      "voice_command_eligible": true
     },
     {
       "action_id": "CrewLean",
       "value_type": "Axis1D",
       "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
-      "deterministic_intent": "crew_lean_lateral"
+      "gameplay_mode": "shared_safety",
+      "deterministic_intent": "crew_lean_lateral",
+      "voice_command_eligible": false
     },
     {
       "action_id": "HoldOn",
       "value_type": "Boolean",
       "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
-      "deterministic_intent": "crew_hold_on"
+      "gameplay_mode": "shared_safety",
+      "deterministic_intent": "crew_hold_on",
+      "voice_command_eligible": true
     },
     {
       "action_id": "RescueTargetSelect",
       "value_type": "Axis1D",
       "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
-      "deterministic_intent": "rescue_target_select"
+      "gameplay_mode": "shared_safety",
+      "deterministic_intent": "rescue_target_select",
+      "voice_command_eligible": false
     },
     {
       "action_id": "RescueReachGrab",
       "value_type": "Boolean",
       "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
-      "deterministic_intent": "rescue_reach_or_paddle_grab"
+      "gameplay_mode": "shared_safety",
+      "deterministic_intent": "rescue_reach_or_paddle_grab",
+      "voice_command_eligible": false
     },
     {
       "action_id": "RescueThrowLine",
       "value_type": "Boolean",
       "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
-      "deterministic_intent": "rescue_throw_line"
+      "gameplay_mode": "shared_safety",
+      "deterministic_intent": "rescue_throw_line",
+      "voice_command_eligible": false
     },
     {
       "action_id": "ReseatCrew",
       "value_type": "Boolean",
       "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
-      "deterministic_intent": "crew_reseat_recovery"
+      "gameplay_mode": "shared_safety",
+      "deterministic_intent": "crew_reseat_recovery",
+      "voice_command_eligible": true
     },
     {
       "action_id": "GuideCommandPushToTalk",
       "value_type": "Boolean",
       "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
-      "deterministic_intent": "voice_command_gate"
+      "gameplay_mode": "guided_paddle_raft",
+      "deterministic_intent": "voice_command_gate",
+      "voice_command_eligible": false
     },
     {
       "action_id": "RecenterVR",
       "value_type": "Boolean",
       "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
-      "deterministic_intent": "recenter_guide_camera"
+      "gameplay_mode": "shared_safety",
+      "deterministic_intent": "recenter_guide_camera",
+      "voice_command_eligible": false
     },
     {
       "action_id": "ReplayScrub",
       "value_type": "Axis1D",
       "devices": ["keyboard_mouse", "gamepad"],
-      "deterministic_intent": "debug_replay_scrub"
+      "gameplay_mode": "debug_replay",
+      "deterministic_intent": "debug_replay_scrub",
+      "voice_command_eligible": false
     },
     {
       "action_id": "DebugOverlayToggle",
       "value_type": "Boolean",
       "devices": ["keyboard_mouse"],
-      "deterministic_intent": "debug_overlay_toggle"
+      "gameplay_mode": "debug_replay",
+      "deterministic_intent": "debug_overlay_toggle",
+      "voice_command_eligible": false
     }
   ]
 }

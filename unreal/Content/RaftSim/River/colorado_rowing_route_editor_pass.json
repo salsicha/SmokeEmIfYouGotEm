@@ -113,8 +113,9 @@
       "control_kind": "pull",
       "gameplay_role": "Drive the oar rig downstream, hold speed through wave trains, or accelerate into a ferry.",
       "input_axes": [
-        "left_oar_pull",
-        "right_oar_pull"
+        "OarLeftStroke",
+        "OarRightStroke",
+        "OarFeather"
       ],
       "telemetry": [
         "stroke_force_n",
@@ -128,8 +129,9 @@
       "control_kind": "back_row",
       "gameplay_role": "Slow the boat, square up to laterals, and create space before a large hydraulic.",
       "input_axes": [
-        "left_oar_push",
-        "right_oar_push"
+        "OarLeftStroke",
+        "OarRightStroke",
+        "OarFeather"
       ],
       "telemetry": [
         "reverse_stroke_force_n",
@@ -142,9 +144,10 @@
       "control_kind": "ferry_angle",
       "gameplay_role": "Maintain crossing angle across eddy fences, laterals, and wide tongues.",
       "input_axes": [
-        "left_oar_pull",
-        "right_oar_back",
-        "guide_lean"
+        "OarLeftStroke",
+        "OarRightStroke",
+        "OarFeather",
+        "CrewLean"
       ],
       "telemetry": [
         "ferry_angle_deg",
@@ -157,8 +160,10 @@
       "control_kind": "spin_correction",
       "gameplay_role": "Recover from unexpected yaw in big-water boils, whirlpools, and lateral hits.",
       "input_axes": [
-        "asymmetric_oar_force",
-        "passenger_weight_trim"
+        "OarLeftStroke",
+        "OarRightStroke",
+        "OarFeather",
+        "CrewLean"
       ],
       "telemetry": [
         "spin_rate_dps",
@@ -171,8 +176,9 @@
       "control_kind": "passenger_trim",
       "gameplay_role": "Shift load to prevent tube clipping, shallow-shelf pins, or surf/flip escalation.",
       "input_axes": [
-        "crew_left_right_trim",
-        "crew_fore_aft_trim"
+        "CrewLean",
+        "HighSide",
+        "HoldOn"
       ],
       "telemetry": [
         "center_of_mass_offset_m",
@@ -185,9 +191,11 @@
       "control_kind": "rescue_assist",
       "gameplay_role": "Set boat angle and relative speed for swimmers, throw-line support, and pull-in timing.",
       "input_axes": [
-        "back_row",
-        "ferry_angle_hold",
-        "rescue_target_select"
+        "OarLeftStroke",
+        "OarRightStroke",
+        "RescueTargetSelect",
+        "RescueReachGrab",
+        "RescueThrowLine"
       ],
       "telemetry": [
         "swimmer_distance_m",
