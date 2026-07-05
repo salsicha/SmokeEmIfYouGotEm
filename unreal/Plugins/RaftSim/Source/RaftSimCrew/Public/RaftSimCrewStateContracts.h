@@ -24,6 +24,19 @@ enum class ERaftSimCrewWeightShiftAction : uint8
     RecoverSeated
 };
 
+UENUM(BlueprintType)
+enum class ERaftSimCrewSafetyState : uint8
+{
+    Seated,
+    AtRisk,
+    FallingEjected,
+    Swimming,
+    RescueTargeted,
+    Rescued,
+    ReseatedRecovered,
+    FailedRescue
+};
+
 USTRUCT(BlueprintType)
 struct FRaftSimCrewSeatOccupancy
 {
@@ -96,6 +109,51 @@ struct FRaftSimCrewWeightDistributionFrame
     int32 LeanCount = 0;
 };
 
+USTRUCT(BlueprintType)
+struct FRaftSimCrewSafetyStateFrame
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    FName PassengerId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    FName SeatId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    ERaftSimCrewSafetyState CurrentState = ERaftSimCrewSafetyState::Seated;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float TimeInStateSeconds = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float TimeInWaterSeconds = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float RescueTargetPriority = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    FName FailedRescueReason;
+};
+
+USTRUCT(BlueprintType)
+struct FRaftSimCrewSafetyTransition
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    ERaftSimCrewSafetyState PreviousState = ERaftSimCrewSafetyState::Seated;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    ERaftSimCrewSafetyState NextState = ERaftSimCrewSafetyState::Seated;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    FName TransitionReason;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    FName SourceContactEventId;
+};
+
 UCLASS()
 class RAFTSIMCREW_API URaftSimCrewWeightDistributionLibrary : public UBlueprintFunctionLibrary
 {
@@ -106,5 +164,24 @@ public:
     static FRaftSimCrewWeightDistributionFrame EvaluateWeightDistribution(
         const TArray<FRaftSimCrewSeatOccupancy>& Seats,
         const TArray<FRaftSimCrewWeightShiftCommand>& Commands
+    );
+};
+
+UCLASS()
+class RAFTSIMCREW_API URaftSimCrewSafetyStateLibrary : public UBlueprintFunctionLibrary
+{
+    GENERATED_BODY()
+
+public:
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew")
+    static bool CanTransitionSafetyState(
+        ERaftSimCrewSafetyState PreviousState,
+        ERaftSimCrewSafetyState NextState
+    );
+
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew")
+    static FRaftSimCrewSafetyStateFrame ApplySafetyTransition(
+        const FRaftSimCrewSafetyStateFrame& CurrentFrame,
+        const FRaftSimCrewSafetyTransition& Transition
     );
 };
