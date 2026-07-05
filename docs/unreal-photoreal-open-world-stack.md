@@ -1,6 +1,7 @@
 # Unreal Photoreal Open-World Stack
 
 The first Unreal slice targets UE 5.8 and enables the modern photoreal river-corridor stack in source-controlled project configuration.
+Landscape, rocks, banks, and foliage are treated as first-class immersion targets, with each river corridor pushed as close to photorealistic reference quality as target hardware, VR comfort, and gameplay readability allow.
 
 ## Production Baseline
 

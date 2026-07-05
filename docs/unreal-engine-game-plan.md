@@ -198,7 +198,7 @@ Tasks:
 - Convert GeoTIFF/COG DEMs and masks, LAS/LAZ/COPC point clouds when needed, GeoJSON/GeoPackage hydrography, and reviewed rapid annotations into Unreal terrain/corridor assets.
 - Build a river validation annotation editor for viewport pins, station spans, polygons, raft lines, footage timecodes, gauge-history snippets, aerial imagery references, guide notes, confidence, and expected raft outcomes.
 - Use Cesium for Unreal or equivalent geospatial tooling where it helps with real-world scale, WGS84 positioning, 3D Tiles, terrain, imagery, and georeferenced scene setup.
-- Create photo-real canyon/forest/desert/mountain river environment pipeline using Nanite rocks/canyon walls/terrain details, Nanite foliage, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, and advanced material layering where supported.
+- Create photo-real canyon/forest/desert/mountain river environment pipeline using Nanite rocks/canyon walls/terrain details, Nanite foliage, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, and advanced material layering where supported. Treat highly detailed, immersive landscapes and dense riverbank foliage as core content goals, pushed as close to photorealistic as target hardware, VR comfort, and gameplay readability allow.
 - Add water material, foam lines, bubbles, waves, wet rocks, spray, mist, debris cues, aeration masks, turbulence masks, and seasonal water appearance.
 - Build first interactive 3D water-audio prototype from free/open, first-party generated, procedural, and AI-generated development assets: river bed, nearby rapid, hydraulic hole, eddy line, spray, foam, raft scrape, paddle catch, rock impact, weather, and canyon reflections driven by solver telemetry.
 - Validate large water-source behavior, ambisonic ambience rotation, binaural/HRTF localization, reverb zones, occlusion traces, and guide-seat readability for hazards and rescue cues.
@@ -256,6 +256,7 @@ Tasks:
 
 - Build additional river biomes.
 - Build additional real-world river sections from source manifests and reviewed rapid annotations.
+- Expand highly detailed, immersive landscape and foliage passes for each river biome so each corridor reads as a real place, not a thin playable channel.
 - Prioritize the Colorado River rowing/oar-rig route as the second real-world river after the South Fork American baseline, with rowing-frame controls, large-volume reading, canyon pacing, and longer rescue/recovery stakes.
 - Make the Pacuare River in Costa Rica the third runnable river target, with a future source manifest, flow bands, rainforest/canyon fidelity needs, rain-fed flow review, and rights-cleared guide annotations before solver or Unreal package generation.
 - Add difficulty progression.
@@ -280,7 +281,7 @@ Tasks:
 - Profile CPU physics, render thread, game thread, GPU water, particles, shadows, and asset streaming.
 - Profile audio voice counts, streaming, decompression, spatialization, binaural/HRTF, ambisonics, occlusion traces, convolution/reverb, MetaSounds graphs, source effects, voice chat, and memory residency.
 - Profile local AI inference, speech recognition latency, audio capture cost, local speech synthesis, memory footprint, and model loading.
-- Add platform-specific runtime modes for full Chrono, reduced Chrono, replay/debug, and lower-cost visual water.
+- Add platform-specific runtime modes for full Chrono, reduced Chrono, replay/debug, lower-cost visual water, and scalable photorealistic landscape/foliage density.
 - Add platform-specific AI modes: full local conversation, command-only local voice, authored/recorded crew barks, text/manual command fallback, and disabled voice input.
 - Build scalability tiers for desktop, VR, and handheld targets.
 - Add automation for builds, smoke tests, content validation, and telemetry replay checks.
@@ -374,6 +375,7 @@ The game should be photo-real and readable:
 
 - Water cues must reveal real gameplay information: current direction, eddy lines, holes, shallow shelves, rocks, laterals, boils, and recovery pools.
 - The highest-value playable sections should be grounded in extracted real-world course/elevation data and reviewed aerial/satellite rapid annotations.
+- River environments must feel highly detailed and immersive from the guide's seat: terrain, banks, rocks, shore features, canopy, understory, driftwood, camps, access points, and distant landscape should be authored toward photorealistic reference quality rather than generic backdrop dressing.
 - Use the current UE5 photoreal stack where it fits the target hardware: Nanite for high-detail rocks, canyon walls, terrain details, and dense foliage; Lumen for dynamic seasonal light; Virtual Shadow Maps for high-resolution shadows; World Partition for river corridor streaming; PCG for vegetation, rocks, gravel, driftwood, debris, camps, and access points; Niagara for spray, mist, foam, rain, and paddle splashes.
 - Raft rubber should show wetness, deformation hints, contact scuffs, and tube volume.
 - Rocks should look wet, slick, and dangerous without hiding collision boundaries.

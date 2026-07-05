@@ -321,8 +321,8 @@ Internally, each selection maps to a scenario package and parameter preset that 
 1. Import geospatial terrain and hydro data into a source-data workspace.
 2. Convert terrain and river corridor into Unreal-ready assets, landscape tiles, or 3D Tiles.
 3. Use World Partition for long corridors and section streaming.
-4. Use PCG to populate vegetation, rocks, gravel, driftwood, debris, and access features from geospatial masks and biome rules.
-5. Use Nanite for high-detail rocks, canyon walls, terrain detail meshes, and dense foliage where supported.
+4. Use PCG to populate highly detailed, immersive vegetation, rocks, gravel, driftwood, debris, camps, trails, and access features from geospatial masks, biome rules, and reviewed reference.
+5. Use Nanite for high-detail rocks, canyon walls, terrain detail meshes, and dense foliage where supported, pushing landscapes and foliage as close to photorealistic as target hardware and gameplay readability allow.
 6. Use Lumen and Virtual Shadow Maps for dynamic seasonal lighting and photoreal canyon/forest shading.
 7. Use water materials, foam masks, Niagara spray/mist, and solver debug textures to visualize the custom C++ water field.
 8. Keep the water visual layer synchronized to solver fields: depth, velocity, turbulence, aeration, foam, and hazard tags.

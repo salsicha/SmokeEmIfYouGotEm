@@ -879,6 +879,7 @@ This milestone delivers the first complete playable Unreal slice from launch to 
 - [ ] Add local voice-command recognition and deterministic command-intent routing for paddle, brace, hold-on, high-side, swimmer, rescue, and recovery commands with confidence/fallback behavior.
 - [ ] Build one training section and one technical rapid using validated river data, live custom water, selected raft/contact authority, crew safety states, scoring, restart, replay, and after-action feedback.
 - [ ] Integrate readable water visuals, foam, spray, wet rocks, raft contact cues, paddle cues, weather, 3D spatial audio, ambisonic ambience, reverb/occlusion, and rescue cues driven by solver/runtime telemetry.
+- [ ] Build the vertical-slice environment as a highly detailed, immersive river corridor, with landscape, rocks, banks, and foliage pushed as close to photorealistic as the target hardware and readability allow.
 - [ ] Add basic menus, settings, river/section/season/flow/difficulty/raft/crew selection, save data, telemetry replay review, and debug overlays.
 - [ ] Gate the milestone on a vertical-slice build that can be completed, failed, restarted, replayed, scored, profiled, and reviewed against physics and river-fidelity evidence.
 
@@ -892,7 +893,7 @@ This milestone expands beyond the vertical slice while preserving the validated 
 - [ ] Add more raft types, handling profiles, passenger archetypes, crew trust/fear/fatigue/skill progression, training lessons, challenge variants, and generated-rapid experiments where validation support exists.
 - [ ] Expand local AI crew conversations and barks for calm water, eddies, scouting, recovery pools, swims, rescues, and debriefs while keeping rapid commands and safety cues deterministic and prioritized.
 - [ ] Evaluate networked human crew multiplayer only after the single-player guide loop, raft/contact authority, local voice commands, rescue loop, and replay/debug tools remain stable.
-- [ ] Expand manifest-approved art, audio, VFX, haptics, UI, accessibility, and platform scalability coverage for additional rivers, seasons, flow levels, raft setups, weather, and biomes.
+- [ ] Expand manifest-approved art, audio, VFX, haptics, UI, accessibility, and platform scalability coverage for additional rivers, seasons, flow levels, raft setups, weather, and biomes, with highly detailed immersive landscapes and photorealistic foliage treated as core content goals.
 - [ ] Gate alpha expansion on automated content validation, physics regression replay, river-source provenance checks, and playable end-to-end river-section runs.
 
 ## Milestone 25: Optimization, Platform Hardening, And Release Readiness
@@ -900,12 +901,12 @@ This milestone expands beyond the vertical slice while preserving the validated 
 This milestone turns the alpha game into a shippable Unreal build.
 
 - [ ] Profile and optimize custom water, selected raft/contact runtime, game thread, render thread, GPU water/VFX, World Partition streaming, audio, local AI, memory, and save/replay systems across target desktop, VR, and handheld tiers.
-- [ ] Add scalability modes for water, raft/contact authority, visual physics, VFX, lighting, audio spatialization, local voice, crew conversation, and fallback/manual command paths.
+- [ ] Add scalability modes for water, raft/contact authority, visual physics, VFX, lighting, photorealistic landscape/foliage density, audio spatialization, local voice, crew conversation, and fallback/manual command paths.
 - [ ] Lock release-quality asset, audio, AI-generation, source-manifest, attribution, license, credits, platform-rights, localization, and store-compliance workflows.
 - [ ] Harden QA automation for physics regressions, Unreal river import/export, feature-forcing manifests, raft/contact fixtures, rescue outcomes, replay determinism, VR comfort, input devices, accessibility, and crash/performance capture.
 - [ ] Polish onboarding, training, scoring, after-action feedback, menus, settings, save data, accessibility, subtitles, microphone/privacy controls, haptics, and final audio mix.
 - [ ] Decide whether Wwise/FMOD, paid asset libraries, professional field recordings, generated-river shipping features, multiplayer, and additional local AI features are required for release or deferred.
-- [ ] Gate release on beta playtests, guide feedback, target-platform performance captures, legal/provenance review, content validation, release branch lock, and patch workflow.
+- [ ] Gate release on beta playtests, guide feedback, target-platform performance captures, legal/provenance review, content validation, photorealistic environment/foliage quality review, release branch lock, and patch workflow.
 
 ## Technical Notes To Revisit
 
