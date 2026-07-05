@@ -1,0 +1,1509 @@
+{
+  "accepted_report_set_lock": {
+    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
+    "manifest": "physics/reports/milestone20/report_set_lock.json"
+  },
+  "asset_class": "URaftSimSouthForkEditorPassConfig",
+  "corridor_package": "physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json",
+  "corridor_package_version": "raftsim.real_world_corridor.v0",
+  "editor_layers": [
+    {
+      "artifact_path": "terrain/3dep_dem_tiles",
+      "display_name": "DEM/Lidar Terrain",
+      "display_role": "Elevation, slope, bank breaks, boulder shadows, and terrain confidence backdrop.",
+      "layer_id": "dem_lidar",
+      "layer_kind": "raster",
+      "required_for_review": true,
+      "source_ids": [
+        "usgs_3dep",
+        "usgs_tnm"
+      ],
+      "visible_by_default": true
+    },
+    {
+      "artifact_path": "imagery/naip_tiles",
+      "display_name": "Aerial/Satellite Imagery",
+      "display_role": "Visible channel, banks, boulders, foam texture, water masks, and access context.",
+      "layer_id": "aerial_satellite_imagery",
+      "layer_kind": "raster",
+      "required_for_review": true,
+      "source_ids": [
+        "usda_naip"
+      ],
+      "visible_by_default": true
+    },
+    {
+      "artifact_path": "hydrography/centerline.geojson",
+      "display_name": "Flowlines And Centerline",
+      "display_role": "River centerline, stationing, flow direction, and named/access hydrography context.",
+      "layer_id": "flowlines",
+      "layer_kind": "vector",
+      "required_for_review": true,
+      "source_ids": [
+        "usgs_3dhp_nhd",
+        "osm"
+      ],
+      "visible_by_default": true
+    },
+    {
+      "artifact_path": "hydrography/cross_sections.geojson",
+      "display_name": "Cross Sections",
+      "display_role": "Bank offsets, width, slope, constriction, and section sampling for solver authoring.",
+      "layer_id": "cross_sections",
+      "layer_kind": "vector",
+      "required_for_review": true,
+      "source_ids": [
+        "usgs_3dep",
+        "usgs_3dhp_nhd"
+      ],
+      "visible_by_default": true
+    },
+    {
+      "artifact_path": "hydrology/usgs_11445500_daily_discharge.json",
+      "display_name": "Gauge History",
+      "display_role": "Flow bands, discharge/stage context, season notes, and validation-flow selection.",
+      "layer_id": "gauge_history",
+      "layer_kind": "table",
+      "required_for_review": true,
+      "source_ids": [
+        "usgs_nwis",
+        "noaa_nwps_nwm",
+        "usgs_streamstats"
+      ],
+      "visible_by_default": true
+    },
+    {
+      "artifact_path": "rapid_review_flow_difficulty_mapping.json",
+      "display_name": "Flow/Difficulty Mapping",
+      "display_role": "Label-specific flow response, difficulty controls, solver parameters, and expected raft outcomes.",
+      "layer_id": "flow_difficulty_mapping",
+      "layer_kind": "table",
+      "required_for_review": true,
+      "source_ids": [
+        "usgs_nwis",
+        "guide_references"
+      ],
+      "visible_by_default": true
+    },
+    {
+      "artifact_path": "source_manifest.json",
+      "display_name": "Source Manifest",
+      "display_role": "Provenance, rights, artifact paths, confidence, and source-status review.",
+      "layer_id": "source_manifest",
+      "layer_kind": "manifest",
+      "required_for_review": true,
+      "source_ids": [
+        "usgs_3dep",
+        "usgs_3dhp_nhd",
+        "usda_naip",
+        "usgs_nwis",
+        "guide_references"
+      ],
+      "visible_by_default": true
+    },
+    {
+      "artifact_path": "review/rapid_candidates.geojson",
+      "display_name": "Candidate Tags",
+      "display_role": "Automated slope/constriction/roughness/imagery tags and human review labels.",
+      "layer_id": "candidate_tags",
+      "layer_kind": "annotation",
+      "required_for_review": true,
+      "source_ids": [
+        "guide_references"
+      ],
+      "visible_by_default": true
+    },
+    {
+      "artifact_path": "review/guide_reference_index.json",
+      "display_name": "Guide Notes",
+      "display_role": "Guide feedback, footage pointers, scout notes, expected outcomes, and review status.",
+      "layer_id": "guide_notes",
+      "layer_kind": "reference",
+      "required_for_review": true,
+      "source_ids": [
+        "guide_references",
+        "field_media"
+      ],
+      "visible_by_default": true
+    },
+    {
+      "artifact_path": "review/river_validation_annotations.geojson",
+      "display_name": "Validation Annotations",
+      "display_role": "Accepted pins, spans, polygons, raft lines, expected outcomes, and rights metadata.",
+      "layer_id": "validation_annotations",
+      "layer_kind": "annotation",
+      "required_for_review": false,
+      "source_ids": [
+        "guide_references",
+        "field_media"
+      ],
+      "visible_by_default": false
+    }
+  ],
+  "editor_panels": [
+    {
+      "editable_fields": [],
+      "layer_ids": [
+        "dem_lidar",
+        "aerial_satellite_imagery",
+        "flowlines",
+        "cross_sections",
+        "candidate_tags",
+        "guide_notes",
+        "validation_annotations"
+      ],
+      "panel_id": "one_view_map",
+      "panel_kind": "map",
+      "purpose": "Primary rapid-design view with terrain, imagery, hydrography, candidates, and evidence overlays.",
+      "title": "Map Review"
+    },
+    {
+      "editable_fields": [],
+      "layer_ids": [
+        "dem_lidar",
+        "flowlines",
+        "cross_sections",
+        "candidate_tags"
+      ],
+      "panel_id": "station_profile",
+      "panel_kind": "profile",
+      "purpose": "Longitudinal elevation/gradient profile plus selected cross-section context.",
+      "title": "Station Profile"
+    },
+    {
+      "editable_fields": [],
+      "layer_ids": [
+        "gauge_history",
+        "flow_difficulty_mapping",
+        "source_manifest",
+        "guide_notes"
+      ],
+      "panel_id": "flow_and_sources",
+      "panel_kind": "hydrology",
+      "purpose": "Gauge bands, source provenance, rights, and confidence for the selected candidate.",
+      "title": "Flow And Sources"
+    },
+    {
+      "editable_fields": [
+        "review_labels",
+        "station_range_m",
+        "geometry",
+        "expected_outcome",
+        "guide_feedback",
+        "flow_context",
+        "rights_provenance",
+        "confidence"
+      ],
+      "layer_ids": [
+        "candidate_tags",
+        "guide_notes",
+        "validation_annotations"
+      ],
+      "panel_id": "annotation_editor",
+      "panel_kind": "annotation_form",
+      "purpose": "Manual edits for labels, boundaries, raft lines, expected outcomes, confidence, and rights.",
+      "title": "Annotation Editor"
+    }
+  ],
+  "editor_pass_id": "south_fork_american_chili_bar_first_river_editor_pass",
+  "feature_tuning_editor": "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+  "flow_bands": [
+    {
+      "confidence": 0.3,
+      "discharge_cfs": 900.0,
+      "discharge_m3s": 25.4851619328,
+      "flow_band": "low_runnable",
+      "notes": "Lower training-oriented flow; expect exposed rocks, shallows, and slower recovery from mistakes.",
+      "percentile_range": [
+        0.1,
+        0.35
+      ],
+      "runnable": true,
+      "season": "late_summer_low_water",
+      "stage_ft": null
+    },
+    {
+      "confidence": 0.35,
+      "discharge_cfs": 1600.0,
+      "discharge_m3s": 45.3069545472,
+      "flow_band": "median_runnable",
+      "notes": "Default validation band for intermediate commercial-style runs.",
+      "percentile_range": [
+        0.35,
+        0.7
+      ],
+      "runnable": true,
+      "season": "summer_commercial",
+      "stage_ft": null
+    },
+    {
+      "confidence": 0.25,
+      "discharge_cfs": 3000.0,
+      "discharge_m3s": 84.950539776,
+      "flow_band": "high_runnable",
+      "notes": "Higher consequence preset with stronger holes, wave trains, eddy-line shear, and faster raft response.",
+      "percentile_range": [
+        0.7,
+        0.9
+      ],
+      "runnable": true,
+      "season": "spring_runoff_or_release",
+      "stage_ft": null
+    }
+  ],
+  "flow_presets": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+  "guide_feedback_policy": {
+    "copyrighted_guidebook_text_not_redistributed": true,
+    "field_media_manifest_references_only_until_rights_clear": true,
+    "footage_timecodes_required_before_final_acceptance": true,
+    "guide_feedback_annotations_required": true
+  },
+  "module": "RaftSimRiver",
+  "quality_gates": [
+    "Every accepted rapid has DEM/lidar, imagery, flowline, cross-section, gauge, source-manifest, candidate-tag, and guide-note context visible in the one-view layout.",
+    "Every accepted annotation records rights/provenance before it can feed validation or Unreal data assets.",
+    "Guidebook text, third-party imagery, and field media remain referenced through manifests unless redistribution rights are explicit.",
+    "Every reviewed rapid in the first pass must link low, median, and high flow bands to stitched validation overlays.",
+    "Every reviewed rapid must keep guide feedback as manifest references until rights and field-media provenance are explicit.",
+    "Validation overlays must remain whole-window stitched outputs, not isolated reach-local signoff artifacts."
+  ],
+  "rapid_candidates": "physics/data/real_world/south_fork_american_chili_bar/rapid_candidates.geojson",
+  "rapid_river_editor": "unreal/Content/RaftSim/River/rapid_river_editor.json",
+  "reach_local_streaming": "unreal/Content/RaftSim/River/reach_local_streaming.json",
+  "reviewed_rapid_count": 4,
+  "reviewed_rapids": [
+    {
+      "accepted_for_editor_pass": true,
+      "candidate_signals": [
+        "boulder_density",
+        "constriction",
+        "dem_slope",
+        "foam_whitewater_texture",
+        "guide_note",
+        "high_score",
+        "roughness"
+      ],
+      "confidence": 0.836653,
+      "cross_section_summary": {
+        "center_lat": 38.7685,
+        "center_lon": -120.858,
+        "channel_width_m": 18.0,
+        "constriction_score": 0.3076923076923077,
+        "gradient": 0.014347826086956509,
+        "left_bank_offset_m": 9.0,
+        "rapid_score": 0.5575514381270901,
+        "right_bank_offset_m": -9.0,
+        "roughness_score": 0.5655999999999999,
+        "station_m": 920.0
+      },
+      "editor_geometry": {
+        "polygons": [
+          "hazard_polygon",
+          "eddy_polygon",
+          "whitewater_polygon",
+          "bank_polygon"
+        ],
+        "raft_lines": [
+          "entry_line",
+          "main_current_line",
+          "recovery_line"
+        ],
+        "reach_span": true,
+        "station_pin": true
+      },
+      "evidence_refs": {
+        "aerial_satellite_imagery": {
+          "artifacts": [
+            "imagery/naip_tiles",
+            "imagery/water_mask.tif",
+            "imagery/foam_texture_mask.tif"
+          ],
+          "source_ids": [
+            "usda_naip"
+          ]
+        },
+        "candidate_tags": {
+          "artifacts": [
+            "review/rapid_candidates.geojson"
+          ],
+          "source_ids": []
+        },
+        "cross_sections": {
+          "artifacts": [
+            "hydrography/cross_sections.geojson"
+          ],
+          "source_ids": [
+            "usgs_3dep",
+            "usgs_3dhp_nhd"
+          ]
+        },
+        "dem_lidar": {
+          "artifacts": [
+            "terrain/3dep_dem_tiles",
+            "terrain/solver_bed_grid.npy"
+          ],
+          "source_ids": [
+            "usgs_3dep",
+            "usgs_tnm"
+          ]
+        },
+        "flow_difficulty_mapping": {
+          "artifacts": [
+            "rapid_review_flow_difficulty_mapping.json"
+          ],
+          "source_ids": [
+            "usgs_nwis",
+            "guide_references"
+          ]
+        },
+        "flowlines": {
+          "artifacts": [
+            "hydrography/centerline.geojson",
+            "hydrography/banks.geojson"
+          ],
+          "source_ids": [
+            "usgs_3dhp_nhd",
+            "osm"
+          ]
+        },
+        "gauge_history": {
+          "artifacts": [
+            "hydrology/usgs_11445500_daily_discharge.json",
+            "hydrology/flow_presets.json"
+          ],
+          "source_ids": [
+            "usgs_nwis",
+            "noaa_nwps_nwm",
+            "usgs_streamstats"
+          ]
+        },
+        "guide_notes": {
+          "artifacts": [
+            "review/guide_reference_index.json",
+            "review/rapid_review_labels.json"
+          ],
+          "source_ids": [
+            "guide_references",
+            "field_media"
+          ]
+        },
+        "source_manifest": {
+          "artifacts": [
+            "source_manifest.json"
+          ],
+          "source_ids": [
+            "source_manifest"
+          ]
+        }
+      },
+      "expected_outcomes": [
+        "accelerate",
+        "brief_surf",
+        "clean_line",
+        "crew_overboard",
+        "flip_if_sideways",
+        "hole_if_controlled",
+        "lateral_hit",
+        "pin",
+        "release",
+        "rock_bump",
+        "splash",
+        "wave_train"
+      ],
+      "flow_review": [
+        {
+          "discharge_cfs": 900.0,
+          "discharge_m3s": 25.4851619328,
+          "flow_band": "low_runnable",
+          "requires_outcome_review": true,
+          "runnable": true,
+          "season": "late_summer_low_water",
+          "validation_overlay_ids": [
+            "south_fork_cascading_low_runnable_reduced_stitched_validation",
+            "south_fork_cascading_low_runnable_finite_volume_stitched_validation"
+          ]
+        },
+        {
+          "discharge_cfs": 1600.0,
+          "discharge_m3s": 45.3069545472,
+          "flow_band": "median_runnable",
+          "requires_outcome_review": true,
+          "runnable": true,
+          "season": "summer_commercial",
+          "validation_overlay_ids": [
+            "south_fork_cascading_median_runnable_reduced_stitched_validation",
+            "south_fork_cascading_median_runnable_finite_volume_stitched_validation"
+          ]
+        },
+        {
+          "discharge_cfs": 3000.0,
+          "discharge_m3s": 84.950539776,
+          "flow_band": "high_runnable",
+          "requires_outcome_review": true,
+          "runnable": true,
+          "season": "spring_runoff_or_release",
+          "validation_overlay_ids": [
+            "south_fork_cascading_high_runnable_reduced_stitched_validation",
+            "south_fork_cascading_high_runnable_finite_volume_stitched_validation"
+          ]
+        }
+      ],
+      "guide_feedback_annotations": [
+        {
+          "annotation_id": "rapid_candidate_01_guide_feedback_seed",
+          "expected_outcomes": [
+            "accelerate",
+            "brief_surf",
+            "clean_line",
+            "crew_overboard",
+            "flip_if_sideways",
+            "hole_if_controlled",
+            "lateral_hit",
+            "pin",
+            "release",
+            "rock_bump",
+            "splash",
+            "wave_train"
+          ],
+          "flow_context_required": true,
+          "footage_timecodes_required": true,
+          "guide_feedback": [
+            "Human guide review pending; keep copyrighted guidebook text and third-party media out of the repo unless rights are explicit.",
+            "Seed guide-note signal is present near this candidate; reviewer must attach citation, flow context, and derived guidance."
+          ],
+          "human_guide_signoff_required": true,
+          "rights_status": "manifest_references_only",
+          "source_layers": [
+            "guide_notes",
+            "field_media"
+          ]
+        }
+      ],
+      "map_focus_wgs84": {
+        "lat": 38.7685,
+        "lon": -120.858
+      },
+      "rapid_id": "rapid_candidate_01",
+      "required_evidence_layers_present": [
+        "aerial_satellite_imagery",
+        "candidate_tags",
+        "cross_sections",
+        "dem_lidar",
+        "flow_difficulty_mapping",
+        "flowlines",
+        "gauge_history",
+        "guide_notes",
+        "source_manifest"
+      ],
+      "review_item_id": "rapid_candidate_01_review",
+      "review_status": "seed_reviewed_for_first_editor_pass_needs_human_signoff",
+      "reviewed_labels": [
+        "constriction",
+        "boulder_garden",
+        "wave_train"
+      ],
+      "rights_provenance": {
+        "fields": [
+          "source_id",
+          "license_or_terms",
+          "attribution",
+          "permission_status",
+          "reviewer",
+          "review_date"
+        ],
+        "required": true,
+        "source_ids": [
+          "field_media",
+          "guide_references",
+          "noaa_nwps_nwm",
+          "osm",
+          "source_manifest",
+          "usda_naip",
+          "usgs_3dep",
+          "usgs_3dhp_nhd",
+          "usgs_nwis",
+          "usgs_streamstats",
+          "usgs_tnm"
+        ],
+        "source_manifest": "source_manifest.json"
+      },
+      "station_pin": {
+        "station_m": 920.0,
+        "wgs84": {
+          "lat": 38.7685,
+          "lon": -120.858
+        }
+      },
+      "station_span_m": [
+        895.0,
+        945.0
+      ]
+    },
+    {
+      "accepted_for_editor_pass": true,
+      "candidate_signals": [
+        "boulder_density",
+        "constriction",
+        "foam_whitewater_texture",
+        "guide_note",
+        "high_score",
+        "roughness"
+      ],
+      "confidence": 0.799903,
+      "cross_section_summary": {
+        "center_lat": 38.7765,
+        "center_lon": -120.842,
+        "channel_width_m": 17.0,
+        "constriction_score": 0.43333333333333335,
+        "gradient": 0.011313131313131301,
+        "left_bank_offset_m": 8.5,
+        "rapid_score": 0.5634599999999998,
+        "right_bank_offset_m": -8.5,
+        "roughness_score": 0.6258,
+        "station_m": 1880.0
+      },
+      "editor_geometry": {
+        "polygons": [
+          "hazard_polygon",
+          "eddy_polygon",
+          "whitewater_polygon",
+          "bank_polygon"
+        ],
+        "raft_lines": [
+          "entry_line",
+          "main_current_line",
+          "recovery_line"
+        ],
+        "reach_span": true,
+        "station_pin": true
+      },
+      "evidence_refs": {
+        "aerial_satellite_imagery": {
+          "artifacts": [
+            "imagery/naip_tiles",
+            "imagery/water_mask.tif",
+            "imagery/foam_texture_mask.tif"
+          ],
+          "source_ids": [
+            "usda_naip"
+          ]
+        },
+        "candidate_tags": {
+          "artifacts": [
+            "review/rapid_candidates.geojson"
+          ],
+          "source_ids": []
+        },
+        "cross_sections": {
+          "artifacts": [
+            "hydrography/cross_sections.geojson"
+          ],
+          "source_ids": [
+            "usgs_3dep",
+            "usgs_3dhp_nhd"
+          ]
+        },
+        "dem_lidar": {
+          "artifacts": [
+            "terrain/3dep_dem_tiles",
+            "terrain/solver_bed_grid.npy"
+          ],
+          "source_ids": [
+            "usgs_3dep",
+            "usgs_tnm"
+          ]
+        },
+        "flow_difficulty_mapping": {
+          "artifacts": [
+            "rapid_review_flow_difficulty_mapping.json"
+          ],
+          "source_ids": [
+            "usgs_nwis",
+            "guide_references"
+          ]
+        },
+        "flowlines": {
+          "artifacts": [
+            "hydrography/centerline.geojson",
+            "hydrography/banks.geojson"
+          ],
+          "source_ids": [
+            "usgs_3dhp_nhd",
+            "osm"
+          ]
+        },
+        "gauge_history": {
+          "artifacts": [
+            "hydrology/usgs_11445500_daily_discharge.json",
+            "hydrology/flow_presets.json"
+          ],
+          "source_ids": [
+            "usgs_nwis",
+            "noaa_nwps_nwm",
+            "usgs_streamstats"
+          ]
+        },
+        "guide_notes": {
+          "artifacts": [
+            "review/guide_reference_index.json",
+            "review/rapid_review_labels.json"
+          ],
+          "source_ids": [
+            "guide_references",
+            "field_media"
+          ]
+        },
+        "source_manifest": {
+          "artifacts": [
+            "source_manifest.json"
+          ],
+          "source_ids": [
+            "source_manifest"
+          ]
+        }
+      },
+      "expected_outcomes": [
+        "accelerate",
+        "brief_surf",
+        "clean_line",
+        "crew_overboard",
+        "flip_if_sideways",
+        "hole_if_controlled",
+        "lateral_hit",
+        "pin",
+        "release",
+        "rock_bump",
+        "splash",
+        "wave_train"
+      ],
+      "flow_review": [
+        {
+          "discharge_cfs": 900.0,
+          "discharge_m3s": 25.4851619328,
+          "flow_band": "low_runnable",
+          "requires_outcome_review": true,
+          "runnable": true,
+          "season": "late_summer_low_water",
+          "validation_overlay_ids": [
+            "south_fork_cascading_low_runnable_reduced_stitched_validation",
+            "south_fork_cascading_low_runnable_finite_volume_stitched_validation"
+          ]
+        },
+        {
+          "discharge_cfs": 1600.0,
+          "discharge_m3s": 45.3069545472,
+          "flow_band": "median_runnable",
+          "requires_outcome_review": true,
+          "runnable": true,
+          "season": "summer_commercial",
+          "validation_overlay_ids": [
+            "south_fork_cascading_median_runnable_reduced_stitched_validation",
+            "south_fork_cascading_median_runnable_finite_volume_stitched_validation"
+          ]
+        },
+        {
+          "discharge_cfs": 3000.0,
+          "discharge_m3s": 84.950539776,
+          "flow_band": "high_runnable",
+          "requires_outcome_review": true,
+          "runnable": true,
+          "season": "spring_runoff_or_release",
+          "validation_overlay_ids": [
+            "south_fork_cascading_high_runnable_reduced_stitched_validation",
+            "south_fork_cascading_high_runnable_finite_volume_stitched_validation"
+          ]
+        }
+      ],
+      "guide_feedback_annotations": [
+        {
+          "annotation_id": "rapid_candidate_02_guide_feedback_seed",
+          "expected_outcomes": [
+            "accelerate",
+            "brief_surf",
+            "clean_line",
+            "crew_overboard",
+            "flip_if_sideways",
+            "hole_if_controlled",
+            "lateral_hit",
+            "pin",
+            "release",
+            "rock_bump",
+            "splash",
+            "wave_train"
+          ],
+          "flow_context_required": true,
+          "footage_timecodes_required": true,
+          "guide_feedback": [
+            "Human guide review pending; keep copyrighted guidebook text and third-party media out of the repo unless rights are explicit.",
+            "Seed guide-note signal is present near this candidate; reviewer must attach citation, flow context, and derived guidance."
+          ],
+          "human_guide_signoff_required": true,
+          "rights_status": "manifest_references_only",
+          "source_layers": [
+            "guide_notes",
+            "field_media"
+          ]
+        }
+      ],
+      "map_focus_wgs84": {
+        "lat": 38.7765,
+        "lon": -120.842
+      },
+      "rapid_id": "rapid_candidate_02",
+      "required_evidence_layers_present": [
+        "aerial_satellite_imagery",
+        "candidate_tags",
+        "cross_sections",
+        "dem_lidar",
+        "flow_difficulty_mapping",
+        "flowlines",
+        "gauge_history",
+        "guide_notes",
+        "source_manifest"
+      ],
+      "review_item_id": "rapid_candidate_02_review",
+      "review_status": "seed_reviewed_for_first_editor_pass_needs_human_signoff",
+      "reviewed_labels": [
+        "constriction",
+        "boulder_garden",
+        "wave_train"
+      ],
+      "rights_provenance": {
+        "fields": [
+          "source_id",
+          "license_or_terms",
+          "attribution",
+          "permission_status",
+          "reviewer",
+          "review_date"
+        ],
+        "required": true,
+        "source_ids": [
+          "field_media",
+          "guide_references",
+          "noaa_nwps_nwm",
+          "osm",
+          "source_manifest",
+          "usda_naip",
+          "usgs_3dep",
+          "usgs_3dhp_nhd",
+          "usgs_nwis",
+          "usgs_streamstats",
+          "usgs_tnm"
+        ],
+        "source_manifest": "source_manifest.json"
+      },
+      "station_pin": {
+        "station_m": 1880.0,
+        "wgs84": {
+          "lat": 38.7765,
+          "lon": -120.842
+        }
+      },
+      "station_span_m": [
+        1855.0,
+        1905.0
+      ]
+    },
+    {
+      "accepted_for_editor_pass": true,
+      "candidate_signals": [
+        "bend_or_lateral_candidate",
+        "boulder_density",
+        "dem_slope",
+        "foam_whitewater_texture",
+        "guide_note",
+        "roughness"
+      ],
+      "confidence": 0.769695,
+      "cross_section_summary": {
+        "center_lat": 38.785,
+        "center_lon": -120.8235,
+        "channel_width_m": 20.0,
+        "constriction_score": 0.16666666666666666,
+        "gradient": 0.015135135135135145,
+        "left_bank_offset_m": 10.0,
+        "rapid_score": 0.5085363963963966,
+        "right_bank_offset_m": -10.0,
+        "roughness_score": 0.5342000000000001,
+        "station_m": 2920.0
+      },
+      "editor_geometry": {
+        "polygons": [
+          "hazard_polygon",
+          "eddy_polygon",
+          "whitewater_polygon",
+          "bank_polygon"
+        ],
+        "raft_lines": [
+          "entry_line",
+          "main_current_line",
+          "recovery_line"
+        ],
+        "reach_span": true,
+        "station_pin": true
+      },
+      "evidence_refs": {
+        "aerial_satellite_imagery": {
+          "artifacts": [
+            "imagery/naip_tiles",
+            "imagery/water_mask.tif",
+            "imagery/foam_texture_mask.tif"
+          ],
+          "source_ids": [
+            "usda_naip"
+          ]
+        },
+        "candidate_tags": {
+          "artifacts": [
+            "review/rapid_candidates.geojson"
+          ],
+          "source_ids": []
+        },
+        "cross_sections": {
+          "artifacts": [
+            "hydrography/cross_sections.geojson"
+          ],
+          "source_ids": [
+            "usgs_3dep",
+            "usgs_3dhp_nhd"
+          ]
+        },
+        "dem_lidar": {
+          "artifacts": [
+            "terrain/3dep_dem_tiles",
+            "terrain/solver_bed_grid.npy"
+          ],
+          "source_ids": [
+            "usgs_3dep",
+            "usgs_tnm"
+          ]
+        },
+        "flow_difficulty_mapping": {
+          "artifacts": [
+            "rapid_review_flow_difficulty_mapping.json"
+          ],
+          "source_ids": [
+            "usgs_nwis",
+            "guide_references"
+          ]
+        },
+        "flowlines": {
+          "artifacts": [
+            "hydrography/centerline.geojson",
+            "hydrography/banks.geojson"
+          ],
+          "source_ids": [
+            "usgs_3dhp_nhd",
+            "osm"
+          ]
+        },
+        "gauge_history": {
+          "artifacts": [
+            "hydrology/usgs_11445500_daily_discharge.json",
+            "hydrology/flow_presets.json"
+          ],
+          "source_ids": [
+            "usgs_nwis",
+            "noaa_nwps_nwm",
+            "usgs_streamstats"
+          ]
+        },
+        "guide_notes": {
+          "artifacts": [
+            "review/guide_reference_index.json",
+            "review/rapid_review_labels.json"
+          ],
+          "source_ids": [
+            "guide_references",
+            "field_media"
+          ]
+        },
+        "source_manifest": {
+          "artifacts": [
+            "source_manifest.json"
+          ],
+          "source_ids": [
+            "source_manifest"
+          ]
+        }
+      },
+      "expected_outcomes": [
+        "angle_correction",
+        "brace",
+        "brief_surf",
+        "clean_line",
+        "crew_overboard",
+        "flip_if_mishandled",
+        "flip_if_sideways",
+        "pin",
+        "release",
+        "rock_bump",
+        "splash"
+      ],
+      "flow_review": [
+        {
+          "discharge_cfs": 900.0,
+          "discharge_m3s": 25.4851619328,
+          "flow_band": "low_runnable",
+          "requires_outcome_review": true,
+          "runnable": true,
+          "season": "late_summer_low_water",
+          "validation_overlay_ids": [
+            "south_fork_cascading_low_runnable_reduced_stitched_validation",
+            "south_fork_cascading_low_runnable_finite_volume_stitched_validation"
+          ]
+        },
+        {
+          "discharge_cfs": 1600.0,
+          "discharge_m3s": 45.3069545472,
+          "flow_band": "median_runnable",
+          "requires_outcome_review": true,
+          "runnable": true,
+          "season": "summer_commercial",
+          "validation_overlay_ids": [
+            "south_fork_cascading_median_runnable_reduced_stitched_validation",
+            "south_fork_cascading_median_runnable_finite_volume_stitched_validation"
+          ]
+        },
+        {
+          "discharge_cfs": 3000.0,
+          "discharge_m3s": 84.950539776,
+          "flow_band": "high_runnable",
+          "requires_outcome_review": true,
+          "runnable": true,
+          "season": "spring_runoff_or_release",
+          "validation_overlay_ids": [
+            "south_fork_cascading_high_runnable_reduced_stitched_validation",
+            "south_fork_cascading_high_runnable_finite_volume_stitched_validation"
+          ]
+        }
+      ],
+      "guide_feedback_annotations": [
+        {
+          "annotation_id": "rapid_candidate_03_guide_feedback_seed",
+          "expected_outcomes": [
+            "angle_correction",
+            "brace",
+            "brief_surf",
+            "clean_line",
+            "crew_overboard",
+            "flip_if_mishandled",
+            "flip_if_sideways",
+            "pin",
+            "release",
+            "rock_bump",
+            "splash"
+          ],
+          "flow_context_required": true,
+          "footage_timecodes_required": true,
+          "guide_feedback": [
+            "Human guide review pending; keep copyrighted guidebook text and third-party media out of the repo unless rights are explicit.",
+            "Seed guide-note signal is present near this candidate; reviewer must attach citation, flow context, and derived guidance."
+          ],
+          "human_guide_signoff_required": true,
+          "rights_status": "manifest_references_only",
+          "source_layers": [
+            "guide_notes",
+            "field_media"
+          ]
+        }
+      ],
+      "map_focus_wgs84": {
+        "lat": 38.785,
+        "lon": -120.8235
+      },
+      "rapid_id": "rapid_candidate_03",
+      "required_evidence_layers_present": [
+        "aerial_satellite_imagery",
+        "candidate_tags",
+        "cross_sections",
+        "dem_lidar",
+        "flow_difficulty_mapping",
+        "flowlines",
+        "gauge_history",
+        "guide_notes",
+        "source_manifest"
+      ],
+      "review_item_id": "rapid_candidate_03_review",
+      "review_status": "seed_reviewed_for_first_editor_pass_needs_human_signoff",
+      "reviewed_labels": [
+        "boulder_garden",
+        "wave_train",
+        "lateral"
+      ],
+      "rights_provenance": {
+        "fields": [
+          "source_id",
+          "license_or_terms",
+          "attribution",
+          "permission_status",
+          "reviewer",
+          "review_date"
+        ],
+        "required": true,
+        "source_ids": [
+          "field_media",
+          "guide_references",
+          "noaa_nwps_nwm",
+          "osm",
+          "source_manifest",
+          "usda_naip",
+          "usgs_3dep",
+          "usgs_3dhp_nhd",
+          "usgs_nwis",
+          "usgs_streamstats",
+          "usgs_tnm"
+        ],
+        "source_manifest": "source_manifest.json"
+      },
+      "station_pin": {
+        "station_m": 2920.0,
+        "wgs84": {
+          "lat": 38.785,
+          "lon": -120.8235
+        }
+      },
+      "station_span_m": [
+        2895.0,
+        2945.0
+      ]
+    },
+    {
+      "accepted_for_editor_pass": true,
+      "candidate_signals": [
+        "bend_or_lateral_candidate",
+        "boulder_density",
+        "constriction",
+        "foam_whitewater_texture",
+        "guide_note",
+        "roughness"
+      ],
+      "confidence": 0.775192,
+      "cross_section_summary": {
+        "center_lat": 38.796,
+        "center_lon": -120.804,
+        "channel_width_m": 19.0,
+        "constriction_score": 0.2962962962962963,
+        "gradient": 0.01163793103448276,
+        "left_bank_offset_m": 9.5,
+        "rapid_score": 0.5185310472541507,
+        "right_bank_offset_m": -9.5,
+        "roughness_score": 0.6016,
+        "station_m": 4050.0
+      },
+      "editor_geometry": {
+        "polygons": [
+          "hazard_polygon",
+          "eddy_polygon",
+          "whitewater_polygon",
+          "bank_polygon"
+        ],
+        "raft_lines": [
+          "entry_line",
+          "main_current_line",
+          "recovery_line"
+        ],
+        "reach_span": true,
+        "station_pin": true
+      },
+      "evidence_refs": {
+        "aerial_satellite_imagery": {
+          "artifacts": [
+            "imagery/naip_tiles",
+            "imagery/water_mask.tif",
+            "imagery/foam_texture_mask.tif"
+          ],
+          "source_ids": [
+            "usda_naip"
+          ]
+        },
+        "candidate_tags": {
+          "artifacts": [
+            "review/rapid_candidates.geojson"
+          ],
+          "source_ids": []
+        },
+        "cross_sections": {
+          "artifacts": [
+            "hydrography/cross_sections.geojson"
+          ],
+          "source_ids": [
+            "usgs_3dep",
+            "usgs_3dhp_nhd"
+          ]
+        },
+        "dem_lidar": {
+          "artifacts": [
+            "terrain/3dep_dem_tiles",
+            "terrain/solver_bed_grid.npy"
+          ],
+          "source_ids": [
+            "usgs_3dep",
+            "usgs_tnm"
+          ]
+        },
+        "flow_difficulty_mapping": {
+          "artifacts": [
+            "rapid_review_flow_difficulty_mapping.json"
+          ],
+          "source_ids": [
+            "usgs_nwis",
+            "guide_references"
+          ]
+        },
+        "flowlines": {
+          "artifacts": [
+            "hydrography/centerline.geojson",
+            "hydrography/banks.geojson"
+          ],
+          "source_ids": [
+            "usgs_3dhp_nhd",
+            "osm"
+          ]
+        },
+        "gauge_history": {
+          "artifacts": [
+            "hydrology/usgs_11445500_daily_discharge.json",
+            "hydrology/flow_presets.json"
+          ],
+          "source_ids": [
+            "usgs_nwis",
+            "noaa_nwps_nwm",
+            "usgs_streamstats"
+          ]
+        },
+        "guide_notes": {
+          "artifacts": [
+            "review/guide_reference_index.json",
+            "review/rapid_review_labels.json"
+          ],
+          "source_ids": [
+            "guide_references",
+            "field_media"
+          ]
+        },
+        "source_manifest": {
+          "artifacts": [
+            "source_manifest.json"
+          ],
+          "source_ids": [
+            "source_manifest"
+          ]
+        }
+      },
+      "expected_outcomes": [
+        "accelerate",
+        "angle_correction",
+        "brace",
+        "brief_surf",
+        "clean_line",
+        "crew_overboard",
+        "flip_if_mishandled",
+        "flip_if_sideways",
+        "hole_if_controlled",
+        "lateral_hit",
+        "pin",
+        "release",
+        "rock_bump",
+        "splash",
+        "wave_train"
+      ],
+      "flow_review": [
+        {
+          "discharge_cfs": 900.0,
+          "discharge_m3s": 25.4851619328,
+          "flow_band": "low_runnable",
+          "requires_outcome_review": true,
+          "runnable": true,
+          "season": "late_summer_low_water",
+          "validation_overlay_ids": [
+            "south_fork_cascading_low_runnable_reduced_stitched_validation",
+            "south_fork_cascading_low_runnable_finite_volume_stitched_validation"
+          ]
+        },
+        {
+          "discharge_cfs": 1600.0,
+          "discharge_m3s": 45.3069545472,
+          "flow_band": "median_runnable",
+          "requires_outcome_review": true,
+          "runnable": true,
+          "season": "summer_commercial",
+          "validation_overlay_ids": [
+            "south_fork_cascading_median_runnable_reduced_stitched_validation",
+            "south_fork_cascading_median_runnable_finite_volume_stitched_validation"
+          ]
+        },
+        {
+          "discharge_cfs": 3000.0,
+          "discharge_m3s": 84.950539776,
+          "flow_band": "high_runnable",
+          "requires_outcome_review": true,
+          "runnable": true,
+          "season": "spring_runoff_or_release",
+          "validation_overlay_ids": [
+            "south_fork_cascading_high_runnable_reduced_stitched_validation",
+            "south_fork_cascading_high_runnable_finite_volume_stitched_validation"
+          ]
+        }
+      ],
+      "guide_feedback_annotations": [
+        {
+          "annotation_id": "rapid_candidate_04_guide_feedback_seed",
+          "expected_outcomes": [
+            "accelerate",
+            "angle_correction",
+            "brace",
+            "brief_surf",
+            "clean_line",
+            "crew_overboard",
+            "flip_if_mishandled",
+            "flip_if_sideways",
+            "hole_if_controlled",
+            "lateral_hit",
+            "pin",
+            "release",
+            "rock_bump",
+            "splash",
+            "wave_train"
+          ],
+          "flow_context_required": true,
+          "footage_timecodes_required": true,
+          "guide_feedback": [
+            "Human guide review pending; keep copyrighted guidebook text and third-party media out of the repo unless rights are explicit.",
+            "Seed guide-note signal is present near this candidate; reviewer must attach citation, flow context, and derived guidance."
+          ],
+          "human_guide_signoff_required": true,
+          "rights_status": "manifest_references_only",
+          "source_layers": [
+            "guide_notes",
+            "field_media"
+          ]
+        }
+      ],
+      "map_focus_wgs84": {
+        "lat": 38.796,
+        "lon": -120.804
+      },
+      "rapid_id": "rapid_candidate_04",
+      "required_evidence_layers_present": [
+        "aerial_satellite_imagery",
+        "candidate_tags",
+        "cross_sections",
+        "dem_lidar",
+        "flow_difficulty_mapping",
+        "flowlines",
+        "gauge_history",
+        "guide_notes",
+        "source_manifest"
+      ],
+      "review_item_id": "rapid_candidate_04_review",
+      "review_status": "seed_reviewed_for_first_editor_pass_needs_human_signoff",
+      "reviewed_labels": [
+        "constriction",
+        "boulder_garden",
+        "wave_train",
+        "lateral"
+      ],
+      "rights_provenance": {
+        "fields": [
+          "source_id",
+          "license_or_terms",
+          "attribution",
+          "permission_status",
+          "reviewer",
+          "review_date"
+        ],
+        "required": true,
+        "source_ids": [
+          "field_media",
+          "guide_references",
+          "noaa_nwps_nwm",
+          "osm",
+          "source_manifest",
+          "usda_naip",
+          "usgs_3dep",
+          "usgs_3dhp_nhd",
+          "usgs_nwis",
+          "usgs_streamstats",
+          "usgs_tnm"
+        ],
+        "source_manifest": "source_manifest.json"
+      },
+      "station_pin": {
+        "station_m": 4050.0,
+        "wgs84": {
+          "lat": 38.796,
+          "lon": -120.804
+        }
+      },
+      "station_span_m": [
+        4025.0,
+        4075.0
+      ]
+    }
+  ],
+  "river_id": "american_south_fork",
+  "schema": "raftsim.unreal.south_fork_editor_pass.v1",
+  "section_id": "chili_bar_to_coloma",
+  "section_name": "Chili Bar to Coloma",
+  "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json",
+  "source_manifest_id": "american_south_fork.chili_bar_to_coloma.source_manifest.v0",
+  "status": "ready_for_south_fork_unreal_editor_pass",
+  "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json",
+  "validation_matrix": "physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json",
+  "validation_overlays": [
+    {
+      "asset_id": "south_fork_cascading_low_runnable_reduced",
+      "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/conservation_summary.json",
+      "display_name": "South Fork Cascading low_runnable reduced",
+      "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/fields.npz",
+      "flow_band": "low_runnable",
+      "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/manifest.json",
+      "overlay_id": "south_fork_cascading_low_runnable_reduced_stitched_validation",
+      "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/probes.json",
+      "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/raft_transition_checkpoints.json",
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario",
+      "solver_mode": "reduced",
+      "stitched_whole_window_required": true,
+      "visible_by_default": false
+    },
+    {
+      "asset_id": "south_fork_cascading_low_runnable_finite_volume",
+      "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/conservation_summary.json",
+      "display_name": "South Fork Cascading low_runnable finite_volume",
+      "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/fields.npz",
+      "flow_band": "low_runnable",
+      "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/manifest.json",
+      "overlay_id": "south_fork_cascading_low_runnable_finite_volume_stitched_validation",
+      "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/probes.json",
+      "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/raft_transition_checkpoints.json",
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario",
+      "solver_mode": "finite_volume",
+      "stitched_whole_window_required": true,
+      "visible_by_default": true
+    },
+    {
+      "asset_id": "south_fork_cascading_median_runnable_reduced",
+      "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/conservation_summary.json",
+      "display_name": "South Fork Cascading median_runnable reduced",
+      "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/fields.npz",
+      "flow_band": "median_runnable",
+      "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/manifest.json",
+      "overlay_id": "south_fork_cascading_median_runnable_reduced_stitched_validation",
+      "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/probes.json",
+      "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/raft_transition_checkpoints.json",
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario",
+      "solver_mode": "reduced",
+      "stitched_whole_window_required": true,
+      "visible_by_default": false
+    },
+    {
+      "asset_id": "south_fork_cascading_median_runnable_finite_volume",
+      "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/conservation_summary.json",
+      "display_name": "South Fork Cascading median_runnable finite_volume",
+      "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/fields.npz",
+      "flow_band": "median_runnable",
+      "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/manifest.json",
+      "overlay_id": "south_fork_cascading_median_runnable_finite_volume_stitched_validation",
+      "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/probes.json",
+      "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/raft_transition_checkpoints.json",
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario",
+      "solver_mode": "finite_volume",
+      "stitched_whole_window_required": true,
+      "visible_by_default": true
+    },
+    {
+      "asset_id": "south_fork_cascading_high_runnable_reduced",
+      "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/conservation_summary.json",
+      "display_name": "South Fork Cascading high_runnable reduced",
+      "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/fields.npz",
+      "flow_band": "high_runnable",
+      "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/manifest.json",
+      "overlay_id": "south_fork_cascading_high_runnable_reduced_stitched_validation",
+      "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/probes.json",
+      "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/raft_transition_checkpoints.json",
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario",
+      "solver_mode": "reduced",
+      "stitched_whole_window_required": true,
+      "visible_by_default": false
+    },
+    {
+      "asset_id": "south_fork_cascading_high_runnable_finite_volume",
+      "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/conservation_summary.json",
+      "display_name": "South Fork Cascading high_runnable finite_volume",
+      "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/fields.npz",
+      "flow_band": "high_runnable",
+      "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/manifest.json",
+      "overlay_id": "south_fork_cascading_high_runnable_finite_volume_stitched_validation",
+      "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/probes.json",
+      "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/raft_transition_checkpoints.json",
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario",
+      "solver_mode": "finite_volume",
+      "stitched_whole_window_required": true,
+      "visible_by_default": true
+    }
+  ],
+  "validation_runs": [
+    {
+      "cpp_mass_relative_drift": 0.014448972855913346,
+      "cpp_returncode": 0,
+      "cpp_validation_passed": true,
+      "difficulty": "beginner",
+      "duration_seconds": 0.15,
+      "eddy_line_shear": 0.27674999999999994,
+      "flow_band": "low_runnable",
+      "hole_retention_strength": 0.2536875,
+      "inflow_m3s": 25.4851619328,
+      "initial_depth_m": 1.1099999999999999,
+      "notes": "Milestone 10 smoke validation after PyClaw reference shelf. Full field/probe threshold matching is tracked in the Milestone 10 readiness report.",
+      "pyclaw_available": true,
+      "pyclaw_mass_relative_drift": 9.837622465225788e-05,
+      "pyclaw_validation_passed": true,
+      "roughness_manning_n": 0.0379375,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_low_runnable_beginner",
+      "season": "late_summer_low_water",
+      "wave_train_strength": 0.4304999999999999
+    },
+    {
+      "cpp_mass_relative_drift": 0.015247076535714459,
+      "cpp_returncode": 0,
+      "cpp_validation_passed": true,
+      "difficulty": "intermediate",
+      "duration_seconds": 0.15,
+      "eddy_line_shear": 0.6,
+      "flow_band": "median_runnable",
+      "hole_retention_strength": 0.55,
+      "inflow_m3s": 45.3069545472,
+      "initial_depth_m": 1.24,
+      "notes": "Milestone 10 smoke validation after PyClaw reference shelf. Full field/probe threshold matching is tracked in the Milestone 10 readiness report.",
+      "pyclaw_available": true,
+      "pyclaw_mass_relative_drift": 0.0001906330520161388,
+      "pyclaw_validation_passed": true,
+      "roughness_manning_n": 0.041,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate",
+      "season": "summer_commercial",
+      "wave_train_strength": 0.7
+    },
+    {
+      "cpp_mass_relative_drift": 0.01704512938548211,
+      "cpp_returncode": 0,
+      "cpp_validation_passed": true,
+      "difficulty": "advanced",
+      "duration_seconds": 0.15,
+      "eddy_line_shear": 1.3275,
+      "flow_band": "high_runnable",
+      "hole_retention_strength": 1.216875,
+      "inflow_m3s": 84.950539776,
+      "initial_depth_m": 1.4320393247567158,
+      "notes": "Milestone 10 smoke validation after PyClaw reference shelf. Full field/probe threshold matching is tracked in the Milestone 10 readiness report.",
+      "pyclaw_available": true,
+      "pyclaw_mass_relative_drift": 0.0003661271936209661,
+      "pyclaw_validation_passed": true,
+      "roughness_manning_n": 0.045200000000000004,
+      "scenario_id": "american_south_fork_chili_bar_to_coloma_high_runnable_advanced",
+      "season": "spring_runoff_or_release",
+      "wave_train_strength": 1.1310470812481679
+    }
+  ]
+}

@@ -14,10 +14,16 @@ from raftsim.milestone21 import (
     MILESTONE21_GEOSPATIAL_IMPORT_PIPELINE_SCHEMA,
     MILESTONE21_RAPID_RIVER_EDITOR_SCHEMA,
     MILESTONE21_REACH_LOCAL_STREAMING_SCHEMA,
+    MILESTONE21_SOUTH_FORK_EDITOR_PASS_SCHEMA,
     RAPID_RIVER_EDITOR_MANIFEST_PATH,
     RAPID_REVIEW_FLOW_DIFFICULTY_PATH,
     REACH_LOCAL_STREAMING_PATH as REACH_LOCAL_STREAMING_MANIFEST,
     REQUIRED_EVIDENCE_LAYERS,
+    SOUTH_FORK_CORRIDOR_PACKAGE_PATH,
+    SOUTH_FORK_EDITOR_PASS_PATH as SOUTH_FORK_EDITOR_PASS_MANIFEST,
+    SOUTH_FORK_RAPID_CANDIDATES_PATH,
+    SOUTH_FORK_SOURCE_MANIFEST_PATH,
+    SOUTH_FORK_VALIDATION_MATRIX_PATH,
     SPATIAL_AUDIO_PRESETS_PATH,
     SOUTH_FORK_WORKFLOW_PATH,
     TRACEABLE_RIVER_DATA_ASSETS_PATH,
@@ -25,10 +31,12 @@ from raftsim.milestone21 import (
     build_geospatial_import_pipeline_manifest,
     build_rapid_river_editor_manifest,
     build_reach_local_streaming_manifest,
+    build_south_fork_editor_pass_manifest,
     write_feature_tuning_editor_manifest,
     write_geospatial_import_pipeline_manifest,
     write_rapid_river_editor_manifest,
     write_reach_local_streaming_manifest,
+    write_south_fork_editor_pass_manifest,
 )
 
 
@@ -52,6 +60,11 @@ FEATURE_TUNING_EDITOR_PATH = REPO_ROOT / FEATURE_TUNING_EDITOR_MANIFEST
 FEATURE_TUNING_EDITOR_HEADER_PATH = (
     REPO_ROOT
     / "unreal/Plugins/RaftSim/Source/RaftSimRiver/Public/RaftSimFeatureTuningEditorConfig.h"
+)
+SOUTH_FORK_EDITOR_PASS_PATH = REPO_ROOT / SOUTH_FORK_EDITOR_PASS_MANIFEST
+SOUTH_FORK_EDITOR_PASS_HEADER_PATH = (
+    REPO_ROOT
+    / "unreal/Plugins/RaftSim/Source/RaftSimRiver/Public/RaftSimSouthForkEditorPassConfig.h"
 )
 
 
@@ -388,6 +401,110 @@ def test_write_feature_tuning_editor_manifest_creates_json(tmp_path):
     output_json = tmp_path / "feature_tuning_editor.json"
 
     generated = write_feature_tuning_editor_manifest(repo_root=REPO_ROOT, output_json=output_json)
+
+    assert output_json.exists()
+    assert json.loads(output_json.read_text(encoding="utf-8")) == generated.manifest
+
+
+def test_south_fork_editor_pass_manifest_matches_generator():
+    expected = build_south_fork_editor_pass_manifest(REPO_ROOT).manifest
+    committed = json.loads(SOUTH_FORK_EDITOR_PASS_PATH.read_text(encoding="utf-8"))
+
+    assert committed == expected
+    assert committed["schema"] == MILESTONE21_SOUTH_FORK_EDITOR_PASS_SCHEMA
+    assert committed["status"] == "ready_for_south_fork_unreal_editor_pass"
+
+
+def test_south_fork_editor_pass_links_sources_flows_and_overlays():
+    manifest = json.loads(SOUTH_FORK_EDITOR_PASS_PATH.read_text(encoding="utf-8"))
+
+    assert manifest["asset_class"] == "URaftSimSouthForkEditorPassConfig"
+    assert manifest["module"] == "RaftSimRiver"
+    assert manifest["source_manifest"] == SOUTH_FORK_SOURCE_MANIFEST_PATH
+    assert manifest["corridor_package"] == SOUTH_FORK_CORRIDOR_PACKAGE_PATH
+    assert manifest["rapid_candidates"] == SOUTH_FORK_RAPID_CANDIDATES_PATH
+    assert manifest["flow_presets"] == FLOW_PRESETS_PATH
+    assert manifest["validation_matrix"] == SOUTH_FORK_VALIDATION_MATRIX_PATH
+    assert manifest["rapid_river_editor"] == RAPID_RIVER_EDITOR_MANIFEST_PATH
+    assert manifest["feature_tuning_editor"] == FEATURE_TUNING_EDITOR_MANIFEST
+    assert manifest["traceable_river_data_assets"] == TRACEABLE_RIVER_DATA_ASSETS_PATH
+    assert manifest["reviewed_rapid_count"] == 4
+    assert len(manifest["reviewed_rapids"]) == 4
+    assert {band["flow_band"] for band in manifest["flow_bands"]} == {
+        "low_runnable",
+        "median_runnable",
+        "high_runnable",
+    }
+    assert {run["flow_band"] for run in manifest["validation_runs"]} == {
+        "low_runnable",
+        "median_runnable",
+        "high_runnable",
+    }
+    assert len(manifest["validation_overlays"]) == 6
+    assert {overlay["solver_mode"] for overlay in manifest["validation_overlays"]} == {
+        "reduced",
+        "finite_volume",
+    }
+    assert {overlay["flow_band"] for overlay in manifest["validation_overlays"]} == {
+        "low_runnable",
+        "median_runnable",
+        "high_runnable",
+    }
+    assert all(overlay["stitched_whole_window_required"] is True for overlay in manifest["validation_overlays"])
+
+
+def test_south_fork_editor_pass_records_guide_feedback_for_each_reviewed_rapid():
+    manifest = json.loads(SOUTH_FORK_EDITOR_PASS_PATH.read_text(encoding="utf-8"))
+    overlay_ids = {overlay["overlay_id"] for overlay in manifest["validation_overlays"]}
+
+    for rapid in manifest["reviewed_rapids"]:
+        assert rapid["accepted_for_editor_pass"] is True
+        assert rapid["review_status"] == "seed_reviewed_for_first_editor_pass_needs_human_signoff"
+        assert rapid["reviewed_labels"]
+        assert rapid["expected_outcomes"]
+        assert rapid["guide_feedback_annotations"]
+        assert rapid["rights_provenance"]["required"] is True
+        assert {"aerial_satellite_imagery", "gauge_history", "source_manifest", "guide_notes"}.issubset(
+            rapid["required_evidence_layers_present"]
+        )
+        assert {review["flow_band"] for review in rapid["flow_review"]} == {
+            "low_runnable",
+            "median_runnable",
+            "high_runnable",
+        }
+        for review in rapid["flow_review"]:
+            assert review["requires_outcome_review"] is True
+            assert set(review["validation_overlay_ids"]).issubset(overlay_ids)
+            assert len(review["validation_overlay_ids"]) == 2
+        for annotation in rapid["guide_feedback_annotations"]:
+            assert annotation["flow_context_required"] is True
+            assert annotation["footage_timecodes_required"] is True
+            assert annotation["rights_status"] == "manifest_references_only"
+            assert annotation["human_guide_signoff_required"] is True
+
+
+def test_south_fork_editor_pass_header_exposes_unreal_data_contract():
+    header_text = SOUTH_FORK_EDITOR_PASS_HEADER_PATH.read_text(encoding="utf-8")
+
+    assert "URaftSimSouthForkEditorPassConfig" in header_text
+    assert "ERaftSimSouthForkReviewStatus" in header_text
+    assert "FRaftSimSouthForkReviewedRapid" in header_text
+    assert "FRaftSimSouthForkFlowReviewBand" in header_text
+    assert "FRaftSimSouthForkGuideFeedbackAnnotation" in header_text
+    assert "FRaftSimSouthForkValidationOverlay" in header_text
+    assert "SeedReviewedNeedsHumanSignoff" in header_text
+    assert "ReviewedRapids" in header_text
+    assert "ValidationOverlays" in header_text
+    assert "bRequireGuideFeedbackAnnotations" in header_text
+    assert "bRequireLowMedianHighFlowPresets" in header_text
+    assert "bRequireStitchedValidationOverlays" in header_text
+    assert "bFieldMediaManifestReferencesOnlyUntilRightsClear" in header_text
+
+
+def test_write_south_fork_editor_pass_manifest_creates_json(tmp_path):
+    output_json = tmp_path / "south_fork_first_river_editor_pass.json"
+
+    generated = write_south_fork_editor_pass_manifest(repo_root=REPO_ROOT, output_json=output_json)
 
     assert output_json.exists()
     assert json.loads(output_json.read_text(encoding="utf-8")) == generated.manifest
