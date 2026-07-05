@@ -7,6 +7,7 @@
     "physics_frame",
     "recognized_phrase",
     "intent",
+    "deterministic_crew_intent",
     "confidence",
     "command_latency_ms",
     "crew_response",
@@ -33,9 +34,14 @@
         "Brace",
         "HoldOn",
         "HighSide",
+        "LeanLeft",
+        "LeanRight",
         "Rescue",
         "Recovery"
       ]
+    },
+    "deterministic_crew_intent": {
+      "type": "string"
     },
     "confidence": {
       "type": "number",

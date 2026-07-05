@@ -30,6 +30,9 @@ struct FRaftSimVoiceCommandTelemetryEvent
     ERaftSimGuideCommandIntent Intent = ERaftSimGuideCommandIntent::None;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RaftSim|VoiceTelemetry")
+    FName DeterministicCrewIntent;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RaftSim|VoiceTelemetry")
     float Confidence = 0.0f;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RaftSim|VoiceTelemetry")

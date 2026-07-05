@@ -14,7 +14,12 @@
     },
     {
       "layer": "command_intent_parser",
-      "purpose": "map transcript into deterministic crew command intents"
+      "purpose": "map transcript into deterministic crew command intents through a normalized phrase grammar"
+    },
+    {
+      "layer": "deterministic_command_router",
+      "interface": "URaftSimVoiceCommandRouter",
+      "purpose": "apply gameplay mode gates, confidence thresholds, latency limits, confirmation behavior, and telemetry before command execution"
     },
     {
       "layer": "crew_dialogue",
@@ -30,8 +35,12 @@
     "core_paddling_commands_must_be_deterministic": true,
     "cloud_ai_not_required": true,
     "manual_input_parity_required": true,
+    "rowing_oar_rig_voice_commands_enabled": false,
     "command_model_profile": "lightweight_efficient_accurate_local",
     "broad_conversation_model_allowed_for_gameplay_commands": false,
+    "execute_confidence_threshold": 0.78,
+    "confirm_confidence_threshold": 0.58,
+    "max_command_latency_ms": 240.0,
     "optimize_for": [
       "accuracy",
       "low_latency",

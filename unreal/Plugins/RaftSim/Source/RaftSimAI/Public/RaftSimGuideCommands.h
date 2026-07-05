@@ -18,6 +18,8 @@ enum class ERaftSimGuideCommandIntent : uint8
     Brace,
     HoldOn,
     HighSide,
+    LeanLeft,
+    LeanRight,
     Rescue,
     Recovery
 };
@@ -35,6 +37,12 @@ struct FRaftSimGuideCommand
 
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|GuideCommand")
     float Confidence = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|GuideCommand")
+    FName DeterministicCrewIntent;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|GuideCommand")
+    bool bMatchedGrammar = false;
 };
 
 UCLASS(BlueprintType)
