@@ -11,8 +11,10 @@ MILESTONE21_RAPID_RIVER_EDITOR_SCHEMA = "raftsim.unreal.rapid_river_editor.v1"
 MILESTONE21_GEOSPATIAL_IMPORT_PIPELINE_SCHEMA = (
     "raftsim.unreal.geospatial_import_pipeline.v1"
 )
+MILESTONE21_REACH_LOCAL_STREAMING_SCHEMA = "raftsim.unreal.reach_local_streaming.v1"
 RAPID_RIVER_EDITOR_MANIFEST_PATH = "unreal/Content/RaftSim/River/rapid_river_editor.json"
 GEOSPATIAL_IMPORT_PIPELINE_PATH = "unreal/Content/RaftSim/River/geospatial_import_pipeline.json"
+REACH_LOCAL_STREAMING_PATH = "unreal/Content/RaftSim/River/reach_local_streaming.json"
 SOUTH_FORK_WORKFLOW_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/rapid_review_editor_workflow.json"
 )
@@ -49,6 +51,13 @@ class Milestone21RapidRiverEditor:
 @dataclass(frozen=True, slots=True)
 class Milestone21GeospatialImportPipeline:
     """Generated Unreal geospatial import pipeline manifest."""
+
+    manifest: dict[str, Any]
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone21ReachLocalStreaming:
+    """Generated Unreal reach-local authoring and streaming manifest."""
 
     manifest: dict[str, Any]
 
@@ -345,6 +354,103 @@ def write_geospatial_import_pipeline_manifest(
     """Generate and write the canonical Unreal geospatial import pipeline manifest."""
 
     generated = build_geospatial_import_pipeline_manifest(repo_root)
+    output_json.parent.mkdir(parents=True, exist_ok=True)
+    output_json.write_text(json.dumps(generated.manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return generated
+
+
+def _reach_adjacency(reach_ids: list[str]) -> list[dict[str, Any]]:
+    adjacency: list[dict[str, Any]] = []
+    for index, reach_id in enumerate(reach_ids):
+        adjacency.append(
+            {
+                "reach_id": reach_id,
+                "upstream_neighbor": reach_ids[index - 1] if index > 0 else None,
+                "downstream_neighbor": reach_ids[index + 1] if index + 1 < len(reach_ids) else None,
+            }
+        )
+    return adjacency
+
+
+def _playable_window(asset: dict[str, Any], repo_root: Path) -> dict[str, Any]:
+    cascading_metadata = _read_json(repo_root / asset["ghost_zone_policy"]["source"])
+    stitched_manifest = _read_json(repo_root / asset["stitched_validation"]["manifest"])
+    reach_ids = list(asset["reach_ids"])
+    return {
+        "window_id": asset["asset_id"],
+        "display_name": asset["display_name"],
+        "flow_band": asset["flow_band"],
+        "solver_mode": asset["solver_mode"],
+        "scenario_package": asset["scenario_package"],
+        "authoring_mode": "reach_local_grids",
+        "streaming_mode": "reach_window_with_overlap_ghost_zones",
+        "reach_ids": reach_ids,
+        "reach_adjacency": _reach_adjacency(reach_ids),
+        "reach_local_grid_count": asset["reach_local_grid_count"],
+        "reach_local_grids": [
+            {
+                "reach_id": grid["reach_id"],
+                "grid": grid["grid"],
+                "upstream_ghost_cells": grid["upstream_ghost_cells"],
+                "downstream_ghost_cells": grid["downstream_ghost_cells"],
+            }
+            for grid in cascading_metadata["reach_local_grids"]
+        ],
+        "ghost_zone_policy": asset["ghost_zone_policy"],
+        "stitched_validation": asset["stitched_validation"],
+        "stitched_validation_scope": stitched_manifest["validation_scope"],
+        "required_exports": {
+            "fields": asset["stitched_validation"]["fields"],
+            "probes": asset["stitched_validation"]["probes"],
+            "conservation_summary": asset["stitched_validation"]["conservation_summary"],
+            "raft_transition_checkpoints": asset["stitched_validation"]["raft_transition_checkpoints"],
+            "manifest": asset["stitched_validation"]["manifest"],
+        },
+        "streaming_contract": {
+            "overlap_metadata_required": True,
+            "neighbor_references_required": True,
+            "stitched_whole_window_validation_required": True,
+            "isolated_reach_validation_allowed_for_signoff": False,
+        },
+    }
+
+
+def build_reach_local_streaming_manifest(repo_root: Path) -> Milestone21ReachLocalStreaming:
+    """Build the Unreal reach-local authoring and streaming manifest."""
+
+    root = repo_root.resolve()
+    traceable_assets = _read_json(root / TRACEABLE_RIVER_DATA_ASSETS_PATH)
+    reach_assets = [
+        asset
+        for asset in traceable_assets["data_assets"]
+        if asset["kind"] == "reach_local_grid_with_stitched_validation"
+    ]
+    windows = [_playable_window(asset, root) for asset in reach_assets]
+    manifest = {
+        "schema": MILESTONE21_REACH_LOCAL_STREAMING_SCHEMA,
+        "streaming_id": "milestone21_reach_local_authoring_streaming",
+        "module": "RaftSimRiver",
+        "asset_class": "URaftSimReachLocalStreamingConfig",
+        "traceable_river_data_assets": TRACEABLE_RIVER_DATA_ASSETS_PATH,
+        "accepted_report_set_lock": traceable_assets["accepted_report_set_lock"],
+        "playable_window_count": len(windows),
+        "playable_windows": windows,
+        "authoring_rules": [
+            "Designers may author and stream reach-local grids for ergonomics and memory.",
+            "Every playable window must export stitched whole-window fields, probes, conservation summaries, and raft transition checkpoints.",
+            "Seam, ghost-zone, bed-slope, wet/dry, and raft-state checks are evaluated on stitched outputs for signoff.",
+        ],
+        "status": "ready_for_reach_local_unreal_authoring_and_streaming",
+    }
+    return Milestone21ReachLocalStreaming(manifest=manifest)
+
+
+def write_reach_local_streaming_manifest(
+    *, repo_root: Path, output_json: Path
+) -> Milestone21ReachLocalStreaming:
+    """Generate and write the Unreal reach-local streaming manifest."""
+
+    generated = build_reach_local_streaming_manifest(repo_root)
     output_json.parent.mkdir(parents=True, exist_ok=True)
     output_json.write_text(json.dumps(generated.manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return generated

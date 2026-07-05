@@ -1,0 +1,1124 @@
+{
+  "accepted_report_set_lock": {
+    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
+    "manifest": "physics/reports/milestone20/report_set_lock.json"
+  },
+  "asset_class": "URaftSimReachLocalStreamingConfig",
+  "authoring_rules": [
+    "Designers may author and stream reach-local grids for ergonomics and memory.",
+    "Every playable window must export stitched whole-window fields, probes, conservation summaries, and raft transition checkpoints.",
+    "Seam, ghost-zone, bed-slope, wet/dry, and raft-state checks are evaluated on stitched outputs for signoff."
+  ],
+  "module": "RaftSimRiver",
+  "playable_window_count": 6,
+  "playable_windows": [
+    {
+      "authoring_mode": "reach_local_grids",
+      "display_name": "South Fork Cascading low_runnable reduced",
+      "flow_band": "low_runnable",
+      "ghost_zone_policy": {
+        "max_downstream_ghost_cells": 2,
+        "max_upstream_ghost_cells": 2,
+        "min_downstream_ghost_cells": 0,
+        "min_upstream_ghost_cells": 0,
+        "source": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/cascading_metadata.json"
+      },
+      "reach_adjacency": [
+        {
+          "downstream_neighbor": "tongue_001",
+          "reach_id": "pool_001",
+          "upstream_neighbor": null
+        },
+        {
+          "downstream_neighbor": "drop_001",
+          "reach_id": "tongue_001",
+          "upstream_neighbor": "pool_001"
+        },
+        {
+          "downstream_neighbor": "wave_train_001",
+          "reach_id": "drop_001",
+          "upstream_neighbor": "tongue_001"
+        },
+        {
+          "downstream_neighbor": "eddy_recovery_001",
+          "reach_id": "wave_train_001",
+          "upstream_neighbor": "drop_001"
+        },
+        {
+          "downstream_neighbor": "boulder_garden_001",
+          "reach_id": "eddy_recovery_001",
+          "upstream_neighbor": "wave_train_001"
+        },
+        {
+          "downstream_neighbor": "pool_002",
+          "reach_id": "boulder_garden_001",
+          "upstream_neighbor": "eddy_recovery_001"
+        },
+        {
+          "downstream_neighbor": null,
+          "reach_id": "pool_002",
+          "upstream_neighbor": "boulder_garden_001"
+        }
+      ],
+      "reach_ids": [
+        "pool_001",
+        "tongue_001",
+        "drop_001",
+        "wave_train_001",
+        "eddy_recovery_001",
+        "boulder_garden_001",
+        "pool_002"
+      ],
+      "reach_local_grid_count": 7,
+      "reach_local_grids": [
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 13,
+            "ny": 20,
+            "origin_x": 0.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "pool_001",
+          "upstream_ghost_cells": 0
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 10,
+            "ny": 20,
+            "origin_x": 36.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "tongue_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 9,
+            "ny": 20,
+            "origin_x": 60.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "drop_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 13,
+            "ny": 20,
+            "origin_x": 80.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "wave_train_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 10,
+            "ny": 20,
+            "origin_x": 116.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "eddy_recovery_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 14,
+            "ny": 20,
+            "origin_x": 140.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "boulder_garden_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 0,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 11,
+            "ny": 20,
+            "origin_x": 180.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "pool_002",
+          "upstream_ghost_cells": 2
+        }
+      ],
+      "required_exports": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/raft_transition_checkpoints.json"
+      },
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario",
+      "solver_mode": "reduced",
+      "stitched_validation": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/raft_transition_checkpoints.json",
+        "required": true,
+        "schema_version": "raftsim.stitched_whole_window_validation.v0"
+      },
+      "stitched_validation_scope": {
+        "consumer_contract": "GeoClaw/C++/Unreal must compare this stitched export, not isolated reach chunks.",
+        "covers_reach_local_grids": true,
+        "seams_visible_to_validators": true,
+        "storage": "stitched_whole_window"
+      },
+      "streaming_contract": {
+        "isolated_reach_validation_allowed_for_signoff": false,
+        "neighbor_references_required": true,
+        "overlap_metadata_required": true,
+        "stitched_whole_window_validation_required": true
+      },
+      "streaming_mode": "reach_window_with_overlap_ghost_zones",
+      "window_id": "south_fork_cascading_low_runnable_reduced"
+    },
+    {
+      "authoring_mode": "reach_local_grids",
+      "display_name": "South Fork Cascading low_runnable finite_volume",
+      "flow_band": "low_runnable",
+      "ghost_zone_policy": {
+        "max_downstream_ghost_cells": 2,
+        "max_upstream_ghost_cells": 2,
+        "min_downstream_ghost_cells": 0,
+        "min_upstream_ghost_cells": 0,
+        "source": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/cascading_metadata.json"
+      },
+      "reach_adjacency": [
+        {
+          "downstream_neighbor": "tongue_001",
+          "reach_id": "pool_001",
+          "upstream_neighbor": null
+        },
+        {
+          "downstream_neighbor": "drop_001",
+          "reach_id": "tongue_001",
+          "upstream_neighbor": "pool_001"
+        },
+        {
+          "downstream_neighbor": "wave_train_001",
+          "reach_id": "drop_001",
+          "upstream_neighbor": "tongue_001"
+        },
+        {
+          "downstream_neighbor": "eddy_recovery_001",
+          "reach_id": "wave_train_001",
+          "upstream_neighbor": "drop_001"
+        },
+        {
+          "downstream_neighbor": "boulder_garden_001",
+          "reach_id": "eddy_recovery_001",
+          "upstream_neighbor": "wave_train_001"
+        },
+        {
+          "downstream_neighbor": "pool_002",
+          "reach_id": "boulder_garden_001",
+          "upstream_neighbor": "eddy_recovery_001"
+        },
+        {
+          "downstream_neighbor": null,
+          "reach_id": "pool_002",
+          "upstream_neighbor": "boulder_garden_001"
+        }
+      ],
+      "reach_ids": [
+        "pool_001",
+        "tongue_001",
+        "drop_001",
+        "wave_train_001",
+        "eddy_recovery_001",
+        "boulder_garden_001",
+        "pool_002"
+      ],
+      "reach_local_grid_count": 7,
+      "reach_local_grids": [
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 13,
+            "ny": 20,
+            "origin_x": 0.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "pool_001",
+          "upstream_ghost_cells": 0
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 10,
+            "ny": 20,
+            "origin_x": 36.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "tongue_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 9,
+            "ny": 20,
+            "origin_x": 60.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "drop_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 13,
+            "ny": 20,
+            "origin_x": 80.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "wave_train_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 10,
+            "ny": 20,
+            "origin_x": 116.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "eddy_recovery_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 14,
+            "ny": 20,
+            "origin_x": 140.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "boulder_garden_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 0,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 11,
+            "ny": 20,
+            "origin_x": 180.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "pool_002",
+          "upstream_ghost_cells": 2
+        }
+      ],
+      "required_exports": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/raft_transition_checkpoints.json"
+      },
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario",
+      "solver_mode": "finite_volume",
+      "stitched_validation": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/raft_transition_checkpoints.json",
+        "required": true,
+        "schema_version": "raftsim.stitched_whole_window_validation.v0"
+      },
+      "stitched_validation_scope": {
+        "consumer_contract": "GeoClaw/C++/Unreal must compare this stitched export, not isolated reach chunks.",
+        "covers_reach_local_grids": true,
+        "seams_visible_to_validators": true,
+        "storage": "stitched_whole_window"
+      },
+      "streaming_contract": {
+        "isolated_reach_validation_allowed_for_signoff": false,
+        "neighbor_references_required": true,
+        "overlap_metadata_required": true,
+        "stitched_whole_window_validation_required": true
+      },
+      "streaming_mode": "reach_window_with_overlap_ghost_zones",
+      "window_id": "south_fork_cascading_low_runnable_finite_volume"
+    },
+    {
+      "authoring_mode": "reach_local_grids",
+      "display_name": "South Fork Cascading median_runnable reduced",
+      "flow_band": "median_runnable",
+      "ghost_zone_policy": {
+        "max_downstream_ghost_cells": 2,
+        "max_upstream_ghost_cells": 2,
+        "min_downstream_ghost_cells": 0,
+        "min_upstream_ghost_cells": 0,
+        "source": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/cascading_metadata.json"
+      },
+      "reach_adjacency": [
+        {
+          "downstream_neighbor": "tongue_001",
+          "reach_id": "pool_001",
+          "upstream_neighbor": null
+        },
+        {
+          "downstream_neighbor": "drop_001",
+          "reach_id": "tongue_001",
+          "upstream_neighbor": "pool_001"
+        },
+        {
+          "downstream_neighbor": "wave_train_001",
+          "reach_id": "drop_001",
+          "upstream_neighbor": "tongue_001"
+        },
+        {
+          "downstream_neighbor": "eddy_recovery_001",
+          "reach_id": "wave_train_001",
+          "upstream_neighbor": "drop_001"
+        },
+        {
+          "downstream_neighbor": "boulder_garden_001",
+          "reach_id": "eddy_recovery_001",
+          "upstream_neighbor": "wave_train_001"
+        },
+        {
+          "downstream_neighbor": "pool_002",
+          "reach_id": "boulder_garden_001",
+          "upstream_neighbor": "eddy_recovery_001"
+        },
+        {
+          "downstream_neighbor": null,
+          "reach_id": "pool_002",
+          "upstream_neighbor": "boulder_garden_001"
+        }
+      ],
+      "reach_ids": [
+        "pool_001",
+        "tongue_001",
+        "drop_001",
+        "wave_train_001",
+        "eddy_recovery_001",
+        "boulder_garden_001",
+        "pool_002"
+      ],
+      "reach_local_grid_count": 7,
+      "reach_local_grids": [
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 14,
+            "ny": 20,
+            "origin_x": 0.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "pool_001",
+          "upstream_ghost_cells": 0
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 10,
+            "ny": 20,
+            "origin_x": 40.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "tongue_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 9,
+            "ny": 20,
+            "origin_x": 64.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "drop_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 13,
+            "ny": 20,
+            "origin_x": 84.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "wave_train_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 10,
+            "ny": 20,
+            "origin_x": 120.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "eddy_recovery_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 13,
+            "ny": 20,
+            "origin_x": 144.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "boulder_garden_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 0,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 11,
+            "ny": 20,
+            "origin_x": 180.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "pool_002",
+          "upstream_ghost_cells": 2
+        }
+      ],
+      "required_exports": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/raft_transition_checkpoints.json"
+      },
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario",
+      "solver_mode": "reduced",
+      "stitched_validation": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/raft_transition_checkpoints.json",
+        "required": true,
+        "schema_version": "raftsim.stitched_whole_window_validation.v0"
+      },
+      "stitched_validation_scope": {
+        "consumer_contract": "GeoClaw/C++/Unreal must compare this stitched export, not isolated reach chunks.",
+        "covers_reach_local_grids": true,
+        "seams_visible_to_validators": true,
+        "storage": "stitched_whole_window"
+      },
+      "streaming_contract": {
+        "isolated_reach_validation_allowed_for_signoff": false,
+        "neighbor_references_required": true,
+        "overlap_metadata_required": true,
+        "stitched_whole_window_validation_required": true
+      },
+      "streaming_mode": "reach_window_with_overlap_ghost_zones",
+      "window_id": "south_fork_cascading_median_runnable_reduced"
+    },
+    {
+      "authoring_mode": "reach_local_grids",
+      "display_name": "South Fork Cascading median_runnable finite_volume",
+      "flow_band": "median_runnable",
+      "ghost_zone_policy": {
+        "max_downstream_ghost_cells": 2,
+        "max_upstream_ghost_cells": 2,
+        "min_downstream_ghost_cells": 0,
+        "min_upstream_ghost_cells": 0,
+        "source": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/cascading_metadata.json"
+      },
+      "reach_adjacency": [
+        {
+          "downstream_neighbor": "tongue_001",
+          "reach_id": "pool_001",
+          "upstream_neighbor": null
+        },
+        {
+          "downstream_neighbor": "drop_001",
+          "reach_id": "tongue_001",
+          "upstream_neighbor": "pool_001"
+        },
+        {
+          "downstream_neighbor": "wave_train_001",
+          "reach_id": "drop_001",
+          "upstream_neighbor": "tongue_001"
+        },
+        {
+          "downstream_neighbor": "eddy_recovery_001",
+          "reach_id": "wave_train_001",
+          "upstream_neighbor": "drop_001"
+        },
+        {
+          "downstream_neighbor": "boulder_garden_001",
+          "reach_id": "eddy_recovery_001",
+          "upstream_neighbor": "wave_train_001"
+        },
+        {
+          "downstream_neighbor": "pool_002",
+          "reach_id": "boulder_garden_001",
+          "upstream_neighbor": "eddy_recovery_001"
+        },
+        {
+          "downstream_neighbor": null,
+          "reach_id": "pool_002",
+          "upstream_neighbor": "boulder_garden_001"
+        }
+      ],
+      "reach_ids": [
+        "pool_001",
+        "tongue_001",
+        "drop_001",
+        "wave_train_001",
+        "eddy_recovery_001",
+        "boulder_garden_001",
+        "pool_002"
+      ],
+      "reach_local_grid_count": 7,
+      "reach_local_grids": [
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 14,
+            "ny": 20,
+            "origin_x": 0.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "pool_001",
+          "upstream_ghost_cells": 0
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 10,
+            "ny": 20,
+            "origin_x": 40.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "tongue_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 9,
+            "ny": 20,
+            "origin_x": 64.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "drop_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 13,
+            "ny": 20,
+            "origin_x": 84.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "wave_train_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 10,
+            "ny": 20,
+            "origin_x": 120.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "eddy_recovery_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 13,
+            "ny": 20,
+            "origin_x": 144.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "boulder_garden_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 0,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 11,
+            "ny": 20,
+            "origin_x": 180.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "pool_002",
+          "upstream_ghost_cells": 2
+        }
+      ],
+      "required_exports": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/raft_transition_checkpoints.json"
+      },
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario",
+      "solver_mode": "finite_volume",
+      "stitched_validation": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/raft_transition_checkpoints.json",
+        "required": true,
+        "schema_version": "raftsim.stitched_whole_window_validation.v0"
+      },
+      "stitched_validation_scope": {
+        "consumer_contract": "GeoClaw/C++/Unreal must compare this stitched export, not isolated reach chunks.",
+        "covers_reach_local_grids": true,
+        "seams_visible_to_validators": true,
+        "storage": "stitched_whole_window"
+      },
+      "streaming_contract": {
+        "isolated_reach_validation_allowed_for_signoff": false,
+        "neighbor_references_required": true,
+        "overlap_metadata_required": true,
+        "stitched_whole_window_validation_required": true
+      },
+      "streaming_mode": "reach_window_with_overlap_ghost_zones",
+      "window_id": "south_fork_cascading_median_runnable_finite_volume"
+    },
+    {
+      "authoring_mode": "reach_local_grids",
+      "display_name": "South Fork Cascading high_runnable reduced",
+      "flow_band": "high_runnable",
+      "ghost_zone_policy": {
+        "max_downstream_ghost_cells": 2,
+        "max_upstream_ghost_cells": 2,
+        "min_downstream_ghost_cells": 0,
+        "min_upstream_ghost_cells": 0,
+        "source": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/cascading_metadata.json"
+      },
+      "reach_adjacency": [
+        {
+          "downstream_neighbor": "tongue_001",
+          "reach_id": "pool_001",
+          "upstream_neighbor": null
+        },
+        {
+          "downstream_neighbor": "drop_001",
+          "reach_id": "tongue_001",
+          "upstream_neighbor": "pool_001"
+        },
+        {
+          "downstream_neighbor": "wave_train_001",
+          "reach_id": "drop_001",
+          "upstream_neighbor": "tongue_001"
+        },
+        {
+          "downstream_neighbor": "eddy_recovery_001",
+          "reach_id": "wave_train_001",
+          "upstream_neighbor": "drop_001"
+        },
+        {
+          "downstream_neighbor": "boulder_garden_001",
+          "reach_id": "eddy_recovery_001",
+          "upstream_neighbor": "wave_train_001"
+        },
+        {
+          "downstream_neighbor": "pool_002",
+          "reach_id": "boulder_garden_001",
+          "upstream_neighbor": "eddy_recovery_001"
+        },
+        {
+          "downstream_neighbor": null,
+          "reach_id": "pool_002",
+          "upstream_neighbor": "boulder_garden_001"
+        }
+      ],
+      "reach_ids": [
+        "pool_001",
+        "tongue_001",
+        "drop_001",
+        "wave_train_001",
+        "eddy_recovery_001",
+        "boulder_garden_001",
+        "pool_002"
+      ],
+      "reach_local_grid_count": 7,
+      "reach_local_grids": [
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 14,
+            "ny": 20,
+            "origin_x": 0.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "pool_001",
+          "upstream_ghost_cells": 0
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 10,
+            "ny": 20,
+            "origin_x": 40.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "tongue_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 8,
+            "ny": 20,
+            "origin_x": 64.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "drop_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 13,
+            "ny": 20,
+            "origin_x": 80.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "wave_train_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 11,
+            "ny": 20,
+            "origin_x": 116.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "eddy_recovery_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 13,
+            "ny": 20,
+            "origin_x": 144.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "boulder_garden_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 0,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 11,
+            "ny": 20,
+            "origin_x": 180.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "pool_002",
+          "upstream_ghost_cells": 2
+        }
+      ],
+      "required_exports": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/raft_transition_checkpoints.json"
+      },
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario",
+      "solver_mode": "reduced",
+      "stitched_validation": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/raft_transition_checkpoints.json",
+        "required": true,
+        "schema_version": "raftsim.stitched_whole_window_validation.v0"
+      },
+      "stitched_validation_scope": {
+        "consumer_contract": "GeoClaw/C++/Unreal must compare this stitched export, not isolated reach chunks.",
+        "covers_reach_local_grids": true,
+        "seams_visible_to_validators": true,
+        "storage": "stitched_whole_window"
+      },
+      "streaming_contract": {
+        "isolated_reach_validation_allowed_for_signoff": false,
+        "neighbor_references_required": true,
+        "overlap_metadata_required": true,
+        "stitched_whole_window_validation_required": true
+      },
+      "streaming_mode": "reach_window_with_overlap_ghost_zones",
+      "window_id": "south_fork_cascading_high_runnable_reduced"
+    },
+    {
+      "authoring_mode": "reach_local_grids",
+      "display_name": "South Fork Cascading high_runnable finite_volume",
+      "flow_band": "high_runnable",
+      "ghost_zone_policy": {
+        "max_downstream_ghost_cells": 2,
+        "max_upstream_ghost_cells": 2,
+        "min_downstream_ghost_cells": 0,
+        "min_upstream_ghost_cells": 0,
+        "source": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/cascading_metadata.json"
+      },
+      "reach_adjacency": [
+        {
+          "downstream_neighbor": "tongue_001",
+          "reach_id": "pool_001",
+          "upstream_neighbor": null
+        },
+        {
+          "downstream_neighbor": "drop_001",
+          "reach_id": "tongue_001",
+          "upstream_neighbor": "pool_001"
+        },
+        {
+          "downstream_neighbor": "wave_train_001",
+          "reach_id": "drop_001",
+          "upstream_neighbor": "tongue_001"
+        },
+        {
+          "downstream_neighbor": "eddy_recovery_001",
+          "reach_id": "wave_train_001",
+          "upstream_neighbor": "drop_001"
+        },
+        {
+          "downstream_neighbor": "boulder_garden_001",
+          "reach_id": "eddy_recovery_001",
+          "upstream_neighbor": "wave_train_001"
+        },
+        {
+          "downstream_neighbor": "pool_002",
+          "reach_id": "boulder_garden_001",
+          "upstream_neighbor": "eddy_recovery_001"
+        },
+        {
+          "downstream_neighbor": null,
+          "reach_id": "pool_002",
+          "upstream_neighbor": "boulder_garden_001"
+        }
+      ],
+      "reach_ids": [
+        "pool_001",
+        "tongue_001",
+        "drop_001",
+        "wave_train_001",
+        "eddy_recovery_001",
+        "boulder_garden_001",
+        "pool_002"
+      ],
+      "reach_local_grid_count": 7,
+      "reach_local_grids": [
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 14,
+            "ny": 20,
+            "origin_x": 0.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "pool_001",
+          "upstream_ghost_cells": 0
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 10,
+            "ny": 20,
+            "origin_x": 40.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "tongue_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 8,
+            "ny": 20,
+            "origin_x": 64.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "drop_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 13,
+            "ny": 20,
+            "origin_x": 80.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "wave_train_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 11,
+            "ny": 20,
+            "origin_x": 116.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "eddy_recovery_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 2,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 13,
+            "ny": 20,
+            "origin_x": 144.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "boulder_garden_001",
+          "upstream_ghost_cells": 2
+        },
+        {
+          "downstream_ghost_cells": 0,
+          "grid": {
+            "dx": 4.0,
+            "dy": 2.0,
+            "nx": 11,
+            "ny": 20,
+            "origin_x": 180.0,
+            "origin_y": -19.0
+          },
+          "reach_id": "pool_002",
+          "upstream_ghost_cells": 2
+        }
+      ],
+      "required_exports": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/raft_transition_checkpoints.json"
+      },
+      "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario",
+      "solver_mode": "finite_volume",
+      "stitched_validation": {
+        "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/conservation_summary.json",
+        "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/fields.npz",
+        "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/manifest.json",
+        "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/probes.json",
+        "raft_transition_checkpoints": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/raft_transition_checkpoints.json",
+        "required": true,
+        "schema_version": "raftsim.stitched_whole_window_validation.v0"
+      },
+      "stitched_validation_scope": {
+        "consumer_contract": "GeoClaw/C++/Unreal must compare this stitched export, not isolated reach chunks.",
+        "covers_reach_local_grids": true,
+        "seams_visible_to_validators": true,
+        "storage": "stitched_whole_window"
+      },
+      "streaming_contract": {
+        "isolated_reach_validation_allowed_for_signoff": false,
+        "neighbor_references_required": true,
+        "overlap_metadata_required": true,
+        "stitched_whole_window_validation_required": true
+      },
+      "streaming_mode": "reach_window_with_overlap_ghost_zones",
+      "window_id": "south_fork_cascading_high_runnable_finite_volume"
+    }
+  ],
+  "schema": "raftsim.unreal.reach_local_streaming.v1",
+  "status": "ready_for_reach_local_unreal_authoring_and_streaming",
+  "streaming_id": "milestone21_reach_local_authoring_streaming",
+  "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
+}
