@@ -18,11 +18,13 @@ from raftsim.milestone21 import (
     MILESTONE21_GEOSPATIAL_IMPORT_PIPELINE_SCHEMA,
     MILESTONE21_RAPID_RIVER_EDITOR_SCHEMA,
     MILESTONE21_REACH_LOCAL_STREAMING_SCHEMA,
+    MILESTONE21_ROUND_TRIP_VALIDATION_SCHEMA,
     MILESTONE21_SOUTH_FORK_EDITOR_PASS_SCHEMA,
     RAPID_RIVER_EDITOR_MANIFEST_PATH,
     RAPID_REVIEW_FLOW_DIFFICULTY_PATH,
     REACH_LOCAL_STREAMING_PATH as REACH_LOCAL_STREAMING_MANIFEST,
     REQUIRED_EVIDENCE_LAYERS,
+    ROUND_TRIP_VALIDATION_PATH as ROUND_TRIP_VALIDATION_MANIFEST,
     SOUTH_FORK_CORRIDOR_PACKAGE_PATH,
     SOUTH_FORK_EDITOR_PASS_PATH as SOUTH_FORK_EDITOR_PASS_MANIFEST,
     SOUTH_FORK_RAPID_CANDIDATES_PATH,
@@ -36,12 +38,14 @@ from raftsim.milestone21 import (
     build_geospatial_import_pipeline_manifest,
     build_rapid_river_editor_manifest,
     build_reach_local_streaming_manifest,
+    build_round_trip_validation_manifest,
     build_south_fork_editor_pass_manifest,
     write_feature_tuning_editor_manifest,
     write_colorado_rowing_route_draft_manifest,
     write_geospatial_import_pipeline_manifest,
     write_rapid_river_editor_manifest,
     write_reach_local_streaming_manifest,
+    write_round_trip_validation_manifest,
     write_south_fork_editor_pass_manifest,
 )
 
@@ -78,6 +82,11 @@ COLORADO_ROWING_FLOW_PRESETS_FILE = REPO_ROOT / COLORADO_ROWING_FLOW_PRESETS_PAT
 COLORADO_ROWING_ROUTE_HEADER_PATH = (
     REPO_ROOT
     / "unreal/Plugins/RaftSim/Source/RaftSimRiver/Public/RaftSimColoradoRowingRouteConfig.h"
+)
+ROUND_TRIP_VALIDATION_PATH = REPO_ROOT / ROUND_TRIP_VALIDATION_MANIFEST
+ROUND_TRIP_VALIDATION_HEADER_PATH = (
+    REPO_ROOT
+    / "unreal/Plugins/RaftSim/Source/RaftSimRiver/Public/RaftSimRiverRoundTripValidationConfig.h"
 )
 
 
@@ -626,3 +635,98 @@ def test_write_colorado_rowing_route_draft_manifest_creates_json(tmp_path):
     assert json.loads(output_json.read_text(encoding="utf-8")) == generated.manifest
     assert json.loads(source_json.read_text(encoding="utf-8")) == generated.source_manifest
     assert json.loads(flow_json.read_text(encoding="utf-8")) == generated.flow_presets
+
+
+def test_round_trip_validation_manifest_matches_generator():
+    expected = build_round_trip_validation_manifest(REPO_ROOT).manifest
+    committed = json.loads(ROUND_TRIP_VALIDATION_PATH.read_text(encoding="utf-8"))
+
+    assert committed == expected
+    assert committed["schema"] == MILESTONE21_ROUND_TRIP_VALIDATION_SCHEMA
+    assert committed["status"] == "ready_for_round_trip_validation_harness"
+
+
+def test_round_trip_validation_covers_required_targets_and_metadata_guards():
+    manifest = json.loads(ROUND_TRIP_VALIDATION_PATH.read_text(encoding="utf-8"))
+    cases = {case["case_id"]: case for case in manifest["round_trip_cases"]}
+
+    assert manifest["asset_class"] == "URaftSimRiverRoundTripValidationConfig"
+    assert manifest["module"] == "RaftSimRiver"
+    assert manifest["canonical_format_contract"] == GEOSPATIAL_FORMAT_CONTRACT_PATH
+    assert manifest["geospatial_import_pipeline"] == GEOSPATIAL_IMPORT_PIPELINE_MANIFEST
+    assert set(manifest["required_target_kinds"]) == {
+        "solver_packages",
+        "geoclaw_cpp_comparison_inputs",
+        "fidelity_review_overlays",
+    }
+    assert {"south_fork_unreal_exports_to_solver_packages", "south_fork_reach_local_streaming_to_stitched_windows", "colorado_rowing_route_metadata_to_planning_inputs"} == set(cases)
+    assert manifest["metadata_guard_categories"]["crs"]["source_crs_required"] is True
+    assert manifest["metadata_guard_categories"]["transform"]["wgs84_required"] is True
+    assert manifest["metadata_guard_categories"]["provenance"]["source_manifest_required"] is True
+    assert manifest["metadata_guard_categories"]["flow_response_metadata"]["flow_dependent_forcing_required"] is True
+    assert manifest["source_summaries"]["south_fork_reviewed_rapids"] == 4
+    assert manifest["source_summaries"]["colorado_route_segments"] >= 4
+
+    for case in cases.values():
+        assert set(case["regenerates"]) == {
+            "solver_packages",
+            "geoclaw_cpp_comparison_inputs",
+            "fidelity_review_overlays",
+        }
+        assert case["metadata_guards"]["crs"]
+        assert case["metadata_guards"]["provenance"]
+        assert case["metadata_guards"]["flow_response_metadata"]
+        assert "coordinate_reference_systems_preserved" in case["loss_checks"]
+        assert "source_ids_and_license_terms_preserved" in case["loss_checks"]
+        assert "flow_band_ids_and_discharge_values_preserved" in case["loss_checks"]
+
+
+def test_round_trip_validation_preserves_south_fork_stitched_overlays_and_colorado_metadata():
+    manifest = json.loads(ROUND_TRIP_VALIDATION_PATH.read_text(encoding="utf-8"))
+    cases = {case["case_id"]: case for case in manifest["round_trip_cases"]}
+    south_fork = cases["south_fork_unreal_exports_to_solver_packages"]
+    reach_streaming = cases["south_fork_reach_local_streaming_to_stitched_windows"]
+    colorado = cases["colorado_rowing_route_metadata_to_planning_inputs"]
+
+    assert len(south_fork["regenerates"]["solver_packages"]) == 6
+    assert len(south_fork["regenerates"]["fidelity_review_overlays"]) == 6
+    assert {overlay["flow_band"] for overlay in south_fork["regenerates"]["fidelity_review_overlays"]} == {
+        "low_runnable",
+        "median_runnable",
+        "high_runnable",
+    }
+    assert {overlay["solver_mode"] for overlay in south_fork["regenerates"]["fidelity_review_overlays"]} == {
+        "reduced",
+        "finite_volume",
+    }
+    assert len(reach_streaming["regenerates"]["solver_packages"]) == 6
+    assert all("stitched" in overlay["overlay_id"] for overlay in reach_streaming["regenerates"]["fidelity_review_overlays"])
+    assert colorado["status"] == "metadata_round_trip_ready_solver_outputs_planned"
+    assert colorado["regenerates"]["solver_packages"] == ["planned_after_geospatial_pull"]
+    assert len(colorado["regenerates"]["fidelity_review_overlays"]) >= 5
+    assert COLORADO_ROWING_FLOW_PRESETS_PATH in colorado["metadata_guards"]["flow_response_metadata"]
+
+
+def test_round_trip_validation_header_exposes_unreal_data_contract():
+    header_text = ROUND_TRIP_VALIDATION_HEADER_PATH.read_text(encoding="utf-8")
+
+    assert "URaftSimRiverRoundTripValidationConfig" in header_text
+    assert "ERaftSimRiverRoundTripTargetKind" in header_text
+    assert "FRaftSimRiverRoundTripCase" in header_text
+    assert "FRaftSimRiverRoundTripMetadataGuards" in header_text
+    assert "FRaftSimRiverRoundTripOverlay" in header_text
+    for enum_value in ("SolverPackages", "GeoClawCppComparisonInputs", "FidelityReviewOverlays"):
+        assert enum_value in header_text
+    assert "bRequireCrsPreservation" in header_text
+    assert "bRequireProvenancePreservation" in header_text
+    assert "bRequireFlowResponseMetadataPreservation" in header_text
+    assert "bRejectIsolatedReachLocalSignoff" in header_text
+
+
+def test_write_round_trip_validation_manifest_creates_json(tmp_path):
+    output_json = tmp_path / "round_trip_validation.json"
+
+    generated = write_round_trip_validation_manifest(repo_root=REPO_ROOT, output_json=output_json)
+
+    assert output_json.exists()
+    assert json.loads(output_json.read_text(encoding="utf-8")) == generated.manifest
