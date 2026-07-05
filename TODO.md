@@ -868,7 +868,7 @@ This milestone wires the selected raft/contact runtime, validated water fields, 
 - [x] Implement crew-overboard safety states: seated, at-risk, falling/ejected, swimming, rescue-targeted, rescued, re-seated/recovered, and failed-rescue.
 - [x] Assign passenger swimming skill per run or roster entry, including non-swimmers who cannot self-rescue and require faster guide or crew intervention.
 - [x] Add swimmer drift, visibility, callouts, rescue target selection, reach/paddle grab, throw-line support where available, pull-in timing, re-seat/recovery, fatigue, trust changes, and failed-rescue consequences.
-- [ ] Add gameplay telemetry and scoring for safety, line choice, boat angle, paddle efficiency, command timing, high-side/brace timing, swims, rescue method, time in water, and crew recovery.
+- [x] Add gameplay telemetry and scoring for safety, line choice, boat angle, paddle efficiency, command timing, high-side/brace timing, swims, rescue method, time in water, and crew recovery.
 
 ## Milestone 23: First-Person Unreal Vertical Slice
 

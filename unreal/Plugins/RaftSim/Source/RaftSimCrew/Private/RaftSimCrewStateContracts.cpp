@@ -343,3 +343,47 @@ FRaftSimSwimmerRescueFrame URaftSimSwimmerRescueLibrary::EvaluateRescueAttempt(
         : FName(TEXT("out_of_reach"));
     return NextFrame;
 }
+
+FRaftSimGameplayScoreBreakdown URaftSimGameplayScoringLibrary::EvaluateGameplayScore(
+    const FRaftSimGameplayScoringSignals& Signals
+)
+{
+    FRaftSimGameplayScoreBreakdown Score;
+    Score.SafetyScore = FMath::Clamp(
+        1.0f - 0.18f * Signals.SafetyIncidentCount - 0.45f * Signals.FailedRescueCount,
+        0.0f,
+        1.0f
+    );
+    Score.LineChoiceScore = FMath::Clamp(Signals.CleanLineRatio, 0.0f, 1.0f);
+    Score.BoatAngleScore = FMath::Clamp(
+        1.0f - Signals.MeanBoatAngleErrorDegrees / 90.0f,
+        0.0f,
+        1.0f
+    );
+    Score.PaddleEfficiencyScore = FMath::Clamp(Signals.UsefulPaddleImpulseRatio, 0.0f, 1.0f);
+    Score.CommandTimingScore = FMath::Clamp(
+        1.0f - Signals.MeanCommandLatencySeconds / 3.0f,
+        0.0f,
+        1.0f
+    );
+    Score.HighSideBraceTimingScore = FMath::Clamp(
+        1.0f - Signals.HighSideBraceTimingErrorSeconds / 2.0f,
+        0.0f,
+        1.0f
+    );
+    Score.SwimRescueScore = FMath::Clamp(
+        1.0f - 0.18f * Signals.SwimCount - Signals.TimeInWaterSeconds / 90.0f - Signals.CrewRecoverySeconds / 120.0f,
+        0.0f,
+        1.0f
+    );
+
+    Score.TotalScore =
+        0.30f * Score.SafetyScore
+        + 0.18f * Score.LineChoiceScore
+        + 0.14f * Score.BoatAngleScore
+        + 0.12f * Score.PaddleEfficiencyScore
+        + 0.10f * Score.CommandTimingScore
+        + 0.08f * Score.HighSideBraceTimingScore
+        + 0.08f * Score.SwimRescueScore;
+    return Score;
+}

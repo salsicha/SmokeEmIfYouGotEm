@@ -1,0 +1,110 @@
+{
+  "schema": "raftsim.unreal.gameplay_telemetry_scoring.v1",
+  "status": "gameplay_telemetry_and_scoring_ready_for_vertical_slice",
+  "source_manifests": {
+    "authority_integration": "unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json",
+    "contact_response": "unreal/Content/RaftSim/Physics/raft_contact_response_telemetry.json",
+    "crew_weight_distribution": "unreal/Content/RaftSim/Crew/crew_weight_distribution.json",
+    "crew_safety_states": "unreal/Content/RaftSim/Crew/crew_overboard_safety_states.json",
+    "swimming_skill_assignment": "unreal/Content/RaftSim/Crew/swimming_skill_assignment.json",
+    "swimmer_rescue_gameplay": "unreal/Content/RaftSim/Crew/swimmer_rescue_gameplay.json"
+  },
+  "runtime_contract": {
+    "module": "RaftSimCrew",
+    "signals_struct": "FRaftSimGameplayScoringSignals",
+    "breakdown_struct": "FRaftSimGameplayScoreBreakdown",
+    "scoring_library": "URaftSimGameplayScoringLibrary::EvaluateGameplayScore"
+  },
+  "telemetry_categories": [
+    {
+      "category_id": "safety",
+      "fields": [
+        "safety_incident_count",
+        "failed_rescue_count",
+        "contact_loading_peak_n"
+      ]
+    },
+    {
+      "category_id": "line_choice",
+      "fields": [
+        "clean_line_ratio",
+        "hazard_avoidance_ratio",
+        "eddy_recovery_used"
+      ]
+    },
+    {
+      "category_id": "boat_angle",
+      "fields": [
+        "mean_angle_error_degrees",
+        "max_angle_error_degrees"
+      ]
+    },
+    {
+      "category_id": "paddle_efficiency",
+      "fields": [
+        "useful_paddle_impulse_ratio",
+        "missed_stroke_count"
+      ]
+    },
+    {
+      "category_id": "command_timing",
+      "fields": [
+        "mean_command_latency_seconds",
+        "late_command_count"
+      ]
+    },
+    {
+      "category_id": "high_side_brace_timing",
+      "fields": [
+        "timing_error_seconds",
+        "successful_counterplay_count"
+      ]
+    },
+    {
+      "category_id": "swims_and_rescue",
+      "fields": [
+        "swim_count",
+        "rescue_method",
+        "time_in_water_seconds",
+        "crew_recovery_seconds"
+      ]
+    }
+  ],
+  "score_weights": {
+    "safety": 0.3,
+    "line_choice": 0.18,
+    "boat_angle": 0.14,
+    "paddle_efficiency": 0.12,
+    "command_timing": 0.1,
+    "high_side_brace_timing": 0.08,
+    "swims_and_rescue": 0.08
+  },
+  "score_inputs": [
+    "safety_incident_count",
+    "clean_line_ratio",
+    "mean_angle_error_degrees",
+    "useful_paddle_impulse_ratio",
+    "mean_command_latency_seconds",
+    "high_side_brace_timing_error_seconds",
+    "swim_count",
+    "rescue_method",
+    "time_in_water_seconds",
+    "crew_recovery_seconds",
+    "failed_rescue_count"
+  ],
+  "source_contract_summary": {
+    "authority_integration": "raftsim.unreal.raft_contact_authority_integration.v1",
+    "contact_response": "raftsim.unreal.raft_contact_telemetry.v1",
+    "crew_weight_distribution": "raftsim.unreal.crew_weight_distribution.v1",
+    "crew_safety_states": "raftsim.unreal.crew_overboard_safety_states.v1",
+    "swimming_skill_assignment": "raftsim.unreal.swimming_skill_assignment.v1",
+    "swimmer_rescue_gameplay": "raftsim.unreal.swimmer_rescue_gameplay.v1"
+  },
+  "pass_policy": {
+    "all_milestone22_gameplay_systems_feed_scoring": true,
+    "safety_and_failed_rescue_can_dominate_score": true,
+    "line_choice_boat_angle_and_paddle_efficiency_are_separate": true,
+    "command_timing_and_high_side_brace_timing_are_recorded": true,
+    "swims_rescue_method_time_in_water_and_recovery_are_scored": true
+  }
+}

@@ -34,6 +34,10 @@ MILESTONE22_SWIMMER_RESCUE_SCHEMA = "raftsim.unreal.swimmer_rescue_gameplay.v1"
 MILESTONE22_SWIMMER_RESCUE_STATUS = (
     "swimmer_drift_rescue_and_recovery_ready_for_runtime_wiring"
 )
+MILESTONE22_GAMEPLAY_SCORING_SCHEMA = "raftsim.unreal.gameplay_telemetry_scoring.v1"
+MILESTONE22_GAMEPLAY_SCORING_STATUS = (
+    "gameplay_telemetry_and_scoring_ready_for_vertical_slice"
+)
 
 
 @dataclass(frozen=True)
@@ -815,6 +819,138 @@ def build_swimmer_rescue_gameplay_manifest(repo_root: Path) -> Milestone22Manife
             "target_selection_prioritizes_non_swimmers_and_low_visibility": True,
             "reach_paddle_and_throw_line_methods_are_supported": True,
             "pull_in_reseat_and_failed_rescue_emit_telemetry": True,
+        },
+    }
+    return Milestone22ManifestBuild(manifest=manifest)
+
+
+def build_gameplay_telemetry_scoring_manifest(repo_root: Path) -> Milestone22ManifestBuild:
+    """Build the Milestone 22 gameplay telemetry and scoring manifest."""
+
+    repo_root = repo_root.resolve()
+    source_paths = {
+        "authority_integration": (
+            repo_root / "unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json"
+        ),
+        "contact_response": (
+            repo_root / "unreal/Content/RaftSim/Physics/raft_contact_response_telemetry.json"
+        ),
+        "crew_weight_distribution": (
+            repo_root / "unreal/Content/RaftSim/Crew/crew_weight_distribution.json"
+        ),
+        "crew_safety_states": (
+            repo_root / "unreal/Content/RaftSim/Crew/crew_overboard_safety_states.json"
+        ),
+        "swimming_skill_assignment": (
+            repo_root / "unreal/Content/RaftSim/Crew/swimming_skill_assignment.json"
+        ),
+        "swimmer_rescue_gameplay": (
+            repo_root / "unreal/Content/RaftSim/Crew/swimmer_rescue_gameplay.json"
+        ),
+    }
+    sources = {key: _load_json(path) for key, path in source_paths.items()}
+
+    telemetry_categories = [
+        {
+            "category_id": "safety",
+            "fields": [
+                "safety_incident_count",
+                "failed_rescue_count",
+                "contact_loading_peak_n",
+            ],
+        },
+        {
+            "category_id": "line_choice",
+            "fields": ["clean_line_ratio", "hazard_avoidance_ratio", "eddy_recovery_used"],
+        },
+        {
+            "category_id": "boat_angle",
+            "fields": ["mean_angle_error_degrees", "max_angle_error_degrees"],
+        },
+        {
+            "category_id": "paddle_efficiency",
+            "fields": ["useful_paddle_impulse_ratio", "missed_stroke_count"],
+        },
+        {
+            "category_id": "command_timing",
+            "fields": ["mean_command_latency_seconds", "late_command_count"],
+        },
+        {
+            "category_id": "high_side_brace_timing",
+            "fields": ["timing_error_seconds", "successful_counterplay_count"],
+        },
+        {
+            "category_id": "swims_and_rescue",
+            "fields": [
+                "swim_count",
+                "rescue_method",
+                "time_in_water_seconds",
+                "crew_recovery_seconds",
+            ],
+        },
+    ]
+
+    manifest: dict[str, Any] = {
+        "schema": MILESTONE22_GAMEPLAY_SCORING_SCHEMA,
+        "status": MILESTONE22_GAMEPLAY_SCORING_STATUS,
+        "source_manifests": {
+            "authority_integration": (
+                "unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json"
+            ),
+            "contact_response": (
+                "unreal/Content/RaftSim/Physics/raft_contact_response_telemetry.json"
+            ),
+            "crew_weight_distribution": (
+                "unreal/Content/RaftSim/Crew/crew_weight_distribution.json"
+            ),
+            "crew_safety_states": (
+                "unreal/Content/RaftSim/Crew/crew_overboard_safety_states.json"
+            ),
+            "swimming_skill_assignment": (
+                "unreal/Content/RaftSim/Crew/swimming_skill_assignment.json"
+            ),
+            "swimmer_rescue_gameplay": (
+                "unreal/Content/RaftSim/Crew/swimmer_rescue_gameplay.json"
+            ),
+        },
+        "runtime_contract": {
+            "module": "RaftSimCrew",
+            "signals_struct": "FRaftSimGameplayScoringSignals",
+            "breakdown_struct": "FRaftSimGameplayScoreBreakdown",
+            "scoring_library": "URaftSimGameplayScoringLibrary::EvaluateGameplayScore",
+        },
+        "telemetry_categories": telemetry_categories,
+        "score_weights": {
+            "safety": 0.30,
+            "line_choice": 0.18,
+            "boat_angle": 0.14,
+            "paddle_efficiency": 0.12,
+            "command_timing": 0.10,
+            "high_side_brace_timing": 0.08,
+            "swims_and_rescue": 0.08,
+        },
+        "score_inputs": [
+            "safety_incident_count",
+            "clean_line_ratio",
+            "mean_angle_error_degrees",
+            "useful_paddle_impulse_ratio",
+            "mean_command_latency_seconds",
+            "high_side_brace_timing_error_seconds",
+            "swim_count",
+            "rescue_method",
+            "time_in_water_seconds",
+            "crew_recovery_seconds",
+            "failed_rescue_count",
+        ],
+        "source_contract_summary": {
+            key: value["schema"] for key, value in sources.items()
+        },
+        "pass_policy": {
+            "all_milestone22_gameplay_systems_feed_scoring": True,
+            "safety_and_failed_rescue_can_dominate_score": True,
+            "line_choice_boat_angle_and_paddle_efficiency_are_separate": True,
+            "command_timing_and_high_side_brace_timing_are_recorded": True,
+            "swims_rescue_method_time_in_water_and_recovery_are_scored": True,
         },
     }
     return Milestone22ManifestBuild(manifest=manifest)

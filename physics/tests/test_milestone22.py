@@ -6,6 +6,8 @@ from raftsim.milestone22 import (
     MILESTONE22_CREW_SAFETY_STATUS,
     MILESTONE22_CREW_WEIGHT_SCHEMA,
     MILESTONE22_CREW_WEIGHT_STATUS,
+    MILESTONE22_GAMEPLAY_SCORING_SCHEMA,
+    MILESTONE22_GAMEPLAY_SCORING_STATUS,
     MILESTONE22_CONTACT_TELEMETRY_SCHEMA,
     MILESTONE22_CONTACT_TELEMETRY_STATUS,
     MILESTONE22_RAFT_CONTACT_AUTHORITY_SCHEMA,
@@ -16,6 +18,7 @@ from raftsim.milestone22 import (
     MILESTONE22_SWIMMING_SKILL_STATUS,
     build_crew_overboard_safety_states_manifest,
     build_crew_weight_distribution_manifest,
+    build_gameplay_telemetry_scoring_manifest,
     build_raft_contact_authority_integration,
     build_raft_contact_response_telemetry,
     build_swimmer_rescue_gameplay_manifest,
@@ -50,6 +53,9 @@ SWIMMING_SKILL_ASSIGNMENT_PATH = (
 )
 SWIMMER_RESCUE_GAMEPLAY_PATH = (
     REPO_ROOT / "unreal/Content/RaftSim/Crew/swimmer_rescue_gameplay.json"
+)
+GAMEPLAY_SCORING_PATH = (
+    REPO_ROOT / "unreal/Content/RaftSim/Crew/gameplay_telemetry_scoring.json"
 )
 PHYSICS_BRIDGE_HEADER_PATH = (
     REPO_ROOT
@@ -481,5 +487,82 @@ def test_unreal_swimmer_rescue_contract_exposes_drift_and_rescue_attempts():
         "PullInProgress",
         "FatigueDelta",
         "TrustDelta",
+    ):
+        assert field in header_text
+
+
+def test_gameplay_telemetry_scoring_manifest_matches_generator():
+    expected = build_gameplay_telemetry_scoring_manifest(REPO_ROOT).manifest
+    committed = json.loads(GAMEPLAY_SCORING_PATH.read_text(encoding="utf-8"))
+
+    assert committed == expected
+    assert committed["schema"] == MILESTONE22_GAMEPLAY_SCORING_SCHEMA
+    assert committed["status"] == MILESTONE22_GAMEPLAY_SCORING_STATUS
+
+
+def test_gameplay_telemetry_scoring_manifest_covers_required_categories():
+    manifest = json.loads(GAMEPLAY_SCORING_PATH.read_text(encoding="utf-8"))
+    categories = {category["category_id"]: category for category in manifest["telemetry_categories"]}
+
+    assert set(categories) == {
+        "safety",
+        "line_choice",
+        "boat_angle",
+        "paddle_efficiency",
+        "command_timing",
+        "high_side_brace_timing",
+        "swims_and_rescue",
+    }
+    assert "rescue_method" in categories["swims_and_rescue"]["fields"]
+    assert "time_in_water_seconds" in categories["swims_and_rescue"]["fields"]
+    assert "timing_error_seconds" in categories["high_side_brace_timing"]["fields"]
+    assert "clean_line_ratio" in categories["line_choice"]["fields"]
+
+
+def test_gameplay_telemetry_scoring_weights_and_inputs_cover_milestone22():
+    manifest = json.loads(GAMEPLAY_SCORING_PATH.read_text(encoding="utf-8"))
+    weights = manifest["score_weights"]
+    inputs = set(manifest["score_inputs"])
+
+    assert round(sum(weights.values()), 5) == 1.0
+    assert weights["safety"] > weights["line_choice"]
+    assert {
+        "safety_incident_count",
+        "clean_line_ratio",
+        "mean_angle_error_degrees",
+        "useful_paddle_impulse_ratio",
+        "mean_command_latency_seconds",
+        "high_side_brace_timing_error_seconds",
+        "swim_count",
+        "rescue_method",
+        "time_in_water_seconds",
+        "crew_recovery_seconds",
+        "failed_rescue_count",
+    } == inputs
+    assert manifest["pass_policy"]["swims_rescue_method_time_in_water_and_recovery_are_scored"] is True
+
+
+def test_unreal_gameplay_scoring_contract_exposes_score_signals_and_breakdown():
+    header_text = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimCrew/Public/RaftSimCrewStateContracts.h"
+    ).read_text(encoding="utf-8")
+
+    assert "FRaftSimGameplayScoringSignals" in header_text
+    assert "FRaftSimGameplayScoreBreakdown" in header_text
+    assert "URaftSimGameplayScoringLibrary" in header_text
+    assert "EvaluateGameplayScore" in header_text
+    for field in (
+        "SafetyIncidentCount",
+        "CleanLineRatio",
+        "MeanBoatAngleErrorDegrees",
+        "UsefulPaddleImpulseRatio",
+        "MeanCommandLatencySeconds",
+        "HighSideBraceTimingErrorSeconds",
+        "SwimCount",
+        "TimeInWaterSeconds",
+        "CrewRecoverySeconds",
+        "FailedRescueCount",
+        "TotalScore",
     ):
         assert field in header_text
