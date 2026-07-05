@@ -241,8 +241,8 @@ Progression should reward mastery more than grind.
 Possible progression tracks:
 
 - Guide skill unlocks
-- Raft types and handling tradeoffs
-- Crew trust and passenger archetypes
+- Raft types and handling tradeoffs, tuned through `unreal/Content/RaftSim/Raft/alpha_systems_progression_catalog.json`
+- Crew trust, fear, fatigue, skill, and passenger archetypes
 - Passenger swimming ability, including non-swimmers who need faster rescue, clearer commands, and higher safety consequences if ejected
 - River permits / route unlocks
 - Cosmetic raft, helmet, paddle, and outfitter gear

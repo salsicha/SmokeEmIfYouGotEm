@@ -267,15 +267,15 @@ Tasks:
 - Use `unreal/Content/RaftSim/River/colorado_rowing_route_editor_pass.json` as the first Colorado rowing prototype contract: it keeps all flow bands review-gated, exposes large-volume reading cues and canyon pacing checkpoints, records longer rescue windows, and requires guide-review annotations before any route is promoted to production-playable.
 - Make the Pacuare River in Costa Rica the third runnable river target with `unreal/Content/RaftSim/River/pacuare_river_third_target_editor_pass.json`, a draft source manifest, relative rain-fed flow bands, rainforest/gorge fidelity needs, hydrology/gauge-source review, protected-area/source-rights review, and rights-cleared guide annotations before solver or Unreal package generation.
 - Add difficulty progression.
-- Add more raft types and handling profiles.
-- Add passenger archetypes and crew trust progression.
+- Add more raft types and handling profiles through `unreal/Content/RaftSim/Raft/alpha_systems_progression_catalog.json`.
+- Add passenger archetypes and crew trust/fear/fatigue/skill progression through the alpha systems catalog and deterministic safety telemetry.
 - Add AI-assisted crew conversations for calm water, eddies, scouting, recovery pools, run starts, run finishes, swims, rescues, and post-rapid debriefs.
 - Add passenger persona data, relationship memory, river knowledge, skill/fear/fatigue state, and conversation pacing rules.
 - Add conversation guardrails so active-rapid dialogue stays short, command acknowledgments take priority, and generated chatter never blocks safety-critical audio.
 - Expand free/open, first-party generated, procedural, and AI-generated art/audio coverage for additional rivers, seasons, flow levels, raft types, gear, weather, and biomes.
 - Revisit paid asset purchases only at the release-readiness gate if free/open and AI-generated assets are not good enough.
-- Add challenge variants and generated rapid support if validated.
-- Expand weather, water levels, rescue scenarios, and training lessons.
+- Add challenge variants and generated rapid support only where the alpha systems catalog names passing validation reports.
+- Expand weather, water levels, rescue scenarios, and training lessons, with lessons tied to required systems and completion telemetry.
 
 Deliverable:
 
