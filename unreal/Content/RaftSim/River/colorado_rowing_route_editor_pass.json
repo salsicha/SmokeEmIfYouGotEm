@@ -3,6 +3,8 @@
   "editor_status": {
     "flow_bands": "planning_placeholders",
     "guide_review": "needs_rights_cleared_human_review",
+    "large_volume_reading": "prototype_cues_drafted",
+    "playable_route_prototype": "drafted_for_alpha_selection",
     "rowing_controls": "drafted",
     "source_manifest": "drafted",
     "validation_annotations": "needs_geospatial_and_field_media_pass"
@@ -107,6 +109,172 @@
     }
   ],
   "route_style": "rowing_oar_rig",
+  "route_prototype": {
+    "prototype_id": "colorado_grand_canyon_rowing_alpha_style",
+    "prototype_role": "second_real_world_river_style",
+    "gameplay_mode": "rowing_oar_rig",
+    "direct_manual_rowing_controls_required": true,
+    "passenger_paddle_voice_commands_enabled": false,
+    "disabled_voice_command_modes": [
+      "forward_paddle",
+      "back_paddle",
+      "left_paddle",
+      "right_paddle",
+      "stop_paddling"
+    ],
+    "prototype_gate": "playable_only_after_source_manifest_and_guide_review_replace_placeholders",
+    "primary_learning_goals": [
+      "read_large_volume_tongues",
+      "square_to_laterals",
+      "time_pull_and_back_row_inputs",
+      "manage_passenger_trim_without_paddle_voice_commands",
+      "recover_swimmers_over_longer_water"
+    ]
+  },
+  "large_volume_reading_cues": [
+    {
+      "cue_id": "wide_tongue_entry",
+      "cue_kind": "tongue",
+      "gameplay_decision": "Enter on a stable green tongue with the oar rig square enough to pull or back-row before the first lateral.",
+      "flow_band_response": "Low releases expose rocks and narrow the tongue; moderate releases are the baseline; high releases widen the tongue but shorten reaction time.",
+      "validation_signals": [
+        "surface_slope",
+        "velocity_alignment",
+        "wave_train_period",
+        "guide_line_annotation"
+      ]
+    },
+    {
+      "cue_id": "lateral_wave_train",
+      "cue_kind": "lateral_wave",
+      "gameplay_decision": "Back-row or ferry-angle before a lateral hits the side tube, then pull through the downstream shoulder.",
+      "flow_band_response": "Moderate and high releases grow the lateral and eddy fence; too low leaves a smaller wavetrain with more rock avoidance.",
+      "validation_signals": [
+        "cross_current_velocity",
+        "raft_yaw_delta",
+        "tube_impact_side",
+        "field_media_timecode"
+      ]
+    },
+    {
+      "cue_id": "boil_and_eddy_fence",
+      "cue_kind": "boil_eddy_fence",
+      "gameplay_decision": "Anticipate yaw and spin correction as the oar rig crosses boil seams and wide eddy fences.",
+      "flow_band_response": "Higher releases increase boil strength and swimmer drift; very high reviewed flows may wash out smaller eddies.",
+      "validation_signals": [
+        "vorticity_proxy",
+        "yaw_rate_dps",
+        "swimmer_drift_path",
+        "guide_feedback"
+      ]
+    },
+    {
+      "cue_id": "large_hydraulic_review_only",
+      "cue_kind": "hydraulic",
+      "gameplay_decision": "Teach scouting, pull timing, and missed-line consequences before enabling a production hydraulic.",
+      "flow_band_response": "Hole stickiness must be flow-dependent: sticky at reviewed ranges, washed out above, and reduced to wave/rapid behavior below.",
+      "validation_signals": [
+        "recirculation_proxy",
+        "flush_or_surf_outcome",
+        "pin_flip_risk",
+        "guide_review_annotation"
+      ]
+    }
+  ],
+  "canyon_pacing_checkpoints": [
+    {
+      "checkpoint_id": "launch_orientation_pool",
+      "segment_id": "lees_ferry_launch_to_marble_canyon",
+      "gameplay_role": "Slow launch-water practice for pull strokes, back-row timing, passenger trim, and reading flow before the canyon narrows.",
+      "expected_run_time_minutes": 8.0,
+      "rescue_window_seconds": 70.0,
+      "review_signals": [
+        "launch_access_context",
+        "flatwater_pacing",
+        "manual_oar_input_timing"
+      ]
+    },
+    {
+      "checkpoint_id": "big_water_decision_sequence",
+      "segment_id": "marble_canyon_to_little_colorado_context",
+      "gameplay_role": "Long approach, wave-train setup, lateral impact, and recovery pool sequence for the first alpha rowing challenge.",
+      "expected_run_time_minutes": 14.0,
+      "rescue_window_seconds": 55.0,
+      "review_signals": [
+        "horizon_line_visibility",
+        "large_volume_audio_build",
+        "wave_train_spacing",
+        "guide_line_review"
+      ]
+    },
+    {
+      "checkpoint_id": "inner_gorge_rescue_runout",
+      "segment_id": "inner_gorge_technical_rowing",
+      "gameplay_role": "Swimmer drift, throw-line setup, pull-in timing, and passenger re-seat under longer canyon recovery distances.",
+      "expected_run_time_minutes": 18.0,
+      "rescue_window_seconds": 90.0,
+      "review_signals": [
+        "swimmer_drift_path",
+        "shore_access_limit",
+        "throw_line_position",
+        "eddy_recovery_zone"
+      ]
+    }
+  ],
+  "guide_review_annotations": [
+    {
+      "annotation_id": "flow_specific_rowing_line",
+      "geometry_kind": "raft_line",
+      "required_sources": [
+        "rights_cleared_guide_notes",
+        "field_media_timecodes",
+        "gauge_history"
+      ],
+      "review_fields": [
+        "entry_line",
+        "pull_back_row_plan",
+        "ferry_angle",
+        "missed_line_consequence",
+        "flow_band_response"
+      ],
+      "blocks_playable_signoff": true
+    },
+    {
+      "annotation_id": "large_volume_feature_outcome",
+      "geometry_kind": "polygon_and_span",
+      "required_sources": [
+        "aerial_imagery",
+        "terrain",
+        "field_media",
+        "guide_feedback"
+      ],
+      "review_fields": [
+        "wave_train",
+        "lateral",
+        "boil",
+        "hole_or_washout",
+        "surf_flush_pin_flip_outcome"
+      ],
+      "blocks_playable_signoff": true
+    },
+    {
+      "annotation_id": "long_water_rescue_review",
+      "geometry_kind": "reach_span",
+      "required_sources": [
+        "field_media",
+        "guide_feedback",
+        "flow_presets"
+      ],
+      "review_fields": [
+        "swimmer_drift_path",
+        "rescue_window_seconds",
+        "eddy_recovery_zone",
+        "shore_access_limit",
+        "pull_in_timing"
+      ],
+      "blocks_playable_signoff": true
+    }
+  ],
   "rowing_frame_controls": [
     {
       "control_id": "pull_stroke",
