@@ -1,0 +1,240 @@
+{
+  "asset_class": "URaftSimCrewConversationCatalog",
+  "schema": "raftsim.unreal.crew_conversation_bark_catalog.v1",
+  "status": "alpha_barks_ready_for_local_ai_selection",
+  "source_contracts": {
+    "crew_personas": "unreal/Content/RaftSim/AI/crew_personas.json",
+    "guide_voice_command_grammar": "unreal/Content/RaftSim/AI/guide_voice_command_grammar.json",
+    "local_ai_runtime": "unreal/Content/RaftSim/AI/local_ai_runtime_manifest.json",
+    "swimmer_rescue": "unreal/Content/RaftSim/Crew/swimmer_rescue_gameplay.json"
+  },
+  "priority_lanes": [
+    {
+      "lane_id": "deterministic_command_ack",
+      "priority": 100,
+      "deterministic_source_only": true,
+      "interrupts_lower_priority": true,
+      "usage": "Acknowledgments for explicit guide command intents only."
+    },
+    {
+      "lane_id": "safety_bark",
+      "priority": 90,
+      "deterministic_source_only": true,
+      "interrupts_lower_priority": true,
+      "usage": "Swimmer, hazard, hold-on, brace, high-side, and rescue callouts from safety state."
+    },
+    {
+      "lane_id": "rapid_short_bark",
+      "priority": 60,
+      "deterministic_source_only": false,
+      "interrupts_lower_priority": true,
+      "usage": "Very short fear, effort, or morale barks that never mask command audio."
+    },
+    {
+      "lane_id": "ambient_conversation",
+      "priority": 20,
+      "deterministic_source_only": false,
+      "interrupts_lower_priority": false,
+      "usage": "Calm water, scouting, eddy, recovery-pool, and debrief chatter."
+    }
+  ],
+  "playback_policy": {
+    "active_rapid_allows_only_lanes": [
+      "deterministic_command_ack",
+      "safety_bark",
+      "rapid_short_bark"
+    ],
+    "ambient_lines_duck_under_commands": true,
+    "command_acknowledgments_use_router_telemetry": true,
+    "generated_dialogue_cannot_emit_command_intents": true,
+    "max_noncritical_line_seconds_in_rapid": 1.2,
+    "minimum_seconds_between_ambient_lines": 9.0,
+    "safety_barks_can_interrupt_ambient": true
+  },
+  "conversation_states": [
+    {
+      "state": "calm_water",
+      "allowed_lanes": ["ambient_conversation"],
+      "selection_context": ["river_id", "flow_band", "crew_trust", "weather", "recent_success"]
+    },
+    {
+      "state": "eddy",
+      "allowed_lanes": ["ambient_conversation", "rapid_short_bark"],
+      "selection_context": ["eddy_catch_quality", "next_rapid_confidence", "crew_fatigue"]
+    },
+    {
+      "state": "scouting",
+      "allowed_lanes": ["ambient_conversation"],
+      "selection_context": ["annotation_viewed", "line_choice", "known_hazard", "crew_skill"]
+    },
+    {
+      "state": "recovery_pool",
+      "allowed_lanes": ["ambient_conversation", "rapid_short_bark"],
+      "selection_context": ["last_rapid_score", "contact_events", "trust_delta", "fatigue_delta"]
+    },
+    {
+      "state": "swim",
+      "allowed_lanes": ["safety_bark", "rapid_short_bark"],
+      "selection_context": ["swimming_skill", "visibility_score", "time_in_water", "distance_from_raft"]
+    },
+    {
+      "state": "rescue",
+      "allowed_lanes": ["deterministic_command_ack", "safety_bark", "rapid_short_bark"],
+      "selection_context": ["rescue_method", "throw_line_available", "pull_in_progress", "rescue_window_seconds"]
+    },
+    {
+      "state": "debrief",
+      "allowed_lanes": ["ambient_conversation"],
+      "selection_context": ["line_score", "rescue_outcome", "trust_delta", "skill_delta"]
+    }
+  ],
+  "bark_lines": [
+    {
+      "bark_id": "calm_nervous_question",
+      "conversation_state": "calm_water",
+      "priority_lane": "ambient_conversation",
+      "speaker_archetype": "nervous_first_timer",
+      "line": "Is this the calm part, or the part before the loud part?",
+      "tags": ["low_trust", "pre_rapid", "reassurance_hook"],
+      "may_play_during_rapid": false,
+      "can_interrupt_noncritical_dialogue": false
+    },
+    {
+      "bark_id": "calm_steady_spots_current",
+      "conversation_state": "calm_water",
+      "priority_lane": "ambient_conversation",
+      "speaker_archetype": "steady_returning_paddler",
+      "line": "Current is pulling left ahead. I can see the tongue now.",
+      "tags": ["spots_hazard", "river_reading", "medium_skill"],
+      "may_play_during_rapid": false,
+      "can_interrupt_noncritical_dialogue": false
+    },
+    {
+      "bark_id": "eddy_overconfident_reset",
+      "conversation_state": "eddy",
+      "priority_lane": "ambient_conversation",
+      "speaker_archetype": "overconfident_friend",
+      "line": "Okay, that eddy catch was less casual than I made it look.",
+      "tags": ["humor", "after_near_miss", "trust_recovery"],
+      "may_play_during_rapid": false,
+      "can_interrupt_noncritical_dialogue": false
+    },
+    {
+      "bark_id": "eddy_fast_learner_ready",
+      "conversation_state": "eddy",
+      "priority_lane": "rapid_short_bark",
+      "speaker_archetype": "quiet_fast_learner",
+      "line": "Ready on your call.",
+      "tags": ["ready", "short", "command_responsive"],
+      "may_play_during_rapid": true,
+      "can_interrupt_noncritical_dialogue": true
+    },
+    {
+      "bark_id": "scout_nervous_line_check",
+      "conversation_state": "scouting",
+      "priority_lane": "ambient_conversation",
+      "speaker_archetype": "nervous_first_timer",
+      "line": "So we miss the rock on the right and then paddle hard?",
+      "tags": ["scout", "line_confirmation", "low_skill"],
+      "may_play_during_rapid": false,
+      "can_interrupt_noncritical_dialogue": false
+    },
+    {
+      "bark_id": "scout_steady_summary",
+      "conversation_state": "scouting",
+      "priority_lane": "ambient_conversation",
+      "speaker_archetype": "steady_returning_paddler",
+      "line": "Enter center, square up, then listen for the brace call.",
+      "tags": ["scout", "summary", "brace"],
+      "may_play_during_rapid": false,
+      "can_interrupt_noncritical_dialogue": false
+    },
+    {
+      "bark_id": "recovery_pool_relief",
+      "conversation_state": "recovery_pool",
+      "priority_lane": "ambient_conversation",
+      "speaker_archetype": "nervous_first_timer",
+      "line": "I hated that and also maybe loved it.",
+      "tags": ["after_rapid", "fear_drop", "trust_gain"],
+      "may_play_during_rapid": false,
+      "can_interrupt_noncritical_dialogue": false
+    },
+    {
+      "bark_id": "recovery_pool_fatigue",
+      "conversation_state": "recovery_pool",
+      "priority_lane": "ambient_conversation",
+      "speaker_archetype": "strong_non_swimmer",
+      "line": "I am good, just give me one breath before the next one.",
+      "tags": ["fatigue", "non_swimmer", "pace_request"],
+      "may_play_during_rapid": false,
+      "can_interrupt_noncritical_dialogue": false
+    },
+    {
+      "bark_id": "swim_non_swimmer_priority",
+      "conversation_state": "swim",
+      "priority_lane": "safety_bark",
+      "speaker_archetype": "strong_non_swimmer",
+      "line": "I cannot swim!",
+      "tags": ["non_swimmer", "rescue_priority", "safety"],
+      "may_play_during_rapid": true,
+      "can_interrupt_noncritical_dialogue": true
+    },
+    {
+      "bark_id": "swim_visible_callout",
+      "conversation_state": "swim",
+      "priority_lane": "safety_bark",
+      "speaker_archetype": "steady_returning_paddler",
+      "line": "Swimmer left side, still visible.",
+      "tags": ["swimmer_visible", "rescue", "left_side"],
+      "may_play_during_rapid": true,
+      "can_interrupt_noncritical_dialogue": true
+    },
+    {
+      "bark_id": "rescue_throw_line_ready",
+      "conversation_state": "rescue",
+      "priority_lane": "deterministic_command_ack",
+      "speaker_archetype": "steady_returning_paddler",
+      "line": "Throw line ready.",
+      "tags": ["throw_line", "command_ack", "rescue"],
+      "may_play_during_rapid": true,
+      "can_interrupt_noncritical_dialogue": true
+    },
+    {
+      "bark_id": "rescue_pull_in_progress",
+      "conversation_state": "rescue",
+      "priority_lane": "safety_bark",
+      "speaker_archetype": "quiet_fast_learner",
+      "line": "I have them. Pulling in.",
+      "tags": ["pull_in", "rescue_progress", "safety"],
+      "may_play_during_rapid": true,
+      "can_interrupt_noncritical_dialogue": true
+    },
+    {
+      "bark_id": "debrief_success",
+      "conversation_state": "debrief",
+      "priority_lane": "ambient_conversation",
+      "speaker_archetype": "steady_returning_paddler",
+      "line": "That line worked. The early call made the difference.",
+      "tags": ["debrief", "trust_gain", "skill_gain"],
+      "may_play_during_rapid": false,
+      "can_interrupt_noncritical_dialogue": false
+    },
+    {
+      "bark_id": "debrief_failed_rescue",
+      "conversation_state": "debrief",
+      "priority_lane": "ambient_conversation",
+      "speaker_archetype": "nervous_first_timer",
+      "line": "Can we talk through what happened before the next rapid?",
+      "tags": ["debrief", "failed_rescue", "fear_high"],
+      "may_play_during_rapid": false,
+      "can_interrupt_noncritical_dialogue": false
+    }
+  ],
+  "pass_policy": {
+    "commands_remain_deterministic": true,
+    "safety_barks_interrupt_ambient": true,
+    "ambient_chatter_blocked_from_masking_rapid_commands": true,
+    "states_cover_calm_eddy_scouting_recovery_swim_rescue_debrief": true,
+    "local_ai_can_select_but_not_execute_gameplay_intents": true
+  }
+}

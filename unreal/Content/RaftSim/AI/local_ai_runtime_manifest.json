@@ -31,6 +31,16 @@
       "purpose": "prototype crew voice rendering when approved audio assets are unavailable"
     }
   ],
+  "conversation_assets": {
+    "crew_bark_catalog": "unreal/Content/RaftSim/AI/crew_conversation_bark_catalog.json",
+    "crew_personas": "unreal/Content/RaftSim/AI/crew_personas.json"
+  },
+  "conversation_priority_policy": {
+    "deterministic_command_acknowledgments_interrupt_chatter": true,
+    "safety_barks_interrupt_chatter": true,
+    "ambient_chatter_disabled_during_unresolved_rescue": true,
+    "generated_dialogue_cannot_emit_gameplay_intents": true
+  },
   "runtime_constraints": {
     "core_paddling_commands_must_be_deterministic": true,
     "cloud_ai_not_required": true,

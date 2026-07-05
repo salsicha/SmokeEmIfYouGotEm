@@ -212,7 +212,7 @@ First draft behaviors:
 
 Crew trust can become a core progression system. Clean guiding builds trust; repeated bad calls make passengers slower, more scared, and more likely to fail under pressure.
 
-The full UE5 version should include a local AI crew layer with passenger personas, relationship memory, fatigue, fear, competence, and river knowledge. The AI can generate or select conversation and reactions, but it should not directly override the deterministic command executor that drives paddle timing, bracing, rescue behavior, and safety-critical outcomes.
+The full UE5 version should include a local AI crew layer with passenger personas, relationship memory, fatigue, fear, competence, and river knowledge. The first local bark catalog is `unreal/Content/RaftSim/AI/crew_conversation_bark_catalog.json`. The AI can generate or select conversation and reactions, but it should not directly override the deterministic command executor that drives paddle timing, bracing, rescue behavior, and safety-critical outcomes.
 
 ## Modes
 
