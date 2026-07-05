@@ -15,15 +15,23 @@ MILESTONE21_GEOSPATIAL_IMPORT_PIPELINE_SCHEMA = (
 )
 MILESTONE21_REACH_LOCAL_STREAMING_SCHEMA = "raftsim.unreal.reach_local_streaming.v1"
 MILESTONE21_FEATURE_TUNING_EDITOR_SCHEMA = "raftsim.unreal.feature_tuning_editor.v1"
+MILESTONE21_SOUTH_FORK_EDITOR_PASS_SCHEMA = "raftsim.unreal.south_fork_editor_pass.v1"
 RAPID_RIVER_EDITOR_MANIFEST_PATH = "unreal/Content/RaftSim/River/rapid_river_editor.json"
 GEOSPATIAL_IMPORT_PIPELINE_PATH = "unreal/Content/RaftSim/River/geospatial_import_pipeline.json"
 REACH_LOCAL_STREAMING_PATH = "unreal/Content/RaftSim/River/reach_local_streaming.json"
 FEATURE_TUNING_EDITOR_PATH = "unreal/Content/RaftSim/River/feature_tuning_editor.json"
+SOUTH_FORK_EDITOR_PASS_PATH = "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json"
 FEATURE_FORCING_DEFAULTS_PATH = "physics/config/feature_forcing_defaults.json"
 RAPID_REVIEW_FLOW_DIFFICULTY_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/rapid_review_flow_difficulty_mapping.json"
 )
 FLOW_PRESETS_PATH = "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"
+SOUTH_FORK_VALIDATION_MATRIX_PATH = (
+    "physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json"
+)
+SOUTH_FORK_RAPID_CANDIDATES_PATH = (
+    "physics/data/real_world/south_fork_american_chili_bar/rapid_candidates.geojson"
+)
 SPATIAL_AUDIO_PRESETS_PATH = "unreal/Content/RaftSim/Audio/spatial_audio_presets.json"
 SOUTH_FORK_WORKFLOW_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/rapid_review_editor_workflow.json"
@@ -97,6 +105,13 @@ class Milestone21ReachLocalStreaming:
 @dataclass(frozen=True, slots=True)
 class Milestone21FeatureTuningEditor:
     """Generated Unreal feature-tuning editor manifest."""
+
+    manifest: dict[str, Any]
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone21SouthForkEditorPass:
+    """Generated South Fork first-river editor pass manifest."""
 
     manifest: dict[str, Any]
 
@@ -786,6 +801,202 @@ def write_feature_tuning_editor_manifest(
     """Generate and write the Unreal feature-tuning editor manifest."""
 
     generated = build_feature_tuning_editor_manifest(repo_root)
+    output_json.parent.mkdir(parents=True, exist_ok=True)
+    output_json.write_text(json.dumps(generated.manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return generated
+
+
+def _validation_overlay(asset: dict[str, Any]) -> dict[str, Any]:
+    stitched = asset["stitched_validation"]
+    return {
+        "overlay_id": f"{asset['asset_id']}_stitched_validation",
+        "asset_id": asset["asset_id"],
+        "display_name": asset["display_name"],
+        "flow_band": asset["flow_band"],
+        "solver_mode": asset["solver_mode"],
+        "scenario_package": asset["scenario_package"],
+        "manifest": stitched["manifest"],
+        "fields": stitched["fields"],
+        "probes": stitched["probes"],
+        "conservation_summary": stitched["conservation_summary"],
+        "raft_transition_checkpoints": stitched["raft_transition_checkpoints"],
+        "visible_by_default": asset["solver_mode"] == "finite_volume",
+        "stitched_whole_window_required": stitched["required"],
+    }
+
+
+def _expected_outcomes_for_tags(
+    tags: list[str],
+    review_responses: dict[str, dict[str, Any]],
+) -> list[str]:
+    outcomes: set[str] = set()
+    for tag in tags:
+        if tag == "manual_review_required":
+            continue
+        outcomes.update(review_responses.get(tag, {}).get("expected_raft_outcomes", []))
+    if not outcomes:
+        outcomes.update(EXPECTED_OUTCOMES)
+    return sorted(outcomes)
+
+
+def _flow_review_for_rapid(
+    review_item: dict[str, Any],
+    overlays_by_flow: dict[str, list[dict[str, Any]]],
+) -> list[dict[str, Any]]:
+    flow_reviews: list[dict[str, Any]] = []
+    for flow_band in review_item["gauge_context"]["flow_bands"]:
+        flow_id = flow_band["flow_band"]
+        flow_reviews.append(
+            {
+                "flow_band": flow_id,
+                "season": flow_band["season"],
+                "discharge_cfs": flow_band["discharge_cfs"],
+                "discharge_m3s": flow_band["discharge_m3s"],
+                "runnable": flow_band["runnable"],
+                "validation_overlay_ids": [overlay["overlay_id"] for overlay in overlays_by_flow.get(flow_id, [])],
+                "requires_outcome_review": True,
+            }
+        )
+    return flow_reviews
+
+
+def _guide_feedback_annotation(review_item: dict[str, Any], expected_outcomes: list[str]) -> dict[str, Any]:
+    return {
+        "annotation_id": f"{review_item['rapid_id']}_guide_feedback_seed",
+        "source_layers": ["guide_notes", "field_media"],
+        "guide_feedback": review_item["guide_notes"],
+        "expected_outcomes": expected_outcomes,
+        "flow_context_required": True,
+        "footage_timecodes_required": True,
+        "rights_status": "manifest_references_only",
+        "human_guide_signoff_required": True,
+    }
+
+
+def _south_fork_reviewed_rapid(
+    *,
+    review_item: dict[str, Any],
+    review_responses: dict[str, dict[str, Any]],
+    overlays_by_flow: dict[str, list[dict[str, Any]]],
+) -> dict[str, Any]:
+    evidence_refs = review_item["evidence_refs"]
+    tags = [tag for tag in review_item["candidate_tags"] if tag != "manual_review_required"]
+    expected_outcomes = _expected_outcomes_for_tags(tags, review_responses)
+    seed_annotation = _seed_annotation(review_item)
+    return {
+        "rapid_id": review_item["rapid_id"],
+        "review_item_id": review_item["review_item_id"],
+        "review_status": "seed_reviewed_for_first_editor_pass_needs_human_signoff",
+        "accepted_for_editor_pass": True,
+        "station_pin": seed_annotation["station_pin"],
+        "station_span_m": seed_annotation["station_span_m"],
+        "map_focus_wgs84": review_item["map_focus_wgs84"],
+        "reviewed_labels": tags,
+        "candidate_signals": review_item["signals"],
+        "confidence": round(float(review_item["confidence"]), 6),
+        "cross_section_summary": review_item["cross_section_summary"],
+        "evidence_refs": {
+            layer_id: {
+                "artifacts": ref.get("artifacts", []),
+                "source_ids": ref.get("source_ids", []),
+            }
+            for layer_id, ref in evidence_refs.items()
+        },
+        "required_evidence_layers_present": sorted(evidence_refs),
+        "flow_review": _flow_review_for_rapid(review_item, overlays_by_flow),
+        "expected_outcomes": expected_outcomes,
+        "guide_feedback_annotations": [
+            _guide_feedback_annotation(review_item, expected_outcomes),
+        ],
+        "editor_geometry": {
+            "station_pin": True,
+            "reach_span": True,
+            "polygons": ["hazard_polygon", "eddy_polygon", "whitewater_polygon", "bank_polygon"],
+            "raft_lines": ["entry_line", "main_current_line", "recovery_line"],
+        },
+        "rights_provenance": seed_annotation["rights_provenance"],
+    }
+
+
+def build_south_fork_editor_pass_manifest(repo_root: Path) -> Milestone21SouthForkEditorPass:
+    """Build the South Fork American first-river editor pass manifest."""
+
+    root = repo_root.resolve()
+    workflow = _read_json(root / SOUTH_FORK_WORKFLOW_PATH)
+    source_manifest = _read_json(root / SOUTH_FORK_SOURCE_MANIFEST_PATH)
+    corridor_package = _read_json(root / SOUTH_FORK_CORRIDOR_PACKAGE_PATH)
+    flow_presets = _read_json(root / FLOW_PRESETS_PATH)
+    validation_matrix = _read_json(root / SOUTH_FORK_VALIDATION_MATRIX_PATH)
+    traceable_assets = _read_json(root / TRACEABLE_RIVER_DATA_ASSETS_PATH)
+    review_mapping = _read_json(root / RAPID_REVIEW_FLOW_DIFFICULTY_PATH)
+    review_responses = _review_response_index(review_mapping)
+    overlays = [
+        _validation_overlay(asset)
+        for asset in traceable_assets["data_assets"]
+        if asset["kind"] == "reach_local_grid_with_stitched_validation"
+    ]
+    overlays_by_flow: dict[str, list[dict[str, Any]]] = {}
+    for overlay in overlays:
+        overlays_by_flow.setdefault(overlay["flow_band"], []).append(overlay)
+    reviewed_rapids = [
+        _south_fork_reviewed_rapid(
+            review_item=item,
+            review_responses=review_responses,
+            overlays_by_flow=overlays_by_flow,
+        )
+        for item in workflow["review_items"]
+    ]
+
+    manifest = {
+        "schema": MILESTONE21_SOUTH_FORK_EDITOR_PASS_SCHEMA,
+        "editor_pass_id": "south_fork_american_chili_bar_first_river_editor_pass",
+        "module": "RaftSimRiver",
+        "asset_class": "URaftSimSouthForkEditorPassConfig",
+        "river_id": workflow["river_id"],
+        "section_id": workflow["section_id"],
+        "section_name": source_manifest["section_name"],
+        "rapid_river_editor": RAPID_RIVER_EDITOR_MANIFEST_PATH,
+        "feature_tuning_editor": FEATURE_TUNING_EDITOR_PATH,
+        "reach_local_streaming": REACH_LOCAL_STREAMING_PATH,
+        "source_manifest": SOUTH_FORK_SOURCE_MANIFEST_PATH,
+        "corridor_package": SOUTH_FORK_CORRIDOR_PACKAGE_PATH,
+        "rapid_candidates": SOUTH_FORK_RAPID_CANDIDATES_PATH,
+        "flow_presets": FLOW_PRESETS_PATH,
+        "validation_matrix": SOUTH_FORK_VALIDATION_MATRIX_PATH,
+        "traceable_river_data_assets": TRACEABLE_RIVER_DATA_ASSETS_PATH,
+        "accepted_report_set_lock": traceable_assets["accepted_report_set_lock"],
+        "source_manifest_id": source_manifest["manifest_id"],
+        "corridor_package_version": corridor_package["corridor_package_version"],
+        "flow_bands": flow_presets["flow_bands"],
+        "validation_runs": validation_matrix["runs"],
+        "validation_overlays": overlays,
+        "reviewed_rapid_count": len(reviewed_rapids),
+        "reviewed_rapids": reviewed_rapids,
+        "editor_layers": workflow["layers"],
+        "editor_panels": workflow["panels"],
+        "guide_feedback_policy": {
+            "guide_feedback_annotations_required": True,
+            "footage_timecodes_required_before_final_acceptance": True,
+            "copyrighted_guidebook_text_not_redistributed": True,
+            "field_media_manifest_references_only_until_rights_clear": True,
+        },
+        "quality_gates": [
+            *workflow["quality_gates"],
+            "Every reviewed rapid in the first pass must link low, median, and high flow bands to stitched validation overlays.",
+            "Every reviewed rapid must keep guide feedback as manifest references until rights and field-media provenance are explicit.",
+            "Validation overlays must remain whole-window stitched outputs, not isolated reach-local signoff artifacts.",
+        ],
+        "status": "ready_for_south_fork_unreal_editor_pass",
+    }
+    return Milestone21SouthForkEditorPass(manifest=manifest)
+
+
+def write_south_fork_editor_pass_manifest(
+    *, repo_root: Path, output_json: Path
+) -> Milestone21SouthForkEditorPass:
+    """Generate and write the South Fork first-river editor pass manifest."""
+
+    generated = build_south_fork_editor_pass_manifest(repo_root)
     output_json.parent.mkdir(parents=True, exist_ok=True)
     output_json.write_text(json.dumps(generated.manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return generated
