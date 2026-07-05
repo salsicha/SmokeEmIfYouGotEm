@@ -5,11 +5,39 @@
 ARaftSimVerticalSliceGameMode::ARaftSimVerticalSliceGameMode()
 {
     DefaultPawnClass = ARaftSimGuidePawn::StaticClass();
+    InitializeScenarioDefinitions();
 }
 
 void ARaftSimVerticalSliceGameMode::RestartRapid()
 {
     CurrentScore = FRaftSimRapidScoreBreakdown();
+    AfterActionFeedback.Reset();
+    ReplayFrame = 0;
+    bRapidComplete = false;
+}
+
+bool ARaftSimVerticalSliceGameMode::SetActiveScenario(FName ScenarioId)
+{
+    for (const FRaftSimVerticalSliceScenarioDefinition& Scenario : ScenarioDefinitions)
+    {
+        if (Scenario.ScenarioId == ScenarioId)
+        {
+            ActiveScenarioId = ScenarioId;
+            RestartRapid();
+            return true;
+        }
+    }
+    return false;
+}
+
+void ARaftSimVerticalSliceGameMode::CompleteRapid(
+    const FRaftSimRapidScoreBreakdown& FinalScore,
+    const TArray<FString>& FeedbackNotes
+)
+{
+    CurrentScore = FinalScore;
+    AfterActionFeedback = FeedbackNotes;
+    bRapidComplete = true;
 }
 
 void ARaftSimVerticalSliceGameMode::SetReplayEnabled(bool bInReplayEnabled)
@@ -20,4 +48,41 @@ void ARaftSimVerticalSliceGameMode::SetReplayEnabled(bool bInReplayEnabled)
 void ARaftSimVerticalSliceGameMode::SetDebugForceVisualizationEnabled(bool bInEnabled)
 {
     bDebugForceVisualizationEnabled = bInEnabled;
+}
+
+void ARaftSimVerticalSliceGameMode::InitializeScenarioDefinitions()
+{
+    FRaftSimVerticalSliceScenarioDefinition TrainingScenario;
+    TrainingScenario.ScenarioId = TEXT("training_eddy_turn_intro");
+    TrainingScenario.ScenarioKind = ERaftSimVerticalSliceScenarioKind::TrainingSection;
+    TrainingScenario.DisplayName = TEXT("Training Eddy Turn Intro");
+    TrainingScenario.FlowBand = TEXT("low_runnable");
+    TrainingScenario.DifficultyPreset = TEXT("beginner");
+    TrainingScenario.RequiredObjectives = {
+        TEXT("forward_paddle_timing"),
+        TEXT("brace_on_wave"),
+        TEXT("hold_on_before_lateral"),
+        TEXT("catch_recovery_eddy"),
+        TEXT("quick_restart"),
+        TEXT("after_action_feedback")
+    };
+    ScenarioDefinitions.Add(TrainingScenario);
+
+    FRaftSimVerticalSliceScenarioDefinition TechnicalRapid;
+    TechnicalRapid.ScenarioId = TEXT("first_technical_constriction_wave_train");
+    TechnicalRapid.ScenarioKind = ERaftSimVerticalSliceScenarioKind::TechnicalRapid;
+    TechnicalRapid.DisplayName = TEXT("First Technical Constriction Wave Train");
+    TechnicalRapid.FlowBand = TEXT("median_runnable");
+    TechnicalRapid.DifficultyPreset = TEXT("intermediate");
+    TechnicalRapid.RequiredObjectives = {
+        TEXT("read_entry_tongue"),
+        TEXT("hold_boat_angle"),
+        TEXT("manual_or_voice_crew_commands"),
+        TEXT("brace_or_high_side_counterplay"),
+        TEXT("recover_swimmer_if_ejected"),
+        TEXT("score_and_replay_review")
+    };
+    ScenarioDefinitions.Add(TechnicalRapid);
+
+    ActiveScenarioId = TrainingScenario.ScenarioId;
 }
