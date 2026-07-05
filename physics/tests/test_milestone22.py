@@ -2,10 +2,13 @@ import json
 from pathlib import Path
 
 from raftsim.milestone22 import (
+    MILESTONE22_CREW_WEIGHT_SCHEMA,
+    MILESTONE22_CREW_WEIGHT_STATUS,
     MILESTONE22_CONTACT_TELEMETRY_SCHEMA,
     MILESTONE22_CONTACT_TELEMETRY_STATUS,
     MILESTONE22_RAFT_CONTACT_AUTHORITY_SCHEMA,
     MILESTONE22_RAFT_CONTACT_AUTHORITY_STATUS,
+    build_crew_weight_distribution_manifest,
     build_raft_contact_authority_integration,
     build_raft_contact_response_telemetry,
 )
@@ -26,6 +29,9 @@ RAFT_RUNTIME_PATH = REPO_ROOT / "unreal/Content/RaftSim/Physics/raft_dynamics_ru
 FIXED_STEP_BRIDGE_PATH = REPO_ROOT / "unreal/Content/RaftSim/Physics/fixed_step_bridge.json"
 CONTACT_TELEMETRY_PATH = (
     REPO_ROOT / "unreal/Content/RaftSim/Physics/raft_contact_response_telemetry.json"
+)
+CREW_WEIGHT_DISTRIBUTION_PATH = (
+    REPO_ROOT / "unreal/Content/RaftSim/Crew/crew_weight_distribution.json"
 )
 PHYSICS_BRIDGE_HEADER_PATH = (
     REPO_ROOT
@@ -177,3 +183,69 @@ def test_unreal_contact_contract_exposes_authoritative_telemetry_events():
         assert field in contact_header
     assert "ContactTelemetryEvents" in bridge_header
     assert "RecordContactTelemetryEvent" in bridge_header
+
+
+def test_crew_weight_distribution_manifest_matches_generator():
+    expected = build_crew_weight_distribution_manifest(REPO_ROOT).manifest
+    committed = json.loads(CREW_WEIGHT_DISTRIBUTION_PATH.read_text(encoding="utf-8"))
+
+    assert committed == expected
+    assert committed["schema"] == MILESTONE22_CREW_WEIGHT_SCHEMA
+    assert committed["status"] == MILESTONE22_CREW_WEIGHT_STATUS
+
+
+def test_crew_weight_distribution_manifest_covers_seats_and_weight_shift_actions():
+    manifest = json.loads(CREW_WEIGHT_DISTRIBUTION_PATH.read_text(encoding="utf-8"))
+    seat_ids = {seat["seat_id"] for seat in manifest["seating_model"]["seats"]}
+    action_ids = {action["action_id"] for action in manifest["weight_shift_actions"]}
+
+    assert manifest["seating_model"]["seat_count"] == 6
+    assert {"stern_guide", "bow_left", "bow_right", "mid_left", "mid_right"}.issubset(
+        seat_ids
+    )
+    assert action_ids == {
+        "brace",
+        "lean_left",
+        "lean_right",
+        "high_side_left",
+        "high_side_right",
+    }
+    assert manifest["outcome_coupling"]["uses_contact_families"] == [
+        "pin_release",
+        "surf_flush",
+        "flip",
+    ]
+
+
+def test_crew_weight_distribution_has_input_and_voice_coverage():
+    manifest = json.loads(CREW_WEIGHT_DISTRIBUTION_PATH.read_text(encoding="utf-8"))
+    coverage = manifest["source_action_coverage"]
+
+    assert "PaddleBrace" in coverage["input_action_ids"]
+    assert "HighSide" in coverage["input_action_ids"]
+    assert "CrewLean" in coverage["input_action_ids"]
+    assert "crew_brace" in coverage["voice_intents"]
+    assert "crew_high_side" in coverage["voice_intents"]
+    assert "crew_lean_left" in coverage["voice_intents"]
+    assert "crew_lean_right" in coverage["voice_intents"]
+
+
+def test_unreal_crew_weight_distribution_contract_exposes_cog_and_outcome_modifiers():
+    header_text = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimCrew/Public/RaftSimCrewStateContracts.h"
+    ).read_text(encoding="utf-8")
+
+    assert "ERaftSimCrewWeightShiftAction" in header_text
+    assert "FRaftSimCrewSeatOccupancy" in header_text
+    assert "FRaftSimCrewWeightShiftCommand" in header_text
+    assert "FRaftSimCrewWeightDistributionFrame" in header_text
+    assert "URaftSimCrewWeightDistributionLibrary" in header_text
+    for field in (
+        "CenterOfGravityLocalMeters",
+        "RollMomentNewtonMeters",
+        "PinLoadModifier",
+        "FlipRiskModifier",
+        "ReleaseAssistModifier",
+    ):
+        assert field in header_text

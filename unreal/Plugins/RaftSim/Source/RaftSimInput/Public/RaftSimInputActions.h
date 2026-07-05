@@ -8,6 +8,7 @@ static const FName PaddleStroke(TEXT("PaddleStroke"));
 static const FName PaddleBrace(TEXT("PaddleBrace"));
 static const FName PaddleDraw(TEXT("PaddleDraw"));
 static const FName HighSide(TEXT("HighSide"));
+static const FName CrewLean(TEXT("CrewLean"));
 static const FName HoldOn(TEXT("HoldOn"));
 static const FName GuideCommandPushToTalk(TEXT("GuideCommandPushToTalk"));
 static const FName RecenterVR(TEXT("RecenterVR"));

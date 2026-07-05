@@ -18,6 +18,10 @@ MILESTONE22_CONTACT_TELEMETRY_SCHEMA = "raftsim.unreal.raft_contact_telemetry.v1
 MILESTONE22_CONTACT_TELEMETRY_STATUS = (
     "contact_families_and_telemetry_ready_for_authoritative_runtime_wiring"
 )
+MILESTONE22_CREW_WEIGHT_SCHEMA = "raftsim.unreal.crew_weight_distribution.v1"
+MILESTONE22_CREW_WEIGHT_STATUS = (
+    "crew_seating_weight_shift_and_outcome_modifiers_ready_for_runtime_wiring"
+)
 
 
 @dataclass(frozen=True)
@@ -295,6 +299,126 @@ def build_raft_contact_response_telemetry(repo_root: Path) -> Milestone22Manifes
             "all_events_record_material_response": True,
             "all_release_paths_record_thresholds": True,
             "contact_telemetry_published_with_authoritative_raft_state": True,
+        },
+    }
+    return Milestone22ManifestBuild(manifest=manifest)
+
+
+def build_crew_weight_distribution_manifest(repo_root: Path) -> Milestone22ManifestBuild:
+    """Build the Milestone 22 crew weight-distribution gameplay manifest."""
+
+    repo_root = repo_root.resolve()
+    crew_seats_path = repo_root / "unreal/Content/RaftSim/Network/crew_seats_roles.json"
+    input_actions_path = repo_root / "unreal/Content/RaftSim/Input/enhanced_input_actions.json"
+    voice_grammar_path = repo_root / "unreal/Content/RaftSim/AI/guide_voice_command_grammar.json"
+    contact_telemetry_path = (
+        repo_root / "unreal/Content/RaftSim/Physics/raft_contact_response_telemetry.json"
+    )
+
+    crew_seats = _load_json(crew_seats_path)
+    input_actions = _load_json(input_actions_path)
+    voice_grammar = _load_json(voice_grammar_path)
+    contact_telemetry = _load_json(contact_telemetry_path)
+
+    playable_seats = [
+        seat for seat in crew_seats["seats"] if seat["role"] != "spectator_scout"
+    ]
+
+    manifest: dict[str, Any] = {
+        "schema": MILESTONE22_CREW_WEIGHT_SCHEMA,
+        "status": MILESTONE22_CREW_WEIGHT_STATUS,
+        "source_manifests": {
+            "crew_seats_roles": "unreal/Content/RaftSim/Network/crew_seats_roles.json",
+            "input_actions": "unreal/Content/RaftSim/Input/enhanced_input_actions.json",
+            "voice_command_grammar": (
+                "unreal/Content/RaftSim/AI/guide_voice_command_grammar.json"
+            ),
+            "contact_response_telemetry": (
+                "unreal/Content/RaftSim/Physics/raft_contact_response_telemetry.json"
+            ),
+        },
+        "runtime_contract": {
+            "module": "RaftSimCrew",
+            "evaluator": "URaftSimCrewWeightDistributionLibrary::EvaluateWeightDistribution",
+            "input_structs": [
+                "FRaftSimCrewSeatOccupancy",
+                "FRaftSimCrewWeightShiftCommand",
+            ],
+            "output_struct": "FRaftSimCrewWeightDistributionFrame",
+            "solver_consumer": "URaftSimPhysicsBridgeSubsystem",
+        },
+        "seating_model": {
+            "seat_count": len(playable_seats),
+            "default_passenger_mass_kg": 82.0,
+            "seats": [
+                {
+                    "seat_id": seat["seat_id"],
+                    "role": seat["role"],
+                    "local_position_m": seat["local_position_m"],
+                    "can_be_human": seat["can_be_human"],
+                    "can_ai_fill": seat["can_ai_fill"],
+                }
+                for seat in playable_seats
+            ],
+        },
+        "weight_shift_actions": [
+            {
+                "action_id": "brace",
+                "crew_intent": "crew_brace",
+                "cog_offset_m": [0.0, 0.0, -0.12],
+                "effect": "lowers_center_of_gravity_and_reduces_flip_risk",
+            },
+            {
+                "action_id": "lean_left",
+                "crew_intent": "crew_lean_left",
+                "cog_offset_m": [0.0, -0.28, 0.0],
+                "effect": "moves_center_of_gravity_left_for_angle_and_pin_control",
+            },
+            {
+                "action_id": "lean_right",
+                "crew_intent": "crew_lean_right",
+                "cog_offset_m": [0.0, 0.28, 0.0],
+                "effect": "moves_center_of_gravity_right_for_angle_and_pin_control",
+            },
+            {
+                "action_id": "high_side_left",
+                "crew_intent": "crew_high_side_left",
+                "cog_offset_m": [0.0, -0.55, 0.08],
+                "effect": "creates_large_lateral_roll_moment_for_pin_flip_release_outcomes",
+            },
+            {
+                "action_id": "high_side_right",
+                "crew_intent": "crew_high_side_right",
+                "cog_offset_m": [0.0, 0.55, 0.08],
+                "effect": "creates_large_lateral_roll_moment_for_pin_flip_release_outcomes",
+            },
+        ],
+        "outcome_coupling": {
+            "contact_telemetry_schema": contact_telemetry["schema"],
+            "uses_contact_families": ["pin_release", "surf_flush", "flip"],
+            "outputs": [
+                "center_of_gravity_local_m",
+                "roll_moment_n_m",
+                "pin_load_modifier",
+                "flip_risk_modifier",
+                "release_assist_modifier",
+                "brace_count",
+                "high_side_count",
+            ],
+        },
+        "source_action_coverage": {
+            "input_action_ids": [
+                action["action_id"] for action in input_actions["actions"]
+            ],
+            "voice_intents": [
+                command["crew_intent"] for command in voice_grammar["commands"]
+            ],
+        },
+        "pass_policy": {
+            "all_playable_seats_have_mass_and_local_position": True,
+            "brace_lean_and_high_side_shift_center_of_gravity": True,
+            "weight_distribution_modifies_pin_flip_release_outcomes": True,
+            "deterministic_inputs_and_voice_commands_cover_weight_shift_actions": True,
         },
     }
     return Milestone22ManifestBuild(manifest=manifest)
