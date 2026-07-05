@@ -14,6 +14,10 @@ MILESTONE22_RAFT_CONTACT_AUTHORITY_SCHEMA = (
 MILESTONE22_RAFT_CONTACT_AUTHORITY_STATUS = (
     "custom_reduced_authority_integrated_over_approved_custom_cxx_water"
 )
+MILESTONE22_CONTACT_TELEMETRY_SCHEMA = "raftsim.unreal.raft_contact_telemetry.v1"
+MILESTONE22_CONTACT_TELEMETRY_STATUS = (
+    "contact_families_and_telemetry_ready_for_authoritative_runtime_wiring"
+)
 
 
 @dataclass(frozen=True)
@@ -141,3 +145,156 @@ def build_raft_contact_authority_integration(repo_root: Path) -> Milestone22Mani
     }
     return Milestone22ManifestBuild(manifest=manifest)
 
+
+def build_raft_contact_response_telemetry(repo_root: Path) -> Milestone22ManifestBuild:
+    """Build the Milestone 22 raft/contact response telemetry manifest."""
+
+    repo_root = repo_root.resolve()
+    authority_integration_path = (
+        repo_root / "unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json"
+    )
+    rock_presets_path = repo_root / "unreal/Content/RaftSim/Physics/rock_contact_presets.json"
+    bed_presets_path = repo_root / "unreal/Content/RaftSim/Physics/bed_grounding_presets.json"
+    collision_sources_path = (
+        repo_root / "unreal/Content/RaftSim/Physics/collision_geometry_sources.json"
+    )
+
+    authority = _load_json(authority_integration_path)
+    rock_presets = _load_json(rock_presets_path)
+    bed_presets = _load_json(bed_presets_path)
+    collision_sources = _load_json(collision_sources_path)
+
+    telemetry_fields = [
+        "event_id",
+        "runtime_id",
+        "frame",
+        "contact_family",
+        "surface_class",
+        "feature_id",
+        "raft_patch_id",
+        "contact_point_world_m",
+        "contact_normal",
+        "penetration_depth_m",
+        "normal_impulse_n_s",
+        "tangent_impulse_n_s",
+        "restitution",
+        "normal_stiffness",
+        "normal_damping",
+        "tangential_friction",
+        "rolling_friction",
+        "stick_slip_state",
+        "contact_loading_n",
+        "release_threshold_n",
+        "release_ratio",
+        "roll_moment_n_m",
+        "outcome",
+    ]
+
+    contact_families = [
+        {
+            "family_id": "raft_rock",
+            "feature_types": ["rock"],
+            "material_presets": ["rock_elastic_default"],
+            "expected_outcomes": ["deflect", "bounce", "scrape", "pin_risk"],
+        },
+        {
+            "family_id": "bank_scrape",
+            "feature_types": ["bank"],
+            "material_presets": ["bank_elastic_scrape"],
+            "expected_outcomes": ["scrape", "deflect", "pin_risk"],
+        },
+        {
+            "family_id": "ledge_launch",
+            "feature_types": ["ledge"],
+            "material_presets": ["ledge_elastic_launch"],
+            "expected_outcomes": ["bounce", "launch", "flip_risk"],
+        },
+        {
+            "family_id": "shallow_shelf",
+            "feature_types": ["shallow"],
+            "material_presets": ["bed_inelastic_shallow_shelf"],
+            "expected_outcomes": ["ground", "pivot", "release", "flip_risk"],
+        },
+        {
+            "family_id": "bed_grounding",
+            "feature_types": ["riverbed"],
+            "material_presets": ["bed_inelastic_default"],
+            "expected_outcomes": ["ground", "scrape", "drag", "unstick"],
+        },
+        {
+            "family_id": "boulder_garden",
+            "feature_types": ["rock", "riverbed"],
+            "material_presets": ["rock_elastic_default", "bed_inelastic_default"],
+            "expected_outcomes": ["multi_contact_loading", "deflect", "pin_risk"],
+        },
+        {
+            "family_id": "pin_release",
+            "feature_types": ["rock", "shallow", "strainer"],
+            "material_presets": [
+                "rock_elastic_default",
+                "bed_inelastic_shallow_shelf",
+                "strainer_high_friction_pin",
+            ],
+            "expected_outcomes": ["pin", "hold", "release", "failed_release"],
+        },
+        {
+            "family_id": "surf_flush",
+            "feature_types": ["hydraulic_hole", "standing_wave", "eddy_line"],
+            "material_presets": ["water_feature_contact"],
+            "expected_outcomes": ["surf", "side_surf", "flush", "flip_risk"],
+        },
+        {
+            "family_id": "flip",
+            "feature_types": ["rock", "ledge", "shallow", "hydraulic_hole"],
+            "material_presets": [
+                "rock_elastic_default",
+                "ledge_elastic_launch",
+                "bed_inelastic_shallow_shelf",
+                "water_feature_contact",
+            ],
+            "expected_outcomes": ["flip_risk", "flip", "recovered_by_high_side"],
+        },
+    ]
+
+    manifest: dict[str, Any] = {
+        "schema": MILESTONE22_CONTACT_TELEMETRY_SCHEMA,
+        "status": MILESTONE22_CONTACT_TELEMETRY_STATUS,
+        "authority_integration": (
+            "unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json"
+        ),
+        "selected_runtime": authority["selected_raft_contact_authority"]["runtime"],
+        "water_authority": authority["approved_custom_water"]["authority"],
+        "source_manifests": {
+            "rock_contact_presets": "unreal/Content/RaftSim/Physics/rock_contact_presets.json",
+            "bed_grounding_presets": (
+                "unreal/Content/RaftSim/Physics/bed_grounding_presets.json"
+            ),
+            "collision_geometry_sources": (
+                "unreal/Content/RaftSim/Physics/collision_geometry_sources.json"
+            ),
+        },
+        "source_preset_counts": {
+            "rock_contact_presets": len(rock_presets["presets"]),
+            "bed_grounding_presets": len(bed_presets["presets"]),
+            "collision_feature_types": len(collision_sources["feature_types"]),
+        },
+        "contact_families": contact_families,
+        "telemetry_schema": {
+            "event_struct": "FRaftSimRaftContactTelemetryEvent",
+            "summary_struct": "FRaftSimRaftContactRuntimeSummary",
+            "required_fields": telemetry_fields,
+        },
+        "runtime_thresholds": {
+            "pin_release_requires_release_threshold": True,
+            "surf_flush_requires_flow_feature_state": True,
+            "flip_requires_roll_moment_and_recovery_window": True,
+            "stick_slip_requires_velocity_and_hysteresis": True,
+        },
+        "pass_policy": {
+            "all_named_contact_families_present": True,
+            "all_events_record_material_response": True,
+            "all_release_paths_record_thresholds": True,
+            "contact_telemetry_published_with_authoritative_raft_state": True,
+        },
+    }
+    return Milestone22ManifestBuild(manifest=manifest)

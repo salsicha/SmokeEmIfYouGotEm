@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "RaftSimChronoRuntimeAdapter.h"
+#include "RaftSimContactMaterials.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 
@@ -66,6 +67,12 @@ struct FRaftSimPhysicsTickOutput
 
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Physics")
     int32 ContactEvents = 0;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Physics")
+    TArray<FRaftSimRaftContactTelemetryEvent> ContactTelemetryEvents;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Physics")
+    FRaftSimRaftContactRuntimeSummary ContactRuntimeSummary;
 };
 
 UCLASS()
@@ -98,6 +105,9 @@ public:
         return AuthorityIntegrationPolicy;
     }
 
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Physics")
+    void RecordContactTelemetryEvent(const FRaftSimRaftContactTelemetryEvent& Event);
+
 private:
     UPROPERTY()
     TObjectPtr<URaftSimWaterRuntimeAdapter> WaterRuntime;
@@ -116,4 +126,5 @@ private:
     int32 PhysicsFrame = 0;
 
     void RunOneFixedWaterTick();
+    void RefreshContactRuntimeSummary();
 };
