@@ -231,6 +231,7 @@ Tasks:
 - Add manifest-approved free/open, first-party generated, procedural, and AI-generated audio for the vertical slice: water beds, rapid features, raft/paddle/rock Foley, guide commands, crew acknowledgments, UI, weather, and fail/safety states.
 - Add manifest-approved 3D audio configuration for the vertical slice: attenuation/spatialization presets, ambisonic beds, reverb/occlusion zones, large rapid spread, crew/voice positions, and VR/headphone validation.
 - Drive readable water visuals, foam, spray, wet rocks, raft contact cues, paddle cues, weather, 3D spatial audio, ambisonic ambience, reverb/occlusion, and rescue cues from bounded solver/runtime telemetry via `unreal/Content/RaftSim/Rendering/telemetry_presentation_cues.json` and `URaftSimTelemetryPresentationCueLibrary::BuildPresentationCues`.
+- Build the vertical-slice river corridor from `unreal/Content/RaftSim/Rendering/vertical_slice_environment_corridor.json`, with photoreal landscape/bed, banks, contact rocks, dense foliage, debris/access context, lighting/weather, audio occlusion geometry, and water-readability layers tied back to source manifests and guide-seat captures.
 
 Deliverable:
 
@@ -337,6 +338,7 @@ Use Unreal data assets for game-facing tuning while keeping source-of-truth expo
 - River catalog, region, section, season, flow, difficulty, gauge, and source-manifest definitions
 - Water field / feature metadata
 - Geospatial corridor metadata, centerlines, banks, cross sections, rapid boundaries, imagery masks, and data confidence scores
+- Vertical-slice environment corridor recipe with authored landscape, bank, rock, foliage, debris, lighting/weather, audio geometry, and water-readability layers plus desktop/VR/debug quality budgets
 - Raft physical parameters
 - Paddle stroke parameters
 - Passenger archetypes

@@ -1,0 +1,145 @@
+{
+  "schema": "raftsim.unreal.vertical_slice_environment.v1",
+  "data_asset_class": "URaftSimVerticalSliceEnvironmentConfig",
+  "map": "/Game/RaftSim/Maps/L_RaftSimBoot",
+  "river_id": "american_south_fork",
+  "section_id": "chili_bar_to_coloma",
+  "station_window_m": [0.0, 160.0],
+  "corridor_package": "physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json",
+  "photoreal_stack_manifest": "unreal/Content/RaftSim/Rendering/photoreal_stack.manifest.json",
+  "presentation_cue_manifest": "unreal/Content/RaftSim/Rendering/telemetry_presentation_cues.json",
+  "source_policy": {
+    "development_assets": "free_open_first_party_generated_procedural_and_ai_generated_development_assets_first",
+    "rights_manifest": "unreal/Content/RaftSim/development_asset_source_policy.json",
+    "photoreal_reference_required": true,
+    "third_party_binary_assets_require_license_review_before_ship": true
+  },
+  "authoring_layers": [
+    {
+      "layer_id": "landscape_and_bed",
+      "kind": "Landscape",
+      "source_manifest": "unreal/Content/RaftSim/River/geospatial_import_pipeline.json",
+      "inputs": ["dem_tiles", "water_masks", "centerline", "cross_sections", "solver_bed_elevation"],
+      "target_systems": ["WorldPartition", "NaniteLandscapeOrLandscapeTiles", "SubstrateMaterials"],
+      "photoreal_targets": ["eroded_bank_edges", "gravel_bars", "shallow_shelves", "wet_dry_edges"],
+      "readability_constraints": ["preserve_downstream_sightline", "do_not_hide_solver_water_surface", "expose_shallow_shelves"],
+      "quality_gate": "guide_seat_capture_matches_geospatial_stationing_and_does_not_occlude_rapid_entry"
+    },
+    {
+      "layer_id": "banks_and_channel_edges",
+      "kind": "RiverBanks",
+      "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/hydrography/banks.geojson",
+      "inputs": ["banks", "roughness_indicators", "water_masks", "imagery_reference"],
+      "target_systems": ["SplineMeshes", "NaniteBankMeshes", "WetnessMasks"],
+      "photoreal_targets": ["undercut_banks", "root_edges", "mud_and_gravel_transition", "wet_rock_sheen"],
+      "readability_constraints": ["leave_eddy_lines_visible", "avoid_false_channel_openings"],
+      "quality_gate": "bank_silhouettes_match_reviewed_rapid_annotations"
+    },
+    {
+      "layer_id": "rocks_boulders_and_ledges",
+      "kind": "RocksAndBoulders",
+      "source_manifest": "unreal/Content/RaftSim/Physics/collision_geometry_sources.json",
+      "inputs": ["hazard_annotations", "boulder_density", "contact_geometry", "flow_band_exposure"],
+      "target_systems": ["NaniteRocks", "ChaosVisualCollision", "CustomContactAuthorityDebug", "SubstrateWetRock"],
+      "photoreal_targets": ["wet_boulder_shoulders", "dry_exposed_caps", "ledge_faces", "scraped_contact_marks"],
+      "readability_constraints": ["contact_rocks_must_match_authoritative_contact_ids", "avoid_decorative_rocks_that_look_runnable"],
+      "quality_gate": "all gameplay-contact rocks have matching visual mesh, collision reference, and telemetry id"
+    },
+    {
+      "layer_id": "riverbank_foliage",
+      "kind": "Foliage",
+      "source_manifest": "unreal/Content/RaftSim/Rendering/art_asset_source_research.json",
+      "inputs": ["imagery_vegetation_texture", "bank_masks", "slope_masks", "season_preset"],
+      "target_systems": ["PCG", "NaniteFoliageEvaluation", "VirtualShadowMaps", "WindAnimation"],
+      "photoreal_targets": ["dense_riparian_canopy", "understory_depth", "leaf_litter", "shore_grass_and_brush"],
+      "readability_constraints": ["no_foliage_inside_guide_sightline_cone", "no_branches_hiding_rescue_targets", "maintain_vr_comfort"],
+      "quality_gate": "foliage_density_is_high_from_guide_seat_but_stays_inside_desktop_and_vr_budgets"
+    },
+    {
+      "layer_id": "driftwood_debris_access_context",
+      "kind": "DriftwoodAndDebris",
+      "source_manifest": "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json",
+      "inputs": ["access_points", "shore_features", "debris_candidates", "guide_review_notes"],
+      "target_systems": ["PCG", "InstancedStaticMeshes", "FidelityReviewAnnotations"],
+      "photoreal_targets": ["driftwood_piles", "shore_gear_marks", "natural_debris", "subtle_access_trail_context"],
+      "readability_constraints": ["do_not_confuse_debris_with_strainer_gameplay_unless_tagged", "keep_rescue_lanes_visible"],
+      "quality_gate": "decorative_debris_is_tagged_separately_from_scoring_hazards"
+    },
+    {
+      "layer_id": "lighting_weather_and_atmosphere",
+      "kind": "LightingAndWeather",
+      "source_manifest": "unreal/Content/RaftSim/Rendering/photoreal_stack.manifest.json",
+      "inputs": ["season_preset", "time_of_day", "weather_wetness", "corridor_enclosure"],
+      "target_systems": ["Lumen", "VirtualShadowMaps", "SkyAtmosphere", "VolumetricFog", "NiagaraRainMist"],
+      "photoreal_targets": ["wet_surface_highlights", "canyon_shadow_depth", "sun_breaks", "spray_backlight"],
+      "readability_constraints": ["avoid_blinding_glare_on_entry_tongue", "maintain_hazard_contrast_in_shadow"],
+      "quality_gate": "lighting_pass_keeps_training_and_technical_rapid_features_readable"
+    },
+    {
+      "layer_id": "audio_occlusion_and_reverb_geometry",
+      "kind": "AudioOcclusionGeometry",
+      "source_manifest": "unreal/Content/RaftSim/Audio/spatial_audio_presets.json",
+      "inputs": ["bank_meshes", "boulder_meshes", "canyon_enclosure", "reverb_zones"],
+      "target_systems": ["AudioVolumes", "OcclusionTraces", "AmbisonicBedRotation", "ReverbSends"],
+      "photoreal_targets": ["soundfield_matches_visible_canyon_and_bank_shape"],
+      "readability_constraints": ["water_hazard_audio_remains_localizable", "rescue_callouts_remain_intelligible"],
+      "quality_gate": "guide_seat_audio_validation_passes_for_rapid_hazards_and_rescue_cues"
+    },
+    {
+      "layer_id": "water_readability_support",
+      "kind": "WaterReadabilitySupport",
+      "source_manifest": "unreal/Content/RaftSim/Rendering/telemetry_presentation_cues.json",
+      "inputs": ["foam_amount", "spray_amount", "surface_streak_amount", "wet_rock_amount", "hazard_contrast"],
+      "target_systems": ["WaterMaterial", "Niagara", "DebugOverlay", "ReplayReview"],
+      "photoreal_targets": ["foam_lines_follow_current", "spray_origin_matches_impacts", "wet_edges_track_solver_wetness"],
+      "readability_constraints": ["presentation_cues_do_not_hide_conservation_failures", "visual_boosts_are_manifest_recorded"],
+      "quality_gate": "rendered_water_features_align_with_solver_runtime_telemetry_in_replay_review"
+    }
+  ],
+  "quality_budgets": [
+    {
+      "target_platform": "desktop_high",
+      "target_frame_rate": 60,
+      "max_visible_foliage_instances": 90000,
+      "max_visible_nanite_triangles_millions": 28.0,
+      "max_gpu_frame_ms": 14.0,
+      "requires_guide_seat_capture": true
+    },
+    {
+      "target_platform": "vr_comfort",
+      "target_frame_rate": 90,
+      "max_visible_foliage_instances": 35000,
+      "max_visible_nanite_triangles_millions": 12.0,
+      "max_gpu_frame_ms": 9.5,
+      "requires_guide_seat_capture": true
+    },
+    {
+      "target_platform": "debug_replay",
+      "target_frame_rate": 60,
+      "max_visible_foliage_instances": 25000,
+      "max_visible_nanite_triangles_millions": 8.0,
+      "max_gpu_frame_ms": 10.0,
+      "requires_guide_seat_capture": false
+    }
+  ],
+  "required_review_captures": [
+    "guide_seat_flat_screen_16x9",
+    "guide_seat_vr_left_right_eye",
+    "downstream_entry_tongue",
+    "technical_rapid_contact_rocks",
+    "swimmer_rescue_visibility",
+    "replay_overlay_with_solver_fields",
+    "foliage_density_and_shadow_budget"
+  ],
+  "pass_policy": {
+    "uses_validated_corridor_package": true,
+    "uses_photoreal_stack": true,
+    "has_landscape_banks_rocks_and_foliage_layers": true,
+    "protects_water_readability": true,
+    "requires_rights_and_source_manifests": true,
+    "has_desktop_vr_and_debug_quality_budgets": true,
+    "requires_guide_seat_captures": true,
+    "requires_replay_review_alignment": true
+  },
+  "status": "ready_for_world_partition_pcg_map_authoring"
+}

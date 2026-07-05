@@ -14,7 +14,8 @@
     "swimmer_rescue_gameplay": "unreal/Content/RaftSim/Crew/swimmer_rescue_gameplay.json",
     "scoring": "unreal/Content/RaftSim/Crew/gameplay_telemetry_scoring.json",
     "replay_manifest": "physics/data/readiness/milestone_10/unreal_visualization/manifest.json",
-    "telemetry_presentation_cues": "unreal/Content/RaftSim/Rendering/telemetry_presentation_cues.json"
+    "telemetry_presentation_cues": "unreal/Content/RaftSim/Rendering/telemetry_presentation_cues.json",
+    "environment_corridor": "unreal/Content/RaftSim/Rendering/vertical_slice_environment_corridor.json"
   },
   "runtime_contract": {
     "water_authority": "custom_cxx_shallow_water_solver",
@@ -24,6 +25,7 @@
     "swimming_skill_assignment_enabled": true,
     "scoring_enabled": true,
     "telemetry_driven_presentation_enabled": true,
+    "photoreal_environment_corridor_enabled": true,
     "restart_enabled": true,
     "replay_enabled": true,
     "after_action_feedback_enabled": true
@@ -153,6 +155,26 @@
       "rescue_callouts"
     ]
   },
+  "environment": {
+    "corridor_manifest": "unreal/Content/RaftSim/Rendering/vertical_slice_environment_corridor.json",
+    "data_asset_class": "URaftSimVerticalSliceEnvironmentConfig",
+    "required_layers": [
+      "landscape_and_bed",
+      "banks_and_channel_edges",
+      "rocks_boulders_and_ledges",
+      "riverbank_foliage",
+      "driftwood_debris_access_context",
+      "lighting_weather_and_atmosphere",
+      "audio_occlusion_and_reverb_geometry",
+      "water_readability_support"
+    ],
+    "quality_targets": [
+      "photoreal_guide_seat_capture",
+      "desktop_high_budget",
+      "vr_comfort_budget",
+      "replay_review_alignment"
+    ]
+  },
   "pass_policy": {
     "has_training_section": true,
     "has_technical_rapid": true,
@@ -161,6 +183,7 @@
     "uses_selected_raft_contact_authority": true,
     "uses_crew_safety_states": true,
     "uses_telemetry_driven_presentation_cues": true,
+    "uses_photoreal_environment_corridor": true,
     "supports_scoring_restart_replay_after_action_feedback": true
   },
   "status": "vertical_slice_training_and_technical_rapid_contract_ready_for_map_authoring"
