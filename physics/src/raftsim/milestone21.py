@@ -17,12 +17,14 @@ MILESTONE21_REACH_LOCAL_STREAMING_SCHEMA = "raftsim.unreal.reach_local_streaming
 MILESTONE21_FEATURE_TUNING_EDITOR_SCHEMA = "raftsim.unreal.feature_tuning_editor.v1"
 MILESTONE21_SOUTH_FORK_EDITOR_PASS_SCHEMA = "raftsim.unreal.south_fork_editor_pass.v1"
 MILESTONE21_COLORADO_ROWING_ROUTE_SCHEMA = "raftsim.unreal.colorado_rowing_route.v1"
+MILESTONE21_ROUND_TRIP_VALIDATION_SCHEMA = "raftsim.unreal.river_round_trip_validation.v1"
 RAPID_RIVER_EDITOR_MANIFEST_PATH = "unreal/Content/RaftSim/River/rapid_river_editor.json"
 GEOSPATIAL_IMPORT_PIPELINE_PATH = "unreal/Content/RaftSim/River/geospatial_import_pipeline.json"
 REACH_LOCAL_STREAMING_PATH = "unreal/Content/RaftSim/River/reach_local_streaming.json"
 FEATURE_TUNING_EDITOR_PATH = "unreal/Content/RaftSim/River/feature_tuning_editor.json"
 SOUTH_FORK_EDITOR_PASS_PATH = "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json"
 COLORADO_ROWING_ROUTE_PATH = "unreal/Content/RaftSim/River/colorado_rowing_route_editor_pass.json"
+ROUND_TRIP_VALIDATION_PATH = "unreal/Content/RaftSim/River/round_trip_validation.json"
 FEATURE_FORCING_DEFAULTS_PATH = "physics/config/feature_forcing_defaults.json"
 RAPID_REVIEW_FLOW_DIFFICULTY_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/rapid_review_flow_difficulty_mapping.json"
@@ -127,6 +129,13 @@ class Milestone21ColoradoRowingRouteDraft:
 
     source_manifest: dict[str, Any]
     flow_presets: dict[str, Any]
+    manifest: dict[str, Any]
+
+
+@dataclass(frozen=True, slots=True)
+class Milestone21RoundTripValidation:
+    """Generated Unreal river-data round-trip validation manifest."""
+
     manifest: dict[str, Any]
 
 
@@ -1378,4 +1387,246 @@ def write_colorado_rowing_route_draft_manifest(
     ):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return generated
+
+
+def _round_trip_validation_overlays(south_fork_pass: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        {
+            "overlay_id": overlay["overlay_id"],
+            "flow_band": overlay["flow_band"],
+            "solver_mode": overlay["solver_mode"],
+            "scenario_package": overlay["scenario_package"],
+            "manifest": overlay["manifest"],
+            "fields": overlay["fields"],
+            "probes": overlay["probes"],
+            "conservation_summary": overlay["conservation_summary"],
+        }
+        for overlay in south_fork_pass["validation_overlays"]
+    ]
+
+
+def _round_trip_case(
+    *,
+    case_id: str,
+    description: str,
+    source_unreal_assets: list[str],
+    source_manifests: list[str],
+    solver_packages: list[str],
+    geoclaw_cpp_inputs: list[str],
+    fidelity_overlays: list[dict[str, Any]],
+    flow_metadata_sources: list[str],
+    status: str = "ready_for_validation_harness",
+) -> dict[str, Any]:
+    return {
+        "case_id": case_id,
+        "description": description,
+        "source_unreal_assets": source_unreal_assets,
+        "source_manifests": source_manifests,
+        "regenerates": {
+            "solver_packages": solver_packages,
+            "geoclaw_cpp_comparison_inputs": geoclaw_cpp_inputs,
+            "fidelity_review_overlays": fidelity_overlays,
+        },
+        "metadata_guards": {
+            "crs": [
+                "source_manifest.coordinate_reference_systems.source",
+                "source_manifest.coordinate_reference_systems.working",
+                "source_manifest.coordinate_reference_systems.solver",
+                "source_manifest.coordinate_reference_systems.unreal",
+                "geospatial_import_pipeline.crs_policy",
+                "geospatial_import_pipeline.transform_policy",
+            ],
+            "provenance": [
+                "source_manifest.manifest_id",
+                "source_manifest.sources[].source_id",
+                "source_manifest.sources[].license_or_terms",
+                "accepted_report_set_lock",
+                "rights_provenance",
+            ],
+            "flow_response_metadata": [
+                *flow_metadata_sources,
+                "feature_tuning_editor.feature_tuning_groups[].flow_response_samples",
+                "feature_tuning_editor.validation_requirements.flow_dependent",
+            ],
+        },
+        "loss_checks": [
+            "source_manifest_path_preserved",
+            "coordinate_reference_systems_preserved",
+            "wgs84_to_local_transform_preserved",
+            "source_ids_and_license_terms_preserved",
+            "flow_band_ids_and_discharge_values_preserved",
+            "feature_flow_response_curve_ids_preserved",
+            "stitched_validation_overlay_ids_preserved",
+        ],
+        "status": status,
+    }
+
+
+def build_round_trip_validation_manifest(repo_root: Path) -> Milestone21RoundTripValidation:
+    """Build the Unreal river-data round-trip validation manifest."""
+
+    root = repo_root.resolve()
+    geospatial_import = _read_json(root / GEOSPATIAL_IMPORT_PIPELINE_PATH)
+    rapid_editor = _read_json(root / RAPID_RIVER_EDITOR_MANIFEST_PATH)
+    reach_streaming = _read_json(root / REACH_LOCAL_STREAMING_PATH)
+    feature_tuning = _read_json(root / FEATURE_TUNING_EDITOR_PATH)
+    south_fork_pass = _read_json(root / SOUTH_FORK_EDITOR_PASS_PATH)
+    colorado_route = _read_json(root / COLORADO_ROWING_ROUTE_PATH)
+    south_fork_source = _read_json(root / SOUTH_FORK_SOURCE_MANIFEST_PATH)
+    colorado_source = _read_json(root / COLORADO_ROWING_SOURCE_MANIFEST_PATH)
+
+    south_fork_overlays = _round_trip_validation_overlays(south_fork_pass)
+    south_fork_solver_packages = sorted({overlay["scenario_package"] for overlay in south_fork_overlays})
+    south_fork_flow_metadata = [
+        SOUTH_FORK_VALIDATION_MATRIX_PATH,
+        FLOW_PRESETS_PATH,
+        RAPID_REVIEW_FLOW_DIFFICULTY_PATH,
+    ]
+    colorado_flow_metadata = [
+        COLORADO_ROWING_FLOW_PRESETS_PATH,
+        "colorado_rowing_route.flow_band_policy",
+        "colorado_rowing_route.rowing_frame_controls",
+    ]
+
+    cases = [
+        _round_trip_case(
+            case_id="south_fork_unreal_exports_to_solver_packages",
+            description="South Fork editor export regenerates solver packages and validation overlays for low/median/high flow windows.",
+            source_unreal_assets=[
+                SOUTH_FORK_EDITOR_PASS_PATH,
+                RAPID_RIVER_EDITOR_MANIFEST_PATH,
+                FEATURE_TUNING_EDITOR_PATH,
+                REACH_LOCAL_STREAMING_PATH,
+            ],
+            source_manifests=[SOUTH_FORK_SOURCE_MANIFEST_PATH],
+            solver_packages=south_fork_solver_packages,
+            geoclaw_cpp_inputs=[
+                *south_fork_solver_packages,
+                "physics/regression_fixtures/milestone16/registry.json",
+            ],
+            fidelity_overlays=south_fork_overlays,
+            flow_metadata_sources=south_fork_flow_metadata,
+        ),
+        _round_trip_case(
+            case_id="south_fork_reach_local_streaming_to_stitched_windows",
+            description="Reach-local authoring exports regenerate stitched whole-window validation inputs without using isolated seams for signoff.",
+            source_unreal_assets=[REACH_LOCAL_STREAMING_PATH, TRACEABLE_RIVER_DATA_ASSETS_PATH],
+            source_manifests=[SOUTH_FORK_SOURCE_MANIFEST_PATH],
+            solver_packages=[
+                window["scenario_package"]
+                for window in reach_streaming["playable_windows"]
+            ],
+            geoclaw_cpp_inputs=[
+                window["required_exports"]["manifest"]
+                for window in reach_streaming["playable_windows"]
+            ],
+            fidelity_overlays=[
+                {
+                    "overlay_id": f"{window['window_id']}_stitched_window",
+                    "flow_band": window["flow_band"],
+                    "solver_mode": window["solver_mode"],
+                    "manifest": window["required_exports"]["manifest"],
+                    "fields": window["required_exports"]["fields"],
+                    "probes": window["required_exports"]["probes"],
+                    "conservation_summary": window["required_exports"]["conservation_summary"],
+                }
+                for window in reach_streaming["playable_windows"]
+            ],
+            flow_metadata_sources=south_fork_flow_metadata,
+        ),
+        _round_trip_case(
+            case_id="colorado_rowing_route_metadata_to_planning_inputs",
+            description="Colorado rowing draft export regenerates planning source manifests, flow bands, rowing controls, and validation annotation needs.",
+            source_unreal_assets=[COLORADO_ROWING_ROUTE_PATH],
+            source_manifests=[COLORADO_ROWING_SOURCE_MANIFEST_PATH],
+            solver_packages=["planned_after_geospatial_pull"],
+            geoclaw_cpp_inputs=["planned_after_flow_band_and_annotation_review"],
+            fidelity_overlays=[
+                {
+                    "overlay_id": need["need_id"],
+                    "geometry_kind": need["geometry_kind"],
+                    "required_sources": need["required_sources"],
+                    "review_fields": need["review_fields"],
+                }
+                for need in colorado_route["validation_annotation_needs"]
+            ],
+            flow_metadata_sources=colorado_flow_metadata,
+            status="metadata_round_trip_ready_solver_outputs_planned",
+        ),
+    ]
+
+    manifest = {
+        "schema": MILESTONE21_ROUND_TRIP_VALIDATION_SCHEMA,
+        "validation_id": "milestone21_unreal_river_data_round_trip_validation",
+        "module": "RaftSimRiver",
+        "asset_class": "URaftSimRiverRoundTripValidationConfig",
+        "source_unreal_assets": [
+            RAPID_RIVER_EDITOR_MANIFEST_PATH,
+            GEOSPATIAL_IMPORT_PIPELINE_PATH,
+            REACH_LOCAL_STREAMING_PATH,
+            FEATURE_TUNING_EDITOR_PATH,
+            SOUTH_FORK_EDITOR_PASS_PATH,
+            COLORADO_ROWING_ROUTE_PATH,
+            TRACEABLE_RIVER_DATA_ASSETS_PATH,
+        ],
+        "canonical_format_contract": GEOSPATIAL_FORMAT_CONTRACT_PATH,
+        "geospatial_import_pipeline": GEOSPATIAL_IMPORT_PIPELINE_PATH,
+        "round_trip_targets": geospatial_import["round_trip_targets"],
+        "required_target_kinds": [
+            "solver_packages",
+            "geoclaw_cpp_comparison_inputs",
+            "fidelity_review_overlays",
+        ],
+        "metadata_guard_categories": {
+            "crs": geospatial_import["crs_policy"],
+            "transform": geospatial_import["transform_policy"],
+            "provenance": {
+                "source_manifest_required": geospatial_import["source_manifest_required"],
+                "south_fork_manifest_id": south_fork_source["manifest_id"],
+                "colorado_manifest_id": colorado_source["manifest_id"],
+                "accepted_report_set_lock": south_fork_pass["accepted_report_set_lock"],
+            },
+            "flow_response_metadata": {
+                "feature_tuning_schema": feature_tuning["schema"],
+                "south_fork_flow_band_count": len(south_fork_pass["flow_bands"]),
+                "colorado_flow_band_count": len(colorado_route["flow_bands"]),
+                "flow_dependent_forcing_required": feature_tuning["validation_requirements"]["flow_dependent"],
+            },
+        },
+        "regeneration_steps": [
+            "Load Unreal river export manifests and canonical source manifests.",
+            "Rebuild source/corridor packages in canonical geospatial formats while preserving CRS and transform metadata.",
+            "Regenerate solver-neutral scenario packages and array manifests for each accepted flow window.",
+            "Regenerate GeoClaw/C++ comparison input packages from the same solver-neutral sources.",
+            "Regenerate fidelity-review overlays for pins, spans, polygons, raft lines, stitched fields, probes, and feature-flow annotations.",
+            "Compare metadata guard fields before and after round trip; fail on missing CRS, provenance, or flow-response metadata.",
+        ],
+        "round_trip_cases": cases,
+        "quality_gates": [
+            "Every case must include solver package, GeoClaw/C++ input, and fidelity overlay targets or explicitly record planned metadata-only status.",
+            "CRS, transform, source-manifest, source-id, license/terms, rights/provenance, and flow-response fields must survive export/import byte-for-byte where canonical JSON allows.",
+            "Stitched whole-window validation overlays are required for South Fork signoff; reach-local exports alone are never acceptance evidence.",
+            "Colorado route placeholders must fail production signoff until gauge history, flow bands, geospatial pulls, guide review, and validation annotations are replaced with reviewed data.",
+        ],
+        "source_summaries": {
+            "rapid_editor_seed_annotations": len(rapid_editor["seed_annotations"]),
+            "reach_streaming_windows": reach_streaming["playable_window_count"],
+            "feature_tuning_groups": len(feature_tuning["feature_tuning_groups"]),
+            "south_fork_reviewed_rapids": south_fork_pass["reviewed_rapid_count"],
+            "colorado_route_segments": len(colorado_route["route_segments"]),
+        },
+        "status": "ready_for_round_trip_validation_harness",
+    }
+    return Milestone21RoundTripValidation(manifest=manifest)
+
+
+def write_round_trip_validation_manifest(
+    *, repo_root: Path, output_json: Path
+) -> Milestone21RoundTripValidation:
+    """Generate and write the Unreal river-data round-trip validation manifest."""
+
+    generated = build_round_trip_validation_manifest(repo_root)
+    output_json.parent.mkdir(parents=True, exist_ok=True)
+    output_json.write_text(json.dumps(generated.manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return generated

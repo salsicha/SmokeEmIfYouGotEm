@@ -1,0 +1,456 @@
+{
+  "asset_class": "URaftSimRiverRoundTripValidationConfig",
+  "canonical_format_contract": "physics/config/geospatial_format_contract.json",
+  "geospatial_import_pipeline": "unreal/Content/RaftSim/River/geospatial_import_pipeline.json",
+  "metadata_guard_categories": {
+    "crs": {
+      "solver_local_crs_required": true,
+      "source_crs_required": true,
+      "unreal_transform_required": true,
+      "working_crs_required": true
+    },
+    "flow_response_metadata": {
+      "colorado_flow_band_count": 3,
+      "feature_tuning_schema": "raftsim.unreal.feature_tuning_editor.v1",
+      "flow_dependent_forcing_required": true,
+      "south_fork_flow_band_count": 3
+    },
+    "provenance": {
+      "accepted_report_set_lock": {
+        "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
+        "manifest": "physics/reports/milestone20/report_set_lock.json"
+      },
+      "colorado_manifest_id": "colorado_river.grand_canyon_lees_ferry_to_diamond_creek_rowing.source_manifest.v0",
+      "source_manifest_required": true,
+      "south_fork_manifest_id": "american_south_fork.chili_bar_to_coloma.source_manifest.v0"
+    },
+    "transform": {
+      "local_solver_transform_required": true,
+      "transform_changes_tracked": true,
+      "wgs84_required": true
+    }
+  },
+  "module": "RaftSimRiver",
+  "quality_gates": [
+    "Every case must include solver package, GeoClaw/C++ input, and fidelity overlay targets or explicitly record planned metadata-only status.",
+    "CRS, transform, source-manifest, source-id, license/terms, rights/provenance, and flow-response fields must survive export/import byte-for-byte where canonical JSON allows.",
+    "Stitched whole-window validation overlays are required for South Fork signoff; reach-local exports alone are never acceptance evidence.",
+    "Colorado route placeholders must fail production signoff until gauge history, flow bands, geospatial pulls, guide review, and validation annotations are replaced with reviewed data."
+  ],
+  "regeneration_steps": [
+    "Load Unreal river export manifests and canonical source manifests.",
+    "Rebuild source/corridor packages in canonical geospatial formats while preserving CRS and transform metadata.",
+    "Regenerate solver-neutral scenario packages and array manifests for each accepted flow window.",
+    "Regenerate GeoClaw/C++ comparison input packages from the same solver-neutral sources.",
+    "Regenerate fidelity-review overlays for pins, spans, polygons, raft lines, stitched fields, probes, and feature-flow annotations.",
+    "Compare metadata guard fields before and after round trip; fail on missing CRS, provenance, or flow-response metadata."
+  ],
+  "required_target_kinds": [
+    "solver_packages",
+    "geoclaw_cpp_comparison_inputs",
+    "fidelity_review_overlays"
+  ],
+  "round_trip_cases": [
+    {
+      "case_id": "south_fork_unreal_exports_to_solver_packages",
+      "description": "South Fork editor export regenerates solver packages and validation overlays for low/median/high flow windows.",
+      "loss_checks": [
+        "source_manifest_path_preserved",
+        "coordinate_reference_systems_preserved",
+        "wgs84_to_local_transform_preserved",
+        "source_ids_and_license_terms_preserved",
+        "flow_band_ids_and_discharge_values_preserved",
+        "feature_flow_response_curve_ids_preserved",
+        "stitched_validation_overlay_ids_preserved"
+      ],
+      "metadata_guards": {
+        "crs": [
+          "source_manifest.coordinate_reference_systems.source",
+          "source_manifest.coordinate_reference_systems.working",
+          "source_manifest.coordinate_reference_systems.solver",
+          "source_manifest.coordinate_reference_systems.unreal",
+          "geospatial_import_pipeline.crs_policy",
+          "geospatial_import_pipeline.transform_policy"
+        ],
+        "flow_response_metadata": [
+          "physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json",
+          "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+          "physics/data/real_world/south_fork_american_chili_bar/rapid_review_flow_difficulty_mapping.json",
+          "feature_tuning_editor.feature_tuning_groups[].flow_response_samples",
+          "feature_tuning_editor.validation_requirements.flow_dependent"
+        ],
+        "provenance": [
+          "source_manifest.manifest_id",
+          "source_manifest.sources[].source_id",
+          "source_manifest.sources[].license_or_terms",
+          "accepted_report_set_lock",
+          "rights_provenance"
+        ]
+      },
+      "regenerates": {
+        "fidelity_review_overlays": [
+          {
+            "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/conservation_summary.json",
+            "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/fields.npz",
+            "flow_band": "low_runnable",
+            "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/manifest.json",
+            "overlay_id": "south_fork_cascading_low_runnable_reduced_stitched_validation",
+            "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/probes.json",
+            "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario",
+            "solver_mode": "reduced"
+          },
+          {
+            "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/conservation_summary.json",
+            "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/fields.npz",
+            "flow_band": "low_runnable",
+            "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/manifest.json",
+            "overlay_id": "south_fork_cascading_low_runnable_finite_volume_stitched_validation",
+            "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/probes.json",
+            "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario",
+            "solver_mode": "finite_volume"
+          },
+          {
+            "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/conservation_summary.json",
+            "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/fields.npz",
+            "flow_band": "median_runnable",
+            "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/manifest.json",
+            "overlay_id": "south_fork_cascading_median_runnable_reduced_stitched_validation",
+            "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/probes.json",
+            "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario",
+            "solver_mode": "reduced"
+          },
+          {
+            "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/conservation_summary.json",
+            "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/fields.npz",
+            "flow_band": "median_runnable",
+            "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/manifest.json",
+            "overlay_id": "south_fork_cascading_median_runnable_finite_volume_stitched_validation",
+            "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/probes.json",
+            "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario",
+            "solver_mode": "finite_volume"
+          },
+          {
+            "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/conservation_summary.json",
+            "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/fields.npz",
+            "flow_band": "high_runnable",
+            "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/manifest.json",
+            "overlay_id": "south_fork_cascading_high_runnable_reduced_stitched_validation",
+            "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/probes.json",
+            "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario",
+            "solver_mode": "reduced"
+          },
+          {
+            "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/conservation_summary.json",
+            "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/fields.npz",
+            "flow_band": "high_runnable",
+            "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/manifest.json",
+            "overlay_id": "south_fork_cascading_high_runnable_finite_volume_stitched_validation",
+            "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/probes.json",
+            "scenario_package": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario",
+            "solver_mode": "finite_volume"
+          }
+        ],
+        "geoclaw_cpp_comparison_inputs": [
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario",
+          "physics/regression_fixtures/milestone16/registry.json"
+        ],
+        "solver_packages": [
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario"
+        ]
+      },
+      "source_manifests": [
+        "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json"
+      ],
+      "source_unreal_assets": [
+        "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json",
+        "unreal/Content/RaftSim/River/rapid_river_editor.json",
+        "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+        "unreal/Content/RaftSim/River/reach_local_streaming.json"
+      ],
+      "status": "ready_for_validation_harness"
+    },
+    {
+      "case_id": "south_fork_reach_local_streaming_to_stitched_windows",
+      "description": "Reach-local authoring exports regenerate stitched whole-window validation inputs without using isolated seams for signoff.",
+      "loss_checks": [
+        "source_manifest_path_preserved",
+        "coordinate_reference_systems_preserved",
+        "wgs84_to_local_transform_preserved",
+        "source_ids_and_license_terms_preserved",
+        "flow_band_ids_and_discharge_values_preserved",
+        "feature_flow_response_curve_ids_preserved",
+        "stitched_validation_overlay_ids_preserved"
+      ],
+      "metadata_guards": {
+        "crs": [
+          "source_manifest.coordinate_reference_systems.source",
+          "source_manifest.coordinate_reference_systems.working",
+          "source_manifest.coordinate_reference_systems.solver",
+          "source_manifest.coordinate_reference_systems.unreal",
+          "geospatial_import_pipeline.crs_policy",
+          "geospatial_import_pipeline.transform_policy"
+        ],
+        "flow_response_metadata": [
+          "physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json",
+          "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+          "physics/data/real_world/south_fork_american_chili_bar/rapid_review_flow_difficulty_mapping.json",
+          "feature_tuning_editor.feature_tuning_groups[].flow_response_samples",
+          "feature_tuning_editor.validation_requirements.flow_dependent"
+        ],
+        "provenance": [
+          "source_manifest.manifest_id",
+          "source_manifest.sources[].source_id",
+          "source_manifest.sources[].license_or_terms",
+          "accepted_report_set_lock",
+          "rights_provenance"
+        ]
+      },
+      "regenerates": {
+        "fidelity_review_overlays": [
+          {
+            "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/conservation_summary.json",
+            "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/fields.npz",
+            "flow_band": "low_runnable",
+            "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/manifest.json",
+            "overlay_id": "south_fork_cascading_low_runnable_reduced_stitched_window",
+            "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/probes.json",
+            "solver_mode": "reduced"
+          },
+          {
+            "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/conservation_summary.json",
+            "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/fields.npz",
+            "flow_band": "low_runnable",
+            "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/manifest.json",
+            "overlay_id": "south_fork_cascading_low_runnable_finite_volume_stitched_window",
+            "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/probes.json",
+            "solver_mode": "finite_volume"
+          },
+          {
+            "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/conservation_summary.json",
+            "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/fields.npz",
+            "flow_band": "median_runnable",
+            "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/manifest.json",
+            "overlay_id": "south_fork_cascading_median_runnable_reduced_stitched_window",
+            "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/probes.json",
+            "solver_mode": "reduced"
+          },
+          {
+            "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/conservation_summary.json",
+            "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/fields.npz",
+            "flow_band": "median_runnable",
+            "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/manifest.json",
+            "overlay_id": "south_fork_cascading_median_runnable_finite_volume_stitched_window",
+            "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/probes.json",
+            "solver_mode": "finite_volume"
+          },
+          {
+            "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/conservation_summary.json",
+            "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/fields.npz",
+            "flow_band": "high_runnable",
+            "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/manifest.json",
+            "overlay_id": "south_fork_cascading_high_runnable_reduced_stitched_window",
+            "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/probes.json",
+            "solver_mode": "reduced"
+          },
+          {
+            "conservation_summary": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/conservation_summary.json",
+            "fields": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/fields.npz",
+            "flow_band": "high_runnable",
+            "manifest": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/manifest.json",
+            "overlay_id": "south_fork_cascading_high_runnable_finite_volume_stitched_window",
+            "probes": "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/probes.json",
+            "solver_mode": "finite_volume"
+          }
+        ],
+        "geoclaw_cpp_comparison_inputs": [
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario/stitched_validation/manifest.json",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario/stitched_validation/manifest.json",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario/stitched_validation/manifest.json",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario/stitched_validation/manifest.json",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario/stitched_validation/manifest.json",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario/stitched_validation/manifest.json"
+        ],
+        "solver_packages": [
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/reduced/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_low/finite_volume/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/reduced/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_med/finite_volume/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/reduced/scenario",
+          "physics/regression_fixtures/milestone16/geoclaw_cpp/cg_high/finite_volume/scenario"
+        ]
+      },
+      "source_manifests": [
+        "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json"
+      ],
+      "source_unreal_assets": [
+        "unreal/Content/RaftSim/River/reach_local_streaming.json",
+        "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
+      ],
+      "status": "ready_for_validation_harness"
+    },
+    {
+      "case_id": "colorado_rowing_route_metadata_to_planning_inputs",
+      "description": "Colorado rowing draft export regenerates planning source manifests, flow bands, rowing controls, and validation annotation needs.",
+      "loss_checks": [
+        "source_manifest_path_preserved",
+        "coordinate_reference_systems_preserved",
+        "wgs84_to_local_transform_preserved",
+        "source_ids_and_license_terms_preserved",
+        "flow_band_ids_and_discharge_values_preserved",
+        "feature_flow_response_curve_ids_preserved",
+        "stitched_validation_overlay_ids_preserved"
+      ],
+      "metadata_guards": {
+        "crs": [
+          "source_manifest.coordinate_reference_systems.source",
+          "source_manifest.coordinate_reference_systems.working",
+          "source_manifest.coordinate_reference_systems.solver",
+          "source_manifest.coordinate_reference_systems.unreal",
+          "geospatial_import_pipeline.crs_policy",
+          "geospatial_import_pipeline.transform_policy"
+        ],
+        "flow_response_metadata": [
+          "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json",
+          "colorado_rowing_route.flow_band_policy",
+          "colorado_rowing_route.rowing_frame_controls",
+          "feature_tuning_editor.feature_tuning_groups[].flow_response_samples",
+          "feature_tuning_editor.validation_requirements.flow_dependent"
+        ],
+        "provenance": [
+          "source_manifest.manifest_id",
+          "source_manifest.sources[].source_id",
+          "source_manifest.sources[].license_or_terms",
+          "accepted_report_set_lock",
+          "rights_provenance"
+        ]
+      },
+      "regenerates": {
+        "fidelity_review_overlays": [
+          {
+            "geometry_kind": "river_mile_pin_and_span",
+            "overlay_id": "river_mile_stationing",
+            "required_sources": [
+              "hydrography/river_mile_markers.geojson",
+              "guide_references"
+            ],
+            "review_fields": [
+              "river_mile",
+              "station_m",
+              "rapid_name_if_rights_clear",
+              "confidence"
+            ]
+          },
+          {
+            "geometry_kind": "raft_line",
+            "overlay_id": "large_volume_lines",
+            "required_sources": [
+              "guide_references",
+              "field_media",
+              "gauge_history"
+            ],
+            "review_fields": [
+              "entry_line",
+              "pull_back_row_plan",
+              "ferry_angle",
+              "missed_line_consequence"
+            ]
+          },
+          {
+            "geometry_kind": "polygon_and_span",
+            "overlay_id": "wave_train_lateral_hole_context",
+            "required_sources": [
+              "imagery",
+              "terrain",
+              "guide_references",
+              "flow_presets"
+            ],
+            "review_fields": [
+              "wave_train",
+              "lateral",
+              "hole",
+              "eddy_fence",
+              "flow_band_response"
+            ]
+          },
+          {
+            "geometry_kind": "reach_span",
+            "overlay_id": "rowing_rescue_windows",
+            "required_sources": [
+              "guide_references",
+              "field_media",
+              "flow_presets"
+            ],
+            "review_fields": [
+              "swimmer_drift_path",
+              "eddy_recovery_zone",
+              "throw_line_position",
+              "pull_in_timing"
+            ]
+          },
+          {
+            "geometry_kind": "reach_span",
+            "overlay_id": "canyon_pacing_and_audio",
+            "required_sources": [
+              "terrain",
+              "field_media",
+              "guide_references"
+            ],
+            "review_fields": [
+              "long_pool_pacing",
+              "wind_exposure",
+              "canyon_echo",
+              "large_water_source_audio"
+            ]
+          }
+        ],
+        "geoclaw_cpp_comparison_inputs": [
+          "planned_after_flow_band_and_annotation_review"
+        ],
+        "solver_packages": [
+          "planned_after_geospatial_pull"
+        ]
+      },
+      "source_manifests": [
+        "physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json"
+      ],
+      "source_unreal_assets": [
+        "unreal/Content/RaftSim/River/colorado_rowing_route_editor_pass.json"
+      ],
+      "status": "metadata_round_trip_ready_solver_outputs_planned"
+    }
+  ],
+  "round_trip_targets": [
+    "solver_neutral_scenario_package",
+    "geoclaw_cpp_comparison_inputs",
+    "unreal_fidelity_review_overlays"
+  ],
+  "schema": "raftsim.unreal.river_round_trip_validation.v1",
+  "source_summaries": {
+    "colorado_route_segments": 4,
+    "feature_tuning_groups": 9,
+    "rapid_editor_seed_annotations": 4,
+    "reach_streaming_windows": 6,
+    "south_fork_reviewed_rapids": 4
+  },
+  "source_unreal_assets": [
+    "unreal/Content/RaftSim/River/rapid_river_editor.json",
+    "unreal/Content/RaftSim/River/geospatial_import_pipeline.json",
+    "unreal/Content/RaftSim/River/reach_local_streaming.json",
+    "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+    "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json",
+    "unreal/Content/RaftSim/River/colorado_rowing_route_editor_pass.json",
+    "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
+  ],
+  "status": "ready_for_round_trip_validation_harness",
+  "validation_id": "milestone21_unreal_river_data_round_trip_validation"
+}
