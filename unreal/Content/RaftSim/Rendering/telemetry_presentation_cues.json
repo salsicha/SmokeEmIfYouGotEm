@@ -1,0 +1,167 @@
+{
+  "schema": "raftsim.unreal.telemetry_presentation_cues.v1",
+  "module": "RaftSimAudio",
+  "blueprint_function": "URaftSimTelemetryPresentationCueLibrary::BuildPresentationCues",
+  "purpose": "Map authoritative solver, contact, paddle, weather, and rescue telemetry to readable visual and spatial-audio cues for the first-person vertical slice.",
+  "source_policy": "Presentation is driven by runtime telemetry only; cue amplification is bounded and cannot feed back into water, raft, crew, scoring, or validation authority.",
+  "authoritative_inputs": [
+    "water_depth_m",
+    "flow_speed_mps",
+    "froude_number",
+    "aeration",
+    "turbulence",
+    "surface_shear",
+    "wetness",
+    "raft_contact_impulse",
+    "rock_scrape_strength",
+    "paddle_catch_strength",
+    "paddle_blade_depth",
+    "weather_wetness",
+    "canyon_enclosure",
+    "reverb_zone_strength",
+    "occlusion_strength",
+    "hazard_proximity",
+    "boat_submersion",
+    "swimmer_urgency",
+    "swimmer_visibility",
+    "rescue_interaction"
+  ],
+  "visual_cues": [
+    {
+      "cue_id": "water_readability",
+      "outputs": ["WaterReadability", "SurfaceStreakAmount", "HazardContrast", "DebugContrast"],
+      "target_systems": ["water_material_parameter_collection", "solver_debug_overlay", "guide_seat_readability_pass"],
+      "design_role": "Make tongues, eddy lines, shallows, and hazard approach vectors legible without replacing the solver state."
+    },
+    {
+      "cue_id": "foam_and_aeration",
+      "outputs": ["FoamAmount", "AeratedWaterAmount"],
+      "target_systems": ["water_material", "niagara_foam_bursts", "fidelity_review_overlay"],
+      "design_role": "Reveal hydraulic intensity, wave crests, hole shoulders, and surf/flush regions from aeration and turbulence telemetry."
+    },
+    {
+      "cue_id": "spray_and_weather",
+      "outputs": ["SprayAmount", "WeatherCue"],
+      "target_systems": ["niagara_spray_mist", "rain_droplets", "camera_water_droplets"],
+      "design_role": "Layer near-field spray, mist, and rain while preserving downstream visibility from the stern guide seat."
+    },
+    {
+      "cue_id": "wet_rocks_and_banks",
+      "outputs": ["WetRockAmount"],
+      "target_systems": ["substrate_wet_rock_materials", "bank_wetness_masks", "photoreal_stack"],
+      "design_role": "Tie wet rock/bank highlights to solver wetness, spray, and weather instead of static decoration."
+    },
+    {
+      "cue_id": "raft_contact_feedback",
+      "outputs": ["RaftContactCue"],
+      "target_systems": ["tube_deformation_material", "haptics", "audio_raft_contact_near_field"],
+      "design_role": "Expose rock, bank, ledge, bed, and pin contact intensity as visible, audible, and tactile feedback."
+    },
+    {
+      "cue_id": "paddle_feedback",
+      "outputs": ["PaddleCue"],
+      "target_systems": ["paddle_splash_niagara", "blade_wetness_material", "haptics", "audio_paddle_point_source"],
+      "design_role": "Make catch, slip, and blade-depth timing readable for guided paddle commands and rowing controls."
+    },
+    {
+      "cue_id": "rescue_feedback",
+      "outputs": ["RescueCue"],
+      "target_systems": ["swimmer_visibility_highlight", "throw_line_prompt", "pull_in_progress", "audio_rescue_callout"],
+      "design_role": "Surface swimmer urgency, visibility, and rescue interaction without turning rescue into non-diegetic clutter."
+    }
+  ],
+  "spatial_audio_cues": [
+    {
+      "cue_id": "river_bed",
+      "output": "RiverBed",
+      "preset_id": "river_line_area_water",
+      "target_bus": "river_bed"
+    },
+    {
+      "cue_id": "large_rapid",
+      "output": "LargeRapid",
+      "preset_id": "large_rapid_feature",
+      "target_bus": "rapid_features"
+    },
+    {
+      "cue_id": "near_water_detail",
+      "output": "NearWaterDetail",
+      "preset_id": "underwater_near_water",
+      "target_bus": "water_detail"
+    },
+    {
+      "cue_id": "raft_contact",
+      "output": "RaftContact",
+      "preset_id": "raft_contact_near_field",
+      "target_bus": "raft_contacts"
+    },
+    {
+      "cue_id": "paddle",
+      "output": "Paddle",
+      "preset_id": "point_source_close_detail",
+      "target_bus": "paddles"
+    },
+    {
+      "cue_id": "weather",
+      "output": "Weather",
+      "preset_id": "ambisonic_canyon_weather_bed",
+      "target_bus": "weather"
+    },
+    {
+      "cue_id": "ambisonic_ambience",
+      "output": "AmbisonicBed",
+      "preset_id": "ambisonic_canyon_weather_bed",
+      "target_bus": "ambience"
+    },
+    {
+      "cue_id": "reverb_and_occlusion",
+      "outputs": ["ReverbSend", "OcclusionAmount"],
+      "preset_id": "occluded_bank_or_rock",
+      "target_bus": "reverb_returns"
+    },
+    {
+      "cue_id": "rescue_callout",
+      "output": "RescueCallout",
+      "preset_id": "crew_voice_seat",
+      "target_bus": "crew_voice"
+    }
+  ],
+  "tuning_limits": {
+    "all_outputs_range": [0.0, 1.0],
+    "may_boost_readability": true,
+    "max_visual_amplification_before_review": 1.35,
+    "max_audio_gain_boost_db_before_review": 3.0,
+    "must_record_overrides_in_manifest": true,
+    "must_not_hide_conservation_or_contact_failures": true,
+    "debug_overlay_required_for_review": true
+  },
+  "debug_and_validation": {
+    "required_debug_views": [
+      "solver_depth_velocity",
+      "aeration_turbulence",
+      "foam_spray_outputs",
+      "contact_impulse",
+      "paddle_catch",
+      "spatial_audio_emitters",
+      "reverb_occlusion",
+      "rescue_state"
+    ],
+    "review_outputs": [
+      "fidelity_review_overlay",
+      "telemetry_replay_review",
+      "guide_seat_readability_capture",
+      "audio_spatialization_debug_capture"
+    ]
+  },
+  "pass_policy": {
+    "all_cues_driven_by_telemetry": true,
+    "water_visuals_include_foam_spray_wet_rocks": true,
+    "raft_contact_and_paddle_cues_present": true,
+    "weather_cues_present": true,
+    "spatial_audio_includes_3d_ambisonic_reverb_occlusion": true,
+    "rescue_cues_present": true,
+    "cue_outputs_are_bounded": true,
+    "presentation_does_not_feed_back_into_authority": true
+  },
+  "status": "ready_for_unreal_material_niagara_metasound_binding"
+}

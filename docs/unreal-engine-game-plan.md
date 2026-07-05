@@ -230,6 +230,7 @@ Tasks:
 - Add river, section, season, flow, difficulty, and raft/crew selection backed by validated data assets.
 - Add manifest-approved free/open, first-party generated, procedural, and AI-generated audio for the vertical slice: water beds, rapid features, raft/paddle/rock Foley, guide commands, crew acknowledgments, UI, weather, and fail/safety states.
 - Add manifest-approved 3D audio configuration for the vertical slice: attenuation/spatialization presets, ambisonic beds, reverb/occlusion zones, large rapid spread, crew/voice positions, and VR/headphone validation.
+- Drive readable water visuals, foam, spray, wet rocks, raft contact cues, paddle cues, weather, 3D spatial audio, ambisonic ambience, reverb/occlusion, and rescue cues from bounded solver/runtime telemetry via `unreal/Content/RaftSim/Rendering/telemetry_presentation_cues.json` and `URaftSimTelemetryPresentationCueLibrary::BuildPresentationCues`.
 
 Deliverable:
 
@@ -344,6 +345,7 @@ Use Unreal data assets for game-facing tuning while keeping source-of-truth expo
 - Audio source manifests, library/vendor records, license terms, attribution requirements, AI generation provenance, approval status, UCS metadata, loop points, loudness targets, and runtime mix categories
 - 3D audio presets for point sources, line/area water sources, large rapids, ambisonic ambience, binaural/HRTF playback, panning/surround playback, reverb/occlusion zones, underwater/near-water states, and spatial voice chat
 - Interactive audio parameter maps for flow speed, depth, turbulence, aeration, raft impact, paddle catch, rock scrape, weather, canyon geometry, camera perspective, and VR comfort mode
+- Telemetry presentation cue maps for readable water visuals, foam, spray, wet rocks, raft contacts, paddle cues, weather, 3D audio, ambisonic beds, reverb/occlusion, and rescue feedback
 - Scoring rules
 - Camera/comfort profiles
 - Platform scalability profiles
@@ -363,6 +365,7 @@ Replay data should include:
 - Crew conversation state, generated/selected line id, passenger speaker, and gameplay event trigger
 - Crew safety state, ejection trigger, swimmer world position, rescue target, rescue method, time in water, pull-in/re-seat result, failed-rescue reason, fatigue, trust delta, and safety score impact
 - Audio event id, source asset id, mix state, runtime parameters, attenuation/spatialization preset, occlusion/reverb state, ambisonic bed state, voice count, streaming/decompression/spatialization cost, and source-manifest approval state
+- Presentation cue frame: water readability, foam, spray, wet rock, contact, paddle, weather, rescue, ambisonic, reverb, and occlusion outputs with any authored override manifest id
 - Force contributions
 - Contact points
 - River sample values
