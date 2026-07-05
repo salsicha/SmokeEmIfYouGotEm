@@ -25,7 +25,7 @@ FRaftSimGuideCommand URaftSimGuideCommandParser::ParseTranscript(
     Command.SourcePhrase = Transcript;
     Command.Confidence = RecognitionConfidence;
 
-    if (ContainsAny(Lower, {TEXT("forward"), TEXT("all forward"), TEXT("paddle forward")}))
+    if (ContainsAny(Lower, {TEXT("forward"), TEXT("forward paddle"), TEXT("all forward"), TEXT("paddle forward")}))
     {
         Command.Intent = ERaftSimGuideCommandIntent::ForwardPaddle;
     }

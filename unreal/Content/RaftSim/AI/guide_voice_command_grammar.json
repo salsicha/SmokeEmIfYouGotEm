@@ -2,10 +2,16 @@
   "schema": "raftsim.unreal.guide_voice_command_grammar.v1",
   "parser": "URaftSimGuideCommandParser",
   "deterministic_execution": true,
+  "enabled_gameplay_modes": [
+    "guided_passenger_paddle_raft"
+  ],
+  "disabled_gameplay_modes": [
+    "rowing_oar_rig"
+  ],
   "commands": [
     {
       "intent": "ForwardPaddle",
-      "phrases": ["forward", "all forward", "paddle forward"],
+      "phrases": ["forward", "forward paddle", "all forward", "paddle forward"],
       "crew_intent": "crew_forward_paddle"
     },
     {

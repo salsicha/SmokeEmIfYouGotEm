@@ -68,7 +68,7 @@ Jolt is the leading specialized candidate for a portable authoritative raft/cont
 - VR and flat-screen support from the start of Unreal production.
 - Single raft, single-player guide role as the first production target.
 - Scripted or AI-assisted passenger crew responding to guide commands.
-- Local AI voice interaction so the guide can speak paddle, brace, high-side, rescue, and recovery commands.
+- Local AI voice interaction in guided passenger paddle-raft modes so the guide can speak paddle, brace, high-side, rescue, and recovery commands; rowing/oar-rig routes use direct manual controls instead.
 - Crew members can talk, acknowledge commands, react to hazards, and hold conversations shaped by passenger persona, trust, fear, fatigue, skill, weather, river history, and recent run events.
 - Crew safety has explicit gameplay states: seated, at-risk, falling/ejected, swimming, rescue-targeted, rescued, re-seated/recovered, and lost/failed-rescue for scoring and training.
 - Passenger swimming ability is assigned per run or roster entry, from strong swimmer through weak swimmer to completely unable to swim; this affects panic, self-rescue, drift risk, throw-line urgency, pull-in difficulty, and safety scoring after ejection.
@@ -92,7 +92,7 @@ Jolt is the leading specialized candidate for a portable authoritative raft/cont
 - Co-op crew.
 - Leaderboards and challenge ghosts.
 - Scenario packs based on different river types.
-- Second real-world route target: rowing the Colorado River with an oar rig/rowing frame after the South Fork American paddle-raft baseline is proven.
+- Second real-world route target: rowing the Colorado River with an oar rig/rowing frame, direct manual rowing controls, and no passenger paddle voice commands after the South Fork American paddle-raft baseline is proven.
 - Third runnable route target: the Pacuare River in Costa Rica, adding tropical rainforest whitewater, rain-fed flow variability, gorge pacing, and international source/provenance needs after the Colorado rowing target.
 
 ## Roadmap Milestone Mapping
@@ -145,7 +145,7 @@ Tasks:
 - Build a small visual prototype with placeholder physics replay data, not gameplay physics.
 - Establish asset scale, coordinate conventions, units, and import/export rules.
 - Define geospatial import rules: coordinate reference systems, WGS84/local transforms, JSON source manifests, GeoJSON/GeoPackage vector imports, GeoTIFF/COG terrain and mask imports, LAS/LAZ/COPC point-cloud handling where needed, terrain tile sizes, imagery masks, river corridor bounds, and confidence metadata.
-- Evaluate local/offline AI runtime options for target platforms: speech-to-text, constrained command parsing, crew dialogue generation/selection, optional local speech synthesis, latency, memory, CPU/GPU cost, licensing, privacy, and console feasibility.
+- Evaluate local/offline AI runtime options for target platforms: lightweight and accurate speech-to-text, constrained command parsing, crew dialogue generation/selection, optional local speech synthesis, latency, memory, CPU/GPU cost, licensing, privacy, and console feasibility.
 - Build the development asset source plan: free/open art and sound sources, AI-generation provenance, license requirements, attribution rules, AI-audio policy, asset manifest, LFS/storage policy, and Unreal import conventions; keep paid-vendor research for release-readiness only.
 - Start with Unreal-native audio and MetaSounds for interactive water/raft/crew sound; evaluate Wwise/FMOD only if the native toolchain cannot meet authoring, mixing, localization, memory, or platform needs.
 - Define the 3D audio stack: Sound Attenuation presets, spatialization modes, binaural/HRTF path for VR/headphones, panning/surround path for speakers, ambisonic bed format, reverb/occlusion strategy, voice-chat spatialization, and platform QA targets.
@@ -179,15 +179,16 @@ Tasks:
 - Add visible hands, paddle, guide seat position, raft bow, tubes, and passenger silhouettes.
 - Implement Enhanced Input actions for keyboard/mouse, gamepad, and VR controllers.
 - Add first paddle interaction model connected to physics runtime.
-- Add guide voice/command inputs for passenger crew using local speech recognition where available.
+- Add guide voice/command inputs for passenger crew in guided paddle-raft mode using lightweight local speech recognition where available; keep rowing/oar-rig mode manual-only.
 - Map recognized speech into deterministic command intents: forward paddle, back paddle, left/right paddle, stop, hold on, brace, high side, rescue, swimmer callout, and recovery commands.
 - Reserve input/actions for swimmer spotting, rescue target selection, throw-line or reach/pull-in attempts, and re-seat/recovery confirmation.
 - Add confidence thresholds, command repeat/confirm behavior for ambiguous recognition, subtitles, accessibility fallbacks, and manual input parity.
+- Set hard budgets for command-model memory, CPU/GPU cost, latency, false positives, and noisy-river/accent accuracy before choosing the local model.
 - Add noisy-water and VR microphone test scenes for false-positive and latency tuning.
 
 Deliverable:
 
-- Playable first-person raft control in a simple test river with manual and local voice command paths.
+- Playable first-person raft control in a simple guided paddle-raft test river with manual and local voice command paths.
 
 ### Phase 4: River Visualization And Level Pipeline
 
@@ -217,7 +218,7 @@ Tasks:
 
 - Build one training section and one technical rapid.
 - Add passenger command response: forward, back, left, right, hold on, brace.
-- Add local voice-command path for the same passenger responses, with deterministic command execution after intent recognition.
+- Add local voice-command path for the same passenger responses in guided paddle-raft mode, with deterministic command execution after intent recognition; keep rowing/oar-rig mode manual-only.
 - Add crew acknowledgments, missed-command behavior, hesitation, and urgency barks based on command confidence and passenger state.
 - Add safety outcomes and state transitions: fall out/ejection, swim, swimmer drift, rescue target, pull-in, re-seat/recovery, failed rescue, pin, surf, flip, flush.
 - Assign passenger swimming skills at run setup, including non-swimmers who cannot self-rescue and require faster guide/crew intervention.
@@ -225,7 +226,7 @@ Tasks:
 - Add scoring for safety, line, boat angle, paddle efficiency, passenger trust, and completion.
 - Add restart, replay, ghost telemetry, and after-action feedback.
 - Add basic menus and settings.
-- Add microphone, push-to-talk/open-mic, subtitles, command confirmation, voice sensitivity, privacy/offline, and fallback-control settings.
+- Add microphone, push-to-talk/open-mic, subtitles, command confirmation, voice sensitivity, privacy/offline, and fallback-control settings for guided paddle-raft voice commands.
 - Add river, section, season, flow, difficulty, and raft/crew selection backed by validated data assets.
 - Add manifest-approved free/open, first-party generated, procedural, and AI-generated audio for the vertical slice: water beds, rapid features, raft/paddle/rock Foley, guide commands, crew acknowledgments, UI, weather, and fail/safety states.
 - Add manifest-approved 3D audio configuration for the vertical slice: attenuation/spatialization presets, ambisonic beds, reverb/occlusion zones, large rapid spread, crew/voice positions, and VR/headphone validation.
@@ -257,7 +258,7 @@ Tasks:
 - Build additional river biomes.
 - Build additional real-world river sections from source manifests and reviewed rapid annotations.
 - Expand highly detailed, immersive landscape and foliage passes for each river biome so each corridor reads as a real place, not a thin playable channel.
-- Prioritize the Colorado River rowing/oar-rig route as the second real-world river after the South Fork American baseline, with rowing-frame controls, large-volume reading, canyon pacing, and longer rescue/recovery stakes.
+- Prioritize the Colorado River rowing/oar-rig route as the second real-world river after the South Fork American baseline, with direct manual rowing-frame controls, no passenger paddle voice commands, large-volume reading, canyon pacing, and longer rescue/recovery stakes.
 - Make the Pacuare River in Costa Rica the third runnable river target, with a future source manifest, flow bands, rainforest/canyon fidelity needs, rain-fed flow review, and rights-cleared guide annotations before solver or Unreal package generation.
 - Add difficulty progression.
 - Add more raft types and handling profiles.
@@ -419,15 +420,16 @@ The full UE5 version should support local AI integration without making cloud se
 
 Responsibilities:
 
-- Local speech-to-text for guide commands where the platform budget allows.
-- Constrained command intent parsing that maps spoken language to explicit crew commands before gameplay state changes.
+- Lightweight local speech-to-text for guided paddle-raft guide commands where the platform budget allows.
+- Constrained, efficient command intent parsing that maps spoken language to explicit crew commands before gameplay state changes.
 - Passenger conversation generation or selection grounded in authored persona, trust, fear, fatigue, skill, river, season, recent events, and current danger level.
 - Optional local text-to-speech or hybrid recorded/generative voice playback after voice quality, licensing, latency, and platform costs are understood.
 
 Rules:
 
 - Gameplay-critical paddle, brace, high-side, rescue, and recovery commands must remain deterministic after recognition.
-- The player must always have manual input parity for every voice command.
+- The player must always have manual input parity for every voice command in guided paddle-raft modes.
+- Rowing/oar-rig mode does not accept passenger paddle voice commands; it uses direct manual rowing controls.
 - Conversation should never override urgent river audio, command acknowledgments, safety cues, or VR comfort.
 - Replays should capture enough voice/intent/conversation telemetry to explain outcomes without requiring raw microphone audio.
 
@@ -479,9 +481,9 @@ The first Unreal vertical slice is successful when:
 - Which platforms are first-class at alpha.
 - Whether generated rivers become a shipping feature or remain internal content tooling after real-world river sections are proven.
 - How much passenger animation is physical simulation versus animation-driven state.
-- Which local AI runtime powers speech recognition, command intent parsing, crew conversation, and optional speech synthesis per platform.
+- Which lightweight local AI runtime powers accurate speech recognition, command intent parsing, crew conversation, and optional speech synthesis per platform.
 - Whether crew conversation uses generated local dialogue, authored lines, recorded barks, or a hybrid.
-- What voice-command latency, confidence, false-positive, privacy, and replay-capture requirements are acceptable.
+- What voice-command latency, confidence, false-positive, noisy-river/accent accuracy, memory/CPU cost, privacy, and replay-capture requirements are acceptable.
 - Whether free/open and AI-generated art/audio assets are good enough for release, or specific paid/professional libraries should be bought near release.
 - Which AI-generated audio uses are allowed beyond development-only assets, if any.
 - Whether Unreal-native audio/MetaSounds is enough or Wwise/FMOD should be adopted.

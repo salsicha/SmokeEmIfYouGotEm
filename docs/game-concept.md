@@ -21,7 +21,7 @@ Core simulation goals:
 - Physically grounded raft buoyancy, drag, collision response, flex, and passenger weight transfer
 - Water behavior that represents current, eddies, standing waves, hydraulics, holes, pour-overs, and turbulent seams
 - Paddle strokes that produce plausible force and torque based on blade position, angle, depth, and timing
-- Local AI voice interaction so the guide can speak paddle, brace, rescue, and safety commands to the crew
+- Local AI voice interaction in guided passenger paddle-raft modes so the guide can speak paddle, brace, rescue, and safety commands to the crew, while rowing/oar-rig modes stay direct-control only
 - Crew conversation that reacts to river state, trust, fear, fatigue, skill, scenery, weather, and the guide's recent decisions
 - VR presence that makes the player feel seated in the stern, holding a paddle, calling commands, and reacting with their body
 - Fully immersive 3D audio that places rapids, hydraulics, rocks, raft contacts, crew, voice chat, rescue cues, weather, canyon reflections, and shore noise in stable world positions
@@ -131,18 +131,19 @@ Possible guide inputs:
 - Back paddle command
 - Left side paddle
 - Right side paddle
-- Spoken commands through local speech recognition and constrained intent parsing
+- Spoken crew commands through local speech recognition and constrained intent parsing in guided passenger paddle-raft modes
 - Hard left / hard right guide stroke
 - Hold on / brace command
 - Rescue and swimmer commands when a passenger falls out
 - VR paddle grip, blade angle, stroke depth, and pull path
 - Flat-screen analog paddle stroke controls for non-VR play
+- Direct rowing/oar-rig controls for rowing routes, without passenger paddle voice commands
 
 The player should feel like they are commanding a crew rather than directly moving a vehicle through abstract input. The raft can still be responsive, but the response should come through paddle force, water current, and raft momentum.
 
 The first-person view should make inputs feel like physical guide actions. Paddle strokes, command calls, brace warnings, and rescue actions should be readable through the player's hands, paddle, voice, and the crew's response.
 
-Voice commands should be local/offline for privacy, latency, and platform control. Gameplay-critical commands should resolve to explicit deterministic intents before affecting the crew, with confidence thresholds, subtitles, accessibility fallbacks, and manual input parity.
+Voice commands apply to guided passenger paddle-raft modes only: the player can say commands such as `forward paddle`, or issue the same intents through keyboard, mouse, gamepad, or VR controls. Rowing/oar-rig modes do not use voice commands; the player rows directly with the supported manual inputs. The speech recognition and intent model for gameplay commands should be lightweight, efficient, low-latency, and accurate, preferring compact local command recognition and constrained parsing over broad conversational inference. Voice processing should be local/offline for privacy, latency, and platform control. Gameplay-critical commands should resolve to explicit deterministic intents before affecting the crew, with confidence thresholds, subtitles, accessibility fallbacks, and manual input parity.
 
 ## River Systems
 
