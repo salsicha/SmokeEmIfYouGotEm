@@ -19,12 +19,16 @@
     "icons",
     "foliage_rocks_terrain_studies",
     "water_foam_spray_mist_prototypes",
+    "vfx_niagara_particles",
+    "haptic_feedback_curves",
     "sound_effects",
     "ambience",
     "interactive_water_audio",
     "ui_audio",
+    "ui_accessibility_art_and_icons",
     "temporary_dialogue",
-    "spatial_audio_prototypes"
+    "spatial_audio_prototypes",
+    "platform_scalability_test_assets"
   ],
   "allowed_during_development": [
     "cc0_assets",
