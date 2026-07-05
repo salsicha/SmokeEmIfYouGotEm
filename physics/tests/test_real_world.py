@@ -46,10 +46,19 @@ from raftsim.schema_versions import SOURCE_MANIFEST_SCHEMA_VERSION
 def test_candidate_inventory_covers_first_playable_sections_and_priorities():
     sections = default_candidate_river_inventory()
     first = sections[0]
+    third = sections[2]
 
     assert len(sections) >= 5
+    assert [section.river_id for section in sections[:3]] == [
+        "american_south_fork",
+        "colorado_grand_canyon_rowing",
+        "pacuare",
+    ]
     assert first.river_id == "american_south_fork"
     assert first.section_id == "chili_bar_to_coloma"
+    assert third.country == "CR"
+    assert third.section_id == "lower_pacuare_planning_corridor"
+    assert "Third runnable river target" in third.notes
     assert {"3dep_lidar_dem", "3dhp_nhd_flowlines", "naip_imagery", "nwis_gauge_11445500"}.issubset(
         set(first.data_priorities)
     )
@@ -59,7 +68,9 @@ def test_candidate_river_inventory_package_links_primary_source_manifest():
     inventory = build_candidate_river_inventory_package()
     data = inventory.to_json_dict()
     primary_link = data["section_source_manifests"][0]
-    planned_links = data["section_source_manifests"][1:]
+    colorado_link = data["section_source_manifests"][1]
+    pacuare_link = data["section_source_manifests"][2]
+    planned_links = data["section_source_manifests"][2:]
 
     assert data["schema_version"] == CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION
     assert data["inventory_id"] == "raftsim.real_world_candidate_river_inventory.v0"
@@ -71,6 +82,10 @@ def test_candidate_river_inventory_package_links_primary_source_manifest():
     }
     assert primary_link["source_manifest_status"] == "drafted"
     assert primary_link["source_manifest_path"] == "south_fork_american_chili_bar/source_manifest.json"
+    assert colorado_link["source_manifest_status"] == "drafted"
+    assert colorado_link["source_manifest_path"] == "colorado_river_grand_canyon_rowing/source_manifest.json"
+    assert pacuare_link["source_manifest_status"] == "planned"
+    assert pacuare_link["source_manifest_path"] is None
     assert all(link["source_manifest_status"] == "planned" for link in planned_links)
     assert any("seasonal flow bands" in criterion for criterion in data["selection_criteria"])
 

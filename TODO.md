@@ -888,6 +888,7 @@ This milestone expands beyond the vertical slice while preserving the validated 
 
 - [ ] Expand the South Fork American content set with additional linked rapids, scouting/eddy/recovery-pool flow, seasonal flow variants, difficulty presets, and guide-reviewed fidelity notes.
 - [ ] Prototype the Colorado River rowing/oar-rig route as the second real-world river style with rowing-frame controls, large-volume water reading, canyon pacing, longer rescue windows, and guide-review annotations.
+- [ ] Draft the Pacuare River in Costa Rica as the third runnable river target with source manifest, rain-fed flow bands, rainforest/gorge fidelity needs, hydrology/gauge-source review, protected-area/source-rights review, and rights-cleared guide/field-media annotations.
 - [ ] Add more raft types, handling profiles, passenger archetypes, crew trust/fear/fatigue/skill progression, training lessons, challenge variants, and generated-rapid experiments where validation support exists.
 - [ ] Expand local AI crew conversations and barks for calm water, eddies, scouting, recovery pools, swims, rescues, and debriefs while keeping rapid commands and safety cues deterministic and prioritized.
 - [ ] Evaluate networked human crew multiplayer only after the single-player guide loop, raft/contact authority, local voice commands, rescue loop, and replay/debug tools remain stable.
@@ -959,7 +960,8 @@ This milestone turns the alpha game into a shippable Unreal build.
 - [x] Add import/export validation checks that reject missing CRS metadata, lossy Shapefile-only canonical inputs, missing source manifests, and untracked WGS84/local transform changes.
 - [x] Draft the first candidate river inventory and source manifest.
 - [x] Prototype course/elevation extraction for one river section.
-- [ ] Draft the Colorado River rowing/oar-rig route as the second real-world river target after the South Fork American baseline, including source manifest, flow bands, rowing-frame controls, guide review, and validation annotation needs.
+- [x] Draft the Colorado River rowing/oar-rig route as the second real-world river target after the South Fork American baseline, including source manifest, flow bands, rowing-frame controls, guide review, and validation annotation needs.
+- [ ] Draft the Pacuare River in Costa Rica as the third runnable river target after Colorado, including source manifest, rain-fed flow bands, hydrology/gauge-source review, protected-area/source-rights review, and rights-cleared guide/field-media annotations.
 - [x] Define the first rapid-review labels and seasonal flow/difficulty parameter mapping.
 - [x] Set up the shared Chaos/Jolt runtime evaluation fixture contract for raft-rock impacts, shelf grounding, pin/release, crew ejection/swimming, determinism, and crowded runtime cost.
 - [x] Build the Milestone 18 GeoClaw/C++ failure triage matrix from the current threshold, geometry, raft-coupling, and full-gate reports.
