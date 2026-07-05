@@ -1,0 +1,198 @@
+{
+  "artifacts": {
+    "elevation": [
+      "terrain/dem_source_research.json",
+      "terrain/rainforest_gorge_corridor_dem.tif"
+    ],
+    "field_media": [
+      "field_media/rights_cleared_reference_index.json"
+    ],
+    "gauges_and_rainfall": [
+      "hydrology/costa_rica_gauge_search.json",
+      "hydrology/rainfall_context.json",
+      "flow_presets.json"
+    ],
+    "guide_references": [
+      "review/guide_review_needs.json",
+      "review/field_media_annotation_needs.geojson"
+    ],
+    "hydrography": [
+      "hydrography/centerline.geojson",
+      "hydrography/banks.geojson",
+      "hydrography/tributary_context.geojson"
+    ],
+    "imagery": [
+      "imagery/aerial_source_research.json",
+      "imagery/canopy_and_water_masks.tif"
+    ],
+    "protected_area_review": [
+      "review/sinac_protected_area_source_rights.json",
+      "review/access_and_conservation_constraints.json"
+    ],
+    "unreal": [
+      "unreal/pacuare_river_third_target_editor_pass.json"
+    ],
+    "validation": [
+      "validation/annotation_needs.json",
+      "validation/rainfed_flow_review_plan.json"
+    ]
+  },
+  "bounds_wgs84": {
+    "max_lat": 10.12,
+    "max_lon": -83.42,
+    "min_lat": 9.72,
+    "min_lon": -83.75,
+    "status": "draft_planning_bounds_needs_local_crs_and_access_review"
+  },
+  "confidence": {
+    "field_media": 0.0,
+    "guide_review": 0.05,
+    "hydrography": 0.1,
+    "hydrology": 0.05,
+    "imagery": 0.05,
+    "overall": 0.08,
+    "protected_area_rights": 0.05,
+    "terrain": 0.08
+  },
+  "coordinate_reference_systems": {
+    "solver": "local meters derived from reviewed Costa Rica working CRS",
+    "source": "EPSG:4326",
+    "unreal": "georeferenced rainforest gorge corridor transform derived from source CRS",
+    "working": "Costa Rica projected CRS to be selected during geospatial source review"
+  },
+  "manifest_id": "pacuare.lower_pacuare_planning_corridor.source_manifest.v0",
+  "provenance": {
+    "generated_by": "raftsim.milestone24.draft_pacuare_third_target",
+    "processing_version": "milestone24_pacuare_planning_draft.v0",
+    "redistribution_notes": "Do not vendor third-party guidebook text, aerial imagery, protected-area content, or field media without explicit rights and attribution records.",
+    "review_status": "draft_target_needs_costa_rica_hydrology_geospatial_protected_area_and_guide_review"
+  },
+  "remote_fetches": [
+    {
+      "category": "hydrography",
+      "fetch_id": "pacuare_osm_hydrography_access",
+      "notes": "Use only as planning seed data until reviewed against authoritative Costa Rica hydrography and access sources.",
+      "source_id": "osm",
+      "status": "planned",
+      "target_artifact": "hydrography/osm_pacuare_access_hydrography.geojson",
+      "url": "https://overpass-api.de/api/interpreter"
+    },
+    {
+      "category": "gauge",
+      "fetch_id": "pacuare_costa_rica_hydrology_gauge_search",
+      "notes": "Identify authoritative Costa Rica discharge, stage, rainfall, and basin products before numeric flow bands are allowed.",
+      "source_id": "costa_rica_hydrology_gauge_search",
+      "status": "source_research_required",
+      "target_artifact": "hydrology/costa_rica_gauge_search.json",
+      "url": "source_research_required"
+    },
+    {
+      "category": "rainfall",
+      "fetch_id": "pacuare_rainfall_context",
+      "notes": "Rain-fed route behavior needs storm timing, antecedent rainfall, flash-rise context, and guide review before solver generation.",
+      "source_id": "rainfall_context_review",
+      "status": "source_research_required",
+      "target_artifact": "hydrology/rainfall_context.json",
+      "url": "source_research_required"
+    },
+    {
+      "category": "protected_area",
+      "fetch_id": "pacuare_sinac_protected_area_review",
+      "notes": "Review protected-area, access, conservation, and source-rights constraints before publishing detailed corridor packages.",
+      "source_id": "sinac_protected_area_review",
+      "status": "source_research_required",
+      "target_artifact": "review/sinac_protected_area_source_rights.json",
+      "url": "source_research_required"
+    },
+    {
+      "category": "field_media",
+      "fetch_id": "pacuare_rights_cleared_field_media_index",
+      "notes": "Record only media we can legally use, with creator, date, flow context, timecode, and redistribution terms.",
+      "source_id": "rights_cleared_field_media",
+      "status": "rights_review_required",
+      "target_artifact": "field_media/rights_cleared_reference_index.json",
+      "url": "manifest_only_until_rights_clear"
+    }
+  ],
+  "river_id": "pacuare",
+  "route_style": "guided_paddle_raft",
+  "schema_version": "raftsim.source_manifest.v0",
+  "section_id": "lower_pacuare_planning_corridor",
+  "section_name": "Lower Pacuare Planning Corridor",
+  "sources": [
+    {
+      "category": "elevation",
+      "license_or_terms": "Confirm product-specific use and attribution before corridor generation.",
+      "provider": "dem_source_research",
+      "source_id": "dem_source_research",
+      "status": "planned",
+      "title": "Costa Rica DEM and gorge terrain source research",
+      "url": "source_research_required",
+      "use_in_pipeline": [
+        "terrain_dem",
+        "gorge_walls",
+        "gradient",
+        "bank_shelves"
+      ]
+    },
+    {
+      "category": "hydrography",
+      "license_or_terms": "OpenStreetMap data has ODbL obligations; use as planning seed unless the production source-rights plan accepts it.",
+      "provider": "OpenStreetMap contributors",
+      "source_id": "osm_pacuare_seed",
+      "status": "planned_seed_only",
+      "title": "OpenStreetMap Pacuare hydrography and access context",
+      "url": "https://www.openstreetmap.org/",
+      "use_in_pipeline": [
+        "centerline_seed",
+        "access_seed",
+        "bridge_and_road_context"
+      ]
+    },
+    {
+      "category": "hydrology",
+      "license_or_terms": "To be recorded from the authoritative Costa Rica provider before use.",
+      "provider": "costa_rica_hydrology_source_review",
+      "source_id": "costa_rica_hydrology_gauge_search",
+      "status": "source_research_required",
+      "title": "Pacuare basin discharge, stage, rainfall, and transfer-function review",
+      "url": "source_research_required",
+      "use_in_pipeline": [
+        "rain_fed_flow_bands",
+        "storm_response",
+        "flash_rise_review",
+        "hydrograph_validation"
+      ]
+    },
+    {
+      "category": "protected_area",
+      "license_or_terms": "Record access, conservation, attribution, and redistribution constraints before packaging.",
+      "provider": "SINAC/MINAE source-rights review",
+      "source_id": "sinac_protected_area_review",
+      "status": "source_research_required",
+      "title": "Protected-area, conservation, and access review",
+      "url": "source_research_required",
+      "use_in_pipeline": [
+        "access_constraints",
+        "conservation_context",
+        "source_rights_review",
+        "environmental_fidelity_limits"
+      ]
+    },
+    {
+      "category": "guide_reference",
+      "license_or_terms": "Do not vendor guidebook text, third-party imagery, or field media without explicit rights.",
+      "provider": "human_review",
+      "source_id": "rights_cleared_guide_and_field_media_review",
+      "status": "planned",
+      "title": "Rights-cleared Pacuare guide review and field-media annotations",
+      "url": "manifest_only_until_rights_clear",
+      "use_in_pipeline": [
+        "rapid_annotations",
+        "rain_fed_behavior_review",
+        "rescue_context",
+        "rainforest_gorge_fidelity"
+      ]
+    }
+  ]
+}

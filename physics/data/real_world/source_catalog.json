@@ -129,6 +129,38 @@
       ]
     },
     {
+      "access_notes": "Use for non-U.S. river basins when no vetted in-repo provider contract exists yet; replace with the authoritative provider and terms before numeric flow bands are promoted.",
+      "attribution": "Record the authoritative Costa Rica provider, retrieval date, station/basin identifiers, and service terms once selected.",
+      "category": "hydrology",
+      "license_or_terms": "Source-specific terms must be reviewed before data is stored or redistributed.",
+      "provider": "Costa Rica hydrology source review",
+      "source_id": "costa_rica_hydrology_gauge_search",
+      "title": "Costa Rica discharge, stage, rainfall, and basin source review",
+      "url": "source_research_required",
+      "use_in_pipeline": [
+        "rain_fed_flow_bands",
+        "rainfall_context",
+        "flash_rise_review",
+        "gauge_history"
+      ]
+    },
+    {
+      "access_notes": "Use for Pacuare access, conservation, protected-area, and source-rights constraints before producing public corridor packages.",
+      "attribution": "Record the responsible Costa Rica protected-area/source authority and required attribution once reviewed.",
+      "category": "protected_area",
+      "license_or_terms": "Source-specific access, conservation, attribution, and redistribution terms must be reviewed before content promotion.",
+      "provider": "SINAC/MINAE source-rights review",
+      "source_id": "sinac_protected_area_review",
+      "title": "Costa Rica protected-area and access source-rights review",
+      "url": "source_research_required",
+      "use_in_pipeline": [
+        "access_constraints",
+        "conservation_context",
+        "source_rights_review",
+        "sensitive_location_redaction"
+      ]
+    },
+    {
       "access_notes": "Use for named rapids, hazards, portages, access, commercial season, and difficulty calibration.",
       "attribution": "Credit reference title/author/URL where licenses allow; keep internal notes separate from redistributable assets.",
       "category": "guide_reference",

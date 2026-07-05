@@ -13,7 +13,7 @@
   "provenance": {
     "generated_by": "raftsim.real_world.build_candidate_river_inventory_package",
     "processing_version": "milestone_17_inventory_seed.v0",
-    "review_status": "draft_inventory_with_two_drafted_source_manifests_and_pacuare_planned_third"
+    "review_status": "draft_inventory_with_three_drafted_source_manifests_and_pacuare_review_gated_third"
   },
   "schema_version": "raftsim.candidate_river_inventory.v0",
   "section_count": 8,
@@ -35,12 +35,12 @@
       "source_manifest_status": "drafted"
     },
     {
-      "required_before_generation": "Draft a source manifest before generating solver or Unreal packages.",
+      "required_before_generation": "Use the Milestone 24 Pacuare draft source manifest before any future solver or Unreal packages, then replace every placeholder with reviewed Costa Rica hydrology, protected-area, and rights-cleared guide data.",
       "river_id": "pacuare",
       "section_id": "lower_pacuare_planning_corridor",
-      "source_manifest_id": null,
-      "source_manifest_path": null,
-      "source_manifest_status": "planned"
+      "source_manifest_id": "pacuare.lower_pacuare_planning_corridor.source_manifest.v0",
+      "source_manifest_path": "pacuare_river_costa_rica/source_manifest.json",
+      "source_manifest_status": "drafted"
     },
     {
       "required_before_generation": "Draft a source manifest before generating solver or Unreal packages.",

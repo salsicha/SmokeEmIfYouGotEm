@@ -93,7 +93,7 @@ Jolt is the leading specialized candidate for a portable authoritative raft/cont
 - Leaderboards and challenge ghosts.
 - Scenario packs based on different river types.
 - Second real-world route target: rowing the Colorado River with an oar rig/rowing frame, direct manual rowing controls, and no passenger paddle voice commands after the South Fork American paddle-raft baseline is proven.
-- Third runnable route target: the Pacuare River in Costa Rica, adding tropical rainforest whitewater, rain-fed flow variability, gorge pacing, and international source/provenance needs after the Colorado rowing target.
+- Third runnable route target: the Pacuare River in Costa Rica, adding tropical rainforest whitewater, rain-fed flow variability, gorge pacing, and international source/provenance needs after the Colorado rowing target; its first draft target contract is `unreal/Content/RaftSim/River/pacuare_river_third_target_editor_pass.json`.
 
 ## Roadmap Milestone Mapping
 
@@ -265,7 +265,7 @@ Tasks:
 - Expand highly detailed, immersive landscape and foliage passes for each river biome so each corridor reads as a real place, not a thin playable channel.
 - Prioritize the Colorado River rowing/oar-rig route as the second real-world river after the South Fork American baseline, with direct manual rowing-frame controls, no passenger paddle voice commands, large-volume reading, canyon pacing, and longer rescue/recovery stakes.
 - Use `unreal/Content/RaftSim/River/colorado_rowing_route_editor_pass.json` as the first Colorado rowing prototype contract: it keeps all flow bands review-gated, exposes large-volume reading cues and canyon pacing checkpoints, records longer rescue windows, and requires guide-review annotations before any route is promoted to production-playable.
-- Make the Pacuare River in Costa Rica the third runnable river target, with a future source manifest, flow bands, rainforest/canyon fidelity needs, rain-fed flow review, and rights-cleared guide annotations before solver or Unreal package generation.
+- Make the Pacuare River in Costa Rica the third runnable river target with `unreal/Content/RaftSim/River/pacuare_river_third_target_editor_pass.json`, a draft source manifest, relative rain-fed flow bands, rainforest/gorge fidelity needs, hydrology/gauge-source review, protected-area/source-rights review, and rights-cleared guide annotations before solver or Unreal package generation.
 - Add difficulty progression.
 - Add more raft types and handling profiles.
 - Add passenger archetypes and crew trust progression.

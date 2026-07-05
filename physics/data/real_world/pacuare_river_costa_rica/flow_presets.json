@@ -1,0 +1,56 @@
+{
+  "flow_band_policy": {
+    "must_replace_placeholders": true,
+    "numeric_discharge_values_allowed": false,
+    "requires_antecedent_rainfall_context": true,
+    "requires_flash_rise_review": true,
+    "requires_hydrology_gauge_source_review": true,
+    "requires_rights_cleared_guide_review": true
+  },
+  "flow_bands": [
+    {
+      "display_name": "Clear Season Low Planning",
+      "expected_gameplay_behavior": "More exposed rocks, narrower tongues, slower swims, and greater need for precise low-water paddle timing.",
+      "flow_band": "clear_season_low_planning",
+      "relative_flow": "low",
+      "review_priority": "high",
+      "runnable": "planning_only"
+    },
+    {
+      "display_name": "Rain-Fed Runnable Planning",
+      "expected_gameplay_behavior": "Default Pacuare planning band with pushy tongues, active wave trains, bank vegetation pressure, and guide-command rhythm changes after showers.",
+      "flow_band": "rainfed_runnable_planning",
+      "relative_flow": "medium",
+      "review_priority": "high",
+      "runnable": "planning_only"
+    },
+    {
+      "display_name": "Rainy Season High Planning",
+      "expected_gameplay_behavior": "Faster reaction windows, stronger laterals, fewer eddies, higher swimmer drift speed, and more conservative scout/rescue decisions.",
+      "flow_band": "rainy_season_high_planning",
+      "relative_flow": "high",
+      "review_priority": "high",
+      "runnable": "review_only"
+    },
+    {
+      "display_name": "Flash Response Review Only",
+      "expected_gameplay_behavior": "Not playable until hydrology and guide review define safe game boundaries; reserved for visual, audio, and hazard-behavior study.",
+      "flow_band": "flash_response_review_only",
+      "relative_flow": "rapid_rise",
+      "review_priority": "critical",
+      "runnable": "blocked_until_review"
+    }
+  ],
+  "hydrology_review_needs": [
+    "authoritative_gauge_or_stage_history",
+    "rainfall_event_history",
+    "guide_reviewed_runnable_ranges",
+    "rapid_rise_and_falling_limb_context",
+    "seasonal_access_and_trip_operator_context"
+  ],
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare_flow_presets.v0",
+  "section_id": "lower_pacuare_planning_corridor",
+  "source_manifest": "physics/data/real_world/pacuare_river_costa_rica/source_manifest.json",
+  "status": "planning_placeholders_require_costa_rica_hydrology_rainfall_and_guide_review"
+}
