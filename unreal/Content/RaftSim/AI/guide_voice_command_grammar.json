@@ -44,6 +44,16 @@
       "crew_intent": "crew_high_side"
     },
     {
+      "intent": "LeanLeft",
+      "phrases": ["lean left", "left lean"],
+      "crew_intent": "crew_lean_left"
+    },
+    {
+      "intent": "LeanRight",
+      "phrases": ["lean right", "right lean"],
+      "crew_intent": "crew_lean_right"
+    },
+    {
       "intent": "Rescue",
       "phrases": ["rescue", "swimmer", "rope"],
       "crew_intent": "crew_rescue"

@@ -43,6 +43,12 @@
       "deterministic_intent": "crew_high_side"
     },
     {
+      "action_id": "CrewLean",
+      "value_type": "Axis1D",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "deterministic_intent": "crew_lean_lateral"
+    },
+    {
       "action_id": "HoldOn",
       "value_type": "Boolean",
       "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
