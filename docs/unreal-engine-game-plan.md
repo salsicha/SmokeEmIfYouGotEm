@@ -195,6 +195,7 @@ Deliverable:
 Tasks:
 
 - Import Python-authored and real-world geospatial river sections with scenario metadata, source manifests, seasonal presets, difficulty presets, and validation confidence.
+- Expand the South Fork American alpha content set through `unreal/Content/RaftSim/River/south_fork_alpha_content_expansion.json`, linking reviewed rapids with scouting eddies, recovery pools, seasonal flow variants, difficulty presets, and guide-reviewed fidelity notes before new routes become authoritative.
 - Build spline/volume/data-asset representation for river centerline, banks, cross sections, rapids, hazards, gauges, season/flow presets, and current fields.
 - Convert GeoTIFF/COG DEMs and masks, LAS/LAZ/COPC point clouds when needed, GeoJSON/GeoPackage hydrography, and reviewed rapid annotations into Unreal terrain/corridor assets.
 - Build a river validation annotation editor for viewport pins, station spans, polygons, raft lines, footage timecodes, gauge-history snippets, aerial imagery references, guide notes, confidence, and expected raft outcomes.

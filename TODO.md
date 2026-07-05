@@ -887,7 +887,7 @@ This milestone delivers the first complete playable Unreal slice from launch to 
 
 This milestone expands beyond the vertical slice while preserving the validated water/runtime contracts.
 
-- [ ] Expand the South Fork American content set with additional linked rapids, scouting/eddy/recovery-pool flow, seasonal flow variants, difficulty presets, and guide-reviewed fidelity notes.
+- [x] Expand the South Fork American content set with additional linked rapids, scouting/eddy/recovery-pool flow, seasonal flow variants, difficulty presets, and guide-reviewed fidelity notes: `URaftSimSouthForkAlphaExpansionConfig` and `unreal/Content/RaftSim/River/south_fork_alpha_content_expansion.json` now define linked scout/rapid/recovery/debrief chains, shoulder-season and high-flow variants, commercial-training through expert linked-run presets, and guide fidelity notes that require evidence, rights review, and human guide signoff before new flows/routes become authoritative.
 - [ ] Prototype the Colorado River rowing/oar-rig route as the second real-world river style with direct manual rowing-frame controls, no passenger paddle voice commands, large-volume water reading, canyon pacing, longer rescue windows, and guide-review annotations.
 - [ ] Draft the Pacuare River in Costa Rica as the third runnable river target with source manifest, rain-fed flow bands, rainforest/gorge fidelity needs, hydrology/gauge-source review, protected-area/source-rights review, and rights-cleared guide/field-media annotations.
 - [ ] Add more raft types, handling profiles, passenger archetypes, crew trust/fear/fatigue/skill progression, training lessons, challenge variants, and generated-rapid experiments where validation support exists.

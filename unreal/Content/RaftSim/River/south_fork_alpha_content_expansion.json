@@ -1,0 +1,214 @@
+{
+  "schema": "raftsim.unreal.south_fork_alpha_content_expansion.v1",
+  "data_asset_class": "URaftSimSouthForkAlphaExpansionConfig",
+  "river_id": "american_south_fork",
+  "section_id": "chili_bar_to_coloma",
+  "source_policy": {
+    "uses_existing_validated_baseline": true,
+    "new_content_requires_guide_review_before_playable": true,
+    "new_flow_variants_require_geoclaw_cpp_validation_before_authority": true,
+    "media_references_only_until_rights_clear": true
+  },
+  "source_manifests": {
+    "editor_pass": "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json",
+    "rapid_river_editor": "unreal/Content/RaftSim/River/rapid_river_editor.json",
+    "flow_difficulty_mapping": "physics/data/real_world/south_fork_american_chili_bar/rapid_review_flow_difficulty_mapping.json",
+    "validation_matrix": "physics/data/real_world/south_fork_american_chili_bar/validation_matrix.json",
+    "accepted_cpp_gate": "physics/reports/milestone16/full_cpp_validation_gate.json"
+  },
+  "linked_runs": [
+    {
+      "run_id": "chili_bar_training_link",
+      "display_name": "Chili Bar Training Link",
+      "node_ids": ["put_in_briefing_pool", "scout_eddy_01", "rapid_candidate_01", "recovery_pool_01", "rapid_candidate_02"],
+      "flow_bands": ["low_runnable", "median_runnable"],
+      "difficulty_presets": ["commercial_training", "beginner", "intermediate"],
+      "purpose": "Extend the vertical-slice training section into a linked scout, rapid, eddy, recovery, and second-rapid loop."
+    },
+    {
+      "run_id": "technical_linked_pair",
+      "display_name": "Technical Linked Pair",
+      "node_ids": ["rapid_candidate_02", "recovery_pool_02", "scout_eddy_03", "rapid_candidate_03"],
+      "flow_bands": ["median_runnable", "high_runnable", "spring_release_peak"],
+      "difficulty_presets": ["intermediate", "technical_scouting", "advanced"],
+      "purpose": "Connect two reviewed rapids with a playable recovery pool and scouting eddy for flow-specific route decisions."
+    },
+    {
+      "run_id": "longer_alpha_chain",
+      "display_name": "Longer Alpha Chain",
+      "node_ids": ["rapid_candidate_01", "recovery_pool_01", "rapid_candidate_02", "recovery_pool_02", "rapid_candidate_03", "debrief_pool_03", "rapid_candidate_04"],
+      "flow_bands": ["low_runnable", "median_runnable", "high_runnable"],
+      "difficulty_presets": ["beginner", "intermediate", "advanced", "expert"],
+      "purpose": "First multi-rapid alpha route with explicit calm-water reset spaces, debrief opportunities, rescue windows, and cumulative scoring."
+    }
+  ],
+  "content_nodes": [
+    {
+      "node_id": "put_in_briefing_pool",
+      "kind": "scout_eddy",
+      "station_span_m": [830.0, 890.0],
+      "gameplay_roles": ["briefing", "voice_command_warmup", "ferry_practice"],
+      "downstream_node_ids": ["scout_eddy_01"]
+    },
+    {
+      "node_id": "scout_eddy_01",
+      "kind": "scout_eddy",
+      "station_span_m": [890.0, 910.0],
+      "gameplay_roles": ["scout_line", "teach_eddy_peelout", "set_boat_angle"],
+      "upstream_node_ids": ["put_in_briefing_pool"],
+      "downstream_node_ids": ["rapid_candidate_01"],
+      "guide_fidelity_note_ids": ["sf_note_eddy_peelout_01"]
+    },
+    {
+      "node_id": "rapid_candidate_01",
+      "kind": "rapid",
+      "rapid_id": "rapid_candidate_01",
+      "station_span_m": [895.0, 945.0],
+      "gameplay_roles": ["training_wave_train", "boulder_spacing_intro"],
+      "upstream_node_ids": ["scout_eddy_01"],
+      "downstream_node_ids": ["recovery_pool_01"]
+    },
+    {
+      "node_id": "recovery_pool_01",
+      "kind": "recovery_pool",
+      "station_span_m": [945.0, 1030.0],
+      "gameplay_roles": ["rescue_window", "crew_reseat", "after_action_micro_feedback"],
+      "upstream_node_ids": ["rapid_candidate_01"],
+      "downstream_node_ids": ["rapid_candidate_02"],
+      "guide_fidelity_note_ids": ["sf_note_recovery_pool_01"]
+    },
+    {
+      "node_id": "rapid_candidate_02",
+      "kind": "rapid",
+      "rapid_id": "rapid_candidate_02",
+      "station_span_m": [1855.0, 1905.0],
+      "gameplay_roles": ["technical_constriction", "manual_or_voice_command_timing", "contact_risk"],
+      "upstream_node_ids": ["recovery_pool_01"],
+      "downstream_node_ids": ["recovery_pool_02"]
+    },
+    {
+      "node_id": "recovery_pool_02",
+      "kind": "recovery_pool",
+      "station_span_m": [1905.0, 2005.0],
+      "gameplay_roles": ["swimmer_pickup", "trust_recovery", "route_choice_reset"],
+      "upstream_node_ids": ["rapid_candidate_02"],
+      "downstream_node_ids": ["scout_eddy_03"]
+    },
+    {
+      "node_id": "scout_eddy_03",
+      "kind": "scout_eddy",
+      "station_span_m": [2860.0, 2895.0],
+      "gameplay_roles": ["scout_line", "flow_specific_route_choice", "crew_instruction"],
+      "upstream_node_ids": ["recovery_pool_02"],
+      "downstream_node_ids": ["rapid_candidate_03"],
+      "guide_fidelity_note_ids": ["sf_note_flow_dependent_line_03"]
+    },
+    {
+      "node_id": "rapid_candidate_03",
+      "kind": "rapid",
+      "rapid_id": "rapid_candidate_03",
+      "station_span_m": [2895.0, 2945.0],
+      "gameplay_roles": ["linked_rapid", "wave_train", "rescue_consequence"],
+      "upstream_node_ids": ["scout_eddy_03"],
+      "downstream_node_ids": ["debrief_pool_03"]
+    },
+    {
+      "node_id": "debrief_pool_03",
+      "kind": "debrief_pool",
+      "station_span_m": [2945.0, 3050.0],
+      "gameplay_roles": ["debrief", "score_preview", "crew_conversation"],
+      "upstream_node_ids": ["rapid_candidate_03"],
+      "downstream_node_ids": ["rapid_candidate_04"]
+    },
+    {
+      "node_id": "rapid_candidate_04",
+      "kind": "rapid",
+      "rapid_id": "rapid_candidate_04",
+      "station_span_m": [4025.0, 4075.0],
+      "gameplay_roles": ["alpha_route_final_rapid", "lateral_and_wave_train", "high_flow_risk"],
+      "upstream_node_ids": ["debrief_pool_03"]
+    }
+  ],
+  "seasonal_flow_variants": [
+    {
+      "flow_variant_id": "shoulder_season_low",
+      "season_id": "fall_private_low_water",
+      "discharge_cfs": 650.0,
+      "expected_feature_changes": ["more_exposed_rocks", "shallower_shelves", "slower_recovery", "weaker_holes"],
+      "requires_validation_before_playable": true
+    },
+    {
+      "flow_variant_id": "summer_commercial",
+      "season_id": "summer_commercial",
+      "discharge_cfs": 1600.0,
+      "expected_feature_changes": ["baseline_training_lines", "moderate_wave_trains", "stable_recovery_pools"],
+      "requires_validation_before_playable": false
+    },
+    {
+      "flow_variant_id": "spring_release_peak",
+      "season_id": "spring_runoff_or_release",
+      "discharge_cfs": 4200.0,
+      "expected_feature_changes": ["faster_canyon_pacing", "stickier_laterals", "some_low_flow_holes_wash_out", "shorter_rescue_windows"],
+      "requires_validation_before_playable": true
+    },
+    {
+      "flow_variant_id": "post_storm_high",
+      "season_id": "storm_response",
+      "discharge_cfs": 5200.0,
+      "expected_feature_changes": ["pushy_current", "reduced_eddy_service", "debris_review_required", "expert_only"],
+      "requires_validation_before_playable": true
+    }
+  ],
+  "difficulty_presets": [
+    {
+      "difficulty_id": "commercial_training",
+      "enabled_content_node_ids": ["put_in_briefing_pool", "scout_eddy_01", "rapid_candidate_01", "recovery_pool_01"],
+      "crew_and_rescue_modifiers": ["generous_command_windows", "low_swim_fatigue", "extra_debrief_prompts"],
+      "requires_guide_review": true
+    },
+    {
+      "difficulty_id": "technical_scouting",
+      "enabled_content_node_ids": ["rapid_candidate_02", "recovery_pool_02", "scout_eddy_03", "rapid_candidate_03"],
+      "crew_and_rescue_modifiers": ["scout_required_for_bonus", "stricter_boat_angle_score", "faster_swimmer_drift"],
+      "requires_guide_review": true
+    },
+    {
+      "difficulty_id": "expert_linked_run",
+      "enabled_content_node_ids": ["rapid_candidate_01", "rapid_candidate_02", "rapid_candidate_03", "rapid_candidate_04"],
+      "crew_and_rescue_modifiers": ["minimal_ui_assist", "strict_high_side_timing", "short_rescue_windows"],
+      "requires_guide_review": true
+    }
+  ],
+  "guide_fidelity_notes": [
+    {
+      "note_id": "sf_note_eddy_peelout_01",
+      "applies_to_node_id": "scout_eddy_01",
+      "required_evidence": ["guide_feedback", "flow_band", "footage_timecode_or_field_note", "aerial_imagery_reference"],
+      "rights_cleared_media_required": true,
+      "human_guide_signoff_required": true
+    },
+    {
+      "note_id": "sf_note_recovery_pool_01",
+      "applies_to_node_id": "recovery_pool_01",
+      "required_evidence": ["recovery_pool_depth_note", "eddy_service_note", "rescue_visibility_note", "gauge_context"],
+      "rights_cleared_media_required": true,
+      "human_guide_signoff_required": true
+    },
+    {
+      "note_id": "sf_note_flow_dependent_line_03",
+      "applies_to_node_id": "scout_eddy_03",
+      "required_evidence": ["low_median_high_line_notes", "hole_washout_or_stickiness_note", "guide_confidence", "reviewer_identity"],
+      "rights_cleared_media_required": true,
+      "human_guide_signoff_required": true
+    }
+  ],
+  "pass_policy": {
+    "links_multiple_reviewed_rapids": true,
+    "defines_scouting_eddy_and_recovery_pool_flow": true,
+    "defines_seasonal_flow_variants": true,
+    "defines_difficulty_presets": true,
+    "requires_guide_reviewed_fidelity_notes": true,
+    "does_not_promote_unvalidated_new_flows_to_authority": true
+  },
+  "status": "ready_for_alpha_south_fork_authoring_and_validation_planning"
+}
