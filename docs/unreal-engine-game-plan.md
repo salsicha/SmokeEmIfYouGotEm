@@ -277,6 +277,7 @@ Tasks:
 - Keep networked human crew multiplayer behind `unreal/Content/RaftSim/Network/networked_crew_evaluation_gate.json` until the single-player guide loop, raft/contact authority, local voice/manual parity, rescue loop, and replay/debug tools are stable.
 - Add challenge variants and generated rapid support only where the alpha systems catalog names passing validation reports.
 - Expand weather, water levels, rescue scenarios, and training lessons, with lessons tied to required systems and completion telemetry.
+- Gate every playable alpha expansion through `unreal/Content/RaftSim/Automation/alpha_expansion_gate.json`, requiring automated content validation, physics regression replay, river-source provenance, and end-to-end river-section run evidence.
 
 Deliverable:
 

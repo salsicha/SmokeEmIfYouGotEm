@@ -1,0 +1,124 @@
+{
+  "schema": "raftsim.unreal.alpha_expansion_gate.v1",
+  "module": "RaftSimAutomation",
+  "gate_id": "milestone24_alpha_content_expansion",
+  "purpose": "Gate alpha expansion on automated content validation, physics regression replay, river-source provenance, and playable end-to-end river-section evidence.",
+  "source_manifests": {
+    "alpha_content_coverage": "unreal/Content/RaftSim/Production/alpha_content_coverage_manifest.json",
+    "alpha_systems_progression": "unreal/Content/RaftSim/Raft/alpha_systems_progression_catalog.json",
+    "colorado_rowing_route": "unreal/Content/RaftSim/River/colorado_rowing_route_editor_pass.json",
+    "live_water_smoke_suite": "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json",
+    "networked_crew_gate": "unreal/Content/RaftSim/Network/networked_crew_evaluation_gate.json",
+    "pacuare_target": "unreal/Content/RaftSim/River/pacuare_river_third_target_editor_pass.json",
+    "river_round_trip_validation": "unreal/Content/RaftSim/River/round_trip_validation.json",
+    "river_selection_catalog": "unreal/Content/RaftSim/UI/river_selection_catalog.json",
+    "south_fork_alpha_content": "unreal/Content/RaftSim/River/south_fork_alpha_content_expansion.json",
+    "vertical_slice_acceptance_gate": "unreal/Content/RaftSim/Automation/vertical_slice_acceptance_gate.json"
+  },
+  "source_provenance_inputs": [
+    "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json",
+    "physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json",
+    "physics/data/real_world/pacuare_river_costa_rica/source_manifest.json",
+    "physics/data/real_world/source_catalog.json"
+  ],
+  "physics_evidence_inputs": [
+    "physics/reports/milestone16/full_cpp_validation_gate.json",
+    "physics/reports/milestone17/analytic_fixture_validation.json",
+    "physics/reports/milestone18/pin_release_fixture.json",
+    "physics/reports/milestone20/report_set_lock.json",
+    "physics/reports/milestone20/live_water_unreal_smoke_suite.json",
+    "physics/reports/milestone23/vertical_slice_acceptance_gate.json"
+  ],
+  "gate_lanes": [
+    {
+      "lane_id": "automated_content_validation",
+      "requirement": "Every alpha content catalog, source policy, river selection entry, AI/crew catalog, network gate, and production coverage manifest must validate as source-controlled JSON and name its upstream source manifests.",
+      "evidence": [
+        "alpha_content_coverage",
+        "river_selection_catalog",
+        "alpha_systems_progression",
+        "crew_conversation_bark_catalog",
+        "networked_crew_gate"
+      ],
+      "blocks_alpha_promotion": true
+    },
+    {
+      "lane_id": "physics_regression_replay",
+      "requirement": "Playable alpha routes must replay against the accepted water report lock, live-water smoke gate, analytic guardrails, feature/raft fixtures, and deterministic replay evidence.",
+      "evidence": [
+        "physics/reports/milestone20/report_set_lock.json",
+        "physics/reports/milestone20/live_water_unreal_smoke_suite.json",
+        "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json",
+        "unreal/Content/RaftSim/River/round_trip_validation.json"
+      ],
+      "blocks_alpha_promotion": true
+    },
+    {
+      "lane_id": "river_source_provenance",
+      "requirement": "Every river promoted into alpha must preserve source manifest id, CRS, transform, flow-band metadata, license/terms, rights/provenance status, guide-review annotations, and field-media rights.",
+      "evidence": [
+        "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json",
+        "physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json",
+        "physics/data/real_world/pacuare_river_costa_rica/source_manifest.json",
+        "physics/data/real_world/source_catalog.json"
+      ],
+      "blocks_alpha_promotion": true
+    },
+    {
+      "lane_id": "playable_end_to_end_runs",
+      "requirement": "Every playable alpha river section must run end-to-end from selection through launch, completion/failure, restart, scoring, replay review, and after-action feedback.",
+      "evidence": [
+        "unreal/Content/RaftSim/Automation/vertical_slice_acceptance_gate.json",
+        "physics/reports/milestone23/vertical_slice_acceptance_gate.json"
+      ],
+      "blocks_alpha_promotion": true
+    }
+  ],
+  "river_run_targets": [
+    {
+      "target_id": "south_fork_alpha_linked_run",
+      "river_id": "american_south_fork",
+      "section_id": "chili_bar_to_coloma",
+      "required_gate_status": "playable_end_to_end_required_before_alpha_promotion",
+      "requires_physics_replay": true,
+      "requires_source_provenance": true,
+      "requires_content_validation": true
+    },
+    {
+      "target_id": "colorado_rowing_review_gated_run",
+      "river_id": "colorado_river",
+      "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+      "required_gate_status": "planning_only_until_gauge_history_geospatial_pull_guide_review_and_field_media_pass",
+      "requires_physics_replay": true,
+      "requires_source_provenance": true,
+      "requires_content_validation": true
+    },
+    {
+      "target_id": "pacuare_review_gated_run",
+      "river_id": "pacuare",
+      "section_id": "lower_pacuare_planning_corridor",
+      "required_gate_status": "planning_only_until_hydrology_protected_area_rights_and_field_media_pass",
+      "requires_physics_replay": true,
+      "requires_source_provenance": true,
+      "requires_content_validation": true
+    }
+  ],
+  "promotion_policy": {
+    "south_fork_can_promote_first": true,
+    "colorado_blocks_on_placeholder_sources": true,
+    "pacuare_blocks_on_placeholder_sources": true,
+    "generated_rapid_experiments_block_until_named_validation_reports_pass": true,
+    "multiplayer_blocks_until_networked_crew_gate_opens": true,
+    "presentation_cues_cannot_hide_physics_failures": true
+  },
+  "pass_policy": {
+    "requires_automated_content_validation": true,
+    "requires_physics_regression_replay": true,
+    "requires_river_source_provenance": true,
+    "requires_playable_end_to_end_runs": true,
+    "review_gated_rivers_remain_planning_only": true,
+    "alpha_promotion_requires_all_gate_lanes_green": true
+  },
+  "report": "physics/reports/milestone24/alpha_expansion_gate.json",
+  "status": "ready_for_alpha_expansion_contract_gate"
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "raftsim.milestone24.alpha_expansion_gate_report.v1",
+  "generated_on": "2026-07-05",
+  "gate_manifest": "unreal/Content/RaftSim/Automation/alpha_expansion_gate.json",
+  "checks": [
+    {
+      "check_id": "gate_contract_present",
+      "passed": true,
+      "summary": "Alpha expansion now has a source-controlled gate manifest that ties content validation, physics replay, source provenance, and end-to-end river runs together."
+    },
+    {
+      "check_id": "content_validation_lane_defined",
+      "passed": true,
+      "summary": "The gate names alpha content coverage, river selection, systems progression, crew conversation, and network gate contracts as content-validation evidence."
+    },
+    {
+      "check_id": "physics_regression_replay_lane_defined",
+      "passed": true,
+      "summary": "The gate requires accepted Milestone 20 report-lock/live-water smoke evidence, round-trip validation, analytic guardrails, and replayable physics evidence before playable promotion."
+    },
+    {
+      "check_id": "source_provenance_lane_defined",
+      "passed": true,
+      "summary": "The gate requires South Fork, Colorado, Pacuare, and source-catalog provenance, including CRS, transform, flow-band, license/terms, rights, and guide-review metadata."
+    },
+    {
+      "check_id": "end_to_end_run_lane_defined",
+      "passed": true,
+      "summary": "The gate requires selection-to-launch-to-completion/failure-to-restart-to-scoring-to-replay-review evidence for every playable alpha river section."
+    },
+    {
+      "check_id": "review_gated_routes_blocked",
+      "passed": true,
+      "summary": "Colorado and Pacuare remain planning-only until their placeholder source, hydrology, guide-review, geospatial, protected-area, and field-media blockers are replaced with reviewed evidence."
+    }
+  ],
+  "decision": "PASS_GATE_CONTRACT_AND_BLOCK_UNVALIDATED_ALPHA_PROMOTION",
+  "alpha_promotion_allowed_now": false,
+  "south_fork_first_candidate_after_gate_lanes_pass": true,
+  "colorado_and_pacuare_planning_only": true,
+  "notes": [
+    "This report closes the Milestone 24 source-controlled gate contract, not the future playable alpha promotion itself.",
+    "If any source manifest, content catalog, validation report, live-water bridge, river selection entry, or route target changes, regenerate this gate report.",
+    "Playable expansion still needs automation execution, physics replay, provenance checks, and end-to-end captures for the specific river sections being promoted."
+  ],
+  "passed": true
+}
