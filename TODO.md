@@ -850,7 +850,7 @@ This milestone starts the real Unreal production project after the custom C++ wa
 
 This milestone turns the validated river-data contracts into the level editor and content pipeline needed to design, review, tune, and stream real rapids.
 
-- [ ] Build the Unreal rapid/river editor for station pins, reach/drop spans, polygons, raft lines, footage timecodes, gauge-history snippets, aerial imagery references, guide notes, confidence, rights/provenance, and expected surf/flush/pin/release/flip outcomes.
+- [x] Build the Unreal rapid/river editor for station pins, reach/drop spans, polygons, raft lines, footage timecodes, gauge-history snippets, aerial imagery references, guide notes, confidence, rights/provenance, and expected surf/flush/pin/release/flip outcomes.
 - [ ] Implement the canonical geospatial import path for JSON source manifests, GeoJSON/GeoPackage vectors, GeoTIFF/COG rasters, LAS/LAZ/COPC point clouds, gauge-history tables, solver arrays, and converted Unreal corridor assets.
 - [ ] Support reach-local authoring and streaming with overlap/ghost-zone metadata while requiring stitched whole-window validation exports for every playable river window.
 - [ ] Expose flow bands, discharge-dependent feature-forcing gains, hole stickiness/washout curves, eddy-line/lateral/wave-train tuning, boulder push/damping, shallow shelves, pins/releases, and visual/audio-only parameters as editor-tunable but manifest-recorded data.

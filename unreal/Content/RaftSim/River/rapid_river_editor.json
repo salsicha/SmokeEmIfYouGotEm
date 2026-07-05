@@ -1,0 +1,596 @@
+{
+  "accepted_report_set_lock": {
+    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
+    "manifest": "physics/reports/milestone20/report_set_lock.json"
+  },
+  "annotation_templates": [
+    {
+      "expected_outcomes": [
+        "surf",
+        "flush",
+        "pin",
+        "release",
+        "flip"
+      ],
+      "geometry_kind": "station_pin",
+      "required_fields": [
+        "station_m",
+        "wgs84",
+        "review_labels",
+        "confidence",
+        "rights_provenance"
+      ],
+      "requires_confidence": true,
+      "requires_rights_provenance": true,
+      "template_id": "station_pin"
+    },
+    {
+      "expected_outcomes": [
+        "surf",
+        "flush",
+        "pin",
+        "release",
+        "flip"
+      ],
+      "geometry_kind": "reach_span",
+      "required_fields": [
+        "station_range_m",
+        "reach_id",
+        "drop_id",
+        "expected_outcomes"
+      ],
+      "requires_confidence": true,
+      "requires_rights_provenance": true,
+      "template_id": "reach_drop_span"
+    },
+    {
+      "expected_outcomes": [
+        "surf",
+        "flush",
+        "pin",
+        "release",
+        "flip"
+      ],
+      "geometry_kind": "polygon",
+      "required_fields": [
+        "polygon_role",
+        "vertices_wgs84",
+        "source_layer",
+        "rights_provenance"
+      ],
+      "requires_confidence": true,
+      "requires_rights_provenance": true,
+      "template_id": "polygon"
+    },
+    {
+      "expected_outcomes": [
+        "surf",
+        "flush",
+        "pin",
+        "release",
+        "flip"
+      ],
+      "geometry_kind": "raft_line",
+      "required_fields": [
+        "line_role",
+        "polyline_wgs84",
+        "flow_band",
+        "expected_outcomes"
+      ],
+      "requires_confidence": true,
+      "requires_rights_provenance": true,
+      "template_id": "raft_line"
+    }
+  ],
+  "asset_class": "URaftSimRapidRiverEditorConfig",
+  "editable_metadata_fields": [
+    "footage_timecodes",
+    "gauge_history_snippets",
+    "aerial_imagery_references",
+    "guide_notes",
+    "confidence",
+    "rights_provenance",
+    "expected_outcomes"
+  ],
+  "editor_id": "milestone21_unreal_rapid_river_editor",
+  "editor_panels": [
+    "one_view_map",
+    "station_profile",
+    "flow_and_sources",
+    "annotation_editor"
+  ],
+  "expected_outcomes": [
+    "surf",
+    "flush",
+    "pin",
+    "release",
+    "flip"
+  ],
+  "export_targets": {
+    "geojson": [
+      "review/rapid_candidates.geojson",
+      "review/river_validation_annotations.geojson",
+      "review/feature_annotations.geojson",
+      "scenario/source_manifest_links.json"
+    ],
+    "json": "unreal/Content/RaftSim/River/rapid_river_editor.json",
+    "python_scenario_generation": "physics/data/real_world/south_fork_american_chili_bar",
+    "unreal_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
+  },
+  "geometry_kinds": [
+    "station_pin",
+    "reach_span",
+    "drop_span",
+    "polygon",
+    "raft_line"
+  ],
+  "module": "RaftSimRiver",
+  "quality_gates": [
+    "Every accepted rapid has DEM/lidar, imagery, flowline, cross-section, gauge, source-manifest, candidate-tag, and guide-note context visible in the one-view layout.",
+    "Every accepted annotation records rights/provenance before it can feed validation or Unreal data assets.",
+    "Guidebook text, third-party imagery, and field media remain referenced through manifests unless redistribution rights are explicit.",
+    "Expected surf/flush/pin/release/flip outcomes must be recorded per flow band before annotations can tune gameplay."
+  ],
+  "required_evidence_layers": [
+    "dem_lidar",
+    "aerial_satellite_imagery",
+    "flowlines",
+    "cross_sections",
+    "gauge_history",
+    "source_manifest",
+    "candidate_tags",
+    "guide_notes"
+  ],
+  "river_id": "american_south_fork",
+  "schema": "raftsim.unreal.rapid_river_editor.v1",
+  "section_id": "chili_bar_to_coloma",
+  "seed_annotations": [
+    {
+      "aerial_imagery_references": [
+        "imagery/naip_tiles",
+        "imagery/water_mask.tif",
+        "imagery/foam_texture_mask.tif"
+      ],
+      "annotation_id": "unreal_seed_rapid_candidate_01",
+      "confidence": 0.836653,
+      "expected_outcome_review": [
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "surf"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "flush"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "pin"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "release"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "flip"
+        }
+      ],
+      "footage_timecodes": {
+        "fields": [
+          "media_id",
+          "start_timecode",
+          "end_timecode",
+          "flow_band",
+          "rights_status"
+        ],
+        "required": true,
+        "source_layers": [
+          "guide_notes",
+          "field_media"
+        ]
+      },
+      "gauge_history_snippets": [
+        "hydrology/usgs_11445500_daily_discharge.json",
+        "hydrology/flow_presets.json"
+      ],
+      "guide_notes": [
+        "Human guide review pending; keep copyrighted guidebook text and third-party media out of the repo unless rights are explicit.",
+        "Seed guide-note signal is present near this candidate; reviewer must attach citation, flow context, and derived guidance."
+      ],
+      "polygon_layers": [
+        "hazard_polygon",
+        "eddy_polygon",
+        "whitewater_polygon",
+        "bank_polygon"
+      ],
+      "raft_line_roles": [
+        "entry_line",
+        "main_current_line",
+        "recovery_line"
+      ],
+      "rapid_id": "rapid_candidate_01",
+      "rights_provenance": {
+        "fields": [
+          "source_id",
+          "license_or_terms",
+          "attribution",
+          "permission_status",
+          "reviewer",
+          "review_date"
+        ],
+        "required": true,
+        "source_ids": [
+          "field_media",
+          "guide_references",
+          "noaa_nwps_nwm",
+          "osm",
+          "source_manifest",
+          "usda_naip",
+          "usgs_3dep",
+          "usgs_3dhp_nhd",
+          "usgs_nwis",
+          "usgs_streamstats",
+          "usgs_tnm"
+        ],
+        "source_manifest": "source_manifest.json"
+      },
+      "station_pin": {
+        "station_m": 920.0,
+        "wgs84": {
+          "lat": 38.7685,
+          "lon": -120.858
+        }
+      },
+      "station_span_m": [
+        895.0,
+        945.0
+      ]
+    },
+    {
+      "aerial_imagery_references": [
+        "imagery/naip_tiles",
+        "imagery/water_mask.tif",
+        "imagery/foam_texture_mask.tif"
+      ],
+      "annotation_id": "unreal_seed_rapid_candidate_02",
+      "confidence": 0.799903,
+      "expected_outcome_review": [
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "surf"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "flush"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "pin"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "release"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "flip"
+        }
+      ],
+      "footage_timecodes": {
+        "fields": [
+          "media_id",
+          "start_timecode",
+          "end_timecode",
+          "flow_band",
+          "rights_status"
+        ],
+        "required": true,
+        "source_layers": [
+          "guide_notes",
+          "field_media"
+        ]
+      },
+      "gauge_history_snippets": [
+        "hydrology/usgs_11445500_daily_discharge.json",
+        "hydrology/flow_presets.json"
+      ],
+      "guide_notes": [
+        "Human guide review pending; keep copyrighted guidebook text and third-party media out of the repo unless rights are explicit.",
+        "Seed guide-note signal is present near this candidate; reviewer must attach citation, flow context, and derived guidance."
+      ],
+      "polygon_layers": [
+        "hazard_polygon",
+        "eddy_polygon",
+        "whitewater_polygon",
+        "bank_polygon"
+      ],
+      "raft_line_roles": [
+        "entry_line",
+        "main_current_line",
+        "recovery_line"
+      ],
+      "rapid_id": "rapid_candidate_02",
+      "rights_provenance": {
+        "fields": [
+          "source_id",
+          "license_or_terms",
+          "attribution",
+          "permission_status",
+          "reviewer",
+          "review_date"
+        ],
+        "required": true,
+        "source_ids": [
+          "field_media",
+          "guide_references",
+          "noaa_nwps_nwm",
+          "osm",
+          "source_manifest",
+          "usda_naip",
+          "usgs_3dep",
+          "usgs_3dhp_nhd",
+          "usgs_nwis",
+          "usgs_streamstats",
+          "usgs_tnm"
+        ],
+        "source_manifest": "source_manifest.json"
+      },
+      "station_pin": {
+        "station_m": 1880.0,
+        "wgs84": {
+          "lat": 38.7765,
+          "lon": -120.842
+        }
+      },
+      "station_span_m": [
+        1855.0,
+        1905.0
+      ]
+    },
+    {
+      "aerial_imagery_references": [
+        "imagery/naip_tiles",
+        "imagery/water_mask.tif",
+        "imagery/foam_texture_mask.tif"
+      ],
+      "annotation_id": "unreal_seed_rapid_candidate_03",
+      "confidence": 0.769695,
+      "expected_outcome_review": [
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "surf"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "flush"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "pin"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "release"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "flip"
+        }
+      ],
+      "footage_timecodes": {
+        "fields": [
+          "media_id",
+          "start_timecode",
+          "end_timecode",
+          "flow_band",
+          "rights_status"
+        ],
+        "required": true,
+        "source_layers": [
+          "guide_notes",
+          "field_media"
+        ]
+      },
+      "gauge_history_snippets": [
+        "hydrology/usgs_11445500_daily_discharge.json",
+        "hydrology/flow_presets.json"
+      ],
+      "guide_notes": [
+        "Human guide review pending; keep copyrighted guidebook text and third-party media out of the repo unless rights are explicit.",
+        "Seed guide-note signal is present near this candidate; reviewer must attach citation, flow context, and derived guidance."
+      ],
+      "polygon_layers": [
+        "hazard_polygon",
+        "eddy_polygon",
+        "whitewater_polygon",
+        "bank_polygon"
+      ],
+      "raft_line_roles": [
+        "entry_line",
+        "main_current_line",
+        "recovery_line"
+      ],
+      "rapid_id": "rapid_candidate_03",
+      "rights_provenance": {
+        "fields": [
+          "source_id",
+          "license_or_terms",
+          "attribution",
+          "permission_status",
+          "reviewer",
+          "review_date"
+        ],
+        "required": true,
+        "source_ids": [
+          "field_media",
+          "guide_references",
+          "noaa_nwps_nwm",
+          "osm",
+          "source_manifest",
+          "usda_naip",
+          "usgs_3dep",
+          "usgs_3dhp_nhd",
+          "usgs_nwis",
+          "usgs_streamstats",
+          "usgs_tnm"
+        ],
+        "source_manifest": "source_manifest.json"
+      },
+      "station_pin": {
+        "station_m": 2920.0,
+        "wgs84": {
+          "lat": 38.785,
+          "lon": -120.8235
+        }
+      },
+      "station_span_m": [
+        2895.0,
+        2945.0
+      ]
+    },
+    {
+      "aerial_imagery_references": [
+        "imagery/naip_tiles",
+        "imagery/water_mask.tif",
+        "imagery/foam_texture_mask.tif"
+      ],
+      "annotation_id": "unreal_seed_rapid_candidate_04",
+      "confidence": 0.775192,
+      "expected_outcome_review": [
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "surf"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "flush"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "pin"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "release"
+        },
+        {
+          "confidence_required": true,
+          "flow_band_required": true,
+          "line_specific": true,
+          "outcome": "flip"
+        }
+      ],
+      "footage_timecodes": {
+        "fields": [
+          "media_id",
+          "start_timecode",
+          "end_timecode",
+          "flow_band",
+          "rights_status"
+        ],
+        "required": true,
+        "source_layers": [
+          "guide_notes",
+          "field_media"
+        ]
+      },
+      "gauge_history_snippets": [
+        "hydrology/usgs_11445500_daily_discharge.json",
+        "hydrology/flow_presets.json"
+      ],
+      "guide_notes": [
+        "Human guide review pending; keep copyrighted guidebook text and third-party media out of the repo unless rights are explicit.",
+        "Seed guide-note signal is present near this candidate; reviewer must attach citation, flow context, and derived guidance."
+      ],
+      "polygon_layers": [
+        "hazard_polygon",
+        "eddy_polygon",
+        "whitewater_polygon",
+        "bank_polygon"
+      ],
+      "raft_line_roles": [
+        "entry_line",
+        "main_current_line",
+        "recovery_line"
+      ],
+      "rapid_id": "rapid_candidate_04",
+      "rights_provenance": {
+        "fields": [
+          "source_id",
+          "license_or_terms",
+          "attribution",
+          "permission_status",
+          "reviewer",
+          "review_date"
+        ],
+        "required": true,
+        "source_ids": [
+          "field_media",
+          "guide_references",
+          "noaa_nwps_nwm",
+          "osm",
+          "source_manifest",
+          "usda_naip",
+          "usgs_3dep",
+          "usgs_3dhp_nhd",
+          "usgs_nwis",
+          "usgs_streamstats",
+          "usgs_tnm"
+        ],
+        "source_manifest": "source_manifest.json"
+      },
+      "station_pin": {
+        "station_m": 4050.0,
+        "wgs84": {
+          "lat": 38.796,
+          "lon": -120.804
+        }
+      },
+      "station_span_m": [
+        4025.0,
+        4075.0
+      ]
+    }
+  ],
+  "source_workflow": "physics/data/real_world/south_fork_american_chili_bar/rapid_review_editor_workflow.json",
+  "status": "ready_for_unreal_editor_widget_and_data_asset_authoring",
+  "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
+}
