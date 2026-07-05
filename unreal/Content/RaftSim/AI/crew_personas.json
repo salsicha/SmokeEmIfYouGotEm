@@ -1,5 +1,6 @@
 {
   "schema": "raftsim.unreal.crew_personas.v1",
+  "crew_bark_catalog": "unreal/Content/RaftSim/AI/crew_conversation_bark_catalog.json",
   "conversation_policy": {
     "ai_assisted_noncritical_conversation": true,
     "gameplay_critical_paddling_under_explicit_command_state_control": true,
