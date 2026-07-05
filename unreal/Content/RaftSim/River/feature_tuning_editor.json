@@ -1,0 +1,1521 @@
+{
+  "accepted_report_set_lock": {
+    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
+    "manifest": "physics/reports/milestone20/report_set_lock.json"
+  },
+  "asset_class": "URaftSimFeatureTuningEditorConfig",
+  "editor_panels": [
+    "flow_band_curve_editor",
+    "feature_gain_bounds",
+    "hole_stickiness_washout",
+    "eddy_lateral_wave_train_tuning",
+    "boulder_shelf_pin_release_tuning",
+    "visual_audio_only_tuning",
+    "manifest_recording_and_validation"
+  ],
+  "export_rules": {
+    "manifest_record_every_edit": true,
+    "reject_conservation_failure_masking": true,
+    "reject_unbounded_gain": true,
+    "require_geoclaw_comparison_before_signoff": true,
+    "visual_audio_only_cannot_change_solver_state": true
+  },
+  "feature_forcing_defaults": "physics/config/feature_forcing_defaults.json",
+  "feature_tuning_groups": [
+    {
+      "audio_only_parameters": {
+        "hole_audio_intensity_default": 0.05
+      },
+      "default_gain": 0.05,
+      "display_name": "Hole Retention And Washout",
+      "editor_domains": [
+        "solver_state",
+        "raft_coupling",
+        "visual_only",
+        "audio_only"
+      ],
+      "enabled_by_default": false,
+      "expected_raft_outcomes": [
+        "surf",
+        "flush",
+        "pin",
+        "release",
+        "flip_if_mishandled"
+      ],
+      "feature_kind": "hole",
+      "flow_response_curve_id": "hole_retention_flow_v0",
+      "flow_response_samples": [
+        {
+          "curve_flow_band": "too_low",
+          "discharge_cfs": 900.0,
+          "discharge_m3s": 25.4851619328,
+          "effective_default_gain": 0.002625,
+          "expected_behavior": "Usually a shallow drop or rough tongue; keep retention low and verify it is not a fake keeper.",
+          "flow_band": "low_runnable",
+          "flow_percentile_range": [
+            0.1,
+            0.35
+          ],
+          "gain_multiplier": 0.15,
+          "outcome_note": "non-retentive rapid",
+          "review_priority": "medium",
+          "season": "late_summer_low_water",
+          "south_fork_activation_scale": 0.35
+        },
+        {
+          "curve_flow_band": "sticky",
+          "discharge_cfs": 1600.0,
+          "discharge_m3s": 45.3069545472,
+          "effective_default_gain": 0.05,
+          "expected_behavior": "Primary sticky-hole review band; tune surf/flush/pin/release outcomes against guide and footage evidence.",
+          "flow_band": "median_runnable",
+          "flow_percentile_range": [
+            0.35,
+            0.7
+          ],
+          "gain_multiplier": 1.0,
+          "outcome_note": "retentive surf/flush window",
+          "review_priority": "medium",
+          "season": "summer_commercial",
+          "south_fork_activation_scale": 1.0
+        },
+        {
+          "curve_flow_band": "washout",
+          "discharge_cfs": 3000.0,
+          "discharge_m3s": 84.950539776,
+          "effective_default_gain": 0.0065,
+          "expected_behavior": "May become aerated or wash out; reduce retention unless reviewed evidence shows a keeper at this flow.",
+          "flow_band": "high_runnable",
+          "flow_percentile_range": [
+            0.7,
+            0.9
+          ],
+          "gain_multiplier": 0.2,
+          "outcome_note": "hole washes out",
+          "review_priority": "medium",
+          "season": "spring_runoff_or_release",
+          "south_fork_activation_scale": 0.65
+        }
+      ],
+      "gain_bounds": {
+        "max": 1.0,
+        "min": 0.0
+      },
+      "hole_stickiness_washout_curve": [
+        {
+          "curve_flow_band": "too_low",
+          "discharge_cfs": 900.0,
+          "expected_behavior": "Usually a shallow drop or rough tongue; keep retention low and verify it is not a fake keeper.",
+          "flow_band": "low_runnable",
+          "stickiness_factor": 0.15,
+          "washout_factor": 0.1
+        },
+        {
+          "curve_flow_band": "sticky",
+          "discharge_cfs": 1600.0,
+          "expected_behavior": "Primary sticky-hole review band; tune surf/flush/pin/release outcomes against guide and footage evidence.",
+          "flow_band": "median_runnable",
+          "stickiness_factor": 1.0,
+          "washout_factor": 0.05
+        },
+        {
+          "curve_flow_band": "washout",
+          "discharge_cfs": 3000.0,
+          "expected_behavior": "May become aerated or wash out; reduce retention unless reviewed evidence shows a keeper at this flow.",
+          "flow_band": "high_runnable",
+          "stickiness_factor": 0.2,
+          "washout_factor": 0.85
+        }
+      ],
+      "manifest_recording": {
+        "fields": [
+          "feature_kind",
+          "flow_band",
+          "discharge_cfs",
+          "gain",
+          "gain_bounds",
+          "curve_id",
+          "editor_user",
+          "source_annotation_id",
+          "geoclaw_comparison_id",
+          "conservation_summary_id"
+        ],
+        "record_targets": [
+          "scenario/features.json",
+          "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+          "deterministic_run_capture_manifest"
+        ],
+        "required": true
+      },
+      "raft_coupling_effects": [
+        "surf_flush_window_modifier",
+        "bow_stall_drag_modifier"
+      ],
+      "review_category": "hydraulic",
+      "review_label": "hole",
+      "solver_state_effects": [
+        "retentive_momentum_bias",
+        "aerated_damping_proxy",
+        "downstream_boil_recovery"
+      ],
+      "tunable_parameters": [
+        "boil_strength",
+        "default_gain",
+        "flow_response_curve",
+        "foam_intensity_default",
+        "gain_bounds",
+        "hazard_activation_scale",
+        "hole_audio_intensity_default",
+        "hole_retention_strength",
+        "hole_stickiness_factor",
+        "hole_washout_factor",
+        "spray_intensity_default",
+        "surf_flush_window_modifier"
+      ],
+      "validation_contract": {
+        "bounded": true,
+        "conservation_guard_required": true,
+        "flow_dependent": true,
+        "geoclaw_compared": true,
+        "hide_conservation_failures": false,
+        "manifest_recorded": true,
+        "real_world_annotation_allowed": true
+      },
+      "visual_only_parameters": {
+        "foam_intensity_default": 0.15,
+        "spray_intensity_default": 0.1
+      }
+    },
+    {
+      "audio_only_parameters": {
+        "audio_intensity_default": 0.1
+      },
+      "default_gain": 0.04,
+      "display_name": "Boil And Upwelling",
+      "editor_domains": [
+        "solver_state",
+        "raft_coupling",
+        "visual_only",
+        "audio_only"
+      ],
+      "enabled_by_default": false,
+      "expected_raft_outcomes": [
+        "surf",
+        "flush",
+        "pin",
+        "release",
+        "flip_if_mishandled"
+      ],
+      "feature_kind": "boil",
+      "flow_response_curve_id": "boil_flow_v0",
+      "flow_response_samples": [
+        {
+          "curve_flow_band": "too_low",
+          "discharge_cfs": 900.0,
+          "discharge_m3s": 25.4851619328,
+          "effective_default_gain": 0.0035,
+          "expected_behavior": "Usually a shallow drop or rough tongue; keep retention low and verify it is not a fake keeper.",
+          "flow_band": "low_runnable",
+          "flow_percentile_range": [
+            0.1,
+            0.35
+          ],
+          "gain_multiplier": 0.25,
+          "outcome_note": "weak upwelling",
+          "review_priority": "medium",
+          "season": "late_summer_low_water",
+          "south_fork_activation_scale": 0.35
+        },
+        {
+          "curve_flow_band": "medium",
+          "discharge_cfs": 1600.0,
+          "discharge_m3s": 45.3069545472,
+          "effective_default_gain": 0.036,
+          "expected_behavior": "Primary sticky-hole review band; tune surf/flush/pin/release outcomes against guide and footage evidence.",
+          "flow_band": "median_runnable",
+          "flow_percentile_range": [
+            0.35,
+            0.7
+          ],
+          "gain_multiplier": 0.9,
+          "outcome_note": "visible boil instability",
+          "review_priority": "medium",
+          "season": "summer_commercial",
+          "south_fork_activation_scale": 1.0
+        },
+        {
+          "curve_flow_band": "high",
+          "discharge_cfs": 3000.0,
+          "discharge_m3s": 84.950539776,
+          "effective_default_gain": 0.026,
+          "expected_behavior": "May become aerated or wash out; reduce retention unless reviewed evidence shows a keeper at this flow.",
+          "flow_band": "high_runnable",
+          "flow_percentile_range": [
+            0.7,
+            0.9
+          ],
+          "gain_multiplier": 1.0,
+          "outcome_note": "strong boil and damping",
+          "review_priority": "medium",
+          "season": "spring_runoff_or_release",
+          "south_fork_activation_scale": 0.65
+        }
+      ],
+      "gain_bounds": {
+        "max": 1.0,
+        "min": 0.0
+      },
+      "hole_stickiness_washout_curve": [],
+      "manifest_recording": {
+        "fields": [
+          "feature_kind",
+          "flow_band",
+          "discharge_cfs",
+          "gain",
+          "gain_bounds",
+          "curve_id",
+          "editor_user",
+          "source_annotation_id",
+          "geoclaw_comparison_id",
+          "conservation_summary_id"
+        ],
+        "record_targets": [
+          "scenario/features.json",
+          "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+          "deterministic_run_capture_manifest"
+        ],
+        "required": true
+      },
+      "raft_coupling_effects": [
+        "lateral_instability_modifier"
+      ],
+      "review_category": "hydraulic",
+      "review_label": "hole",
+      "solver_state_effects": [
+        "upwelling_proxy",
+        "local_damping"
+      ],
+      "tunable_parameters": [
+        "audio_intensity_default",
+        "boil_strength",
+        "boil_surface_pulse_rate",
+        "boil_upwelling_scale",
+        "default_gain",
+        "flow_response_curve",
+        "gain_bounds",
+        "hazard_activation_scale",
+        "hole_retention_strength",
+        "surface_pulse_default"
+      ],
+      "validation_contract": {
+        "bounded": true,
+        "conservation_guard_required": true,
+        "flow_dependent": true,
+        "geoclaw_compared": true,
+        "hide_conservation_failures": false,
+        "manifest_recorded": true,
+        "real_world_annotation_allowed": true
+      },
+      "visual_only_parameters": {
+        "audio_intensity_default": 0.1,
+        "surface_pulse_default": 0.12
+      }
+    },
+    {
+      "audio_only_parameters": {
+        "lateral_audio_intensity_default": 0.05
+      },
+      "default_gain": 0.05,
+      "display_name": "Lateral Wave Push",
+      "editor_domains": [
+        "solver_state",
+        "raft_coupling",
+        "visual_only",
+        "audio_only"
+      ],
+      "enabled_by_default": false,
+      "expected_raft_outcomes": [
+        "angle_correction",
+        "brace",
+        "flip_if_mishandled"
+      ],
+      "feature_kind": "lateral",
+      "flow_response_curve_id": "lateral_flow_v0",
+      "flow_response_samples": [
+        {
+          "curve_flow_band": "too_low",
+          "discharge_cfs": 900.0,
+          "discharge_m3s": 25.4851619328,
+          "effective_default_gain": 0.0055,
+          "expected_behavior": "Often weak or rock-controlled; verify it is not just bank roughness.",
+          "flow_band": "low_runnable",
+          "flow_percentile_range": [
+            0.1,
+            0.35
+          ],
+          "gain_multiplier": 0.2,
+          "outcome_note": "small diagonal push",
+          "review_priority": "medium",
+          "season": "late_summer_low_water",
+          "south_fork_activation_scale": 0.55
+        },
+        {
+          "curve_flow_band": "medium",
+          "discharge_cfs": 1600.0,
+          "discharge_m3s": 45.3069545472,
+          "effective_default_gain": 0.0375,
+          "expected_behavior": "Default cross-current hit and recovery review band.",
+          "flow_band": "median_runnable",
+          "flow_percentile_range": [
+            0.35,
+            0.7
+          ],
+          "gain_multiplier": 0.75,
+          "outcome_note": "line-changing lateral",
+          "review_priority": "medium",
+          "season": "summer_commercial",
+          "south_fork_activation_scale": 1.0
+        },
+        {
+          "curve_flow_band": "high",
+          "discharge_cfs": 3000.0,
+          "discharge_m3s": 84.950539776,
+          "effective_default_gain": 0.065,
+          "expected_behavior": "Strong lateral push; tune angle, brace timing, and flip-risk escalation.",
+          "flow_band": "high_runnable",
+          "flow_percentile_range": [
+            0.7,
+            0.9
+          ],
+          "gain_multiplier": 1.0,
+          "outcome_note": "strong yaw/roll contribution",
+          "review_priority": "high",
+          "season": "spring_runoff_or_release",
+          "south_fork_activation_scale": 1.3
+        }
+      ],
+      "gain_bounds": {
+        "max": 1.0,
+        "min": 0.0
+      },
+      "hole_stickiness_washout_curve": [],
+      "manifest_recording": {
+        "fields": [
+          "feature_kind",
+          "flow_band",
+          "discharge_cfs",
+          "gain",
+          "gain_bounds",
+          "curve_id",
+          "editor_user",
+          "source_annotation_id",
+          "geoclaw_comparison_id",
+          "conservation_summary_id"
+        ],
+        "record_targets": [
+          "scenario/features.json",
+          "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+          "deterministic_run_capture_manifest"
+        ],
+        "required": true
+      },
+      "raft_coupling_effects": [
+        "yaw_impulse_modifier",
+        "roll_impulse_modifier"
+      ],
+      "review_category": "hydraulic",
+      "review_label": "lateral",
+      "solver_state_effects": [
+        "cross_current_momentum_bias"
+      ],
+      "tunable_parameters": [
+        "brace_timing_window_s",
+        "default_gain",
+        "downstream_momentum_scale",
+        "eddy_line_shear",
+        "flow_response_curve",
+        "foam_streak_default",
+        "gain_bounds",
+        "hazard_activation_scale",
+        "lateral_audio_intensity_default",
+        "lateral_push_scale"
+      ],
+      "validation_contract": {
+        "bounded": true,
+        "conservation_guard_required": true,
+        "flow_dependent": true,
+        "geoclaw_compared": true,
+        "hide_conservation_failures": false,
+        "manifest_recorded": true,
+        "real_world_annotation_allowed": true
+      },
+      "visual_only_parameters": {
+        "foam_streak_default": 0.1
+      }
+    },
+    {
+      "audio_only_parameters": {
+        "eddy_line_audio_intensity_default": 0.05
+      },
+      "default_gain": 0.04,
+      "display_name": "Eddy-Line Shear",
+      "editor_domains": [
+        "solver_state",
+        "raft_coupling",
+        "visual_only",
+        "audio_only"
+      ],
+      "enabled_by_default": false,
+      "expected_raft_outcomes": [
+        "peel_out",
+        "ferry",
+        "spin_or_flip_if_mishandled"
+      ],
+      "feature_kind": "eddy_line",
+      "flow_response_curve_id": "eddy_line_flow_v0",
+      "flow_response_samples": [
+        {
+          "curve_flow_band": "too_low",
+          "discharge_cfs": 900.0,
+          "discharge_m3s": 25.4851619328,
+          "effective_default_gain": 0.0042,
+          "expected_behavior": "Lower shear, useful training target.",
+          "flow_band": "low_runnable",
+          "flow_percentile_range": [
+            0.1,
+            0.35
+          ],
+          "gain_multiplier": 0.15,
+          "outcome_note": "soft eddy transition",
+          "review_priority": "medium",
+          "season": "late_summer_low_water",
+          "south_fork_activation_scale": 0.7
+        },
+        {
+          "curve_flow_band": "medium",
+          "discharge_cfs": 1600.0,
+          "discharge_m3s": 45.3069545472,
+          "effective_default_gain": 0.034,
+          "expected_behavior": "Default ferry, peel-out, and recovery review band.",
+          "flow_band": "median_runnable",
+          "flow_percentile_range": [
+            0.35,
+            0.7
+          ],
+          "gain_multiplier": 0.85,
+          "outcome_note": "catchable eddy-line shear",
+          "review_priority": "medium",
+          "season": "summer_commercial",
+          "south_fork_activation_scale": 1.0
+        },
+        {
+          "curve_flow_band": "high",
+          "discharge_cfs": 3000.0,
+          "discharge_m3s": 84.950539776,
+          "effective_default_gain": 0.05,
+          "expected_behavior": "Sharper shear with stronger catch/flip consequences.",
+          "flow_band": "high_runnable",
+          "flow_percentile_range": [
+            0.7,
+            0.9
+          ],
+          "gain_multiplier": 1.0,
+          "outcome_note": "grabby crossing and recovery window",
+          "review_priority": "high",
+          "season": "spring_runoff_or_release",
+          "south_fork_activation_scale": 1.25
+        }
+      ],
+      "gain_bounds": {
+        "max": 1.0,
+        "min": 0.0
+      },
+      "hole_stickiness_washout_curve": [],
+      "manifest_recording": {
+        "fields": [
+          "feature_kind",
+          "flow_band",
+          "discharge_cfs",
+          "gain",
+          "gain_bounds",
+          "curve_id",
+          "editor_user",
+          "source_annotation_id",
+          "geoclaw_comparison_id",
+          "conservation_summary_id"
+        ],
+        "record_targets": [
+          "scenario/features.json",
+          "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+          "deterministic_run_capture_manifest"
+        ],
+        "required": true
+      },
+      "raft_coupling_effects": [
+        "crossing_grab_modifier",
+        "steering_authority_modifier"
+      ],
+      "review_category": "current",
+      "review_label": "eddy_line",
+      "solver_state_effects": [
+        "shear_band_damping",
+        "eddy_recovery_bias"
+      ],
+      "tunable_parameters": [
+        "crossing_grab_modifier",
+        "damping_scale",
+        "default_gain",
+        "eddy_line_audio_intensity_default",
+        "eddy_line_shear",
+        "eddy_line_shear_width_m",
+        "flow_response_curve",
+        "foam_edge_default",
+        "gain_bounds",
+        "raft_drag_coefficient_scale"
+      ],
+      "validation_contract": {
+        "bounded": true,
+        "conservation_guard_required": true,
+        "flow_dependent": true,
+        "geoclaw_compared": true,
+        "hide_conservation_failures": false,
+        "manifest_recorded": true,
+        "real_world_annotation_allowed": true
+      },
+      "visual_only_parameters": {
+        "foam_edge_default": 0.12
+      }
+    },
+    {
+      "audio_only_parameters": {
+        "wave_train_audio_intensity_default": 0.05
+      },
+      "default_gain": 0.04,
+      "display_name": "Wave Train",
+      "editor_domains": [
+        "solver_state",
+        "raft_coupling",
+        "visual_only",
+        "audio_only"
+      ],
+      "enabled_by_default": false,
+      "expected_raft_outcomes": [
+        "clean_line",
+        "splash",
+        "brief_surf",
+        "flip_if_sideways"
+      ],
+      "feature_kind": "wave_train",
+      "flow_response_curve_id": "wave_train_flow_v0",
+      "flow_response_samples": [
+        {
+          "curve_flow_band": "too_low",
+          "discharge_cfs": 900.0,
+          "discharge_m3s": 25.4851619328,
+          "effective_default_gain": 0.0058,
+          "expected_behavior": "Small waves or riffles; keep amplitude modest.",
+          "flow_band": "low_runnable",
+          "flow_percentile_range": [
+            0.1,
+            0.35
+          ],
+          "gain_multiplier": 0.25,
+          "outcome_note": "riffle waves",
+          "review_priority": "medium",
+          "season": "late_summer_low_water",
+          "south_fork_activation_scale": 0.58
+        },
+        {
+          "curve_flow_band": "medium",
+          "discharge_cfs": 1600.0,
+          "discharge_m3s": 45.3069545472,
+          "effective_default_gain": 0.032,
+          "expected_behavior": "Default standing-wave spacing and raft timing review band.",
+          "flow_band": "median_runnable",
+          "flow_percentile_range": [
+            0.35,
+            0.7
+          ],
+          "gain_multiplier": 0.8,
+          "outcome_note": "readable wave train",
+          "review_priority": "medium",
+          "season": "summer_commercial",
+          "south_fork_activation_scale": 1.0
+        },
+        {
+          "curve_flow_band": "high",
+          "discharge_cfs": 3000.0,
+          "discharge_m3s": 84.950539776,
+          "effective_default_gain": 0.054,
+          "expected_behavior": "Larger wave train with stronger momentum, splash, aeration, and flip consequences.",
+          "flow_band": "high_runnable",
+          "flow_percentile_range": [
+            0.7,
+            0.9
+          ],
+          "gain_multiplier": 1.0,
+          "outcome_note": "larger crests and spray",
+          "review_priority": "high",
+          "season": "spring_runoff_or_release",
+          "south_fork_activation_scale": 1.35
+        }
+      ],
+      "gain_bounds": {
+        "max": 1.0,
+        "min": 0.0
+      },
+      "hole_stickiness_washout_curve": [],
+      "manifest_recording": {
+        "fields": [
+          "feature_kind",
+          "flow_band",
+          "discharge_cfs",
+          "gain",
+          "gain_bounds",
+          "curve_id",
+          "editor_user",
+          "source_annotation_id",
+          "geoclaw_comparison_id",
+          "conservation_summary_id"
+        ],
+        "record_targets": [
+          "scenario/features.json",
+          "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+          "deterministic_run_capture_manifest"
+        ],
+        "required": true
+      },
+      "raft_coupling_effects": [
+        "vertical_lift_modifier",
+        "pitch_impulse_modifier"
+      ],
+      "review_category": "hydraulic",
+      "review_label": "wave_train",
+      "solver_state_effects": [
+        "phase_amplitude_bias",
+        "crest_lift_proxy"
+      ],
+      "tunable_parameters": [
+        "aeration_turbulence_scale",
+        "crest_lift_scale",
+        "default_gain",
+        "flow_response_curve",
+        "foam_crest_default",
+        "gain_bounds",
+        "spray_intensity_default",
+        "wave_train_audio_intensity_default",
+        "wave_train_spacing_m",
+        "wave_train_strength"
+      ],
+      "validation_contract": {
+        "bounded": true,
+        "conservation_guard_required": true,
+        "flow_dependent": true,
+        "geoclaw_compared": true,
+        "hide_conservation_failures": false,
+        "manifest_recorded": true,
+        "real_world_annotation_allowed": true
+      },
+      "visual_only_parameters": {
+        "foam_crest_default": 0.12,
+        "spray_intensity_default": 0.14
+      }
+    },
+    {
+      "audio_only_parameters": {
+        "scrape_audio_default": 0.12
+      },
+      "default_gain": 0.06,
+      "display_name": "Shallow Shelf",
+      "editor_domains": [
+        "solver_state",
+        "raft_coupling",
+        "visual_only",
+        "audio_only"
+      ],
+      "enabled_by_default": false,
+      "expected_raft_outcomes": [
+        "clean_line",
+        "rock_bump",
+        "pin",
+        "release",
+        "crew_overboard"
+      ],
+      "feature_kind": "shallow_shelf",
+      "flow_response_curve_id": "shallow_shelf_flow_v0",
+      "flow_response_samples": [
+        {
+          "curve_flow_band": "too_low",
+          "discharge_cfs": 900.0,
+          "discharge_m3s": 25.4851619328,
+          "effective_default_gain": 0.075,
+          "expected_behavior": "Rocks expose and pin risk rises; tune rock push, damping, shallow shelves, and crew high-side timing.",
+          "flow_band": "low_runnable",
+          "flow_percentile_range": [
+            0.1,
+            0.35
+          ],
+          "gain_multiplier": 1.0,
+          "outcome_note": "scrape and pivot hazard",
+          "review_priority": "high",
+          "season": "late_summer_low_water",
+          "south_fork_activation_scale": 1.25
+        },
+        {
+          "curve_flow_band": "medium",
+          "discharge_cfs": 1600.0,
+          "discharge_m3s": 45.3069545472,
+          "effective_default_gain": 0.039,
+          "expected_behavior": "Default line-choice and collision review band.",
+          "flow_band": "median_runnable",
+          "flow_percentile_range": [
+            0.35,
+            0.7
+          ],
+          "gain_multiplier": 0.65,
+          "outcome_note": "shallow drag and release",
+          "review_priority": "medium",
+          "season": "summer_commercial",
+          "south_fork_activation_scale": 1.0
+        },
+        {
+          "curve_flow_band": "high",
+          "discharge_cfs": 3000.0,
+          "discharge_m3s": 84.950539776,
+          "effective_default_gain": 0.0108,
+          "expected_behavior": "More rocks cover over; emphasize powerful laterals, hidden impacts, and faster recovery windows.",
+          "flow_band": "high_runnable",
+          "flow_percentile_range": [
+            0.7,
+            0.9
+          ],
+          "gain_multiplier": 0.25,
+          "outcome_note": "mostly covered shelf",
+          "review_priority": "medium",
+          "season": "spring_runoff_or_release",
+          "south_fork_activation_scale": 0.72
+        }
+      ],
+      "gain_bounds": {
+        "max": 1.0,
+        "min": 0.0
+      },
+      "hole_stickiness_washout_curve": [],
+      "manifest_recording": {
+        "fields": [
+          "feature_kind",
+          "flow_band",
+          "discharge_cfs",
+          "gain",
+          "gain_bounds",
+          "curve_id",
+          "editor_user",
+          "source_annotation_id",
+          "geoclaw_comparison_id",
+          "conservation_summary_id"
+        ],
+        "record_targets": [
+          "scenario/features.json",
+          "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+          "deterministic_run_capture_manifest"
+        ],
+        "required": true
+      },
+      "raft_coupling_effects": [
+        "grounding_friction_modifier",
+        "pivot_release_modifier"
+      ],
+      "review_category": "bedform",
+      "review_label": "boulder_garden",
+      "solver_state_effects": [
+        "local_drag_bias",
+        "roughness_bias"
+      ],
+      "tunable_parameters": [
+        "damping_scale",
+        "default_gain",
+        "flow_response_curve",
+        "gain_bounds",
+        "hazard_activation_scale",
+        "pivot_release_modifier",
+        "scrape_audio_default",
+        "shallow_hazard_threshold_m",
+        "shelf_grounding_depth_m",
+        "thin_water_highlight_default"
+      ],
+      "validation_contract": {
+        "bounded": true,
+        "conservation_guard_required": true,
+        "flow_dependent": true,
+        "geoclaw_compared": true,
+        "hide_conservation_failures": false,
+        "manifest_recorded": true,
+        "real_world_annotation_allowed": true
+      },
+      "visual_only_parameters": {
+        "scrape_audio_default": 0.12,
+        "thin_water_highlight_default": 0.1
+      }
+    },
+    {
+      "audio_only_parameters": {
+        "contact_audio_default": 0.1
+      },
+      "default_gain": 0.05,
+      "display_name": "Boulder Push And Damping",
+      "editor_domains": [
+        "solver_state",
+        "raft_coupling",
+        "visual_only",
+        "audio_only"
+      ],
+      "enabled_by_default": false,
+      "expected_raft_outcomes": [
+        "clean_line",
+        "rock_bump",
+        "pin",
+        "release",
+        "crew_overboard"
+      ],
+      "feature_kind": "boulder_push_damping",
+      "flow_response_curve_id": "boulder_push_flow_v0",
+      "flow_response_samples": [
+        {
+          "curve_flow_band": "too_low",
+          "discharge_cfs": 900.0,
+          "discharge_m3s": 25.4851619328,
+          "effective_default_gain": 0.021875,
+          "expected_behavior": "Rocks expose and pin risk rises; tune rock push, damping, shallow shelves, and crew high-side timing.",
+          "flow_band": "low_runnable",
+          "flow_percentile_range": [
+            0.1,
+            0.35
+          ],
+          "gain_multiplier": 0.35,
+          "outcome_note": "scrape dominates",
+          "review_priority": "high",
+          "season": "late_summer_low_water",
+          "south_fork_activation_scale": 1.25
+        },
+        {
+          "curve_flow_band": "medium",
+          "discharge_cfs": 1600.0,
+          "discharge_m3s": 45.3069545472,
+          "effective_default_gain": 0.0425,
+          "expected_behavior": "Default line-choice and collision review band.",
+          "flow_band": "median_runnable",
+          "flow_percentile_range": [
+            0.35,
+            0.7
+          ],
+          "gain_multiplier": 0.85,
+          "outcome_note": "deflection and damping",
+          "review_priority": "medium",
+          "season": "summer_commercial",
+          "south_fork_activation_scale": 1.0
+        },
+        {
+          "curve_flow_band": "high",
+          "discharge_cfs": 3000.0,
+          "discharge_m3s": 84.950539776,
+          "effective_default_gain": 0.036,
+          "expected_behavior": "More rocks cover over; emphasize powerful laterals, hidden impacts, and faster recovery windows.",
+          "flow_band": "high_runnable",
+          "flow_percentile_range": [
+            0.7,
+            0.9
+          ],
+          "gain_multiplier": 1.0,
+          "outcome_note": "strong wrap/pin pressure",
+          "review_priority": "medium",
+          "season": "spring_runoff_or_release",
+          "south_fork_activation_scale": 0.72
+        }
+      ],
+      "gain_bounds": {
+        "max": 1.0,
+        "min": 0.0
+      },
+      "hole_stickiness_washout_curve": [],
+      "manifest_recording": {
+        "fields": [
+          "feature_kind",
+          "flow_band",
+          "discharge_cfs",
+          "gain",
+          "gain_bounds",
+          "curve_id",
+          "editor_user",
+          "source_annotation_id",
+          "geoclaw_comparison_id",
+          "conservation_summary_id"
+        ],
+        "record_targets": [
+          "scenario/features.json",
+          "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+          "deterministic_run_capture_manifest"
+        ],
+        "required": true
+      },
+      "raft_coupling_effects": [
+        "scrape_modifier",
+        "launch_modifier",
+        "pin_pressure_modifier"
+      ],
+      "review_category": "bedform",
+      "review_label": "boulder_garden",
+      "solver_state_effects": [
+        "local_deflection_bias",
+        "wake_damping_proxy"
+      ],
+      "tunable_parameters": [
+        "boulder_damping_scale",
+        "boulder_push_scale",
+        "contact_audio_default",
+        "damping_scale",
+        "default_gain",
+        "flow_response_curve",
+        "gain_bounds",
+        "hazard_activation_scale",
+        "shallow_hazard_threshold_m",
+        "splash_default"
+      ],
+      "validation_contract": {
+        "bounded": true,
+        "conservation_guard_required": true,
+        "flow_dependent": true,
+        "geoclaw_compared": true,
+        "hide_conservation_failures": false,
+        "manifest_recorded": true,
+        "real_world_annotation_allowed": true
+      },
+      "visual_only_parameters": {
+        "contact_audio_default": 0.1,
+        "splash_default": 0.12
+      }
+    },
+    {
+      "audio_only_parameters": {
+        "pin_release_audio_intensity_default": 0.05
+      },
+      "default_gain": 0.03,
+      "display_name": "Pin And Release",
+      "editor_domains": [
+        "solver_state",
+        "raft_coupling",
+        "visual_only",
+        "audio_only"
+      ],
+      "enabled_by_default": false,
+      "expected_raft_outcomes": [
+        "clean_line",
+        "rock_bump",
+        "pin",
+        "release",
+        "crew_overboard"
+      ],
+      "feature_kind": "pin_release",
+      "flow_response_curve_id": "pin_release_flow_v0",
+      "flow_response_samples": [
+        {
+          "curve_flow_band": "too_low",
+          "discharge_cfs": 900.0,
+          "discharge_m3s": 25.4851619328,
+          "effective_default_gain": 0.01125,
+          "expected_behavior": "Rocks expose and pin risk rises; tune rock push, damping, shallow shelves, and crew high-side timing.",
+          "flow_band": "low_runnable",
+          "flow_percentile_range": [
+            0.1,
+            0.35
+          ],
+          "gain_multiplier": 0.3,
+          "outcome_note": "grounding/contact hold",
+          "review_priority": "high",
+          "season": "late_summer_low_water",
+          "south_fork_activation_scale": 1.25
+        },
+        {
+          "curve_flow_band": "medium",
+          "discharge_cfs": 1600.0,
+          "discharge_m3s": 45.3069545472,
+          "effective_default_gain": 0.027,
+          "expected_behavior": "Default line-choice and collision review band.",
+          "flow_band": "median_runnable",
+          "flow_percentile_range": [
+            0.35,
+            0.7
+          ],
+          "gain_multiplier": 0.9,
+          "outcome_note": "pin/release skill window",
+          "review_priority": "medium",
+          "season": "summer_commercial",
+          "south_fork_activation_scale": 1.0
+        },
+        {
+          "curve_flow_band": "high",
+          "discharge_cfs": 3000.0,
+          "discharge_m3s": 84.950539776,
+          "effective_default_gain": 0.0216,
+          "expected_behavior": "More rocks cover over; emphasize powerful laterals, hidden impacts, and faster recovery windows.",
+          "flow_band": "high_runnable",
+          "flow_percentile_range": [
+            0.7,
+            0.9
+          ],
+          "gain_multiplier": 1.0,
+          "outcome_note": "high water loading",
+          "review_priority": "medium",
+          "season": "spring_runoff_or_release",
+          "south_fork_activation_scale": 0.72
+        }
+      ],
+      "gain_bounds": {
+        "max": 1.0,
+        "min": 0.0
+      },
+      "hole_stickiness_washout_curve": [],
+      "manifest_recording": {
+        "fields": [
+          "feature_kind",
+          "flow_band",
+          "discharge_cfs",
+          "gain",
+          "gain_bounds",
+          "curve_id",
+          "editor_user",
+          "source_annotation_id",
+          "geoclaw_comparison_id",
+          "conservation_summary_id"
+        ],
+        "record_targets": [
+          "scenario/features.json",
+          "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+          "deterministic_run_capture_manifest"
+        ],
+        "required": true
+      },
+      "raft_coupling_effects": [
+        "contact_hold_modifier",
+        "release_threshold_modifier",
+        "crew_response_window_modifier"
+      ],
+      "review_category": "bedform",
+      "review_label": "boulder_garden",
+      "solver_state_effects": [
+        "water_loading_pressure_proxy"
+      ],
+      "tunable_parameters": [
+        "crew_weight_distribution_scale",
+        "damping_scale",
+        "default_gain",
+        "flow_response_curve",
+        "gain_bounds",
+        "hazard_activation_scale",
+        "hazard_highlight_default",
+        "high_side_timing_window_s",
+        "pin_load_threshold_n",
+        "pin_release_audio_intensity_default",
+        "release_impulse_threshold_n_s",
+        "shallow_hazard_threshold_m"
+      ],
+      "validation_contract": {
+        "bounded": true,
+        "conservation_guard_required": true,
+        "flow_dependent": true,
+        "geoclaw_compared": true,
+        "hide_conservation_failures": false,
+        "manifest_recorded": true,
+        "real_world_annotation_allowed": true
+      },
+      "visual_only_parameters": {
+        "hazard_highlight_default": 0.06
+      }
+    },
+    {
+      "audio_only_parameters": {
+        "crew_callout_intensity_default": 0.08
+      },
+      "default_gain": 0.03,
+      "display_name": "Flip And High-Side Counterplay",
+      "editor_domains": [
+        "solver_state",
+        "raft_coupling",
+        "visual_only",
+        "audio_only"
+      ],
+      "enabled_by_default": false,
+      "expected_raft_outcomes": [
+        "angle_correction",
+        "brace",
+        "flip_if_mishandled"
+      ],
+      "feature_kind": "flip",
+      "flow_response_curve_id": "flip_flow_v0",
+      "flow_response_samples": [
+        {
+          "curve_flow_band": "too_low",
+          "discharge_cfs": 900.0,
+          "discharge_m3s": 25.4851619328,
+          "effective_default_gain": 0.004125,
+          "expected_behavior": "Often weak or rock-controlled; verify it is not just bank roughness.",
+          "flow_band": "low_runnable",
+          "flow_percentile_range": [
+            0.1,
+            0.35
+          ],
+          "gain_multiplier": 0.25,
+          "outcome_note": "rock/tube leverage dominates",
+          "review_priority": "medium",
+          "season": "late_summer_low_water",
+          "south_fork_activation_scale": 0.55
+        },
+        {
+          "curve_flow_band": "medium",
+          "discharge_cfs": 1600.0,
+          "discharge_m3s": 45.3069545472,
+          "effective_default_gain": 0.0255,
+          "expected_behavior": "Default cross-current hit and recovery review band.",
+          "flow_band": "median_runnable",
+          "flow_percentile_range": [
+            0.35,
+            0.7
+          ],
+          "gain_multiplier": 0.85,
+          "outcome_note": "high-side counterplay window",
+          "review_priority": "medium",
+          "season": "summer_commercial",
+          "south_fork_activation_scale": 1.0
+        },
+        {
+          "curve_flow_band": "high",
+          "discharge_cfs": 3000.0,
+          "discharge_m3s": 84.950539776,
+          "effective_default_gain": 0.039,
+          "expected_behavior": "Strong lateral push; tune angle, brace timing, and flip-risk escalation.",
+          "flow_band": "high_runnable",
+          "flow_percentile_range": [
+            0.7,
+            0.9
+          ],
+          "gain_multiplier": 1.0,
+          "outcome_note": "fast roll impulse risk",
+          "review_priority": "high",
+          "season": "spring_runoff_or_release",
+          "south_fork_activation_scale": 1.3
+        }
+      ],
+      "gain_bounds": {
+        "max": 1.0,
+        "min": 0.0
+      },
+      "hole_stickiness_washout_curve": [],
+      "manifest_recording": {
+        "fields": [
+          "feature_kind",
+          "flow_band",
+          "discharge_cfs",
+          "gain",
+          "gain_bounds",
+          "curve_id",
+          "editor_user",
+          "source_annotation_id",
+          "geoclaw_comparison_id",
+          "conservation_summary_id"
+        ],
+        "record_targets": [
+          "scenario/features.json",
+          "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+          "deterministic_run_capture_manifest"
+        ],
+        "required": true
+      },
+      "raft_coupling_effects": [
+        "upstream_tube_loading_modifier",
+        "high_side_counterplay_window_modifier",
+        "recovery_threshold_modifier"
+      ],
+      "review_category": "hydraulic",
+      "review_label": "lateral",
+      "solver_state_effects": [
+        "roll_impulse_source_proxy"
+      ],
+      "tunable_parameters": [
+        "camera_shake_default",
+        "crew_callout_intensity_default",
+        "crew_weight_distribution_scale",
+        "default_gain",
+        "downstream_momentum_scale",
+        "eddy_line_shear",
+        "flow_response_curve",
+        "gain_bounds",
+        "hazard_activation_scale",
+        "high_side_counterplay_window_s",
+        "roll_impulse_threshold_n_m_s"
+      ],
+      "validation_contract": {
+        "bounded": true,
+        "conservation_guard_required": true,
+        "flow_dependent": true,
+        "geoclaw_compared": true,
+        "hide_conservation_failures": false,
+        "manifest_recorded": true,
+        "real_world_annotation_allowed": true
+      },
+      "visual_only_parameters": {
+        "camera_shake_default": 0.04,
+        "crew_callout_intensity_default": 0.08
+      }
+    }
+  ],
+  "flow_bands": [
+    {
+      "confidence": 0.3,
+      "discharge_cfs": 900.0,
+      "discharge_m3s": 25.4851619328,
+      "flow_band": "low_runnable",
+      "notes": "Lower training-oriented flow; expect exposed rocks, shallows, and slower recovery from mistakes.",
+      "percentile_range": [
+        0.1,
+        0.35
+      ],
+      "runnable": true,
+      "season": "late_summer_low_water",
+      "stage_ft": null
+    },
+    {
+      "confidence": 0.35,
+      "discharge_cfs": 1600.0,
+      "discharge_m3s": 45.3069545472,
+      "flow_band": "median_runnable",
+      "notes": "Default validation band for intermediate commercial-style runs.",
+      "percentile_range": [
+        0.35,
+        0.7
+      ],
+      "runnable": true,
+      "season": "summer_commercial",
+      "stage_ft": null
+    },
+    {
+      "confidence": 0.25,
+      "discharge_cfs": 3000.0,
+      "discharge_m3s": 84.950539776,
+      "flow_band": "high_runnable",
+      "notes": "Higher consequence preset with stronger holes, wave trains, eddy-line shear, and faster raft response.",
+      "percentile_range": [
+        0.7,
+        0.9
+      ],
+      "runnable": true,
+      "season": "spring_runoff_or_release",
+      "stage_ft": null
+    }
+  ],
+  "flow_presets": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+  "module": "RaftSimRiver",
+  "rapid_review_flow_difficulty_mapping": "physics/data/real_world/south_fork_american_chili_bar/rapid_review_flow_difficulty_mapping.json",
+  "rapid_river_editor": "unreal/Content/RaftSim/River/rapid_river_editor.json",
+  "reach_local_streaming": "unreal/Content/RaftSim/River/reach_local_streaming.json",
+  "runtime_posture": {
+    "feature_forcing_enabled_by_default": false,
+    "global_gain_scale": 0.05,
+    "keep_default_gains_low": true,
+    "max_default_gain": 0.12,
+    "physics_gameplay_visual_separated": true
+  },
+  "schema": "raftsim.unreal.feature_tuning_editor.v1",
+  "spatial_audio_presets": "unreal/Content/RaftSim/Audio/spatial_audio_presets.json",
+  "status": "ready_for_unreal_feature_tuning_data_asset",
+  "tuning_id": "milestone21_feature_tuning_editor",
+  "validation_requirements": {
+    "bounded": true,
+    "conservation_guard_required": true,
+    "flow_dependent": true,
+    "force_only_after_water_field_acceptance": true,
+    "geoclaw_compared": true,
+    "hide_conservation_failures": false,
+    "manifest_recorded": true
+  },
+  "visual_audio_only_controls": [
+    {
+      "control_id": "hole.foam_intensity_default",
+      "default_value": 0.15,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "hole",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "hole.spray_intensity_default",
+      "default_value": 0.1,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "hole",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "hole.hole_audio_intensity_default",
+      "default_value": 0.05,
+      "domain": "audio_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "hole",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "boil.surface_pulse_default",
+      "default_value": 0.12,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "boil",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "boil.audio_intensity_default",
+      "default_value": 0.1,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "boil",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "lateral.foam_streak_default",
+      "default_value": 0.1,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "lateral",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "lateral.lateral_audio_intensity_default",
+      "default_value": 0.05,
+      "domain": "audio_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "lateral",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "eddy_line.foam_edge_default",
+      "default_value": 0.12,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "eddy_line",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "eddy_line.eddy_line_audio_intensity_default",
+      "default_value": 0.05,
+      "domain": "audio_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "eddy_line",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "wave_train.spray_intensity_default",
+      "default_value": 0.14,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "wave_train",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "wave_train.foam_crest_default",
+      "default_value": 0.12,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "wave_train",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "wave_train.wave_train_audio_intensity_default",
+      "default_value": 0.05,
+      "domain": "audio_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "wave_train",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "shallow_shelf.scrape_audio_default",
+      "default_value": 0.12,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "shallow_shelf",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "shallow_shelf.thin_water_highlight_default",
+      "default_value": 0.1,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "shallow_shelf",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "boulder_push_damping.splash_default",
+      "default_value": 0.12,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "boulder_push_damping",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "boulder_push_damping.contact_audio_default",
+      "default_value": 0.1,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "boulder_push_damping",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "pin_release.hazard_highlight_default",
+      "default_value": 0.06,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "pin_release",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "pin_release.pin_release_audio_intensity_default",
+      "default_value": 0.05,
+      "domain": "audio_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "pin_release",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "flip.camera_shake_default",
+      "default_value": 0.04,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "flip",
+      "manifest_recording_required": true
+    },
+    {
+      "control_id": "flip.crew_callout_intensity_default",
+      "default_value": 0.08,
+      "domain": "visual_only",
+      "effective_on_raft_coupling": false,
+      "effective_on_solver_state": false,
+      "feature_kind": "flip",
+      "manifest_recording_required": true
+    }
+  ]
+}
