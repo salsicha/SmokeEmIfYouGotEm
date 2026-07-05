@@ -7,6 +7,14 @@ namespace RaftSimInputActions
 static const FName PaddleStroke(TEXT("PaddleStroke"));
 static const FName PaddleBrace(TEXT("PaddleBrace"));
 static const FName PaddleDraw(TEXT("PaddleDraw"));
+static const FName OarLeftStroke(TEXT("OarLeftStroke"));
+static const FName OarRightStroke(TEXT("OarRightStroke"));
+static const FName OarFeather(TEXT("OarFeather"));
+static const FName GuideCommandForwardPaddle(TEXT("GuideCommandForwardPaddle"));
+static const FName GuideCommandBackPaddle(TEXT("GuideCommandBackPaddle"));
+static const FName GuideCommandLeftPaddle(TEXT("GuideCommandLeftPaddle"));
+static const FName GuideCommandRightPaddle(TEXT("GuideCommandRightPaddle"));
+static const FName GuideCommandStop(TEXT("GuideCommandStop"));
 static const FName HighSide(TEXT("HighSide"));
 static const FName CrewLean(TEXT("CrewLean"));
 static const FName HoldOn(TEXT("HoldOn"));
