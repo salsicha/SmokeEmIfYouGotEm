@@ -56,6 +56,83 @@
       ],
       "raft_setups": ["standard_14ft_paddle_raft", "heavier_training_raft"],
       "crew_setups": ["ai_training_crew", "experienced_ai_crew", "empty_debug_raft"]
+    },
+    {
+      "river_id": "colorado_river",
+      "river_name": "Colorado River",
+      "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+      "section_name": "Lees Ferry to Diamond Creek Rowing Prototype",
+      "route_prototype": "unreal/Content/RaftSim/River/colorado_rowing_route_editor_pass.json",
+      "region": "Arizona Grand Canyon",
+      "route_style": "rowing_oar_rig",
+      "input_contract": {
+        "direct_manual_rowing_controls_required": true,
+        "passenger_paddle_voice_commands_enabled": false,
+        "manual_actions": [
+          "OarLeftStroke",
+          "OarRightStroke",
+          "OarFeather",
+          "CrewLean",
+          "HighSide",
+          "HoldOn",
+          "RescueTargetSelect",
+          "RescueReachGrab",
+          "RescueThrowLine"
+        ]
+      },
+      "difficulty_presets": [
+        "large_volume_orientation",
+        "rowing_ferry_practice",
+        "wave_train_and_lateral_sequence",
+        "long_water_rescue_training",
+        "guide_review_scouting"
+      ],
+      "difficulty_range": ["class_ii_big_water", "class_iv_big_water_planning"],
+      "seasons": ["low_release_planning", "moderate_release_planning", "high_release_planning", "review_only_spike_flow"],
+      "flow_bands": [
+        {
+          "flow_band": "low_release_planning",
+          "season": "low_release_planning",
+          "discharge_cfs": 8000.0,
+          "confidence": 0.15,
+          "requires_validation_before_playable": true
+        },
+        {
+          "flow_band": "moderate_release_planning",
+          "season": "moderate_release_planning",
+          "discharge_cfs": 12000.0,
+          "confidence": 0.18,
+          "requires_validation_before_playable": true
+        },
+        {
+          "flow_band": "high_release_planning",
+          "season": "high_release_planning",
+          "discharge_cfs": 18000.0,
+          "confidence": 0.12,
+          "requires_validation_before_playable": true
+        },
+        {
+          "flow_band": "review_only_spike_flow",
+          "season": "review_only_spike_flow",
+          "discharge_cfs": 24000.0,
+          "confidence": 0.08,
+          "requires_validation_before_playable": true
+        }
+      ],
+      "raft_setups": ["sixteen_foot_oar_rig", "eighteen_foot_oar_rig", "cargo_training_oar_rig"],
+      "crew_setups": ["passenger_cargo_mix", "rescue_training_passengers", "empty_debug_oar_rig"],
+      "rescue_window_profile": {
+        "flatwater_orientation_seconds": 70.0,
+        "big_water_sequence_seconds": 55.0,
+        "inner_gorge_runout_seconds": 90.0
+      },
+      "validation_status": {
+        "source_manifest": "draft_placeholders",
+        "gauge_history": "required_before_playable",
+        "guide_review": "required_before_playable",
+        "field_media_timecodes": "required_before_playable",
+        "geospatial_corridor": "required_before_playable"
+      }
     }
   ],
   "menu_flow": [

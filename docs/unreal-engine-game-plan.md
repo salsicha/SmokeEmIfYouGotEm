@@ -264,6 +264,7 @@ Tasks:
 - Build additional real-world river sections from source manifests and reviewed rapid annotations.
 - Expand highly detailed, immersive landscape and foliage passes for each river biome so each corridor reads as a real place, not a thin playable channel.
 - Prioritize the Colorado River rowing/oar-rig route as the second real-world river after the South Fork American baseline, with direct manual rowing-frame controls, no passenger paddle voice commands, large-volume reading, canyon pacing, and longer rescue/recovery stakes.
+- Use `unreal/Content/RaftSim/River/colorado_rowing_route_editor_pass.json` as the first Colorado rowing prototype contract: it keeps all flow bands review-gated, exposes large-volume reading cues and canyon pacing checkpoints, records longer rescue windows, and requires guide-review annotations before any route is promoted to production-playable.
 - Make the Pacuare River in Costa Rica the third runnable river target, with a future source manifest, flow bands, rainforest/canyon fidelity needs, rain-fed flow review, and rights-cleared guide annotations before solver or Unreal package generation.
 - Add difficulty progression.
 - Add more raft types and handling profiles.

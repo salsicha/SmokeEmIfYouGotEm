@@ -94,6 +94,72 @@ struct FRaftSimColoradoValidationAnnotationNeed
     TArray<FName> ReviewFields;
 };
 
+USTRUCT(BlueprintType)
+struct FRaftSimColoradoLargeVolumeReadingCue
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    FName CueId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    FName CueKind;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    FString GameplayDecision;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    FString FlowBandResponse;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    TArray<FName> ValidationSignals;
+};
+
+USTRUCT(BlueprintType)
+struct FRaftSimColoradoCanyonPacingCheckpoint
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    FName CheckpointId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    FName SegmentId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    FString GameplayRole;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    float ExpectedRunTimeMinutes = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    float RescueWindowSeconds = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    TArray<FName> ReviewSignals;
+};
+
+USTRUCT(BlueprintType)
+struct FRaftSimColoradoGuideReviewAnnotation
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    FName AnnotationId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    FName GeometryKind;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    TArray<FString> RequiredSources;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    TArray<FName> ReviewFields;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    bool bBlocksPlayableSignoff = true;
+};
+
 UCLASS(BlueprintType)
 class RAFTSIMRIVER_API URaftSimColoradoRowingRouteConfig : public UDataAsset
 {
@@ -126,6 +192,24 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
     TArray<FRaftSimColoradoValidationAnnotationNeed> ValidationAnnotationNeeds;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    TArray<FRaftSimColoradoLargeVolumeReadingCue> LargeVolumeReadingCues;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    TArray<FRaftSimColoradoCanyonPacingCheckpoint> CanyonPacingCheckpoints;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    TArray<FRaftSimColoradoGuideReviewAnnotation> GuideReviewAnnotations;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    bool bDirectManualRowingControlsRequired = true;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    bool bPassengerPaddleVoiceCommandsEnabled = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
+    float DefaultLongWaterRescueWindowSeconds = 55.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ColoradoRowing")
     bool bOarRigGuideSignoffRequired = true;
