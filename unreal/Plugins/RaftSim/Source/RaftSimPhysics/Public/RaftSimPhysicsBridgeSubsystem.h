@@ -92,6 +92,12 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Physics")
     const FRaftSimPhysicsTickOutput& GetLastOutput() const { return LastOutput; }
 
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Physics")
+    const FRaftSimRaftAuthorityIntegrationPolicy& GetAuthorityIntegrationPolicy() const
+    {
+        return AuthorityIntegrationPolicy;
+    }
+
 private:
     UPROPERTY()
     TObjectPtr<URaftSimWaterRuntimeAdapter> WaterRuntime;
@@ -105,6 +111,7 @@ private:
     float WaterStepSeconds = 1.0f / 60.0f;
     float ChronoSubstepSeconds = 1.0f / 120.0f;
     FRaftSimWaterRaftCouplingPolicy CouplingPolicy;
+    FRaftSimRaftAuthorityIntegrationPolicy AuthorityIntegrationPolicy;
     float AccumulatedSeconds = 0.0f;
     int32 PhysicsFrame = 0;
 

@@ -862,7 +862,7 @@ This milestone turns the validated river-data contracts into the level editor an
 
 This milestone wires the selected raft/contact runtime, validated water fields, and crew safety systems into scoring-critical gameplay.
 
-- [ ] Integrate the Milestone 19 selected raft/contact authority path over approved custom C++ water, keeping Chaos for visual/non-authoritative physics unless it wins the scoring-critical fixture suite.
+- [x] Integrate the Milestone 19 selected raft/contact authority path over approved custom C++ water, keeping Chaos for visual/non-authoritative physics unless it wins the scoring-critical fixture suite.
 - [ ] Implement raft-rock, bank, ledge, shallow-shelf, bed-grounding, boulder-garden, pin/release, surf/flush, and flip contacts with telemetry for restitution, damping, friction, stick/slip, contact loading, and release thresholds.
 - [ ] Implement crew seating, weight distribution, brace, lean, and high-side mechanics that shift center of gravity and change pin/flip/release outcomes.
 - [ ] Implement crew-overboard safety states: seated, at-risk, falling/ejected, swimming, rescue-targeted, rescued, re-seated/recovered, and failed-rescue.

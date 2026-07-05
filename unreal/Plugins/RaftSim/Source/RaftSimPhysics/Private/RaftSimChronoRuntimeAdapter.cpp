@@ -3,6 +3,13 @@
 void URaftSimChronoRuntimeAdapter::ConfigureRaftBody(const FRaftSimRaftBodyConfig& InConfig)
 {
     RaftConfig = InConfig;
+    AuthorityIntegrationPolicy.SelectedRuntime = InConfig.Runtime;
+}
+
+void URaftSimChronoRuntimeAdapter::ConfigureAuthorityIntegrationPolicy(const FRaftSimRaftAuthorityIntegrationPolicy& InPolicy)
+{
+    AuthorityIntegrationPolicy = InPolicy;
+    RaftConfig.Runtime = InPolicy.SelectedRuntime;
 }
 
 void URaftSimChronoRuntimeAdapter::SetKinematicState(const FRaftSimRaftKinematicState& InState)

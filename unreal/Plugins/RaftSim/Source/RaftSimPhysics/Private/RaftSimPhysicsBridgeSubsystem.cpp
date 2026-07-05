@@ -25,6 +25,10 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
     WaterStepSeconds = FMath::Max(InWaterStepSeconds, KINDA_SMALL_NUMBER);
     ChronoSubstepSeconds = FMath::Clamp(InChronoSubstepSeconds, KINDA_SMALL_NUMBER, WaterStepSeconds);
     CouplingPolicy = InCouplingPolicy;
+    AuthorityIntegrationPolicy.SelectedRuntime = RaftConfig.Runtime;
+    AuthorityIntegrationPolicy.WaterAuthority = TEXT("custom_cxx_shallow_water_solver");
+    AuthorityIntegrationPolicy.bChaosMayDriveScoringCriticalPhysics = false;
+    AuthorityIntegrationPolicy.bRenderTickMayAdvanceAuthority = false;
     AccumulatedSeconds = 0.0f;
     PhysicsFrame = 0;
     LastOutput = FRaftSimPhysicsTickOutput();
@@ -39,6 +43,7 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
     if (RaftRuntime)
     {
         RaftRuntime->ConfigureRaftBody(RaftConfig);
+        RaftRuntime->ConfigureAuthorityIntegrationPolicy(AuthorityIntegrationPolicy);
     }
 }
 
