@@ -60,6 +60,14 @@ FRaftSimPhysicsTickOutput URaftSimPhysicsBridgeSubsystem::TickBridge(const FRaft
     return LastOutput;
 }
 
+void URaftSimPhysicsBridgeSubsystem::RecordContactTelemetryEvent(
+    const FRaftSimRaftContactTelemetryEvent& Event
+)
+{
+    LastOutput.ContactTelemetryEvents.Add(Event);
+    RefreshContactRuntimeSummary();
+}
+
 void URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick()
 {
     if (!WaterRuntime || !RaftRuntime)
@@ -84,5 +92,37 @@ void URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick()
     LastOutput.SimTimeSeconds = PhysicsFrame * WaterStepSeconds;
     LastOutput.RaftState = RaftRuntime->GetKinematicState();
     LastOutput.WaterSamplesApplied = 0;
-    LastOutput.ContactEvents = 0;
+    RefreshContactRuntimeSummary();
+}
+
+void URaftSimPhysicsBridgeSubsystem::RefreshContactRuntimeSummary()
+{
+    FRaftSimRaftContactRuntimeSummary Summary;
+    Summary.EventCount = LastOutput.ContactTelemetryEvents.Num();
+
+    for (const FRaftSimRaftContactTelemetryEvent& Event : LastOutput.ContactTelemetryEvents)
+    {
+        Summary.MaxContactLoadingNewtons = FMath::Max(
+            Summary.MaxContactLoadingNewtons,
+            Event.ContactLoadingNewtons
+        );
+
+        if (Event.Outcome == ERaftSimContactOutcome::Pin || Event.Outcome == ERaftSimContactOutcome::Release)
+        {
+            ++Summary.PinOrReleaseEventCount;
+        }
+
+        if (
+            Event.Outcome == ERaftSimContactOutcome::Surf
+            || Event.Outcome == ERaftSimContactOutcome::Flush
+            || Event.Outcome == ERaftSimContactOutcome::Flip
+            || Event.Outcome == ERaftSimContactOutcome::FlipRisk
+        )
+        {
+            ++Summary.SurfFlushOrFlipEventCount;
+        }
+    }
+
+    LastOutput.ContactRuntimeSummary = Summary;
+    LastOutput.ContactEvents = Summary.EventCount;
 }
