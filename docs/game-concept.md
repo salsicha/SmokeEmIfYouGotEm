@@ -259,6 +259,7 @@ The simulator should feel energetic, outdoorsy, risky, and a little scrappy. It 
 Visual direction:
 
 - Photo-real river environments based on real canyon, forest, desert, and mountain reference, with the highest-value sections grounded in geospatial course/elevation data
+- Highly detailed and immersive landscapes, banks, rocks, shore features, and foliage that look as photorealistic as possible while preserving performance, VR comfort, and water-reading clarity
 - Clear diegetic water direction indicators through foam lines, bubbles, surface streaks, waves, and debris
 - Physically plausible materials for raft rubber, wet rock, water, spray, foam, ropes, helmets, PFDs, and paddles
 - Strong silhouettes for rocks, raft, waves, and hazards without stylizing away realism
