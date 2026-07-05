@@ -1,0 +1,122 @@
+{
+  "schema": "raftsim.unreal.vertical_slice_acceptance_gate.v1",
+  "module": "RaftSimAutomation",
+  "gate_id": "milestone23_first_person_vertical_slice",
+  "purpose": "Gate the first-person Unreal vertical slice on completion, failure, restart, replay, scoring, profiling, and physics/river-fidelity review evidence.",
+  "source_manifests": {
+    "vertical_slice": "unreal/Content/RaftSim/VerticalSlice/first_rapid_vertical_slice.json",
+    "frontend_flow": "unreal/Content/RaftSim/UI/vertical_slice_frontend_flow.json",
+    "environment_corridor": "unreal/Content/RaftSim/Rendering/vertical_slice_environment_corridor.json",
+    "presentation_cues": "unreal/Content/RaftSim/Rendering/telemetry_presentation_cues.json",
+    "live_water_bridge": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
+    "raft_contact_authority": "unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json",
+    "crew_safety_states": "unreal/Content/RaftSim/Crew/crew_overboard_safety_states.json",
+    "scoring": "unreal/Content/RaftSim/Crew/gameplay_telemetry_scoring.json",
+    "replay_playback": "unreal/Content/RaftSim/Physics/replay_playback_manifest.json",
+    "debug_views": "unreal/Content/RaftSim/Debug/live_water_debug_views.json",
+    "full_cpp_validation_gate": "physics/reports/milestone16/full_cpp_validation_gate.json",
+    "live_water_unreal_smoke_gate": "physics/reports/milestone20/live_water_unreal_smoke_suite.json"
+  },
+  "build_targets": [
+    {
+      "target_id": "mac_editor_development",
+      "command": "Build.sh SmokeEmIfYouGotEmEditor Mac Development -Project=unreal/SmokeEmIfYouGotEm.uproject -NoHotReload",
+      "required_before_milestone_close": true,
+      "required_before_release_signoff": true
+    },
+    {
+      "target_id": "nullrhi_automation",
+      "command": "UnrealEditor-Cmd unreal/SmokeEmIfYouGotEm.uproject -unattended -nop4 -nosplash -NullRHI -NoSound -ExecCmds='Automation RunTests RaftSim.Milestone23; Quit'",
+      "required_before_milestone_close": false,
+      "required_before_release_signoff": true
+    }
+  ],
+  "acceptance_scenarios": [
+    {
+      "scenario_id": "training_complete",
+      "source_scenario": "training_eddy_turn_intro",
+      "required_outcome": "complete",
+      "required_evidence": ["score_record", "replay_bookmarks", "debug_overlay_capture"]
+    },
+    {
+      "scenario_id": "technical_clean_line_complete",
+      "source_scenario": "first_technical_constriction_wave_train",
+      "required_outcome": "complete",
+      "required_evidence": ["score_record", "line_summary", "contact_telemetry", "physics_review_overlay"]
+    },
+    {
+      "scenario_id": "technical_failure_path",
+      "source_scenario": "first_technical_constriction_wave_train",
+      "required_outcome": "failed_or_rescued",
+      "required_evidence": ["failed_rescue_or_swimmer_state", "score_penalty", "after_action_feedback"]
+    },
+    {
+      "scenario_id": "restart_path",
+      "source_scenario": "first_technical_constriction_wave_train",
+      "required_outcome": "restart_returns_to_same_selected_scenario",
+      "required_evidence": ["reset_score", "reset_replay_frame", "reset_crew_safety_state"]
+    },
+    {
+      "scenario_id": "replay_review_path",
+      "source_scenario": "first_technical_constriction_wave_train",
+      "required_outcome": "replay_review_scrub_and_overlay",
+      "required_evidence": ["entry_bookmark", "contact_bookmark", "command_bookmark", "rescue_bookmark", "finish_bookmark"]
+    }
+  ],
+  "gate_checks": [
+    {
+      "check_id": "build_compiles",
+      "requirement": "Editor target builds successfully for the locked UE 5.8 Mac development target.",
+      "evidence": ["mac_editor_development"]
+    },
+    {
+      "check_id": "complete_and_failure_paths",
+      "requirement": "The vertical slice exposes both successful completion and failed/rescue outcomes with scoring and after-action feedback.",
+      "evidence": ["first_rapid_vertical_slice", "gameplay_telemetry_scoring", "swimmer_rescue_gameplay"]
+    },
+    {
+      "check_id": "restart_path",
+      "requirement": "Restart resets score, replay frame, and crew safety state while preserving the selected scenario.",
+      "evidence": ["first_rapid_vertical_slice.restart"]
+    },
+    {
+      "check_id": "replay_review_path",
+      "requirement": "Replay review can load a manifest, scrub bookmarks, and toggle water/contact/runtime overlays.",
+      "evidence": ["URaftSimReplaySubsystem", "vertical_slice_frontend_flow", "live_water_debug_views"]
+    },
+    {
+      "check_id": "scoring_path",
+      "requirement": "Safety, line choice, boat angle, paddle efficiency, command timing, high-side timing, swims, and rescue feed scoring.",
+      "evidence": ["gameplay_telemetry_scoring"]
+    },
+    {
+      "check_id": "profile_path",
+      "requirement": "Accepted C++ water/runtime profiles stay inside desktop, VR, and handheld budgets; environment budgets are defined for the slice.",
+      "evidence": ["physics/reports/milestone16/runtime_profile.json", "vertical_slice_environment_corridor.quality_budgets"]
+    },
+    {
+      "check_id": "physics_evidence",
+      "requirement": "The slice consumes the accepted full C++ water validation gate and Milestone 20 Unreal live-water smoke gate.",
+      "evidence": ["physics/reports/milestone16/full_cpp_validation_gate.json", "physics/reports/milestone20/live_water_unreal_smoke_suite.json"]
+    },
+    {
+      "check_id": "river_fidelity_evidence",
+      "requirement": "Visual, audio, annotation, and environment review layers point back to validated South Fork corridor and solver telemetry.",
+      "evidence": ["vertical_slice_environment_corridor", "telemetry_presentation_cues", "south_fork_first_river_editor_pass"]
+    }
+  ],
+  "pass_policy": {
+    "requires_successful_build": true,
+    "requires_complete_path": true,
+    "requires_failure_path": true,
+    "requires_restart_path": true,
+    "requires_replay_review_path": true,
+    "requires_scoring_path": true,
+    "requires_profile_path": true,
+    "requires_physics_validation_evidence": true,
+    "requires_river_fidelity_evidence": true,
+    "requires_release_signoff_playtest_capture_later": true
+  },
+  "report": "physics/reports/milestone23/vertical_slice_acceptance_gate.json",
+  "status": "ready_for_milestone23_contract_gate_and_editor_build_verification"
+}

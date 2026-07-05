@@ -1,0 +1,40 @@
+{
+  "schema": "raftsim.milestone23.vertical_slice_acceptance_gate_report.v1",
+  "generated_on": "2026-07-05",
+  "gate_manifest": "unreal/Content/RaftSim/Automation/vertical_slice_acceptance_gate.json",
+  "checks": [
+    {
+      "check_id": "source_contracts_present",
+      "passed": true,
+      "summary": "Vertical slice, frontend, environment, presentation, scoring, replay, and debug contracts are source-controlled and linked."
+    },
+    {
+      "check_id": "complete_fail_restart_replay_score_paths",
+      "passed": true,
+      "summary": "The gate requires complete, failure/rescue, restart, replay review, and scoring paths before the vertical slice can be accepted."
+    },
+    {
+      "check_id": "physics_and_river_fidelity_evidence",
+      "passed": true,
+      "summary": "The gate references the passing full C++ validation gate, the Milestone 20 Unreal live-water smoke gate, South Fork corridor data, presentation cues, and debug overlays."
+    },
+    {
+      "check_id": "profile_and_review_evidence",
+      "passed": true,
+      "summary": "The gate requires runtime profile evidence, environment quality budgets, replay bookmarks, debug overlays, and guide-seat/river-fidelity review captures."
+    },
+    {
+      "check_id": "editor_target_build",
+      "passed": true,
+      "summary": "SmokeEmIfYouGotEmEditor Mac Development target built successfully after the Milestone 23 gate contracts were added."
+    }
+  ],
+  "decision": "PASS_CONTRACT_AND_EDITOR_BUILD_GATE",
+  "live_playtest_capture_required_before_release_signoff": true,
+  "passed": true,
+  "notes": [
+    "This report closes the source-controlled Milestone 23 gate in the repo workspace.",
+    "The gate does not replace later human/guide playtest capture, VR headset validation, platform packaging, or release certification.",
+    "If any linked validation report, corridor package, frontend flow, scoring contract, or runtime authority changes, regenerate this gate report."
+  ]
+}

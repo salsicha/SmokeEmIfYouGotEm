@@ -233,6 +233,7 @@ Tasks:
 - Add manifest-approved 3D audio configuration for the vertical slice: attenuation/spatialization presets, ambisonic beds, reverb/occlusion zones, large rapid spread, crew/voice positions, and VR/headphone validation.
 - Drive readable water visuals, foam, spray, wet rocks, raft contact cues, paddle cues, weather, 3D spatial audio, ambisonic ambience, reverb/occlusion, and rescue cues from bounded solver/runtime telemetry via `unreal/Content/RaftSim/Rendering/telemetry_presentation_cues.json` and `URaftSimTelemetryPresentationCueLibrary::BuildPresentationCues`.
 - Build the vertical-slice river corridor from `unreal/Content/RaftSim/Rendering/vertical_slice_environment_corridor.json`, with photoreal landscape/bed, banks, contact rocks, dense foliage, debris/access context, lighting/weather, audio occlusion geometry, and water-readability layers tied back to source manifests and guide-seat captures.
+- Gate the vertical slice with `unreal/Content/RaftSim/Automation/vertical_slice_acceptance_gate.json`, requiring build, completion, failure/rescue, restart, replay review, scoring, profiling, physics evidence, and river-fidelity review evidence.
 
 Deliverable:
 
@@ -338,6 +339,7 @@ Use Unreal data assets for game-facing tuning while keeping source-of-truth expo
 - River section definitions
 - River catalog, region, section, season, flow, difficulty, gauge, and source-manifest definitions
 - Frontend flow, save-game fields, replay-review bookmarks, settings groups, and debug overlay toggles
+- Vertical-slice acceptance gate manifest and report
 - Water field / feature metadata
 - Geospatial corridor metadata, centerlines, banks, cross sections, rapid boundaries, imagery masks, and data confidence scores
 - Vertical-slice environment corridor recipe with authored landscape, bank, rock, foliage, debris, lighting/weather, audio geometry, and water-readability layers plus desktop/VR/debug quality budgets
@@ -477,6 +479,7 @@ The first Unreal vertical slice is successful when:
 - Force/contact/debug telemetry is visible in-engine.
 - The section can be completed, failed, restarted, replayed, and scored.
 - Performance is inside the chosen desktop and VR budgets.
+- The Milestone 23 acceptance gate passes contract and editor-build checks while later human/guide playtest, VR headset validation, platform packaging, and release certification remain separate signoff gates.
 
 ## Open Decisions
 

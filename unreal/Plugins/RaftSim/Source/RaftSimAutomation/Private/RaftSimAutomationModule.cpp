@@ -1,6 +1,7 @@
 #include "RaftSimAutomationModule.h"
 
 #include "Modules/ModuleManager.h"
+#include "RaftSimAutomationContracts.h"
 
 void FRaftSimAutomationModule::StartupModule()
 {
