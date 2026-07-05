@@ -20,3 +20,7 @@ Landscape, rocks, banks, and foliage are treated as first-class immersion target
 - Unreal Water System is enabled for visual water and authoring, but the custom shallow-water solver remains authoritative physics.
 
 The canonical feature manifest is `unreal/Content/RaftSim/Rendering/photoreal_stack.manifest.json`.
+
+The first vertical-slice environment recipe is `unreal/Content/RaftSim/Rendering/vertical_slice_environment_corridor.json`. It binds the South Fork corridor package, photoreal stack, and telemetry presentation cues into map-authoring layers for landscape/bed, banks, rocks, foliage, debris/access context, lighting/weather, audio occlusion/reverb geometry, and water-readability support.
+
+The recipe requires guide-seat review captures, desktop/VR/debug quality budgets, source and rights manifests, and replay alignment between rendered water features and solver/runtime telemetry before the environment can count as milestone-complete.
