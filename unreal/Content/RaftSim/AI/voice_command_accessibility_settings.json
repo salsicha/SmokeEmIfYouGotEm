@@ -1,6 +1,10 @@
 {
   "schema": "raftsim.unreal.voice_command_accessibility_settings.v1",
   "activation_modes": ["push_to_talk", "open_mic", "disabled_manual_only"],
+  "gameplay_mode_policy": {
+    "guided_passenger_paddle_raft": "push_to_talk_or_open_mic_with_manual_parity",
+    "rowing_oar_rig": "disabled_manual_only"
+  },
   "defaults": {
     "activation_mode": "push_to_talk",
     "execute_confidence_threshold": 0.78,

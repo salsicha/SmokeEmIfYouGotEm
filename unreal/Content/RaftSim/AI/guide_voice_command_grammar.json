@@ -2,6 +2,8 @@
   "schema": "raftsim.unreal.guide_voice_command_grammar.v1",
   "parser": "URaftSimGuideCommandParser",
   "deterministic_execution": true,
+  "matching_strategy": "normalized_contiguous_phrase_grammar",
+  "model_profile": "lightweight_local_command_grammar",
   "enabled_gameplay_modes": [
     "guided_passenger_paddle_raft"
   ],
