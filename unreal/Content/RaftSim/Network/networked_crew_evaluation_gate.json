@@ -1,0 +1,110 @@
+{
+  "asset_class": "URaftSimNetworkedCrewEvaluationGate",
+  "schema": "raftsim.unreal.networked_crew_evaluation_gate.v1",
+  "gate_status": "blocked_until_single_player_systems_stable",
+  "allow_networked_human_crew_evaluation": false,
+  "decision": {
+    "evaluate_networked_human_crew_only_after": [
+      "single_player_guide_loop_stable",
+      "raft_contact_authority_selected_and_replayable",
+      "local_voice_commands_and_manual_parity_stable",
+      "crew_overboard_rescue_loop_stable",
+      "replay_debug_tools_can_explain_desyncs_and_scores"
+    ],
+    "current_allowed_scope": "contracts_and_local_lan_lab_planning_only",
+    "internet_play_allowed": false
+  },
+  "prerequisites": [
+    {
+      "gate_id": "single_player_guide_loop",
+      "display_name": "Single-Player Guide Loop Stable",
+      "evidence_artifact": "unreal/Content/RaftSim/VerticalSlice/first_rapid_vertical_slice.json",
+      "required_status": "playable_end_to_end_with_restart_scoring_and_recovery",
+      "blocks_human_crew_prototype": true
+    },
+    {
+      "gate_id": "raft_contact_authority",
+      "display_name": "Raft/Contact Authority Selected",
+      "evidence_artifact": "unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json",
+      "required_status": "authoritative_runtime_selected_with_fixture_replay",
+      "blocks_human_crew_prototype": true
+    },
+    {
+      "gate_id": "local_voice_and_manual_parity",
+      "display_name": "Local Voice Commands And Manual Parity Stable",
+      "evidence_artifact": "unreal/Content/RaftSim/AI/local_ai_runtime_manifest.json",
+      "required_status": "guided_mode_commands_stable_and_rowing_voice_disabled",
+      "blocks_human_crew_prototype": true
+    },
+    {
+      "gate_id": "rescue_loop",
+      "display_name": "Crew Overboard Rescue Loop Stable",
+      "evidence_artifact": "unreal/Content/RaftSim/Crew/swimmer_rescue_gameplay.json",
+      "required_status": "swim_rescue_reseat_failed_rescue_telemetry_replayable",
+      "blocks_human_crew_prototype": true
+    },
+    {
+      "gate_id": "replay_debug_tools",
+      "display_name": "Replay And Debug Tools Explain Divergence",
+      "evidence_artifact": "unreal/Content/RaftSim/Debug/debug_overlay_validation.json",
+      "required_status": "frame_ids_hashes_inputs_contacts_scores_and_rescue_events_replayable",
+      "blocks_human_crew_prototype": true
+    },
+    {
+      "gate_id": "mixed_crew_validation",
+      "display_name": "Mixed Desktop/VR Crew Validation",
+      "evidence_artifact": "unreal/Content/RaftSim/Network/mixed_crew_validation.json",
+      "required_status": "desktop_vr_accessibility_latency_reconnect_ai_takeover_targets_defined",
+      "blocks_human_crew_prototype": true
+    }
+  ],
+  "experiment_slices": [
+    {
+      "slice_id": "local_two_player_lan_lab",
+      "display_name": "Local Two-Player LAN Lab",
+      "allowed_modes": ["lan_offline_coop", "listen_server"],
+      "required_validation_targets": [
+        "desktop_only_crew",
+        "manual_input_only_accessibility",
+        "authoritative_replay_can_explain_score_and_desyncs"
+      ],
+      "internet_play_allowed": false
+    },
+    {
+      "slice_id": "mixed_desktop_vr_lan_lab",
+      "display_name": "Mixed Desktop/VR LAN Lab",
+      "allowed_modes": ["lan_offline_coop"],
+      "required_validation_targets": [
+        "mixed_desktop_vr_crew",
+        "comfort_settings_per_connected_player",
+        "vr_players_can_filter_corrections_for_comfort"
+      ],
+      "internet_play_allowed": false
+    },
+    {
+      "slice_id": "listen_server_rescue_drill",
+      "display_name": "Listen-Server Rescue Drill",
+      "allowed_modes": ["listen_server"],
+      "required_validation_targets": [
+        "reconnect_and_ai_takeover",
+        "packet_loss_latency_jitter",
+        "multiplayer_replay_desync_detection",
+        "rescue_loop_telemetry_replay"
+      ],
+      "internet_play_allowed": false
+    }
+  ],
+  "blocked_until": {
+    "dedicated_server": "physics_budgets_and_authority_selection_are_proven",
+    "relay_session_service": "account_privacy_moderation_and_session_policy_are_chosen",
+    "internet_public_playtest": "lan_lab_replay_debug_and_rescue_drills_pass"
+  },
+  "pass_policy": {
+    "single_player_stability_blocks_multiplayer": true,
+    "raft_contact_authority_blocks_multiplayer": true,
+    "voice_manual_parity_blocks_multiplayer": true,
+    "rescue_loop_blocks_multiplayer": true,
+    "replay_debug_tools_block_multiplayer": true,
+    "internet_play_is_not_allowed_by_this_gate": true
+  }
+}

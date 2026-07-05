@@ -274,6 +274,7 @@ Tasks:
 - Add conversation guardrails so active-rapid dialogue stays short, command acknowledgments and safety barks take priority, and generated chatter never blocks safety-critical audio.
 - Expand free/open, first-party generated, procedural, and AI-generated art/audio coverage for additional rivers, seasons, flow levels, raft types, gear, weather, and biomes.
 - Revisit paid asset purchases only at the release-readiness gate if free/open and AI-generated assets are not good enough.
+- Keep networked human crew multiplayer behind `unreal/Content/RaftSim/Network/networked_crew_evaluation_gate.json` until the single-player guide loop, raft/contact authority, local voice/manual parity, rescue loop, and replay/debug tools are stable.
 - Add challenge variants and generated rapid support only where the alpha systems catalog names passing validation reports.
 - Expand weather, water levels, rescue scenarios, and training lessons, with lessons tied to required systems and completion telemetry.
 
