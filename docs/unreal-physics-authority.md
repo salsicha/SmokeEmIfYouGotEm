@@ -47,6 +47,8 @@ Jolt must consume the same custom-water query API and emit the same telemetry/re
 
 `CustomReducedRigidBody` is the selected first vertical-slice raft/contact/swimmer authority because the Milestone 19 comparison report currently blocks Chaos or Jolt selection pending measured runtime telemetry.
 
+Milestone 22 integrates that selection through `unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json`: approved custom C++ water remains the only authoritative water source, `URaftSimPhysicsBridgeSubsystem` advances water and the selected raft/contact runtime on fixed steps, and Chaos remains visual/non-authoritative unless the shared fixture suite later allows scoring-critical authority.
+
 The fallback may be replaced only after:
 
 - Unreal Chaos automation fixtures are run with measured telemetry.
