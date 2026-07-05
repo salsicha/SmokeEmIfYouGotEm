@@ -1,5 +1,6 @@
 {
   "schema": "raftsim.unreal.river_selection_catalog.v1",
+  "alpha_systems_catalog": "unreal/Content/RaftSim/Raft/alpha_systems_progression_catalog.json",
   "source_model": "../../physics/data/real_world/player_selection_model.json",
   "view_model": "URaftSimSelectionViewModel",
   "sections": [

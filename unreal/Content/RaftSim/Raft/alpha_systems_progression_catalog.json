@@ -1,0 +1,398 @@
+{
+  "asset_class": "URaftSimAlphaSystemsConfig",
+  "schema": "raftsim.unreal.alpha_systems_progression.v1",
+  "status": "alpha_systems_catalog_ready_for_designer_tuning",
+  "source_contracts": {
+    "crew_personas": "unreal/Content/RaftSim/AI/crew_personas.json",
+    "crew_weight_distribution": "unreal/Content/RaftSim/Crew/crew_weight_distribution.json",
+    "raft_dynamics_runtime": "unreal/Content/RaftSim/Physics/raft_dynamics_runtime.json",
+    "river_selection_catalog": "unreal/Content/RaftSim/UI/river_selection_catalog.json",
+    "swimmer_rescue": "unreal/Content/RaftSim/Crew/swimmer_rescue_gameplay.json"
+  },
+  "raft_handling_profiles": [
+    {
+      "profile_id": "standard_14ft_paddle_raft",
+      "display_name": "Standard 14 ft Paddle Raft",
+      "route_styles": ["guided_paddle_raft"],
+      "mass_kg": 170.0,
+      "length_m": 4.2,
+      "width_m": 2.0,
+      "stability": 0.62,
+      "maneuverability": 0.7,
+      "momentum_retention": 0.45,
+      "gameplay_tradeoffs": [
+        "baseline_training_handling",
+        "quick_to_turn",
+        "sensitive_to_crew_weight_distribution"
+      ],
+      "validation_fixtures": [
+        "raft_coupling_default",
+        "crew_weight_distribution",
+        "pin_release",
+        "flip_recovery"
+      ]
+    },
+    {
+      "profile_id": "technical_13ft_paddle_raft",
+      "display_name": "Technical 13 ft Paddle Raft",
+      "route_styles": ["guided_paddle_raft"],
+      "mass_kg": 150.0,
+      "length_m": 3.95,
+      "width_m": 1.9,
+      "stability": 0.52,
+      "maneuverability": 0.82,
+      "momentum_retention": 0.36,
+      "gameplay_tradeoffs": [
+        "snappier_ferries",
+        "higher_flip_risk",
+        "better_boulder_garden_line_changes"
+      ],
+      "validation_fixtures": [
+        "boulder_push_damping",
+        "shallow_shelf",
+        "lateral_hit",
+        "flip_recovery"
+      ]
+    },
+    {
+      "profile_id": "heavier_training_raft",
+      "display_name": "Heavier Training Raft",
+      "route_styles": ["guided_paddle_raft"],
+      "mass_kg": 205.0,
+      "length_m": 4.35,
+      "width_m": 2.1,
+      "stability": 0.74,
+      "maneuverability": 0.55,
+      "momentum_retention": 0.62,
+      "gameplay_tradeoffs": [
+        "forgiving_initial_lessons",
+        "slower_to_correct",
+        "stronger_pin_loads_if_mishandled"
+      ],
+      "validation_fixtures": [
+        "crew_weight_distribution",
+        "pin_release",
+        "rock_contact",
+        "swimmer_rescue_window"
+      ]
+    },
+    {
+      "profile_id": "sixteen_foot_oar_rig",
+      "display_name": "16 ft Oar Rig",
+      "route_styles": ["rowing_oar_rig"],
+      "mass_kg": 260.0,
+      "length_m": 4.9,
+      "width_m": 2.25,
+      "stability": 0.78,
+      "maneuverability": 0.5,
+      "momentum_retention": 0.76,
+      "gameplay_tradeoffs": [
+        "direct_oar_control",
+        "large_volume_momentum",
+        "longer_rescue_setup"
+      ],
+      "validation_fixtures": [
+        "colorado_oar_pull_backrow",
+        "large_volume_lateral",
+        "long_water_rescue_window"
+      ]
+    },
+    {
+      "profile_id": "loaded_expedition_paddle_raft",
+      "display_name": "Loaded Expedition Paddle Raft",
+      "route_styles": ["guided_paddle_raft"],
+      "mass_kg": 235.0,
+      "length_m": 4.55,
+      "width_m": 2.15,
+      "stability": 0.68,
+      "maneuverability": 0.48,
+      "momentum_retention": 0.7,
+      "gameplay_tradeoffs": [
+        "gear_weight_changes_trim",
+        "slower_high_side_response",
+        "longer_swimmer_pickup_setup"
+      ],
+      "validation_fixtures": [
+        "crew_weight_distribution",
+        "swimmer_rescue_window",
+        "rainfed_bank_hazard_review"
+      ]
+    }
+  ],
+  "passenger_archetypes": [
+    {
+      "archetype_id": "nervous_first_timer",
+      "display_name": "Nervous First Timer",
+      "starting_trust": 0.35,
+      "starting_fear": 0.7,
+      "starting_fatigue": 0.1,
+      "starting_skill": 0.2,
+      "gameplay_traits": [
+        "needs_clear_commands",
+        "high_fear_growth_after_hits",
+        "fast_trust_gain_after_successful_rescue"
+      ]
+    },
+    {
+      "archetype_id": "steady_returning_paddler",
+      "display_name": "Steady Returning Paddler",
+      "starting_trust": 0.65,
+      "starting_fear": 0.25,
+      "starting_fatigue": 0.15,
+      "starting_skill": 0.65,
+      "gameplay_traits": [
+        "strong_command_following",
+        "spots_hazards",
+        "stabilizes_crew_morale"
+      ]
+    },
+    {
+      "archetype_id": "overconfident_friend",
+      "display_name": "Overconfident Friend",
+      "starting_trust": 0.5,
+      "starting_fear": 0.2,
+      "starting_fatigue": 0.05,
+      "starting_skill": 0.35,
+      "gameplay_traits": [
+        "talks_over_commands",
+        "late_brace_until_trained",
+        "large_skill_gain_after_debrief"
+      ]
+    },
+    {
+      "archetype_id": "strong_non_swimmer",
+      "display_name": "Strong Non-Swimmer",
+      "starting_trust": 0.45,
+      "starting_fear": 0.6,
+      "starting_fatigue": 0.05,
+      "starting_skill": 0.15,
+      "gameplay_traits": [
+        "high_rescue_priority",
+        "strong_paddle_power_when_seated",
+        "panic_growth_in_water"
+      ]
+    },
+    {
+      "archetype_id": "quiet_fast_learner",
+      "display_name": "Quiet Fast Learner",
+      "starting_trust": 0.55,
+      "starting_fear": 0.35,
+      "starting_fatigue": 0.08,
+      "starting_skill": 0.45,
+      "gameplay_traits": [
+        "few_barks",
+        "high_skill_growth",
+        "strong_recovery_after_debrief"
+      ]
+    }
+  ],
+  "crew_progression_rules": [
+    {
+      "rule_id": "clean_line_through_rapid",
+      "trigger": "rapid_completed_without_contact_or_swim",
+      "trust_delta": 0.08,
+      "fear_delta": -0.04,
+      "fatigue_delta": 0.04,
+      "skill_delta": 0.03
+    },
+    {
+      "rule_id": "late_or_wrong_command",
+      "trigger": "crew_command_missed_timing_window",
+      "trust_delta": -0.06,
+      "fear_delta": 0.08,
+      "fatigue_delta": 0.04,
+      "skill_delta": 0.0
+    },
+    {
+      "rule_id": "successful_swimmer_rescue",
+      "trigger": "swimmer_recovered_before_window_end",
+      "trust_delta": 0.1,
+      "fear_delta": -0.03,
+      "fatigue_delta": 0.08,
+      "skill_delta": 0.04
+    },
+    {
+      "rule_id": "failed_or_late_rescue",
+      "trigger": "failed_rescue_or_rescue_window_expired",
+      "trust_delta": -0.18,
+      "fear_delta": 0.22,
+      "fatigue_delta": 0.25,
+      "skill_delta": 0.01
+    },
+    {
+      "rule_id": "clear_debrief_after_scout",
+      "trigger": "scout_or_recovery_pool_debrief_completed",
+      "trust_delta": 0.05,
+      "fear_delta": -0.05,
+      "fatigue_delta": -0.02,
+      "skill_delta": 0.06
+    }
+  ],
+  "training_lessons": [
+    {
+      "lesson_id": "forward_stop_and_brace",
+      "display_name": "Forward, Stop, Brace",
+      "river_id": "american_south_fork",
+      "required_systems": [
+        "guide_voice_commands",
+        "manual_input_parity",
+        "crew_weight_distribution"
+      ],
+      "completion_telemetry": [
+        "command_latency_ms",
+        "crew_followthrough_score",
+        "brace_timing_score"
+      ]
+    },
+    {
+      "lesson_id": "eddy_scout_and_recovery_pool",
+      "display_name": "Eddy, Scout, Recovery",
+      "river_id": "american_south_fork",
+      "required_systems": [
+        "river_annotation_overlays",
+        "crew_conversation_state",
+        "trust_fear_skill_progression"
+      ],
+      "completion_telemetry": [
+        "eddy_catch_accuracy",
+        "scout_annotation_viewed",
+        "debrief_completed"
+      ]
+    },
+    {
+      "lesson_id": "oar_pull_backrow_lateral",
+      "display_name": "Pull, Back-Row, Lateral",
+      "river_id": "colorado_river",
+      "required_systems": [
+        "direct_manual_oar_controls",
+        "large_volume_reading_cues",
+        "long_water_rescue_windows"
+      ],
+      "completion_telemetry": [
+        "oar_stroke_balance",
+        "ferry_angle_error",
+        "lateral_squareup_timing"
+      ]
+    },
+    {
+      "lesson_id": "rainfed_flow_and_bank_hazards",
+      "display_name": "Rain-Fed Flow And Bank Hazards",
+      "river_id": "pacuare",
+      "required_systems": [
+        "rainfed_flow_review",
+        "protected_area_source_rights_review",
+        "rights_cleared_field_media"
+      ],
+      "completion_telemetry": [
+        "flow_band_review_status",
+        "bank_hazard_annotation_seen",
+        "rescue_decision_time_seconds"
+      ]
+    }
+  ],
+  "challenge_variants": [
+    {
+      "variant_id": "clean_commercial_line",
+      "display_name": "Clean Commercial Line",
+      "allowed_rivers": ["american_south_fork"],
+      "scoring_axes": [
+        "line_accuracy",
+        "crew_trust",
+        "paddle_efficiency",
+        "no_swim_bonus"
+      ],
+      "requires_validated_water_and_raft_fixtures": true
+    },
+    {
+      "variant_id": "high_flow_rescue_drill",
+      "display_name": "High Flow Rescue Drill",
+      "allowed_rivers": ["american_south_fork", "colorado_river", "pacuare"],
+      "scoring_axes": [
+        "swimmer_recovery_time",
+        "rescue_method_choice",
+        "crew_fatigue_control",
+        "safety_score"
+      ],
+      "requires_validated_water_and_raft_fixtures": true
+    },
+    {
+      "variant_id": "oar_rig_large_volume_line",
+      "display_name": "Oar Rig Large-Volume Line",
+      "allowed_rivers": ["colorado_river"],
+      "scoring_axes": [
+        "ferry_angle",
+        "pull_backrow_timing",
+        "wave_train_squareup",
+        "passenger_trim"
+      ],
+      "requires_validated_water_and_raft_fixtures": true
+    },
+    {
+      "variant_id": "rainforest_scouting_review",
+      "display_name": "Rainforest Scouting Review",
+      "allowed_rivers": ["pacuare"],
+      "scoring_axes": [
+        "annotation_review_completion",
+        "source_rights_status",
+        "bank_hazard_identification",
+        "rainfed_flow_decision"
+      ],
+      "requires_validated_water_and_raft_fixtures": true
+    }
+  ],
+  "generated_rapid_experiments": [
+    {
+      "experiment_id": "validated_wave_train_shuffle",
+      "display_name": "Validated Wave Train Shuffle",
+      "supported_feature_kinds": [
+        "wave_train",
+        "eddy_line",
+        "lateral"
+      ],
+      "required_validation_reports": [
+        "milestone17_analytic_guardrails",
+        "milestone18_feature_forcing_conservation",
+        "raft_coupling_agreement"
+      ],
+      "playable_until_validation_passes": false
+    },
+    {
+      "experiment_id": "boulder_garden_training_seed",
+      "display_name": "Boulder Garden Training Seed",
+      "supported_feature_kinds": [
+        "boulder_push_damping",
+        "shallow_shelf",
+        "pin_release"
+      ],
+      "required_validation_reports": [
+        "pin_release_fixture",
+        "rock_contact_fixture",
+        "crew_weight_distribution_fixture"
+      ],
+      "playable_until_validation_passes": false
+    },
+    {
+      "experiment_id": "rainfed_bank_hazard_study",
+      "display_name": "Rain-Fed Bank Hazard Study",
+      "supported_feature_kinds": [
+        "lateral",
+        "strainer_review",
+        "bank_eddy",
+        "swimmer_drift"
+      ],
+      "required_validation_reports": [
+        "pacuare_hydrology_review",
+        "rights_cleared_field_media_annotations",
+        "swimmer_rescue_fixture"
+      ],
+      "playable_until_validation_passes": false
+    }
+  ],
+  "pass_policy": {
+    "raft_profiles_reference_validation_fixtures": true,
+    "passenger_archetypes_cover_trust_fear_fatigue_skill": true,
+    "training_lessons_emit_completion_telemetry": true,
+    "challenge_variants_require_validated_water_and_raft_fixtures": true,
+    "generated_rapid_experiments_remain_nonplayable_until_validation_passes": true
+  }
+}
