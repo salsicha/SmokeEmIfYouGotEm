@@ -46,6 +46,15 @@ enum class ERaftSimSwimmingSkillLevel : uint8
     StrongSwimmer
 };
 
+UENUM(BlueprintType)
+enum class ERaftSimRescueMethod : uint8
+{
+    None,
+    ReachGrab,
+    PaddleGrab,
+    ThrowLine
+};
+
 USTRUCT(BlueprintType)
 struct FRaftSimCrewSeatOccupancy
 {
@@ -208,6 +217,78 @@ struct FRaftSimPassengerSwimmingSkillAssignment
     FRaftSimSwimmingSkillProfile Profile;
 };
 
+USTRUCT(BlueprintType)
+struct FRaftSimSwimmerRescueFrame
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    FName PassengerId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    FVector SwimmerWorldPositionMeters = FVector::ZeroVector;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    FVector SwimmerDriftVelocityMetersPerSecond = FVector::ZeroVector;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float VisibilityScore = 1.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float CalloutPriority = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    int32 RescueTargetRank = 0;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    ERaftSimRescueMethod RescueMethod = ERaftSimRescueMethod::None;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    bool bThrowLineAvailable = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float TimeInWaterSeconds = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float RescueWindowSeconds = 12.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float PullInProgress = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float ReseatRecoverySeconds = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float FatigueDelta = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float TrustDelta = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    FName FailedRescueReason;
+};
+
+USTRUCT(BlueprintType)
+struct FRaftSimRescueAttempt
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    FName PassengerId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    ERaftSimRescueMethod Method = ERaftSimRescueMethod::ReachGrab;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float DistanceMeters = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    bool bThrowLineAvailable = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Crew")
+    float TimeInWaterSeconds = 0.0f;
+};
+
 UCLASS()
 class RAFTSIMCREW_API URaftSimCrewWeightDistributionLibrary : public UBlueprintFunctionLibrary
 {
@@ -258,5 +339,26 @@ public:
         float NormalizedValue,
         int32 AssignmentSeed,
         bool bAssignedFromRoster = false
+    );
+};
+
+UCLASS()
+class RAFTSIMCREW_API URaftSimSwimmerRescueLibrary : public UBlueprintFunctionLibrary
+{
+    GENERATED_BODY()
+
+public:
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew")
+    static FRaftSimSwimmerRescueFrame IntegrateSwimmerDrift(
+        const FRaftSimSwimmerRescueFrame& CurrentFrame,
+        FVector WaterVelocityMetersPerSecond,
+        float DeltaSeconds
+    );
+
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew")
+    static FRaftSimSwimmerRescueFrame EvaluateRescueAttempt(
+        const FRaftSimSwimmerRescueFrame& CurrentFrame,
+        const FRaftSimRescueAttempt& Attempt,
+        const FRaftSimSwimmingSkillProfile& SkillProfile
     );
 };

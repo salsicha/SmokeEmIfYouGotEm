@@ -30,6 +30,10 @@ MILESTONE22_SWIMMING_SKILL_SCHEMA = "raftsim.unreal.swimming_skill_assignment.v1
 MILESTONE22_SWIMMING_SKILL_STATUS = (
     "passenger_swimming_skill_assignment_ready_for_run_setup"
 )
+MILESTONE22_SWIMMER_RESCUE_SCHEMA = "raftsim.unreal.swimmer_rescue_gameplay.v1"
+MILESTONE22_SWIMMER_RESCUE_STATUS = (
+    "swimmer_drift_rescue_and_recovery_ready_for_runtime_wiring"
+)
 
 
 @dataclass(frozen=True)
@@ -691,6 +695,126 @@ def build_swimming_skill_assignment_manifest(repo_root: Path) -> Milestone22Mani
             "non_swimmers_cannot_self_rescue": True,
             "assignments_are_seeded_or_roster_recorded": True,
             "skill_affects_rescue_priority_and_safety_scoring": True,
+        },
+    }
+    return Milestone22ManifestBuild(manifest=manifest)
+
+
+def build_swimmer_rescue_gameplay_manifest(repo_root: Path) -> Milestone22ManifestBuild:
+    """Build the Milestone 22 swimmer drift and rescue gameplay manifest."""
+
+    repo_root = repo_root.resolve()
+    safety_states_path = (
+        repo_root / "unreal/Content/RaftSim/Crew/crew_overboard_safety_states.json"
+    )
+    swimming_skill_path = (
+        repo_root / "unreal/Content/RaftSim/Crew/swimming_skill_assignment.json"
+    )
+    input_actions_path = repo_root / "unreal/Content/RaftSim/Input/enhanced_input_actions.json"
+    voice_grammar_path = repo_root / "unreal/Content/RaftSim/AI/guide_voice_command_grammar.json"
+
+    safety_states = _load_json(safety_states_path)
+    swimming_skill = _load_json(swimming_skill_path)
+    input_actions = _load_json(input_actions_path)
+    voice_grammar = _load_json(voice_grammar_path)
+
+    manifest: dict[str, Any] = {
+        "schema": MILESTONE22_SWIMMER_RESCUE_SCHEMA,
+        "status": MILESTONE22_SWIMMER_RESCUE_STATUS,
+        "source_manifests": {
+            "crew_overboard_safety_states": (
+                "unreal/Content/RaftSim/Crew/crew_overboard_safety_states.json"
+            ),
+            "swimming_skill_assignment": (
+                "unreal/Content/RaftSim/Crew/swimming_skill_assignment.json"
+            ),
+            "input_actions": "unreal/Content/RaftSim/Input/enhanced_input_actions.json",
+            "voice_command_grammar": (
+                "unreal/Content/RaftSim/AI/guide_voice_command_grammar.json"
+            ),
+        },
+        "runtime_contract": {
+            "module": "RaftSimCrew",
+            "rescue_method_enum": "ERaftSimRescueMethod",
+            "swimmer_frame_struct": "FRaftSimSwimmerRescueFrame",
+            "rescue_attempt_struct": "FRaftSimRescueAttempt",
+            "rescue_library": "URaftSimSwimmerRescueLibrary",
+        },
+        "swimmer_model": {
+            "drift_source": "custom_cxx_water_velocity_sample_plus_swimmer_drag",
+            "visibility_factors": [
+                "distance_from_raft",
+                "foam_or_spray_occlusion",
+                "guide_line_of_sight",
+                "callout_recentness",
+            ],
+            "callout_priorities": [
+                "non_swimmer",
+                "long_time_in_water",
+                "approaching_hazard",
+                "low_visibility",
+            ],
+        },
+        "rescue_methods": [
+            {
+                "method": "reach_grab",
+                "max_distance_m": 1.2,
+                "requires_throw_line": False,
+                "pull_in_seconds": 2.5,
+            },
+            {
+                "method": "paddle_grab",
+                "max_distance_m": 2.0,
+                "requires_throw_line": False,
+                "pull_in_seconds": 3.5,
+            },
+            {
+                "method": "throw_line",
+                "max_distance_m": 8.0,
+                "requires_throw_line": True,
+                "pull_in_seconds": 6.0,
+            },
+        ],
+        "input_and_voice_coverage": {
+            "input_action_ids": [
+                action["action_id"] for action in input_actions["actions"]
+            ],
+            "voice_intents": [
+                command["crew_intent"] for command in voice_grammar["commands"]
+            ],
+        },
+        "recovery_effects": {
+            "successful_rescue_transitions": ["rescue_targeted", "rescued", "reseated_recovered"],
+            "failed_rescue_transitions": ["swimming", "failed_rescue"],
+            "fatigue_delta_on_success": 0.08,
+            "fatigue_delta_on_failure": 0.35,
+            "trust_delta_on_success": 0.08,
+            "trust_delta_on_failure": -0.25,
+            "non_swimmer_priority_uses_skill_schema": swimming_skill["schema"],
+            "linked_safety_state_schema": safety_states["schema"],
+        },
+        "telemetry_fields": [
+            "passenger_id",
+            "swimmer_world_position_m",
+            "swimmer_drift_velocity_mps",
+            "visibility_score",
+            "callout_priority",
+            "rescue_target_rank",
+            "rescue_method",
+            "throw_line_available",
+            "time_in_water_seconds",
+            "rescue_window_seconds",
+            "pull_in_progress",
+            "reseat_recovery_seconds",
+            "fatigue_delta",
+            "trust_delta",
+            "failed_rescue_reason",
+        ],
+        "pass_policy": {
+            "swimmer_drift_is_water_velocity_driven": True,
+            "target_selection_prioritizes_non_swimmers_and_low_visibility": True,
+            "reach_paddle_and_throw_line_methods_are_supported": True,
+            "pull_in_reseat_and_failed_rescue_emit_telemetry": True,
         },
     }
     return Milestone22ManifestBuild(manifest=manifest)

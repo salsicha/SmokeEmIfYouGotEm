@@ -247,3 +247,99 @@ FRaftSimPassengerSwimmingSkillAssignment URaftSimSwimmingSkillLibrary::AssignSwi
     Assignment.Profile = MakeSwimmingSkillProfile(SkillLevel);
     return Assignment;
 }
+
+namespace
+{
+float MaxDistanceForRescueMethod(ERaftSimRescueMethod Method, bool bThrowLineAvailable)
+{
+    switch (Method)
+    {
+        case ERaftSimRescueMethod::ReachGrab:
+            return 1.2f;
+        case ERaftSimRescueMethod::PaddleGrab:
+            return 2.0f;
+        case ERaftSimRescueMethod::ThrowLine:
+            return bThrowLineAvailable ? 8.0f : 0.0f;
+        case ERaftSimRescueMethod::None:
+        default:
+            return 0.0f;
+    }
+}
+
+float PullInSecondsForRescueMethod(ERaftSimRescueMethod Method)
+{
+    switch (Method)
+    {
+        case ERaftSimRescueMethod::ReachGrab:
+            return 2.5f;
+        case ERaftSimRescueMethod::PaddleGrab:
+            return 3.5f;
+        case ERaftSimRescueMethod::ThrowLine:
+            return 6.0f;
+        case ERaftSimRescueMethod::None:
+        default:
+            return 1000000.0f;
+    }
+}
+}
+
+FRaftSimSwimmerRescueFrame URaftSimSwimmerRescueLibrary::IntegrateSwimmerDrift(
+    const FRaftSimSwimmerRescueFrame& CurrentFrame,
+    FVector WaterVelocityMetersPerSecond,
+    float DeltaSeconds
+)
+{
+    FRaftSimSwimmerRescueFrame NextFrame = CurrentFrame;
+    const float StepSeconds = FMath::Max(DeltaSeconds, 0.0f);
+    NextFrame.SwimmerDriftVelocityMetersPerSecond = WaterVelocityMetersPerSecond;
+    NextFrame.SwimmerWorldPositionMeters += WaterVelocityMetersPerSecond * StepSeconds;
+    NextFrame.TimeInWaterSeconds += StepSeconds;
+    NextFrame.VisibilityScore = FMath::Clamp(
+        CurrentFrame.VisibilityScore - 0.015f * StepSeconds,
+        0.0f,
+        1.0f
+    );
+    NextFrame.CalloutPriority = FMath::Clamp(
+        CurrentFrame.CalloutPriority + 0.04f * StepSeconds,
+        0.0f,
+        1.0f
+    );
+    return NextFrame;
+}
+
+FRaftSimSwimmerRescueFrame URaftSimSwimmerRescueLibrary::EvaluateRescueAttempt(
+    const FRaftSimSwimmerRescueFrame& CurrentFrame,
+    const FRaftSimRescueAttempt& Attempt,
+    const FRaftSimSwimmingSkillProfile& SkillProfile
+)
+{
+    FRaftSimSwimmerRescueFrame NextFrame = CurrentFrame;
+    NextFrame.RescueMethod = Attempt.Method;
+    NextFrame.bThrowLineAvailable = Attempt.bThrowLineAvailable;
+    NextFrame.TimeInWaterSeconds = Attempt.TimeInWaterSeconds;
+
+    const float MaxDistance = MaxDistanceForRescueMethod(Attempt.Method, Attempt.bThrowLineAvailable);
+    const bool bInsideDistance = Attempt.DistanceMeters <= MaxDistance;
+    const bool bInsideWindow = Attempt.TimeInWaterSeconds <= SkillProfile.TimeToCriticalSeconds;
+    if (bInsideDistance && bInsideWindow)
+    {
+        const float PullInSeconds = PullInSecondsForRescueMethod(Attempt.Method);
+        NextFrame.PullInProgress = FMath::Clamp(
+            CurrentFrame.PullInProgress + 1.0f / FMath::Max(PullInSeconds, KINDA_SMALL_NUMBER),
+            0.0f,
+            1.0f
+        );
+        NextFrame.FatigueDelta = 0.08f;
+        NextFrame.TrustDelta = 0.08f;
+        NextFrame.FailedRescueReason = NAME_None;
+        return NextFrame;
+    }
+
+    NextFrame.PullInProgress = 0.0f;
+    NextFrame.FatigueDelta = 0.35f;
+    NextFrame.TrustDelta = -0.25f;
+    NextFrame.FailedRescueReason = bInsideDistance
+        ? FName(TEXT("time_to_critical_exceeded"))
+        : FName(TEXT("out_of_reach"));
+    return NextFrame;
+}
