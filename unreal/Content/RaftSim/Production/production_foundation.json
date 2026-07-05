@@ -9,6 +9,7 @@
     "uproject": "unreal/SmokeEmIfYouGotEm.uproject",
     "primary_plugin": "unreal/Plugins/RaftSim/RaftSim.uplugin",
     "accepted_water_report_manifest": "physics/reports/milestone20/report_set_lock.json",
+    "alpha_content_coverage_manifest": "unreal/Content/RaftSim/Production/alpha_content_coverage_manifest.json",
     "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json",
     "live_water_debug_views": "unreal/Content/RaftSim/Debug/live_water_debug_views.json",
     "live_water_smoke_suite": "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json",

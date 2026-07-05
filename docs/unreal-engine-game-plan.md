@@ -272,7 +272,7 @@ Tasks:
 - Add AI-assisted crew conversations for calm water, eddies, scouting, recovery pools, run starts, run finishes, swims, rescues, and post-rapid debriefs through `unreal/Content/RaftSim/AI/crew_conversation_bark_catalog.json`.
 - Add passenger persona data, relationship memory, river knowledge, skill/fear/fatigue state, and conversation pacing rules.
 - Add conversation guardrails so active-rapid dialogue stays short, command acknowledgments and safety barks take priority, and generated chatter never blocks safety-critical audio.
-- Expand free/open, first-party generated, procedural, and AI-generated art/audio coverage for additional rivers, seasons, flow levels, raft types, gear, weather, and biomes.
+- Expand free/open, first-party generated, procedural, and AI-generated art/audio/VFX/haptics/UI/accessibility/platform coverage through `unreal/Content/RaftSim/Production/alpha_content_coverage_manifest.json` for additional rivers, seasons, flow levels, raft types, gear, weather, and biomes.
 - Revisit paid asset purchases only at the release-readiness gate if free/open and AI-generated assets are not good enough.
 - Keep networked human crew multiplayer behind `unreal/Content/RaftSim/Network/networked_crew_evaluation_gate.json` until the single-player guide loop, raft/contact authority, local voice/manual parity, rescue loop, and replay/debug tools are stable.
 - Add challenge variants and generated rapid support only where the alpha systems catalog names passing validation reports.

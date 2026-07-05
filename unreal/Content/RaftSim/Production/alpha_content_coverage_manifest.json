@@ -1,0 +1,246 @@
+{
+  "schema": "raftsim.unreal.alpha_content_coverage.v1",
+  "status": "coverage_targets_ready_for_manifest_approved_asset_work",
+  "source_policy": "unreal/Content/RaftSim/development_asset_source_policy.json",
+  "production_foundation": "unreal/Content/RaftSim/Production/production_foundation.json",
+  "coverage_principles": {
+    "manifest_required_for_every_asset": true,
+    "free_open_first_party_generated_procedural_and_ai_generated_first": true,
+    "paid_assets_deferred_until_release_gate": true,
+    "photoreal_landscape_and_foliage_are_core_content_goals": true,
+    "source_rights_and_platform_rights_block_promotion": true,
+    "visual_audio_vfx_boosts_must_not_hide_physics_or_validation_failures": true
+  },
+  "river_biome_coverage": [
+    {
+      "river_id": "american_south_fork",
+      "biome": "california_sierra_foothill_riparian",
+      "environment_targets": [
+        "high_detail_granite_and_metamorphic_rock_edges",
+        "photoreal_oak_conifer_riparian_mix",
+        "seasonal_grass_and_scrub",
+        "commercial_access_and_recovery_pool_context"
+      ],
+      "flow_and_season_targets": [
+        "late_summer_low_water",
+        "summer_commercial",
+        "spring_runoff_or_release",
+        "storm_response"
+      ],
+      "source_manifests": [
+        "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json",
+        "unreal/Content/RaftSim/River/south_fork_alpha_content_expansion.json"
+      ]
+    },
+    {
+      "river_id": "colorado_river",
+      "biome": "grand_canyon_desert_canyon_big_water",
+      "environment_targets": [
+        "large_scale_canyon_walls",
+        "desert_riparian_banks",
+        "big_water_laterals_and_wave_trains",
+        "oar_rig_camp_and_rescue_context"
+      ],
+      "flow_and_season_targets": [
+        "low_release_planning",
+        "moderate_release_planning",
+        "high_release_planning",
+        "review_only_spike_flow"
+      ],
+      "source_manifests": [
+        "physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json",
+        "unreal/Content/RaftSim/River/colorado_rowing_route_editor_pass.json"
+      ]
+    },
+    {
+      "river_id": "pacuare",
+      "biome": "costa_rica_tropical_rainforest_gorge",
+      "environment_targets": [
+        "dense_layered_rainforest_canopy",
+        "wet_gorge_walls_and_waterfalls",
+        "rain_mist_bank_vegetation_and_woody_debris",
+        "photoreal_tropical_foliage_without_hiding_rescue_targets"
+      ],
+      "flow_and_season_targets": [
+        "clear_season_low_planning",
+        "rainfed_runnable_planning",
+        "rainy_season_high_planning",
+        "flash_response_review_only"
+      ],
+      "source_manifests": [
+        "physics/data/real_world/pacuare_river_costa_rica/source_manifest.json",
+        "unreal/Content/RaftSim/River/pacuare_river_third_target_editor_pass.json"
+      ]
+    }
+  ],
+  "discipline_coverage": [
+    {
+      "discipline": "art_environment",
+      "coverage_targets": [
+        "terrain_materials",
+        "riverbank_meshes",
+        "rock_boulder_ledges",
+        "foliage_pcg_rules",
+        "seasonal_variants",
+        "weather_wetness_variants"
+      ],
+      "quality_requirements": [
+        "photoreal_from_guide_seat",
+        "high_detail_immersive_corridors",
+        "hazards_and_rescue_targets_remain_readable",
+        "assets_have_source_manifest_records"
+      ],
+      "reference_manifests": [
+        "unreal/Content/RaftSim/Rendering/vertical_slice_environment_corridor.json",
+        "unreal/Content/RaftSim/Rendering/art_asset_source_research.json"
+      ]
+    },
+    {
+      "discipline": "audio",
+      "coverage_targets": [
+        "river_roar_flow_bands",
+        "rapid_nearfield_layers",
+        "canyon_and_forest_ambiences",
+        "rain_wind_spray_weather",
+        "raft_paddle_rock_gear_foley",
+        "crew_barks_and_safety_cues"
+      ],
+      "quality_requirements": [
+        "spatial_from_stern_guide_seat",
+        "rescue_and_command_intelligibility",
+        "flow_dependent_mixes",
+        "manifested_source_and_license_records"
+      ],
+      "reference_manifests": [
+        "unreal/Content/RaftSim/Audio/audio_source_manifest.json",
+        "unreal/Content/RaftSim/Audio/spatial_audio_presets.json",
+        "unreal/Content/RaftSim/AI/crew_conversation_bark_catalog.json"
+      ]
+    },
+    {
+      "discipline": "vfx",
+      "coverage_targets": [
+        "foam_lines",
+        "spray_impacts",
+        "mist_and_rain",
+        "wet_rock_sheen",
+        "paddle_splashes",
+        "rescue_visibility_markers"
+      ],
+      "quality_requirements": [
+        "flow_band_dependent",
+        "aligned_with_solver_and_feature_manifests",
+        "does_not_hide_conservation_or_coupling_failures",
+        "performance_budgeted_for_desktop_and_vr"
+      ],
+      "reference_manifests": [
+        "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+        "unreal/Content/RaftSim/Rendering/vertical_slice_environment_corridor.json"
+      ]
+    },
+    {
+      "discipline": "haptics",
+      "coverage_targets": [
+        "paddle_catch",
+        "raft_rock_scrape",
+        "large_lateral_hit",
+        "pin_release",
+        "rescue_pull_in",
+        "vr_comfort_feedback"
+      ],
+      "quality_requirements": [
+        "optional_and_accessibility_tunable",
+        "tied_to_authoritative_contact_or_rescue_events",
+        "comfort_checked_for_vr",
+        "does_not_replace_audio_or_visual_safety_cues"
+      ],
+      "reference_manifests": [
+        "unreal/Content/RaftSim/Raft/guide_camera_config.json",
+        "unreal/Content/RaftSim/Physics/raft_contact_response_telemetry.json"
+      ]
+    },
+    {
+      "discipline": "ui_accessibility",
+      "coverage_targets": [
+        "river_selection",
+        "flow_band_and_season_selection",
+        "voice_privacy_and_subtitle_settings",
+        "manual_input_parity",
+        "rescue_callout_readability",
+        "debug_replay_review"
+      ],
+      "quality_requirements": [
+        "keyboard_gamepad_vr_accessible",
+        "subtitles_for_commands_barks_and_rescues",
+        "microphone_privacy_visible",
+        "text_scales_without_overlap",
+        "settings_survive_platform_scaling"
+      ],
+      "reference_manifests": [
+        "unreal/Content/RaftSim/UI/river_selection_catalog.json",
+        "unreal/Content/RaftSim/AI/voice_command_accessibility_settings.json"
+      ]
+    },
+    {
+      "discipline": "platform_scalability",
+      "coverage_targets": [
+        "desktop_high",
+        "desktop_medium",
+        "vr_comfort",
+        "debug_replay",
+        "future_handheld_or_console_review"
+      ],
+      "quality_requirements": [
+        "foliage_density_lods",
+        "water_vfx_scalability",
+        "audio_voice_mix_cost_limits",
+        "cpu_budget_for_ai_and_physics",
+        "vr_frame_time_budget"
+      ],
+      "reference_manifests": [
+        "unreal/Content/RaftSim/Rendering/vertical_slice_environment_corridor.json",
+        "unreal/Content/RaftSim/Audio/spatial_audio_platform_validation.json",
+        "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json"
+      ]
+    }
+  ],
+  "raft_weather_and_flow_matrix": [
+    {
+      "coverage_id": "paddle_raft_low_to_high_water",
+      "raft_setups": ["standard_14ft_paddle_raft", "technical_13ft_paddle_raft", "heavier_training_raft"],
+      "weather": ["clear", "overcast", "light_rain", "post_storm"],
+      "flow_context": ["low", "median", "high", "storm_response"],
+      "required_asset_disciplines": ["art_environment", "audio", "vfx", "haptics", "ui_accessibility"]
+    },
+    {
+      "coverage_id": "oar_rig_big_water",
+      "raft_setups": ["sixteen_foot_oar_rig", "eighteen_foot_oar_rig", "cargo_training_oar_rig"],
+      "weather": ["desert_sun", "canyon_shadow", "wind"],
+      "flow_context": ["low_release", "moderate_release", "high_release"],
+      "required_asset_disciplines": ["art_environment", "audio", "vfx", "haptics", "platform_scalability"]
+    },
+    {
+      "coverage_id": "rainforest_rainfed_paddle",
+      "raft_setups": ["standard_14ft_paddle_raft", "loaded_expedition_paddle_raft"],
+      "weather": ["humid_clear", "rain", "mist", "flash_response_review"],
+      "flow_context": ["clear_season_low", "rainfed_runnable", "rainy_season_high"],
+      "required_asset_disciplines": ["art_environment", "audio", "vfx", "ui_accessibility", "platform_scalability"]
+    }
+  ],
+  "promotion_gates": {
+    "source_manifest_complete": true,
+    "license_or_generation_metadata_complete": true,
+    "photoreal_reference_review_complete": true,
+    "guide_seat_capture_review_complete": true,
+    "desktop_and_vr_budget_review_complete": true,
+    "accessibility_review_complete": true,
+    "physics_validation_not_hidden_by_presentation": true
+  },
+  "pass_policy": {
+    "covers_additional_rivers_seasons_flows_rafts_weather_biomes": true,
+    "covers_art_audio_vfx_haptics_ui_accessibility_and_scalability": true,
+    "photoreal_landscape_and_foliage_are_core_goals": true,
+    "all_assets_require_manifest_approved_sources": true,
+    "paid_assets_remain_release_gate_only": true
+  }
+}
