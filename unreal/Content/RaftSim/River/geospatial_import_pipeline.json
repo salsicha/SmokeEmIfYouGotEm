@@ -1,0 +1,183 @@
+{
+  "asset_class": "URaftSimGeospatialImportPipelineConfig",
+  "corridor_package": "physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json",
+  "crs_policy": {
+    "solver_local_crs_required": true,
+    "source_crs_required": true,
+    "unreal_transform_required": true,
+    "working_crs_required": true
+  },
+  "format_contract": "physics/config/geospatial_format_contract.json",
+  "import_stages": [
+    {
+      "canonical_formats": [
+        "JSON"
+      ],
+      "category": "source_manifests",
+      "required_metadata": [
+        "provider",
+        "license_or_terms",
+        "attribution"
+      ],
+      "requires_crs": false,
+      "requires_source_manifest": false,
+      "seed_status": "available_in_seed_manifest",
+      "source_paths": [
+        "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json"
+      ],
+      "stage_id": "source_manifest_json",
+      "unreal_conversion_target": "URaftSimTraceableRiverDataAsset.source_manifest"
+    },
+    {
+      "canonical_formats": [
+        "GeoJSON",
+        "GeoPackage"
+      ],
+      "category": "vectors_annotations",
+      "required_metadata": [
+        "crs",
+        "source_manifest"
+      ],
+      "requires_crs": true,
+      "requires_source_manifest": true,
+      "seed_status": "available_in_seed_manifest",
+      "source_paths": [
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/centerline.geojson",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/banks.geojson",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/cross_sections.geojson",
+        "physics/data/real_world/south_fork_american_chili_bar/rapid_candidates.geojson",
+        "physics/data/real_world/south_fork_american_chili_bar/review/rapid_candidates.geojson"
+      ],
+      "stage_id": "vectors_annotations_geojson_geopackage",
+      "unreal_conversion_target": "river splines, banks, rapid polygons, validation annotation layers"
+    },
+    {
+      "canonical_formats": [
+        "GeoTIFF",
+        "COG"
+      ],
+      "category": "rasters",
+      "required_metadata": [
+        "crs",
+        "resolution",
+        "source_manifest"
+      ],
+      "requires_crs": true,
+      "requires_source_manifest": true,
+      "seed_status": "available_in_seed_manifest",
+      "source_paths": [
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/naip_tiles",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/water_mask.tif",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/foam_texture_mask.tif"
+      ],
+      "stage_id": "rasters_geotiff_cog",
+      "unreal_conversion_target": "landscape height/mask tiles, water masks, foam confidence masks"
+    },
+    {
+      "canonical_formats": [
+        "LAS",
+        "LAZ",
+        "COPC"
+      ],
+      "category": "point_clouds",
+      "required_metadata": [
+        "crs",
+        "vertical_datum",
+        "source_manifest"
+      ],
+      "requires_crs": true,
+      "requires_source_manifest": true,
+      "seed_status": "planned_not_vendored_in_south_fork_seed",
+      "source_paths": [],
+      "stage_id": "point_clouds_las_laz_copc",
+      "unreal_conversion_target": "optional high-detail rocks, banks, undercuts, and 3D Tiles source meshes"
+    },
+    {
+      "canonical_formats": [
+        "JSON",
+        "CSV",
+        "Parquet"
+      ],
+      "category": "gauge_history",
+      "required_metadata": [
+        "gauge_id",
+        "units",
+        "time_zone",
+        "source_manifest"
+      ],
+      "requires_crs": false,
+      "requires_source_manifest": true,
+      "seed_status": "available_in_seed_manifest",
+      "source_paths": [
+        "physics/data/real_world/south_fork_american_chili_bar/hydrology/usgs_11445500_daily_discharge.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrology/flow_presets.json"
+      ],
+      "stage_id": "gauge_history_tables",
+      "unreal_conversion_target": "flow-band presets, hydrograph snippets, editor review panels"
+    },
+    {
+      "canonical_formats": [
+        "JSON",
+        "NPY",
+        "NPZ"
+      ],
+      "category": "solver_packages",
+      "required_metadata": [
+        "scenario_schema",
+        "array_manifest",
+        "source_manifest"
+      ],
+      "requires_crs": false,
+      "requires_source_manifest": true,
+      "seed_status": "available_in_seed_manifest",
+      "source_paths": [
+        "physics/data/real_world/south_fork_american_chili_bar/scenario/scenario.json",
+        "physics/data/real_world/south_fork_american_chili_bar/scenario/bed.npy",
+        "physics/data/real_world/south_fork_american_chili_bar/scenario/initial_state.npz"
+      ],
+      "stage_id": "solver_arrays",
+      "unreal_conversion_target": "custom water runtime scenario packages and validation overlays"
+    },
+    {
+      "canonical_formats": [
+        "JSON",
+        "GeoJSON",
+        "converted_engine_assets"
+      ],
+      "category": "unreal_corridor_exports",
+      "required_metadata": [
+        "wgs84_to_local_transform",
+        "source_manifest"
+      ],
+      "requires_crs": false,
+      "requires_source_manifest": true,
+      "seed_status": "available_in_seed_manifest",
+      "source_paths": [
+        "physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json",
+        "unreal/Content/RaftSim/River/traceable_river_data_assets.json",
+        "unreal/Content/RaftSim/River/rapid_river_editor.json"
+      ],
+      "stage_id": "converted_unreal_corridor_assets",
+      "unreal_conversion_target": "World Partition corridor package, data assets, splines, masks, and review overlays"
+    }
+  ],
+  "module": "RaftSimGeo",
+  "pipeline_id": "milestone21_canonical_geospatial_import",
+  "rapid_river_editor": "unreal/Content/RaftSim/River/rapid_river_editor.json",
+  "round_trip_targets": [
+    "solver_neutral_scenario_package",
+    "geoclaw_cpp_comparison_inputs",
+    "unreal_fidelity_review_overlays"
+  ],
+  "schema": "raftsim.unreal.geospatial_import_pipeline.v1",
+  "shapefile_canonical_allowed": false,
+  "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json",
+  "source_manifest_required": true,
+  "status": "ready_for_unreal_geospatial_import_tooling",
+  "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json",
+  "transform_policy": {
+    "local_solver_transform_required": true,
+    "transform_changes_tracked": true,
+    "wgs84_required": true
+  }
+}
