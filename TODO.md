@@ -852,7 +852,7 @@ This milestone turns the validated river-data contracts into the level editor an
 
 - [x] Build the Unreal rapid/river editor for station pins, reach/drop spans, polygons, raft lines, footage timecodes, gauge-history snippets, aerial imagery references, guide notes, confidence, rights/provenance, and expected surf/flush/pin/release/flip outcomes.
 - [x] Implement the canonical geospatial import path for JSON source manifests, GeoJSON/GeoPackage vectors, GeoTIFF/COG rasters, LAS/LAZ/COPC point clouds, gauge-history tables, solver arrays, and converted Unreal corridor assets.
-- [ ] Support reach-local authoring and streaming with overlap/ghost-zone metadata while requiring stitched whole-window validation exports for every playable river window.
+- [x] Support reach-local authoring and streaming with overlap/ghost-zone metadata while requiring stitched whole-window validation exports for every playable river window.
 - [ ] Expose flow bands, discharge-dependent feature-forcing gains, hole stickiness/washout curves, eddy-line/lateral/wave-train tuning, boulder push/damping, shallow shelves, pins/releases, and visual/audio-only parameters as editor-tunable but manifest-recorded data.
 - [ ] Build the South Fork American first-river editor pass with reviewed rapids, source manifests, low/median/high flow presets, validation overlays, and guide-feedback annotations.
 - [ ] Draft the Colorado River rowing/oar-rig route as the second real-world river target with source manifest, flow bands, rowing-frame controls, guide review, and validation annotation needs.

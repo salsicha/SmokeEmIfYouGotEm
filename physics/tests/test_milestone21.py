@@ -8,14 +8,18 @@ from raftsim.milestone21 import (
     GEOMETRY_KINDS,
     MILESTONE21_GEOSPATIAL_IMPORT_PIPELINE_SCHEMA,
     MILESTONE21_RAPID_RIVER_EDITOR_SCHEMA,
+    MILESTONE21_REACH_LOCAL_STREAMING_SCHEMA,
     RAPID_RIVER_EDITOR_MANIFEST_PATH,
+    REACH_LOCAL_STREAMING_PATH as REACH_LOCAL_STREAMING_MANIFEST,
     REQUIRED_EVIDENCE_LAYERS,
     SOUTH_FORK_WORKFLOW_PATH,
     TRACEABLE_RIVER_DATA_ASSETS_PATH,
     build_geospatial_import_pipeline_manifest,
     build_rapid_river_editor_manifest,
+    build_reach_local_streaming_manifest,
     write_geospatial_import_pipeline_manifest,
     write_rapid_river_editor_manifest,
+    write_reach_local_streaming_manifest,
 )
 
 
@@ -29,6 +33,11 @@ GEOSPATIAL_IMPORT_PIPELINE_PATH = REPO_ROOT / GEOSPATIAL_IMPORT_PIPELINE_MANIFES
 GEOSPATIAL_IMPORT_PIPELINE_HEADER_PATH = (
     REPO_ROOT
     / "unreal/Plugins/RaftSim/Source/RaftSimGeo/Public/RaftSimGeospatialImportPipeline.h"
+)
+REACH_LOCAL_STREAMING_PATH = REPO_ROOT / REACH_LOCAL_STREAMING_MANIFEST
+REACH_LOCAL_STREAMING_HEADER_PATH = (
+    REPO_ROOT
+    / "unreal/Plugins/RaftSim/Source/RaftSimRiver/Public/RaftSimReachLocalStreamingConfig.h"
 )
 
 
@@ -169,6 +178,75 @@ def test_write_geospatial_import_pipeline_manifest_creates_json(tmp_path):
     output_json = tmp_path / "geospatial_import_pipeline.json"
 
     generated = write_geospatial_import_pipeline_manifest(repo_root=REPO_ROOT, output_json=output_json)
+
+    assert output_json.exists()
+    assert json.loads(output_json.read_text(encoding="utf-8")) == generated.manifest
+
+
+def test_reach_local_streaming_manifest_matches_generator():
+    expected = build_reach_local_streaming_manifest(REPO_ROOT).manifest
+    committed = json.loads(REACH_LOCAL_STREAMING_PATH.read_text(encoding="utf-8"))
+
+    assert committed == expected
+    assert committed["schema"] == MILESTONE21_REACH_LOCAL_STREAMING_SCHEMA
+    assert committed["status"] == "ready_for_reach_local_unreal_authoring_and_streaming"
+
+
+def test_reach_local_streaming_requires_ghost_zones_and_stitched_exports():
+    manifest = json.loads(REACH_LOCAL_STREAMING_PATH.read_text(encoding="utf-8"))
+
+    assert manifest["asset_class"] == "URaftSimReachLocalStreamingConfig"
+    assert manifest["module"] == "RaftSimRiver"
+    assert manifest["playable_window_count"] == 6
+    for window in manifest["playable_windows"]:
+        assert window["authoring_mode"] == "reach_local_grids"
+        assert window["streaming_mode"] == "reach_window_with_overlap_ghost_zones"
+        assert window["reach_local_grid_count"] == len(window["reach_ids"]) == len(
+            window["reach_local_grids"]
+        )
+        assert window["streaming_contract"] == {
+            "isolated_reach_validation_allowed_for_signoff": False,
+            "neighbor_references_required": True,
+            "overlap_metadata_required": True,
+            "stitched_whole_window_validation_required": True,
+        }
+        assert window["ghost_zone_policy"]["max_upstream_ghost_cells"] == 2
+        assert window["ghost_zone_policy"]["max_downstream_ghost_cells"] == 2
+        assert window["stitched_validation"]["required"] is True
+        assert window["stitched_validation_scope"]["covers_reach_local_grids"] is True
+        assert window["stitched_validation_scope"]["seams_visible_to_validators"] is True
+        for export_path in window["required_exports"].values():
+            assert (REPO_ROOT / export_path).exists()
+
+
+def test_reach_local_streaming_records_reach_adjacency():
+    manifest = json.loads(REACH_LOCAL_STREAMING_PATH.read_text(encoding="utf-8"))
+
+    for window in manifest["playable_windows"]:
+        adjacency = window["reach_adjacency"]
+        assert len(adjacency) == len(window["reach_ids"])
+        assert adjacency[0]["upstream_neighbor"] is None
+        assert adjacency[-1]["downstream_neighbor"] is None
+        for previous, current in zip(adjacency, adjacency[1:]):
+            assert previous["downstream_neighbor"] == current["reach_id"]
+            assert current["upstream_neighbor"] == previous["reach_id"]
+
+
+def test_reach_local_streaming_header_exposes_unreal_data_contract():
+    header_text = REACH_LOCAL_STREAMING_HEADER_PATH.read_text(encoding="utf-8")
+
+    assert "URaftSimReachLocalStreamingConfig" in header_text
+    assert "FRaftSimReachLocalGridWindow" in header_text
+    assert "FRaftSimReachStreamingWindow" in header_text
+    assert "bRequireOverlapGhostZones" in header_text
+    assert "bRejectIsolatedReachValidationForSignoff" in header_text
+    assert "bRequiresStitchedWholeWindowValidation" in header_text
+
+
+def test_write_reach_local_streaming_manifest_creates_json(tmp_path):
+    output_json = tmp_path / "reach_local_streaming.json"
+
+    generated = write_reach_local_streaming_manifest(repo_root=REPO_ROOT, output_json=output_json)
 
     assert output_json.exists()
     assert json.loads(output_json.read_text(encoding="utf-8")) == generated.manifest
