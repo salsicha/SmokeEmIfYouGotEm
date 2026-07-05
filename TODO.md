@@ -191,8 +191,8 @@ Conditionally superseded for live water by Milestone 14. Telemetry/replay playba
 - [x] Build the first-person guide camera with flat-screen and VR comfort options.
 - [x] Build river, season, flow, difficulty, and raft/crew selection UI from validated data assets.
 - [x] Add local/offline AI integration layer for speech recognition, command intent parsing, crew dialogue, and optional local speech synthesis.
-- [x] Implement guide voice commands that map spoken instructions into deterministic crew intents: forward paddle, back paddle, left/right paddle, stop, brace, hold on, high side, rescue, and recovery commands.
-- [x] Add confidence thresholds, push-to-talk/open-mic settings, noisy-river audio tests, subtitles, accessibility fallbacks, and manual input parity for all voice commands.
+- [x] Implement guide voice commands for guided passenger paddle-raft mode that map spoken instructions into deterministic crew intents: forward paddle, back paddle, left/right paddle, stop, brace, hold on, high side, rescue, and recovery commands.
+- [x] Add confidence thresholds, push-to-talk/open-mic settings, noisy-river audio tests, subtitles, accessibility fallbacks, lightweight/local command-model requirements, and manual input parity for all voice commands.
 - [ ] Add a crew-overboard safety-state model: seated, at-risk, falling/ejected, swimming, rescue-targeted, rescued, re-seated/recovered, and failed-rescue.
 - [ ] Add randomly assigned passenger swimming skills at run setup, including non-swimmers who cannot self-rescue, so ejection urgency, panic, pull-in difficulty, rescue priority, and safety scoring vary by passenger.
 - [ ] Add swimmer and rescue gameplay: swimmer drift/visibility, guide and crew callouts, rescue target selection, reach/paddle grab, throw-line support where available, pull-in timing, re-seat/recovery, and failed-rescue consequences.
@@ -875,8 +875,8 @@ This milestone wires the selected raft/contact runtime, validated water fields, 
 This milestone delivers the first complete playable Unreal slice from launch to score screen.
 
 - [ ] Build the stern guide camera for flat-screen and VR with seated recentering, comfort settings, haptics, visible hands/paddle, raft context, and accessibility options.
-- [ ] Implement paddle, oar, guide-command, brace, high-side, rescue, and recovery inputs with manual parity for keyboard/mouse, gamepad, and VR controllers.
-- [ ] Add local voice-command recognition and deterministic command-intent routing for paddle, brace, hold-on, high-side, swimmer, rescue, and recovery commands with confidence/fallback behavior.
+- [ ] Implement paddle, oar, guide-command, brace, high-side, rescue, and recovery inputs with manual parity for keyboard/mouse, gamepad, and VR controllers; rowing/oar-rig controls stay direct/manual-only and do not route through passenger paddle voice commands.
+- [ ] Add lightweight, efficient, accurate local voice-command recognition and deterministic command-intent routing for guided passenger paddle-raft commands such as `forward paddle`, back paddle, brace, hold-on, high-side, swimmer, rescue, and recovery, with confidence/fallback behavior and manual parity through keyboard/mouse, gamepad, and VR controllers.
 - [ ] Build one training section and one technical rapid using validated river data, live custom water, selected raft/contact authority, crew safety states, scoring, restart, replay, and after-action feedback.
 - [ ] Integrate readable water visuals, foam, spray, wet rocks, raft contact cues, paddle cues, weather, 3D spatial audio, ambisonic ambience, reverb/occlusion, and rescue cues driven by solver/runtime telemetry.
 - [ ] Build the vertical-slice environment as a highly detailed, immersive river corridor, with landscape, rocks, banks, and foliage pushed as close to photorealistic as the target hardware and readability allow.
@@ -888,7 +888,7 @@ This milestone delivers the first complete playable Unreal slice from launch to 
 This milestone expands beyond the vertical slice while preserving the validated water/runtime contracts.
 
 - [ ] Expand the South Fork American content set with additional linked rapids, scouting/eddy/recovery-pool flow, seasonal flow variants, difficulty presets, and guide-reviewed fidelity notes.
-- [ ] Prototype the Colorado River rowing/oar-rig route as the second real-world river style with rowing-frame controls, large-volume water reading, canyon pacing, longer rescue windows, and guide-review annotations.
+- [ ] Prototype the Colorado River rowing/oar-rig route as the second real-world river style with direct manual rowing-frame controls, no passenger paddle voice commands, large-volume water reading, canyon pacing, longer rescue windows, and guide-review annotations.
 - [ ] Draft the Pacuare River in Costa Rica as the third runnable river target with source manifest, rain-fed flow bands, rainforest/gorge fidelity needs, hydrology/gauge-source review, protected-area/source-rights review, and rights-cleared guide/field-media annotations.
 - [ ] Add more raft types, handling profiles, passenger archetypes, crew trust/fear/fatigue/skill progression, training lessons, challenge variants, and generated-rapid experiments where validation support exists.
 - [ ] Expand local AI crew conversations and barks for calm water, eddies, scouting, recovery pools, swims, rescues, and debriefs while keeping rapid commands and safety cues deterministic and prioritized.
@@ -901,7 +901,7 @@ This milestone expands beyond the vertical slice while preserving the validated 
 This milestone turns the alpha game into a shippable Unreal build.
 
 - [ ] Profile and optimize custom water, selected raft/contact runtime, game thread, render thread, GPU water/VFX, World Partition streaming, audio, local AI, memory, and save/replay systems across target desktop, VR, and handheld tiers.
-- [ ] Add scalability modes for water, raft/contact authority, visual physics, VFX, lighting, photorealistic landscape/foliage density, audio spatialization, local voice, crew conversation, and fallback/manual command paths.
+- [ ] Add scalability modes for water, raft/contact authority, visual physics, VFX, lighting, photorealistic landscape/foliage density, audio spatialization, guided paddle-raft local voice, crew conversation, and fallback/manual command paths.
 - [ ] Lock release-quality asset, audio, AI-generation, source-manifest, attribution, license, credits, platform-rights, localization, and store-compliance workflows.
 - [ ] Harden QA automation for physics regressions, Unreal river import/export, feature-forcing manifests, raft/contact fixtures, rescue outcomes, replay determinism, VR comfort, input devices, accessibility, and crash/performance capture.
 - [ ] Polish onboarding, training, scoring, after-action feedback, menus, settings, save data, accessibility, subtitles, microphone/privacy controls, haptics, and final audio mix.
@@ -922,9 +922,9 @@ This milestone turns the alpha game into a shippable Unreal build.
 - [x] Identify reference footage, river data, aerial/satellite imagery, flow history, and expert guide feedback needed for validation: build a game/editor-integrated river validation annotation tool so evidence is attached directly to river stations, reaches, drops, raft lines, and expected outcomes.
 - [x] Decide which geospatial formats become canonical for source data, generated scenarios, and Unreal corridor packages: JSON source manifests, GeoJSON vectors/annotations, GeoPackage for larger GIS workspaces, GeoTIFF/COG rasters, LAS/LAZ or COPC point clouds, normalized JSON/CSV/Parquet gauge history, custom JSON plus `.npy`/`.npz` solver packages, and JSON/GeoJSON plus converted assets for Unreal corridor packages.
 - [ ] Re-check latest UE5 rendering/geospatial plugin capabilities at the Python-to-Unreal readiness gate.
-- [ ] Decide local AI model/runtime strategy for desktop, VR, handheld, and future console targets.
+- [ ] Decide the lightweight, efficient, accurate local AI model/runtime strategy for guided paddle-raft voice commands on desktop, VR, handheld, and future console targets.
 - [ ] Decide how much crew dialogue is generated locally versus authored as recorded barks, constrained templates, or designer-approved lines.
-- [ ] Decide latency, privacy, profanity/safety, save-data, and deterministic replay requirements for voice and conversation systems.
+- [ ] Decide latency, memory/CPU cost, noisy-river/accent accuracy, privacy, profanity/safety, save-data, and deterministic replay requirements for voice and conversation systems.
 - [ ] Decide whether free/open and AI-generated art/audio assets are good enough for release, and buy paid libraries only for proven gaps.
 - [ ] Decide whether Unreal-native audio/MetaSounds is enough or whether Wwise/FMOD should be adopted for the full UE5 version.
 - [ ] Decide the binaural/HRTF plugin/runtime path, ambisonic capture/playback format, surround targets, reverb/occlusion strategy, and spatial-audio certification requirements for the first VR build.

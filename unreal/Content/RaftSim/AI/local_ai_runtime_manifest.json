@@ -2,6 +2,10 @@
   "schema": "raftsim.unreal.local_ai_runtime.v1",
   "module": "RaftSimAI",
   "privacy_policy": "offline_first_no_cloud_required_for_core_gameplay",
+  "gameplay_mode_policy": {
+    "guided_passenger_paddle_raft": "voice_or_manual_crew_commands",
+    "rowing_oar_rig": "manual_oar_controls_only_voice_commands_disabled"
+  },
   "layers": [
     {
       "layer": "speech_recognition",
@@ -25,6 +29,15 @@
   "runtime_constraints": {
     "core_paddling_commands_must_be_deterministic": true,
     "cloud_ai_not_required": true,
-    "manual_input_parity_required": true
+    "manual_input_parity_required": true,
+    "command_model_profile": "lightweight_efficient_accurate_local",
+    "broad_conversation_model_allowed_for_gameplay_commands": false,
+    "optimize_for": [
+      "accuracy",
+      "low_latency",
+      "low_memory",
+      "low_cpu_gpu_cost",
+      "noisy_river_robustness"
+    ]
   }
 }
