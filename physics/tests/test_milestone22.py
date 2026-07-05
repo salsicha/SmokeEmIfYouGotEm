@@ -10,12 +10,15 @@ from raftsim.milestone22 import (
     MILESTONE22_CONTACT_TELEMETRY_STATUS,
     MILESTONE22_RAFT_CONTACT_AUTHORITY_SCHEMA,
     MILESTONE22_RAFT_CONTACT_AUTHORITY_STATUS,
+    MILESTONE22_SWIMMER_RESCUE_SCHEMA,
+    MILESTONE22_SWIMMER_RESCUE_STATUS,
     MILESTONE22_SWIMMING_SKILL_SCHEMA,
     MILESTONE22_SWIMMING_SKILL_STATUS,
     build_crew_overboard_safety_states_manifest,
     build_crew_weight_distribution_manifest,
     build_raft_contact_authority_integration,
     build_raft_contact_response_telemetry,
+    build_swimmer_rescue_gameplay_manifest,
     build_swimming_skill_assignment_manifest,
 )
 
@@ -44,6 +47,9 @@ CREW_SAFETY_STATES_PATH = (
 )
 SWIMMING_SKILL_ASSIGNMENT_PATH = (
     REPO_ROOT / "unreal/Content/RaftSim/Crew/swimming_skill_assignment.json"
+)
+SWIMMER_RESCUE_GAMEPLAY_PATH = (
+    REPO_ROOT / "unreal/Content/RaftSim/Crew/swimmer_rescue_gameplay.json"
 )
 PHYSICS_BRIDGE_HEADER_PATH = (
     REPO_ROOT
@@ -400,3 +406,80 @@ def test_unreal_swimming_skill_contract_exposes_non_swimmer_assignment():
     assert "URaftSimSwimmingSkillLibrary" in header_text
     assert "bSelfRescueAllowed" in header_text
     assert "AssignSwimmingSkillFromNormalizedValue" in header_text
+
+
+def test_swimmer_rescue_gameplay_manifest_matches_generator():
+    expected = build_swimmer_rescue_gameplay_manifest(REPO_ROOT).manifest
+    committed = json.loads(SWIMMER_RESCUE_GAMEPLAY_PATH.read_text(encoding="utf-8"))
+
+    assert committed == expected
+    assert committed["schema"] == MILESTONE22_SWIMMER_RESCUE_SCHEMA
+    assert committed["status"] == MILESTONE22_SWIMMER_RESCUE_STATUS
+
+
+def test_swimmer_rescue_gameplay_manifest_covers_methods_and_outcomes():
+    manifest = json.loads(SWIMMER_RESCUE_GAMEPLAY_PATH.read_text(encoding="utf-8"))
+    methods = {method["method"]: method for method in manifest["rescue_methods"]}
+
+    assert set(methods) == {"reach_grab", "paddle_grab", "throw_line"}
+    assert methods["throw_line"]["requires_throw_line"] is True
+    assert methods["reach_grab"]["max_distance_m"] < methods["throw_line"]["max_distance_m"]
+    assert manifest["recovery_effects"]["successful_rescue_transitions"] == [
+        "rescue_targeted",
+        "rescued",
+        "reseated_recovered",
+    ]
+    assert manifest["recovery_effects"]["failed_rescue_transitions"] == [
+        "swimming",
+        "failed_rescue",
+    ]
+
+
+def test_swimmer_rescue_gameplay_manifest_has_input_voice_and_telemetry_coverage():
+    manifest = json.loads(SWIMMER_RESCUE_GAMEPLAY_PATH.read_text(encoding="utf-8"))
+    coverage = manifest["input_and_voice_coverage"]
+    fields = set(manifest["telemetry_fields"])
+
+    assert "RescueTargetSelect" in coverage["input_action_ids"]
+    assert "RescueReachGrab" in coverage["input_action_ids"]
+    assert "RescueThrowLine" in coverage["input_action_ids"]
+    assert "ReseatCrew" in coverage["input_action_ids"]
+    assert "crew_rescue" in coverage["voice_intents"]
+    assert "crew_recovery" in coverage["voice_intents"]
+    assert {
+        "swimmer_world_position_m",
+        "swimmer_drift_velocity_mps",
+        "visibility_score",
+        "callout_priority",
+        "rescue_target_rank",
+        "rescue_method",
+        "pull_in_progress",
+        "reseat_recovery_seconds",
+        "fatigue_delta",
+        "trust_delta",
+        "failed_rescue_reason",
+    }.issubset(fields)
+
+
+def test_unreal_swimmer_rescue_contract_exposes_drift_and_rescue_attempts():
+    header_text = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimCrew/Public/RaftSimCrewStateContracts.h"
+    ).read_text(encoding="utf-8")
+
+    assert "ERaftSimRescueMethod" in header_text
+    assert "FRaftSimSwimmerRescueFrame" in header_text
+    assert "FRaftSimRescueAttempt" in header_text
+    assert "URaftSimSwimmerRescueLibrary" in header_text
+    assert "IntegrateSwimmerDrift" in header_text
+    assert "EvaluateRescueAttempt" in header_text
+    for field in (
+        "SwimmerWorldPositionMeters",
+        "SwimmerDriftVelocityMetersPerSecond",
+        "VisibilityScore",
+        "CalloutPriority",
+        "PullInProgress",
+        "FatigueDelta",
+        "TrustDelta",
+    ):
+        assert field in header_text

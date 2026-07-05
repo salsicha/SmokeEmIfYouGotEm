@@ -55,6 +55,30 @@
       "deterministic_intent": "crew_hold_on"
     },
     {
+      "action_id": "RescueTargetSelect",
+      "value_type": "Axis1D",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "deterministic_intent": "rescue_target_select"
+    },
+    {
+      "action_id": "RescueReachGrab",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "deterministic_intent": "rescue_reach_or_paddle_grab"
+    },
+    {
+      "action_id": "RescueThrowLine",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "deterministic_intent": "rescue_throw_line"
+    },
+    {
+      "action_id": "ReseatCrew",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
+      "deterministic_intent": "crew_reseat_recovery"
+    },
+    {
       "action_id": "GuideCommandPushToTalk",
       "value_type": "Boolean",
       "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
