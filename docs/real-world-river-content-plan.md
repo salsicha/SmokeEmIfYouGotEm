@@ -169,6 +169,8 @@ South Fork American should be the baseline content target for this package revis
 
 The second real-world river target should be a Colorado River rowing route rather than another paddle-raft-only section. This route should introduce an oar rig/rowing frame, larger-volume current reading, longer canyon pacing, rowing-specific ferry/pull/back-row controls, and passenger safety decisions over longer recovery distances. Its source manifest, flow bands, corridor package, guide review, and validation annotations should be drafted only after the South Fork baseline workflow is proven.
 
+The third runnable river target should be the Pacuare River in Costa Rica. Treat it as a distinct tropical rainforest/gorge whitewater package rather than another U.S. geodata-first section: start with planning bounds only, then draft a Costa Rica source manifest, rain-fed seasonal flow bands, hydrology/gauge-source review, protected-area/source-rights review, aerial/terrain references, and rights-cleared guide/field-media annotations before solver packages or Unreal corridor exports are generated.
+
 ## Rapid Identification From Aerial And Satellite Imagery
 
 Identify candidate rapids by combining terrain, hydrography, image analysis, and human review.

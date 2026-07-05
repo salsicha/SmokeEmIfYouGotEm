@@ -93,6 +93,7 @@ Jolt is the leading specialized candidate for a portable authoritative raft/cont
 - Leaderboards and challenge ghosts.
 - Scenario packs based on different river types.
 - Second real-world route target: rowing the Colorado River with an oar rig/rowing frame after the South Fork American paddle-raft baseline is proven.
+- Third runnable route target: the Pacuare River in Costa Rica, adding tropical rainforest whitewater, rain-fed flow variability, gorge pacing, and international source/provenance needs after the Colorado rowing target.
 
 ## Roadmap Milestone Mapping
 
@@ -103,7 +104,7 @@ The TODO roadmap now carries the full Unreal game build as explicit production m
 - Milestone 21: build the Unreal river editor and content pipeline for geospatial imports, reach-local authoring, stitched validation exports, flow-dependent feature tuning, guide annotations, South Fork content, and the Colorado rowing/oar-rig route.
 - Milestone 22: implement authoritative raft, crew, swimmer, and rescue gameplay over the validated water and selected contact runtime.
 - Milestone 23: deliver the first-person Unreal vertical slice from launch through scoring, replay, and physics/fidelity review.
-- Milestone 24: expand alpha content, systems depth, South Fork coverage, Colorado rowing, crew AI, generated-rapid experiments, and multiplayer feasibility only after the single-player guide loop is stable.
+- Milestone 24: expand alpha content, systems depth, South Fork coverage, Colorado rowing, Pacuare third-river planning, crew AI, generated-rapid experiments, and multiplayer feasibility only after the single-player guide loop is stable.
 - Milestone 25: harden performance, platform support, QA automation, accessibility, asset/provenance workflows, release compliance, beta playtests, and patch operations.
 
 Milestones 20-25 should not relax the water evidence rules: any new river, feature-forcing tune, raft/contact change, swimmer/rescue outcome, or content pipeline export must remain traceable to manifests, validation fixtures, telemetry, and replayable Unreal evidence.
@@ -256,6 +257,7 @@ Tasks:
 - Build additional river biomes.
 - Build additional real-world river sections from source manifests and reviewed rapid annotations.
 - Prioritize the Colorado River rowing/oar-rig route as the second real-world river after the South Fork American baseline, with rowing-frame controls, large-volume reading, canyon pacing, and longer rescue/recovery stakes.
+- Make the Pacuare River in Costa Rica the third runnable river target, with a future source manifest, flow bands, rainforest/canyon fidelity needs, rain-fed flow review, and rights-cleared guide annotations before solver or Unreal package generation.
 - Add difficulty progression.
 - Add more raft types and handling profiles.
 - Add passenger archetypes and crew trust progression.

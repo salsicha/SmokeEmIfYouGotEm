@@ -520,6 +520,44 @@ def default_candidate_river_inventory() -> tuple[CandidateRiverSection, ...]:
             notes="Representative Milestone 9 seed section; coordinates are planning bounds and must be verified before production extraction.",
         ),
         CandidateRiverSection(
+            river_id="colorado_grand_canyon_rowing",
+            river_name="Colorado River",
+            section_id="lees_ferry_to_diamond_creek",
+            section_name="Grand Canyon Rowing Route",
+            region="Arizona Grand Canyon",
+            country="US",
+            bounds_wgs84=BoundsWGS84(-113.55, 35.75, -111.55, 36.95),
+            difficulty_range=("class_iii", "class_v"),
+            playable_reason="Second runnable river target with oar-rig rowing, large-volume current reading, canyon pacing, and longer rescue windows.",
+            data_priorities=("usgs_gauge_09380000", "usgs_gauge_09402500", "nps_permit_context", "3dep_dem_research", "guide_reference_review"),
+            gauge_candidates=(
+                "USGS 09380000 Colorado River at Lees Ferry, AZ",
+                "USGS 09402500 Colorado River near Grand Canyon, AZ",
+            ),
+            notes="Second real-world target after the South Fork baseline; source manifest and planning flow bands are drafted in Milestone 21.",
+        ),
+        CandidateRiverSection(
+            river_id="pacuare",
+            river_name="Pacuare River",
+            section_id="lower_pacuare_planning_corridor",
+            section_name="Lower Pacuare Planning Corridor",
+            region="Costa Rica Caribbean slope",
+            country="CR",
+            bounds_wgs84=BoundsWGS84(-83.75, 9.72, -83.42, 10.12),
+            difficulty_range=("class_iii", "class_iv"),
+            playable_reason="Third runnable river target with tropical rainforest whitewater, rain-fed flow variability, steep-walled gorges, and a distinct international rafting biome.",
+            data_priorities=(
+                "dem_source_research",
+                "osm_hydrography_access",
+                "costa_rica_hydrology_gauge_search",
+                "sinac_protected_area_review",
+                "guide_reference_review",
+                "field_media_rights_review",
+            ),
+            gauge_candidates=("Costa Rica hydrology gauge search for the Rio Pacuare basin",),
+            notes="Third runnable river target after South Fork American and Colorado rowing; planning bounds, source manifest, flow bands, and guide annotations must be replaced with reviewed Costa Rica data before solver generation.",
+        ),
+        CandidateRiverSection(
             river_id="youghiogheny_lower",
             river_name="Youghiogheny River",
             section_id="ohiopyle_to_bruner_run",
@@ -616,13 +654,13 @@ def build_candidate_river_inventory_package(
         next_review_actions=(
             "Verify planning bounds and gauge candidates before production extraction.",
             "Replace seed DEM/imagery/guide placeholders with pulled source products and reviewed annotations.",
-            "Draft source manifests for non-primary sections before generating solver packages from them.",
+            "Draft source manifests for planned sections before generating solver packages from them.",
             "Keep rights/provenance separate from third-party media until redistribution permissions are explicit.",
         ),
         provenance={
             "generated_by": "raftsim.real_world.build_candidate_river_inventory_package",
             "processing_version": "milestone_17_inventory_seed.v0",
-            "review_status": "draft_inventory_with_one_drafted_source_manifest",
+            "review_status": "draft_inventory_with_two_drafted_source_manifests_and_pacuare_planned_third",
         },
     )
 
@@ -1666,20 +1704,31 @@ def _candidate_section_source_manifest_link(
     primary: CandidateRiverSection,
 ) -> dict[str, object]:
     is_primary = section.river_id == primary.river_id and section.section_id == primary.section_id
-    manifest_path = f"south_fork_american_chili_bar/{SOURCE_MANIFEST_FILE}" if is_primary else None
+    is_colorado_rowing = (
+        section.river_id == "colorado_grand_canyon_rowing"
+        and section.section_id == "lees_ferry_to_diamond_creek"
+    )
+    manifest_path = None
+    manifest_id = None
+    required_before_generation = "Draft a source manifest before generating solver or Unreal packages."
+    status = "planned"
+    if is_primary:
+        manifest_path = f"south_fork_american_chili_bar/{SOURCE_MANIFEST_FILE}"
+        manifest_id = f"{section.river_id}.{section.section_id}.source_manifest.v0"
+        required_before_generation = "Use the drafted source manifest for the seed South Fork package."
+        status = "drafted"
+    elif is_colorado_rowing:
+        manifest_path = "colorado_river_grand_canyon_rowing/source_manifest.json"
+        manifest_id = "colorado_river.grand_canyon_lees_ferry_to_diamond_creek_rowing.source_manifest.v0"
+        required_before_generation = "Use the Milestone 21 Colorado rowing draft source manifest before generating solver or Unreal packages."
+        status = "drafted"
     return {
         "river_id": section.river_id,
         "section_id": section.section_id,
-        "source_manifest_status": "drafted" if is_primary else "planned",
+        "source_manifest_status": status,
         "source_manifest_path": manifest_path,
-        "source_manifest_id": (
-            f"{section.river_id}.{section.section_id}.source_manifest.v0" if is_primary else None
-        ),
-        "required_before_generation": (
-            "Use the drafted source manifest for the seed South Fork package."
-            if is_primary
-            else "Draft a source manifest before generating solver or Unreal packages."
-        ),
+        "source_manifest_id": manifest_id,
+        "required_before_generation": required_before_generation,
     }
 
 
