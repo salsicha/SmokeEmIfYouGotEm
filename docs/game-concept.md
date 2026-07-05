@@ -251,7 +251,7 @@ Content route order:
 
 - First real-world baseline: South Fork American River, Chili Bar to Coloma, paddle-raft guide experience.
 - Second real-world target: a Colorado River rowing route with an oar rig/rowing frame, larger-volume lines, longer canyon pacing, and rowing-specific ferry, pull, back-row, rescue, and passenger-management decisions.
-- Third runnable river target: Pacuare River in Costa Rica, focused on tropical rainforest whitewater, rain-fed flow variability, steep-walled gorges, and rights-cleared guide/field-media review before solver generation.
+- Third runnable river target: Pacuare River in Costa Rica, focused on tropical rainforest whitewater, rain-fed flow variability, steep-walled gorges, and rights-cleared guide/field-media review before solver generation; its first planning contract is `unreal/Content/RaftSim/River/pacuare_river_third_target_editor_pass.json`.
 
 ## Tone
 

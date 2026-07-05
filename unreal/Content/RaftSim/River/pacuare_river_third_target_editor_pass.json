@@ -1,0 +1,181 @@
+{
+  "asset_class": "URaftSimPacuareRiverTargetConfig",
+  "editor_status": {
+    "field_media": "rights_review_required",
+    "flow_bands": "relative_rainfed_placeholders",
+    "guide_review": "needs_rights_cleared_human_review",
+    "hydrology": "needs_costa_rica_gauge_and_rainfall_source_review",
+    "protected_area_rights": "needs_sinac_minae_source_review",
+    "rainforest_gorge_fidelity": "planning_needs_reference_board",
+    "source_manifest": "drafted"
+  },
+  "flow_presets": "physics/data/real_world/pacuare_river_costa_rica/flow_presets.json",
+  "hydrology_gauge_source_review": {
+    "blocks_numeric_flow_bands": true,
+    "needed_sources": [
+      "authoritative_discharge_or_stage_history",
+      "rainfall_event_history",
+      "basin_transfer_context",
+      "guide_reviewed_runnable_ranges"
+    ],
+    "review_outputs": [
+      "numeric_flow_band_ranges",
+      "rainfall_to_trip_risk_notes",
+      "flash_rise_exclusion_rules",
+      "falling_limb_behavior_notes"
+    ]
+  },
+  "module": "RaftSimRiver",
+  "protected_area_source_rights_review": {
+    "blocks_public_corridor_package": true,
+    "review_outputs": [
+      "access_constraints",
+      "conservation_sensitive_areas",
+      "attribution_requirements",
+      "content_redistribution_limits"
+    ],
+    "source_review_targets": [
+      "protected_area_authority_sources",
+      "local_access_rules",
+      "commercial_trip_context",
+      "imagery_and_field_media_rights"
+    ]
+  },
+  "rain_fed_flow_bands": [
+    {
+      "display_name": "Clear Season Low Planning",
+      "expected_gameplay_behavior": "Sharper rock dodging, low-water paddle timing, and narrower recovery eddies.",
+      "flow_band": "clear_season_low_planning",
+      "relative_flow": "low",
+      "requires_hydrology_review": true
+    },
+    {
+      "display_name": "Rain-Fed Runnable Planning",
+      "expected_gameplay_behavior": "Default tropical route behavior with pushy tongues, quick current changes, active wave trains, and dense-bank hazard reading.",
+      "flow_band": "rainfed_runnable_planning",
+      "relative_flow": "medium",
+      "requires_hydrology_review": true
+    },
+    {
+      "display_name": "Rainy Season High Planning",
+      "expected_gameplay_behavior": "Higher speed, stronger laterals, fewer eddy catches, louder rain/river audio, and more conservative rescue windows.",
+      "flow_band": "rainy_season_high_planning",
+      "relative_flow": "high",
+      "requires_hydrology_review": true
+    },
+    {
+      "display_name": "Flash Response Review Only",
+      "expected_gameplay_behavior": "Review-only extreme; reserved for blocked hazard visualization until hydrology and guide signoff define safe gameplay bounds.",
+      "flow_band": "flash_response_review_only",
+      "relative_flow": "rapid_rise",
+      "requires_hydrology_review": true
+    }
+  ],
+  "rainforest_gorge_fidelity_needs": [
+    {
+      "fidelity_goal": "Dense layered tropical canopy, vines, bank vegetation, wet rock, and sightline occlusion that affect river reading without hiding safety-critical hazards.",
+      "need_id": "rainforest_canopy_and_banks",
+      "need_kind": "environment_art",
+      "required_sources": [
+        "rights_cleared_field_media",
+        "aerial_or_satellite_reference",
+        "local_ecology_review"
+      ],
+      "review_status": "planning_reference_needed"
+    },
+    {
+      "fidelity_goal": "Steep gorge walls, waterfalls, side streams, mist, wet surfaces, and acoustic reflections that make the biome feel distinct from the South Fork and Colorado routes.",
+      "need_id": "gorge_walls_waterfalls_and_mist",
+      "need_kind": "terrain_vfx_audio",
+      "required_sources": [
+        "terrain_dem",
+        "field_media_timecodes",
+        "audio_reference"
+      ],
+      "review_status": "planning_reference_needed"
+    },
+    {
+      "fidelity_goal": "Rain-fed water color, turbulence, foam, woody debris, strainers, and bank hazards that change across low, runnable, high, and flash-response bands.",
+      "need_id": "rainfed_surface_and_bank_hazards",
+      "need_kind": "water_vfx_physics_review",
+      "required_sources": [
+        "hydrology_review",
+        "guide_feedback",
+        "field_media_timecodes"
+      ],
+      "review_status": "blocks_solver_generation"
+    }
+  ],
+  "guide_annotation_needs": [
+    {
+      "annotation_id": "rain_fed_line_changes",
+      "geometry_kind": "raft_line_and_reach_span",
+      "required_sources": [
+        "rights_cleared_guide_notes",
+        "hydrology_review",
+        "field_media_timecodes"
+      ],
+      "review_fields": [
+        "low_flow_line",
+        "rainfed_runnable_line",
+        "high_flow_cutoff",
+        "rapid_rise_exclusion"
+      ],
+      "blocks_solver_generation": true
+    },
+    {
+      "annotation_id": "rainforest_rescue_and_bank_hazards",
+      "geometry_kind": "polygon_and_reach_span",
+      "required_sources": [
+        "guide_feedback",
+        "field_media_timecodes",
+        "protected_area_access_review"
+      ],
+      "review_fields": [
+        "swimmer_drift_path",
+        "eddy_recovery_zone",
+        "vegetation_or_strainer_risk",
+        "shore_access_limit"
+      ],
+      "blocks_solver_generation": true
+    },
+    {
+      "annotation_id": "protected_area_and_source_rights",
+      "geometry_kind": "section_metadata",
+      "required_sources": [
+        "protected_area_authority_review",
+        "source_license_review",
+        "field_media_rights"
+      ],
+      "review_fields": [
+        "access_constraints",
+        "attribution",
+        "redistribution_limits",
+        "sensitive_location_redaction"
+      ],
+      "blocks_solver_generation": true
+    }
+  ],
+  "rainforest_route_prototype": {
+    "gameplay_mode": "guided_paddle_raft",
+    "manual_input_parity_required": true,
+    "passenger_paddle_voice_commands_allowed": true,
+    "prototype_gate": "not_solver_or_unreal_package_ready_until_hydrology_protected_area_and_rights_reviews_pass",
+    "prototype_id": "pacuare_lower_corridor_third_runnable_target",
+    "prototype_role": "third_runnable_river_target",
+    "primary_learning_goals": [
+      "read_rainfed_flow_changes",
+      "call_paddle_rhythm_through_gorge_sequences",
+      "manage_visibility_and_bank_hazards",
+      "time_rescues_in_pushy_tropical_water",
+      "respect_source_rights_and_protected_area_constraints"
+    ]
+  },
+  "river_id": "pacuare",
+  "route_style": "guided_paddle_raft",
+  "schema": "raftsim.unreal.pacuare_river_target.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "section_name": "Lower Pacuare Planning Corridor",
+  "source_manifest": "physics/data/real_world/pacuare_river_costa_rica/source_manifest.json",
+  "status": "ready_for_pacuare_third_target_planning"
+}

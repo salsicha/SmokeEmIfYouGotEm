@@ -133,6 +133,72 @@
         "field_media_timecodes": "required_before_playable",
         "geospatial_corridor": "required_before_playable"
       }
+    },
+    {
+      "river_id": "pacuare",
+      "river_name": "Pacuare River",
+      "section_id": "lower_pacuare_planning_corridor",
+      "section_name": "Lower Pacuare Planning Corridor",
+      "route_target": "unreal/Content/RaftSim/River/pacuare_river_third_target_editor_pass.json",
+      "region": "Costa Rica Caribbean slope",
+      "route_style": "guided_paddle_raft",
+      "input_contract": {
+        "manual_input_parity_required": true,
+        "passenger_paddle_voice_commands_allowed": true,
+        "manual_actions": [
+          "GuideForwardPaddle",
+          "GuideBackPaddle",
+          "GuideLeftPaddle",
+          "GuideRightPaddle",
+          "GuideStopPaddle",
+          "Brace",
+          "HighSide",
+          "HoldOn",
+          "RescueTargetSelect",
+          "RescueReachGrab",
+          "RescueThrowLine"
+        ]
+      },
+      "difficulty_presets": [
+        "rainforest_orientation",
+        "gorge_line_training",
+        "rainfed_flow_variation",
+        "bank_hazard_and_rescue_training",
+        "guide_review_scouting"
+      ],
+      "difficulty_range": ["class_iii_planning", "class_iv_planning"],
+      "seasons": ["clear_season_low_planning", "rainfed_runnable_planning", "rainy_season_high_planning", "flash_response_review_only"],
+      "flow_bands": [
+        {
+          "flow_band": "clear_season_low_planning",
+          "relative_flow": "low",
+          "requires_validation_before_playable": true
+        },
+        {
+          "flow_band": "rainfed_runnable_planning",
+          "relative_flow": "medium",
+          "requires_validation_before_playable": true
+        },
+        {
+          "flow_band": "rainy_season_high_planning",
+          "relative_flow": "high",
+          "requires_validation_before_playable": true
+        },
+        {
+          "flow_band": "flash_response_review_only",
+          "relative_flow": "rapid_rise",
+          "requires_validation_before_playable": true
+        }
+      ],
+      "raft_setups": ["standard_14ft_paddle_raft", "technical_13ft_paddle_raft", "loaded_expedition_paddle_raft"],
+      "crew_setups": ["ai_training_crew", "mixed_skill_tourist_crew", "rescue_training_passengers"],
+      "validation_status": {
+        "source_manifest": "draft_placeholders",
+        "hydrology_gauge_source_review": "required_before_playable",
+        "protected_area_source_rights_review": "required_before_playable",
+        "field_media_timecodes": "required_before_playable",
+        "rainforest_gorge_fidelity_review": "required_before_playable"
+      }
     }
   ],
   "menu_flow": [
