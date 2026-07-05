@@ -10,10 +10,13 @@ from raftsim.milestone22 import (
     MILESTONE22_CONTACT_TELEMETRY_STATUS,
     MILESTONE22_RAFT_CONTACT_AUTHORITY_SCHEMA,
     MILESTONE22_RAFT_CONTACT_AUTHORITY_STATUS,
+    MILESTONE22_SWIMMING_SKILL_SCHEMA,
+    MILESTONE22_SWIMMING_SKILL_STATUS,
     build_crew_overboard_safety_states_manifest,
     build_crew_weight_distribution_manifest,
     build_raft_contact_authority_integration,
     build_raft_contact_response_telemetry,
+    build_swimming_skill_assignment_manifest,
 )
 
 
@@ -38,6 +41,9 @@ CREW_WEIGHT_DISTRIBUTION_PATH = (
 )
 CREW_SAFETY_STATES_PATH = (
     REPO_ROOT / "unreal/Content/RaftSim/Crew/crew_overboard_safety_states.json"
+)
+SWIMMING_SKILL_ASSIGNMENT_PATH = (
+    REPO_ROOT / "unreal/Content/RaftSim/Crew/swimming_skill_assignment.json"
 )
 PHYSICS_BRIDGE_HEADER_PATH = (
     REPO_ROOT
@@ -334,3 +340,63 @@ def test_unreal_crew_safety_state_contract_exposes_overboard_state_machine():
     assert "FRaftSimCrewSafetyStateFrame" in header_text
     assert "FRaftSimCrewSafetyTransition" in header_text
     assert "CanTransitionSafetyState" in header_text
+
+
+def test_swimming_skill_assignment_manifest_matches_generator():
+    expected = build_swimming_skill_assignment_manifest(REPO_ROOT).manifest
+    committed = json.loads(SWIMMING_SKILL_ASSIGNMENT_PATH.read_text(encoding="utf-8"))
+
+    assert committed == expected
+    assert committed["schema"] == MILESTONE22_SWIMMING_SKILL_SCHEMA
+    assert committed["status"] == MILESTONE22_SWIMMING_SKILL_STATUS
+
+
+def test_swimming_skill_assignment_manifest_covers_non_swimmers_and_roster_policy():
+    manifest = json.loads(SWIMMING_SKILL_ASSIGNMENT_PATH.read_text(encoding="utf-8"))
+    levels = {level["skill_id"]: level for level in manifest["skill_levels"]}
+
+    assert set(levels) == {
+        "non_swimmer",
+        "weak_swimmer",
+        "average_swimmer",
+        "strong_swimmer",
+    }
+    assert levels["non_swimmer"]["self_rescue_allowed"] is False
+    assert levels["non_swimmer"]["rescue_priority"] == 1.0
+    assert manifest["assignment_policy"]["mode"] == "per_run_seeded_random_or_roster_override"
+    assert manifest["assignment_policy"]["record_assignment_in_replay"] is True
+    assert len(manifest["roster_entries"]) >= 3
+
+
+def test_swimming_skill_assignment_manifest_records_gameplay_and_telemetry_effects():
+    manifest = json.loads(SWIMMING_SKILL_ASSIGNMENT_PATH.read_text(encoding="utf-8"))
+    fields = set(manifest["telemetry_fields"])
+
+    assert manifest["gameplay_effects"]["non_swimmers_cannot_self_rescue"] is True
+    assert manifest["gameplay_effects"]["affects_rescue_priority"] is True
+    assert manifest["gameplay_effects"]["affects_safety_score"] is True
+    assert {
+        "skill_level",
+        "assigned_from_roster",
+        "assignment_seed",
+        "self_rescue_allowed",
+        "panic_scalar",
+        "rescue_priority",
+        "pull_in_difficulty",
+        "time_to_critical_seconds",
+    }.issubset(fields)
+
+
+def test_unreal_swimming_skill_contract_exposes_non_swimmer_assignment():
+    header_text = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimCrew/Public/RaftSimCrewStateContracts.h"
+    ).read_text(encoding="utf-8")
+
+    assert "ERaftSimSwimmingSkillLevel" in header_text
+    assert "NonSwimmer" in header_text
+    assert "FRaftSimSwimmingSkillProfile" in header_text
+    assert "FRaftSimPassengerSwimmingSkillAssignment" in header_text
+    assert "URaftSimSwimmingSkillLibrary" in header_text
+    assert "bSelfRescueAllowed" in header_text
+    assert "AssignSwimmingSkillFromNormalizedValue" in header_text

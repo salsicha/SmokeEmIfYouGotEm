@@ -172,3 +172,78 @@ FRaftSimCrewSafetyStateFrame URaftSimCrewSafetyStateLibrary::ApplySafetyTransiti
     }
     return NextFrame;
 }
+
+FRaftSimSwimmingSkillProfile URaftSimSwimmingSkillLibrary::MakeSwimmingSkillProfile(
+    ERaftSimSwimmingSkillLevel SkillLevel
+)
+{
+    FRaftSimSwimmingSkillProfile Profile;
+    Profile.SkillLevel = SkillLevel;
+
+    switch (SkillLevel)
+    {
+        case ERaftSimSwimmingSkillLevel::NonSwimmer:
+            Profile.bSelfRescueAllowed = false;
+            Profile.PanicScalar = 1.0f;
+            Profile.RescuePriority = 1.0f;
+            Profile.PullInDifficulty = 1.2f;
+            Profile.TimeToCriticalSeconds = 8.0f;
+            break;
+        case ERaftSimSwimmingSkillLevel::WeakSwimmer:
+            Profile.bSelfRescueAllowed = true;
+            Profile.PanicScalar = 0.75f;
+            Profile.RescuePriority = 0.8f;
+            Profile.PullInDifficulty = 1.05f;
+            Profile.TimeToCriticalSeconds = 14.0f;
+            break;
+        case ERaftSimSwimmingSkillLevel::StrongSwimmer:
+            Profile.bSelfRescueAllowed = true;
+            Profile.PanicScalar = 0.25f;
+            Profile.RescuePriority = 0.35f;
+            Profile.PullInDifficulty = 0.75f;
+            Profile.TimeToCriticalSeconds = 32.0f;
+            break;
+        case ERaftSimSwimmingSkillLevel::AverageSwimmer:
+        default:
+            Profile.bSelfRescueAllowed = true;
+            Profile.PanicScalar = 0.45f;
+            Profile.RescuePriority = 0.55f;
+            Profile.PullInDifficulty = 0.9f;
+            Profile.TimeToCriticalSeconds = 22.0f;
+            break;
+    }
+
+    return Profile;
+}
+
+FRaftSimPassengerSwimmingSkillAssignment URaftSimSwimmingSkillLibrary::AssignSwimmingSkillFromNormalizedValue(
+    FName PassengerId,
+    FName SeatId,
+    float NormalizedValue,
+    int32 AssignmentSeed,
+    bool bAssignedFromRoster
+)
+{
+    const float Roll = FMath::Clamp(NormalizedValue, 0.0f, 1.0f);
+    ERaftSimSwimmingSkillLevel SkillLevel = ERaftSimSwimmingSkillLevel::StrongSwimmer;
+    if (Roll < 0.15f)
+    {
+        SkillLevel = ERaftSimSwimmingSkillLevel::NonSwimmer;
+    }
+    else if (Roll < 0.40f)
+    {
+        SkillLevel = ERaftSimSwimmingSkillLevel::WeakSwimmer;
+    }
+    else if (Roll < 0.85f)
+    {
+        SkillLevel = ERaftSimSwimmingSkillLevel::AverageSwimmer;
+    }
+
+    FRaftSimPassengerSwimmingSkillAssignment Assignment;
+    Assignment.PassengerId = PassengerId;
+    Assignment.SeatId = SeatId;
+    Assignment.bAssignedFromRoster = bAssignedFromRoster;
+    Assignment.AssignmentSeed = AssignmentSeed;
+    Assignment.Profile = MakeSwimmingSkillProfile(SkillLevel);
+    return Assignment;
+}

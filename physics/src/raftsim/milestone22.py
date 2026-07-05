@@ -26,6 +26,10 @@ MILESTONE22_CREW_SAFETY_SCHEMA = "raftsim.unreal.crew_overboard_safety_states.v1
 MILESTONE22_CREW_SAFETY_STATUS = (
     "crew_overboard_safety_states_ready_for_rescue_gameplay_wiring"
 )
+MILESTONE22_SWIMMING_SKILL_SCHEMA = "raftsim.unreal.swimming_skill_assignment.v1"
+MILESTONE22_SWIMMING_SKILL_STATUS = (
+    "passenger_swimming_skill_assignment_ready_for_run_setup"
+)
 
 
 @dataclass(frozen=True)
@@ -561,6 +565,132 @@ def build_crew_overboard_safety_states_manifest(repo_root: Path) -> Milestone22M
             "all_state_changes_emit_transition_telemetry": True,
             "failed_rescue_is_terminal_until_reset": True,
             "recovered_passenger_requires_reseat_before_normal_crew_actions": True,
+        },
+    }
+    return Milestone22ManifestBuild(manifest=manifest)
+
+
+def build_swimming_skill_assignment_manifest(repo_root: Path) -> Milestone22ManifestBuild:
+    """Build the Milestone 22 passenger swimming-skill assignment manifest."""
+
+    repo_root = repo_root.resolve()
+    personas_path = repo_root / "unreal/Content/RaftSim/AI/crew_personas.json"
+    safety_states_path = (
+        repo_root / "unreal/Content/RaftSim/Crew/crew_overboard_safety_states.json"
+    )
+
+    personas = _load_json(personas_path)
+    safety_states = _load_json(safety_states_path)
+
+    skill_levels = [
+        {
+            "skill_id": "non_swimmer",
+            "display_name": "Non-swimmer",
+            "self_rescue_allowed": False,
+            "panic_scalar": 1.0,
+            "rescue_priority": 1.0,
+            "pull_in_difficulty": 1.2,
+            "time_to_critical_seconds": 8.0,
+        },
+        {
+            "skill_id": "weak_swimmer",
+            "display_name": "Weak swimmer",
+            "self_rescue_allowed": True,
+            "panic_scalar": 0.75,
+            "rescue_priority": 0.8,
+            "pull_in_difficulty": 1.05,
+            "time_to_critical_seconds": 14.0,
+        },
+        {
+            "skill_id": "average_swimmer",
+            "display_name": "Average swimmer",
+            "self_rescue_allowed": True,
+            "panic_scalar": 0.45,
+            "rescue_priority": 0.55,
+            "pull_in_difficulty": 0.9,
+            "time_to_critical_seconds": 22.0,
+        },
+        {
+            "skill_id": "strong_swimmer",
+            "display_name": "Strong swimmer",
+            "self_rescue_allowed": True,
+            "panic_scalar": 0.25,
+            "rescue_priority": 0.35,
+            "pull_in_difficulty": 0.75,
+            "time_to_critical_seconds": 32.0,
+        },
+    ]
+
+    manifest: dict[str, Any] = {
+        "schema": MILESTONE22_SWIMMING_SKILL_SCHEMA,
+        "status": MILESTONE22_SWIMMING_SKILL_STATUS,
+        "source_manifests": {
+            "crew_personas": "unreal/Content/RaftSim/AI/crew_personas.json",
+            "crew_overboard_safety_states": (
+                "unreal/Content/RaftSim/Crew/crew_overboard_safety_states.json"
+            ),
+        },
+        "runtime_contract": {
+            "module": "RaftSimCrew",
+            "skill_enum": "ERaftSimSwimmingSkillLevel",
+            "profile_struct": "FRaftSimSwimmingSkillProfile",
+            "assignment_struct": "FRaftSimPassengerSwimmingSkillAssignment",
+            "assignment_library": (
+                "URaftSimSwimmingSkillLibrary::AssignSwimmingSkillFromNormalizedValue"
+            ),
+        },
+        "assignment_policy": {
+            "mode": "per_run_seeded_random_or_roster_override",
+            "deterministic_seed_sources": [
+                "run_seed",
+                "river_id",
+                "section_id",
+                "passenger_id",
+                "seat_id",
+            ],
+            "default_distribution": {
+                "non_swimmer": 0.15,
+                "weak_swimmer": 0.25,
+                "average_swimmer": 0.45,
+                "strong_swimmer": 0.15,
+            },
+            "record_assignment_in_replay": True,
+        },
+        "skill_levels": skill_levels,
+        "roster_entries": [
+            {
+                "passenger_id": persona["passenger_id"],
+                "display_name": persona["display_name"],
+                "roster_override_allowed": True,
+                "default_assignment": "per_run_seeded_random",
+            }
+            for persona in personas["personas"]
+        ],
+        "gameplay_effects": {
+            "non_swimmers_cannot_self_rescue": True,
+            "affects_panic": True,
+            "affects_rescue_priority": True,
+            "affects_pull_in_difficulty": True,
+            "affects_safety_score": True,
+            "linked_safety_state_schema": safety_states["schema"],
+        },
+        "telemetry_fields": [
+            "passenger_id",
+            "seat_id",
+            "skill_level",
+            "assigned_from_roster",
+            "assignment_seed",
+            "self_rescue_allowed",
+            "panic_scalar",
+            "rescue_priority",
+            "pull_in_difficulty",
+            "time_to_critical_seconds",
+        ],
+        "pass_policy": {
+            "non_swimmer_skill_level_required": True,
+            "non_swimmers_cannot_self_rescue": True,
+            "assignments_are_seeded_or_roster_recorded": True,
+            "skill_affects_rescue_priority_and_safety_scoring": True,
         },
     }
     return Milestone22ManifestBuild(manifest=manifest)
