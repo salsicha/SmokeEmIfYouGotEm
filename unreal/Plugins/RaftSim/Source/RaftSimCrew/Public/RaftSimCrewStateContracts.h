@@ -289,6 +289,75 @@ struct FRaftSimRescueAttempt
     float TimeInWaterSeconds = 0.0f;
 };
 
+USTRUCT(BlueprintType)
+struct FRaftSimGameplayScoringSignals
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Scoring")
+    int32 SafetyIncidentCount = 0;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Scoring")
+    float CleanLineRatio = 1.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Scoring")
+    float MeanBoatAngleErrorDegrees = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Scoring")
+    float UsefulPaddleImpulseRatio = 1.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Scoring")
+    float MeanCommandLatencySeconds = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Scoring")
+    float HighSideBraceTimingErrorSeconds = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Scoring")
+    int32 SwimCount = 0;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Scoring")
+    ERaftSimRescueMethod RescueMethod = ERaftSimRescueMethod::None;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Scoring")
+    float TimeInWaterSeconds = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Scoring")
+    float CrewRecoverySeconds = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Scoring")
+    int32 FailedRescueCount = 0;
+};
+
+USTRUCT(BlueprintType)
+struct FRaftSimGameplayScoreBreakdown
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Scoring")
+    float SafetyScore = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Scoring")
+    float LineChoiceScore = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Scoring")
+    float BoatAngleScore = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Scoring")
+    float PaddleEfficiencyScore = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Scoring")
+    float CommandTimingScore = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Scoring")
+    float HighSideBraceTimingScore = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Scoring")
+    float SwimRescueScore = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Scoring")
+    float TotalScore = 0.0f;
+};
+
 UCLASS()
 class RAFTSIMCREW_API URaftSimCrewWeightDistributionLibrary : public UBlueprintFunctionLibrary
 {
@@ -360,5 +429,17 @@ public:
         const FRaftSimSwimmerRescueFrame& CurrentFrame,
         const FRaftSimRescueAttempt& Attempt,
         const FRaftSimSwimmingSkillProfile& SkillProfile
+    );
+};
+
+UCLASS()
+class RAFTSIMCREW_API URaftSimGameplayScoringLibrary : public UBlueprintFunctionLibrary
+{
+    GENERATED_BODY()
+
+public:
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Scoring")
+    static FRaftSimGameplayScoreBreakdown EvaluateGameplayScore(
+        const FRaftSimGameplayScoringSignals& Signals
     );
 };
