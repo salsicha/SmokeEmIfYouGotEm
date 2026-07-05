@@ -1,6 +1,7 @@
 {
   "schema": "raftsim.unreal.network_architecture.v1",
   "production_gate": "after_single_player_guide_physics_voice_ai_vertical_slice_is_stable",
+  "evaluation_gate": "unreal/Content/RaftSim/Network/networked_crew_evaluation_gate.json",
   "first_playable_architecture": "listen_server_authoritative_host",
   "supported_modes": [
     {

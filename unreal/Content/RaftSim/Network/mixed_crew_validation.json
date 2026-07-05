@@ -1,5 +1,6 @@
 {
   "schema": "raftsim.unreal.mixed_crew_validation.v1",
+  "evaluation_gate": "unreal/Content/RaftSim/Network/networked_crew_evaluation_gate.json",
   "validation_targets": [
     "desktop_only_crew",
     "vr_only_crew",

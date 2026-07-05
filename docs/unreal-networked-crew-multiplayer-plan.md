@@ -2,11 +2,22 @@
 
 ## Gate
 
-Networked human crew play starts after the single-player guide loop, authoritative physics bridge, local voice-command path, and AI crew fallback systems are stable enough to replay and debug. Milestone 12 adds the source-level contracts now, but production tuning should follow the single-player vertical slice.
+Networked human crew play starts after the single-player guide loop, authoritative physics bridge, local voice-command path, rescue loop, and AI crew fallback systems are stable enough to replay and debug. Milestone 24 makes that gate explicit in `unreal/Content/RaftSim/Network/networked_crew_evaluation_gate.json`.
+
+The gate currently blocks human crew evaluation until these evidence artifacts are stable:
+
+- Single-player guide loop: `unreal/Content/RaftSim/VerticalSlice/first_rapid_vertical_slice.json`.
+- Raft/contact authority: `unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json`.
+- Local voice/manual parity: `unreal/Content/RaftSim/AI/local_ai_runtime_manifest.json`.
+- Rescue loop: `unreal/Content/RaftSim/Crew/swimmer_rescue_gameplay.json`.
+- Replay/debug tools: `unreal/Content/RaftSim/Debug/debug_overlay_validation.json`.
+- Mixed crew validation: `unreal/Content/RaftSim/Network/mixed_crew_validation.json`.
+
+Until those pass, multiplayer work is limited to contract design and local lab planning. Internet play, relay sessions, and public playtests stay blocked.
 
 ## Architecture Decision
 
-Use an authoritative host model for the first multiplayer playable:
+Use an authoritative host model for the first multiplayer playable after the evaluation gate opens:
 
 - Primary first pass: listen server with the stern guide or lobby host owning authoritative fixed-step raft/water state.
 - LAN/offline co-op: supported as a low-friction testing mode.
