@@ -30,7 +30,8 @@
         "terrain/production_import_pilot/3dep_tiles",
         "terrain/production_import_pilot/dem_relief_2048.png",
         "terrain/production_import_pilot/heightfield_candidate_2017.png",
-        "production_import_pilot_derivatives_manifest.json"
+        "production_import_pilot_derivatives_manifest.json",
+        "review/production_import_pilot/source_metadata_review.json"
       ]
     },
     {
@@ -67,7 +68,8 @@
       "target_outputs": [
         "imagery/production_import_pilot/naip_tiles",
         "imagery/production_import_pilot/source_drape_4096.png",
-        "production_import_pilot_derivatives_manifest.json"
+        "production_import_pilot_derivatives_manifest.json",
+        "review/production_import_pilot/source_metadata_review.json"
       ]
     },
     {
@@ -89,7 +91,7 @@
     },
     {
       "class_id": "seasonal_flow_or_release_history",
-      "promotion_gate": "Use CDEC CBR as the primary modern flow/stage candidate after the USGS 11445500 IV diagnostic; the first terms/flag/station review is attached, but broader representative windows, legal/redistribution signoff, release context, and guide review are still required before low/median/high visual variants are promoted.",
+      "promotion_gate": "Use CDEC CBR as the primary modern flow/stage candidate after the USGS 11445500 IV diagnostic; the first terms/flag/station review, 30-day CBR/A25 context, water-year-to-date seasonal review, and multi-year CBR flow context are attached, but A25 routing, high-flow peak review, legal/redistribution signoff, station-to-reach relation, and guide review are still required before low/median/high visual variants are promoted.",
       "source_ids": [
         "usgs_water_services",
         "cdec_cbr",
@@ -103,6 +105,8 @@
         "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
         "hydrology/cdec_terms_flags_and_station_relation_review.json",
         "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+        "hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
+        "hydrology/production_import_pilot/cdec_multiyear_flow_review_2021-10-01_2026-07-06.json",
         "hydrology/production_import_pilot/flow_band_review.json"
       ]
     },

@@ -83,6 +83,7 @@ from raftsim.real_world import (
     SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE,
     SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE,
     SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE,
+    SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE,
     adaptive_solver_parameters,
     build_candidate_river_inventory_package,
     build_colorado_access_points_geojson,
@@ -228,6 +229,7 @@ def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE in manifest["artifacts"]["source_pulls"]
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE in manifest["artifacts"]["source_pulls"]
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE in manifest["artifacts"]["source_pulls"]
+    assert SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE in manifest["artifacts"]["source_pulls"]
     assert SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE in manifest["artifacts"]["access_and_protected_context"]
     assert SOUTH_FORK_ACCESS_POINTS_FILE in manifest["artifacts"]["access_and_protected_context"]
     assert SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE in manifest["artifacts"]["access_and_protected_context"]
@@ -369,6 +371,8 @@ def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_revie
     assert "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json" in classes[
         "hydrography_and_centerline"
     ]["target_outputs"]
+    assert SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE in classes["terrain_dem_or_lidar"]["target_outputs"]
+    assert SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE in classes["aerial_or_satellite_imagery"]["target_outputs"]
     assert SOUTH_FORK_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE in classes[
         "hydrography_and_centerline"
     ]["target_outputs"]
@@ -393,6 +397,58 @@ def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_revie
     assert SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE in classes["protected_area_and_access_context"]["target_outputs"]
     assert SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE in classes["protected_area_and_access_context"]["target_outputs"]
     assert pilot["unreal_import_targets"]["future_production_map"] == "/Game/RaftSim/Maps/Production/L_SouthForkAmerican_ChiliBar"
+
+
+def test_south_fork_source_metadata_review_attaches_pilot_tile_provenance_without_promoting():
+    south_fork_dir = REAL_WORLD_DATA_DIR / "south_fork_american_chili_bar"
+    source_manifest = json.loads((south_fork_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((south_fork_dir / "production_source_pull_manifest.json").read_text())
+    tile_pull_manifest = json.loads((south_fork_dir / "production_import_pilot_pull_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+    review = json.loads((south_fork_dir / SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE).read_text())
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+    photoreal_rivers = {river["river_id"]: river for river in photoreal_sources["rivers"]}
+    attached_sources = rivers["american_south_fork"]["attached_sources_by_class"]
+
+    assert SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE in source_manifest["artifacts"]["source_pulls"]
+    assert tile_pull_manifest["metadata_review"] == SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE
+    assert any(artifact["artifact_id"] == "south_fork_source_metadata_review" for artifact in pull_manifest["pulled_artifacts"])
+    assert (
+        f"physics/data/real_world/south_fork_american_chili_bar/{SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE}"
+        in attached_sources["terrain_dem_or_lidar"]["artifacts"]
+    )
+    assert (
+        f"physics/data/real_world/south_fork_american_chili_bar/{SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE}"
+        in attached_sources["aerial_or_satellite_imagery"]["artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "south_fork_source_metadata_review"
+        for artifact in photoreal_rivers["american_south_fork"]["source_sample_artifacts"]
+    )
+    assert review["schema"] == "raftsim.south_fork_source_metadata_review.v1"
+    assert review["status"] == "pilot_tile_metadata_attached_review_gated_not_production_promoted"
+    assert review["raw_response_policy"]["raw_service_payloads_committed"] is False
+    assert len(review["official_service_payloads"]) == 4
+    assert review["downloaded_tile_summary"]["download_count"] == 8
+    assert review["usda_naip_metadata"]["item_query"]["primary_feature_count"] == 12
+    assert review["usda_naip_metadata"]["item_query"]["date_min"] == "2022-07-20"
+    assert review["usda_naip_metadata"]["item_query"]["date_max"] == "2022-07-21"
+    assert review["usgs_3dep_metadata"]["item_query"]["primary_feature_count"] == 12
+    assert review["usgs_3dep_metadata"]["item_query"]["overview_feature_count"] == 12
+    assert review["usgs_3dep_metadata"]["item_query"]["date_min"] == "2012-03-04"
+    assert review["usgs_3dep_metadata"]["item_query"]["date_max"] == "2023-10-13"
+    assert any(
+        "North American Vertical Datum of 1988" in datum
+        for item in review["usgs_3dep_metadata"]["item_query"]["items"]
+        for datum in item["vertical_datums"]
+    )
+    assert "claiming production-ready terrain or water masks" in review["forbidden_use"]
 
 
 def test_south_fork_flow_band_review_compares_cdec_window_to_planning_bands():
@@ -545,6 +601,8 @@ def test_south_fork_production_source_gate_review_blocks_promotion_but_allows_ne
         "guide_and_reference_media_annotations",
     } == set(gate_items)
     assert SOUTH_FORK_NHD_MAINSTEM_CANDIDATE_FILE in gate_items["hydrography_and_centerline"]["attached_artifacts"]
+    assert SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE in gate_items["terrain_dem_or_lidar"]["attached_artifacts"]
+    assert SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE in gate_items["aerial_or_satellite_imagery"]["attached_artifacts"]
     assert SOUTH_FORK_CDEC_SEASONAL_WINDOW_REVIEW_FILE in gate_items["seasonal_flow_or_release_history"][
         "attached_artifacts"
     ]
@@ -1811,6 +1869,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
         "guide_and_reference_media_annotations",
     }.issubset(pacuare_p0)
     assert SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
+    assert SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert "hydrology/south_fork_modern_flow_source_selection.json" in rivers["american_south_fork"]["attached_preview_inputs"]
     assert (
         "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json"

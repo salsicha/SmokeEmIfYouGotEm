@@ -107,6 +107,7 @@ SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE = "hydrography/production_import_pil
 SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE = "hydrography/production_import_pilot/banks.geojson"
 SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE = "hydrography/production_import_pilot/cross_sections.geojson"
 SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE = "review/production_import_pilot/access_publication_sensitivity_review.json"
+SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE = "review/production_import_pilot/source_metadata_review.json"
 SOUTH_FORK_ACCESS_POINTS_FILE = "review/production_import_pilot/access_points.geojson"
 SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE = "review/production_import_pilot/no_publish_sensitive_polygons.geojson"
 SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE = "review/production_import_pilot/evacuation_and_rescue_routes.geojson"
@@ -1294,6 +1295,7 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                     "terrain/production_import_pilot/dem_relief_2048.png",
                     "terrain/production_import_pilot/heightfield_candidate_2017.png",
                     "production_import_pilot_derivatives_manifest.json",
+                    SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE,
                 ],
                 "promotion_gate": "Download tiles, mosaic/clip, review voids and artifacts, hydrologically condition, burn the channel, and compare slope/banks to guide-reviewed rapids.",
             },
@@ -1326,6 +1328,7 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                     "imagery/production_import_pilot/naip_tiles",
                     "imagery/production_import_pilot/source_drape_4096.png",
                     "production_import_pilot_derivatives_manifest.json",
+                    SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE,
                 ],
                 "promotion_gate": "Attach acquisition year/date, resolution, CRS, attribution, and scene/tile metadata; use Landsat only for seasonal comparison unless resolution is adequate for masks.",
             },
@@ -1424,10 +1427,11 @@ def build_south_fork_production_source_gate_review(section: CandidateRiverSectio
                 "terrain/production_import_pilot/heightfield_candidate_2017.png",
                 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE,
                 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE,
+                SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE,
             ],
             "promotion_blockers": [
                 "full corridor mosaic and clip",
-                "source metadata and acquisition review",
+                "full-corridor source metadata and acquisition review beyond the pilot tile envelope",
                 "void/artifact review",
                 "hydrologic conditioning",
                 "channel burning",
@@ -1444,9 +1448,10 @@ def build_south_fork_production_source_gate_review(section: CandidateRiverSectio
                 "imagery/production_import_pilot/water_mask_2048.png",
                 "imagery/production_import_pilot/vegetation_mask_2048.png",
                 "imagery/production_import_pilot/source_masks_manifest.json",
+                SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE,
             ],
             "promotion_blockers": [
-                "tile acquisition year/date review",
+                "full-corridor tile acquisition year/date review beyond the pilot tile envelope",
                 "orthomosaic or service-derivative metadata review",
                 "water/vegetation mask QA against hydrography and visible banks",
                 "seasonal exposed-bar and wet-edge review",
@@ -3339,6 +3344,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "production_import_pilot/heightfield_candidate_2017.png",
                     "production_import_pilot/water_mask_2048.png",
                     "production_import_pilot/vegetation_mask_2048.png",
+                    SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE,
                     SOUTH_FORK_NHD_WATER_PRIOR_MANIFEST_FILE,
                     SOUTH_FORK_NHD_WATER_PRIOR_FILE,
                     SOUTH_FORK_NHD_HU8_MANIFEST_FILE,
@@ -3782,6 +3788,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE,
                 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE,
                 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE,
+                SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE,
             ],
             "validation": ["validation_matrix.json"],
             "unreal": ["unreal/corridor_package_manifest.json"],

@@ -1,0 +1,473 @@
+{
+  "allowed_use": [
+    "pilot DEM/NAIP provenance review",
+    "editor source overlay triage",
+    "next renderer iteration with review-gated source-drape and heightfield candidates"
+  ],
+  "downloaded_tile_summary": {
+    "download_count": 8,
+    "downloads_by_kind": {
+      "3dep_dem_export": 4,
+      "naip_export": 4
+    },
+    "providers": [
+      "USDA/APFO NAIP ImageServer",
+      "USGS 3D Elevation Program ImageServer"
+    ],
+    "review_gates_from_pull_manifest": [
+      "Verify provider metadata and acquisition dates for every imagery tile.",
+      "Mosaic, clip, reproject, void-review, hydrologically condition, and channel-burn DEM tiles before Unreal Landscape promotion.",
+      "Derive water/vegetation/wet-rock masks from the pilot imagery only after hydrography and bank alignment review.",
+      "Do not treat downloaded reference tiles as final photoreal art until guide/geospatial review passes."
+    ]
+  },
+  "forbidden_use": [
+    "claiming production-ready terrain or water masks",
+    "claiming lifelike source fidelity",
+    "publishing detailed route screenshots as approved real-world reproductions",
+    "using service metadata as guide/geospatial approval"
+  ],
+  "generated_on": "2026-07-06",
+  "official_service_payloads": [
+    {
+      "byte_count": 12974,
+      "raw_payload_committed": false,
+      "request_id": "usgs_3dep_service_metadata",
+      "sha256": "d454148c69783db1b4816f48d1279d7c248b8e26ec70d4156a9874b49fd9d570",
+      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer?f=pjson"
+    },
+    {
+      "byte_count": 589612,
+      "raw_payload_committed": false,
+      "request_id": "usgs_3dep_item_query",
+      "sha256": "a9c30660e8ba26d53242a9381f85090f5cf24cde31551e1db74b5c8cc459000f",
+      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/query?geometry=-120.90%2C38.74%2C-120.72%2C38.83&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"
+    },
+    {
+      "byte_count": 6386,
+      "raw_payload_committed": false,
+      "request_id": "usda_naip_service_metadata",
+      "sha256": "9f45ad12c3002b1c02f960756fa40aa06e1bf0c7b2474bcf16e40f3c0dfd362b",
+      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer?f=pjson"
+    },
+    {
+      "byte_count": 6491,
+      "raw_payload_committed": false,
+      "request_id": "usda_naip_item_query",
+      "sha256": "18fc32c3c4c11688e233762994ec4ce6db881e8bc6249a914b2da7830f425756",
+      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/query?geometry=-120.90%2C38.74%2C-120.72%2C38.83&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"
+    }
+  ],
+  "raw_response_policy": {
+    "committed_payload_hashes": true,
+    "raw_payload_location": "/private/tmp during generation only",
+    "raw_service_payloads_committed": false,
+    "reason": "Keep the repository on compact reviewed metadata while preserving reproducible request URLs and hashes."
+  },
+  "remaining_blockers": [
+    "Full South Fork corridor tiling/mosaic and clipping are not complete.",
+    "3DEP vertical datum and product choice must be reviewed before production terrain or Landscape promotion.",
+    "DEM void/artifact review, hydrologic conditioning, and channel burning remain open.",
+    "NAIP/orthomosaic terms and attribution signoff remain open before production drape publication.",
+    "Water, vegetation, wet-bank, exposed-bar, and shadow masks need reviewed imagery, hydrography, banks, and guide validation.",
+    "Guide/geospatial approval is required before screenshots or route details are treated as lifelike production evidence."
+  ],
+  "review_status_by_source_class": {
+    "aerial_or_satellite_imagery": "pilot_naip_acquisition_dates_attached_full_corridor_review_pending",
+    "terrain_dem_or_lidar": "pilot_service_and_item_metadata_attached_full_corridor_review_pending"
+  },
+  "river_id": "american_south_fork",
+  "schema": "raftsim.south_fork_source_metadata_review.v1",
+  "section_id": "chili_bar_to_coloma",
+  "source_pull_manifest": "production_import_pilot_pull_manifest.json",
+  "source_recipe": "production_import_pilot.json",
+  "status": "pilot_tile_metadata_attached_review_gated_not_production_promoted",
+  "usda_naip_metadata": {
+    "item_query": {
+      "date_max": "2022-07-21",
+      "date_min": "2022-07-20",
+      "feature_count": 12,
+      "items": [
+        {
+          "count": 1,
+          "dates": [
+            "2022-07-21"
+          ],
+          "name": "m_3812009_ne_10_060_20220721",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2022
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2022-07-21"
+          ],
+          "name": "m_3812009_se_10_060_20220721",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2022
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2022-07-20"
+          ],
+          "name": "m_3812010_ne_10_060_20220720",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2022
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2022-07-21"
+          ],
+          "name": "m_3812010_nw_10_060_20220721",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2022
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2022-07-20"
+          ],
+          "name": "m_3812010_se_10_060_20220720",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2022
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2022-07-21"
+          ],
+          "name": "m_3812010_sw_10_060_20220721",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2022
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2022-07-20"
+          ],
+          "name": "m_3812011_nw_10_060_20220720",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2022
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2022-07-20"
+          ],
+          "name": "m_3812011_sw_10_060_20220720",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2022
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2022-07-21"
+          ],
+          "name": "m_3812017_ne_10_060_20220721",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2022
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2022-07-20"
+          ],
+          "name": "m_3812018_ne_10_060_20220720",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2022
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2022-07-21"
+          ],
+          "name": "m_3812018_nw_10_060_20220721",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2022
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2022-07-20"
+          ],
+          "name": "m_3812019_nw_10_060_20220720",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2022
+          ]
+        }
+      ],
+      "overview_feature_count": 0,
+      "primary_feature_count": 12,
+      "spatial_reference": {
+        "latestWkid": 3857,
+        "wkid": 102100
+      }
+    },
+    "review_decision": "Pilot envelope has official NAIP item metadata with 12 primary image footprints, all Year_ts 2022, and QQDATE values on July 20-21, 2022. This resolves the pilot acquisition-date unknown, but not full-corridor orthomosaic selection, terms/attribution signoff, seasonal comparison, or mask QA.",
+    "service": {
+      "band_count": 4,
+      "copyright_text": "",
+      "description": "NAIP/USDA_CONUS_PRIME",
+      "field_names": [
+        "OBJECTID",
+        "Shape",
+        "Name",
+        "Category",
+        "Year_ts",
+        "ST",
+        "QQNAME",
+        "QQDATE"
+      ],
+      "max_image_height": 4100,
+      "max_image_width": 15000,
+      "name": "NAIP/USDA_CONUS_PRIME",
+      "pixel_type": "U8",
+      "service_data_type": "esriImageServiceDataTypeGeneric",
+      "spatial_reference": {
+        "latestWkid": 3857,
+        "wkid": 102100
+      }
+    }
+  },
+  "usgs_3dep_metadata": {
+    "item_query": {
+      "date_max": "2023-10-13",
+      "date_min": "2012-03-04",
+      "feature_count": 24,
+      "items": [
+        {
+          "count": 2,
+          "dates": [
+            "2018-08-20"
+          ],
+          "name": "CA_NoCAL_Wildfires_B1_2018",
+          "product_names": [
+            "USGS_3DEP"
+          ],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [
+            "USGS"
+          ],
+          "vertical_datums": [
+            "North American Vertical Datum of 1988 (NAVD 88)"
+          ],
+          "years": []
+        },
+        {
+          "count": 3,
+          "dates": [
+            "2022-09-23"
+          ],
+          "name": "CA_SierraNevada_B22",
+          "product_names": [
+            "USGS_3DEP"
+          ],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [
+            "USGS"
+          ],
+          "vertical_datums": [
+            "North American Vertical Datum of 1988 (NAVD 88)"
+          ],
+          "years": []
+        },
+        {
+          "count": 4,
+          "dates": [
+            "2020-05-03"
+          ],
+          "name": "CA_UpperSouthAmerican_Eldorado_2019_B19",
+          "product_names": [
+            "USGS_3DEP"
+          ],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [
+            "USGS"
+          ],
+          "vertical_datums": [
+            "North American Vertical Datum of 1988 (NAVD 88)"
+          ],
+          "years": []
+        },
+        {
+          "count": 2,
+          "dates": [
+            "2023-10-13"
+          ],
+          "name": "n39w121",
+          "product_names": [
+            "USGS_3DEP"
+          ],
+          "resolution_x": [
+            "2.77777777786999E-04",
+            "9.25925926922017E-05"
+          ],
+          "resolution_y": [
+            "-0.00027777777803598015",
+            "-9.259259277537894e-05"
+          ],
+          "sources": [
+            "USGS"
+          ],
+          "vertical_datums": [
+            "North American Vertical Datum of 1988 (NAVD 88)"
+          ],
+          "years": []
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2012-03-04"
+          ],
+          "name": "ned19_n39x00_w121x00_ca_placerco_west_2012",
+          "product_names": [
+            "USGS_3DEP"
+          ],
+          "resolution_x": [
+            "0.00001"
+          ],
+          "resolution_y": [
+            "1e-05"
+          ],
+          "sources": [
+            "USGS"
+          ],
+          "vertical_datums": [
+            "North American Vertical Datum of 1988 (NAVD 88)"
+          ],
+          "years": []
+        }
+      ],
+      "overview_feature_count": 12,
+      "primary_feature_count": 12,
+      "spatial_reference": {
+        "latestWkid": 3857,
+        "wkid": 102100
+      }
+    },
+    "review_decision": "Pilot envelope has official 3DEP service metadata plus primary item footprints with acquisition dates, NAVD 88 vertical datum records, and source/product names. This supports pilot provenance only; production terrain still needs selected full-corridor products, vertical-datum confirmation, void review, conditioning, channel burning, and guide/geospatial approval.",
+    "service": {
+      "band_count": 1,
+      "copyright_text": "USGS National Map 3D Elevation Program (3DEP). June 24, 2026.",
+      "description": "The USGS 3D Elevation Program (3DEP) Bare Earth DEM Dynamic service is based on multi-resolution USGS DEM sources and provides dynamic functions for visualization. These functions include: Hillshade, Aspect Map, Hillshade Stretched, Multi-directional Hillshade, Slope Map, Elevation Tinted Hillshade, Contour. In addition the OGC Web Map Service (WMS) and Web Coverage Service (WCS) interfaces are enabled. Data available in this map service reflects all 3DEP DEM data published as of June 23, 2026.",
+      "field_names": [
+        "OBJECTID",
+        "Shape",
+        "Name",
+        "MinPS",
+        "MaxPS",
+        "LowPS",
+        "HighPS",
+        "Category",
+        "Tag",
+        "GroupName",
+        "ProductName",
+        "CenterX",
+        "CenterY",
+        "ZOrder",
+        "Shape_Length",
+        "Shape_Area",
+        "Dataset_ID",
+        "Best",
+        "DEM_Type",
+        "Source",
+        "VerticalDatum",
+        "AcquisitionDate",
+        "URL",
+        "Metadata",
+        "pubdate",
+        "title",
+        "Resolution_X",
+        "Resolution_Y",
+        "Cdate",
+        "StartDate",
+        "EndDate"
+      ],
+      "max_image_height": 8000,
+      "max_image_width": 8000,
+      "name": "3DEPElevation",
+      "pixel_type": "F32",
+      "service_data_type": "esriImageServiceDataTypeElevation",
+      "spatial_reference": {
+        "latestWkid": 3857,
+        "wkid": 102100
+      }
+    }
+  }
+}
