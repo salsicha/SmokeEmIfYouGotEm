@@ -11,6 +11,7 @@
     "procedural_generation_must_not_hide_physics_failures": true,
     "capture_outputs": "docs/environment-captures/photoreal_river_previews"
   },
+  "reference_media_link_manifest": "physics/data/real_world/reference_media_link_manifest.json",
   "global_sources": [
     {
       "source_id": "usgs_3dep",
@@ -158,8 +159,8 @@
       ],
       "reference_media_sources": [
         {"source_id": "first_party_field_capture", "rights_status": "preferred_for_shipping", "status": "planned"},
-        {"source_id": "wikimedia_or_flickr_cc_review", "rights_status": "per_item_license_review_required", "status": "planned"},
-        {"source_id": "public_social_links", "rights_status": "reference_only_no_download_no_scraping", "status": "planned"}
+        {"source_id": "wikimedia_or_flickr_cc_review", "rights_status": "per_item_license_review_required", "status": "link_seed_manifest_recorded"},
+        {"source_id": "public_social_links", "rights_status": "reference_only_no_download_no_scraping", "status": "link_seed_manifest_recorded"}
       ],
       "capture_targets": ["guide_seat_downstream_low", "guide_seat_downstream_median", "guide_seat_downstream_high", "rapid_entry_tongue", "swimmer_rescue_visibility"]
     },
@@ -219,9 +220,9 @@
         {"source_id": "usbr_glen_canyon_releases", "url": "https://www.usbr.gov/uc/water/hydrodata/", "status": "planned"}
       ],
       "reference_media_sources": [
-        {"source_id": "nps_public_reference_pages", "rights_status": "record_nps_attribution_and_item_terms_before_use", "status": "planned"},
+        {"source_id": "nps_public_reference_pages", "rights_status": "record_nps_attribution_and_item_terms_before_use", "status": "link_seed_manifest_recorded"},
         {"source_id": "oarsman_or_guide_permission", "rights_status": "explicit_permission_required", "status": "planned"},
-        {"source_id": "public_social_links", "rights_status": "reference_only_no_download_no_scraping", "status": "planned"}
+        {"source_id": "public_social_links", "rights_status": "reference_only_no_download_no_scraping", "status": "link_seed_manifest_recorded"}
       ],
       "capture_targets": ["guide_seat_downstream_low_release", "guide_seat_downstream_moderate_release", "guide_seat_downstream_high_release", "big_water_lateral", "long_swimmer_rescue_visibility"]
     },
@@ -289,7 +290,7 @@
       "reference_media_sources": [
         {"source_id": "first_party_field_capture", "rights_status": "preferred_for_shipping", "status": "planned"},
         {"source_id": "outfitter_or_guide_permission", "rights_status": "explicit_permission_required", "status": "planned"},
-        {"source_id": "public_social_links", "rights_status": "reference_only_no_download_no_scraping", "status": "planned"}
+        {"source_id": "public_social_links", "rights_status": "reference_only_no_download_no_scraping", "status": "link_seed_manifest_recorded"}
       ],
       "capture_targets": ["guide_seat_downstream_clear_season", "guide_seat_downstream_rainfed", "guide_seat_downstream_high_rain", "rainforest_gorge_entry", "swimmer_rescue_visibility_in_dense_foliage"]
     }

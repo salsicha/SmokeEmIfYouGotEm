@@ -1,0 +1,195 @@
+{
+  "schema": "raftsim.reference_media_link_manifest.v1",
+  "generated_on": "2026-07-06",
+  "status": "link_seeds_recorded_no_media_downloaded",
+  "policy": {
+    "storage": "Link-only. Do not download, scrape, vendor, train on, or package third-party photos, footage, captions, or comments until explicit rights are recorded per item.",
+    "shipping_rule": "First-party capture, official/public-domain media with item metadata, or explicit written permission is required before a reference can become a production asset.",
+    "social_rule": "Public social links and hashtag/search pages are fidelity-review seeds only. Record platform, creator, date, observed flow context, and permission status before any asset use.",
+    "guide_review": "Guide/outfitter notes can validate lines, hazards, surf/flush/pin behavior, rescue visibility, and seasonal flow appearance, but guidebook text and third-party captions remain link-only unless rights clear."
+  },
+  "rivers": [
+    {
+      "river_id": "american_south_fork",
+      "section_id": "chili_bar_to_coloma",
+      "reference_goals": [
+        "Chili Bar put-in, Troublemaker/Meatgrinder-style boulder gardens, oak/conifer riparian banks, exposed late-summer rocks, commercial summer flow color, high-flow foam lines",
+        "Guide-seat downstream framing, swimmer visibility, eddy/recovery pools, and bank vegetation density"
+      ],
+      "candidate_links": [
+        {
+          "source_id": "blm_south_fork_american_recreation_page",
+          "source_type": "official_context_page",
+          "provider": "Bureau of Land Management",
+          "url": "https://www.blm.gov/visit/south-fork-american-river",
+          "rights_status": "official_us_government_page_but_per_media_item_metadata_review_required",
+          "use": [
+            "access context",
+            "corridor recreation context",
+            "candidate official media references"
+          ],
+          "notes": "Use as official context and a starting point for public-domain/attribution review; do not assume every embedded image is shippable without item metadata."
+        },
+        {
+          "source_id": "wikimedia_south_fork_american_search",
+          "source_type": "creative_commons_candidate_search",
+          "provider": "Wikimedia Commons",
+          "url": "https://commons.wikimedia.org/w/index.php?search=South+Fork+American+River+rafting&title=Special:MediaSearch&type=image",
+          "rights_status": "per_file_license_attribution_and_model_property_review_required",
+          "use": [
+            "visual reference candidates",
+            "bank and water-color comparison"
+          ],
+          "notes": "Review each file page, license, author, date, and attribution before using as more than reference."
+        },
+        {
+          "source_id": "flickr_south_fork_american_search",
+          "source_type": "creative_commons_candidate_search",
+          "provider": "Flickr",
+          "url": "https://www.flickr.com/search/?text=South%20Fork%20American%20River%20rafting",
+          "rights_status": "per_item_license_and_creator_permission_review_required",
+          "use": [
+            "reference-only visual comparison",
+            "candidate contact list for permission"
+          ],
+          "notes": "Use search results only as leads; do not download images without license/permission review."
+        },
+        {
+          "source_id": "instagram_south_fork_american_hashtag",
+          "source_type": "public_social_search_seed",
+          "provider": "Instagram",
+          "url": "https://www.instagram.com/explore/tags/southforkamericanriver/",
+          "rights_status": "reference_only_no_download_no_scraping_explicit_creator_permission_required",
+          "use": [
+            "recent visual trend review",
+            "candidate creator/outfitter contact leads"
+          ],
+          "notes": "Record only public link, creator handle, date, and observed conditions after manual review; never vendor the media itself."
+        }
+      ]
+    },
+    {
+      "river_id": "colorado_river",
+      "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+      "reference_goals": [
+        "Lees Ferry launch, Grand Canyon canyon-wall scale, sand bars, big-water laterals, boils, wave trains, oar-rig sightlines, dam-release water color",
+        "Sparse desert riparian vegetation, long swimmer/rescue sightlines, river-mile context, canyon atmospheric depth"
+      ],
+      "candidate_links": [
+        {
+          "source_id": "nps_grand_canyon_photos_multimedia",
+          "source_type": "official_media_page",
+          "provider": "National Park Service",
+          "url": "https://www.nps.gov/grca/learn/photosmultimedia/index.htm",
+          "rights_status": "official_us_government_media_page_per_item_public_domain_or_credit_review_required",
+          "use": [
+            "canyon-wall and river visual references",
+            "official b-roll/photo leads",
+            "attribution metadata"
+          ],
+          "notes": "NPS media is the preferred first review path for Colorado visual reference, but each image/video still needs item metadata and credit review."
+        },
+        {
+          "source_id": "nps_grand_canyon_river_trips",
+          "source_type": "official_context_page",
+          "provider": "National Park Service",
+          "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm",
+          "rights_status": "official_us_government_page_but_per_media_item_metadata_review_required",
+          "use": [
+            "route style context",
+            "launch/takeout and permit context",
+            "candidate official media references"
+          ],
+          "notes": "Use for contextual validation; do not treat embedded media as assets until item rights are recorded."
+        },
+        {
+          "source_id": "wikimedia_grand_canyon_rafting_search",
+          "source_type": "creative_commons_candidate_search",
+          "provider": "Wikimedia Commons",
+          "url": "https://commons.wikimedia.org/w/index.php?search=Grand+Canyon+Colorado+River+rafting&title=Special:MediaSearch&type=image",
+          "rights_status": "per_file_license_attribution_and_model_property_review_required",
+          "use": [
+            "visual reference candidates",
+            "canyon color and scale comparison"
+          ],
+          "notes": "Review each file page and avoid guidebook/caption reuse unless rights explicitly allow it."
+        },
+        {
+          "source_id": "instagram_grand_canyon_rafting_hashtag",
+          "source_type": "public_social_search_seed",
+          "provider": "Instagram",
+          "url": "https://www.instagram.com/explore/tags/grandcanyonrafting/",
+          "rights_status": "reference_only_no_download_no_scraping_explicit_creator_permission_required",
+          "use": [
+            "recent trip-condition reference",
+            "candidate oarsman/outfitter contact leads"
+          ],
+          "notes": "Use only for manual fidelity notes and permission outreach; no media import without rights."
+        }
+      ]
+    },
+    {
+      "river_id": "pacuare",
+      "section_id": "lower_pacuare_planning_corridor",
+      "reference_goals": [
+        "Rainforest gorge density, steep green banks, clear-season versus rainy-season water color, waterfalls, hanging vegetation, tropical humidity and mist",
+        "Commercial raft scale, rescue visibility under canopy, bank vegetation pressure, post-rain pushy wave trains"
+      ],
+      "candidate_links": [
+        {
+          "source_id": "wikimedia_pacuare_river_search",
+          "source_type": "creative_commons_candidate_search",
+          "provider": "Wikimedia Commons",
+          "url": "https://commons.wikimedia.org/w/index.php?search=Pacuare+River+rafting&title=Special:MediaSearch&type=image",
+          "rights_status": "per_file_license_attribution_and_model_property_review_required",
+          "use": [
+            "rainforest gorge visual candidates",
+            "water color and canopy-density comparison"
+          ],
+          "notes": "Treat as candidate references only until each file page, author, license, and attribution are recorded."
+        },
+        {
+          "source_id": "flickr_pacuare_river_search",
+          "source_type": "creative_commons_candidate_search",
+          "provider": "Flickr",
+          "url": "https://www.flickr.com/search/?text=Pacuare%20River%20rafting",
+          "rights_status": "per_item_license_and_creator_permission_review_required",
+          "use": [
+            "reference-only rainforest/rafting comparison",
+            "candidate permission outreach"
+          ],
+          "notes": "Use search results only as leads; do not download images without license/permission review."
+        },
+        {
+          "source_id": "instagram_pacuare_river_hashtag",
+          "source_type": "public_social_search_seed",
+          "provider": "Instagram",
+          "url": "https://www.instagram.com/explore/tags/pacuareriver/",
+          "rights_status": "reference_only_no_download_no_scraping_explicit_creator_permission_required",
+          "use": [
+            "recent rainforest/flow-condition reference",
+            "candidate guide/outfitter contact leads"
+          ],
+          "notes": "Record only public link, creator handle, date, and observed flow/weather notes after manual review."
+        },
+        {
+          "source_id": "youtube_pacuare_river_rafting_search",
+          "source_type": "public_social_video_search_seed",
+          "provider": "YouTube",
+          "url": "https://www.youtube.com/results?search_query=Pacuare+River+rafting",
+          "rights_status": "reference_only_no_download_no_scraping_explicit_creator_permission_required",
+          "use": [
+            "movement and rapid-behavior reference",
+            "candidate guide/outfitter contact leads"
+          ],
+          "notes": "Use as manual review leads for motion and line choices; no footage extraction or audio use without explicit rights."
+        }
+      ]
+    }
+  ],
+  "next_actions": [
+    "Manually review candidate pages and promote only item-level references with recorded author, license, date, station/reach, observed flow or rainfall context, and permission status.",
+    "Attach first-party guide/outfitter review notes for each promoted reference.",
+    "Use the references to drive biome-specific asset selection and environment art reviews, not as downloaded source assets."
+  ]
+}
