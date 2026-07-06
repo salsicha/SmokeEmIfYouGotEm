@@ -1,243 +1,250 @@
 {
-  "schema": "raftsim.production_source_pull_manifest.v1",
-  "generated_on": "2026-07-06",
-  "river_id": "pacuare",
-  "section_id": "lower_pacuare_planning_corridor",
-  "status": "partial_official_and_public_global_source_slice_downloaded",
-  "source_manifest": "source_manifest.json",
   "bounds_wgs84": {
-    "min_lon": -83.75,
-    "min_lat": 9.72,
+    "max_lat": 10.12,
     "max_lon": -83.42,
-    "max_lat": 10.12
+    "min_lat": 9.72,
+    "min_lon": -83.75
   },
+  "generated_on": "2026-07-06",
+  "production_blockers": [
+    "Copernicus DEM tiles are downloaded but not clipped, reprojected, hydrologically conditioned, or imported as Unreal heightfields.",
+    "NASA GIBS imagery is coarse and partly cloudy; production Pacuare art still needs higher-resolution cloud-screened Sentinel/Landsat/first-party imagery or licensed aerial references.",
+    "Authoritative Costa Rica hydrography, rainfall, discharge, access, and protected-area layers are still under source-rights review; the attached preview centerline is only an editor scaffold.",
+    "No Pacuare field/social reference media has explicit game-use rights attached yet.",
+    "Rain-fed flow bands remain relative until gauge/rainfall sources and guide feedback are reviewed.",
+    "Pacuare rainfall station review now identifies IMN precipitation and SENARA station candidates, but station IDs, features, time series, basin relation, and guide/outfitter validation remain open before numeric rain-fed flow bands or flash-response visuals can be promoted."
+  ],
   "pulled_artifacts": [
     {
       "artifact_id": "copernicus_dem_glo30_N09_W084",
       "category": "terrain_sample",
+      "caveats": [
+        "This is a one-degree DSM tile covering the southern portion of the draft Pacuare bounds, not a clipped corridor DEM.",
+        "The tile still needs clipping, reprojection, void/artifact review, river-centerline conditioning, and Unreal heightfield import."
+      ],
       "path": "terrain/copernicus_dem_glo30_N09_W084.tif",
       "provider": "Copernicus DEM GLO-30 Public on AWS Open Data",
-      "url": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N09_00_W084_00_DEM/Copernicus_DSM_COG_10_N09_00_W084_00_DEM.tif",
       "status": "tile_downloaded",
       "summary": {
-        "tile": "N09_00_W084_00",
-        "width": 3600,
+        "format": "Cloud Optimized GeoTIFF",
         "height": 3600,
         "pixel_type": "F32",
-        "format": "Cloud Optimized GeoTIFF",
-        "size_bytes": 42012875
+        "size_bytes": 42012875,
+        "tile": "N09_00_W084_00",
+        "width": 3600
       },
+      "url": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N09_00_W084_00_DEM/Copernicus_DSM_COG_10_N09_00_W084_00_DEM.tif",
       "use": [
         "rainforest_gorge_heightfield_source",
         "slope_and_gorge_wall_context",
         "hydrologic_conditioning_input"
-      ],
-      "caveats": [
-        "This is a one-degree DSM tile covering the southern portion of the draft Pacuare bounds, not a clipped corridor DEM.",
-        "The tile still needs clipping, reprojection, void/artifact review, river-centerline conditioning, and Unreal heightfield import."
       ]
     },
     {
       "artifact_id": "copernicus_dem_glo30_N10_W084",
       "category": "terrain_sample",
+      "caveats": [
+        "This is a one-degree DSM tile covering the northern edge of the draft Pacuare bounds, not a clipped corridor DEM.",
+        "The tile still needs clipping, reprojection, void/artifact review, river-centerline conditioning, and Unreal heightfield import."
+      ],
       "path": "terrain/copernicus_dem_glo30_N10_W084.tif",
       "provider": "Copernicus DEM GLO-30 Public on AWS Open Data",
-      "url": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N10_00_W084_00_DEM/Copernicus_DSM_COG_10_N10_00_W084_00_DEM.tif",
       "status": "tile_downloaded",
       "summary": {
-        "tile": "N10_00_W084_00",
-        "width": 3600,
+        "format": "Cloud Optimized GeoTIFF",
         "height": 3600,
         "pixel_type": "F32",
-        "format": "Cloud Optimized GeoTIFF",
-        "size_bytes": 28217552
+        "size_bytes": 28217552,
+        "tile": "N10_00_W084_00",
+        "width": 3600
       },
+      "url": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N10_00_W084_00_DEM/Copernicus_DSM_COG_10_N10_00_W084_00_DEM.tif",
       "use": [
         "rainforest_gorge_heightfield_source",
         "northern_bounds_coverage",
         "hydrologic_conditioning_input"
-      ],
-      "caveats": [
-        "This is a one-degree DSM tile covering the northern edge of the draft Pacuare bounds, not a clipped corridor DEM.",
-        "The tile still needs clipping, reprojection, void/artifact review, river-centerline conditioning, and Unreal heightfield import."
       ]
     },
     {
       "artifact_id": "nasa_gibs_pacuare_truecolor_2025_04_02",
       "category": "satellite_imagery_sample",
+      "caveats": [
+        "MODIS true-color resolution is too coarse for final photoreal corridor art.",
+        "The selected image still has partial cloud cover and must be replaced or supplemented with higher-resolution Sentinel/Landsat/first-party imagery before production approval."
+      ],
       "path": "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
       "provider": "NASA GIBS WMS",
-      "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor&CRS=EPSG:4326&BBOX=9.72,-83.75,10.12,-83.42&FORMAT=image/png&WIDTH=512&HEIGHT=512&TIME=2025-04-02&STYLES=&TRANSPARENT=FALSE",
       "status": "cloud_screened_sample_downloaded",
       "summary": {
-        "width": 512,
+        "format": "PNG",
         "height": 512,
         "pixel_type": "RGBA_U8",
-        "format": "PNG",
         "size_bytes": 89266,
-        "visual_review": "best of the sampled dates; partial cloud remains but enough rainforest texture is visible for a coarse Unreal source drape"
+        "visual_review": "best of the sampled dates; partial cloud remains but enough rainforest texture is visible for a coarse Unreal source drape",
+        "width": 512
       },
+      "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor&CRS=EPSG:4326&BBOX=9.72,-83.75,10.12,-83.42&FORMAT=image/png&WIDTH=512&HEIGHT=512&TIME=2025-04-02&STYLES=&TRANSPARENT=FALSE",
       "use": [
         "source-derived_unreal_preview_overlay",
         "rainforest_color_reference",
         "cloud_screening_pipeline_smoke_test"
-      ],
-      "caveats": [
-        "MODIS true-color resolution is too coarse for final photoreal corridor art.",
-        "The selected image still has partial cloud cover and must be replaced or supplemented with higher-resolution Sentinel/Landsat/first-party imagery before production approval."
       ]
     },
     {
       "artifact_id": "nasa_gibs_pacuare_truecolor_2025_04_02_1024",
       "category": "satellite_imagery_sample",
+      "caveats": [
+        "MODIS true-color resolution is still too coarse for final photoreal corridor art even when requested at 1024px.",
+        "The selected image still has partial cloud cover and must be replaced or supplemented with higher-resolution Sentinel/Landsat/first-party imagery before production approval."
+      ],
       "path": "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
       "provider": "NASA GIBS WMS",
-      "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor&CRS=EPSG:4326&BBOX=9.72,-83.75,10.12,-83.42&FORMAT=image/png&WIDTH=1024&HEIGHT=1024&TIME=2025-04-02&STYLES=&TRANSPARENT=FALSE",
       "status": "larger_cloud_screened_sample_downloaded_for_active_preview",
       "summary": {
-        "width": 1024,
+        "format": "PNG",
         "height": 1024,
         "pixel_type": "RGBA_U8",
-        "format": "PNG",
         "size_bytes": 116272,
-        "visual_review": "same selected NASA GIBS date as the retained 512px sample; larger request preserves the active Pacuare preview path at the same nominal source as South Fork and Colorado"
+        "visual_review": "same selected NASA GIBS date as the retained 512px sample; larger request preserves the active Pacuare preview path at the same nominal source as South Fork and Colorado",
+        "width": 1024
       },
+      "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor&CRS=EPSG:4326&BBOX=9.72,-83.75,10.12,-83.42&FORMAT=image/png&WIDTH=1024&HEIGHT=1024&TIME=2025-04-02&STYLES=&TRANSPARENT=FALSE",
       "use": [
         "active_source-derived_unreal_preview_overlay",
         "rainforest_color_reference",
         "larger_source_preview_pipeline_smoke_test"
-      ],
-      "caveats": [
-        "MODIS true-color resolution is still too coarse for final photoreal corridor art even when requested at 1024px.",
-        "The selected image still has partial cloud cover and must be replaced or supplemented with higher-resolution Sentinel/Landsat/first-party imagery before production approval."
       ]
     },
     {
       "artifact_id": "pacuare_nasa_gibs_demshade_source_drape_2025_04_02",
       "category": "derived_preview_drape",
+      "caveats": [
+        "This is a deterministic source-derived preview composite, not production photoreal imagery.",
+        "Cloud-filled areas are DEM-derived rainforest relief placeholders and must be replaced by higher-resolution cloud-screened imagery before production approval."
+      ],
       "path": "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
       "provider": "RaftSim source-preview tool from NASA GIBS and Copernicus DEM GLO-30 inputs",
-      "url": "physics/src/raftsim/geospatial_preview.py",
       "status": "generated_preview_only",
       "summary": {
-        "width": 512,
+        "format": "PNG",
         "height": 512,
         "pixel_type": "RGBA_U8",
-        "format": "PNG",
-        "processing_manifest": "imagery/pacuare_source_drape_composite_manifest.json"
+        "processing_manifest": "imagery/pacuare_source_drape_composite_manifest.json",
+        "width": 512
       },
+      "url": "physics/src/raftsim/geospatial_preview.py",
       "use": [
         "unreal_source_overlay",
         "cloud_gap_preview_fill",
         "terrain_relief_visual_review"
-      ],
-      "caveats": [
-        "This is a deterministic source-derived preview composite, not production photoreal imagery.",
-        "Cloud-filled areas are DEM-derived rainforest relief placeholders and must be replaced by higher-resolution cloud-screened imagery before production approval."
       ]
     },
     {
       "artifact_id": "pacuare_nasa_gibs_demshade_source_drape_2025_04_02_1024",
       "category": "derived_preview_drape",
+      "caveats": [
+        "This is a deterministic source-derived preview composite, not production photoreal imagery.",
+        "Cloud-filled areas are DEM-derived rainforest relief placeholders and must be replaced by higher-resolution cloud-screened imagery before production approval."
+      ],
       "path": "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png",
       "provider": "RaftSim source-preview tool from NASA GIBS and Copernicus DEM GLO-30 inputs",
-      "url": "physics/src/raftsim/geospatial_preview.py",
       "status": "generated_active_preview_only",
       "summary": {
-        "width": 1024,
+        "format": "PNG",
         "height": 1024,
         "pixel_type": "RGBA_U8",
-        "format": "PNG",
+        "processing_manifest": "imagery/pacuare_source_drape_composite_manifest_1024.json",
         "size_bytes": 689821,
-        "processing_manifest": "imagery/pacuare_source_drape_composite_manifest_1024.json"
+        "width": 1024
       },
+      "url": "physics/src/raftsim/geospatial_preview.py",
       "use": [
         "active_unreal_source_overlay",
         "cloud_gap_preview_fill",
         "terrain_relief_visual_review"
-      ],
-      "caveats": [
-        "This is a deterministic source-derived preview composite, not production photoreal imagery.",
-        "Cloud-filled areas are DEM-derived rainforest relief placeholders and must be replaced by higher-resolution cloud-screened imagery before production approval."
       ]
     },
     {
       "artifact_id": "pacuare_dem_relief_preview_512",
       "category": "derived_terrain_relief",
-      "path": "terrain/pacuare_dem_relief_preview_512.png",
-      "provider": "RaftSim source-preview tool from Copernicus DEM GLO-30 inputs",
-      "url": "physics/src/raftsim/geospatial_preview.py",
-      "status": "generated_preview_only",
-      "summary": {
-        "width": 512,
-        "height": 512,
-        "pixel_type": "L_U8",
-        "format": "PNG",
-        "processing_manifest": "imagery/pacuare_source_drape_composite_manifest.json"
-      },
-      "use": [
-        "unreal_preview_height_perturbation",
-        "terrain_relief_visual_review"
-      ],
       "caveats": [
         "Preview relief is sampled into procedural geometry only; it is not a clipped, reprojected, hydrologically conditioned Unreal heightfield.",
         "Full terrain import still requires proper geospatial conditioning and source-rights review."
+      ],
+      "path": "terrain/pacuare_dem_relief_preview_512.png",
+      "provider": "RaftSim source-preview tool from Copernicus DEM GLO-30 inputs",
+      "status": "generated_preview_only",
+      "summary": {
+        "format": "PNG",
+        "height": 512,
+        "pixel_type": "L_U8",
+        "processing_manifest": "imagery/pacuare_source_drape_composite_manifest.json",
+        "width": 512
+      },
+      "url": "physics/src/raftsim/geospatial_preview.py",
+      "use": [
+        "unreal_preview_height_perturbation",
+        "terrain_relief_visual_review"
       ]
     },
     {
       "artifact_id": "pacuare_dem_relief_preview_1024",
       "category": "derived_terrain_relief",
-      "path": "terrain/pacuare_dem_relief_preview_1024.png",
-      "provider": "RaftSim source-preview tool from Copernicus DEM GLO-30 inputs",
-      "url": "physics/src/raftsim/geospatial_preview.py",
-      "status": "generated_active_preview_only",
-      "summary": {
-        "width": 1024,
-        "height": 1024,
-        "pixel_type": "L_U8",
-        "format": "PNG",
-        "size_bytes": 601340,
-        "processing_manifest": "imagery/pacuare_source_drape_composite_manifest_1024.json"
-      },
-      "use": [
-        "active_unreal_preview_height_perturbation",
-        "terrain_relief_visual_review"
-      ],
       "caveats": [
         "Preview relief is sampled into procedural geometry only; it is not a clipped, reprojected, hydrologically conditioned Unreal heightfield.",
         "Full terrain import still requires proper geospatial conditioning and source-rights review."
+      ],
+      "path": "terrain/pacuare_dem_relief_preview_1024.png",
+      "provider": "RaftSim source-preview tool from Copernicus DEM GLO-30 inputs",
+      "status": "generated_active_preview_only",
+      "summary": {
+        "format": "PNG",
+        "height": 1024,
+        "pixel_type": "L_U8",
+        "processing_manifest": "imagery/pacuare_source_drape_composite_manifest_1024.json",
+        "size_bytes": 601340,
+        "width": 1024
+      },
+      "url": "physics/src/raftsim/geospatial_preview.py",
+      "use": [
+        "active_unreal_preview_height_perturbation",
+        "terrain_relief_visual_review"
       ]
     },
     {
       "artifact_id": "pacuare_copernicus_dem_corridor_heightfield_1009",
       "category": "derived_heightfield_candidate",
+      "caveats": [
+        "This is a normalized import candidate for tool testing, not production terrain.",
+        "The source DEM is not yet clipped to a surveyed corridor, reprojected to the selected Costa Rica working CRS, void/artifact reviewed, hydrologically conditioned, river-channel burned, or guide-reviewed."
+      ],
       "path": "terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png",
       "provider": "RaftSim geospatial preview utility from Copernicus DEM GLO-30 inputs",
-      "url": "physics/src/raftsim/geospatial_preview.py",
       "status": "generated_review_gated_import_candidate",
       "summary": {
-        "width": 1009,
+        "elevation_max_m": 3230.446044921875,
+        "elevation_min_m": 16.122909545898438,
+        "format": "16-bit grayscale PNG",
         "height": 1009,
         "pixel_type": "U16",
-        "format": "16-bit grayscale PNG",
+        "processing_manifest": "terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json",
         "size_bytes": 1463813,
-        "elevation_min_m": 16.122909545898438,
-        "elevation_max_m": 3230.446044921875,
-        "processing_manifest": "terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json"
+        "width": 1009
       },
+      "url": "physics/src/raftsim/geospatial_preview.py",
       "use": [
         "unreal_landscape_import_test",
         "terrain_scale_review",
         "heightfield_conditioning_pipeline_proof"
-      ],
-      "caveats": [
-        "This is a normalized import candidate for tool testing, not production terrain.",
-        "The source DEM is not yet clipped to a surveyed corridor, reprojected to the selected Costa Rica working CRS, void/artifact reviewed, hydrologically conditioned, river-channel burned, or guide-reviewed."
       ]
     },
     {
       "artifact_id": "nasa_gibs_pacuare_cloud_screen_candidates",
       "category": "satellite_imagery_cloud_screen_candidates",
+      "caveats": [
+        "Unselected samples are retained only as source-selection evidence.",
+        "Production imagery still needs scene metadata, acquisition review, and higher-resolution cloud screening."
+      ],
       "paths": [
         "imagery/nasa_gibs_pacuare_truecolor_2025-01-10_512.png",
         "imagery/nasa_gibs_pacuare_truecolor_2025-01-25_512.png",
@@ -260,63 +267,63 @@
       "use": [
         "cloud_screening_evidence",
         "source_selection_traceability"
-      ],
-      "caveats": [
-        "Unselected samples are retained only as source-selection evidence.",
-        "Production imagery still needs scene metadata, acquisition review, and higher-resolution cloud screening."
       ]
     },
     {
       "artifact_id": "opentopography_srtmgl1_pacuare_probe",
       "category": "terrain_source_probe",
-      "path": "terrain/opentopography_srtmgl1_pacuare_probe_response.txt",
-      "provider": "OpenTopography Global DEM API",
-      "url": "https://portal.opentopography.org/API/globaldem?demtype=SRTMGL1&south=9.72&north=10.12&west=-83.75&east=-83.42&outputFormat=GTiff",
-      "status": "api_key_required_recorded",
-      "summary": {
-        "http_status": 401,
-        "content_type": "application/xml",
-        "size_bytes": 162
-      },
-      "use": [
-        "source_access_gate_record"
-      ],
       "caveats": [
         "OpenTopography remains a valid future terrain path, but production pulls require a registered API key and terms review."
+      ],
+      "path": "terrain/opentopography_srtmgl1_pacuare_probe_response.txt",
+      "provider": "OpenTopography Global DEM API",
+      "status": "api_key_required_recorded",
+      "summary": {
+        "content_type": "application/xml",
+        "http_status": 401,
+        "size_bytes": 162
+      },
+      "url": "https://portal.opentopography.org/API/globaldem?demtype=SRTMGL1&south=9.72&north=10.12&west=-83.75&east=-83.42&outputFormat=GTiff",
+      "use": [
+        "source_access_gate_record"
       ]
     },
     {
       "artifact_id": "pacuare_unreal_preview_centerline_scaffold",
       "category": "derived_hydrography_preview_scaffold",
+      "caveats": [
+        "Generated from the current Unreal preview curve and draft planning bounds, not an official Costa Rica hydrography layer.",
+        "Do not use as bank geometry, wetted width, solver centerline, access stationing, or production route authority.",
+        "Replace or validate with official hydrography, conditioned DEM, cloud-screened imagery, protected-area review, and guide/outfitter annotations."
+      ],
       "paths": [
         "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
         "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
         "hydrography/production_import_pilot/preview_stationing_scaffold.json"
       ],
       "provider": "RaftSim geospatial preview utility from Unreal Pacuare preview curve",
-      "url": "physics/src/raftsim/geospatial_preview.py",
       "status": "generated_review_gated_preview_route_not_official_hydrography",
       "summary": {
         "centerline_vertex_count": 129,
-        "station_sample_count": 184,
-        "station_interval_m": 250.0,
         "length_m_preview_wgs84_linearized": 45642.42,
-        "processing_manifest": "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json"
+        "processing_manifest": "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
+        "station_interval_m": 250.0,
+        "station_sample_count": 184
       },
+      "url": "physics/src/raftsim/geospatial_preview.py",
       "use": [
         "rapid_and_access_annotation_scaffold",
         "procedural_rainforest_dressing_seed",
         "unreal_preview_capture_framing"
-      ],
-      "caveats": [
-        "Generated from the current Unreal preview curve and draft planning bounds, not an official Costa Rica hydrography layer.",
-        "Do not use as bank geometry, wetted width, solver centerline, access stationing, or production route authority.",
-        "Replace or validate with official hydrography, conditioned DEM, cloud-screened imagery, protected-area review, and guide/outfitter annotations."
       ]
     },
     {
       "artifact_id": "pacuare_snit_official_layer_catalog_metadata",
       "category": "official_service_metadata",
+      "caveats": [
+        "SNIT metadata is archived for discovery only; no feature geometry, tiles, station time series, or media were downloaded.",
+        "Selected per-layer metadata records CRS and terms leads, but every layer still needs import permission, attribution, attribute schema, Pacuare corridor intersection, and guide/local review before import or gameplay use."
+      ],
       "paths": [
         "hydrography/production_import_pilot/snit_ogc_services_catalog.html",
         "hydrography/production_import_pilot/snit_config_ssnit.js",
@@ -333,12 +340,8 @@
         "hydrography/production_import_pilot/snit_layer_lists/ice_sistema_electrico_capas_de_nodo.json"
       ],
       "provider": "Sistema Nacional de Informacion Territorial de Costa Rica / IDECORI",
-      "url": "https://www.snitcr.go.cr/ico_servicios_ogc",
       "status": "catalog_and_node_layer_lists_archived_metadata_only_no_features_downloaded",
       "summary": {
-        "reviewed_node_count": 7,
-        "selected_candidate_layer_count": 17,
-        "selected_metadata_layer_count": 11,
         "candidate_roles": [
           "Direccion de Agua aforo and hydrologic-unit discovery",
           "IMN rainfall climatology",
@@ -346,27 +349,56 @@
           "SINAC protected-area, forest-cover, corridor, and wetland context",
           "ICE utility context only"
         ],
-        "processing_manifest": "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
         "layer_metadata_summary": "hydrography/production_import_pilot/snit_layer_metadata_summary.json",
+        "processing_manifest": "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+        "reviewed_node_count": 7,
+        "selected_candidate_layer_count": 17,
+        "selected_metadata_layer_count": 11,
         "terms_status": "SINAC protected-area/corridor/wetland layers advertise unrestricted metadata claims requiring final review; SENARA, ICE, and SINAC forest-cover records expose copyright or IP restrictions that block import until terms are approved."
       },
+      "url": "https://www.snitcr.go.cr/ico_servicios_ogc",
       "use": [
         "official_hydrography_and_station_discovery",
         "rainfed_flow_review",
         "protected_area_publication_sensitivity",
         "rainforest_mask_and_reference_review"
-      ],
+      ]
+    },
+    {
+      "artifact_id": "pacuare_rainfall_station_review",
+      "category": "seasonal_flow_or_release_history_review",
       "caveats": [
-        "SNIT metadata is archived for discovery only; no feature geometry, tiles, station time series, or media were downloaded.",
-        "Selected per-layer metadata records CRS and terms leads, but every layer still needs import permission, attribution, attribute schema, Pacuare corridor intersection, and guide/local review before import or gameplay use."
+        "No station features or time series are imported.",
+        "WFS availability and layer metadata do not prove Pacuare basin relevance.",
+        "Numeric dry/runnable/high/flash flow bands remain blocked until station records, units, time zones, coverage, basin relation, and guide review are attached."
+      ],
+      "path": "hydrology/production_import_pilot/rainfall_station_review.json",
+      "provider": "RaftSim review artifact from SNIT IMN/SENARA metadata, Pacuare rainfall context, and hydrology source research",
+      "related_artifacts": [
+        "hydrology/rainfall_context.json",
+        "hydrology/costa_rica_gauge_search.json",
+        "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+        "hydrography/production_import_pilot/snit_layer_metadata_summary.json"
+      ],
+      "status": "metadata_only_station_candidates_attached_numeric_flow_blocked",
+      "summary": {
+        "candidate_layer_count": 6,
+        "imn_precipitation_layers": 3,
+        "senara_station_layers": 2,
+        "station_time_series_imported": false,
+        "wfs_available_count": 5
+      },
+      "use": [
+        "rainfall_station_source_triage",
+        "rainfed_flow_band_evidence_checklist",
+        "future_flash_response_review",
+        "guide_and_outfitter_hydrology_review_queue"
       ]
     }
   ],
-  "production_blockers": [
-    "Copernicus DEM tiles are downloaded but not clipped, reprojected, hydrologically conditioned, or imported as Unreal heightfields.",
-    "NASA GIBS imagery is coarse and partly cloudy; production Pacuare art still needs higher-resolution cloud-screened Sentinel/Landsat/first-party imagery or licensed aerial references.",
-    "Authoritative Costa Rica hydrography, rainfall, discharge, access, and protected-area layers are still under source-rights review; the attached preview centerline is only an editor scaffold.",
-    "No Pacuare field/social reference media has explicit game-use rights attached yet.",
-    "Rain-fed flow bands remain relative until gauge/rainfall sources and guide feedback are reviewed."
-  ]
+  "river_id": "pacuare",
+  "schema": "raftsim.production_source_pull_manifest.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "source_manifest": "source_manifest.json",
+  "status": "partial_official_and_public_global_source_slice_downloaded"
 }

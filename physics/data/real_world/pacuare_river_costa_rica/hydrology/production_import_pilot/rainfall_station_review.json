@@ -1,0 +1,198 @@
+{
+  "allowed_use": [
+    "rainfall station source triage",
+    "Pacuare hydrology annotation planning",
+    "future dry/runnable/high/flash flow-band evidence checklist"
+  ],
+  "candidate_layer_summary": {
+    "candidate_layer_count": 6,
+    "imn_precipitation_layers": 3,
+    "metadata_attached_count": 3,
+    "senara_station_layers": 2,
+    "wfs_available_count": 5
+  },
+  "candidate_layers": [
+    {
+      "abstract": "En este an\u00e1lisis se toma en cuenta la variable de precipitaci\u00f3n en mil\u00edmetros anual en un periodo de estudio desde el a\u00f1o 1960 al 2013.",
+      "candidate_id": "precipitaci\u00f3n_anual__per\u00edodo_1960-2013",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "has_metadata": false,
+      "institution": "Instituto Meteorol\u00f3gico Nacional",
+      "layer": "anual_precipitacion_60_13",
+      "metadata_file": null,
+      "metadata_terms_status": "metadata_not_attached",
+      "name": "Precipitaci\u00f3n Anual: per\u00edodo 1960-2013",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_role": "rainfall_climatology_context",
+      "source_node_id": "snit_imn",
+      "wfs_available": true
+    },
+    {
+      "abstract": "En este an\u00e1lisis se toma en cuenta la variable de precipitaci\u00f3n en mil\u00edmetros durante el mes de abril en un periodo de estudio desde el a\u00f1o 1960 al 2013. Los datos fueron recolectados por las diferentes estaciones meteorol\u00f3gicas mec\u00e1nicas a disposici\u00f3n del Instituto Meteorol\u00f3gico Nacional. Los pol\u00edgonos fueron delimitados por medio de un an\u00e1lisis clim\u00e1tico multidisciplinario. El an\u00e1lisis se da a nivel nacional.",
+      "candidate_id": "precipitaci\u00f3n_abril__per\u00edodo_1960-2013",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "has_metadata": false,
+      "institution": "Instituto Meteorol\u00f3gico Nacional",
+      "layer": "abril_precipitacion_60_13",
+      "metadata_file": null,
+      "metadata_terms_status": "metadata_not_attached",
+      "name": "Precipitaci\u00f3n Abril: per\u00edodo 1960-2013",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_role": "rainfall_climatology_context",
+      "source_node_id": "snit_imn",
+      "wfs_available": true
+    },
+    {
+      "abstract": "En este an\u00e1lisis se toma en cuenta la variable de precipitaci\u00f3n en mil\u00edmetros durante el mes de octubre en un periodo de estudio desde el a\u00f1o 1960 al 2013. Los datos fueron recolectados por las diferentes estaciones meteorol\u00f3gicas mec\u00e1nicas a disposici\u00f3n del Instituto Meteorol\u00f3gico Nacional. Los pol\u00edgonos fueron delimitados por medio de un an\u00e1lisis clim\u00e1tico multidisciplinario. El an\u00e1lisis se da a nivel nacional.",
+      "candidate_id": "precipitaci\u00f3n_octubre__per\u00edodo_1960-2013",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "has_metadata": false,
+      "institution": "Instituto Meteorol\u00f3gico Nacional",
+      "layer": "octubre_precipitacion_60_13",
+      "metadata_file": null,
+      "metadata_terms_status": "metadata_not_attached",
+      "name": "Precipitaci\u00f3n Octubre: per\u00edodo 1960-2013",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_role": "rainfall_climatology_context",
+      "source_node_id": "snit_imn",
+      "wfs_available": true
+    },
+    {
+      "abstract": "La red de estaciones autom\u00e1ticas, es una red reciente, la cual fue creada para el monitoreo de los acu\u00edferos del proyecto Progirh del SENARA. Actualmente la red se mantiene con cinco estaciones localizadas en Grecia, Matapalo de Guanacaste, Savegre y dos estaciones en el sector de Ario, C\u00f3bano.",
+      "candidate_id": "estaciones_autom\u00e1ticas",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "has_metadata": true,
+      "institution": "Servicio Nacional de Aguas Subterr\u00e1neas, Riego y Avenamiento - ESTACIONES METEOROL\u00d3GICAS",
+      "layer": "estaciones_automaticas",
+      "metadata_file": "snit_layer_metadata/senara_estaciones_automaticas_metadata.json",
+      "metadata_terms_status": "copyright_or_ip_restrictions_recorded_import_blocked_until_terms_review",
+      "name": "Estaciones Autom\u00e1ticas",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_role": "rain_station_discovery",
+      "source_node_id": "snit_senara_estaciones",
+      "wfs_available": true
+    },
+    {
+      "abstract": "La red es estaciones pluviom\u00e9tricas tuvo sus inicios de los a\u00f1os sesenta. Se caracteriza por contar con observadores, quienes son los encargados de realizar la recolecci\u00f3n de los datos diariamente. El par\u00e1metro registrado es la precipitaci\u00f3n. Las estaciones pluviom\u00e9tricas, fueron cerradas de acuerdo con el oficio SENARA-DIGH-OFI-004-2025. La informaci\u00f3n se encuentra disponible a junio del 2024.",
+      "candidate_id": "estaciones_pluviom\u00e9tricas",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "has_metadata": true,
+      "institution": "Servicio Nacional de Aguas Subterr\u00e1neas, Riego y Avenamiento - ESTACIONES METEOROL\u00d3GICAS",
+      "layer": "estaciones_pluviometricas",
+      "metadata_file": "snit_layer_metadata/senara_estaciones_pluviometricas_metadata.json",
+      "metadata_terms_status": "copyright_or_ip_restrictions_recorded_import_blocked_until_terms_review",
+      "name": "Estaciones Pluviom\u00e9tricas",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_role": "rain_station_discovery",
+      "source_node_id": "snit_senara_estaciones",
+      "wfs_available": true
+    },
+    {
+      "abstract": "El mapa de recarga muestra la recarga potencial en mm por a\u00f1o en cada sector, fue desarrollado mediante la metodolog\u00eda de balance h\u00eddrico de suelos seg\u00fan Schosinsky (2006) y posteriormente fue reclasificado en cinco clases de recarga seg\u00fan la metodolog\u00eda propuesta por el SENARA para el desarrollo de estudios hidrogeol\u00f3gicos de planes reguladores cantonales, publicada en La Gaceta 137 del 16 de julio del 2015.",
+      "candidate_id": "recarga_siquirres_sirgas",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "has_metadata": true,
+      "institution": "Servicio Nacional de Aguas Subterr\u00e1neas, Riego y Avenamiento - RECARGA",
+      "layer": "Recarga_Siquirres_SIRGAS",
+      "metadata_file": "snit_layer_metadata/senara_recarga_siquirres_metadata.json",
+      "metadata_terms_status": "copyright_or_ip_restrictions_recorded_import_blocked_until_terms_review",
+      "name": "Recarga_Siquirres_SIRGAS",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_role": "recharge_context_not_station_authority",
+      "source_node_id": "snit_senara_recarga",
+      "wfs_available": false
+    }
+  ],
+  "flow_band_questions": [
+    {
+      "flow_band": "clear_season_low_planning",
+      "needed_evidence": [
+        "recent rainfall deficit or dry-season pattern",
+        "guide-reviewed runnable minimum",
+        "visible shallow shelves and exposed rock behavior"
+      ],
+      "review_status": "blocked_until_station_ids_records_basin_relation_and_guide_review"
+    },
+    {
+      "flow_band": "rainfed_runnable_planning",
+      "needed_evidence": [
+        "storm or antecedent rainfall pattern that produces commercial runnable flow",
+        "guide-reviewed hole, wave-train, lateral, and eddy-line behavior",
+        "swimmer recovery visibility and eddy accessibility"
+      ],
+      "review_status": "blocked_until_station_ids_records_basin_relation_and_guide_review"
+    },
+    {
+      "flow_band": "rainy_season_high_planning",
+      "needed_evidence": [
+        "high-rainfall or high-stage conditions",
+        "washout thresholds for holes and sticky hydraulics",
+        "guide-reviewed no-go or expert-only constraints"
+      ],
+      "review_status": "blocked_until_station_ids_records_basin_relation_and_guide_review"
+    },
+    {
+      "flow_band": "flash_response_review_only",
+      "needed_evidence": [
+        "rainfall-to-stage lag",
+        "flash-rise warning indicators",
+        "unsafe or review-only scenario criteria"
+      ],
+      "review_status": "blocked_until_station_ids_records_basin_relation_and_guide_review"
+    }
+  ],
+  "forbidden_use": [
+    "numeric Pacuare flow-band promotion",
+    "production water-level or foam tuning",
+    "claiming accepted station-to-corridor hydrology",
+    "shipping flash-response scenarios without station records and guide review"
+  ],
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "gauge_search": "physics/data/real_world/pacuare_river_costa_rica/hydrology/costa_rica_gauge_search.json",
+    "rainfall_context": "physics/data/real_world/pacuare_river_costa_rica/hydrology/rainfall_context.json",
+    "snit_layer_catalog_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+    "snit_layer_metadata_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_metadata_summary.json"
+  },
+  "needed_station_metadata": [
+    "station_id",
+    "provider",
+    "latitude_longitude",
+    "drainage_area_or_basin_relation",
+    "variables",
+    "units",
+    "temporal_resolution",
+    "record_start_end",
+    "time_zone",
+    "quality_flags",
+    "terms_and_attribution"
+  ],
+  "next_actions": [
+    "Select exact IMN/SENARA rainfall or station layers and record terms, CRS, attributes, and units.",
+    "Pull only approved station features or time-series metadata after terms and attribution are clear.",
+    "Relate candidate stations to the lower Pacuare basin and corridor before tuning rain-fed flow bands.",
+    "Add discharge/stage station review and flash-response review before any Pacuare numeric flow or water visual promotion."
+  ],
+  "policy": {
+    "feature_downloads_performed": false,
+    "numeric_flow_bands_promoted": false,
+    "station_time_series_imported": false,
+    "use_as_metadata_review_only": true
+  },
+  "promotion_blockers": [
+    "No station IDs, coordinates, variables, units, time zones, temporal coverage, or quality flags are attached yet.",
+    "No rainfall, discharge, stage, or flash-response time series are imported.",
+    "Layer bboxes and WFS availability are discovery metadata, not proof of Pacuare-basin relevance.",
+    "Guide/outfitter review is required before rain-fed flow bands change gameplay, hazards, swimmer rescue timing, or visuals."
+  ],
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare_rainfall_station_review.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "metadata_only_rainfall_station_candidates_attached_numeric_flow_blocked"
+}

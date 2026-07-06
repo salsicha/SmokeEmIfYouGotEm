@@ -903,6 +903,14 @@
           "provider": "RaftSim geospatial preview utility from Unreal Pacuare preview curve",
           "status": "active_annotation_scaffold_review_gated_not_official_hydrography",
           "unreal_use": "preview-only centerline/stationing scaffold for annotation placement, procedural rainforest dressing, and capture framing; not official Pacuare route geometry, banks, wetted width, or solver input"
+        },
+        {
+          "artifact_id": "pacuare_rainfall_station_review",
+          "category": "seasonal_flow_or_release_history_review",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/hydrology/production_import_pilot/rainfall_station_review.json",
+          "provider": "RaftSim review artifact from SNIT IMN/SENARA metadata",
+          "status": "metadata_only_station_candidates_attached_numeric_flow_blocked",
+          "unreal_use": "Source triage for future dry/runnable/high/flash Pacuare visual variants; not water level, foam, mist, hole, swimmer, or flash-response tuning authority."
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"

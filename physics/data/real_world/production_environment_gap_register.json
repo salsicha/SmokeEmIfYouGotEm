@@ -388,6 +388,7 @@
         "hydrography/production_import_pilot/preview_stationing_scaffold.json",
         "hydrology/costa_rica_gauge_search.json",
         "hydrology/rainfall_context.json",
+        "hydrology/production_import_pilot/rainfall_station_review.json",
         "review/sinac_protected_area_source_rights.json",
         "review/access_and_conservation_constraints.json"
       ],

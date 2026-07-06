@@ -128,6 +128,7 @@ PACUARE_SNIT_CONFIG_FILE = "hydrography/production_import_pilot/snit_config_ssni
 PACUARE_SNIT_LAYER_LIST_SCRIPT_FILE = "hydrography/production_import_pilot/snit_ico_servicios_ogc_lista_capas.js"
 PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE = "hydrography/production_import_pilot/snit_layer_catalog_summary.json"
 PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE = "hydrography/production_import_pilot/snit_layer_metadata_summary.json"
+PACUARE_RAINFALL_STATION_REVIEW_FILE = "hydrology/production_import_pilot/rainfall_station_review.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE = "production_import_pilot_derivatives_manifest.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
@@ -1667,6 +1668,124 @@ def build_colorado_release_band_review(
     }
 
 
+def build_pacuare_rainfall_station_review(
+    rainfall_context: dict[str, object],
+    gauge_search: dict[str, object],
+    snit_layer_catalog_summary: dict[str, object],
+    snit_layer_metadata_summary: dict[str, object],
+) -> dict[str, object]:
+    """Summarize Pacuare rainfall and rain-station candidates from archived metadata."""
+
+    metadata_layers = {
+        layer["candidate_id"]: layer
+        for layer in snit_layer_metadata_summary["metadata_layers"]
+        if "candidate_id" in layer
+    }
+    review_nodes = {
+        "snit_imn": "rainfall_climatology_context",
+        "snit_senara_estaciones": "rain_station_discovery",
+        "snit_senara_recarga": "recharge_context_not_station_authority",
+    }
+    candidate_layers: list[dict[str, object]] = []
+    for node in snit_layer_catalog_summary["node_layer_archives"]:
+        node_id = node["node_id"]
+        if node_id not in review_nodes:
+            continue
+        for layer in node.get("selected_candidate_layers", []):
+            metadata = next(
+                (
+                    metadata_layer
+                    for metadata_layer in metadata_layers.values()
+                    if metadata_layer.get("selected_layer_name") == layer.get("name")
+                    or metadata_layer.get("distribution_layer") == layer.get("layer")
+                ),
+                None,
+            )
+            candidate_layers.append(
+                {
+                    "candidate_id": layer["name"].lower().replace(" ", "_").replace(":", "_"),
+                    "source_node_id": node_id,
+                    "review_role": review_nodes[node_id],
+                    "name": layer["name"],
+                    "layer": layer["layer"],
+                    "institution": layer.get("institution"),
+                    "publication_or_catalog_date": layer.get("publication_or_catalog_date"),
+                    "wfs_available": bool(layer.get("wfs_available")),
+                    "has_metadata": bool(layer.get("has_metadata")),
+                    "metadata_file": metadata.get("metadata_file") if metadata else None,
+                    "metadata_terms_status": metadata.get("terms_status") if metadata else "metadata_not_attached",
+                    "abstract": layer.get("abstract"),
+                    "feature_download_status": layer.get("feature_download_status", "not_downloaded_metadata_only"),
+                    "promotion_gate": layer.get(
+                        "promotion_gate",
+                        "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and guide/local interpretation before import or gameplay use.",
+                    ),
+                }
+            )
+
+    return {
+        "schema": "raftsim.pacuare_rainfall_station_review.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "status": "metadata_only_rainfall_station_candidates_attached_numeric_flow_blocked",
+        "inputs": {
+            "rainfall_context": "physics/data/real_world/pacuare_river_costa_rica/hydrology/rainfall_context.json",
+            "gauge_search": "physics/data/real_world/pacuare_river_costa_rica/hydrology/costa_rica_gauge_search.json",
+            "snit_layer_catalog_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+            "snit_layer_metadata_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_metadata_summary.json",
+        },
+        "policy": {
+            "feature_downloads_performed": False,
+            "station_time_series_imported": False,
+            "numeric_flow_bands_promoted": False,
+            "use_as_metadata_review_only": True,
+        },
+        "candidate_layers": candidate_layers,
+        "candidate_layer_summary": {
+            "candidate_layer_count": len(candidate_layers),
+            "wfs_available_count": sum(1 for layer in candidate_layers if layer["wfs_available"]),
+            "metadata_attached_count": sum(1 for layer in candidate_layers if layer["has_metadata"]),
+            "imn_precipitation_layers": sum(1 for layer in candidate_layers if layer["source_node_id"] == "snit_imn"),
+            "senara_station_layers": sum(
+                1 for layer in candidate_layers if layer["source_node_id"] == "snit_senara_estaciones"
+            ),
+        },
+        "flow_band_questions": [
+            {
+                "flow_band": item["flow_band"],
+                "needed_evidence": item["needed_evidence"],
+                "review_status": "blocked_until_station_ids_records_basin_relation_and_guide_review",
+            }
+            for item in rainfall_context["seasonal_context_to_resolve"]
+        ],
+        "needed_station_metadata": gauge_search["needed_station_metadata"],
+        "next_actions": [
+            "Select exact IMN/SENARA rainfall or station layers and record terms, CRS, attributes, and units.",
+            "Pull only approved station features or time-series metadata after terms and attribution are clear.",
+            "Relate candidate stations to the lower Pacuare basin and corridor before tuning rain-fed flow bands.",
+            "Add discharge/stage station review and flash-response review before any Pacuare numeric flow or water visual promotion.",
+        ],
+        "promotion_blockers": [
+            "No station IDs, coordinates, variables, units, time zones, temporal coverage, or quality flags are attached yet.",
+            "No rainfall, discharge, stage, or flash-response time series are imported.",
+            "Layer bboxes and WFS availability are discovery metadata, not proof of Pacuare-basin relevance.",
+            "Guide/outfitter review is required before rain-fed flow bands change gameplay, hazards, swimmer rescue timing, or visuals.",
+        ],
+        "allowed_use": [
+            "rainfall station source triage",
+            "Pacuare hydrology annotation planning",
+            "future dry/runnable/high/flash flow-band evidence checklist",
+        ],
+        "forbidden_use": [
+            "numeric Pacuare flow-band promotion",
+            "production water-level or foam tuning",
+            "claiming accepted station-to-corridor hydrology",
+            "shipping flash-response scenarios without station records and guide review",
+        ],
+    }
+
+
 def pacuare_import_pilot_bounds() -> BoundsWGS84:
     """Return the current lower Pacuare planning bounds for production source review."""
 
@@ -1861,7 +1980,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
                     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
                     PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
-                    "hydrology/production_import_pilot/rainfall_station_review.json",
+                    PACUARE_RAINFALL_STATION_REVIEW_FILE,
                     "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
                     "hydrology/production_import_pilot/flash_response_review.json",
                     "hydrology/production_import_pilot/flow_band_review.json",
@@ -2337,6 +2456,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
                     "hydrology/costa_rica_gauge_search.json",
                     "hydrology/rainfall_context.json",
+                    PACUARE_RAINFALL_STATION_REVIEW_FILE,
                     "review/sinac_protected_area_source_rights.json",
                     "review/access_and_conservation_constraints.json",
                 ],
@@ -2375,7 +2495,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
                             PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
                             PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
-                            "hydrology/production_import_pilot/rainfall_station_review.json",
+                            PACUARE_RAINFALL_STATION_REVIEW_FILE,
                             "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
                             "hydrology/production_import_pilot/flash_response_review.json",
                         ],
