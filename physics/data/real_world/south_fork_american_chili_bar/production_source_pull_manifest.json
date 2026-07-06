@@ -11,6 +11,12 @@
     "max_lon": -120.72,
     "max_lat": 38.83
   },
+  "sample_bounds_epsg3857": {
+    "xmin": -13458526.4369,
+    "ymin": 4684496.9368,
+    "xmax": -13438488.9286,
+    "ymax": 4697349.7027
+  },
   "pulled_artifacts": [
     {
       "artifact_id": "usgs_11445500_daily_discharge",
@@ -64,7 +70,7 @@
       "category": "terrain_sample",
       "path": "terrain/usgs_3dep_chili_bar_sample_256.tif",
       "provider": "USGS 3D Elevation Program ImageServer",
-      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13627665%2C4547675%2C-13617881%2C4557460&bboxSR=3857&imageSR=3857&size=256%2C256&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=256%2C256&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
       "status": "sample_downloaded",
       "summary": {
         "width": 256,
@@ -81,6 +87,30 @@
       "caveats": [
         "This is a small sample, not a complete production corridor DEM.",
         "Full corridor terrain still needs reviewed raster tiling, reprojection, hydrologic conditioning, and LFS/package policy."
+      ]
+    },
+    {
+      "artifact_id": "usda_naip_chili_bar_sample_512",
+      "category": "aerial_imagery_sample",
+      "path": "imagery/usda_naip_chili_bar_sample_512.png",
+      "provider": "USDA/APFO NAIP ImageServer",
+      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=512%2C512&format=png&f=image",
+      "status": "sample_downloaded",
+      "summary": {
+        "width": 512,
+        "height": 512,
+        "pixel_type": "RGB_U8",
+        "format": "PNG",
+        "size_bytes": 538725
+      },
+      "use": [
+        "aerial_reference_smoke_test",
+        "vegetation_and_water_mask_prototype",
+        "source-provenance plumbing"
+      ],
+      "caveats": [
+        "This is a small sample export, not a complete production orthomosaic corridor.",
+        "Full corridor imagery still needs official tile selection, acquisition-date review, attribution, reprojection, and LFS/package policy."
       ]
     }
   ],
