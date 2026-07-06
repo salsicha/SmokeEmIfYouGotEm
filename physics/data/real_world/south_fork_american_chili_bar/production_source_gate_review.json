@@ -1,0 +1,145 @@
+{
+  "active_unreal_preview_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview",
+  "gap_register": "../production_environment_gap_register.json",
+  "generated_on": "2026-07-06",
+  "next_checkpoint_recommendation": [
+    "Broaden CDEC CBR/A25 seasonal windows and resolve A25 flags/routing.",
+    "Run guide/geospatial review on NHD-derived centerline, banks, cross sections, eddy/recovery zones, and source masks.",
+    "Attach permissioned or first-party South Fork reference photos/footage before photoreal material promotion."
+  ],
+  "promotion_decision": {
+    "can_drive_next_renderer_iteration": true,
+    "can_drive_production_terrain_or_water": false,
+    "decision": "do_not_promote_to_production_or_lifelike",
+    "reason": "Every source class has useful preview evidence, but guide/geospatial/rights/seasonal-flow review is still open."
+  },
+  "readiness_manifest": "../production_geospatial_source_readiness.json",
+  "river_id": "american_south_fork",
+  "schema": "raftsim.south_fork_production_source_gate_review.v1",
+  "section_id": "chili_bar_to_coloma",
+  "source_gate_items": [
+    {
+      "attached_artifacts": [
+        "terrain/production_import_pilot/3dep_tiles",
+        "terrain/production_import_pilot/dem_relief_2048.png",
+        "terrain/production_import_pilot/heightfield_candidate_2017.png",
+        "production_import_pilot_pull_manifest.json",
+        "production_import_pilot_derivatives_manifest.json"
+      ],
+      "next_decision": "Select conditioned production Landscape/Nanite terrain path after CRS, vertical datum, and channel-burning review.",
+      "preview_evidence_status": "attached_review_gated",
+      "promotion_blockers": [
+        "full corridor mosaic and clip",
+        "source metadata and acquisition review",
+        "void/artifact review",
+        "hydrologic conditioning",
+        "channel burning",
+        "guide/geospatial approval"
+      ],
+      "source_class": "terrain_dem_or_lidar"
+    },
+    {
+      "attached_artifacts": [
+        "imagery/production_import_pilot/naip_tiles",
+        "imagery/production_import_pilot/source_drape_4096.png",
+        "imagery/production_import_pilot/water_mask_2048.png",
+        "imagery/production_import_pilot/vegetation_mask_2048.png",
+        "imagery/production_import_pilot/source_masks_manifest.json"
+      ],
+      "next_decision": "Promote only after source drape and masks are accepted as production derivatives or replaced by better imagery.",
+      "preview_evidence_status": "attached_review_gated",
+      "promotion_blockers": [
+        "tile acquisition year/date review",
+        "orthomosaic or service-derivative metadata review",
+        "water/vegetation mask QA against hydrography and visible banks",
+        "seasonal exposed-bar and wet-edge review",
+        "attribution and redistribution signoff"
+      ],
+      "source_class": "aerial_or_satellite_imagery"
+    },
+    {
+      "attached_artifacts": [
+        "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+        "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
+        "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
+        "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+        "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
+        "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
+        "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
+        "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+        "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
+        "hydrography/production_import_pilot/hydrography_draft_manifest.json",
+        "hydrography/production_import_pilot/centerline.geojson",
+        "hydrography/production_import_pilot/banks.geojson",
+        "hydrography/production_import_pilot/cross_sections.geojson"
+      ],
+      "next_decision": "Use the attached NHD-derived overlays for editor review, not solver authority, until guide-reviewed banks and stationing pass.",
+      "preview_evidence_status": "attached_review_gated",
+      "promotion_blockers": [
+        "flow direction confirmation",
+        "working CRS transform review",
+        "bank and wetted-width correction",
+        "rapid, eddy, recovery, and swimmer-rescue station review",
+        "guide validation against footage or field notes"
+      ],
+      "source_class": "hydrography_and_centerline"
+    },
+    {
+      "attached_artifacts": [
+        "hydrology/usgs_11445500_daily_discharge.json",
+        "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+        "hydrology/south_fork_modern_flow_source_selection.json",
+        "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+        "hydrology/cdec_terms_flags_and_station_relation_review.json",
+        "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+        "hydrology/production_import_pilot/flow_band_review.json"
+      ],
+      "next_decision": "Keep flow-band visuals as review presets until seasonal windows and guide validation support retuning.",
+      "preview_evidence_status": "attached_review_gated",
+      "promotion_blockers": [
+        "broader representative CDEC CBR seasonal windows",
+        "A25 flag/routing interpretation",
+        "station-to-reach lag and routing review",
+        "legal/redistribution signoff",
+        "guide/outfitter validation for low, median, high, and unsafe flows"
+      ],
+      "source_class": "seasonal_flow_or_release_history"
+    },
+    {
+      "attached_artifacts": [
+        "review/production_import_pilot/access_publication_sensitivity_review.json",
+        "review/production_import_pilot/access_points.geojson",
+        "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+        "review/production_import_pilot/evacuation_and_rescue_routes.geojson"
+      ],
+      "next_decision": "Treat access and no-publish geometry as editor seeds until official layer selection and local review pass.",
+      "preview_evidence_status": "attached_review_gated",
+      "promotion_blockers": [
+        "exact access geometry and current restriction review",
+        "parcel/public-private land status",
+        "evacuation route authority",
+        "sensitive-location screenshot policy",
+        "guide/local approval"
+      ],
+      "source_class": "protected_area_and_access_context"
+    },
+    {
+      "attached_artifacts": [
+        "review/production_import_pilot/reference_annotations.geojson",
+        "field_media/production_import_pilot/rights_manifest.json"
+      ],
+      "next_decision": "Use links only as review annotations until first-party or permissioned media can influence production art.",
+      "preview_evidence_status": "link_scaffold_attached_no_media_rights",
+      "promotion_blockers": [
+        "item-level creator/date/reach/flow/weather metadata",
+        "explicit permission or compatible license",
+        "no scraping or packaged social media without rights",
+        "guide review for visual fidelity and raft outcomes",
+        "field capture or outfitter-approved reference set"
+      ],
+      "source_class": "guide_and_reference_media_annotations"
+    }
+  ],
+  "source_manifest": "source_manifest.json",
+  "status": "source_data_attached_for_preview_but_blocked_from_lifelike_promotion"
+}

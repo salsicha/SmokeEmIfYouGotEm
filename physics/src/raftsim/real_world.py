@@ -66,6 +66,7 @@ RAPID_REVIEW_EDITOR_WORKFLOW_FILE = "rapid_review_editor_workflow.json"
 PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION = "raftsim.production_import_pilot.v0"
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION = "raftsim.production_environment_gap_register.v0"
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE = "production_environment_gap_register.json"
+SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE = "production_source_gate_review.json"
 REFERENCE_MEDIA_ANNOTATIONS_FILE = "review/production_import_pilot/reference_annotations.geojson"
 REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE = "field_media/production_import_pilot/rights_manifest.json"
 REFERENCE_MEDIA_TARGET_STATION_FRACTIONS = {
@@ -1371,6 +1372,160 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
             "processing_version": "milestone_26_south_fork_import_pilot.v0",
             "review_status": "recipe_only_downloads_and_imports_pending",
         },
+    }
+
+
+def build_south_fork_production_source_gate_review(section: CandidateRiverSection | None = None) -> dict[str, object]:
+    """Summarize whether attached South Fork source data is ready for production promotion."""
+
+    target = section or south_fork_american_section()
+
+    gate_items = [
+        {
+            "source_class": "terrain_dem_or_lidar",
+            "preview_evidence_status": "attached_review_gated",
+            "attached_artifacts": [
+                "terrain/production_import_pilot/3dep_tiles",
+                "terrain/production_import_pilot/dem_relief_2048.png",
+                "terrain/production_import_pilot/heightfield_candidate_2017.png",
+                SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE,
+                SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE,
+            ],
+            "promotion_blockers": [
+                "full corridor mosaic and clip",
+                "source metadata and acquisition review",
+                "void/artifact review",
+                "hydrologic conditioning",
+                "channel burning",
+                "guide/geospatial approval",
+            ],
+            "next_decision": "Select conditioned production Landscape/Nanite terrain path after CRS, vertical datum, and channel-burning review.",
+        },
+        {
+            "source_class": "aerial_or_satellite_imagery",
+            "preview_evidence_status": "attached_review_gated",
+            "attached_artifacts": [
+                "imagery/production_import_pilot/naip_tiles",
+                "imagery/production_import_pilot/source_drape_4096.png",
+                "imagery/production_import_pilot/water_mask_2048.png",
+                "imagery/production_import_pilot/vegetation_mask_2048.png",
+                "imagery/production_import_pilot/source_masks_manifest.json",
+            ],
+            "promotion_blockers": [
+                "tile acquisition year/date review",
+                "orthomosaic or service-derivative metadata review",
+                "water/vegetation mask QA against hydrography and visible banks",
+                "seasonal exposed-bar and wet-edge review",
+                "attribution and redistribution signoff",
+            ],
+            "next_decision": "Promote only after source drape and masks are accepted as production derivatives or replaced by better imagery.",
+        },
+        {
+            "source_class": "hydrography_and_centerline",
+            "preview_evidence_status": "attached_review_gated",
+            "attached_artifacts": [
+                SOUTH_FORK_NHD_HU8_MANIFEST_FILE,
+                SOUTH_FORK_NHD_HU8_FLOWLINE_EXTRACT_FILE,
+                SOUTH_FORK_NHD_HU8_SUPPORT_EXTRACT_FILE,
+                SOUTH_FORK_NHD_MAINSTEM_MANIFEST_FILE,
+                SOUTH_FORK_NHD_MAINSTEM_CANDIDATE_FILE,
+                SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
+                SOUTH_FORK_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
+                SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE,
+                SOUTH_FORK_NHD_ALIGNMENT_DIAGNOSTIC_FILE,
+                SOUTH_FORK_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE,
+                SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE,
+                SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE,
+                SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
+            ],
+            "promotion_blockers": [
+                "flow direction confirmation",
+                "working CRS transform review",
+                "bank and wetted-width correction",
+                "rapid, eddy, recovery, and swimmer-rescue station review",
+                "guide validation against footage or field notes",
+            ],
+            "next_decision": "Use the attached NHD-derived overlays for editor review, not solver authority, until guide-reviewed banks and stationing pass.",
+        },
+        {
+            "source_class": "seasonal_flow_or_release_history",
+            "preview_evidence_status": "attached_review_gated",
+            "attached_artifacts": [
+                "hydrology/usgs_11445500_daily_discharge.json",
+                "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+                "hydrology/south_fork_modern_flow_source_selection.json",
+                "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+                SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
+                SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
+                SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
+            ],
+            "promotion_blockers": [
+                "broader representative CDEC CBR seasonal windows",
+                "A25 flag/routing interpretation",
+                "station-to-reach lag and routing review",
+                "legal/redistribution signoff",
+                "guide/outfitter validation for low, median, high, and unsafe flows",
+            ],
+            "next_decision": "Keep flow-band visuals as review presets until seasonal windows and guide validation support retuning.",
+        },
+        {
+            "source_class": "protected_area_and_access_context",
+            "preview_evidence_status": "attached_review_gated",
+            "attached_artifacts": [
+                SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
+                SOUTH_FORK_ACCESS_POINTS_FILE,
+                SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
+                SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE,
+            ],
+            "promotion_blockers": [
+                "exact access geometry and current restriction review",
+                "parcel/public-private land status",
+                "evacuation route authority",
+                "sensitive-location screenshot policy",
+                "guide/local approval",
+            ],
+            "next_decision": "Treat access and no-publish geometry as editor seeds until official layer selection and local review pass.",
+        },
+        {
+            "source_class": "guide_and_reference_media_annotations",
+            "preview_evidence_status": "link_scaffold_attached_no_media_rights",
+            "attached_artifacts": [
+                REFERENCE_MEDIA_ANNOTATIONS_FILE,
+                REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
+            ],
+            "promotion_blockers": [
+                "item-level creator/date/reach/flow/weather metadata",
+                "explicit permission or compatible license",
+                "no scraping or packaged social media without rights",
+                "guide review for visual fidelity and raft outcomes",
+                "field capture or outfitter-approved reference set",
+            ],
+            "next_decision": "Use links only as review annotations until first-party or permissioned media can influence production art.",
+        },
+    ]
+
+    return {
+        "schema": "raftsim.south_fork_production_source_gate_review.v1",
+        "generated_on": "2026-07-06",
+        "river_id": target.river_id,
+        "section_id": target.section_id,
+        "status": "source_data_attached_for_preview_but_blocked_from_lifelike_promotion",
+        "source_manifest": SOURCE_MANIFEST_FILE,
+        "gap_register": f"../{PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE}",
+        "readiness_manifest": "../production_geospatial_source_readiness.json",
+        "active_unreal_preview_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview",
+        "promotion_decision": {
+            "decision": "do_not_promote_to_production_or_lifelike",
+            "reason": "Every source class has useful preview evidence, but guide/geospatial/rights/seasonal-flow review is still open.",
+            "can_drive_next_renderer_iteration": True,
+            "can_drive_production_terrain_or_water": False,
+        },
+        "source_gate_items": gate_items,
+        "next_checkpoint_recommendation": [
+            "Broaden CDEC CBR/A25 seasonal windows and resolve A25 flags/routing.",
+            "Run guide/geospatial review on NHD-derived centerline, banks, cross sections, eddy/recovery zones, and source masks.",
+            "Attach permissioned or first-party South Fork reference photos/footage before photoreal material promotion.",
+        ],
     }
 
 
@@ -3140,6 +3295,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                 "active_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview",
                 "current_strength": "strongest solver/source seed; official pilot DEM/NAIP tiles and derivatives are attached for a small corridor slice.",
                 "attached_preview_inputs": [
+                    SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE,
                     "production_import_pilot/3dep_tiles",
                     "production_import_pilot/naip_tiles",
                     "production_import_pilot/source_drape_4096.png",
@@ -3579,6 +3735,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
             "solver": ["scenario/scenario.json", "scenario/bed.npy", "scenario/initial_state.npz"],
             "source_pulls": [
                 "production_source_pull_manifest.json",
+                SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE,
                 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE,
                 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE,
                 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE,
@@ -5468,6 +5625,10 @@ def write_real_world_seed_package(directory: str | Path) -> Path:
     _write_json(data_dir / "corridor_package_manifest.json", _corridor_manifest(package))
     _write_json(data_dir / SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE, build_south_fork_access_publication_review())
     _write_json(data_dir / SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE, build_south_fork_production_import_pilot(package.section))
+    _write_json(
+        data_dir / SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE,
+        build_south_fork_production_source_gate_review(package.section),
+    )
     generate_real_world_scenario2_5d().write_package(scenario_dir)
     cascading_dir = data_dir / "cascading_scenarios"
     for cascading_package in generate_south_fork_american_cascading_seed_scenarios():
