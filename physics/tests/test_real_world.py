@@ -29,6 +29,7 @@ from raftsim.real_world import (
     COURSE_ELEVATION_EXTRACTION_FILE,
     COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION,
     PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE,
+    PACUARE_FLASH_RESPONSE_REVIEW_FILE,
     PACUARE_RAINFALL_STATION_REVIEW_FILE,
     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
@@ -64,6 +65,7 @@ from raftsim.real_world import (
     build_colorado_release_band_review,
     build_course_elevation_extraction,
     build_pacuare_discharge_stage_station_review,
+    build_pacuare_flash_response_review,
     build_pacuare_production_import_pilot,
     build_pacuare_rainfall_station_review,
     build_player_selection_model,
@@ -876,6 +878,7 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
     assert PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert PACUARE_RAINFALL_STATION_REVIEW_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
+    assert PACUARE_FLASH_RESPONSE_REVIEW_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE in classes["protected_area_and_access_context"]["target_outputs"]
     assert PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE in classes["protected_area_and_access_context"]["target_outputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE in classes["hydrography_and_centerline"]["target_outputs"]
@@ -1086,6 +1089,47 @@ def test_pacuare_discharge_stage_station_review_summarizes_metadata_without_flow
     )
 
 
+def test_pacuare_flash_response_review_links_hydrology_metadata_without_model_promotion():
+    pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
+    source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((pacuare_dir / "production_source_pull_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    rainfall_context = json.loads((pacuare_dir / "hydrology/rainfall_context.json").read_text())
+    rainfall_review = json.loads((pacuare_dir / PACUARE_RAINFALL_STATION_REVIEW_FILE).read_text())
+    discharge_review = json.loads((pacuare_dir / PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE).read_text())
+    da_summary = json.loads((pacuare_dir / PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE).read_text())
+    catalog_summary = json.loads((pacuare_dir / PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE).read_text())
+    review = json.loads((pacuare_dir / PACUARE_FLASH_RESPONSE_REVIEW_FILE).read_text())
+    builder_review = build_pacuare_flash_response_review(
+        rainfall_context,
+        rainfall_review,
+        discharge_review,
+        da_summary,
+        catalog_summary,
+    )
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+
+    assert review == builder_review
+    assert PACUARE_FLASH_RESPONSE_REVIEW_FILE in source_manifest["artifacts"]["gauges_and_rainfall"]
+    assert any(
+        artifact["artifact_id"] == "pacuare_flash_response_review"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert review["schema"] == "raftsim.pacuare_flash_response_review.v1"
+    assert review["status"] == "metadata_only_flash_response_context_attached_model_blocked"
+    assert review["policy"]["lag_model_built"] is False
+    assert review["flash_flow_band_question"]["flow_band"] == "flash_response_review_only"
+    assert review["rainfall_review_summary"]["candidate_layer_count"] == 6
+    assert review["discharge_stage_review_summary"]["da_sinigirh_candidate_count"] == 3
+    assert len(review["basin_and_recharge_context_candidates"]["da_sinigirh_candidates"]) == 2
+    assert len(review["basin_and_recharge_context_candidates"]["snit_context_layers"]) == 2
+    assert "numeric flash-response tuning" in review["forbidden_use"]
+    assert (
+        "physics/data/real_world/pacuare_river_costa_rica/" + PACUARE_FLASH_RESPONSE_REVIEW_FILE
+        in rivers["pacuare"]["attached_sources_by_class"]["seasonal_flow_or_release_history"]["artifacts"]
+    )
+
+
 def test_pacuare_preview_centerline_scaffold_is_not_official_hydrography():
     pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
     source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
@@ -1237,6 +1281,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_RAINFALL_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_FLASH_RESPONSE_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert "waterfalls" in rivers["pacuare"]["completion_gate"]
 
 

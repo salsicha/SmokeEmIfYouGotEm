@@ -1,0 +1,146 @@
+{
+  "allowed_use": [
+    "flash-response source triage",
+    "future unsafe-flow checklist planning",
+    "guide/outfitter annotation queue"
+  ],
+  "basin_and_recharge_context_candidates": {
+    "da_sinigirh_candidates": [
+      {
+        "candidate_id": "da_unidades_hidrologicas",
+        "feature_download_status": "not_downloaded_metadata_only",
+        "latlon_bbox": {
+          "maxx": -82.54474531399609,
+          "maxy": 11.224117503811387,
+          "minx": -87.14733170864938,
+          "miny": 5.950346237975033
+        },
+        "name": "Aguas:DA_UNIDADES_HIDROLOGICAS",
+        "review_reason": "Hydrologic units for station/basin relation and rainfall station screening.",
+        "srs": [
+          "EPSG:5367"
+        ],
+        "target_outputs": [
+          "hydrology/production_import_pilot/basin_relation_review.geojson"
+        ],
+        "title": "DA_UNIDADES HIDROLOGICAS"
+      },
+      {
+        "candidate_id": "ice_cuencas_hidrograficas",
+        "feature_download_status": "not_downloaded_metadata_only",
+        "latlon_bbox": {
+          "maxx": -82.54474531399609,
+          "maxy": 11.224117503811387,
+          "minx": -87.14733170864938,
+          "miny": 5.950346237975033
+        },
+        "name": "Aguas:DA_Cuencas_Hidrograficas_CR",
+        "review_reason": "Basin context for rain-fed response and station transfer review.",
+        "srs": [
+          "EPSG:5367"
+        ],
+        "target_outputs": [
+          "hydrology/production_import_pilot/flash_response_review.json"
+        ],
+        "title": "ICE_CUENCAS HIDROGRAFICAS"
+      }
+    ],
+    "snit_context_layers": [
+      {
+        "abstract": null,
+        "feature_download_status": "not_downloaded_metadata_only",
+        "has_metadata": false,
+        "institution": "Direcci\u00f3n de Agua, MINAE",
+        "layer": "Aguas:DA_UNIDADES_HIDROLOGICAS",
+        "name": "DA_UNIDADES HIDROLOGICAS",
+        "node_name": "DIRECCI\u00d3N DE AGUA",
+        "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+        "publication_or_catalog_date": "05-07-2026",
+        "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RElSRUNDSSVDMyU5M04rREUrQUdVQTo6QWd1YXMlM0FEQV9VTklEQURFU19ISURST0xPR0lDQVM=",
+        "wfs_available": false,
+        "wms_available": true,
+        "wmts_available": false
+      },
+      {
+        "abstract": "El mapa de recarga muestra la recarga potencial en mm por a\u00f1o en cada sector, fue desarrollado mediante la metodolog\u00eda de balance h\u00eddrico de suelos seg\u00fan Schosinsky (2006) y posteriormente fue reclasificado en cinco clases de recarga seg\u00fan la metodolog\u00eda propuesta por el SENARA para el desarrollo de estudios hidrogeol\u00f3gicos de planes reguladores cantonales, publicada en La Gaceta 137 del 16 de julio del 2015.",
+        "feature_download_status": "not_downloaded_metadata_only",
+        "has_metadata": true,
+        "institution": "Servicio Nacional de Aguas Subterr\u00e1neas, Riego y Avenamiento - RECARGA",
+        "layer": "Recarga_Siquirres_SIRGAS",
+        "name": "Recarga_Siquirres_SIRGAS",
+        "node_name": "SENARA-RECARGA",
+        "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+        "publication_or_catalog_date": "28-06-2026",
+        "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6UkVDQVJHQTo6UmVjYXJnYV9TaXF1aXJyZXNfU0lSR0FT",
+        "wfs_available": false,
+        "wms_available": true,
+        "wmts_available": false
+      }
+    ]
+  },
+  "discharge_stage_review_summary": {
+    "basin_relation_candidate_layers": [
+      "Aguas:DA_UNIDADES_HIDROLOGICAS"
+    ],
+    "da_sinigirh_candidate_count": 3,
+    "primary_station_candidate_layers": [
+      "Aguas:DA_AFOROS",
+      "Aguas:JASEC_ESTACIONES_HIDROMETRICAS"
+    ],
+    "snit_direccion_de_agua_candidate_count": 2,
+    "wfs_feature_access_advertised_count": 0
+  },
+  "flash_flow_band_question": {
+    "flow_band": "flash_response_review_only",
+    "needed_evidence": [
+      "rainfall-to-stage lag",
+      "flash-rise warning indicators",
+      "unsafe or review-only scenario criteria"
+    ],
+    "review_status": "blocked_until_rainfall_stage_lag_station_records_and_guide_review"
+  },
+  "forbidden_use": [
+    "numeric flash-response tuning",
+    "production high-water or flood visuals",
+    "unsafe/no-go gameplay authority",
+    "claiming accepted Pacuare rainfall-to-stage lag"
+  ],
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "da_sinigirh_wms_capabilities_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
+    "discharge_stage_station_review": "physics/data/real_world/pacuare_river_costa_rica/hydrology/production_import_pilot/discharge_or_stage_station_review.json",
+    "rainfall_context": "physics/data/real_world/pacuare_river_costa_rica/hydrology/rainfall_context.json",
+    "rainfall_station_review": "physics/data/real_world/pacuare_river_costa_rica/hydrology/production_import_pilot/rainfall_station_review.json",
+    "snit_layer_catalog_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_catalog_summary.json"
+  },
+  "next_actions": [
+    "Select station features and time series only after terms, CRS, attributes, and attribution are clear.",
+    "Relate rainfall and discharge/stage stations to the lower Pacuare basin and review upstream lag.",
+    "Define review-only unsafe flash-rise criteria before exposing flash scenarios in gameplay.",
+    "Ask guide/outfitter reviewers to annotate visible warning signs, no-go cues, swimmer rescue limits, and evacuation constraints."
+  ],
+  "policy": {
+    "feature_downloads_performed": false,
+    "flash_gameplay_promoted": false,
+    "lag_model_built": false,
+    "station_time_series_imported": false,
+    "use_as_metadata_review_only": true
+  },
+  "promotion_blockers": [
+    "No rainfall-to-stage or rainfall-to-discharge lag evidence is attached.",
+    "No station time series, station coordinates, basin relation, or quality flags are attached.",
+    "Basin/recharge layers are metadata leads only and do not establish runoff response.",
+    "Flash scenarios remain review-only until guide/outfitter safety review and rescue/readability gates pass."
+  ],
+  "rainfall_review_summary": {
+    "candidate_layer_count": 6,
+    "imn_precipitation_layers": 3,
+    "metadata_attached_count": 3,
+    "senara_station_layers": 2,
+    "wfs_available_count": 5
+  },
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare_flash_response_review.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "metadata_only_flash_response_context_attached_model_blocked"
+}
