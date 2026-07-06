@@ -13,4 +13,9 @@ namespace RaftSimAutomation
         TEXT("raftsim.unreal.vertical_slice_acceptance_gate.v1");
     static constexpr const TCHAR* Milestone23VerticalSliceGatePath =
         TEXT("unreal/Content/RaftSim/Automation/vertical_slice_acceptance_gate.json");
+
+    static constexpr const TCHAR* Milestone25APolishedToolingGateSchema =
+        TEXT("raftsim.unreal.polished_tooling_slice_gate.v1");
+    static constexpr const TCHAR* Milestone25APolishedToolingGatePath =
+        TEXT("unreal/Content/RaftSim/Automation/polished_tooling_slice_gate.json");
 }

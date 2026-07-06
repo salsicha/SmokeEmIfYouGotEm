@@ -1,0 +1,58 @@
+{
+  "schema": "raftsim.milestone25a.polished_tooling_slice_gate_report.v1",
+  "generated_on": "2026-07-05",
+  "gate_manifest": "unreal/Content/RaftSim/Automation/polished_tooling_slice_gate.json",
+  "checks": [
+    {
+      "check_id": "editor_module_and_menu_registry",
+      "passed": true,
+      "summary": "RaftSimEditor, RaftSim Tools menu registration, and the polished tool registry are source-controlled."
+    },
+    {
+      "check_id": "tool_shells_present",
+      "passed": true,
+      "summary": "Replay + Debug Viewer, Rapid/River Editor, and Feature Tuning Editor shells have C++ config/view-model types plus JSON shell manifests."
+    },
+    {
+      "check_id": "sample_data_and_validation_state",
+      "passed": true,
+      "summary": "Each shell names South Fork or Milestone 10 sample data and exposes validation state, blockers, or report links."
+    },
+    {
+      "check_id": "one_click_validation_actions",
+      "passed": true,
+      "summary": "Tool validation actions cover source checks, deterministic export, solver package regeneration, stitched-window validation, live-water smoke, round-trip validation, and report opening."
+    },
+    {
+      "check_id": "workflow_doc_present",
+      "passed": true,
+      "summary": "The workflow document describes how to open RaftSim Tools and review replay/debug, river authoring, feature tuning, validation, and playtest surfaces."
+    },
+    {
+      "check_id": "editor_target_build",
+      "passed": true,
+      "summary": "SmokeEmIfYouGotEmEditor Mac Development target built successfully with RaftSimEditor, shell view models, validation actions, and the Milestone 25A automation test source."
+    },
+    {
+      "check_id": "unreal_automation_test",
+      "passed": true,
+      "summary": "RaftSim.Milestone25A.PolishedToolingSliceGateManifest completed successfully under UnrealEditor-Cmd NullRHI with exit code 0."
+    }
+  ],
+  "decision": "PASS_TOOLING_CONTRACT_AND_EDITOR_BUILD_GATE",
+  "automation_test_name": "RaftSim.Milestone25A.PolishedToolingSliceGateManifest",
+  "automation_test_result": {
+    "result": "Success",
+    "exit_code": 0,
+    "command": "UnrealEditor-Cmd unreal/SmokeEmIfYouGotEm.uproject -unattended -nop4 -nosplash -NullRHI -NoSound -ExecCmds='Automation RunTests RaftSim.Milestone25A.PolishedToolingSliceGateManifest; Quit'",
+    "log_evidence": "LogAutomationController: Display: Test Completed. Result={Success} Name={PolishedToolingSliceGateManifest} Path={RaftSim.Milestone25A.PolishedToolingSliceGateManifest}"
+  },
+  "ready_for_interactive_widget_buildout": true,
+  "remaining_before_designer_polish": [
+    "Replace launch stubs with actual dockable Slate/UMG editor tabs.",
+    "Wire validation actions to real command execution and report capture.",
+    "Create reviewed binary DataAssets from the source manifests inside Unreal Editor.",
+    "Capture screenshots or video of the tools open in the editor once widgets exist."
+  ],
+  "passed": true
+}
