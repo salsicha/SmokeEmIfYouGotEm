@@ -322,6 +322,14 @@
           "unreal_use": "single Colorado River review line for editor overlays, future river-mile stationing, cross-section seed generation, and water-edge alignment; not accepted banks, sandbars, or production corridor geometry"
         },
         {
+          "artifact_id": "colorado_nhd_hu8_lees_ferry_mainstem_stationing_candidate",
+          "category": "hydrography_stationing_candidate",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+          "provider": "RaftSim preview stationing utility from the Colorado NHD mainstem candidate",
+          "status": "attached_review_gated_not_final_crs_or_river_mile_stationing",
+          "unreal_use": "preview metric station samples, downstream tangents, and river-left normal seeds for editor overlays and future cross-section review; not final canyon CRS or production river-mile stationing"
+        },
+        {
           "artifact_id": "usgs_3dep_lees_ferry_sample_256",
           "category": "terrain_sample",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_sample_256.tif",

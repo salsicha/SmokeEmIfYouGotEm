@@ -11,6 +11,7 @@ from raftsim.real_world import (
     COLORADO_NHD_HU8_SUPPORT_EXTRACT_FILE,
     COLORADO_NHD_MAINSTEM_CANDIDATE_FILE,
     COLORADO_NHD_MAINSTEM_MANIFEST_FILE,
+    COLORADO_NHD_MAINSTEM_STATIONING_FILE,
     COLORADO_PRODUCTION_IMPORT_PILOT_FILE,
     COLORADO_USBR_RELEASE_CONTEXT_FILE,
     COLORADO_USBR_TOTAL_RELEASE_FILE,
@@ -303,12 +304,13 @@ def test_colorado_production_import_pilot_exposes_lees_ferry_tile_plan_and_revie
         "guide_and_reference_media_annotations",
     }.issubset(classes)
     assert "usbr_glen_canyon_release_context" in classes["seasonal_flow_or_release_history"]["source_ids"]
-    assert classes["hydrography_and_centerline"]["status"] == "nhd_hu8_mainstem_candidate_attached_review_pending"
+    assert classes["hydrography_and_centerline"]["status"] == "nhd_hu8_preview_stationing_attached_review_pending"
     assert COLORADO_NHD_HU8_MANIFEST_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert COLORADO_NHD_HU8_FLOWLINE_EXTRACT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert COLORADO_NHD_HU8_SUPPORT_EXTRACT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert COLORADO_NHD_MAINSTEM_MANIFEST_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert COLORADO_NHD_MAINSTEM_CANDIDATE_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert COLORADO_NHD_MAINSTEM_STATIONING_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert classes["seasonal_flow_or_release_history"]["status"] == (
         "usgs_daily_discharge_and_usbr_release_context_attached_review_pending"
     )
@@ -422,6 +424,27 @@ def test_colorado_nhd_mainstem_candidate_orders_exact_graph_without_promotion():
     assert mainstem["features"][0]["properties"]["status"] == (
         "derived_review_gated_mainstem_candidate_not_river_mile_stationing"
     )
+
+
+def test_colorado_nhd_stationing_candidate_adds_preview_metric_scaffold():
+    colorado_dir = REAL_WORLD_DATA_DIR / "colorado_river_grand_canyon_rowing"
+    source_manifest = json.loads((colorado_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((colorado_dir / "production_source_pull_manifest.json").read_text())
+    stationing = json.loads((colorado_dir / COLORADO_NHD_MAINSTEM_STATIONING_FILE).read_text())
+
+    assert COLORADO_NHD_MAINSTEM_STATIONING_FILE in source_manifest["artifacts"]["hydrography"]
+    assert any(
+        artifact["artifact_id"] == "colorado_nhd_hu8_lees_ferry_mainstem_stationing_candidate"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert stationing["review_status"] == "metric_stationing_candidate_review_required_not_final_crs_or_river_mile_stationing"
+    assert stationing["local_transform"]["type"] == "local_equirectangular_preview_meters"
+    assert stationing["summary"]["vertex_count"] == 145
+    assert stationing["summary"]["station_sample_count"] == 244
+    assert stationing["summary"]["length_m_geodesic_vertices"] == 24223.694
+    assert stationing["summary"]["source_length_km_nhd_sum"] == 24.205286
+    assert stationing["station_samples"][0]["station_m"] == 0.0
+    assert stationing["station_samples"][-1]["station_m"] == 24223.694
 
 
 def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_gates():
@@ -539,6 +562,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert COLORADO_NHD_HU8_SUPPORT_EXTRACT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_NHD_MAINSTEM_MANIFEST_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_NHD_MAINSTEM_CANDIDATE_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_NHD_MAINSTEM_STATIONING_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_TOTAL_RELEASE_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert "waterfalls" in rivers["pacuare"]["completion_gate"]

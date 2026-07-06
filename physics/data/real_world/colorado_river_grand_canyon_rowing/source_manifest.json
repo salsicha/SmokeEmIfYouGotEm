@@ -37,7 +37,8 @@
       "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
       "hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson",
       "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
-      "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson"
+      "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
+      "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json"
     ],
     "imagery": [
       "imagery/usda_naip_lees_ferry_sample_512.png",
@@ -76,9 +77,9 @@
   },
   "confidence": {
     "guide_review": 0.05,
-    "hydrography": 0.28,
+    "hydrography": 0.31,
     "hydrology": 0.48,
-    "overall": 0.34,
+    "overall": 0.35,
     "rapid_annotations": 0.05,
     "terrain": 0.25
   },
@@ -199,6 +200,19 @@
       ],
       "url": "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
       "notes": "Derived a single exact-endpoint Colorado River mainstem candidate from named NHD flowlines in the stitched Lees Ferry HU8 overlay. This is an editor/review line only, not river-mile stationing, accepted banks, sandbars, or production geometry."
+    },
+    {
+      "category": "hydrography",
+      "fetch_id": "colorado_nhd_hu8_lees_ferry_mainstem_stationing_candidate",
+      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
+      "status": "metric_stationing_candidate_review_required_not_final_crs_or_river_mile_stationing",
+      "target_artifact": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+      "related_artifacts": [
+        "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
+        "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson"
+      ],
+      "url": "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
+      "notes": "Generated preview metric stationing, downstream tangents, and river-left normal seeds from the exact-graph Colorado NHD mainstem candidate. This is local equirectangular edit scaffolding only, not final canyon CRS or river-mile stationing."
     }
   ],
   "river_id": "colorado_river",
