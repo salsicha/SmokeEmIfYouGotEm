@@ -11,6 +11,8 @@
     "accepted_water_report_manifest": "physics/reports/milestone20/report_set_lock.json",
     "alpha_expansion_gate": "unreal/Content/RaftSim/Automation/alpha_expansion_gate.json",
     "alpha_content_coverage_manifest": "unreal/Content/RaftSim/Production/alpha_content_coverage_manifest.json",
+    "release_readiness_plan": "unreal/Content/RaftSim/Production/release_readiness_plan.json",
+    "release_readiness_gate": "unreal/Content/RaftSim/Automation/release_readiness_gate.json",
     "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json",
     "live_water_debug_views": "unreal/Content/RaftSim/Debug/live_water_debug_views.json",
     "live_water_smoke_suite": "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json",

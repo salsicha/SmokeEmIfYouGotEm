@@ -329,6 +329,8 @@ Tasks:
 - Run QA passes on physics regressions, VR comfort, input devices, and content.
 - Lock release branch and patch workflow.
 
+Milestone 25 release hardening is now recorded in `unreal/Content/RaftSim/Production/release_readiness_plan.json`, gated by `unreal/Content/RaftSim/Automation/release_readiness_gate.json`, summarized in `physics/reports/milestone25/release_readiness_gate.json`, and checked by the native `RaftSim.Milestone25.ReleaseReadinessGate` automation test. This gate closes the milestone contract while keeping actual shipping blocked on beta playtests, guide feedback, target-platform performance captures, legal/provenance review, content validation, photoreal environment/foliage quality review, release branch lock, and patch workflow evidence.
+
 Deliverable:
 
 - Shippable multi-platform Unreal build.
