@@ -33,8 +33,8 @@
   ],
   "generated_on": "2026-07-06",
   "production_blockers": [
-    "Full corridor DEM/lidar tiles are not downloaded or conditioned yet.",
-    "Aerial imagery and water/vegetation masks are not downloaded yet.",
+    "Pilot DEM tiles and official service/item metadata are attached, but full-corridor DEM/lidar tiling, mosaic/clip, vertical-datum review, void review, conditioning, and channel burning remain open.",
+    "Pilot NAIP tiles, item-level acquisition dates, and preview water/vegetation masks are attached, but full-corridor orthomosaic/imagery selection, terms review, mask QA, and guide/geospatial approval remain open.",
     "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, an ordered South Fork mainstem candidate, preview metric stationing, cross-section seed lines, a preview NAIP/DEM alignment diagnostic, and generated production-import draft centerline/bank/cross-section overlays, but it still needs direction confirmation, production CRS selection, bank/cross-section review, stronger NAIP/DEM alignment, and guide review.",
     "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window, a water-year-to-date CDEC seasonal review, and a multi-year CBR flow review, but A25 X-flag/routing interpretation, official high-flow peak review, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
     "Access/publication source leads are now attached for South Fork, but exact access geometry, parcel/public-private land status, evacuation routes, sensitive-location screening, and guide/local approval remain open.",
@@ -721,6 +721,50 @@
         "larger_unreal_source_drape",
         "vegetation_and_water_mask_prototype",
         "source-provenance plumbing"
+      ]
+    },
+    {
+      "artifact_id": "south_fork_source_metadata_review",
+      "category": "terrain_imagery_source_metadata_review",
+      "caveats": [
+        "Raw ArcGIS service/query payloads are not committed; reproducible URLs, byte counts, and SHA-256 hashes are recorded.",
+        "NAIP item-level acquisition dates cover the current pilot envelope only, not the full South Fork production corridor.",
+        "3DEP item metadata confirms pilot-envelope source candidates and NAVD 88 records, but production terrain still needs selected full-corridor products, vertical-datum review, void review, hydrologic conditioning, and channel burning.",
+        "This artifact does not grant guide/geospatial approval, route-publication approval, or lifelike production status."
+      ],
+      "path": "review/production_import_pilot/source_metadata_review.json",
+      "provider": "RaftSim review artifact from official USGS 3DEP and USDA/APFO NAIP ArcGIS ImageServer metadata/query responses",
+      "related_artifacts": [
+        "production_import_pilot.json",
+        "production_import_pilot_pull_manifest.json",
+        "production_import_pilot_derivatives_manifest.json",
+        "terrain/production_import_pilot/3dep_tiles",
+        "imagery/production_import_pilot/naip_tiles"
+      ],
+      "status": "pilot_tile_metadata_attached_review_gated_not_production_promoted",
+      "summary": {
+        "downloaded_tile_count": 8,
+        "naip_acquisition_date_max": "2022-07-21",
+        "naip_acquisition_date_min": "2022-07-20",
+        "naip_primary_item_count": 12,
+        "naip_years": [
+          2022
+        ],
+        "official_service_payload_count": 4,
+        "raw_payloads_committed": false,
+        "usgs_3dep_acquisition_date_max": "2023-10-13",
+        "usgs_3dep_acquisition_date_min": "2012-03-04",
+        "usgs_3dep_overview_item_count": 12,
+        "usgs_3dep_primary_item_count": 12,
+        "usgs_3dep_vertical_datums": [
+          "North American Vertical Datum of 1988 (NAVD 88)"
+        ]
+      },
+      "use": [
+        "pilot_dem_naip_provenance_review",
+        "source_gate_metadata_evidence",
+        "editor_source_overlay_triage",
+        "next_renderer_iteration_context"
       ]
     },
     {

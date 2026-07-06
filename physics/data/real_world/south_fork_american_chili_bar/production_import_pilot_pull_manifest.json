@@ -163,8 +163,9 @@
     }
   ],
   "generated_on": "2026-07-06",
+  "metadata_review": "review/production_import_pilot/source_metadata_review.json",
   "review_gates": [
-    "Verify provider metadata and acquisition dates for every imagery tile.",
+    "Use the attached pilot source metadata review for current tile provenance, then verify full-corridor provider metadata and acquisition dates before production promotion.",
     "Mosaic, clip, reproject, void-review, hydrologically condition, and channel-burn DEM tiles before Unreal Landscape promotion.",
     "Derive water/vegetation/wet-rock masks from the pilot imagery only after hydrography and bank alignment review.",
     "Do not treat downloaded reference tiles as final photoreal art until guide/geospatial review passes."

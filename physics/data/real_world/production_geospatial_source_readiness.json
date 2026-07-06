@@ -263,10 +263,11 @@
           "artifacts": [
             "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_sample_1024.png",
             "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/naip_tiles",
-            "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png"
+            "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png",
+            "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/source_metadata_review.json"
           ],
-          "promotion_blocker": "Pilot NAIP tiles are attached, but they still need provider metadata/acquisition-date review, mosaic/clip, CRS/terms review, mask derivation, and guide/geospatial approval before production drape use.",
-          "status": "naip_corridor_sample_pilot_tiles_and_stitched_source_drape_attached"
+          "promotion_blocker": "Pilot NAIP tiles and item-level acquisition dates for July 20-21, 2022 are attached for the current envelope, but full-corridor orthomosaic/imagery selection, terms/attribution signoff, mosaic/clip, seasonal comparison, mask derivation, and guide/geospatial approval remain open before production drape use.",
+          "status": "naip_pilot_tiles_acquisition_dates_and_source_drape_attached"
         },
         "guide_and_reference_media_annotations": {
           "artifacts": [
@@ -331,10 +332,11 @@
             "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
             "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/3dep_tiles",
             "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/dem_relief_2048.png",
-            "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/heightfield_candidate_2017.png"
+            "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/heightfield_candidate_2017.png",
+            "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/source_metadata_review.json"
           ],
-          "promotion_blocker": "Pilot DEM tiles are attached, but they still need mosaic/clip, CRS/vertical-datum review, void review, hydrologic conditioning, channel burning, and guide/geospatial approval before Landscape promotion.",
-          "status": "corridor_sample_pilot_dem_tiles_relief_and_heightfield_candidate_attached"
+          "promotion_blocker": "Pilot DEM tiles and official service/item metadata are attached, including 3DEP primary item dates and NAVD 88 records for the pilot envelope, but full-corridor mosaic/clip, CRS and vertical-datum review, void review, hydrologic conditioning, channel burning, and guide/geospatial approval remain open before Landscape promotion.",
+          "status": "pilot_dem_tiles_metadata_relief_and_heightfield_candidate_attached"
         },
         "water_and_vegetation_masks": {
           "artifacts": [

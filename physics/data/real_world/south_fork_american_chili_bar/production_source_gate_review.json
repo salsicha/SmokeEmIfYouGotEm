@@ -24,13 +24,14 @@
         "terrain/production_import_pilot/dem_relief_2048.png",
         "terrain/production_import_pilot/heightfield_candidate_2017.png",
         "production_import_pilot_pull_manifest.json",
-        "production_import_pilot_derivatives_manifest.json"
+        "production_import_pilot_derivatives_manifest.json",
+        "review/production_import_pilot/source_metadata_review.json"
       ],
       "next_decision": "Select conditioned production Landscape/Nanite terrain path after CRS, vertical datum, and channel-burning review.",
       "preview_evidence_status": "attached_review_gated",
       "promotion_blockers": [
         "full corridor mosaic and clip",
-        "source metadata and acquisition review",
+        "full-corridor source metadata and acquisition review beyond the pilot tile envelope",
         "void/artifact review",
         "hydrologic conditioning",
         "channel burning",
@@ -44,12 +45,13 @@
         "imagery/production_import_pilot/source_drape_4096.png",
         "imagery/production_import_pilot/water_mask_2048.png",
         "imagery/production_import_pilot/vegetation_mask_2048.png",
-        "imagery/production_import_pilot/source_masks_manifest.json"
+        "imagery/production_import_pilot/source_masks_manifest.json",
+        "review/production_import_pilot/source_metadata_review.json"
       ],
       "next_decision": "Promote only after source drape and masks are accepted as production derivatives or replaced by better imagery.",
       "preview_evidence_status": "attached_review_gated",
       "promotion_blockers": [
-        "tile acquisition year/date review",
+        "full-corridor tile acquisition year/date review beyond the pilot tile envelope",
         "orthomosaic or service-derivative metadata review",
         "water/vegetation mask QA against hydrography and visible banks",
         "seasonal exposed-bar and wet-edge review",

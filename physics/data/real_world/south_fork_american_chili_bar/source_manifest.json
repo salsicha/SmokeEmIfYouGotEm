@@ -90,7 +90,8 @@
       "production_source_gate_review.json",
       "production_import_pilot.json",
       "production_import_pilot_pull_manifest.json",
-      "production_import_pilot_derivatives_manifest.json"
+      "production_import_pilot_derivatives_manifest.json",
+      "review/production_import_pilot/source_metadata_review.json"
     ],
     "unreal": [
       "unreal/corridor_package_manifest.json"
