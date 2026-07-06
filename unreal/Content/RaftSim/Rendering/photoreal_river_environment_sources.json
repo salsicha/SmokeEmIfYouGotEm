@@ -422,23 +422,39 @@
           "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
           "provider": "RaftSim source-preview tool from NASA GIBS WMS and Copernicus DEM GLO-30 inputs",
           "status": "retained_preview_provenance_superseded_by_1024_active_drape",
-          "unreal_use": "retained 512px source-derived Pacuare drape; active Unreal preview now uses pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024"
+          "unreal_use": "retained 512px source-derived Pacuare drape; active Unreal preview now uses the production-import placeholder source_drape_4096"
         },
         {
           "artifact_id": "pacuare_nasa_gibs_demshade_source_drape_2025_04_02_1024",
           "category": "derived_preview_drape",
           "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png",
           "provider": "RaftSim source-preview tool from NASA GIBS WMS and Copernicus DEM GLO-30 inputs",
-          "status": "draped_into_unreal_preview_terrain_conforming_mosaic",
-          "unreal_use": "active 1024px source-derived terrain-conforming rainforest drape mosaic with DEM relief and cloud-gap preview fill for /Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
+          "status": "retained_preview_seed_superseded_by_production_import_placeholder_drape",
+          "unreal_use": "retained 1024px source-derived terrain-conforming rainforest drape seed; active Unreal preview now uses imagery/production_import_pilot/source_drape_4096.png"
         },
         {
           "artifact_id": "pacuare_nasa_gibs_demshade_source_masks_1024",
           "category": "derived_water_and_vegetation_masks",
           "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_water_mask_1024.png; physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_vegetation_mask_1024.png",
           "provider": "RaftSim source-preview tool from NASA GIBS/Copernicus source drape plus bounded rainfed-runnable preview channel prior",
-          "status": "sampled_by_unreal_preview_terrain_and_drape_coloring",
-          "unreal_use": "review-gated preview water/vegetation masks sampled into Pacuare terrain and source-drape color variation; not final segmentation or production masks"
+          "status": "retained_preview_masks_superseded_by_production_import_placeholder_masks",
+          "unreal_use": "retained preview water/vegetation masks; active preview masks now use the Pacuare production-import placeholder masks"
+        },
+        {
+          "artifact_id": "pacuare_production_import_pilot_source_drape_4096",
+          "category": "coarse_source_product_pilot_drape",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/source_drape_4096.png",
+          "provider": "RaftSim source-preview tool from NASA GIBS WMS and Copernicus DEM GLO-30 preview seeds",
+          "status": "active_unreal_preview_drape_review_gated_coarse_seed",
+          "unreal_use": "4096px Pacuare production-import placeholder drape sampled by /Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview; coarse/cloudy and not final orthophoto or photoreal material"
+        },
+        {
+          "artifact_id": "pacuare_production_import_pilot_source_masks_2048",
+          "category": "derived_water_and_vegetation_masks",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png; physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png",
+          "provider": "RaftSim source-preview tool from the Pacuare production-import placeholder drape plus bounded rainfed-runnable preview channel prior",
+          "status": "active_unreal_preview_masks_review_gated_coarse_seed",
+          "unreal_use": "larger review-gated Pacuare water/vegetation masks sampled into terrain/source-drape color and deterministic detail placement; not final segmentation, canopy, wet-rock, waterfall, or mist masks"
         },
         {
           "artifact_id": "copernicus_dem_glo30_pacuare_bounds_tiles",
@@ -453,8 +469,8 @@
           "category": "derived_heightfield_candidate",
           "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png",
           "provider": "RaftSim geospatial preview utility from Copernicus DEM GLO-30 inputs",
-          "status": "generated_review_gated_import_candidate",
-          "unreal_use": "1009px 16-bit grayscale Unreal Landscape import-test candidate; not yet clipped, reprojected, hydrologically conditioned, or approved for production terrain"
+          "status": "retained_import_candidate_superseded_by_production_import_placeholder_heightfield",
+          "unreal_use": "retained 1009px 16-bit grayscale Unreal Landscape import-test candidate; active preview geometry now samples terrain/production_import_pilot/heightfield_candidate_2017.png"
         },
         {
           "artifact_id": "pacuare_dem_relief_preview_512",
@@ -462,15 +478,31 @@
           "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_512.png",
           "provider": "RaftSim source-preview tool from Copernicus DEM GLO-30 inputs",
           "status": "retained_preview_provenance_superseded_by_1024_active_relief",
-          "unreal_use": "retained 512px preview terrain relief; active Unreal preview geometry now uses pacuare_dem_relief_preview_1024"
+          "unreal_use": "retained 512px preview terrain relief; active Unreal preview geometry now uses terrain/production_import_pilot/dem_relief_2048.png"
         },
         {
           "artifact_id": "pacuare_dem_relief_preview_1024",
           "category": "derived_terrain_relief",
           "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_1024.png",
           "provider": "RaftSim source-preview tool from Copernicus DEM GLO-30 inputs",
-          "status": "sampled_by_unreal_preview_geometry",
-          "unreal_use": "active 1024px preview-only terrain relief perturbation for Pacuare bank and gorge geometry; full Unreal heightfield import still pending"
+          "status": "retained_relief_preview_superseded_by_production_import_placeholder_relief",
+          "unreal_use": "retained 1024px preview-only terrain relief perturbation; active preview geometry now samples terrain/production_import_pilot/dem_relief_2048.png"
+        },
+        {
+          "artifact_id": "pacuare_production_import_pilot_dem_relief_2048",
+          "category": "coarse_source_product_terrain_relief",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/dem_relief_2048.png",
+          "provider": "RaftSim geospatial preview utility from Copernicus DEM GLO-30 public tiles",
+          "status": "active_unreal_preview_relief_review_gated_coarse_seed",
+          "unreal_use": "2048px Pacuare production-import placeholder relief sampled into generated preview terrain; not clipped, conditioned, or approved production gorge terrain"
+        },
+        {
+          "artifact_id": "pacuare_production_import_pilot_heightfield_candidate_2017",
+          "category": "coarse_source_product_heightfield_candidate",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/heightfield_candidate_2017.png",
+          "provider": "RaftSim geospatial preview utility from Copernicus DEM GLO-30 public tiles",
+          "status": "active_unreal_preview_heightfield_review_gated_coarse_seed",
+          "unreal_use": "2017px 16-bit grayscale Pacuare production-import placeholder heightfield sampled into generated preview gorge geometry; not a promoted Landscape import or conditioned production terrain"
         }
       ],
       "reference_media_sources": [
