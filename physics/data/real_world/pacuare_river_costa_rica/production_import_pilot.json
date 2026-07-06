@@ -110,6 +110,8 @@
         "imagery/production_import_pilot/landsat_product_access_gate_review.json",
         "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json",
         "imagery/production_import_pilot/sentinel_cog_access_probe.json",
+        "imagery/production_import_pilot/sentinel_tci_review_preview.json",
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tci_review_1024.png",
         "production_import_pilot_derivatives_manifest.json",
         "review/production_import_pilot/source_metadata_review.json"
       ]
@@ -134,6 +136,8 @@
         "imagery/production_import_pilot/landsat_product_access_gate_review.json",
         "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json",
         "imagery/production_import_pilot/sentinel_cog_access_probe.json",
+        "imagery/production_import_pilot/sentinel_tci_review_preview.json",
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tci_review_1024.png",
         "review/production_import_pilot/source_metadata_review.json"
       ]
     },
