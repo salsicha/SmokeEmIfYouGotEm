@@ -1114,6 +1114,18 @@
             "cloud_screening_review_gate",
             "production_mask_source_selection"
           ]
+        },
+        {
+          "artifact_id": "pacuare_landsat_product_access_gate_review",
+          "category": "landsat_product_access_gate_review",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/landsat_product_access_gate_review.json",
+          "promotion_blocker": "No Landsat browse image, metadata JSON, COG band, or QA mask is attached; anonymous asset URLs return EROS login HTML and require an approved access workflow before Unreal source-drape replacement.",
+          "status": "direct_landsatlook_asset_requests_return_eros_login_html_no_imagery_downloaded",
+          "use_in_unreal": [
+            "imagery_download_gate",
+            "source_drape_replacement_blocker",
+            "bad_artifact_prevention"
+          ]
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"

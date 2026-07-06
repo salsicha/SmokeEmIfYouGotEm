@@ -17,7 +17,8 @@
     "Pacuare River reference annotations and rights manifest are attached as link-only review scaffolds, but no item-level media rights, first-party capture, station geometry, or guide approval is recorded yet.",
     "Pacuare cloud-screened scene index and cloud/shadow review are attached for retained MODIS/GIBS candidates, but production imagery still needs higher-resolution Sentinel/Landsat/local orthophoto or first-party/permissioned aerial sources.",
     "Pacuare consolidated source metadata review is attached, but it only records local review-gated metadata and does not promote DEM, imagery, hydrography, hydrology, access, protected-area, or media sources to production use.",
-    "Pacuare high-resolution scene metadata review identifies official Landsat/Sentinel candidates, but production imagery still needs full-year paging, download approval, manual visual QA, CRS/band/scale review, and guide/geospatial signoff before replacing the MODIS/GIBS preview."
+    "Pacuare high-resolution scene metadata review identifies official Landsat/Sentinel candidates, but production imagery still needs full-year paging, download approval, manual visual QA, CRS/band/scale review, and guide/geospatial signoff before replacing the MODIS/GIBS preview.",
+    "Anonymous LandsatLook product asset URLs returned EROS login HTML for the best Pacuare Landsat candidate, so imagery downloads remain blocked until an approved access path returns expected JPEG/JSON/COG content."
   ],
   "pulled_artifacts": [
     {
@@ -765,6 +766,37 @@
         "high_resolution_imagery_source_selection",
         "future_cloud_screened_drape_download_planning",
         "production_mask_source_gate"
+      ]
+    },
+    {
+      "artifact_id": "pacuare_landsat_product_access_gate_review",
+      "category": "landsat_product_access_gate_review",
+      "caveats": [
+        "Records failed anonymous LandsatLook product asset access only; no browse JPEG, MTL JSON, COG band, or QA mask is attached.",
+        "HTTP 200 responses were text/html EROS login pages, so the attempted files must not be used as imagery, metadata, source drapes, or masks.",
+        "Production Landsat use still needs approved access, terms, attribution, storage/package policy, bounded download or windowed COG workflow, and manual QA."
+      ],
+      "path": "imagery/production_import_pilot/landsat_product_access_gate_review.json",
+      "provider": "USGS LandsatLook product asset URLs / EROS registration gate",
+      "related_artifacts": [
+        "imagery/production_import_pilot/high_resolution_scene_metadata_review.json"
+      ],
+      "status": "direct_landsatlook_asset_requests_return_eros_login_html_no_imagery_downloaded",
+      "summary": {
+        "attempted_asset_count": 2,
+        "bad_download_removed_from_workspace": true,
+        "expected_assets": [
+          "reduced_resolution_browse JPEG",
+          "MTL.json metadata"
+        ],
+        "imagery_products_downloaded": 0,
+        "response_class": "eros_registration_login_html",
+        "scene_id": "LC80140532025345LGN00"
+      },
+      "use": [
+        "download_access_gate",
+        "production_imagery_workflow_planning",
+        "anti_bad_artifact_check"
       ]
     }
   ],

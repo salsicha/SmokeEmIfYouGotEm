@@ -85,7 +85,8 @@
       "imagery/nasa_gibs_pacuare_truecolor_2025-03-08_512.png",
       "imagery/production_import_pilot/cloud_screened_scene_index.json",
       "imagery/production_import_pilot/cloud_shadow_review.json",
-      "imagery/production_import_pilot/high_resolution_scene_metadata_review.json"
+      "imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
+      "imagery/production_import_pilot/landsat_product_access_gate_review.json"
     ],
     "protected_area_review": [
       "review/sinac_protected_area_source_rights.json",
