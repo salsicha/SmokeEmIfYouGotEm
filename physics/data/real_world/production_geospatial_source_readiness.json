@@ -170,15 +170,17 @@
       "production_readiness": "preview_only_not_lifelike",
       "attached_source_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_source_pull_manifest.json",
       "production_import_pilot": "physics/data/real_world/south_fork_american_chili_bar/production_import_pilot.json",
+      "production_import_pilot_pull_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_import_pilot_pull_manifest.json",
       "attached_sources_by_class": {
         "terrain_dem_or_lidar": {
-          "status": "corridor_sample_and_heightfield_candidate_attached",
+          "status": "corridor_sample_heightfield_candidate_and_pilot_dem_tiles_attached",
           "artifacts": [
             "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
             "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png",
-            "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png"
+            "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
+            "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/3dep_tiles"
           ],
-          "promotion_blocker": "Still a sample/candidate, not a full corridor tiled, reprojected, hydrologically conditioned, channel-burned Landscape source."
+          "promotion_blocker": "Pilot DEM tiles are attached, but they still need mosaic/clip, CRS/vertical-datum review, void review, hydrologic conditioning, channel burning, and guide/geospatial approval before Landscape promotion."
         },
         "hydrography_and_centerline": {
           "status": "tnm_nhd_metadata_attached_only",
@@ -188,11 +190,12 @@
           "promotion_blocker": "Selected NHD/3DHP product still needs download, clipping, CRS review, imagery alignment, and guide rapid/eddy annotations."
         },
         "aerial_or_satellite_imagery": {
-          "status": "naip_corridor_sample_attached",
+          "status": "naip_corridor_sample_and_pilot_tiles_attached",
           "artifacts": [
-            "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_sample_1024.png"
+            "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_sample_1024.png",
+            "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/naip_tiles"
           ],
-          "promotion_blocker": "Sample export must be replaced by reviewed orthomosaic/corridor tiles with acquisition metadata, CRS, terms, and masks."
+          "promotion_blocker": "Pilot NAIP tiles are attached, but they still need provider metadata/acquisition-date review, mosaic/clip, CRS/terms review, mask derivation, and guide/geospatial approval before production drape use."
         },
         "water_and_vegetation_masks": {
           "status": "preview_masks_attached",
