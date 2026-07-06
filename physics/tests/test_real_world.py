@@ -25,6 +25,7 @@ from raftsim.real_world import (
     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
     PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
+    PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
     PACUARE_PRODUCTION_IMPORT_PILOT_FILE,
     PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE,
     PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION,
@@ -549,6 +550,8 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
     assert pilot["corridor_scope"]["status"] == "draft_lower_pacuare_planning_bounds_not_surveyed_route"
     assert "copernicus_dem_glo30_public_tiles" in seeds
     assert "nasa_gibs_modis_demshade_preview_drape" in seeds
+    assert "pacuare_official_source_access_plan" in seeds
+    assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in seeds["pacuare_official_source_access_plan"]["artifacts"]
     assert {
         "terrain_dem_or_lidar",
         "hydrography_and_centerline",
@@ -568,6 +571,8 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
         classes["hydrography_and_centerline"]["status"]
         == "preview_centerline_scaffold_attached_official_hydrography_pending"
     )
+    assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE in classes["hydrography_and_centerline"]["target_outputs"]
@@ -576,6 +581,28 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
         pilot["unreal_import_targets"]["future_production_map"]
         == "/Game/RaftSim/Maps/Production/L_PacuareRainforest_LowerPacuare"
     )
+
+
+def test_pacuare_official_source_access_plan_records_catalogs_without_downloads():
+    plan_path = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica" / PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE
+    plan = json.loads(plan_path.read_text())
+    catalogs = {catalog["source_id"]: catalog for catalog in plan["reviewed_official_service_catalogs"]}
+    layer_queue = {entry["candidate_id"]: entry for entry in plan["candidate_layer_review_queue"]}
+
+    assert plan["schema"] == "raftsim.pacuare.official_source_access_plan.v1"
+    assert plan["status"] == "official_service_catalogs_recorded_no_layer_download"
+    assert plan["policy"]["no_layer_downloaded_or_promoted"] is True
+    assert {"snit_ogc_services_catalog", "snit_recurso_hidrico_viewer", "direccion_de_agua_sinigirh_geoservices"}.issubset(
+        catalogs
+    )
+    assert "DA_AFOROS" in catalogs["direccion_de_agua_sinigirh_geoservices"]["candidate_layers"]
+    assert "DA_UNIDADES HIDROLOGICAS" in catalogs["direccion_de_agua_sinigirh_geoservices"]["candidate_layers"]
+    assert "ICE_CUENCAS HIDROGRAFICAS" in catalogs["direccion_de_agua_sinigirh_geoservices"]["candidate_layers"]
+    assert layer_queue["da_aforos"]["target_outputs"] == [
+        "hydrology/production_import_pilot/discharge_or_stage_station_review.json"
+    ]
+    assert any("terms" in item for item in plan["per_layer_required_metadata"])
+    assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in plan["downstream_manifest_targets"]
 
 
 def test_pacuare_preview_centerline_scaffold_is_not_official_hydrography():
@@ -705,6 +732,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert COLORADO_NHD_ALIGNMENT_DIAGNOSTIC_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_TOTAL_RELEASE_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE in rivers["pacuare"]["attached_preview_inputs"]

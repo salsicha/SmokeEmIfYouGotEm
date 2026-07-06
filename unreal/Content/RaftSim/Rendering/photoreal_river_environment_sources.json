@@ -655,6 +655,11 @@
           "status": "official_source_leads_attached"
         },
         {
+          "source_id": "direccion_de_agua_sinigirh_geoservices",
+          "url": "https://mapas.da.go.cr/geoservicios.php",
+          "status": "official_service_catalog_recorded_layer_download_pending"
+        },
+        {
           "source_id": "copernicus_dem",
           "url": "https://registry.opendata.aws/copernicus-dem/",
           "status": "tile_samples_attached_for_pacuare_terrain_source"

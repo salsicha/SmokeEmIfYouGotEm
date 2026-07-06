@@ -114,6 +114,17 @@
       "url": "https://www.snitcr.go.cr/"
     },
     {
+      "production_use": "Official Costa Rica SINIGIRH geoservice layer discovery for aforos, hydrologic units, basin context, water works, and water-use constraints",
+      "promotion_gate": "Record GetCapabilities metadata, layer names/titles, CRS, attributes, terms, attribution, station variables, units, and Pacuare basin relation before importing any features.",
+      "provider": "MINAE Direccion de Agua / SINIGIRH",
+      "source_class": "seasonal_flow_or_release_history",
+      "source_id": "direccion_de_agua_sinigirh_geoservices",
+      "target_rivers": [
+        "pacuare"
+      ],
+      "url": "https://mapas.da.go.cr/geoservicios.php"
+    },
+    {
       "production_use": "Rainfall, weather, storm timing, and flash-response sanity checks",
       "promotion_gate": "Record station ids, variables, units, time zone, access terms, and basin relation before replacing relative Pacuare flow bands.",
       "provider": "Instituto Meteorologico Nacional de Costa Rica",
@@ -393,6 +404,7 @@
           "artifacts": [
             "physics/data/real_world/pacuare_river_costa_rica/terrain/dem_source_research.json",
             "physics/data/real_world/pacuare_river_costa_rica/hydrology/costa_rica_gauge_search.json",
+            "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/official_source_access_plan.json",
             "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
             "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
             "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json"
@@ -403,7 +415,8 @@
         "protected_area_and_access_context": {
           "artifacts": [
             "physics/data/real_world/pacuare_river_costa_rica/review/sinac_protected_area_source_rights.json",
-            "physics/data/real_world/pacuare_river_costa_rica/review/access_and_conservation_constraints.json"
+            "physics/data/real_world/pacuare_river_costa_rica/review/access_and_conservation_constraints.json",
+            "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/official_source_access_plan.json"
           ],
           "promotion_blocker": "Exact protected-area/access layers and local publication-risk review are required before detailed Pacuare route packages.",
           "status": "review_manifests_attached_publication_not_cleared"
@@ -412,7 +425,8 @@
           "artifacts": [
             "physics/data/real_world/pacuare_river_costa_rica/flow_presets.json",
             "physics/data/real_world/pacuare_river_costa_rica/hydrology/costa_rica_gauge_search.json",
-            "physics/data/real_world/pacuare_river_costa_rica/hydrology/rainfall_context.json"
+            "physics/data/real_world/pacuare_river_costa_rica/hydrology/rainfall_context.json",
+            "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/official_source_access_plan.json"
           ],
           "promotion_blocker": "Numeric flow tuning remains blocked until Costa Rica gauge/rainfall/station metadata and guide review are attached.",
           "status": "relative_flow_bands_and_source_leads_attached"

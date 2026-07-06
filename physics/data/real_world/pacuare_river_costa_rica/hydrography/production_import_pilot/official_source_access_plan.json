@@ -1,0 +1,167 @@
+{
+  "schema": "raftsim.pacuare.official_source_access_plan.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "official_service_catalogs_recorded_no_layer_download",
+  "purpose": "Record official Costa Rica source catalogs and exact next review steps before importing Pacuare hydrography, hydrology, protected-area, access, or rain-fed flow evidence.",
+  "policy": {
+    "official_sources_first": true,
+    "no_layer_downloaded_or_promoted": true,
+    "preview_centerline_not_authoritative": true,
+    "hydrosheds_osm_fallback_seed_only": true,
+    "promotion_requires_layer_metadata_terms_crs_and_guide_review": true
+  },
+  "reviewed_official_service_catalogs": [
+    {
+      "source_id": "snit_ogc_services_catalog",
+      "provider": "Sistema Nacional de Informacion Territorial de Costa Rica / IDECORI",
+      "url": "https://www.snitcr.go.cr/ico_servicios_ogc",
+      "review_status": "official_catalog_recorded_getcapabilities_review_pending",
+      "candidate_uses": [
+        "official hydrography layer discovery",
+        "working CRS selection",
+        "protected-area/access layer discovery",
+        "imagery or orthophoto layer discovery"
+      ],
+      "observed_catalog_topics": [
+        "Recurso Hidrico themed viewer",
+        "OGC service access",
+        "institutional Costa Rica data nodes"
+      ],
+      "review_gate": "Record exact service URL, layer title/name, CRS, responsible institution, terms, attribution, publication sensitivity, and download/redistribution status before importing any features."
+    },
+    {
+      "source_id": "snit_recurso_hidrico_viewer",
+      "provider": "Sistema Nacional de Informacion Territorial de Costa Rica / IDECORI",
+      "url": "https://www.snitcr.go.cr/Visor/visor?p=cHJveWVjdG86OnJlY3Vyc29oaWRyaWNv",
+      "review_status": "themed_viewer_recorded_layer_inventory_pending",
+      "candidate_uses": [
+        "hydric resource context",
+        "river-network and basin cross-checks",
+        "candidate station or water-resource layer discovery"
+      ],
+      "review_gate": "Use as a manual review entry point only until the backing services, layer names, attributes, CRS, and terms are captured from official metadata."
+    },
+    {
+      "source_id": "direccion_de_agua_sinigirh_geoservices",
+      "provider": "MINAE Direccion de Agua / SINIGIRH",
+      "url": "https://mapas.da.go.cr/geoservicios.php",
+      "capabilities_url": "http://mapas.da.go.cr/geopc.php?request=GetCapabilities&version=1.1.1",
+      "review_status": "official_wms_catalog_recorded_getcapabilities_layer_metadata_pending",
+      "candidate_layers": [
+        "DA_AFOROS",
+        "DA_UNIDADES HIDROLOGICAS",
+        "ICE_CUENCAS HIDROGRAFICAS",
+        "DA_OBRAS_EN_CAUCE",
+        "DA_CONCESIONES",
+        "DA_VERTIDOS"
+      ],
+      "candidate_uses": [
+        "gauge or aforo station discovery",
+        "hydrologic unit and catchment context",
+        "river works and water-use context",
+        "Pacuare basin relation checks"
+      ],
+      "review_gate": "Use the WMS catalog for layer discovery only until GetCapabilities metadata, attributes, station coordinates, units, terms, and redistribution limits are reviewed."
+    },
+    {
+      "source_id": "direccion_de_agua_portal",
+      "provider": "MINAE Direccion de Agua",
+      "url": "https://da.go.cr/",
+      "review_status": "official_portal_recorded_data_access_review_pending",
+      "candidate_uses": [
+        "water-resource policy and dataset ownership context",
+        "SINIGIRH layer and metadata discovery",
+        "hydrology station/source contact path"
+      ],
+      "review_gate": "Record exact data owner, service terms, station metadata, and allowed use before using any derived flow or station data."
+    }
+  ],
+  "candidate_layer_review_queue": [
+    {
+      "candidate_id": "da_aforos",
+      "source_id": "direccion_de_agua_sinigirh_geoservices",
+      "layer_or_service": "DA_AFOROS",
+      "why_it_matters": "Likely official aforo/gauging layer candidate for discharge/stage station discovery near the Pacuare basin.",
+      "target_outputs": [
+        "hydrology/production_import_pilot/discharge_or_stage_station_review.json"
+      ],
+      "promotion_gate": "Capture station IDs, names, coordinates, variables, units, record coverage, time zone, quality flags, basin relation, terms, and guide interpretation before numeric Pacuare flow bands are allowed."
+    },
+    {
+      "candidate_id": "da_unidades_hidrologicas",
+      "source_id": "direccion_de_agua_sinigirh_geoservices",
+      "layer_or_service": "DA_UNIDADES HIDROLOGICAS",
+      "why_it_matters": "Official hydrologic-unit layer candidate for checking whether station and rainfall sources are in the correct Pacuare basin relation.",
+      "target_outputs": [
+        "hydrology/production_import_pilot/basin_relation_review.geojson",
+        "hydrology/production_import_pilot/rainfall_station_review.json"
+      ],
+      "promotion_gate": "Review CRS, boundaries, attribute definitions, publication terms, and relation to the lower Pacuare corridor before using it for station selection."
+    },
+    {
+      "candidate_id": "ice_cuencas_hidrograficas",
+      "source_id": "direccion_de_agua_sinigirh_geoservices",
+      "layer_or_service": "ICE_CUENCAS HIDROGRAFICAS",
+      "why_it_matters": "ICE basin context can cross-check drainage and rain-fed response assumptions for Pacuare flow tuning.",
+      "target_outputs": [
+        "hydrology/production_import_pilot/flash_response_review.json"
+      ],
+      "promotion_gate": "Use only after layer provenance, attributes, CRS, terms, and relation to IMN/ICE hydromet data are recorded."
+    },
+    {
+      "candidate_id": "snit_hydric_resource_layers",
+      "source_id": "snit_recurso_hidrico_viewer",
+      "layer_or_service": "SNIT Recurso Hidrico viewer backing layers",
+      "why_it_matters": "Primary official Costa Rica path for replacing the Unreal-preview Pacuare centerline scaffold with real hydrography and access/protected-area context.",
+      "target_outputs": [
+        "hydrography/production_import_pilot/centerline.geojson",
+        "hydrography/production_import_pilot/banks.geojson",
+        "hydrography/production_import_pilot/rapid_and_access_stationing.geojson"
+      ],
+      "promotion_gate": "Do not import until exact backing service/layer metadata, CRS, terms, attribute semantics, visible-imagery alignment, and guide/outfitter stationing review are complete."
+    },
+    {
+      "candidate_id": "snit_protected_area_access_layers",
+      "source_id": "snit_ogc_services_catalog",
+      "layer_or_service": "SNIT protected-area/access candidate services",
+      "why_it_matters": "Detailed Pacuare route packages and screenshots need protected-area and access publication constraints before public-facing review.",
+      "target_outputs": [
+        "review/production_import_pilot/protected_area_publication_sensitivity.json",
+        "review/production_import_pilot/access_and_conservation_policy.json"
+      ],
+      "promotion_gate": "Record exact layers, responsible institution, terms, attribution, sensitive-location policy, and allowed screenshot/publication detail before detailed route packages are committed."
+    }
+  ],
+  "per_layer_required_metadata": [
+    "official_provider",
+    "service_url",
+    "layer_name",
+    "layer_title",
+    "responsible_institution",
+    "crs_and_axis_order",
+    "attribute_schema",
+    "geometry_type",
+    "coverage_or_publication_date",
+    "terms_and_attribution",
+    "download_or_redistribution_permission",
+    "sensitive_location_or_publication_limit",
+    "Pacuare corridor intersection summary",
+    "guide_or_local_reviewer_status"
+  ],
+  "downstream_manifest_targets": [
+    "hydrography/production_import_pilot/official_source_access_plan.json",
+    "hydrography/production_import_pilot/centerline.geojson",
+    "hydrography/production_import_pilot/banks.geojson",
+    "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
+    "hydrology/production_import_pilot/rainfall_station_review.json",
+    "review/production_import_pilot/protected_area_publication_sensitivity.json"
+  ],
+  "next_actions": [
+    "Fetch and archive GetCapabilities metadata for the SNIT and Direccion de Agua services without importing features.",
+    "Identify whether DA_AFOROS or another official layer contains Pacuare-relevant discharge or stage stations.",
+    "Intersect hydrologic-unit candidates with the draft Pacuare bounds before selecting rainfall/stage stations.",
+    "Keep the Unreal-preview centerline as annotation scaffolding until official hydrography and guide stationing replace or validate it."
+  ]
+}
