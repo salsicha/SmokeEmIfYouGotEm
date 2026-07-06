@@ -124,15 +124,21 @@
     },
     {
       "class_id": "protected_area_and_access_context",
-      "promotion_gate": "Review NPS route context, camps/access sensitivity, permit context, evacuation/publication limits, and screenshot safety before committing detailed route packages.",
+      "promotion_gate": "Use the attached NPS source-lead review only as publication/access context; exact launch, take-out, camp/beach, sensitive-resource, permit-text, and screenshot-safety review must pass before committing detailed route packages.",
       "source_ids": [
-        "nps_grand_canyon",
+        "nps_grand_canyon_river_trips_permits",
+        "nps_grand_canyon_noncommercial_river_trip_links",
+        "nps_grand_canyon_lees_ferry_diamond_creek_overview",
+        "nps_grand_canyon_noncommercial_river_trip_regulations_pdf",
         "guide_review"
       ],
-      "status": "planned_review_required",
+      "status": "official_nps_access_publication_leads_attached_review_required",
       "target_outputs": [
-        "review/production_import_pilot/route_access_publication_sensitivity.json",
-        "review/production_import_pilot/camps_and_sensitive_locations_policy.json"
+        "review/production_import_pilot/access_publication_sensitivity_review.json",
+        "review/production_import_pilot/access_points.geojson",
+        "review/production_import_pilot/camps_and_sensitive_locations_policy.json",
+        "review/production_import_pilot/camps_and_beaches_review.geojson",
+        "review/production_import_pilot/no_publish_sensitive_polygons.geojson"
       ]
     },
     {

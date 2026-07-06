@@ -476,6 +476,16 @@
           "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
           "status": "mainstem_candidate_attached_review_gated_not_river_mile_geometry",
           "url": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json"
+        },
+        {
+          "source_id": "nps_grand_canyon_river_trips_permits",
+          "status": "official_access_publication_source_lead_attached_review_gated",
+          "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm"
+        },
+        {
+          "source_id": "nps_grand_canyon_noncommercial_river_trip_links",
+          "status": "official_access_publication_document_index_attached_review_gated",
+          "url": "https://www.nps.gov/grca/planyourvisit/noncommercial-riv-docs.htm"
         }
       ],
       "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
@@ -640,6 +650,14 @@
           "provider": "RaftSim review artifact from USBR Glen Canyon release history and Colorado flow presets",
           "status": "review_gated_not_release_preset_promotion",
           "unreal_use": "Release-band discussion aid for future low/moderate/high water, sandbar, wet-bank, boil, wave-train, and swimmer-drift variants; not final daily/subdaily hydrology or gameplay tuning authority."
+        },
+        {
+          "artifact_id": "colorado_access_publication_sensitivity_review",
+          "category": "protected_area_and_access_context_review",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/access_publication_sensitivity_review.json",
+          "provider": "RaftSim review artifact from official NPS Grand Canyon source leads",
+          "status": "source_leads_attached_review_gated_no_geometry",
+          "unreal_use": "Controls Grand Canyon access, camp/beach, sensitive-location, river-mile publication, screenshot, and oarsman review before detailed route maps or captures are promoted; no NPS media, maps, PDF text, or sensitive geometry is imported."
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"

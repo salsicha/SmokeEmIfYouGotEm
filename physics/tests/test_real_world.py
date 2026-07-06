@@ -7,6 +7,7 @@ import numpy as np
 from raftsim.real_world import (
     CANDIDATE_RIVER_INVENTORY_FILE,
     CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION,
+    COLORADO_ACCESS_PUBLICATION_REVIEW_FILE,
     COLORADO_NHD_ALIGNMENT_DIAGNOSTIC_FILE,
     COLORADO_NHD_CROSS_SECTION_SEED_FILE,
     COLORADO_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
@@ -61,6 +62,7 @@ from raftsim.real_world import (
     SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE,
     adaptive_solver_parameters,
     build_candidate_river_inventory_package,
+    build_colorado_access_publication_review,
     build_colorado_production_import_pilot,
     build_colorado_release_band_review,
     build_course_elevation_extraction,
@@ -509,6 +511,12 @@ def test_colorado_production_import_pilot_exposes_lees_ferry_tile_plan_and_revie
     assert COLORADO_USBR_TOTAL_RELEASE_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert COLORADO_RELEASE_BAND_REVIEW_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
+    assert classes["protected_area_and_access_context"]["status"] == (
+        "official_nps_access_publication_leads_attached_review_required"
+    )
+    assert "nps_grand_canyon_river_trips_permits" in classes["protected_area_and_access_context"]["source_ids"]
+    assert "nps_grand_canyon_noncommercial_river_trip_links" in classes["protected_area_and_access_context"]["source_ids"]
+    assert COLORADO_ACCESS_PUBLICATION_REVIEW_FILE in classes["protected_area_and_access_context"]["target_outputs"]
     assert classes["water_and_vegetation_masks"]["status"] == "nhd_water_prior_attached_release_sandbar_masks_pending"
     assert COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE in classes["water_and_vegetation_masks"]["target_outputs"]
     assert COLORADO_NHD_WATER_PRIOR_FILE in classes["water_and_vegetation_masks"]["target_outputs"]
@@ -610,6 +618,53 @@ def test_colorado_release_band_review_artifact_is_review_gated():
         == 278
     )
     assert "final release-band promotion" in review["forbidden_use"]
+
+
+def test_colorado_access_publication_review_artifact_tracks_nps_source_leads():
+    colorado_dir = REAL_WORLD_DATA_DIR / "colorado_river_grand_canyon_rowing"
+    source_manifest = json.loads((colorado_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((colorado_dir / "production_source_pull_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+    review = json.loads((colorado_dir / COLORADO_ACCESS_PUBLICATION_REVIEW_FILE).read_text())
+    builder_review = build_colorado_access_publication_review()
+
+    source_ids = {source["source_id"] for source in review["sources_checked"]}
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+    colorado_sources = next(river for river in photoreal_sources["rivers"] if river["river_id"] == "colorado_river")
+
+    assert review == builder_review
+    assert COLORADO_ACCESS_PUBLICATION_REVIEW_FILE in source_manifest["artifacts"]["access_and_protected_context"]
+    assert any(
+        artifact["artifact_id"] == "colorado_access_publication_sensitivity_review"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert review["schema"] == "raftsim.colorado_access_publication_sensitivity_review.v1"
+    assert review["status"] == "official_nps_river_access_publication_leads_attached_review_gated"
+    assert {
+        "nps_grand_canyon_river_trips_permits",
+        "nps_grand_canyon_noncommercial_river_trip_links",
+        "nps_grand_canyon_lees_ferry_diamond_creek_overview",
+        "nps_grand_canyon_noncommercial_river_trip_regulations_pdf",
+    }.issubset(source_ids)
+    assert review["sources_checked"][0]["page_updated"] == "2026-06-03"
+    assert review["sources_checked"][1]["page_updated"] == "2026-05-08"
+    assert len(review["station_review_zones"]) == 3
+    assert "permit or legal advice" in review["forbidden_use"]
+    assert "review/production_import_pilot/camps_and_beaches_review.geojson" in review["required_editor_annotations"]
+    assert (
+        f"physics/data/real_world/colorado_river_grand_canyon_rowing/{COLORADO_ACCESS_PUBLICATION_REVIEW_FILE}"
+        in rivers["colorado_river"]["attached_sources_by_class"]["protected_area_and_access_context"]["artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "colorado_access_publication_sensitivity_review"
+        for artifact in colorado_sources["source_sample_artifacts"]
+    )
 
 
 def test_colorado_nhd_hu8_lees_ferry_extract_records_stitched_source_overlay():
@@ -1198,7 +1253,12 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
         "protected_area_and_access_context",
         "guide_and_reference_media_annotations",
     }.issubset(south_fork_p0)
-    assert {"hydrography_and_centerline", "seasonal_flow_or_release_history", "guide_and_reference_media_annotations"}.issubset(colorado_p0)
+    assert {
+        "hydrography_and_centerline",
+        "seasonal_flow_or_release_history",
+        "protected_area_and_access_context",
+        "guide_and_reference_media_annotations",
+    }.issubset(colorado_p0)
     assert {
         "hydrography_and_centerline",
         "aerial_or_satellite_imagery",
@@ -1273,6 +1333,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert COLORADO_USBR_TOTAL_RELEASE_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_RELEASE_BAND_REVIEW_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_ACCESS_PUBLICATION_REVIEW_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE in rivers["pacuare"]["attached_preview_inputs"]

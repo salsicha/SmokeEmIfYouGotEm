@@ -110,6 +110,7 @@ COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE = "hydrography/production_import_p
 COLORADO_USBR_TOTAL_RELEASE_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json"
 COLORADO_USBR_RELEASE_CONTEXT_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json"
 COLORADO_RELEASE_BAND_REVIEW_FILE = "hydrology/production_import_pilot/release_band_review.json"
+COLORADO_ACCESS_PUBLICATION_REVIEW_FILE = "review/production_import_pilot/access_publication_sensitivity_review.json"
 PACUARE_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE = (
     "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json"
@@ -1502,15 +1503,25 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
             },
             {
                 "class_id": "protected_area_and_access_context",
-                "status": "planned_review_required",
-                "source_ids": ["nps_grand_canyon", "guide_review"],
+                "status": "official_nps_access_publication_leads_attached_review_required",
+                "source_ids": [
+                    "nps_grand_canyon_river_trips_permits",
+                    "nps_grand_canyon_noncommercial_river_trip_links",
+                    "nps_grand_canyon_lees_ferry_diamond_creek_overview",
+                    "nps_grand_canyon_noncommercial_river_trip_regulations_pdf",
+                    "guide_review",
+                ],
                 "target_outputs": [
-                    "review/production_import_pilot/route_access_publication_sensitivity.json",
+                    COLORADO_ACCESS_PUBLICATION_REVIEW_FILE,
+                    "review/production_import_pilot/access_points.geojson",
                     "review/production_import_pilot/camps_and_sensitive_locations_policy.json",
+                    "review/production_import_pilot/camps_and_beaches_review.geojson",
+                    "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
                 ],
                 "promotion_gate": (
-                    "Review NPS route context, camps/access sensitivity, permit context, evacuation/publication limits, "
-                    "and screenshot safety before committing detailed route packages."
+                    "Use the attached NPS source-lead review only as publication/access context; exact launch, take-out, "
+                    "camp/beach, sensitive-resource, permit-text, and screenshot-safety review must pass before committing "
+                    "detailed route packages."
                 ),
             },
             {
@@ -1666,6 +1677,164 @@ def build_colorado_release_band_review(
             "claiming accepted river-mile hydrology",
             "production lifelike water approval",
             "hiding water-simulation conservation failures with visuals or forcing",
+        ],
+    }
+
+
+def build_colorado_access_publication_review() -> dict[str, object]:
+    """Build the review-gated Colorado/Grand Canyon access and publication source artifact."""
+
+    return {
+        "schema": "raftsim.colorado_access_publication_sensitivity_review.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "status": "official_nps_river_access_publication_leads_attached_review_gated",
+        "scope": (
+            "Grand Canyon route access, launch/take-out context, noncommercial trip regulations, camps/beaches, "
+            "river-mile publication sensitivity, media/source-use caveats, and oarsman review planning for the "
+            "Colorado River rowing production environment pilot."
+        ),
+        "sources_checked": [
+            {
+                "source_id": "nps_grand_canyon_river_trips_permits",
+                "provider": "National Park Service Grand Canyon",
+                "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm",
+                "retrieved_on": "2026-07-06",
+                "page_updated": "2026-06-03",
+                "http_status": 200,
+                "review_status": "official_page_reviewed",
+                "evidence": [
+                    "NPS River Trips / Permits page covers Colorado River trip planning through Grand Canyon.",
+                    "Page links commercial and noncommercial trip context, Lees Ferry to Diamond Creek overview, and river trip regulations.",
+                    "Use as official route/access/publication context only; do not import page media, maps, or geometry as production assets.",
+                ],
+                "artifact_use": "official Grand Canyon river-trip source lead for route access and publication review",
+                "blocked_from": [
+                    "permit or legal advice",
+                    "final put-in or take-out geometry",
+                    "shipping NPS page media, maps, or screenshots as art assets",
+                    "claiming camps, beaches, or sensitive locations are publication-cleared",
+                ],
+            },
+            {
+                "source_id": "nps_grand_canyon_noncommercial_river_trip_links",
+                "provider": "National Park Service Grand Canyon",
+                "url": "https://www.nps.gov/grca/planyourvisit/noncommercial-riv-docs.htm",
+                "retrieved_on": "2026-07-06",
+                "page_updated": "2026-05-08",
+                "http_status": 200,
+                "review_status": "official_page_reviewed",
+                "evidence": [
+                    "Page lists Lees Ferry as a starting location and Diamond Creek/Pearce Ferry as take-out locations for noncommercial support review.",
+                    "Page links noncommercial river trip regulations and related official trip documents.",
+                    "Use as a source-lead index only until the exact documents, dates, terms, and human review are recorded.",
+                ],
+                "artifact_use": "launch/take-out document index and regulation-source lead",
+                "blocked_from": [
+                    "current permit availability claims",
+                    "operational instructions",
+                    "exact trip logistics or fees in gameplay text",
+                ],
+            },
+            {
+                "source_id": "nps_grand_canyon_lees_ferry_diamond_creek_overview",
+                "provider": "National Park Service Grand Canyon",
+                "url": "https://www.nps.gov/grca/planyourvisit/overview-lees-ferry-diamond-ck.htm",
+                "retrieved_on": "2026-07-06",
+                "page_updated": "2025-06-06",
+                "http_status": 200,
+                "review_status": "official_page_reviewed",
+                "evidence": [
+                    "Overview page provides Lees Ferry to Diamond Creek route, river-mile, camping/beach, and take-out context.",
+                    "Use for station-aware review planning, not as final river-mile geometry or a camps/beaches publication clearance.",
+                ],
+                "artifact_use": "river-mile, camp/beach, and take-out context lead for manual editor annotations",
+                "blocked_from": [
+                    "final river-mile stationing",
+                    "publishing detailed camp or beach locations without sensitivity review",
+                    "using page photos or maps as texture or art inputs",
+                ],
+            },
+            {
+                "source_id": "nps_grand_canyon_noncommercial_river_trip_regulations_pdf",
+                "provider": "National Park Service Grand Canyon",
+                "url": "https://www.nps.gov/grca/planyourvisit/upload/Noncommercial_River_Trip_Regulations.pdf",
+                "retrieved_on": "2026-07-06",
+                "document_revision": "2024-12-20",
+                "http_status": "linked_from_official_page_not_imported",
+                "review_status": "official_pdf_lead_attached_manual_review_required",
+                "evidence": [
+                    "Linked by NPS as the revised noncommercial river trip regulations PDF.",
+                    "The PDF is not vendored, parsed, or treated as a game instruction source by this artifact.",
+                ],
+                "artifact_use": "manual policy and publication-sensitivity review lead",
+                "blocked_from": [
+                    "quoting or reproducing regulation text",
+                    "in-game legal guidance",
+                    "route package promotion without human review",
+                ],
+            },
+        ],
+        "station_review_zones": [
+            {
+                "zone_id": "lees_ferry_launch_review_zone",
+                "river_mile_range": [0.0, 1.0],
+                "review_status": "official_nps_launch_context_attached_geometry_pending",
+                "needs": [
+                    "exact launch, rigging, parking, and staging geometry from approved source layers",
+                    "river-mile zero and local working-CRS confirmation",
+                    "permit/trip-document date review before any game-facing wording",
+                    "oarsman validation of launch sightlines and traffic flow",
+                ],
+            },
+            {
+                "zone_id": "grand_canyon_camps_beaches_sensitive_context_review_zone",
+                "river_mile_range": [1.0, 224.0],
+                "review_status": "route_context_leads_attached_publication_sensitivity_pending",
+                "needs": [
+                    "camp/beach/sandbar publication-sensitivity review",
+                    "sensitive-resource and cultural-resource screening before detailed screenshots",
+                    "river-mile stationing and release-dependent wet-bank/sandbar review",
+                    "guide/oarsman notes for scouting, rescue, and long swimmer drift",
+                ],
+            },
+            {
+                "zone_id": "diamond_creek_takeout_review_zone",
+                "river_mile_range": [224.0, 226.0],
+                "review_status": "official_nps_takeout_context_attached_geometry_pending",
+                "needs": [
+                    "exact take-out and road/access geometry from approved sources",
+                    "current access, fee, and operating-constraint review",
+                    "publication sensitivity and screenshot framing review",
+                    "oarsman validation before production route package promotion",
+                ],
+            },
+        ],
+        "required_editor_annotations": [
+            "review/production_import_pilot/access_points.geojson",
+            "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+            "review/production_import_pilot/camps_and_beaches_review.geojson",
+            "review/production_import_pilot/oarsman_route_publication_notes.json",
+        ],
+        "allowed_use": [
+            "source-lead triage",
+            "station-aware route annotation planning",
+            "publication-sensitivity checklist gating",
+            "preventing detailed Grand Canyon map or screenshot publication before review",
+        ],
+        "forbidden_use": [
+            "permit or legal advice",
+            "final put-in or take-out geometry",
+            "current operation, fee, or access claims without day-of source review",
+            "publishing camps, beaches, sensitive resources, or detailed access geometry without review",
+            "using NPS media, PDFs, maps, or screenshots as texture or art assets",
+        ],
+        "promotion_blockers": [
+            "Exact launch, take-out, staging, road, river-mile, camp, beach, and sensitive-location geometries are not attached.",
+            "NPS document dates and operational constraints must be manually reviewed before any game-facing route language.",
+            "Cultural-resource, camp/beach, and sensitive-location publication rules need human review before detailed screenshots.",
+            "Guide/oarsman review is required before access, scouting, rescue, or rowing-route gameplay uses these zones.",
         ],
     }
 
@@ -2332,6 +2501,22 @@ def build_production_environment_gap_register() -> dict[str, object]:
             "why_it_matters": "Preferred official-media lead for Colorado canyon wall, river, sandbar, b-roll, and atmosphere reference.",
             "use_gate": "Record item-level public-domain or Creative Commons status, credit, date, location, and allowed use before any media becomes production reference or asset input.",
         },
+        {
+            "source_id": "nps_grand_canyon_river_trips_permits",
+            "provider": "National Park Service Grand Canyon River Trips / Permits",
+            "review_date": "2026-07-06",
+            "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm",
+            "why_it_matters": "Official Colorado River trip, route, and permit-context source lead for Grand Canyon route/access review.",
+            "use_gate": "Use as source triage only until exact launch/take-out geometry, document dates, access constraints, publication sensitivity, and oarsman review are attached.",
+        },
+        {
+            "source_id": "nps_grand_canyon_noncommercial_river_trip_links",
+            "provider": "National Park Service Grand Canyon Noncommercial River Trip Helpful Links",
+            "review_date": "2026-07-06",
+            "url": "https://www.nps.gov/grca/planyourvisit/noncommercial-riv-docs.htm",
+            "why_it_matters": "Official document index for Lees Ferry starts, Diamond Creek/Pearce Ferry take-outs, and noncommercial river trip regulations.",
+            "use_gate": "Keep linked regulations and support pages in manual review; do not present permit/legal guidance or import page/PDF content as game assets.",
+        },
     ]
 
     return {
@@ -2555,6 +2740,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     COLORADO_USBR_TOTAL_RELEASE_FILE,
                     COLORADO_USBR_RELEASE_CONTEXT_FILE,
                     COLORADO_RELEASE_BAND_REVIEW_FILE,
+                    COLORADO_ACCESS_PUBLICATION_REVIEW_FILE,
                     "reference_media_link_manifest.json",
                 ],
                 "p0_next_pulls_or_attachments": [
@@ -2598,6 +2784,24 @@ def build_production_environment_gap_register() -> dict[str, object]:
                         ],
                         "source_leads": ["nps_grand_canyon_media", "first_party_field_capture", "explicit_oarsman_or_outfitter_permission"],
                         "promotion_gate": "Use official/public-domain media only after item metadata review; attach oarsman sightline notes before art or gameplay tuning.",
+                    },
+                    {
+                        "source_class": "protected_area_and_access_context",
+                        "required_artifacts": [
+                            COLORADO_ACCESS_PUBLICATION_REVIEW_FILE,
+                            "review/production_import_pilot/access_points.geojson",
+                            "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+                            "review/production_import_pilot/camps_and_beaches_review.geojson",
+                            "review/production_import_pilot/oarsman_route_publication_notes.json",
+                        ],
+                        "source_leads": [
+                            "nps_grand_canyon_river_trips_permits",
+                            "nps_grand_canyon_noncommercial_river_trip_links",
+                            "nps_grand_canyon_lees_ferry_diamond_creek_overview",
+                            "nps_grand_canyon_noncommercial_river_trip_regulations_pdf",
+                            "guide_review",
+                        ],
+                        "promotion_gate": "Use the attached NPS access/publication review as source-lead evidence only; exact launch/take-out, camp/beach, sensitive-location, river-mile publication, and route-language review still block detailed maps and screenshots.",
                     },
                 ],
                 "procedural_generation_allowlist": [
