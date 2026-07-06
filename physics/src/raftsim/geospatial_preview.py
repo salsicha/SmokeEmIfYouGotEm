@@ -539,6 +539,7 @@ def build_pacuare_demshade_drape(
     selected_date: str,
     repo_root: Path | None = None,
     output_size_px: int = 512,
+    relief_size_px: int | None = None,
 ) -> None:
     """Blend NASA true color with DEM-derived rainforest relief for preview-only draping."""
 
@@ -571,8 +572,19 @@ def build_pacuare_demshade_drape(
 
     output_png_path.parent.mkdir(parents=True, exist_ok=True)
     Image.fromarray(np.clip(rgba * 255.0, 0, 255).astype(np.uint8), mode="RGBA").save(output_png_path)
+    relief_output_size_px = relief_size_px or output_size_px
+    if relief_output_size_px == output_size_px:
+        relief_output = relief
+    else:
+        relief_dem = sample_copernicus_dem(
+            CopernicusTile(southern_dem_path, south_lat=9, west_lon=-84),
+            CopernicusTile(northern_dem_path, south_lat=10, west_lon=-84),
+            bounds,
+            relief_output_size_px,
+        )
+        _, relief_output = _normalized_relief(relief_dem)
     output_relief_png_path.parent.mkdir(parents=True, exist_ok=True)
-    Image.fromarray(np.clip(relief * 255.0, 0, 255).astype(np.uint8), mode="L").save(output_relief_png_path)
+    Image.fromarray(np.clip(relief_output * 255.0, 0, 255).astype(np.uint8), mode="L").save(output_relief_png_path)
 
     manifest = {
         "schema": "raftsim.pacuare_source_drape_composite.v1",
@@ -593,6 +605,7 @@ def build_pacuare_demshade_drape(
         "terrain_relief_output": _manifest_path(output_relief_png_path, repo_root),
         "processing": {
             "size_px": output_size_px,
+            "relief_size_px": relief_output_size_px,
             "dem_sampling": "nearest_neighbor_from_copernicus_glo30_tiles",
             "cloud_mask": "truecolor brightness > 0.70 and channel range < 0.16",
             "blend": "non_cloud = 45% NASA truecolor + 55% DEM rainforest relief; cloud = DEM rainforest relief",
@@ -667,6 +680,114 @@ def build_pacuare_heightfield_candidate(
         ],
     }
     output_manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
+def build_pacuare_import_pilot_derivatives(
+    pacuare_root: Path,
+    repo_root: Path | None = None,
+    source_drape_size_px: int = 4096,
+    relief_size_px: int = 2048,
+    heightfield_size_px: int = 2017,
+    mask_size_px: int = 2048,
+) -> None:
+    """Generate review-gated Pacuare pilot derivatives from attached public/global seeds."""
+
+    bounds = BoundsWgs84(min_lon=-83.75, min_lat=9.72, max_lon=-83.42, max_lat=10.12)
+    imagery_root = pacuare_root / "imagery/production_import_pilot"
+    terrain_root = pacuare_root / "terrain/production_import_pilot"
+    source_drape_path = imagery_root / f"source_drape_{source_drape_size_px}.png"
+    source_drape_manifest_path = imagery_root / "source_drape_composite_manifest.json"
+    relief_path = terrain_root / f"dem_relief_{relief_size_px}.png"
+    heightfield_path = terrain_root / f"heightfield_candidate_{heightfield_size_px}.png"
+    heightfield_manifest_path = terrain_root / "heightfield_candidate_manifest.json"
+    water_mask_path = imagery_root / f"water_mask_{mask_size_px}.png"
+    vegetation_mask_path = imagery_root / f"vegetation_mask_{mask_size_px}.png"
+    mask_manifest_path = imagery_root / "source_masks_manifest.json"
+    derivative_manifest_path = pacuare_root / "production_import_pilot_derivatives_manifest.json"
+    southern_dem_path = pacuare_root / "terrain/copernicus_dem_glo30_N09_W084.tif"
+    northern_dem_path = pacuare_root / "terrain/copernicus_dem_glo30_N10_W084.tif"
+    nasa_truecolor_path = pacuare_root / "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png"
+
+    build_pacuare_demshade_drape(
+        nasa_truecolor_path=nasa_truecolor_path,
+        southern_dem_path=southern_dem_path,
+        northern_dem_path=northern_dem_path,
+        output_png_path=source_drape_path,
+        output_manifest_path=source_drape_manifest_path,
+        output_relief_png_path=relief_path,
+        bounds=bounds,
+        selected_date="2025-04-02",
+        repo_root=repo_root,
+        output_size_px=source_drape_size_px,
+        relief_size_px=relief_size_px,
+    )
+    build_pacuare_heightfield_candidate(
+        southern_dem_path=southern_dem_path,
+        northern_dem_path=northern_dem_path,
+        output_png_path=heightfield_path,
+        output_manifest_path=heightfield_manifest_path,
+        bounds=bounds,
+        repo_root=repo_root,
+        output_size_px=heightfield_size_px,
+    )
+    build_source_imagery_masks(
+        source_image_path=source_drape_path,
+        output_water_mask_path=water_mask_path,
+        output_vegetation_mask_path=vegetation_mask_path,
+        output_manifest_path=mask_manifest_path,
+        source_id=f"pacuare_production_import_pilot_source_drape_{source_drape_size_px}",
+        provider="NASA GIBS MODIS/Terra true-color plus Copernicus DEM-derived source drape",
+        source_description=(
+            "Pacuare stitched-size production-import pilot source drape generated from the selected NASA GIBS "
+            "true-color preview seed and Copernicus DEM relief; coarse/cloudy and not production orthophoto."
+        ),
+        repo_root=repo_root,
+        output_size_px=mask_size_px,
+        preview_river_half_width_cm=305.0 * 1.05,
+        preview_bend_amplitude_cm=340.0,
+        preview_corridor_half_width_cm=2750.0,
+    )
+
+    manifest = {
+        "schema": "raftsim.pacuare_import_pilot_derivatives.v1",
+        "status": "generated_review_gated_from_coarse_preview_seeds_not_production_import",
+        "source_recipe": _manifest_path(pacuare_root / "production_import_pilot.json", repo_root),
+        "inputs": {
+            "nasa_gibs_truecolor": _manifest_path(nasa_truecolor_path, repo_root),
+            "copernicus_dem_glo30_southern_tile": _manifest_path(southern_dem_path, repo_root),
+            "copernicus_dem_glo30_northern_tile": _manifest_path(northern_dem_path, repo_root),
+        },
+        "outputs": {
+            "source_drape": _manifest_path(source_drape_path, repo_root),
+            "source_drape_manifest": _manifest_path(source_drape_manifest_path, repo_root),
+            "dem_relief": _manifest_path(relief_path, repo_root),
+            "heightfield_candidate": _manifest_path(heightfield_path, repo_root),
+            "heightfield_manifest": _manifest_path(heightfield_manifest_path, repo_root),
+            "water_mask": _manifest_path(water_mask_path, repo_root),
+            "vegetation_mask": _manifest_path(vegetation_mask_path, repo_root),
+            "mask_manifest": _manifest_path(mask_manifest_path, repo_root),
+        },
+        "processing": {
+            "source_drape_size_px": source_drape_size_px,
+            "relief_size_px": relief_size_px,
+            "heightfield_size_px": heightfield_size_px,
+            "mask_size_px": mask_size_px,
+            "heightfield_pixel_format": "16_bit_grayscale_png",
+            "bounds_wgs84": {
+                "min_lon": bounds.min_lon,
+                "min_lat": bounds.min_lat,
+                "max_lon": bounds.max_lon,
+                "max_lat": bounds.max_lat,
+            },
+        },
+        "caveats": [
+            "These derivatives normalize the active Pacuare preview seeds into the production-import folder shape; they are not production photoreal terrain or imagery.",
+            "NASA GIBS/MODIS is coarse and partly cloudy, and cloud-filled areas remain DEM-derived rainforest placeholders.",
+            "Copernicus DEM tiles are not clipped to a surveyed corridor, reprojected to the final Costa Rica CRS, void-reviewed, hydrologically conditioned, or channel-burned.",
+            "Masks are preview segmentation aids and must be replaced or approved through higher-resolution imagery, hydrography, rainfall/flow context, and guide/outfitter review.",
+        ],
+    }
+    derivative_manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
 
 def main() -> None:
@@ -806,6 +927,7 @@ def main() -> None:
         preview_bend_amplitude_cm=340.0,
         preview_corridor_half_width_cm=2750.0,
     )
+    build_pacuare_import_pilot_derivatives(pacuare_root, repo_root=repo_root)
 
 
 if __name__ == "__main__":

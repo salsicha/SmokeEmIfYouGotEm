@@ -9,6 +9,9 @@
       "terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json",
       "terrain/pacuare_dem_relief_preview_512.png",
       "terrain/pacuare_dem_relief_preview_1024.png",
+      "terrain/production_import_pilot/dem_relief_2048.png",
+      "terrain/production_import_pilot/heightfield_candidate_2017.png",
+      "terrain/production_import_pilot/heightfield_candidate_manifest.json",
       "terrain/opentopography_srtmgl1_pacuare_probe_response.txt"
     ],
     "field_media": [
@@ -38,6 +41,11 @@
       "imagery/pacuare_nasa_gibs_2025-04-02_masks_manifest.json",
       "imagery/pacuare_source_drape_composite_manifest.json",
       "imagery/pacuare_source_drape_composite_manifest_1024.json",
+      "imagery/production_import_pilot/source_drape_4096.png",
+      "imagery/production_import_pilot/water_mask_2048.png",
+      "imagery/production_import_pilot/vegetation_mask_2048.png",
+      "imagery/production_import_pilot/source_drape_composite_manifest.json",
+      "imagery/production_import_pilot/source_masks_manifest.json",
       "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
       "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
       "imagery/nasa_gibs_pacuare_truecolor_2025-01-10_512.png",
@@ -51,7 +59,8 @@
     ],
     "source_pulls": [
       "production_source_pull_manifest.json",
-      "production_import_pilot.json"
+      "production_import_pilot.json",
+      "production_import_pilot_derivatives_manifest.json"
     ],
     "unreal": [
       "unreal/pacuare_river_third_target_editor_pass.json"

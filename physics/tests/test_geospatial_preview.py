@@ -5,6 +5,7 @@ from PIL import Image
 
 from raftsim.geospatial_preview import (
     build_colorado_import_pilot_derivatives,
+    build_pacuare_import_pilot_derivatives,
     build_source_imagery_masks,
     build_south_fork_import_pilot_derivatives,
 )
@@ -149,3 +150,51 @@ def test_build_colorado_import_pilot_derivatives_stitches_tiles_and_records_mani
     assert "guide/oarsman" in manifest["caveats"][1]
     assert water_mask.mean() > 0.0
     assert vegetation_mask.mean() > 0.0
+
+
+def test_build_pacuare_import_pilot_derivatives_records_coarse_seed_caveats(tmp_path):
+    pacuare_root = tmp_path / "pacuare"
+    imagery_dir = pacuare_root / "imagery"
+    terrain_dir = pacuare_root / "terrain"
+    imagery_dir.mkdir(parents=True)
+    terrain_dir.mkdir(parents=True)
+    (pacuare_root / "production_import_pilot.json").write_text("{}", encoding="utf-8")
+
+    truecolor = np.zeros((16, 16, 4), dtype=np.uint8)
+    truecolor[..., 0] = 34
+    truecolor[..., 1] = 92
+    truecolor[..., 2] = 42
+    truecolor[..., 3] = 255
+    truecolor[4:9, :, 1] = 120
+    truecolor[:, 7:9, 2] = 150
+    Image.fromarray(truecolor, mode="RGBA").save(imagery_dir / "nasa_gibs_pacuare_truecolor_2025-04-02_1024.png")
+
+    southern_dem = np.linspace(120.0, 360.0, 16 * 16, dtype=np.float32).reshape(16, 16)
+    northern_dem = np.linspace(260.0, 620.0, 16 * 16, dtype=np.float32).reshape(16, 16)
+    Image.fromarray(southern_dem, mode="F").save(terrain_dir / "copernicus_dem_glo30_N09_W084.tif")
+    Image.fromarray(northern_dem, mode="F").save(terrain_dir / "copernicus_dem_glo30_N10_W084.tif")
+
+    build_pacuare_import_pilot_derivatives(
+        pacuare_root,
+        repo_root=tmp_path,
+        source_drape_size_px=16,
+        relief_size_px=12,
+        heightfield_size_px=17,
+        mask_size_px=16,
+    )
+
+    manifest_path = pacuare_root / "production_import_pilot_derivatives_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    source_drape = Image.open(pacuare_root / "imagery/production_import_pilot/source_drape_16.png")
+    relief = Image.open(pacuare_root / "terrain/production_import_pilot/dem_relief_12.png")
+    heightfield = Image.open(pacuare_root / "terrain/production_import_pilot/heightfield_candidate_17.png")
+    water_mask = np.asarray(Image.open(pacuare_root / "imagery/production_import_pilot/water_mask_16.png"))
+
+    assert manifest["schema"] == "raftsim.pacuare_import_pilot_derivatives.v1"
+    assert manifest["status"] == "generated_review_gated_from_coarse_preview_seeds_not_production_import"
+    assert manifest["outputs"]["source_drape"] == "pacuare/imagery/production_import_pilot/source_drape_16.png"
+    assert source_drape.size == (16, 16)
+    assert relief.size == (12, 12)
+    assert heightfield.size == (17, 17)
+    assert "coarse and partly cloudy" in " ".join(manifest["caveats"])
+    assert water_mask.mean() > 0.0
