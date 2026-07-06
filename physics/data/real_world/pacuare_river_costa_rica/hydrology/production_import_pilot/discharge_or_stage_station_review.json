@@ -1,0 +1,163 @@
+{
+  "allowed_use": [
+    "discharge and stage station source triage",
+    "Pacuare basin-relation planning",
+    "future flow-band evidence checklist"
+  ],
+  "candidate_summary": {
+    "basin_relation_candidate_layers": [
+      "Aguas:DA_UNIDADES_HIDROLOGICAS"
+    ],
+    "da_sinigirh_candidate_count": 3,
+    "primary_station_candidate_layers": [
+      "Aguas:DA_AFOROS",
+      "Aguas:JASEC_ESTACIONES_HIDROMETRICAS"
+    ],
+    "snit_direccion_de_agua_candidate_count": 2,
+    "wfs_feature_access_advertised_count": 0
+  },
+  "da_sinigirh_candidates": [
+    {
+      "candidate_id": "da_aforos",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "latlon_bbox": {
+        "maxx": -82.54474531399609,
+        "maxy": 11.224117503811387,
+        "minx": -87.14733170864938,
+        "miny": 5.950346237975033
+      },
+      "name": "Aguas:DA_AFOROS",
+      "review_reason": "Aforo/gauging station candidate for discharge or stage station discovery.",
+      "srs": [
+        "EPSG:5367"
+      ],
+      "target_outputs": [
+        "hydrology/production_import_pilot/discharge_or_stage_station_review.json"
+      ],
+      "title": "DA_AFOROS"
+    },
+    {
+      "candidate_id": "jasec_estaciones_hidrometricas",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "latlon_bbox": {
+        "maxx": -82.54474531399609,
+        "maxy": 11.224117503811387,
+        "minx": -87.14733170864938,
+        "miny": 5.950346237975033
+      },
+      "name": "Aguas:JASEC_ESTACIONES_HIDROMETRICAS",
+      "review_reason": "Hydrometric station candidate; review basin proximity and whether records are public and relevant to Pacuare.",
+      "srs": [
+        "EPSG:5367"
+      ],
+      "target_outputs": [
+        "hydrology/production_import_pilot/discharge_or_stage_station_review.json"
+      ],
+      "title": "JASEC_ESTACIONES HIDROMETRICAS"
+    },
+    {
+      "candidate_id": "da_unidades_hidrologicas",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "latlon_bbox": {
+        "maxx": -82.54474531399609,
+        "maxy": 11.224117503811387,
+        "minx": -87.14733170864938,
+        "miny": 5.950346237975033
+      },
+      "name": "Aguas:DA_UNIDADES_HIDROLOGICAS",
+      "review_reason": "Hydrologic units for station/basin relation and rainfall station screening.",
+      "srs": [
+        "EPSG:5367"
+      ],
+      "target_outputs": [
+        "hydrology/production_import_pilot/basin_relation_review.geojson"
+      ],
+      "title": "DA_UNIDADES HIDROLOGICAS"
+    }
+  ],
+  "forbidden_use": [
+    "numeric Pacuare flow-band promotion",
+    "production water-level or foam tuning",
+    "claiming accepted station-to-corridor hydrology",
+    "shipping high-water or flash-response scenarios without station records and guide review"
+  ],
+  "gameplay_questions_to_answer": [
+    "What rainfall or stage conditions correspond to commercial runnable flows?",
+    "At what rain/flow levels do holes, laterals, eddy lines, wave trains, and wood hazards change behavior?",
+    "What lag exists between upstream rainfall and runnable Pacuare corridor response?",
+    "Which high-water bands become review-only or unsafe for gameplay scenarios?"
+  ],
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "da_sinigirh_wms_capabilities_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
+    "gauge_search": "physics/data/real_world/pacuare_river_costa_rica/hydrology/costa_rica_gauge_search.json",
+    "snit_layer_catalog_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_catalog_summary.json"
+  },
+  "needed_station_metadata": [
+    "station_id",
+    "provider",
+    "latitude_longitude",
+    "drainage_area_or_basin_relation",
+    "variables",
+    "units",
+    "temporal_resolution",
+    "record_start_end",
+    "time_zone",
+    "quality_flags",
+    "terms_and_attribution"
+  ],
+  "next_actions": [
+    "Confirm layer-specific terms, attributes, CRS axis order, and whether station feature access is public.",
+    "Identify whether DA_AFOROS or JASEC_ESTACIONES_HIDROMETRICAS intersects the Pacuare basin.",
+    "Record station ids, variables, units, time zone, coverage, quality flags, and basin relation before numeric flow tuning.",
+    "Pair station review with rainfall and flash-response review plus guide/outfitter validation before water visuals change."
+  ],
+  "policy": {
+    "feature_downloads_performed": false,
+    "numeric_flow_bands_promoted": false,
+    "station_time_series_imported": false,
+    "use_as_metadata_review_only": true
+  },
+  "promotion_blockers": [
+    "No station feature records, station ids, variables, units, time zones, or time series are attached.",
+    "Layer bboxes are broad service extents and do not prove Pacuare-basin relevance.",
+    "DA/SINIGIRH selected WMS candidates advertise metadata only; no WFS or time-series payload is archived by this artifact.",
+    "Guide/outfitter review is required before stage/discharge evidence changes hazards, swimmer drift, rescue timing, or visuals."
+  ],
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare_discharge_stage_station_review.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "snit_direccion_de_agua_candidates": [
+    {
+      "abstract": null,
+      "feature_download_status": "not_downloaded_metadata_only",
+      "has_metadata": false,
+      "institution": "Direcci\u00f3n de Agua, MINAE",
+      "layer": "Aguas:DA_AFOROS",
+      "name": "DA_AFOROS",
+      "node_name": "DIRECCI\u00d3N DE AGUA",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "05-07-2026",
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RElSRUNDSSVDMyU5M04rREUrQUdVQTo6QWd1YXMlM0FEQV9BRk9ST1M=",
+      "wfs_available": false,
+      "wms_available": true,
+      "wmts_available": false
+    },
+    {
+      "abstract": null,
+      "feature_download_status": "not_downloaded_metadata_only",
+      "has_metadata": false,
+      "institution": "Direcci\u00f3n de Agua, MINAE",
+      "layer": "Aguas:DA_UNIDADES_HIDROLOGICAS",
+      "name": "DA_UNIDADES HIDROLOGICAS",
+      "node_name": "DIRECCI\u00d3N DE AGUA",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "05-07-2026",
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RElSRUNDSSVDMyU5M04rREUrQUdVQTo6QWd1YXMlM0FEQV9VTklEQURFU19ISURST0xPR0lDQVM=",
+      "wfs_available": false,
+      "wms_available": true,
+      "wmts_available": false
+    }
+  ],
+  "status": "metadata_only_discharge_stage_candidates_attached_numeric_flow_blocked"
+}
