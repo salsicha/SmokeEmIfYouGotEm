@@ -295,12 +295,13 @@ def build_single_dem_heightfield_candidate(
     output_manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
 
-def _south_fork_pilot_tile_id(row: int, column: int) -> str:
-    return f"sfa_chili_bar_tile_r{row}_c{column}"
+def _pilot_tile_id(tile_prefix: str, row: int, column: int) -> str:
+    return f"{tile_prefix}_tile_r{row}_c{column}"
 
 
 def _stitch_image_tiles(
     tile_dir: Path,
+    tile_prefix: str,
     extension: str,
     rows: int,
     columns: int,
@@ -311,7 +312,7 @@ def _stitch_image_tiles(
     opened: dict[tuple[int, int], Image.Image] = {}
     for row in range(rows):
         for column in range(columns):
-            path = tile_dir / f"{_south_fork_pilot_tile_id(row, column)}.{extension}"
+            path = tile_dir / f"{_pilot_tile_id(tile_prefix, row, column)}.{extension}"
             inputs.append(path)
             opened[(row, column)] = Image.open(path).convert(convert_mode)
 
@@ -327,12 +328,12 @@ def _stitch_image_tiles(
     return mosaic, inputs
 
 
-def _stitch_float_dem_tiles(tile_dir: Path, rows: int, columns: int) -> tuple[np.ndarray, list[Path]]:
+def _stitch_float_dem_tiles(tile_dir: Path, tile_prefix: str, rows: int, columns: int) -> tuple[np.ndarray, list[Path]]:
     inputs: list[Path] = []
     arrays: dict[tuple[int, int], np.ndarray] = {}
     for row in range(rows):
         for column in range(columns):
-            path = tile_dir / f"{_south_fork_pilot_tile_id(row, column)}.tif"
+            path = tile_dir / f"{_pilot_tile_id(tile_prefix, row, column)}.tif"
             inputs.append(path)
             arrays[(row, column)] = _load_float_tiff(path)
 
@@ -367,30 +368,40 @@ def _write_heightfield_from_dem(
     return elevation_min_m, elevation_max_m
 
 
-def build_south_fork_import_pilot_derivatives(
-    south_fork_root: Path,
+def _build_import_pilot_derivatives(
+    river_root: Path,
+    *,
+    tile_prefix: str,
+    schema: str,
+    source_id: str,
+    source_description: str,
+    preview_river_half_width_cm: float,
+    preview_bend_amplitude_cm: float,
+    preview_corridor_half_width_cm: float,
+    review_role: str,
     repo_root: Path | None = None,
     source_drape_size_px: int = 4096,
     relief_size_px: int = 2048,
     heightfield_size_px: int = 2017,
     mask_size_px: int = 2048,
 ) -> None:
-    """Stitch downloaded South Fork pilot tiles into review-gated preview derivatives."""
+    """Stitch downloaded pilot tiles into review-gated preview derivatives."""
 
     rows = 2
     columns = 2
-    imagery_root = south_fork_root / "imagery/production_import_pilot"
-    terrain_root = south_fork_root / "terrain/production_import_pilot"
+    imagery_root = river_root / "imagery/production_import_pilot"
+    terrain_root = river_root / "terrain/production_import_pilot"
     source_drape_path = imagery_root / f"source_drape_{source_drape_size_px}.png"
     relief_path = terrain_root / f"dem_relief_{relief_size_px}.png"
     heightfield_path = terrain_root / f"heightfield_candidate_{heightfield_size_px}.png"
     water_mask_path = imagery_root / f"water_mask_{mask_size_px}.png"
     vegetation_mask_path = imagery_root / f"vegetation_mask_{mask_size_px}.png"
     mask_manifest_path = imagery_root / "source_masks_manifest.json"
-    derivative_manifest_path = south_fork_root / "production_import_pilot_derivatives_manifest.json"
+    derivative_manifest_path = river_root / "production_import_pilot_derivatives_manifest.json"
 
     source_drape, imagery_inputs = _stitch_image_tiles(
         imagery_root / "naip_tiles",
+        tile_prefix,
         "png",
         rows,
         columns,
@@ -400,7 +411,7 @@ def build_south_fork_import_pilot_derivatives(
     source_drape_path.parent.mkdir(parents=True, exist_ok=True)
     source_drape.save(source_drape_path)
 
-    dem_mosaic, dem_inputs = _stitch_float_dem_tiles(terrain_root / "3dep_tiles", rows, columns)
+    dem_mosaic, dem_inputs = _stitch_float_dem_tiles(terrain_root / "3dep_tiles", tile_prefix, rows, columns)
     _, relief = _normalized_relief(dem_mosaic)
     relief_image = Image.fromarray(np.clip(relief * 255.0, 0, 255).astype(np.uint8), mode="L")
     if relief_image.size != (relief_size_px, relief_size_px):
@@ -414,21 +425,21 @@ def build_south_fork_import_pilot_derivatives(
         output_water_mask_path=water_mask_path,
         output_vegetation_mask_path=vegetation_mask_path,
         output_manifest_path=mask_manifest_path,
-        source_id="south_fork_production_import_pilot_source_drape_4096",
+        source_id=source_id,
         provider="USDA/APFO NAIP ImageServer",
-        source_description="South Fork American stitched 2x2 pilot NAIP source drape generated from official service export tiles.",
+        source_description=source_description,
         repo_root=repo_root,
         output_size_px=mask_size_px,
-        preview_river_half_width_cm=335.0,
-        preview_bend_amplitude_cm=290.0,
-        preview_corridor_half_width_cm=2750.0,
+        preview_river_half_width_cm=preview_river_half_width_cm,
+        preview_bend_amplitude_cm=preview_bend_amplitude_cm,
+        preview_corridor_half_width_cm=preview_corridor_half_width_cm,
     )
 
     manifest = {
-        "schema": "raftsim.south_fork_import_pilot_derivatives.v1",
+        "schema": schema,
         "status": "generated_review_gated_not_conditioned_not_production_import",
-        "source_recipe": _manifest_path(south_fork_root / "production_import_pilot.json", repo_root),
-        "source_pull_manifest": _manifest_path(south_fork_root / "production_import_pilot_pull_manifest.json", repo_root),
+        "source_recipe": _manifest_path(river_root / "production_import_pilot.json", repo_root),
+        "source_pull_manifest": _manifest_path(river_root / "production_import_pilot_pull_manifest.json", repo_root),
         "inputs": {
             "naip_tiles": [_manifest_path(path, repo_root) for path in imagery_inputs],
             "dem_tiles": [_manifest_path(path, repo_root) for path in dem_inputs],
@@ -454,11 +465,67 @@ def build_south_fork_import_pilot_derivatives(
         },
         "caveats": [
             "This is a stitched derivative of the official-service pilot tiles, not final photoreal terrain.",
-            "The DEM mosaic is not yet reprojected to a selected working CRS, hydrologically conditioned, channel-burned, or guide reviewed.",
-            "The source masks are preview segmentation aids and must be reviewed against hydrography, bank polygons, seasonal imagery, and guide feedback before production use.",
+            f"The DEM mosaic is not yet reprojected to a selected working CRS, hydrologically conditioned, channel-burned, or {review_role} reviewed.",
+            f"The source masks are preview segmentation aids and must be reviewed against hydrography, bank polygons, seasonal imagery, and {review_role} feedback before production use.",
         ],
     }
     derivative_manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
+def build_south_fork_import_pilot_derivatives(
+    south_fork_root: Path,
+    repo_root: Path | None = None,
+    source_drape_size_px: int = 4096,
+    relief_size_px: int = 2048,
+    heightfield_size_px: int = 2017,
+    mask_size_px: int = 2048,
+) -> None:
+    """Stitch downloaded South Fork pilot tiles into review-gated preview derivatives."""
+
+    _build_import_pilot_derivatives(
+        south_fork_root,
+        tile_prefix="sfa_chili_bar",
+        schema="raftsim.south_fork_import_pilot_derivatives.v1",
+        source_id=f"south_fork_production_import_pilot_source_drape_{source_drape_size_px}",
+        source_description="South Fork American stitched 2x2 pilot NAIP source drape generated from official service export tiles.",
+        preview_river_half_width_cm=335.0,
+        preview_bend_amplitude_cm=290.0,
+        preview_corridor_half_width_cm=2750.0,
+        review_role="guide",
+        repo_root=repo_root,
+        source_drape_size_px=source_drape_size_px,
+        relief_size_px=relief_size_px,
+        heightfield_size_px=heightfield_size_px,
+        mask_size_px=mask_size_px,
+    )
+
+
+def build_colorado_import_pilot_derivatives(
+    colorado_root: Path,
+    repo_root: Path | None = None,
+    source_drape_size_px: int = 4096,
+    relief_size_px: int = 2048,
+    heightfield_size_px: int = 2017,
+    mask_size_px: int = 2048,
+) -> None:
+    """Stitch downloaded Colorado/Lees Ferry pilot tiles into review-gated preview derivatives."""
+
+    _build_import_pilot_derivatives(
+        colorado_root,
+        tile_prefix="colorado_lees_ferry",
+        schema="raftsim.colorado_import_pilot_derivatives.v1",
+        source_id=f"colorado_production_import_pilot_source_drape_{source_drape_size_px}",
+        source_description="Colorado River Lees Ferry stitched 2x2 pilot NAIP source drape generated from official service export tiles.",
+        preview_river_half_width_cm=520.0 * 1.08,
+        preview_bend_amplitude_cm=360.0,
+        preview_corridor_half_width_cm=4300.0,
+        review_role="guide/oarsman",
+        repo_root=repo_root,
+        source_drape_size_px=source_drape_size_px,
+        relief_size_px=relief_size_px,
+        heightfield_size_px=heightfield_size_px,
+        mask_size_px=mask_size_px,
+    )
 
 
 def build_pacuare_demshade_drape(
@@ -692,6 +759,7 @@ def main() -> None:
         preview_bend_amplitude_cm=360.0,
         preview_corridor_half_width_cm=4300.0,
     )
+    build_colorado_import_pilot_derivatives(colorado_root, repo_root=repo_root)
     build_pacuare_demshade_drape(
         nasa_truecolor_path=pacuare_root / "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
         southern_dem_path=pacuare_root / "terrain/copernicus_dem_glo30_N09_W084.tif",
