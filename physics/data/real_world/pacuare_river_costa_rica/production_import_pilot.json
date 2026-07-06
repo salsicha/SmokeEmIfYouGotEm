@@ -107,6 +107,7 @@
         "imagery/production_import_pilot/source_drape_4096.png",
         "imagery/production_import_pilot/cloud_shadow_review.json",
         "imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
+        "imagery/production_import_pilot/landsat_product_access_gate_review.json",
         "production_import_pilot_derivatives_manifest.json",
         "review/production_import_pilot/source_metadata_review.json"
       ]
@@ -128,6 +129,7 @@
         "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_2048.png",
         "imagery/production_import_pilot/source_masks_manifest.json",
         "imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
+        "imagery/production_import_pilot/landsat_product_access_gate_review.json",
         "review/production_import_pilot/source_metadata_review.json"
       ]
     },

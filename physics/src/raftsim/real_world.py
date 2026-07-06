@@ -176,6 +176,9 @@ PACUARE_CLOUD_SHADOW_REVIEW_FILE = "imagery/production_import_pilot/cloud_shadow
 PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE = (
     "imagery/production_import_pilot/high_resolution_scene_metadata_review.json"
 )
+PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE = (
+    "imagery/production_import_pilot/landsat_product_access_gate_review.json"
+)
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE = "production_import_pilot_derivatives_manifest.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
@@ -3030,6 +3033,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     "imagery/production_import_pilot/source_drape_4096.png",
                     PACUARE_CLOUD_SHADOW_REVIEW_FILE,
                     PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE,
+                    PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
                     "production_import_pilot_derivatives_manifest.json",
                     PACUARE_SOURCE_METADATA_REVIEW_FILE,
                 ],
@@ -3050,6 +3054,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_2048.png",
                     "imagery/production_import_pilot/source_masks_manifest.json",
                     PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE,
+                    PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
                     PACUARE_SOURCE_METADATA_REVIEW_FILE,
                 ],
                 "promotion_gate": (
@@ -3598,6 +3603,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE,
                     PACUARE_CLOUD_SHADOW_REVIEW_FILE,
                     PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE,
+                    PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
                     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,

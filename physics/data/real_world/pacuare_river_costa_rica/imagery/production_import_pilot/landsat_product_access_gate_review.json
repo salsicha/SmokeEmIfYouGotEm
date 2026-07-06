@@ -1,0 +1,68 @@
+{
+  "allowed_use": [
+    "production imagery access planning",
+    "source-download gate evidence",
+    "future authenticated or alternate official mirror workflow design"
+  ],
+  "attempted_asset_requests": [
+    {
+      "artifact_committed": false,
+      "byte_count": 36063,
+      "content_type": "text/html; charset=UTF-8",
+      "expected_asset": "reduced_resolution_browse JPEG",
+      "raw_payload_committed": false,
+      "request_id": "landsat_lc80140532025345_reduced_resolution_browse",
+      "response_class": "eros_registration_login_html",
+      "sha256": "92af5afe0b66bd6a5c34b452eaac1d871c6d18e28bfcd4e81876e185739edb3b",
+      "status_code": 200,
+      "url": "https://landsatlook.usgs.gov/data/collection02/level-2/standard/oli-tirs/2025/014/053/LC08_L2SP_014053_20251211_20251217_02_T2/LC08_L2SP_014053_20251211_20251217_02_T2_thumb_large.jpeg"
+    },
+    {
+      "artifact_committed": false,
+      "byte_count": 36063,
+      "content_type": "text/html; charset=UTF-8",
+      "expected_asset": "MTL.json metadata",
+      "raw_payload_committed": false,
+      "request_id": "landsat_lc80140532025345_mtl_json",
+      "response_class": "eros_registration_login_html",
+      "sha256": "99171117635835b6f0b40c561a74e929e479275ab45581ab1582b97146fe4d87",
+      "status_code": 200,
+      "url": "https://landsatlook.usgs.gov/data/collection02/level-2/standard/oli-tirs/2025/014/053/LC08_L2SP_014053_20251211_20251217_02_T2/LC08_L2SP_014053_20251211_20251217_02_T2_MTL.json"
+    }
+  ],
+  "forbidden_use": [
+    "claiming Landsat browse imagery is attached",
+    "claiming Landsat bands or MTL metadata are downloaded",
+    "using login HTML as a source artifact",
+    "production source-drape or mask generation"
+  ],
+  "generated_on": "2026-07-06",
+  "next_access_options": [
+    "Use an approved USGS/EROS account or documented API flow if credentials and redistribution/storage policy are accepted.",
+    "Find an official unauthenticated COG or browse mirror with stable public terms before committing imagery products.",
+    "Prefer a bounded windowed COG read or small reviewed browse artifact rather than full-scene downloads when testing source-drape replacement.",
+    "Record exact terms, attribution, package-size policy, CRS, bands, scale factors, nodata, and QA masks before any Landsat-derived material work."
+  ],
+  "response_policy": {
+    "bad_download_removed_from_workspace": true,
+    "do_not_commit_login_html_as_imagery_or_metadata": true,
+    "imagery_products_downloaded": false,
+    "requires_approved_download_path_before_product_use": true
+  },
+  "review_decision": "The scene remains a useful official metadata candidate, but anonymous direct LandsatLook asset URLs currently return EROS login HTML in this environment. Do not attach imagery or metadata products from those URLs until an approved access path returns the expected content type.",
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare_landsat_product_access_gate_review.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "source_scene": {
+    "catalog_cloud_cover_percent": 12.05,
+    "collection": "landsat-c2l2-sr",
+    "collection_category": "T2",
+    "datetime": "2025-12-11T15:48:30.763128Z",
+    "item_id": "LC08_L2SP_014053_20251211_20251217_02_T2_SR",
+    "platform": "LANDSAT_8",
+    "scene_id": "LC80140532025345LGN00",
+    "wrs_path": "014",
+    "wrs_row": "053"
+  },
+  "status": "direct_landsatlook_asset_requests_return_eros_login_html_no_imagery_downloaded"
+}

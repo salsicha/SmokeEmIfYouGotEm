@@ -472,9 +472,10 @@
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/cloud_screened_scene_index.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/cloud_shadow_review.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/landsat_product_access_gate_review.json",
             "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/source_metadata_review.json"
           ],
-          "promotion_blocker": "Pacuare has a retained NASA GIBS/MODIS cloud-screened candidate index, cloud/shadow diagnostic, coarse production-import derivatives, and official Landsat/Sentinel high-resolution scene metadata, but production still needs full-year scene paging, imagery download approval, manual cloud/shadow QA, CRS/band/scale review, first-party or permissioned aerial reference where needed, and guide/geospatial approval before photoreal imagery or masks are promoted.",
+          "promotion_blocker": "Pacuare has a retained NASA GIBS/MODIS cloud-screened candidate index, cloud/shadow diagnostic, coarse production-import derivatives, official Landsat/Sentinel high-resolution scene metadata, and an explicit Landsat product access-gate review, but production still needs an approved imagery download path, full-year scene paging, manual cloud/shadow QA, CRS/band/scale review, first-party or permissioned aerial reference where needed, and guide/geospatial approval before photoreal imagery or masks are promoted.",
           "status": "coarse_preview_and_high_resolution_scene_metadata_attached_imagery_download_blocked"
         },
         "guide_and_reference_media_annotations": {
@@ -560,9 +561,10 @@
             "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_catalog_summary.json",
             "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_metadata_summary.json",
             "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/source_metadata_review.json",
-            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/high_resolution_scene_metadata_review.json"
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/landsat_product_access_gate_review.json"
           ],
-          "promotion_blocker": "Masks are coarse preview derivatives; high-resolution Landsat/Sentinel scene metadata now identifies candidate replacement imagery, but production still needs approved downloads, manual cloud/shadow review, hydrography alignment, water/canopy/wet-rock/waterfall/mist segmentation, approved layer terms, and corridor intersection review.",
+          "promotion_blocker": "Masks are coarse preview derivatives; high-resolution Landsat/Sentinel scene metadata and the Landsat access-gate review now identify candidate replacement imagery and download blockers, but production still needs approved downloads, manual cloud/shadow review, hydrography alignment, water/canopy/wet-rock/waterfall/mist segmentation, approved layer terms, and corridor intersection review.",
           "status": "preview_masks_and_pilot_derivative_masks_attached"
         }
       },
