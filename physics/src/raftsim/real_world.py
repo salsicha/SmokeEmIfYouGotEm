@@ -73,6 +73,8 @@ SOUTH_FORK_NHD_HU8_SUPPORT_EXTRACT_FILE = "hydrography/nhd_hu8_18020129_support_
 SOUTH_FORK_NHD_MAINSTEM_MANIFEST_FILE = "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json"
 SOUTH_FORK_NHD_MAINSTEM_CANDIDATE_FILE = "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson"
 SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE = "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json"
+SOUTH_FORK_NHD_CROSS_SECTION_SEED_MANIFEST_FILE = "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json"
+SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE = "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
@@ -1145,7 +1147,7 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
             },
             {
                 "class_id": "hydrography_and_centerline",
-                "status": "nhd_hu8_stationing_candidate_attached_review_pending",
+                "status": "nhd_hu8_cross_section_seeds_attached_review_pending",
                 "source_ids": ["usgs_3dhp_nhd"],
                 "target_outputs": [
                     SOUTH_FORK_NHD_HU8_MANIFEST_FILE,
@@ -1154,11 +1156,13 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                     SOUTH_FORK_NHD_MAINSTEM_MANIFEST_FILE,
                     SOUTH_FORK_NHD_MAINSTEM_CANDIDATE_FILE,
                     SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
+                    SOUTH_FORK_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
+                    SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE,
                     "hydrography/production_import_pilot/centerline.geojson",
                     "hydrography/production_import_pilot/banks.geojson",
                     "hydrography/production_import_pilot/cross_sections.geojson",
                 ],
-                "promotion_gate": "Use the attached NHD HU8 extract and derived mainstem candidate as source evidence, then confirm direction, reproject, align to NAIP and DEM relief, hand-review banks/rapid stations, and keep OSM only as supplemental access context.",
+                "promotion_gate": "Use the attached NHD HU8 extract, derived mainstem candidate, stationing, and cross-section seed lines as source evidence, then confirm direction, reproject, align to NAIP and DEM relief, hand-review banks/rapid stations, and keep OSM only as supplemental access context.",
             },
             {
                 "class_id": "aerial_or_satellite_imagery",
@@ -1833,6 +1837,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     SOUTH_FORK_NHD_MAINSTEM_MANIFEST_FILE,
                     SOUTH_FORK_NHD_MAINSTEM_CANDIDATE_FILE,
                     SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
+                    SOUTH_FORK_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
+                    SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE,
                     "hydrology/usgs_11445500_daily_discharge.json",
                     "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
                     "hydrology/south_fork_modern_flow_source_selection.json",
@@ -1851,6 +1857,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             SOUTH_FORK_NHD_MAINSTEM_MANIFEST_FILE,
                             SOUTH_FORK_NHD_MAINSTEM_CANDIDATE_FILE,
                             SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
+                            SOUTH_FORK_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
+                            SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE,
                             "hydrography/production_import_pilot/centerline.geojson",
                             "hydrography/production_import_pilot/banks.geojson",
                             "hydrography/production_import_pilot/cross_sections.geojson",
@@ -2070,6 +2078,8 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 SOUTH_FORK_NHD_MAINSTEM_MANIFEST_FILE,
                 SOUTH_FORK_NHD_MAINSTEM_CANDIDATE_FILE,
                 SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
+                SOUTH_FORK_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
+                SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE,
                 "hydrography/centerline.geojson",
                 "hydrography/banks.geojson",
                 "hydrography/cross_sections.geojson",
@@ -3259,9 +3269,9 @@ def _rapid_review_layers() -> tuple[RapidReviewLayer, ...]:
             "cross_sections",
             "Cross Sections",
             "vector",
-            "hydrography/cross_sections.geojson",
+            SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE,
             ("usgs_3dep", "usgs_3dhp_nhd"),
-            "Bank offsets, width, slope, constriction, and section sampling for solver authoring.",
+            "Review-gated cross-section seed lines, future bank offsets, width, slope, constriction, and solver section sampling.",
         ),
         RapidReviewLayer(
             "gauge_history",
@@ -3432,7 +3442,11 @@ def _rapid_review_evidence_refs(candidate: RapidCandidate) -> dict[str, object]:
         },
         "cross_sections": {
             "layer_id": "cross_sections",
-            "artifacts": ["hydrography/cross_sections.geojson"],
+            "artifacts": [
+                SOUTH_FORK_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
+                SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE,
+                "hydrography/cross_sections.geojson",
+            ],
             "source_ids": ["usgs_3dep", "usgs_3dhp_nhd"],
         },
         "gauge_history": {

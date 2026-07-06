@@ -1,0 +1,38 @@
+{
+  "caveats": [
+    "Fixed 80 m half-width is intentionally generous for review and does not represent channel width.",
+    "Lines use preview stationing normals and inherit the direction/CRS caveats of the mainstem stationing candidate.",
+    "No imagery, DEM, hydrology, or guide validation has accepted these seed lines yet."
+  ],
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "source_mainstem_candidate": "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
+    "stationing_candidate": "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json"
+  },
+  "outputs": {
+    "cross_section_seed_geojson": "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson"
+  },
+  "parameters": {
+    "endpoint_policy": "include_final_station_even_when_not_on_interval",
+    "half_width_m_each_side": 80.0,
+    "interval_m": 200.0,
+    "line_total_width_m": 160.0
+  },
+  "promotion_gates": [
+    "Compare each seed line against NAIP water edge, 3DEP terrain relief, and visible banks before deriving bank polygons.",
+    "Confirm production CRS and stationing before using these offsets for solver or Unreal geometry.",
+    "Clip, move, delete, or add cross sections in the editor based on guide-reviewed rapids, eddies, shelves, boulders, and access constraints.",
+    "Do not infer wetted width, bank truth, or hazard geometry from these fixed-width seed lines alone."
+  ],
+  "review_status": "seed_candidates_review_required_not_banks_or_cross_sections",
+  "river_id": "american_south_fork",
+  "schema": "raftsim.nhd_cross_section_seed_manifest.v0",
+  "section_id": "chili_bar_to_coloma",
+  "summary": {
+    "feature_count": 133,
+    "first_station_m": 0.0,
+    "last_station_m": 26204.692,
+    "source_station_sample_count": 264,
+    "source_vertex_count": 361
+  }
+}

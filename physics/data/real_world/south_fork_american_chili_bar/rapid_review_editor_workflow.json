@@ -176,9 +176,9 @@
       "visible_by_default": true
     },
     {
-      "artifact_path": "hydrography/cross_sections.geojson",
+      "artifact_path": "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
       "display_name": "Cross Sections",
-      "display_role": "Bank offsets, width, slope, constriction, and section sampling for solver authoring.",
+      "display_role": "Review-gated cross-section seed lines, future bank offsets, width, slope, constriction, and solver section sampling.",
       "layer_id": "cross_sections",
       "layer_kind": "vector",
       "required_for_review": true,
@@ -420,6 +420,8 @@
         },
         "cross_sections": {
           "artifacts": [
+            "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
+            "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
             "hydrography/cross_sections.geojson"
           ],
           "layer_id": "cross_sections",
@@ -637,6 +639,8 @@
         },
         "cross_sections": {
           "artifacts": [
+            "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
+            "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
             "hydrography/cross_sections.geojson"
           ],
           "layer_id": "cross_sections",
@@ -853,6 +857,8 @@
         },
         "cross_sections": {
           "artifacts": [
+            "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
+            "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
             "hydrography/cross_sections.geojson"
           ],
           "layer_id": "cross_sections",
@@ -1071,6 +1077,8 @@
         },
         "cross_sections": {
           "artifacts": [
+            "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
+            "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
             "hydrography/cross_sections.geojson"
           ],
           "layer_id": "cross_sections",
