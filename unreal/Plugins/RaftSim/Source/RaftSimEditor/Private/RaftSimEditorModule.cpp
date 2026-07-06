@@ -230,7 +230,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.ElevationSample =
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_sample_512.tif");
     SouthFork.SourceDrapeDescription =
-        TEXT("larger official USDA/APFO NAIP 1024px corridor sample sampled into a denser terrain-conforming source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into bank and valley preview geometry; first-party procedural wet-bank, leaf-litter, talus, and vertex-color water-gradient detail generated as rights-safe proxy dressing; full elevation conditioning remains pending; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers");
+        TEXT("larger official USDA/APFO NAIP 1024px corridor sample sampled into a denser terrain-conforming source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into bank and valley preview geometry; review-gated source water/vegetation masks sampled into terrain color and deterministic wet-rock, talus, foliage, and understory placement; first-party procedural wet-bank, leaf-litter, talus, and vertex-color water-gradient detail generated as rights-safe proxy dressing; full elevation conditioning remains pending; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers");
     SouthFork.FlowBandId = TEXT("median_runnable");
     SouthFork.FlowBandDisplayName = TEXT("Median Runnable / Summer Commercial");
     SouthFork.FlowBandSource = TEXT("physics/data/real_world/south_fork_american_chili_bar/flow_presets.json");
@@ -270,7 +270,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.ElevationSample =
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif");
     Colorado.SourceDrapeDescription =
-        TEXT("larger official USDA/APFO NAIP 1024px Lees Ferry corridor sample sampled into a denser terrain-conforming canyon source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into canyon bank preview geometry; first-party procedural strata, talus, wet-rock, and vertex-color water-gradient detail generated as rights-safe proxy dressing; full canyon heightfield conditioning remains pending; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers");
+        TEXT("larger official USDA/APFO NAIP 1024px Lees Ferry corridor sample sampled into a denser terrain-conforming canyon source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into canyon bank preview geometry; review-gated source water/vegetation masks sampled into terrain color and deterministic wet-rock, talus, sparse scrub, and boulder placement; first-party procedural strata, talus, wet-rock, and vertex-color water-gradient detail generated as rights-safe proxy dressing; full canyon heightfield conditioning remains pending; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers");
     Colorado.FlowBandId = TEXT("moderate_release_planning");
     Colorado.FlowBandDisplayName = TEXT("Moderate Release Planning");
     Colorado.FlowBandSource = TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json");
@@ -316,7 +316,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.ElevationSample =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
-        TEXT("larger deterministic 1024px preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, sampled into a denser terrain-conforming rainforest source-drape mosaic with cloud gaps filled by DEM-derived shading; larger derived 1024px Copernicus DEM relief preview and review-gated 1009px heightfield candidate sampled into Pacuare bank and gorge preview geometry; first-party procedural rainforest leaf-litter, wet-rock, talus, and vertex-color water-gradient detail generated as rights-safe proxy dressing; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water shaders, waterfalls, foam, raft, and lighting remain proxy layers");
+        TEXT("larger deterministic 1024px preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, sampled into a denser terrain-conforming rainforest source-drape mosaic with cloud gaps filled by DEM-derived shading; larger derived 1024px Copernicus DEM relief preview and review-gated 1009px heightfield candidate sampled into Pacuare bank and gorge preview geometry; review-gated source water/vegetation masks sampled into terrain color and deterministic wet-rock, talus, rainforest foliage, and understory placement; first-party procedural rainforest leaf-litter, wet-rock, talus, and vertex-color water-gradient detail generated as rights-safe proxy dressing; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water shaders, waterfalls, foam, raft, and lighting remain proxy layers");
     Pacuare.FlowBandId = TEXT("rainfed_runnable_planning");
     Pacuare.FlowBandDisplayName = TEXT("Rain-Fed Runnable Planning");
     Pacuare.FlowBandSource = TEXT("physics/data/real_world/pacuare_river_costa_rica/flow_presets.json");
@@ -755,6 +755,32 @@ float GetPreviewActiveRiverHalfWidthCm(const FRaftSimEnvironmentPreviewSpec& Spe
 float GetPreviewWaterSurfaceBaseZCm(const FRaftSimEnvironmentPreviewSpec& Spec)
 {
     return 10.0f + Spec.FlowWaterLevelOffsetCm;
+}
+
+void GetPreviewMaskUv(const FRaftSimEnvironmentPreviewSpec& Spec, float X, float Y, float& OutU, float& OutV)
+{
+    const float MinX = -5800.0f;
+    const float MaxX = 26500.0f;
+    const float HalfWidth = Spec.bDesertCanyon ? 4300.0f : 2750.0f;
+    OutU = FMath::Clamp((X - MinX) / (MaxX - MinX), 0.0f, 1.0f);
+    OutV = FMath::Clamp((Y + HalfWidth) / (HalfWidth * 2.0f), 0.0f, 1.0f);
+}
+
+float SamplePreviewMaskAtWorld(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* Mask,
+    float X,
+    float Y)
+{
+    if (!Mask || !Mask->IsValid())
+    {
+        return 0.0f;
+    }
+
+    float U = 0.0f;
+    float V = 0.0f;
+    GetPreviewMaskUv(Spec, X, Y, U, V);
+    return Mask->SampleLuma(U, V);
 }
 
 float SamplePreviewTerrainReliefCm(
@@ -1357,6 +1383,8 @@ void AddPreviewProceduralEnvironmentDetail(
     const FRaftSimEnvironmentPreviewSpec& Spec,
     const FRaftSimPreviewImage* TerrainRelief,
     const FRaftSimPreviewImage* HeightfieldPreview,
+    const FRaftSimPreviewImage* WaterMask,
+    const FRaftSimPreviewImage* VegetationMask,
     UStaticMesh* PebbleMesh)
 {
     if (!World)
@@ -1420,14 +1448,31 @@ void AddPreviewProceduralEnvironmentDetail(
     for (int32 PebbleIndex = 0; PebbleIndex < PebbleCount; ++PebbleIndex)
     {
         const float T = static_cast<float>(PebbleIndex) / static_cast<float>(FMath::Max(1, PebbleCount - 1));
-        const float X = FMath::Lerp(-4300.0f, 24600.0f, T) + 190.0f * FMath::Sin(static_cast<float>(PebbleIndex) * 2.13f);
-        const float CenterY = GetPreviewRiverCenterY(Spec, X);
         const float Side = (PebbleIndex % 2 == 0) ? -1.0f : 1.0f;
         const float BarJitter = FMath::Abs(FMath::Sin(static_cast<float>(PebbleIndex) * 1.31f));
-        const float Offset = ActiveRiverHalfWidth + (Spec.bDesertCanyon ? 120.0f : 85.0f) +
+        const float BaseX = FMath::Lerp(-4300.0f, 24600.0f, T) + 190.0f * FMath::Sin(static_cast<float>(PebbleIndex) * 2.13f);
+        const float BaseOffset = ActiveRiverHalfWidth + (Spec.bDesertCanyon ? 120.0f : 85.0f) +
             BarJitter * (Spec.bDesertCanyon ? 520.0f : 310.0f) +
             static_cast<float>(PebbleIndex % 4) * (Spec.bDesertCanyon ? 68.0f : 42.0f);
-        const float Y = CenterY + Side * Offset;
+        float X = BaseX;
+        float Y = GetPreviewRiverCenterY(Spec, X) + Side * BaseOffset;
+        float BestScore = -1000.0f;
+        for (int32 CandidateIndex = 0; CandidateIndex < 4; ++CandidateIndex)
+        {
+            const float CandidateX = BaseX + 72.0f * FMath::Sin(static_cast<float>(PebbleIndex) * 0.41f + static_cast<float>(CandidateIndex) * 1.37f);
+            const float CandidateOffset = BaseOffset + Side * 92.0f * (static_cast<float>(CandidateIndex) - 1.5f);
+            const float CandidateY = GetPreviewRiverCenterY(Spec, CandidateX) + Side * CandidateOffset;
+            const float WaterT = SamplePreviewMaskAtWorld(Spec, WaterMask, CandidateX, CandidateY);
+            const float VegetationT = SamplePreviewMaskAtWorld(Spec, VegetationMask, CandidateX, CandidateY);
+            const float Score = WaterT * 1.25f - VegetationT * 0.42f +
+                0.04f * FMath::Sin(static_cast<float>(PebbleIndex) * 0.73f + static_cast<float>(CandidateIndex));
+            if (Score > BestScore)
+            {
+                BestScore = Score;
+                X = CandidateX;
+                Y = CandidateY;
+            }
+        }
         const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief, HeightfieldPreview);
         const float PebbleScale = 0.72f + 0.18f * static_cast<float>(PebbleIndex % 5);
         const FVector Scale = Spec.bDesertCanyon
@@ -1438,6 +1483,11 @@ void AddPreviewProceduralEnvironmentDetail(
             : (Spec.bHasWaterfalls
                   ? ScalePreviewColor(FMath::Lerp(FLinearColor(0.045f, 0.060f, 0.050f), Spec.RockColor, 0.58f), 0.86f + 0.05f * static_cast<float>(PebbleIndex % 5))
                   : ScalePreviewColor(FMath::Lerp(FLinearColor(0.20f, 0.18f, 0.14f), Spec.RockColor, 0.52f), 0.88f + 0.05f * static_cast<float>(PebbleIndex % 4)));
+        const float WetMaskT = SamplePreviewMaskAtWorld(Spec, WaterMask, X, Y);
+        const FLinearColor MaskAwarePebbleColor = FMath::Lerp(
+            PebbleColor,
+            FMath::Lerp(ScalePreviewColor(Spec.RockColor, 0.45f), ScalePreviewColor(Spec.WaterColor, 0.36f), 0.35f),
+            FMath::Clamp(WetMaskT * 0.42f, 0.0f, 0.50f));
 
         AddPreviewMeshActor(
             World,
@@ -1446,7 +1496,7 @@ void AddPreviewProceduralEnvironmentDetail(
             FVector(X, Y, TerrainZ + (Spec.bDesertCanyon ? 24.0f : 18.0f)),
             FRotator(0.0f, static_cast<float>((PebbleIndex * 29) % 360), 0.0f),
             Scale,
-            PebbleColor);
+            MaskAwarePebbleColor);
     }
 }
 
@@ -1950,19 +2000,42 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     AddPreviewAerialDrapeTiles(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, WaterMaskPtr, VegetationMaskPtr);
     AddPreviewRiverRibbonMesh(World, Spec);
     AddPreviewWetBankDressing(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr);
-    AddPreviewProceduralEnvironmentDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, SphereMesh);
+    AddPreviewProceduralEnvironmentDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, WaterMaskPtr, VegetationMaskPtr, SphereMesh);
     AddPreviewWaterSurfaceDetail(World, Spec);
     AddPreviewFoamAndHydraulics(World, Spec);
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     for (int32 BoulderIndex = 0; BoulderIndex < Spec.BoulderCount; ++BoulderIndex)
     {
-        const float X = -3600.0f + static_cast<float>(BoulderIndex) * (28200.0f / FMath::Max(1, Spec.BoulderCount));
-        const float CenterY = GetPreviewRiverCenterY(Spec, X);
         const float Side = (BoulderIndex % 2 == 0) ? -1.0f : 1.0f;
-        const float Y = CenterY + Side * (ActiveRiverHalfWidth * (0.32f + 0.55f * FMath::Abs(FMath::Sin(static_cast<float>(BoulderIndex) * 1.91f))));
+        const float BaseX = -3600.0f + static_cast<float>(BoulderIndex) * (28200.0f / FMath::Max(1, Spec.BoulderCount));
+        const float BaseOffset = ActiveRiverHalfWidth * (0.32f + 0.55f * FMath::Abs(FMath::Sin(static_cast<float>(BoulderIndex) * 1.91f)));
+        float X = BaseX;
+        float Y = GetPreviewRiverCenterY(Spec, X) + Side * BaseOffset;
+        float BestBoulderScore = -1000.0f;
+        for (int32 CandidateIndex = 0; CandidateIndex < 5; ++CandidateIndex)
+        {
+            const float CandidateX = BaseX + 145.0f * FMath::Sin(static_cast<float>(BoulderIndex) * 0.67f + static_cast<float>(CandidateIndex) * 1.21f);
+            const float CandidateOffset = BaseOffset + Side * 125.0f * (static_cast<float>(CandidateIndex) - 2.0f);
+            const float CandidateY = GetPreviewRiverCenterY(Spec, CandidateX) + Side * CandidateOffset;
+            const float WaterT = SamplePreviewMaskAtWorld(Spec, WaterMaskPtr, CandidateX, CandidateY);
+            const float VegetationT = SamplePreviewMaskAtWorld(Spec, VegetationMaskPtr, CandidateX, CandidateY);
+            const float Score = WaterT * 1.15f - VegetationT * 0.70f +
+                0.05f * FMath::Sin(static_cast<float>(BoulderIndex) * 0.97f + static_cast<float>(CandidateIndex));
+            if (Score > BestBoulderScore)
+            {
+                BestBoulderScore = Score;
+                X = CandidateX;
+                Y = CandidateY;
+            }
+        }
         const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainReliefPtr, HeightfieldPreviewPtr);
         const float Scale = Spec.bDesertCanyon ? 1.6f : 1.0f + 0.35f * static_cast<float>(BoulderIndex % 3);
+        const float BoulderWaterT = SamplePreviewMaskAtWorld(Spec, WaterMaskPtr, X, Y);
+        const FLinearColor BoulderColor = FMath::Lerp(
+            Spec.RockColor,
+            FMath::Lerp(ScalePreviewColor(Spec.RockColor, 0.46f), ScalePreviewColor(Spec.WaterColor, 0.34f), 0.30f),
+            FMath::Clamp(BoulderWaterT * 0.36f, 0.0f, 0.42f));
         AddPreviewMeshActor(
             World,
             PcgBoulderMesh ? PcgBoulderMesh : SphereMesh,
@@ -1970,24 +2043,43 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             FVector(X, Y, FMath::Max(24.0f, TerrainZ + 44.0f + 12.0f * static_cast<float>(BoulderIndex % 4))),
             FRotator(0.0f, static_cast<float>(BoulderIndex * 31), 0.0f),
             PcgBoulderMesh ? FVector(Scale * 1.25f, Scale * 1.05f, Scale * 0.72f) : FVector(Scale * 1.4f, Scale, Scale * 0.62f),
-            Spec.RockColor);
+            BoulderColor);
     }
 
     for (int32 FoliageIndex = 0; FoliageIndex < Spec.FoliageCount; ++FoliageIndex)
     {
-        const float X = -2400.0f + static_cast<float>(FoliageIndex) * (28600.0f / FMath::Max(1, Spec.FoliageCount));
-        const float CenterY = GetPreviewRiverCenterY(Spec, X);
         const float Side = (FoliageIndex % 2 == 0) ? -1.0f : 1.0f;
         const float BankOffset = Spec.bDesertCanyon ? ActiveRiverHalfWidth + 1350.0f : ActiveRiverHalfWidth + 620.0f;
-        const float Y = CenterY + Side * (BankOffset + 210.0f * FMath::Sin(static_cast<float>(FoliageIndex) * 1.31f));
+        const float BaseX = -2400.0f + static_cast<float>(FoliageIndex) * (28600.0f / FMath::Max(1, Spec.FoliageCount));
+        float X = BaseX;
+        float Y = GetPreviewRiverCenterY(Spec, X) + Side * (BankOffset + 210.0f * FMath::Sin(static_cast<float>(FoliageIndex) * 1.31f));
+        float BestFoliageScore = -1000.0f;
+        for (int32 CandidateIndex = 0; CandidateIndex < 5; ++CandidateIndex)
+        {
+            const float CandidateX = BaseX + 210.0f * FMath::Sin(static_cast<float>(FoliageIndex) * 0.49f + static_cast<float>(CandidateIndex) * 1.51f);
+            const float CandidateOffset = BankOffset +
+                300.0f * FMath::Sin(static_cast<float>(FoliageIndex) * 0.83f + static_cast<float>(CandidateIndex) * 0.91f);
+            const float CandidateY = GetPreviewRiverCenterY(Spec, CandidateX) + Side * CandidateOffset;
+            const float VegetationT = SamplePreviewMaskAtWorld(Spec, VegetationMaskPtr, CandidateX, CandidateY);
+            const float WaterT = SamplePreviewMaskAtWorld(Spec, WaterMaskPtr, CandidateX, CandidateY);
+            const float Score = VegetationT * (Spec.bDesertCanyon ? 0.65f : 1.45f) - WaterT * 1.10f +
+                0.05f * FMath::Sin(static_cast<float>(FoliageIndex) * 1.17f + static_cast<float>(CandidateIndex));
+            if (Score > BestFoliageScore)
+            {
+                BestFoliageScore = Score;
+                X = CandidateX;
+                Y = CandidateY;
+            }
+        }
         const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainReliefPtr, HeightfieldPreviewPtr);
         const float Height = Spec.bHasWaterfalls ? 2.35f + 0.28f * static_cast<float>(FoliageIndex % 5) : (Spec.bDesertCanyon ? 0.50f : 1.45f + 0.18f * static_cast<float>(FoliageIndex % 3));
         const float CanopyWidth = Spec.bHasWaterfalls ? 1.35f + 0.18f * static_cast<float>(FoliageIndex % 4) : (Spec.bDesertCanyon ? 0.55f : 0.92f + 0.10f * static_cast<float>(FoliageIndex % 3));
+        const float FoliageMaskT = SamplePreviewMaskAtWorld(Spec, VegetationMaskPtr, X, Y);
         const FLinearColor CanopyColor = Spec.bDesertCanyon
             ? FLinearColor(0.22f, 0.28f, 0.13f)
             : FLinearColor(
                   FMath::Clamp(Spec.FoliageColor.R + 0.025f * static_cast<float>(FoliageIndex % 3), 0.0f, 1.0f),
-                  FMath::Clamp(Spec.FoliageColor.G + 0.055f * static_cast<float>((FoliageIndex + 1) % 4), 0.0f, 1.0f),
+                  FMath::Clamp(Spec.FoliageColor.G + 0.055f * static_cast<float>((FoliageIndex + 1) % 4) + FoliageMaskT * 0.055f, 0.0f, 1.0f),
                   FMath::Clamp(Spec.FoliageColor.B + 0.025f * static_cast<float>((FoliageIndex + 2) % 3), 0.0f, 1.0f));
         UStaticMesh* PcgFoliageMesh = nullptr;
         if (Spec.bDesertCanyon)
@@ -2056,14 +2148,31 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             for (int32 UnderstoryIndex = 0; UnderstoryIndex < UnderstoryClusterCount; ++UnderstoryIndex)
             {
                 const float Phase = static_cast<float>(FoliageIndex) * 0.77f + static_cast<float>(UnderstoryIndex) * 1.93f;
-                const float UnderstoryX = X + 95.0f * FMath::Cos(Phase) + 70.0f * static_cast<float>(UnderstoryIndex);
-                const float UnderstoryY =
+                float UnderstoryX = X + 95.0f * FMath::Cos(Phase) + 70.0f * static_cast<float>(UnderstoryIndex);
+                float UnderstoryY =
                     Y - Side * (155.0f + 70.0f * static_cast<float>(UnderstoryIndex)) + 54.0f * FMath::Sin(Phase);
+                float BestUnderstoryScore = -1000.0f;
+                for (int32 CandidateIndex = 0; CandidateIndex < 4; ++CandidateIndex)
+                {
+                    const float CandidateX = UnderstoryX + 72.0f * FMath::Sin(Phase + static_cast<float>(CandidateIndex) * 1.31f);
+                    const float CandidateY = UnderstoryY + Side * 86.0f * FMath::Cos(Phase * 0.73f + static_cast<float>(CandidateIndex) * 1.17f);
+                    const float VegetationT = SamplePreviewMaskAtWorld(Spec, VegetationMaskPtr, CandidateX, CandidateY);
+                    const float WaterT = SamplePreviewMaskAtWorld(Spec, WaterMaskPtr, CandidateX, CandidateY);
+                    const float Score = VegetationT * 1.30f - WaterT * 0.95f +
+                        0.04f * FMath::Sin(Phase + static_cast<float>(CandidateIndex));
+                    if (Score > BestUnderstoryScore)
+                    {
+                        BestUnderstoryScore = Score;
+                        UnderstoryX = CandidateX;
+                        UnderstoryY = CandidateY;
+                    }
+                }
                 const float UnderstoryZ = GetPreviewTerrainHeightCm(Spec, UnderstoryX, UnderstoryY, TerrainReliefPtr, HeightfieldPreviewPtr);
+                const float UnderstoryMaskT = SamplePreviewMaskAtWorld(Spec, VegetationMaskPtr, UnderstoryX, UnderstoryY);
                 const FLinearColor UnderstoryColor = FMath::Lerp(
                     CanopyColor,
                     Spec.bHasWaterfalls ? FLinearColor(0.035f, 0.20f, 0.07f) : FLinearColor(0.13f, 0.26f, 0.10f),
-                    0.35f);
+                    FMath::Clamp(0.35f + UnderstoryMaskT * 0.18f, 0.35f, 0.55f));
                 if (PcgSeedlingMesh)
                 {
                     const float SeedlingScale = Spec.bHasWaterfalls ? 0.24f + 0.03f * static_cast<float>(UnderstoryIndex) : 0.18f;
