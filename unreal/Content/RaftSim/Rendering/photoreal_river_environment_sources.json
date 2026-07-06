@@ -156,6 +156,22 @@
           "unreal_use": "review-gated preview water/vegetation masks sampled into South Fork terrain and source-drape color variation; not final segmentation or production masks"
         },
         {
+          "artifact_id": "south_fork_production_import_pilot_source_drape_4096",
+          "category": "stitched_aerial_imagery_pilot_drape",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png",
+          "provider": "RaftSim geospatial preview utility from four official USDA/APFO NAIP ImageServer pilot tiles",
+          "status": "active_unreal_preview_drape_review_gated",
+          "unreal_use": "larger stitched South Fork pilot source drape sampled by /Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview; not final orthomosaic or production terrain material"
+        },
+        {
+          "artifact_id": "south_fork_production_import_pilot_source_masks_2048",
+          "category": "derived_water_and_vegetation_masks",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/water_mask_2048.png; physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/vegetation_mask_2048.png",
+          "provider": "RaftSim geospatial preview utility from the stitched South Fork pilot NAIP drape plus bounded preview channel prior",
+          "status": "active_unreal_preview_masks_review_gated",
+          "unreal_use": "larger review-gated South Fork pilot water/vegetation masks sampled into terrain/source-drape color and deterministic detail placement; not final segmentation, bank polygons, or wet-rock masks"
+        },
+        {
           "artifact_id": "usgs_3dep_chili_bar_sample_256",
           "category": "terrain_sample",
           "path": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_sample_256.tif",
@@ -194,6 +210,22 @@
           "provider": "RaftSim geospatial preview utility from larger USGS 3DEP ImageServer corridor sample",
           "status": "sampled_by_unreal_preview_geometry",
           "unreal_use": "larger preview-only bank and valley terrain relief perturbation for /Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview"
+        },
+        {
+          "artifact_id": "south_fork_production_import_pilot_dem_relief_2048",
+          "category": "stitched_terrain_relief_preview",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/dem_relief_2048.png",
+          "provider": "RaftSim geospatial preview utility from four official USGS 3DEP ImageServer pilot DEM tiles",
+          "status": "active_unreal_preview_relief_review_gated",
+          "unreal_use": "larger stitched South Fork pilot DEM relief sampled into generated preview terrain; not hydrologically conditioned production terrain"
+        },
+        {
+          "artifact_id": "south_fork_production_import_pilot_heightfield_candidate_2017",
+          "category": "derived_heightfield_candidate",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/heightfield_candidate_2017.png",
+          "provider": "RaftSim geospatial preview utility from four official USGS 3DEP ImageServer pilot DEM tiles",
+          "status": "active_unreal_preview_heightfield_review_gated",
+          "unreal_use": "larger 2017px 16-bit grayscale South Fork pilot heightfield candidate sampled into preview terrain; not reprojected, hydrologically conditioned, channel-burned, or production-approved"
         }
       ],
       "flow_sources": [
