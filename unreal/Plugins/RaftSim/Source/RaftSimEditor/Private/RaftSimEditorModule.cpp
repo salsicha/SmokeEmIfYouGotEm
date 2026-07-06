@@ -209,7 +209,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.ElevationSample =
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_sample_256.tif");
     SouthFork.SourceDrapeDescription =
-        TEXT("official USDA/APFO NAIP 512px aerial sample sampled into visible terrain overlay tiles; derived USGS 3DEP relief preview sampled into bank and valley terrain geometry; full elevation conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
+        TEXT("official USDA/APFO NAIP 512px aerial sample sampled into a denser terrain-conforming source-drape mosaic; derived USGS 3DEP relief preview sampled into bank and valley terrain geometry; full elevation conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
     SouthFork.WaterColor = FLinearColor(0.05f, 0.42f, 0.47f);
     SouthFork.TerrainColor = FLinearColor(0.35f, 0.30f, 0.21f);
     SouthFork.RockColor = FLinearColor(0.38f, 0.36f, 0.31f);
@@ -236,7 +236,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.ElevationSample =
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_sample_256.tif");
     Colorado.SourceDrapeDescription =
-        TEXT("official USDA/APFO NAIP 512px Lees Ferry aerial sample sampled into visible canyon terrain overlay tiles; derived USGS 3DEP relief preview sampled into canyon bank geometry; full canyon heightfield conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
+        TEXT("official USDA/APFO NAIP 512px Lees Ferry aerial sample sampled into a denser terrain-conforming canyon source-drape mosaic; derived USGS 3DEP relief preview sampled into canyon bank geometry; full canyon heightfield conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
     Colorado.WaterColor = FLinearColor(0.34f, 0.28f, 0.19f);
     Colorado.TerrainColor = FLinearColor(0.48f, 0.30f, 0.18f);
     Colorado.RockColor = FLinearColor(0.55f, 0.32f, 0.20f);
@@ -264,7 +264,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.ElevationSample =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
-        TEXT("deterministic preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, with cloud gaps filled by DEM-derived rainforest shading; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water, waterfalls, foam, raft, and lighting remain proxy layers");
+        TEXT("deterministic preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, sampled into a denser terrain-conforming rainforest source-drape mosaic with cloud gaps filled by DEM-derived shading; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water, waterfalls, foam, raft, and lighting remain proxy layers");
     Pacuare.WaterColor = FLinearColor(0.04f, 0.35f, 0.28f);
     Pacuare.TerrainColor = FLinearColor(0.17f, 0.22f, 0.13f);
     Pacuare.RockColor = FLinearColor(0.20f, 0.24f, 0.20f);
@@ -745,8 +745,8 @@ void AddPreviewAerialDrapeTiles(
         return;
     }
 
-    constexpr int32 XTiles = 40;
-    constexpr int32 YTiles = 12;
+    constexpr int32 XTiles = 64;
+    constexpr int32 YTiles = 20;
     const float MinX = -5600.0f;
     const float MaxX = 26000.0f;
     const float HalfWidth = Spec.bDesertCanyon ? 4300.0f : 2750.0f;
@@ -767,9 +767,13 @@ void AddPreviewAerialDrapeTiles(
                 continue;
             }
 
-            const FLinearColor AerialColor = FMath::Lerp(AerialDrape.Sample(U, V), Spec.TerrainColor, 0.08f);
-            const float HalfLength = TileLength * 0.50f;
-            const float HalfTileWidth = TileWidth * 0.50f;
+            FLinearColor AerialColor = FMath::Lerp(AerialDrape.Sample(U, V), Spec.TerrainColor, 0.08f);
+            AerialColor.R = FMath::Max(AerialColor.R, Spec.TerrainColor.R * 0.80f + 0.04f);
+            AerialColor.G = FMath::Max(AerialColor.G, Spec.TerrainColor.G * 0.80f + 0.04f);
+            AerialColor.B = FMath::Max(AerialColor.B, Spec.TerrainColor.B * 0.80f + 0.04f);
+            AerialColor.A = 1.0f;
+            const float HalfLength = TileLength * 0.56f;
+            const float HalfTileWidth = TileWidth * 0.56f;
             const float TileZOffset = 14.0f;
             const float X0 = X - HalfLength;
             const float X1 = X + HalfLength;

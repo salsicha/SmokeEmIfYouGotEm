@@ -134,8 +134,8 @@
           "category": "aerial_imagery_sample",
           "path": "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_sample_512.png",
           "provider": "USDA/APFO NAIP ImageServer",
-          "status": "draped_into_unreal_preview_terrain_overlay_tiles",
-          "unreal_use": "source-derived visible terrain overlay layer for /Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview"
+          "status": "draped_into_unreal_preview_terrain_conforming_mosaic",
+          "unreal_use": "source-derived denser terrain-conforming drape mosaic for /Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview"
         },
         {
           "artifact_id": "usgs_3dep_chili_bar_sample_256",
@@ -194,8 +194,8 @@
           "category": "aerial_imagery_sample",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_sample_512.png",
           "provider": "USDA/APFO NAIP ImageServer",
-          "status": "draped_into_unreal_preview_terrain_overlay_tiles",
-          "unreal_use": "source-derived visible canyon terrain overlay layer for /Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"
+          "status": "draped_into_unreal_preview_terrain_conforming_mosaic",
+          "unreal_use": "source-derived denser terrain-conforming canyon drape mosaic for /Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"
         },
         {
           "artifact_id": "usgs_3dep_lees_ferry_sample_256",
@@ -267,8 +267,8 @@
           "category": "derived_preview_drape",
           "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
           "provider": "RaftSim source-preview tool from NASA GIBS WMS and Copernicus DEM GLO-30 inputs",
-          "status": "draped_into_unreal_preview_terrain_overlay_tiles",
-          "unreal_use": "source-derived coarse rainforest terrain overlay layer with DEM relief and cloud-gap preview fill for /Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
+          "status": "draped_into_unreal_preview_terrain_conforming_mosaic",
+          "unreal_use": "source-derived denser terrain-conforming rainforest drape mosaic with DEM relief and cloud-gap preview fill for /Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
         },
         {
           "artifact_id": "copernicus_dem_glo30_pacuare_bounds_tiles",
