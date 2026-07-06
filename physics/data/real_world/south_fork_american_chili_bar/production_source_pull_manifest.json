@@ -35,7 +35,7 @@
   "production_blockers": [
     "Full corridor DEM/lidar tiles are not downloaded or conditioned yet.",
     "Aerial imagery and water/vegetation masks are not downloaded yet.",
-    "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, but the mainstem still needs ordering, reprojection, bank/cross-section derivation, NAIP/DEM alignment, and guide review.",
+    "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract and an ordered South Fork mainstem candidate, but it still needs direction confirmation, reprojection, bank/cross-section derivation, NAIP/DEM alignment, and guide review.",
     "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window, but broader seasonal windows, A25 X-flag interpretation, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet."
   ],
@@ -268,7 +268,9 @@
       "provider": "USGS National Hydrography Dataset via The National Map",
       "related_artifacts": [
         "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
-        "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson"
+        "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
+        "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+        "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson"
       ],
       "status": "source_extract_attached_review_required",
       "summary": {
@@ -283,6 +285,35 @@
         "official_hydrography_source_alignment",
         "future_ordered_centerline_review",
         "tributary_waterbody_and_bank_context",
+        "naip_dem_alignment_gate"
+      ]
+    },
+    {
+      "artifact_id": "nhd_hu8_18020129_south_fork_mainstem_candidate",
+      "category": "hydrography_centerline_candidate",
+      "caveats": [
+        "This is a derived candidate from named NHD South Fork American River segments, not a final raftable centerline.",
+        "East-to-west orientation is inferred for Chili Bar to Coloma and still needs confirmation against official flow direction, DEM slope, station context, and guide review.",
+        "The line is still in source geographic coordinates and must be reprojected before stationing, cross-section, solver, or Unreal transform work.",
+        "No reviewed banks, shelves, side channels, rapid boundaries, access points, or guide annotations are attached yet."
+      ],
+      "path": "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+      "provider": "RaftSim derived artifact from USGS National Hydrography Dataset HU8 18020129",
+      "related_artifacts": [
+        "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson"
+      ],
+      "status": "derived_candidate_attached_review_required",
+      "summary": {
+        "connected_component_count": 1,
+        "endpoint_snapping": "none_required_exact_7_decimal_endpoint_matches",
+        "length_km_nhd_sum": 26.19019554,
+        "ordered_source_feature_count": 102,
+        "vertex_count": 361
+      },
+      "use": [
+        "candidate_centerline_review",
+        "future_stationing_seed",
+        "rapid_review_overlay",
         "naip_dem_alignment_gate"
       ]
     },

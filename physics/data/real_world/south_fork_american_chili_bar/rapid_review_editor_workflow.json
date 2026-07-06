@@ -163,9 +163,9 @@
       "visible_by_default": true
     },
     {
-      "artifact_path": "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
+      "artifact_path": "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
       "display_name": "Flowlines And Centerline",
-      "display_role": "NHD source flowlines, future ordered centerline, stationing, flow direction, and named/access hydrography context.",
+      "display_role": "Derived NHD mainstem candidate, source flowlines, future reviewed centerline, stationing, flow direction, and named/access hydrography context.",
       "layer_id": "flowlines",
       "layer_kind": "vector",
       "required_for_review": true,
@@ -454,6 +454,8 @@
             "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
             "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
             "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
+            "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+            "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
             "hydrography/centerline.geojson",
             "hydrography/banks.geojson"
           ],
@@ -668,6 +670,8 @@
             "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
             "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
             "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
+            "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+            "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
             "hydrography/centerline.geojson",
             "hydrography/banks.geojson"
           ],
@@ -881,6 +885,8 @@
             "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
             "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
             "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
+            "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+            "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
             "hydrography/centerline.geojson",
             "hydrography/banks.geojson"
           ],
@@ -1096,6 +1102,8 @@
             "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
             "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
             "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
+            "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+            "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
             "hydrography/centerline.geojson",
             "hydrography/banks.geojson"
           ],
