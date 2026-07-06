@@ -175,6 +175,7 @@
     {
       "active_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview",
       "attached_preview_inputs": [
+        "production_source_gate_review.json",
         "production_import_pilot/3dep_tiles",
         "production_import_pilot/naip_tiles",
         "production_import_pilot/source_drape_4096.png",

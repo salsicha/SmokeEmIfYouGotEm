@@ -70,6 +70,7 @@ from raftsim.real_world import (
     SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
     SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE,
     SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
+    SOUTH_FORK_NHD_MAINSTEM_CANDIDATE_FILE,
     SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
     SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
     SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE,
@@ -79,6 +80,7 @@ from raftsim.real_world import (
     SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE,
     SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE,
     SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE,
+    SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE,
     adaptive_solver_parameters,
     build_candidate_river_inventory_package,
     build_colorado_access_points_geojson,
@@ -111,6 +113,7 @@ from raftsim.real_world import (
     build_south_fork_access_publication_review,
     build_south_fork_evacuation_rescue_routes_geojson,
     build_south_fork_flow_band_review,
+    build_south_fork_production_source_gate_review,
     build_south_fork_no_publish_sensitive_polygons_geojson,
     build_south_fork_production_import_pilot,
     build_source_manifest,
@@ -219,6 +222,7 @@ def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
     }.issubset(set(manifest["artifacts"]))
     assert COURSE_ELEVATION_EXTRACTION_FILE in manifest["artifacts"]["elevation"]
     assert RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE in manifest["artifacts"]["guide_references"]
+    assert SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE in manifest["artifacts"]["source_pulls"]
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE in manifest["artifacts"]["source_pulls"]
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE in manifest["artifacts"]["source_pulls"]
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE in manifest["artifacts"]["source_pulls"]
@@ -415,6 +419,49 @@ def test_south_fork_flow_band_review_artifact_is_review_gated():
     assert review["reviewed_bands"][2]["flow_band"] == "high_runnable"
     assert review["reviewed_bands"][2]["observed_peak_days_ge_planning_flow"] == 0
     assert "final preset retuning" in review["forbidden_use"]
+
+
+def test_south_fork_production_source_gate_review_blocks_promotion_but_allows_next_renderer_iteration():
+    south_fork_dir = REAL_WORLD_DATA_DIR / "south_fork_american_chili_bar"
+    source_manifest = json.loads((south_fork_dir / "source_manifest.json").read_text())
+    gap_register = json.loads((REAL_WORLD_DATA_DIR / PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE).read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    artifact = json.loads((south_fork_dir / SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE).read_text())
+    built = build_south_fork_production_source_gate_review()
+    south_fork_gap = next(river for river in gap_register["rivers"] if river["river_id"] == "american_south_fork")
+    south_fork_readiness = next(river for river in readiness["rivers"] if river["river_id"] == "american_south_fork")
+
+    assert SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE in source_manifest["artifacts"]["source_pulls"]
+    assert SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE in south_fork_gap["attached_preview_inputs"]
+    assert (
+        readiness["canonical_inputs"]["south_fork_production_source_gate_review"]
+        == f"physics/data/real_world/south_fork_american_chili_bar/{SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE}"
+    )
+    assert (
+        south_fork_readiness["production_source_gate_review"]
+        == f"physics/data/real_world/south_fork_american_chili_bar/{SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE}"
+    )
+    assert artifact == built
+    assert artifact["schema"] == "raftsim.south_fork_production_source_gate_review.v1"
+    assert artifact["promotion_decision"]["can_drive_next_renderer_iteration"] is True
+    assert artifact["promotion_decision"]["can_drive_production_terrain_or_water"] is False
+    assert artifact["promotion_decision"]["decision"] == "do_not_promote_to_production_or_lifelike"
+
+    gate_items = {item["source_class"]: item for item in artifact["source_gate_items"]}
+    assert {
+        "terrain_dem_or_lidar",
+        "aerial_or_satellite_imagery",
+        "hydrography_and_centerline",
+        "seasonal_flow_or_release_history",
+        "protected_area_and_access_context",
+        "guide_and_reference_media_annotations",
+    } == set(gate_items)
+    assert SOUTH_FORK_NHD_MAINSTEM_CANDIDATE_FILE in gate_items["hydrography_and_centerline"]["attached_artifacts"]
+    assert SOUTH_FORK_FLOW_BAND_REVIEW_FILE in gate_items["seasonal_flow_or_release_history"]["attached_artifacts"]
+    assert "channel burning" in gate_items["terrain_dem_or_lidar"]["promotion_blockers"]
+    assert "explicit permission or compatible license" in gate_items["guide_and_reference_media_annotations"][
+        "promotion_blockers"
+    ]
 
 
 def test_south_fork_access_publication_review_artifact_tracks_official_source_leads():
@@ -1666,6 +1713,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
         "seasonal_flow_or_release_history",
         "guide_and_reference_media_annotations",
     }.issubset(pacuare_p0)
+    assert SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert "hydrology/south_fork_modern_flow_source_selection.json" in rivers["american_south_fork"]["attached_preview_inputs"]
     assert (
         "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json"

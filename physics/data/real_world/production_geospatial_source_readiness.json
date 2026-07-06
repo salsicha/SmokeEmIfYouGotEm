@@ -4,7 +4,8 @@
     "flow_visual_bands": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
     "photoreal_environment_sources": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
     "production_environment_gap_register": "physics/data/real_world/production_environment_gap_register.json",
-    "reference_media_links": "physics/data/real_world/reference_media_link_manifest.json"
+    "reference_media_links": "physics/data/real_world/reference_media_link_manifest.json",
+    "south_fork_production_source_gate_review": "physics/data/real_world/south_fork_american_chili_bar/production_source_gate_review.json"
   },
   "generated_on": "2026-07-06",
   "global_source_leads": [
@@ -350,6 +351,7 @@
       "production_import_pilot_derivatives_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_import_pilot_derivatives_manifest.json",
       "production_import_pilot_pull_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_import_pilot_pull_manifest.json",
       "production_readiness": "preview_only_not_lifelike",
+      "production_source_gate_review": "physics/data/real_world/south_fork_american_chili_bar/production_source_gate_review.json",
       "river_id": "american_south_fork",
       "section_id": "chili_bar_to_coloma"
     },

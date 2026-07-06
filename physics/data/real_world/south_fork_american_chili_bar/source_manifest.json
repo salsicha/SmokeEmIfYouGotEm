@@ -85,6 +85,7 @@
     ],
     "source_pulls": [
       "production_source_pull_manifest.json",
+      "production_source_gate_review.json",
       "production_import_pilot.json",
       "production_import_pilot_pull_manifest.json",
       "production_import_pilot_derivatives_manifest.json"
