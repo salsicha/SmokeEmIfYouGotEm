@@ -322,6 +322,8 @@
         "hydrography/production_import_pilot/snit_config_ssnit.js",
         "hydrography/production_import_pilot/snit_ico_servicios_ogc_lista_capas.js",
         "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+        "hydrography/production_import_pilot/snit_layer_metadata_summary.json",
+        "hydrography/production_import_pilot/snit_layer_metadata/*.json",
         "hydrography/production_import_pilot/snit_layer_lists/direccion_de_agua_capas_de_nodo.json",
         "hydrography/production_import_pilot/snit_layer_lists/imn_capas_de_nodo.json",
         "hydrography/production_import_pilot/snit_layer_lists/sinac_capas_de_nodo.json",
@@ -336,6 +338,7 @@
       "summary": {
         "reviewed_node_count": 7,
         "selected_candidate_layer_count": 17,
+        "selected_metadata_layer_count": 11,
         "candidate_roles": [
           "Direccion de Agua aforo and hydrologic-unit discovery",
           "IMN rainfall climatology",
@@ -343,7 +346,9 @@
           "SINAC protected-area, forest-cover, corridor, and wetland context",
           "ICE utility context only"
         ],
-        "processing_manifest": "hydrography/production_import_pilot/snit_layer_catalog_summary.json"
+        "processing_manifest": "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+        "layer_metadata_summary": "hydrography/production_import_pilot/snit_layer_metadata_summary.json",
+        "terms_status": "SINAC protected-area/corridor/wetland layers advertise unrestricted metadata claims requiring final review; SENARA, ICE, and SINAC forest-cover records expose copyright or IP restrictions that block import until terms are approved."
       },
       "use": [
         "official_hydrography_and_station_discovery",
@@ -353,7 +358,7 @@
       ],
       "caveats": [
         "SNIT metadata is archived for discovery only; no feature geometry, tiles, station time series, or media were downloaded.",
-        "Every layer still needs terms, CRS, attribute schema, Pacuare corridor intersection, and guide/local review before import or gameplay use."
+        "Selected per-layer metadata records CRS and terms leads, but every layer still needs import permission, attribution, attribute schema, Pacuare corridor intersection, and guide/local review before import or gameplay use."
       ]
     }
   ],

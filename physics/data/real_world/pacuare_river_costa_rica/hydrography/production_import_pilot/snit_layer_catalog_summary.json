@@ -5,6 +5,7 @@
   "section_id": "lower_pacuare_planning_corridor",
   "status": "snit_catalog_and_node_layer_lists_archived_metadata_only_no_features_downloaded",
   "source_id": "snit_ogc_services_catalog",
+  "selected_layer_metadata_summary": "snit_layer_metadata_summary.json",
   "pacuare_planning_bounds_wgs84": {
     "min_lon": -83.75,
     "min_lat": 9.72,
