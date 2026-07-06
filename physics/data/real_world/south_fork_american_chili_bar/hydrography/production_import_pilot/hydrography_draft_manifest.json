@@ -1,0 +1,44 @@
+{
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "alignment_diagnostic": "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
+    "cross_section_seeds": "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+    "mainstem_manifest": "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+    "stationing": "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
+    "water_prior_manifest": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json"
+  },
+  "output_checksums": {
+    "banks": {
+      "sha256": "68837c3f4461f22c5bfdb9362f14b46d2fc000b0eac21f889ec256c98344b09b"
+    },
+    "centerline": {
+      "sha256": "c405c6d44e8f6a10f10f15ff1136c85871e85fd0a0f9fd745643e921f951c7d5"
+    },
+    "cross_sections": {
+      "sha256": "5ee6962d257f26b00d2c9e86cad329d433f90933d3ac26f33f41297594e21146"
+    }
+  },
+  "outputs": {
+    "banks": "physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/banks.geojson",
+    "centerline": "physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/centerline.geojson",
+    "cross_sections": "physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/cross_sections.geojson"
+  },
+  "review_gates": [
+    "Confirm the NHD-derived centerline direction, station zero, and working CRS.",
+    "Edit banks against NAIP, DEM relief, water prior masks, field observations, side channels, shelves, and guide notes.",
+    "Reject or repair out-of-bounds/low-water cross-section centers before solver grid generation.",
+    "Attach guide-reviewed rapid, eddy, access, and rescue annotations before gameplay or Unreal production authority."
+  ],
+  "river_id": "american_south_fork",
+  "schema": "raftsim.south_fork_production_hydrography_drafts.manifest.v1",
+  "section_id": "chili_bar_to_coloma",
+  "status": "draft_hydrography_artifacts_generated_review_required_not_production_authority",
+  "summary": {
+    "bank_offset_line_count": 2,
+    "centerline_station_sample_count": 264,
+    "centerline_vertex_count": 361,
+    "cross_section_count": 133,
+    "length_m_preview": 26204.692,
+    "mainstem_orientation": "east_endpoint_to_west_endpoint_inferred_upstream_to_downstream_for_chili_bar_to_coloma_review"
+  }
+}

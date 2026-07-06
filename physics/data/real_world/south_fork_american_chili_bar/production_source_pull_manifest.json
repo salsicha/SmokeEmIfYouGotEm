@@ -35,7 +35,7 @@
   "production_blockers": [
     "Full corridor DEM/lidar tiles are not downloaded or conditioned yet.",
     "Aerial imagery and water/vegetation masks are not downloaded yet.",
-    "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, an ordered South Fork mainstem candidate, preview metric stationing, cross-section seed lines, and a preview NAIP/DEM alignment diagnostic, but it still needs direction confirmation, production CRS selection, bank/cross-section review, stronger NAIP/DEM alignment, and guide review.",
+    "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, an ordered South Fork mainstem candidate, preview metric stationing, cross-section seed lines, a preview NAIP/DEM alignment diagnostic, and generated production-import draft centerline/bank/cross-section overlays, but it still needs direction confirmation, production CRS selection, bank/cross-section review, stronger NAIP/DEM alignment, and guide review.",
     "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window, but broader seasonal windows, A25 X-flag interpretation, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet."
   ],
@@ -433,6 +433,34 @@
         "future_mask_generation_prior",
         "hydrography_visual_review",
         "manual_bank_derivation_seed"
+      ]
+    },
+    {
+      "artifact_id": "south_fork_production_hydrography_drafts",
+      "category": "derived_hydrography_review_artifacts",
+      "caveats": [
+        "These are production-import folder overlays for editor review, not accepted route authority.",
+        "Bank lines are fixed-offset seed endpoints from cross-section review lines, not observed wetted banks.",
+        "Cross-section lines remain review seeds and must not be used as solver cross sections until bank, shelf, side-channel, and guide review pass."
+      ],
+      "path": "hydrography/production_import_pilot/hydrography_draft_manifest.json",
+      "provider": "RaftSim derived artifact from the South Fork NHD mainstem stationing and cross-section seeds",
+      "related_artifacts": [
+        "hydrography/production_import_pilot/centerline.geojson",
+        "hydrography/production_import_pilot/banks.geojson",
+        "hydrography/production_import_pilot/cross_sections.geojson"
+      ],
+      "status": "generated_review_gated_drafts_not_production_geometry",
+      "summary": {
+        "bank_offset_line_count": 2,
+        "centerline_vertex_count": 361,
+        "cross_section_count": 133
+      },
+      "use": [
+        "editor_hydrography_overlay",
+        "manual_bank_review_seed",
+        "future_solver_geometry_authoring",
+        "guide_review_stationing_context"
       ]
     },
     {

@@ -78,6 +78,12 @@ SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE = "hydrography/nhd_hu8_18020129_cross_sec
 SOUTH_FORK_NHD_ALIGNMENT_DIAGNOSTIC_FILE = "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json"
 SOUTH_FORK_NHD_WATER_PRIOR_MANIFEST_FILE = "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json"
 SOUTH_FORK_NHD_WATER_PRIOR_FILE = "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png"
+SOUTH_FORK_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE = (
+    "hydrography/production_import_pilot/hydrography_draft_manifest.json"
+)
+SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE = "hydrography/production_import_pilot/centerline.geojson"
+SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE = "hydrography/production_import_pilot/banks.geojson"
+SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE = "hydrography/production_import_pilot/cross_sections.geojson"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
@@ -1192,9 +1198,10 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                     SOUTH_FORK_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
                     SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE,
                     SOUTH_FORK_NHD_ALIGNMENT_DIAGNOSTIC_FILE,
-                    "hydrography/production_import_pilot/centerline.geojson",
-                    "hydrography/production_import_pilot/banks.geojson",
-                    "hydrography/production_import_pilot/cross_sections.geojson",
+                    SOUTH_FORK_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE,
+                    SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE,
+                    SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE,
+                    SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
                 ],
                 "promotion_gate": "Use the attached NHD HU8 extract, derived mainstem candidate, stationing, cross-section seed lines, and preview alignment diagnostic as source evidence, then confirm direction, reproject, improve NAIP/DEM alignment, hand-review banks/rapid stations, and keep OSM only as supplemental access context.",
             },
@@ -1951,6 +1958,10 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     SOUTH_FORK_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
                     SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE,
                     SOUTH_FORK_NHD_ALIGNMENT_DIAGNOSTIC_FILE,
+                    SOUTH_FORK_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE,
+                    SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE,
+                    SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE,
+                    SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
                     "hydrology/usgs_11445500_daily_discharge.json",
                     "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
                     "hydrology/south_fork_modern_flow_source_selection.json",
@@ -1972,9 +1983,10 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             SOUTH_FORK_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
                             SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE,
                             SOUTH_FORK_NHD_ALIGNMENT_DIAGNOSTIC_FILE,
-                            "hydrography/production_import_pilot/centerline.geojson",
-                            "hydrography/production_import_pilot/banks.geojson",
-                            "hydrography/production_import_pilot/cross_sections.geojson",
+                            SOUTH_FORK_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE,
+                            SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE,
+                            SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE,
+                            SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
                         ],
                         "source_leads": ["usgs_3dhp", "usgs_3dep", "guide_review"],
                         "promotion_gate": "Promote the attached NHD HU8 source extract and derived mainstem candidate only after direction, working CRS, NAIP, DEM relief, rapid stations, and guide-reviewed eddy/recovery geometry are confirmed.",
@@ -2247,9 +2259,10 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 SOUTH_FORK_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
                 SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE,
                 SOUTH_FORK_NHD_ALIGNMENT_DIAGNOSTIC_FILE,
-                "hydrography/centerline.geojson",
-                "hydrography/banks.geojson",
-                "hydrography/cross_sections.geojson",
+                SOUTH_FORK_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE,
+                SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE,
+                SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE,
+                SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
             ],
             "imagery": [
                 "imagery/tnm_naip_products.json",

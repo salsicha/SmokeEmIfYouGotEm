@@ -1,0 +1,5206 @@
+{
+  "bbox": [
+    -120.9017441,
+    38.7622587,
+    -120.719923,
+    38.814506
+  ],
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7199632,
+            38.7778975
+          ],
+          [
+            -120.7199431,
+            38.7786168
+          ],
+          [
+            -120.719923,
+            38.7793361
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7786168,
+        "center_lon": -120.7199431,
+        "center_x_east_m": 0.0,
+        "center_y_north_m": 0.0,
+        "cross_section_id": "sfa_nhd_xs_seed_000",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.021809,
+        "left_normal_north": -0.999762,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 0,
+        "station_m": 0.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.999762,
+        "tangent_north": 0.021809,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7212088,
+            38.7773784
+          ],
+          [
+            -120.7219222,
+            38.7778348
+          ],
+          [
+            -120.7226355,
+            38.7782913
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7778348,
+        "center_lon": -120.7219222,
+        "center_x_east_m": -171.551,
+        "center_y_north_m": -86.952,
+        "cross_section_id": "sfa_nhd_xs_seed_001",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.772957,
+        "left_normal_north": -0.634458,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 2,
+        "station_m": 200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.634458,
+        "tangent_north": -0.772957,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7225737,
+            38.7759893
+          ],
+          [
+            -120.7233245,
+            38.7764078
+          ],
+          [
+            -120.7240752,
+            38.7768263
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7764078,
+        "center_lon": -120.7233245,
+        "center_x_east_m": -293.107,
+        "center_y_north_m": -245.63,
+        "cross_section_id": "sfa_nhd_xs_seed_002",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.813437,
+        "left_normal_north": -0.581653,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 4,
+        "station_m": 400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.581653,
+        "tangent_north": -0.813437,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7255683,
+            38.7751171
+          ],
+          [
+            -120.7252951,
+            38.7758043
+          ],
+          [
+            -120.7250219,
+            38.7764915
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7758043,
+        "center_lon": -120.7252951,
+        "center_x_east_m": -463.929,
+        "center_y_north_m": -312.733,
+        "cross_section_id": "sfa_nhd_xs_seed_003",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.295987,
+        "left_normal_north": -0.955192,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 6,
+        "station_m": 600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.955192,
+        "tangent_north": 0.295987,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7278806,
+            38.7759955
+          ],
+          [
+            -120.7273436,
+            38.7765806
+          ],
+          [
+            -120.7268065,
+            38.7771657
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7765806,
+        "center_lon": -120.7273436,
+        "center_x_east_m": -641.497,
+        "center_y_north_m": -226.418,
+        "cross_section_id": "sfa_nhd_xs_seed_004",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.581908,
+        "left_normal_north": -0.813255,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 8,
+        "station_m": 800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.813255,
+        "tangent_north": 0.581908,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7295722,
+            38.7766191
+          ],
+          [
+            -120.7293981,
+            38.7773256
+          ],
+          [
+            -120.7292239,
+            38.7780322
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7773256,
+        "center_lon": -120.7293981,
+        "center_x_east_m": -819.586,
+        "center_y_north_m": -143.572,
+        "cross_section_id": "sfa_nhd_xs_seed_005",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.188675,
+        "left_normal_north": -0.982039,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 10,
+        "station_m": 1000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.982039,
+        "tangent_north": 0.188675,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7307388,
+            38.7762602
+          ],
+          [
+            -120.7314359,
+            38.7767317
+          ],
+          [
+            -120.7321331,
+            38.7772031
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7767317,
+        "center_lon": -120.7314359,
+        "center_x_east_m": -996.234,
+        "center_y_north_m": -209.615,
+        "cross_section_id": "sfa_nhd_xs_seed_006",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.755391,
+        "left_normal_north": -0.655274,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 12,
+        "station_m": 1200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.655274,
+        "tangent_north": -0.755391,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7318561,
+            38.7748688
+          ],
+          [
+            -120.7326664,
+            38.7752131
+          ],
+          [
+            -120.7334768,
+            38.7755574
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7752131,
+        "center_lon": -120.7326664,
+        "center_x_east_m": -1102.897,
+        "center_y_north_m": -378.472,
+        "cross_section_id": "sfa_nhd_xs_seed_007",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.878059,
+        "left_normal_north": -0.478553,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 14,
+        "station_m": 1400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.478553,
+        "tangent_north": -0.878059,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7332198,
+            38.7732765
+          ],
+          [
+            -120.7339423,
+            38.7737242
+          ],
+          [
+            -120.7346647,
+            38.774172
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7737242,
+        "center_lon": -120.7339423,
+        "center_x_east_m": -1213.491,
+        "center_y_north_m": -544.028,
+        "cross_section_id": "sfa_nhd_xs_seed_008",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.782761,
+        "left_normal_north": -0.622323,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 16,
+        "station_m": 1600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.622323,
+        "tangent_north": -0.782761,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7347054,
+            38.7719075
+          ],
+          [
+            -120.7354311,
+            38.772352
+          ],
+          [
+            -120.7361568,
+            38.7727965
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.772352,
+        "center_lon": -120.7354311,
+        "center_x_east_m": -1342.548,
+        "center_y_north_m": -696.615,
+        "cross_section_id": "sfa_nhd_xs_seed_009",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.786312,
+        "left_normal_north": -0.617829,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 18,
+        "station_m": 1800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.617829,
+        "tangent_north": -0.786312,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7379335,
+            38.7712457
+          ],
+          [
+            -120.7374491,
+            38.771858
+          ],
+          [
+            -120.7369647,
+            38.7724704
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.771858,
+        "center_lon": -120.7374491,
+        "center_x_east_m": -1517.476,
+        "center_y_north_m": -751.54,
+        "cross_section_id": "sfa_nhd_xs_seed_010",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.524905,
+        "left_normal_north": -0.851161,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 20,
+        "station_m": 2000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.851161,
+        "tangent_north": 0.524905,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7400682,
+            38.7726103
+          ],
+          [
+            -120.7392247,
+            38.7729023
+          ],
+          [
+            -120.7383812,
+            38.7731942
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7729023,
+        "center_lon": -120.7392247,
+        "center_x_east_m": -1671.391,
+        "center_y_north_m": -635.428,
+        "cross_section_id": "sfa_nhd_xs_seed_011",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.913976,
+        "left_normal_north": -0.405768,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 22,
+        "station_m": 2200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.405768,
+        "tangent_north": 0.913976,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7406898,
+            38.7746449
+          ],
+          [
+            -120.7397669,
+            38.7746449
+          ],
+          [
+            -120.738844,
+            38.7746449
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7746449,
+        "center_lon": -120.7397669,
+        "center_x_east_m": -1718.39,
+        "center_y_north_m": -441.655,
+        "cross_section_id": "sfa_nhd_xs_seed_012",
+        "half_width_m": 80.0,
+        "left_normal_east": -1.0,
+        "left_normal_north": 0.0,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 24,
+        "station_m": 2400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.0,
+        "tangent_north": 1.0,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.741461,
+            38.7759642
+          ],
+          [
+            -120.7406343,
+            38.7762839
+          ],
+          [
+            -120.7398075,
+            38.7766036
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7762839,
+        "center_lon": -120.7406343,
+        "center_x_east_m": -1793.576,
+        "center_y_north_m": -259.406,
+        "cross_section_id": "sfa_nhd_xs_seed_013",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.895842,
+        "left_normal_north": -0.444373,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 26,
+        "station_m": 2600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.444373,
+        "tangent_north": 0.895842,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7427455,
+            38.776541
+          ],
+          [
+            -120.7425289,
+            38.7772404
+          ],
+          [
+            -120.7423123,
+            38.7779397
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7772404,
+        "center_lon": -120.7425289,
+        "center_x_east_m": -1957.81,
+        "center_y_north_m": -153.053,
+        "cross_section_id": "sfa_nhd_xs_seed_014",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.234683,
+        "left_normal_north": -0.972072,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 28,
+        "station_m": 2800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.972072,
+        "tangent_north": 0.234683,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7446943,
+            38.7765338
+          ],
+          [
+            -120.744816,
+            38.777247
+          ],
+          [
+            -120.7449376,
+            38.7779602
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.777247,
+        "center_lon": -120.744816,
+        "center_x_east_m": -2156.058,
+        "center_y_north_m": -152.318,
+        "cross_section_id": "sfa_nhd_xs_seed_015",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.131801,
+        "left_normal_north": -0.991276,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 30,
+        "station_m": 3000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.991276,
+        "tangent_north": -0.131801,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7464555,
+            38.7760092
+          ],
+          [
+            -120.7469347,
+            38.776624
+          ],
+          [
+            -120.7474139,
+            38.7772389
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.776624,
+        "center_lon": -120.7469347,
+        "center_x_east_m": -2339.719,
+        "center_y_north_m": -221.585,
+        "cross_section_id": "sfa_nhd_xs_seed_016",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.519216,
+        "left_normal_north": -0.854643,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 32,
+        "station_m": 3200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.854643,
+        "tangent_north": -0.519216,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7481884,
+            38.7750592
+          ],
+          [
+            -120.7488126,
+            38.7755891
+          ],
+          [
+            -120.7494369,
+            38.776119
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7755891,
+        "center_lon": -120.7488126,
+        "center_x_east_m": -2502.503,
+        "center_y_north_m": -336.665,
+        "cross_section_id": "sfa_nhd_xs_seed_017",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.676394,
+        "left_normal_north": -0.73654,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 34,
+        "station_m": 3400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.73654,
+        "tangent_north": -0.676394,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7503112,
+            38.7738214
+          ],
+          [
+            -120.7506273,
+            38.7744973
+          ],
+          [
+            -120.7509435,
+            38.7751733
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7744973,
+        "center_lon": -120.7506273,
+        "center_x_east_m": -2659.805,
+        "center_y_north_m": -458.065,
+        "cross_section_id": "sfa_nhd_xs_seed_018",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.342564,
+        "left_normal_north": -0.939494,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 36,
+        "station_m": 3600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.939494,
+        "tangent_north": -0.342564,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7530738,
+            38.7739758
+          ],
+          [
+            -120.7529069,
+            38.7746834
+          ],
+          [
+            -120.7527399,
+            38.775391
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7746834,
+        "center_lon": -120.7529069,
+        "center_x_east_m": -2857.405,
+        "center_y_north_m": -437.371,
+        "cross_section_id": "sfa_nhd_xs_seed_019",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.180912,
+        "left_normal_north": -0.983499,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 38,
+        "station_m": 3800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.983499,
+        "tangent_north": 0.180912,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7554373,
+            38.7749385
+          ],
+          [
+            -120.754924,
+            38.7755365
+          ],
+          [
+            -120.7544108,
+            38.7761344
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7755365,
+        "center_lon": -120.754924,
+        "center_x_east_m": -3032.259,
+        "center_y_north_m": -342.519,
+        "cross_section_id": "sfa_nhd_xs_seed_020",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.556092,
+        "left_normal_north": -0.831121,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 40,
+        "station_m": 4000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.831121,
+        "tangent_north": 0.556092,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7572802,
+            38.7761823
+          ],
+          [
+            -120.7566612,
+            38.7767159
+          ],
+          [
+            -120.7560422,
+            38.7772496
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7767159,
+        "center_lon": -120.7566612,
+        "center_x_east_m": -3182.841,
+        "center_y_north_m": -211.369,
+        "cross_section_id": "sfa_nhd_xs_seed_021",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.670705,
+        "left_normal_north": -0.741724,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 42,
+        "station_m": 4200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.741724,
+        "tangent_north": 0.670705,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7589794,
+            38.7777858
+          ],
+          [
+            -120.7581361,
+            38.7780781
+          ],
+          [
+            -120.7572927,
+            38.7783703
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7780781,
+        "center_lon": -120.7581361,
+        "center_x_east_m": -3310.687,
+        "center_y_north_m": -59.906,
+        "cross_section_id": "sfa_nhd_xs_seed_022",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.913771,
+        "left_normal_north": -0.40623,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 44,
+        "station_m": 4400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.40623,
+        "tangent_north": 0.913771,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7591618,
+            38.7797544
+          ],
+          [
+            -120.7582479,
+            38.7798548
+          ],
+          [
+            -120.757334,
+            38.7799551
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7798548,
+        "center_lon": -120.7582479,
+        "center_x_east_m": -3320.381,
+        "center_y_north_m": 137.654,
+        "cross_section_id": "sfa_nhd_xs_seed_023",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.99022,
+        "left_normal_north": -0.139516,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 46,
+        "station_m": 4600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.139516,
+        "tangent_north": 0.99022,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7599195,
+            38.78003
+          ],
+          [
+            -120.75994,
+            38.7807493
+          ],
+          [
+            -120.7599605,
+            38.7814686
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7807493,
+        "center_lon": -120.75994,
+        "center_x_east_m": -3467.059,
+        "center_y_north_m": 237.126,
+        "cross_section_id": "sfa_nhd_xs_seed_024",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.022186,
+        "left_normal_north": -0.999754,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 48,
+        "station_m": 4800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.999754,
+        "tangent_north": -0.022186,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7611109,
+            38.7794411
+          ],
+          [
+            -120.7618426,
+            38.7798795
+          ],
+          [
+            -120.7625744,
+            38.780318
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7798795,
+        "center_lon": -120.7618426,
+        "center_x_east_m": -3631.983,
+        "center_y_north_m": 140.41,
+        "cross_section_id": "sfa_nhd_xs_seed_025",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.792878,
+        "left_normal_north": -0.609381,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 50,
+        "station_m": 5000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.609381,
+        "tangent_north": -0.792878,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7625535,
+            38.7780134
+          ],
+          [
+            -120.7632701,
+            38.7784667
+          ],
+          [
+            -120.7639868,
+            38.77892
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7784667,
+        "center_lon": -120.7632701,
+        "center_x_east_m": -3755.725,
+        "center_y_north_m": -16.691,
+        "cross_section_id": "sfa_nhd_xs_seed_026",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.776508,
+        "left_normal_north": -0.630107,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 52,
+        "station_m": 5200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.630107,
+        "tangent_north": -0.776508,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7643874,
+            38.7765995
+          ],
+          [
+            -120.7648891,
+            38.7772034
+          ],
+          [
+            -120.7653908,
+            38.7778073
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7772034,
+        "center_lon": -120.7648891,
+        "center_x_east_m": -3896.063,
+        "center_y_north_m": -157.163,
+        "cross_section_id": "sfa_nhd_xs_seed_027",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.543603,
+        "left_normal_north": -0.839342,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 54,
+        "station_m": 5400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.839342,
+        "tangent_north": -0.543603,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7674996,
+            38.7774316
+          ],
+          [
+            -120.766745,
+            38.7778458
+          ],
+          [
+            -120.7659903,
+            38.7782599
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7778458,
+        "center_lon": -120.766745,
+        "center_x_east_m": -4056.933,
+        "center_y_north_m": -85.732,
+        "cross_section_id": "sfa_nhd_xs_seed_028",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.817697,
+        "left_normal_north": -0.575649,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 56,
+        "station_m": 5600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.575649,
+        "tangent_north": 0.817697,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7688443,
+            38.7788452
+          ],
+          [
+            -120.7681189,
+            38.77929
+          ],
+          [
+            -120.7673935,
+            38.7797348
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.77929,
+        "center_lon": -120.7681189,
+        "center_x_east_m": -4176.028,
+        "center_y_north_m": 74.854,
+        "cross_section_id": "sfa_nhd_xs_seed_029",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.786008,
+        "left_normal_north": -0.618217,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 58,
+        "station_m": 5800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.618217,
+        "tangent_north": 0.786008,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7702134,
+            38.7803574
+          ],
+          [
+            -120.7694477,
+            38.7807591
+          ],
+          [
+            -120.7686821,
+            38.7811608
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7807591,
+        "center_lon": -120.7694477,
+        "center_x_east_m": -4291.217,
+        "center_y_north_m": 238.212,
+        "cross_section_id": "sfa_nhd_xs_seed_030",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.829601,
+        "left_normal_north": -0.558356,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 60,
+        "station_m": 6000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.558356,
+        "tangent_north": 0.829601,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7715403,
+            38.7818245
+          ],
+          [
+            -120.770777,
+            38.782229
+          ],
+          [
+            -120.7700137,
+            38.7826334
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.782229,
+        "center_lon": -120.770777,
+        "center_x_east_m": -4406.441,
+        "center_y_north_m": 401.654,
+        "cross_section_id": "sfa_nhd_xs_seed_031",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.827069,
+        "left_normal_north": -0.5621,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 62,
+        "station_m": 6200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.5621,
+        "tangent_north": 0.827069,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7729635,
+            38.7828225
+          ],
+          [
+            -120.7724645,
+            38.7834277
+          ],
+          [
+            -120.7719655,
+            38.784033
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7834277,
+        "center_lon": -120.7724645,
+        "center_x_east_m": -4552.723,
+        "center_y_north_m": 534.953,
+        "cross_section_id": "sfa_nhd_xs_seed_032",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.540689,
+        "left_normal_north": -0.841222,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 64,
+        "station_m": 6400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.841222,
+        "tangent_north": 0.540689,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7745711,
+            38.782507
+          ],
+          [
+            -120.7747462,
+            38.7832133
+          ],
+          [
+            -120.7749213,
+            38.7839197
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7832133,
+        "center_lon": -120.7747462,
+        "center_x_east_m": -4750.508,
+        "center_y_north_m": 511.113,
+        "cross_section_id": "sfa_nhd_xs_seed_033",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.189756,
+        "left_normal_north": -0.981831,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 66,
+        "station_m": 6600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.981831,
+        "tangent_north": -0.189756,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7768894,
+            38.7822092
+          ],
+          [
+            -120.7770227,
+            38.7829211
+          ],
+          [
+            -120.777156,
+            38.783633
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7829211,
+        "center_lon": -120.7770227,
+        "center_x_east_m": -4947.842,
+        "center_y_north_m": 478.62,
+        "cross_section_id": "sfa_nhd_xs_seed_034",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.144451,
+        "left_normal_north": -0.989512,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 68,
+        "station_m": 6800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.989512,
+        "tangent_north": -0.144451,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7794885,
+            38.7822577
+          ],
+          [
+            -120.7793092,
+            38.7829635
+          ],
+          [
+            -120.77913,
+            38.7836692
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7829635,
+        "center_lon": -120.7793092,
+        "center_x_east_m": -5146.046,
+        "center_y_north_m": 483.329,
+        "cross_section_id": "sfa_nhd_xs_seed_035",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.194177,
+        "left_normal_north": -0.980967,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 70,
+        "station_m": 7000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.980967,
+        "tangent_north": 0.194177,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7814206,
+            38.7821665
+          ],
+          [
+            -120.7815927,
+            38.7828734
+          ],
+          [
+            -120.7817648,
+            38.7835802
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7828734,
+        "center_lon": -120.7815927,
+        "center_x_east_m": -5343.981,
+        "center_y_north_m": 473.31,
+        "cross_section_id": "sfa_nhd_xs_seed_036",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.186458,
+        "left_normal_north": -0.982463,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 72,
+        "station_m": 7200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.982463,
+        "tangent_north": -0.186458,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7827489,
+            38.7817838
+          ],
+          [
+            -120.7835584,
+            38.7821293
+          ],
+          [
+            -120.7843679,
+            38.7824748
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7821293,
+        "center_lon": -120.7835584,
+        "center_x_east_m": -5514.375,
+        "center_y_north_m": 390.572,
+        "cross_section_id": "sfa_nhd_xs_seed_037",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.877167,
+        "left_normal_north": -0.480186,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 74,
+        "station_m": 7400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.480186,
+        "tangent_north": -0.877167,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7822475,
+            38.780989
+          ],
+          [
+            -120.7829967,
+            38.7805689
+          ],
+          [
+            -120.7837458,
+            38.7801487
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7805689,
+        "center_lon": -120.7829967,
+        "center_x_east_m": -5465.682,
+        "center_y_north_m": 217.059,
+        "cross_section_id": "sfa_nhd_xs_seed_038",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.811778,
+        "left_normal_north": 0.583967,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 76,
+        "station_m": 7600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.583967,
+        "tangent_north": -0.811778,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7808246,
+            38.7796371
+          ],
+          [
+            -120.7815349,
+            38.7791777
+          ],
+          [
+            -120.7822452,
+            38.7787183
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7791777,
+        "center_lon": -120.7815349,
+        "center_x_east_m": -5338.972,
+        "center_y_north_m": 62.369,
+        "cross_section_id": "sfa_nhd_xs_seed_039",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.769593,
+        "left_normal_north": 0.638535,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 78,
+        "station_m": 7800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.638535,
+        "tangent_north": -0.769593,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7794559,
+            38.7788364
+          ],
+          [
+            -120.7797192,
+            38.7781469
+          ],
+          [
+            -120.7799824,
+            38.7774573
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7781469,
+        "center_lon": -120.7797192,
+        "center_x_east_m": -5181.578,
+        "center_y_north_m": -52.254,
+        "cross_section_id": "sfa_nhd_xs_seed_040",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.285257,
+        "left_normal_north": 0.958451,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 80,
+        "station_m": 8000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.958451,
+        "tangent_north": -0.285257,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7770696,
+            38.7782378
+          ],
+          [
+            -120.7775419,
+            38.7776197
+          ],
+          [
+            -120.7780143,
+            38.7770017
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7776197,
+        "center_lon": -120.7775419,
+        "center_x_east_m": -4992.85,
+        "center_y_north_m": -110.868,
+        "cross_section_id": "sfa_nhd_xs_seed_041",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.511816,
+        "left_normal_north": 0.859095,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 82,
+        "station_m": 8200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.859095,
+        "tangent_north": -0.511816,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7761962,
+            38.7757562
+          ],
+          [
+            -120.7769119,
+            38.7762104
+          ],
+          [
+            -120.7776276,
+            38.7766647
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7762104,
+        "center_lon": -120.7769119,
+        "center_x_east_m": -4938.234,
+        "center_y_north_m": -267.575,
+        "cross_section_id": "sfa_nhd_xs_seed_042",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.775515,
+        "left_normal_north": -0.63133,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 84,
+        "station_m": 8400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.63133,
+        "tangent_north": -0.775515,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7777946,
+            38.7744188
+          ],
+          [
+            -120.778485,
+            38.7748964
+          ],
+          [
+            -120.7791752,
+            38.7753739
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7748964,
+        "center_lon": -120.778485,
+        "center_x_east_m": -5074.593,
+        "center_y_north_m": -413.693,
+        "cross_section_id": "sfa_nhd_xs_seed_043",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.747967,
+        "left_normal_north": -0.663736,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 86,
+        "station_m": 8600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.663736,
+        "tangent_north": -0.747967,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7789375,
+            38.7730004
+          ],
+          [
+            -120.7797125,
+            38.773391
+          ],
+          [
+            -120.7804875,
+            38.7737817
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.773391,
+        "center_lon": -120.7797125,
+        "center_x_east_m": -5180.999,
+        "center_y_north_m": -581.081,
+        "cross_section_id": "sfa_nhd_xs_seed_044",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.839758,
+        "left_normal_north": -0.542961,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 88,
+        "station_m": 8800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.542961,
+        "tangent_north": -0.839758,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7803239,
+            38.7717537
+          ],
+          [
+            -120.7811752,
+            38.7720315
+          ],
+          [
+            -120.7820265,
+            38.7723093
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7720315,
+        "center_lon": -120.7811752,
+        "center_x_east_m": -5307.794,
+        "center_y_north_m": -732.253,
+        "cross_section_id": "sfa_nhd_xs_seed_045",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.922441,
+        "left_normal_north": -0.386137,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 90,
+        "station_m": 9000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.386137,
+        "tangent_north": -0.922441,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.781044,
+            38.770179
+          ],
+          [
+            -120.7819437,
+            38.770339
+          ],
+          [
+            -120.7828435,
+            38.7704991
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.770339,
+        "center_lon": -120.7819437,
+        "center_x_east_m": -5374.411,
+        "center_y_north_m": -920.446,
+        "cross_section_id": "sfa_nhd_xs_seed_046",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.974942,
+        "left_normal_north": -0.22246,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 92,
+        "station_m": 9200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.22246,
+        "tangent_north": -0.974942,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7814157,
+            38.7684951
+          ],
+          [
+            -120.7823337,
+            38.7685696
+          ],
+          [
+            -120.7832516,
+            38.768644
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7685696,
+        "center_lon": -120.7823337,
+        "center_x_east_m": -5408.213,
+        "center_y_north_m": -1117.203,
+        "cross_section_id": "sfa_nhd_xs_seed_047",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.99463,
+        "left_normal_north": -0.103493,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 94,
+        "station_m": 9400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.103493,
+        "tangent_north": -0.99463,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7811815,
+            38.7671413
+          ],
+          [
+            -120.7820058,
+            38.7668176
+          ],
+          [
+            -120.78283,
+            38.7664939
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7668176,
+        "center_lon": -120.7820058,
+        "center_x_east_m": -5379.788,
+        "center_y_north_m": -1312.013,
+        "cross_section_id": "sfa_nhd_xs_seed_048",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.8931,
+        "left_normal_north": 0.449858,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 96,
+        "station_m": 9600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.449858,
+        "tangent_north": -0.8931,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7802516,
+            38.765179
+          ],
+          [
+            -120.7811741,
+            38.7651578
+          ],
+          [
+            -120.7820966,
+            38.7651365
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7651578,
+        "center_lon": -120.7811741,
+        "center_x_east_m": -5307.699,
+        "center_y_north_m": -1496.578,
+        "cross_section_id": "sfa_nhd_xs_seed_049",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.999564,
+        "left_normal_north": 0.029542,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 98,
+        "station_m": 9800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.029542,
+        "tangent_north": -0.999564,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7821111,
+            38.7631354
+          ],
+          [
+            -120.7821753,
+            38.7638531
+          ],
+          [
+            -120.7822394,
+            38.7645708
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7638531,
+        "center_lon": -120.7821753,
+        "center_x_east_m": -5394.482,
+        "center_y_north_m": -1641.651,
+        "cross_section_id": "sfa_nhd_xs_seed_050",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.06952,
+        "left_normal_north": -0.997581,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 100,
+        "station_m": 10000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.997581,
+        "tangent_north": -0.06952,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7847505,
+            38.7636967
+          ],
+          [
+            -120.7843608,
+            38.7643488
+          ],
+          [
+            -120.7839711,
+            38.765001
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7643488,
+        "center_lon": -120.7843608,
+        "center_x_east_m": -5583.933,
+        "center_y_north_m": -1586.527,
+        "cross_section_id": "sfa_nhd_xs_seed_051",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.422246,
+        "left_normal_north": -0.906481,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 102,
+        "station_m": 10200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.906481,
+        "tangent_north": 0.422246,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.786734,
+            38.7649595
+          ],
+          [
+            -120.7861028,
+            38.7654844
+          ],
+          [
+            -120.7854716,
+            38.7660093
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7654844,
+        "center_lon": -120.7861028,
+        "center_x_east_m": -5734.934,
+        "center_y_north_m": -1460.261,
+        "cross_section_id": "sfa_nhd_xs_seed_052",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.683899,
+        "left_normal_north": -0.729577,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 104,
+        "station_m": 10400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.729577,
+        "tangent_north": 0.683899,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7873914,
+            38.7649413
+          ],
+          [
+            -120.7880847,
+            38.7654161
+          ],
+          [
+            -120.788778,
+            38.765891
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7654161,
+        "center_lon": -120.7880847,
+        "center_x_east_m": -5906.727,
+        "center_y_north_m": -1467.848,
+        "cross_section_id": "sfa_nhd_xs_seed_053",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.75121,
+        "left_normal_north": -0.660064,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 106,
+        "station_m": 10600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.660064,
+        "tangent_north": -0.75121,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7884488,
+            38.7635914
+          ],
+          [
+            -120.7892863,
+            38.7638937
+          ],
+          [
+            -120.7901238,
+            38.764196
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7638937,
+        "center_lon": -120.7892863,
+        "center_x_east_m": -6010.886,
+        "center_y_north_m": -1637.136,
+        "cross_section_id": "sfa_nhd_xs_seed_054",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.907449,
+        "left_normal_north": -0.420163,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 108,
+        "station_m": 10800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.420163,
+        "tangent_north": -0.907449,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7909751,
+            38.7622587
+          ],
+          [
+            -120.7909864,
+            38.7629781
+          ],
+          [
+            -120.7909977,
+            38.7636975
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7629781,
+        "center_lon": -120.7909864,
+        "center_x_east_m": -6158.257,
+        "center_y_north_m": -1738.943,
+        "cross_section_id": "sfa_nhd_xs_seed_055",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.012215,
+        "left_normal_north": -0.999925,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 110,
+        "station_m": 11000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.999925,
+        "tangent_north": -0.012215,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7934452,
+            38.7639754
+          ],
+          [
+            -120.7925269,
+            38.764047
+          ],
+          [
+            -120.7916086,
+            38.7641186
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.764047,
+        "center_lon": -120.7925269,
+        "center_x_east_m": -6291.796,
+        "center_y_north_m": -1620.09,
+        "cross_section_id": "sfa_nhd_xs_seed_056",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.995036,
+        "left_normal_north": -0.099516,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 112,
+        "station_m": 11200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.099516,
+        "tangent_north": 0.995036,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7932482,
+            38.7659879
+          ],
+          [
+            -120.7923477,
+            38.7658304
+          ],
+          [
+            -120.7914472,
+            38.765673
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7658304,
+        "center_lon": -120.7923477,
+        "center_x_east_m": -6276.262,
+        "center_y_north_m": -1421.784,
+        "cross_section_id": "sfa_nhd_xs_seed_057",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.975758,
+        "left_normal_north": 0.218853,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 114,
+        "station_m": 11400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.218853,
+        "tangent_north": 0.975758,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7931368,
+            38.7674574
+          ],
+          [
+            -120.7922299,
+            38.7675906
+          ],
+          [
+            -120.7913229,
+            38.7677238
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7675906,
+        "center_lon": -120.7922299,
+        "center_x_east_m": -6266.048,
+        "center_y_north_m": -1226.056,
+        "cross_section_id": "sfa_nhd_xs_seed_058",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.982717,
+        "left_normal_north": -0.185116,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 116,
+        "station_m": 11600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.185116,
+        "tangent_north": 0.982717,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.794078,
+            38.7680266
+          ],
+          [
+            -120.7937951,
+            38.7687114
+          ],
+          [
+            -120.7935123,
+            38.7693963
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7687114,
+        "center_lon": -120.7937951,
+        "center_x_east_m": -6401.729,
+        "center_y_north_m": -1101.428,
+        "cross_section_id": "sfa_nhd_xs_seed_059",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.306455,
+        "left_normal_north": -0.951885,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 118,
+        "station_m": 11800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.951885,
+        "tangent_north": 0.306455,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7959652,
+            38.7677779
+          ],
+          [
+            -120.796082,
+            38.7684916
+          ],
+          [
+            -120.7961987,
+            38.7692052
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7684916,
+        "center_lon": -120.796082,
+        "center_x_east_m": -6599.958,
+        "center_y_north_m": -1125.878,
+        "cross_section_id": "sfa_nhd_xs_seed_060",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.126512,
+        "left_normal_north": -0.991965,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 120,
+        "station_m": 12000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.991965,
+        "tangent_north": -0.126512,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.7985539,
+            38.7679973
+          ],
+          [
+            -120.7983408,
+            38.7686973
+          ],
+          [
+            -120.7981277,
+            38.7693973
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7686973,
+        "center_lon": -120.7983408,
+        "center_x_east_m": -6795.763,
+        "center_y_north_m": -1103.001,
+        "cross_section_id": "sfa_nhd_xs_seed_061",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.230887,
+        "left_normal_north": -0.972981,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 122,
+        "station_m": 12200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.972981,
+        "tangent_north": 0.230887,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8006606,
+            38.7682505
+          ],
+          [
+            -120.8006119,
+            38.768969
+          ],
+          [
+            -120.8005631,
+            38.7696874
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.768969,
+        "center_lon": -120.8006119,
+        "center_x_east_m": -6992.626,
+        "center_y_north_m": -1072.789,
+        "cross_section_id": "sfa_nhd_xs_seed_062",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.052836,
+        "left_normal_north": -0.998603,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 124,
+        "station_m": 12400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.998603,
+        "tangent_north": 0.052836,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8019561,
+            38.7676641
+          ],
+          [
+            -120.8025504,
+            38.7682145
+          ],
+          [
+            -120.8031447,
+            38.7687649
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7682145,
+        "center_lon": -120.8025504,
+        "center_x_east_m": -7160.664,
+        "center_y_north_m": -1156.683,
+        "cross_section_id": "sfa_nhd_xs_seed_063",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.643977,
+        "left_normal_north": -0.765045,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 126,
+        "station_m": 12600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.765045,
+        "tangent_north": -0.643977,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8023232,
+            38.7663233
+          ],
+          [
+            -120.8032145,
+            38.76651
+          ],
+          [
+            -120.8041058,
+            38.7666966
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.76651,
+        "center_lon": -120.8032145,
+        "center_x_east_m": -7218.227,
+        "center_y_north_m": -1346.219,
+        "cross_section_id": "sfa_nhd_xs_seed_064",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.96576,
+        "left_normal_north": -0.259436,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 128,
+        "station_m": 12800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.259436,
+        "tangent_north": -0.96576,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8042542,
+            38.7644656
+          ],
+          [
+            -120.8045172,
+            38.7651552
+          ],
+          [
+            -120.8047801,
+            38.7658448
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7651552,
+        "center_lon": -120.8045172,
+        "center_x_east_m": -7331.148,
+        "center_y_north_m": -1496.865,
+        "cross_section_id": "sfa_nhd_xs_seed_065",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.284919,
+        "left_normal_north": -0.958552,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 130,
+        "station_m": 13000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.958552,
+        "tangent_north": -0.284919,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.807175,
+            38.7643186
+          ],
+          [
+            -120.8066774,
+            38.7649245
+          ],
+          [
+            -120.8061798,
+            38.7655304
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7649245,
+        "center_lon": -120.8066774,
+        "center_x_east_m": -7518.402,
+        "center_y_north_m": -1522.518,
+        "cross_section_id": "sfa_nhd_xs_seed_066",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.539151,
+        "left_normal_north": -0.842209,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 132,
+        "station_m": 13200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.842209,
+        "tangent_north": 0.539151,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8091179,
+            38.7652882
+          ],
+          [
+            -120.8086203,
+            38.7658941
+          ],
+          [
+            -120.8081227,
+            38.7665
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7658941,
+        "center_lon": -120.8086203,
+        "center_x_east_m": -7686.818,
+        "center_y_north_m": -1414.7,
+        "cross_section_id": "sfa_nhd_xs_seed_067",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.539179,
+        "left_normal_north": -0.842191,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 134,
+        "station_m": 13400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.842191,
+        "tangent_north": 0.539179,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8104324,
+            38.7672263
+          ],
+          [
+            -120.8095859,
+            38.7675129
+          ],
+          [
+            -120.8087394,
+            38.7677996
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7675129,
+        "center_lon": -120.8095859,
+        "center_x_east_m": -7770.523,
+        "center_y_north_m": -1234.694,
+        "cross_section_id": "sfa_nhd_xs_seed_068",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.917208,
+        "left_normal_north": -0.39841,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 136,
+        "station_m": 13600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.39841,
+        "tangent_north": 0.917208,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8104659,
+            38.7693382
+          ],
+          [
+            -120.8095447,
+            38.7692949
+          ],
+          [
+            -120.8086234,
+            38.7692515
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7692949,
+        "center_lon": -120.8095447,
+        "center_x_east_m": -7766.948,
+        "center_y_north_m": -1036.553,
+        "cross_section_id": "sfa_nhd_xs_seed_069",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.998185,
+        "left_normal_north": 0.060227,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 138,
+        "station_m": 13800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.060227,
+        "tangent_north": 0.998185,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.810239,
+            38.7705484
+          ],
+          [
+            -120.8095696,
+            38.7710437
+          ],
+          [
+            -120.8089002,
+            38.771539
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7710437,
+        "center_lon": -120.8095696,
+        "center_x_east_m": -7769.108,
+        "center_y_north_m": -842.095,
+        "cross_section_id": "sfa_nhd_xs_seed_070",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.725318,
+        "left_normal_north": -0.688414,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 140,
+        "station_m": 14000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.688414,
+        "tangent_north": 0.725318,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.811466,
+            38.7711641
+          ],
+          [
+            -120.8114286,
+            38.771883
+          ],
+          [
+            -120.8113912,
+            38.7726019
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.771883,
+        "center_lon": -120.8114286,
+        "center_x_east_m": -7930.251,
+        "center_y_north_m": -748.764,
+        "cross_section_id": "sfa_nhd_xs_seed_071",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.040507,
+        "left_normal_north": -0.999179,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 142,
+        "station_m": 14200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.999179,
+        "tangent_north": 0.040507,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8134668,
+            38.7707484
+          ],
+          [
+            -120.8136068,
+            38.7714596
+          ],
+          [
+            -120.8137468,
+            38.7721707
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7714596,
+        "center_lon": -120.8136068,
+        "center_x_east_m": -8119.067,
+        "center_y_north_m": -795.848,
+        "cross_section_id": "sfa_nhd_xs_seed_072",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.151685,
+        "left_normal_north": -0.988429,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 144,
+        "station_m": 14400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.988429,
+        "tangent_north": -0.151685,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8153485,
+            38.7703106
+          ],
+          [
+            -120.8157838,
+            38.770945
+          ],
+          [
+            -120.816219,
+            38.7715794
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.770945,
+        "center_lon": -120.8157838,
+        "center_x_east_m": -8307.771,
+        "center_y_north_m": -853.066,
+        "cross_section_id": "sfa_nhd_xs_seed_073",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.471636,
+        "left_normal_north": -0.881793,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 146,
+        "station_m": 14600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.881793,
+        "tangent_north": -0.471636,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8161203,
+            38.7694275
+          ],
+          [
+            -120.8170247,
+            38.7695709
+          ],
+          [
+            -120.8179291,
+            38.7697143
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7695709,
+        "center_lon": -120.8170247,
+        "center_x_east_m": -8415.34,
+        "center_y_north_m": -1005.857,
+        "cross_section_id": "sfa_nhd_xs_seed_074",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.979936,
+        "left_normal_north": -0.199311,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 148,
+        "station_m": 14800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.199311,
+        "tangent_north": -0.979936,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8173162,
+            38.7675497
+          ],
+          [
+            -120.8180245,
+            38.768011
+          ],
+          [
+            -120.8187327,
+            38.7684723
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.768011,
+        "center_lon": -120.8180245,
+        "center_x_east_m": -8502.002,
+        "center_y_north_m": -1179.312,
+        "cross_section_id": "sfa_nhd_xs_seed_075",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.767398,
+        "left_normal_north": -0.641171,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 150,
+        "station_m": 15000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.641171,
+        "tangent_north": -0.767398,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8191083,
+            38.7667888
+          ],
+          [
+            -120.8199375,
+            38.7671047
+          ],
+          [
+            -120.8207666,
+            38.7674207
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7671047,
+        "center_lon": -120.8199375,
+        "center_x_east_m": -8667.829,
+        "center_y_north_m": -1280.084,
+        "cross_section_id": "sfa_nhd_xs_seed_076",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.898426,
+        "left_normal_north": -0.439124,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 152,
+        "station_m": 15200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.439124,
+        "tangent_north": -0.898426,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8215203,
+            38.765411
+          ],
+          [
+            -120.8217178,
+            38.7661138
+          ],
+          [
+            -120.8219152,
+            38.7668166
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7661138,
+        "center_lon": -120.8217178,
+        "center_x_east_m": -8822.151,
+        "center_y_north_m": -1390.267,
+        "cross_section_id": "sfa_nhd_xs_seed_077",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.21395,
+        "left_normal_north": -0.976845,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 154,
+        "station_m": 15400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.976845,
+        "tangent_north": -0.21395,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8243911,
+            38.7657884
+          ],
+          [
+            -120.8238551,
+            38.7663741
+          ],
+          [
+            -120.8233191,
+            38.7669598
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7663741,
+        "center_lon": -120.8238551,
+        "center_x_east_m": -9007.419,
+        "center_y_north_m": -1361.324,
+        "cross_section_id": "sfa_nhd_xs_seed_078",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.580758,
+        "left_normal_north": -0.814076,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 156,
+        "station_m": 15600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.814076,
+        "tangent_north": 0.580758,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8255599,
+            38.7670712
+          ],
+          [
+            -120.8252362,
+            38.767745
+          ],
+          [
+            -120.8249125,
+            38.7684187
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.767745,
+        "center_lon": -120.8252362,
+        "center_x_east_m": -9127.14,
+        "center_y_north_m": -1208.896,
+        "cross_section_id": "sfa_nhd_xs_seed_079",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.350705,
+        "left_normal_north": -0.936486,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 158,
+        "station_m": 15800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.936486,
+        "tangent_north": 0.350705,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8276305,
+            38.767531
+          ],
+          [
+            -120.8274478,
+            38.7682362
+          ],
+          [
+            -120.8272651,
+            38.7689414
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7682362,
+        "center_lon": -120.8274478,
+        "center_x_east_m": -9318.848,
+        "center_y_north_m": -1154.271,
+        "cross_section_id": "sfa_nhd_xs_seed_080",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.198002,
+        "left_normal_north": -0.980202,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 160,
+        "station_m": 16000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.980202,
+        "tangent_north": 0.198002,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8298149,
+            38.7681487
+          ],
+          [
+            -120.829596,
+            38.7688477
+          ],
+          [
+            -120.829377,
+            38.7695466
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7688477,
+        "center_lon": -120.829596,
+        "center_x_east_m": -9505.06,
+        "center_y_north_m": -1086.281,
+        "cross_section_id": "sfa_nhd_xs_seed_081",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.237239,
+        "left_normal_north": -0.971451,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 162,
+        "station_m": 16200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.971451,
+        "tangent_north": 0.237239,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8320943,
+            38.7689013
+          ],
+          [
+            -120.8317119,
+            38.7695561
+          ],
+          [
+            -120.8313296,
+            38.7702109
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7695561,
+        "center_lon": -120.8317119,
+        "center_x_east_m": -9688.475,
+        "center_y_north_m": -1007.503,
+        "cross_section_id": "sfa_nhd_xs_seed_082",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.414304,
+        "left_normal_north": -0.910139,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 164,
+        "station_m": 16400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.910139,
+        "tangent_north": 0.414304,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8340586,
+            38.7702076
+          ],
+          [
+            -120.8334382,
+            38.7707402
+          ],
+          [
+            -120.8328177,
+            38.7712728
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7707402,
+        "center_lon": -120.8334382,
+        "center_x_east_m": -9838.111,
+        "center_y_north_m": -875.834,
+        "cross_section_id": "sfa_nhd_xs_seed_083",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.672292,
+        "left_normal_north": -0.740286,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 166,
+        "station_m": 16600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.740286,
+        "tangent_north": 0.672292,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8355698,
+            38.7711039
+          ],
+          [
+            -120.8352918,
+            38.77179
+          ],
+          [
+            -120.8350137,
+            38.772476
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.77179,
+        "center_lon": -120.8352918,
+        "center_x_east_m": -9998.787,
+        "center_y_north_m": -759.109,
+        "cross_section_id": "sfa_nhd_xs_seed_084",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.301264,
+        "left_normal_north": -0.953541,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 168,
+        "station_m": 16800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.953541,
+        "tangent_north": 0.301264,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.837522,
+            38.7713788
+          ],
+          [
+            -120.8375497,
+            38.7720979
+          ],
+          [
+            -120.8375774,
+            38.7728171
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7720979,
+        "center_lon": -120.8375497,
+        "center_x_east_m": -10194.512,
+        "center_y_north_m": -724.867,
+        "cross_section_id": "sfa_nhd_xs_seed_085",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.030009,
+        "left_normal_north": -0.99955,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 170,
+        "station_m": 17000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.99955,
+        "tangent_north": -0.030009,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8396041,
+            38.7711912
+          ],
+          [
+            -120.8398281,
+            38.7718891
+          ],
+          [
+            -120.8400522,
+            38.772587
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7718891,
+        "center_lon": -120.8398281,
+        "center_x_east_m": -10392.016,
+        "center_y_north_m": -748.089,
+        "cross_section_id": "sfa_nhd_xs_seed_086",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.242783,
+        "left_normal_north": -0.970081,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 172,
+        "station_m": 17200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.970081,
+        "tangent_north": -0.242783,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8421657,
+            38.7709588
+          ],
+          [
+            -120.8420835,
+            38.7716754
+          ],
+          [
+            -120.8420013,
+            38.772392
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7716754,
+        "center_lon": -120.8420835,
+        "center_x_east_m": -10587.516,
+        "center_y_north_m": -771.849,
+        "cross_section_id": "sfa_nhd_xs_seed_087",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.089031,
+        "left_normal_north": -0.996029,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 174,
+        "station_m": 17400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.996029,
+        "tangent_north": 0.089031,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8432802,
+            38.770176
+          ],
+          [
+            -120.8437929,
+            38.7707742
+          ],
+          [
+            -120.8443056,
+            38.7713724
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7707742,
+        "center_lon": -120.8437929,
+        "center_x_east_m": -10735.695,
+        "center_y_north_m": -872.059,
+        "cross_section_id": "sfa_nhd_xs_seed_088",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.555512,
+        "left_normal_north": -0.831508,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 176,
+        "station_m": 17600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.831508,
+        "tangent_north": -0.555512,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8455173,
+            38.7693007
+          ],
+          [
+            -120.8458497,
+            38.7699719
+          ],
+          [
+            -120.8461822,
+            38.770643
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7699719,
+        "center_lon": -120.8458497,
+        "center_x_east_m": -10913.984,
+        "center_y_north_m": -961.276,
+        "cross_section_id": "sfa_nhd_xs_seed_089",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.360231,
+        "left_normal_north": -0.932863,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 178,
+        "station_m": 17800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.932863,
+        "tangent_north": -0.360231,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8481075,
+            38.7688923
+          ],
+          [
+            -120.8480857,
+            38.7696116
+          ],
+          [
+            -120.8480638,
+            38.7703309
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7696116,
+        "center_lon": -120.8480857,
+        "center_x_east_m": -11107.803,
+        "center_y_north_m": -1001.334,
+        "cross_section_id": "sfa_nhd_xs_seed_090",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.023632,
+        "left_normal_north": -0.999721,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 180,
+        "station_m": 18000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.999721,
+        "tangent_north": 0.023632,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8504539,
+            38.770846
+          ],
+          [
+            -120.8495611,
+            38.7706637
+          ],
+          [
+            -120.8486683,
+            38.7704815
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7706637,
+        "center_lon": -120.8495611,
+        "center_x_east_m": -11235.696,
+        "center_y_north_m": -884.343,
+        "cross_section_id": "sfa_nhd_xs_seed_091",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.967382,
+        "left_normal_north": 0.253322,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 182,
+        "station_m": 18200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.253322,
+        "tangent_north": 0.967382,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8493264,
+            38.772669
+          ],
+          [
+            -120.8485697,
+            38.7722571
+          ],
+          [
+            -120.847813,
+            38.7718453
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7722571,
+        "center_lon": -120.8485697,
+        "center_x_east_m": -11149.762,
+        "center_y_north_m": -707.164,
+        "cross_section_id": "sfa_nhd_xs_seed_092",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.819933,
+        "left_normal_north": 0.57246,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 184,
+        "station_m": 18400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.57246,
+        "tangent_north": 0.819933,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8478068,
+            38.7741198
+          ],
+          [
+            -120.8471095,
+            38.7736486
+          ],
+          [
+            -120.8464121,
+            38.7731773
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7736486,
+        "center_lon": -120.8471095,
+        "center_x_east_m": -11023.183,
+        "center_y_north_m": -552.443,
+        "cross_section_id": "sfa_nhd_xs_seed_093",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.755649,
+        "left_normal_north": 0.654977,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 186,
+        "station_m": 18600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.654977,
+        "tangent_north": 0.755649,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8467412,
+            38.7754506
+          ],
+          [
+            -120.8458987,
+            38.7751569
+          ],
+          [
+            -120.8450562,
+            38.7748632
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7751569,
+        "center_lon": -120.8458987,
+        "center_x_east_m": -10918.229,
+        "center_y_north_m": -384.725,
+        "cross_section_id": "sfa_nhd_xs_seed_094",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.912866,
+        "left_normal_north": 0.408259,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 188,
+        "station_m": 18800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.408259,
+        "tangent_north": 0.912866,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8464407,
+            38.7768271
+          ],
+          [
+            -120.8455233,
+            38.776906
+          ],
+          [
+            -120.844606,
+            38.7769849
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.776906,
+        "center_lon": -120.8455233,
+        "center_x_east_m": -10885.692,
+        "center_y_north_m": -190.232,
+        "cross_section_id": "sfa_nhd_xs_seed_095",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.993973,
+        "left_normal_north": -0.109626,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 190,
+        "station_m": 19000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.109626,
+        "tangent_north": 0.993973,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8469495,
+            38.7784238
+          ],
+          [
+            -120.8460711,
+            38.7786446
+          ],
+          [
+            -120.8451927,
+            38.7788654
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7786446,
+        "center_lon": -120.8460711,
+        "center_x_east_m": -10933.175,
+        "center_y_north_m": 3.092,
+        "cross_section_id": "sfa_nhd_xs_seed_096",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.951748,
+        "left_normal_north": -0.306879,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 192,
+        "station_m": 19200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.306879,
+        "tangent_north": 0.951748,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8478844,
+            38.7797304
+          ],
+          [
+            -120.8471938,
+            38.7802078
+          ],
+          [
+            -120.8465033,
+            38.7806851
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7802078,
+        "center_lon": -120.8471938,
+        "center_x_east_m": -11030.496,
+        "center_y_north_m": 176.906,
+        "cross_section_id": "sfa_nhd_xs_seed_097",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.748237,
+        "left_normal_north": -0.663432,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 194,
+        "station_m": 19400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.663432,
+        "tangent_north": 0.748237,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8493821,
+            38.7809891
+          ],
+          [
+            -120.8487638,
+            38.7815233
+          ],
+          [
+            -120.8481454,
+            38.7820574
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7815233,
+        "center_lon": -120.8487638,
+        "center_x_east_m": -11166.584,
+        "center_y_north_m": 323.183,
+        "cross_section_id": "sfa_nhd_xs_seed_098",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.66998,
+        "left_normal_north": -0.74238,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 196,
+        "station_m": 19600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.74238,
+        "tangent_north": 0.66998,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8508608,
+            38.781868
+          ],
+          [
+            -120.850615,
+            38.7825615
+          ],
+          [
+            -120.8503692,
+            38.7832549
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7825615,
+        "center_lon": -120.850615,
+        "center_x_east_m": -11327.056,
+        "center_y_north_m": 438.627,
+        "cross_section_id": "sfa_nhd_xs_seed_099",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.266314,
+        "left_normal_north": -0.963886,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 198,
+        "station_m": 19800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.963886,
+        "tangent_north": 0.266314,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8529262,
+            38.7820543
+          ],
+          [
+            -120.852892,
+            38.7827732
+          ],
+          [
+            -120.8528578,
+            38.7834922
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7827732,
+        "center_lon": -120.852892,
+        "center_x_east_m": -11524.434,
+        "center_y_north_m": 462.174,
+        "cross_section_id": "sfa_nhd_xs_seed_100",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.037076,
+        "left_normal_north": -0.999312,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 200,
+        "station_m": 20000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.999312,
+        "tangent_north": 0.037076,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8553963,
+            38.7821374
+          ],
+          [
+            -120.8551895,
+            38.7828386
+          ],
+          [
+            -120.8549827,
+            38.7835398
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7828386,
+        "center_lon": -120.8551895,
+        "center_x_east_m": -11723.587,
+        "center_y_north_m": 469.444,
+        "cross_section_id": "sfa_nhd_xs_seed_101",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.224109,
+        "left_normal_north": -0.974564,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 202,
+        "station_m": 20200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.974564,
+        "tangent_north": 0.224109,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8578575,
+            38.7829718
+          ],
+          [
+            -120.8572852,
+            38.7835362
+          ],
+          [
+            -120.8567129,
+            38.7841006
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7835362,
+        "center_lon": -120.8572852,
+        "center_x_east_m": -11905.251,
+        "center_y_north_m": 547.012,
+        "cross_section_id": "sfa_nhd_xs_seed_102",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.620123,
+        "left_normal_north": -0.784505,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 204,
+        "station_m": 20400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.784505,
+        "tangent_north": 0.620123,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8584843,
+            38.7852945
+          ],
+          [
+            -120.8575637,
+            38.7852447
+          ],
+          [
+            -120.856643,
+            38.7851948
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7852447,
+        "center_lon": -120.8575637,
+        "center_x_east_m": -11929.386,
+        "center_y_north_m": 736.986,
+        "cross_section_id": "sfa_nhd_xs_seed_103",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.997595,
+        "left_normal_north": 0.069309,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 206,
+        "station_m": 20600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": 0.069309,
+        "tangent_north": 0.997595,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8588637,
+            38.7864652
+          ],
+          [
+            -120.8581164,
+            38.7868874
+          ],
+          [
+            -120.8573692,
+            38.7873097
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7868874,
+        "center_lon": -120.8581164,
+        "center_x_east_m": -11977.302,
+        "center_y_north_m": 919.654,
+        "cross_section_id": "sfa_nhd_xs_seed_104",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.809644,
+        "left_normal_north": -0.586921,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 208,
+        "station_m": 20800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.586921,
+        "tangent_north": 0.809644,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8601499,
+            38.7874426
+          ],
+          [
+            -120.8597525,
+            38.788092
+          ],
+          [
+            -120.8593551,
+            38.7887413
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.788092,
+        "center_lon": -120.8597525,
+        "center_x_east_m": -12119.12,
+        "center_y_north_m": 1053.592,
+        "cross_section_id": "sfa_nhd_xs_seed_105",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.430584,
+        "left_normal_north": -0.902551,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 210,
+        "station_m": 21000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.902551,
+        "tangent_north": 0.430584,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8621543,
+            38.7879572
+          ],
+          [
+            -120.8619298,
+            38.788655
+          ],
+          [
+            -120.8617052,
+            38.7893529
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.788655,
+        "center_lon": -120.8619298,
+        "center_x_east_m": -12307.855,
+        "center_y_north_m": 1116.202,
+        "cross_section_id": "sfa_nhd_xs_seed_106",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.243304,
+        "left_normal_north": -0.96995,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 212,
+        "station_m": 21200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.96995,
+        "tangent_north": 0.243304,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8643877,
+            38.7883916
+          ],
+          [
+            -120.8641686,
+            38.7890905
+          ],
+          [
+            -120.8639496,
+            38.7897894
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7890905,
+        "center_lon": -120.8641686,
+        "center_x_east_m": -12501.928,
+        "center_y_north_m": 1164.629,
+        "cross_section_id": "sfa_nhd_xs_seed_107",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.237335,
+        "left_normal_north": -0.971428,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 214,
+        "station_m": 21400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.971428,
+        "tangent_north": 0.237335,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8668026,
+            38.7888911
+          ],
+          [
+            -120.8664011,
+            38.7895389
+          ],
+          [
+            -120.8659996,
+            38.7901867
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7895389,
+        "center_lon": -120.8664011,
+        "center_x_east_m": -12695.441,
+        "center_y_north_m": 1214.482,
+        "cross_section_id": "sfa_nhd_xs_seed_108",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.435052,
+        "left_normal_north": -0.900405,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 216,
+        "station_m": 21600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.900405,
+        "tangent_north": 0.435052,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8688155,
+            38.7895514
+          ],
+          [
+            -120.8685243,
+            38.7902341
+          ],
+          [
+            -120.868233,
+            38.7909168
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7902341,
+        "center_lon": -120.8685243,
+        "center_x_east_m": -12879.487,
+        "center_y_north_m": 1291.789,
+        "cross_section_id": "sfa_nhd_xs_seed_109",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.315561,
+        "left_normal_north": -0.948905,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 218,
+        "station_m": 21800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.948905,
+        "tangent_north": 0.315561,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8705723,
+            38.7897902
+          ],
+          [
+            -120.8707634,
+            38.7904941
+          ],
+          [
+            -120.8709545,
+            38.7911979
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7904941,
+        "center_lon": -120.8707634,
+        "center_x_east_m": -13073.58,
+        "center_y_north_m": 1320.694,
+        "cross_section_id": "sfa_nhd_xs_seed_110",
+        "half_width_m": 80.0,
+        "left_normal_east": 0.207092,
+        "left_normal_north": -0.978321,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 220,
+        "station_m": 22000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.978321,
+        "tangent_north": -0.207092,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8731996,
+            38.7898161
+          ],
+          [
+            -120.8730286,
+            38.7905231
+          ],
+          [
+            -120.8728576,
+            38.7912301
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7905231,
+        "center_lon": -120.8730286,
+        "center_x_east_m": -13269.936,
+        "center_y_north_m": 1323.925,
+        "cross_section_id": "sfa_nhd_xs_seed_111",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.185288,
+        "left_normal_north": -0.982684,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 222,
+        "station_m": 22200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.982684,
+        "tangent_north": 0.185288,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8754165,
+            38.790077
+          ],
+          [
+            -120.87531,
+            38.7907916
+          ],
+          [
+            -120.8752035,
+            38.7915063
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7907916,
+        "center_lon": -120.87531,
+        "center_x_east_m": -13467.693,
+        "center_y_north_m": 1353.783,
+        "cross_section_id": "sfa_nhd_xs_seed_112",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.115414,
+        "left_normal_north": -0.993317,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 224,
+        "station_m": 22400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.993317,
+        "tangent_north": 0.115414,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8777103,
+            38.7910178
+          ],
+          [
+            -120.8772462,
+            38.7916397
+          ],
+          [
+            -120.8767821,
+            38.7922615
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7916397,
+        "center_lon": -120.8772462,
+        "center_x_east_m": -13635.529,
+        "center_y_north_m": 1448.08,
+        "cross_section_id": "sfa_nhd_xs_seed_113",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.502881,
+        "left_normal_north": -0.864356,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 226,
+        "station_m": 22600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.864356,
+        "tangent_north": 0.502881,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8797916,
+            38.7920135
+          ],
+          [
+            -120.8792139,
+            38.7925746
+          ],
+          [
+            -120.8786363,
+            38.7931357
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7925746,
+        "center_lon": -120.8792139,
+        "center_x_east_m": -13806.101,
+        "center_y_north_m": 1552.035,
+        "cross_section_id": "sfa_nhd_xs_seed_114",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.625896,
+        "left_normal_north": -0.779906,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 228,
+        "station_m": 22800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.779906,
+        "tangent_north": 0.625896,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8816061,
+            38.7935163
+          ],
+          [
+            -120.8807877,
+            38.7938488
+          ],
+          [
+            -120.8799693,
+            38.7941814
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7938488,
+        "center_lon": -120.8807877,
+        "center_x_east_m": -13942.519,
+        "center_y_north_m": 1693.727,
+        "cross_section_id": "sfa_nhd_xs_seed_115",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.886785,
+        "left_normal_north": -0.462183,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 230,
+        "station_m": 23000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.462183,
+        "tangent_north": 0.886785,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.882293,
+            38.7955129
+          ],
+          [
+            -120.8813736,
+            38.7955755
+          ],
+          [
+            -120.8804542,
+            38.7956381
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7955755,
+        "center_lon": -120.8813736,
+        "center_x_east_m": -13993.304,
+        "center_y_north_m": 1885.724,
+        "cross_section_id": "sfa_nhd_xs_seed_116",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.996205,
+        "left_normal_north": -0.087042,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 232,
+        "station_m": 23200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.087042,
+        "tangent_north": 0.996205,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8823034,
+            38.7973473
+          ],
+          [
+            -120.8813805,
+            38.7973574
+          ],
+          [
+            -120.8804577,
+            38.7973675
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7973574,
+        "center_lon": -120.8813805,
+        "center_x_east_m": -13993.91,
+        "center_y_north_m": 2083.863,
+        "cross_section_id": "sfa_nhd_xs_seed_117",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.999901,
+        "left_normal_north": -0.014041,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 234,
+        "station_m": 23400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.014041,
+        "tangent_north": 0.999901,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8828848,
+            38.798591
+          ],
+          [
+            -120.8821403,
+            38.7990162
+          ],
+          [
+            -120.8813958,
+            38.7994413
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7990162,
+        "center_lon": -120.8821403,
+        "center_x_east_m": -14059.77,
+        "center_y_north_m": 2268.308,
+        "cross_section_id": "sfa_nhd_xs_seed_118",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.806691,
+        "left_normal_north": -0.590973,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 236,
+        "station_m": 23600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.590973,
+        "tangent_north": 0.806691,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8843557,
+            38.7991783
+          ],
+          [
+            -120.8840753,
+            38.7998638
+          ],
+          [
+            -120.883795,
+            38.8005492
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.7998638,
+        "center_lon": -120.8840753,
+        "center_x_east_m": -14227.502,
+        "center_y_north_m": 2362.557,
+        "cross_section_id": "sfa_nhd_xs_seed_119",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.3038,
+        "left_normal_north": -0.952736,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 238,
+        "station_m": 23800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.952736,
+        "tangent_north": 0.3038,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8865097,
+            38.7997674
+          ],
+          [
+            -120.8862504,
+            38.8004579
+          ],
+          [
+            -120.8859912,
+            38.8011484
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.8004579,
+        "center_lon": -120.8862504,
+        "center_x_east_m": -14416.046,
+        "center_y_north_m": 2428.622,
+        "cross_section_id": "sfa_nhd_xs_seed_120",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.280922,
+        "left_normal_north": -0.959731,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 240,
+        "station_m": 24000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.959731,
+        "tangent_north": 0.280922,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8887885,
+            38.8001564
+          ],
+          [
+            -120.8885048,
+            38.800841
+          ],
+          [
+            -120.8882211,
+            38.8015256
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.800841,
+        "center_lon": -120.8885048,
+        "center_x_east_m": -14611.464,
+        "center_y_north_m": 2471.225,
+        "cross_section_id": "sfa_nhd_xs_seed_121",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.307419,
+        "left_normal_north": -0.951574,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 242,
+        "station_m": 24200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.951574,
+        "tangent_north": 0.307419,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8910532,
+            38.8008303
+          ],
+          [
+            -120.8906551,
+            38.8014794
+          ],
+          [
+            -120.890257,
+            38.8021285
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.8014794,
+        "center_lon": -120.8906551,
+        "center_x_east_m": -14797.859,
+        "center_y_north_m": 2542.21,
+        "cross_section_id": "sfa_nhd_xs_seed_122",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.43137,
+        "left_normal_north": -0.902175,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 244,
+        "station_m": 24400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.902175,
+        "tangent_north": 0.43137,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8927717,
+            38.8026615
+          ],
+          [
+            -120.891932,
+            38.8029599
+          ],
+          [
+            -120.8910922,
+            38.8032583
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.8029599,
+        "center_lon": -120.891932,
+        "center_x_east_m": -14908.54,
+        "center_y_north_m": 2706.833,
+        "cross_section_id": "sfa_nhd_xs_seed_123",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.909931,
+        "left_normal_north": -0.414761,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 246,
+        "station_m": 24600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.414761,
+        "tangent_north": 0.909931,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8934023,
+            38.8045112
+          ],
+          [
+            -120.8925091,
+            38.8046921
+          ],
+          [
+            -120.8916159,
+            38.8048731
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.8046921,
+        "center_lon": -120.8925091,
+        "center_x_east_m": -14958.568,
+        "center_y_north_m": 2899.449,
+        "cross_section_id": "sfa_nhd_xs_seed_124",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.967848,
+        "left_normal_north": -0.251536,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 248,
+        "station_m": 24800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.251536,
+        "tangent_north": 0.967848,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8948276,
+            38.8055214
+          ],
+          [
+            -120.8940832,
+            38.8059466
+          ],
+          [
+            -120.8933388,
+            38.8063719
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.8059466,
+        "center_lon": -120.8940832,
+        "center_x_east_m": -15095.013,
+        "center_y_north_m": 3038.942,
+        "cross_section_id": "sfa_nhd_xs_seed_125",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.806596,
+        "left_normal_north": -0.591102,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 250,
+        "station_m": 25000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.591102,
+        "tangent_north": 0.806596,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8963773,
+            38.806858
+          ],
+          [
+            -120.8956198,
+            38.807269
+          ],
+          [
+            -120.8948623,
+            38.8076799
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.807269,
+        "center_lon": -120.8956198,
+        "center_x_east_m": -15228.211,
+        "center_y_north_m": 3185.978,
+        "cross_section_id": "sfa_nhd_xs_seed_126",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.820777,
+        "left_normal_north": -0.571249,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 252,
+        "station_m": 25200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.571249,
+        "tangent_north": 0.820777,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8971137,
+            38.8087124
+          ],
+          [
+            -120.8962448,
+            38.8089549
+          ],
+          [
+            -120.8953759,
+            38.8091974
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.8089549,
+        "center_lon": -120.8962448,
+        "center_x_east_m": -15282.387,
+        "center_y_north_m": 3373.449,
+        "cross_section_id": "sfa_nhd_xs_seed_127",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.941489,
+        "left_normal_north": -0.337045,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 254,
+        "station_m": 25400.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.337045,
+        "tangent_north": 0.941489,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8976258,
+            38.8102502
+          ],
+          [
+            -120.8968275,
+            38.8106113
+          ],
+          [
+            -120.8960293,
+            38.8109723
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.8106113,
+        "center_lon": -120.8968275,
+        "center_x_east_m": -15332.903,
+        "center_y_north_m": 3557.627,
+        "cross_section_id": "sfa_nhd_xs_seed_128",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.864937,
+        "left_normal_north": -0.50188,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 256,
+        "station_m": 25600.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.50188,
+        "tangent_north": 0.864937,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8987895,
+            38.8119399
+          ],
+          [
+            -120.8979196,
+            38.8121802
+          ],
+          [
+            -120.8970497,
+            38.8124206
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.8121802,
+        "center_lon": -120.8979196,
+        "center_x_east_m": -15427.569,
+        "center_y_north_m": 3732.088,
+        "cross_section_id": "sfa_nhd_xs_seed_129",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.942549,
+        "left_normal_north": -0.334068,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 258,
+        "station_m": 25800.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.334068,
+        "tangent_north": 0.942549,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.8995447,
+            38.8128744
+          ],
+          [
+            -120.8992056,
+            38.8135435
+          ],
+          [
+            -120.8988666,
+            38.8142127
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.8135435,
+        "center_lon": -120.8992056,
+        "center_x_east_m": -15539.044,
+        "center_y_north_m": 3883.68,
+        "cross_section_id": "sfa_nhd_xs_seed_130",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.367375,
+        "left_normal_north": -0.930073,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 260,
+        "station_m": 26000.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.930073,
+        "tangent_north": 0.367375,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.9016919,
+            38.8131092
+          ],
+          [
+            -120.9014428,
+            38.8138019
+          ],
+          [
+            -120.9011936,
+            38.8144946
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.8138019,
+        "center_lon": -120.9014428,
+        "center_x_east_m": -15732.966,
+        "center_y_north_m": 3912.41,
+        "cross_section_id": "sfa_nhd_xs_seed_131",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.269973,
+        "left_normal_north": -0.962868,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 262,
+        "station_m": 26200.0,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.962868,
+        "tangent_north": 0.269973,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.9017441,
+            38.8131206
+          ],
+          [
+            -120.9014949,
+            38.8138133
+          ],
+          [
+            -120.9012457,
+            38.814506
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "center_lat": 38.8138133,
+        "center_lon": -120.9014949,
+        "center_x_east_m": -15737.485,
+        "center_y_north_m": 3913.678,
+        "cross_section_id": "sfa_nhd_xs_seed_132",
+        "half_width_m": 80.0,
+        "left_normal_east": -0.269973,
+        "left_normal_north": -0.962868,
+        "promotion_gate": "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow before accepting as a production cross section.",
+        "review_status": "seed_line_requires_bank_dem_imagery_and_guide_review",
+        "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+        "source_station_sample_index": 263,
+        "station_m": 26204.692,
+        "status": "draft_production_import_cross_section_review_line_not_solver_section",
+        "tangent_east": -0.962868,
+        "tangent_north": 0.269973,
+        "total_width_m": 160.0
+      },
+      "type": "Feature"
+    }
+  ],
+  "name": "south_fork_american_production_import_cross_section_drafts",
+  "properties": {
+    "feature_count": 133,
+    "generated_on": "2026-07-06",
+    "review_status": "draft_review_lines_not_solver_cross_sections",
+    "schema": "raftsim.south_fork_production_hydrography_drafts.cross_sections.v1",
+    "source_cross_sections": "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson"
+  },
+  "type": "FeatureCollection"
+}

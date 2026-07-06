@@ -42,6 +42,10 @@ from raftsim.real_world import (
     RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
     RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_SCHEMA_VERSION,
     PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION,
+    SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE,
+    SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE,
+    SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
+    SOUTH_FORK_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE,
     SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE,
     SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE,
     SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE,
@@ -173,6 +177,10 @@ def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
     assert "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json" in manifest["artifacts"]["hydrography"]
     assert "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson" in manifest["artifacts"]["hydrography"]
     assert "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json" in manifest["artifacts"]["hydrography"]
+    assert SOUTH_FORK_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE in manifest["artifacts"]["hydrography"]
+    assert SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE in manifest["artifacts"]["hydrography"]
+    assert SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE in manifest["artifacts"]["hydrography"]
+    assert SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in manifest["artifacts"]["hydrography"]
     assert "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json" in manifest["artifacts"]["imagery"]
     assert "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png" in manifest["artifacts"]["imagery"]
 
@@ -278,6 +286,12 @@ def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_revie
     assert "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json" in classes[
         "hydrography_and_centerline"
     ]["target_outputs"]
+    assert SOUTH_FORK_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE in classes[
+        "hydrography_and_centerline"
+    ]["target_outputs"]
+    assert SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert classes["water_and_vegetation_masks"]["status"] == "requires_new_derivatives_from_pilot_imagery_and_hydrography"
     assert "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json" in classes[
         "water_and_vegetation_masks"
@@ -286,6 +300,43 @@ def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_revie
         "water_and_vegetation_masks"
     ]["target_outputs"]
     assert pilot["unreal_import_targets"]["future_production_map"] == "/Game/RaftSim/Maps/Production/L_SouthForkAmerican_ChiliBar"
+
+
+def test_south_fork_production_hydrography_drafts_are_review_gated():
+    hydro_root = REAL_WORLD_DATA_DIR / "south_fork_american_chili_bar" / "hydrography"
+    draft_root = hydro_root / "production_import_pilot"
+    manifest = json.loads((REAL_WORLD_DATA_DIR / "south_fork_american_chili_bar" / SOUTH_FORK_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE).read_text())
+    centerline_path = REAL_WORLD_DATA_DIR / "south_fork_american_chili_bar" / SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE
+    banks_path = REAL_WORLD_DATA_DIR / "south_fork_american_chili_bar" / SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE
+    cross_sections_path = REAL_WORLD_DATA_DIR / "south_fork_american_chili_bar" / SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE
+    centerline = json.loads(centerline_path.read_text())
+    banks = json.loads(banks_path.read_text())
+    cross_sections = json.loads(cross_sections_path.read_text())
+
+    assert draft_root.is_dir()
+    assert manifest["schema"] == "raftsim.south_fork_production_hydrography_drafts.manifest.v1"
+    assert manifest["status"] == "draft_hydrography_artifacts_generated_review_required_not_production_authority"
+    assert manifest["summary"]["centerline_vertex_count"] == 361
+    assert manifest["summary"]["centerline_station_sample_count"] == 264
+    assert manifest["summary"]["cross_section_count"] == 133
+    assert manifest["summary"]["bank_offset_line_count"] == 2
+    assert manifest["output_checksums"]["centerline"]["sha256"] == hashlib.sha256(centerline_path.read_bytes()).hexdigest()
+    assert manifest["output_checksums"]["banks"]["sha256"] == hashlib.sha256(banks_path.read_bytes()).hexdigest()
+    assert manifest["output_checksums"]["cross_sections"]["sha256"] == hashlib.sha256(
+        cross_sections_path.read_bytes()
+    ).hexdigest()
+    assert centerline["properties"]["review_status"] == "draft_review_required_not_final_centerline"
+    assert centerline["features"][0]["properties"]["status"] == (
+        "draft_from_nhd_mainstem_candidate_review_gated_not_final_centerline"
+    )
+    assert banks["properties"]["review_status"] == "offset_lines_review_required_not_banks_or_wetted_width"
+    assert len(banks["features"]) == 2
+    assert cross_sections["properties"]["review_status"] == "draft_review_lines_not_solver_cross_sections"
+    assert len(cross_sections["features"]) == 133
+    assert all(
+        feature["properties"]["status"] == "draft_production_import_cross_section_review_line_not_solver_section"
+        for feature in cross_sections["features"]
+    )
 
 
 def test_colorado_production_import_pilot_exposes_lees_ferry_tile_plan_and_review_gates():
@@ -834,6 +885,10 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
         "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json"
         in rivers["american_south_fork"]["attached_preview_inputs"]
     )
+    assert SOUTH_FORK_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
+    assert SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
+    assert SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
+    assert SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert (
         "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json"
         in rivers["american_south_fork"]["attached_preview_inputs"]

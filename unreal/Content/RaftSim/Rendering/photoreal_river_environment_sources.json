@@ -258,6 +258,14 @@
           "unreal_use": "larger review-gated South Fork pilot water/vegetation masks sampled into terrain/source-drape color and deterministic detail placement; not final segmentation, bank polygons, or wet-rock masks"
         },
         {
+          "artifact_id": "south_fork_production_hydrography_drafts",
+          "category": "derived_hydrography_review_artifacts",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/hydrography_draft_manifest.json; physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/centerline.geojson; physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/banks.geojson; physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/cross_sections.geojson",
+          "provider": "RaftSim geospatial preview utility from NHD HU8 mainstem stationing and cross-section seeds",
+          "status": "draft_review_artifacts_not_production_geometry",
+          "unreal_use": "editor overlays for South Fork centerline, bank-offset, and cross-section review; not accepted banks, wetted width, solver sections, or production route authority"
+        },
+        {
           "artifact_id": "usgs_3dep_chili_bar_sample_256",
           "category": "terrain_sample",
           "path": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_sample_256.tif",
