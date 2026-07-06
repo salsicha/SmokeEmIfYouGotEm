@@ -111,6 +111,7 @@ Treat a new river as a source-controlled content package first, not as an Unreal
 
 10. Attach river-validation evidence.
     Every playable feature should be tied to station spans or geometry with footage timecodes, gauge history, aerial imagery dates, guide feedback, expected raft outcomes, confidence, rights/provenance, and flow context.
+    Use `physics/data/real_world/reference_media_review_queue.json` to turn link-only media leads into station-aware review targets before changing art, water, or gameplay tuning. Keep third-party media link-only until creator, URL, date, station or reach, observed flow/weather, license or written permission, attribution, and allowed-use notes are recorded.
 
 11. Generate or update solver packages.
     Existing South Fork seed packages can be regenerated with:
