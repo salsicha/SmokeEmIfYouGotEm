@@ -2,7 +2,10 @@
   "artifacts": {
     "elevation": [
       "terrain/dem_source_research.json",
-      "terrain/rainforest_gorge_corridor_dem.tif"
+      "terrain/rainforest_gorge_corridor_dem.tif",
+      "terrain/copernicus_dem_glo30_N09_W084.tif",
+      "terrain/copernicus_dem_glo30_N10_W084.tif",
+      "terrain/opentopography_srtmgl1_pacuare_probe_response.txt"
     ],
     "field_media": [
       "field_media/rights_cleared_reference_index.json"
@@ -23,11 +26,19 @@
     ],
     "imagery": [
       "imagery/aerial_source_research.json",
-      "imagery/canopy_and_water_masks.tif"
+      "imagery/canopy_and_water_masks.tif",
+      "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
+      "imagery/nasa_gibs_pacuare_truecolor_2025-01-10_512.png",
+      "imagery/nasa_gibs_pacuare_truecolor_2025-01-25_512.png",
+      "imagery/nasa_gibs_pacuare_truecolor_2025-02-15_512.png",
+      "imagery/nasa_gibs_pacuare_truecolor_2025-03-08_512.png"
     ],
     "protected_area_review": [
       "review/sinac_protected_area_source_rights.json",
       "review/access_and_conservation_constraints.json"
+    ],
+    "source_pulls": [
+      "production_source_pull_manifest.json"
     ],
     "unreal": [
       "unreal/pacuare_river_third_target_editor_pass.json"
@@ -49,10 +60,10 @@
     "guide_review": 0.05,
     "hydrography": 0.1,
     "hydrology": 0.05,
-    "imagery": 0.05,
-    "overall": 0.08,
+    "imagery": 0.22,
+    "overall": 0.16,
     "protected_area_rights": 0.05,
-    "terrain": 0.08
+    "terrain": 0.24
   },
   "coordinate_reference_systems": {
     "solver": "local meters derived from reviewed Costa Rica working CRS",
@@ -63,11 +74,38 @@
   "manifest_id": "pacuare.lower_pacuare_planning_corridor.source_manifest.v0",
   "provenance": {
     "generated_by": "raftsim.milestone24.draft_pacuare_third_target",
-    "processing_version": "milestone24_pacuare_planning_draft.v0",
+    "processing_version": "milestone24_pacuare_planning_draft.v0+milestone26_source_slice.v1",
     "redistribution_notes": "Do not vendor third-party guidebook text, aerial imagery, protected-area content, or field media without explicit rights and attribution records.",
-    "review_status": "draft_target_needs_costa_rica_hydrology_geospatial_protected_area_and_guide_review"
+    "review_status": "partial_public_global_terrain_and_nasa_imagery_slice_attached; needs_costa_rica_hydrology_hydrography_protected_area_and_guide_review"
   },
   "remote_fetches": [
+    {
+      "category": "elevation",
+      "fetch_id": "pacuare_copernicus_dem_glo30_tiles",
+      "notes": "Public Copernicus DEM GLO-30 COG tiles covering the draft Pacuare bounds; not yet clipped, reprojected, conditioned, or imported as Unreal heightfields.",
+      "source_id": "copernicus_dem_glo30_public",
+      "status": "downloaded",
+      "target_artifact": "terrain/copernicus_dem_glo30_N09_W084.tif; terrain/copernicus_dem_glo30_N10_W084.tif",
+      "url": "https://registry.opendata.aws/copernicus-dem/"
+    },
+    {
+      "category": "imagery",
+      "fetch_id": "pacuare_nasa_gibs_modis_truecolor_cloud_screen",
+      "notes": "Five MODIS/Terra true-color dates were sampled from NASA GIBS. The April 2, 2025 image has partial cloud but enough visible rainforest texture for the coarse Unreal preview drape.",
+      "source_id": "nasa_gibs_modis_truecolor",
+      "status": "downloaded_cloud_screened_preview_sample",
+      "target_artifact": "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
+      "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi"
+    },
+    {
+      "category": "elevation",
+      "fetch_id": "pacuare_opentopography_srtmgl1_probe",
+      "notes": "Probe confirmed OpenTopography global DEM access requires a registered API key before SRTMGL1 fallback pulls can be used.",
+      "source_id": "opentopography_srtmgl1",
+      "status": "api_key_required_recorded",
+      "target_artifact": "terrain/opentopography_srtmgl1_pacuare_probe_response.txt",
+      "url": "https://portal.opentopography.org/API/globaldem"
+    },
     {
       "category": "hydrography",
       "fetch_id": "pacuare_osm_hydrography_access",
@@ -122,17 +160,44 @@
   "sources": [
     {
       "category": "elevation",
-      "license_or_terms": "Confirm product-specific use and attribution before corridor generation.",
-      "provider": "dem_source_research",
-      "source_id": "dem_source_research",
-      "status": "planned",
-      "title": "Costa Rica DEM and gorge terrain source research",
-      "url": "source_research_required",
+      "license_or_terms": "GLO-30 Public is available on a free basis for the general public under Copernicus DEM terms; preserve provider, tile ids, and access date.",
+      "provider": "Copernicus DEM GLO-30 Public on AWS Open Data",
+      "source_id": "copernicus_dem_glo30_public",
+      "status": "tile_samples_downloaded",
+      "title": "Copernicus DEM GLO-30 public terrain tiles covering draft Pacuare bounds",
+      "url": "https://registry.opendata.aws/copernicus-dem/",
       "use_in_pipeline": [
         "terrain_dem",
         "gorge_walls",
         "gradient",
         "bank_shelves"
+      ]
+    },
+    {
+      "category": "elevation",
+      "license_or_terms": "OpenTopography global DEM pulls require an account-specific API key and dataset-specific terms review before production use.",
+      "provider": "OpenTopography",
+      "source_id": "opentopography_srtmgl1",
+      "status": "api_key_required_recorded",
+      "title": "OpenTopography SRTMGL1 fallback terrain source",
+      "url": "https://opentopography.org/developers",
+      "use_in_pipeline": [
+        "fallback_terrain_dem",
+        "terrain_cross_check"
+      ]
+    },
+    {
+      "category": "imagery",
+      "license_or_terms": "NASA GIBS imagery is official NASA Earthdata service output; preserve layer, date, CRS, bounds, and terms before production packaging.",
+      "provider": "NASA GIBS",
+      "source_id": "nasa_gibs_modis_truecolor",
+      "status": "cloud_screened_preview_sample_downloaded",
+      "title": "NASA GIBS MODIS Terra corrected reflectance true-color Pacuare samples",
+      "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi",
+      "use_in_pipeline": [
+        "coarse_aerial_preview_drape",
+        "rainforest_color_reference",
+        "cloud_screening_trace"
       ]
     },
     {

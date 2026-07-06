@@ -393,7 +393,7 @@ Each real-world river section must pass:
 ### Milestone F: Unreal Photoreal Corridor
 
 - Use latest stable UE5 rendering stack, Nanite foliage, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, Substrate/material layering, and water visualization.
-- Use `RaftSim.CreatePhotorealEnvironmentPreviewMaps` and `RaftSim.CapturePhotorealEnvironmentPreviews` to generate and capture current procedural blockout evidence for South Fork American, Colorado River, and Pacuare under `/Game/RaftSim/Maps/EnvironmentPreviews/` and `docs/environment-captures/photoreal_river_previews/`.
+- Use `RaftSim.CreatePhotorealEnvironmentPreviewMaps` and `RaftSim.CapturePhotorealEnvironmentPreviews` to generate and capture current source-draped preview evidence for South Fork American, Colorado River, and Pacuare under `/Game/RaftSim/Maps/EnvironmentPreviews/` and `docs/environment-captures/photoreal_river_previews/`; these previews remain non-photoreal until full-corridor terrain, imagery, assets, and guide-reviewed annotations are promoted.
 - Treat the current generated valley terrain, river ribbons, foam/hydraulic cues, boulder bars, foliage proxies, and light/fog variants as review blockouts only. Promotion to photoreal production requires reviewed DEM/aerial imports and rights-cleared or first-party terrain, rock, foliage, water-detail, mist/spray, and raft assets.
 - Validate performance against desktop/VR targets.
 

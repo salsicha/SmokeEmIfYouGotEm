@@ -61,6 +61,13 @@ Treat this as a rain-fed tropical gorge environment until authoritative hydrolog
 - Aerial imagery: Copernicus Sentinel and Landsat for vegetation, river color, and cloud-aware seasonal review.
 - Review media: first-party field captures or explicit outfitter/guide permissions; public social links remain reference-only.
 
+Initial source slice:
+
+- `physics/data/real_world/pacuare_river_costa_rica/production_source_pull_manifest.json` records the first Pacuare source pull.
+- Copernicus DEM GLO-30 public COG tiles `N09_00_W084_00` and `N10_00_W084_00` now cover the draft WGS84 bounds. They are source terrain artifacts only; clipping, reprojection, hydrologic conditioning, and Unreal heightfield import remain open.
+- NASA GIBS MODIS/Terra true-color samples were pulled for five dates. The April 2, 2025 sample has the best visible rainforest texture and is used as the coarse Unreal preview drape; the other dates are retained as cloud-screening evidence.
+- OpenTopography SRTMGL1 was probed and returned an API-key requirement, so that path remains available only after key and terms review.
+
 ## Unreal Construction Plan
 
 1. Create source-controlled preview recipes for all three rivers from the manifest.
@@ -86,8 +93,9 @@ Treat this as a rain-fed tropical gorge environment until authoritative hydrolog
 - The first South Fork official source slice now exists at `physics/data/real_world/south_fork_american_chili_bar/production_source_pull_manifest.json`: historical USGS `11445500` daily discharge, TNM NHD product metadata, TNM DEM/NAIP zero-hit diagnostics, a small USGS 3DEP GeoTIFF sample, and a small USDA/APFO NAIP aerial sample.
 - The South Fork preview now uses the USDA/APFO NAIP sample as a source-derived visible terrain overlay in Unreal. This proves the imagery-to-editor path, but it is a small smoke-test raster rather than a complete orthomosaic or terrain material pass.
 - The first Colorado/Lees Ferry official source slice now exists at `physics/data/real_world/colorado_river_grand_canyon_rowing/production_source_pull_manifest.json`: USGS `09380000` and `09402500` daily discharge histories through July 4, 2026, a small USGS 3DEP GeoTIFF sample, and a small USDA/APFO NAIP aerial sample. The Colorado preview uses that NAIP sample as a source-derived visible canyon terrain overlay.
+- The first Pacuare public/global source slice now exists at `physics/data/real_world/pacuare_river_costa_rica/production_source_pull_manifest.json`: Copernicus DEM GLO-30 public COG tiles for the draft bounds, a NASA GIBS MODIS/Terra April 2, 2025 true-color preview sample selected from five cloud-screened dates, and an OpenTopography API-key gate probe. The Pacuare preview uses the NASA sample as a source-derived visible rainforest terrain overlay.
 - The existing default map path `/Game/RaftSim/Maps/L_RaftSimBoot` has no committed level asset yet.
-- Colorado and Pacuare still need real geospatial pulls, hydrology review, guide review, and rights-cleared field/reference media.
+- Colorado and Pacuare still need full-corridor geospatial processing, hydrology review, guide review, and rights-cleared field/reference media.
 - South Fork has the only solver corridor package, but its terrain, imagery, and field media are still representative placeholders rather than production pulls.
 - Production photoreal review is blocked on reviewed DEM/aerial imports plus rights-cleared or first-party river environment assets for terrain materials, wet rocks, foliage, water surface detail, foam, mist, spray, and lighting.
 
@@ -99,4 +107,5 @@ Treat this as a rain-fed tropical gorge environment until authoritative hydrolog
 - Colorado River: `/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview`, capture `docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png`.
 - Colorado source data: `physics/data/real_world/colorado_river_grand_canyon_rowing/production_source_pull_manifest.json` records the initial official pull; `imagery/usda_naip_lees_ferry_sample_512.png` is sampled into visible canyon terrain overlay tiles, and `terrain/usgs_3dep_lees_ferry_sample_256.tif` is recorded for the next canyon heightfield-conditioning pass.
 - Pacuare River: `/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview`, capture `docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png`.
+- Pacuare source data: `physics/data/real_world/pacuare_river_costa_rica/production_source_pull_manifest.json` records the initial public/global pull; `imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png` is sampled into visible rainforest terrain overlay tiles, and `terrain/copernicus_dem_glo30_N09_W084.tif` plus `terrain/copernicus_dem_glo30_N10_W084.tif` are recorded for the next gorge heightfield-conditioning pass.
 - These captures verify editor automation, camera placement, generated valley terrain meshes, curved river ribbons, foam/hydraulic cue strips, boulder bars, foliage proxies, and per-river light/fog variants. They must be replaced by source-derived or rights-cleared photoreal passes before the goal is complete.
