@@ -14,7 +14,8 @@
     "Rain-fed flow bands remain relative until gauge/rainfall sources and guide feedback are reviewed.",
     "Pacuare rainfall station review now identifies IMN precipitation and SENARA station candidates, but station IDs, features, time series, basin relation, and guide/outfitter validation remain open before numeric rain-fed flow bands or flash-response visuals can be promoted.",
     "Pacuare flash-response review now links rainfall, discharge/stage, basin, and recharge metadata leads, but rainfall-to-stage lag, station time series, basin relation, unsafe-flow criteria, rescue readability, evacuation constraints, and guide/outfitter validation remain open before flash scenarios or high-water visuals can be promoted.",
-    "Pacuare River reference annotations and rights manifest are attached as link-only review scaffolds, but no item-level media rights, first-party capture, station geometry, or guide approval is recorded yet."
+    "Pacuare River reference annotations and rights manifest are attached as link-only review scaffolds, but no item-level media rights, first-party capture, station geometry, or guide approval is recorded yet.",
+    "Pacuare cloud-screened scene index and cloud/shadow review are attached for retained MODIS/GIBS candidates, but production imagery still needs higher-resolution Sentinel/Landsat/local orthophoto or first-party/permissioned aerial sources."
   ],
   "pulled_artifacts": [
     {
@@ -515,6 +516,71 @@
         "rights_review_gate",
         "candidate_link_inventory",
         "permission_outreach_planning"
+      ]
+    },
+    {
+      "artifact_id": "pacuare_cloud_screened_scene_index",
+      "category": "satellite_imagery_cloud_screen_index",
+      "caveats": [
+        "MODIS/GIBS is too coarse for production photoreal materials.",
+        "The active April 2 preview has useful rainforest color but still records shadow/cloud risk and must be replaced or supplemented.",
+        "No Sentinel/Landsat scene IDs, official orthophoto layers, first-party aerials, or item-level rights-cleared field references are attached yet.",
+        "Cloud/shadow metrics are threshold diagnostics only and need manual geospatial review before mask or material authority."
+      ],
+      "path": "imagery/production_import_pilot/cloud_screened_scene_index.json",
+      "provider": "RaftSim diagnostic from retained NASA GIBS MODIS true-color candidates",
+      "related_artifacts": [
+        "imagery/production_import_pilot/cloud_shadow_review.json",
+        "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
+        "imagery/production_import_pilot/source_drape_4096.png"
+      ],
+      "status": "modis_gibs_candidates_indexed_review_gated_not_production_imagery",
+      "summary": {
+        "active_preview_cloud_like_fraction": 0.0557,
+        "active_preview_date": "2025-04-02",
+        "active_preview_shadow_like_fraction": 0.3061,
+        "best_rank_score": -0.0195,
+        "best_rank_score_date": "2025-03-08",
+        "candidate_count": 5,
+        "lowest_cloud_metric_date": "2025-03-08",
+        "lowest_cloud_metric_fraction": 0.0399,
+        "production_decision": "blocked_pending_higher_resolution_cloud_screened_imagery_or_first_party_aerial_reference"
+      },
+      "use": [
+        "cloud-screening provenance",
+        "preview source-drape selection traceability",
+        "future Sentinel/Landsat/orthophoto search planning"
+      ]
+    },
+    {
+      "artifact_id": "pacuare_cloud_shadow_review",
+      "category": "satellite_imagery_cloud_shadow_review",
+      "caveats": [
+        "MODIS/GIBS is too coarse for production photoreal materials.",
+        "The active April 2 preview has useful rainforest color but still records shadow/cloud risk and must be replaced or supplemented.",
+        "No Sentinel/Landsat scene IDs, official orthophoto layers, first-party aerials, or item-level rights-cleared field references are attached yet.",
+        "Cloud/shadow metrics are threshold diagnostics only and need manual geospatial review before mask or material authority."
+      ],
+      "path": "imagery/production_import_pilot/cloud_shadow_review.json",
+      "provider": "RaftSim diagnostic from retained NASA GIBS MODIS true-color candidates",
+      "related_artifacts": [
+        "imagery/production_import_pilot/cloud_screened_scene_index.json"
+      ],
+      "status": "review_gated_modis_cloud_shadow_diagnostic_not_acceptance",
+      "summary": {
+        "bright_like_fraction": 0.0324,
+        "cloud_like_fraction": 0.0557,
+        "date": "2025-04-02",
+        "decision": "retain_as_active_preview_seed_only_because_current_unreal_derivatives_already_use_this_date",
+        "green_dominant_fraction": 0.8331,
+        "path_1024": "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
+        "path_512": "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
+        "shadow_like_fraction": 0.3061
+      },
+      "use": [
+        "cloud-screening provenance",
+        "preview source-drape selection traceability",
+        "future Sentinel/Landsat/orthophoto search planning"
       ]
     }
   ],

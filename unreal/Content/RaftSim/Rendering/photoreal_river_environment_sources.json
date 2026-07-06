@@ -993,6 +993,22 @@
           "provider": "RaftSim generated link-only media rights gate",
           "status": "candidate_links_only_no_rights_cleared",
           "unreal_use": "Blocks texture, photogrammetry, AI-training, packaged media, marketing, or production-art use until item-level rights and guide review are recorded."
+        },
+        {
+          "artifact_id": "pacuare_cloud_screened_scene_index",
+          "category": "satellite_imagery_cloud_screen_index",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/cloud_screened_scene_index.json",
+          "provider": "RaftSim diagnostic from retained NASA GIBS MODIS true-color candidates",
+          "status": "attached_review_gated_not_production_imagery",
+          "unreal_use": "Documents why the active Pacuare preview drape uses April 2, 2025 and why higher-resolution cloud-screened imagery is still required before photoreal material or mask promotion."
+        },
+        {
+          "artifact_id": "pacuare_cloud_shadow_review",
+          "category": "satellite_imagery_cloud_shadow_review",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/cloud_shadow_review.json",
+          "provider": "RaftSim diagnostic from retained NASA GIBS MODIS true-color candidates",
+          "status": "attached_review_gated_not_cloud_mask_acceptance",
+          "unreal_use": "Flags active preview cloud/shadow limitations and required Sentinel/Landsat/orthophoto/first-party imagery before production Pacuare masks or materials are approved."
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"

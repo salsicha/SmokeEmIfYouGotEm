@@ -1,0 +1,108 @@
+{
+  "active_preview": {
+    "bright_like_fraction": 0.0324,
+    "cloud_like_fraction": 0.0557,
+    "date": "2025-04-02",
+    "decision": "retain_as_active_preview_seed_only_because_current_unreal_derivatives_already_use_this_date",
+    "green_dominant_fraction": 0.8331,
+    "path_1024": "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
+    "path_512": "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
+    "shadow_like_fraction": 0.3061
+  },
+  "allowed_use": [
+    "cloud-screening provenance",
+    "preview source-drape selection traceability",
+    "future Sentinel/Landsat/orthophoto search planning"
+  ],
+  "candidate_diagnostics": [
+    {
+      "active_preview_source": false,
+      "bright_like_fraction": 0.4848,
+      "cloud_like_fraction": 0.6028,
+      "date": "2025-01-10",
+      "diagnostic_rank_score": 0.5824,
+      "green_dominant_fraction": 0.2044,
+      "height": 512,
+      "path": "imagery/nasa_gibs_pacuare_truecolor_2025-01-10_512.png",
+      "shadow_like_fraction": 0.0,
+      "width": 512
+    },
+    {
+      "active_preview_source": false,
+      "bright_like_fraction": 0.8669,
+      "cloud_like_fraction": 0.9097,
+      "date": "2025-01-25",
+      "diagnostic_rank_score": 0.9096,
+      "green_dominant_fraction": 0.0012,
+      "height": 512,
+      "path": "imagery/nasa_gibs_pacuare_truecolor_2025-01-25_512.png",
+      "shadow_like_fraction": 0.0,
+      "width": 512
+    },
+    {
+      "active_preview_source": false,
+      "bright_like_fraction": 0.9472,
+      "cloud_like_fraction": 0.9968,
+      "date": "2025-02-15",
+      "diagnostic_rank_score": 0.9968,
+      "green_dominant_fraction": 0.0,
+      "height": 512,
+      "path": "imagery/nasa_gibs_pacuare_truecolor_2025-02-15_512.png",
+      "shadow_like_fraction": 0.0,
+      "width": 512
+    },
+    {
+      "active_preview_source": false,
+      "bright_like_fraction": 0.0117,
+      "cloud_like_fraction": 0.0399,
+      "date": "2025-03-08",
+      "diagnostic_rank_score": -0.0195,
+      "green_dominant_fraction": 0.5954,
+      "height": 512,
+      "path": "imagery/nasa_gibs_pacuare_truecolor_2025-03-08_512.png",
+      "shadow_like_fraction": 0.0005,
+      "width": 512
+    },
+    {
+      "active_preview_source": true,
+      "bright_like_fraction": 0.0324,
+      "cloud_like_fraction": 0.0557,
+      "date": "2025-04-02",
+      "diagnostic_rank_score": 0.0795,
+      "green_dominant_fraction": 0.8331,
+      "height": 512,
+      "path": "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
+      "selection_note": "active preview source because the existing visual review found useful rainforest texture despite coarse MODIS resolution and shadow/cloud risk",
+      "shadow_like_fraction": 0.3061,
+      "width": 512
+    }
+  ],
+  "forbidden_use": [
+    "production photoreal material approval",
+    "final water, canopy, wet-rock, or cloud-shadow masks",
+    "claiming cloud-free Pacuare reference imagery"
+  ],
+  "generated_on": "2026-07-06",
+  "promotion_blockers": [
+    "MODIS/GIBS is too coarse for production photoreal materials.",
+    "The active April 2 preview has useful rainforest color but still records shadow/cloud risk and must be replaced or supplemented.",
+    "No Sentinel/Landsat scene IDs, official orthophoto layers, first-party aerials, or item-level rights-cleared field references are attached yet.",
+    "Cloud/shadow metrics are threshold diagnostics only and need manual geospatial review before mask or material authority."
+  ],
+  "required_next_sources": [
+    "Copernicus Sentinel scene metadata with acquisition date, processing level, cloud score, CRS, terms, and attribution",
+    "Landsat seasonal context scenes for dry/rainfed/high-rain comparison",
+    "SNIT/IDECORI official orthophoto layer discovery and terms review if available",
+    "first-party or explicit-permission aerial/field references for rainforest canopy, wet rock, and river color"
+  ],
+  "review_findings": [
+    "March 8, 2025 has the lowest simple cloud-like fraction among retained MODIS/GIBS candidates.",
+    "April 2, 2025 remains the active preview seed because it already drives the generated Pacuare drape and has stronger green-dominant rainforest signal, but it also has elevated shadow-like coverage.",
+    "All retained candidates are coarse MODIS/GIBS references and are unsuitable for final orthophoto, material, or segmentation authority."
+  ],
+  "river_id": "pacuare",
+  "scene_index": "imagery/production_import_pilot/cloud_screened_scene_index.json",
+  "schema": "raftsim.pacuare.cloud_shadow_review.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "review_gated_modis_cloud_shadow_diagnostic_not_acceptance"
+}

@@ -1,0 +1,125 @@
+{
+  "allowed_use": [
+    "cloud-screening provenance",
+    "preview source-drape selection traceability",
+    "future Sentinel/Landsat/orthophoto search planning"
+  ],
+  "candidates": [
+    {
+      "active_preview_source": false,
+      "bright_like_fraction": 0.4848,
+      "cloud_like_fraction": 0.6028,
+      "date": "2025-01-10",
+      "diagnostic_rank_score": 0.5824,
+      "green_dominant_fraction": 0.2044,
+      "height": 512,
+      "path": "imagery/nasa_gibs_pacuare_truecolor_2025-01-10_512.png",
+      "shadow_like_fraction": 0.0,
+      "width": 512
+    },
+    {
+      "active_preview_source": false,
+      "bright_like_fraction": 0.8669,
+      "cloud_like_fraction": 0.9097,
+      "date": "2025-01-25",
+      "diagnostic_rank_score": 0.9096,
+      "green_dominant_fraction": 0.0012,
+      "height": 512,
+      "path": "imagery/nasa_gibs_pacuare_truecolor_2025-01-25_512.png",
+      "shadow_like_fraction": 0.0,
+      "width": 512
+    },
+    {
+      "active_preview_source": false,
+      "bright_like_fraction": 0.9472,
+      "cloud_like_fraction": 0.9968,
+      "date": "2025-02-15",
+      "diagnostic_rank_score": 0.9968,
+      "green_dominant_fraction": 0.0,
+      "height": 512,
+      "path": "imagery/nasa_gibs_pacuare_truecolor_2025-02-15_512.png",
+      "shadow_like_fraction": 0.0,
+      "width": 512
+    },
+    {
+      "active_preview_source": false,
+      "bright_like_fraction": 0.0117,
+      "cloud_like_fraction": 0.0399,
+      "date": "2025-03-08",
+      "diagnostic_rank_score": -0.0195,
+      "green_dominant_fraction": 0.5954,
+      "height": 512,
+      "path": "imagery/nasa_gibs_pacuare_truecolor_2025-03-08_512.png",
+      "shadow_like_fraction": 0.0005,
+      "width": 512
+    },
+    {
+      "active_preview_source": true,
+      "bright_like_fraction": 0.0324,
+      "cloud_like_fraction": 0.0557,
+      "date": "2025-04-02",
+      "diagnostic_rank_score": 0.0795,
+      "green_dominant_fraction": 0.8331,
+      "height": 512,
+      "path": "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
+      "selection_note": "active preview source because the existing visual review found useful rainforest texture despite coarse MODIS resolution and shadow/cloud risk",
+      "shadow_like_fraction": 0.3061,
+      "width": 512
+    }
+  ],
+  "diagnostic_method": {
+    "bright_like": "RGB max channel > 200 on RGBA pixels",
+    "cloud_like": "RGB max channel > 185 and channel spread < 35 on RGBA pixels",
+    "green_dominant": "G channel exceeds R and B by more than 5 on RGBA pixels",
+    "limits": "Simple RGB threshold diagnostic over coarse MODIS/GIBS PNGs; not Sentinel/Landsat QA, not cloud mask truth, and not production imagery acceptance.",
+    "rank_score": "cloud_like + 0.35 * shadow_like - 0.1 * green_dominant; lower is better for review triage only",
+    "shadow_like": "RGB max channel < 50 on RGBA pixels"
+  },
+  "forbidden_use": [
+    "production photoreal material approval",
+    "final water, canopy, wet-rock, or cloud-shadow masks",
+    "claiming cloud-free Pacuare reference imagery"
+  ],
+  "generated_on": "2026-07-06",
+  "promotion_blockers": [
+    "MODIS/GIBS is too coarse for production photoreal materials.",
+    "The active April 2 preview has useful rainforest color but still records shadow/cloud risk and must be replaced or supplemented.",
+    "No Sentinel/Landsat scene IDs, official orthophoto layers, first-party aerials, or item-level rights-cleared field references are attached yet.",
+    "Cloud/shadow metrics are threshold diagnostics only and need manual geospatial review before mask or material authority."
+  ],
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare.cloud_screened_scene_index.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "source": {
+    "active_preview_artifact": "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
+    "active_preview_sample_size_px": [
+      1024,
+      1024
+    ],
+    "bounds_wgs84": {
+      "max_lat": 10.12,
+      "max_lon": -83.42,
+      "min_lat": 9.72,
+      "min_lon": -83.75
+    },
+    "candidate_sample_size_px": [
+      512,
+      512
+    ],
+    "layer": "MODIS_Terra_CorrectedReflectance_TrueColor",
+    "provider": "NASA GIBS WMS",
+    "source_id": "nasa_gibs_modis_truecolor"
+  },
+  "status": "modis_gibs_candidates_indexed_review_gated_not_production_imagery",
+  "summary": {
+    "active_preview_cloud_like_fraction": 0.0557,
+    "active_preview_date": "2025-04-02",
+    "active_preview_shadow_like_fraction": 0.3061,
+    "best_rank_score": -0.0195,
+    "best_rank_score_date": "2025-03-08",
+    "candidate_count": 5,
+    "lowest_cloud_metric_date": "2025-03-08",
+    "lowest_cloud_metric_fraction": 0.0399,
+    "production_decision": "blocked_pending_higher_resolution_cloud_screened_imagery_or_first_party_aerial_reference"
+  }
+}
