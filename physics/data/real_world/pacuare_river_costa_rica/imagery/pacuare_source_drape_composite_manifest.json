@@ -1,0 +1,28 @@
+{
+  "schema": "raftsim.pacuare_source_drape_composite.v1",
+  "status": "generated_preview_only_not_production_photoreal",
+  "bounds_wgs84": {
+    "min_lon": -83.75,
+    "min_lat": 9.72,
+    "max_lon": -83.42,
+    "max_lat": 10.12
+  },
+  "inputs": {
+    "nasa_gibs_truecolor": "physics/data/real_world/pacuare_river_costa_rica/imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
+    "nasa_gibs_selected_date": "2025-04-02",
+    "copernicus_dem_glo30_southern_tile": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif",
+    "copernicus_dem_glo30_northern_tile": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif"
+  },
+  "output": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
+  "processing": {
+    "size_px": 512,
+    "dem_sampling": "nearest_neighbor_from_copernicus_glo30_tiles",
+    "cloud_mask": "truecolor brightness > 0.70 and channel range < 0.16",
+    "blend": "non_cloud = 45% NASA truecolor + 55% DEM rainforest relief; cloud = DEM rainforest relief"
+  },
+  "caveats": [
+    "Preview composite is a deterministic source-derived drape, not a production orthomosaic.",
+    "Cloud-filled areas are DEM-derived rainforest relief placeholders and must be replaced by higher-resolution cloud-screened imagery before photoreal approval.",
+    "DEM tiles are not yet clipped, reprojected, hydrologically conditioned, or imported as Unreal heightfields."
+  ]
+}

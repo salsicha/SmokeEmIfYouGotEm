@@ -88,6 +88,30 @@
       ]
     },
     {
+      "artifact_id": "pacuare_nasa_gibs_demshade_source_drape_2025_04_02",
+      "category": "derived_preview_drape",
+      "path": "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
+      "provider": "RaftSim source-preview tool from NASA GIBS and Copernicus DEM GLO-30 inputs",
+      "url": "physics/src/raftsim/geospatial_preview.py",
+      "status": "generated_preview_only",
+      "summary": {
+        "width": 512,
+        "height": 512,
+        "pixel_type": "RGBA_U8",
+        "format": "PNG",
+        "processing_manifest": "imagery/pacuare_source_drape_composite_manifest.json"
+      },
+      "use": [
+        "unreal_source_overlay",
+        "cloud_gap_preview_fill",
+        "terrain_relief_visual_review"
+      ],
+      "caveats": [
+        "This is a deterministic source-derived preview composite, not production photoreal imagery.",
+        "Cloud-filled areas are DEM-derived rainforest relief placeholders and must be replaced by higher-resolution cloud-screened imagery before production approval."
+      ]
+    },
+    {
       "artifact_id": "nasa_gibs_pacuare_cloud_screen_candidates",
       "category": "satellite_imagery_cloud_screen_candidates",
       "paths": [

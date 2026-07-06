@@ -27,6 +27,8 @@
     "imagery": [
       "imagery/aerial_source_research.json",
       "imagery/canopy_and_water_masks.tif",
+      "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
+      "imagery/pacuare_source_drape_composite_manifest.json",
       "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
       "imagery/nasa_gibs_pacuare_truecolor_2025-01-10_512.png",
       "imagery/nasa_gibs_pacuare_truecolor_2025-01-25_512.png",
@@ -96,6 +98,15 @@
       "status": "downloaded_cloud_screened_preview_sample",
       "target_artifact": "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
       "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi"
+    },
+    {
+      "category": "derived_preview_drape",
+      "fetch_id": "pacuare_demshade_source_drape_composite",
+      "notes": "Deterministic preview composite generated from the selected NASA GIBS true-color image and Copernicus DEM GLO-30 relief. Cloud-filled areas use DEM-derived rainforest relief placeholders until higher-resolution cloud-free imagery is reviewed.",
+      "source_id": "pacuare_nasa_gibs_demshade_composite",
+      "status": "generated_preview_only",
+      "target_artifact": "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
+      "url": "physics/src/raftsim/geospatial_preview.py"
     },
     {
       "category": "elevation",
@@ -198,6 +209,20 @@
         "coarse_aerial_preview_drape",
         "rainforest_color_reference",
         "cloud_screening_trace"
+      ]
+    },
+    {
+      "category": "derived_preview_drape",
+      "license_or_terms": "Derived from NASA GIBS and Copernicus DEM source samples; keep source terms, inputs, and processing manifest attached. Preview-only until higher-resolution imagery is reviewed.",
+      "provider": "RaftSim source-preview tool",
+      "source_id": "pacuare_nasa_gibs_demshade_composite",
+      "status": "generated_preview_only",
+      "title": "Pacuare NASA GIBS plus Copernicus DEM shaded source drape",
+      "url": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_source_drape_composite_manifest.json",
+      "use_in_pipeline": [
+        "unreal_source_overlay",
+        "cloud_gap_preview_fill",
+        "terrain_relief_visual_review"
       ]
     },
     {

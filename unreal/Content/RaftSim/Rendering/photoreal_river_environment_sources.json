@@ -246,12 +246,12 @@
       ],
       "source_sample_artifacts": [
         {
-          "artifact_id": "nasa_gibs_pacuare_truecolor_2025_04_02",
-          "category": "satellite_imagery_sample",
-          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
-          "provider": "NASA GIBS WMS",
+          "artifact_id": "pacuare_nasa_gibs_demshade_source_drape_2025_04_02",
+          "category": "derived_preview_drape",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
+          "provider": "RaftSim source-preview tool from NASA GIBS WMS and Copernicus DEM GLO-30 inputs",
           "status": "draped_into_unreal_preview_terrain_overlay_tiles",
-          "unreal_use": "source-derived coarse rainforest terrain overlay layer for /Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
+          "unreal_use": "source-derived coarse rainforest terrain overlay layer with DEM relief and cloud-gap preview fill for /Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
         },
         {
           "artifact_id": "copernicus_dem_glo30_pacuare_bounds_tiles",
