@@ -238,15 +238,16 @@
       "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
       "production_readiness": "preview_only_not_lifelike",
       "attached_source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_source_pull_manifest.json",
+      "production_import_pilot": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_import_pilot.json",
       "attached_sources_by_class": {
         "terrain_dem_or_lidar": {
-          "status": "lees_ferry_corridor_sample_and_heightfield_candidate_attached",
+          "status": "lees_ferry_corridor_sample_heightfield_candidate_and_import_pilot_recipe_attached",
           "artifacts": [
             "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_relief_preview_1024.png",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png"
           ],
-          "promotion_blocker": "Covers only a preview sample near Lees Ferry; full canyon terrain needs tiling, stationing, conditioning, canyon-wall material breakup, and guide/oarsman review."
+          "promotion_blocker": "Covers only a preview sample near Lees Ferry and a planned 2x2 official-service pilot recipe; full canyon terrain still needs tile download, tiling expansion, stationing, conditioning, canyon-wall material breakup, and guide/oarsman review."
         },
         "hydrography_and_centerline": {
           "status": "not_attached_for_full_corridor",
@@ -254,11 +255,11 @@
           "promotion_blocker": "Need 3DHP/NHD or NPS/GCMRC river-mile aligned centerline, rapid annotations, tributaries, camps/access context, and solver corridor stationing."
         },
         "aerial_or_satellite_imagery": {
-          "status": "naip_lees_ferry_corridor_sample_attached",
+          "status": "naip_lees_ferry_corridor_sample_and_import_pilot_recipe_attached",
           "artifacts": [
             "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_sample_1024.png"
           ],
-          "promotion_blocker": "Sample export does not cover the full rowing prototype corridor or canyon visual diversity; needs selected orthomosaics/satellite scenes, dates, CRS, and terms."
+          "promotion_blocker": "Sample export and planned 2x2 NAIP pilot recipe do not cover the full rowing prototype corridor or canyon visual diversity; needs selected orthomosaics/satellite scenes, dates, CRS, terms, and review-gated stitched derivatives."
         },
         "water_and_vegetation_masks": {
           "status": "preview_masks_attached",
