@@ -18,7 +18,8 @@
     "Pacuare cloud-screened scene index and cloud/shadow review are attached for retained MODIS/GIBS candidates, but production imagery still needs higher-resolution Sentinel/Landsat/local orthophoto or first-party/permissioned aerial sources.",
     "Pacuare consolidated source metadata review is attached, but it only records local review-gated metadata and does not promote DEM, imagery, hydrography, hydrology, access, protected-area, or media sources to production use.",
     "Pacuare high-resolution scene metadata review identifies official Landsat/Sentinel candidates, but production imagery still needs full-year paging, download approval, manual visual QA, CRS/band/scale review, and guide/geospatial signoff before replacing the MODIS/GIBS preview.",
-    "Anonymous LandsatLook product asset URLs returned EROS login HTML for the best Pacuare Landsat candidate, so imagery downloads remain blocked until an approved access path returns expected JPEG/JSON/COG content."
+    "Anonymous LandsatLook product asset URLs returned EROS login HTML for the best Pacuare Landsat candidate, so imagery downloads remain blocked until an approved access path returns expected JPEG/JSON/COG content.",
+    "Pacuare Sentinel COG thumbnails and tile metadata are attached as visual triage, but full-resolution Sentinel bands, SCL/QA masks, corridor clipping, terms/attribution, and manual cloud/shadow QA are still required before source-drape or mask replacement."
   ],
   "pulled_artifacts": [
     {
@@ -797,6 +798,48 @@
         "download_access_gate",
         "production_imagery_workflow_planning",
         "anti_bad_artifact_check"
+      ]
+    },
+    {
+      "artifact_id": "pacuare_sentinel_cog_thumbnail_review",
+      "category": "high_resolution_sentinel_thumbnail_and_tile_metadata_review",
+      "caveats": [
+        "Attaches public Sentinel-2 L2A COG thumbnails and tile metadata only; no full-resolution bands, TCI COG, SCL mask, or source-drape derivative is promoted.",
+        "The 17PKM tile is mostly lower/coastal Pacuare context and the 16PHR companion tile has visible cloud scatter; both need corridor clipping, full-resolution QA, and guide/geospatial review.",
+        "Thumbnails are visual triage references, not production masks, material sources, or lifelike evidence."
+      ],
+      "paths": [
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_thumbnail.jpg",
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tileinfo_metadata.json",
+        "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_thumbnail.jpg",
+        "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tileinfo_metadata.json",
+        "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json"
+      ],
+      "provider": "Element 84 / AWS Open Data Sentinel-2 L2A COG mirror with Copernicus Data Space metadata context",
+      "related_artifacts": [
+        "imagery/production_import_pilot/high_resolution_scene_metadata_review.json"
+      ],
+      "status": "public_sentinel_cog_thumbnail_and_tile_metadata_attached_review_gated_not_source_drape",
+      "summary": {
+        "attached_thumbnail_count": 2,
+        "attached_tileinfo_metadata_count": 2,
+        "date": "2025-01-19",
+        "full_resolution_bands_downloaded": 0,
+        "mgrs_tiles": [
+          "17PKM",
+          "16PHR"
+        ],
+        "thumbnail_dimensions_px": [
+          343,
+          343
+        ],
+        "tile_16phr_catalog_cloud_cover_percent": 14.778528,
+        "tile_17pkm_catalog_cloud_cover_percent": 4.785432
+      },
+      "use": [
+        "visual_source_triage",
+        "sentinel_cog_access_validation",
+        "future_windowed_cog_read_planning"
       ]
     }
   ],
