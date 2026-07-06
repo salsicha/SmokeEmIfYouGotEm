@@ -340,11 +340,12 @@
         "terrain/copernicus_dem_glo30_N10_W084.tif",
         "production_import_pilot/source_drape_4096.png",
         "production_import_pilot/dem_relief_2048.png",
-        "production_import_pilot/heightfield_candidate_2017.png",
-        "production_import_pilot/water_mask_2048.png",
-        "production_import_pilot/vegetation_mask_2048.png",
-        "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
-        "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
+                "production_import_pilot/heightfield_candidate_2017.png",
+                "production_import_pilot/water_mask_2048.png",
+                "production_import_pilot/vegetation_mask_2048.png",
+                "hydrography/production_import_pilot/official_source_access_plan.json",
+                "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
+                "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
         "hydrography/production_import_pilot/preview_stationing_scaffold.json",
         "hydrology/costa_rica_gauge_search.json",
         "hydrology/rainfall_context.json",
@@ -353,10 +354,11 @@
       ],
       "p0_next_pulls_or_attachments": [
         {
-          "source_class": "hydrography_and_centerline",
-          "required_artifacts": [
-            "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
-            "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
+                    "source_class": "hydrography_and_centerline",
+                    "required_artifacts": [
+                        "hydrography/production_import_pilot/official_source_access_plan.json",
+                        "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
+                        "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
             "hydrography/production_import_pilot/preview_stationing_scaffold.json",
             "hydrography/production_import_pilot/centerline.geojson",
             "hydrography/production_import_pilot/banks.geojson",
@@ -385,9 +387,10 @@
           "promotion_gate": "Replace MODIS/GIBS proxy drape with cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference."
         },
         {
-          "source_class": "seasonal_flow_or_release_history",
-          "required_artifacts": [
-            "hydrology/production_import_pilot/rainfall_station_review.json",
+                    "source_class": "seasonal_flow_or_release_history",
+                    "required_artifacts": [
+                        "hydrography/production_import_pilot/official_source_access_plan.json",
+                        "hydrology/production_import_pilot/rainfall_station_review.json",
             "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
             "hydrology/production_import_pilot/flash_response_review.json"
           ],

@@ -65,9 +65,9 @@
       ],
       "limits": "MODIS/GIBS is coarse and partly cloudy; it is only a source-aware preview seed until higher-resolution cloud-screened imagery or first-party/permissioned aerial reference is approved."
     },
-    {
-      "product_id": "pacuare_unreal_preview_centerline_scaffold",
-      "status": "generated_review_gated_preview_route_not_official_hydrography",
+        {
+            "product_id": "pacuare_unreal_preview_centerline_scaffold",
+            "status": "generated_review_gated_preview_route_not_official_hydrography",
       "source_ids": [
         "unreal_preview_curve",
         "pacuare_production_import_pilot_masks"
@@ -76,10 +76,24 @@
         "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
         "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
         "hydrography/production_import_pilot/preview_stationing_scaffold.json"
-      ],
-      "limits": "Deterministic scaffold from the current Unreal Pacuare preview curve and draft WGS84 bounds; use for annotation placement and procedural dressing only until official hydrography, CRS, banks, rapid/access stationing, and guide/outfitter review replace or validate it."
-    }
-  ],
+            ],
+            "limits": "Deterministic scaffold from the current Unreal Pacuare preview curve and draft WGS84 bounds; use for annotation placement and procedural dressing only until official hydrography, CRS, banks, rapid/access stationing, and guide/outfitter review replace or validate it."
+        },
+        {
+            "product_id": "pacuare_official_source_access_plan",
+            "status": "official_service_catalogs_recorded_layer_download_pending",
+            "source_ids": [
+                "snit_cr_idecori",
+                "minae_direccion_agua",
+                "imn_costa_rica",
+                "ice_hydromet"
+            ],
+            "artifacts": [
+                "hydrography/production_import_pilot/official_source_access_plan.json"
+            ],
+            "limits": "Records official Costa Rica service catalogs, candidate layer names, and review gates only; no SNIT/Direccion de Agua/SINIGIRH features are downloaded, clipped, or promoted by this plan."
+        }
+    ],
   "required_source_classes": [
     {
       "class_id": "terrain_dem_or_lidar",
@@ -105,10 +119,11 @@
         "minae_direccion_agua",
         "hydrosheds",
         "osm"
-      ],
-      "target_outputs": [
-        "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
-        "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
+            ],
+            "target_outputs": [
+                "hydrography/production_import_pilot/official_source_access_plan.json",
+                "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
+                "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
         "hydrography/production_import_pilot/preview_stationing_scaffold.json",
         "hydrography/production_import_pilot/centerline.geojson",
         "hydrography/production_import_pilot/banks.geojson",
@@ -161,10 +176,11 @@
         "ice_hydromet",
         "minae_direccion_agua",
         "guide_review"
-      ],
-      "target_outputs": [
-        "hydrology/production_import_pilot/rainfall_station_review.json",
-        "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
+            ],
+            "target_outputs": [
+                "hydrography/production_import_pilot/official_source_access_plan.json",
+                "hydrology/production_import_pilot/rainfall_station_review.json",
+                "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
         "hydrology/production_import_pilot/flash_response_review.json",
         "hydrology/production_import_pilot/flow_band_review.json"
       ],
@@ -177,10 +193,11 @@
         "sinac_minae",
         "snit_cr_idecori",
         "guide_review"
-      ],
-      "target_outputs": [
-        "review/production_import_pilot/protected_area_publication_sensitivity.json",
-        "review/production_import_pilot/access_and_conservation_policy.json"
+            ],
+            "target_outputs": [
+                "hydrography/production_import_pilot/official_source_access_plan.json",
+                "review/production_import_pilot/protected_area_publication_sensitivity.json",
+                "review/production_import_pilot/access_and_conservation_policy.json"
       ],
       "promotion_gate": "Record exact layers, terms, sensitive-location policy, access constraints, and screenshot/publication limits before committing detailed route packages or public-facing captures."
     },
