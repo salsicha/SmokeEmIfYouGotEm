@@ -6,6 +6,7 @@
       "terrain/copernicus_dem_glo30_N09_W084.tif",
       "terrain/copernicus_dem_glo30_N10_W084.tif",
       "terrain/pacuare_dem_relief_preview_512.png",
+      "terrain/pacuare_dem_relief_preview_1024.png",
       "terrain/opentopography_srtmgl1_pacuare_probe_response.txt"
     ],
     "field_media": [
@@ -29,8 +30,11 @@
       "imagery/aerial_source_research.json",
       "imagery/canopy_and_water_masks.tif",
       "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
+      "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png",
       "imagery/pacuare_source_drape_composite_manifest.json",
+      "imagery/pacuare_source_drape_composite_manifest_1024.json",
       "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
+      "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
       "imagery/nasa_gibs_pacuare_truecolor_2025-01-10_512.png",
       "imagery/nasa_gibs_pacuare_truecolor_2025-01-25_512.png",
       "imagery/nasa_gibs_pacuare_truecolor_2025-02-15_512.png",
@@ -94,28 +98,28 @@
     {
       "category": "imagery",
       "fetch_id": "pacuare_nasa_gibs_modis_truecolor_cloud_screen",
-      "notes": "Five MODIS/Terra true-color dates were sampled from NASA GIBS. The April 2, 2025 image has partial cloud but enough visible rainforest texture for the coarse Unreal preview drape.",
+      "notes": "Five MODIS/Terra true-color dates were sampled from NASA GIBS. The April 2, 2025 image has partial cloud but enough visible rainforest texture for the coarse Unreal preview drape; the selected date is also retained as a larger 1024px active preview input.",
       "source_id": "nasa_gibs_modis_truecolor",
-      "status": "downloaded_cloud_screened_preview_sample",
-      "target_artifact": "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
+      "status": "downloaded_cloud_screened_preview_sample_with_larger_active_input",
+      "target_artifact": "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png; imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
       "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi"
     },
     {
       "category": "derived_preview_drape",
       "fetch_id": "pacuare_demshade_source_drape_composite",
-      "notes": "Deterministic preview composite generated from the selected NASA GIBS true-color image and Copernicus DEM GLO-30 relief. Cloud-filled areas use DEM-derived rainforest relief placeholders until higher-resolution cloud-free imagery is reviewed.",
+      "notes": "Deterministic preview composite generated from the selected NASA GIBS true-color image and Copernicus DEM GLO-30 relief. Cloud-filled areas use DEM-derived rainforest relief placeholders until higher-resolution cloud-free imagery is reviewed; the 1024px composite is the active Unreal preview drape while the 512px composite is retained for provenance.",
       "source_id": "pacuare_nasa_gibs_demshade_composite",
       "status": "generated_preview_only",
-      "target_artifact": "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
+      "target_artifact": "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png; imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png",
       "url": "physics/src/raftsim/geospatial_preview.py"
     },
     {
       "category": "derived_terrain_relief",
       "fetch_id": "pacuare_dem_relief_preview",
-      "notes": "Normalized Copernicus DEM relief image generated alongside the Pacuare source drape and sampled by Unreal preview generation for source-derived bank/gorge height perturbation.",
+      "notes": "Normalized Copernicus DEM relief image generated alongside the Pacuare source drape and sampled by Unreal preview generation for source-derived bank/gorge height perturbation; the 1024px relief is now the active preview geometry input.",
       "source_id": "pacuare_dem_relief_preview",
       "status": "generated_preview_only",
-      "target_artifact": "terrain/pacuare_dem_relief_preview_512.png",
+      "target_artifact": "terrain/pacuare_dem_relief_preview_512.png; terrain/pacuare_dem_relief_preview_1024.png",
       "url": "physics/src/raftsim/geospatial_preview.py"
     },
     {
@@ -212,7 +216,7 @@
       "license_or_terms": "NASA GIBS imagery is official NASA Earthdata service output; preserve layer, date, CRS, bounds, and terms before production packaging.",
       "provider": "NASA GIBS",
       "source_id": "nasa_gibs_modis_truecolor",
-      "status": "cloud_screened_preview_sample_downloaded",
+      "status": "cloud_screened_preview_sample_downloaded_with_1024_active_input",
       "title": "NASA GIBS MODIS Terra corrected reflectance true-color Pacuare samples",
       "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi",
       "use_in_pipeline": [
@@ -228,7 +232,7 @@
       "source_id": "pacuare_nasa_gibs_demshade_composite",
       "status": "generated_preview_only",
       "title": "Pacuare NASA GIBS plus Copernicus DEM shaded source drape",
-      "url": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_source_drape_composite_manifest.json",
+      "url": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_source_drape_composite_manifest_1024.json",
       "use_in_pipeline": [
         "unreal_source_overlay",
         "cloud_gap_preview_fill",
@@ -242,7 +246,7 @@
       "source_id": "pacuare_dem_relief_preview",
       "status": "generated_preview_only",
       "title": "Pacuare Copernicus DEM relief preview for Unreal terrain perturbation",
-      "url": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_source_drape_composite_manifest.json",
+      "url": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_source_drape_composite_manifest_1024.json",
       "use_in_pipeline": [
         "unreal_preview_height_perturbation",
         "terrain_relief_visual_review"

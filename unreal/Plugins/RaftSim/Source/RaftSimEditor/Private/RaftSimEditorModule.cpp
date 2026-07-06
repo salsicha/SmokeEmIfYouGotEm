@@ -258,13 +258,13 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.MapPackagePath = TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview");
     Pacuare.SourceManifest = TEXT("physics/data/real_world/pacuare_river_costa_rica/source_manifest.json");
     Pacuare.AerialDrapeImage =
-        TEXT("physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png");
+        TEXT("physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png");
     Pacuare.TerrainReliefImage =
-        TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_512.png");
+        TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_1024.png");
     Pacuare.ElevationSample =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
-        TEXT("deterministic preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, sampled into a denser terrain-conforming rainforest source-drape mosaic with cloud gaps filled by DEM-derived shading; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water, waterfalls, foam, raft, and lighting remain proxy layers");
+        TEXT("larger deterministic 1024px preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, sampled into a denser terrain-conforming rainforest source-drape mosaic with cloud gaps filled by DEM-derived shading; larger derived 1024px Copernicus DEM relief preview sampled into Pacuare bank and gorge geometry; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water, waterfalls, foam, raft, and lighting remain proxy layers");
     Pacuare.WaterColor = FLinearColor(0.04f, 0.35f, 0.28f);
     Pacuare.TerrainColor = FLinearColor(0.17f, 0.22f, 0.13f);
     Pacuare.RockColor = FLinearColor(0.20f, 0.24f, 0.20f);

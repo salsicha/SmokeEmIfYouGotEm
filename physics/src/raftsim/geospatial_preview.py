@@ -136,11 +136,12 @@ def build_pacuare_demshade_drape(
     bounds: BoundsWgs84,
     selected_date: str,
     repo_root: Path | None = None,
+    output_size_px: int = 512,
 ) -> None:
     """Blend NASA true color with DEM-derived rainforest relief for preview-only draping."""
 
     with Image.open(nasa_truecolor_path) as image:
-        source = image.convert("RGBA").resize((512, 512), Image.Resampling.BILINEAR)
+        source = image.convert("RGBA").resize((output_size_px, output_size_px), Image.Resampling.BILINEAR)
     source_rgb = np.asarray(source, dtype=np.float32)[..., :3] / 255.0
     source_alpha = np.asarray(source, dtype=np.float32)[..., 3:4] / 255.0
 
@@ -148,7 +149,7 @@ def build_pacuare_demshade_drape(
         CopernicusTile(southern_dem_path, south_lat=9, west_lon=-84),
         CopernicusTile(northern_dem_path, south_lat=10, west_lon=-84),
         bounds,
-        512,
+        output_size_px,
     )
     height, relief = _normalized_relief(dem)
 
@@ -189,7 +190,7 @@ def build_pacuare_demshade_drape(
         "output": _manifest_path(output_png_path, repo_root),
         "terrain_relief_output": _manifest_path(output_relief_png_path, repo_root),
         "processing": {
-            "size_px": 512,
+            "size_px": output_size_px,
             "dem_sampling": "nearest_neighbor_from_copernicus_glo30_tiles",
             "cloud_mask": "truecolor brightness > 0.70 and channel range < 0.16",
             "blend": "non_cloud = 45% NASA truecolor + 55% DEM rainforest relief; cloud = DEM rainforest relief",
@@ -256,6 +257,18 @@ def main() -> None:
         bounds=BoundsWgs84(min_lon=-83.75, min_lat=9.72, max_lon=-83.42, max_lat=10.12),
         selected_date="2025-04-02",
         repo_root=repo_root,
+    )
+    build_pacuare_demshade_drape(
+        nasa_truecolor_path=pacuare_root / "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
+        southern_dem_path=pacuare_root / "terrain/copernicus_dem_glo30_N09_W084.tif",
+        northern_dem_path=pacuare_root / "terrain/copernicus_dem_glo30_N10_W084.tif",
+        output_png_path=pacuare_root / "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png",
+        output_manifest_path=pacuare_root / "imagery/pacuare_source_drape_composite_manifest_1024.json",
+        output_relief_png_path=pacuare_root / "terrain/pacuare_dem_relief_preview_1024.png",
+        bounds=BoundsWgs84(min_lon=-83.75, min_lat=9.72, max_lon=-83.42, max_lat=10.12),
+        selected_date="2025-04-02",
+        repo_root=repo_root,
+        output_size_px=1024,
     )
 
 
