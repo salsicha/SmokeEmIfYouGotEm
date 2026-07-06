@@ -1,0 +1,50 @@
+{
+  "schema": "raftsim.pacuare.access_conservation_constraints.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "constraints_review_required_before_detailed_route_publication",
+  "constraint_categories": [
+    {
+      "category": "protected_area",
+      "source_leads": [
+        "https://www.sinac.go.cr/",
+        "https://www.snitcr.go.cr/"
+      ],
+      "decision_needed": "Which protected-area or conservation boundaries intersect the playable corridor and what detail may be published?"
+    },
+    {
+      "category": "access_points",
+      "source_leads": [
+        "official Costa Rica geospatial layers",
+        "rights-cleared guide/outfitter review",
+        "first-party field verification"
+      ],
+      "decision_needed": "Which put-ins, take-outs, bridges, trails, and evacuation points are safe and appropriate to expose in-game?"
+    },
+    {
+      "category": "sensitive_locations",
+      "source_leads": [
+        "SINAC/MINAE review",
+        "guide review",
+        "local conservation guidance"
+      ],
+      "decision_needed": "Which areas should be generalized, hidden, or omitted from detailed maps and screenshots?"
+    },
+    {
+      "category": "media_rights",
+      "source_leads": [
+        "first-party captures",
+        "explicit guide/outfitter permission",
+        "reference-only public/social links"
+      ],
+      "decision_needed": "Which media can be used for texture, material, audio, animation, or review reference without violating rights?"
+    }
+  ],
+  "publication_gate": [
+    "Record exact source layers and terms.",
+    "Attach guide or local review for access and safety-sensitive details.",
+    "Keep public/social media link-only until explicit rights are attached.",
+    "Do not package detailed conservation-sensitive coordinates until publication risk is reviewed."
+  ]
+}

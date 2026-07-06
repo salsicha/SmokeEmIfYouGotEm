@@ -294,20 +294,20 @@
         {"flow_band": "flash_response_review_only", "relative_flow": "rapid_rise", "source": "review_only_until_rainfall_flash_response_evidence"}
       ],
       "river_map_sources": [
-        {"source_id": "snit_cr", "url": "https://www.snitcr.go.cr/", "status": "source_research_required"},
+        {"source_id": "snit_cr", "url": "https://www.snitcr.go.cr/", "status": "official_source_leads_attached"},
         {"source_id": "copernicus_dem", "url": "https://registry.opendata.aws/copernicus-dem/", "status": "tile_samples_attached_for_pacuare_terrain_source"},
         {"source_id": "hydrosheds", "url": "https://www.hydrosheds.org/", "status": "planned_basin_context"},
         {"source_id": "opentopography", "url": "https://opentopography.org/", "status": "api_key_required_recorded"},
         {"source_id": "osm", "url": "https://www.openstreetmap.org/copyright", "status": "planning_seed_only"}
       ],
       "flow_sources": [
-        {"source_id": "imn_costa_rica", "url": "https://www.imn.ac.cr/", "status": "source_research_required"},
-        {"source_id": "ice_hydromet_review", "url": "https://www.ice.go.cr/", "status": "source_research_required"}
+        {"source_id": "imn_costa_rica", "url": "https://www.imn.ac.cr/", "status": "official_source_leads_attached"},
+        {"source_id": "ice_hydromet_review", "url": "https://www.ice.go.cr/", "status": "official_source_leads_attached"}
       ],
       "aerial_imagery_sources": [
         {"source_id": "nasa_gibs", "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi", "status": "cloud_screened_sample_attached_for_unreal_preview_drape"},
-        {"source_id": "copernicus_sentinel", "url": "https://dataspace.copernicus.eu/terms-and-conditions", "status": "planned"},
-        {"source_id": "landsat", "url": "https://www.usgs.gov/landsat-missions/landsat-data-access", "status": "planned"}
+        {"source_id": "copernicus_sentinel", "url": "https://dataspace.copernicus.eu/terms-and-conditions", "status": "official_source_lead_attached"},
+        {"source_id": "landsat", "url": "https://www.usgs.gov/landsat-missions/landsat-data-access", "status": "official_source_lead_attached"}
       ],
       "source_sample_artifacts": [
         {

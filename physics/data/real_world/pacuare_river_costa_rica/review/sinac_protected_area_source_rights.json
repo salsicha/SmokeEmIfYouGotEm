@@ -1,0 +1,61 @@
+{
+  "schema": "raftsim.pacuare.protected_area_source_rights.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "review_gated_source_leads_attached",
+  "policy": {
+    "do_not_publish_detailed_access_or_route_packages_without_review": true,
+    "record_conservation_and_access_constraints_before_shipping": true,
+    "third_party_media_requires_item_level_rights": true
+  },
+  "candidate_sources": [
+    {
+      "source_id": "sinac_minae",
+      "provider": "Sistema Nacional de Areas de Conservacion / MINAE",
+      "url": "https://www.sinac.go.cr/",
+      "status": "protected_area_review_required",
+      "target_use": [
+        "protected-area and conservation context",
+        "access and publication constraints",
+        "environmental sensitivity review"
+      ],
+      "production_gate": "Record official layer/source, protected-area intersections, attribution, and allowed publication detail before shipping route packages."
+    },
+    {
+      "source_id": "snit_cr_protected_area_layers",
+      "provider": "Sistema Nacional de Informacion Territorial de Costa Rica",
+      "url": "https://www.snitcr.go.cr/",
+      "status": "official_layer_discovery_required",
+      "target_use": [
+        "protected-area layer cross-check",
+        "hydric-resource and conservation layer discovery",
+        "official basemap/context review"
+      ],
+      "production_gate": "Record exact layer ids, dates, CRS, and terms before using derived GIS outputs."
+    },
+    {
+      "source_id": "rights_cleared_guides_and_outfitters",
+      "provider": "explicit guide/outfitter permission",
+      "url": "manifest_only_until_rights_clear",
+      "status": "permission_required",
+      "target_use": [
+        "rapid names and guide lines",
+        "flow-specific hazard behavior",
+        "field photos, footage, and audio reference"
+      ],
+      "production_gate": "Use only item-level permissioned media or first-party captures; public social links remain reference-only until cleared."
+    }
+  ],
+  "review_questions": [
+    "Which protected areas or conservation rules intersect the Pacuare planning corridor?",
+    "Are any access points, cultural sites, or sensitive habitats unsuitable for detailed publication?",
+    "What attribution and redistribution terms apply to official GIS layers?",
+    "Which guide/outfitter media can be used for texture, material, animation, or audio reference?"
+  ],
+  "next_actions": [
+    "Cross-check Pacuare planning bounds against SINAC/SNIT protected-area layers.",
+    "Create a guide/outfitter media permission matrix with creator, date, flow/weather context, and permitted use.",
+    "Keep public/social media references link-only until explicit rights are attached."
+  ]
+}

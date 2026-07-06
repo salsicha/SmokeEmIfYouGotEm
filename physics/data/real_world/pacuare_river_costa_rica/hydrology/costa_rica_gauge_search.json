@@ -1,0 +1,93 @@
+{
+  "schema": "raftsim.pacuare.hydrology_source_research.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "numeric_flow_bands_blocked_until_authoritative_station_review",
+  "current_gameplay_flow_policy": "Keep Pacuare clear-season-low, rainfed-runnable, rainy-season-high, and flash-response bands relative until discharge, stage, rainfall, and guide review are attached.",
+  "candidate_sources": [
+    {
+      "source_id": "imn_costa_rica",
+      "provider": "Instituto Meteorologico Nacional de Costa Rica",
+      "url": "https://www.imn.ac.cr/",
+      "status": "rainfall_and_weather_source_review_required",
+      "target_use": [
+        "rainfall history",
+        "storm timing",
+        "seasonal climate context",
+        "flash-response sanity checks"
+      ],
+      "production_gate": "Record station ids, variables, units, time zone, data access terms, and coverage before using numeric rain-fed flow tuning."
+    },
+    {
+      "source_id": "ice_hydromet",
+      "provider": "Instituto Costarricense de Electricidad",
+      "url": "https://www.ice.go.cr/",
+      "status": "hydrometeorological_access_review_required",
+      "target_use": [
+        "possible discharge or stage records",
+        "hydroelectric or basin hydromet context",
+        "rainfall-runoff transfer checks"
+      ],
+      "production_gate": "Confirm public access, station relevance, units, terms, and whether redistribution is permitted."
+    },
+    {
+      "source_id": "direccion_de_agua_minae",
+      "provider": "MINAE Direccion de Agua",
+      "url": "https://da.go.cr/",
+      "status": "water-resource_layer_and_station_review_required",
+      "target_use": [
+        "official hydric-resource context",
+        "water-rights and river-network cross-checks",
+        "potential station/source discovery through national portals"
+      ],
+      "production_gate": "Record exact datasets, layer ids, terms, and station metadata before corridor package promotion."
+    },
+    {
+      "source_id": "senara_or_snit_station_nodes",
+      "provider": "SENARA or SNIT-published station layers",
+      "url": "https://www.snitcr.go.cr/",
+      "status": "station_layer_discovery_required",
+      "target_use": [
+        "meteorological station discovery",
+        "rainfall station proximity screening"
+      ],
+      "production_gate": "Use only after exact station locations, ownership, terms, and variable definitions are recorded."
+    },
+    {
+      "source_id": "global_rainfall_context",
+      "provider": "reviewed global rainfall or reanalysis products",
+      "url": "source_research_required",
+      "status": "fallback_context_only",
+      "target_use": [
+        "gap-filling storm context",
+        "rainy/dry season sanity checks"
+      ],
+      "production_gate": "Do not replace official Costa Rica hydrology or guide review with global proxies."
+    }
+  ],
+  "needed_station_metadata": [
+    "station_id",
+    "provider",
+    "latitude_longitude",
+    "drainage_area_or_basin_relation",
+    "variables",
+    "units",
+    "temporal_resolution",
+    "record_start_end",
+    "time_zone",
+    "quality_flags",
+    "terms_and_attribution"
+  ],
+  "gameplay_questions_to_answer": [
+    "What rainfall or stage conditions correspond to commercial runnable flows?",
+    "At what rain/flow levels do holes, laterals, eddy lines, wave trains, and wood hazards change behavior?",
+    "What lag exists between upstream rainfall and runnable Pacuare corridor response?",
+    "Which high-water bands become review-only or unsafe for gameplay scenarios?"
+  ],
+  "next_actions": [
+    "Inventory IMN, ICE, MINAE/Direccion de Agua, and SNIT/SENARA station or layer access for the Pacuare basin.",
+    "Record candidate station ids and distance/basin relation to the lower Pacuare planning corridor.",
+    "Keep flow presets relative until guide-reviewed numeric ranges can be tied to station evidence."
+  ]
+}

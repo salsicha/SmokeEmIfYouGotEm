@@ -1,0 +1,64 @@
+{
+  "schema": "raftsim.pacuare.rainfall_context.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "rainfed_flow_context_blocked_until_station_review",
+  "flow_model_policy": "Use relative Pacuare flow bands only until rainfall/stage/discharge sources and guide feedback are tied to station ids and dates.",
+  "seasonal_context_to_resolve": [
+    {
+      "flow_band": "clear_season_low_planning",
+      "needed_evidence": [
+        "recent rainfall deficit or dry-season pattern",
+        "guide-reviewed runnable minimum",
+        "visible shallow shelves and exposed rock behavior"
+      ]
+    },
+    {
+      "flow_band": "rainfed_runnable_planning",
+      "needed_evidence": [
+        "storm or antecedent rainfall pattern that produces commercial runnable flow",
+        "guide-reviewed hole, wave-train, lateral, and eddy-line behavior",
+        "swimmer recovery visibility and eddy accessibility"
+      ]
+    },
+    {
+      "flow_band": "rainy_season_high_planning",
+      "needed_evidence": [
+        "high-rainfall or high-stage conditions",
+        "washout thresholds for holes and sticky hydraulics",
+        "guide-reviewed no-go or expert-only constraints"
+      ]
+    },
+    {
+      "flow_band": "flash_response_review_only",
+      "needed_evidence": [
+        "rainfall-to-stage lag",
+        "flash-rise warning indicators",
+        "unsafe or review-only scenario criteria"
+      ]
+    }
+  ],
+  "candidate_sources": [
+    {
+      "source_id": "imn_costa_rica",
+      "url": "https://www.imn.ac.cr/",
+      "target_use": "official rainfall, weather, and station context"
+    },
+    {
+      "source_id": "ice_hydromet",
+      "url": "https://www.ice.go.cr/",
+      "target_use": "hydrometeorological context if public station data is available"
+    },
+    {
+      "source_id": "snit_or_senara_station_layers",
+      "url": "https://www.snitcr.go.cr/",
+      "target_use": "station discovery and proximity screening"
+    }
+  ],
+  "next_actions": [
+    "Record candidate rainfall/stage/discharge station ids and basin relation.",
+    "Build a dry/runnable/high/flash rain-fed decision table after station metadata is reviewed.",
+    "Ask guide reviewers to mark flow-specific hydraulic behavior and rescue implications before numeric tuning."
+  ]
+}
