@@ -660,6 +660,41 @@
         "release_band_visual_planning",
         "oarsman_review_queue"
       ]
+    },
+    {
+      "artifact_id": "colorado_access_publication_annotation_scaffolds",
+      "category": "protected_area_and_access_context_review",
+      "caveats": [
+        "Coordinates are review seeds from the Lees Ferry NHD stationing candidate, not official launch, take-out, camp, beach, road, or sensitive-resource geometry.",
+        "Diamond Creek is outside the current pilot slice and is represented as a null-geometry review placeholder.",
+        "Do not use these scaffolds as permit, access, camp/beach, screenshot-publication, or gameplay route authority."
+      ],
+      "paths": [
+        "review/production_import_pilot/access_points.geojson",
+        "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+        "review/production_import_pilot/camps_and_beaches_review.geojson",
+        "review/production_import_pilot/oarsman_route_publication_notes.json"
+      ],
+      "provider": "RaftSim generated review scaffolds from Colorado NPS access-publication review and NHD Lees Ferry stationing candidate",
+      "related_artifacts": [
+        "review/production_import_pilot/access_publication_sensitivity_review.json",
+        "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+        "hydrography/production_import_pilot/river_mile_markers.geojson",
+        "hydrography/production_import_pilot/sandbars.geojson"
+      ],
+      "status": "review_seed_access_publication_scaffolds_attached_not_authoritative_geometry",
+      "summary": {
+        "access_point_feature_count": 3,
+        "camp_beach_review_seed_count": 4,
+        "no_publish_feature_count": 3,
+        "oarsman_notes_status": "oarsman_publication_notes_template_attached_review_required"
+      },
+      "use": [
+        "access_publication_review_overlay",
+        "camp_beach_sensitive_context_review",
+        "oarsman_route_notes_template",
+        "future_official_layer_comparison"
+      ]
     }
   ],
   "river_id": "colorado_river",

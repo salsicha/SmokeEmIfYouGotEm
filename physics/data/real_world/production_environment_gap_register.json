@@ -325,6 +325,10 @@
         "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
         "hydrology/production_import_pilot/release_band_review.json",
         "review/production_import_pilot/access_publication_sensitivity_review.json",
+        "review/production_import_pilot/access_points.geojson",
+        "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+        "review/production_import_pilot/camps_and_beaches_review.geojson",
+        "review/production_import_pilot/oarsman_route_publication_notes.json",
         "reference_media_link_manifest.json",
         "review/production_import_pilot/reference_annotations.geojson",
         "field_media/production_import_pilot/rights_manifest.json"

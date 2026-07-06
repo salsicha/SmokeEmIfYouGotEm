@@ -129,6 +129,10 @@ COLORADO_USBR_TOTAL_RELEASE_FILE = "hydrology/production_import_pilot/usbr_glen_
 COLORADO_USBR_RELEASE_CONTEXT_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json"
 COLORADO_RELEASE_BAND_REVIEW_FILE = "hydrology/production_import_pilot/release_band_review.json"
 COLORADO_ACCESS_PUBLICATION_REVIEW_FILE = "review/production_import_pilot/access_publication_sensitivity_review.json"
+COLORADO_ACCESS_POINTS_FILE = "review/production_import_pilot/access_points.geojson"
+COLORADO_NO_PUBLISH_SENSITIVE_POLYGONS_FILE = "review/production_import_pilot/no_publish_sensitive_polygons.geojson"
+COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE = "review/production_import_pilot/camps_and_beaches_review.geojson"
+COLORADO_OARSMAN_ROUTE_PUBLICATION_NOTES_FILE = "review/production_import_pilot/oarsman_route_publication_notes.json"
 PACUARE_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE = (
     "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json"
@@ -1538,10 +1542,10 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
                 ],
                 "target_outputs": [
                     COLORADO_ACCESS_PUBLICATION_REVIEW_FILE,
-                    "review/production_import_pilot/access_points.geojson",
-                    "review/production_import_pilot/camps_and_sensitive_locations_policy.json",
-                    "review/production_import_pilot/camps_and_beaches_review.geojson",
-                    "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+                    COLORADO_ACCESS_POINTS_FILE,
+                    COLORADO_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
+                    COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE,
+                    COLORADO_OARSMAN_ROUTE_PUBLICATION_NOTES_FILE,
                 ],
                 "promotion_gate": (
                     "Use the attached NPS source-lead review only as publication/access context; exact launch, take-out, "
@@ -1837,10 +1841,10 @@ def build_colorado_access_publication_review() -> dict[str, object]:
             },
         ],
         "required_editor_annotations": [
-            "review/production_import_pilot/access_points.geojson",
-            "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
-            "review/production_import_pilot/camps_and_beaches_review.geojson",
-            "review/production_import_pilot/oarsman_route_publication_notes.json",
+            COLORADO_ACCESS_POINTS_FILE,
+            COLORADO_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
+            COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE,
+            COLORADO_OARSMAN_ROUTE_PUBLICATION_NOTES_FILE,
         ],
         "allowed_use": [
             "source-lead triage",
@@ -3275,6 +3279,10 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     COLORADO_USBR_RELEASE_CONTEXT_FILE,
                     COLORADO_RELEASE_BAND_REVIEW_FILE,
                     COLORADO_ACCESS_PUBLICATION_REVIEW_FILE,
+                    COLORADO_ACCESS_POINTS_FILE,
+                    COLORADO_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
+                    COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE,
+                    COLORADO_OARSMAN_ROUTE_PUBLICATION_NOTES_FILE,
                     "reference_media_link_manifest.json",
                     REFERENCE_MEDIA_ANNOTATIONS_FILE,
                     REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
@@ -3325,10 +3333,10 @@ def build_production_environment_gap_register() -> dict[str, object]:
                         "source_class": "protected_area_and_access_context",
                         "required_artifacts": [
                             COLORADO_ACCESS_PUBLICATION_REVIEW_FILE,
-                            "review/production_import_pilot/access_points.geojson",
-                            "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
-                            "review/production_import_pilot/camps_and_beaches_review.geojson",
-                            "review/production_import_pilot/oarsman_route_publication_notes.json",
+                            COLORADO_ACCESS_POINTS_FILE,
+                            COLORADO_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
+                            COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE,
+                            COLORADO_OARSMAN_ROUTE_PUBLICATION_NOTES_FILE,
                         ],
                         "source_leads": [
                             "nps_grand_canyon_river_trips_permits",
@@ -4278,6 +4286,280 @@ def build_colorado_sandbar_review_seeds_geojson(stationing: dict[str, object]) -
             ],
         },
         "features": features,
+    }
+
+
+def _colorado_access_zone(access_review: dict[str, object], zone_id: str) -> dict[str, object]:
+    for zone in access_review["station_review_zones"]:
+        if zone["zone_id"] == zone_id:
+            return zone
+    raise ValueError(f"Missing Colorado access zone {zone_id!r}")
+
+
+def _colorado_access_annotation_policy() -> dict[str, object]:
+    return {
+        "geometry_authority": "review_seed_from_nhd_stationing_not_official_nps_access_or_camp_geometry",
+        "allowed_use": [
+            "editor access and publication review",
+            "oarsman route-note placement",
+            "future NPS/GCMRC/manual layer comparison",
+        ],
+        "forbidden_use": [
+            "permit or legal advice",
+            "final launch, take-out, camp, beach, or road geometry",
+            "public camp/beach/sensitive-resource publication",
+            "production route authority",
+        ],
+    }
+
+
+def build_colorado_access_points_geojson(
+    access_review: dict[str, object],
+    stationing: dict[str, object],
+) -> dict[str, object]:
+    """Build review-only Colorado access point annotation seeds."""
+
+    launch_zone = _colorado_access_zone(access_review, "lees_ferry_launch_review_zone")
+    route_zone = _colorado_access_zone(access_review, "grand_canyon_camps_beaches_sensitive_context_review_zone")
+    takeout_zone = _colorado_access_zone(access_review, "diamond_creek_takeout_review_zone")
+    launch_coords, launch_props = _stationed_point(stationing, 0.0, offset_left_m=80.0)
+    scout_coords, scout_props = _stationed_point(stationing, 12000.0, offset_left_m=-120.0)
+    return {
+        "type": "FeatureCollection",
+        "schema": "raftsim.colorado_access_points.geojson.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "status": "review_seed_access_points_not_authoritative_geometry",
+        "source_access_review": COLORADO_ACCESS_PUBLICATION_REVIEW_FILE,
+        "stationing_source": COLORADO_NHD_MAINSTEM_STATIONING_FILE,
+        "policy": _colorado_access_annotation_policy(),
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {"type": "Point", "coordinates": launch_coords},
+                "properties": {
+                    "annotation_id": "lees_ferry_launch_access_review_seed",
+                    "river_id": "colorado_river",
+                    "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+                    "feature_role": "launch_access_review_seed",
+                    "source_review_zone": launch_zone["zone_id"],
+                    "review_status": launch_zone["review_status"],
+                    "needs": launch_zone["needs"],
+                    "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative",
+                    **launch_props,
+                    "promotion_gate": "Replace with official launch, rigging, parking, staging, and oarsman-reviewed geometry before production use.",
+                },
+            },
+            {
+                "type": "Feature",
+                "geometry": {"type": "Point", "coordinates": scout_coords},
+                "properties": {
+                    "annotation_id": "lees_ferry_slice_route_context_review_seed",
+                    "river_id": "colorado_river",
+                    "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+                    "feature_role": "route_context_access_review_seed",
+                    "source_review_zone": route_zone["zone_id"],
+                    "review_status": route_zone["review_status"],
+                    "needs": route_zone["needs"],
+                    "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative",
+                    **scout_props,
+                    "promotion_gate": "Use as an editor note only until camp/beach/sensitive-resource and oarsman review assigns real geometry.",
+                },
+            },
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "annotation_id": "diamond_creek_takeout_outside_pilot_review_placeholder",
+                    "river_id": "colorado_river",
+                    "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+                    "feature_role": "out_of_pilot_takeout_review_placeholder",
+                    "source_review_zone": takeout_zone["zone_id"],
+                    "review_status": takeout_zone["review_status"],
+                    "needs": takeout_zone["needs"],
+                    "stationing_status": "outside_lees_ferry_pilot_slice_no_geometry_seeded",
+                    "promotion_gate": "Do not create take-out geometry until full-route stationing and approved access sources are attached.",
+                },
+            },
+        ],
+    }
+
+
+def build_colorado_no_publish_sensitive_polygons_geojson(
+    access_review: dict[str, object],
+    stationing: dict[str, object],
+) -> dict[str, object]:
+    """Build coarse Colorado no-publish publication-sensitivity review polygons."""
+
+    launch_zone = _colorado_access_zone(access_review, "lees_ferry_launch_review_zone")
+    route_zone = _colorado_access_zone(access_review, "grand_canyon_camps_beaches_sensitive_context_review_zone")
+    takeout_zone = _colorado_access_zone(access_review, "diamond_creek_takeout_review_zone")
+
+    def polygon_for(annotation_id: str, zone: dict[str, object], start_m: float, end_m: float, half_width_m: float) -> dict[str, object]:
+        start_left, start_props = _stationed_point(stationing, start_m, offset_left_m=half_width_m)
+        end_left, _ = _stationed_point(stationing, end_m, offset_left_m=half_width_m)
+        end_right, end_props = _stationed_point(stationing, end_m, offset_left_m=-half_width_m)
+        start_right, _ = _stationed_point(stationing, start_m, offset_left_m=-half_width_m)
+        return {
+            "type": "Feature",
+            "geometry": {"type": "Polygon", "coordinates": [[start_left, end_left, end_right, start_right, start_left]]},
+            "properties": {
+                "annotation_id": annotation_id,
+                "river_id": "colorado_river",
+                "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+                "feature_role": "no_publish_sensitive_context_review_seed",
+                "source_review_zone": zone["zone_id"],
+                "review_status": zone["review_status"],
+                "needs": zone["needs"],
+                "station_start_m": start_props["station_m"],
+                "station_end_m": end_props["station_m"],
+                "half_width_m": half_width_m,
+                "stationing_status": "coarse_buffer_from_nhd_stationing_candidate_not_publication_boundary",
+                "promotion_gate": "Replace with reviewed camp/beach, cultural-resource, sensitive-location, and screenshot-safety rules before public route captures.",
+            },
+        }
+
+    return {
+        "type": "FeatureCollection",
+        "schema": "raftsim.colorado_no_publish_sensitive_polygons.geojson.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "status": "coarse_review_seed_no_publish_polygons_not_authoritative",
+        "source_access_review": COLORADO_ACCESS_PUBLICATION_REVIEW_FILE,
+        "stationing_source": COLORADO_NHD_MAINSTEM_STATIONING_FILE,
+        "policy": _colorado_access_annotation_policy(),
+        "features": [
+            polygon_for("lees_ferry_launch_no_publish_review_seed", launch_zone, 0.0, 1609.344, 320.0),
+            polygon_for("lees_ferry_slice_route_no_publish_review_seed", route_zone, 1609.344, 24223.694, 420.0),
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "annotation_id": "diamond_creek_takeout_no_publish_outside_pilot_placeholder",
+                    "river_id": "colorado_river",
+                    "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+                    "feature_role": "out_of_pilot_no_publish_review_placeholder",
+                    "source_review_zone": takeout_zone["zone_id"],
+                    "review_status": takeout_zone["review_status"],
+                    "needs": takeout_zone["needs"],
+                    "stationing_status": "outside_lees_ferry_pilot_slice_no_geometry_seeded",
+                    "promotion_gate": "No Diamond Creek publication geometry is seeded in the Lees Ferry pilot slice.",
+                },
+            },
+        ],
+    }
+
+
+def build_colorado_camps_and_beaches_review_geojson(
+    access_review: dict[str, object],
+    stationing: dict[str, object],
+) -> dict[str, object]:
+    """Build Colorado camps/beaches review seed polygons."""
+
+    route_zone = _colorado_access_zone(access_review, "grand_canyon_camps_beaches_sensitive_context_review_zone")
+    seed_definitions = [
+        ("lees_ferry_slice_beach_review_seed_01", 4200.0, "river_right", -1),
+        ("lees_ferry_slice_beach_review_seed_02", 8200.0, "river_left", 1),
+        ("lees_ferry_slice_beach_review_seed_03", 13200.0, "river_right", -1),
+        ("lees_ferry_slice_beach_review_seed_04", 18800.0, "river_left", 1),
+    ]
+    features: list[dict[str, object]] = []
+    for annotation_id, station_m, side_label, side in seed_definitions:
+        upstream_inner, props = _stationed_point(stationing, station_m, offset_left_m=side * 90.0, offset_downstream_m=-140.0)
+        downstream_inner, _ = _stationed_point(stationing, station_m, offset_left_m=side * 90.0, offset_downstream_m=140.0)
+        downstream_outer, _ = _stationed_point(stationing, station_m, offset_left_m=side * 260.0, offset_downstream_m=140.0)
+        upstream_outer, _ = _stationed_point(stationing, station_m, offset_left_m=side * 260.0, offset_downstream_m=-140.0)
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[upstream_inner, downstream_inner, downstream_outer, upstream_outer, upstream_inner]],
+                },
+                "properties": {
+                    "annotation_id": annotation_id,
+                    "river_id": "colorado_river",
+                    "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+                    "feature_role": "camp_beach_publication_review_seed",
+                    "river_side_hint": side_label,
+                    "source_review_zone": route_zone["zone_id"],
+                    "review_status": "preview_beach_seed_not_camp_beach_or_publication_authority",
+                    "needs": route_zone["needs"],
+                    "station_m": props["station_m"],
+                    "station_sample_index": props["station_sample_index"],
+                    "stationing_status": "coarse_polygon_from_nhd_stationing_candidate_not_camp_beach_authority",
+                    "promotion_gate": "Replace with approved camp/beach/sandbar review, release context, and oarsman notes before production or public screenshots.",
+                },
+            }
+        )
+    return {
+        "type": "FeatureCollection",
+        "schema": "raftsim.colorado_camps_and_beaches_review.geojson.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "status": "camp_beach_review_seeds_not_authoritative",
+        "source_access_review": COLORADO_ACCESS_PUBLICATION_REVIEW_FILE,
+        "stationing_source": COLORADO_NHD_MAINSTEM_STATIONING_FILE,
+        "policy": _colorado_access_annotation_policy(),
+        "features": features,
+    }
+
+
+def build_colorado_oarsman_route_publication_notes(
+    access_review: dict[str, object],
+    river_mile_markers: dict[str, object],
+    sandbars: dict[str, object],
+    camps_and_beaches: dict[str, object],
+) -> dict[str, object]:
+    """Build review-gated Colorado oarsman publication notes."""
+
+    return {
+        "schema": "raftsim.colorado_oarsman_route_publication_notes.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "status": "oarsman_publication_notes_template_attached_review_required",
+        "inputs": {
+            "access_publication_review": COLORADO_ACCESS_PUBLICATION_REVIEW_FILE,
+            "river_mile_markers": COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE,
+            "sandbars": COLORADO_PRODUCTION_SANDBARS_FILE,
+            "camps_and_beaches_review": COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE,
+        },
+        "source_review_zones": access_review["station_review_zones"],
+        "review_overlay_summary": {
+            "preview_river_mile_marker_count": len(river_mile_markers["features"]),
+            "sandbar_review_seed_count": len(sandbars["features"]),
+            "camp_beach_review_seed_count": len(camps_and_beaches["features"]),
+        },
+        "required_oarsman_fields": [
+            "reviewer_name_or_role",
+            "review_date",
+            "flow_or_release_context",
+            "launch_and_rigging_sightline_notes",
+            "sandbar_wet_bank_release_notes",
+            "camp_beach_publication_limits",
+            "long_swimmer_and_rescue_visibility_notes",
+            "screenshot_or_map_detail_limits",
+        ],
+        "allowed_use": [
+            "oarsman review checklist",
+            "publication-sensitivity handoff",
+            "future river-mile and release-aware route validation",
+        ],
+        "forbidden_use": [
+            "permit or legal advice",
+            "current access operation claims",
+            "camp/beach publication clearance",
+            "final river-mile or route authority",
+        ],
+        "promotion_blockers": [
+            "No completed oarsman reviewer identity, date, flow/release context, or approval is attached.",
+            "River-mile markers, sandbars, camps, beaches, and access points are review seeds only.",
+            "NPS/current operating constraints and sensitive-resource publication rules still need human review before public route detail.",
+        ],
     }
 
 

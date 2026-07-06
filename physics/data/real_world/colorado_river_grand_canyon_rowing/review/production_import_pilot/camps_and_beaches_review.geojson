@@ -1,0 +1,222 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -111.5583568,
+              36.8750598
+            ],
+            [
+              -111.5613591,
+              36.875807
+            ],
+            [
+              -111.560792,
+              36.8772652
+            ],
+            [
+              -111.5577896,
+              36.8765179
+            ],
+            [
+              -111.5583568,
+              36.8750598
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "annotation_id": "lees_ferry_slice_beach_review_seed_01",
+        "feature_role": "camp_beach_publication_review_seed",
+        "needs": [
+          "camp/beach/sandbar publication-sensitivity review",
+          "sensitive-resource and cultural-resource screening before detailed screenshots",
+          "river-mile stationing and release-dependent wet-bank/sandbar review",
+          "guide/oarsman notes for scouting, rescue, and long swimmer drift"
+        ],
+        "promotion_gate": "Replace with approved camp/beach/sandbar review, release context, and oarsman notes before production or public screenshots.",
+        "review_status": "preview_beach_seed_not_camp_beach_or_publication_authority",
+        "river_id": "colorado_river",
+        "river_side_hint": "river_right",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "source_review_zone": "grand_canyon_camps_beaches_sensitive_context_review_zone",
+        "station_m": 4200.0,
+        "station_sample_index": 42,
+        "stationing_status": "coarse_polygon_from_nhd_stationing_candidate_not_camp_beach_authority"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -111.5439373,
+              36.8514037
+            ],
+            [
+              -111.5421306,
+              36.8493455
+            ],
+            [
+              -111.5405689,
+              36.8502233
+            ],
+            [
+              -111.5423756,
+              36.8522815
+            ],
+            [
+              -111.5439373,
+              36.8514037
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "annotation_id": "lees_ferry_slice_beach_review_seed_02",
+        "feature_role": "camp_beach_publication_review_seed",
+        "needs": [
+          "camp/beach/sandbar publication-sensitivity review",
+          "sensitive-resource and cultural-resource screening before detailed screenshots",
+          "river-mile stationing and release-dependent wet-bank/sandbar review",
+          "guide/oarsman notes for scouting, rescue, and long swimmer drift"
+        ],
+        "promotion_gate": "Replace with approved camp/beach/sandbar review, release context, and oarsman notes before production or public screenshots.",
+        "review_status": "preview_beach_seed_not_camp_beach_or_publication_authority",
+        "river_id": "colorado_river",
+        "river_side_hint": "river_left",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "source_review_zone": "grand_canyon_camps_beaches_sensitive_context_review_zone",
+        "station_m": 8200.0,
+        "station_sample_index": 82,
+        "stationing_status": "coarse_polygon_from_nhd_stationing_candidate_not_camp_beach_authority"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -111.5763318,
+              36.8588744
+            ],
+            [
+              -111.5762649,
+              36.8613891
+            ],
+            [
+              -111.5743567,
+              36.8613566
+            ],
+            [
+              -111.5744235,
+              36.8588419
+            ],
+            [
+              -111.5763318,
+              36.8588744
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "annotation_id": "lees_ferry_slice_beach_review_seed_03",
+        "feature_role": "camp_beach_publication_review_seed",
+        "needs": [
+          "camp/beach/sandbar publication-sensitivity review",
+          "sensitive-resource and cultural-resource screening before detailed screenshots",
+          "river-mile stationing and release-dependent wet-bank/sandbar review",
+          "guide/oarsman notes for scouting, rescue, and long swimmer drift"
+        ],
+        "promotion_gate": "Replace with approved camp/beach/sandbar review, release context, and oarsman notes before production or public screenshots.",
+        "review_status": "preview_beach_seed_not_camp_beach_or_publication_authority",
+        "river_id": "colorado_river",
+        "river_side_hint": "river_right",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "source_review_zone": "grand_canyon_camps_beaches_sensitive_context_review_zone",
+        "station_m": 13200.0,
+        "station_sample_index": 132,
+        "stationing_status": "coarse_polygon_from_nhd_stationing_candidate_not_camp_beach_authority"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -111.6165159,
+              36.8406655
+            ],
+            [
+              -111.6154753,
+              36.8382921
+            ],
+            [
+              -111.6136748,
+              36.8387977
+            ],
+            [
+              -111.6147153,
+              36.8411711
+            ],
+            [
+              -111.6165159,
+              36.8406655
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "annotation_id": "lees_ferry_slice_beach_review_seed_04",
+        "feature_role": "camp_beach_publication_review_seed",
+        "needs": [
+          "camp/beach/sandbar publication-sensitivity review",
+          "sensitive-resource and cultural-resource screening before detailed screenshots",
+          "river-mile stationing and release-dependent wet-bank/sandbar review",
+          "guide/oarsman notes for scouting, rescue, and long swimmer drift"
+        ],
+        "promotion_gate": "Replace with approved camp/beach/sandbar review, release context, and oarsman notes before production or public screenshots.",
+        "review_status": "preview_beach_seed_not_camp_beach_or_publication_authority",
+        "river_id": "colorado_river",
+        "river_side_hint": "river_left",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "source_review_zone": "grand_canyon_camps_beaches_sensitive_context_review_zone",
+        "station_m": 18800.0,
+        "station_sample_index": 188,
+        "stationing_status": "coarse_polygon_from_nhd_stationing_candidate_not_camp_beach_authority"
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-06",
+  "policy": {
+    "allowed_use": [
+      "editor access and publication review",
+      "oarsman route-note placement",
+      "future NPS/GCMRC/manual layer comparison"
+    ],
+    "forbidden_use": [
+      "permit or legal advice",
+      "final launch, take-out, camp, beach, or road geometry",
+      "public camp/beach/sensitive-resource publication",
+      "production route authority"
+    ],
+    "geometry_authority": "review_seed_from_nhd_stationing_not_official_nps_access_or_camp_geometry"
+  },
+  "river_id": "colorado_river",
+  "schema": "raftsim.colorado_camps_and_beaches_review.geojson.v1",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "source_access_review": "review/production_import_pilot/access_publication_sensitivity_review.json",
+  "stationing_source": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+  "status": "camp_beach_review_seeds_not_authoritative",
+  "type": "FeatureCollection"
+}

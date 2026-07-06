@@ -399,10 +399,14 @@
         "protected_area_and_access_context": {
           "artifacts": [
             "physics/data/real_world/reference_media_link_manifest.json",
-            "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/access_publication_sensitivity_review.json"
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/access_publication_sensitivity_review.json",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/access_points.geojson",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/camps_and_beaches_review.geojson",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/oarsman_route_publication_notes.json"
           ],
-          "promotion_blocker": "NPS River Trips / Permits, Noncommercial River Trip Helpful Links, Lees Ferry to Diamond Creek overview, and linked regulations PDF leads are attached in the access/publication review, but exact launch/take-out, camp/beach, sensitive-location, river-mile, operational-document, media-rights, and oarsman review still block detailed production route packages and screenshots.",
-          "status": "official_nps_access_publication_leads_attached_geometry_and_media_rights_pending"
+          "promotion_blocker": "Colorado access, no-publish, camp/beach, and oarsman publication-note scaffolds are attached for review, but official launch/take-out/camp/beach/sensitive-resource geometry, current NPS operating constraints, permit/legal wording, and oarsman approval still block detailed route packages and public screenshots.",
+          "status": "review_seed_access_publication_scaffolds_attached_not_authoritative_geometry"
         },
         "seasonal_flow_or_release_history": {
           "artifacts": [
