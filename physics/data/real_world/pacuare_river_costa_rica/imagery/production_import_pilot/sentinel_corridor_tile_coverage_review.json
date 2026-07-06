@@ -82,17 +82,19 @@
     "preliminary_decision": "Both 17PKM and 16PHR bbox-intersect the draft planning bounds; keep both in the future windowed COG extraction/stitch plan while exact CRS clipping decides final coverage."
   },
   "windowed_read_decision": {
-    "corridor_clips_generated": false,
     "source_drape_replaced": false,
     "mask_sources_replaced": false,
     "full_cogs_committed": false,
-    "next_required_step": "Implement a reviewed raster-window reader that clips each tile in its native UTM CRS, applies SCL/cloud QA, stitches the accepted corridor, and records Sentinel terms/attribution before any production derivative is generated."
+    "next_required_step": "Implement a reviewed raster-window reader that clips each tile in its native UTM CRS, applies SCL/cloud QA, stitches the accepted corridor, and records Sentinel terms/attribution before any production derivative is generated.",
+    "exact_corridor_clips_generated": false,
+    "corridor_bbox_clip_previews_generated": true
   },
   "source_links": {
     "thumbnail_review": "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json",
     "access_probe": "imagery/production_import_pilot/sentinel_cog_access_probe.json",
     "review_png_17pkm": "imagery/production_import_pilot/sentinel_tci_review_preview.json",
-    "review_png_16phr": "imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json"
+    "review_png_16phr": "imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json",
+    "corridor_bbox_clip_review": "imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json"
   },
   "allowed_use": [
     "sentinel_windowed_read_planning",

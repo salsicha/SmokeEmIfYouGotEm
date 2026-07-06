@@ -484,9 +484,12 @@
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tci_review_1024.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_clip_review.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_clip_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/source_metadata_review.json"
           ],
-          "promotion_blocker": "Pacuare has retained NASA GIBS/MODIS cloud-screening evidence, coarse production-import derivatives, official Landsat/Sentinel high-resolution scene metadata, a Landsat access-gate review, Sentinel COG thumbnails/tile metadata, a successful Sentinel COG range-access probe, downsampled 17PKM/16PHR TCI review PNGs, and a bbox-level tile coverage review. Production still needs exact native-CRS corridor clipping, approved raster-window extraction, stitching, SCL/cloud-shadow QA, CRS/band/scale review, first-party or permissioned aerial reference where needed, terms/attribution review, and guide/geospatial approval before photoreal imagery or masks are promoted.",
+          "promotion_blocker": "Pacuare has retained NASA GIBS/MODIS cloud-screening evidence, coarse production-import derivatives, official Landsat/Sentinel high-resolution scene metadata, a Landsat access-gate review, Sentinel COG thumbnails/tile metadata, a successful Sentinel COG range-access probe, downsampled 17PKM/16PHR TCI review PNGs, a bbox-level tile coverage review, and two review-only corridor-bbox window clips. Production still needs exact native-CRS route/bank clipping, SCL/cloud-shadow QA, stitching, CRS/band/scale review, first-party or permissioned aerial reference where needed, terms/attribution review, and guide/geospatial approval before photoreal imagery or masks are promoted.",
           "status": "coarse_preview_and_high_resolution_scene_metadata_attached_sentinel_full_tile_review_previews_extraction_blocked"
         },
         "guide_and_reference_media_annotations": {
@@ -584,7 +587,10 @@
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tci_review_1024.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tci_review_1024.png",
-            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json"
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_clip_review.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_clip_review.png"
           ],
           "promotion_blocker": "Masks are coarse preview derivatives; high-resolution Landsat/Sentinel scene metadata, Landsat access-gate review, Sentinel thumbnail/tile metadata, Sentinel COG range-access probes, and 17PKM/16PHR TCI review PNGs identify candidate replacement imagery and access paths, but production still needs approved windowed reads, corridor clipping/stitching, SCL/QA review, hydrography alignment, water/canopy/wet-rock/waterfall/mist segmentation, approved terms, and guide review.",
           "status": "preview_masks_and_pilot_derivative_masks_attached"

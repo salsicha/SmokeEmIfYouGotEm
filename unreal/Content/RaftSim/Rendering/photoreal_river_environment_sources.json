@@ -1198,6 +1198,22 @@
             "corridor_clip_tooling_requirements",
             "cloud_and_tile_coverage_review"
           ]
+        },
+        {
+          "artifact_id": "pacuare_sentinel_corridor_bbox_clip_review",
+          "category": "sentinel_corridor_bbox_window_clip_review",
+          "paths": [
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_clip_review.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_clip_review.png"
+          ],
+          "promotion_blocker": "These are draft planning-bounds bbox window clips, not exact route clips, source drapes, mask sources, material inputs, or lifelike evidence; production still needs exact native-CRS route/bank clipping, stitched COG reads, SCL/cloud QA, terms review, and guide/geospatial approval.",
+          "status": "sentinel_corridor_bbox_window_clips_attached_review_only",
+          "use_in_unreal": [
+            "visual_reference_review",
+            "cloud_qa_planning",
+            "future_source_drape_replacement_planning"
+          ]
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
