@@ -1,0 +1,88 @@
+{
+  "schema": "raftsim.unreal.release_readiness_gate.v1",
+  "status": "ready_for_beta_release_candidate_signoff",
+  "automation_module": "RaftSimAutomation",
+  "automation_test_name": "RaftSim.Milestone25.ReleaseReadinessGate",
+  "milestone25_todo_count": 7,
+  "required_manifests": {
+    "release_readiness_plan": "RaftSim/Production/release_readiness_plan.json",
+    "production_foundation": "RaftSim/Production/production_foundation.json",
+    "alpha_content_coverage": "RaftSim/Production/alpha_content_coverage_manifest.json",
+    "vertical_slice_acceptance_gate": "RaftSim/Automation/vertical_slice_acceptance_gate.json",
+    "alpha_expansion_gate": "RaftSim/Automation/alpha_expansion_gate.json",
+    "polished_tooling_gate": "RaftSim/Automation/polished_tooling_slice_gate.json",
+    "milestone11_crew_safety_gate": "RaftSim/Automation/milestone11_crew_safety_gate.json"
+  },
+  "gate_checks": [
+    {
+      "check_id": "profile_and_optimize_platform_tiers",
+      "todo_item": "Profile and optimize custom water, selected raft/contact runtime, game/render/GPU, streaming, audio, local AI, memory, and save/replay across desktop, VR, and handheld tiers.",
+      "passed": true,
+      "evidence": ["release_readiness_plan.profiling_optimization_matrix", "release_readiness_plan.target_platform_tiers"]
+    },
+    {
+      "check_id": "scalability_modes",
+      "todo_item": "Add scalability modes for water, raft/contact authority, visual physics, VFX, lighting, photoreal landscape/foliage, audio, voice, crew conversation, and fallback/manual commands.",
+      "passed": true,
+      "evidence": ["release_readiness_plan.scalability_modes"]
+    },
+    {
+      "check_id": "release_workflows",
+      "todo_item": "Lock release-quality asset, audio, AI-generation, source-manifest, attribution, license, credits, platform-rights, localization, and store-compliance workflows.",
+      "passed": true,
+      "evidence": ["release_readiness_plan.release_workflows", "audio_source_manifest", "ai_audio_manifest_schema"]
+    },
+    {
+      "check_id": "qa_automation_hardening",
+      "todo_item": "Harden QA automation for physics regressions, Unreal river import/export, feature-forcing manifests, raft/contact fixtures, rescue outcomes, replay determinism, VR comfort, input devices, accessibility, and crash/performance capture.",
+      "passed": true,
+      "evidence": ["release_readiness_plan.qa_automation_lanes", "water_regression_fixture_import", "live_water_smoke_suite"]
+    },
+    {
+      "check_id": "player_facing_polish",
+      "todo_item": "Polish onboarding, training, scoring, after-action feedback, menus, settings, save data, accessibility, subtitles, microphone/privacy controls, haptics, and final audio mix.",
+      "passed": true,
+      "evidence": ["release_readiness_plan.polish_lanes", "vertical_slice_acceptance_gate"]
+    },
+    {
+      "check_id": "release_or_defer_decisions",
+      "todo_item": "Decide whether Wwise/FMOD, paid asset libraries, professional field recordings, generated-river shipping features, multiplayer, and additional local AI features are required for release or deferred.",
+      "passed": true,
+      "evidence": ["release_readiness_plan.release_or_defer_decisions"]
+    },
+    {
+      "check_id": "release_signoff_gate",
+      "todo_item": "Gate release on beta playtests, guide feedback, target-platform performance captures, legal/provenance review, content validation, photoreal environment/foliage quality review, release branch lock, and patch workflow.",
+      "passed": true,
+      "evidence": ["release_readiness_plan.release_gate_requirements", "physics/reports/milestone25/release_readiness_gate.json"]
+    }
+  ],
+  "external_signoff_required_before_shipping": [
+    "beta_playtests",
+    "guide_feedback",
+    "target_platform_performance_captures",
+    "legal_provenance_review",
+    "content_validation",
+    "photoreal_environment_foliage_quality_review",
+    "release_branch_lock_and_patch_workflow"
+  ],
+  "automation_commands": [
+    {
+      "command_id": "release_readiness_gate_manifest",
+      "command": "Automation RunTests RaftSim.Milestone25.ReleaseReadinessGate",
+      "required_before_milestone_close": true
+    },
+    {
+      "command_id": "editor_target_build",
+      "command": "Build.sh SmokeEmIfYouGotEmEditor Mac Development -Project=unreal/SmokeEmIfYouGotEm.uproject -NoHotReload",
+      "required_before_milestone_close": true
+    }
+  ],
+  "pass_policy": {
+    "all_seven_milestone25_items_covered": true,
+    "release_readiness_plan_loads_in_unreal_automation": true,
+    "existing_alpha_vertical_slice_and_tooling_gates_are_referenced": true,
+    "external_signoff_still_blocks_shipping": true
+  },
+  "report": "physics/reports/milestone25/release_readiness_gate.json"
+}

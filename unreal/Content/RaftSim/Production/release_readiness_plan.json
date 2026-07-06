@@ -1,0 +1,365 @@
+{
+  "schema": "raftsim.unreal.release_readiness_plan.v1",
+  "status": "release_readiness_contract_ready_for_beta_candidate_hardening",
+  "milestone": 25,
+  "purpose": "Define the optimization, platform hardening, compliance, QA, polish, release/defer, and final signoff lanes required before the alpha can become a shippable Unreal release candidate.",
+  "source_manifests": {
+    "production_foundation": "unreal/Content/RaftSim/Production/production_foundation.json",
+    "alpha_content_coverage": "unreal/Content/RaftSim/Production/alpha_content_coverage_manifest.json",
+    "vertical_slice_acceptance_gate": "unreal/Content/RaftSim/Automation/vertical_slice_acceptance_gate.json",
+    "alpha_expansion_gate": "unreal/Content/RaftSim/Automation/alpha_expansion_gate.json",
+    "polished_tooling_gate": "unreal/Content/RaftSim/Automation/polished_tooling_slice_gate.json",
+    "physics_regression_import": "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json",
+    "live_water_smoke_suite": "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json",
+    "audio_source_manifest": "unreal/Content/RaftSim/Audio/audio_source_manifest.json",
+    "ai_audio_manifest_schema": "unreal/Content/RaftSim/Audio/ai_audio_manifest.schema.json",
+    "local_ai_runtime": "unreal/Content/RaftSim/AI/local_ai_runtime_manifest.json",
+    "enhanced_input_actions": "unreal/Content/RaftSim/Input/enhanced_input_actions.json"
+  },
+  "target_platform_tiers": [
+    {
+      "tier_id": "desktop_high",
+      "role": "primary flat-screen development and beta target",
+      "frame_time_budget_ms": 16.6,
+      "capture_required": true,
+      "priority_systems": [
+        "custom_water",
+        "raft_contact_authority",
+        "gpu_water_vfx",
+        "photoreal_environment",
+        "audio_spatialization",
+        "local_voice_commands"
+      ]
+    },
+    {
+      "tier_id": "vr_comfort",
+      "role": "OpenXR comfort target with stricter frame pacing and accessibility review",
+      "frame_time_budget_ms": 11.1,
+      "capture_required": true,
+      "priority_systems": [
+        "render_thread",
+        "gpu_water_vfx",
+        "world_partition_streaming",
+        "spatial_audio",
+        "haptics",
+        "vr_comfort"
+      ]
+    },
+    {
+      "tier_id": "handheld_or_low_power_review",
+      "role": "future handheld and low-power scaling target, not a first release requirement until performance captures pass",
+      "frame_time_budget_ms": 33.3,
+      "capture_required": true,
+      "priority_systems": [
+        "reduced_water_quality",
+        "reduced_visual_physics",
+        "foliage_density_lods",
+        "manual_command_fallback",
+        "authored_crew_barks"
+      ]
+    }
+  ],
+  "profiling_optimization_matrix": [
+    {
+      "system_id": "custom_water",
+      "metrics": ["fixed_step_ms", "cell_count", "mass_error", "momentum_error", "gpu_upload_ms"],
+      "capture_modes": ["live_water_smoke", "vertical_slice_run", "replay_review"],
+      "optimization_actions": ["profile_hot_loops", "reduce_copy_cost", "validate_scalable_cell_density", "preserve_geo_claw_compared_outputs"]
+    },
+    {
+      "system_id": "raft_contact_runtime",
+      "metrics": ["fixed_step_ms", "contact_count", "pin_release_stability", "determinism_hash", "cpu_cost_ms"],
+      "capture_modes": ["chaos_jolt_fixture_replay", "pin_release", "rescue_outcome"],
+      "optimization_actions": ["keep_selected_authority_replayable", "profile_contact_pair_budget", "separate_visual_physics_from_scoring"]
+    },
+    {
+      "system_id": "game_thread",
+      "metrics": ["game_thread_ms", "tick_group_cost", "subsystem_cost", "hitch_count"],
+      "capture_modes": ["training_complete", "technical_failure_path", "tool_validation"],
+      "optimization_actions": ["collapse_duplicate_manifest_loads", "batch_debug_overlay_updates", "budget_ui_and_ai_ticks"]
+    },
+    {
+      "system_id": "render_thread",
+      "metrics": ["render_thread_ms", "draw_calls", "shadow_cost_ms", "nanite_visible_clusters"],
+      "capture_modes": ["guide_camera", "vr_comfort", "photoreal_review"],
+      "optimization_actions": ["profile_lumen_vsm_cost", "validate_nanite_landscape_foliage_modes", "keep_water_readability"]
+    },
+    {
+      "system_id": "gpu_water_vfx",
+      "metrics": ["gpu_ms", "niagara_particle_count", "foam_layer_cost", "spray_overdraw"],
+      "capture_modes": ["standing_wave", "hydraulic_hole", "rainforest_rainfed"],
+      "optimization_actions": ["tie_vfx_lods_to_flow_band", "cap spray_overdraw", "never_hide_validation_failures"]
+    },
+    {
+      "system_id": "world_partition_streaming",
+      "metrics": ["streaming_hitch_ms", "loaded_cell_count", "io_mb_per_second", "memory_peak_mb"],
+      "capture_modes": ["linked_south_fork_run", "colorado_rowing_planning", "pacuare_planning"],
+      "optimization_actions": ["profile_corridor_cell_size", "preload_scout_recovery_pool_edges", "budget_foliage_streaming"]
+    },
+    {
+      "system_id": "audio_spatialization",
+      "metrics": ["active_voice_count", "audio_thread_ms", "streaming_buffer_ms", "hrtf_cost_ms", "memory_mb"],
+      "capture_modes": ["stern_guide_spatial_audio", "rescue_cues", "canyon_reflections"],
+      "optimization_actions": ["prioritize_rescue_and_command_cues", "profile_ambisonic_beds", "gate_middleware_if_native_stack_fails"]
+    },
+    {
+      "system_id": "local_ai_voice",
+      "metrics": ["recognition_latency_ms", "intent_accuracy", "cpu_ms", "memory_mb", "model_load_ms"],
+      "capture_modes": ["noisy_river_commands", "guided_paddle_raft", "manual_fallback"],
+      "optimization_actions": ["keep_command_model_lightweight", "require_manual_parity", "disable_voice_for_rowing_oar_rig"]
+    },
+    {
+      "system_id": "memory",
+      "metrics": ["resident_mb", "peak_mb", "asset_pool_mb", "replay_buffer_mb"],
+      "capture_modes": ["desktop_high", "vr_comfort", "handheld_or_low_power_review"],
+      "optimization_actions": ["budget_replay_retention", "stream_photoreal_assets", "keep_debug_captures_out_of_shipping_builds"]
+    },
+    {
+      "system_id": "save_replay",
+      "metrics": ["save_ms", "replay_size_mb", "determinism_hash_match", "serialization_alloc_mb"],
+      "capture_modes": ["restart_path", "replay_review_path", "after_action_feedback"],
+      "optimization_actions": ["version_save_schema", "dedupe_replay_samples", "record_release_build_metadata"]
+    },
+    {
+      "system_id": "photoreal_environment_foliage",
+      "metrics": ["foliage_instance_count", "lod_transition_hitches", "occlusion_failures", "guide_seat_quality_score"],
+      "capture_modes": ["south_fork", "colorado", "pacuare"],
+      "optimization_actions": ["scale_density_per_tier", "preserve_hazard_visibility", "require_quality_review"]
+    }
+  ],
+  "scalability_modes": [
+    {
+      "mode_id": "desktop_epic",
+      "water": "full_validated_custom_water_field",
+      "raft_contact_authority": "selected_scoring_authority",
+      "visual_physics": "chaos_visuals_enabled",
+      "vfx": "full_flow_dependent_foam_spray_mist",
+      "lighting": "lumen_high_with_virtual_shadow_maps",
+      "landscape_foliage": "photoreal_high_density_with_nanite_or_equivalent",
+      "audio": "full_spatial_audio_and_ambisonic_beds",
+      "local_voice": "lightweight_command_model_enabled",
+      "crew_conversation": "approved_local_or_authored_barks",
+      "fallback_commands": "keyboard_gamepad_vr_manual_parity"
+    },
+    {
+      "mode_id": "desktop_balanced",
+      "water": "validated_field_with_reduced_presentation_layers",
+      "raft_contact_authority": "selected_scoring_authority",
+      "visual_physics": "reduced_non_scoring_visual_physics",
+      "vfx": "bounded_foam_spray_lods",
+      "lighting": "lumen_balanced_or_baked_fallback_review",
+      "landscape_foliage": "medium_density_with_hazard_readability",
+      "audio": "prioritized_spatial_cues",
+      "local_voice": "command_model_enabled_with_latency_budget",
+      "crew_conversation": "authored_barks_preferred",
+      "fallback_commands": "manual_parity_required"
+    },
+    {
+      "mode_id": "vr_comfort",
+      "water": "validated_field_with_vr_frame_pacing_profile",
+      "raft_contact_authority": "selected_scoring_authority",
+      "visual_physics": "visual_only_physics_capped",
+      "vfx": "comfort_capped_spray_mist_and_overdraw",
+      "lighting": "vr_budget_lighting_profile",
+      "landscape_foliage": "vr_readable_density_and_stable_lods",
+      "audio": "binaural_hrtf_with_rescue_cue_priority",
+      "local_voice": "push_to_talk_preferred",
+      "crew_conversation": "safety_and_command_barks_prioritized",
+      "fallback_commands": "vr_controller_manual_parity_required"
+    },
+    {
+      "mode_id": "handheld_or_low_power_review",
+      "water": "reduced_visual_water_over_accepted_authoritative_samples",
+      "raft_contact_authority": "selected_authority_only_if_cpu_budget_passes",
+      "visual_physics": "minimal_visual_only_physics",
+      "vfx": "low_particle_count_and_static_foam_fallbacks",
+      "lighting": "low_cost_lighting_review",
+      "landscape_foliage": "aggressive_density_lods",
+      "audio": "stereo_priority_mix",
+      "local_voice": "manual_or_push_to_talk_only_until_budget_passes",
+      "crew_conversation": "authored_barks_only",
+      "fallback_commands": "manual_required_and_first_class"
+    },
+    {
+      "mode_id": "replay_debug",
+      "water": "recorded_replay_samples",
+      "raft_contact_authority": "recorded_authoritative_state",
+      "visual_physics": "deterministic_replay_visualization",
+      "vfx": "debug_overlay_or_presentation_cue_preview",
+      "lighting": "editor_review_profile",
+      "landscape_foliage": "sample_corridor_context",
+      "audio": "debug_mix_with_cue_isolation",
+      "local_voice": "recorded_command_telemetry",
+      "crew_conversation": "recorded_dialogue_telemetry",
+      "fallback_commands": "replay_scrub_and_overlay_controls"
+    }
+  ],
+  "release_workflows": [
+    {
+      "workflow_id": "asset_source_manifest",
+      "blocks_release": true,
+      "required_records": ["source_url_or_first_party_id", "license", "author", "allowed_use", "platform_rights", "reviewer"]
+    },
+    {
+      "workflow_id": "audio_source_and_middleware",
+      "blocks_release": true,
+      "required_records": ["source_manifest", "middleware_decision", "voice_budget", "final_mix_review", "localization_plan"]
+    },
+    {
+      "workflow_id": "ai_generation",
+      "blocks_release": true,
+      "required_records": ["tool", "model", "prompt", "seed", "output_terms", "similarity_review", "approved_for_shipping"]
+    },
+    {
+      "workflow_id": "attribution_credits",
+      "blocks_release": true,
+      "required_records": ["asset_attributions", "third_party_notices", "open_source_licenses", "contractor_credits"]
+    },
+    {
+      "workflow_id": "platform_rights",
+      "blocks_release": true,
+      "required_records": ["desktop_rights", "vr_rights", "console_or_handheld_rights_if_targeted", "store_media_rights"]
+    },
+    {
+      "workflow_id": "localization",
+      "blocks_release": true,
+      "required_records": ["string_table_lock", "subtitle_coverage", "voice_command_locale_policy", "font_and_text_fit_review"]
+    },
+    {
+      "workflow_id": "store_compliance",
+      "blocks_release": true,
+      "required_records": ["privacy_disclosure", "microphone_disclosure", "accessibility_notes", "age_rating_inputs", "crash_reporting_policy"]
+    },
+    {
+      "workflow_id": "release_branch_and_patch",
+      "blocks_release": true,
+      "required_records": ["release_branch_lock", "hotfix_branch_policy", "save_migration_policy", "patch_notes_template"]
+    }
+  ],
+  "qa_automation_lanes": [
+    {
+      "lane_id": "physics_regressions",
+      "required_evidence": ["water_regression_fixture_import", "milestone16_17_18_reports", "live_water_smoke_suite"]
+    },
+    {
+      "lane_id": "unreal_river_import_export",
+      "required_evidence": ["geospatial_validator", "deterministic_export_actions", "round_trip_validation"]
+    },
+    {
+      "lane_id": "feature_forcing_manifests",
+      "required_evidence": ["feature_tuning_editor_shell", "manifest_recording", "geoclaw_comparison", "conservation_guards"]
+    },
+    {
+      "lane_id": "raft_contact_fixtures",
+      "required_evidence": ["chaos_jolt_runtime_evaluation", "raft_contact_authority_integration", "pin_release_fixture"]
+    },
+    {
+      "lane_id": "rescue_outcomes",
+      "required_evidence": ["crew_safety_gate", "swimmer_rescue_gameplay", "gameplay_telemetry_scoring"]
+    },
+    {
+      "lane_id": "replay_determinism",
+      "required_evidence": ["replay_playback_manifest", "determinism_hash", "restart_path"]
+    },
+    {
+      "lane_id": "vr_comfort",
+      "required_evidence": ["openxr_profile", "guide_camera_comfort", "frame_time_capture", "haptics_review"]
+    },
+    {
+      "lane_id": "input_devices",
+      "required_evidence": ["enhanced_input_actions", "keyboard_mouse", "gamepad", "vr_motion_controllers", "manual_voice_parity"]
+    },
+    {
+      "lane_id": "accessibility",
+      "required_evidence": ["subtitles", "microphone_privacy", "text_scaling", "manual_fallback", "comfort_options"]
+    },
+    {
+      "lane_id": "crash_performance_capture",
+      "required_evidence": ["crash_reporting_policy", "performance_capture_profile", "memory_capture", "platform_log_bundle"]
+    }
+  ],
+  "polish_lanes": [
+    "onboarding",
+    "training",
+    "scoring",
+    "after_action_feedback",
+    "menus_settings",
+    "save_data",
+    "accessibility",
+    "subtitles",
+    "microphone_privacy",
+    "haptics",
+    "final_audio_mix"
+  ],
+  "release_or_defer_decisions": [
+    {
+      "decision_id": "wwise_fmod",
+      "decision": "defer",
+      "condition_to_reopen": "native_unreal_audio_or_metasounds_fails measured voice, memory, localization, or authoring gates"
+    },
+    {
+      "decision_id": "paid_asset_libraries",
+      "decision": "defer_until_proven_gap",
+      "condition_to_reopen": "photoreal_or_audio_quality review identifies a rights-clear gap that first-party, free, procedural, or approved generated assets cannot close"
+    },
+    {
+      "decision_id": "professional_field_recordings",
+      "decision": "shipping_candidate_with_rights_review",
+      "condition_to_reopen": "final audio mix or guide-feedback review rejects prototype/generated/reference recordings"
+    },
+    {
+      "decision_id": "generated_river_shipping_features",
+      "decision": "defer_to_internal_tools",
+      "condition_to_reopen": "generated scenarios pass the same source, validation, guide-review, and replay gates as real-world river sections"
+    },
+    {
+      "decision_id": "multiplayer",
+      "decision": "defer_after_single_player_release_candidate",
+      "condition_to_reopen": "networked crew gate passes after single-player physics, rescue, replay, and performance budgets remain stable"
+    },
+    {
+      "decision_id": "additional_local_ai_features",
+      "decision": "defer_beyond_deterministic_command_and_approved_bark_layers",
+      "condition_to_reopen": "latency, privacy, accuracy, memory, safety, and replay determinism gates pass for each extra feature"
+    }
+  ],
+  "release_gate_requirements": [
+    {
+      "requirement_id": "beta_playtests",
+      "required_before_release_branch": true
+    },
+    {
+      "requirement_id": "guide_feedback",
+      "required_before_release_branch": true
+    },
+    {
+      "requirement_id": "target_platform_performance_captures",
+      "required_before_release_branch": true
+    },
+    {
+      "requirement_id": "legal_provenance_review",
+      "required_before_release_branch": true
+    },
+    {
+      "requirement_id": "content_validation",
+      "required_before_release_branch": true
+    },
+    {
+      "requirement_id": "photoreal_environment_foliage_quality_review",
+      "required_before_release_branch": true
+    },
+    {
+      "requirement_id": "release_branch_lock_and_patch_workflow",
+      "required_before_release_branch": true
+    }
+  ],
+  "pass_policy": {
+    "profiles_all_milestone25_systems": true,
+    "defines_desktop_vr_and_handheld_scalability": true,
+    "locks_release_asset_audio_ai_source_and_compliance_workflows": true,
+    "hardens_qa_automation_lanes": true,
+    "covers_player_polish_lanes": true,
+    "records_release_or_defer_decisions": true,
+    "gates_release_on_external_signoff_evidence": true
+  }
+}

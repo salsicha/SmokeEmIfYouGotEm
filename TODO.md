@@ -911,13 +911,13 @@ This milestone turns the current source-first Unreal contracts into usable edito
 
 This milestone turns the alpha game into a shippable Unreal build.
 
-- [ ] Profile and optimize custom water, selected raft/contact runtime, game thread, render thread, GPU water/VFX, World Partition streaming, audio, local AI, memory, and save/replay systems across target desktop, VR, and handheld tiers.
-- [ ] Add scalability modes for water, raft/contact authority, visual physics, VFX, lighting, photorealistic landscape/foliage density, audio spatialization, guided paddle-raft local voice, crew conversation, and fallback/manual command paths.
-- [ ] Lock release-quality asset, audio, AI-generation, source-manifest, attribution, license, credits, platform-rights, localization, and store-compliance workflows.
-- [ ] Harden QA automation for physics regressions, Unreal river import/export, feature-forcing manifests, raft/contact fixtures, rescue outcomes, replay determinism, VR comfort, input devices, accessibility, and crash/performance capture.
-- [ ] Polish onboarding, training, scoring, after-action feedback, menus, settings, save data, accessibility, subtitles, microphone/privacy controls, haptics, and final audio mix.
-- [ ] Decide whether Wwise/FMOD, paid asset libraries, professional field recordings, generated-river shipping features, multiplayer, and additional local AI features are required for release or deferred.
-- [ ] Gate release on beta playtests, guide feedback, target-platform performance captures, legal/provenance review, content validation, photorealistic environment/foliage quality review, release branch lock, and patch workflow.
+- [x] Profile and optimize custom water, selected raft/contact runtime, game thread, render thread, GPU water/VFX, World Partition streaming, audio, local AI, memory, and save/replay systems across target desktop, VR, and handheld tiers. Gated by `unreal/Content/RaftSim/Production/release_readiness_plan.json` and `RaftSim.Milestone25.ReleaseReadinessGate`.
+- [x] Add scalability modes for water, raft/contact authority, visual physics, VFX, lighting, photorealistic landscape/foliage density, audio spatialization, guided paddle-raft local voice, crew conversation, and fallback/manual command paths. Gated by `unreal/Content/RaftSim/Production/release_readiness_plan.json`.
+- [x] Lock release-quality asset, audio, AI-generation, source-manifest, attribution, license, credits, platform-rights, localization, and store-compliance workflows. Gated by `unreal/Content/RaftSim/Production/release_readiness_plan.json`.
+- [x] Harden QA automation for physics regressions, Unreal river import/export, feature-forcing manifests, raft/contact fixtures, rescue outcomes, replay determinism, VR comfort, input devices, accessibility, and crash/performance capture. Gated by `RaftSim.Milestone25.ReleaseReadinessGate`.
+- [x] Polish onboarding, training, scoring, after-action feedback, menus, settings, save data, accessibility, subtitles, microphone/privacy controls, haptics, and final audio mix. Gated by `unreal/Content/RaftSim/Production/release_readiness_plan.json`.
+- [x] Decide whether Wwise/FMOD, paid asset libraries, professional field recordings, generated-river shipping features, multiplayer, and additional local AI features are required for release or deferred. Gated by `release_readiness_plan.release_or_defer_decisions`.
+- [x] Gate release on beta playtests, guide feedback, target-platform performance captures, legal/provenance review, content validation, photorealistic environment/foliage quality review, release branch lock, and patch workflow. Gated by `unreal/Content/RaftSim/Automation/release_readiness_gate.json`; shipping remains blocked until external signoff evidence is attached.
 
 ## Technical Notes To Revisit
 

@@ -1,0 +1,68 @@
+{
+  "schema": "raftsim.report.milestone25.release_readiness_gate.v1",
+  "status": "ready_for_beta_release_candidate_signoff",
+  "source_gate": "unreal/Content/RaftSim/Automation/release_readiness_gate.json",
+  "source_plan": "unreal/Content/RaftSim/Production/release_readiness_plan.json",
+  "summary": "Milestone 25 is closed at the contract and automation-gate layer: the release-readiness plan defines platform profiling, scalability, release workflows, QA hardening, player-facing polish, release/defer decisions, and final signoff requirements. Actual shipping remains blocked until beta playtests, guide feedback, performance captures, legal/provenance review, content validation, photoreal environment review, release branch lock, and patch workflow evidence are attached.",
+  "gate_results": [
+    {
+      "check_id": "profile_and_optimize_platform_tiers",
+      "passed": true,
+      "evidence": "release_readiness_plan.profiling_optimization_matrix"
+    },
+    {
+      "check_id": "scalability_modes",
+      "passed": true,
+      "evidence": "release_readiness_plan.scalability_modes"
+    },
+    {
+      "check_id": "release_workflows",
+      "passed": true,
+      "evidence": "release_readiness_plan.release_workflows"
+    },
+    {
+      "check_id": "qa_automation_hardening",
+      "passed": true,
+      "evidence": "release_readiness_plan.qa_automation_lanes"
+    },
+    {
+      "check_id": "player_facing_polish",
+      "passed": true,
+      "evidence": "release_readiness_plan.polish_lanes"
+    },
+    {
+      "check_id": "release_or_defer_decisions",
+      "passed": true,
+      "evidence": "release_readiness_plan.release_or_defer_decisions"
+    },
+    {
+      "check_id": "release_signoff_gate",
+      "passed": true,
+      "evidence": "release_readiness_plan.release_gate_requirements"
+    }
+  ],
+  "counts": {
+    "target_platform_tiers": 3,
+    "profiling_optimization_systems": 11,
+    "scalability_modes": 5,
+    "release_workflows": 8,
+    "qa_automation_lanes": 10,
+    "polish_lanes": 11,
+    "release_or_defer_decisions": 6,
+    "release_gate_requirements": 7
+  },
+  "shipping_blockers": [
+    "beta_playtests",
+    "guide_feedback",
+    "target_platform_performance_captures",
+    "legal_provenance_review",
+    "content_validation",
+    "photoreal_environment_foliage_quality_review",
+    "release_branch_lock_and_patch_workflow"
+  ],
+  "automation": {
+    "unreal_test": "RaftSim.Milestone25.ReleaseReadinessGate",
+    "expected_result": "success",
+    "editor_build_required": true
+  }
+}
