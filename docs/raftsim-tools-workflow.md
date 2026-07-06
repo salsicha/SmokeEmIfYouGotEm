@@ -1,6 +1,6 @@
 # RaftSim Tools Workflow
 
-Open `unreal/SmokeEmIfYouGotEm.uproject` in Unreal Editor 5.8 and use the `RaftSim Tools` menu as the entry point for tooling review.
+Open `unreal/SmokeEmIfYouGotEm.uproject` in Unreal Editor 5.8 and use the `RaftSim Tools` menu as the entry point for tooling review. The menu opens dockable Slate tabs for each tool surface and includes utility commands for opening every tool, creating reviewed DataAssets, and capturing screenshot evidence.
 
 ## Replay + Debug Viewer
 
@@ -27,6 +27,14 @@ Use the validation actions as the standard review buttons:
 - Open Latest Report
 
 Each action names its required evidence and report target in `unreal/Content/RaftSim/Tools/tool_validation_actions.json`.
+
+The Slate buttons now run the same C++ action path used by `URaftSimToolValidationActionRunner`: required evidence is checked, an action record is written under `Saved/RaftSim/ToolValidation`, report-opening actions launch the linked report, and live-water smoke dispatches the Unreal automation command.
+
+## Review Artifacts
+
+Run `RaftSim.CreateReviewedDataAssets` from the Unreal console or `-ExecCmds` to generate reviewed assets under `/Game/RaftSim/Tools/Reviewed`. The current reviewed assets are `DA_RaftSimToolRegistry`, `DA_ReplayDebugViewer`, `DA_RapidRiverEditorShell`, `DA_FeatureTuningEditorShell`, and `DA_ToolValidationActions`.
+
+Run `RaftSim.CaptureToolEvidence` to open every tool tab and write panel screenshots plus a manifest under `docs/tool-captures/milestone25a/`. The capture manifest records the screenshot sequence; native automated video capture is still a follow-up unless a reviewer records the editor screen manually.
 
 ## Vertical Slice Launcher
 
