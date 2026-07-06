@@ -35,3 +35,5 @@ A tool is not considered polished until it:
 ## Implemented Shells
 
 The Replay + Debug Viewer shell is the first implemented surface. `URaftSimReplayDebugViewerConfig`, `URaftSimReplayDebugViewerViewModel`, and `unreal/Content/RaftSim/Tools/replay_debug_viewer.json` load the existing Milestone 10 replay manifest, expose timeline bookmarks, clamp scrub time to the replay range, and manage overlay toggles for every live-water debug view. The shell intentionally works from replay data first so reviewers can validate visualization and overlay behavior before live physics is allowed to drive the scene.
+
+The Rapid/River Editor shell wraps the existing river editor contracts with an editor-facing validation model. `URaftSimRapidRiverEditorShellConfig`, `URaftSimRapidRiverEditorShellViewModel`, and `unreal/Content/RaftSim/Tools/rapid_river_editor_shell.json` expose panel requirements, sample South Fork annotations, source/provenance evidence, expected raft outcomes, and export blockers so the future widget can show exactly why a river edit is or is not ready for deterministic export.

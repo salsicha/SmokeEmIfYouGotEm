@@ -1,0 +1,111 @@
+{
+  "schema": "raftsim.unreal.rapid_river_editor_shell.v1",
+  "status": "ready_for_editor_widget_shell",
+  "module": "RaftSimEditor",
+  "config_class": "URaftSimRapidRiverEditorShellConfig",
+  "view_model_class": "URaftSimRapidRiverEditorShellViewModel",
+  "source_manifests": {
+    "rapid_river_editor": "unreal/Content/RaftSim/River/rapid_river_editor.json",
+    "south_fork_editor_pass": "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json",
+    "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json",
+    "round_trip_validation": "unreal/Content/RaftSim/River/round_trip_validation.json"
+  },
+  "panels": [
+    "map_view",
+    "annotation_list",
+    "evidence_refs",
+    "guide_notes",
+    "expected_outcomes",
+    "source_provenance",
+    "validation_warnings",
+    "export_readiness"
+  ],
+  "annotation_geometry": [
+    "station_pin",
+    "reach_span",
+    "drop_span",
+    "polygon",
+    "raft_line"
+  ],
+  "expected_outcomes": [
+    "surf",
+    "flush",
+    "pin",
+    "release",
+    "flip"
+  ],
+  "sample_annotations": [
+    {
+      "annotation_id": "rapid_candidate_01_review_pin",
+      "display_name": "Rapid Candidate 01 Review Pin",
+      "geometry_kind": "station_pin",
+      "station_start_m": 0.0,
+      "station_end_m": 120.0,
+      "expected_outcomes": [
+        "flush",
+        "release"
+      ],
+      "evidence_refs": [
+        {
+          "evidence_id": "south_fork_source_manifest",
+          "layer_id": "source_manifest",
+          "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json",
+          "rights_status": "source_manifest_recorded_pending_human_review",
+          "confidence": 0.35
+        }
+      ],
+      "guide_note": "Seed guide-note signal is present; reviewer must attach citation, flow context, and derived guidance before authoritative export.",
+      "rights_cleared": false,
+      "has_validation_overlay": true
+    },
+    {
+      "annotation_id": "first_technical_raft_line",
+      "display_name": "First Technical Raft Line",
+      "geometry_kind": "raft_line",
+      "station_start_m": 90.0,
+      "station_end_m": 135.0,
+      "expected_outcomes": [
+        "surf",
+        "flush",
+        "pin",
+        "release",
+        "flip"
+      ],
+      "evidence_refs": [
+        {
+          "evidence_id": "round_trip_validation",
+          "layer_id": "stitched_validation_overlay",
+          "source_manifest": "unreal/Content/RaftSim/River/round_trip_validation.json",
+          "rights_status": "internal_validation_artifact",
+          "confidence": 0.7
+        }
+      ],
+      "guide_note": "Use as the first shell sample for surf/flush/pin/release/flip review against trajectory overlays.",
+      "rights_cleared": true,
+      "has_validation_overlay": true
+    }
+  ],
+  "validation_messages": [
+    {
+      "message_id": "human_guide_signoff_required",
+      "severity": "blocking",
+      "summary": "Seed guide notes and source-rights status must be replaced by reviewed evidence before authoritative gameplay export.",
+      "source_path": "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json",
+      "blocks_export": true
+    },
+    {
+      "message_id": "stitched_export_required",
+      "severity": "warning",
+      "summary": "Every playable window must preserve stitched whole-window validation outputs next to reach-local authoring data.",
+      "source_path": "unreal/Content/RaftSim/River/reach_local_streaming.json",
+      "blocks_export": false
+    }
+  ],
+  "export_readiness": {
+    "requires_rights_clearance": true,
+    "requires_expected_outcome": true,
+    "requires_validation_overlay": true,
+    "requires_round_trip_manifest": true,
+    "requires_stitched_validation_export": true
+  }
+}
