@@ -5,6 +5,7 @@
       "terrain/rainforest_gorge_corridor_dem.tif",
       "terrain/copernicus_dem_glo30_N09_W084.tif",
       "terrain/copernicus_dem_glo30_N10_W084.tif",
+      "terrain/pacuare_dem_relief_preview_512.png",
       "terrain/opentopography_srtmgl1_pacuare_probe_response.txt"
     ],
     "field_media": [
@@ -106,6 +107,15 @@
       "source_id": "pacuare_nasa_gibs_demshade_composite",
       "status": "generated_preview_only",
       "target_artifact": "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
+      "url": "physics/src/raftsim/geospatial_preview.py"
+    },
+    {
+      "category": "derived_terrain_relief",
+      "fetch_id": "pacuare_dem_relief_preview",
+      "notes": "Normalized Copernicus DEM relief image generated alongside the Pacuare source drape and sampled by Unreal preview generation for source-derived bank/gorge height perturbation.",
+      "source_id": "pacuare_dem_relief_preview",
+      "status": "generated_preview_only",
+      "target_artifact": "terrain/pacuare_dem_relief_preview_512.png",
       "url": "physics/src/raftsim/geospatial_preview.py"
     },
     {
@@ -222,6 +232,19 @@
       "use_in_pipeline": [
         "unreal_source_overlay",
         "cloud_gap_preview_fill",
+        "terrain_relief_visual_review"
+      ]
+    },
+    {
+      "category": "derived_terrain_relief",
+      "license_or_terms": "Derived from Copernicus DEM source samples; keep source terms, inputs, and processing manifest attached. Preview-only until full terrain conditioning is complete.",
+      "provider": "RaftSim source-preview tool",
+      "source_id": "pacuare_dem_relief_preview",
+      "status": "generated_preview_only",
+      "title": "Pacuare Copernicus DEM relief preview for Unreal terrain perturbation",
+      "url": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_source_drape_composite_manifest.json",
+      "use_in_pipeline": [
+        "unreal_preview_height_perturbation",
         "terrain_relief_visual_review"
       ]
     },
