@@ -25,6 +25,7 @@
       "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
       "hydrography/production_import_pilot/snit_layer_metadata_summary.json",
       "hydrology/production_import_pilot/rainfall_station_review.json",
+      "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
       "flow_presets.json"
     ],
     "guide_references": [
