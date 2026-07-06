@@ -40,6 +40,7 @@
       "mask_biased_boulders_pebbles_foliage_and_understory",
       "vertex_color_water_gradients",
       "current_streaks_foam_tongues_wave_highlights_and_eddy_lines",
+      "translucent_surface_glints_foam_flecks_canyon_haze_and_rainforest_spray_mist",
       "river_specific_sun_skylight_fog_camera_exposure"
     ],
     "missing_renderer_coverage_before_lifelike": [

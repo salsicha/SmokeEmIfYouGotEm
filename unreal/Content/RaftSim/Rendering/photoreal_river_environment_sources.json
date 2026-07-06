@@ -1097,6 +1097,7 @@
       "source_backed_flow_band_visual_parameters_recorded",
       "biome_specific_understory_and_scrub_proxy_layers_recorded",
       "current_streak_proxy_layers_recorded",
+      "first_party_translucent_surface_glint_foam_fleck_haze_and_spray_mist_layers_recorded",
       "known_nonphotoreal_proxy_layers_explicitly_recorded"
     ],
     "preview_capture_root": "docs/environment-captures/photoreal_river_previews",

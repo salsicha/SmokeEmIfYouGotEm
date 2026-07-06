@@ -36,6 +36,7 @@
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionConstant.h"
 #include "Materials/MaterialExpressionMultiply.h"
+#include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionVertexColor.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -382,6 +383,11 @@ void ConnectPreviewMaterialColorInput(FColorMaterialInput& Input, UMaterialExpre
     Input.MaskA = 0;
 }
 
+void ConnectPreviewMaterialScalarInput(FScalarMaterialInput& Input, UMaterialExpression* Expression)
+{
+    Input.Expression = Expression;
+}
+
 UMaterialInterface* LoadOrCreatePreviewColorMaterial()
 {
     static const TCHAR* MaterialPackagePath = TEXT("/Game/RaftSim/Materials/M_RaftSim_LitColorPreview");
@@ -491,6 +497,76 @@ UMaterialInterface* LoadOrCreatePreviewVertexColorMaterial()
         UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
         ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, VertexColor);
         ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
+
+        Material->PostEditChange();
+        Package->MarkPackageDirty();
+
+        const FString Filename =
+            FPackageName::LongPackageNameToFilename(MaterialPackagePath, FPackageName::GetAssetPackageExtension());
+        IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+
+        FSavePackageArgs SaveArgs;
+        SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+        SaveArgs.SaveFlags = SAVE_NoError;
+        UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+    }
+
+    return Material;
+}
+
+UMaterialInterface* LoadOrCreatePreviewTranslucentColorMaterial()
+{
+    static const TCHAR* MaterialPackagePath = TEXT("/Game/RaftSim/Materials/M_RaftSim_TranslucentColorPreview");
+    static const TCHAR* MaterialObjectPath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_TranslucentColorPreview.M_RaftSim_TranslucentColorPreview");
+
+    UMaterial* Material = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, MaterialObjectPath));
+    if (!Material)
+    {
+        UPackage* Package = CreatePackage(MaterialPackagePath);
+        if (!Package)
+        {
+            return nullptr;
+        }
+
+        Material = NewObject<UMaterial>(
+            Package,
+            TEXT("M_RaftSim_TranslucentColorPreview"),
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (!Material)
+        {
+            return nullptr;
+        }
+
+        FAssetRegistryModule::AssetCreated(Material);
+        Material->Modify();
+        Material->SetShadingModel(MSM_Unlit);
+        Material->BlendMode = BLEND_Translucent;
+        Material->TwoSided = true;
+
+        UMaterialExpressionVectorParameter* ColorParameter = NewObject<UMaterialExpressionVectorParameter>(Material);
+        ColorParameter->ParameterName = TEXT("PreviewColor");
+        ColorParameter->DefaultValue = FLinearColor(0.78f, 0.92f, 0.94f, 1.0f);
+        Material->GetExpressionCollection().AddExpression(ColorParameter);
+
+        UMaterialExpressionScalarParameter* OpacityParameter = NewObject<UMaterialExpressionScalarParameter>(Material);
+        OpacityParameter->ParameterName = TEXT("PreviewOpacity");
+        OpacityParameter->DefaultValue = 0.28f;
+        Material->GetExpressionCollection().AddExpression(OpacityParameter);
+
+        UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
+        EmissiveScale->R = 0.85f;
+        Material->GetExpressionCollection().AddExpression(EmissiveScale);
+
+        UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
+        EmissiveColor->A.Expression = ColorParameter;
+        EmissiveColor->B.Expression = EmissiveScale;
+        Material->GetExpressionCollection().AddExpression(EmissiveColor);
+
+        UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, ColorParameter);
+        ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Opacity, OpacityParameter);
 
         Material->PostEditChange();
         Package->MarkPackageDirty();
@@ -620,6 +696,20 @@ UMaterialInstanceDynamic* CreatePreviewColorMaterial(UObject* Outer, const FLine
     return nullptr;
 }
 
+UMaterialInstanceDynamic* CreatePreviewTranslucentColorMaterial(UObject* Outer, const FLinearColor& Color, float Opacity)
+{
+    UMaterialInterface* BaseMaterial = LoadOrCreatePreviewTranslucentColorMaterial();
+    if (BaseMaterial)
+    {
+        UMaterialInstanceDynamic* Material = UMaterialInstanceDynamic::Create(BaseMaterial, Outer);
+        Material->SetVectorParameterValue(TEXT("PreviewColor"), Color);
+        Material->SetScalarParameterValue(TEXT("PreviewOpacity"), FMath::Clamp(Opacity, 0.02f, 0.85f));
+        return Material;
+    }
+
+    return nullptr;
+}
+
 TArray<FVector> ComputePreviewMeshNormals(const TArray<FVector>& Vertices, const TArray<int32>& Triangles)
 {
     TArray<FVector> Normals;
@@ -716,6 +806,23 @@ void ApplyPreviewColor(UMeshComponent* Component, const FLinearColor& Color)
     }
 
     if (UMaterialInstanceDynamic* Material = CreatePreviewColorMaterial(Component, Color))
+    {
+        const int32 MaterialCount = FMath::Max(1, Component->GetNumMaterials());
+        for (int32 MaterialIndex = 0; MaterialIndex < MaterialCount; ++MaterialIndex)
+        {
+            Component->SetMaterial(MaterialIndex, Material);
+        }
+    }
+}
+
+void ApplyPreviewTranslucentColor(UMeshComponent* Component, const FLinearColor& Color, float Opacity)
+{
+    if (!Component)
+    {
+        return;
+    }
+
+    if (UMaterialInstanceDynamic* Material = CreatePreviewTranslucentColorMaterial(Component, Color, Opacity))
     {
         const int32 MaterialCount = FMath::Max(1, Component->GetNumMaterials());
         for (int32 MaterialIndex = 0; MaterialIndex < MaterialCount; ++MaterialIndex)
@@ -906,6 +1013,26 @@ AStaticMeshActor* AddPreviewMeshActor(
     else if (!bUseMeshDefaultMaterial)
     {
         ApplyPreviewColor(Component, Color);
+    }
+    return Actor;
+}
+
+AStaticMeshActor* AddPreviewTranslucentMeshActor(
+    UWorld* World,
+    UStaticMesh* Mesh,
+    const FString& Label,
+    const FVector& Location,
+    const FRotator& Rotation,
+    const FVector& Scale,
+    const FLinearColor& Color,
+    float Opacity)
+{
+    AStaticMeshActor* Actor = AddPreviewMeshActor(World, Mesh, Label, Location, Rotation, Scale, Color);
+    if (Actor && Actor->GetStaticMeshComponent())
+    {
+        Actor->GetStaticMeshComponent()->SetCastShadow(false);
+        Actor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        ApplyPreviewTranslucentColor(Actor->GetStaticMeshComponent(), Color, Opacity);
     }
     return Actor;
 }
@@ -1663,6 +1790,103 @@ void AddPreviewWaterSurfaceDetail(UWorld* World, const FRaftSimEnvironmentPrevie
     }
 }
 
+void AddPreviewSurfaceAtmosphereAndSprayDetail(
+    UWorld* World,
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* TerrainRelief,
+    const FRaftSimPreviewImage* HeightfieldPreview,
+    UStaticMesh* PlaneMesh)
+{
+    if (!World || !PlaneMesh)
+    {
+        return;
+    }
+
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+    const float WaterBaseZ = GetPreviewWaterSurfaceBaseZCm(Spec);
+    const int32 GlintCount = Spec.bDesertCanyon ? 34 : (Spec.bHasWaterfalls ? 58 : 44);
+    const FLinearColor GlintColor = Spec.bDesertCanyon
+        ? FLinearColor(0.72f, 0.66f, 0.50f, 1.0f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.54f, 0.92f, 0.82f, 1.0f) : FLinearColor(0.60f, 0.94f, 0.92f, 1.0f));
+
+    for (int32 GlintIndex = 0; GlintIndex < GlintCount; ++GlintIndex)
+    {
+        const float T = static_cast<float>(GlintIndex) / static_cast<float>(FMath::Max(1, GlintCount - 1));
+        const float X = FMath::Lerp(-4300.0f, 24800.0f, T);
+        const float RiverCenterY = GetPreviewRiverCenterY(Spec, X);
+        const float Lateral = FMath::Sin(static_cast<float>(GlintIndex) * 2.31f) * ActiveRiverHalfWidth * 0.62f;
+        const float WidthScale = 0.09f + 0.022f * static_cast<float>(GlintIndex % 4);
+        const float LengthScale = (Spec.bDesertCanyon ? 1.10f : 0.78f) + 0.12f * static_cast<float>(GlintIndex % 5);
+        const float Opacity = Spec.bDesertCanyon ? 0.16f : (Spec.bHasWaterfalls ? 0.24f : 0.20f);
+        AddPreviewTranslucentMeshActor(
+            World,
+            PlaneMesh,
+            FString::Printf(TEXT("RaftSim_SurfaceGlint_%03d_%s"), GlintIndex, *Spec.RiverId),
+            FVector(X, RiverCenterY + Lateral, WaterBaseZ + 22.0f + 1.6f * FMath::Sin(static_cast<float>(GlintIndex))),
+            FRotator(0.0f, static_cast<float>((GlintIndex * 19) % 360), 0.0f),
+            FVector(LengthScale, WidthScale, 1.0f),
+            GlintColor,
+            Opacity);
+    }
+
+    const int32 FleckCount = Spec.bDesertCanyon ? 22 : (Spec.bHasWaterfalls ? 46 : 32);
+    for (int32 FleckIndex = 0; FleckIndex < FleckCount; ++FleckIndex)
+    {
+        const float T = FMath::Frac(0.173f * static_cast<float>(FleckIndex) + 0.19f);
+        const float X = FMath::Lerp(-3600.0f, 24400.0f, T);
+        const float RiverCenterY = GetPreviewRiverCenterY(Spec, X);
+        const float Lateral = FMath::Sin(static_cast<float>(FleckIndex) * 1.83f) * ActiveRiverHalfWidth * 0.84f;
+        const float FleckOpacity = Spec.bDesertCanyon ? 0.14f : 0.22f;
+        AddPreviewTranslucentMeshActor(
+            World,
+            PlaneMesh,
+            FString::Printf(TEXT("RaftSim_FoamFleck_%03d_%s"), FleckIndex, *Spec.RiverId),
+            FVector(X, RiverCenterY + Lateral, WaterBaseZ + 25.0f),
+            FRotator(0.0f, static_cast<float>((FleckIndex * 47) % 360), 0.0f),
+            FVector(0.18f + 0.04f * static_cast<float>(FleckIndex % 3), 0.035f, 1.0f),
+            Spec.bDesertCanyon ? FLinearColor(0.78f, 0.76f, 0.66f, 1.0f) : FLinearColor(0.86f, 0.96f, 0.90f, 1.0f),
+            FleckOpacity);
+    }
+
+    if (Spec.bDesertCanyon)
+    {
+        for (int32 HazeIndex = 0; HazeIndex < 7; ++HazeIndex)
+        {
+            const float X = 2400.0f + static_cast<float>(HazeIndex) * 3600.0f;
+            const float CenterY = GetPreviewRiverCenterY(Spec, X);
+            const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, CenterY, TerrainRelief, HeightfieldPreview);
+            AddPreviewTranslucentMeshActor(
+                World,
+                PlaneMesh,
+                FString::Printf(TEXT("RaftSim_CanyonDistanceHaze_%02d_%s"), HazeIndex, *Spec.RiverId),
+                FVector(X, CenterY, TerrainZ + 560.0f + 30.0f * static_cast<float>(HazeIndex % 2)),
+                FRotator(82.0f, 0.0f, 0.0f),
+                FVector(16.0f, 3.4f, 1.0f),
+                FLinearColor(0.72f, 0.64f, 0.50f, 1.0f),
+                0.12f);
+        }
+    }
+
+    if (Spec.bHasWaterfalls)
+    {
+        for (int32 SprayIndex = 0; SprayIndex < 14; ++SprayIndex)
+        {
+            const float X = 3650.0f + static_cast<float>(SprayIndex % 7) * 4300.0f + 170.0f * FMath::Sin(static_cast<float>(SprayIndex));
+            const float Side = (SprayIndex % 2 == 0) ? -1.0f : 1.0f;
+            const float Y = GetPreviewRiverCenterY(Spec, X) + Side * (1750.0f + 120.0f * static_cast<float>(SprayIndex % 3));
+            AddPreviewTranslucentMeshActor(
+                World,
+                PlaneMesh,
+                FString::Printf(TEXT("RaftSim_RainforestSprayMist_%02d_%s"), SprayIndex, *Spec.RiverId),
+                FVector(X, Y, 245.0f + 28.0f * static_cast<float>(SprayIndex % 4)),
+                FRotator(74.0f, 0.0f, static_cast<float>((SprayIndex * 29) % 360)),
+                FVector(3.6f + 0.35f * static_cast<float>(SprayIndex % 3), 0.72f, 1.0f),
+                FLinearColor(0.58f, 0.88f, 0.78f, 1.0f),
+                0.20f);
+        }
+    }
+}
+
 void AddPreviewRaftForeground(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec, UStaticMesh* CubeMesh, UStaticMesh* CylinderMesh)
 {
     if (!World || !CubeMesh || !CylinderMesh)
@@ -2013,6 +2237,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     AddPreviewProceduralEnvironmentDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, WaterMaskPtr, VegetationMaskPtr, SphereMesh);
     AddPreviewWaterSurfaceDetail(World, Spec);
     AddPreviewFoamAndHydraulics(World, Spec);
+    AddPreviewSurfaceAtmosphereAndSprayDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, PlaneMesh);
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     for (int32 BoulderIndex = 0; BoulderIndex < Spec.BoulderCount; ++BoulderIndex)
