@@ -204,6 +204,69 @@ def build_pacuare_demshade_drape(
     output_manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
 
+def build_pacuare_heightfield_candidate(
+    southern_dem_path: Path,
+    northern_dem_path: Path,
+    output_png_path: Path,
+    output_manifest_path: Path,
+    bounds: BoundsWgs84,
+    repo_root: Path | None = None,
+    output_size_px: int = 1009,
+) -> None:
+    """Export a review-gated 16-bit Pacuare DEM sample for Unreal Landscape import tests."""
+
+    dem = sample_copernicus_dem(
+        CopernicusTile(southern_dem_path, south_lat=9, west_lon=-84),
+        CopernicusTile(northern_dem_path, south_lat=10, west_lon=-84),
+        bounds,
+        output_size_px,
+    )
+    finite = np.isfinite(dem)
+    if not finite.any():
+        raise ValueError("Pacuare DEM sample contains no finite elevations")
+
+    fill_value = float(np.median(dem[finite]))
+    dem = np.where(finite, dem, fill_value).astype(np.float32)
+    elevation_min_m = float(np.min(dem))
+    elevation_max_m = float(np.max(dem))
+    elevation_span_m = max(1.0, elevation_max_m - elevation_min_m)
+    normalized = np.clip((dem - elevation_min_m) / elevation_span_m, 0.0, 1.0)
+    heightfield_u16 = np.round(normalized * 65535.0).astype(np.uint16)
+
+    output_png_path.parent.mkdir(parents=True, exist_ok=True)
+    Image.fromarray(heightfield_u16).save(output_png_path)
+
+    manifest = {
+        "schema": "raftsim.pacuare_heightfield_candidate.v1",
+        "status": "generated_review_gated_not_conditioned_not_production_import",
+        "bounds_wgs84": {
+            "min_lon": bounds.min_lon,
+            "min_lat": bounds.min_lat,
+            "max_lon": bounds.max_lon,
+            "max_lat": bounds.max_lat,
+        },
+        "inputs": {
+            "copernicus_dem_glo30_southern_tile": _manifest_path(southern_dem_path, repo_root),
+            "copernicus_dem_glo30_northern_tile": _manifest_path(northern_dem_path, repo_root),
+        },
+        "output_heightfield_png": _manifest_path(output_png_path, repo_root),
+        "processing": {
+            "output_size_px": output_size_px,
+            "pixel_format": "16_bit_grayscale_png",
+            "dem_sampling": "nearest_neighbor_from_copernicus_glo30_tiles",
+            "elevation_min_m": elevation_min_m,
+            "elevation_max_m": elevation_max_m,
+            "unreal_import_note": "Height samples are normalized to 0..65535; use the recorded elevation min/max and chosen vertical exaggeration when testing Landscape import.",
+        },
+        "caveats": [
+            "This is an import candidate for tool testing, not a production Unreal heightfield.",
+            "DEM tiles are not yet clipped to a surveyed corridor, reprojected to the chosen Costa Rica working CRS, void/artifact reviewed, hydrologically conditioned, or aligned to a reviewed river centerline.",
+            "River channel burning, bank breaklines, boulder/bed features, access constraints, and guide review are still required before photoreal terrain promotion.",
+        ],
+    }
+    output_manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build source-derived DEM relief and preview drapes for river environments.")
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
@@ -269,6 +332,15 @@ def main() -> None:
         selected_date="2025-04-02",
         repo_root=repo_root,
         output_size_px=1024,
+    )
+    build_pacuare_heightfield_candidate(
+        southern_dem_path=pacuare_root / "terrain/copernicus_dem_glo30_N09_W084.tif",
+        northern_dem_path=pacuare_root / "terrain/copernicus_dem_glo30_N10_W084.tif",
+        output_png_path=pacuare_root / "terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png",
+        output_manifest_path=pacuare_root / "terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json",
+        bounds=BoundsWgs84(min_lon=-83.75, min_lat=9.72, max_lon=-83.42, max_lat=10.12),
+        repo_root=repo_root,
+        output_size_px=1009,
     )
 
 

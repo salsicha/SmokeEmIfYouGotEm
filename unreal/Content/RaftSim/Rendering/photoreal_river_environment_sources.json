@@ -343,6 +343,14 @@
           "unreal_use": "provenance and import-pipeline terrain source; full clipped heightfield replacement still pending"
         },
         {
+          "artifact_id": "pacuare_copernicus_dem_corridor_heightfield_1009",
+          "category": "derived_heightfield_candidate",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png",
+          "provider": "RaftSim geospatial preview utility from Copernicus DEM GLO-30 inputs",
+          "status": "generated_review_gated_import_candidate",
+          "unreal_use": "1009px 16-bit grayscale Unreal Landscape import-test candidate; not yet clipped, reprojected, hydrologically conditioned, or approved for production terrain"
+        },
+        {
           "artifact_id": "pacuare_dem_relief_preview_512",
           "category": "derived_terrain_relief",
           "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_512.png",

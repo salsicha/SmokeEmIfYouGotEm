@@ -209,6 +209,33 @@
       ]
     },
     {
+      "artifact_id": "pacuare_copernicus_dem_corridor_heightfield_1009",
+      "category": "derived_heightfield_candidate",
+      "path": "terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png",
+      "provider": "RaftSim geospatial preview utility from Copernicus DEM GLO-30 inputs",
+      "url": "physics/src/raftsim/geospatial_preview.py",
+      "status": "generated_review_gated_import_candidate",
+      "summary": {
+        "width": 1009,
+        "height": 1009,
+        "pixel_type": "U16",
+        "format": "16-bit grayscale PNG",
+        "size_bytes": 1463813,
+        "elevation_min_m": 16.122909545898438,
+        "elevation_max_m": 3230.446044921875,
+        "processing_manifest": "terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json"
+      },
+      "use": [
+        "unreal_landscape_import_test",
+        "terrain_scale_review",
+        "heightfield_conditioning_pipeline_proof"
+      ],
+      "caveats": [
+        "This is a normalized import candidate for tool testing, not production terrain.",
+        "The source DEM is not yet clipped to a surveyed corridor, reprojected to the selected Costa Rica working CRS, void/artifact reviewed, hydrologically conditioned, river-channel burned, or guide-reviewed."
+      ]
+    },
+    {
       "artifact_id": "nasa_gibs_pacuare_cloud_screen_candidates",
       "category": "satellite_imagery_cloud_screen_candidates",
       "paths": [
