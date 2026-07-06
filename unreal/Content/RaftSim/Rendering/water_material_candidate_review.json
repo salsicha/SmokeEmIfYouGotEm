@@ -1,0 +1,55 @@
+{
+  "schema": "raftsim.unreal.water_material_candidate_review.v1",
+  "generated_on": "2026-07-06",
+  "status": "engine_water_plugin_candidate_rejected_for_generated_preview_river_ribbon",
+  "goal": "Evaluate whether installed Unreal Water/WaterAdvanced plugin materials can improve the generated downstream river-eye preview captures before custom production water shaders are built.",
+  "candidate_materials": [
+    {
+      "material": "/WaterAdvanced/Materials/Water_Material_Simple.Water_Material_Simple",
+      "source": "Unreal Engine WaterAdvanced plugin content",
+      "result": "rejected_for_generated_preview_mesh"
+    },
+    {
+      "material": "/Water/Materials/WaterSurface/Water_Material_CustomMesh.Water_Material_CustomMesh",
+      "source": "Unreal Engine Water plugin content",
+      "result": "retained_as_future_manual_candidate_not_active"
+    },
+    {
+      "material": "/Water/Materials/WaterSurface/Water_Material_River.Water_Material_River",
+      "source": "Unreal Engine Water plugin content",
+      "result": "retained_as_future_manual_candidate_not_active"
+    }
+  ],
+  "test_run": {
+    "build": "SmokeEmIfYouGotEmEditor Mac Development succeeded with UE_5.8",
+    "capture_command": "UnrealEditor SmokeEmIfYouGotEm.uproject -RaftSimCreatePhotorealEnvironmentPreviewMaps -RaftSimCapturePhotorealEnvironmentPreviews -RaftSimExitAfterEnvironmentAutomation -unattended -nop4 -nosplash",
+    "captures_regenerated": [
+      "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
+      "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
+      "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png"
+    ]
+  },
+  "observed_failure": {
+    "summary": "The engine WaterAdvanced material candidate produced a near-black river surface on the generated procedural river ribbon, making the downstream river-eye captures worse than the active vertex-color water preview.",
+    "likely_causes": [
+      "plugin water material expects WaterBody or WaterZone data not present on the generated ProceduralMeshComponent ribbon",
+      "default plugin material parameters are not tuned for the custom preview mesh, manual exposure, or source-mask-driven river colors",
+      "the generated mesh currently needs a purpose-built material or Water plugin integration rather than a direct material swap"
+    ],
+    "blocked_use": [
+      "do not use the tested engine water material candidate as the active generated preview water path",
+      "do not claim Water plugin integration is validated for the preview river ribbon",
+      "do not overwrite the currently readable vertex-color water captures with the failed black-water captures"
+    ]
+  },
+  "active_decision": {
+    "active_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
+    "decision": "Keep the first-party lit vertex-color water preview material active until a custom water shader or true WaterBody integration is implemented and visually verified.",
+    "promotion_gate": "Any future Water plugin material attempt must be captured for all three rivers and visually checked for nonblack water, readable waves/foam, hazard visibility, and no masking of swimmer/rescue targets before it replaces the active preview material."
+  },
+  "next_actions": [
+    "Prototype a purpose-built preview water material with normal/foam texture inputs rather than direct Water plugin material reuse.",
+    "Evaluate true WaterBodyRiver or WaterMesh integration only after terrain, channel, and spline geometry are production-shaped.",
+    "Keep regenerated captures honest: mark current water as readable proxy material, not production photoreal water."
+  ]
+}
