@@ -2,7 +2,7 @@
 
 This directory contains the UE 5.8 source-controlled project shell for the full rafting simulator.
 
-The local workstation used for this scaffolding does not currently have Unreal Editor installed, so this project is text-first: `.uproject`, C++ targets, module build rules, config, manifests, and source skeletons are committed for later editor generation and compilation.
+The project remains source-first: `.uproject`, C++ targets, module build rules, config, manifests, and source skeletons stay in git while editor-created binary assets are generated intentionally from reviewed workflows.
 
 Milestone 20 production foundation state is recorded in `Content/RaftSim/Production/production_foundation.json`. That manifest binds the UE 5.8 project lock, enabled project plugins, `RaftSim` module boundaries, and accepted Milestone 20 water report-set lock before live-water integration code is treated as production work.
 
@@ -12,7 +12,8 @@ Milestone 20 production foundation state is recorded in `Content/RaftSim/Product
 2. Open `SmokeEmIfYouGotEm.uproject`.
 3. Let Unreal generate IDE project files.
 4. Build the editor target.
-5. Create binary map, Blueprint, material, MetaSound, and DataAsset content from the source manifests in this repo.
+5. Open the `RaftSim Tools` menu to inspect replay/debug, rapid/river, feature tuning, geospatial validation, and vertical-slice launcher surfaces as they come online.
+6. Create binary map, Blueprint, material, MetaSound, and DataAsset content from the source manifests in this repo.
 
 ## Source Policy
 

@@ -1,0 +1,84 @@
+{
+  "schema": "raftsim.unreal.polished_tool_registry.v1",
+  "status": "ready_for_editor_menu_registration",
+  "module": "RaftSimEditor",
+  "menu": {
+    "owner": "RaftSimTools",
+    "main_menu_path": "LevelEditor.MainMenu",
+    "display_name": "RaftSim Tools"
+  },
+  "tools": [
+    {
+      "tool_id": "ReplayDebugViewer",
+      "display_name": "Replay + Debug Viewer",
+      "kind": "replay_debug_viewer",
+      "required_module": "RaftSimDebug",
+      "source_manifest": "unreal/Content/RaftSim/Tools/replay_debug_viewer.json",
+      "loads_sample_data": [
+        "physics/data/readiness/milestone_10/unreal_visualization/manifest.json",
+        "unreal/Content/RaftSim/Debug/live_water_debug_views.json"
+      ],
+      "requires_validation_before_export": false,
+      "polish_goal": "Open a timeline and overlay review surface without hand-editing replay JSON."
+    },
+    {
+      "tool_id": "RapidRiverEditor",
+      "display_name": "Rapid/River Editor",
+      "kind": "rapid_river_editor",
+      "required_module": "RaftSimRiver",
+      "source_manifest": "unreal/Content/RaftSim/River/rapid_river_editor.json",
+      "loads_sample_data": [
+        "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json",
+        "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
+      ],
+      "requires_validation_before_export": true,
+      "polish_goal": "Edit river evidence, annotation geometry, expected outcomes, and export readiness with visible validation state."
+    },
+    {
+      "tool_id": "FeatureTuningEditor",
+      "display_name": "Feature Tuning Editor",
+      "kind": "feature_tuning_editor",
+      "required_module": "RaftSimRiver",
+      "source_manifest": "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+      "loads_sample_data": [
+        "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+        "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json"
+      ],
+      "requires_validation_before_export": true,
+      "polish_goal": "Expose flow-dependent forcing, feature tuning, and visual/audio-only cues with conservative defaults and validation warnings."
+    },
+    {
+      "tool_id": "GeospatialValidator",
+      "display_name": "Geospatial Import/Export Validator",
+      "kind": "geospatial_validator",
+      "required_module": "RaftSimGeo",
+      "source_manifest": "unreal/Content/RaftSim/River/geospatial_import_pipeline.json",
+      "loads_sample_data": [
+        "unreal/Content/RaftSim/River/reach_local_streaming.json",
+        "unreal/Content/RaftSim/River/round_trip_validation.json"
+      ],
+      "requires_validation_before_export": true,
+      "polish_goal": "Validate source manifests, CRS, reach-local grids, stitched outputs, and solver package regeneration before promotion."
+    },
+    {
+      "tool_id": "VerticalSliceLauncher",
+      "display_name": "Vertical Slice Playtest Launcher",
+      "kind": "vertical_slice_launcher",
+      "required_module": "RaftSimUI",
+      "source_manifest": "unreal/Content/RaftSim/VerticalSlice/first_rapid_vertical_slice.json",
+      "loads_sample_data": [
+        "unreal/Content/RaftSim/UI/vertical_slice_frontend_flow.json",
+        "unreal/Content/RaftSim/Automation/vertical_slice_acceptance_gate.json"
+      ],
+      "requires_validation_before_export": false,
+      "polish_goal": "Launch the selected South Fork scenario and capture replay/debug evidence for acceptance review."
+    }
+  ],
+  "polish_gate": {
+    "requires_menu_entry": true,
+    "requires_sample_data": true,
+    "requires_clear_validation_state": true,
+    "requires_deterministic_export_when_applicable": true,
+    "requires_workflow_doc": true
+  }
+}
