@@ -81,9 +81,9 @@
   "manifest_id": "pacuare.lower_pacuare_planning_corridor.source_manifest.v0",
   "provenance": {
     "generated_by": "raftsim.milestone24.draft_pacuare_third_target",
-    "processing_version": "milestone24_pacuare_planning_draft.v0+milestone26_source_slice.v1",
+    "processing_version": "milestone24_pacuare_planning_draft.v0+milestone26_source_slice.v2",
     "redistribution_notes": "Do not vendor third-party guidebook text, aerial imagery, protected-area content, or field media without explicit rights and attribution records.",
-    "review_status": "partial_public_global_terrain_and_nasa_imagery_slice_attached; needs_costa_rica_hydrology_hydrography_protected_area_and_guide_review"
+    "review_status": "partial_public_global_terrain_and_nasa_imagery_slice_attached_with_official_source_leads; needs_costa_rica_hydrology_hydrography_protected_area_and_guide_review"
   },
   "remote_fetches": [
     {
@@ -145,25 +145,25 @@
       "fetch_id": "pacuare_costa_rica_hydrology_gauge_search",
       "notes": "Identify authoritative Costa Rica discharge, stage, rainfall, and basin products before numeric flow bands are allowed.",
       "source_id": "costa_rica_hydrology_gauge_search",
-      "status": "source_research_required",
+      "status": "official_source_leads_attached",
       "target_artifact": "hydrology/costa_rica_gauge_search.json",
       "url": "source_research_required"
     },
     {
       "category": "rainfall",
       "fetch_id": "pacuare_rainfall_context",
-      "notes": "Rain-fed route behavior needs storm timing, antecedent rainfall, flash-rise context, and guide review before solver generation.",
+      "notes": "Rain-fed route behavior needs storm timing, antecedent rainfall, flash-rise context, and guide review before solver generation. Initial official source leads are attached, but station ids and numeric ranges are still unresolved.",
       "source_id": "rainfall_context_review",
-      "status": "source_research_required",
+      "status": "official_source_leads_attached",
       "target_artifact": "hydrology/rainfall_context.json",
       "url": "source_research_required"
     },
     {
       "category": "protected_area",
       "fetch_id": "pacuare_sinac_protected_area_review",
-      "notes": "Review protected-area, access, conservation, and source-rights constraints before publishing detailed corridor packages.",
+      "notes": "Review protected-area, access, conservation, and source-rights constraints before publishing detailed corridor packages. Initial SINAC/SNIT/source-rights leads are attached.",
       "source_id": "sinac_protected_area_review",
-      "status": "source_research_required",
+      "status": "official_source_leads_attached",
       "target_artifact": "review/sinac_protected_area_source_rights.json",
       "url": "source_research_required"
     },
@@ -271,7 +271,7 @@
       "license_or_terms": "To be recorded from the authoritative Costa Rica provider before use.",
       "provider": "costa_rica_hydrology_source_review",
       "source_id": "costa_rica_hydrology_gauge_search",
-      "status": "source_research_required",
+      "status": "official_source_leads_attached",
       "title": "Pacuare basin discharge, stage, rainfall, and transfer-function review",
       "url": "source_research_required",
       "use_in_pipeline": [
@@ -286,7 +286,7 @@
       "license_or_terms": "Record access, conservation, attribution, and redistribution constraints before packaging.",
       "provider": "SINAC/MINAE source-rights review",
       "source_id": "sinac_protected_area_review",
-      "status": "source_research_required",
+      "status": "official_source_leads_attached",
       "title": "Protected-area, conservation, and access review",
       "url": "source_research_required",
       "use_in_pipeline": [

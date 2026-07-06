@@ -1,0 +1,80 @@
+{
+  "schema": "raftsim.pacuare.terrain_source_research.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "review_gated_source_leads_attached",
+  "bounds_wgs84": {
+    "min_lon": -83.75,
+    "min_lat": 9.72,
+    "max_lon": -83.42,
+    "max_lat": 10.12
+  },
+  "working_crs_decision": "Do not promote a Pacuare heightfield until a Costa Rica working CRS, vertical datum handling, and Unreal georeference transform are recorded.",
+  "candidate_sources": [
+    {
+      "source_id": "snit_cr_idecori",
+      "provider": "Sistema Nacional de Informacion Territorial de Costa Rica",
+      "url": "https://www.snitcr.go.cr/",
+      "status": "official_portal_review_required",
+      "target_use": [
+        "authoritative Costa Rica geospatial layer discovery",
+        "official hydrography and protected-area cross-check",
+        "possible national orthophoto or elevation layer discovery"
+      ],
+      "production_gate": "Record exact OGC service/layer names, CRS, access terms, attribution, and redistribution constraints before import."
+    },
+    {
+      "source_id": "copernicus_dem_glo30_public",
+      "provider": "Copernicus DEM GLO-30 Public on AWS Open Data",
+      "url": "https://registry.opendata.aws/copernicus-dem/",
+      "status": "draft_bounds_tiles_downloaded",
+      "target_use": [
+        "rainforest gorge slope and relief preview",
+        "fallback corridor heightfield source",
+        "cross-check against Costa Rica official layers"
+      ],
+      "attached_artifacts": [
+        "terrain/copernicus_dem_glo30_N09_W084.tif",
+        "terrain/copernicus_dem_glo30_N10_W084.tif",
+        "terrain/pacuare_dem_relief_preview_1024.png"
+      ],
+      "production_gate": "Clip, reproject, void-review, hydrologically condition, and compare against official or field-reviewed references before Unreal Landscape promotion."
+    },
+    {
+      "source_id": "opentopography",
+      "provider": "OpenTopography",
+      "url": "https://opentopography.org/",
+      "status": "api_key_required_recorded",
+      "target_use": [
+        "high-resolution terrain dataset discovery",
+        "SRTMGL1 fallback only after key and terms review"
+      ],
+      "attached_artifacts": [
+        "terrain/opentopography_srtmgl1_pacuare_probe_response.txt"
+      ],
+      "production_gate": "Register an API key, record dataset-specific terms, and keep raw pulls out of packaged content until redistribution is approved."
+    },
+    {
+      "source_id": "hydrosheds",
+      "provider": "HydroSHEDS",
+      "url": "https://www.hydrosheds.org/",
+      "status": "planned_basin_context",
+      "target_use": [
+        "basin and stream-network context",
+        "rainfall-runoff sanity checks"
+      ],
+      "production_gate": "Use as contextual validation unless license review approves packaged derivative data."
+    }
+  ],
+  "next_actions": [
+    "Inventory SNIT/IDECORI OGC services for DEM, contours, hydrography, protected areas, and orthophotos covering the Pacuare planning bounds.",
+    "Select the Pacuare working CRS and vertical datum conversion before producing any Unreal heightfield.",
+    "Clip and condition the Copernicus DEM tiles into a draft corridor heightfield, then compare slope/channel placement against official layers and guide review."
+  ],
+  "do_not_use_yet": [
+    "Unattributed third-party route maps",
+    "Guidebook-derived geometry without permission",
+    "Social media imagery as texture or training data"
+  ]
+}

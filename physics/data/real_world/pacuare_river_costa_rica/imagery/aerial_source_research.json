@@ -1,0 +1,94 @@
+{
+  "schema": "raftsim.pacuare.imagery_source_research.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "review_gated_source_leads_attached",
+  "imagery_policy": {
+    "official_open_sources_first": true,
+    "social_media_reference_only": true,
+    "no_scraping": true,
+    "no_training_or_texture_use_without_item_level_rights": true
+  },
+  "candidate_sources": [
+    {
+      "source_id": "nasa_gibs_modis_truecolor",
+      "provider": "NASA GIBS WMS",
+      "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi",
+      "status": "cloud_screened_preview_sample_downloaded",
+      "target_use": [
+        "coarse rainforest color reference",
+        "preview-only source drape",
+        "cloud-screening workflow proof"
+      ],
+      "attached_artifacts": [
+        "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
+        "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png"
+      ],
+      "production_gate": "Replace or supplement with higher-resolution cloud-screened imagery before photoreal approval."
+    },
+    {
+      "source_id": "copernicus_sentinel",
+      "provider": "Copernicus Data Space Ecosystem",
+      "url": "https://dataspace.copernicus.eu/",
+      "status": "planned_cloud_screened_scene_review",
+      "target_use": [
+        "higher-resolution seasonal vegetation and river-color review",
+        "water and canopy masks",
+        "cloud-free corridor reference"
+      ],
+      "production_gate": "Record scene ids, acquisition dates, processing level, cloud score, terms, and attribution before derivatives are committed."
+    },
+    {
+      "source_id": "landsat",
+      "provider": "USGS/NASA Landsat",
+      "url": "https://www.usgs.gov/landsat-missions/landsat-data-access",
+      "status": "planned_seasonal_history_review",
+      "target_use": [
+        "longer-term seasonal context",
+        "vegetation and water-color sanity checks",
+        "rainy/dry season comparison"
+      ],
+      "production_gate": "Record scene ids and dates; use as context unless resolution is sufficient for a specific mask."
+    },
+    {
+      "source_id": "snit_cr_orthophoto_layer_discovery",
+      "provider": "Sistema Nacional de Informacion Territorial de Costa Rica",
+      "url": "https://www.snitcr.go.cr/",
+      "status": "official_layer_discovery_required",
+      "target_use": [
+        "Costa Rica official imagery or orthophoto discovery",
+        "access roads, bridges, banks, and vegetation edge cross-checks"
+      ],
+      "production_gate": "Record exact service, layer, date, resolution, terms, and allowed redistribution before using imagery in Unreal."
+    },
+    {
+      "source_id": "first_party_or_permissioned_field_media",
+      "provider": "first-party capture or explicit outfitter/guide permission",
+      "url": "manifest_only_until_rights_clear",
+      "status": "required_for_lifelike_rainforest_detail",
+      "target_use": [
+        "wet rock and bank material reference",
+        "tropical canopy density",
+        "mist, spray, wood debris, and guide-seat perspective"
+      ],
+      "production_gate": "Attach creator, date, location, flow/weather context, permission, and attribution before packaging or texture derivation."
+    }
+  ],
+  "reference_only_social_media": {
+    "status": "link_only_review_seeds_allowed",
+    "allowed_use": "human fidelity review only after item-level rights are recorded",
+    "blocked_use": [
+      "download",
+      "scrape",
+      "train",
+      "texture",
+      "package"
+    ]
+  },
+  "next_actions": [
+    "Pull Sentinel/Landsat candidate scene metadata for dry, runnable rainfed, and high-rain periods.",
+    "Identify any official SNIT orthophoto services covering the Pacuare bounds.",
+    "Build a rights-cleared field-media request list for guides/outfitters before using non-official photos."
+  ]
+}
