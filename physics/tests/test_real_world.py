@@ -24,6 +24,8 @@ from raftsim.real_world import (
     COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
     COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE,
     COLORADO_PRODUCTION_IMPORT_PILOT_FILE,
+    COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE,
+    COLORADO_PRODUCTION_SANDBARS_FILE,
     COLORADO_RELEASE_BAND_REVIEW_FILE,
     COLORADO_USBR_RELEASE_CONTEXT_FILE,
     COLORADO_USBR_TOTAL_RELEASE_FILE,
@@ -74,7 +76,9 @@ from raftsim.real_world import (
     build_candidate_river_inventory_package,
     build_colorado_access_publication_review,
     build_colorado_production_import_pilot,
+    build_colorado_river_mile_markers_geojson,
     build_colorado_release_band_review,
+    build_colorado_sandbar_review_seeds_geojson,
     build_course_elevation_extraction,
     build_pacuare_access_conservation_policy,
     build_pacuare_discharge_stage_station_review,
@@ -573,6 +577,8 @@ def test_colorado_production_import_pilot_exposes_lees_ferry_tile_plan_and_revie
     assert COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert COLORADO_PRODUCTION_BANKS_DRAFT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert COLORADO_PRODUCTION_SANDBARS_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert classes["seasonal_flow_or_release_history"]["status"] == (
         "usgs_daily_discharge_and_usbr_release_context_attached_review_pending"
     )
@@ -904,19 +910,41 @@ def test_colorado_production_hydrography_drafts_are_review_gated():
     colorado_dir = REAL_WORLD_DATA_DIR / "colorado_river_grand_canyon_rowing"
     source_manifest = json.loads((colorado_dir / "source_manifest.json").read_text())
     pull_manifest = json.loads((colorado_dir / "production_source_pull_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+    stationing = json.loads((colorado_dir / COLORADO_NHD_MAINSTEM_STATIONING_FILE).read_text())
     manifest = json.loads((colorado_dir / COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE).read_text())
     centerline = json.loads((colorado_dir / COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE).read_text())
     banks = json.loads((colorado_dir / COLORADO_PRODUCTION_BANKS_DRAFT_FILE).read_text())
     cross_sections = json.loads((colorado_dir / COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE).read_text())
+    river_miles = json.loads((colorado_dir / COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE).read_text())
+    sandbars = json.loads((colorado_dir / COLORADO_PRODUCTION_SANDBARS_FILE).read_text())
+    expected_river_miles = build_colorado_river_mile_markers_geojson(stationing)
+    expected_sandbars = build_colorado_sandbar_review_seeds_geojson(stationing)
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+    photoreal_rivers = {river["river_id"]: river for river in photoreal_sources["rivers"]}
 
     assert COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE in source_manifest["artifacts"]["hydrography"]
     assert COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE in source_manifest["artifacts"]["hydrography"]
     assert COLORADO_PRODUCTION_BANKS_DRAFT_FILE in source_manifest["artifacts"]["hydrography"]
     assert COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in source_manifest["artifacts"]["hydrography"]
+    assert COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE in source_manifest["artifacts"]["hydrography"]
+    assert COLORADO_PRODUCTION_SANDBARS_FILE in source_manifest["artifacts"]["hydrography"]
     assert any(
         artifact["artifact_id"] == "colorado_production_hydrography_drafts"
         for artifact in pull_manifest["pulled_artifacts"]
     )
+    assert any(
+        artifact["artifact_id"] == "colorado_river_mile_and_sandbar_review_seeds"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert river_miles == expected_river_miles
+    assert sandbars == expected_sandbars
     assert manifest["schema"] == "raftsim.colorado_production_hydrography_drafts.manifest.v1"
     assert manifest["summary"]["centerline_vertex_count"] == 145
     assert manifest["summary"]["centerline_station_sample_count"] == 244
@@ -943,6 +971,27 @@ def test_colorado_production_hydrography_drafts_are_review_gated():
         "draft_review_lines_not_solver_cross_sections_or_sandbar_boundaries"
     )
     assert len(cross_sections["features"]) == 123
+    assert river_miles["schema"] == "raftsim.colorado_river_mile_markers.geojson.v1"
+    assert river_miles["status"] == "preview_river_mile_markers_from_nhd_stationing_not_official"
+    assert len(river_miles["features"]) == 16
+    assert river_miles["features"][0]["properties"]["preview_river_mile"] == 0
+    assert sandbars["schema"] == "raftsim.colorado_sandbar_review_seeds.geojson.v1"
+    assert sandbars["status"] == "release_sensitive_sandbar_review_seeds_not_authoritative"
+    assert len(sandbars["features"]) == 6
+    assert all(feature["geometry"]["type"] == "Polygon" for feature in sandbars["features"])
+    assert (
+        "physics/data/real_world/colorado_river_grand_canyon_rowing/"
+        + COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE
+        in rivers["colorado_river"]["attached_sources_by_class"]["hydrography_and_centerline"]["artifacts"]
+    )
+    assert (
+        "physics/data/real_world/colorado_river_grand_canyon_rowing/" + COLORADO_PRODUCTION_SANDBARS_FILE
+        in rivers["colorado_river"]["attached_sources_by_class"]["hydrography_and_centerline"]["artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "colorado_river_mile_and_sandbar_review_seeds"
+        for artifact in photoreal_rivers["colorado_river"]["source_sample_artifacts"]
+    )
     assert all(
         feature["properties"]["status"] == "draft_production_import_cross_section_review_line_not_solver_section"
         for feature in cross_sections["features"]
@@ -1541,6 +1590,8 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_PRODUCTION_BANKS_DRAFT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_PRODUCTION_SANDBARS_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_TOTAL_RELEASE_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_RELEASE_BAND_REVIEW_FILE in rivers["colorado_river"]["attached_preview_inputs"]

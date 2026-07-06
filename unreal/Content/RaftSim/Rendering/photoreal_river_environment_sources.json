@@ -698,6 +698,14 @@
           "provider": "RaftSim generated link-only media rights gate",
           "status": "candidate_links_only_no_rights_cleared",
           "unreal_use": "Blocks texture, photogrammetry, AI-training, packaged media, marketing, or production-art use until item-level rights and guide review are recorded."
+        },
+        {
+          "artifact_id": "colorado_river_mile_and_sandbar_review_seeds",
+          "category": "hydrography_and_centerline_review",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/river_mile_markers.geojson; physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/sandbars.geojson",
+          "provider": "RaftSim generated review overlays from Colorado NHD Lees Ferry stationing candidate",
+          "status": "preview_river_mile_and_sandbar_review_seeds_not_authoritative",
+          "unreal_use": "Editor overlays for river-mile orientation, release-sensitive sandbar/wet-bank review, and oarsman notes; not final route or camp/beach authority."
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"

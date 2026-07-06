@@ -631,6 +631,35 @@
         "candidate_link_inventory",
         "permission_outreach_planning"
       ]
+    },
+    {
+      "artifact_id": "colorado_river_mile_and_sandbar_review_seeds",
+      "category": "hydrography_and_centerline_review",
+      "caveats": [
+        "Preview river-mile markers are derived from NHD stationing and are not official Grand Canyon river-mile stationing.",
+        "Sandbar polygons are coarse review seeds, not geomorphic boundaries, camps, beaches, or access/publication authority.",
+        "Review against NPS/GCMRC context, imagery, DEM relief, release bands, and oarsman notes before production use."
+      ],
+      "paths": [
+        "hydrography/production_import_pilot/river_mile_markers.geojson",
+        "hydrography/production_import_pilot/sandbars.geojson"
+      ],
+      "provider": "RaftSim generated review overlays from Colorado NHD Lees Ferry stationing candidate",
+      "related_artifacts": [
+        "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json"
+      ],
+      "status": "preview_river_mile_and_sandbar_review_seeds_not_authoritative",
+      "summary": {
+        "river_mile_marker_count": 16,
+        "sandbar_review_seed_count": 6,
+        "stationing_source": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json"
+      },
+      "use": [
+        "river_mile_review_overlay",
+        "sandbar_and_wet_bank_review_seed",
+        "release_band_visual_planning",
+        "oarsman_review_queue"
+      ]
     }
   ],
   "river_id": "colorado_river",

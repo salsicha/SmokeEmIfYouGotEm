@@ -123,6 +123,8 @@ COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE = (
 COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE = "hydrography/production_import_pilot/centerline.geojson"
 COLORADO_PRODUCTION_BANKS_DRAFT_FILE = "hydrography/production_import_pilot/banks.geojson"
 COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE = "hydrography/production_import_pilot/cross_sections.geojson"
+COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE = "hydrography/production_import_pilot/river_mile_markers.geojson"
+COLORADO_PRODUCTION_SANDBARS_FILE = "hydrography/production_import_pilot/sandbars.geojson"
 COLORADO_USBR_TOTAL_RELEASE_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json"
 COLORADO_USBR_RELEASE_CONTEXT_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json"
 COLORADO_RELEASE_BAND_REVIEW_FILE = "hydrology/production_import_pilot/release_band_review.json"
@@ -1459,8 +1461,8 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
                     COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE,
                     COLORADO_PRODUCTION_BANKS_DRAFT_FILE,
                     COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
-                    "hydrography/production_import_pilot/river_mile_markers.geojson",
-                    "hydrography/production_import_pilot/sandbars.geojson",
+                    COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE,
+                    COLORADO_PRODUCTION_SANDBARS_FILE,
                 ],
                 "promotion_gate": (
                     "Use the attached stitched NHD HU8 source overlay, exact-graph mainstem candidate, preview "
@@ -3265,6 +3267,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE,
                     COLORADO_PRODUCTION_BANKS_DRAFT_FILE,
                     COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
+                    COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE,
+                    COLORADO_PRODUCTION_SANDBARS_FILE,
                     "hydrology/usgs_09380000_daily_discharge.json",
                     "hydrology/usgs_09402500_daily_discharge.json",
                     COLORADO_USBR_TOTAL_RELEASE_FILE,
@@ -3292,8 +3296,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE,
                             COLORADO_PRODUCTION_BANKS_DRAFT_FILE,
                             COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
-                            "hydrography/production_import_pilot/river_mile_markers.geojson",
-                            "hydrography/production_import_pilot/sandbars.geojson",
+                            COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE,
+                            COLORADO_PRODUCTION_SANDBARS_FILE,
                         ],
                         "source_leads": ["usgs_3dhp", "nps_grand_canyon_media", "gcmrc_or_river_mile_context"],
                         "promotion_gate": "Promote the attached stitched NHD HU8 source overlay, exact-graph mainstem candidate, preview metric stationing, cross-section seeds, and preview alignment diagnostic only after river mile stationing, visible flowline/water-edge alignment, exposed sandbars, eddies, camps/access sensitivity, and oarsman review pass.",
@@ -4127,6 +4131,152 @@ def build_south_fork_evacuation_rescue_routes_geojson(
         "source_access_review": SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
         "stationing_source": SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
         "policy": _south_fork_access_annotation_policy(),
+        "features": features,
+    }
+
+
+def build_colorado_river_mile_markers_geojson(stationing: dict[str, object]) -> dict[str, object]:
+    """Build preview river-mile marker seeds from Colorado NHD stationing."""
+
+    mile_m = 1609.344
+    length_m = float(stationing["summary"]["length_m_geodesic_vertices"])
+    marker_count = int(length_m // mile_m) + 1
+    features: list[dict[str, object]] = []
+    for mile in range(marker_count):
+        station_m = mile * mile_m
+        coordinates, station_properties = _stationed_point(stationing, station_m)
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": {"type": "Point", "coordinates": coordinates},
+                "properties": {
+                    "annotation_id": f"colorado_preview_river_mile_{mile:03d}",
+                    "river_id": "colorado_river",
+                    "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+                    "feature_role": "preview_river_mile_marker_review_seed",
+                    "preview_river_mile": mile,
+                    "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+                    "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative",
+                    **station_properties,
+                    "promotion_gate": (
+                        "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, "
+                        "release-aware water edge review, and oarsman validation before production route use."
+                    ),
+                },
+            }
+        )
+    return {
+        "type": "FeatureCollection",
+        "schema": "raftsim.colorado_river_mile_markers.geojson.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "status": "preview_river_mile_markers_from_nhd_stationing_not_official",
+        "stationing_source": COLORADO_NHD_MAINSTEM_STATIONING_FILE,
+        "policy": {
+            "geometry_authority": "review_seed_from_nhd_stationing_not_official_river_miles",
+            "allowed_use": [
+                "editor route orientation",
+                "oarsman review queue",
+                "future NPS/GCMRC river-mile comparison",
+            ],
+            "forbidden_use": [
+                "official Grand Canyon river-mile stationing",
+                "permit or route-publication authority",
+                "production gameplay distance claims",
+            ],
+        },
+        "features": features,
+    }
+
+
+def build_colorado_sandbar_review_seeds_geojson(stationing: dict[str, object]) -> dict[str, object]:
+    """Build release-sensitive Colorado sandbar review seed polygons."""
+
+    seed_definitions = [
+        ("lees_ferry_margin_sandbar_review_seed", 1600.0, "river_left", 1),
+        ("paria_context_sandbar_review_seed", 4500.0, "river_right", -1),
+        ("cathedral_wash_margin_sandbar_review_seed", 7800.0, "river_left", 1),
+        ("marble_canyon_bend_sandbar_review_seed", 11800.0, "river_right", -1),
+        ("rowing_recovery_bar_review_seed", 16600.0, "river_left", 1),
+        ("downstream_wet_bank_sandbar_review_seed", 21000.0, "river_right", -1),
+    ]
+    features: list[dict[str, object]] = []
+    for annotation_id, station_m, side_label, side in seed_definitions:
+        upstream_inner, upstream_props = _stationed_point(
+            stationing,
+            station_m,
+            offset_left_m=side * 80.0,
+            offset_downstream_m=-180.0,
+        )
+        downstream_inner, _ = _stationed_point(
+            stationing,
+            station_m,
+            offset_left_m=side * 80.0,
+            offset_downstream_m=180.0,
+        )
+        downstream_outer, downstream_props = _stationed_point(
+            stationing,
+            station_m,
+            offset_left_m=side * 220.0,
+            offset_downstream_m=180.0,
+        )
+        upstream_outer, _ = _stationed_point(
+            stationing,
+            station_m,
+            offset_left_m=side * 220.0,
+            offset_downstream_m=-180.0,
+        )
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[upstream_inner, downstream_inner, downstream_outer, upstream_outer, upstream_inner]],
+                },
+                "properties": {
+                    "annotation_id": annotation_id,
+                    "river_id": "colorado_river",
+                    "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+                    "feature_role": "release_sensitive_sandbar_review_seed",
+                    "river_side_hint": side_label,
+                    "station_m": upstream_props["station_m"],
+                    "station_sample_index": upstream_props["station_sample_index"],
+                    "station_end_m": downstream_props["station_m"],
+                    "review_status": "preview_sandbar_seed_not_geomorphic_boundary_or_camp_beach_authority",
+                    "stationing_status": "coarse_polygon_from_nhd_stationing_candidate_not_sandbar_authority",
+                    "flow_dependency": (
+                        "Review exposed/wet/submerged state across low, moderate, high, and subdaily release variants "
+                        "before using this as art, rowing, camp/beach, or rescue geometry."
+                    ),
+                    "promotion_gate": (
+                        "Replace or approve against visible imagery, DEM relief, release-band history, NPS/GCMRC or "
+                        "guide/oarsman review, and access/publication sensitivity before production use."
+                    ),
+                },
+            }
+        )
+    return {
+        "type": "FeatureCollection",
+        "schema": "raftsim.colorado_sandbar_review_seeds.geojson.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "status": "release_sensitive_sandbar_review_seeds_not_authoritative",
+        "stationing_source": COLORADO_NHD_MAINSTEM_STATIONING_FILE,
+        "policy": {
+            "geometry_authority": "review_seed_from_nhd_stationing_not_geomorphic_or_camp_boundary",
+            "allowed_use": [
+                "editor sandbar and wet-bank review",
+                "release-band visual planning",
+                "oarsman review queue",
+            ],
+            "forbidden_use": [
+                "camp or beach publication authority",
+                "final sandbar geometry",
+                "release-dependent gameplay clearance",
+            ],
+        },
         "features": features,
     }
 
