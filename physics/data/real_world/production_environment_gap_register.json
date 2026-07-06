@@ -245,6 +245,8 @@
         "production_import_pilot/vegetation_mask_2048.png",
         "hydrology/usgs_09380000_daily_discharge.json",
         "hydrology/usgs_09402500_daily_discharge.json",
+        "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
+        "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
         "reference_media_link_manifest.json"
       ],
       "completion_gate": "Captures read as Grand Canyon big-water rowing, with river-mile scale, canyon atmosphere, sandbar/wet-bank variation, oar-rig sightlines, and rescue visibility intact.",
@@ -266,8 +268,9 @@
           ]
         },
         {
-          "promotion_gate": "Compare Glen Canyon release series with Lees Ferry and downstream gauges before final release-dependent visuals.",
+          "promotion_gate": "Use the attached Reclamation daily total-release context as review-gated evidence, then add hourly/subdaily release patterns, final unit/terms confirmation, Lees Ferry/downstream gauge comparisons, and oarsman review before final release-dependent visuals.",
           "required_artifacts": [
+            "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
             "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
             "hydrology/production_import_pilot/release_band_review.json"
           ],

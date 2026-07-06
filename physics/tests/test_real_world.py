@@ -7,6 +7,8 @@ from raftsim.real_world import (
     CANDIDATE_RIVER_INVENTORY_FILE,
     CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION,
     COLORADO_PRODUCTION_IMPORT_PILOT_FILE,
+    COLORADO_USBR_RELEASE_CONTEXT_FILE,
+    COLORADO_USBR_TOTAL_RELEASE_FILE,
     COURSE_ELEVATION_EXTRACTION_FILE,
     COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION,
     PACUARE_PRODUCTION_IMPORT_PILOT_FILE,
@@ -296,11 +298,49 @@ def test_colorado_production_import_pilot_exposes_lees_ferry_tile_plan_and_revie
         "guide_and_reference_media_annotations",
     }.issubset(classes)
     assert "usbr_glen_canyon_release_context" in classes["seasonal_flow_or_release_history"]["source_ids"]
+    assert classes["seasonal_flow_or_release_history"]["status"] == (
+        "usgs_daily_discharge_and_usbr_release_context_attached_review_pending"
+    )
+    assert COLORADO_USBR_TOTAL_RELEASE_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
+    assert COLORADO_USBR_RELEASE_CONTEXT_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert "sandbar_wet_bank_mask_2048.png" in " ".join(classes["water_and_vegetation_masks"]["target_outputs"])
     assert (
         pilot["unreal_import_targets"]["future_production_map"]
         == "/Game/RaftSim/Maps/Production/L_ColoradoGrandCanyon_LeesFerryRowing"
     )
+
+
+def test_colorado_usbr_glen_canyon_release_context_records_official_series_and_gauge_comparisons():
+    colorado_dir = REAL_WORLD_DATA_DIR / "colorado_river_grand_canyon_rowing"
+    source_manifest = json.loads((colorado_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((colorado_dir / "production_source_pull_manifest.json").read_text())
+    raw_release = json.loads((colorado_dir / COLORADO_USBR_TOTAL_RELEASE_FILE).read_text())
+    context = json.loads((colorado_dir / COLORADO_USBR_RELEASE_CONTEXT_FILE).read_text())
+
+    assert COLORADO_USBR_TOTAL_RELEASE_FILE in source_manifest["artifacts"]["gauges"]
+    assert COLORADO_USBR_RELEASE_CONTEXT_FILE in source_manifest["artifacts"]["gauges"]
+    assert any(source["source_id"] == "usbr_glen_canyon_release_context" for source in source_manifest["sources"])
+    assert any(
+        artifact["artifact_id"] == "usbr_glen_canyon_total_release_daily"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert raw_release["columns"] == ["datetime", "total release"]
+    assert len(raw_release["data"]) == 23125
+    assert context["status"] == "official_usbr_release_series_attached_review_gated"
+    assert context["source"]["dashboard_variable_id"] == "42"
+    assert context["source"]["raw_sha256"] == "41e5929b5dc6dc3e953943ed3e855284b5458001502ce8c449939c6c293c0ca0"
+    assert context["usbr_total_release_summary"]["all_available"]["valid_value_count"] == 23124
+    assert context["usbr_total_release_summary"]["all_available"]["first_valid_date"] == "1963-03-14"
+    assert context["usbr_total_release_summary"]["all_available"]["last_valid_date"] == "2026-07-05"
+    assert context["usbr_total_release_summary"]["water_year_2026_to_date"]["mean_cfs"] == 8426.237
+    assert context["release_visual_band_candidates"]["low_release_cfs"] == [7044.695, 7868.888]
+    assert context["release_visual_band_candidates"]["status"] == (
+        "review_gated_initial_thresholds_not_final_gameplay_bands"
+    )
+    lees_comparison = context["daily_comparisons"][0]
+    assert lees_comparison["comparison_id"] == "usbr_total_release_vs_usgs_09380000_lees_ferry_same_date"
+    assert lees_comparison["overlapping_valid_days"] == 23122
+    assert lees_comparison["mean_absolute_delta_cfs"] == 110.058
 
 
 def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_gates():
@@ -413,6 +453,8 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     )
     assert "USGS 11445500" in rivers["american_south_fork"]["procedural_generation_allowlist"][2]
     assert "release-band" in rivers["colorado_river"]["procedural_generation_allowlist"][2]
+    assert COLORADO_USBR_TOTAL_RELEASE_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_USBR_RELEASE_CONTEXT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert "waterfalls" in rivers["pacuare"]["completion_gate"]
 
 

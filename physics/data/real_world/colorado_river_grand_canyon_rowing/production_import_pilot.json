@@ -92,17 +92,18 @@
     },
     {
       "class_id": "seasonal_flow_or_release_history",
-      "promotion_gate": "Compare Glen Canyon release series against Lees Ferry and downstream USGS gauges, then record guide/oarsman review for low, moderate, high, and special-release visual/gameplay bands.",
+      "promotion_gate": "Use the attached Reclamation daily total-release series as review-gated context, confirm units and terms, compare with hourly/subdaily patterns plus Lees Ferry and downstream USGS gauges, then record guide/oarsman review for low, moderate, high, and special-release visual/gameplay bands.",
       "source_ids": [
         "usgs_water_services",
         "usgs_09380000_lees_ferry",
         "usgs_09402500_near_grand_canyon",
         "usbr_glen_canyon_release_context"
       ],
-      "status": "usgs_daily_discharge_attached_release_context_pending",
+      "status": "usgs_daily_discharge_and_usbr_release_context_attached_review_pending",
       "target_outputs": [
         "hydrology/production_import_pilot/usgs_09380000_instantaneous_discharge.json",
         "hydrology/production_import_pilot/usgs_09402500_instantaneous_discharge.json",
+        "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
         "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
         "hydrology/production_import_pilot/release_band_review.json"
       ]

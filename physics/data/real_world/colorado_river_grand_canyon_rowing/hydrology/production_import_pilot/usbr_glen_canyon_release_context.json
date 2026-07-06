@@ -1,0 +1,159 @@
+{
+  "daily_comparisons": [
+    {
+      "caveat": "Daily same-date comparison only; downstream gauge timing, routing, tributaries, side storage, measurement basis, and provisional revisions still need hydrologist/guide review.",
+      "comparison_id": "usbr_total_release_vs_usgs_09380000_lees_ferry_same_date",
+      "first_overlap_date": "1963-03-14",
+      "last_overlap_date": "2026-07-03",
+      "max_absolute_delta_cfs": 9911.747,
+      "max_absolute_delta_date": "1999-03-10",
+      "max_absolute_delta_values_cfs": {
+        "usbr_total_release": 3788.253,
+        "usgs_discharge": 13700.0
+      },
+      "mean_absolute_delta_cfs": 110.058,
+      "mean_signed_delta_cfs": -77.066,
+      "overlapping_valid_days": 23122,
+      "p95_absolute_delta_cfs": 439.776
+    },
+    {
+      "caveat": "Daily same-date comparison only; downstream gauge timing, routing, tributaries, side storage, measurement basis, and provisional revisions still need hydrologist/guide review.",
+      "comparison_id": "usbr_total_release_vs_usgs_09402500_near_grand_canyon_same_date",
+      "first_overlap_date": "1963-03-14",
+      "last_overlap_date": "2026-07-03",
+      "max_absolute_delta_cfs": 25610.0,
+      "max_absolute_delta_date": "1978-12-23",
+      "max_absolute_delta_values_cfs": {
+        "usbr_total_release": 7790.0,
+        "usgs_discharge": 33400.0
+      },
+      "mean_absolute_delta_cfs": 1419.232,
+      "mean_signed_delta_cfs": -623.646,
+      "overlapping_valid_days": 22393,
+      "p95_absolute_delta_cfs": 4433.639
+    }
+  ],
+  "generated_on": "2026-07-06",
+  "promotion_gates": [
+    "Confirm Reclamation unit metadata and terms before this drives final flow bands.",
+    "Compare against hourly/subdaily release patterns, Lees Ferry stage, guide/oarsman review, and river-mile travel-time effects before gameplay authority.",
+    "Keep current Unreal release visual bands preview-only until sandbar/wet-bank masks and oar-line annotations are reviewed at multiple releases."
+  ],
+  "release_visual_band_candidates": {
+    "high_release_cfs": [
+      8605.693,
+      10303.314
+    ],
+    "low_release_cfs": [
+      7044.695,
+      7868.888
+    ],
+    "source_window": "water_year_2026_to_date",
+    "standard_release_cfs": [
+      7868.888,
+      8605.693
+    ],
+    "status": "review_gated_initial_thresholds_not_final_gameplay_bands",
+    "use": [
+      "preview water-level variants",
+      "sandbar/wet-bank exposure candidates",
+      "big-water boil and wave-train tuning seeds"
+    ],
+    "very_high_or_experimental_review_cfs": [
+      10303.314,
+      10878.062
+    ]
+  },
+  "river_id": "colorado_river",
+  "schema": "raftsim.colorado_glen_canyon_release_context.v0",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "source": {
+    "dashboard_url": "https://www.usbr.gov/uc/water/hydrodata/reservoir_data/919/dashboard.html",
+    "dashboard_variable_id": "42",
+    "dashboard_variable_label": "Total Release",
+    "json_url": "https://www.usbr.gov/uc/water/hydrodata/reservoir_data/919/json/42.json",
+    "provider": "Bureau of Reclamation Upper Colorado Region hydrodata",
+    "provisional_note": "Dashboard states all data are provisional and subject to revision.",
+    "raw_artifact": "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
+    "raw_columns": [
+      "datetime",
+      "total release"
+    ],
+    "raw_sha256": "41e5929b5dc6dc3e953943ed3e855284b5458001502ce8c449939c6c293c0ca0",
+    "reservoir_site": "Lake Powell / Glen Canyon Dam",
+    "unit_assumption": "cfs inferred from Reclamation total-release hydrodata magnitudes and comparison to USGS discharge; downloaded dashboard/JSON did not include explicit unit metadata, so confirm before final gameplay tuning."
+  },
+  "status": "official_usbr_release_series_attached_review_gated",
+  "usbr_total_release_summary": {
+    "all_available": {
+      "first_valid_date": "1963-03-14",
+      "last_valid_date": "2026-07-05",
+      "max_cfs": 92600.0,
+      "mean_cfs": 12904.162,
+      "median_cfs": 11833.119,
+      "min_cfs": 869.0,
+      "null_value_count": 1,
+      "p05_cfs": 5651.5,
+      "p25_cfs": 9509.807,
+      "p75_cfs": 14895.344,
+      "p95_cfs": 24000.0,
+      "valid_value_count": 23124
+    },
+    "last_365_available_days": {
+      "first_valid_date": "2025-07-06",
+      "last_valid_date": "2026-07-05",
+      "max_cfs": 12754.211,
+      "mean_cfs": 9066.979,
+      "median_cfs": 8494.579,
+      "min_cfs": 7044.695,
+      "null_value_count": 1,
+      "p05_cfs": 7187.138,
+      "p25_cfs": 8064.207,
+      "p75_cfs": 9662.905,
+      "p95_cfs": 12383.509,
+      "valid_value_count": 364
+    },
+    "post_2000_operations": {
+      "first_valid_date": "2000-01-01",
+      "last_valid_date": "2026-07-05",
+      "max_cfs": 42982.766,
+      "mean_cfs": 11646.191,
+      "median_cfs": 11151.733,
+      "min_cfs": 4017.23,
+      "null_value_count": 1,
+      "p05_cfs": 7943.203,
+      "p25_cfs": 9678.506,
+      "p75_cfs": 13364.982,
+      "p95_cfs": 15998.584,
+      "valid_value_count": 9682
+    },
+    "water_year_2026_to_date": {
+      "first_valid_date": "2025-10-01",
+      "last_valid_date": "2026-07-05",
+      "max_cfs": 10878.062,
+      "mean_cfs": 8426.237,
+      "median_cfs": 8237.467,
+      "min_cfs": 7044.695,
+      "null_value_count": 1,
+      "p05_cfs": 7141.164,
+      "p25_cfs": 7868.888,
+      "p75_cfs": 8605.693,
+      "p95_cfs": 10303.314,
+      "valid_value_count": 277
+    }
+  },
+  "usgs_gauge_inputs": [
+    {
+      "artifact": "hydrology/usgs_09380000_daily_discharge.json",
+      "comparison_role": "near-dam launch gauge",
+      "name": "Colorado River at Lees Ferry, AZ",
+      "site": "09380000"
+    },
+    {
+      "artifact": "hydrology/usgs_09402500_daily_discharge.json",
+      "comparison_role": "downstream Grand Canyon propagation gauge",
+      "name": "Colorado River near Grand Canyon, AZ",
+      "site": "09402500"
+    }
+  ]
+}

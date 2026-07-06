@@ -148,14 +148,14 @@
     },
     {
       "production_use": "Glen Canyon Dam release context for rowing flow bands and big-water feature timing",
-      "promotion_gate": "Attach release series/metadata and compare against USGS Lees Ferry and downstream gauges before final Colorado flow presets.",
+      "promotion_gate": "Attached daily total-release series is review-gated; confirm unit metadata/terms, add hourly/subdaily operations where needed, and compare against USGS Lees Ferry/downstream gauges plus guide/oarsman review before final Colorado flow presets.",
       "provider": "Bureau of Reclamation",
       "source_class": "seasonal_flow_or_release_history",
       "source_id": "usbr_glen_canyon_release_context",
       "target_rivers": [
         "colorado_river"
       ],
-      "url": "https://www.usbr.gov/uc/water/hydrodata/gc/"
+      "url": "https://www.usbr.gov/uc/water/hydrodata/reservoir_data/919/dashboard.html"
     },
     {
       "production_use": "River trip context, launch/takeout sensitivity, route review, official media leads",
@@ -320,10 +320,12 @@
           "artifacts": [
             "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/usgs_09380000_daily_discharge.json",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/usgs_09402500_daily_discharge.json",
-            "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json"
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/usbr_glen_canyon_release_context.json"
           ],
-          "promotion_blocker": "USBR Glen Canyon Dam release context and guide/oarsman review are still needed before final release-dependent visuals.",
-          "status": "usgs_daily_discharge_attached_release_context_pending"
+          "promotion_blocker": "USBR Glen Canyon daily total-release context is attached and compared against USGS daily gauges, but unit/terms confirmation, hourly/subdaily operations, release-band variants, river-mile travel-time review, and guide/oarsman approval are still required before final release-dependent visuals.",
+          "status": "usgs_daily_discharge_and_usbr_release_context_attached_review_pending"
         },
         "terrain_dem_or_lidar": {
           "artifacts": [
