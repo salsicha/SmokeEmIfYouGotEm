@@ -2,6 +2,8 @@
 
 Open `unreal/SmokeEmIfYouGotEm.uproject` in Unreal Editor 5.8 and use the `RaftSim Tools` menu as the entry point for tooling review. The menu opens dockable Slate tabs for each tool surface and includes utility commands for opening every tool, creating reviewed DataAssets, and capturing screenshot evidence.
 
+For a step-by-step editing, playtesting, and new-river authoring guide, see `docs/editing-playtesting-and-river-authoring-walkthrough.md`.
+
 ## Replay + Debug Viewer
 
 Use this first. It loads the Milestone 10 replay package, timeline bookmarks, force telemetry, and live-water debug overlay definitions. Review depth, velocity, Froude, wet/dry, feature tags, conservation deltas, raft trajectory, contact probes, and runtime budget overlays before allowing live physics to drive the same view.
