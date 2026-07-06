@@ -304,19 +304,19 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.MapPackagePath = TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview");
     Pacuare.SourceManifest = TEXT("physics/data/real_world/pacuare_river_costa_rica/source_manifest.json");
     Pacuare.AerialDrapeImage =
-        TEXT("physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png");
+        TEXT("physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/source_drape_4096.png");
     Pacuare.TerrainReliefImage =
-        TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_1024.png");
+        TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/dem_relief_2048.png");
     Pacuare.HeightfieldPreviewImage =
-        TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png");
+        TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/heightfield_candidate_2017.png");
     Pacuare.WaterMaskImage =
-        TEXT("physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_water_mask_1024.png");
+        TEXT("physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png");
     Pacuare.VegetationMaskImage =
-        TEXT("physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_vegetation_mask_1024.png");
+        TEXT("physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png");
     Pacuare.ElevationSample =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
-        TEXT("larger deterministic 1024px preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, sampled into a denser terrain-conforming rainforest source-drape mosaic with cloud gaps filled by DEM-derived shading; larger derived 1024px Copernicus DEM relief preview and review-gated 1009px heightfield candidate sampled into Pacuare bank and gorge preview geometry; review-gated source water/vegetation masks sampled into terrain color and deterministic wet-rock, talus, rainforest foliage, and understory placement; first-party procedural rainforest leaf-litter, wet-rock, talus, and vertex-color water-gradient detail generated as rights-safe proxy dressing; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water shaders, waterfalls, foam, raft, and lighting remain proxy layers");
+        TEXT("review-gated Pacuare production-import derivative placeholders generated from the selected NASA GIBS MODIS/Terra true-color seed and Copernicus DEM GLO-30 relief, normalized into a 4096px source drape, 2048px DEM relief, 2017px heightfield candidate, and 2048px water/vegetation masks; these remain coarse/cloudy proxy inputs until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, and vertex-color water-gradient detail remains rights-safe proxy dressing; rocks, foliage, water shaders, waterfalls, foam, raft, and lighting remain proxy layers");
     Pacuare.FlowBandId = TEXT("rainfed_runnable_planning");
     Pacuare.FlowBandDisplayName = TEXT("Rain-Fed Runnable Planning");
     Pacuare.FlowBandSource = TEXT("physics/data/real_world/pacuare_river_costa_rica/flow_presets.json");
