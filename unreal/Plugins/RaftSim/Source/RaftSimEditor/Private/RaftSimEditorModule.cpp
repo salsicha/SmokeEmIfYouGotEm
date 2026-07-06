@@ -1071,7 +1071,6 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     UStaticMesh* CubeMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
     UStaticMesh* PlaneMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Plane.Plane"));
     UStaticMesh* SphereMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
-    UStaticMesh* ConeMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Cone.Cone"));
     UStaticMesh* CylinderMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
     UStaticMesh* PcgBoulderMesh = LoadPreviewMesh(TEXT("/PCG/SampleContent/SimpleForest/Meshes/PCG_Boulder_02.PCG_Boulder_02"));
 
@@ -1110,22 +1109,38 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         const float Y = CenterY + Side * (BankOffset + 210.0f * FMath::Sin(static_cast<float>(FoliageIndex) * 1.31f));
         const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y);
         const float Height = Spec.bHasWaterfalls ? 2.35f + 0.28f * static_cast<float>(FoliageIndex % 5) : (Spec.bDesertCanyon ? 0.50f : 1.45f + 0.18f * static_cast<float>(FoliageIndex % 3));
+        const float CanopyWidth = Spec.bHasWaterfalls ? 1.35f + 0.18f * static_cast<float>(FoliageIndex % 4) : (Spec.bDesertCanyon ? 0.55f : 0.92f + 0.10f * static_cast<float>(FoliageIndex % 3));
+        const FLinearColor CanopyColor = Spec.bDesertCanyon
+            ? FLinearColor(0.22f, 0.28f, 0.13f)
+            : FLinearColor(
+                  FMath::Clamp(Spec.FoliageColor.R + 0.025f * static_cast<float>(FoliageIndex % 3), 0.0f, 1.0f),
+                  FMath::Clamp(Spec.FoliageColor.G + 0.055f * static_cast<float>((FoliageIndex + 1) % 4), 0.0f, 1.0f),
+                  FMath::Clamp(Spec.FoliageColor.B + 0.025f * static_cast<float>((FoliageIndex + 2) % 3), 0.0f, 1.0f));
         AddPreviewMeshActor(
             World,
             CylinderMesh,
             FString::Printf(TEXT("RaftSim_FoliageTrunk_%02d_%s"), FoliageIndex, *Spec.RiverId),
-            FVector(X, Y, TerrainZ + 95.0f * Height * 0.45f),
+            FVector(X, Y, TerrainZ + 78.0f * Height * 0.46f),
             FRotator::ZeroRotator,
-            FVector(Spec.bDesertCanyon ? 0.18f : 0.24f, Spec.bDesertCanyon ? 0.18f : 0.24f, Height),
+            FVector(Spec.bDesertCanyon ? 0.11f : 0.14f, Spec.bDesertCanyon ? 0.11f : 0.14f, Height * 0.82f),
             Spec.bDesertCanyon ? FLinearColor(0.21f, 0.18f, 0.10f) : FLinearColor(0.20f, 0.12f, 0.07f));
-        AddPreviewMeshActor(
-            World,
-            ConeMesh,
-            FString::Printf(TEXT("RaftSim_FoliageCanopy_%02d_%s"), FoliageIndex, *Spec.RiverId),
-            FVector(X, Y, TerrainZ + 140.0f * Height),
-            FRotator(0.0f, static_cast<float>((FoliageIndex * 47) % 360), 0.0f),
-            FVector(Spec.bHasWaterfalls ? 1.55f : (Spec.bDesertCanyon ? 0.62f : 1.0f), Spec.bHasWaterfalls ? 1.55f : (Spec.bDesertCanyon ? 0.62f : 1.0f), Height * 0.86f),
-            Spec.FoliageColor);
+
+        const int32 CanopyLobes = Spec.bHasWaterfalls ? 5 : (Spec.bDesertCanyon ? 2 : 3);
+        for (int32 LobeIndex = 0; LobeIndex < CanopyLobes; ++LobeIndex)
+        {
+            const float AngleRadians = FMath::DegreesToRadians(static_cast<float>((FoliageIndex * 47 + LobeIndex * 83) % 360));
+            const float Radius = (LobeIndex == 0) ? 0.0f : (Spec.bHasWaterfalls ? 82.0f : 56.0f);
+            const float LobeX = X + FMath::Cos(AngleRadians) * Radius;
+            const float LobeY = Y + FMath::Sin(AngleRadians) * Radius;
+            AddPreviewMeshActor(
+                World,
+                SphereMesh,
+                FString::Printf(TEXT("RaftSim_FoliageCanopy_%02d_%02d_%s"), FoliageIndex, LobeIndex, *Spec.RiverId),
+                FVector(LobeX, LobeY, TerrainZ + 112.0f * Height + 18.0f * static_cast<float>(LobeIndex % 3)),
+                FRotator(0.0f, static_cast<float>((FoliageIndex * 47 + LobeIndex * 19) % 360), 0.0f),
+                FVector(CanopyWidth * (1.08f - 0.08f * static_cast<float>(LobeIndex % 2)), CanopyWidth * (0.82f + 0.07f * static_cast<float>(LobeIndex % 3)), Height * (Spec.bHasWaterfalls ? 0.34f : 0.28f)),
+                CanopyColor);
+        }
 
         if (!Spec.bDesertCanyon && FoliageIndex % 4 == 0)
         {
@@ -1133,12 +1148,12 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             const float UnderstoryY = Y - Side * 180.0f;
             AddPreviewMeshActor(
                 World,
-                ConeMesh,
+                SphereMesh,
                 FString::Printf(TEXT("RaftSim_Understory_%02d_%s"), FoliageIndex, *Spec.RiverId),
-                FVector(UnderstoryX, UnderstoryY, GetPreviewTerrainHeightCm(Spec, UnderstoryX, UnderstoryY) + 22.0f),
+                FVector(UnderstoryX, UnderstoryY, GetPreviewTerrainHeightCm(Spec, UnderstoryX, UnderstoryY) + 34.0f),
                 FRotator(0.0f, static_cast<float>((FoliageIndex * 29) % 360), 0.0f),
-                FVector(0.44f, 0.44f, 0.42f),
-                Spec.FoliageColor);
+                FVector(0.56f, 0.42f, 0.28f),
+                CanopyColor);
         }
     }
 
@@ -1151,11 +1166,11 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             const float Y = GetPreviewRiverCenterY(Spec, X) + Side * 2200.0f;
             AddPreviewMeshActor(
                 World,
-                CubeMesh,
+                PlaneMesh,
                 FString::Printf(TEXT("RaftSim_RainforestWaterfall_%02d"), WaterfallIndex),
                 FVector(X, Y, 660.0f),
-                FRotator::ZeroRotator,
-                FVector(3.0f, 0.55f, 9.5f),
+                FRotator(0.0f, 0.0f, 90.0f),
+                FVector(4.2f, 12.0f, 1.0f),
                 FLinearColor(0.72f, 0.92f, 0.94f));
         }
     }
