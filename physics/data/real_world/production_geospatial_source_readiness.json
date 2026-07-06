@@ -191,6 +191,28 @@
         "pacuare"
       ],
       "url": "physics/data/real_world/reference_media_link_manifest.json"
+    },
+    {
+      "production_use": "Official Coloma/state-park access, park map, concession/outfitter, water-safety, restriction, and publication-sensitivity source lead.",
+      "promotion_gate": "Use as review evidence only until exact geometry, current restrictions, media/map rights, publication sensitivity, and guide/outfitter validation are attached.",
+      "provider": "California State Parks",
+      "source_class": "protected_area_and_access_context",
+      "source_id": "ca_state_parks_marshall_gold_discovery",
+      "target_rivers": [
+        "american_south_fork"
+      ],
+      "url": "https://www.parks.ca.gov/?page_id=484"
+    },
+    {
+      "production_use": "County GIS lead for parcels, roads, access, public/private land, evacuation, and route-publication context.",
+      "promotion_gate": "Select exact layers, CRS, terms, and attribution before importing geometry or using county context as access or emergency-route authority.",
+      "provider": "El Dorado County",
+      "source_class": "protected_area_and_access_context",
+      "source_id": "el_dorado_county_gis",
+      "target_rivers": [
+        "american_south_fork"
+      ],
+      "url": "https://experience.arcgis.com/experience/58a5b752c549418285583fc4c0301c29"
     }
   ],
   "goal": "Track the exact production geospatial, seasonal-flow, aerial, protected-access, and reference-media evidence required before South Fork American, Colorado River, and Pacuare Unreal environments can be promoted from source-aware previews to lifelike production river maps.",
@@ -251,9 +273,11 @@
           "status": "draft_production_import_hydrography_attached_review_pending"
         },
         "protected_area_and_access_context": {
-          "artifacts": [],
-          "promotion_blocker": "Need access, private/public land, put-in/take-out, evacuation, and sensitive-location review before detailed production maps.",
-          "status": "not_attached_for_production_publication"
+          "artifacts": [
+            "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/access_publication_sensitivity_review.json"
+          ],
+          "promotion_blocker": "The South Fork access/publication review attaches State Parks Marshall Gold Discovery and county GIS source leads, but exact put-in/take-out geometry, parcel/public-private land status, evacuation routes, sensitive-location screening, current restrictions, and guide/local approval remain open before detailed production maps or screenshots.",
+          "status": "official_state_park_and_county_gis_leads_attached_publication_geometry_pending"
         },
         "seasonal_flow_or_release_history": {
           "artifacts": [

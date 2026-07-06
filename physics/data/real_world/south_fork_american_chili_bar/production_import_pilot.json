@@ -110,11 +110,14 @@
       "class_id": "protected_area_and_access_context",
       "promotion_gate": "Review put-ins, take-outs, private/public land, evacuation points, sensitive locations, and what may appear in screenshots or maps.",
       "source_ids": [
+        "ca_state_parks_marshall_gold_discovery",
+        "el_dorado_county_gis",
         "official_land_access_review",
         "guide_review"
       ],
-      "status": "planned_review_required",
+      "status": "official_state_park_and_county_gis_leads_attached_review_required",
       "target_outputs": [
+        "review/production_import_pilot/access_publication_sensitivity_review.json",
         "review/production_import_pilot/access_points.geojson",
         "review/production_import_pilot/publication_sensitivity.json"
       ]
