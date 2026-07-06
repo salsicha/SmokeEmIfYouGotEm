@@ -237,6 +237,8 @@ Tasks:
 - Build the vertical-slice river corridor from `unreal/Content/RaftSim/Rendering/vertical_slice_environment_corridor.json`, with photoreal landscape/bed, banks, contact rocks, dense foliage, debris/access context, lighting/weather, audio occlusion geometry, and water-readability layers tied back to source manifests and guide-seat captures.
 - Gate the vertical slice with `unreal/Content/RaftSim/Automation/vertical_slice_acceptance_gate.json`, requiring build, completion, failure/rescue, restart, replay review, scoring, profiling, physics evidence, and river-fidelity review evidence.
 
+Milestone 11 crew safety is now closed by `unreal/Content/RaftSim/Automation/milestone11_crew_safety_gate.json` and the native `RaftSim.Milestone11.CrewSafetyGate` automation test. The gate loads the overboard-state, swimming-skill, swimmer-rescue, and gameplay-scoring manifests, then exercises the `RaftSimCrew` C++ state transition, seeded swim-skill, drift/rescue, and score-penalty APIs directly.
+
 Deliverable:
 
 - One complete playable vertical slice from launch to scoring screen.
