@@ -1049,6 +1049,14 @@
           "provider": "RaftSim review artifact from Pacuare access constraints and protected-context metadata",
           "status": "access_conservation_policy_attached_no_geometry_review_gated",
           "unreal_use": "Editor checklist for access, evacuation, conservation, flow-dependent access review, and guide signoff; not final route authority."
+        },
+        {
+          "artifact_id": "pacuare_production_hydrography_review_drafts",
+          "category": "hydrography_and_centerline_review",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson; physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/banks.geojson; physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/rapid_and_access_stationing.geojson",
+          "provider": "RaftSim generated review drafts from Pacuare Unreal-preview centerline and stationing scaffold",
+          "status": "drafts_from_preview_scaffold_review_required_not_official_hydrography",
+          "unreal_use": "Editor overlays for Pacuare centerline, bank, rapid/access, and procedural rainforest review; not official hydrography, banks, access stationing, or solver geometry."
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"

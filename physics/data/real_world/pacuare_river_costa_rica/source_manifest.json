@@ -57,7 +57,10 @@
       "hydrography/production_import_pilot/snit_layer_metadata_summary.json",
       "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
       "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
-      "hydrography/production_import_pilot/preview_stationing_scaffold.json"
+      "hydrography/production_import_pilot/preview_stationing_scaffold.json",
+      "hydrography/production_import_pilot/centerline.geojson",
+      "hydrography/production_import_pilot/banks.geojson",
+      "hydrography/production_import_pilot/rapid_and_access_stationing.geojson"
     ],
     "imagery": [
       "imagery/aerial_source_research.json",

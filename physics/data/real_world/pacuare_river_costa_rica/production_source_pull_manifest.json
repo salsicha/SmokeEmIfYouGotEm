@@ -651,6 +651,39 @@
         "flow_dependent_access_review",
         "guide_publication_signoff_queue"
       ]
+    },
+    {
+      "artifact_id": "pacuare_production_hydrography_review_drafts",
+      "category": "hydrography_and_centerline_review",
+      "caveats": [
+        "Derived from the Unreal preview scaffold, not official Costa Rica hydrography.",
+        "Bank lines are fixed offsets and are not wetted width, bank geometry, shelves, or solver cross sections.",
+        "Rapid/access points are annotation seeds only until official hydrography/access layers, rainfall/flow context, protected-area review, and guide/outfitter validation pass."
+      ],
+      "paths": [
+        "hydrography/production_import_pilot/centerline.geojson",
+        "hydrography/production_import_pilot/banks.geojson",
+        "hydrography/production_import_pilot/rapid_and_access_stationing.geojson"
+      ],
+      "provider": "RaftSim generated review drafts from Pacuare Unreal-preview centerline and stationing scaffold",
+      "related_artifacts": [
+        "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
+        "hydrography/production_import_pilot/preview_stationing_scaffold.json"
+      ],
+      "status": "drafts_from_preview_scaffold_review_required_not_official_hydrography",
+      "summary": {
+        "bank_offset_line_count": 2,
+        "centerline_feature_count": 1,
+        "centerline_vertex_count": 129,
+        "rapid_access_seed_count": 6,
+        "stationing_source": "hydrography/production_import_pilot/preview_stationing_scaffold.json"
+      },
+      "use": [
+        "editor_hydrography_review_overlay",
+        "rapid_access_annotation_seed",
+        "procedural_rainforest_dressing_seed",
+        "future_official_layer_comparison"
+      ]
     }
   ],
   "river_id": "pacuare",

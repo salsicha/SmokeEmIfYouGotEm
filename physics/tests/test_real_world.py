@@ -47,8 +47,11 @@ from raftsim.real_world import (
     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_FILE,
     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
+    PACUARE_PRODUCTION_BANKS_DRAFT_FILE,
+    PACUARE_PRODUCTION_CENTERLINE_DRAFT_FILE,
     PACUARE_PRODUCTION_IMPORT_PILOT_FILE,
     PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE,
+    PACUARE_RAPID_ACCESS_STATIONING_DRAFT_FILE,
     PACUARE_SNIT_CONFIG_FILE,
     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
     PACUARE_SNIT_LAYER_LIST_SCRIPT_FILE,
@@ -91,8 +94,11 @@ from raftsim.real_world import (
     build_pacuare_access_conservation_policy,
     build_pacuare_discharge_stage_station_review,
     build_pacuare_flash_response_review,
+    build_pacuare_production_banks_draft_geojson,
+    build_pacuare_production_centerline_draft_geojson,
     build_pacuare_production_import_pilot,
     build_pacuare_protected_area_publication_sensitivity,
+    build_pacuare_rapid_access_stationing_draft_geojson,
     build_pacuare_rainfall_station_review,
     build_player_selection_model,
     build_production_environment_gap_register,
@@ -1126,6 +1132,9 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
     assert PACUARE_RAINFALL_STATION_REVIEW_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert PACUARE_FLASH_RESPONSE_REVIEW_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
+    assert PACUARE_PRODUCTION_CENTERLINE_DRAFT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert PACUARE_PRODUCTION_BANKS_DRAFT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert PACUARE_RAPID_ACCESS_STATIONING_DRAFT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE in classes["protected_area_and_access_context"]["target_outputs"]
     assert PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE in classes["protected_area_and_access_context"]["target_outputs"]
     assert (
@@ -1553,6 +1562,66 @@ def test_pacuare_preview_centerline_scaffold_is_not_official_hydrography():
     assert stationing["station_samples"][-1]["station_m"] == 45642.42
 
 
+def test_pacuare_production_hydrography_review_drafts_are_from_preview_scaffold():
+    pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
+    source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((pacuare_dir / "production_source_pull_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+    preview_centerline = json.loads((pacuare_dir / PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE).read_text())
+    stationing = json.loads((pacuare_dir / PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE).read_text())
+    centerline = json.loads((pacuare_dir / PACUARE_PRODUCTION_CENTERLINE_DRAFT_FILE).read_text())
+    banks = json.loads((pacuare_dir / PACUARE_PRODUCTION_BANKS_DRAFT_FILE).read_text())
+    rapid_access = json.loads((pacuare_dir / PACUARE_RAPID_ACCESS_STATIONING_DRAFT_FILE).read_text())
+    expected_centerline = build_pacuare_production_centerline_draft_geojson(preview_centerline)
+    expected_banks = build_pacuare_production_banks_draft_geojson(stationing)
+    expected_rapid_access = build_pacuare_rapid_access_stationing_draft_geojson(stationing)
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+    pacuare_sources = next(river for river in photoreal_sources["rivers"] if river["river_id"] == "pacuare")
+
+    assert centerline == expected_centerline
+    assert banks == expected_banks
+    assert rapid_access == expected_rapid_access
+    assert PACUARE_PRODUCTION_CENTERLINE_DRAFT_FILE in source_manifest["artifacts"]["hydrography"]
+    assert PACUARE_PRODUCTION_BANKS_DRAFT_FILE in source_manifest["artifacts"]["hydrography"]
+    assert PACUARE_RAPID_ACCESS_STATIONING_DRAFT_FILE in source_manifest["artifacts"]["hydrography"]
+    assert any(
+        artifact["artifact_id"] == "pacuare_production_hydrography_review_drafts"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert centerline["schema"] == "raftsim.pacuare_production_centerline_draft.geojson.v1"
+    assert centerline["status"] == "draft_from_preview_scaffold_review_required_not_official_hydrography"
+    assert len(centerline["features"][0]["geometry"]["coordinates"]) == 129
+    assert banks["schema"] == "raftsim.pacuare_production_banks_draft.geojson.v1"
+    assert banks["status"] == "draft_bank_offsets_from_preview_stationing_review_required"
+    assert len(banks["features"]) == 2
+    assert rapid_access["schema"] == "raftsim.pacuare_rapid_access_stationing_draft.geojson.v1"
+    assert rapid_access["status"] == "preview_rapid_access_stationing_review_seeds_not_authoritative"
+    assert len(rapid_access["features"]) == 6
+    assert all(feature["geometry"]["type"] == "Point" for feature in rapid_access["features"])
+    assert (
+        f"physics/data/real_world/pacuare_river_costa_rica/{PACUARE_PRODUCTION_CENTERLINE_DRAFT_FILE}"
+        in rivers["pacuare"]["attached_sources_by_class"]["hydrography_and_centerline"]["artifacts"]
+    )
+    assert (
+        f"physics/data/real_world/pacuare_river_costa_rica/{PACUARE_PRODUCTION_BANKS_DRAFT_FILE}"
+        in rivers["pacuare"]["attached_sources_by_class"]["hydrography_and_centerline"]["artifacts"]
+    )
+    assert (
+        f"physics/data/real_world/pacuare_river_costa_rica/{PACUARE_RAPID_ACCESS_STATIONING_DRAFT_FILE}"
+        in rivers["pacuare"]["attached_sources_by_class"]["hydrography_and_centerline"]["artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "pacuare_production_hydrography_review_drafts"
+        for artifact in pacuare_sources["source_sample_artifacts"]
+    )
+
+
 def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_rivers():
     register = build_production_environment_gap_register()
     rivers = {entry["river_id"]: entry for entry in register["rivers"]}
@@ -1681,6 +1750,9 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_PRODUCTION_CENTERLINE_DRAFT_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_PRODUCTION_BANKS_DRAFT_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_RAPID_ACCESS_STATIONING_DRAFT_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_CLOUD_SHADOW_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_RAINFALL_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
