@@ -1186,6 +1186,18 @@
             "future_source_drape_replacement_planning",
             "cloud_and_corridor_clip_review"
           ]
+        },
+        {
+          "artifact_id": "pacuare_sentinel_corridor_tile_coverage_review",
+          "category": "sentinel_tile_bbox_corridor_coverage_review",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json",
+          "promotion_blocker": "This is a bbox-level tile coverage review, not a corridor clip, source drape, mask source, material input, or lifelike evidence; production still needs exact native-CRS clipping, stitched COG window reads, SCL/cloud QA, terms review, and guide/geospatial approval.",
+          "status": "sentinel_tile_bbox_coverage_review_attached_windowed_reads_blocked",
+          "use_in_unreal": [
+            "future_source_drape_replacement_planning",
+            "corridor_clip_tooling_requirements",
+            "cloud_and_tile_coverage_review"
+          ]
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"

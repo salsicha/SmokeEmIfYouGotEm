@@ -1,0 +1,114 @@
+{
+  "schema": "raftsim.pacuare_sentinel_corridor_tile_coverage_review.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "sentinel_tile_bbox_coverage_review_attached_windowed_reads_blocked",
+  "goal": "Record which attached Sentinel-2 L2A COG tiles bbox-intersect the draft Pacuare planning bounds before implementing corridor-clipped raster-window reads or source-drape replacement.",
+  "planning_bounds_wgs84": {
+    "min_lon": -83.75,
+    "min_lat": 9.72,
+    "max_lon": -83.42,
+    "max_lat": 10.12,
+    "source": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/high_resolution_scene_metadata_review.json"
+  },
+  "method": {
+    "source": "sentinel_cog_thumbnail_review attached_thumbnails bbox_wgs84 and tileinfo metadata",
+    "calculation": "Axis-aligned WGS84 bbox intersections against draft Pacuare planning bounds; useful for source planning only.",
+    "precision_limit": "Does not clip tileGeometry polygons in EPSG:32616/EPSG:32617, does not reproject the Pacuare route, and does not compute pixel windows."
+  },
+  "tile_intersections": [
+    {
+      "tile_id": "17PKM",
+      "product_id": "S2B_17PKM_20250119_0_L2A",
+      "epsg": 32617,
+      "source_bbox_wgs84": [
+        -83.7439023257064,
+        9.851329583910688,
+        -82.73466483299958,
+        10.850553117490108
+      ],
+      "intersection_bbox_wgs84": [
+        -83.7439023257064,
+        9.851329583910688,
+        -83.42,
+        10.12
+      ],
+      "intersects_planning_bounds": true,
+      "approximate_intersection_area_degrees2": 0.08702297262,
+      "approximate_corridor_area_fraction": 0.65926494409,
+      "tileinfo_path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tileinfo_metadata.json",
+      "thumbnail_path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_thumbnail.jpg",
+      "coverage_role": "corridor_intersection_candidate_for_future_windowed_cog_clip"
+    },
+    {
+      "tile_id": "16PHR",
+      "product_id": "S2B_16PHR_20250119_0_L2A",
+      "epsg": 32616,
+      "source_bbox_wgs84": [
+        -84.27214053021162,
+        8.939548783069545,
+        -83.26428702442637,
+        9.940211441730609
+      ],
+      "intersection_bbox_wgs84": [
+        -83.75,
+        9.72,
+        -83.42,
+        9.940211441730609
+      ],
+      "intersects_planning_bounds": true,
+      "approximate_intersection_area_degrees2": 0.072669775771,
+      "approximate_corridor_area_fraction": 0.550528604327,
+      "tileinfo_path": "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tileinfo_metadata.json",
+      "thumbnail_path": "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_thumbnail.jpg",
+      "coverage_role": "corridor_intersection_candidate_for_future_windowed_cog_clip"
+    }
+  ],
+  "coverage_summary": {
+    "planning_bounds_area_degrees2": 0.132,
+    "intersecting_tile_count": 2,
+    "intersection_union_area_degrees2": 0.13090370793,
+    "overlap_area_degrees2": 0.028789040461,
+    "overlap_bbox_wgs84": [
+      -83.7439023257064,
+      9.851329583910688,
+      -83.42,
+      9.940211441730609
+    ],
+    "approximate_corridor_fraction_covered_by_tile_bboxes": 0.991694757045,
+    "approximate_missing_area_degrees2": 0.00109629207,
+    "missing_area_requires_exact_crs_review": true,
+    "preliminary_decision": "Both 17PKM and 16PHR bbox-intersect the draft planning bounds; keep both in the future windowed COG extraction/stitch plan while exact CRS clipping decides final coverage."
+  },
+  "windowed_read_decision": {
+    "corridor_clips_generated": false,
+    "source_drape_replaced": false,
+    "mask_sources_replaced": false,
+    "full_cogs_committed": false,
+    "next_required_step": "Implement a reviewed raster-window reader that clips each tile in its native UTM CRS, applies SCL/cloud QA, stitches the accepted corridor, and records Sentinel terms/attribution before any production derivative is generated."
+  },
+  "source_links": {
+    "thumbnail_review": "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json",
+    "access_probe": "imagery/production_import_pilot/sentinel_cog_access_probe.json",
+    "review_png_17pkm": "imagery/production_import_pilot/sentinel_tci_review_preview.json",
+    "review_png_16phr": "imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json"
+  },
+  "allowed_use": [
+    "sentinel_windowed_read_planning",
+    "corridor_clip_tooling_requirements",
+    "guide_geospatial_source_review"
+  ],
+  "forbidden_use": [
+    "production source-drape replacement",
+    "water, vegetation, canopy, wet-rock, waterfall, mist, or cloud-shadow mask authority",
+    "claiming complete Pacuare corridor imagery coverage",
+    "claiming lifelike Pacuare screenshot readiness"
+  ],
+  "promotion_blockers": [
+    "Clip tileGeometry in EPSG:32616 and EPSG:32617 against a reviewed Pacuare corridor geometry rather than bbox estimates.",
+    "Compute exact COG pixel windows, read only the needed raster windows, and stitch in the selected working CRS.",
+    "Apply SCL/cloud/shadow/haze QA plus manual river/canopy/wet-rock/waterfall/mist review before generating masks or source drapes.",
+    "Record Sentinel terms, attribution, storage/LFS policy, and package redistribution review before committing derived production rasters."
+  ]
+}
