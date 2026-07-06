@@ -468,10 +468,11 @@
             "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/official_source_access_plan.json",
             "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
             "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_catalog_summary.json",
-            "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_metadata_summary.json"
+            "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_metadata_summary.json",
+            "physics/data/real_world/pacuare_river_costa_rica/hydrology/production_import_pilot/rainfall_station_review.json"
           ],
-          "promotion_blocker": "SNIT IMN precipitation, SENARA rain-station, and Direccion de Agua aforo candidates are identified as metadata-only leads, with selected per-layer terms/CRS now recorded where advertised; numeric flow tuning remains blocked until station variables, units, time zones, coverage, access permissions, Pacuare basin relation, and guide review are attached.",
-          "status": "relative_flow_bands_and_source_leads_attached"
+          "promotion_blocker": "SNIT IMN precipitation and SENARA station candidates are now summarized in rainfall_station_review.json, but numeric Pacuare flow tuning remains blocked until station IDs/features/time series, variables, units, time zones, coverage, terms, Pacuare basin relation, discharge/stage review, flash-response review, and guide/outfitter validation are attached.",
+          "status": "rainfall_station_metadata_review_attached_numeric_flow_blocked"
         },
         "terrain_dem_or_lidar": {
           "artifacts": [
