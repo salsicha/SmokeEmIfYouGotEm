@@ -831,7 +831,6 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
             const float Lateral = FMath::Lerp(-Width, Width, V);
             const float Wave = FMath::Sin(X * 0.011f + Lateral * 0.015f) * (Spec.bDesertCanyon ? 2.0f : 4.5f);
             Vertices.Add(FVector(X, CenterY + Lateral, 10.0f + Wave));
-            Normals.Add(FVector::UpVector);
             UVs.Add(FVector2D(U * 18.0f, V));
         }
     }
@@ -853,6 +852,7 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
             Triangles.Add(D);
         }
     }
+    Normals = ComputePreviewMeshNormals(Vertices, Triangles);
 
     AddPreviewProceduralMeshActor(
         World,
@@ -864,9 +864,70 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
         Spec.WaterColor);
 }
 
-void AddPreviewFoamAndHydraulics(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec, UStaticMesh* PlaneMesh)
+void AddPreviewFoamRibbon(
+    UWorld* World,
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FString& Label,
+    float StartX,
+    float Length,
+    float LateralOffset,
+    float Width,
+    float Phase,
+    const FLinearColor& Color)
 {
-    if (!World || !PlaneMesh)
+    if (!World)
+    {
+        return;
+    }
+
+    constexpr int32 Segments = 10;
+    TArray<FVector> Vertices;
+    TArray<FVector> Normals;
+    TArray<FVector2D> UVs;
+    TArray<int32> Triangles;
+    Vertices.Reserve((Segments + 1) * 2);
+    UVs.Reserve((Segments + 1) * 2);
+    Triangles.Reserve(Segments * 6);
+
+    for (int32 SegmentIndex = 0; SegmentIndex <= Segments; ++SegmentIndex)
+    {
+        const float T = static_cast<float>(SegmentIndex) / static_cast<float>(Segments);
+        const float X = StartX + Length * T;
+        const float RiverCenterY = GetPreviewRiverCenterY(Spec, X);
+        const float Sway = FMath::Sin(Phase + T * UE_TWO_PI) * Width * 0.32f;
+        const float Taper = FMath::Sin(T * PI);
+        const float LocalHalfWidth = FMath::Max(6.0f, Width * (0.18f + 0.62f * Taper));
+        const float CenterY = RiverCenterY + LateralOffset + Sway;
+        const float SurfaceWave = FMath::Sin(X * 0.011f + CenterY * 0.015f) * (Spec.bDesertCanyon ? 2.0f : 4.5f);
+        const float Z = 25.0f + SurfaceWave + 2.0f * FMath::Sin(Phase * 1.7f + T * PI);
+
+        Vertices.Add(FVector(X, CenterY - LocalHalfWidth, Z));
+        Vertices.Add(FVector(X, CenterY + LocalHalfWidth, Z + 0.6f));
+        UVs.Add(FVector2D(T, 0.0f));
+        UVs.Add(FVector2D(T, 1.0f));
+    }
+
+    for (int32 SegmentIndex = 0; SegmentIndex < Segments; ++SegmentIndex)
+    {
+        const int32 A = SegmentIndex * 2;
+        const int32 B = A + 1;
+        const int32 C = A + 2;
+        const int32 D = A + 3;
+        Triangles.Add(A);
+        Triangles.Add(C);
+        Triangles.Add(B);
+        Triangles.Add(B);
+        Triangles.Add(C);
+        Triangles.Add(D);
+    }
+
+    Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    AddPreviewProceduralMeshActor(World, Label, Vertices, Triangles, Normals, UVs, Color);
+}
+
+void AddPreviewFoamAndHydraulics(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
+{
+    if (!World)
     {
         return;
     }
@@ -874,27 +935,40 @@ void AddPreviewFoamAndHydraulics(UWorld* World, const FRaftSimEnvironmentPreview
     for (int32 FoamIndex = 0; FoamIndex < Spec.FoamTrainCount; ++FoamIndex)
     {
         const float X = -4050.0f + static_cast<float>(FoamIndex) * (28000.0f / FMath::Max(1, Spec.FoamTrainCount));
-        const float CenterY = GetPreviewRiverCenterY(Spec, X);
         const float Offset = FMath::Sin(static_cast<float>(FoamIndex) * 1.7f) * Spec.RiverHalfWidthCm * 0.42f;
-        const float LengthScale = Spec.bDesertCanyon ? 4.0f : 3.2f;
-        AddPreviewMeshActor(
+        const float Length = Spec.bDesertCanyon ? 1420.0f : 1050.0f;
+        AddPreviewFoamRibbon(
             World,
-            PlaneMesh,
+            Spec,
             FString::Printf(TEXT("RaftSim_FoamTongue_%02d_%s"), FoamIndex, *Spec.RiverId),
-            FVector(X, CenterY + Offset, 24.0f + static_cast<float>(FoamIndex % 3)),
-            FRotator(0.0f, FMath::Sin(static_cast<float>(FoamIndex) * 0.62f) * 13.0f, 0.0f),
-            FVector(LengthScale, 0.18f + 0.04f * static_cast<float>(FoamIndex % 4), 1.0f),
+            X - Length * 0.48f,
+            Length,
+            Offset,
+            54.0f + 12.0f * static_cast<float>(FoamIndex % 3),
+            static_cast<float>(FoamIndex) * 0.83f,
             FLinearColor(0.82f, 0.90f, 0.86f));
+        AddPreviewFoamRibbon(
+            World,
+            Spec,
+            FString::Printf(TEXT("RaftSim_WaveHighlight_%02d_%s"), FoamIndex, *Spec.RiverId),
+            X - Length * 0.26f,
+            Length * 0.55f,
+            Offset * 0.55f,
+            22.0f + 5.0f * static_cast<float>(FoamIndex % 2),
+            static_cast<float>(FoamIndex) * 1.19f + 0.4f,
+            Spec.bDesertCanyon ? FLinearColor(0.78f, 0.82f, 0.76f) : FLinearColor(0.72f, 0.88f, 0.84f));
 
         if (!Spec.bDesertCanyon && FoamIndex % 3 == 0)
         {
-            AddPreviewMeshActor(
+            AddPreviewFoamRibbon(
                 World,
-                PlaneMesh,
+                Spec,
                 FString::Printf(TEXT("RaftSim_EddyLine_%02d_%s"), FoamIndex, *Spec.RiverId),
-                FVector(X + 420.0f, CenterY + Spec.RiverHalfWidthCm * 0.76f, 25.0f),
-                FRotator(0.0f, -21.0f, 0.0f),
-                FVector(2.2f, 0.08f, 1.0f),
+                X + 80.0f,
+                720.0f,
+                Spec.RiverHalfWidthCm * 0.76f,
+                18.0f,
+                static_cast<float>(FoamIndex) * 0.47f,
                 FLinearColor(0.88f, 0.94f, 0.90f));
         }
     }
@@ -1194,7 +1268,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     AddPreviewAerialDrapeTiles(World, Spec, TerrainReliefPtr);
     AddPreviewRiverRibbonMesh(World, Spec);
     AddPreviewRaftForeground(World, Spec, CubeMesh, CylinderMesh);
-    AddPreviewFoamAndHydraulics(World, Spec, PlaneMesh);
+    AddPreviewFoamAndHydraulics(World, Spec);
 
     for (int32 BoulderIndex = 0; BoulderIndex < Spec.BoulderCount; ++BoulderIndex)
     {
