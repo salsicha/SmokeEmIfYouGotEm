@@ -97,7 +97,8 @@
     "source_pulls": [
       "production_source_pull_manifest.json",
       "production_import_pilot.json",
-      "production_import_pilot_derivatives_manifest.json"
+      "production_import_pilot_derivatives_manifest.json",
+      "review/production_import_pilot/source_metadata_review.json"
     ],
     "unreal": [
       "unreal/pacuare_river_third_target_editor_pass.json"

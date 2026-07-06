@@ -170,6 +170,7 @@ PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE = (
     "review/production_import_pilot/protected_area_publication_sensitivity.json"
 )
 PACUARE_ACCESS_CONSERVATION_POLICY_FILE = "review/production_import_pilot/access_and_conservation_policy.json"
+PACUARE_SOURCE_METADATA_REVIEW_FILE = "review/production_import_pilot/source_metadata_review.json"
 PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE = "imagery/production_import_pilot/cloud_screened_scene_index.json"
 PACUARE_CLOUD_SHADOW_REVIEW_FILE = "imagery/production_import_pilot/cloud_shadow_review.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
@@ -2986,6 +2987,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     "terrain/production_import_pilot/dem_relief_2048.png",
                     "terrain/production_import_pilot/heightfield_candidate_2017.png",
                     "production_import_pilot_derivatives_manifest.json",
+                    PACUARE_SOURCE_METADATA_REVIEW_FILE,
                 ],
                 "promotion_gate": (
                     "Select local or best-available terrain source, record product ids/terms/CRS/vertical datum, clip to "
@@ -3002,6 +3004,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
                     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
                     PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
+                    PACUARE_SOURCE_METADATA_REVIEW_FILE,
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
                     PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
@@ -3024,6 +3027,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     "imagery/production_import_pilot/source_drape_4096.png",
                     PACUARE_CLOUD_SHADOW_REVIEW_FILE,
                     "production_import_pilot_derivatives_manifest.json",
+                    PACUARE_SOURCE_METADATA_REVIEW_FILE,
                 ],
                 "promotion_gate": (
                     "Attach scene ids, acquisition dates, cloud score, CRS, resolution, terms, and attribution; prefer "
@@ -3041,6 +3045,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     "imagery/production_import_pilot/canopy_shadow_mask_2048.png",
                     "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_2048.png",
                     "imagery/production_import_pilot/source_masks_manifest.json",
+                    PACUARE_SOURCE_METADATA_REVIEW_FILE,
                 ],
                 "promotion_gate": (
                     "Derive masks only after higher-resolution imagery and hydrography are reviewed; manually check "
@@ -3059,6 +3064,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_RAINFALL_STATION_REVIEW_FILE,
                     PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE,
                     PACUARE_FLASH_RESPONSE_REVIEW_FILE,
+                    PACUARE_SOURCE_METADATA_REVIEW_FILE,
                     "hydrology/production_import_pilot/flow_band_review.json",
                 ],
                 "promotion_gate": (
@@ -3077,6 +3083,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
                     PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE,
                     PACUARE_ACCESS_CONSERVATION_POLICY_FILE,
+                    PACUARE_SOURCE_METADATA_REVIEW_FILE,
                 ],
                 "promotion_gate": (
                     "Record exact layers, terms, sensitive-location policy, access constraints, and screenshot/publication "
@@ -3090,6 +3097,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                 "target_outputs": [
                     REFERENCE_MEDIA_ANNOTATIONS_FILE,
                     REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
+                    PACUARE_SOURCE_METADATA_REVIEW_FILE,
                 ],
                 "promotion_gate": (
                     "Attach creator, date, reach, rain/flow context, permission, attribution, and allowed asset uses before "
@@ -3581,6 +3589,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "production_import_pilot/heightfield_candidate_2017.png",
                     "production_import_pilot/water_mask_2048.png",
                     "production_import_pilot/vegetation_mask_2048.png",
+                    PACUARE_SOURCE_METADATA_REVIEW_FILE,
                     PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE,
                     PACUARE_CLOUD_SHADOW_REVIEW_FILE,
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,

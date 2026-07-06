@@ -1,0 +1,215 @@
+{
+  "allowed_use": [
+    "Pacuare source-metadata consolidation",
+    "editor source overlay triage",
+    "next renderer iteration with review-gated Pacuare terrain, drape, hydrography, hydrology, access, and media-rights evidence"
+  ],
+  "forbidden_use": [
+    "production photoreal Pacuare terrain, water, or rainforest material approval",
+    "numeric Pacuare rainfall, stage, discharge, or flow-band promotion",
+    "claiming official Pacuare hydrography, banks, rapid stationing, or access geometry",
+    "using public social media, guide media, or outfitter media as texture, training, photogrammetry, or packaged source assets",
+    "publishing detailed route screenshots as approved real-world reproductions"
+  ],
+  "generated_on": "2026-07-06",
+  "hydrology_metadata": {
+    "discharge_stage_basin_relation_candidate_layers": [
+      "Aguas:DA_UNIDADES_HIDROLOGICAS"
+    ],
+    "discharge_stage_candidate_count": 3,
+    "primary_station_candidate_layers": [
+      "Aguas:DA_AFOROS",
+      "Aguas:JASEC_ESTACIONES_HIDROMETRICAS"
+    ],
+    "rainfall_candidate_layer_count": 6,
+    "rainfall_imn_precipitation_layers": 3,
+    "rainfall_senara_station_layers": 2,
+    "review_decision": "Pacuare rainfall, discharge/stage, and flash-response metadata leads are attached, but no station IDs, feature records, time series, units, time zones, basin relation, rainfall-to-stage lag, unsafe-flow criteria, or guide/outfitter validation are attached, so numeric flow bands remain blocked.",
+    "wfs_feature_access_advertised_count": 0
+  },
+  "imagery_metadata": {
+    "cloud_screened_candidates": {
+      "active_preview_cloud_like_fraction": 0.0557,
+      "active_preview_date": "2025-04-02",
+      "active_preview_shadow_like_fraction": 0.3061,
+      "best_rank_score_date": "2025-03-08",
+      "candidate_count": 5,
+      "lowest_cloud_metric_date": "2025-03-08",
+      "lowest_cloud_metric_fraction": 0.0399,
+      "production_decision": "blocked_pending_higher_resolution_cloud_screened_imagery_or_first_party_aerial_reference"
+    },
+    "cloud_shadow_review": {
+      "active_preview_decision": "retain_as_active_preview_seed_only_because_current_unreal_derivatives_already_use_this_date",
+      "active_preview_shadow_like_fraction": 0.3061,
+      "green_dominant_fraction": 0.8331
+    },
+    "production_import_derivatives": {
+      "heightfield_size_px": 2017,
+      "mask_size_px": 2048,
+      "relief_size_px": 2048,
+      "source_drape_size_px": 4096
+    },
+    "review_decision": "NASA GIBS/MODIS is retained only as a coarse cloud-screened preview drape. Production Pacuare art still needs higher-resolution cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference with terms, attribution, manual cloud/shadow review, and guide/geospatial approval."
+  },
+  "official_costa_rica_metadata": {
+    "direccion_de_agua_advertised_named_layer_count": 52,
+    "direccion_de_agua_selected_candidate_layer_count": 8,
+    "direccion_de_agua_supported_root_srs": [
+      "EPSG:4326",
+      "EPSG:5367",
+      "EPSG:5456"
+    ],
+    "feature_downloads_performed": false,
+    "map_tiles_imported": false,
+    "review_decision": "SNIT/IDECORI and Direccion de Agua/SINIGIRH metadata are useful discovery leads for hydrography, stations, protected areas, forest cover, wetlands, recharge, and access/conservation review, but no features, map tiles, station time series, or official geometry are imported.",
+    "snit_node_layer_archive_count": 7,
+    "snit_selected_candidate_layer_count": 17,
+    "snit_selected_metadata_layer_count": 11
+  },
+  "pilot_bounds_wgs84": {
+    "max_lat": 10.12,
+    "max_lon": -83.42,
+    "min_lat": 9.72,
+    "min_lon": -83.75
+  },
+  "raw_response_policy": {
+    "committed_payload_hashes": true,
+    "raw_payload_location": "Committed only when already represented as compact local source summaries or approved metadata files; transient raw service payloads should remain outside the repo unless a later rights/maintenance review approves them.",
+    "raw_third_party_media_committed": false,
+    "raw_third_party_payloads_committed": false,
+    "reason": "Keep Pacuare source review compact, reproducible, and rights-safe while preserving local artifact hashes and paths."
+  },
+  "reference_media_metadata": {
+    "candidate_link_count": 4,
+    "media_files_downloaded": 0,
+    "promoted_item_count": 0,
+    "review_decision": "Reference media remains link-only. No social, guide, outfitter, thumbnail, video, caption, audio, or comment asset may drive textures, training, photogrammetry, marketing, or packaged content until item-level rights and attribution are recorded.",
+    "review_target_count": 3,
+    "rights_cleared_for_asset_use": 0
+  },
+  "remaining_blockers": [
+    "Select and approve the Costa Rica working CRS, vertical datum handling, and Unreal georeference transform.",
+    "Clip, mosaic, void-review, hydrologically condition, and channel-burn Pacuare DEM inputs before production terrain or Landscape promotion.",
+    "Replace or supplement NASA GIBS/MODIS with higher-resolution cloud-screened imagery or first-party/permissioned aerial reference before photoreal material or mask approval.",
+    "Import no SNIT, Direccion de Agua, SINIGIRH, SINAC, SENARA, ICE, IMN, OSM, or HydroSHEDS feature geometry until terms, CRS, attributes, Pacuare corridor intersection, and attribution are reviewed.",
+    "Attach station IDs, variables, units, time zones, coverage, quality flags, rainfall-to-stage lag, basin relation, unsafe-flow criteria, and guide/outfitter validation before numeric Pacuare flow bands.",
+    "Clear protected-area, access, rescue, evacuation, no-publish, and screenshot-publication policy before detailed route packages or public-facing captures.",
+    "Attach first-party or rights-cleared rainforest, waterfall, canopy, mist, water-color, and rapid-behavior references before production art promotion."
+  ],
+  "review_status_by_source_class": {
+    "aerial_or_satellite_imagery": "coarse_modis_gibs_preview_metadata_attached_high_resolution_imagery_blocked",
+    "guide_and_reference_media_annotations": "link_only_reference_media_gate_attached_no_media_rights",
+    "hydrography_and_centerline": "official_service_metadata_and_preview_scaffold_attached_official_geometry_blocked",
+    "protected_area_and_access_context": "metadata_policy_reviews_attached_geometry_and_publication_blocked",
+    "seasonal_flow_or_release_history": "rainfall_discharge_stage_and_flash_metadata_attached_numeric_flow_blocked",
+    "terrain_dem_or_lidar": "copernicus_dem_tiles_and_heightfield_candidates_attached_conditioning_blocked",
+    "water_and_vegetation_masks": "coarse_preview_masks_attached_production_segmentation_blocked"
+  },
+  "reviewed_local_artifacts": [
+    {
+      "path": "terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json",
+      "sha256": "9a23b9971cf3bf6827f34a8cf442dbcb0537e2e793e6ea580961e6c2af11ed91",
+      "source_class": "terrain_dem_or_lidar",
+      "status": "generated_review_gated_not_conditioned_not_production_import"
+    },
+    {
+      "path": "terrain/production_import_pilot/heightfield_candidate_manifest.json",
+      "sha256": "1ab4d1a6e68ecce880103deada75f1381f3bb5849616576c1d144e4b0e9346c0",
+      "source_class": "terrain_dem_or_lidar",
+      "status": "generated_review_gated_from_coarse_preview_seeds_not_production_import"
+    },
+    {
+      "path": "production_import_pilot_derivatives_manifest.json",
+      "sha256": "fd348f135ffc8aade5356021137cfd45e50a126fe7b6cd5252e598fd7cc1fc2c",
+      "source_class": "terrain_imagery_masks",
+      "status": "generated_review_gated_from_coarse_preview_seeds_not_production_import"
+    },
+    {
+      "path": "imagery/production_import_pilot/cloud_screened_scene_index.json",
+      "sha256": "26ed7f2bb468b92b47ef1fc4c4d07741e0f3a06f2df1fcd6fc0a511c634fd6bb",
+      "source_class": "aerial_or_satellite_imagery",
+      "status": "modis_gibs_candidates_indexed_review_gated_not_production_imagery"
+    },
+    {
+      "path": "imagery/production_import_pilot/cloud_shadow_review.json",
+      "sha256": "44c472065994e8f3e7641e4c22b498fc929cbba3c51622b198f4d7a5f23c9fbe",
+      "source_class": "aerial_or_satellite_imagery",
+      "status": "review_gated_modis_cloud_shadow_diagnostic_not_acceptance"
+    },
+    {
+      "path": "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+      "sha256": "da56d98eff9d522c2241b649b8ff18b29b209aba515d00b6e8f53a0fc446a898",
+      "source_class": "official_costa_rica_metadata",
+      "status": "snit_catalog_and_node_layer_lists_archived_metadata_only_no_features_downloaded"
+    },
+    {
+      "path": "hydrography/production_import_pilot/snit_layer_metadata_summary.json",
+      "sha256": "9f0ae66f370f44e40b83d17c254a1d52369b1cc1c7faeb9ce03707c6c47878d2",
+      "source_class": "official_costa_rica_metadata",
+      "status": "selected_snit_layer_metadata_archived_no_features_downloaded"
+    },
+    {
+      "path": "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
+      "sha256": "11a73e27fba9374054150aeed80d98e252e35ec8f42cb5f5f2fe8421448a8bcf",
+      "source_class": "official_costa_rica_metadata",
+      "status": "capabilities_archived_layer_metadata_only_no_features_downloaded"
+    },
+    {
+      "path": "hydrology/production_import_pilot/rainfall_station_review.json",
+      "sha256": "d775f106fd785cb3ba8db025a0267c2b497349672d8bafc022dc8702abeb8eb9",
+      "source_class": "seasonal_flow_or_release_history",
+      "status": "metadata_only_rainfall_station_candidates_attached_numeric_flow_blocked"
+    },
+    {
+      "path": "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
+      "sha256": "77919ab4461e226930ca3e14592e7895c8c68c5b3ca892962690d35cb8fc809c",
+      "source_class": "seasonal_flow_or_release_history",
+      "status": "metadata_only_discharge_stage_candidates_attached_numeric_flow_blocked"
+    },
+    {
+      "path": "hydrology/production_import_pilot/flash_response_review.json",
+      "sha256": "e68f6a705d13c4aad83bc51d1b6907e60d81c2c24aec93d972d815a2708fe744",
+      "source_class": "seasonal_flow_or_release_history",
+      "status": "metadata_only_flash_response_context_attached_model_blocked"
+    },
+    {
+      "path": "review/production_import_pilot/protected_area_publication_sensitivity.json",
+      "sha256": "5279dab58ed95a129ab21661af0eac3e4a336975aa629d44962272223592d190",
+      "source_class": "protected_area_and_access_context",
+      "status": "metadata_only_protected_area_publication_policy_attached_review_gated"
+    },
+    {
+      "path": "review/production_import_pilot/access_and_conservation_policy.json",
+      "sha256": "e21df55548f2c3bf32f0f94507560ddb838f1b878e4484cc9ab98a31336968c1",
+      "source_class": "protected_area_and_access_context",
+      "status": "access_conservation_policy_attached_no_geometry_review_gated"
+    },
+    {
+      "path": "field_media/production_import_pilot/rights_manifest.json",
+      "sha256": "3f0993484cff7c6f56da94b92df86a8dbb9382a88907e96a569829cb75b5f610",
+      "source_class": "guide_and_reference_media_annotations",
+      "status": "candidate_links_only_no_media_downloaded_no_rights_cleared"
+    }
+  ],
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare_source_metadata_review.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "source_pull_manifest": "production_source_pull_manifest.json",
+  "source_recipe": "production_import_pilot.json",
+  "status": "metadata_consolidated_review_gated_not_production_promoted",
+  "terrain_dem_metadata": {
+    "copernicus_dem_tiles": [
+      "terrain/copernicus_dem_glo30_N09_W084.tif",
+      "terrain/copernicus_dem_glo30_N10_W084.tif"
+    ],
+    "heightfield_candidates": {
+      "elevation_max_m": 3230.44604,
+      "elevation_min_m": 16.12291,
+      "pixel_format": "16_bit_grayscale_png",
+      "preview_size_px": 1009,
+      "production_import_size_px": 2017,
+      "sampling": "nearest_neighbor_from_copernicus_glo30_tiles"
+    },
+    "review_decision": "Copernicus DEM tiles and heightfield candidates support import testing and gorge-scale preview relief only. Production terrain remains blocked on source selection, CRS/vertical-datum review, clipping, void review, hydrologic conditioning, channel burning, official-layer comparison, and guide/outfitter review."
+  }
+}

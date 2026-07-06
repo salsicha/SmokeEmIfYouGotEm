@@ -1090,6 +1090,18 @@
           "provider": "RaftSim generated review drafts from Pacuare Unreal-preview centerline and stationing scaffold",
           "status": "drafts_from_preview_scaffold_review_required_not_official_hydrography",
           "unreal_use": "Editor overlays for Pacuare centerline, bank, rapid/access, and procedural rainforest review; not official hydrography, banks, access stationing, or solver geometry."
+        },
+        {
+          "artifact_id": "pacuare_source_metadata_review",
+          "category": "terrain_imagery_hydrography_hydrology_access_media_source_metadata_review",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/source_metadata_review.json",
+          "promotion_blocker": "Consolidates Pacuare source metadata only; lifelike production remains blocked on high-resolution imagery, official geometry, numeric flow evidence, access/protected-area clearance, media rights, guide review, and in-engine capture evidence.",
+          "status": "metadata_consolidated_review_gated_not_production_promoted",
+          "use_in_unreal": [
+            "source_overlay_review",
+            "renderer_iteration_gate",
+            "production_source_selection_checklist"
+          ]
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
