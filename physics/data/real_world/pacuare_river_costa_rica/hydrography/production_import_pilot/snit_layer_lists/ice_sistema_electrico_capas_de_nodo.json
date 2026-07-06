@@ -1,0 +1,60 @@
+{
+    "resultado": true,
+    "success": true,
+    "data": [
+        {
+            "id": "Y2FwYTo6SUNFOjpUcmFuc21pc2lvbklDRSUzQVN1YmVzdGFjaW9uZXM=",
+            "nombre": "Subestaciones",
+            "layer": "TransmisionICE:Subestaciones",
+            "url": "\/Visor\/index?k=Y2FwYTo6SUNFOjpUcmFuc21pc2lvbklDRSUzQVN1YmVzdGFjaW9uZXM=",
+            "institucion": "Instituto Costarricense de Electricidad (ICE)",
+            "fecha": "28-06-2026",
+            "node_name": "ICE-Sistema El\u00e9ctrico Nacional",
+            "node_status": "activo",
+            "NodoPadreKey": "bm9kbzo6MTIw",
+            "detalles": true,
+            "wms": false,
+            "wmts": false,
+            "wfs": true,
+            "Abstract": "",
+            "TieneMetadatos": true,
+            "Missing": false
+        },
+        {
+            "id": "Y2FwYTo6SUNFOjpUcmFuc21pc2lvbklDRSUzQVRvcnJlcw==",
+            "nombre": "Torres",
+            "layer": "TransmisionICE:Torres",
+            "url": "\/Visor\/index?k=Y2FwYTo6SUNFOjpUcmFuc21pc2lvbklDRSUzQVRvcnJlcw==",
+            "institucion": "Instituto Costarricense de Electricidad (ICE)",
+            "fecha": "28-06-2026",
+            "node_name": "ICE-Sistema El\u00e9ctrico Nacional",
+            "node_status": "activo",
+            "NodoPadreKey": "bm9kbzo6MTIw",
+            "detalles": true,
+            "wms": false,
+            "wmts": false,
+            "wfs": true,
+            "Abstract": "",
+            "TieneMetadatos": true,
+            "Missing": false
+        },
+        {
+            "id": "Y2FwYTo6SUNFOjpUcmFuc21pc2lvbklDRSUzQUxpbmVhc1RyYW5zbWlzaW9u",
+            "nombre": "LineasTransmision",
+            "layer": "TransmisionICE:LineasTransmision",
+            "url": "\/Visor\/index?k=Y2FwYTo6SUNFOjpUcmFuc21pc2lvbklDRSUzQUxpbmVhc1RyYW5zbWlzaW9u",
+            "institucion": "Instituto Costarricense de Electricidad (ICE)",
+            "fecha": "28-06-2026",
+            "node_name": "ICE-Sistema El\u00e9ctrico Nacional",
+            "node_status": "activo",
+            "NodoPadreKey": "bm9kbzo6MTIw",
+            "detalles": true,
+            "wms": false,
+            "wmts": false,
+            "wfs": true,
+            "Abstract": "",
+            "TieneMetadatos": true,
+            "Missing": false
+        }
+    ]
+}

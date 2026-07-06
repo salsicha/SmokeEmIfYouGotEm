@@ -652,7 +652,7 @@
         {
           "source_id": "snit_cr",
           "url": "https://www.snitcr.go.cr/",
-          "status": "official_source_leads_attached"
+          "status": "official_catalog_and_selected_node_layer_lists_archived_metadata_only"
         },
         {
           "source_id": "direccion_de_agua_sinigirh_geoservices",
@@ -689,7 +689,12 @@
         {
           "source_id": "imn_costa_rica",
           "url": "https://www.imn.ac.cr/",
-          "status": "official_source_leads_attached"
+          "status": "snit_precipitation_layer_leads_archived_metadata_only"
+        },
+        {
+          "source_id": "senara_costa_rica",
+          "url": "https://www.snitcr.go.cr/ico_servicios_ogc",
+          "status": "snit_rain_station_and_recharge_layer_leads_archived_metadata_only"
         },
         {
           "source_id": "ice_hydromet_review",
@@ -818,6 +823,14 @@
           "provider": "MINAE Direccion de Agua / SINIGIRH WMS",
           "status": "metadata_archived_no_features_downloaded",
           "unreal_use": "official service metadata for future Pacuare station, hydrologic-unit, basin, and access review; not imported route geometry or flow authority"
+        },
+        {
+          "artifact_id": "pacuare_snit_layer_catalog_metadata",
+          "category": "official_service_metadata",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_catalog_summary.json; physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_ogc_services_catalog.html; physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_lists/direccion_de_agua_capas_de_nodo.json; physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_lists/imn_capas_de_nodo.json; physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_lists/sinac_capas_de_nodo.json; physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_lists/senara_estaciones_capas_de_nodo.json",
+          "provider": "Sistema Nacional de Informacion Territorial de Costa Rica / IDECORI",
+          "status": "catalog_and_node_layer_lists_archived_metadata_only_no_features_downloaded",
+          "unreal_use": "official metadata leads for Pacuare hydrology, rainfall, protected-area, forest-cover, wetland, recharge, and access review; not imported route geometry, station time series, vegetation masks, or publication clearance"
         },
         {
           "artifact_id": "pacuare_unreal_preview_centerline_scaffold",

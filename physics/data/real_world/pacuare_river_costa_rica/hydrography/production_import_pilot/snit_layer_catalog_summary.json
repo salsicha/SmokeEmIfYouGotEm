@@ -1,0 +1,825 @@
+{
+  "schema": "raftsim.pacuare.snit_layer_catalog_summary.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "snit_catalog_and_node_layer_lists_archived_metadata_only_no_features_downloaded",
+  "source_id": "snit_ogc_services_catalog",
+  "pacuare_planning_bounds_wgs84": {
+    "min_lon": -83.75,
+    "min_lat": 9.72,
+    "max_lon": -83.42,
+    "max_lat": 10.12
+  },
+  "policy": {
+    "feature_downloads_performed": false,
+    "map_tiles_imported": false,
+    "layer_geometry_imported": false,
+    "media_downloaded": false,
+    "use_as_discovery_metadata_only": true
+  },
+  "archived_catalog": {
+    "url": "https://www.snitcr.go.cr/ico_servicios_ogc",
+    "path": "snit_ogc_services_catalog.html",
+    "raw_bytes": 68871,
+    "raw_sha256": "4f6499af1cdd64d0bd197805a5a27472fed4eb3fbb877ef8aa8cf6184994ef38",
+    "observed_projection_notes": [
+      "EPSG:8908",
+      "EPSG:5367",
+      "EPSG:4326"
+    ]
+  },
+  "endpoint_contract_evidence": {
+    "config_script": {
+      "path": "snit_config_ssnit.js",
+      "raw_bytes": 56653,
+      "raw_sha256": "dd82e56f6a14b5fdda922f60cb960e053b5a6eaba140e5b68cf0849d7353cedf"
+    },
+    "layer_list_script": {
+      "path": "snit_ico_servicios_ogc_lista_capas.js",
+      "raw_bytes": 47876,
+      "raw_sha256": "9a48e2e68d62a15efd08ee6ea9585b24aa345be7112a71a84c3471db1a1f37b8"
+    },
+    "layer_list_endpoint": "https://www.snitcr.go.cr/Visor/capas_de_nodo",
+    "layer_list_request": "POST application/x-www-form-urlencoded nk=<SNIT node key>",
+    "verified_response_semantics": "Returns node layer-list JSON with layer title/name, SNIT viewer URL, institution, catalog date, WMS/WFS/WMTS booleans, and selected abstracts where available.",
+    "detail_endpoint_caution": "Direct layer detail samples returned SNIT default placeholder records during this review, so only node layer-list JSON is archived as trusted evidence in this slice."
+  },
+  "node_layer_archives": [
+    {
+      "node_id": "snit_direccion_de_agua",
+      "display_name": "DIRECCION DE AGUA",
+      "provider": "MINAE Direccion de Agua",
+      "node_key": "bm9kbzo6MTA=",
+      "source_info_url": "https://www.snitcr.go.cr/ico_servicios_ogc_info?k=bm9kbzo6MTA=",
+      "archived_layer_list": "snit_layer_lists/direccion_de_agua_capas_de_nodo.json",
+      "raw_bytes": 30957,
+      "raw_sha256": "b03239a512a54ed5009b5cbcda1f35b173fb30b31c2ef321718c2a5ec890dc6a",
+      "endpoint": "https://www.snitcr.go.cr/Visor/capas_de_nodo",
+      "request": {
+        "method": "POST",
+        "form": {
+          "nk": "bm9kbzo6MTA="
+        }
+      },
+      "resultado": true,
+      "layer_count": 37,
+      "wms_layer_count": 37,
+      "wfs_layer_count": 0,
+      "wmts_layer_count": 0,
+      "metadata_layer_count": 8,
+      "review_role": "official aforo/station, hydrologic-unit, and in-channel works discovery for Pacuare flow and basin relation review",
+      "selected_candidate_layers": [
+        {
+          "name": "DA_AFOROS",
+          "layer": "Aguas:DA_AFOROS",
+          "institution": "Dirección de Agua, MINAE",
+          "node_name": "DIRECCIÓN DE AGUA",
+          "publication_or_catalog_date": "05-07-2026",
+          "wms_available": true,
+          "wfs_available": false,
+          "wmts_available": false,
+          "has_metadata": false,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RElSRUNDSSVDMyU5M04rREUrQUdVQTo6QWd1YXMlM0FEQV9BRk9ST1M=",
+          "abstract": null,
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        },
+        {
+          "name": "DA_UNIDADES HIDROLOGICAS",
+          "layer": "Aguas:DA_UNIDADES_HIDROLOGICAS",
+          "institution": "Dirección de Agua, MINAE",
+          "node_name": "DIRECCIÓN DE AGUA",
+          "publication_or_catalog_date": "05-07-2026",
+          "wms_available": true,
+          "wfs_available": false,
+          "wmts_available": false,
+          "has_metadata": false,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RElSRUNDSSVDMyU5M04rREUrQUdVQTo6QWd1YXMlM0FEQV9VTklEQURFU19ISURST0xPR0lDQVM=",
+          "abstract": null,
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        },
+        {
+          "name": "DA_OBRAS EN CAUCE",
+          "layer": "Aguas:DA_OBRAS_EN_CAUCE",
+          "institution": "Dirección de Agua, MINAE",
+          "node_name": "DIRECCIÓN DE AGUA",
+          "publication_or_catalog_date": "05-07-2026",
+          "wms_available": true,
+          "wfs_available": false,
+          "wmts_available": false,
+          "has_metadata": false,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RElSRUNDSSVDMyU5M04rREUrQUdVQTo6QWd1YXMlM0FEQV9PQlJBU19FTl9DQVVDRQ==",
+          "abstract": null,
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        },
+        {
+          "name": "DA_OFICINAS DE UNIDADES HIDROLOGICAS",
+          "layer": "Aguas:OFICINAS_U_HIDROLOGICAS__1M_",
+          "institution": "Dirección de Agua, MINAE",
+          "node_name": "DIRECCIÓN DE AGUA",
+          "publication_or_catalog_date": "05-07-2026",
+          "wms_available": true,
+          "wfs_available": false,
+          "wmts_available": false,
+          "has_metadata": true,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RElSRUNDSSVDMyU5M04rREUrQUdVQTo6QWd1YXMlM0FPRklDSU5BU19VX0hJRFJPTE9HSUNBU19fMU1f",
+          "abstract": "Ubicación de las oficinas centrales y regionales de la Dirección de Agua.",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        }
+      ]
+    },
+    {
+      "node_id": "snit_imn",
+      "display_name": "Instituto Meteorologico Nacional (IMN)",
+      "provider": "Instituto Meteorologico Nacional",
+      "node_key": "bm9kbzo6NzM=",
+      "source_info_url": "https://www.snitcr.go.cr/ico_servicios_ogc_info?k=bm9kbzo6NzM=",
+      "archived_layer_list": "snit_layer_lists/imn_capas_de_nodo.json",
+      "raw_bytes": 48568,
+      "raw_sha256": "ac031764aa96bd546873d09e5b98d25a8eb31574642e7037fc5a026cd5cfbf08",
+      "endpoint": "https://www.snitcr.go.cr/Visor/capas_de_nodo",
+      "request": {
+        "method": "POST",
+        "form": {
+          "nk": "bm9kbzo6NzM="
+        }
+      },
+      "resultado": true,
+      "layer_count": 39,
+      "wms_layer_count": 39,
+      "wfs_layer_count": 39,
+      "wmts_layer_count": 0,
+      "metadata_layer_count": 2,
+      "review_role": "rainfall climatology and seasonal flow-band context for Pacuare rainfed behavior",
+      "selected_candidate_layers": [
+        {
+          "name": "Precipitación Anual: período 1960-2013",
+          "layer": "anual_precipitacion_60_13",
+          "institution": "Instituto Meteorológico Nacional",
+          "node_name": "Instituto Meteorológico Nacional (IMN)",
+          "publication_or_catalog_date": "28-06-2026",
+          "wms_available": true,
+          "wfs_available": true,
+          "wmts_available": false,
+          "has_metadata": false,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6SU1OOjphbnVhbF9wcmVjaXBpdGFjaW9uXzYwXzEz",
+          "abstract": "En este análisis se toma en cuenta la variable de precipitación en milímetros anual en un periodo de estudio desde el año 1960 al 2013.",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        },
+        {
+          "name": "Precipitación Abril: período 1960-2013",
+          "layer": "abril_precipitacion_60_13",
+          "institution": "Instituto Meteorológico Nacional",
+          "node_name": "Instituto Meteorológico Nacional (IMN)",
+          "publication_or_catalog_date": "28-06-2026",
+          "wms_available": true,
+          "wfs_available": true,
+          "wmts_available": false,
+          "has_metadata": false,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6SU1OOjphYnJpbF9wcmVjaXBpdGFjaW9uXzYwXzEz",
+          "abstract": "En este análisis se toma en cuenta la variable de precipitación en milímetros durante el mes de abril en un periodo de estudio desde el año 1960 al 2013. Los datos fueron recolectados por las diferentes estaciones meteorológicas mecánicas a disposición del Instituto Meteorológico Nacional. Los polígonos fueron delimitados por medio de un análisis climático multidisciplinario. El análisis se da a nivel nacional.",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        },
+        {
+          "name": "Precipitación Octubre: período 1960-2013",
+          "layer": "octubre_precipitacion_60_13",
+          "institution": "Instituto Meteorológico Nacional",
+          "node_name": "Instituto Meteorológico Nacional (IMN)",
+          "publication_or_catalog_date": "28-06-2026",
+          "wms_available": true,
+          "wfs_available": true,
+          "wmts_available": false,
+          "has_metadata": false,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6SU1OOjpvY3R1YnJlX3ByZWNpcGl0YWNpb25fNjBfMTM=",
+          "abstract": "En este análisis se toma en cuenta la variable de precipitación en milímetros durante el mes de octubre en un periodo de estudio desde el año 1960 al 2013. Los datos fueron recolectados por las diferentes estaciones meteorológicas mecánicas a disposición del Instituto Meteorológico Nacional. Los polígonos fueron delimitados por medio de un análisis climático multidisciplinario. El análisis se da a nivel nacional.",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        }
+      ]
+    },
+    {
+      "node_id": "snit_sinac",
+      "display_name": "Sistema Nacional de Areas de Conservacion (SINAC)",
+      "provider": "Sistema Nacional de Areas de Conservacion",
+      "node_key": "bm9kbzo6NDA=",
+      "source_info_url": "https://www.snitcr.go.cr/ico_servicios_ogc_info?k=bm9kbzo6NDA=",
+      "archived_layer_list": "snit_layer_lists/sinac_capas_de_nodo.json",
+      "raw_bytes": 8497,
+      "raw_sha256": "210277b19b8f25c018245f2ee831c5eee77664ddfe89253219964fd99cb346fa",
+      "endpoint": "https://www.snitcr.go.cr/Visor/capas_de_nodo",
+      "request": {
+        "method": "POST",
+        "form": {
+          "nk": "bm9kbzo6NDA="
+        }
+      },
+      "resultado": true,
+      "layer_count": 7,
+      "wms_layer_count": 7,
+      "wfs_layer_count": 7,
+      "wmts_layer_count": 0,
+      "metadata_layer_count": 7,
+      "review_role": "protected-area, forest-cover, biological-corridor, and wetland publication-sensitivity review",
+      "selected_candidate_layers": [
+        {
+          "name": "Áreas Silvestres Protegidas",
+          "layer": "areas_silvestres_protegidas",
+          "institution": "Sistema Nacional de Áreas de Conservación",
+          "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+          "publication_or_catalog_date": "05-07-2026",
+          "wms_available": true,
+          "wfs_available": true,
+          "wmts_available": false,
+          "has_metadata": true,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6U0lOQUM6OmFyZWFzX3NpbHZlc3RyZXNfcHJvdGVnaWRhcw==",
+          "abstract": "Delimitación de las Áreas Silvestres Protegidas de Costa Rica.",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        },
+        {
+          "name": "Cobertura Forestal 2023",
+          "layer": "cobertura_forestal_2023",
+          "institution": "Sistema Nacional de Áreas de Conservación",
+          "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+          "publication_or_catalog_date": "05-07-2026",
+          "wms_available": true,
+          "wfs_available": true,
+          "wmts_available": false,
+          "has_metadata": true,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6U0lOQUM6OmNvYmVydHVyYV9mb3Jlc3RhbF8yMDIz",
+          "abstract": "Descripción: Capa de referencia para el 2023, desarrollada en el marco del Inventario Forestal Nacional de Costa Rica (IFN-CR), representa la continuación del mapeo realizado en 2021, con mejoras significativas en la metodología. El modelo de aprendizaje automático utilizado para integrar datos de los satélites Sentinel-1 y Sentinel-2 ha sido perfeccionado, incorporando nuevos algoritmos y optimizando los parámetros de clasificación. Al igual que la capa de 2021, la clasificación se realiza para el año libre de nubes y con una unidad mínima de mapeo de 0.5 hectáreas. El mapa resultante muestra las inferencias de las clases de bosque definidas por el IFN-CR.",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        },
+        {
+          "name": "Corredores Biológicos",
+          "layer": "corredoresbiologicos",
+          "institution": "Sistema Nacional de Áreas de Conservación",
+          "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+          "publication_or_catalog_date": "05-07-2026",
+          "wms_available": true,
+          "wfs_available": true,
+          "wmts_available": false,
+          "has_metadata": true,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6U0lOQUM6OmNvcnJlZG9yZXNiaW9sb2dpY29z",
+          "abstract": "En Costa Rica los Corredores Biológicos son la segunda estrategia de conservación más importante en cuanto a territorio y alcance, impulsados por el SINAC a través del Programa Nacional de Corredores Biológicos y con la participación de los actores locales en su gestión mediante plataformas participativas denominadas Comités Locales de Corredores Biológicos.",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        },
+        {
+          "name": "Registro Nacional de Humedales",
+          "layer": "registro_nacional_humedales",
+          "institution": "Sistema Nacional de Áreas de Conservación",
+          "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+          "publication_or_catalog_date": "05-07-2026",
+          "wms_available": true,
+          "wfs_available": true,
+          "wmts_available": false,
+          "has_metadata": true,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6U0lOQUM6OnJlZ2lzdHJvX25hY2lvbmFsX2h1bWVkYWxlcw==",
+          "abstract": "Actualización de la información del Inventario Nacional de Humedales para el país en lo que corresponde al Componente Geográfico, lo cual facilita la valoración de las variables de tamaño y cambio en el área de los humedales, según los registros anteriores (1998) al periodo de la actualización (2016-2018). El Inventario Nacional de Humedales hace un esfuerzo para complementar dicho componente con alguna información del componente biológico, pero la misma es aún limitada.",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        }
+      ]
+    },
+    {
+      "node_id": "snit_senara_estaciones",
+      "display_name": "SENARA-Estaciones Meteorologicas",
+      "provider": "Servicio Nacional de Aguas Subterraneas, Riego y Avenamiento",
+      "node_key": "bm9kbzo6MTAw",
+      "source_info_url": "https://www.snitcr.go.cr/ico_servicios_ogc_info?k=bm9kbzo6MTAw",
+      "archived_layer_list": "snit_layer_lists/senara_estaciones_capas_de_nodo.json",
+      "raw_bytes": 2530,
+      "raw_sha256": "3973ab317f02f658c9e27bde1acc5a40d6e6ba9aa4c64c80aa3bbabf932f6be2",
+      "endpoint": "https://www.snitcr.go.cr/Visor/capas_de_nodo",
+      "request": {
+        "method": "POST",
+        "form": {
+          "nk": "bm9kbzo6MTAw"
+        }
+      },
+      "resultado": true,
+      "layer_count": 2,
+      "wms_layer_count": 2,
+      "wfs_layer_count": 2,
+      "wmts_layer_count": 0,
+      "metadata_layer_count": 2,
+      "review_role": "rain-station discovery for Pacuare flash-response and flow-band context",
+      "selected_candidate_layers": [
+        {
+          "name": "Estaciones Automáticas",
+          "layer": "estaciones_automaticas",
+          "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - ESTACIONES METEOROLÓGICAS",
+          "node_name": "SENARA-Estaciones Meteorológicas",
+          "publication_or_catalog_date": "28-06-2026",
+          "wms_available": true,
+          "wfs_available": true,
+          "wmts_available": false,
+          "has_metadata": true,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RXN0YWNpb25lcytNZXRlb3JvbCVDMyVCM2dpY2FzOjplc3RhY2lvbmVzX2F1dG9tYXRpY2Fz",
+          "abstract": "La red de estaciones automáticas, es una red reciente, la cual fue creada para el monitoreo de los acuíferos del proyecto Progirh del SENARA. Actualmente la red se mantiene con cinco estaciones localizadas en Grecia, Matapalo de Guanacaste, Savegre y dos estaciones en el sector de Ario, Cóbano.",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        },
+        {
+          "name": "Estaciones Pluviométricas",
+          "layer": "estaciones_pluviometricas",
+          "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - ESTACIONES METEOROLÓGICAS",
+          "node_name": "SENARA-Estaciones Meteorológicas",
+          "publication_or_catalog_date": "28-06-2026",
+          "wms_available": true,
+          "wfs_available": true,
+          "wmts_available": false,
+          "has_metadata": true,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RXN0YWNpb25lcytNZXRlb3JvbCVDMyVCM2dpY2FzOjplc3RhY2lvbmVzX3BsdXZpb21ldHJpY2Fz",
+          "abstract": "La red es estaciones pluviométricas tuvo sus inicios de los años sesenta. Se caracteriza por contar con observadores, quienes son los encargados de realizar la recolección de los datos diariamente. El parámetro registrado es la precipitación. Las estaciones pluviométricas, fueron cerradas de acuerdo con el oficio SENARA-DIGH-OFI-004-2025. La información se encuentra disponible a junio del 2024.",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        }
+      ]
+    },
+    {
+      "node_id": "snit_senara_recarga",
+      "display_name": "SENARA-RECARGA",
+      "provider": "Servicio Nacional de Aguas Subterraneas, Riego y Avenamiento",
+      "node_key": "bm9kbzo6ODg=",
+      "source_info_url": "https://www.snitcr.go.cr/ico_servicios_ogc_info?k=bm9kbzo6ODg=",
+      "archived_layer_list": "snit_layer_lists/senara_recarga_capas_de_nodo.json",
+      "raw_bytes": 24248,
+      "raw_sha256": "7a5d52c220c42a676120dd5eaaa72c306be33e22b762b74d7cb6aee9bcc40cdd",
+      "endpoint": "https://www.snitcr.go.cr/Visor/capas_de_nodo",
+      "request": {
+        "method": "POST",
+        "form": {
+          "nk": "bm9kbzo6ODg="
+        }
+      },
+      "resultado": true,
+      "layer_count": 15,
+      "wms_layer_count": 15,
+      "wfs_layer_count": 0,
+      "wmts_layer_count": 0,
+      "metadata_layer_count": 15,
+      "review_role": "near-corridor recharge/hydrogeology context for lower Pacuare/Siquirres review",
+      "selected_candidate_layers": [
+        {
+          "name": "Recarga_Siquirres_SIRGAS",
+          "layer": "Recarga_Siquirres_SIRGAS",
+          "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - RECARGA",
+          "node_name": "SENARA-RECARGA",
+          "publication_or_catalog_date": "28-06-2026",
+          "wms_available": true,
+          "wfs_available": false,
+          "wmts_available": false,
+          "has_metadata": true,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6UkVDQVJHQTo6UmVjYXJnYV9TaXF1aXJyZXNfU0lSR0FT",
+          "abstract": "El mapa de recarga muestra la recarga potencial en mm por año en cada sector, fue desarrollado mediante la metodología de balance hídrico de suelos según Schosinsky (2006) y posteriormente fue reclasificado en cinco clases de recarga según la metodología propuesta por el SENARA para el desarrollo de estudios hidrogeológicos de planes reguladores cantonales, publicada en La Gaceta 137 del 16 de julio del 2015.",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        }
+      ]
+    },
+    {
+      "node_id": "snit_senara_vulnerabilidad",
+      "display_name": "SENARA-VULNERABILIDAD",
+      "provider": "Servicio Nacional de Aguas Subterraneas, Riego y Avenamiento",
+      "node_key": "bm9kbzo6ODc=",
+      "source_info_url": "https://www.snitcr.go.cr/ico_servicios_ogc_info?k=bm9kbzo6ODc=",
+      "archived_layer_list": "snit_layer_lists/senara_vulnerabilidad_capas_de_nodo.json",
+      "raw_bytes": 58520,
+      "raw_sha256": "36137bb1dc392f9c4a3afe145d95b0c5618b8cfc52c70dc9ff26cf9d5c2bd405",
+      "endpoint": "https://www.snitcr.go.cr/Visor/capas_de_nodo",
+      "request": {
+        "method": "POST",
+        "form": {
+          "nk": "bm9kbzo6ODc="
+        }
+      },
+      "resultado": true,
+      "layer_count": 36,
+      "wms_layer_count": 36,
+      "wfs_layer_count": 35,
+      "wmts_layer_count": 0,
+      "metadata_layer_count": 36,
+      "review_role": "near-Caribbean hydrogeology context; not direct river geometry or flow authority until basin relation is confirmed",
+      "selected_candidate_layers": [
+        {
+          "name": "Vulnerabilidad_LIVERPOOL",
+          "layer": "Vulnerabilidad_LIVERPOOL",
+          "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - VULNERABILIDAD",
+          "node_name": "SENARA-VULNERABILIDAD",
+          "publication_or_catalog_date": "28-06-2026",
+          "wms_available": true,
+          "wfs_available": true,
+          "wmts_available": false,
+          "has_metadata": true,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6VlVMTkVSQUJJTElEQUQ6OlZ1bG5lcmFiaWxpZGFkX0xJVkVSUE9PTA==",
+          "abstract": "El estudio hidrogeológico se realiza según la licitación abreviada 2021LA-000008-0018800001, denominado Estudio Hidrogeológico para la Subcuenca del Río Blanco Limón, Costa Rica.En el cual se elaboró el modelo de vulnerabilidad intrínseca a la contaminación del acuífero Río Blanco, por medio de las metodologías (Foster et al, 2003) y Ramírez (2013). Se determinó que la zona de vulnerabilidad baja, corresponde con el sitio del pozo RB-109, la zona de vulnerabilidad media comprende casila totalidad del área con información del acuífero Río Blanco. Las zonas de vulnerabilidad alta, se presenta desde el punto RBL-6 hasta el RBL-4. En el acuífero Liverpool, la zona de vulnerabilidad media, corresponde con la zona que se encuentra bordeando al humedal. El área de vulnerabilidadalta: es la zona que bordea el interior del humedal hasta el pozo RB-86. El área de vulnerabilidad extrema: bordea las inmediaciones de los pozos RB-94 y RB-140 hacia los límites internos del humedal.",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        }
+      ]
+    },
+    {
+      "node_id": "snit_ice_sistema_electrico",
+      "display_name": "ICE-Sistema Electrico Nacional",
+      "provider": "Instituto Costarricense de Electricidad (ICE)",
+      "node_key": "bm9kbzo6MTIw",
+      "source_info_url": "https://www.snitcr.go.cr/ico_servicios_ogc_info?k=bm9kbzo6MTIw",
+      "archived_layer_list": "snit_layer_lists/ice_sistema_electrico_capas_de_nodo.json",
+      "raw_bytes": 2284,
+      "raw_sha256": "6046b158ffec10b73e7bae80c52ae879e40c6c8c3853248b033b1751307d4a93",
+      "endpoint": "https://www.snitcr.go.cr/Visor/capas_de_nodo",
+      "request": {
+        "method": "POST",
+        "form": {
+          "nk": "bm9kbzo6MTIw"
+        }
+      },
+      "resultado": true,
+      "layer_count": 3,
+      "wms_layer_count": 0,
+      "wfs_layer_count": 3,
+      "wmts_layer_count": 0,
+      "metadata_layer_count": 3,
+      "review_role": "utility context only; not direct Pacuare hydromet authority from this node list",
+      "selected_candidate_layers": [
+        {
+          "name": "Subestaciones",
+          "layer": "TransmisionICE:Subestaciones",
+          "institution": "Instituto Costarricense de Electricidad (ICE)",
+          "node_name": "ICE-Sistema Eléctrico Nacional",
+          "publication_or_catalog_date": "28-06-2026",
+          "wms_available": false,
+          "wfs_available": true,
+          "wmts_available": false,
+          "has_metadata": true,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6SUNFOjpUcmFuc21pc2lvbklDRSUzQVN1YmVzdGFjaW9uZXM=",
+          "abstract": "",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        },
+        {
+          "name": "LineasTransmision",
+          "layer": "TransmisionICE:LineasTransmision",
+          "institution": "Instituto Costarricense de Electricidad (ICE)",
+          "node_name": "ICE-Sistema Eléctrico Nacional",
+          "publication_or_catalog_date": "28-06-2026",
+          "wms_available": false,
+          "wfs_available": true,
+          "wmts_available": false,
+          "has_metadata": true,
+          "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6SUNFOjpUcmFuc21pc2lvbklDRSUzQUxpbmVhc1RyYW5zbWlzaW9u",
+          "abstract": "",
+          "feature_download_status": "not_downloaded_metadata_only",
+          "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use."
+        }
+      ]
+    }
+  ],
+  "selected_candidate_layers": [
+    {
+      "name": "DA_AFOROS",
+      "layer": "Aguas:DA_AFOROS",
+      "institution": "Dirección de Agua, MINAE",
+      "node_name": "DIRECCIÓN DE AGUA",
+      "publication_or_catalog_date": "05-07-2026",
+      "wms_available": true,
+      "wfs_available": false,
+      "wmts_available": false,
+      "has_metadata": false,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RElSRUNDSSVDMyU5M04rREUrQUdVQTo6QWd1YXMlM0FEQV9BRk9ST1M=",
+      "abstract": null,
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_direccion_de_agua"
+    },
+    {
+      "name": "DA_UNIDADES HIDROLOGICAS",
+      "layer": "Aguas:DA_UNIDADES_HIDROLOGICAS",
+      "institution": "Dirección de Agua, MINAE",
+      "node_name": "DIRECCIÓN DE AGUA",
+      "publication_or_catalog_date": "05-07-2026",
+      "wms_available": true,
+      "wfs_available": false,
+      "wmts_available": false,
+      "has_metadata": false,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RElSRUNDSSVDMyU5M04rREUrQUdVQTo6QWd1YXMlM0FEQV9VTklEQURFU19ISURST0xPR0lDQVM=",
+      "abstract": null,
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_direccion_de_agua"
+    },
+    {
+      "name": "DA_OBRAS EN CAUCE",
+      "layer": "Aguas:DA_OBRAS_EN_CAUCE",
+      "institution": "Dirección de Agua, MINAE",
+      "node_name": "DIRECCIÓN DE AGUA",
+      "publication_or_catalog_date": "05-07-2026",
+      "wms_available": true,
+      "wfs_available": false,
+      "wmts_available": false,
+      "has_metadata": false,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RElSRUNDSSVDMyU5M04rREUrQUdVQTo6QWd1YXMlM0FEQV9PQlJBU19FTl9DQVVDRQ==",
+      "abstract": null,
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_direccion_de_agua"
+    },
+    {
+      "name": "DA_OFICINAS DE UNIDADES HIDROLOGICAS",
+      "layer": "Aguas:OFICINAS_U_HIDROLOGICAS__1M_",
+      "institution": "Dirección de Agua, MINAE",
+      "node_name": "DIRECCIÓN DE AGUA",
+      "publication_or_catalog_date": "05-07-2026",
+      "wms_available": true,
+      "wfs_available": false,
+      "wmts_available": false,
+      "has_metadata": true,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RElSRUNDSSVDMyU5M04rREUrQUdVQTo6QWd1YXMlM0FPRklDSU5BU19VX0hJRFJPTE9HSUNBU19fMU1f",
+      "abstract": "Ubicación de las oficinas centrales y regionales de la Dirección de Agua.",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_direccion_de_agua"
+    },
+    {
+      "name": "Precipitación Anual: período 1960-2013",
+      "layer": "anual_precipitacion_60_13",
+      "institution": "Instituto Meteorológico Nacional",
+      "node_name": "Instituto Meteorológico Nacional (IMN)",
+      "publication_or_catalog_date": "28-06-2026",
+      "wms_available": true,
+      "wfs_available": true,
+      "wmts_available": false,
+      "has_metadata": false,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6SU1OOjphbnVhbF9wcmVjaXBpdGFjaW9uXzYwXzEz",
+      "abstract": "En este análisis se toma en cuenta la variable de precipitación en milímetros anual en un periodo de estudio desde el año 1960 al 2013.",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_imn"
+    },
+    {
+      "name": "Precipitación Abril: período 1960-2013",
+      "layer": "abril_precipitacion_60_13",
+      "institution": "Instituto Meteorológico Nacional",
+      "node_name": "Instituto Meteorológico Nacional (IMN)",
+      "publication_or_catalog_date": "28-06-2026",
+      "wms_available": true,
+      "wfs_available": true,
+      "wmts_available": false,
+      "has_metadata": false,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6SU1OOjphYnJpbF9wcmVjaXBpdGFjaW9uXzYwXzEz",
+      "abstract": "En este análisis se toma en cuenta la variable de precipitación en milímetros durante el mes de abril en un periodo de estudio desde el año 1960 al 2013. Los datos fueron recolectados por las diferentes estaciones meteorológicas mecánicas a disposición del Instituto Meteorológico Nacional. Los polígonos fueron delimitados por medio de un análisis climático multidisciplinario. El análisis se da a nivel nacional.",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_imn"
+    },
+    {
+      "name": "Precipitación Octubre: período 1960-2013",
+      "layer": "octubre_precipitacion_60_13",
+      "institution": "Instituto Meteorológico Nacional",
+      "node_name": "Instituto Meteorológico Nacional (IMN)",
+      "publication_or_catalog_date": "28-06-2026",
+      "wms_available": true,
+      "wfs_available": true,
+      "wmts_available": false,
+      "has_metadata": false,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6SU1OOjpvY3R1YnJlX3ByZWNpcGl0YWNpb25fNjBfMTM=",
+      "abstract": "En este análisis se toma en cuenta la variable de precipitación en milímetros durante el mes de octubre en un periodo de estudio desde el año 1960 al 2013. Los datos fueron recolectados por las diferentes estaciones meteorológicas mecánicas a disposición del Instituto Meteorológico Nacional. Los polígonos fueron delimitados por medio de un análisis climático multidisciplinario. El análisis se da a nivel nacional.",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_imn"
+    },
+    {
+      "name": "Áreas Silvestres Protegidas",
+      "layer": "areas_silvestres_protegidas",
+      "institution": "Sistema Nacional de Áreas de Conservación",
+      "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+      "publication_or_catalog_date": "05-07-2026",
+      "wms_available": true,
+      "wfs_available": true,
+      "wmts_available": false,
+      "has_metadata": true,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6U0lOQUM6OmFyZWFzX3NpbHZlc3RyZXNfcHJvdGVnaWRhcw==",
+      "abstract": "Delimitación de las Áreas Silvestres Protegidas de Costa Rica.",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_sinac"
+    },
+    {
+      "name": "Cobertura Forestal 2023",
+      "layer": "cobertura_forestal_2023",
+      "institution": "Sistema Nacional de Áreas de Conservación",
+      "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+      "publication_or_catalog_date": "05-07-2026",
+      "wms_available": true,
+      "wfs_available": true,
+      "wmts_available": false,
+      "has_metadata": true,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6U0lOQUM6OmNvYmVydHVyYV9mb3Jlc3RhbF8yMDIz",
+      "abstract": "Descripción: Capa de referencia para el 2023, desarrollada en el marco del Inventario Forestal Nacional de Costa Rica (IFN-CR), representa la continuación del mapeo realizado en 2021, con mejoras significativas en la metodología. El modelo de aprendizaje automático utilizado para integrar datos de los satélites Sentinel-1 y Sentinel-2 ha sido perfeccionado, incorporando nuevos algoritmos y optimizando los parámetros de clasificación. Al igual que la capa de 2021, la clasificación se realiza para el año libre de nubes y con una unidad mínima de mapeo de 0.5 hectáreas. El mapa resultante muestra las inferencias de las clases de bosque definidas por el IFN-CR.",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_sinac"
+    },
+    {
+      "name": "Corredores Biológicos",
+      "layer": "corredoresbiologicos",
+      "institution": "Sistema Nacional de Áreas de Conservación",
+      "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+      "publication_or_catalog_date": "05-07-2026",
+      "wms_available": true,
+      "wfs_available": true,
+      "wmts_available": false,
+      "has_metadata": true,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6U0lOQUM6OmNvcnJlZG9yZXNiaW9sb2dpY29z",
+      "abstract": "En Costa Rica los Corredores Biológicos son la segunda estrategia de conservación más importante en cuanto a territorio y alcance, impulsados por el SINAC a través del Programa Nacional de Corredores Biológicos y con la participación de los actores locales en su gestión mediante plataformas participativas denominadas Comités Locales de Corredores Biológicos.",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_sinac"
+    },
+    {
+      "name": "Registro Nacional de Humedales",
+      "layer": "registro_nacional_humedales",
+      "institution": "Sistema Nacional de Áreas de Conservación",
+      "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+      "publication_or_catalog_date": "05-07-2026",
+      "wms_available": true,
+      "wfs_available": true,
+      "wmts_available": false,
+      "has_metadata": true,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6U0lOQUM6OnJlZ2lzdHJvX25hY2lvbmFsX2h1bWVkYWxlcw==",
+      "abstract": "Actualización de la información del Inventario Nacional de Humedales para el país en lo que corresponde al Componente Geográfico, lo cual facilita la valoración de las variables de tamaño y cambio en el área de los humedales, según los registros anteriores (1998) al periodo de la actualización (2016-2018). El Inventario Nacional de Humedales hace un esfuerzo para complementar dicho componente con alguna información del componente biológico, pero la misma es aún limitada.",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_sinac"
+    },
+    {
+      "name": "Estaciones Automáticas",
+      "layer": "estaciones_automaticas",
+      "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - ESTACIONES METEOROLÓGICAS",
+      "node_name": "SENARA-Estaciones Meteorológicas",
+      "publication_or_catalog_date": "28-06-2026",
+      "wms_available": true,
+      "wfs_available": true,
+      "wmts_available": false,
+      "has_metadata": true,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RXN0YWNpb25lcytNZXRlb3JvbCVDMyVCM2dpY2FzOjplc3RhY2lvbmVzX2F1dG9tYXRpY2Fz",
+      "abstract": "La red de estaciones automáticas, es una red reciente, la cual fue creada para el monitoreo de los acuíferos del proyecto Progirh del SENARA. Actualmente la red se mantiene con cinco estaciones localizadas en Grecia, Matapalo de Guanacaste, Savegre y dos estaciones en el sector de Ario, Cóbano.",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_senara_estaciones"
+    },
+    {
+      "name": "Estaciones Pluviométricas",
+      "layer": "estaciones_pluviometricas",
+      "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - ESTACIONES METEOROLÓGICAS",
+      "node_name": "SENARA-Estaciones Meteorológicas",
+      "publication_or_catalog_date": "28-06-2026",
+      "wms_available": true,
+      "wfs_available": true,
+      "wmts_available": false,
+      "has_metadata": true,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6RXN0YWNpb25lcytNZXRlb3JvbCVDMyVCM2dpY2FzOjplc3RhY2lvbmVzX3BsdXZpb21ldHJpY2Fz",
+      "abstract": "La red es estaciones pluviométricas tuvo sus inicios de los años sesenta. Se caracteriza por contar con observadores, quienes son los encargados de realizar la recolección de los datos diariamente. El parámetro registrado es la precipitación. Las estaciones pluviométricas, fueron cerradas de acuerdo con el oficio SENARA-DIGH-OFI-004-2025. La información se encuentra disponible a junio del 2024.",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_senara_estaciones"
+    },
+    {
+      "name": "Recarga_Siquirres_SIRGAS",
+      "layer": "Recarga_Siquirres_SIRGAS",
+      "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - RECARGA",
+      "node_name": "SENARA-RECARGA",
+      "publication_or_catalog_date": "28-06-2026",
+      "wms_available": true,
+      "wfs_available": false,
+      "wmts_available": false,
+      "has_metadata": true,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6UkVDQVJHQTo6UmVjYXJnYV9TaXF1aXJyZXNfU0lSR0FT",
+      "abstract": "El mapa de recarga muestra la recarga potencial en mm por año en cada sector, fue desarrollado mediante la metodología de balance hídrico de suelos según Schosinsky (2006) y posteriormente fue reclasificado en cinco clases de recarga según la metodología propuesta por el SENARA para el desarrollo de estudios hidrogeológicos de planes reguladores cantonales, publicada en La Gaceta 137 del 16 de julio del 2015.",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_senara_recarga"
+    },
+    {
+      "name": "Vulnerabilidad_LIVERPOOL",
+      "layer": "Vulnerabilidad_LIVERPOOL",
+      "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - VULNERABILIDAD",
+      "node_name": "SENARA-VULNERABILIDAD",
+      "publication_or_catalog_date": "28-06-2026",
+      "wms_available": true,
+      "wfs_available": true,
+      "wmts_available": false,
+      "has_metadata": true,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6VlVMTkVSQUJJTElEQUQ6OlZ1bG5lcmFiaWxpZGFkX0xJVkVSUE9PTA==",
+      "abstract": "El estudio hidrogeológico se realiza según la licitación abreviada 2021LA-000008-0018800001, denominado Estudio Hidrogeológico para la Subcuenca del Río Blanco Limón, Costa Rica.En el cual se elaboró el modelo de vulnerabilidad intrínseca a la contaminación del acuífero Río Blanco, por medio de las metodologías (Foster et al, 2003) y Ramírez (2013). Se determinó que la zona de vulnerabilidad baja, corresponde con el sitio del pozo RB-109, la zona de vulnerabilidad media comprende casila totalidad del área con información del acuífero Río Blanco. Las zonas de vulnerabilidad alta, se presenta desde el punto RBL-6 hasta el RBL-4. En el acuífero Liverpool, la zona de vulnerabilidad media, corresponde con la zona que se encuentra bordeando al humedal. El área de vulnerabilidadalta: es la zona que bordea el interior del humedal hasta el pozo RB-86. El área de vulnerabilidad extrema: bordea las inmediaciones de los pozos RB-94 y RB-140 hacia los límites internos del humedal.",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_senara_vulnerabilidad"
+    },
+    {
+      "name": "Subestaciones",
+      "layer": "TransmisionICE:Subestaciones",
+      "institution": "Instituto Costarricense de Electricidad (ICE)",
+      "node_name": "ICE-Sistema Eléctrico Nacional",
+      "publication_or_catalog_date": "28-06-2026",
+      "wms_available": false,
+      "wfs_available": true,
+      "wmts_available": false,
+      "has_metadata": true,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6SUNFOjpUcmFuc21pc2lvbklDRSUzQVN1YmVzdGFjaW9uZXM=",
+      "abstract": "",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_ice_sistema_electrico"
+    },
+    {
+      "name": "LineasTransmision",
+      "layer": "TransmisionICE:LineasTransmision",
+      "institution": "Instituto Costarricense de Electricidad (ICE)",
+      "node_name": "ICE-Sistema Eléctrico Nacional",
+      "publication_or_catalog_date": "28-06-2026",
+      "wms_available": false,
+      "wfs_available": true,
+      "wmts_available": false,
+      "has_metadata": true,
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6SUNFOjpUcmFuc21pc2lvbklDRSUzQUxpbmVhc1RyYW5zbWlzaW9u",
+      "abstract": "",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "node_id": "snit_ice_sistema_electrico"
+    }
+  ],
+  "candidate_review_targets": [
+    {
+      "target": "Pacuare official hydrography and station discovery",
+      "candidate_nodes": [
+        "snit_direccion_de_agua"
+      ],
+      "candidate_layers": [
+        "DA_AFOROS",
+        "DA_UNIDADES HIDROLOGICAS",
+        "DA_OBRAS EN CAUCE"
+      ],
+      "target_outputs": [
+        "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
+        "hydrology/production_import_pilot/basin_relation_review.geojson",
+        "hydrography/production_import_pilot/centerline.geojson"
+      ],
+      "promotion_gate": "Confirm layer terms, CRS, attributes, WMS/WFS availability, Pacuare basin intersection, and guide/outfitter interpretation before importing or tuning flow bands."
+    },
+    {
+      "target": "Pacuare rainfed seasonal and flash-response context",
+      "candidate_nodes": [
+        "snit_imn",
+        "snit_senara_estaciones"
+      ],
+      "candidate_layers": [
+        "Precipitación Anual: período 1960-2013",
+        "Estaciones Pluviométricas",
+        "Estaciones Automáticas"
+      ],
+      "target_outputs": [
+        "hydrology/production_import_pilot/rainfall_station_review.json",
+        "hydrology/production_import_pilot/flash_response_review.json",
+        "hydrology/production_import_pilot/flow_band_review.json"
+      ],
+      "promotion_gate": "Numeric gameplay flow bands remain blocked until station identity, rainfall/discharge variables, units, coverage, time zone, access terms, and guide review are recorded."
+    },
+    {
+      "target": "Pacuare rainforest/protected-area publication sensitivity",
+      "candidate_nodes": [
+        "snit_sinac",
+        "snit_senara_recarga",
+        "snit_senara_vulnerabilidad"
+      ],
+      "candidate_layers": [
+        "Áreas Silvestres Protegidas",
+        "Cobertura Forestal 2023",
+        "Corredores Biológicos",
+        "Registro Nacional de Humedales",
+        "Recarga_Siquirres_SIRGAS"
+      ],
+      "target_outputs": [
+        "review/production_import_pilot/protected_area_publication_sensitivity.json",
+        "review/production_import_pilot/access_and_conservation_policy.json",
+        "imagery/production_import_pilot/vegetation_mask_review.json"
+      ],
+      "promotion_gate": "Do not publish detailed access, sensitive locations, or production vegetation masks until SINAC/SENARA terms and local sensitivity review clear them."
+    }
+  ],
+  "next_actions": [
+    "Review selected SNIT layer terms, CRS, attribute schema, and WMS/WFS availability before any feature or tile import.",
+    "Intersect DA_AFOROS, DA_UNIDADES HIDROLOGICAS, IMN precipitation, SENARA station/recharge, and SINAC protected-area candidates with the Pacuare planning bounds after terms review.",
+    "Replace the Unreal-preview Pacuare centerline scaffold only after official hydrography/basin relation and guide stationing review agree.",
+    "Keep all SNIT layers discovery-only until import scripts record checksums, attribution, CRS, bounds, and redistribution policy."
+  ]
+}

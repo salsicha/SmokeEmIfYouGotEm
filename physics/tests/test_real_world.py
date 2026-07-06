@@ -30,6 +30,10 @@ from raftsim.real_world import (
     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
     PACUARE_PRODUCTION_IMPORT_PILOT_FILE,
+    PACUARE_SNIT_CONFIG_FILE,
+    PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
+    PACUARE_SNIT_LAYER_LIST_SCRIPT_FILE,
+    PACUARE_SNIT_OGC_CATALOG_FILE,
     PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE,
     PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION,
     RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
@@ -557,6 +561,10 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in seeds["pacuare_official_source_access_plan"]["artifacts"]
     assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_FILE in seeds["pacuare_official_source_access_plan"]["artifacts"]
     assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE in seeds["pacuare_official_source_access_plan"]["artifacts"]
+    assert PACUARE_SNIT_OGC_CATALOG_FILE in seeds["pacuare_official_source_access_plan"]["artifacts"]
+    assert PACUARE_SNIT_CONFIG_FILE in seeds["pacuare_official_source_access_plan"]["artifacts"]
+    assert PACUARE_SNIT_LAYER_LIST_SCRIPT_FILE in seeds["pacuare_official_source_access_plan"]["artifacts"]
+    assert PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE in seeds["pacuare_official_source_access_plan"]["artifacts"]
     assert {
         "terrain_dem_or_lidar",
         "hydrography_and_centerline",
@@ -580,6 +588,9 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
+    assert PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
+    assert PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE in classes["protected_area_and_access_context"]["target_outputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE in classes["hydrography_and_centerline"]["target_outputs"]
@@ -602,6 +613,10 @@ def test_pacuare_official_source_access_plan_records_catalogs_without_downloads(
     assert {"snit_ogc_services_catalog", "snit_recurso_hidrico_viewer", "direccion_de_agua_sinigirh_geoservices"}.issubset(
         catalogs
     )
+    assert catalogs["snit_ogc_services_catalog"]["archived_catalog_file"] == "snit_ogc_services_catalog.html"
+    assert catalogs["snit_ogc_services_catalog"]["layer_catalog_summary"] == "snit_layer_catalog_summary.json"
+    assert "snit_sinac" in catalogs["snit_ogc_services_catalog"]["reviewed_nodes"]
+    assert "snit_senara_estaciones" in catalogs["snit_ogc_services_catalog"]["reviewed_nodes"]
     assert "Aguas:DA_AFOROS" in catalogs["direccion_de_agua_sinigirh_geoservices"]["candidate_layers"]
     assert "Aguas:JASEC_ESTACIONES_HIDROMETRICAS" in catalogs["direccion_de_agua_sinigirh_geoservices"]["candidate_layers"]
     assert "Aguas:DA_UNIDADES_HIDROLOGICAS" in catalogs["direccion_de_agua_sinigirh_geoservices"]["candidate_layers"]
@@ -614,6 +629,7 @@ def test_pacuare_official_source_access_plan_records_catalogs_without_downloads(
     ]
     assert any("terms" in item for item in plan["per_layer_required_metadata"])
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in plan["downstream_manifest_targets"]
+    assert PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE in plan["downstream_manifest_targets"]
 
 
 def test_pacuare_direccion_de_agua_capabilities_are_archived_as_metadata_only():
@@ -634,6 +650,43 @@ def test_pacuare_direccion_de_agua_capabilities_are_archived_as_metadata_only():
     assert "Aguas:JASEC_ESTACIONES_HIDROMETRICAS" in selected_names
     assert "Aguas:DA_UNIDADES_HIDROLOGICAS" in selected_names
     assert "Aguas:DA_Cuencas_Hidrograficas_CR" in selected_names
+    assert all(layer["feature_download_status"] == "not_downloaded_metadata_only" for layer in summary["selected_candidate_layers"])
+
+
+def test_pacuare_snit_layer_catalog_is_archived_as_metadata_only():
+    base = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
+    summary_path = base / PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE
+    summary = json.loads(summary_path.read_text())
+    catalog_path = base / PACUARE_SNIT_OGC_CATALOG_FILE
+    config_path = base / PACUARE_SNIT_CONFIG_FILE
+    layer_list_script_path = base / PACUARE_SNIT_LAYER_LIST_SCRIPT_FILE
+    node_archives = {entry["node_id"]: entry for entry in summary["node_layer_archives"]}
+    selected_names = {layer["name"] for layer in summary["selected_candidate_layers"]}
+
+    assert catalog_path.is_file()
+    assert config_path.is_file()
+    assert layer_list_script_path.is_file()
+    assert summary["schema"] == "raftsim.pacuare.snit_layer_catalog_summary.v1"
+    assert summary["status"] == "snit_catalog_and_node_layer_lists_archived_metadata_only_no_features_downloaded"
+    assert summary["policy"]["feature_downloads_performed"] is False
+    assert summary["policy"]["layer_geometry_imported"] is False
+    assert summary["archived_catalog"]["raw_sha256"] == hashlib.sha256(catalog_path.read_bytes()).hexdigest()
+    assert summary["endpoint_contract_evidence"]["config_script"]["raw_sha256"] == hashlib.sha256(
+        config_path.read_bytes()
+    ).hexdigest()
+    assert summary["endpoint_contract_evidence"]["layer_list_script"]["raw_sha256"] == hashlib.sha256(
+        layer_list_script_path.read_bytes()
+    ).hexdigest()
+    assert node_archives["snit_direccion_de_agua"]["layer_count"] == 37
+    assert node_archives["snit_imn"]["layer_count"] == 39
+    assert node_archives["snit_sinac"]["layer_count"] == 7
+    assert node_archives["snit_senara_estaciones"]["layer_count"] == 2
+    assert "DA_AFOROS" in selected_names
+    assert "DA_UNIDADES HIDROLOGICAS" in selected_names
+    assert "Precipitación Anual: período 1960-2013" in selected_names
+    assert "Estaciones Pluviométricas" in selected_names
+    assert "Áreas Silvestres Protegidas" in selected_names
+    assert "Cobertura Forestal 2023" in selected_names
     assert all(layer["feature_download_status"] == "not_downloaded_metadata_only" for layer in summary["selected_candidate_layers"])
 
 

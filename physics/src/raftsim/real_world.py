@@ -107,6 +107,10 @@ PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_FILE = (
 PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE = (
     "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json"
 )
+PACUARE_SNIT_OGC_CATALOG_FILE = "hydrography/production_import_pilot/snit_ogc_services_catalog.html"
+PACUARE_SNIT_CONFIG_FILE = "hydrography/production_import_pilot/snit_config_ssnit.js"
+PACUARE_SNIT_LAYER_LIST_SCRIPT_FILE = "hydrography/production_import_pilot/snit_ico_servicios_ogc_lista_capas.js"
+PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE = "hydrography/production_import_pilot/snit_layer_catalog_summary.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE = "production_import_pilot_derivatives_manifest.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
@@ -1573,15 +1577,27 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
             {
                 "product_id": "pacuare_official_source_access_plan",
                 "status": "official_service_catalogs_recorded_layer_download_pending",
-                "source_ids": ["snit_cr_idecori", "minae_direccion_agua", "imn_costa_rica", "ice_hydromet"],
+                "source_ids": [
+                    "snit_cr_idecori",
+                    "minae_direccion_agua",
+                    "imn_costa_rica",
+                    "sinac_minae",
+                    "senara_costa_rica",
+                    "ice_hydromet",
+                ],
                 "artifacts": [
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_FILE,
                     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
+                    PACUARE_SNIT_OGC_CATALOG_FILE,
+                    PACUARE_SNIT_CONFIG_FILE,
+                    PACUARE_SNIT_LAYER_LIST_SCRIPT_FILE,
+                    PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
                 ],
                 "limits": (
                     "Records official Costa Rica service catalogs, archived Direccion de Agua WMS capabilities metadata, "
-                    "candidate layer names, and review gates only; no SNIT/Direccion de Agua/SINIGIRH features are "
+                    "archived SNIT node layer-list metadata, candidate layer names, and review gates only; no "
+                    "SNIT/Direccion de Agua/SINIGIRH features are "
                     "downloaded, clipped, or promoted by this plan."
                 ),
             },
@@ -1610,6 +1626,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                 "target_outputs": [
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
+                    PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
                     PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
@@ -1662,6 +1679,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                 "target_outputs": [
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
+                    PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
                     "hydrology/production_import_pilot/rainfall_station_review.json",
                     "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
                     "hydrology/production_import_pilot/flash_response_review.json",
@@ -1679,6 +1697,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                 "source_ids": ["sinac_minae", "snit_cr_idecori", "guide_review"],
                 "target_outputs": [
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
+                    PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
                     "review/production_import_pilot/protected_area_publication_sensitivity.json",
                     "review/production_import_pilot/access_and_conservation_policy.json",
                 ],
@@ -2083,6 +2102,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "production_import_pilot/vegetation_mask_2048.png",
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
+                    PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
                     PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
@@ -2097,6 +2117,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                         "required_artifacts": [
                             PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                             PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
+                            PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
                             PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
                             PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
                             PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
@@ -2122,12 +2143,24 @@ def build_production_environment_gap_register() -> dict[str, object]:
                         "required_artifacts": [
                             PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                             PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
+                            PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
                             "hydrology/production_import_pilot/rainfall_station_review.json",
                             "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
                             "hydrology/production_import_pilot/flash_response_review.json",
                         ],
                         "source_leads": ["imn_costa_rica", "ice_hydromet", "minae_direccion_agua", "guide_review"],
-                        "promotion_gate": "Keep relative flow bands until station variables, units, time zones, access terms, rainfall/flow coverage, and guide review are attached.",
+                        "promotion_gate": "Use the SNIT node layer-list summary as discovery metadata for IMN precipitation, SENARA station, and Direccion de Agua aforo candidates, but keep relative flow bands until station variables, units, time zones, access terms, rainfall/flow coverage, Pacuare basin relation, and guide review are attached.",
+                    },
+                    {
+                        "source_class": "protected_area_and_access_context",
+                        "required_artifacts": [
+                            PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
+                            PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
+                            "review/production_import_pilot/protected_area_publication_sensitivity.json",
+                            "review/production_import_pilot/access_and_conservation_policy.json",
+                        ],
+                        "source_leads": ["sinac_minae", "senara_costa_rica", "guide_review"],
+                        "promotion_gate": "Use the SNIT SINAC/SENARA layer lists only as metadata leads until protected-area, forest-cover, wetland, recharge, access, and sensitive-location terms clear public screenshots and route-detail publication.",
                     },
                     {
                         "source_class": "guide_and_reference_media_annotations",
