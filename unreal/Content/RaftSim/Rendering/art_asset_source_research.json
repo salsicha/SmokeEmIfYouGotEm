@@ -89,5 +89,42 @@
     "specialist_photogrammetry_libraries",
     "outsourced_custom_art_or_photogrammetry"
   ],
+  "photoreal_environment_review_2026_07_05": {
+    "local_unreal_content_inventory": {
+      "status": "no_committed_megascans_quixel_fab_or_photogrammetry_environment_assets_found",
+      "available_preview_assets": [
+        "RaftSim generated preview materials",
+        "engine/plugin PCG sample trees, seedlings, and boulders loaded by path when available",
+        "source-derived DEM and aerial preview rasters"
+      ],
+      "impact": "current captures can improve as source-aware blockouts, but lifelike screenshots require imported production terrain, rock, foliage, water, foam, mist, and lighting assets or first-party/procedural equivalents"
+    },
+    "official_source_checks": [
+      {
+        "name": "Poly Haven",
+        "url": "https://polyhaven.com/license",
+        "review_date": "2026-07-05",
+        "current_use": "candidate CC0 source for HDRIs, textures, and models after asset-level URL and license snapshot records are added"
+      },
+      {
+        "name": "Fab Standard License",
+        "url": "https://www.fab.com/eula",
+        "review_date": "2026-07-05",
+        "current_use": "candidate source for free Unreal-ready environment assets after per-asset price, license tier, collaborator-sharing, and standalone-redistribution checks are recorded"
+      },
+      {
+        "name": "OpenTopography",
+        "url": "https://opentopography.org/",
+        "review_date": "2026-07-05",
+        "current_use": "candidate high-resolution topography and hydrology-processing source; API-key and dataset-specific citation/terms review remain required before production terrain import"
+      },
+      {
+        "name": "USGS The National Map",
+        "url": "https://apps.nationalmap.gov/tnmaccess/",
+        "review_date": "2026-07-05",
+        "current_use": "official U.S. DEM, hydrography, and imagery source already used for sample pulls; full-corridor source pulls and conditioning remain required"
+      }
+    ]
+  },
   "buy_paid_assets_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true
 }
