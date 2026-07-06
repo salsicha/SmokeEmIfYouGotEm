@@ -1,7 +1,10 @@
 {
   "artifacts": {
     "access_and_protected_context": [
-      "review/production_import_pilot/access_publication_sensitivity_review.json"
+      "review/production_import_pilot/access_publication_sensitivity_review.json",
+      "review/production_import_pilot/access_points.geojson",
+      "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+      "review/production_import_pilot/evacuation_and_rescue_routes.geojson"
     ],
     "elevation": [
       "terrain/3dep_dem_tiles",

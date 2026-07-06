@@ -44,6 +44,7 @@ Use the existing South Fork corridor package as the baseline. Fill it with produ
 - Flow levels: USGS Water Data station `USGS-11445500`, including daily and instantaneous discharge plus stage when available.
 - Aerial imagery: NAIP where available, plus Landsat/Sentinel for historical season comparison and water/vegetation masks.
 - Review media: rights-cleared guide footage, first-party field captures, Wikimedia/Flickr Creative Commons candidates only after per-item license review, and public social links as reference-only annotations.
+- Access/publication review: `review/production_import_pilot/access_points.geojson`, `no_publish_sensitive_polygons.geojson`, and `evacuation_and_rescue_routes.geojson` now provide stationing-derived editor overlays only; official access, land-status, sensitive-location, and emergency-route review still gates production use and public screenshots.
 
 ### Colorado River
 

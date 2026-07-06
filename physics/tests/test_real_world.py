@@ -57,9 +57,12 @@ from raftsim.real_world import (
     REFERENCE_MEDIA_ANNOTATIONS_FILE,
     REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
     PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION,
+    SOUTH_FORK_ACCESS_POINTS_FILE,
     SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
+    SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE,
     SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
     SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
+    SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
     SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE,
     SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE,
     SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
@@ -86,8 +89,11 @@ from raftsim.real_world import (
     build_real_world_corridor_package,
     build_reference_media_annotations_geojson,
     build_reference_media_rights_manifest,
+    build_south_fork_access_points_geojson,
     build_south_fork_access_publication_review,
+    build_south_fork_evacuation_rescue_routes_geojson,
     build_south_fork_flow_band_review,
+    build_south_fork_no_publish_sensitive_polygons_geojson,
     build_south_fork_production_import_pilot,
     build_source_manifest,
     default_candidate_river_inventory,
@@ -199,6 +205,9 @@ def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE in manifest["artifacts"]["source_pulls"]
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE in manifest["artifacts"]["source_pulls"]
     assert SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE in manifest["artifacts"]["access_and_protected_context"]
+    assert SOUTH_FORK_ACCESS_POINTS_FILE in manifest["artifacts"]["access_and_protected_context"]
+    assert SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE in manifest["artifacts"]["access_and_protected_context"]
+    assert SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE in manifest["artifacts"]["access_and_protected_context"]
     assert any(
         fetch["fetch_id"] == "sfa_access_publication_sensitivity_review"
         for fetch in manifest["remote_fetches"]
@@ -346,6 +355,9 @@ def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_revie
     assert "ca_state_parks_marshall_gold_discovery" in classes["protected_area_and_access_context"]["source_ids"]
     assert "el_dorado_county_gis" in classes["protected_area_and_access_context"]["source_ids"]
     assert SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE in classes["protected_area_and_access_context"]["target_outputs"]
+    assert SOUTH_FORK_ACCESS_POINTS_FILE in classes["protected_area_and_access_context"]["target_outputs"]
+    assert SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE in classes["protected_area_and_access_context"]["target_outputs"]
+    assert SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE in classes["protected_area_and_access_context"]["target_outputs"]
     assert pilot["unreal_import_targets"]["future_production_map"] == "/Game/RaftSim/Maps/Production/L_SouthForkAmerican_ChiliBar"
 
 
@@ -403,20 +415,49 @@ def test_south_fork_access_publication_review_artifact_tracks_official_source_le
         ).read_text()
     )
     review = json.loads((south_fork_dir / SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE).read_text())
+    stationing = json.loads((south_fork_dir / SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE).read_text())
+    access_points = json.loads((south_fork_dir / SOUTH_FORK_ACCESS_POINTS_FILE).read_text())
+    no_publish = json.loads((south_fork_dir / SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE).read_text())
+    evacuation_routes = json.loads((south_fork_dir / SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE).read_text())
     builder_review = build_south_fork_access_publication_review()
+    expected_access_points = build_south_fork_access_points_geojson(builder_review, stationing)
+    expected_no_publish = build_south_fork_no_publish_sensitive_polygons_geojson(builder_review, stationing)
+    expected_evacuation_routes = build_south_fork_evacuation_rescue_routes_geojson(builder_review, stationing)
 
     rivers = {river["river_id"]: river for river in readiness["rivers"]}
     photoreal_rivers = {river["river_id"]: river for river in photoreal_sources["rivers"]}
     source_ids = {source["source_id"] for source in review["sources_checked"]}
 
     assert review == builder_review
+    assert access_points == expected_access_points
+    assert no_publish == expected_no_publish
+    assert evacuation_routes == expected_evacuation_routes
     assert SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE in source_manifest["artifacts"]["access_and_protected_context"]
+    assert SOUTH_FORK_ACCESS_POINTS_FILE in source_manifest["artifacts"]["access_and_protected_context"]
+    assert SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE in source_manifest["artifacts"]["access_and_protected_context"]
+    assert SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE in source_manifest["artifacts"]["access_and_protected_context"]
     assert any(
         artifact["artifact_id"] == "south_fork_access_publication_sensitivity_review"
         for artifact in pull_manifest["pulled_artifacts"]
     )
+    assert any(
+        artifact["artifact_id"] == "south_fork_access_annotation_scaffolds"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
     assert review["schema"] == "raftsim.south_fork_access_publication_sensitivity_review.v1"
     assert review["status"] == "official_state_park_and_county_gis_leads_attached_review_gated"
+    assert access_points["schema"] == "raftsim.south_fork_access_points.geojson.v1"
+    assert access_points["status"] == "review_seed_access_points_not_authoritative_geometry"
+    assert no_publish["schema"] == "raftsim.south_fork_no_publish_sensitive_polygons.geojson.v1"
+    assert no_publish["status"] == "coarse_review_seed_no_publish_polygons_not_authoritative"
+    assert evacuation_routes["schema"] == "raftsim.south_fork_evacuation_rescue_routes.geojson.v1"
+    assert evacuation_routes["status"] == "coarse_review_seed_evacuation_rescue_routes_not_authoritative"
+    assert len(access_points["features"]) == 3
+    assert len(no_publish["features"]) == 3
+    assert len(evacuation_routes["features"]) == 3
+    assert all(feature["geometry"]["type"] == "Point" for feature in access_points["features"])
+    assert all(feature["geometry"]["type"] == "Polygon" for feature in no_publish["features"])
+    assert all(feature["geometry"]["type"] == "LineString" for feature in evacuation_routes["features"])
     assert {"ca_state_parks_marshall_gold_discovery", "el_dorado_county_gis"}.issubset(source_ids)
     assert len(review["station_review_zones"]) == 3
     assert review["sources_checked"][-1]["source_id"] == "blm_cronan_ranch_legacy_candidate"
@@ -426,8 +467,24 @@ def test_south_fork_access_publication_review_artifact_tracks_official_source_le
         SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE
         in rivers["american_south_fork"]["attached_sources_by_class"]["protected_area_and_access_context"]["artifacts"][0]
     )
+    assert (
+        f"physics/data/real_world/south_fork_american_chili_bar/{SOUTH_FORK_ACCESS_POINTS_FILE}"
+        in rivers["american_south_fork"]["attached_sources_by_class"]["protected_area_and_access_context"]["artifacts"]
+    )
+    assert (
+        f"physics/data/real_world/south_fork_american_chili_bar/{SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE}"
+        in rivers["american_south_fork"]["attached_sources_by_class"]["protected_area_and_access_context"]["artifacts"]
+    )
+    assert (
+        f"physics/data/real_world/south_fork_american_chili_bar/{SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE}"
+        in rivers["american_south_fork"]["attached_sources_by_class"]["protected_area_and_access_context"]["artifacts"]
+    )
     assert any(
         artifact["artifact_id"] == "south_fork_access_publication_sensitivity_review"
+        for artifact in photoreal_rivers["american_south_fork"]["source_sample_artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "south_fork_access_annotation_scaffolds"
         for artifact in photoreal_rivers["american_south_fork"]["source_sample_artifacts"]
     )
 
@@ -1454,6 +1511,9 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert SOUTH_FORK_FLOW_BAND_REVIEW_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
+    assert SOUTH_FORK_ACCESS_POINTS_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
+    assert SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
+    assert SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert REFERENCE_MEDIA_ANNOTATIONS_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert (
