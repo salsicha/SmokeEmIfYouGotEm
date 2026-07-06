@@ -86,6 +86,7 @@ SOUTH_FORK_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE = (
 SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE = "hydrography/production_import_pilot/centerline.geojson"
 SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE = "hydrography/production_import_pilot/banks.geojson"
 SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE = "hydrography/production_import_pilot/cross_sections.geojson"
+SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE = "review/production_import_pilot/access_publication_sensitivity_review.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
@@ -853,6 +854,28 @@ def default_source_catalog() -> tuple[SourceCatalogEntry, ...]:
             use_in_pipeline=("imagery_masks", "foam_texture", "boulder_density", "banks", "access_points"),
         ),
         SourceCatalogEntry(
+            source_id="ca_state_parks_marshall_gold_discovery",
+            category="access",
+            provider="California State Parks",
+            title="Marshall Gold Discovery State Historic Park",
+            url="https://www.parks.ca.gov/?page_id=484",
+            license_or_terms="Official park and access context; media, maps, restrictions, and concession references need item-level review before redistribution or in-game use.",
+            attribution="Credit California State Parks and Marshall Gold Discovery State Historic Park for official park/access facts used in review manifests.",
+            access_notes="Use as the downstream Coloma/state-park source lead, including map, concessionaire, flow-link, water-safety, and restriction review.",
+            use_in_pipeline=("access_context", "publication_sensitivity", "guide_reference_leads", "capture_review"),
+        ),
+        SourceCatalogEntry(
+            source_id="el_dorado_county_gis",
+            category="access",
+            provider="El Dorado County",
+            title="El Dorado County GIS Viewer and planning-source leads",
+            url="https://www.eldoradocounty.ca.gov/",
+            license_or_terms="Official county GIS/planning context; exact datasets, parcel/use restrictions, and redistribution terms must be checked per layer.",
+            attribution="Credit El Dorado County for county GIS and planning source layers when used.",
+            access_notes="Use for public/private land, road, parcel, river-management, evacuation, and access review leads before route publication.",
+            use_in_pipeline=("access_context", "parcel_land_status", "evacuation_review", "publication_sensitivity"),
+        ),
+        SourceCatalogEntry(
             source_id="osm",
             category="hydrography",
             provider="OpenStreetMap contributors",
@@ -989,6 +1012,19 @@ def south_fork_american_fetch_specs() -> tuple[RemoteFetchSpec, ...]:
                 "Review-gated preview water and vegetation masks generated from the active 1024px USDA/APFO NAIP drape "
                 "plus a bounded generated-preview channel prior. These masks are sampled by Unreal preview terrain/drape "
                 "coloring but are not final segmentation, bank polygons, or production masks."
+            ),
+        ),
+        RemoteFetchSpec(
+            fetch_id="sfa_access_publication_sensitivity_review",
+            category="access_and_publication_review",
+            source_id="ca_state_parks_marshall_gold_discovery",
+            url="https://www.parks.ca.gov/?page_id=484",
+            target_artifact=SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
+            status="official_source_lead_attached_review_required",
+            notes=(
+                "Records current State Parks Marshall Gold Discovery access/publication source evidence plus county GIS "
+                "and land-manager follow-up leads. This is not access geometry, private/public land authority, or "
+                "permission to publish sensitive route details."
             ),
         ),
         RemoteFetchSpec(
@@ -1254,9 +1290,15 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
             },
             {
                 "class_id": "protected_area_and_access_context",
-                "status": "planned_review_required",
-                "source_ids": ["official_land_access_review", "guide_review"],
+                "status": "official_state_park_and_county_gis_leads_attached_review_required",
+                "source_ids": [
+                    "ca_state_parks_marshall_gold_discovery",
+                    "el_dorado_county_gis",
+                    "official_land_access_review",
+                    "guide_review",
+                ],
                 "target_outputs": [
+                    SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
                     "review/production_import_pilot/access_points.geojson",
                     "review/production_import_pilot/publication_sensitivity.json",
                 ],
@@ -1942,6 +1984,22 @@ def build_production_environment_gap_register() -> dict[str, object]:
             "use_gate": "Attach station metadata, variables, units, quality flags, temporal coverage, and guide/release interpretation before final flow bands.",
         },
         {
+            "source_id": "ca_state_parks_marshall_gold_discovery",
+            "provider": "California State Parks",
+            "review_date": "2026-07-06",
+            "url": "https://www.parks.ca.gov/?page_id=484",
+            "why_it_matters": "Official downstream Coloma/state-park access, map, concession, water-safety, and publication-sensitivity source lead for the South Fork pilot.",
+            "use_gate": "Use as source-review evidence only until exact access geometry, current restrictions, publication sensitivity, media rights, and guide/outfitter review are attached.",
+        },
+        {
+            "source_id": "el_dorado_county_gis",
+            "provider": "El Dorado County",
+            "review_date": "2026-07-06",
+            "url": "https://experience.arcgis.com/experience/58a5b752c549418285583fc4c0301c29",
+            "why_it_matters": "Official county GIS lead for parcels, roads, public/private land, access, evacuation, and route-publication context.",
+            "use_gate": "Select exact layers and terms before importing geometries or using county context as access, parcel, or emergency-route authority.",
+        },
+        {
             "source_id": "copernicus_data_space",
             "provider": "Copernicus Data Space Ecosystem",
             "review_date": "2026-07-06",
@@ -2097,6 +2155,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                     SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
                     SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
+                    SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
                     "reference_media_link_manifest.json",
                 ],
                 "p0_next_pulls_or_attachments": [
@@ -2145,6 +2204,21 @@ def build_production_environment_gap_register() -> dict[str, object]:
                         ],
                         "source_leads": ["first_party_field_capture", "explicit_guide_or_outfitter_permission", "reference_media_link_manifest"],
                         "promotion_gate": "Attach creator/date/reach/flow/weather/permission before photos or footage influence production art.",
+                    },
+                    {
+                        "source_class": "protected_area_and_access_context",
+                        "required_artifacts": [
+                            SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
+                            "review/production_import_pilot/access_points.geojson",
+                            "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+                            "review/production_import_pilot/evacuation_and_rescue_routes.geojson",
+                        ],
+                        "source_leads": [
+                            "ca_state_parks_marshall_gold_discovery",
+                            "el_dorado_county_gis",
+                            "guide_review",
+                        ],
+                        "promotion_gate": "Use the attached State Parks/county GIS review as source-lead evidence only; exact access, land-status, evacuation, and publication-sensitivity geometries still need official layer selection and guide/local review.",
                     },
                 ],
                 "procedural_generation_allowlist": [
@@ -2435,6 +2509,9 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
                 RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
             ],
+            "access_and_protected_context": [
+                SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
+            ],
             "field_media": ["field_media/README.md"],
             "solver": ["scenario/scenario.json", "scenario/bed.npy", "scenario/initial_state.npz"],
             "source_pulls": [
@@ -2631,6 +2708,146 @@ def south_fork_american_flow_bands() -> tuple[FlowBand, ...]:
             confidence=0.25,
         ),
     )
+
+
+def build_south_fork_access_publication_review() -> dict[str, object]:
+    """Build the review-gated South Fork access and publication-sensitivity source artifact."""
+
+    return {
+        "schema": "raftsim.south_fork_access_publication_sensitivity_review.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "status": "official_state_park_and_county_gis_leads_attached_review_gated",
+        "scope": (
+            "Access, public/private land, emergency/evacuation, concession/outfitter, and publication-sensitivity "
+            "source review for the South Fork American Chili Bar to Coloma production environment pilot."
+        ),
+        "sources_checked": [
+            {
+                "source_id": "ca_state_parks_marshall_gold_discovery",
+                "provider": "California State Parks",
+                "url": "https://www.parks.ca.gov/?page_id=484",
+                "retrieved_on": "2026-07-06",
+                "http_status": 200,
+                "review_status": "official_page_reviewed",
+                "evidence": [
+                    "Page identifies Marshall Gold Discovery State Historic Park in Coloma on the South Fork of the American River.",
+                    "Page links an official ArcGIS park map and PDF tour map for local park/access review.",
+                    "Page includes current restrictions, water-safety language, concessionaire links, and a river-flow lead.",
+                    "Page describes Coloma/Highway 49 location context and park visitor/contact information.",
+                ],
+                "artifact_use": "downstream Coloma/state-park access and publication-sensitivity source lead",
+                "blocked_from": [
+                    "final take-out geometry",
+                    "redistributing park media or map assets",
+                    "claiming current operating restrictions without manual day-of review",
+                ],
+            },
+            {
+                "source_id": "ca_state_parks_marshall_arcgis_map",
+                "provider": "California State Parks ArcGIS",
+                "url": "https://csparks.maps.arcgis.com/apps/instant/basic/index.html?appid=065b067caa204e8da48d4b53c9483ab0&UNITNBR=304",
+                "retrieved_on": "2026-07-06",
+                "http_status": "linked_from_official_page_not_imported",
+                "review_status": "candidate_map_layer_manual_review_required",
+                "evidence": [
+                    "Linked from the official Marshall Gold Discovery State Historic Park page as the park map.",
+                    "No ArcGIS layer geometry, screenshots, or tiles are imported into the repository by this artifact.",
+                ],
+                "artifact_use": "manual park-boundary/access overlay review lead",
+                "blocked_from": ["shipping map layer", "texture or asset derivation", "route-publication authority"],
+            },
+            {
+                "source_id": "el_dorado_county_gis",
+                "provider": "El Dorado County",
+                "url": "https://experience.arcgis.com/experience/58a5b752c549418285583fc4c0301c29",
+                "retrieved_on": "2026-07-06",
+                "http_status": "linked_from_county_planning_page_not_imported",
+                "review_status": "official_county_gis_lead_attached",
+                "evidence": [
+                    "The fetched El Dorado County planning page links the county GIS Viewer as a geospatial data and mapping platform.",
+                    "The legacy river-management URL used for this check did not expose South Fork-specific river-management content in the fetched HTML.",
+                ],
+                "artifact_use": "public/private land, parcel, road, evacuation, and publication-sensitivity source lead",
+                "blocked_from": ["parcel authority", "emergency route authority", "final access geometry"],
+            },
+            {
+                "source_id": "blm_cronan_ranch_legacy_candidate",
+                "provider": "Bureau of Land Management",
+                "url": "https://www.blm.gov/visit/cronan-ranch-regional-trails-park",
+                "retrieved_on": "2026-07-06",
+                "http_status": 404,
+                "review_status": "legacy_candidate_rejected_needs_research",
+                "evidence": [
+                    "Candidate URL returned 404 during this review and is not accepted as an attached source.",
+                    "Find the current BLM or partner land-manager page before using Cronan/Henningsen/Lotus context.",
+                ],
+                "artifact_use": "negative source-lead evidence",
+                "blocked_from": ["access claims", "land-manager attribution", "publication sensitivity decisions"],
+            },
+        ],
+        "station_review_zones": [
+            {
+                "zone_id": "upstream_chili_bar_put_in_review_zone",
+                "station_range_m": [0.0, 600.0],
+                "review_status": "candidate_only_no_official_geometry_attached",
+                "needs": [
+                    "exact put-in ownership and access rules",
+                    "commercial/private launch constraints",
+                    "parking and road approach source layer",
+                    "guide validation before publishing map detail",
+                ],
+            },
+            {
+                "zone_id": "mid_reach_land_status_and_rescue_review_zone",
+                "station_range_m": [600.0, 4200.0],
+                "review_status": "requires_county_parcel_land_manager_and_guide_review",
+                "needs": [
+                    "public/private parcel review",
+                    "evacuation and road/trail access context",
+                    "sensitive-location and cultural-resource screening",
+                    "rapid rescue visibility notes",
+                ],
+            },
+            {
+                "zone_id": "coloma_marshall_gold_downstream_review_zone",
+                "station_range_m": [4200.0, 5200.0],
+                "review_status": "official_state_park_source_lead_attached_geometry_pending",
+                "needs": [
+                    "official park-boundary and access overlay review",
+                    "take-out and visitor-flow validation",
+                    "publication/cultural-resource sensitivity check",
+                    "concession/outfitter guide review",
+                ],
+            },
+        ],
+        "required_editor_annotations": [
+            "review/production_import_pilot/access_points.geojson",
+            "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+            "review/production_import_pilot/evacuation_and_rescue_routes.geojson",
+            "review/production_import_pilot/guide_access_notes.json",
+        ],
+        "allowed_use": [
+            "source-lead triage",
+            "station-aware annotation planning",
+            "publication-sensitivity checklist gating",
+            "preventing over-detailed preview map publication before review",
+        ],
+        "forbidden_use": [
+            "final access geometry",
+            "public/private land authority",
+            "evacuation or rescue route authority",
+            "shipping screenshots that reveal sensitive route/access details without review",
+            "using State Parks gallery media, maps, or third-party concession media as texture or art assets",
+        ],
+        "promotion_blockers": [
+            "Exact put-in, take-out, parking, road, trail, and evacuation geometries are not attached.",
+            "El Dorado County river-management, parcel, and public/private land layers still need exact source selection and terms review.",
+            "Cultural-resource, private-property, and sensitive-location publication rules need human review before route-detail screenshots.",
+            "Guide/outfitter review is required before access, scouting, rescue, or passenger-dropoff gameplay uses these zones.",
+        ],
+    }
 
 
 def build_south_fork_flow_band_review(
@@ -3371,6 +3588,7 @@ def write_real_world_seed_package(directory: str | Path) -> Path:
     _write_json(data_dir / "rapid_candidates.geojson", _rapid_candidates_geojson(package.rapid_candidates, package.indicators))
     _write_json(data_dir / RAPID_REVIEW_EDITOR_WORKFLOW_FILE, build_rapid_review_editor_workflow(package).to_json_dict())
     _write_json(data_dir / "corridor_package_manifest.json", _corridor_manifest(package))
+    _write_json(data_dir / SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE, build_south_fork_access_publication_review())
     _write_json(data_dir / SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE, build_south_fork_production_import_pilot(package.section))
     generate_real_world_scenario2_5d().write_package(scenario_dir)
     cascading_dir = data_dir / "cascading_scenarios"

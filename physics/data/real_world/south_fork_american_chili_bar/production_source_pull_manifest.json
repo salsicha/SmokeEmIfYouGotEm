@@ -37,6 +37,7 @@
     "Aerial imagery and water/vegetation masks are not downloaded yet.",
     "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, an ordered South Fork mainstem candidate, preview metric stationing, cross-section seed lines, a preview NAIP/DEM alignment diagnostic, and generated production-import draft centerline/bank/cross-section overlays, but it still needs direction confirmation, production CRS selection, bank/cross-section review, stronger NAIP/DEM alignment, and guide review.",
     "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window, but broader seasonal windows, A25 X-flag interpretation, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
+    "Access/publication source leads are now attached for South Fork, but exact access geometry, parcel/public-private land status, evacuation routes, sensitive-location screening, and guide/local approval remain open.",
     "No field/social reference media has explicit game-use rights attached yet."
   ],
   "pulled_artifacts": [
@@ -642,14 +643,20 @@
     {
       "artifact_id": "south_fork_flow_band_review",
       "category": "seasonal_flow_or_release_history_review",
+      "caveats": [
+        "Attached evidence is a 30-day early-summer CDEC context window, not representative seasonal coverage.",
+        "A25 X-flag meaning and station-to-reach release routing are unresolved.",
+        "Legal/redistribution signoff, guide/outfitter validation, and hydrologic station-to-rapid relation remain open.",
+        "High-flow planning at 3000 cfs was not observed in the attached window and needs separate runoff/release evidence."
+      ],
       "path": "hydrology/production_import_pilot/flow_band_review.json",
+      "provider": "RaftSim review artifact from CDEC CBR/A25 context and South Fork planning flow presets",
       "related_artifacts": [
         "flow_presets.json",
         "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
         "hydrology/south_fork_modern_flow_source_selection.json",
         "hydrology/cdec_terms_flags_and_station_relation_review.json"
       ],
-      "provider": "RaftSim review artifact from CDEC CBR/A25 context and South Fork planning flow presets",
       "status": "generated_review_gated_flow_band_comparison_not_preset_promotion",
       "summary": {
         "a25_unlisted_flags_observed": [
@@ -675,12 +682,34 @@
         "guide_discussion",
         "future_visual_variant_planning",
         "missing_seasonal_window_tracking"
-      ],
+      ]
+    },
+    {
+      "artifact_id": "south_fork_access_publication_sensitivity_review",
+      "category": "protected_area_and_access_context_review",
       "caveats": [
-        "Attached evidence is a 30-day early-summer CDEC context window, not representative seasonal coverage.",
-        "A25 X-flag meaning and station-to-reach release routing are unresolved.",
-        "Legal/redistribution signoff, guide/outfitter validation, and hydrologic station-to-rapid relation remain open.",
-        "High-flow planning at 3000 cfs was not observed in the attached window and needs separate runoff/release evidence."
+        "This is not put-in, take-out, public/private land, parcel, emergency-route, or sensitive-location geometry authority.",
+        "State Parks maps, gallery media, restrictions, and concession links require item-level rights/currentness review before production use.",
+        "County GIS layers still need exact layer selection, terms, and CRS review before importing geometry."
+      ],
+      "path": "review/production_import_pilot/access_publication_sensitivity_review.json",
+      "provider": "RaftSim review artifact from California State Parks Marshall Gold Discovery page and El Dorado County GIS source leads",
+      "related_artifacts": [
+        "source_manifest.json",
+        "production_import_pilot.json"
+      ],
+      "status": "official_source_leads_attached_review_gated_no_access_geometry",
+      "summary": {
+        "blm_cronan_legacy_candidate_status": "http_404_rejected_needs_current_source",
+        "county_gis_status": "linked_from_county_planning_page_not_imported",
+        "state_parks_page_status": "http_200_reviewed",
+        "station_review_zone_count": 3
+      },
+      "use": [
+        "access_source_triage",
+        "publication_sensitivity_gate",
+        "station_aware_annotation_planning",
+        "guide_and_geospatial_review_queue"
       ]
     }
   ],

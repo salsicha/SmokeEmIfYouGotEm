@@ -1,5 +1,8 @@
 {
   "artifacts": {
+    "access_and_protected_context": [
+      "review/production_import_pilot/access_publication_sensitivity_review.json"
+    ],
     "elevation": [
       "terrain/3dep_dem_tiles",
       "terrain/tnm_3dep_dem_products.json",
@@ -187,6 +190,15 @@
       "status": "generated_review_gated_preview_masks",
       "target_artifact": "imagery/usda_naip_chili_bar_corridor_water_mask_1024.png; imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png; imagery/usda_naip_chili_bar_corridor_masks_manifest.json",
       "url": "physics/src/raftsim/geospatial_preview.py"
+    },
+    {
+      "category": "access_and_publication_review",
+      "fetch_id": "sfa_access_publication_sensitivity_review",
+      "notes": "Records current State Parks Marshall Gold Discovery access/publication source evidence plus county GIS and land-manager follow-up leads. This is not access geometry, private/public land authority, or permission to publish sensitive route details.",
+      "source_id": "ca_state_parks_marshall_gold_discovery",
+      "status": "official_source_lead_attached_review_required",
+      "target_artifact": "review/production_import_pilot/access_publication_sensitivity_review.json",
+      "url": "https://www.parks.ca.gov/?page_id=484"
     },
     {
       "category": "derived_heightfield_candidate",
@@ -397,6 +409,38 @@
         "boulder_density",
         "banks",
         "access_points"
+      ]
+    },
+    {
+      "access_notes": "Use as the downstream Coloma/state-park source lead, including map, concessionaire, flow-link, water-safety, and restriction review.",
+      "attribution": "Credit California State Parks and Marshall Gold Discovery State Historic Park for official park/access facts used in review manifests.",
+      "category": "access",
+      "license_or_terms": "Official park and access context; media, maps, restrictions, and concession references need item-level review before redistribution or in-game use.",
+      "provider": "California State Parks",
+      "source_id": "ca_state_parks_marshall_gold_discovery",
+      "title": "Marshall Gold Discovery State Historic Park",
+      "url": "https://www.parks.ca.gov/?page_id=484",
+      "use_in_pipeline": [
+        "access_context",
+        "publication_sensitivity",
+        "guide_reference_leads",
+        "capture_review"
+      ]
+    },
+    {
+      "access_notes": "Use for public/private land, road, parcel, river-management, evacuation, and access review leads before route publication.",
+      "attribution": "Credit El Dorado County for county GIS and planning source layers when used.",
+      "category": "access",
+      "license_or_terms": "Official county GIS/planning context; exact datasets, parcel/use restrictions, and redistribution terms must be checked per layer.",
+      "provider": "El Dorado County",
+      "source_id": "el_dorado_county_gis",
+      "title": "El Dorado County GIS Viewer and planning-source leads",
+      "url": "https://www.eldoradocounty.ca.gov/",
+      "use_in_pipeline": [
+        "access_context",
+        "parcel_land_status",
+        "evacuation_review",
+        "publication_sensitivity"
       ]
     },
     {

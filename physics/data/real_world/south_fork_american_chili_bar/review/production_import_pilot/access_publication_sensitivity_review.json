@@ -1,0 +1,153 @@
+{
+  "allowed_use": [
+    "source-lead triage",
+    "station-aware annotation planning",
+    "publication-sensitivity checklist gating",
+    "preventing over-detailed preview map publication before review"
+  ],
+  "forbidden_use": [
+    "final access geometry",
+    "public/private land authority",
+    "evacuation or rescue route authority",
+    "shipping screenshots that reveal sensitive route/access details without review",
+    "using State Parks gallery media, maps, or third-party concession media as texture or art assets"
+  ],
+  "generated_on": "2026-07-06",
+  "promotion_blockers": [
+    "Exact put-in, take-out, parking, road, trail, and evacuation geometries are not attached.",
+    "El Dorado County river-management, parcel, and public/private land layers still need exact source selection and terms review.",
+    "Cultural-resource, private-property, and sensitive-location publication rules need human review before route-detail screenshots.",
+    "Guide/outfitter review is required before access, scouting, rescue, or passenger-dropoff gameplay uses these zones."
+  ],
+  "required_editor_annotations": [
+    "review/production_import_pilot/access_points.geojson",
+    "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+    "review/production_import_pilot/evacuation_and_rescue_routes.geojson",
+    "review/production_import_pilot/guide_access_notes.json"
+  ],
+  "river_id": "american_south_fork",
+  "schema": "raftsim.south_fork_access_publication_sensitivity_review.v1",
+  "scope": "Access, public/private land, emergency/evacuation, concession/outfitter, and publication-sensitivity source review for the South Fork American Chili Bar to Coloma production environment pilot.",
+  "section_id": "chili_bar_to_coloma",
+  "sources_checked": [
+    {
+      "artifact_use": "downstream Coloma/state-park access and publication-sensitivity source lead",
+      "blocked_from": [
+        "final take-out geometry",
+        "redistributing park media or map assets",
+        "claiming current operating restrictions without manual day-of review"
+      ],
+      "evidence": [
+        "Page identifies Marshall Gold Discovery State Historic Park in Coloma on the South Fork of the American River.",
+        "Page links an official ArcGIS park map and PDF tour map for local park/access review.",
+        "Page includes current restrictions, water-safety language, concessionaire links, and a river-flow lead.",
+        "Page describes Coloma/Highway 49 location context and park visitor/contact information."
+      ],
+      "http_status": 200,
+      "provider": "California State Parks",
+      "retrieved_on": "2026-07-06",
+      "review_status": "official_page_reviewed",
+      "source_id": "ca_state_parks_marshall_gold_discovery",
+      "url": "https://www.parks.ca.gov/?page_id=484"
+    },
+    {
+      "artifact_use": "manual park-boundary/access overlay review lead",
+      "blocked_from": [
+        "shipping map layer",
+        "texture or asset derivation",
+        "route-publication authority"
+      ],
+      "evidence": [
+        "Linked from the official Marshall Gold Discovery State Historic Park page as the park map.",
+        "No ArcGIS layer geometry, screenshots, or tiles are imported into the repository by this artifact."
+      ],
+      "http_status": "linked_from_official_page_not_imported",
+      "provider": "California State Parks ArcGIS",
+      "retrieved_on": "2026-07-06",
+      "review_status": "candidate_map_layer_manual_review_required",
+      "source_id": "ca_state_parks_marshall_arcgis_map",
+      "url": "https://csparks.maps.arcgis.com/apps/instant/basic/index.html?appid=065b067caa204e8da48d4b53c9483ab0&UNITNBR=304"
+    },
+    {
+      "artifact_use": "public/private land, parcel, road, evacuation, and publication-sensitivity source lead",
+      "blocked_from": [
+        "parcel authority",
+        "emergency route authority",
+        "final access geometry"
+      ],
+      "evidence": [
+        "The fetched El Dorado County planning page links the county GIS Viewer as a geospatial data and mapping platform.",
+        "The legacy river-management URL used for this check did not expose South Fork-specific river-management content in the fetched HTML."
+      ],
+      "http_status": "linked_from_county_planning_page_not_imported",
+      "provider": "El Dorado County",
+      "retrieved_on": "2026-07-06",
+      "review_status": "official_county_gis_lead_attached",
+      "source_id": "el_dorado_county_gis",
+      "url": "https://experience.arcgis.com/experience/58a5b752c549418285583fc4c0301c29"
+    },
+    {
+      "artifact_use": "negative source-lead evidence",
+      "blocked_from": [
+        "access claims",
+        "land-manager attribution",
+        "publication sensitivity decisions"
+      ],
+      "evidence": [
+        "Candidate URL returned 404 during this review and is not accepted as an attached source.",
+        "Find the current BLM or partner land-manager page before using Cronan/Henningsen/Lotus context."
+      ],
+      "http_status": 404,
+      "provider": "Bureau of Land Management",
+      "retrieved_on": "2026-07-06",
+      "review_status": "legacy_candidate_rejected_needs_research",
+      "source_id": "blm_cronan_ranch_legacy_candidate",
+      "url": "https://www.blm.gov/visit/cronan-ranch-regional-trails-park"
+    }
+  ],
+  "station_review_zones": [
+    {
+      "needs": [
+        "exact put-in ownership and access rules",
+        "commercial/private launch constraints",
+        "parking and road approach source layer",
+        "guide validation before publishing map detail"
+      ],
+      "review_status": "candidate_only_no_official_geometry_attached",
+      "station_range_m": [
+        0.0,
+        600.0
+      ],
+      "zone_id": "upstream_chili_bar_put_in_review_zone"
+    },
+    {
+      "needs": [
+        "public/private parcel review",
+        "evacuation and road/trail access context",
+        "sensitive-location and cultural-resource screening",
+        "rapid rescue visibility notes"
+      ],
+      "review_status": "requires_county_parcel_land_manager_and_guide_review",
+      "station_range_m": [
+        600.0,
+        4200.0
+      ],
+      "zone_id": "mid_reach_land_status_and_rescue_review_zone"
+    },
+    {
+      "needs": [
+        "official park-boundary and access overlay review",
+        "take-out and visitor-flow validation",
+        "publication/cultural-resource sensitivity check",
+        "concession/outfitter guide review"
+      ],
+      "review_status": "official_state_park_source_lead_attached_geometry_pending",
+      "station_range_m": [
+        4200.0,
+        5200.0
+      ],
+      "zone_id": "coloma_marshall_gold_downstream_review_zone"
+    }
+  ],
+  "status": "official_state_park_and_county_gis_leads_attached_review_gated"
+}
