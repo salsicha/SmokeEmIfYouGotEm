@@ -83,7 +83,7 @@ Treat this as a rain-fed tropical gorge environment until authoritative hydrolog
 
 - First-pass river `.umap` assets now exist under `unreal/Content/RaftSim/Maps/EnvironmentPreviews/`.
 - Rendered guide-seat procedural blockout captures now exist under `docs/environment-captures/photoreal_river_previews/`, but they are not lifelike production evidence yet.
-- The first South Fork official source slice now exists at `physics/data/real_world/south_fork_american_chili_bar/production_source_pull_manifest.json`: historical USGS `11445500` daily discharge, TNM NHD product metadata, TNM DEM/NAIP zero-hit diagnostics, and a small USGS 3DEP GeoTIFF sample.
+- The first South Fork official source slice now exists at `physics/data/real_world/south_fork_american_chili_bar/production_source_pull_manifest.json`: historical USGS `11445500` daily discharge, TNM NHD product metadata, TNM DEM/NAIP zero-hit diagnostics, a small USGS 3DEP GeoTIFF sample, and a small USDA/APFO NAIP aerial sample.
 - The existing default map path `/Game/RaftSim/Maps/L_RaftSimBoot` has no committed level asset yet.
 - Colorado and Pacuare still need real geospatial pulls, hydrology review, guide review, and rights-cleared field/reference media.
 - South Fork has the only solver corridor package, but its terrain, imagery, and field media are still representative placeholders rather than production pulls.

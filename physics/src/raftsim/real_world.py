@@ -898,6 +898,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
             ],
             "imagery": [
                 "imagery/tnm_naip_products.json",
+                "imagery/usda_naip_chili_bar_sample_512.png",
                 "imagery/naip_tiles",
                 "imagery/water_mask.tif",
                 "imagery/foam_texture_mask.tif",
