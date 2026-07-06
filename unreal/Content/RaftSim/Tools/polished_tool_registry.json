@@ -30,10 +30,14 @@
       "kind": "rapid_river_editor",
       "required_module": "RaftSimRiver",
       "source_manifest": "unreal/Content/RaftSim/River/rapid_river_editor.json",
+      "shell_manifest": "unreal/Content/RaftSim/Tools/rapid_river_editor_shell.json",
+      "config_class": "URaftSimRapidRiverEditorShellConfig",
+      "view_model_class": "URaftSimRapidRiverEditorShellViewModel",
       "loads_sample_data": [
         "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json",
         "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
       ],
+      "status": "editor_shell_implemented",
       "requires_validation_before_export": true,
       "polish_goal": "Edit river evidence, annotation geometry, expected outcomes, and export readiness with visible validation state."
     },
