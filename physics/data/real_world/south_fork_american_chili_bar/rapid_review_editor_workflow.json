@@ -463,6 +463,7 @@
         "gauge_history": {
           "artifacts": [
             "hydrology/usgs_11445500_daily_discharge.json",
+            "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
             "hydrology/flow_presets.json"
           ],
           "layer_id": "gauge_history",
@@ -667,6 +668,7 @@
         "gauge_history": {
           "artifacts": [
             "hydrology/usgs_11445500_daily_discharge.json",
+            "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
             "hydrology/flow_presets.json"
           ],
           "layer_id": "gauge_history",
@@ -870,6 +872,7 @@
         "gauge_history": {
           "artifacts": [
             "hydrology/usgs_11445500_daily_discharge.json",
+            "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
             "hydrology/flow_presets.json"
           ],
           "layer_id": "gauge_history",
@@ -1075,6 +1078,7 @@
         "gauge_history": {
           "artifacts": [
             "hydrology/usgs_11445500_daily_discharge.json",
+            "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
             "hydrology/flow_presets.json"
           ],
           "layer_id": "gauge_history",

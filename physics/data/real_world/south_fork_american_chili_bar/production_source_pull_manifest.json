@@ -43,6 +43,31 @@
       ]
     },
     {
+      "artifact_id": "usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic",
+      "category": "hydrology_availability_diagnostic",
+      "path": "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+      "provider": "USGS Water Services / NWIS",
+      "url": "https://waterservices.usgs.gov/nwis/iv/?format=json&sites=11445500&parameterCd=00060,00065&period=P30D&siteStatus=all",
+      "status": "source_reached_no_instantaneous_timeseries_returned",
+      "summary": {
+        "site": "11445500",
+        "parameter_cds": ["00060", "00065"],
+        "period": "P30D",
+        "request_dt_utc": "2026-07-06T14:11:02.641Z",
+        "time_series_count": 0
+      },
+      "use": [
+        "modern_flow_source_availability_check",
+        "flow_visual_gate_blocker_documentation",
+        "alternate_source_selection"
+      ],
+      "caveats": [
+        "This is negative availability evidence, not a modern flow record.",
+        "USGS 11445500 returned no instantaneous discharge or gage-height time series for the P30D request on 2026-07-06.",
+        "South Fork low/median/high visual and gameplay bands still need current official discharge, stage, release, or guide-validated flow context."
+      ]
+    },
+    {
       "artifact_id": "tnm_nhd_products",
       "category": "hydrography_metadata",
       "path": "hydrography/tnm_nhd_products.json",

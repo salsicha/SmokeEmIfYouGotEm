@@ -22,6 +22,7 @@
     ],
     "gauges": [
       "hydrology/usgs_11445500_daily_discharge.json",
+      "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
       "hydrology/flow_presets.json"
     ],
     "guide_references": [

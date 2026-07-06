@@ -1741,6 +1741,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "production_import_pilot/water_mask_2048.png",
                     "production_import_pilot/vegetation_mask_2048.png",
                     "hydrology/usgs_11445500_daily_discharge.json",
+                    "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
                     "reference_media_link_manifest.json",
                 ],
                 "p0_next_pulls_or_attachments": [
@@ -1757,12 +1758,16 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     {
                         "source_class": "seasonal_flow_or_release_history",
                         "required_artifacts": [
-                            "hydrology/production_import_pilot/usgs_11445500_instantaneous_discharge.json",
-                            "hydrology/production_import_pilot/usgs_11445500_stage.json",
+                            "hydrology/production_import_pilot/modern_flow_source_selection.json",
+                            "hydrology/production_import_pilot/current_discharge_or_release_series.json",
+                            "hydrology/production_import_pilot/current_stage_or_stage_unavailable_note.json",
                             "hydrology/production_import_pilot/flow_band_review.json",
                         ],
-                        "source_leads": ["usgs_water_services", "guide_review"],
-                        "promotion_gate": "Tie low/median/high visual variants to modern discharge/stage, release context if relevant, and guide notes.",
+                        "source_leads": ["usgs_water_services", "cdec_or_operator_release_records", "guide_review"],
+                        "promotion_gate": (
+                            "USGS 11445500 returned no P30D instantaneous time series on 2026-07-06; tie low/median/high "
+                            "visual variants to a current official discharge/stage or release source, then add guide notes."
+                        ),
                     },
                     {
                         "source_class": "guide_and_reference_media_annotations",
@@ -1973,7 +1978,11 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 "imagery/water_mask.tif",
                 "imagery/foam_texture_mask.tif",
             ],
-            "gauges": ["hydrology/usgs_11445500_daily_discharge.json", "hydrology/flow_presets.json"],
+            "gauges": [
+                "hydrology/usgs_11445500_daily_discharge.json",
+                "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+                "hydrology/flow_presets.json",
+            ],
             "guide_references": [
                 "review/guide_reference_index.json",
                 "review/rapid_review_labels.json",
@@ -3303,7 +3312,11 @@ def _rapid_review_evidence_refs(candidate: RapidCandidate) -> dict[str, object]:
         },
         "gauge_history": {
             "layer_id": "gauge_history",
-            "artifacts": ["hydrology/usgs_11445500_daily_discharge.json", "hydrology/flow_presets.json"],
+            "artifacts": [
+                "hydrology/usgs_11445500_daily_discharge.json",
+                "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+                "hydrology/flow_presets.json",
+            ],
             "source_ids": ["usgs_nwis", "noaa_nwps_nwm", "usgs_streamstats"],
         },
         "flow_difficulty_mapping": {
