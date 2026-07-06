@@ -46,6 +46,7 @@ from raftsim.real_world import (
     RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
     RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_SCHEMA_VERSION,
     PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION,
+    SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
     SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE,
     SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE,
     SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
@@ -63,6 +64,7 @@ from raftsim.real_world import (
     build_rapid_review_editor_workflow,
     build_rapid_review_flow_difficulty_mapping,
     build_real_world_corridor_package,
+    build_south_fork_flow_band_review,
     build_south_fork_production_import_pilot,
     build_source_manifest,
     default_candidate_river_inventory,
@@ -303,7 +305,46 @@ def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_revie
     assert "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png" in classes[
         "water_and_vegetation_masks"
     ]["target_outputs"]
+    assert SOUTH_FORK_FLOW_BAND_REVIEW_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert pilot["unreal_import_targets"]["future_production_map"] == "/Game/RaftSim/Maps/Production/L_SouthForkAmerican_ChiliBar"
+
+
+def test_south_fork_flow_band_review_compares_cdec_window_to_planning_bands():
+    south_fork_dir = REAL_WORLD_DATA_DIR / "south_fork_american_chili_bar"
+    flow_presets = json.loads((south_fork_dir / "flow_presets.json").read_text())
+    cdec_context = json.loads((south_fork_dir / "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json").read_text())
+    source_selection = json.loads((south_fork_dir / "hydrology/south_fork_modern_flow_source_selection.json").read_text())
+    review = build_south_fork_flow_band_review(flow_presets, cdec_context, source_selection)
+
+    bands = {band["flow_band"]: band for band in review["reviewed_bands"]}
+    assert review["status"] == "review_gated_do_not_promote_presets"
+    assert review["cdec_window_summary"]["valid_sample_count"] == 2744
+    assert review["cdec_window_summary"]["days_peak_ge_900_cfs"] == 25
+    assert review["cdec_window_summary"]["days_peak_ge_1600_cfs"] == 9
+    assert review["cdec_window_summary"]["days_peak_ge_3000_cfs"] == 0
+    assert review["cdec_window_summary"]["total_hours_ge_900_cfs"] == 165.5
+    assert review["cdec_window_summary"]["total_hours_ge_1600_cfs"] == 58.5
+    assert bands["low_runnable"]["observed_peak_days_ge_planning_flow"] == 25
+    assert bands["median_runnable"]["observed_peak_days_ge_planning_flow"] == 9
+    assert bands["high_runnable"]["observed_peak_days_ge_planning_flow"] == 0
+    assert bands["high_runnable"]["evidence_status"] == "not_observed_in_attached_30_day_context"
+
+
+def test_south_fork_flow_band_review_artifact_is_review_gated():
+    south_fork_dir = REAL_WORLD_DATA_DIR / "south_fork_american_chili_bar"
+    source_manifest = json.loads((south_fork_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((south_fork_dir / "production_source_pull_manifest.json").read_text())
+    review = json.loads((south_fork_dir / SOUTH_FORK_FLOW_BAND_REVIEW_FILE).read_text())
+
+    assert SOUTH_FORK_FLOW_BAND_REVIEW_FILE in source_manifest["artifacts"]["gauges"]
+    assert any(artifact["artifact_id"] == "south_fork_flow_band_review" for artifact in pull_manifest["pulled_artifacts"])
+    assert review["schema"] == "raftsim.south_fork_flow_band_review.v1"
+    assert review["status"] == "review_gated_do_not_promote_presets"
+    assert review["cdec_window_summary"]["flow_peak_max_cfs"] == 1688.0
+    assert review["cdec_window_summary"]["stage_peak_max_ft"] == 4.04
+    assert review["reviewed_bands"][2]["flow_band"] == "high_runnable"
+    assert review["reviewed_bands"][2]["observed_peak_days_ge_planning_flow"] == 0
+    assert "final preset retuning" in review["forbidden_use"]
 
 
 def test_south_fork_production_hydrography_drafts_are_review_gated():
@@ -946,6 +987,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
+    assert SOUTH_FORK_FLOW_BAND_REVIEW_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert (
         "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json"
         in rivers["american_south_fork"]["attached_preview_inputs"]

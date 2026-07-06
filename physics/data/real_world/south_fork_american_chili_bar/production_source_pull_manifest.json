@@ -638,6 +638,50 @@
         "vegetation_and_water_mask_prototype",
         "source-provenance plumbing"
       ]
+    },
+    {
+      "artifact_id": "south_fork_flow_band_review",
+      "category": "seasonal_flow_or_release_history_review",
+      "path": "hydrology/production_import_pilot/flow_band_review.json",
+      "related_artifacts": [
+        "flow_presets.json",
+        "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+        "hydrology/south_fork_modern_flow_source_selection.json",
+        "hydrology/cdec_terms_flags_and_station_relation_review.json"
+      ],
+      "provider": "RaftSim review artifact from CDEC CBR/A25 context and South Fork planning flow presets",
+      "status": "generated_review_gated_flow_band_comparison_not_preset_promotion",
+      "summary": {
+        "a25_unlisted_flags_observed": [
+          "X"
+        ],
+        "a25_valid_daily_generation_samples": 20,
+        "days_peak_ge_1600_cfs": 9,
+        "days_peak_ge_3000_cfs": 0,
+        "days_peak_ge_900_cfs": 25,
+        "flow_median_of_daily_medians_cfs": 321.0,
+        "flow_min_cfs": 291.0,
+        "flow_peak_max_cfs": 1688.0,
+        "requested_end": "2026-07-06T23:59",
+        "requested_start": "2026-06-07T00:00",
+        "stage_peak_max_ft": 4.04,
+        "total_hours_ge_1600_cfs": 58.5,
+        "total_hours_ge_900_cfs": 165.5,
+        "valid_day_count": 31,
+        "valid_sample_count": 2744
+      },
+      "use": [
+        "editor_flow_band_review",
+        "guide_discussion",
+        "future_visual_variant_planning",
+        "missing_seasonal_window_tracking"
+      ],
+      "caveats": [
+        "Attached evidence is a 30-day early-summer CDEC context window, not representative seasonal coverage.",
+        "A25 X-flag meaning and station-to-reach release routing are unresolved.",
+        "Legal/redistribution signoff, guide/outfitter validation, and hydrologic station-to-rapid relation remain open.",
+        "High-flow planning at 3000 cfs was not observed in the attached window and needs separate runoff/release evidence."
+      ]
     }
   ],
   "river_id": "american_south_fork",

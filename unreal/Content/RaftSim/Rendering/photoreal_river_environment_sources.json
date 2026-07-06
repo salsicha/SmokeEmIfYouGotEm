@@ -320,6 +320,14 @@
           "provider": "RaftSim geospatial preview utility from four official USGS 3DEP ImageServer pilot DEM tiles",
           "status": "active_unreal_preview_heightfield_review_gated",
           "unreal_use": "larger 2017px 16-bit grayscale South Fork pilot heightfield candidate sampled into preview terrain; not reprojected, hydrologically conditioned, channel-burned, or production-approved"
+        },
+        {
+          "artifact_id": "south_fork_flow_band_review",
+          "category": "seasonal_flow_or_release_history_review",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json",
+          "provider": "RaftSim review artifact from CDEC CBR/A25 context and South Fork flow presets",
+          "status": "review_gated_not_flow_preset_promotion",
+          "unreal_use": "Flow-band discussion aid for future low/median/high water variants; not final water width, foam, wet-bank, hole, or gameplay tuning authority."
         }
       ],
       "flow_sources": [

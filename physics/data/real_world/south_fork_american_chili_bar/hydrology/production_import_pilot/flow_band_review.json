@@ -1,0 +1,195 @@
+{
+  "allowed_use": [
+    "editor flow-band review",
+    "guide discussion",
+    "future low/median/high visual variant planning",
+    "identifying missing seasonal CDEC/A25 pulls"
+  ],
+  "cdec_window_summary": {
+    "a25_unlisted_flags_observed": [
+      "X"
+    ],
+    "a25_valid_daily_generation_samples": 20,
+    "days_peak_ge_1600_cfs": 9,
+    "days_peak_ge_3000_cfs": 0,
+    "days_peak_ge_900_cfs": 25,
+    "flow_median_of_daily_medians_cfs": 321.0,
+    "flow_min_cfs": 291.0,
+    "flow_peak_max_cfs": 1688.0,
+    "requested_end": "2026-07-06T23:59",
+    "requested_start": "2026-06-07T00:00",
+    "stage_peak_max_ft": 4.04,
+    "total_hours_ge_1600_cfs": 58.5,
+    "total_hours_ge_900_cfs": 165.5,
+    "valid_day_count": 31,
+    "valid_sample_count": 2744
+  },
+  "forbidden_use": [
+    "final preset retuning",
+    "claiming accepted seasonal flow bands",
+    "hiding water-simulation conservation failures with visuals or forcing",
+    "production lifelike water approval"
+  ],
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "cdec_context": "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+    "flow_presets": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+    "source_selection": "physics/data/real_world/south_fork_american_chili_bar/hydrology/south_fork_modern_flow_source_selection.json",
+    "terms_flags_station_relation_review": "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_terms_flags_and_station_relation_review.json"
+  },
+  "promotion_blockers": [
+    "Attached evidence is a 30-day early-summer CDEC context window, not representative seasonal coverage.",
+    "A25 X-flag meaning and station-to-reach release routing are unresolved.",
+    "Legal/redistribution signoff, guide/outfitter validation, and hydrologic station-to-rapid relation remain open.",
+    "High-flow planning at 3000 cfs was not observed in the attached window and needs separate runoff/release evidence."
+  ],
+  "reviewed_bands": [
+    {
+      "evidence_status": "observed_as_short_release_window_not_seasonal_validation",
+      "flow_band": "low_runnable",
+      "observed_hours_ge_planning_flow": 165.5,
+      "observed_median_days_ge_planning_flow": 0,
+      "observed_peak_dates": [
+        {
+          "date_local": "2026-06-13",
+          "flow_peak_cfs": 1688.0,
+          "flow_peak_time_local": "2026-06-13T11:30",
+          "stage_peak_ft": 4.04
+        },
+        {
+          "date_local": "2026-06-14",
+          "flow_peak_cfs": 1680.0,
+          "flow_peak_time_local": "2026-06-14T11:30",
+          "stage_peak_ft": 4.03
+        },
+        {
+          "date_local": "2026-06-20",
+          "flow_peak_cfs": 1672.0,
+          "flow_peak_time_local": "2026-06-20T11:15",
+          "stage_peak_ft": 4.02
+        },
+        {
+          "date_local": "2026-06-07",
+          "flow_peak_cfs": 1664.0,
+          "flow_peak_time_local": "2026-06-07T12:00",
+          "stage_peak_ft": 4.01
+        },
+        {
+          "date_local": "2026-06-21",
+          "flow_peak_cfs": 1664.0,
+          "flow_peak_time_local": "2026-06-21T11:15",
+          "stage_peak_ft": 4.01
+        },
+        {
+          "date_local": "2026-06-27",
+          "flow_peak_cfs": 1664.0,
+          "flow_peak_time_local": "2026-06-27T11:15",
+          "stage_peak_ft": 4.01
+        },
+        {
+          "date_local": "2026-06-28",
+          "flow_peak_cfs": 1664.0,
+          "flow_peak_time_local": "2026-06-28T11:30",
+          "stage_peak_ft": 4.01
+        },
+        {
+          "date_local": "2026-07-04",
+          "flow_peak_cfs": 1664.0,
+          "flow_peak_time_local": "2026-07-04T11:45",
+          "stage_peak_ft": 4.01
+        }
+      ],
+      "observed_peak_days_ge_planning_flow": 25,
+      "planning_confidence": 0.3,
+      "planning_discharge_cfs": 900.0,
+      "planning_discharge_m3s": 25.4851619328,
+      "planning_notes": "Lower training-oriented flow; expect exposed rocks, shallows, and slower recovery from mistakes.",
+      "promotion_decision": "blocked_pending_broader_windows_release_context_station_routing_guide_review",
+      "review_use": "Use as a visual/gameplay discussion aid only; do not retune solver presets, holes, wave trains, wet banks, or lifelike water appearance from this 30-day window alone.",
+      "season": "late_summer_low_water"
+    },
+    {
+      "evidence_status": "observed_as_short_release_window_not_seasonal_validation",
+      "flow_band": "median_runnable",
+      "observed_hours_ge_planning_flow": 58.5,
+      "observed_median_days_ge_planning_flow": 0,
+      "observed_peak_dates": [
+        {
+          "date_local": "2026-06-13",
+          "flow_peak_cfs": 1688.0,
+          "flow_peak_time_local": "2026-06-13T11:30",
+          "stage_peak_ft": 4.04
+        },
+        {
+          "date_local": "2026-06-14",
+          "flow_peak_cfs": 1680.0,
+          "flow_peak_time_local": "2026-06-14T11:30",
+          "stage_peak_ft": 4.03
+        },
+        {
+          "date_local": "2026-06-20",
+          "flow_peak_cfs": 1672.0,
+          "flow_peak_time_local": "2026-06-20T11:15",
+          "stage_peak_ft": 4.02
+        },
+        {
+          "date_local": "2026-06-07",
+          "flow_peak_cfs": 1664.0,
+          "flow_peak_time_local": "2026-06-07T12:00",
+          "stage_peak_ft": 4.01
+        },
+        {
+          "date_local": "2026-06-21",
+          "flow_peak_cfs": 1664.0,
+          "flow_peak_time_local": "2026-06-21T11:15",
+          "stage_peak_ft": 4.01
+        },
+        {
+          "date_local": "2026-06-27",
+          "flow_peak_cfs": 1664.0,
+          "flow_peak_time_local": "2026-06-27T11:15",
+          "stage_peak_ft": 4.01
+        },
+        {
+          "date_local": "2026-06-28",
+          "flow_peak_cfs": 1664.0,
+          "flow_peak_time_local": "2026-06-28T11:30",
+          "stage_peak_ft": 4.01
+        },
+        {
+          "date_local": "2026-07-04",
+          "flow_peak_cfs": 1664.0,
+          "flow_peak_time_local": "2026-07-04T11:45",
+          "stage_peak_ft": 4.01
+        }
+      ],
+      "observed_peak_days_ge_planning_flow": 9,
+      "planning_confidence": 0.35,
+      "planning_discharge_cfs": 1600.0,
+      "planning_discharge_m3s": 45.3069545472,
+      "planning_notes": "Default validation band for intermediate commercial-style runs.",
+      "promotion_decision": "blocked_pending_broader_windows_release_context_station_routing_guide_review",
+      "review_use": "Use as a visual/gameplay discussion aid only; do not retune solver presets, holes, wave trains, wet banks, or lifelike water appearance from this 30-day window alone.",
+      "season": "summer_commercial"
+    },
+    {
+      "evidence_status": "not_observed_in_attached_30_day_context",
+      "flow_band": "high_runnable",
+      "observed_hours_ge_planning_flow": 0.0,
+      "observed_median_days_ge_planning_flow": 0,
+      "observed_peak_dates": [],
+      "observed_peak_days_ge_planning_flow": 0,
+      "planning_confidence": 0.25,
+      "planning_discharge_cfs": 3000.0,
+      "planning_discharge_m3s": 84.950539776,
+      "planning_notes": "Higher consequence preset with stronger holes, wave trains, eddy-line shear, and faster raft response.",
+      "promotion_decision": "blocked_pending_broader_windows_release_context_station_routing_guide_review",
+      "review_use": "Use as a visual/gameplay discussion aid only; do not retune solver presets, holes, wave trains, wet banks, or lifelike water appearance from this 30-day window alone.",
+      "season": "spring_runoff_or_release"
+    }
+  ],
+  "river_id": "american_south_fork",
+  "schema": "raftsim.south_fork_flow_band_review.v1",
+  "section_id": "chili_bar_to_coloma",
+  "status": "review_gated_do_not_promote_presets"
+}
