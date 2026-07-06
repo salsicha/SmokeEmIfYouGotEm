@@ -48,14 +48,18 @@
       "provider": "MINAE Direccion de Agua / SINIGIRH",
       "url": "https://mapas.da.go.cr/geoservicios.php",
       "capabilities_url": "http://mapas.da.go.cr/geopc.php?request=GetCapabilities&version=1.1.1",
-      "review_status": "official_wms_catalog_recorded_getcapabilities_layer_metadata_pending",
+      "archived_capabilities_file": "direccion_de_agua_sinigirh_wms_getcapabilities.xml",
+      "capabilities_summary": "direccion_de_agua_sinigirh_wms_capabilities_summary.json",
+      "review_status": "official_wms_capabilities_archived_layer_metadata_only",
       "candidate_layers": [
-        "DA_AFOROS",
-        "DA_UNIDADES HIDROLOGICAS",
-        "ICE_CUENCAS HIDROGRAFICAS",
-        "DA_OBRAS_EN_CAUCE",
-        "DA_CONCESIONES",
-        "DA_VERTIDOS"
+        "Aguas:DA_AFOROS",
+        "Aguas:JASEC_ESTACIONES_HIDROMETRICAS",
+        "Aguas:DA_UNIDADES_HIDROLOGICAS",
+        "Aguas:DA_Cuencas_Hidrograficas_CR",
+        "Aguas:DA_OBRAS_EN_CAUCE",
+        "Aguas:DA_Concesiones",
+        "Aguas:DA_Vertidos",
+        "Aguas:shp_ptos_monitoreo_calidad_aguadfee5c98"
       ],
       "candidate_uses": [
         "gauge or aforo station discovery",
@@ -90,9 +94,19 @@
       "promotion_gate": "Capture station IDs, names, coordinates, variables, units, record coverage, time zone, quality flags, basin relation, terms, and guide interpretation before numeric Pacuare flow bands are allowed."
     },
     {
+      "candidate_id": "jasec_estaciones_hidrometricas",
+      "source_id": "direccion_de_agua_sinigirh_geoservices",
+      "layer_or_service": "Aguas:JASEC_ESTACIONES_HIDROMETRICAS",
+      "why_it_matters": "Official WMS capabilities advertise a hydrometric station layer candidate; review basin proximity, owner, public record access, and whether it is relevant to the Pacuare watershed.",
+      "target_outputs": [
+        "hydrology/production_import_pilot/discharge_or_stage_station_review.json"
+      ],
+      "promotion_gate": "Do not use for flow bands until station IDs, variables, units, record coverage, basin relation, terms, and guide interpretation are recorded."
+    },
+    {
       "candidate_id": "da_unidades_hidrologicas",
       "source_id": "direccion_de_agua_sinigirh_geoservices",
-      "layer_or_service": "DA_UNIDADES HIDROLOGICAS",
+      "layer_or_service": "Aguas:DA_UNIDADES_HIDROLOGICAS",
       "why_it_matters": "Official hydrologic-unit layer candidate for checking whether station and rainfall sources are in the correct Pacuare basin relation.",
       "target_outputs": [
         "hydrology/production_import_pilot/basin_relation_review.geojson",
@@ -103,7 +117,7 @@
     {
       "candidate_id": "ice_cuencas_hidrograficas",
       "source_id": "direccion_de_agua_sinigirh_geoservices",
-      "layer_or_service": "ICE_CUENCAS HIDROGRAFICAS",
+      "layer_or_service": "Aguas:DA_Cuencas_Hidrograficas_CR",
       "why_it_matters": "ICE basin context can cross-check drainage and rain-fed response assumptions for Pacuare flow tuning.",
       "target_outputs": [
         "hydrology/production_import_pilot/flash_response_review.json"
@@ -152,6 +166,8 @@
   ],
   "downstream_manifest_targets": [
     "hydrography/production_import_pilot/official_source_access_plan.json",
+    "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_getcapabilities.xml",
+    "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
     "hydrography/production_import_pilot/centerline.geojson",
     "hydrography/production_import_pilot/banks.geojson",
     "hydrology/production_import_pilot/discharge_or_stage_station_review.json",

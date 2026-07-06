@@ -812,6 +812,14 @@
           "unreal_use": "2017px 16-bit grayscale Pacuare production-import placeholder heightfield sampled into generated preview gorge geometry; not a promoted Landscape import or conditioned production terrain"
         },
         {
+          "artifact_id": "pacuare_direccion_de_agua_sinigirh_wms_capabilities",
+          "category": "official_service_metadata",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json; physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_getcapabilities.xml",
+          "provider": "MINAE Direccion de Agua / SINIGIRH WMS",
+          "status": "metadata_archived_no_features_downloaded",
+          "unreal_use": "official service metadata for future Pacuare station, hydrologic-unit, basin, and access review; not imported route geometry or flow authority"
+        },
+        {
           "artifact_id": "pacuare_unreal_preview_centerline_scaffold",
           "category": "derived_hydrography_preview_scaffold",
           "path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_centerline_scaffold.geojson; physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
