@@ -187,7 +187,7 @@
     "Pick South Fork American as the first full-corridor production import pilot until its source, flow, review, and lifelike capture gates are genuinely closed.",
     "For South Fork, attach full corridor DEM/lidar plus hydrography, then produce a clipped conditioned heightfield and river/bank polygons.",
     "Attach full-resolution aerial/satellite or orthomosaic data with acquisition metadata and derive reviewed water, vegetation, wet-rock, and bank masks.",
-    "Expand CDEC CBR/A25 flow evidence across representative windows and keep the terms/flag review, station-to-reach routing, legal/redistribution signoff, and guide validation attached before any flow-band promotion.",
+    "Expand CDEC CBR/A25 flow evidence beyond the current 30-day context window and keep A25 X-flag interpretation, station-to-reach routing, legal/redistribution signoff, and guide validation attached before any flow-band promotion.",
     "Promote only rights-cleared or first-party references into annotation records; keep social links as manual review leads.",
     "Regenerate Unreal maps from the production corridor package and capture lifelike review frames before checking the broad production-data item complete."
   ],
@@ -238,10 +238,11 @@
             "physics/data/real_world/south_fork_american_chili_bar/hydrology/south_fork_modern_flow_source_selection.json",
             "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
             "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_terms_flags_and_station_relation_review.json",
+            "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
             "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"
           ],
-          "promotion_blocker": "USGS 11445500 returned no P30D instantaneous discharge or stage time series on 2026-07-06; CDEC CBR now has a first reproducible event-window pull plus an attached terms/flag/station relation review, but broader representative windows, release context, hydrologic station-to-reach review, legal/redistribution signoff, and guide validation are still needed before all seasonal flow visuals are final.",
-          "status": "historical_daily_discharge_usgs_iv_no_data_cdec_candidate_first_window_and_terms_flag_review_attached"
+          "promotion_blocker": "USGS 11445500 returned no P30D instantaneous discharge or stage time series on 2026-07-06; CDEC CBR now has a first reproducible event-window pull, an attached terms/flag/station relation review, and a 30-day CBR/A25 context window. Broader seasonal windows, A25 X-flag interpretation, release context, hydrologic station-to-reach review, legal/redistribution signoff, and guide validation are still needed before all seasonal flow visuals are final.",
+          "status": "historical_daily_discharge_usgs_iv_no_data_cdec_candidate_first_window_terms_flag_review_and_30d_context_attached"
         },
         "terrain_dem_or_lidar": {
           "artifacts": [

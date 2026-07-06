@@ -1,4 +1,27 @@
 {
+  "cdec_30_day_context_window": {
+    "artifact": "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+    "status": "attached_review_required",
+    "summary": {
+      "a25_unlisted_flags_observed": [
+        "X"
+      ],
+      "a25_valid_daily_generation_samples": 20,
+      "cbr_flow_max_cfs": 1688.0,
+      "cbr_flow_median_cfs": 321.0,
+      "cbr_flow_min_cfs": 291.0,
+      "cbr_flow_valid_sample_count": 2744,
+      "cbr_stage_max_ft": 4.04,
+      "cbr_stage_median_ft": 1.59,
+      "cbr_stage_min_ft": 1.5,
+      "days_peak_ge_1600_cfs": 9,
+      "days_peak_ge_900_cfs": 25
+    },
+    "window": {
+      "end": "2026-07-06T23:59",
+      "start": "2026-06-07T00:00"
+    }
+  },
   "cdec_cbr_latest_query_summary": {
     "flow_cfs_max": 455.0,
     "flow_cfs_min": 294.0,
@@ -70,13 +93,15 @@
           {
             "description": "DISCHARGE, POWER GENERATION",
             "duration": "daily",
-            "sensor_no": 35683,
+            "plot_sensor_no": 35683,
+            "sensor_num": 48,
             "unit": "CFS"
           },
           {
             "description": "OUTFLOW, VOLUME",
             "duration": "daily",
-            "sensor_no": 35684,
+            "plot_sensor_no": 35684,
+            "sensor_num": 272,
             "unit": "AF"
           }
         ],
@@ -88,7 +113,7 @@
     "search_url": "https://cdec.water.ca.gov/dynamicapp/staSearch?sta_chk=on&sta=CHILI&active_chk=on&active=Y&display=sta"
   },
   "generated_on": "2026-07-06",
-  "promotion_gate": "CBR is the current primary official modern-flow candidate and the first CDEC terms/flag/station relation review is attached, but South Fork visual/gameplay flow bands remain blocked until broader windows, release context, legal/redistribution signoff, hydrologic station-to-reach review, and guide validation are attached.",
+  "promotion_gate": "CBR is the current primary official modern-flow candidate, and the first CDEC terms/flag/station relation review plus a 30-day CBR/A25 context window are attached. South Fork visual/gameplay flow bands remain blocked until broader windows, A25 X-flag interpretation, release context, legal/redistribution signoff, hydrologic station-to-reach review, and guide validation are attached.",
   "purpose": "Select a modern official flow/stage source candidate after USGS 11445500 returned no P30D instantaneous discharge or gage-height time series.",
   "reproducible_cdec_event_window": {
     "artifact": "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
@@ -115,7 +140,8 @@
   },
   "required_before_flow_band_promotion": [
     "Treat the attached CDEC terms/flags/station relation review as engineering provenance only until legal/redistribution signoff is complete.",
-    "Expand the reproducible CBR event/hourly pulls across representative low, commercial, high, and too-low windows with timestamps, units, sensor numbers, and QA/flag meanings.",
+    "Resolve or document the observed A25 X flag against CDEC/station metadata before using A25 daily discharge for release interpretation.",
+    "Expand reproducible CBR/A25 pulls across representative seasonal, low, commercial, high, too-low, and washout windows with timestamps, units, sensor numbers, and QA/flag meanings.",
     "Compare CBR flow/stage to existing low/median/high presets and guide/outfitter notes for the Chili Bar to Coloma section.",
     "Use A25 powerhouse data only as release-operation context unless hydrologic routing and guide review confirm direct relation to raftable flow at the target reach.",
     "Record how selected flow bands alter holes, exposed rocks, wave trains, wet banks, boulder push/damping, and rescue visibility before Unreal promotion."
@@ -123,12 +149,12 @@
   "river_id": "american_south_fork",
   "schema": "raftsim.south_fork_modern_flow_source_selection.v1",
   "section_id": "chili_bar_to_coloma",
-  "status": "cdec_cbr_primary_candidate_first_window_and_terms_flag_review_attached_promotion_blocked",
+  "status": "cdec_cbr_primary_candidate_first_window_terms_flag_review_and_30d_context_attached_promotion_blocked",
   "terms_flags_station_relation_review": {
     "artifact": "hydrology/cdec_terms_flags_and_station_relation_review.json",
     "conditions_of_use_url": "https://water.ca.gov/Conditions-of-Use",
     "flag_list_url": "https://cdec.water.ca.gov/reportapp/javareports?name=FlagList",
-    "review_summary": "CDEC flag definitions and DWR Conditions of Use are recorded for import provenance; CBR remains review-gated for broader windows, release context, station-to-reach routing, legal/redistribution signoff, and guide validation.",
+    "review_summary": "CDEC flag definitions and DWR Conditions of Use are recorded for import provenance; the 30-day A25 context introduced an X flag that is held/excluded pending CDEC or station metadata definition. CBR remains review-gated for broader windows, release context, station-to-reach routing, legal/redistribution signoff, and guide validation.",
     "status": "attached_engineering_review_not_legal_signoff"
   },
   "usgs_screening": {

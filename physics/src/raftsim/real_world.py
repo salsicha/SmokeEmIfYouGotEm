@@ -66,6 +66,7 @@ PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION = "raftsim.production_import_pilot.v0"
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION = "raftsim.production_environment_gap_register.v0"
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE = "production_environment_gap_register.json"
 SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE = "hydrology/cdec_terms_flags_and_station_relation_review.json"
+SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE = "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
@@ -972,6 +973,18 @@ def south_fork_american_fetch_specs() -> tuple[RemoteFetchSpec, ...]:
             ),
         ),
         RemoteFetchSpec(
+            fetch_id="sfa_cdec_cbr_a25_flow_context_30d",
+            category="gauge",
+            source_id="cdec_cbr",
+            url="https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2026-06-07T00:00&End=2026-07-06T23:59",
+            target_artifact=SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
+            status="downloaded",
+            notes=(
+                "Compact 30-day CBR flow/stage and A25 daily powerhouse-generation context window. Use for review "
+                "discussion only until broader seasonal windows, routing, release interpretation, and guide signoff pass."
+            ),
+        ),
+        RemoteFetchSpec(
             fetch_id="sfa_nwps_nwm_context",
             category="gauge",
             source_id="noaa_nwps_nwm",
@@ -1154,6 +1167,7 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                     "hydrology/south_fork_modern_flow_source_selection.json",
                     "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
                     SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
+                    SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
                     "hydrology/production_import_pilot/flow_band_review.json",
                 ],
                 "promotion_gate": "Use CDEC CBR as the primary modern flow/stage candidate after the USGS 11445500 IV diagnostic; the first terms/flag/station review is attached, but broader representative windows, legal/redistribution signoff, release context, and guide review are still required before low/median/high visual variants are promoted.",
@@ -1794,6 +1808,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "hydrology/south_fork_modern_flow_source_selection.json",
                     "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
                     SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
+                    SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
                     "reference_media_link_manifest.json",
                 ],
                 "p0_next_pulls_or_attachments": [
@@ -1813,14 +1828,15 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             "hydrology/south_fork_modern_flow_source_selection.json",
                             "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
                             SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
+                            SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
                             "hydrology/production_import_pilot/flow_band_review.json",
                         ],
                         "source_leads": ["cdec_cbr", "cdec_a25_powerhouse_context", "usgs_water_services", "guide_review"],
                         "promotion_gate": (
                             "USGS 11445500 returned no P30D instantaneous time series on 2026-07-06, and CDEC CBR now "
-                            "has a first reproducible event-window pull plus an attached terms/flag/station review; tie "
-                            "low/median/high visual variants to broader CBR windows, release context, legal/redistribution "
-                            "signoff, station-to-reach review, and guide notes."
+                            "has a first reproducible event-window pull, terms/flag/station review, and 30-day CBR/A25 "
+                            "context window; tie low/median/high visual variants to broader seasonal windows, release "
+                            "context, legal/redistribution signoff, station-to-reach review, and guide notes."
                         ),
                     },
                     {
@@ -2038,6 +2054,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 "hydrology/south_fork_modern_flow_source_selection.json",
                 "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
                 SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
+                SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
                 "hydrology/flow_presets.json",
             ],
             "guide_references": [
@@ -3375,6 +3392,7 @@ def _rapid_review_evidence_refs(candidate: RapidCandidate) -> dict[str, object]:
                 "hydrology/south_fork_modern_flow_source_selection.json",
                 "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
                 SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
+                SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
                 "hydrology/flow_presets.json",
             ],
             "source_ids": ["usgs_nwis", "cdec_cbr", "cdec_a25_powerhouse_context", "noaa_nwps_nwm", "usgs_streamstats"],

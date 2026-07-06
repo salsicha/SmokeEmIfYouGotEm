@@ -59,6 +59,11 @@
       "code": "v",
       "meaning": "Out of Valid Range",
       "pipeline_action": "exclude_from_flow_band_statistics_until_reviewed"
+    },
+    {
+      "code": "X",
+      "meaning": "Observed in A25 daily discharge rows but not defined by the attached CDEC FlagList table",
+      "pipeline_action": "exclude_and_hold_for_cdec_or_station_metadata_review"
     }
   ],
   "generated_on": "2026-07-06",
@@ -66,11 +71,13 @@
     "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
     "hydrology/south_fork_modern_flow_source_selection.json",
     "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+    "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
     "production_source_pull_manifest.json",
     "../production_geospatial_source_readiness.json",
     "../production_environment_gap_register.json"
   ],
   "no_data_policy": {
+    "a25_observed_unlisted_flag": "X on -9999 A25 power-generation discharge rows; exclude until CDEC or station metadata defines it.",
     "current_window_unique_flags": [
       ""
     ],
@@ -80,9 +87,10 @@
     "observed_raw_no_data_value": -9999,
     "required_followup": "Find or request an official CDEC no-data sentinel definition before promoted automation treats -9999 as universal across all sensors/durations."
   },
-  "promotion_gate": "CDEC CBR remains the primary modern South Fork flow/stage candidate, and flags/terms are now recorded for the first pulled window. Do not retune presets or photoreal water bands until broader representative CBR/A25 windows, release context, legal/redistribution signoff, hydrologic station-to-rapid relation, and guide review are complete.",
+  "promotion_gate": "CDEC CBR remains the primary modern South Fork flow/stage candidate, and flags/terms are recorded for the first CBR pull plus the 30-day CBR/A25 context window. Do not retune presets or photoreal water bands until broader representative CBR/A25 windows, A25 flag/routing interpretation, release context, legal/redistribution signoff, hydrologic station-to-rapid relation, and guide review are complete.",
   "purpose": "Record the CDEC/DWR terms, data flag definitions, no-data treatment, and CBR/A25 station interpretation needed before South Fork flow windows can influence visual or gameplay flow bands.",
   "retrieval_review": {
+    "a25_followup_probe": "The 2026-06-07 to 2026-07-06 A25 daily power-generation discharge window introduced X flags on -9999 rows; X was not present in the attached CDEC FlagList table and is treated as exclude/hold-for-review.",
     "api_docs_probe": "Official CDEC API PDFs were fetched; each pointed to the FlagList report endpoint for data flag definitions.",
     "conditions_page_local_probe": "DWR Conditions of Use page fetched successfully and reviewed for reliability/no-guarantee language.",
     "flag_list_probe": "The old /misc/flaglist.html URL returned 404; the current CDEC reportapp FlagList endpoint returned the data flag table.",
@@ -132,7 +140,7 @@
       "Explicit review of how each promoted band changes holes, exposed rocks, shelves, wave trains, eddies, boulder damping, and rescue visibility."
     ]
   },
-  "status": "terms_flags_and_station_relation_review_attached_promotion_still_blocked",
+  "status": "terms_flags_station_relation_and_a25_x_flag_review_attached_promotion_still_blocked",
   "terms_summary": {
     "conditions_of_use_summary": [
       "DWR publishes web information for convenient immediate access.",
