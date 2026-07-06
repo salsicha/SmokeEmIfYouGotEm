@@ -1144,6 +1144,18 @@
             "future_source_drape_replacement_planning",
             "sentinel_cog_access_validation"
           ]
+        },
+        {
+          "artifact_id": "pacuare_sentinel_cog_access_probe",
+          "category": "sentinel_cog_range_access_probe",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_cog_access_probe.json",
+          "promotion_blocker": "Sentinel COG assets are reachable with byte-range reads, but no full bands or derivatives are committed; Pacuare source-drape replacement still needs raster-window extraction, corridor clipping, SCL/cloud QA, terms review, and guide/geospatial approval.",
+          "status": "public_sentinel_cog_range_access_verified_extraction_not_promoted",
+          "use_in_unreal": [
+            "future_source_drape_replacement_planning",
+            "cog_window_read_tooling_gate",
+            "production_mask_source_gate"
+          ]
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
@@ -1178,11 +1190,11 @@
       "source_manifest_and_rights_status_visible_in_capture_manifest",
       "review_gated_heightfield_candidate_sampling_visible_in_capture_manifest",
       "review_gated_source_water_and_vegetation_masks_sampled_by_preview_rendering_and_detail_placement",
-            "source_drape_vertex_color_terrain_material_blend_recorded",
-            "first_party_procedural_strata_leaf_litter_wet_rock_and_talus_detail_recorded",
-            "first_party_procedural_lit_vertex_color_water_gradients_recorded",
-            "first_party_mask_aware_ground_cover_and_canopy_cards_recorded",
-            "source_backed_flow_band_visual_parameters_recorded",
+      "source_drape_vertex_color_terrain_material_blend_recorded",
+      "first_party_procedural_strata_leaf_litter_wet_rock_and_talus_detail_recorded",
+      "first_party_procedural_lit_vertex_color_water_gradients_recorded",
+      "first_party_mask_aware_ground_cover_and_canopy_cards_recorded",
+      "source_backed_flow_band_visual_parameters_recorded",
       "biome_specific_understory_and_scrub_proxy_layers_recorded",
       "current_streak_proxy_layers_recorded",
       "first_party_translucent_surface_glint_foam_fleck_haze_and_spray_mist_layers_recorded",

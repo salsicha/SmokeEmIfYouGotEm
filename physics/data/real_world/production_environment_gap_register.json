@@ -446,6 +446,7 @@
         "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_thumbnail.jpg",
         "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tileinfo_metadata.json",
         "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json",
+        "imagery/production_import_pilot/sentinel_cog_access_probe.json",
         "hydrography/production_import_pilot/official_source_access_plan.json",
         "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
         "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
@@ -495,11 +496,15 @@
           ]
         },
         {
-          "promotion_gate": "Replace MODIS/GIBS proxy drape with cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference.",
+          "promotion_gate": "Replace the MODIS/GIBS proxy drape with cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference only after the successful Sentinel COG range-access path is upgraded into corridor-clipped raster reads, SCL/cloud QA, terms review, and guide/geospatial approval.",
           "required_artifacts": [
             "imagery/production_import_pilot/cloud_screened_scene_index.json",
             "imagery/production_import_pilot/source_drape_4096.png",
-            "imagery/production_import_pilot/cloud_shadow_review.json"
+            "imagery/production_import_pilot/cloud_shadow_review.json",
+            "imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
+            "imagery/production_import_pilot/landsat_product_access_gate_review.json",
+            "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json",
+            "imagery/production_import_pilot/sentinel_cog_access_probe.json"
           ],
           "source_class": "aerial_or_satellite_imagery",
           "source_leads": [

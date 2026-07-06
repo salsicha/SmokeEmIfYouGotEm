@@ -841,6 +841,37 @@
         "sentinel_cog_access_validation",
         "future_windowed_cog_read_planning"
       ]
+    },
+    {
+      "artifact_id": "pacuare_sentinel_cog_access_probe",
+      "category": "sentinel_cog_range_access_probe",
+      "path": "imagery/production_import_pilot/sentinel_cog_access_probe.json",
+      "provider": "Element 84 / AWS Open Data Sentinel-2 L2A COG mirror",
+      "status": "public_sentinel_cog_range_access_verified_extraction_not_promoted",
+      "summary": {
+        "candidate_tile_count": 2,
+        "successful_range_probe_count": 4,
+        "full_resolution_bands_committed": false,
+        "range_probe_bytes_committed": false,
+        "source_drape_replaced": false,
+        "total_full_resolution_bytes_advertised_for_probed_assets": 679418869,
+        "scl_probe_available": true
+      },
+      "related_artifacts": [
+        "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json",
+        "imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
+        "imagery/production_import_pilot/landsat_product_access_gate_review.json"
+      ],
+      "use": [
+        "cog_range_access_validation",
+        "future_windowed_cog_read_planning",
+        "raster_tooling_gap_definition"
+      ],
+      "caveats": [
+        "No full-resolution Sentinel bands, TCI images, SCL masks, or derived source drapes are committed.",
+        "Range reads succeeded only as temporary header probes; production extraction still needs approved raster tooling, corridor clipping, SCL/cloud QA, terms review, and guide/geospatial approval.",
+        "This artifact proves access workflow viability only and does not promote Pacuare imagery, masks, materials, or lifelike captures."
+      ]
     }
   ],
   "river_id": "pacuare",
