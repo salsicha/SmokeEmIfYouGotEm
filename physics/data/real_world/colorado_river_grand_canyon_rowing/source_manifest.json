@@ -1,5 +1,8 @@
 {
   "artifacts": {
+    "access_and_protected_context": [
+      "review/production_import_pilot/access_publication_sensitivity_review.json"
+    ],
     "elevation": [
       "terrain/3dep_dem_tiles",
       "terrain/canyon_corridor_dem.tif",
@@ -142,107 +145,105 @@
     {
       "category": "elevation",
       "fetch_id": "colorado_3dep_lees_ferry_corridor_sample",
+      "notes": "Larger official USGS 3DEP ImageServer export for active Unreal preview relief; still not a complete conditioned canyon DEM.",
       "source_id": "usgs_3dep",
       "status": "downloaded",
       "target_artifact": "terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif",
-      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-12429934.341976928%2C4411265.910262686%2C-12416576.003081735%2C4425177.2278650915&bboxSR=3857&imageSR=3857&size=512%2C512&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
-      "notes": "Larger official USGS 3DEP ImageServer export for active Unreal preview relief; still not a complete conditioned canyon DEM."
+      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-12429934.341976928%2C4411265.910262686%2C-12416576.003081735%2C4425177.2278650915&bboxSR=3857&imageSR=3857&size=512%2C512&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image"
     },
     {
       "category": "imagery",
       "fetch_id": "colorado_naip_lees_ferry_corridor_sample",
+      "notes": "Larger official USDA/APFO NAIP ImageServer export for active Unreal preview drape; still not a complete canyon orthomosaic.",
       "source_id": "usda_naip",
       "status": "downloaded",
       "target_artifact": "imagery/usda_naip_lees_ferry_corridor_sample_1024.png",
-      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-12429934.341976928%2C4411265.910262686%2C-12416576.003081735%2C4425177.2278650915&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=png&f=image",
-      "notes": "Larger official USDA/APFO NAIP ImageServer export for active Unreal preview drape; still not a complete canyon orthomosaic."
+      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-12429934.341976928%2C4411265.910262686%2C-12416576.003081735%2C4425177.2278650915&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=png&f=image"
     },
     {
       "category": "derived_source_masks",
       "fetch_id": "colorado_naip_lees_ferry_corridor_masks",
+      "notes": "Review-gated preview water and vegetation masks generated from the active 1024px USDA/APFO NAIP drape plus a bounded generated big-water channel prior. These masks are sampled by Unreal preview terrain/drape coloring but are not final segmentation, bank polygons, or production masks.",
       "source_id": "usda_naip_lees_ferry_corridor_sample_1024",
       "status": "generated_review_gated_preview_masks",
       "target_artifact": "imagery/usda_naip_lees_ferry_corridor_water_mask_1024.png; imagery/usda_naip_lees_ferry_corridor_vegetation_mask_1024.png; imagery/usda_naip_lees_ferry_corridor_masks_manifest.json",
-      "url": "physics/src/raftsim/geospatial_preview.py",
-      "notes": "Review-gated preview water and vegetation masks generated from the active 1024px USDA/APFO NAIP drape plus a bounded generated big-water channel prior. These masks are sampled by Unreal preview terrain/drape coloring but are not final segmentation, bank polygons, or production masks."
+      "url": "physics/src/raftsim/geospatial_preview.py"
     },
     {
       "category": "derived_heightfield_candidate",
       "fetch_id": "colorado_3dep_lees_ferry_corridor_heightfield_candidate",
+      "notes": "Review-gated 1009px 16-bit normalized PNG generated from the official USGS 3DEP Lees Ferry corridor sample for Unreal Landscape import tests. This is not a complete Grand Canyon corridor DEM, reprojected final terrain, river-mile conditioned surface, or production Landscape replacement.",
       "source_id": "usgs_3dep_lees_ferry_corridor_sample_512",
       "status": "generated_review_gated_import_candidate",
       "target_artifact": "terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png",
-      "url": "physics/src/raftsim/geospatial_preview.py",
-      "notes": "Review-gated 1009px 16-bit normalized PNG generated from the official USGS 3DEP Lees Ferry corridor sample for Unreal Landscape import tests. This is not a complete Grand Canyon corridor DEM, reprojected final terrain, river-mile conditioned surface, or production Landscape replacement."
+      "url": "physics/src/raftsim/geospatial_preview.py"
     },
     {
-      "fetch_id": "colorado_usbr_glen_canyon_total_release_daily",
-      "source_id": "usbr_glen_canyon_release_context",
       "category": "release_context",
-      "target_artifact": "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
-      "url": "https://www.usbr.gov/uc/water/hydrodata/reservoir_data/919/json/42.json",
+      "fetch_id": "colorado_usbr_glen_canyon_total_release_daily",
+      "notes": "Official Reclamation daily Total Release JSON pulled on 2026-07-06; use the derived release context manifest for checksums, summaries, unit caveat, and USGS comparisons.",
+      "source_id": "usbr_glen_canyon_release_context",
       "status": "downloaded_review_gated",
-      "notes": "Official Reclamation daily Total Release JSON pulled on 2026-07-06; use the derived release context manifest for checksums, summaries, unit caveat, and USGS comparisons."
+      "target_artifact": "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
+      "url": "https://www.usbr.gov/uc/water/hydrodata/reservoir_data/919/json/42.json"
     },
     {
       "category": "hydrography",
       "fetch_id": "colorado_nhd_hu8_lees_ferry_bbox_extract",
-      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
-      "status": "downloaded_and_generated_review_gated_extract",
-      "target_artifact": "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
+      "notes": "Official TNM NHD HU8 products 14070006, 14070007, and 15010001 were downloaded and bbox-intersected into a stitched Lees Ferry pilot overlay. This is source context only, not accepted river-mile centerline or sandbar geometry.",
       "related_artifacts": [
         "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
         "hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson"
       ],
-      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=National%20Hydrography%20Dataset%20%28NHD%29&bbox=-111.66,36.80,-111.54,36.90&prodFormats=Shapefile&outputFormat=JSON",
-      "notes": "Official TNM NHD HU8 products 14070006, 14070007, and 15010001 were downloaded and bbox-intersected into a stitched Lees Ferry pilot overlay. This is source context only, not accepted river-mile centerline or sandbar geometry."
+      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
+      "status": "downloaded_and_generated_review_gated_extract",
+      "target_artifact": "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=National%20Hydrography%20Dataset%20%28NHD%29&bbox=-111.66,36.80,-111.54,36.90&prodFormats=Shapefile&outputFormat=JSON"
     },
     {
       "category": "hydrography",
       "fetch_id": "colorado_nhd_hu8_lees_ferry_mainstem_candidate",
-      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
-      "status": "derived_review_gated_mainstem_candidate_not_river_mile_stationing",
-      "target_artifact": "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
+      "notes": "Derived a single exact-endpoint Colorado River mainstem candidate from named NHD flowlines in the stitched Lees Ferry HU8 overlay. This is an editor/review line only, not river-mile stationing, accepted banks, sandbars, or production geometry.",
       "related_artifacts": [
         "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
         "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
         "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson"
       ],
-      "url": "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
-      "notes": "Derived a single exact-endpoint Colorado River mainstem candidate from named NHD flowlines in the stitched Lees Ferry HU8 overlay. This is an editor/review line only, not river-mile stationing, accepted banks, sandbars, or production geometry."
+      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
+      "status": "derived_review_gated_mainstem_candidate_not_river_mile_stationing",
+      "target_artifact": "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
+      "url": "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson"
     },
     {
       "category": "hydrography",
       "fetch_id": "colorado_nhd_hu8_lees_ferry_mainstem_stationing_candidate",
-      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
-      "status": "metric_stationing_candidate_review_required_not_final_crs_or_river_mile_stationing",
-      "target_artifact": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+      "notes": "Generated preview metric stationing, downstream tangents, and river-left normal seeds from the exact-graph Colorado NHD mainstem candidate. This is local equirectangular edit scaffolding only, not final canyon CRS or river-mile stationing.",
       "related_artifacts": [
         "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
         "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson"
       ],
-      "url": "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
-      "notes": "Generated preview metric stationing, downstream tangents, and river-left normal seeds from the exact-graph Colorado NHD mainstem candidate. This is local equirectangular edit scaffolding only, not final canyon CRS or river-mile stationing."
+      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
+      "status": "metric_stationing_candidate_review_required_not_final_crs_or_river_mile_stationing",
+      "target_artifact": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+      "url": "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson"
     },
     {
       "category": "hydrography",
       "fetch_id": "colorado_nhd_hu8_lees_ferry_cross_section_seed_candidates",
-      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
-      "status": "seed_candidates_review_required_not_banks_or_cross_sections",
-      "target_artifact": "hydrography/nhd_hu8_lees_ferry_cross_section_seed_manifest.json",
+      "notes": "Generated fixed-width Colorado cross-section review seed lines from preview stationing normals. These are editor review aids only, not accepted banks, channel widths, sandbars, or production cross sections.",
       "related_artifacts": [
         "hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson",
         "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json"
       ],
-      "url": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
-      "notes": "Generated fixed-width Colorado cross-section review seed lines from preview stationing normals. These are editor review aids only, not accepted banks, channel widths, sandbars, or production cross sections."
+      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
+      "status": "seed_candidates_review_required_not_banks_or_cross_sections",
+      "target_artifact": "hydrography/nhd_hu8_lees_ferry_cross_section_seed_manifest.json",
+      "url": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json"
     },
     {
       "category": "hydrography_alignment_diagnostic",
       "fetch_id": "colorado_nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic",
-      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract_usda_naip_usgs_3dep_preview_masks",
-      "status": "generated_review_gated_preview_mask_diagnostic_not_acceptance",
-      "target_artifact": "hydrography/nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic.json",
+      "notes": "Samples Colorado preview stationing and cross-section seeds against the review-gated NAIP water/vegetation masks and 3DEP relief. This is a manual review prioritization aid only, not accepted river-mile geometry, banks, sandbars, or solver cross sections.",
       "related_artifacts": [
         "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
         "hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson",
@@ -250,22 +251,33 @@
         "imagery/production_import_pilot/vegetation_mask_2048.png",
         "terrain/production_import_pilot/dem_relief_2048.png"
       ],
-      "url": "hydrography/nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic.json",
-      "notes": "Samples Colorado preview stationing and cross-section seeds against the review-gated NAIP water/vegetation masks and 3DEP relief. This is a manual review prioritization aid only, not accepted river-mile geometry, banks, sandbars, or solver cross sections."
+      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract_usda_naip_usgs_3dep_preview_masks",
+      "status": "generated_review_gated_preview_mask_diagnostic_not_acceptance",
+      "target_artifact": "hydrography/nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic.json",
+      "url": "hydrography/nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic.json"
     },
     {
       "category": "imagery_mask_prior",
       "fetch_id": "colorado_nhd_hu8_lees_ferry_water_prior",
-      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract_stationing_prior",
-      "status": "generated_review_gated_alignment_prior_not_segmentation_truth",
-      "target_artifact": "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json",
+      "notes": "Rasterized the Colorado NHD mainstem stationing into the pilot mask grid as an editor and mask-generation prior. This is not visible-water segmentation, accepted wetted width, sandbar geometry, or a release-dependent wet-bank mask.",
       "related_artifacts": [
         "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png",
         "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
         "imagery/production_import_pilot/water_mask_2048.png"
       ],
-      "url": "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json",
-      "notes": "Rasterized the Colorado NHD mainstem stationing into the pilot mask grid as an editor and mask-generation prior. This is not visible-water segmentation, accepted wetted width, sandbar geometry, or a release-dependent wet-bank mask."
+      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract_stationing_prior",
+      "status": "generated_review_gated_alignment_prior_not_segmentation_truth",
+      "target_artifact": "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json",
+      "url": "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json"
+    },
+    {
+      "category": "protected_area_and_access_context_review",
+      "fetch_id": "colorado_access_publication_sensitivity_review",
+      "notes": "Review artifact records NPS River Trips / Permits, Noncommercial River Trip Helpful Links, Lees Ferry to Diamond Creek overview, and linked regulations PDF leads. No NPS media, maps, PDF text, or geometry are imported.",
+      "source_id": "nps_grand_canyon_river_trips_permits",
+      "status": "generated_review_gated_source_lead_artifact",
+      "target_artifact": "review/production_import_pilot/access_publication_sensitivity_review.json",
+      "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm"
     }
   ],
   "river_id": "colorado_river",
@@ -303,18 +315,18 @@
       ]
     },
     {
-      "source_id": "usbr_glen_canyon_release_context",
-      "provider": "Bureau of Reclamation Upper Colorado Region hydrodata",
       "category": "release_context",
+      "license_or_terms": "Official Reclamation hydrodata; preserve dashboard URL, JSON endpoint, retrieval date, provisional-data note, and unit/terms review before final gameplay tuning.",
+      "provider": "Bureau of Reclamation Upper Colorado Region hydrodata",
+      "source_id": "usbr_glen_canyon_release_context",
+      "status": "daily_total_release_attached_review_gated",
       "title": "Lake Powell / Glen Canyon Dam Total Release",
       "url": "https://www.usbr.gov/uc/water/hydrodata/reservoir_data/919/dashboard.html",
-      "license_or_terms": "Official Reclamation hydrodata; preserve dashboard URL, JSON endpoint, retrieval date, provisional-data note, and unit/terms review before final gameplay tuning.",
       "use_in_pipeline": [
         "release_band_history",
         "sandbar_wet_bank_exposure",
         "big_water_visual_tuning"
-      ],
-      "status": "daily_total_release_attached_review_gated"
+      ]
     },
     {
       "category": "permit_context",
@@ -414,6 +426,64 @@
         "tributary_context",
         "river_mile_stationing_seed",
         "visible_water_edge_alignment"
+      ]
+    },
+    {
+      "category": "protected_area_and_access_context",
+      "license_or_terms": "U.S. government web content; preserve NPS attribution, page title, and updated date. Do not reuse page media, maps, or screenshots as assets without item review.",
+      "provider": "National Park Service",
+      "source_id": "nps_grand_canyon_river_trips_permits",
+      "status": "official_page_reviewed_source_lead_attached",
+      "title": "Grand Canyon River Trips / Permits",
+      "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm",
+      "use_in_pipeline": [
+        "route_access_review",
+        "launch_takeout_context",
+        "permit_context_source_lead",
+        "publication_sensitivity"
+      ]
+    },
+    {
+      "category": "protected_area_and_access_context",
+      "license_or_terms": "U.S. government web content; linked documents require manual date, terms, and publication review.",
+      "provider": "National Park Service",
+      "source_id": "nps_grand_canyon_noncommercial_river_trip_links",
+      "status": "official_page_reviewed_source_lead_attached",
+      "title": "Grand Canyon Noncommercial River Trip Helpful Links",
+      "url": "https://www.nps.gov/grca/planyourvisit/noncommercial-riv-docs.htm",
+      "use_in_pipeline": [
+        "launch_takeout_context",
+        "regulation_source_review",
+        "publication_sensitivity"
+      ]
+    },
+    {
+      "category": "protected_area_and_access_context",
+      "license_or_terms": "U.S. government web content; preserve NPS attribution and page metadata.",
+      "provider": "National Park Service",
+      "source_id": "nps_grand_canyon_lees_ferry_diamond_creek_overview",
+      "status": "official_page_reviewed_source_lead_attached",
+      "title": "Overview: Lees Ferry to Diamond Creek",
+      "url": "https://www.nps.gov/grca/planyourvisit/overview-lees-ferry-diamond-ck.htm",
+      "use_in_pipeline": [
+        "river_mile_context",
+        "camp_beach_review",
+        "takeout_context",
+        "publication_sensitivity"
+      ]
+    },
+    {
+      "category": "protected_area_and_access_context",
+      "license_or_terms": "Linked official PDF; do not vendor, quote, or present as legal advice without human review.",
+      "provider": "National Park Service",
+      "source_id": "nps_grand_canyon_noncommercial_river_trip_regulations_pdf",
+      "status": "linked_official_pdf_not_imported",
+      "title": "Noncommercial River Trip Regulations PDF",
+      "url": "https://www.nps.gov/grca/planyourvisit/upload/Noncommercial_River_Trip_Regulations.pdf",
+      "use_in_pipeline": [
+        "manual_policy_review",
+        "publication_sensitivity",
+        "route_package_gate"
       ]
     }
   ]

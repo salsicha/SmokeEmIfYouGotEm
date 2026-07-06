@@ -151,6 +151,22 @@
       "url": "https://www.nps.gov/grca/learn/photosmultimedia/index.htm",
       "use_gate": "Record item-level public-domain or Creative Commons status, credit, date, location, and allowed use before any media becomes production reference or asset input.",
       "why_it_matters": "Preferred official-media lead for Colorado canyon wall, river, sandbar, b-roll, and atmosphere reference."
+    },
+    {
+      "provider": "National Park Service Grand Canyon River Trips / Permits",
+      "review_date": "2026-07-06",
+      "source_id": "nps_grand_canyon_river_trips_permits",
+      "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm",
+      "use_gate": "Use as source triage only until exact launch/take-out geometry, document dates, access constraints, publication sensitivity, and oarsman review are attached.",
+      "why_it_matters": "Official Colorado River trip, route, and permit-context source lead for Grand Canyon route/access review."
+    },
+    {
+      "provider": "National Park Service Grand Canyon Noncommercial River Trip Helpful Links",
+      "review_date": "2026-07-06",
+      "source_id": "nps_grand_canyon_noncommercial_river_trip_links",
+      "url": "https://www.nps.gov/grca/planyourvisit/noncommercial-riv-docs.htm",
+      "use_gate": "Keep linked regulations and support pages in manual review; do not present permit/legal guidance or import page/PDF content as game assets.",
+      "why_it_matters": "Official document index for Lees Ferry starts, Diamond Creek/Pearce Ferry take-outs, and noncommercial river trip regulations."
     }
   ],
   "rivers": [
@@ -301,6 +317,7 @@
         "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
         "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
         "hydrology/production_import_pilot/release_band_review.json",
+        "review/production_import_pilot/access_publication_sensitivity_review.json",
         "reference_media_link_manifest.json"
       ],
       "completion_gate": "Captures read as Grand Canyon big-water rowing, with river-mile scale, canyon atmosphere, sandbar/wet-bank variation, oar-rig sightlines, and rescue visibility intact.",
@@ -358,6 +375,24 @@
             "nps_grand_canyon_media",
             "first_party_field_capture",
             "explicit_oarsman_or_outfitter_permission"
+          ]
+        },
+        {
+          "promotion_gate": "Use the attached NPS access/publication review as source-lead evidence only; exact launch/take-out, camp/beach, sensitive-location, river-mile publication, and route-language review still block detailed maps and screenshots.",
+          "required_artifacts": [
+            "review/production_import_pilot/access_publication_sensitivity_review.json",
+            "review/production_import_pilot/access_points.geojson",
+            "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+            "review/production_import_pilot/camps_and_beaches_review.geojson",
+            "review/production_import_pilot/oarsman_route_publication_notes.json"
+          ],
+          "source_class": "protected_area_and_access_context",
+          "source_leads": [
+            "nps_grand_canyon_river_trips_permits",
+            "nps_grand_canyon_noncommercial_river_trip_links",
+            "nps_grand_canyon_lees_ferry_diamond_creek_overview",
+            "nps_grand_canyon_noncommercial_river_trip_regulations_pdf",
+            "guide_review"
           ]
         }
       ],

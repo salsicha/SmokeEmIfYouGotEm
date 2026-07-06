@@ -213,6 +213,28 @@
         "american_south_fork"
       ],
       "url": "https://experience.arcgis.com/experience/58a5b752c549418285583fc4c0301c29"
+    },
+    {
+      "production_use": "Official route/trip/access/publication source lead for Grand Canyon river trips.",
+      "promotion_gate": "Use as source review only until exact geometry, current document dates, publication sensitivity, and oarsman review are attached.",
+      "provider": "National Park Service",
+      "source_class": "protected_area_and_access_context",
+      "source_id": "nps_grand_canyon_river_trips_permits",
+      "target_rivers": [
+        "colorado_river"
+      ],
+      "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm"
+    },
+    {
+      "production_use": "Official document index for launch/take-out support references and noncommercial regulation source leads.",
+      "promotion_gate": "Do not present permit/legal guidance or import linked documents as assets until manual review is complete.",
+      "provider": "National Park Service",
+      "source_class": "protected_area_and_access_context",
+      "source_id": "nps_grand_canyon_noncommercial_river_trip_links",
+      "target_rivers": [
+        "colorado_river"
+      ],
+      "url": "https://www.nps.gov/grca/planyourvisit/noncommercial-riv-docs.htm"
     }
   ],
   "goal": "Track the exact production geospatial, seasonal-flow, aerial, protected-access, and reference-media evidence required before South Fork American, Colorado River, and Pacuare Unreal environments can be promoted from source-aware previews to lifelike production river maps.",
@@ -365,10 +387,11 @@
         },
         "protected_area_and_access_context": {
           "artifacts": [
-            "physics/data/real_world/reference_media_link_manifest.json"
+            "physics/data/real_world/reference_media_link_manifest.json",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/access_publication_sensitivity_review.json"
           ],
-          "promotion_blocker": "Need NPS route/publication constraints, camps/access sensitivity, permits context, and media item metadata before production route packages.",
-          "status": "official_context_leads_only"
+          "promotion_blocker": "NPS River Trips / Permits, Noncommercial River Trip Helpful Links, Lees Ferry to Diamond Creek overview, and linked regulations PDF leads are attached in the access/publication review, but exact launch/take-out, camp/beach, sensitive-location, river-mile, operational-document, media-rights, and oarsman review still block detailed production route packages and screenshots.",
+          "status": "official_nps_access_publication_leads_attached_geometry_and_media_rights_pending"
         },
         "seasonal_flow_or_release_history": {
           "artifacts": [
