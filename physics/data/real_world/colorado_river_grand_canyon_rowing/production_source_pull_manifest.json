@@ -409,6 +409,43 @@
         "Lines use preview stationing normals and inherit the direction, CRS, and river-mile caveats of the mainstem stationing candidate.",
         "No imagery, DEM, hydrology, release-band, NPS/GCMRC, or oarsman validation has accepted these seed lines yet."
       ]
+    },
+    {
+      "artifact_id": "colorado_nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic",
+      "category": "derived_hydrography_alignment_diagnostic",
+      "path": "hydrography/nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic.json",
+      "related_artifacts": [
+        "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+        "hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson",
+        "imagery/production_import_pilot/water_mask_2048.png",
+        "imagery/production_import_pilot/vegetation_mask_2048.png",
+        "terrain/production_import_pilot/dem_relief_2048.png"
+      ],
+      "provider": "RaftSim preview diagnostic from USGS TNM NHD, USDA/APFO NAIP masks, and USGS 3DEP relief",
+      "url": "hydrography/nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic.json",
+      "status": "diagnostic_preview_masks_not_alignment_acceptance",
+      "summary": {
+        "station_sample_count": 244,
+        "station_samples_in_bounds": 219,
+        "station_samples_out_of_bounds": 25,
+        "station_water_ge_0_35_fraction": 0.7443,
+        "cross_section_count": 123,
+        "cross_sections_with_center_in_bounds": 109,
+        "cross_sections_out_of_bounds": 14,
+        "cross_section_center_water_ge_0_35_fraction": 0.7523,
+        "diagnostic_sha256": "fe323e815aca03b870094a7c144bd9fd9bbe678bc3562f7621cdb6fd8c703e05"
+      },
+      "use": [
+        "editor_review_prioritization",
+        "water_edge_alignment_sampling",
+        "sandbar_and_wet_bank_review_input",
+        "oarsman_annotation_scaffold"
+      ],
+      "caveats": [
+        "The diagnostic uses preview masks with a bounded channel prior, so agreement is not production acceptance.",
+        "Out-of-bounds stations and seed lines reflect the current Lees Ferry pilot bbox and full-feature NHD candidate extent.",
+        "River-mile stationing, accepted banks, sandbars, eddies, release-aware wet-bank classes, and oarsman/geospatial review remain required."
+      ]
     }
   ],
   "production_blockers": [
