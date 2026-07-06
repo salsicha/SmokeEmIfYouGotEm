@@ -96,7 +96,8 @@
       "imagery/production_import_pilot/sentinel_tci_review_preview.json",
       "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tci_review_1024.png",
       "imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json",
-      "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tci_review_1024.png"
+      "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tci_review_1024.png",
+      "imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json"
     ],
     "protected_area_review": [
       "review/sinac_protected_area_source_rights.json",
