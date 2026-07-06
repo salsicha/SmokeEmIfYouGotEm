@@ -31,6 +31,7 @@ from raftsim.real_world import (
     COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE,
     COLORADO_PRODUCTION_SANDBARS_FILE,
     COLORADO_RELEASE_BAND_REVIEW_FILE,
+    COLORADO_SOURCE_METADATA_REVIEW_FILE,
     COLORADO_USBR_RELEASE_CONTEXT_FILE,
     COLORADO_USBR_TOTAL_RELEASE_FILE,
     COURSE_ELEVATION_EXTRACTION_FILE,
@@ -795,6 +796,8 @@ def test_colorado_production_import_pilot_exposes_lees_ferry_tile_plan_and_revie
     assert COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert COLORADO_PRODUCTION_SANDBARS_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert COLORADO_SOURCE_METADATA_REVIEW_FILE in classes["terrain_dem_or_lidar"]["target_outputs"]
+    assert COLORADO_SOURCE_METADATA_REVIEW_FILE in classes["aerial_or_satellite_imagery"]["target_outputs"]
     assert classes["seasonal_flow_or_release_history"]["status"] == (
         "usgs_daily_discharge_and_usbr_release_context_attached_review_pending"
     )
@@ -819,6 +822,58 @@ def test_colorado_production_import_pilot_exposes_lees_ferry_tile_plan_and_revie
         pilot["unreal_import_targets"]["future_production_map"]
         == "/Game/RaftSim/Maps/Production/L_ColoradoGrandCanyon_LeesFerryRowing"
     )
+
+
+def test_colorado_source_metadata_review_attaches_pilot_tile_provenance_without_promoting():
+    colorado_dir = REAL_WORLD_DATA_DIR / "colorado_river_grand_canyon_rowing"
+    source_manifest = json.loads((colorado_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((colorado_dir / "production_source_pull_manifest.json").read_text())
+    tile_pull_manifest = json.loads((colorado_dir / "production_import_pilot_pull_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+    review = json.loads((colorado_dir / COLORADO_SOURCE_METADATA_REVIEW_FILE).read_text())
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+    photoreal_rivers = {river["river_id"]: river for river in photoreal_sources["rivers"]}
+    attached_sources = rivers["colorado_river"]["attached_sources_by_class"]
+
+    assert COLORADO_SOURCE_METADATA_REVIEW_FILE in source_manifest["artifacts"]["source_pulls"]
+    assert tile_pull_manifest["metadata_review"] == COLORADO_SOURCE_METADATA_REVIEW_FILE
+    assert any(artifact["artifact_id"] == "colorado_source_metadata_review" for artifact in pull_manifest["pulled_artifacts"])
+    assert (
+        f"physics/data/real_world/colorado_river_grand_canyon_rowing/{COLORADO_SOURCE_METADATA_REVIEW_FILE}"
+        in attached_sources["terrain_dem_or_lidar"]["artifacts"]
+    )
+    assert (
+        f"physics/data/real_world/colorado_river_grand_canyon_rowing/{COLORADO_SOURCE_METADATA_REVIEW_FILE}"
+        in attached_sources["aerial_or_satellite_imagery"]["artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "colorado_source_metadata_review"
+        for artifact in photoreal_rivers["colorado_river"]["source_sample_artifacts"]
+    )
+    assert review["schema"] == "raftsim.colorado_source_metadata_review.v1"
+    assert review["status"] == "pilot_tile_metadata_attached_review_gated_not_production_promoted"
+    assert review["raw_response_policy"]["raw_service_payloads_committed"] is False
+    assert len(review["official_service_payloads"]) == 4
+    assert review["downloaded_tile_summary"]["download_count"] == 8
+    assert review["usda_naip_metadata"]["item_query"]["primary_feature_count"] == 9
+    assert review["usda_naip_metadata"]["item_query"]["date_min"] == "2021-10-15"
+    assert review["usda_naip_metadata"]["item_query"]["date_max"] == "2021-10-15"
+    assert review["usgs_3dep_metadata"]["item_query"]["primary_feature_count"] == 9
+    assert review["usgs_3dep_metadata"]["item_query"]["overview_feature_count"] == 12
+    assert review["usgs_3dep_metadata"]["item_query"]["date_min"] == "2022-11-10"
+    assert review["usgs_3dep_metadata"]["item_query"]["date_max"] == "2023-09-16"
+    assert any(
+        "North American Vertical Datum of 1988" in datum
+        for item in review["usgs_3dep_metadata"]["item_query"]["items"]
+        for datum in item["vertical_datums"]
+    )
+    assert "claiming production-ready canyon terrain or release-aware water masks" in review["forbidden_use"]
 
 
 def test_colorado_usbr_glen_canyon_release_context_records_official_series_and_gauge_comparisons():
@@ -1927,6 +1982,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     )
     assert "USGS 11445500" in rivers["american_south_fork"]["procedural_generation_allowlist"][2]
     assert "release-band" in rivers["colorado_river"]["procedural_generation_allowlist"][2]
+    assert COLORADO_SOURCE_METADATA_REVIEW_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_NHD_WATER_PRIOR_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_NHD_HU8_MANIFEST_FILE in rivers["colorado_river"]["attached_preview_inputs"]

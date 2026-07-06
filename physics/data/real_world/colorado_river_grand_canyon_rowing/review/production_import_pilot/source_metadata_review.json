@@ -1,0 +1,396 @@
+{
+  "allowed_use": [
+    "pilot DEM/NAIP provenance review",
+    "editor source overlay triage",
+    "next renderer iteration with review-gated source-drape and heightfield candidates"
+  ],
+  "downloaded_tile_summary": {
+    "download_count": 8,
+    "downloads_by_kind": {
+      "3dep_dem_export": 4,
+      "naip_export": 4
+    },
+    "providers": [
+      "USDA/APFO NAIP ImageServer",
+      "USGS 3D Elevation Program ImageServer"
+    ],
+    "review_gates_from_pull_manifest": [
+      "Verify provider metadata and acquisition dates for every imagery tile.",
+      "Mosaic, clip, reproject, void-review, hydrologically condition, and channel-burn DEM tiles before Unreal Landscape promotion.",
+      "Derive water, vegetation, wet-rock, sandbar, and release-band masks only after hydrography, river-edge, and bank alignment review.",
+      "Do not treat downloaded reference tiles as final photoreal art until guide/oarsman and geospatial review passes."
+    ]
+  },
+  "forbidden_use": [
+    "claiming production-ready canyon terrain or release-aware water masks",
+    "claiming lifelike Grand Canyon source fidelity",
+    "publishing detailed route screenshots as approved real-world reproductions",
+    "using service metadata as guide/oarsman/geospatial approval"
+  ],
+  "generated_on": "2026-07-06",
+  "official_service_payloads": [
+    {
+      "byte_count": 12974,
+      "raw_payload_committed": false,
+      "request_id": "usgs_3dep_service_metadata",
+      "sha256": "d454148c69783db1b4816f48d1279d7c248b8e26ec70d4156a9874b49fd9d570",
+      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer?f=pjson"
+    },
+    {
+      "byte_count": 575991,
+      "raw_payload_committed": false,
+      "request_id": "usgs_3dep_item_query",
+      "sha256": "2d318f9b64cfb7b926336a4300b1f0923c07a3558d33ffd9261a3c8c592a8570",
+      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/query?geometry=-111.66%2C36.8%2C-111.54%2C36.9&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"
+    },
+    {
+      "byte_count": 6386,
+      "raw_payload_committed": false,
+      "request_id": "usda_naip_service_metadata",
+      "sha256": "9f45ad12c3002b1c02f960756fa40aa06e1bf0c7b2474bcf16e40f3c0dfd362b",
+      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer?f=pjson"
+    },
+    {
+      "byte_count": 5180,
+      "raw_payload_committed": false,
+      "request_id": "usda_naip_item_query",
+      "sha256": "5d5063e4ed11258013048e612b55cf9cb918b562494426104b8f5042354ff961",
+      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/query?geometry=-111.66%2C36.8%2C-111.54%2C36.9&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json"
+    }
+  ],
+  "pilot_bounds_wgs84": {
+    "max_lat": 36.9,
+    "max_lon": -111.54,
+    "min_lat": 36.8,
+    "min_lon": -111.66
+  },
+  "raw_response_policy": {
+    "committed_payload_hashes": true,
+    "raw_payload_location": "/private/tmp during generation only",
+    "raw_service_payloads_committed": false,
+    "reason": "Keep the repository on compact reviewed metadata while preserving reproducible request URLs and hashes."
+  },
+  "remaining_blockers": [
+    "Full Lees Ferry-to-Diamond Creek canyon tiling, mosaic, clipping, and river-mile stationing are not complete.",
+    "3DEP vertical datum and product choice must be reviewed before production terrain or Landscape promotion.",
+    "DEM void/artifact review, hydrologic conditioning, canyon-wall treatment, and channel burning remain open.",
+    "NAIP/orthomosaic terms, attribution, and canyon color/seasonal review remain open before production drape publication.",
+    "Release-aware wet-bank, sandbar, side-channel, and shadow masks need reviewed imagery, hydrography, release context, and oarsman validation.",
+    "Guide/oarsman/geospatial approval is required before screenshots or route details are treated as lifelike production evidence."
+  ],
+  "review_status_by_source_class": {
+    "aerial_or_satellite_imagery": "pilot_naip_acquisition_dates_attached_full_canyon_review_pending",
+    "terrain_dem_or_lidar": "pilot_service_and_item_metadata_attached_full_canyon_review_pending"
+  },
+  "river_id": "colorado_river",
+  "schema": "raftsim.colorado_source_metadata_review.v1",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "source_pull_manifest": "production_import_pilot_pull_manifest.json",
+  "source_recipe": "production_import_pilot.json",
+  "status": "pilot_tile_metadata_attached_review_gated_not_production_promoted",
+  "usda_naip_metadata": {
+    "item_query": {
+      "date_max": "2021-10-15",
+      "date_min": "2021-10-15",
+      "feature_count": 9,
+      "items": [
+        {
+          "count": 1,
+          "dates": [
+            "2021-10-15"
+          ],
+          "name": "m_3611103_se_12_060_20211015",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2021
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2021-10-15"
+          ],
+          "name": "m_3611104_se_12_060_20211015",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2021
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2021-10-15"
+          ],
+          "name": "m_3611104_sw_12_060_20211015",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2021
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2021-10-15"
+          ],
+          "name": "m_3611111_ne_12_060_20211015",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2021
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2021-10-15"
+          ],
+          "name": "m_3611111_se_12_060_20211015",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2021
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2021-10-15"
+          ],
+          "name": "m_3611112_ne_12_060_20211015",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2021
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2021-10-15"
+          ],
+          "name": "m_3611112_nw_12_060_20211015",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2021
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2021-10-15"
+          ],
+          "name": "m_3611112_se_12_060_20211015",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2021
+          ]
+        },
+        {
+          "count": 1,
+          "dates": [
+            "2021-10-15"
+          ],
+          "name": "m_3611112_sw_12_060_20211015",
+          "product_names": [],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [],
+          "vertical_datums": [],
+          "years": [
+            2021
+          ]
+        }
+      ],
+      "overview_feature_count": 0,
+      "primary_feature_count": 9,
+      "spatial_reference": {
+        "latestWkid": 3857,
+        "wkid": 102100
+      },
+      "years": [
+        2021
+      ]
+    },
+    "review_decision": "Lees Ferry pilot envelope has official NAIP item metadata with 9 primary image footprints, all Year_ts 2021, and QQDATE October 15, 2021. This resolves the pilot acquisition-date unknown, but not full-canyon imagery selection, terms/attribution signoff, seasonal color review, or release-aware mask QA.",
+    "service": {
+      "band_count": 4,
+      "copyright_text": "",
+      "description": "NAIP/USDA_CONUS_PRIME",
+      "field_names": [
+        "OBJECTID",
+        "Shape",
+        "Name",
+        "Category",
+        "Year_ts",
+        "ST",
+        "QQNAME",
+        "QQDATE"
+      ],
+      "max_image_height": 4100,
+      "max_image_width": 15000,
+      "name": "NAIP/USDA_CONUS_PRIME",
+      "pixel_type": "U8",
+      "service_data_type": "esriImageServiceDataTypeGeneric",
+      "spatial_reference": {
+        "latestWkid": 3857,
+        "wkid": 102100
+      }
+    }
+  },
+  "usgs_3dep_metadata": {
+    "item_query": {
+      "date_max": "2023-09-16",
+      "date_min": "2022-11-10",
+      "feature_count": 21,
+      "items": [
+        {
+          "count": 3,
+          "dates": [
+            "2022-11-10"
+          ],
+          "name": "AZ_CentralCoconino_B22",
+          "product_names": [
+            "USGS_3DEP"
+          ],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [
+            "USGS"
+          ],
+          "vertical_datums": [
+            "North American Vertical Datum of 1988 (NAVD 88)"
+          ],
+          "years": []
+        },
+        {
+          "count": 4,
+          "dates": [
+            "2023-09-16"
+          ],
+          "name": "AZ_NorthEast_D23",
+          "product_names": [
+            "USGS_3DEP"
+          ],
+          "resolution_x": [],
+          "resolution_y": [],
+          "sources": [
+            "USGS"
+          ],
+          "vertical_datums": [
+            "North American Vertical Datum of 1988 (NAVD 88)"
+          ],
+          "years": []
+        },
+        {
+          "count": 2,
+          "dates": [
+            "2023-09-16"
+          ],
+          "name": "n37w112",
+          "product_names": [
+            "USGS_3DEP"
+          ],
+          "resolution_x": [
+            "2.77777777787015E-04",
+            "9.25925926922017E-05"
+          ],
+          "resolution_y": [
+            "-0.000277777777786999",
+            "-9.259259269220167e-05"
+          ],
+          "sources": [
+            "USGS"
+          ],
+          "vertical_datums": [
+            "North American Vertical Datum of 1988 (NAVD 88)"
+          ],
+          "years": []
+        }
+      ],
+      "overview_feature_count": 12,
+      "primary_feature_count": 9,
+      "spatial_reference": {
+        "latestWkid": 3857,
+        "wkid": 102100
+      },
+      "years": []
+    },
+    "review_decision": "Lees Ferry pilot envelope has official 3DEP service metadata plus primary item footprints with acquisition dates and NAVD 88 vertical datum records. Production canyon terrain still needs expanded tiling, stationing, CRS/vertical-datum acceptance, void review, conditioning, channel burning, canyon-wall material breakup, and oarsman/geospatial approval.",
+    "service": {
+      "band_count": 1,
+      "copyright_text": "USGS National Map 3D Elevation Program (3DEP). June 24, 2026.",
+      "description": "The USGS 3D Elevation Program (3DEP) Bare Earth DEM Dynamic service is based on multi-resolution USGS DEM sources and provides dynamic functions for visualization. These functions include: Hillshade, Aspect Map, Hillshade Stretched, Multi-directional Hillshade, Slope Map, Elevation Tinted Hillshade, Contour. In addition the OGC Web Map Service (WMS) and Web Coverage Service (WCS) interfaces are enabled. Data available in this map service reflects all 3DEP DEM data published as of June 23, 2026.",
+      "field_names": [
+        "OBJECTID",
+        "Shape",
+        "Name",
+        "MinPS",
+        "MaxPS",
+        "LowPS",
+        "HighPS",
+        "Category",
+        "Tag",
+        "GroupName",
+        "ProductName",
+        "CenterX",
+        "CenterY",
+        "ZOrder",
+        "Shape_Length",
+        "Shape_Area",
+        "Dataset_ID",
+        "Best",
+        "DEM_Type",
+        "Source",
+        "VerticalDatum",
+        "AcquisitionDate",
+        "URL",
+        "Metadata",
+        "pubdate",
+        "title",
+        "Resolution_X",
+        "Resolution_Y",
+        "Cdate",
+        "StartDate",
+        "EndDate"
+      ],
+      "max_image_height": 8000,
+      "max_image_width": 8000,
+      "name": "3DEPElevation",
+      "pixel_type": "F32",
+      "service_data_type": "esriImageServiceDataTypeElevation",
+      "spatial_reference": {
+        "latestWkid": 3857,
+        "wkid": 102100
+      }
+    }
+  }
+}

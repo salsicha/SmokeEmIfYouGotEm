@@ -137,6 +137,7 @@ COLORADO_USBR_TOTAL_RELEASE_FILE = "hydrology/production_import_pilot/usbr_glen_
 COLORADO_USBR_RELEASE_CONTEXT_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json"
 COLORADO_RELEASE_BAND_REVIEW_FILE = "hydrology/production_import_pilot/release_band_review.json"
 COLORADO_ACCESS_PUBLICATION_REVIEW_FILE = "review/production_import_pilot/access_publication_sensitivity_review.json"
+COLORADO_SOURCE_METADATA_REVIEW_FILE = "review/production_import_pilot/source_metadata_review.json"
 COLORADO_ACCESS_POINTS_FILE = "review/production_import_pilot/access_points.geojson"
 COLORADO_NO_PUBLISH_SENSITIVE_POLYGONS_FILE = "review/production_import_pilot/no_publish_sensitive_polygons.geojson"
 COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE = "review/production_import_pilot/camps_and_beaches_review.geojson"
@@ -1639,6 +1640,7 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
                     "terrain/production_import_pilot/dem_relief_2048.png",
                     "terrain/production_import_pilot/heightfield_candidate_2017.png",
                     "production_import_pilot_derivatives_manifest.json",
+                    COLORADO_SOURCE_METADATA_REVIEW_FILE,
                 ],
                 "promotion_gate": (
                     "Download tiles, mosaic/clip, select canyon CRS, review voids and vertical datum, hydrologically "
@@ -1683,6 +1685,7 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
                     "imagery/production_import_pilot/naip_tiles",
                     "imagery/production_import_pilot/source_drape_4096.png",
                     "production_import_pilot_derivatives_manifest.json",
+                    COLORADO_SOURCE_METADATA_REVIEW_FILE,
                 ],
                 "promotion_gate": (
                     "Attach acquisition year/date, resolution, CRS, attribution, terms, canyon color review, and Landsat "
@@ -3464,6 +3467,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "production_import_pilot/heightfield_candidate_2017.png",
                     "production_import_pilot/water_mask_2048.png",
                     "production_import_pilot/vegetation_mask_2048.png",
+                    COLORADO_SOURCE_METADATA_REVIEW_FILE,
                     COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE,
                     COLORADO_NHD_WATER_PRIOR_FILE,
                     COLORADO_NHD_HU8_MANIFEST_FILE,

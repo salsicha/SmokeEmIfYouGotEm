@@ -693,6 +693,14 @@
           "unreal_use": "2017px 16-bit grayscale stitched Colorado pilot heightfield sampled into generated preview canyon geometry; not a promoted Landscape import or conditioned production terrain"
         },
         {
+          "artifact_id": "colorado_source_metadata_review",
+          "category": "terrain_imagery_source_metadata_review",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/source_metadata_review.json",
+          "provider": "RaftSim review artifact from official USGS 3DEP and USDA/APFO NAIP service metadata",
+          "status": "pilot_tile_metadata_attached_review_gated",
+          "unreal_use": "Provenance for the active Colorado source-drape and heightfield pilot inputs; not production canyon terrain, final orthomosaic, release-aware masks, or lifelike approval."
+        },
+        {
           "artifact_id": "colorado_release_band_review",
           "category": "seasonal_flow_or_release_history_review",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/release_band_review.json",

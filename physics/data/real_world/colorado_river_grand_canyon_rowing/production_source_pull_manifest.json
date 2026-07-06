@@ -7,8 +7,8 @@
   },
   "generated_on": "2026-07-06",
   "production_blockers": [
-    "Full canyon DEM/lidar tiles are not downloaded or conditioned yet.",
-    "Full canyon aerial/satellite imagery and water/vegetation/rock masks are not downloaded yet.",
+    "Lees Ferry pilot DEM tiles and official service/item metadata are attached, but full-canyon DEM/lidar tiling, mosaic/clip, CRS and vertical-datum review, void review, conditioning, canyon-wall treatment, and channel burning remain open.",
+    "Lees Ferry pilot NAIP tiles, item-level acquisition dates, and preview water/vegetation masks are attached, but full-canyon orthomosaic/imagery selection, terms review, release-aware mask QA, and guide/oarsman/geospatial approval remain open.",
     "A stitched Lees Ferry NHD HU8 source overlay, exact-graph Colorado mainstem candidate, preview metric stationing, fixed-width cross-section seeds, preview alignment diagnostic, and NHD-aligned water prior are attached, but river-mile stationing, accepted banks, sandbars, eddies, release-aware wet-bank classes, and rapid annotations are not clipped into a reviewed corridor workspace yet.",
     "USBR Glen Canyon daily total-release context is attached, but unit/terms confirmation, hourly/subdaily release patterns, release-band review, and guide/oarsman review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet.",
@@ -238,6 +238,50 @@
         "larger_unreal_canyon_source_drape",
         "canyon_color_and_river_edge_masks",
         "source-provenance plumbing"
+      ]
+    },
+    {
+      "artifact_id": "colorado_source_metadata_review",
+      "category": "terrain_imagery_source_metadata_review",
+      "caveats": [
+        "Raw ArcGIS service/query payloads are not committed; reproducible URLs, byte counts, and SHA-256 hashes are recorded.",
+        "NAIP item-level acquisition date covers the current Lees Ferry pilot envelope only, not the full Grand Canyon rowing corridor.",
+        "3DEP item metadata confirms pilot-envelope source candidates and NAVD 88 records, but production terrain still needs expanded tiling, canyon CRS/vertical-datum review, void review, hydrologic conditioning, and channel burning.",
+        "This artifact does not grant guide/oarsman/geospatial approval, route-publication approval, or lifelike production status."
+      ],
+      "path": "review/production_import_pilot/source_metadata_review.json",
+      "provider": "RaftSim review artifact from official USGS 3DEP and USDA/APFO NAIP ArcGIS ImageServer metadata/query responses",
+      "related_artifacts": [
+        "production_import_pilot.json",
+        "production_import_pilot_pull_manifest.json",
+        "production_import_pilot_derivatives_manifest.json",
+        "terrain/production_import_pilot/3dep_tiles",
+        "imagery/production_import_pilot/naip_tiles"
+      ],
+      "status": "pilot_tile_metadata_attached_review_gated_not_production_promoted",
+      "summary": {
+        "downloaded_tile_count": 8,
+        "naip_acquisition_date_max": "2021-10-15",
+        "naip_acquisition_date_min": "2021-10-15",
+        "naip_primary_item_count": 9,
+        "naip_years": [
+          2021
+        ],
+        "official_service_payload_count": 4,
+        "raw_payloads_committed": false,
+        "usgs_3dep_acquisition_date_max": "2023-09-16",
+        "usgs_3dep_acquisition_date_min": "2022-11-10",
+        "usgs_3dep_overview_item_count": 12,
+        "usgs_3dep_primary_item_count": 9,
+        "usgs_3dep_vertical_datums": [
+          "North American Vertical Datum of 1988 (NAVD 88)"
+        ]
+      },
+      "use": [
+        "pilot_dem_naip_provenance_review",
+        "source_gate_metadata_evidence",
+        "editor_source_overlay_triage",
+        "next_renderer_iteration_context"
       ]
     },
     {

@@ -366,10 +366,11 @@
           "artifacts": [
             "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_sample_1024.png",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/naip_tiles",
-            "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png"
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/source_metadata_review.json"
           ],
-          "promotion_blocker": "Sample export and 2x2 NAIP pilot drape do not cover the full rowing prototype corridor or canyon visual diversity; needs provider metadata/acquisition-date review, mosaic/clip, CRS/terms review, selected orthomosaics/satellite scenes, and guide/oarsman approval before production drape use.",
-          "status": "naip_lees_ferry_corridor_sample_pilot_tiles_and_stitched_source_drape_attached"
+          "promotion_blocker": "Lees Ferry pilot NAIP tiles and item-level acquisition date October 15, 2021 are attached for the current envelope, but the sample export and 2x2 NAIP drape do not cover the full rowing prototype corridor or canyon visual diversity; mosaic/clip, terms/attribution signoff, selected orthomosaics/satellite scenes, release-aware mask QA, and guide/oarsman approval remain open.",
+          "status": "naip_lees_ferry_pilot_acquisition_dates_and_source_drape_attached"
         },
         "guide_and_reference_media_annotations": {
           "artifacts": [
@@ -433,10 +434,11 @@
             "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/dem_relief_2048.png",
-            "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/heightfield_candidate_2017.png"
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/heightfield_candidate_2017.png",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/source_metadata_review.json"
           ],
-          "promotion_blocker": "Covers only a preview sample near Lees Ferry plus 2x2 official-service pilot derivatives; full canyon terrain still needs mosaic/clip, CRS and vertical-datum review, tiling expansion, stationing, hydrologic conditioning, canyon-wall material breakup, and guide/oarsman review.",
-          "status": "lees_ferry_corridor_sample_pilot_dem_tiles_relief_and_heightfield_candidate_attached"
+          "promotion_blocker": "Lees Ferry pilot DEM tiles and official service/item metadata are attached, including 3DEP primary item dates and NAVD 88 records for the pilot envelope, but full-canyon mosaic/clip, CRS and vertical-datum review, tiling expansion, river-mile stationing, hydrologic conditioning, canyon-wall material breakup, and guide/oarsman review remain open.",
+          "status": "lees_ferry_pilot_dem_tiles_metadata_relief_and_heightfield_candidate_attached"
         },
         "water_and_vegetation_masks": {
           "artifacts": [
