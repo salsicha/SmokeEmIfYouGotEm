@@ -1,0 +1,120 @@
+{
+  "schema": "raftsim.production_source_pull_manifest.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "american_south_fork",
+  "section_id": "chili_bar_to_coloma",
+  "status": "partial_official_source_slice_downloaded",
+  "source_manifest": "source_manifest.json",
+  "bounds_wgs84": {
+    "min_lon": -120.9,
+    "min_lat": 38.74,
+    "max_lon": -120.72,
+    "max_lat": 38.83
+  },
+  "pulled_artifacts": [
+    {
+      "artifact_id": "usgs_11445500_daily_discharge",
+      "category": "hydrology",
+      "path": "hydrology/usgs_11445500_daily_discharge.json",
+      "provider": "USGS Water Services / NWIS",
+      "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=11445500&parameterCd=00060&startDT=1951-01-01&endDT=1995-12-31",
+      "status": "downloaded",
+      "summary": {
+        "site": "11445500",
+        "parameter_cd": "00060",
+        "value_count": 16071,
+        "first_datetime": "1951-10-01T00:00:00.000",
+        "last_datetime": "1995-09-30T00:00:00.000"
+      },
+      "use": [
+        "historical_flow_percentiles",
+        "seasonal_flow_band_review",
+        "flow_visual_variant_calibration"
+      ],
+      "caveats": [
+        "Gauge history is historical, not a current live release feed.",
+        "Current South Fork commercial/release bands still require modern gauge/release context and guide review."
+      ]
+    },
+    {
+      "artifact_id": "tnm_nhd_products",
+      "category": "hydrography_metadata",
+      "path": "hydrography/tnm_nhd_products.json",
+      "provider": "The National Map",
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=National%20Hydrography%20Dataset%20(NHD)&bbox=-120.90,38.74,-120.72,38.83",
+      "status": "metadata_downloaded",
+      "summary": {
+        "product_count": 32,
+        "preferred_product_kinds": [
+          "National Hydrography Dataset Best Resolution GeoPackage",
+          "National Hydrography Dataset Best Resolution FileGDB"
+        ]
+      },
+      "use": [
+        "centerline_source_discovery",
+        "flowline_alignment",
+        "tributary_context"
+      ],
+      "caveats": [
+        "This is product metadata only; selected NHD/3DHP products still need download, clipping, CRS review, and attribution."
+      ]
+    },
+    {
+      "artifact_id": "usgs_3dep_chili_bar_sample_256",
+      "category": "terrain_sample",
+      "path": "terrain/usgs_3dep_chili_bar_sample_256.tif",
+      "provider": "USGS 3D Elevation Program ImageServer",
+      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13627665%2C4547675%2C-13617881%2C4557460&bboxSR=3857&imageSR=3857&size=256%2C256&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+      "status": "sample_downloaded",
+      "summary": {
+        "width": 256,
+        "height": 256,
+        "pixel_type": "F32",
+        "format": "GeoTIFF",
+        "size_bytes": 263322
+      },
+      "use": [
+        "import_pipeline_smoke_test",
+        "terrain_material_and_heightfield_prototype",
+        "source-provenance plumbing"
+      ],
+      "caveats": [
+        "This is a small sample, not a complete production corridor DEM.",
+        "Full corridor terrain still needs reviewed raster tiling, reprojection, hydrologic conditioning, and LFS/package policy."
+      ]
+    }
+  ],
+  "diagnostic_artifacts": [
+    {
+      "artifact_id": "tnm_3dep_dem_products_zero_hit",
+      "category": "terrain_metadata_query",
+      "path": "terrain/tnm_3dep_dem_products.json",
+      "provider": "The National Map",
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Elevation%20Products%20(3D%20Elevation%20Program%20Products%20and%20Services)&bbox=-120.90,38.74,-120.72,38.83",
+      "status": "metadata_query_returned_zero_products",
+      "summary": {
+        "product_count": 0
+      },
+      "next_action": "Use the USGS 3DEP ImageServer/WCS or a broader TNM product query for corridor DEM acquisition."
+    },
+    {
+      "artifact_id": "tnm_naip_products_zero_hit",
+      "category": "imagery_metadata_query",
+      "path": "imagery/tnm_naip_products.json",
+      "provider": "The National Map",
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Imagery%20-%20NAIP%20(1%20meter%20to%20.5%20foot)&bbox=-120.90,38.74,-120.72,38.83",
+      "status": "metadata_query_returned_zero_products",
+      "summary": {
+        "product_count": 0
+      },
+      "next_action": "Use an official NAIP/USDA image service or product index query that returns California orthophoto tiles for the corridor."
+    }
+  ],
+  "production_blockers": [
+    "Full corridor DEM/lidar tiles are not downloaded or conditioned yet.",
+    "Aerial imagery and water/vegetation masks are not downloaded yet.",
+    "Hydrography products are discovered but not clipped into a reviewed corridor workspace yet.",
+    "Modern release/gauge context and guide review are still required before flow bands are final.",
+    "No field/social reference media has explicit game-use rights attached yet."
+  ]
+}

@@ -382,6 +382,7 @@ Each real-world river section must pass:
 - Pull gauge and modeled flow data.
 - Build seasonal presets and difficulty-flow mapping.
 - Make fluid parameters adaptive to river/season/flow/difficulty.
+- Current South Fork source slice: `physics/data/real_world/south_fork_american_chili_bar/production_source_pull_manifest.json` records historical USGS `11445500` daily discharge, TNM NHD product metadata, TNM DEM/NAIP zero-hit diagnostics, and a small USGS 3DEP GeoTIFF sample for import-pipeline smoke testing.
 
 ### Milestone E: River Selection UX
 
