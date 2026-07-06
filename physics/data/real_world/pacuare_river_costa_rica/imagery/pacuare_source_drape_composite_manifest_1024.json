@@ -17,6 +17,7 @@
   "terrain_relief_output": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_1024.png",
   "processing": {
     "size_px": 1024,
+    "relief_size_px": 1024,
     "dem_sampling": "nearest_neighbor_from_copernicus_glo30_tiles",
     "cloud_mask": "truecolor brightness > 0.70 and channel range < 0.16",
     "blend": "non_cloud = 45% NASA truecolor + 55% DEM rainforest relief; cloud = DEM rainforest relief"

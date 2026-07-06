@@ -1,0 +1,35 @@
+{
+  "schema": "raftsim.source_imagery_masks.v1",
+  "status": "generated_review_gated_preview_masks_not_final_segmentation",
+  "source_id": "pacuare_production_import_pilot_source_drape_4096",
+  "provider": "NASA GIBS MODIS/Terra true-color plus Copernicus DEM-derived source drape",
+  "source_description": "Pacuare stitched-size production-import pilot source drape generated from the selected NASA GIBS true-color preview seed and Copernicus DEM relief; coarse/cloudy and not production orthophoto.",
+  "input_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/source_drape_4096.png",
+  "outputs": {
+    "water_mask": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png",
+    "vegetation_mask": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png"
+  },
+  "processing": {
+    "output_size_px": 2048,
+    "water_features": [
+      "visible_color_blue_green_or_muted_smooth_water_likelihood",
+      "bounded_preview_channel_prior_matching_generated_unreal_preview_geometry"
+    ],
+    "vegetation_features": [
+      "visible_green_excess",
+      "green_channel_dominance",
+      "channel_prior_suppression"
+    ],
+    "cloud_or_snow_filter": "brightness > 0.78 and channel range < 0.12 reduces mask confidence",
+    "coverage": {
+      "water_mean": 0.31180311364938257,
+      "vegetation_mean": 0.7085598506636797,
+      "cloud_or_snow_fraction": 0.0
+    }
+  },
+  "caveats": [
+    "Masks are deterministic source-assisted preview inputs, not production water or vegetation segmentation.",
+    "The water mask uses a bounded preview channel prior so the generated Unreal review map can consume the mask before final hydrography and hand-reviewed bank polygons are available.",
+    "Production masks still require reviewed orthomosaics or satellite scenes, hydrography/bank alignment, cloud/shadow review, and guide/geospatial approval."
+  ]
+}

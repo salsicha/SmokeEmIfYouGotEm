@@ -309,16 +309,19 @@
       "production_readiness": "preview_only_not_lifelike",
       "attached_source_manifest": "physics/data/real_world/pacuare_river_costa_rica/production_source_pull_manifest.json",
       "production_import_pilot": "physics/data/real_world/pacuare_river_costa_rica/production_import_pilot.json",
+      "production_import_pilot_derivatives_manifest": "physics/data/real_world/pacuare_river_costa_rica/production_import_pilot_derivatives_manifest.json",
       "attached_sources_by_class": {
         "terrain_dem_or_lidar": {
-          "status": "copernicus_dem_tiles_and_heightfield_candidate_attached",
+          "status": "copernicus_dem_tiles_heightfield_candidate_and_pilot_derivatives_attached",
           "artifacts": [
             "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif",
             "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif",
             "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_1024.png",
-            "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png"
+            "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png",
+            "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/dem_relief_2048.png",
+            "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/heightfield_candidate_2017.png"
           ],
-          "promotion_blocker": "Pacuare now has a source-product pilot recipe, but terrain still needs Costa Rica working CRS, vertical datum handling, clipping, void review, hydrologic conditioning, channel burning, official-layer comparison, and guide review."
+          "promotion_blocker": "Pacuare now has coarse public/global production-import derivatives, but terrain still needs Costa Rica working CRS, vertical datum handling, clipping, void review, hydrologic conditioning, channel burning, official-layer comparison, and guide review."
         },
         "hydrography_and_centerline": {
           "status": "official_source_leads_attached_not_imported",
@@ -329,19 +332,22 @@
           "promotion_blocker": "Need exact SNIT/IDECORI/MINAE layer ids or HydroSHEDS fallback review before centerline and tributaries become authoritative."
         },
         "aerial_or_satellite_imagery": {
-          "status": "coarse_cloud_screened_preview_attached",
+          "status": "coarse_cloud_screened_preview_and_pilot_derivative_attached",
           "artifacts": [
             "physics/data/real_world/pacuare_river_costa_rica/imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/source_drape_4096.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/aerial_source_research.json"
           ],
-          "promotion_blocker": "Pacuare now has a source-product pilot recipe, but MODIS/GIBS remains too coarse and partly cloudy; production needs Sentinel/Landsat scene metadata, official orthophoto discovery, or first-party/permissioned aerial reference."
+          "promotion_blocker": "Pacuare now has a coarse source-product pilot derivative, but MODIS/GIBS remains too coarse and partly cloudy; production needs Sentinel/Landsat scene metadata, official orthophoto discovery, or first-party/permissioned aerial reference."
         },
         "water_and_vegetation_masks": {
-          "status": "preview_masks_attached",
+          "status": "preview_masks_and_pilot_derivative_masks_attached",
           "artifacts": [
             "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_water_mask_1024.png",
-            "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_vegetation_mask_1024.png"
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_vegetation_mask_1024.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png"
           ],
           "promotion_blocker": "Masks are coarse preview derivatives; production needs higher-resolution cloud-screened water, canopy, wet-rock, waterfall/mist, and bank classes."
         },
