@@ -36,6 +36,7 @@
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionConstant.h"
 #include "Materials/MaterialExpressionMultiply.h"
+#include "Materials/MaterialExpressionVertexColor.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Misc/CommandLine.h"
@@ -373,6 +374,68 @@ UMaterialInterface* LoadOrCreatePreviewColorMaterial()
     return Material;
 }
 
+UMaterialInterface* LoadOrCreatePreviewVertexColorMaterial()
+{
+    static const TCHAR* MaterialPackagePath = TEXT("/Game/RaftSim/Materials/M_RaftSim_VertexColorPreview");
+    static const TCHAR* MaterialObjectPath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_VertexColorPreview.M_RaftSim_VertexColorPreview");
+
+    UMaterial* Material = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, MaterialObjectPath));
+    if (!Material)
+    {
+        UPackage* Package = CreatePackage(MaterialPackagePath);
+        if (!Package)
+        {
+            return nullptr;
+        }
+
+        Material = NewObject<UMaterial>(
+            Package,
+            TEXT("M_RaftSim_VertexColorPreview"),
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (!Material)
+        {
+            return nullptr;
+        }
+
+        FAssetRegistryModule::AssetCreated(Material);
+        Material->Modify();
+        Material->SetShadingModel(MSM_DefaultLit);
+        Material->BlendMode = BLEND_Opaque;
+        Material->TwoSided = true;
+
+        UMaterialExpressionVertexColor* VertexColor = NewObject<UMaterialExpressionVertexColor>(Material);
+        Material->GetExpressionCollection().AddExpression(VertexColor);
+
+        UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
+        EmissiveScale->R = 0.18f;
+        Material->GetExpressionCollection().AddExpression(EmissiveScale);
+
+        UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
+        EmissiveColor->A.Expression = VertexColor;
+        EmissiveColor->B.Expression = EmissiveScale;
+        Material->GetExpressionCollection().AddExpression(EmissiveColor);
+
+        UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, VertexColor);
+        ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
+
+        Material->PostEditChange();
+        Package->MarkPackageDirty();
+
+        const FString Filename =
+            FPackageName::LongPackageNameToFilename(MaterialPackagePath, FPackageName::GetAssetPackageExtension());
+        IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+
+        FSavePackageArgs SaveArgs;
+        SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+        SaveArgs.SaveFlags = SAVE_NoError;
+        UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+    }
+
+    return Material;
+}
+
 UMaterialInstanceDynamic* CreatePreviewColorMaterial(UObject* Outer, const FLinearColor& Color)
 {
     UMaterialInterface* BaseMaterial = LoadOrCreatePreviewColorMaterial();
@@ -508,6 +571,20 @@ float SmoothPreviewStep(float Edge0, float Edge1, float Value)
 
     const float T = FMath::Clamp((Value - Edge0) / (Edge1 - Edge0), 0.0f, 1.0f);
     return T * T * (3.0f - 2.0f * T);
+}
+
+FLinearColor ClampPreviewColor(const FLinearColor& Color)
+{
+    return FLinearColor(
+        FMath::Clamp(Color.R, 0.0f, 1.0f),
+        FMath::Clamp(Color.G, 0.0f, 1.0f),
+        FMath::Clamp(Color.B, 0.0f, 1.0f),
+        FMath::Clamp(Color.A, 0.0f, 1.0f));
+}
+
+FLinearColor ScalePreviewColor(const FLinearColor& Color, float Scale)
+{
+    return ClampPreviewColor(FLinearColor(Color.R * Scale, Color.G * Scale, Color.B * Scale, Color.A));
 }
 
 float GetPreviewRiverCenterY(const FRaftSimEnvironmentPreviewSpec& Spec, float X)
@@ -680,10 +757,12 @@ void AddPreviewTerrainMesh(
     TArray<FVector> Vertices;
     TArray<FVector> Normals;
     TArray<FVector2D> UVs;
+    TArray<FLinearColor> VertexColors;
     TArray<int32> Triangles;
     Vertices.Reserve((XSteps + 1) * (YSteps + 1));
     Normals.Reserve((XSteps + 1) * (YSteps + 1));
     UVs.Reserve((XSteps + 1) * (YSteps + 1));
+    VertexColors.Reserve((XSteps + 1) * (YSteps + 1));
     Triangles.Reserve(XSteps * YSteps * 6);
 
     for (int32 XIndex = 0; XIndex <= XSteps; ++XIndex)
@@ -695,8 +774,28 @@ void AddPreviewTerrainMesh(
             const float V = static_cast<float>(YIndex) / static_cast<float>(YSteps);
             const float Y = FMath::Lerp(-HalfWidth, HalfWidth, V);
             const float Z = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief);
+            const float CenterY = GetPreviewRiverCenterY(Spec, X);
+            const float Offset = FMath::Abs(Y - CenterY);
+            const float BankT = SmoothPreviewStep(Spec.RiverHalfWidthCm, Spec.RiverHalfWidthCm + Spec.BankWidthCm, Offset);
+            const float CanyonT = SmoothPreviewStep(
+                Spec.RiverHalfWidthCm + Spec.BankWidthCm,
+                Spec.RiverHalfWidthCm + Spec.BankWidthCm + (Spec.bDesertCanyon ? 1400.0f : 820.0f),
+                Offset);
+            const float WetT = 1.0f - SmoothPreviewStep(Spec.RiverHalfWidthCm + 35.0f, Spec.RiverHalfWidthCm + 360.0f, Offset);
+            const float ColorNoise = 0.88f + 0.10f * FMath::Sin(X * 0.0031f + Y * 0.0047f) +
+                0.06f * FMath::Sin(X * 0.0013f - Y * 0.0029f);
+            const FLinearColor ShoulderColor = Spec.bDesertCanyon
+                ? FLinearColor(0.62f, 0.40f, 0.24f)
+                : ScalePreviewColor(Spec.TerrainColor, Spec.bHasWaterfalls ? 0.72f : 1.12f);
+            const FLinearColor WetBankColor = Spec.bDesertCanyon
+                ? FLinearColor(0.30f, 0.23f, 0.16f)
+                : FMath::Lerp(ScalePreviewColor(Spec.WaterColor, 0.55f), ScalePreviewColor(Spec.RockColor, 0.62f), 0.48f);
+            FLinearColor TerrainColor = FMath::Lerp(Spec.TerrainColor, ShoulderColor, FMath::Clamp(BankT * 0.45f + CanyonT * 0.35f, 0.0f, 1.0f));
+            TerrainColor = FMath::Lerp(TerrainColor, WetBankColor, FMath::Clamp(WetT * 0.70f, 0.0f, 1.0f));
+            TerrainColor = ScalePreviewColor(TerrainColor, ColorNoise);
             Vertices.Add(FVector(X, Y, Z));
             UVs.Add(FVector2D(U * 12.0f, V * 4.0f));
+            VertexColors.Add(TerrainColor);
         }
     }
 
@@ -726,7 +825,9 @@ void AddPreviewTerrainMesh(
         Triangles,
         Normals,
         UVs,
-        Spec.TerrainColor);
+        Spec.TerrainColor,
+        LoadOrCreatePreviewVertexColorMaterial(),
+        &VertexColors);
 }
 
 void AddPreviewAerialDrapeTiles(
@@ -866,6 +967,136 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
         Normals,
         UVs,
         Spec.WaterColor);
+}
+
+void AddPreviewShoreRibbon(
+    UWorld* World,
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* TerrainRelief,
+    const FString& Label,
+    float SignedCenterOffset,
+    float Width,
+    float ZOffset,
+    const FLinearColor& InnerColor,
+    const FLinearColor& OuterColor)
+{
+    if (!World)
+    {
+        return;
+    }
+
+    constexpr int32 Segments = 96;
+    constexpr int32 CrossSteps = 2;
+    const float MinX = -5520.0f;
+    const float MaxX = 26000.0f;
+    const float Side = SignedCenterOffset < 0.0f ? -1.0f : 1.0f;
+
+    TArray<FVector> Vertices;
+    TArray<FVector> Normals;
+    TArray<FVector2D> UVs;
+    TArray<FLinearColor> VertexColors;
+    TArray<int32> Triangles;
+    Vertices.Reserve((Segments + 1) * (CrossSteps + 1));
+    Normals.Reserve((Segments + 1) * (CrossSteps + 1));
+    UVs.Reserve((Segments + 1) * (CrossSteps + 1));
+    VertexColors.Reserve((Segments + 1) * (CrossSteps + 1));
+    Triangles.Reserve(Segments * CrossSteps * 6);
+
+    for (int32 SegmentIndex = 0; SegmentIndex <= Segments; ++SegmentIndex)
+    {
+        const float U = static_cast<float>(SegmentIndex) / static_cast<float>(Segments);
+        const float X = FMath::Lerp(MinX, MaxX, U);
+        const float CenterY = GetPreviewRiverCenterY(Spec, X);
+        for (int32 CrossIndex = 0; CrossIndex <= CrossSteps; ++CrossIndex)
+        {
+            const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
+            const float Offset = SignedCenterOffset + Side * Width * (V - 0.5f);
+            const float Y = CenterY + Offset;
+            const float SurfaceWave = FMath::Sin(X * 0.011f + Y * 0.015f) * (Spec.bDesertCanyon ? 2.0f : 4.5f);
+            const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief);
+            const float Z = FMath::Max(TerrainZ + ZOffset, 13.0f + SurfaceWave + ZOffset * 0.25f);
+            const float Fleck = 0.92f + 0.08f * FMath::Sin(X * 0.0053f + Y * 0.0037f);
+            Vertices.Add(FVector(X, Y, Z));
+            UVs.Add(FVector2D(U * 16.0f, V));
+            VertexColors.Add(ScalePreviewColor(FMath::Lerp(InnerColor, OuterColor, V), Fleck));
+        }
+    }
+
+    const int32 RowSize = CrossSteps + 1;
+    for (int32 SegmentIndex = 0; SegmentIndex < Segments; ++SegmentIndex)
+    {
+        for (int32 CrossIndex = 0; CrossIndex < CrossSteps; ++CrossIndex)
+        {
+            const int32 A = SegmentIndex * RowSize + CrossIndex;
+            const int32 B = A + 1;
+            const int32 C = (SegmentIndex + 1) * RowSize + CrossIndex;
+            const int32 D = C + 1;
+            Triangles.Add(A);
+            Triangles.Add(C);
+            Triangles.Add(B);
+            Triangles.Add(B);
+            Triangles.Add(C);
+            Triangles.Add(D);
+        }
+    }
+
+    Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    AddPreviewProceduralMeshActor(
+        World,
+        Label,
+        Vertices,
+        Triangles,
+        Normals,
+        UVs,
+        InnerColor,
+        LoadOrCreatePreviewVertexColorMaterial(),
+        &VertexColors);
+}
+
+void AddPreviewWetBankDressing(
+    UWorld* World,
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* TerrainRelief)
+{
+    if (!World)
+    {
+        return;
+    }
+
+    const FLinearColor WetEdge = Spec.bDesertCanyon
+        ? FLinearColor(0.24f, 0.18f, 0.13f)
+        : FMath::Lerp(ScalePreviewColor(Spec.WaterColor, 0.48f), ScalePreviewColor(Spec.RockColor, 0.60f), 0.45f);
+    const FLinearColor BankBand = Spec.bDesertCanyon
+        ? FLinearColor(0.50f, 0.34f, 0.22f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.045f, 0.10f, 0.055f) : FLinearColor(0.16f, 0.17f, 0.13f));
+    const FLinearColor GravelBand = Spec.bDesertCanyon
+        ? FLinearColor(0.64f, 0.43f, 0.26f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.08f, 0.13f, 0.08f) : FLinearColor(0.22f, 0.22f, 0.17f));
+
+    for (int32 SideIndex = 0; SideIndex < 2; ++SideIndex)
+    {
+        const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+        AddPreviewShoreRibbon(
+            World,
+            Spec,
+            TerrainRelief,
+            FString::Printf(TEXT("RaftSim_WetWaterline_%s_%s"), Side < 0.0f ? TEXT("Left") : TEXT("Right"), *Spec.RiverId),
+            Side * (Spec.RiverHalfWidthCm + 82.0f),
+            Spec.bDesertCanyon ? 145.0f : 105.0f,
+            20.0f,
+            WetEdge,
+            BankBand);
+        AddPreviewShoreRibbon(
+            World,
+            Spec,
+            TerrainRelief,
+            FString::Printf(TEXT("RaftSim_GravelMudBank_%s_%s"), Side < 0.0f ? TEXT("Left") : TEXT("Right"), *Spec.RiverId),
+            Side * (Spec.RiverHalfWidthCm + 260.0f),
+            Spec.bDesertCanyon ? 230.0f : 125.0f,
+            24.0f,
+            BankBand,
+            GravelBand);
+    }
 }
 
 void AddPreviewFoamRibbon(
@@ -1326,6 +1557,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     AddPreviewTerrainMesh(World, Spec, TerrainReliefPtr);
     AddPreviewAerialDrapeTiles(World, Spec, TerrainReliefPtr);
     AddPreviewRiverRibbonMesh(World, Spec);
+    AddPreviewWetBankDressing(World, Spec, TerrainReliefPtr);
     AddPreviewWaterSurfaceDetail(World, Spec);
     AddPreviewRaftForeground(World, Spec, CubeMesh, CylinderMesh);
     AddPreviewFoamAndHydraulics(World, Spec);
