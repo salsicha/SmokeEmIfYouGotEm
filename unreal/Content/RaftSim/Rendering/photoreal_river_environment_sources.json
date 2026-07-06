@@ -157,12 +157,31 @@
       ],
       "river_map_sources": [
         {"source_id": "nps_grand_canyon_river_trips", "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm", "status": "metadata_ready"},
-        {"source_id": "usgs_3dep", "url": "https://www.usgs.gov/3d-elevation-program", "status": "planned"},
+        {"source_id": "usgs_3dep", "url": "https://www.usgs.gov/3d-elevation-program", "status": "sample_attached_for_unreal_preview_drape"},
+        {"source_id": "usda_naip", "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer", "status": "sample_attached_for_unreal_preview_drape"},
         {"source_id": "usgs_3dhp_nhd", "url": "https://www.usgs.gov/3d-hydrography-program", "status": "planned"}
       ],
+      "source_sample_artifacts": [
+        {
+          "artifact_id": "usda_naip_lees_ferry_sample_512",
+          "category": "aerial_imagery_sample",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_sample_512.png",
+          "provider": "USDA/APFO NAIP ImageServer",
+          "status": "draped_into_unreal_preview_terrain_overlay_tiles",
+          "unreal_use": "source-derived visible canyon terrain overlay layer for /Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"
+        },
+        {
+          "artifact_id": "usgs_3dep_lees_ferry_sample_256",
+          "category": "terrain_sample",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_sample_256.tif",
+          "provider": "USGS 3D Elevation Program ImageServer",
+          "status": "recorded_for_follow_on_canyon_heightfield_conditioning",
+          "unreal_use": "provenance and import-pipeline smoke-test sample; full canyon heightfield replacement still pending"
+        }
+      ],
       "flow_sources": [
-        {"source_id": "usgs_09380000", "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09380000/", "status": "metadata_ready"},
-        {"source_id": "usgs_09402500", "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09402500/", "status": "metadata_ready"},
+        {"source_id": "usgs_09380000", "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09380000/", "status": "daily_history_downloaded"},
+        {"source_id": "usgs_09402500", "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09402500/", "status": "daily_history_downloaded"},
         {"source_id": "usbr_glen_canyon_releases", "url": "https://www.usbr.gov/uc/water/hydrodata/", "status": "planned"}
       ],
       "reference_media_sources": [
@@ -237,5 +256,5 @@
       "desktop_and_vr_performance_captures"
     ]
   },
-  "status": "south_fork_naip_source_drape_available; colorado_and_pacuare_remain_procedural_blockouts; production_geospatial_imports_and_photoreal_assets_pending"
+  "status": "south_fork_and_colorado_naip_source_drapes_available; pacuare_remains_procedural_blockout; production_geospatial_imports_and_photoreal_assets_pending"
 }

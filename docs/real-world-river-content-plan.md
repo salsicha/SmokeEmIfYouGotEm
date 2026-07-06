@@ -383,6 +383,7 @@ Each real-world river section must pass:
 - Build seasonal presets and difficulty-flow mapping.
 - Make fluid parameters adaptive to river/season/flow/difficulty.
 - Current South Fork source slice: `physics/data/real_world/south_fork_american_chili_bar/production_source_pull_manifest.json` records historical USGS `11445500` daily discharge, TNM NHD product metadata, TNM DEM/NAIP zero-hit diagnostics, a small USGS 3DEP GeoTIFF sample, and a small USDA/APFO NAIP aerial sample for import-pipeline smoke testing. The Unreal preview automation now drapes that NAIP sample into the generated South Fork terrain as visible overlay tiles and records the paired 3DEP sample for follow-on heightfield conditioning.
+- Current Colorado source slice: `physics/data/real_world/colorado_river_grand_canyon_rowing/production_source_pull_manifest.json` records USGS `09380000` and `09402500` daily discharge histories through July 4, 2026, a small Lees Ferry USGS 3DEP GeoTIFF sample, and a small USDA/APFO NAIP aerial sample. The Unreal preview automation now drapes that NAIP sample into the generated Colorado canyon terrain as visible overlay tiles and records the paired 3DEP sample for follow-on heightfield conditioning.
 
 ### Milestone E: River Selection UX
 

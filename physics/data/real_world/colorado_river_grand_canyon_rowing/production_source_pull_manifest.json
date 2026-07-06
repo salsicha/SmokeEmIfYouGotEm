@@ -1,0 +1,125 @@
+{
+  "schema": "raftsim.production_source_pull_manifest.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "colorado_river",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "status": "partial_official_source_slice_downloaded",
+  "source_manifest": "source_manifest.json",
+  "bounds_wgs84": {
+    "min_lon": -111.66,
+    "min_lat": 36.8,
+    "max_lon": -111.54,
+    "max_lat": 36.9
+  },
+  "sample_bounds_epsg3857": {
+    "xmin": -12429934.341976928,
+    "ymin": 4411265.910262686,
+    "xmax": -12416576.003081735,
+    "ymax": 4425177.2278650915
+  },
+  "pulled_artifacts": [
+    {
+      "artifact_id": "usgs_09380000_daily_discharge",
+      "category": "hydrology",
+      "path": "hydrology/usgs_09380000_daily_discharge.json",
+      "provider": "USGS Water Services / NWIS",
+      "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=09380000&parameterCd=00060&startDT=1920-01-01&endDT=2026-07-06",
+      "status": "downloaded",
+      "summary": {
+        "site": "09380000",
+        "parameter_cd": "00060",
+        "value_count": 38262,
+        "first_datetime": "1921-10-01T00:00:00.000",
+        "last_datetime": "2026-07-04T00:00:00.000"
+      },
+      "use": [
+        "release_band_history",
+        "launch_flow_context",
+        "hydrograph_validation"
+      ],
+      "caveats": [
+        "Daily discharge history still needs dam-release schedule context before final game flow bands.",
+        "Instantaneous discharge and stage review remain follow-on tasks."
+      ]
+    },
+    {
+      "artifact_id": "usgs_09402500_daily_discharge",
+      "category": "hydrology",
+      "path": "hydrology/usgs_09402500_daily_discharge.json",
+      "provider": "USGS Water Services / NWIS",
+      "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=09402500&parameterCd=00060&startDT=1920-01-01&endDT=2026-07-06",
+      "status": "downloaded",
+      "summary": {
+        "site": "09402500",
+        "parameter_cd": "00060",
+        "value_count": 37168,
+        "first_datetime": "1922-10-01T00:00:00.000",
+        "last_datetime": "2026-07-04T00:00:00.000"
+      },
+      "use": [
+        "downstream_flow_context",
+        "travel_time_checks",
+        "hydrograph_validation"
+      ],
+      "caveats": [
+        "Daily discharge history still needs dam-release schedule context before final game flow bands.",
+        "Instantaneous discharge and stage review remain follow-on tasks."
+      ]
+    },
+    {
+      "artifact_id": "usgs_3dep_lees_ferry_sample_256",
+      "category": "terrain_sample",
+      "path": "terrain/usgs_3dep_lees_ferry_sample_256.tif",
+      "provider": "USGS 3D Elevation Program ImageServer",
+      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-12429934.341976928%2C4411265.910262686%2C-12416576.003081735%2C4425177.2278650915&bboxSR=3857&imageSR=3857&size=256%2C256&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+      "status": "sample_downloaded",
+      "summary": {
+        "width": 256,
+        "height": 256,
+        "pixel_type": "F32",
+        "format": "GeoTIFF",
+        "size_bytes": 263322
+      },
+      "use": [
+        "import_pipeline_smoke_test",
+        "canyon_heightfield_prototype",
+        "source-provenance plumbing"
+      ],
+      "caveats": [
+        "This is a small Lees Ferry sample, not a complete Grand Canyon corridor DEM.",
+        "Full canyon terrain still needs reviewed tiling, reprojection, river-mile stationing, hydrologic conditioning, and LFS/package policy."
+      ]
+    },
+    {
+      "artifact_id": "usda_naip_lees_ferry_sample_512",
+      "category": "aerial_imagery_sample",
+      "path": "imagery/usda_naip_lees_ferry_sample_512.png",
+      "provider": "USDA/APFO NAIP ImageServer",
+      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-12429934.341976928%2C4411265.910262686%2C-12416576.003081735%2C4425177.2278650915&bboxSR=3857&imageSR=3857&size=512%2C512&format=png&f=image",
+      "status": "sample_downloaded",
+      "summary": {
+        "width": 512,
+        "height": 512,
+        "pixel_type": "RGB_U8",
+        "format": "PNG",
+        "size_bytes": 539989
+      },
+      "use": [
+        "aerial_reference_smoke_test",
+        "canyon_color_and_river_edge_masks",
+        "unreal_source_overlay"
+      ],
+      "caveats": [
+        "This is a small Lees Ferry sample export, not a complete canyon orthomosaic.",
+        "Full corridor imagery still needs official tile selection, acquisition-date review, attribution, reprojection, and LFS/package policy."
+      ]
+    }
+  ],
+  "production_blockers": [
+    "Full canyon DEM/lidar tiles are not downloaded or conditioned yet.",
+    "Full canyon aerial/satellite imagery and water/vegetation/rock masks are not downloaded yet.",
+    "Hydrography, river-mile stationing, and rapid annotations are not clipped into a reviewed corridor workspace yet.",
+    "USBR Glen Canyon release context and guide/oarsman review are still required before flow bands are final.",
+    "No field/social reference media has explicit game-use rights attached yet."
+  ]
+}

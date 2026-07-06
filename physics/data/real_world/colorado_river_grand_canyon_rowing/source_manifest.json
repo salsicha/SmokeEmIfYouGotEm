@@ -2,14 +2,17 @@
   "artifacts": {
     "elevation": [
       "terrain/3dep_dem_tiles",
-      "terrain/canyon_corridor_dem.tif"
+      "terrain/canyon_corridor_dem.tif",
+      "terrain/usgs_3dep_lees_ferry_sample_256.tif"
     ],
     "flow_presets": [
       "flow_presets.json"
     ],
     "gauges": [
       "hydrology/usgs_09380000_lees_ferry.json",
-      "hydrology/usgs_09402500_near_grand_canyon.json"
+      "hydrology/usgs_09402500_near_grand_canyon.json",
+      "hydrology/usgs_09380000_daily_discharge.json",
+      "hydrology/usgs_09402500_daily_discharge.json"
     ],
     "guide_references": [
       "review/guide_review_needs.json",
@@ -18,6 +21,13 @@
     "hydrography": [
       "hydrography/centerline.geojson",
       "hydrography/river_mile_markers.geojson"
+    ],
+    "imagery": [
+      "imagery/usda_naip_lees_ferry_sample_512.png",
+      "imagery/naip_or_satellite_corridor_tiles"
+    ],
+    "source_pulls": [
+      "production_source_pull_manifest.json"
     ],
     "unreal": [
       "unreal/colorado_rowing_route_editor_pass.json"
@@ -37,10 +47,10 @@
   "confidence": {
     "guide_review": 0.05,
     "hydrography": 0.15,
-    "hydrology": 0.3,
-    "overall": 0.2,
+    "hydrology": 0.45,
+    "overall": 0.28,
     "rapid_annotations": 0.05,
-    "terrain": 0.15
+    "terrain": 0.25
   },
   "coordinate_reference_systems": {
     "solver": "local meters or river-mile stationing converted to meters",
@@ -60,17 +70,33 @@
       "category": "gauge",
       "fetch_id": "colorado_lees_ferry_gauge",
       "source_id": "usgs_09380000_lees_ferry",
-      "status": "metadata_ready",
-      "target_artifact": "hydrology/usgs_09380000_lees_ferry.json",
-      "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09380000/"
+      "status": "downloaded",
+      "target_artifact": "hydrology/usgs_09380000_daily_discharge.json",
+      "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=09380000&parameterCd=00060&startDT=1920-01-01&endDT=2026-07-06"
     },
     {
       "category": "gauge",
       "fetch_id": "colorado_near_grand_canyon_gauge",
       "source_id": "usgs_09402500_near_grand_canyon",
-      "status": "metadata_ready",
-      "target_artifact": "hydrology/usgs_09402500_near_grand_canyon.json",
-      "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09402500/"
+      "status": "downloaded",
+      "target_artifact": "hydrology/usgs_09402500_daily_discharge.json",
+      "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=09402500&parameterCd=00060&startDT=1920-01-01&endDT=2026-07-06"
+    },
+    {
+      "category": "elevation",
+      "fetch_id": "colorado_3dep_lees_ferry_sample",
+      "source_id": "usgs_3dep",
+      "status": "downloaded",
+      "target_artifact": "terrain/usgs_3dep_lees_ferry_sample_256.tif",
+      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-12429934.341976928%2C4411265.910262686%2C-12416576.003081735%2C4425177.2278650915&bboxSR=3857&imageSR=3857&size=256%2C256&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image"
+    },
+    {
+      "category": "imagery",
+      "fetch_id": "colorado_naip_lees_ferry_sample",
+      "source_id": "usda_naip",
+      "status": "downloaded",
+      "target_artifact": "imagery/usda_naip_lees_ferry_sample_512.png",
+      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-12429934.341976928%2C4411265.910262686%2C-12416576.003081735%2C4425177.2278650915&bboxSR=3857&imageSR=3857&size=512%2C512&format=png&f=image"
     }
   ],
   "river_id": "colorado_river",
@@ -84,7 +110,7 @@
       "license_or_terms": "U.S. federal hydrologic data; cite USGS Water Data for the Nation and site ID.",
       "provider": "USGS",
       "source_id": "usgs_09380000_lees_ferry",
-      "status": "metadata_ready",
+      "status": "daily_history_downloaded",
       "title": "Colorado River at Lees Ferry, AZ - USGS-09380000",
       "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09380000/",
       "use_in_pipeline": [
@@ -98,7 +124,7 @@
       "license_or_terms": "U.S. federal hydrologic data; cite USGS Water Data for the Nation and site ID.",
       "provider": "USGS",
       "source_id": "usgs_09402500_near_grand_canyon",
-      "status": "metadata_ready",
+      "status": "daily_history_downloaded",
       "title": "Colorado River Near Grand Canyon, AZ - USGS-09402500",
       "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09402500/",
       "use_in_pipeline": [
@@ -141,13 +167,27 @@
       "license_or_terms": "U.S. federal source; confirm product-specific metadata.",
       "provider": "USGS",
       "source_id": "usgs_3dep",
-      "status": "planned",
+      "status": "sample_downloaded",
       "title": "3D Elevation Program (3DEP)",
       "url": "https://www.usgs.gov/3d-elevation-program",
       "use_in_pipeline": [
         "terrain_dem",
         "canyon_wall_context",
         "bank_shelves"
+      ]
+    },
+    {
+      "category": "imagery",
+      "license_or_terms": "U.S. federal aerial imagery source; preserve USDA/APFO attribution and service metadata.",
+      "provider": "USDA/APFO",
+      "source_id": "usda_naip",
+      "status": "sample_downloaded",
+      "title": "NAIP imagery for Lees Ferry sample corridor",
+      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer",
+      "use_in_pipeline": [
+        "canyon_color_reference",
+        "river_edge_visual_masks",
+        "unreal_source_overlay"
       ]
     },
     {
