@@ -21,7 +21,8 @@
       "terrain/solver_bed_grid.npy"
     ],
     "field_media": [
-      "field_media/README.md"
+      "field_media/README.md",
+      "field_media/production_import_pilot/rights_manifest.json"
     ],
     "gauges": [
       "hydrology/usgs_11445500_daily_discharge.json",
@@ -37,7 +38,8 @@
       "review/guide_reference_index.json",
       "review/rapid_review_labels.json",
       "rapid_review_flow_difficulty_mapping.json",
-      "rapid_review_editor_workflow.json"
+      "rapid_review_editor_workflow.json",
+      "review/production_import_pilot/reference_annotations.geojson"
     ],
     "hydrography": [
       "hydrography/tnm_nhd_products.json",

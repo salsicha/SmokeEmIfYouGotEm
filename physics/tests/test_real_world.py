@@ -50,6 +50,8 @@ from raftsim.real_world import (
     RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION,
     RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
     RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_SCHEMA_VERSION,
+    REFERENCE_MEDIA_ANNOTATIONS_FILE,
+    REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
     PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION,
     SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
     SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
@@ -75,6 +77,8 @@ from raftsim.real_world import (
     build_rapid_review_editor_workflow,
     build_rapid_review_flow_difficulty_mapping,
     build_real_world_corridor_package,
+    build_reference_media_annotations_geojson,
+    build_reference_media_rights_manifest,
     build_south_fork_access_publication_review,
     build_south_fork_flow_band_review,
     build_south_fork_production_import_pilot,
@@ -1305,6 +1309,8 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert SOUTH_FORK_FLOW_BAND_REVIEW_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
+    assert REFERENCE_MEDIA_ANNOTATIONS_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
+    assert REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert (
         "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json"
         in rivers["american_south_fork"]["attached_preview_inputs"]
@@ -1334,6 +1340,8 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_RELEASE_BAND_REVIEW_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_ACCESS_PUBLICATION_REVIEW_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert REFERENCE_MEDIA_ANNOTATIONS_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE in rivers["pacuare"]["attached_preview_inputs"]
@@ -1343,6 +1351,8 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert PACUARE_RAINFALL_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_FLASH_RESPONSE_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert REFERENCE_MEDIA_ANNOTATIONS_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert "waterfalls" in rivers["pacuare"]["completion_gate"]
 
 
@@ -1376,6 +1386,61 @@ def test_reference_media_review_queue_is_link_only_and_station_aware():
     assert {"american_south_fork", "colorado_river", "pacuare"} == set(targets_by_river)
     assert all(len(targets) >= 3 for targets in targets_by_river.values())
     assert any("rescue" in target["target_id"] for target in queue["review_targets"])
+
+
+def test_reference_media_annotations_and_rights_manifests_are_link_only_per_river():
+    queue = json.loads((REAL_WORLD_DATA_DIR / "reference_media_review_queue.json").read_text())
+    link_manifest = json.loads((REAL_WORLD_DATA_DIR / "reference_media_link_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+    river_dirs = {
+        "american_south_fork": "south_fork_american_chili_bar",
+        "colorado_river": "colorado_river_grand_canyon_rowing",
+        "pacuare": "pacuare_river_costa_rica",
+    }
+    readiness_by_river = {river["river_id"]: river for river in readiness["rivers"]}
+    photoreal_by_river = {river["river_id"]: river for river in photoreal_sources["rivers"]}
+
+    for river_id, river_dir in river_dirs.items():
+        data_dir = REAL_WORLD_DATA_DIR / river_dir
+        source_manifest = json.loads((data_dir / "source_manifest.json").read_text())
+        annotations = json.loads((data_dir / REFERENCE_MEDIA_ANNOTATIONS_FILE).read_text())
+        rights = json.loads((data_dir / REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE).read_text())
+        expected_annotations = build_reference_media_annotations_geojson(river_id, queue)
+        expected_rights = build_reference_media_rights_manifest(river_id, link_manifest, queue)
+
+        assert annotations == expected_annotations
+        assert rights == expected_rights
+        assert annotations["type"] == "FeatureCollection"
+        assert annotations["status"] == "link_only_annotation_targets_no_media_downloaded"
+        assert len(annotations["features"]) == 3
+        assert all(feature["geometry"] is None for feature in annotations["features"])
+        assert all(
+            feature["properties"]["review_status"] == "candidate_links_only_no_media_downloaded"
+            for feature in annotations["features"]
+        )
+        assert rights["status"] == "candidate_links_only_no_media_downloaded_no_rights_cleared"
+        assert rights["rights_summary"]["media_files_downloaded"] == 0
+        assert rights["rights_summary"]["promoted_item_count"] == 0
+        assert rights["promoted_items"] == []
+        assert "using public social media as source textures or training data" in rights["forbidden_use"]
+        assert REFERENCE_MEDIA_ANNOTATIONS_FILE in source_manifest["artifacts"]["guide_references"]
+        assert REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE in source_manifest["artifacts"]["field_media"]
+        assert (
+            f"physics/data/real_world/{river_dir}/{REFERENCE_MEDIA_ANNOTATIONS_FILE}"
+            in readiness_by_river[river_id]["attached_sources_by_class"]["guide_and_reference_media_annotations"][
+                "artifacts"
+            ]
+        )
+        assert any(
+            artifact["artifact_id"] == f"{river_id}_reference_media_annotations"
+            for artifact in photoreal_by_river[river_id]["source_sample_artifacts"]
+        )
 
 
 def test_channel_indicators_and_rapid_candidates_find_complex_water():

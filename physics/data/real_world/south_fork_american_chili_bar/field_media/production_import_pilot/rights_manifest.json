@@ -1,0 +1,196 @@
+{
+  "candidate_links": [
+    {
+      "allowed_before_rights_clear": [
+        "manual visual comparison",
+        "guide/outfitter discussion",
+        "permission outreach planning",
+        "internal station annotation placeholders"
+      ],
+      "blocked_before_rights_clear": [
+        "download",
+        "scrape",
+        "vendor",
+        "train_on",
+        "texture_or_material_derivation",
+        "photogrammetry",
+        "packaged_media",
+        "marketing_or_public_promo_use"
+      ],
+      "notes": "Use as official context and a starting point for public-domain/attribution review; do not assume every embedded image is shippable without item metadata.",
+      "provider": "Bureau of Land Management",
+      "rights_status": "official_us_government_page_but_per_media_item_metadata_review_required",
+      "source_id": "blm_south_fork_american_recreation_page",
+      "source_type": "official_context_page",
+      "url": "https://www.blm.gov/visit/south-fork-american-river"
+    },
+    {
+      "allowed_before_rights_clear": [
+        "manual visual comparison",
+        "guide/outfitter discussion",
+        "permission outreach planning",
+        "internal station annotation placeholders"
+      ],
+      "blocked_before_rights_clear": [
+        "download",
+        "scrape",
+        "vendor",
+        "train_on",
+        "texture_or_material_derivation",
+        "photogrammetry",
+        "packaged_media",
+        "marketing_or_public_promo_use"
+      ],
+      "notes": "Review each file page, license, author, date, and attribution before using as more than reference.",
+      "provider": "Wikimedia Commons",
+      "rights_status": "per_file_license_attribution_and_model_property_review_required",
+      "source_id": "wikimedia_south_fork_american_search",
+      "source_type": "creative_commons_candidate_search",
+      "url": "https://commons.wikimedia.org/w/index.php?search=South+Fork+American+River+rafting&title=Special:MediaSearch&type=image"
+    },
+    {
+      "allowed_before_rights_clear": [
+        "manual visual comparison",
+        "guide/outfitter discussion",
+        "permission outreach planning",
+        "internal station annotation placeholders"
+      ],
+      "blocked_before_rights_clear": [
+        "download",
+        "scrape",
+        "vendor",
+        "train_on",
+        "texture_or_material_derivation",
+        "photogrammetry",
+        "packaged_media",
+        "marketing_or_public_promo_use"
+      ],
+      "notes": "Use search results only as leads; do not download images without license/permission review.",
+      "provider": "Flickr",
+      "rights_status": "per_item_license_and_creator_permission_review_required",
+      "source_id": "flickr_south_fork_american_search",
+      "source_type": "creative_commons_candidate_search",
+      "url": "https://www.flickr.com/search/?text=South%20Fork%20American%20River%20rafting"
+    },
+    {
+      "allowed_before_rights_clear": [
+        "manual visual comparison",
+        "guide/outfitter discussion",
+        "permission outreach planning",
+        "internal station annotation placeholders"
+      ],
+      "blocked_before_rights_clear": [
+        "download",
+        "scrape",
+        "vendor",
+        "train_on",
+        "texture_or_material_derivation",
+        "photogrammetry",
+        "packaged_media",
+        "marketing_or_public_promo_use"
+      ],
+      "notes": "Record only public link, creator handle, date, and observed conditions after manual review; never vendor the media itself.",
+      "provider": "Instagram",
+      "rights_status": "reference_only_no_download_no_scraping_explicit_creator_permission_required",
+      "source_id": "instagram_south_fork_american_hashtag",
+      "source_type": "public_social_search_seed",
+      "url": "https://www.instagram.com/explore/tags/southforkamericanriver/"
+    }
+  ],
+  "forbidden_use": [
+    "using public social media as source textures or training data",
+    "downloading thumbnails, videos, captions, comments, or audio without rights",
+    "claiming photoreal fidelity from unreviewed media",
+    "shipping third-party media or derived assets without explicit rights"
+  ],
+  "generated_on": "2026-07-06",
+  "policy": {
+    "blocked_use_before_rights_clear": "Texture extraction, photogrammetry, AI training, marketing screenshots, packaged media, copied captions, or derived shipping assets.",
+    "review_queue_promotion_gate": "Every promoted item needs creator, URL, date, approximate station or reach, observed flow or weather context, license or written permission, attribution, and allowed-use notes.",
+    "shipping_rule": "First-party capture, official/public-domain media with item metadata, or explicit written permission is required before a reference can become a production asset.",
+    "social_rule": "Public social links and hashtag/search pages are fidelity-review seeds only. Record platform, creator, date, observed flow context, and permission status before any asset use.",
+    "storage": "Link-only. Do not download, scrape, vendor, train on, or package third-party photos, footage, captions, or comments until explicit rights are recorded per item."
+  },
+  "promoted_items": [],
+  "reference_annotations": "review/production_import_pilot/reference_annotations.geojson",
+  "required_fields_before_promotion": [
+    "creator_or_rights_holder",
+    "source_url",
+    "capture_or_publication_date",
+    "approximate_station_or_reach",
+    "observed_flow_or_release_or_rain_context",
+    "license_or_written_permission",
+    "attribution_text",
+    "allowed_game_uses",
+    "guide_or_outfitter_review_notes"
+  ],
+  "review_targets": [
+    {
+      "anchor_hint": "Chili Bar to Coloma guide-seat downstream frame",
+      "annotation_outputs": [
+        "review/production_import_pilot/reference_annotations.geojson",
+        "field_media/production_import_pilot/rights_manifest.json"
+      ],
+      "candidate_source_ids": [
+        "blm_south_fork_american_recreation_page",
+        "wikimedia_south_fork_american_search",
+        "flickr_south_fork_american_search",
+        "instagram_south_fork_american_hashtag"
+      ],
+      "flow_context_needed": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "rights_status": "candidate_links_only",
+      "target_id": "south_fork_guide_seat_boulder_garden"
+    },
+    {
+      "anchor_hint": "Low-flow rock exposure and wet-bank comparison",
+      "annotation_outputs": [
+        "imagery/production_import_pilot/wet_rock_review.geojson",
+        "field_media/production_import_pilot/rights_manifest.json"
+      ],
+      "candidate_source_ids": [
+        "wikimedia_south_fork_american_search",
+        "flickr_south_fork_american_search",
+        "instagram_south_fork_american_hashtag"
+      ],
+      "flow_context_needed": [
+        "low_runnable"
+      ],
+      "rights_status": "candidate_links_only",
+      "target_id": "south_fork_late_summer_exposed_rocks"
+    },
+    {
+      "anchor_hint": "Spring runoff or release-driven high-flow review",
+      "annotation_outputs": [
+        "review/production_import_pilot/flow_variant_reference_annotations.geojson",
+        "field_media/production_import_pilot/rights_manifest.json"
+      ],
+      "candidate_source_ids": [
+        "flickr_south_fork_american_search",
+        "instagram_south_fork_american_hashtag"
+      ],
+      "flow_context_needed": [
+        "high_runnable"
+      ],
+      "rights_status": "candidate_links_only",
+      "target_id": "south_fork_high_flow_foam_lines"
+    }
+  ],
+  "rights_summary": {
+    "candidate_link_count": 4,
+    "media_files_downloaded": 0,
+    "promoted_item_count": 0,
+    "review_target_count": 3,
+    "rights_cleared_for_asset_use": 0,
+    "status": "no_media_or_rights_promoted"
+  },
+  "river_id": "american_south_fork",
+  "schema": "raftsim.reference_media_rights_manifest.v1",
+  "section_id": "chili_bar_to_coloma",
+  "source_link_manifest": "physics/data/real_world/reference_media_link_manifest.json",
+  "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+  "status": "candidate_links_only_no_media_downloaded_no_rights_cleared"
+}

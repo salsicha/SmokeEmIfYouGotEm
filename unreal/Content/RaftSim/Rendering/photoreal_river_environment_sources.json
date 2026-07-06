@@ -367,6 +367,22 @@
           "provider": "RaftSim review artifact from State Parks and county GIS source leads",
           "status": "source_leads_attached_review_gated_no_geometry",
           "unreal_use": "Controls access-context and publication-sensitivity review before detailed South Fork maps, screenshots, rescue routes, or access gameplay are promoted; no third-party media or sensitive geometry is imported."
+        },
+        {
+          "artifact_id": "american_south_fork_reference_media_annotations",
+          "category": "guide_and_reference_media_annotations",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/reference_annotations.geojson",
+          "provider": "RaftSim generated link-only media review annotation scaffold",
+          "status": "attached_no_media_downloaded_no_geometry_promoted",
+          "unreal_use": "Editor review targets for visual fidelity, flow context, rescue readability, and guide/outfitter discussion; features have null geometry until stationed and cannot drive production assets until rights clear."
+        },
+        {
+          "artifact_id": "american_south_fork_reference_media_rights_manifest",
+          "category": "field_media_rights_manifest",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/field_media/production_import_pilot/rights_manifest.json",
+          "provider": "RaftSim generated link-only media rights gate",
+          "status": "candidate_links_only_no_rights_cleared",
+          "unreal_use": "Blocks texture, photogrammetry, AI-training, packaged media, marketing, or production-art use until item-level rights and guide review are recorded."
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview"
@@ -658,6 +674,22 @@
           "provider": "RaftSim review artifact from official NPS Grand Canyon source leads",
           "status": "source_leads_attached_review_gated_no_geometry",
           "unreal_use": "Controls Grand Canyon access, camp/beach, sensitive-location, river-mile publication, screenshot, and oarsman review before detailed route maps or captures are promoted; no NPS media, maps, PDF text, or sensitive geometry is imported."
+        },
+        {
+          "artifact_id": "colorado_river_reference_media_annotations",
+          "category": "guide_and_reference_media_annotations",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/reference_annotations.geojson",
+          "provider": "RaftSim generated link-only media review annotation scaffold",
+          "status": "attached_no_media_downloaded_no_geometry_promoted",
+          "unreal_use": "Editor review targets for visual fidelity, flow context, rescue readability, and guide/outfitter discussion; features have null geometry until stationed and cannot drive production assets until rights clear."
+        },
+        {
+          "artifact_id": "colorado_river_reference_media_rights_manifest",
+          "category": "field_media_rights_manifest",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/field_media/production_import_pilot/rights_manifest.json",
+          "provider": "RaftSim generated link-only media rights gate",
+          "status": "candidate_links_only_no_rights_cleared",
+          "unreal_use": "Blocks texture, photogrammetry, AI-training, packaged media, marketing, or production-art use until item-level rights and guide review are recorded."
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"
@@ -945,6 +977,22 @@
           "provider": "RaftSim review artifact from rainfall/discharge/basin metadata",
           "status": "metadata_only_flash_response_context_attached_model_blocked",
           "unreal_use": "Source triage for future Pacuare flash/high-water visual variants and safety gates; not water level, foam, mist, swimmer drift, evacuation, or unsafe-flow tuning authority."
+        },
+        {
+          "artifact_id": "pacuare_reference_media_annotations",
+          "category": "guide_and_reference_media_annotations",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/reference_annotations.geojson",
+          "provider": "RaftSim generated link-only media review annotation scaffold",
+          "status": "attached_no_media_downloaded_no_geometry_promoted",
+          "unreal_use": "Editor review targets for visual fidelity, flow context, rescue readability, and guide/outfitter discussion; features have null geometry until stationed and cannot drive production assets until rights clear."
+        },
+        {
+          "artifact_id": "pacuare_reference_media_rights_manifest",
+          "category": "field_media_rights_manifest",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/field_media/production_import_pilot/rights_manifest.json",
+          "provider": "RaftSim generated link-only media rights gate",
+          "status": "candidate_links_only_no_rights_cleared",
+          "unreal_use": "Blocks texture, photogrammetry, AI-training, packaged media, marketing, or production-art use until item-level rights and guide review are recorded."
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"

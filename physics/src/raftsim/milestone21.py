@@ -1183,7 +1183,12 @@ def build_colorado_rowing_source_manifest() -> dict[str, Any]:
             "hydrography": ["hydrography/centerline.geojson", "hydrography/river_mile_markers.geojson"],
             "gauges": ["hydrology/usgs_09380000_lees_ferry.json", "hydrology/usgs_09402500_near_grand_canyon.json"],
             "flow_presets": ["flow_presets.json"],
-            "guide_references": ["review/guide_review_needs.json", "review/oar_line_annotations.geojson"],
+            "guide_references": [
+                "review/guide_review_needs.json",
+                "review/oar_line_annotations.geojson",
+                "review/production_import_pilot/reference_annotations.geojson",
+            ],
+            "field_media": ["field_media/production_import_pilot/rights_manifest.json"],
             "access_and_protected_context": [
                 "review/production_import_pilot/access_publication_sensitivity_review.json",
             ],

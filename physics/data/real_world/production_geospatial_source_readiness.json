@@ -269,10 +269,13 @@
         },
         "guide_and_reference_media_annotations": {
           "artifacts": [
-            "physics/data/real_world/reference_media_link_manifest.json"
+            "physics/data/real_world/reference_media_link_manifest.json",
+            "physics/data/real_world/reference_media_review_queue.json",
+            "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/reference_annotations.geojson",
+            "physics/data/real_world/south_fork_american_chili_bar/field_media/production_import_pilot/rights_manifest.json"
           ],
-          "promotion_blocker": "Need first-party capture or explicit item-level rights plus guide notes before reference media can drive production art.",
-          "status": "link_seeds_attached_no_media_rights"
+          "promotion_blocker": "Station-aware reference annotation and rights-manifest scaffolds are attached from link-only official/public/social seeds, but no media files, thumbnails, captions, comments, audio, item-level rights, first-party capture, station geometry, or guide approval are recorded yet.",
+          "status": "link_annotation_and_rights_scaffold_attached_no_media_rights"
         },
         "hydrography_and_centerline": {
           "artifacts": [
@@ -361,10 +364,13 @@
         },
         "guide_and_reference_media_annotations": {
           "artifacts": [
-            "physics/data/real_world/reference_media_link_manifest.json"
+            "physics/data/real_world/reference_media_link_manifest.json",
+            "physics/data/real_world/reference_media_review_queue.json",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/reference_annotations.geojson",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/field_media/production_import_pilot/rights_manifest.json"
           ],
-          "promotion_blocker": "Need first-party/oarsman footage or explicit permissions for big-water feature behavior, oar-rig sightlines, and canyon atmosphere.",
-          "status": "link_seeds_attached_no_media_rights"
+          "promotion_blocker": "Station-aware reference annotation and rights-manifest scaffolds are attached from link-only official/public/social seeds, but no media files, thumbnails, captions, comments, audio, item-level rights, first-party capture, station geometry, or guide approval are recorded yet.",
+          "status": "link_annotation_and_rights_scaffold_attached_no_media_rights"
         },
         "hydrography_and_centerline": {
           "artifacts": [
@@ -452,10 +458,13 @@
         },
         "guide_and_reference_media_annotations": {
           "artifacts": [
-            "physics/data/real_world/reference_media_link_manifest.json"
+            "physics/data/real_world/reference_media_link_manifest.json",
+            "physics/data/real_world/reference_media_review_queue.json",
+            "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/reference_annotations.geojson",
+            "physics/data/real_world/pacuare_river_costa_rica/field_media/production_import_pilot/rights_manifest.json"
           ],
-          "promotion_blocker": "Need first-party or explicit outfitter/guide permissions for rainforest canopy, water color, waterfalls, mist, and rapid behavior.",
-          "status": "link_seeds_attached_no_media_rights"
+          "promotion_blocker": "Station-aware reference annotation and rights-manifest scaffolds are attached from link-only official/public/social seeds, but no media files, thumbnails, captions, comments, audio, item-level rights, first-party capture, station geometry, or guide approval are recorded yet.",
+          "status": "link_annotation_and_rights_scaffold_attached_no_media_rights"
         },
         "hydrography_and_centerline": {
           "artifacts": [

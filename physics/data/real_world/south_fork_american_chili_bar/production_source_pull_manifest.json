@@ -38,7 +38,8 @@
     "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, an ordered South Fork mainstem candidate, preview metric stationing, cross-section seed lines, a preview NAIP/DEM alignment diagnostic, and generated production-import draft centerline/bank/cross-section overlays, but it still needs direction confirmation, production CRS selection, bank/cross-section review, stronger NAIP/DEM alignment, and guide review.",
     "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window, but broader seasonal windows, A25 X-flag interpretation, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
     "Access/publication source leads are now attached for South Fork, but exact access geometry, parcel/public-private land status, evacuation routes, sensitive-location screening, and guide/local approval remain open.",
-    "No field/social reference media has explicit game-use rights attached yet."
+    "No field/social reference media has explicit game-use rights attached yet.",
+    "South Fork American reference annotations and rights manifest are attached as link-only review scaffolds, but no item-level media rights, first-party capture, station geometry, or guide approval is recorded yet."
   ],
   "pulled_artifacts": [
     {
@@ -710,6 +711,63 @@
         "publication_sensitivity_gate",
         "station_aware_annotation_planning",
         "guide_and_geospatial_review_queue"
+      ]
+    },
+    {
+      "artifact_id": "american_south_fork_reference_media_annotations",
+      "category": "guide_and_reference_media_annotations",
+      "caveats": [
+        "GeoJSON features intentionally have null geometry until an editor or guide assigns station/reach geometry.",
+        "No third-party photos, videos, thumbnails, captions, comments, or audio are downloaded or imported.",
+        "Reference targets cannot drive production art, water, gameplay tuning, or marketing until rights and guide review are recorded."
+      ],
+      "path": "review/production_import_pilot/reference_annotations.geojson",
+      "provider": "RaftSim generated link-only media review annotation scaffold",
+      "related_artifacts": [
+        "field_media/production_import_pilot/rights_manifest.json",
+        "../reference_media_review_queue.json"
+      ],
+      "status": "link_only_annotation_targets_no_media_downloaded",
+      "summary": {
+        "candidate_source_id_count": 4,
+        "feature_count": 3,
+        "geometry_status": "null_geometry_anchor_hints_only"
+      },
+      "use": [
+        "editor_reference_review_targets",
+        "guide_visual_fidelity_discussion",
+        "flow_variant_photo_review_planning",
+        "permission_outreach_queue"
+      ]
+    },
+    {
+      "artifact_id": "american_south_fork_reference_media_rights_manifest",
+      "category": "field_media_rights_manifest",
+      "caveats": [
+        "using public social media as source textures or training data",
+        "downloading thumbnails, videos, captions, comments, or audio without rights",
+        "claiming photoreal fidelity from unreviewed media",
+        "shipping third-party media or derived assets without explicit rights"
+      ],
+      "path": "field_media/production_import_pilot/rights_manifest.json",
+      "provider": "RaftSim generated link-only media rights gate",
+      "related_artifacts": [
+        "review/production_import_pilot/reference_annotations.geojson",
+        "../reference_media_link_manifest.json"
+      ],
+      "status": "candidate_links_only_no_media_downloaded_no_rights_cleared",
+      "summary": {
+        "candidate_link_count": 4,
+        "media_files_downloaded": 0,
+        "promoted_item_count": 0,
+        "review_target_count": 3,
+        "rights_cleared_for_asset_use": 0,
+        "status": "no_media_or_rights_promoted"
+      },
+      "use": [
+        "rights_review_gate",
+        "candidate_link_inventory",
+        "permission_outreach_planning"
       ]
     }
   ],
