@@ -50,7 +50,8 @@
       "review/access_and_conservation_constraints.json"
     ],
     "source_pulls": [
-      "production_source_pull_manifest.json"
+      "production_source_pull_manifest.json",
+      "production_import_pilot.json"
     ],
     "unreal": [
       "unreal/pacuare_river_third_target_editor_pass.json"

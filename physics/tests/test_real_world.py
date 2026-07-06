@@ -8,6 +8,7 @@ from raftsim.real_world import (
     COLORADO_PRODUCTION_IMPORT_PILOT_FILE,
     COURSE_ELEVATION_EXTRACTION_FILE,
     COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION,
+    PACUARE_PRODUCTION_IMPORT_PILOT_FILE,
     RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
     RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION,
     RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
@@ -20,6 +21,7 @@ from raftsim.real_world import (
     build_candidate_river_inventory_package,
     build_colorado_production_import_pilot,
     build_course_elevation_extraction,
+    build_pacuare_production_import_pilot,
     build_player_selection_model,
     build_rapid_review_editor_workflow,
     build_rapid_review_flow_difficulty_mapping,
@@ -195,6 +197,42 @@ def test_colorado_production_import_pilot_exposes_lees_ferry_tile_plan_and_revie
     assert (
         pilot["unreal_import_targets"]["future_production_map"]
         == "/Game/RaftSim/Maps/Production/L_ColoradoGrandCanyon_LeesFerryRowing"
+    )
+
+
+def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_gates():
+    pilot = build_pacuare_production_import_pilot()
+    classes = {entry["class_id"]: entry for entry in pilot["required_source_classes"]}
+    seeds = {entry["product_id"]: entry for entry in pilot["seed_products"]}
+
+    assert PACUARE_PRODUCTION_IMPORT_PILOT_FILE == "production_import_pilot.json"
+    assert pilot["schema"] == PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION
+    assert pilot["status"] == "planned_review_gated_source_selection_pending"
+    assert pilot["river_id"] == "pacuare"
+    assert pilot["section_id"] == "lower_pacuare_planning_corridor"
+    assert pilot["route_style"] == "guided_paddle_raft"
+    assert pilot["corridor_scope"]["status"] == "draft_lower_pacuare_planning_bounds_not_surveyed_route"
+    assert "copernicus_dem_glo30_public_tiles" in seeds
+    assert "nasa_gibs_modis_demshade_preview_drape" in seeds
+    assert {
+        "terrain_dem_or_lidar",
+        "hydrography_and_centerline",
+        "aerial_or_satellite_imagery",
+        "water_and_vegetation_masks",
+        "seasonal_flow_or_release_history",
+        "protected_area_and_access_context",
+        "guide_and_reference_media_annotations",
+    }.issubset(classes)
+    assert "snit_cr_idecori" in classes["hydrography_and_centerline"]["source_ids"]
+    assert "imn_costa_rica" in classes["seasonal_flow_or_release_history"]["source_ids"]
+    assert "sinac_minae" in classes["protected_area_and_access_context"]["source_ids"]
+    assert "wet_rock_waterfall_mist_mask_2048.png" in " ".join(
+        classes["water_and_vegetation_masks"]["target_outputs"]
+    )
+    assert pilot["procedural_generation_plan"]["status"] == "allowed_only_as_manifest_recorded_review_gated_fill"
+    assert (
+        pilot["unreal_import_targets"]["future_production_map"]
+        == "/Game/RaftSim/Maps/Production/L_PacuareRainforest_LowerPacuare"
     )
 
 
