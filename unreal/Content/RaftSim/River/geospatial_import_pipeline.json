@@ -169,6 +169,15 @@
     "geoclaw_cpp_comparison_inputs",
     "unreal_fidelity_review_overlays"
   ],
+  "review_gated_import_tests": [
+    {
+      "river_id": "pacuare",
+      "stage_id": "pacuare_heightfield_import_test",
+      "config": "unreal/Content/RaftSim/River/pacuare_heightfield_import_test.json",
+      "status": "review_gated_not_enabled_for_preview_maps",
+      "source_artifact": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png"
+    }
+  ],
   "schema": "raftsim.unreal.geospatial_import_pipeline.v1",
   "shapefile_canonical_allowed": false,
   "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json",
