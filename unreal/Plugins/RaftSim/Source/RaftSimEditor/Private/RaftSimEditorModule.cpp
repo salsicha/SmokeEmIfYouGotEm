@@ -214,7 +214,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.ElevationSample =
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_sample_512.tif");
     SouthFork.SourceDrapeDescription =
-        TEXT("larger official USDA/APFO NAIP 1024px corridor sample sampled into a denser terrain-conforming source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into bank and valley preview geometry; full elevation conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
+        TEXT("larger official USDA/APFO NAIP 1024px corridor sample sampled into a denser terrain-conforming source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into bank and valley preview geometry; first-party procedural wet-bank, leaf-litter, and talus detail generated as rights-safe proxy dressing; full elevation conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
     SouthFork.WaterColor = FLinearColor(0.05f, 0.42f, 0.47f);
     SouthFork.TerrainColor = FLinearColor(0.35f, 0.30f, 0.21f);
     SouthFork.RockColor = FLinearColor(0.38f, 0.36f, 0.31f);
@@ -244,7 +244,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.ElevationSample =
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif");
     Colorado.SourceDrapeDescription =
-        TEXT("larger official USDA/APFO NAIP 1024px Lees Ferry corridor sample sampled into a denser terrain-conforming canyon source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into canyon bank preview geometry; full canyon heightfield conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
+        TEXT("larger official USDA/APFO NAIP 1024px Lees Ferry corridor sample sampled into a denser terrain-conforming canyon source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into canyon bank preview geometry; first-party procedural strata, talus, and wet-rock detail generated as rights-safe proxy dressing; full canyon heightfield conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
     Colorado.WaterColor = FLinearColor(0.34f, 0.28f, 0.19f);
     Colorado.TerrainColor = FLinearColor(0.48f, 0.30f, 0.18f);
     Colorado.RockColor = FLinearColor(0.55f, 0.32f, 0.20f);
@@ -275,7 +275,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.ElevationSample =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
-        TEXT("larger deterministic 1024px preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, sampled into a denser terrain-conforming rainforest source-drape mosaic with cloud gaps filled by DEM-derived shading; larger derived 1024px Copernicus DEM relief preview and review-gated 1009px heightfield candidate sampled into Pacuare bank and gorge preview geometry; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water, waterfalls, foam, raft, and lighting remain proxy layers");
+        TEXT("larger deterministic 1024px preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, sampled into a denser terrain-conforming rainforest source-drape mosaic with cloud gaps filled by DEM-derived shading; larger derived 1024px Copernicus DEM relief preview and review-gated 1009px heightfield candidate sampled into Pacuare bank and gorge preview geometry; first-party procedural rainforest leaf-litter, wet-rock, and talus detail generated as rights-safe proxy dressing; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water, waterfalls, foam, raft, and lighting remain proxy layers");
     Pacuare.WaterColor = FLinearColor(0.04f, 0.35f, 0.28f);
     Pacuare.TerrainColor = FLinearColor(0.17f, 0.22f, 0.13f);
     Pacuare.RockColor = FLinearColor(0.20f, 0.24f, 0.20f);
@@ -1143,6 +1143,103 @@ void AddPreviewWetBankDressing(
     }
 }
 
+void AddPreviewProceduralEnvironmentDetail(
+    UWorld* World,
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* TerrainRelief,
+    const FRaftSimPreviewImage* HeightfieldPreview,
+    UStaticMesh* PebbleMesh)
+{
+    if (!World)
+    {
+        return;
+    }
+
+    const int32 BandCount = Spec.bDesertCanyon ? 7 : (Spec.bHasWaterfalls ? 5 : 4);
+    const float BaseBandOffset = Spec.RiverHalfWidthCm +
+        (Spec.bDesertCanyon ? Spec.BankWidthCm * 0.72f + 380.0f : Spec.BankWidthCm * 0.35f + 190.0f);
+    const float BandSpacing = Spec.bDesertCanyon ? 315.0f : (Spec.bHasWaterfalls ? 150.0f : 180.0f);
+    const float BandWidth = Spec.bDesertCanyon ? 125.0f : (Spec.bHasWaterfalls ? 78.0f : 92.0f);
+
+    for (int32 SideIndex = 0; SideIndex < 2; ++SideIndex)
+    {
+        const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+        for (int32 BandIndex = 0; BandIndex < BandCount; ++BandIndex)
+        {
+            const float Offset = BaseBandOffset + BandSpacing * static_cast<float>(BandIndex);
+            const float Lift = Spec.bDesertCanyon ? 34.0f + 8.0f * static_cast<float>(BandIndex) : 26.0f;
+            const float Warmth = 0.88f + 0.04f * static_cast<float>(BandIndex % 3);
+            FLinearColor InnerColor;
+            FLinearColor OuterColor;
+            if (Spec.bDesertCanyon)
+            {
+                InnerColor = ScalePreviewColor(FLinearColor(0.42f, 0.28f, 0.17f), Warmth);
+                OuterColor = ScalePreviewColor(FLinearColor(0.70f, 0.51f, 0.32f), 0.90f + 0.03f * static_cast<float>(BandIndex % 2));
+            }
+            else if (Spec.bHasWaterfalls)
+            {
+                InnerColor = ScalePreviewColor(FLinearColor(0.030f, 0.070f, 0.038f), 0.92f + 0.04f * static_cast<float>(BandIndex % 2));
+                OuterColor = ScalePreviewColor(FLinearColor(0.075f, 0.120f, 0.060f), 0.86f + 0.05f * static_cast<float>(BandIndex % 3));
+            }
+            else
+            {
+                InnerColor = ScalePreviewColor(FLinearColor(0.14f, 0.13f, 0.10f), 0.92f + 0.04f * static_cast<float>(BandIndex % 2));
+                OuterColor = ScalePreviewColor(FLinearColor(0.29f, 0.25f, 0.17f), 0.88f + 0.04f * static_cast<float>(BandIndex % 3));
+            }
+
+            AddPreviewShoreRibbon(
+                World,
+                Spec,
+                TerrainRelief,
+                HeightfieldPreview,
+                FString::Printf(TEXT("RaftSim_ProceduralSourceDetailBand_%02d_%s_%s"), BandIndex, Side < 0.0f ? TEXT("Left") : TEXT("Right"), *Spec.RiverId),
+                Side * Offset,
+                BandWidth,
+                Lift,
+                InnerColor,
+                OuterColor);
+        }
+    }
+
+    if (!PebbleMesh)
+    {
+        return;
+    }
+
+    const int32 PebbleCount = Spec.bDesertCanyon ? 96 : (Spec.bHasWaterfalls ? 86 : 72);
+    for (int32 PebbleIndex = 0; PebbleIndex < PebbleCount; ++PebbleIndex)
+    {
+        const float T = static_cast<float>(PebbleIndex) / static_cast<float>(FMath::Max(1, PebbleCount - 1));
+        const float X = FMath::Lerp(-4300.0f, 24600.0f, T) + 190.0f * FMath::Sin(static_cast<float>(PebbleIndex) * 2.13f);
+        const float CenterY = GetPreviewRiverCenterY(Spec, X);
+        const float Side = (PebbleIndex % 2 == 0) ? -1.0f : 1.0f;
+        const float BarJitter = FMath::Abs(FMath::Sin(static_cast<float>(PebbleIndex) * 1.31f));
+        const float Offset = Spec.RiverHalfWidthCm + (Spec.bDesertCanyon ? 120.0f : 85.0f) +
+            BarJitter * (Spec.bDesertCanyon ? 520.0f : 310.0f) +
+            static_cast<float>(PebbleIndex % 4) * (Spec.bDesertCanyon ? 68.0f : 42.0f);
+        const float Y = CenterY + Side * Offset;
+        const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief, HeightfieldPreview);
+        const float PebbleScale = 0.72f + 0.18f * static_cast<float>(PebbleIndex % 5);
+        const FVector Scale = Spec.bDesertCanyon
+            ? FVector(0.42f * PebbleScale, 0.24f * PebbleScale, 0.055f * PebbleScale)
+            : FVector(0.28f * PebbleScale, 0.18f * PebbleScale, 0.045f * PebbleScale);
+        const FLinearColor PebbleColor = Spec.bDesertCanyon
+            ? ScalePreviewColor(FMath::Lerp(FLinearColor(0.44f, 0.31f, 0.21f), Spec.RockColor, 0.45f), 0.90f + 0.06f * static_cast<float>(PebbleIndex % 4))
+            : (Spec.bHasWaterfalls
+                  ? ScalePreviewColor(FMath::Lerp(FLinearColor(0.045f, 0.060f, 0.050f), Spec.RockColor, 0.58f), 0.86f + 0.05f * static_cast<float>(PebbleIndex % 5))
+                  : ScalePreviewColor(FMath::Lerp(FLinearColor(0.20f, 0.18f, 0.14f), Spec.RockColor, 0.52f), 0.88f + 0.05f * static_cast<float>(PebbleIndex % 4)));
+
+        AddPreviewMeshActor(
+            World,
+            PebbleMesh,
+            FString::Printf(TEXT("RaftSim_ProceduralTalusPebble_%03d_%s"), PebbleIndex, *Spec.RiverId),
+            FVector(X, Y, TerrainZ + (Spec.bDesertCanyon ? 24.0f : 18.0f)),
+            FRotator(0.0f, static_cast<float>((PebbleIndex * 29) % 360), 0.0f),
+            Scale,
+            PebbleColor);
+    }
+}
+
 void AddPreviewFoamRibbon(
     UWorld* World,
     const FRaftSimEnvironmentPreviewSpec& Spec,
@@ -1608,6 +1705,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     AddPreviewAerialDrapeTiles(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr);
     AddPreviewRiverRibbonMesh(World, Spec);
     AddPreviewWetBankDressing(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr);
+    AddPreviewProceduralEnvironmentDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, SphereMesh);
     AddPreviewWaterSurfaceDetail(World, Spec);
     AddPreviewRaftForeground(World, Spec, CubeMesh, CylinderMesh);
     AddPreviewFoamAndHydraulics(World, Spec);
