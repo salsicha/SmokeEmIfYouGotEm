@@ -36,7 +36,7 @@
     "Full corridor DEM/lidar tiles are not downloaded or conditioned yet.",
     "Aerial imagery and water/vegetation masks are not downloaded yet.",
     "Hydrography products are discovered but not clipped into a reviewed corridor workspace yet.",
-    "Modern release/gauge context, broader CDEC windows, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
+    "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window, but broader seasonal windows, A25 X-flag interpretation, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet."
   ],
   "pulled_artifacts": [
@@ -193,6 +193,43 @@
         "cdec_flag_semantics_for_import_pipeline",
         "south_fork_station_relation_gate",
         "future_flow_band_calibration_prerequisite"
+      ]
+    },
+    {
+      "artifact_id": "cdec_cbr_a25_flow_context_2026_06_07_2026_07_06",
+      "category": "hydrology_modern_flow_stage_release_context_window",
+      "caveats": [
+        "This is a compact summary artifact, not a raw telemetry archive.",
+        "CBR event-service rows returned a local 2026-06-06 23:00 first sample for the requested 2026-06-07 start.",
+        "A25 daily generation discharge includes X-flagged -9999 rows; X is not defined by the attached CDEC FlagList and is excluded pending CDEC/station review.",
+        "Do not retune presets or photoreal water appearance until broader seasonal windows, release/routing interpretation, legal/redistribution signoff, and guide review pass."
+      ],
+      "path": "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+      "provider": "California Data Exchange Center / California Department of Water Resources",
+      "status": "official_context_window_pulled_review_required",
+      "summary": {
+        "a25_power_generation_valid_daily_samples": 20,
+        "a25_unlisted_flags_observed": [
+          "X"
+        ],
+        "cbr_flow_max_cfs": 1688.0,
+        "cbr_flow_median_cfs": 321.0,
+        "cbr_flow_min_cfs": 291.0,
+        "cbr_flow_valid_sample_count": 2744,
+        "cbr_stage_max_ft": 4.04,
+        "cbr_stage_median_ft": 1.59,
+        "cbr_stage_min_ft": 1.5,
+        "days_peak_ge_1600_cfs": 9,
+        "days_peak_ge_900_cfs": 25,
+        "window_end": "2026-07-06T23:59",
+        "window_start": "2026-06-07T00:00"
+      },
+      "url": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2026-06-07T00:00&End=2026-07-06T23:59",
+      "use": [
+        "broader_modern_flow_context",
+        "release_pulse_review",
+        "future_flow_band_calibration_input",
+        "guide_discussion_seed"
       ]
     },
     {

@@ -1,0 +1,912 @@
+{
+  "daily_a25_power_generation_summary": [
+    {
+      "data_flag": "",
+      "date_local": "2026-06-07",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 787.0,
+      "raw_value": 787
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-08",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 553.0,
+      "raw_value": 553
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-09",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 553.0,
+      "raw_value": 553
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-10",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 287.0,
+      "raw_value": 287
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-11",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 553.0,
+      "raw_value": 553
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-12",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 554.0,
+      "raw_value": 554
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-13",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 787.0,
+      "raw_value": 787
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-14",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 787.0,
+      "raw_value": 787
+    },
+    {
+      "data_flag": "X",
+      "date_local": "2026-06-15",
+      "excluded_from_stats": true,
+      "power_generation_discharge_cfs": null,
+      "raw_value": -9999
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-16",
+      "excluded_from_stats": true,
+      "power_generation_discharge_cfs": null,
+      "raw_value": -9999
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-17",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 287.0,
+      "raw_value": 287
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-18",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 553.0,
+      "raw_value": 553
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-19",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 554.0,
+      "raw_value": 554
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-20",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 786.0,
+      "raw_value": 786
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-21",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 786.0,
+      "raw_value": 786
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-22",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 553.0,
+      "raw_value": 553
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-23",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 554.0,
+      "raw_value": 554
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-24",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 287.0,
+      "raw_value": 287
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-25",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 554.0,
+      "raw_value": 554
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-26",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 554.0,
+      "raw_value": 554
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-27",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 787.0,
+      "raw_value": 787
+    },
+    {
+      "data_flag": "",
+      "date_local": "2026-06-28",
+      "excluded_from_stats": false,
+      "power_generation_discharge_cfs": 787.0,
+      "raw_value": 787
+    },
+    {
+      "data_flag": "X",
+      "date_local": "2026-06-29",
+      "excluded_from_stats": true,
+      "power_generation_discharge_cfs": null,
+      "raw_value": -9999
+    },
+    {
+      "data_flag": "X",
+      "date_local": "2026-06-30",
+      "excluded_from_stats": true,
+      "power_generation_discharge_cfs": null,
+      "raw_value": -9999
+    },
+    {
+      "data_flag": "X",
+      "date_local": "2026-07-01",
+      "excluded_from_stats": true,
+      "power_generation_discharge_cfs": null,
+      "raw_value": -9999
+    },
+    {
+      "data_flag": "X",
+      "date_local": "2026-07-02",
+      "excluded_from_stats": true,
+      "power_generation_discharge_cfs": null,
+      "raw_value": -9999
+    },
+    {
+      "data_flag": "X",
+      "date_local": "2026-07-03",
+      "excluded_from_stats": true,
+      "power_generation_discharge_cfs": null,
+      "raw_value": -9999
+    },
+    {
+      "data_flag": "X",
+      "date_local": "2026-07-04",
+      "excluded_from_stats": true,
+      "power_generation_discharge_cfs": null,
+      "raw_value": -9999
+    },
+    {
+      "data_flag": "X",
+      "date_local": "2026-07-05",
+      "excluded_from_stats": true,
+      "power_generation_discharge_cfs": null,
+      "raw_value": -9999
+    },
+    {
+      "data_flag": "X",
+      "date_local": "2026-07-06",
+      "excluded_from_stats": true,
+      "power_generation_discharge_cfs": null,
+      "raw_value": -9999
+    }
+  ],
+  "daily_cbr_flow_stage_summary": [
+    {
+      "date_local": "2026-06-06",
+      "flow_median_cfs": 312.5,
+      "flow_min_cfs": 311.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 314.0,
+      "flow_peak_time_local": "2026-06-06T23:00",
+      "flow_sample_count": 4,
+      "flow_valid_count": 4,
+      "hours_flow_ge_low_runnable_900_cfs": 0,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.565,
+      "stage_min_ft": 1.56,
+      "stage_peak_ft": 1.57,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-07",
+      "flow_median_cfs": 455.0,
+      "flow_min_cfs": 304.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1664.0,
+      "flow_peak_time_local": "2026-06-07T12:00",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 9.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 6.5,
+      "stage_median_ft": 1.96,
+      "stage_min_ft": 1.54,
+      "stage_peak_ft": 4.01,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-08",
+      "flow_median_cfs": 311.0,
+      "flow_min_cfs": 304.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1417.0,
+      "flow_peak_time_local": "2026-06-08T10:45",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.56,
+      "stage_min_ft": 1.54,
+      "stage_peak_ft": 3.68,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-09",
+      "flow_median_cfs": 317.0,
+      "flow_min_cfs": 307.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1446.0,
+      "flow_peak_time_local": "2026-06-09T11:00",
+      "flow_sample_count": 72,
+      "flow_valid_count": 72,
+      "hours_flow_ge_low_runnable_900_cfs": 1.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.58,
+      "stage_min_ft": 1.55,
+      "stage_peak_ft": 3.72,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-10",
+      "flow_median_cfs": 321.0,
+      "flow_min_cfs": 314.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 324.0,
+      "flow_peak_time_local": "2026-06-10T17:45",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 0,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.59,
+      "stage_min_ft": 1.57,
+      "stage_peak_ft": 1.6,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-11",
+      "flow_median_cfs": 319.0,
+      "flow_min_cfs": 314.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1446.0,
+      "flow_peak_time_local": "2026-06-11T10:30",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.585,
+      "stage_min_ft": 1.57,
+      "stage_peak_ft": 3.72,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-12",
+      "flow_median_cfs": 317.0,
+      "flow_min_cfs": 314.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1424.0,
+      "flow_peak_time_local": "2026-06-12T10:00",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.58,
+      "stage_min_ft": 1.57,
+      "stage_peak_ft": 3.69,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-13",
+      "flow_median_cfs": 461.0,
+      "flow_min_cfs": 314.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1688.0,
+      "flow_peak_time_local": "2026-06-13T11:30",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 9.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 6.5,
+      "stage_median_ft": 1.975,
+      "stage_min_ft": 1.57,
+      "stage_peak_ft": 4.04,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-14",
+      "flow_median_cfs": 461.0,
+      "flow_min_cfs": 314.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1680.0,
+      "flow_peak_time_local": "2026-06-14T11:30",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 9.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 6.5,
+      "stage_median_ft": 1.975,
+      "stage_min_ft": 1.57,
+      "stage_peak_ft": 4.03,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-15",
+      "flow_median_cfs": 322.5,
+      "flow_min_cfs": 314.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1446.0,
+      "flow_peak_time_local": "2026-06-15T11:00",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.5950000000000002,
+      "stage_min_ft": 1.57,
+      "stage_peak_ft": 3.72,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-16",
+      "flow_median_cfs": 324.0,
+      "flow_min_cfs": 314.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1446.0,
+      "flow_peak_time_local": "2026-06-16T10:15",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.6,
+      "stage_min_ft": 1.57,
+      "stage_peak_ft": 3.72,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-17",
+      "flow_median_cfs": 324.0,
+      "flow_min_cfs": 321.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 328.0,
+      "flow_peak_time_local": "2026-06-17T17:15",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 0,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.6,
+      "stage_min_ft": 1.59,
+      "stage_peak_ft": 1.61,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-18",
+      "flow_median_cfs": 324.0,
+      "flow_min_cfs": 317.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1446.0,
+      "flow_peak_time_local": "2026-06-18T10:45",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.6,
+      "stage_min_ft": 1.58,
+      "stage_peak_ft": 3.72,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-19",
+      "flow_median_cfs": 324.0,
+      "flow_min_cfs": 314.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1453.0,
+      "flow_peak_time_local": "2026-06-19T10:45",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.6,
+      "stage_min_ft": 1.57,
+      "stage_peak_ft": 3.73,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-20",
+      "flow_median_cfs": 455.5,
+      "flow_min_cfs": 311.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1672.0,
+      "flow_peak_time_local": "2026-06-20T11:15",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 9.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 6.5,
+      "stage_median_ft": 1.96,
+      "stage_min_ft": 1.56,
+      "stage_peak_ft": 4.02,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-21",
+      "flow_median_cfs": 451.5,
+      "flow_min_cfs": 307.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1664.0,
+      "flow_peak_time_local": "2026-06-21T11:15",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 9.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 6.5,
+      "stage_median_ft": 1.95,
+      "stage_min_ft": 1.55,
+      "stage_peak_ft": 4.01,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-22",
+      "flow_median_cfs": 321.0,
+      "flow_min_cfs": 311.0,
+      "flow_no_data_count": 4,
+      "flow_peak_cfs": 1438.0,
+      "flow_peak_time_local": "2026-06-22T10:15",
+      "flow_sample_count": 96,
+      "flow_valid_count": 92,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.59,
+      "stage_min_ft": 1.55,
+      "stage_peak_ft": 3.71,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-23",
+      "flow_median_cfs": 321.0,
+      "flow_min_cfs": 317.0,
+      "flow_no_data_count": 40,
+      "flow_peak_cfs": 1438.0,
+      "flow_peak_time_local": "2026-06-23T10:15",
+      "flow_sample_count": 96,
+      "flow_valid_count": 56,
+      "hours_flow_ge_low_runnable_900_cfs": 2.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.59,
+      "stage_min_ft": 1.58,
+      "stage_peak_ft": 3.71,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-24",
+      "flow_median_cfs": 317.0,
+      "flow_min_cfs": 314.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 321.0,
+      "flow_peak_time_local": "2026-06-24T00:00",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 0,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.58,
+      "stage_min_ft": 1.57,
+      "stage_peak_ft": 1.59,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-25",
+      "flow_median_cfs": 321.0,
+      "flow_min_cfs": 311.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1438.0,
+      "flow_peak_time_local": "2026-06-25T10:30",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.59,
+      "stage_min_ft": 1.56,
+      "stage_peak_ft": 3.71,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-26",
+      "flow_median_cfs": 317.0,
+      "flow_min_cfs": 307.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1446.0,
+      "flow_peak_time_local": "2026-06-26T10:45",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.58,
+      "stage_min_ft": 1.55,
+      "stage_peak_ft": 3.72,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-27",
+      "flow_median_cfs": 447.5,
+      "flow_min_cfs": 301.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1664.0,
+      "flow_peak_time_local": "2026-06-27T11:15",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 9.25,
+      "hours_flow_ge_median_runnable_1600_cfs": 6.5,
+      "stage_median_ft": 1.94,
+      "stage_min_ft": 1.53,
+      "stage_peak_ft": 4.01,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-28",
+      "flow_median_cfs": 447.5,
+      "flow_min_cfs": 301.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1664.0,
+      "flow_peak_time_local": "2026-06-28T11:30",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 9.25,
+      "hours_flow_ge_median_runnable_1600_cfs": 6.5,
+      "stage_median_ft": 1.94,
+      "stage_min_ft": 1.52,
+      "stage_peak_ft": 4.01,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-29",
+      "flow_median_cfs": 314.0,
+      "flow_min_cfs": 304.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1460.0,
+      "flow_peak_time_local": "2026-06-29T10:45",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.57,
+      "stage_min_ft": 1.54,
+      "stage_peak_ft": 3.74,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-06-30",
+      "flow_median_cfs": 307.0,
+      "flow_min_cfs": 301.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1438.0,
+      "flow_peak_time_local": "2026-06-30T10:15",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.54,
+      "stage_min_ft": 1.53,
+      "stage_peak_ft": 3.71,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-07-01",
+      "flow_median_cfs": 301.0,
+      "flow_min_cfs": 298.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 304.0,
+      "flow_peak_time_local": "2026-07-01T00:00",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 0,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.53,
+      "stage_min_ft": 1.52,
+      "stage_peak_ft": 1.54,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-07-02",
+      "flow_median_cfs": 301.0,
+      "flow_min_cfs": 298.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1424.0,
+      "flow_peak_time_local": "2026-07-02T10:45",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.53,
+      "stage_min_ft": 1.51,
+      "stage_peak_ft": 3.69,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-07-03",
+      "flow_median_cfs": 304.0,
+      "flow_min_cfs": 294.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1431.0,
+      "flow_peak_time_local": "2026-07-03T10:00",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 5.5,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.54,
+      "stage_min_ft": 1.51,
+      "stage_peak_ft": 3.7,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-07-04",
+      "flow_median_cfs": 597.5,
+      "flow_min_cfs": 291.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1664.0,
+      "flow_peak_time_local": "2026-07-04T11:45",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 9.25,
+      "hours_flow_ge_median_runnable_1600_cfs": 6.5,
+      "stage_median_ft": 2.3049999999999997,
+      "stage_min_ft": 1.5,
+      "stage_peak_ft": 4.01,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-07-05",
+      "flow_median_cfs": 442.0,
+      "flow_min_cfs": 291.0,
+      "flow_no_data_count": 0,
+      "flow_peak_cfs": 1649.0,
+      "flow_peak_time_local": "2026-07-05T11:00",
+      "flow_sample_count": 96,
+      "flow_valid_count": 96,
+      "hours_flow_ge_low_runnable_900_cfs": 9.25,
+      "hours_flow_ge_median_runnable_1600_cfs": 6.5,
+      "stage_median_ft": 1.9249999999999998,
+      "stage_min_ft": 1.5,
+      "stage_peak_ft": 3.99,
+      "unique_flow_flags": [
+        ""
+      ]
+    },
+    {
+      "date_local": "2026-07-06",
+      "flow_median_cfs": 298.0,
+      "flow_min_cfs": 294.0,
+      "flow_no_data_count": 68,
+      "flow_peak_cfs": 338.0,
+      "flow_peak_time_local": "2026-07-06T05:45",
+      "flow_sample_count": 92,
+      "flow_valid_count": 24,
+      "hours_flow_ge_low_runnable_900_cfs": 0,
+      "hours_flow_ge_median_runnable_1600_cfs": 0,
+      "stage_median_ft": 1.51,
+      "stage_min_ft": 1.51,
+      "stage_peak_ft": 1.64,
+      "unique_flow_flags": [
+        ""
+      ]
+    }
+  ],
+  "data_policy": {
+    "a25_flag_caveat": "A25 daily discharge includes X flags on -9999 rows; X was not present in the attached CDEC FlagList table and must be treated as exclude/hold-for-review until defined by CDEC or station metadata.",
+    "cbr_flags": "Only blank/no-flag values were observed in the CBR flow and stage pulls.",
+    "no_data_normalized_to_null": true,
+    "raw_no_data_value": -9999,
+    "statistics_exclude": [
+      "raw -9999 values",
+      "A25 rows with X flags"
+    ]
+  },
+  "generated_on": "2026-07-06",
+  "linked_artifacts": [
+    "hydrology/south_fork_modern_flow_source_selection.json",
+    "hydrology/cdec_terms_flags_and_station_relation_review.json",
+    "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+    "production_source_pull_manifest.json",
+    "../production_geospatial_source_readiness.json",
+    "../production_environment_gap_register.json"
+  ],
+  "promotion_gate": "Use this 30-day CDEC context window for review and guide discussion only. Do not retune South Fork presets or lifelike water appearance until additional representative windows, A25 routing/release interpretation, legal/redistribution signoff, hydrologic station-to-rapid relation, and guide/outfitter validation are complete.",
+  "purpose": "Attach a compact 30-day CDEC CBR flow/stage and A25 powerhouse-generation context window for South Fork flow-band review without promoting gameplay or photoreal presets.",
+  "request_window": {
+    "note": "CDEC event services returned records beginning 2026-06-06 23:00 local time for the requested 2026-06-07 start.",
+    "requested_end": "2026-07-06T23:59",
+    "requested_start": "2026-06-07T00:00"
+  },
+  "river_id": "american_south_fork",
+  "schema": "raftsim.cdec_south_fork_flow_context_window.v1",
+  "section_id": "chili_bar_to_coloma",
+  "series": {
+    "a25_outflow_volume_af": {
+      "duration_code": "D",
+      "sample_count": 0,
+      "sensor_num": 272,
+      "station_id": "A25",
+      "status": "request_returned_empty_array"
+    },
+    "a25_power_generation_discharge_cfs": {
+      "duration_code": "D",
+      "sensor_num": 48,
+      "station_id": "A25",
+      "summary": {
+        "first_datetime_local": "2026-06-07T00:00",
+        "last_datetime_local": "2026-07-06T00:00",
+        "max": 787.0,
+        "median": 554.0,
+        "min": 287.0,
+        "no_data_or_excluded_count": 10,
+        "p10": 287.0,
+        "p90": 787.0,
+        "sample_count": 30,
+        "unique_flags": [
+          "",
+          "X"
+        ],
+        "units": "CFS",
+        "valid_sample_count": 20,
+        "value_key": "power_generation_discharge_cfs"
+      }
+    },
+    "cbr_flow_cfs": {
+      "duration_code": "E",
+      "sensor_num": 20,
+      "station_id": "CBR",
+      "summary": {
+        "first_datetime_local": "2026-06-06T23:00",
+        "last_datetime_local": "2026-07-06T22:45",
+        "max": 1688.0,
+        "median": 321.0,
+        "min": 291.0,
+        "no_data_or_excluded_count": 112,
+        "p10": 301.0,
+        "p90": 1446.0,
+        "sample_count": 2856,
+        "unique_flags": [
+          ""
+        ],
+        "units": "CFS",
+        "valid_sample_count": 2744,
+        "value_key": "flow_cfs"
+      }
+    },
+    "cbr_stage_ft": {
+      "duration_code": "E",
+      "sensor_num": 1,
+      "station_id": "CBR",
+      "summary": {
+        "first_datetime_local": "2026-06-06T23:00",
+        "last_datetime_local": "2026-07-06T22:45",
+        "max": 4.04,
+        "median": 1.59,
+        "min": 1.5,
+        "no_data_or_excluded_count": 112,
+        "p10": 1.53,
+        "p90": 3.72,
+        "sample_count": 2856,
+        "unique_flags": [
+          ""
+        ],
+        "units": "FEET",
+        "valid_sample_count": 2744,
+        "value_key": "stage_ft"
+      }
+    }
+  },
+  "source_urls": {
+    "a25_daily_outflow_volume_json": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=A25&SensorNums=272&dur_code=D&Start=2026-06-07T00:00&End=2026-07-06T23:59",
+    "a25_daily_power_generation_discharge_json": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=A25&SensorNums=48&dur_code=D&Start=2026-06-07T00:00&End=2026-07-06T23:59",
+    "a25_sensor_metadata_json": "https://cdec.water.ca.gov/dynamicapp/wsSensorData/getSensorsForStation?stationId=A25",
+    "cbr_event_flow_json": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2026-06-07T00:00&End=2026-07-06T23:59",
+    "cbr_event_stage_json": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=1&dur_code=E&Start=2026-06-07T00:00&End=2026-07-06T23:59"
+  },
+  "status": "cdec_30_day_context_attached_review_required",
+  "window_interpretation": {
+    "days_with_a25_valid_power_generation_discharge": 20,
+    "days_with_peak_flow_ge_low_runnable_900_cfs": 25,
+    "days_with_peak_flow_ge_median_runnable_1600_cfs": 9,
+    "observed_a25_unlisted_flags": [
+      "X"
+    ],
+    "preview_flow_band_comparison": [
+      {
+        "flow_band": "low_runnable",
+        "preset_cfs": 900.0,
+        "window_status": "25 local days reached or exceeded this threshold at peak CBR event flow"
+      },
+      {
+        "flow_band": "median_runnable",
+        "preset_cfs": 1600.0,
+        "window_status": "9 local days reached or exceeded this threshold at peak CBR event flow"
+      },
+      {
+        "flow_band": "high_runnable",
+        "preset_cfs": 3000.0,
+        "window_status": "not observed in this CBR context window"
+      }
+    ]
+  }
+}
