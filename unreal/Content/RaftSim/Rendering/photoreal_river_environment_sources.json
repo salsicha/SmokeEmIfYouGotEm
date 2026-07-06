@@ -162,7 +162,7 @@
         {"source_id": "wikimedia_or_flickr_cc_review", "rights_status": "per_item_license_review_required", "status": "link_seed_manifest_recorded"},
         {"source_id": "public_social_links", "rights_status": "reference_only_no_download_no_scraping", "status": "link_seed_manifest_recorded"}
       ],
-      "capture_targets": ["guide_seat_downstream_low", "guide_seat_downstream_median", "guide_seat_downstream_high", "rapid_entry_tongue", "swimmer_rescue_visibility"]
+      "capture_targets": ["guide_seat_downstream_low", "guide_seat_downstream_median", "guide_seat_downstream_high", "river_eye_downstream_environment_review", "rapid_entry_tongue", "swimmer_rescue_visibility"]
     },
     {
       "river_id": "colorado_river",
@@ -224,7 +224,7 @@
         {"source_id": "oarsman_or_guide_permission", "rights_status": "explicit_permission_required", "status": "planned"},
         {"source_id": "public_social_links", "rights_status": "reference_only_no_download_no_scraping", "status": "link_seed_manifest_recorded"}
       ],
-      "capture_targets": ["guide_seat_downstream_low_release", "guide_seat_downstream_moderate_release", "guide_seat_downstream_high_release", "big_water_lateral", "long_swimmer_rescue_visibility"]
+      "capture_targets": ["guide_seat_downstream_low_release", "guide_seat_downstream_moderate_release", "guide_seat_downstream_high_release", "river_eye_downstream_environment_review", "big_water_lateral", "long_swimmer_rescue_visibility"]
     },
     {
       "river_id": "pacuare",
@@ -292,7 +292,7 @@
         {"source_id": "outfitter_or_guide_permission", "rights_status": "explicit_permission_required", "status": "planned"},
         {"source_id": "public_social_links", "rights_status": "reference_only_no_download_no_scraping", "status": "link_seed_manifest_recorded"}
       ],
-      "capture_targets": ["guide_seat_downstream_clear_season", "guide_seat_downstream_rainfed", "guide_seat_downstream_high_rain", "rainforest_gorge_entry", "swimmer_rescue_visibility_in_dense_foliage"]
+      "capture_targets": ["guide_seat_downstream_clear_season", "guide_seat_downstream_rainfed", "guide_seat_downstream_high_rain", "river_eye_downstream_environment_review", "rainforest_gorge_entry", "swimmer_rescue_visibility_in_dense_foliage"]
     }
   ],
   "unreal_generation": {
@@ -302,10 +302,10 @@
       "RaftSim.CreatePhotorealEnvironmentPreviewMaps",
       "RaftSim.CapturePhotorealEnvironmentPreviews"
     ],
-    "visual_target": "lifelike_downstream_guide_seat_screenshots_before_playable_promotion",
+    "visual_target": "lifelike_downstream_guide_seat_and_river_eye_screenshots_before_playable_promotion",
     "first_pass_acceptance": [
       "one_generated_unreal_preview_map_per_river",
-      "one_downstream_guide_seat_screenshot_per_river",
+      "one_downstream_guide_seat_and_one_raft_hidden_river_eye_screenshot_per_river",
       "source_manifest_and_rights_status_visible_in_capture_manifest",
       "known_nonphotoreal_proxy_layers_explicitly_recorded"
     ],
