@@ -83,6 +83,48 @@ def _normalized_relief(dem: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return height, relief
 
 
+def _manifest_path(path: Path, repo_root: Path | None) -> str:
+    if repo_root is None:
+        return str(path)
+    return str(path.resolve().relative_to(repo_root.resolve()))
+
+
+def build_dem_relief_preview(
+    dem_path: Path,
+    output_relief_png_path: Path,
+    output_manifest_path: Path,
+    source_id: str,
+    provider: str,
+    repo_root: Path | None = None,
+) -> None:
+    dem = _load_float_tiff(dem_path)
+    _, relief = _normalized_relief(dem)
+    relief_image = Image.fromarray(np.clip(relief * 255.0, 0, 255).astype(np.uint8), mode="L")
+    relief_image = relief_image.resize((512, 512), Image.Resampling.BILINEAR)
+
+    output_relief_png_path.parent.mkdir(parents=True, exist_ok=True)
+    relief_image.save(output_relief_png_path)
+
+    manifest = {
+        "schema": "raftsim.dem_relief_preview.v1",
+        "status": "generated_preview_only_not_production_heightfield",
+        "source_id": source_id,
+        "provider": provider,
+        "input_dem": _manifest_path(dem_path, repo_root),
+        "output_relief": _manifest_path(output_relief_png_path, repo_root),
+        "processing": {
+            "output_size_px": 512,
+            "height_percentiles": "2_to_98",
+            "relief": "slope_aware_normalized_grayscale_preview",
+        },
+        "caveats": [
+            "Preview relief is sampled into procedural geometry only.",
+            "Full terrain import still requires clipping, reprojection, conditioning, and Unreal heightfield or landscape import.",
+        ],
+    }
+    output_manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
 def build_pacuare_demshade_drape(
     nasa_truecolor_path: Path,
     southern_dem_path: Path,
@@ -128,11 +170,6 @@ def build_pacuare_demshade_drape(
     output_relief_png_path.parent.mkdir(parents=True, exist_ok=True)
     Image.fromarray(np.clip(relief * 255.0, 0, 255).astype(np.uint8), mode="L").save(output_relief_png_path)
 
-    def manifest_path(path: Path) -> str:
-        if repo_root is None:
-            return str(path)
-        return str(path.resolve().relative_to(repo_root.resolve()))
-
     manifest = {
         "schema": "raftsim.pacuare_source_drape_composite.v1",
         "status": "generated_preview_only_not_production_photoreal",
@@ -143,13 +180,13 @@ def build_pacuare_demshade_drape(
             "max_lat": bounds.max_lat,
         },
         "inputs": {
-            "nasa_gibs_truecolor": manifest_path(nasa_truecolor_path),
+            "nasa_gibs_truecolor": _manifest_path(nasa_truecolor_path, repo_root),
             "nasa_gibs_selected_date": selected_date,
-            "copernicus_dem_glo30_southern_tile": manifest_path(southern_dem_path),
-            "copernicus_dem_glo30_northern_tile": manifest_path(northern_dem_path),
+            "copernicus_dem_glo30_southern_tile": _manifest_path(southern_dem_path, repo_root),
+            "copernicus_dem_glo30_northern_tile": _manifest_path(northern_dem_path, repo_root),
         },
-        "output": manifest_path(output_png_path),
-        "terrain_relief_output": manifest_path(output_relief_png_path),
+        "output": _manifest_path(output_png_path, repo_root),
+        "terrain_relief_output": _manifest_path(output_relief_png_path, repo_root),
         "processing": {
             "size_px": 512,
             "dem_sampling": "nearest_neighbor_from_copernicus_glo30_tiles",
@@ -166,12 +203,30 @@ def build_pacuare_demshade_drape(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build Pacuare source-derived DEM-shaded preview drape.")
+    parser = argparse.ArgumentParser(description="Build source-derived DEM relief and preview drapes for river environments.")
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     args = parser.parse_args()
 
     repo_root = args.repo_root.resolve()
+    south_fork_root = repo_root / "physics/data/real_world/south_fork_american_chili_bar"
+    colorado_root = repo_root / "physics/data/real_world/colorado_river_grand_canyon_rowing"
     pacuare_root = repo_root / "physics/data/real_world/pacuare_river_costa_rica"
+    build_dem_relief_preview(
+        dem_path=south_fork_root / "terrain/usgs_3dep_chili_bar_sample_256.tif",
+        output_relief_png_path=south_fork_root / "terrain/usgs_3dep_chili_bar_relief_preview_512.png",
+        output_manifest_path=south_fork_root / "terrain/usgs_3dep_chili_bar_relief_preview_manifest.json",
+        source_id="usgs_3dep_chili_bar_sample_256",
+        provider="USGS 3D Elevation Program ImageServer",
+        repo_root=repo_root,
+    )
+    build_dem_relief_preview(
+        dem_path=colorado_root / "terrain/usgs_3dep_lees_ferry_sample_256.tif",
+        output_relief_png_path=colorado_root / "terrain/usgs_3dep_lees_ferry_relief_preview_512.png",
+        output_manifest_path=colorado_root / "terrain/usgs_3dep_lees_ferry_relief_preview_manifest.json",
+        source_id="usgs_3dep_lees_ferry_sample_256",
+        provider="USGS 3D Elevation Program ImageServer",
+        repo_root=repo_root,
+    )
     build_pacuare_demshade_drape(
         nasa_truecolor_path=pacuare_root / "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
         southern_dem_path=pacuare_root / "terrain/copernicus_dem_glo30_N09_W084.tif",

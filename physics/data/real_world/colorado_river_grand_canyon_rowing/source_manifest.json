@@ -3,7 +3,9 @@
     "elevation": [
       "terrain/3dep_dem_tiles",
       "terrain/canyon_corridor_dem.tif",
-      "terrain/usgs_3dep_lees_ferry_sample_256.tif"
+      "terrain/usgs_3dep_lees_ferry_sample_256.tif",
+      "terrain/usgs_3dep_lees_ferry_relief_preview_512.png",
+      "terrain/usgs_3dep_lees_ferry_relief_preview_manifest.json"
     ],
     "flow_presets": [
       "flow_presets.json"

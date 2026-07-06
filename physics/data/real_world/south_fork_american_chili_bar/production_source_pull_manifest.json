@@ -90,6 +90,31 @@
       ]
     },
     {
+      "artifact_id": "usgs_3dep_chili_bar_relief_preview_512",
+      "category": "derived_terrain_relief_preview",
+      "path": "terrain/usgs_3dep_chili_bar_relief_preview_512.png",
+      "provider": "RaftSim geospatial preview utility from USGS 3DEP ImageServer sample",
+      "source_artifacts": [
+        "terrain/usgs_3dep_chili_bar_sample_256.tif"
+      ],
+      "status": "derived_preview_generated",
+      "summary": {
+        "width": 512,
+        "height": 512,
+        "format": "PNG_L",
+        "processing_manifest": "terrain/usgs_3dep_chili_bar_relief_preview_manifest.json"
+      },
+      "use": [
+        "preview-only Unreal bank and valley height perturbation",
+        "source-provenance plumbing",
+        "terrain import path smoke test"
+      ],
+      "caveats": [
+        "This is normalized relief from a small sample, not a production heightfield.",
+        "Full corridor terrain still needs reviewed raster tiling, reprojection, hydrologic conditioning, and Unreal landscape import."
+      ]
+    },
+    {
       "artifact_id": "usda_naip_chili_bar_sample_512",
       "category": "aerial_imagery_sample",
       "path": "imagery/usda_naip_chili_bar_sample_512.png",
