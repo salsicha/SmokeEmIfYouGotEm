@@ -29,7 +29,10 @@
     "hydrography": [
       "hydrography/centerline.geojson",
       "hydrography/banks.geojson",
-      "hydrography/tributary_context.geojson"
+      "hydrography/tributary_context.geojson",
+      "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
+      "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
+      "hydrography/production_import_pilot/preview_stationing_scaffold.json"
     ],
     "imagery": [
       "imagery/aerial_source_research.json",
@@ -96,7 +99,7 @@
   "manifest_id": "pacuare.lower_pacuare_planning_corridor.source_manifest.v0",
   "provenance": {
     "generated_by": "raftsim.milestone24.draft_pacuare_third_target",
-    "processing_version": "milestone24_pacuare_planning_draft.v0+milestone26_source_slice.v2",
+    "processing_version": "milestone24_pacuare_planning_draft.v0+milestone26_source_slice.v3",
     "redistribution_notes": "Do not vendor third-party guidebook text, aerial imagery, protected-area content, or field media without explicit rights and attribution records.",
     "review_status": "partial_public_global_terrain_and_nasa_imagery_slice_attached_with_official_source_leads; needs_costa_rica_hydrology_hydrography_protected_area_and_guide_review"
   },
@@ -208,6 +211,15 @@
       "status": "rights_review_required",
       "target_artifact": "field_media/rights_cleared_reference_index.json",
       "url": "manifest_only_until_rights_clear"
+    },
+    {
+      "category": "hydrography",
+      "fetch_id": "pacuare_preview_centerline_scaffold",
+      "notes": "Generated from the deterministic Unreal Pacuare preview curve and draft WGS84 bounds for editor annotation and procedural dressing only; not official hydrography, banks, wetted width, or solver geometry.",
+      "source_id": "pacuare_unreal_preview_centerline_scaffold",
+      "status": "generated_review_gated_preview_scaffold",
+      "target_artifact": "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json; hydrography/production_import_pilot/preview_centerline_scaffold.geojson; hydrography/production_import_pilot/preview_stationing_scaffold.json",
+      "url": "physics/src/raftsim/geospatial_preview.py"
     }
   ],
   "river_id": "pacuare",
@@ -356,6 +368,20 @@
         "rain_fed_behavior_review",
         "rescue_context",
         "rainforest_gorge_fidelity"
+      ]
+    },
+    {
+      "category": "hydrography",
+      "license_or_terms": "Generated first-party RaftSim preview scaffold; no external hydrography rights implied. Replace or validate with official Costa Rica hydrography before production use.",
+      "provider": "RaftSim Unreal preview generator",
+      "source_id": "pacuare_unreal_preview_centerline_scaffold",
+      "status": "generated_review_gated_preview_route_not_official_hydrography",
+      "title": "Pacuare Unreal preview centerline and stationing scaffold",
+      "url": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
+      "use_in_pipeline": [
+        "annotation_scaffold",
+        "procedural_dressing_seed",
+        "preview_capture_framing"
       ]
     }
   ]

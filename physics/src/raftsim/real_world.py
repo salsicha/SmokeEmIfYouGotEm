@@ -95,6 +95,11 @@ COLORADO_NHD_WATER_PRIOR_FILE = "imagery/production_import_pilot/nhd_mainstem_wa
 COLORADO_USBR_TOTAL_RELEASE_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json"
 COLORADO_USBR_RELEASE_CONTEXT_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json"
 PACUARE_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
+PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE = (
+    "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json"
+)
+PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE = "hydrography/production_import_pilot/preview_centerline_scaffold.geojson"
+PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE = "hydrography/production_import_pilot/preview_stationing_scaffold.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE = "production_import_pilot_derivatives_manifest.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
@@ -1543,6 +1548,21 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                 ],
                 "limits": "MODIS/GIBS is coarse and partly cloudy; it is only a source-aware preview seed until higher-resolution cloud-screened imagery or first-party/permissioned aerial reference is approved.",
             },
+            {
+                "product_id": "pacuare_unreal_preview_centerline_scaffold",
+                "status": "generated_review_gated_preview_route_not_official_hydrography",
+                "source_ids": ["unreal_preview_curve", "pacuare_production_import_pilot_masks"],
+                "artifacts": [
+                    PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
+                    PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
+                    PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
+                ],
+                "limits": (
+                    "Deterministic scaffold from the current Unreal Pacuare preview curve and draft WGS84 bounds; "
+                    "use for annotation placement and procedural dressing only until official hydrography, CRS, "
+                    "banks, rapid/access stationing, and guide/outfitter review replace or validate it."
+                ),
+            },
         ],
         "required_source_classes": [
             {
@@ -1563,9 +1583,12 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
             },
             {
                 "class_id": "hydrography_and_centerline",
-                "status": "official_source_leads_attached_not_imported",
+                "status": "preview_centerline_scaffold_attached_official_hydrography_pending",
                 "source_ids": ["snit_cr_idecori", "minae_direccion_agua", "hydrosheds", "osm"],
                 "target_outputs": [
+                    PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
+                    PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
+                    PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
                     "hydrography/production_import_pilot/centerline.geojson",
                     "hydrography/production_import_pilot/banks.geojson",
                     "hydrography/production_import_pilot/tributaries.geojson",
@@ -2022,7 +2045,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                 "display_name": "Pacuare River, Costa Rica lower planning corridor",
                 "readiness": "preview_only_not_lifelike",
                 "active_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview",
-                "current_strength": "Copernicus DEM and NASA GIBS/Copernicus preview derivatives are normalized into the production folder shape, but the imagery is coarse/cloudy and local hydrology is not authoritative.",
+                "current_strength": "Copernicus DEM and NASA GIBS/Copernicus preview derivatives are normalized into the production folder shape, and a deterministic Unreal-curve centerline/stationing scaffold exists for annotation placement; imagery is still coarse/cloudy and local hydrology/hydrography are not authoritative.",
                 "attached_preview_inputs": [
                     "terrain/copernicus_dem_glo30_N09_W084.tif",
                     "terrain/copernicus_dem_glo30_N10_W084.tif",
@@ -2031,6 +2054,9 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "production_import_pilot/heightfield_candidate_2017.png",
                     "production_import_pilot/water_mask_2048.png",
                     "production_import_pilot/vegetation_mask_2048.png",
+                    PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
+                    PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
+                    PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
                     "hydrology/costa_rica_gauge_search.json",
                     "hydrology/rainfall_context.json",
                     "review/sinac_protected_area_source_rights.json",
@@ -2040,12 +2066,15 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     {
                         "source_class": "hydrography_and_centerline",
                         "required_artifacts": [
+                            PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
+                            PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
+                            PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
                             "hydrography/production_import_pilot/centerline.geojson",
                             "hydrography/production_import_pilot/banks.geojson",
                             "hydrography/production_import_pilot/rapid_and_access_stationing.geojson",
                         ],
                         "source_leads": ["snit_cr_idecori", "hydrosheds", "guide_review"],
-                        "promotion_gate": "Confirm exact official Costa Rica layers and use HydroSHEDS/OSM only as fallback seeds until guide/outfitter stationing approves the route.",
+                        "promotion_gate": "Use the attached Unreal-curve scaffold only for review overlays/procedural dressing; confirm exact official Costa Rica layers and use HydroSHEDS/OSM only as fallback seeds until guide/outfitter stationing approves the route.",
                     },
                     {
                         "source_class": "aerial_or_satellite_imagery",

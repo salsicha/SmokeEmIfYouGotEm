@@ -1,30 +1,206 @@
 {
-  "acceptance_gate": [
-    "All production source products have source metadata, checksums, CRS, acquisition dates, terms, and attribution.",
-    "Conditioned heightfield and masks are generated from reviewed terrain, imagery, hydrography, and rain/flow context.",
-    "Procedural rainforest, waterfall, mist, wet-rock, and canopy layers record source inputs and remain review-gated.",
-    "Unreal preview map can be regenerated from pilot artifacts with water readability, rescue targets, and protected-area constraints preserved.",
-    "Screenshots look materially closer to the real Pacuare corridor without claiming final photoreal approval."
-  ],
+  "schema": "raftsim.production_import_pilot.v0",
+  "pilot_id": "pacuare_lower_pacuare_public_global_source_pilot",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "route_style": "guided_paddle_raft",
+  "status": "planned_review_gated_source_selection_pending",
+  "source_manifest": "source_manifest.json",
+  "readiness_manifest": "../production_geospatial_source_readiness.json",
   "bounds_wgs84": {
-    "max_lat": 10.12,
-    "max_lon": -83.42,
+    "min_lon": -83.75,
     "min_lat": 9.72,
-    "min_lon": -83.75
+    "max_lon": -83.42,
+    "max_lat": 10.12
   },
   "corridor_scope": {
+    "status": "draft_lower_pacuare_planning_bounds_not_surveyed_route",
+    "reason": "The pilot starts from attached public/global DEM and cloud-screened preview imagery while authoritative Costa Rica hydrography, rainfall/flow, access, protected-area, and guide/outfitter review are secured.",
     "full_route_requires": [
       "Costa Rica working CRS selection",
       "official hydrography and access layer review",
       "rainfall/flow station authority review",
       "protected-area and publication sensitivity review",
       "first-party or permissioned field-media validation"
-    ],
-    "reason": "The pilot starts from attached public/global DEM and cloud-screened preview imagery while authoritative Costa Rica hydrography, rainfall/flow, access, protected-area, and guide/outfitter review are secured.",
-    "status": "draft_lower_pacuare_planning_bounds_not_surveyed_route"
+    ]
   },
-  "pilot_id": "pacuare_lower_pacuare_public_global_source_pilot",
+  "working_crs_decision": {
+    "status": "required_before_unreal_promotion",
+    "candidate": "costa_rica_projected_corridor_crs_derived_from_reviewed_epsg4326_bounds",
+    "required_review": [
+      "horizontal CRS and units",
+      "vertical datum handling for DEM elevations",
+      "Unreal origin and scale transform",
+      "round-trip error budget against source coordinates",
+      "protected-area/access publication constraints"
+    ]
+  },
+  "seed_products": [
+    {
+      "product_id": "copernicus_dem_glo30_public_tiles",
+      "status": "downloaded_review_gated_seed",
+      "source_ids": [
+        "copernicus_dem"
+      ],
+      "artifacts": [
+        "terrain/copernicus_dem_glo30_N09_W084.tif",
+        "terrain/copernicus_dem_glo30_N10_W084.tif",
+        "terrain/pacuare_dem_relief_preview_1024.png",
+        "terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png"
+      ],
+      "limits": "Global DEM tiles are useful for gorge-scale preview relief but are not clipped, void-reviewed, hydrologically conditioned, channel-burned, or locally datum-reviewed."
+    },
+    {
+      "product_id": "nasa_gibs_modis_demshade_preview_drape",
+      "status": "downloaded_cloud_screened_preview_seed",
+      "source_ids": [
+        "nasa_gibs",
+        "copernicus_dem"
+      ],
+      "artifacts": [
+        "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
+        "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png",
+        "imagery/pacuare_nasa_gibs_2025-04-02_water_mask_1024.png",
+        "imagery/pacuare_nasa_gibs_2025-04-02_vegetation_mask_1024.png"
+      ],
+      "limits": "MODIS/GIBS is coarse and partly cloudy; it is only a source-aware preview seed until higher-resolution cloud-screened imagery or first-party/permissioned aerial reference is approved."
+    },
+    {
+      "product_id": "pacuare_unreal_preview_centerline_scaffold",
+      "status": "generated_review_gated_preview_route_not_official_hydrography",
+      "source_ids": [
+        "unreal_preview_curve",
+        "pacuare_production_import_pilot_masks"
+      ],
+      "artifacts": [
+        "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
+        "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
+        "hydrography/production_import_pilot/preview_stationing_scaffold.json"
+      ],
+      "limits": "Deterministic scaffold from the current Unreal Pacuare preview curve and draft WGS84 bounds; use for annotation placement and procedural dressing only until official hydrography, CRS, banks, rapid/access stationing, and guide/outfitter review replace or validate it."
+    }
+  ],
+  "required_source_classes": [
+    {
+      "class_id": "terrain_dem_or_lidar",
+      "status": "global_dem_seed_attached_local_source_review_pending",
+      "source_ids": [
+        "copernicus_dem",
+        "snit_cr_idecori",
+        "opentopography"
+      ],
+      "target_outputs": [
+        "terrain/production_import_pilot/reviewed_dem_tiles",
+        "terrain/production_import_pilot/dem_relief_2048.png",
+        "terrain/production_import_pilot/heightfield_candidate_2017.png",
+        "production_import_pilot_derivatives_manifest.json"
+      ],
+      "promotion_gate": "Select local or best-available terrain source, record product ids/terms/CRS/vertical datum, clip to corridor, void-review, hydrologically condition, burn the river channel, and compare gorge form to guide-reviewed field references."
+    },
+    {
+      "class_id": "hydrography_and_centerline",
+      "status": "preview_centerline_scaffold_attached_official_hydrography_pending",
+      "source_ids": [
+        "snit_cr_idecori",
+        "minae_direccion_agua",
+        "hydrosheds",
+        "osm"
+      ],
+      "target_outputs": [
+        "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
+        "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
+        "hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "hydrography/production_import_pilot/centerline.geojson",
+        "hydrography/production_import_pilot/banks.geojson",
+        "hydrography/production_import_pilot/tributaries.geojson",
+        "hydrography/production_import_pilot/rapid_and_access_stationing.geojson"
+      ],
+      "promotion_gate": "Confirm exact official Costa Rica layers, terms, CRS, and attribution; use HydroSHEDS/OSM only as review seeds until aligned to visible imagery and guide-reviewed rapid/access annotations."
+    },
+    {
+      "class_id": "aerial_or_satellite_imagery",
+      "status": "coarse_preview_seed_attached_high_resolution_cloud_screening_pending",
+      "source_ids": [
+        "copernicus_sentinel",
+        "landsat",
+        "nasa_gibs",
+        "snit_cr_idecori",
+        "first_party_aerial"
+      ],
+      "target_outputs": [
+        "imagery/production_import_pilot/cloud_screened_scene_index.json",
+        "imagery/production_import_pilot/source_drape_4096.png",
+        "imagery/production_import_pilot/cloud_shadow_review.json",
+        "production_import_pilot_derivatives_manifest.json"
+      ],
+      "promotion_gate": "Attach scene ids, acquisition dates, cloud score, CRS, resolution, terms, and attribution; prefer cloud-free Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference before using imagery for production masks or photoreal materials."
+    },
+    {
+      "class_id": "water_and_vegetation_masks",
+      "status": "coarse_preview_masks_attached_production_segmentation_pending",
+      "source_ids": [
+        "copernicus_sentinel",
+        "landsat",
+        "hydrography_review",
+        "guide_review"
+      ],
+      "target_outputs": [
+        "imagery/production_import_pilot/water_mask_2048.png",
+        "imagery/production_import_pilot/vegetation_mask_2048.png",
+        "imagery/production_import_pilot/canopy_shadow_mask_2048.png",
+        "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_2048.png",
+        "imagery/production_import_pilot/source_masks_manifest.json"
+      ],
+      "promotion_gate": "Derive masks only after higher-resolution imagery and hydrography are reviewed; manually check river edge, wet rock, waterfalls, mist, canopy shadow, exposed shelves, and rain/flow variants."
+    },
+    {
+      "class_id": "seasonal_flow_or_release_history",
+      "status": "relative_flow_bands_attached_numeric_authority_pending",
+      "source_ids": [
+        "imn_costa_rica",
+        "ice_hydromet",
+        "minae_direccion_agua",
+        "guide_review"
+      ],
+      "target_outputs": [
+        "hydrology/production_import_pilot/rainfall_station_review.json",
+        "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
+        "hydrology/production_import_pilot/flash_response_review.json",
+        "hydrology/production_import_pilot/flow_band_review.json"
+      ],
+      "promotion_gate": "Attach station ids, variables, units, time zone, access terms, rainfall/flow coverage, and guide review before converting relative clear-season/rainfed/rainy-season/flash-response bands into numeric gameplay and visual presets."
+    },
+    {
+      "class_id": "protected_area_and_access_context",
+      "status": "review_manifests_attached_publication_not_cleared",
+      "source_ids": [
+        "sinac_minae",
+        "snit_cr_idecori",
+        "guide_review"
+      ],
+      "target_outputs": [
+        "review/production_import_pilot/protected_area_publication_sensitivity.json",
+        "review/production_import_pilot/access_and_conservation_policy.json"
+      ],
+      "promotion_gate": "Record exact layers, terms, sensitive-location policy, access constraints, and screenshot/publication limits before committing detailed route packages or public-facing captures."
+    },
+    {
+      "class_id": "guide_and_reference_media_annotations",
+      "status": "link_seeds_attached_no_media_rights",
+      "source_ids": [
+        "reference_media_link_manifest",
+        "first_party_field_capture",
+        "explicit_outfitter_or_guide_permission"
+      ],
+      "target_outputs": [
+        "review/production_import_pilot/reference_annotations.geojson",
+        "field_media/production_import_pilot/rights_manifest.json"
+      ],
+      "promotion_gate": "Attach creator, date, reach, rain/flow context, permission, attribution, and allowed asset uses before photos or footage drive rainforest materials, water color, waterfalls, mist, or rapid behavior."
+    }
+  ],
   "procedural_generation_plan": {
+    "status": "allowed_only_as_manifest_recorded_review_gated_fill",
     "allowed_layers": [
       "rainforest canopy density",
       "leaf litter",
@@ -39,186 +215,27 @@
       "must not hide missing hydrography, flow, or conservation failures",
       "must remain separable from reviewed geospatial products",
       "must be replaceable by first-party or rights-cleared field references"
-    ],
-    "status": "allowed_only_as_manifest_recorded_review_gated_fill"
+    ]
   },
-  "provenance": {
-    "generated_by": "raftsim.real_world.build_pacuare_production_import_pilot",
-    "processing_version": "milestone_26_pacuare_import_pilot.v0",
-    "review_status": "recipe_only_source_selection_and_imports_pending"
-  },
-  "readiness_manifest": "../production_geospatial_source_readiness.json",
-  "required_source_classes": [
-    {
-      "class_id": "terrain_dem_or_lidar",
-      "promotion_gate": "Select local or best-available terrain source, record product ids/terms/CRS/vertical datum, clip to corridor, void-review, hydrologically condition, burn the river channel, and compare gorge form to guide-reviewed field references.",
-      "source_ids": [
-        "copernicus_dem",
-        "snit_cr_idecori",
-        "opentopography"
-      ],
-      "status": "global_dem_seed_attached_local_source_review_pending",
-      "target_outputs": [
-        "terrain/production_import_pilot/reviewed_dem_tiles",
-        "terrain/production_import_pilot/dem_relief_2048.png",
-        "terrain/production_import_pilot/heightfield_candidate_2017.png",
-        "production_import_pilot_derivatives_manifest.json"
-      ]
-    },
-    {
-      "class_id": "hydrography_and_centerline",
-      "promotion_gate": "Confirm exact official Costa Rica layers, terms, CRS, and attribution; use HydroSHEDS/OSM only as review seeds until aligned to visible imagery and guide-reviewed rapid/access annotations.",
-      "source_ids": [
-        "snit_cr_idecori",
-        "minae_direccion_agua",
-        "hydrosheds",
-        "osm"
-      ],
-      "status": "official_source_leads_attached_not_imported",
-      "target_outputs": [
-        "hydrography/production_import_pilot/centerline.geojson",
-        "hydrography/production_import_pilot/banks.geojson",
-        "hydrography/production_import_pilot/tributaries.geojson",
-        "hydrography/production_import_pilot/rapid_and_access_stationing.geojson"
-      ]
-    },
-    {
-      "class_id": "aerial_or_satellite_imagery",
-      "promotion_gate": "Attach scene ids, acquisition dates, cloud score, CRS, resolution, terms, and attribution; prefer cloud-free Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference before using imagery for production masks or photoreal materials.",
-      "source_ids": [
-        "copernicus_sentinel",
-        "landsat",
-        "nasa_gibs",
-        "snit_cr_idecori",
-        "first_party_aerial"
-      ],
-      "status": "coarse_preview_seed_attached_high_resolution_cloud_screening_pending",
-      "target_outputs": [
-        "imagery/production_import_pilot/cloud_screened_scene_index.json",
-        "imagery/production_import_pilot/source_drape_4096.png",
-        "imagery/production_import_pilot/cloud_shadow_review.json",
-        "production_import_pilot_derivatives_manifest.json"
-      ]
-    },
-    {
-      "class_id": "water_and_vegetation_masks",
-      "promotion_gate": "Derive masks only after higher-resolution imagery and hydrography are reviewed; manually check river edge, wet rock, waterfalls, mist, canopy shadow, exposed shelves, and rain/flow variants.",
-      "source_ids": [
-        "copernicus_sentinel",
-        "landsat",
-        "hydrography_review",
-        "guide_review"
-      ],
-      "status": "coarse_preview_masks_attached_production_segmentation_pending",
-      "target_outputs": [
-        "imagery/production_import_pilot/water_mask_2048.png",
-        "imagery/production_import_pilot/vegetation_mask_2048.png",
-        "imagery/production_import_pilot/canopy_shadow_mask_2048.png",
-        "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_2048.png",
-        "imagery/production_import_pilot/source_masks_manifest.json"
-      ]
-    },
-    {
-      "class_id": "seasonal_flow_or_release_history",
-      "promotion_gate": "Attach station ids, variables, units, time zone, access terms, rainfall/flow coverage, and guide review before converting relative clear-season/rainfed/rainy-season/flash-response bands into numeric gameplay and visual presets.",
-      "source_ids": [
-        "imn_costa_rica",
-        "ice_hydromet",
-        "minae_direccion_agua",
-        "guide_review"
-      ],
-      "status": "relative_flow_bands_attached_numeric_authority_pending",
-      "target_outputs": [
-        "hydrology/production_import_pilot/rainfall_station_review.json",
-        "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
-        "hydrology/production_import_pilot/flash_response_review.json",
-        "hydrology/production_import_pilot/flow_band_review.json"
-      ]
-    },
-    {
-      "class_id": "protected_area_and_access_context",
-      "promotion_gate": "Record exact layers, terms, sensitive-location policy, access constraints, and screenshot/publication limits before committing detailed route packages or public-facing captures.",
-      "source_ids": [
-        "sinac_minae",
-        "snit_cr_idecori",
-        "guide_review"
-      ],
-      "status": "review_manifests_attached_publication_not_cleared",
-      "target_outputs": [
-        "review/production_import_pilot/protected_area_publication_sensitivity.json",
-        "review/production_import_pilot/access_and_conservation_policy.json"
-      ]
-    },
-    {
-      "class_id": "guide_and_reference_media_annotations",
-      "promotion_gate": "Attach creator, date, reach, rain/flow context, permission, attribution, and allowed asset uses before photos or footage drive rainforest materials, water color, waterfalls, mist, or rapid behavior.",
-      "source_ids": [
-        "reference_media_link_manifest",
-        "first_party_field_capture",
-        "explicit_outfitter_or_guide_permission"
-      ],
-      "status": "link_seeds_attached_no_media_rights",
-      "target_outputs": [
-        "review/production_import_pilot/reference_annotations.geojson",
-        "field_media/production_import_pilot/rights_manifest.json"
-      ]
-    }
-  ],
-  "river_id": "pacuare",
-  "route_style": "guided_paddle_raft",
-  "schema": "raftsim.production_import_pilot.v0",
-  "section_id": "lower_pacuare_planning_corridor",
-  "seed_products": [
-    {
-      "artifacts": [
-        "terrain/copernicus_dem_glo30_N09_W084.tif",
-        "terrain/copernicus_dem_glo30_N10_W084.tif",
-        "terrain/pacuare_dem_relief_preview_1024.png",
-        "terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png"
-      ],
-      "limits": "Global DEM tiles are useful for gorge-scale preview relief but are not clipped, void-reviewed, hydrologically conditioned, channel-burned, or locally datum-reviewed.",
-      "product_id": "copernicus_dem_glo30_public_tiles",
-      "source_ids": [
-        "copernicus_dem"
-      ],
-      "status": "downloaded_review_gated_seed"
-    },
-    {
-      "artifacts": [
-        "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
-        "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png",
-        "imagery/pacuare_nasa_gibs_2025-04-02_water_mask_1024.png",
-        "imagery/pacuare_nasa_gibs_2025-04-02_vegetation_mask_1024.png"
-      ],
-      "limits": "MODIS/GIBS is coarse and partly cloudy; it is only a source-aware preview seed until higher-resolution cloud-screened imagery or first-party/permissioned aerial reference is approved.",
-      "product_id": "nasa_gibs_modis_demshade_preview_drape",
-      "source_ids": [
-        "nasa_gibs",
-        "copernicus_dem"
-      ],
-      "status": "downloaded_cloud_screened_preview_seed"
-    }
-  ],
-  "source_manifest": "source_manifest.json",
-  "status": "planned_review_gated_source_selection_pending",
   "unreal_import_targets": {
-    "future_production_map": "/Game/RaftSim/Maps/Production/L_PacuareRainforest_LowerPacuare",
     "heightfield_import_contract": "unreal/Content/RaftSim/River/pacuare_heightfield_import_test.json",
     "preview_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview",
+    "future_production_map": "/Game/RaftSim/Maps/Production/L_PacuareRainforest_LowerPacuare",
     "review_captures": [
       "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png"
     ]
   },
-  "working_crs_decision": {
-    "candidate": "costa_rica_projected_corridor_crs_derived_from_reviewed_epsg4326_bounds",
-    "required_review": [
-      "horizontal CRS and units",
-      "vertical datum handling for DEM elevations",
-      "Unreal origin and scale transform",
-      "round-trip error budget against source coordinates",
-      "protected-area/access publication constraints"
-    ],
-    "status": "required_before_unreal_promotion"
+  "acceptance_gate": [
+    "All production source products have source metadata, checksums, CRS, acquisition dates, terms, and attribution.",
+    "Conditioned heightfield and masks are generated from reviewed terrain, imagery, hydrography, and rain/flow context.",
+    "Procedural rainforest, waterfall, mist, wet-rock, and canopy layers record source inputs and remain review-gated.",
+    "Unreal preview map can be regenerated from pilot artifacts with water readability, rescue targets, and protected-area constraints preserved.",
+    "Screenshots look materially closer to the real Pacuare corridor without claiming final photoreal approval."
+  ],
+  "provenance": {
+    "generated_by": "raftsim.real_world.build_pacuare_production_import_pilot",
+    "processing_version": "milestone_26_pacuare_import_pilot.v0",
+    "review_status": "recipe_only_source_selection_and_imports_pending"
   }
 }

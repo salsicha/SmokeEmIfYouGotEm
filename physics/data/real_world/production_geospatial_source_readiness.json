@@ -392,10 +392,13 @@
         "hydrography_and_centerline": {
           "artifacts": [
             "physics/data/real_world/pacuare_river_costa_rica/terrain/dem_source_research.json",
-            "physics/data/real_world/pacuare_river_costa_rica/hydrology/costa_rica_gauge_search.json"
+            "physics/data/real_world/pacuare_river_costa_rica/hydrology/costa_rica_gauge_search.json",
+            "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
+            "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
+            "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json"
           ],
-          "promotion_blocker": "Need exact SNIT/IDECORI/MINAE layer ids or HydroSHEDS fallback review before centerline and tributaries become authoritative.",
-          "status": "official_source_leads_attached_not_imported"
+          "promotion_blocker": "A deterministic Unreal-curve centerline/stationing scaffold is attached for annotation placement and procedural dressing, but exact SNIT/IDECORI/MINAE layer ids or HydroSHEDS fallback review, official route alignment, banks, tributaries, and guide/outfitter stationing are still required before centerline authority.",
+          "status": "preview_centerline_scaffold_attached_official_hydrography_pending"
         },
         "protected_area_and_access_context": {
           "artifacts": [

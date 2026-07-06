@@ -1,145 +1,155 @@
 {
-  "blocking_rule": "No river can be marked production-playable or lifelike until every P0 source-data, visual-replacement, rights-review, guide-review, capture, and performance gate for that river is closed.",
-  "canonical_inputs": {
-    "art_asset_source_research": "unreal/Content/RaftSim/Rendering/art_asset_source_research.json",
-    "capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
-    "geospatial_readiness": "physics/data/real_world/production_geospatial_source_readiness.json",
-    "photoreal_environment_sources": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
-    "reference_media_links": "physics/data/real_world/reference_media_link_manifest.json"
-  },
+  "schema": "raftsim.production_environment_gap_register.v0",
   "generated_on": "2026-07-06",
+  "status": "active_goal_gap_register_all_rivers_preview_only_not_lifelike",
+  "goal": "Drive South Fork American, Colorado River, and Pacuare from source-aware Unreal previews to complete photoreal river environments by tracking maps, seasonal flows, aerial imagery, rights-reviewed reference media, additional source data, procedural substitutes, lifelike captures, and performance evidence.",
+  "blocking_rule": "No river can be marked production-playable or lifelike until every P0 source-data, visual-replacement, rights-review, guide-review, capture, and performance gate for that river is closed.",
+  "policy": {
+    "official_open_sources_first": true,
+    "social_media_reference_only_until_explicit_item_rights_clear": true,
+    "do_not_download_scrape_train_on_or_package_third_party_media_without_rights": true,
+    "procedural_generation_allowed_when_manifest_recorded": true,
+    "procedural_generation_must_not_hide_hazards_rescue_targets_or_physics_failures": true,
+    "lifetime_goal_requires_lifelike_unreal_screenshots": true
+  },
+  "source_classes": [
+    "terrain_dem_or_lidar",
+    "hydrography_and_centerline",
+    "aerial_or_satellite_imagery",
+    "water_and_vegetation_masks",
+    "seasonal_flow_or_release_history",
+    "protected_area_and_access_context",
+    "guide_and_reference_media_annotations",
+    "production_art_assets_or_first_party_procedural_equivalents",
+    "unreal_lifelike_capture_and_performance_evidence"
+  ],
+  "canonical_inputs": {
+    "photoreal_environment_sources": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
+    "geospatial_readiness": "physics/data/real_world/production_geospatial_source_readiness.json",
+    "reference_media_links": "physics/data/real_world/reference_media_link_manifest.json",
+    "art_asset_source_research": "unreal/Content/RaftSim/Rendering/art_asset_source_research.json",
+    "capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json"
+  },
+  "reviewed_source_leads_2026_07_06": [
+    {
+      "source_id": "usgs_3dep",
+      "provider": "USGS 3D Elevation Program",
+      "review_date": "2026-07-06",
+      "url": "https://www.usgs.gov/3d-elevation-program",
+      "why_it_matters": "Primary U.S. DEM/lidar source for South Fork and Colorado terrain, slope, banks, and Unreal Landscape conditioning.",
+      "use_gate": "Record product id, acquisition date, CRS, vertical datum, void review, hydrologic conditioning, channel burning, attribution, and package/LFS policy before production terrain use."
+    },
+    {
+      "source_id": "usgs_3dhp",
+      "provider": "USGS 3D Hydrography Program",
+      "review_date": "2026-07-06",
+      "url": "https://www.usgs.gov/3d-hydrography-program",
+      "why_it_matters": "Primary U.S. hydrography successor path for flowlines, drainage context, tributaries, and river/bank alignment.",
+      "use_gate": "Clip selected products into the river corridor and compare to imagery, DEM-derived channels, and guide-reviewed rapid/eddy annotations before gameplay authority."
+    },
+    {
+      "source_id": "usgs_water_services",
+      "provider": "USGS Water Services",
+      "review_date": "2026-07-06",
+      "url": "https://waterservices.usgs.gov/",
+      "why_it_matters": "Daily and instantaneous discharge/stage source for South Fork and Colorado seasonal or release-band visuals.",
+      "use_gate": "Attach station metadata, variables, units, quality flags, temporal coverage, and guide/release interpretation before final flow bands."
+    },
+    {
+      "source_id": "copernicus_data_space",
+      "provider": "Copernicus Data Space Ecosystem",
+      "review_date": "2026-07-06",
+      "url": "https://dataspace.copernicus.eu/",
+      "why_it_matters": "Primary candidate for Pacuare Sentinel scene discovery, cloud screening, river color, vegetation masks, and wet/rain seasonal review.",
+      "use_gate": "Record scene ids, acquisition dates, cloud score, processing level, CRS, terms, and attribution before derivatives drive production masks or materials."
+    },
+    {
+      "source_id": "snit_cr_idecori",
+      "provider": "Sistema Nacional de Informacion Territorial de Costa Rica / IDECORI",
+      "review_date": "2026-07-06",
+      "url": "https://www.snitcr.go.cr/",
+      "why_it_matters": "Official Costa Rica layer portal for Pacuare hydrography, terrain, protected-area, access, and possible imagery context.",
+      "use_gate": "Record exact service/layer names, CRS, responsible institution, terms, attribution, and publication sensitivity before importing any layer."
+    },
+    {
+      "source_id": "hydrosheds",
+      "provider": "HydroSHEDS",
+      "review_date": "2026-07-06",
+      "url": "https://www.hydrosheds.org/",
+      "why_it_matters": "Global catchment and river-network fallback for Pacuare basin context while official Costa Rica layers are reviewed.",
+      "use_gate": "Use as a review seed only until aligned against official hydrography, visible imagery, and guide/outfitter stationing."
+    },
+    {
+      "source_id": "opentopography",
+      "provider": "OpenTopography",
+      "review_date": "2026-07-06",
+      "url": "https://opentopography.org/",
+      "why_it_matters": "Candidate high-resolution topography and hydrologic-conditioning tool path for U.S. and Pacuare terrain if dataset terms allow.",
+      "use_gate": "Confirm API key, dataset license, citation, redistribution limits, and derivative rights before importing terrain or conditioning outputs."
+    },
+    {
+      "source_id": "nps_grand_canyon_media",
+      "provider": "National Park Service Grand Canyon Photos & Multimedia",
+      "review_date": "2026-07-06",
+      "url": "https://www.nps.gov/grca/learn/photosmultimedia/index.htm",
+      "why_it_matters": "Preferred official-media lead for Colorado canyon wall, river, sandbar, b-roll, and atmosphere reference.",
+      "use_gate": "Record item-level public-domain or Creative Commons status, credit, date, location, and allowed use before any media becomes production reference or asset input."
+    }
+  ],
   "global_visual_replacement_targets": [
     {
+      "target": "terrain_and_banks",
       "required_before_lifelike": [
         "conditioned source heightfields or approved procedural terrain",
         "bank breaklines and channel burning",
         "biome-specific terrain material layering",
         "source-aligned wet/dry and exposed-bar masks"
-      ],
-      "target": "terrain_and_banks"
+      ]
     },
     {
+      "target": "rocks_boulders_and_riverbed",
       "required_before_lifelike": [
         "rights-cleared or first-party rock/boulder assets",
         "wetness and moss/sediment material variants",
         "mask-aware placement that preserves hazard readability",
         "river-specific scale and abrasion review"
-      ],
-      "target": "rocks_boulders_and_riverbed"
+      ]
     },
     {
+      "target": "foliage_and_ecology",
       "required_before_lifelike": [
         "biome-specific trees, seedlings, shrubs, grasses, tropical canopy, and deadfall",
         "density masks from reviewed imagery or first-party procedural rules",
         "seasonal and flow-bank exposure variants",
         "performance-scalable Nanite/PCG or instancing path"
-      ],
-      "target": "foliage_and_ecology"
+      ]
     },
     {
+      "target": "water_foam_spray_mist_and_wetness",
       "required_before_lifelike": [
         "production water shader with reflections, depth color, turbidity, and solver/current cues",
         "foam, boil, wave-train, hole, eddy-line, lateral, spray, and mist layers",
         "flow-band dependency from validated hydrology and gameplay tuning",
         "no visual forcing that hides conservation or physics failures"
-      ],
-      "target": "water_foam_spray_mist_and_wetness"
+      ]
     },
     {
+      "target": "lighting_atmosphere_and_capture",
       "required_before_lifelike": [
         "river-specific time-of-day and weather presets",
         "HDRI or first-party sky/atmosphere setup with rights recorded",
         "manual exposure/camera language matching guide-seat review",
         "desktop and VR performance captures with settings recorded"
-      ],
-      "target": "lighting_atmosphere_and_capture"
-    }
-  ],
-  "goal": "Drive South Fork American, Colorado River, and Pacuare from source-aware Unreal previews to complete photoreal river environments by tracking maps, seasonal flows, aerial imagery, rights-reviewed reference media, additional source data, procedural substitutes, lifelike captures, and performance evidence.",
-  "next_checkpoint_order": [
-    "Close South Fork hydrography/flow/media annotations enough to test a true source-conditioned terrain and material pass.",
-    "Close Colorado river-mile/release/media annotations before expanding beyond the Lees Ferry pilot slice.",
-    "Close Pacuare official hydrography, cloud-screened imagery, rainfall/flow, and protected-area review before claiming local fidelity.",
-    "Replace proxy art using rights-cleared assets or first-party procedural equivalents and regenerate guide-seat plus river-eye captures after each river pass.",
-    "Add desktop and VR performance evidence before any river leaves preview-only status."
-  ],
-  "policy": {
-    "do_not_download_scrape_train_on_or_package_third_party_media_without_rights": true,
-    "lifetime_goal_requires_lifelike_unreal_screenshots": true,
-    "official_open_sources_first": true,
-    "procedural_generation_allowed_when_manifest_recorded": true,
-    "procedural_generation_must_not_hide_hazards_rescue_targets_or_physics_failures": true,
-    "social_media_reference_only_until_explicit_item_rights_clear": true
-  },
-  "reviewed_source_leads_2026_07_06": [
-    {
-      "provider": "USGS 3D Elevation Program",
-      "review_date": "2026-07-06",
-      "source_id": "usgs_3dep",
-      "url": "https://www.usgs.gov/3d-elevation-program",
-      "use_gate": "Record product id, acquisition date, CRS, vertical datum, void review, hydrologic conditioning, channel burning, attribution, and package/LFS policy before production terrain use.",
-      "why_it_matters": "Primary U.S. DEM/lidar source for South Fork and Colorado terrain, slope, banks, and Unreal Landscape conditioning."
-    },
-    {
-      "provider": "USGS 3D Hydrography Program",
-      "review_date": "2026-07-06",
-      "source_id": "usgs_3dhp",
-      "url": "https://www.usgs.gov/3d-hydrography-program",
-      "use_gate": "Clip selected products into the river corridor and compare to imagery, DEM-derived channels, and guide-reviewed rapid/eddy annotations before gameplay authority.",
-      "why_it_matters": "Primary U.S. hydrography successor path for flowlines, drainage context, tributaries, and river/bank alignment."
-    },
-    {
-      "provider": "USGS Water Services",
-      "review_date": "2026-07-06",
-      "source_id": "usgs_water_services",
-      "url": "https://waterservices.usgs.gov/",
-      "use_gate": "Attach station metadata, variables, units, quality flags, temporal coverage, and guide/release interpretation before final flow bands.",
-      "why_it_matters": "Daily and instantaneous discharge/stage source for South Fork and Colorado seasonal or release-band visuals."
-    },
-    {
-      "provider": "Copernicus Data Space Ecosystem",
-      "review_date": "2026-07-06",
-      "source_id": "copernicus_data_space",
-      "url": "https://dataspace.copernicus.eu/",
-      "use_gate": "Record scene ids, acquisition dates, cloud score, processing level, CRS, terms, and attribution before derivatives drive production masks or materials.",
-      "why_it_matters": "Primary candidate for Pacuare Sentinel scene discovery, cloud screening, river color, vegetation masks, and wet/rain seasonal review."
-    },
-    {
-      "provider": "Sistema Nacional de Informacion Territorial de Costa Rica / IDECORI",
-      "review_date": "2026-07-06",
-      "source_id": "snit_cr_idecori",
-      "url": "https://www.snitcr.go.cr/",
-      "use_gate": "Record exact service/layer names, CRS, responsible institution, terms, attribution, and publication sensitivity before importing any layer.",
-      "why_it_matters": "Official Costa Rica layer portal for Pacuare hydrography, terrain, protected-area, access, and possible imagery context."
-    },
-    {
-      "provider": "HydroSHEDS",
-      "review_date": "2026-07-06",
-      "source_id": "hydrosheds",
-      "url": "https://www.hydrosheds.org/",
-      "use_gate": "Use as a review seed only until aligned against official hydrography, visible imagery, and guide/outfitter stationing.",
-      "why_it_matters": "Global catchment and river-network fallback for Pacuare basin context while official Costa Rica layers are reviewed."
-    },
-    {
-      "provider": "OpenTopography",
-      "review_date": "2026-07-06",
-      "source_id": "opentopography",
-      "url": "https://opentopography.org/",
-      "use_gate": "Confirm API key, dataset license, citation, redistribution limits, and derivative rights before importing terrain or conditioning outputs.",
-      "why_it_matters": "Candidate high-resolution topography and hydrologic-conditioning tool path for U.S. and Pacuare terrain if dataset terms allow."
-    },
-    {
-      "provider": "National Park Service Grand Canyon Photos & Multimedia",
-      "review_date": "2026-07-06",
-      "source_id": "nps_grand_canyon_media",
-      "url": "https://www.nps.gov/grca/learn/photosmultimedia/index.htm",
-      "use_gate": "Record item-level public-domain or Creative Commons status, credit, date, location, and allowed use before any media becomes production reference or asset input.",
-      "why_it_matters": "Preferred official-media lead for Colorado canyon wall, river, sandbar, b-roll, and atmosphere reference."
+      ]
     }
   ],
   "rivers": [
     {
+      "river_id": "american_south_fork",
+      "display_name": "South Fork American River, Chili Bar to Coloma",
+      "readiness": "preview_only_not_lifelike",
       "active_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview",
+      "current_strength": "strongest solver/source seed; official pilot DEM/NAIP tiles and derivatives are attached for a small corridor slice.",
       "attached_preview_inputs": [
         "production_import_pilot/3dep_tiles",
         "production_import_pilot/naip_tiles",
@@ -167,12 +177,9 @@
         "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
         "reference_media_link_manifest.json"
       ],
-      "completion_gate": "Guide-seat and river-eye captures read as the South Fork corridor at reviewed low/median/high flow bands, with swimmer/rescue targets and rapid hazards still readable.",
-      "current_strength": "strongest solver/source seed; official pilot DEM/NAIP tiles and derivatives are attached for a small corridor slice.",
-      "display_name": "South Fork American River, Chili Bar to Coloma",
       "p0_next_pulls_or_attachments": [
         {
-          "promotion_gate": "Promote the attached NHD HU8 source extract and derived mainstem candidate only after direction, working CRS, NAIP, DEM relief, rapid stations, and guide-reviewed eddy/recovery geometry are confirmed.",
+          "source_class": "hydrography_and_centerline",
           "required_artifacts": [
             "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
             "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
@@ -187,15 +194,15 @@
             "hydrography/production_import_pilot/banks.geojson",
             "hydrography/production_import_pilot/cross_sections.geojson"
           ],
-          "source_class": "hydrography_and_centerline",
           "source_leads": [
             "usgs_3dhp",
             "usgs_3dep",
             "guide_review"
-          ]
+          ],
+          "promotion_gate": "Promote the attached NHD HU8 source extract and derived mainstem candidate only after direction, working CRS, NAIP, DEM relief, rapid stations, and guide-reviewed eddy/recovery geometry are confirmed."
         },
         {
-          "promotion_gate": "USGS 11445500 returned no P30D instantaneous time series on 2026-07-06, and CDEC CBR now has a first reproducible event-window pull, terms/flag/station review, and 30-day CBR/A25 context window; tie low/median/high visual variants to broader seasonal windows, release context, legal/redistribution signoff, station-to-reach review, and guide notes.",
+          "source_class": "seasonal_flow_or_release_history",
           "required_artifacts": [
             "hydrology/south_fork_modern_flow_source_selection.json",
             "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
@@ -203,26 +210,26 @@
             "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
             "hydrology/production_import_pilot/flow_band_review.json"
           ],
-          "source_class": "seasonal_flow_or_release_history",
           "source_leads": [
             "cdec_cbr",
             "cdec_a25_powerhouse_context",
             "usgs_water_services",
             "guide_review"
-          ]
+          ],
+          "promotion_gate": "USGS 11445500 returned no P30D instantaneous time series on 2026-07-06, and CDEC CBR now has a first reproducible event-window pull, terms/flag/station review, and 30-day CBR/A25 context window; tie low/median/high visual variants to broader seasonal windows, release context, legal/redistribution signoff, station-to-reach review, and guide notes."
         },
         {
-          "promotion_gate": "Attach creator/date/reach/flow/weather/permission before photos or footage influence production art.",
+          "source_class": "guide_and_reference_media_annotations",
           "required_artifacts": [
             "review/production_import_pilot/reference_annotations.geojson",
             "field_media/production_import_pilot/rights_manifest.json"
           ],
-          "source_class": "guide_and_reference_media_annotations",
           "source_leads": [
             "first_party_field_capture",
             "explicit_guide_or_outfitter_permission",
             "reference_media_link_manifest"
-          ]
+          ],
+          "promotion_gate": "Attach creator/date/reach/flow/weather/permission before photos or footage influence production art."
         }
       ],
       "procedural_generation_allowlist": [
@@ -230,11 +237,14 @@
         "granite/metamorphic boulder variants from first-party procedural materials",
         "flow-band foam/wet-rock cues driven by USGS 11445500 review"
       ],
-      "readiness": "preview_only_not_lifelike",
-      "river_id": "american_south_fork"
+      "completion_gate": "Guide-seat and river-eye captures read as the South Fork corridor at reviewed low/median/high flow bands, with swimmer/rescue targets and rapid hazards still readable."
     },
     {
+      "river_id": "colorado_river",
+      "display_name": "Colorado River, Grand Canyon Lees Ferry rowing prototype",
+      "readiness": "preview_only_not_lifelike",
       "active_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview",
+      "current_strength": "Lees Ferry pilot tiles and derivatives are attached; daily USGS gauge histories exist, but full canyon stationing and release-aware masks are still missing.",
       "attached_preview_inputs": [
         "production_import_pilot/3dep_tiles",
         "production_import_pilot/naip_tiles",
@@ -260,12 +270,9 @@
         "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
         "reference_media_link_manifest.json"
       ],
-      "completion_gate": "Captures read as Grand Canyon big-water rowing, with river-mile scale, canyon atmosphere, sandbar/wet-bank variation, oar-rig sightlines, and rescue visibility intact.",
-      "current_strength": "Lees Ferry pilot tiles and derivatives are attached; daily USGS gauge histories exist, but full canyon stationing and release-aware masks are still missing.",
-      "display_name": "Colorado River, Grand Canyon Lees Ferry rowing prototype",
       "p0_next_pulls_or_attachments": [
         {
-          "promotion_gate": "Promote the attached stitched NHD HU8 source overlay, exact-graph mainstem candidate, preview metric stationing, cross-section seeds, and preview alignment diagnostic only after river mile stationing, visible flowline/water-edge alignment, exposed sandbars, eddies, camps/access sensitivity, and oarsman review pass.",
+          "source_class": "hydrography_and_centerline",
           "required_artifacts": [
             "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
             "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
@@ -280,39 +287,39 @@
             "hydrography/production_import_pilot/river_mile_markers.geojson",
             "hydrography/production_import_pilot/sandbars.geojson"
           ],
-          "source_class": "hydrography_and_centerline",
           "source_leads": [
             "usgs_3dhp",
             "nps_grand_canyon_media",
             "gcmrc_or_river_mile_context"
-          ]
+          ],
+          "promotion_gate": "Promote the attached stitched NHD HU8 source overlay, exact-graph mainstem candidate, preview metric stationing, cross-section seeds, and preview alignment diagnostic only after river mile stationing, visible flowline/water-edge alignment, exposed sandbars, eddies, camps/access sensitivity, and oarsman review pass."
         },
         {
-          "promotion_gate": "Use the attached Reclamation daily total-release context as review-gated evidence, then add hourly/subdaily release patterns, final unit/terms confirmation, Lees Ferry/downstream gauge comparisons, and oarsman review before final release-dependent visuals.",
+          "source_class": "seasonal_flow_or_release_history",
           "required_artifacts": [
             "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
             "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
             "hydrology/production_import_pilot/release_band_review.json"
           ],
-          "source_class": "seasonal_flow_or_release_history",
           "source_leads": [
             "usgs_water_services",
             "usbr_glen_canyon_release_context",
             "guide_review"
-          ]
+          ],
+          "promotion_gate": "Use the attached Reclamation daily total-release context as review-gated evidence, then add hourly/subdaily release patterns, final unit/terms confirmation, Lees Ferry/downstream gauge comparisons, and oarsman review before final release-dependent visuals."
         },
         {
-          "promotion_gate": "Use official/public-domain media only after item metadata review; attach oarsman sightline notes before art or gameplay tuning.",
+          "source_class": "guide_and_reference_media_annotations",
           "required_artifacts": [
             "review/production_import_pilot/reference_annotations.geojson",
             "field_media/production_import_pilot/rights_manifest.json"
           ],
-          "source_class": "guide_and_reference_media_annotations",
           "source_leads": [
             "nps_grand_canyon_media",
             "first_party_field_capture",
             "explicit_oarsman_or_outfitter_permission"
-          ]
+          ],
+          "promotion_gate": "Use official/public-domain media only after item metadata review; attach oarsman sightline notes before art or gameplay tuning."
         }
       ],
       "procedural_generation_allowlist": [
@@ -320,11 +327,14 @@
         "sparse desert riparian scrub and tamarisk/cottonwood placeholders from masks",
         "sandbar, wet-bank, boil, and big-water wave-train cues driven by release-band review"
       ],
-      "readiness": "preview_only_not_lifelike",
-      "river_id": "colorado_river"
+      "completion_gate": "Captures read as Grand Canyon big-water rowing, with river-mile scale, canyon atmosphere, sandbar/wet-bank variation, oar-rig sightlines, and rescue visibility intact."
     },
     {
+      "river_id": "pacuare",
+      "display_name": "Pacuare River, Costa Rica lower planning corridor",
+      "readiness": "preview_only_not_lifelike",
       "active_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview",
+      "current_strength": "Copernicus DEM and NASA GIBS/Copernicus preview derivatives are normalized into the production folder shape, and a deterministic Unreal-curve centerline/stationing scaffold exists for annotation placement; imagery is still coarse/cloudy and local hydrology/hydrography are not authoritative.",
       "attached_preview_inputs": [
         "terrain/copernicus_dem_glo30_N09_W084.tif",
         "terrain/copernicus_dem_glo30_N10_W084.tif",
@@ -333,71 +343,74 @@
         "production_import_pilot/heightfield_candidate_2017.png",
         "production_import_pilot/water_mask_2048.png",
         "production_import_pilot/vegetation_mask_2048.png",
+        "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
+        "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
+        "hydrography/production_import_pilot/preview_stationing_scaffold.json",
         "hydrology/costa_rica_gauge_search.json",
         "hydrology/rainfall_context.json",
         "review/sinac_protected_area_source_rights.json",
         "review/access_and_conservation_constraints.json"
       ],
-      "completion_gate": "Captures read as a humid Pacuare rainforest gorge with believable canopy, waterfalls/mist, wet rocks, rainfed flow variation, and rescue readability under foliage.",
-      "current_strength": "Copernicus DEM and NASA GIBS/Copernicus preview derivatives are normalized into the production folder shape, but the imagery is coarse/cloudy and local hydrology is not authoritative.",
-      "display_name": "Pacuare River, Costa Rica lower planning corridor",
       "p0_next_pulls_or_attachments": [
         {
-          "promotion_gate": "Confirm exact official Costa Rica layers and use HydroSHEDS/OSM only as fallback seeds until guide/outfitter stationing approves the route.",
+          "source_class": "hydrography_and_centerline",
           "required_artifacts": [
+            "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
+            "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
+            "hydrography/production_import_pilot/preview_stationing_scaffold.json",
             "hydrography/production_import_pilot/centerline.geojson",
             "hydrography/production_import_pilot/banks.geojson",
             "hydrography/production_import_pilot/rapid_and_access_stationing.geojson"
           ],
-          "source_class": "hydrography_and_centerline",
           "source_leads": [
             "snit_cr_idecori",
             "hydrosheds",
             "guide_review"
-          ]
+          ],
+          "promotion_gate": "Use the attached Unreal-curve scaffold only for review overlays/procedural dressing; confirm exact official Costa Rica layers and use HydroSHEDS/OSM only as fallback seeds until guide/outfitter stationing approves the route."
         },
         {
-          "promotion_gate": "Replace MODIS/GIBS proxy drape with cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference.",
+          "source_class": "aerial_or_satellite_imagery",
           "required_artifacts": [
             "imagery/production_import_pilot/cloud_screened_scene_index.json",
             "imagery/production_import_pilot/source_drape_4096.png",
             "imagery/production_import_pilot/cloud_shadow_review.json"
           ],
-          "source_class": "aerial_or_satellite_imagery",
           "source_leads": [
             "copernicus_data_space",
             "landsat",
             "snit_cr_idecori",
             "first_party_aerial"
-          ]
+          ],
+          "promotion_gate": "Replace MODIS/GIBS proxy drape with cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference."
         },
         {
-          "promotion_gate": "Keep relative flow bands until station variables, units, time zones, access terms, rainfall/flow coverage, and guide review are attached.",
+          "source_class": "seasonal_flow_or_release_history",
           "required_artifacts": [
             "hydrology/production_import_pilot/rainfall_station_review.json",
             "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
             "hydrology/production_import_pilot/flash_response_review.json"
           ],
-          "source_class": "seasonal_flow_or_release_history",
           "source_leads": [
             "imn_costa_rica",
             "ice_hydromet",
             "minae_direccion_agua",
             "guide_review"
-          ]
+          ],
+          "promotion_gate": "Keep relative flow bands until station variables, units, time zones, access terms, rainfall/flow coverage, and guide review are attached."
         },
         {
-          "promotion_gate": "Attach permissioned rainforest, waterfall, canopy, mist, water-color, and rapid-behavior references before production art promotion.",
+          "source_class": "guide_and_reference_media_annotations",
           "required_artifacts": [
             "review/production_import_pilot/reference_annotations.geojson",
             "field_media/production_import_pilot/rights_manifest.json"
           ],
-          "source_class": "guide_and_reference_media_annotations",
           "source_leads": [
             "first_party_field_capture",
             "explicit_outfitter_or_guide_permission",
             "reference_media_link_manifest"
-          ]
+          ],
+          "promotion_gate": "Attach permissioned rainforest, waterfall, canopy, mist, water-color, and rapid-behavior references before production art promotion."
         }
       ],
       "procedural_generation_allowlist": [
@@ -405,21 +418,14 @@
         "wet rocks, waterfalls, spray, and mist as separately toggleable layers with source/tuning manifests",
         "tropical humidity and cloud-shadow variants that do not hide rescue targets or rapid geometry"
       ],
-      "readiness": "preview_only_not_lifelike",
-      "river_id": "pacuare"
+      "completion_gate": "Captures read as a humid Pacuare rainforest gorge with believable canopy, waterfalls/mist, wet rocks, rainfed flow variation, and rescue readability under foliage."
     }
   ],
-  "schema": "raftsim.production_environment_gap_register.v0",
-  "source_classes": [
-    "terrain_dem_or_lidar",
-    "hydrography_and_centerline",
-    "aerial_or_satellite_imagery",
-    "water_and_vegetation_masks",
-    "seasonal_flow_or_release_history",
-    "protected_area_and_access_context",
-    "guide_and_reference_media_annotations",
-    "production_art_assets_or_first_party_procedural_equivalents",
-    "unreal_lifelike_capture_and_performance_evidence"
-  ],
-  "status": "active_goal_gap_register_all_rivers_preview_only_not_lifelike"
+  "next_checkpoint_order": [
+    "Close South Fork hydrography/flow/media annotations enough to test a true source-conditioned terrain and material pass.",
+    "Close Colorado river-mile/release/media annotations before expanding beyond the Lees Ferry pilot slice.",
+    "Close Pacuare official hydrography, cloud-screened imagery, rainfall/flow, and protected-area review before claiming local fidelity.",
+    "Replace proxy art using rights-cleared assets or first-party procedural equivalents and regenerate guide-seat plus river-eye captures after each river pass.",
+    "Add desktop and VR performance evidence before any river leaves preview-only status."
+  ]
 }

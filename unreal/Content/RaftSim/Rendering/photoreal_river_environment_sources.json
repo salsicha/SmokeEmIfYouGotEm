@@ -23,7 +23,13 @@
       "title": "3D Elevation Program",
       "url": "https://www.usgs.gov/3d-elevation-program",
       "rights_status": "official_us_source_public_domain_or_no_use_restrictions_per_provider_page",
-      "pipeline_use": ["dem", "slope", "bank_breaks", "boulder_exposure", "terrain_mesh"]
+      "pipeline_use": [
+        "dem",
+        "slope",
+        "bank_breaks",
+        "boulder_exposure",
+        "terrain_mesh"
+      ]
     },
     {
       "source_id": "usgs_3dhp_nhd",
@@ -32,7 +38,12 @@
       "title": "3D Hydrography Program and NHD fallback",
       "url": "https://www.usgs.gov/3d-hydrography-program",
       "rights_status": "official_us_source_public_domain_with_product_metadata_review",
-      "pipeline_use": ["centerline", "tributaries", "catchment_context", "flowline_alignment"]
+      "pipeline_use": [
+        "centerline",
+        "tributaries",
+        "catchment_context",
+        "flowline_alignment"
+      ]
     },
     {
       "source_id": "usgs_water_data",
@@ -41,7 +52,12 @@
       "title": "Water Data for the Nation",
       "url": "https://waterdata.usgs.gov/",
       "rights_status": "official_us_hydrology_data_with_station_attribution",
-      "pipeline_use": ["daily_discharge", "instantaneous_discharge", "stage", "flow_percentiles"]
+      "pipeline_use": [
+        "daily_discharge",
+        "instantaneous_discharge",
+        "stage",
+        "flow_percentiles"
+      ]
     },
     {
       "source_id": "landsat",
@@ -50,7 +66,11 @@
       "title": "Landsat data access",
       "url": "https://www.usgs.gov/landsat-missions/landsat-data-access",
       "rights_status": "official_us_satellite_data_with_scene_metadata_and_attribution",
-      "pipeline_use": ["seasonal_water_masks", "vegetation_change", "historical_flow_context"]
+      "pipeline_use": [
+        "seasonal_water_masks",
+        "vegetation_change",
+        "historical_flow_context"
+      ]
     },
     {
       "source_id": "nasa_gibs",
@@ -59,7 +79,11 @@
       "title": "Global Imagery Browse Services WMS/WMTS",
       "url": "https://gibs.earthdata.nasa.gov/",
       "rights_status": "official_nasa_imagery_service_with_layer_date_crs_and_terms_metadata_required",
-      "pipeline_use": ["pacuare_cloud_screened_preview_imagery", "wide_area_rainforest_color_reference", "seasonal_cloud_screening"]
+      "pipeline_use": [
+        "pacuare_cloud_screened_preview_imagery",
+        "wide_area_rainforest_color_reference",
+        "seasonal_cloud_screening"
+      ]
     },
     {
       "source_id": "copernicus_sentinel",
@@ -68,7 +92,12 @@
       "title": "Copernicus Sentinel data access and terms",
       "url": "https://dataspace.copernicus.eu/terms-and-conditions",
       "rights_status": "sentinel_data_free_full_open_subject_to_sentinel_legal_notice; portal_content_noncommercial_without_extra_rights",
-      "pipeline_use": ["pacuare_cloud_screened_imagery", "river_color", "vegetation_masks", "wide_area_change"]
+      "pipeline_use": [
+        "pacuare_cloud_screened_imagery",
+        "river_color",
+        "vegetation_masks",
+        "wide_area_change"
+      ]
     },
     {
       "source_id": "copernicus_dem",
@@ -77,7 +106,12 @@
       "title": "Copernicus Digital Elevation Model GLO-30 Public",
       "url": "https://registry.opendata.aws/copernicus-dem/",
       "rights_status": "free_public_copernicus_dem_terms_and_tile_metadata_required",
-      "pipeline_use": ["pacuare_gorge_dem", "terrain_slope", "bank_and_gorge_wall_context", "unreal_heightfield_input"]
+      "pipeline_use": [
+        "pacuare_gorge_dem",
+        "terrain_slope",
+        "bank_and_gorge_wall_context",
+        "unreal_heightfield_input"
+      ]
     },
     {
       "source_id": "hydrosheds",
@@ -86,7 +120,11 @@
       "title": "HydroSHEDS global hydrographic data",
       "url": "https://www.hydrosheds.org/",
       "rights_status": "free_standard_gis_data_with_terms_review_before_packaging",
-      "pipeline_use": ["pacuare_basin_context", "river_network_seed", "catchment_context"]
+      "pipeline_use": [
+        "pacuare_basin_context",
+        "river_network_seed",
+        "catchment_context"
+      ]
     },
     {
       "source_id": "opentopography",
@@ -95,7 +133,11 @@
       "title": "OpenTopography high-resolution topography data and tools",
       "url": "https://opentopography.org/",
       "rights_status": "dataset_specific_license_and_api_key_require_review",
-      "pipeline_use": ["global_dem_fallback", "lidar_discovery", "hydrologic_conditioning"]
+      "pipeline_use": [
+        "global_dem_fallback",
+        "lidar_discovery",
+        "hydrologic_conditioning"
+      ]
     },
     {
       "source_id": "osm",
@@ -104,7 +146,13 @@
       "title": "OpenStreetMap",
       "url": "https://www.openstreetmap.org/copyright",
       "rights_status": "odbl_attribution_and_database_derivative_review_required",
-      "pipeline_use": ["access_roads", "bridges", "trails", "place_names", "supplemental_centerline_seed"]
+      "pipeline_use": [
+        "access_roads",
+        "bridges",
+        "trails",
+        "place_names",
+        "supplemental_centerline_seed"
+      ]
     }
   ],
   "rivers": [
@@ -119,17 +167,53 @@
         "terrain_style": "pool_drop_granite_metamorphic_foothill_channel",
         "foliage_style": "oak_conifer_riparian_mix_with_seasonal_grass_scrub",
         "water_style": "clear_to_green_release_water_with_foam_lines_and_wet_rocks",
-        "procedural_layers": ["terrain_bands", "river_surface", "banks", "boulder_gardens", "gravel_bars", "riparian_foliage", "access_context", "foam_and_mist_cues"]
+        "procedural_layers": [
+          "terrain_bands",
+          "river_surface",
+          "banks",
+          "boulder_gardens",
+          "gravel_bars",
+          "riparian_foliage",
+          "access_context",
+          "foam_and_mist_cues"
+        ]
       },
       "flow_levels": [
-        {"flow_band": "low_runnable", "season": "late_summer_low_water", "discharge_cfs": 900.0, "source": "USGS-11445500 plus guide review"},
-        {"flow_band": "median_runnable", "season": "summer_commercial", "discharge_cfs": 1600.0, "source": "USGS-11445500 plus guide review"},
-        {"flow_band": "high_runnable", "season": "spring_runoff_or_release", "discharge_cfs": 3000.0, "source": "USGS-11445500 plus guide review"}
+        {
+          "flow_band": "low_runnable",
+          "season": "late_summer_low_water",
+          "discharge_cfs": 900.0,
+          "source": "USGS-11445500 plus guide review"
+        },
+        {
+          "flow_band": "median_runnable",
+          "season": "summer_commercial",
+          "discharge_cfs": 1600.0,
+          "source": "USGS-11445500 plus guide review"
+        },
+        {
+          "flow_band": "high_runnable",
+          "season": "spring_runoff_or_release",
+          "discharge_cfs": 3000.0,
+          "source": "USGS-11445500 plus guide review"
+        }
       ],
       "river_map_sources": [
-        {"source_id": "usgs_3dep", "url": "https://apps.nationalmap.gov/tnmaccess/api/products?datasets=Digital%20Elevation%20Model%20(DEM)&bbox=-120.90,38.74,-120.72,38.83", "status": "metadata_ready"},
-        {"source_id": "usgs_3dhp_nhd", "url": "https://apps.nationalmap.gov/tnmaccess/api/products?datasets=National%20Hydrography%20Dataset%20(NHD)&bbox=-120.90,38.74,-120.72,38.83", "status": "metadata_ready"},
-        {"source_id": "usda_naip", "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=NAIP%20Plus&bbox=-120.90,38.74,-120.72,38.83", "status": "sample_attached_for_unreal_preview_drape"}
+        {
+          "source_id": "usgs_3dep",
+          "url": "https://apps.nationalmap.gov/tnmaccess/api/products?datasets=Digital%20Elevation%20Model%20(DEM)&bbox=-120.90,38.74,-120.72,38.83",
+          "status": "metadata_ready"
+        },
+        {
+          "source_id": "usgs_3dhp_nhd",
+          "url": "https://apps.nationalmap.gov/tnmaccess/api/products?datasets=National%20Hydrography%20Dataset%20(NHD)&bbox=-120.90,38.74,-120.72,38.83",
+          "status": "metadata_ready"
+        },
+        {
+          "source_id": "usda_naip",
+          "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=NAIP%20Plus&bbox=-120.90,38.74,-120.72,38.83",
+          "status": "sample_attached_for_unreal_preview_drape"
+        }
       ],
       "source_sample_artifacts": [
         {
@@ -230,14 +314,37 @@
         }
       ],
       "flow_sources": [
-        {"source_id": "usgs_11445500", "url": "https://waterdata.usgs.gov/monitoring-location/USGS-11445500/", "status": "metadata_ready"}
+        {
+          "source_id": "usgs_11445500",
+          "url": "https://waterdata.usgs.gov/monitoring-location/USGS-11445500/",
+          "status": "metadata_ready"
+        }
       ],
       "reference_media_sources": [
-        {"source_id": "first_party_field_capture", "rights_status": "preferred_for_shipping", "status": "planned"},
-        {"source_id": "wikimedia_or_flickr_cc_review", "rights_status": "per_item_license_review_required", "status": "link_seed_manifest_recorded"},
-        {"source_id": "public_social_links", "rights_status": "reference_only_no_download_no_scraping", "status": "link_seed_manifest_recorded"}
+        {
+          "source_id": "first_party_field_capture",
+          "rights_status": "preferred_for_shipping",
+          "status": "planned"
+        },
+        {
+          "source_id": "wikimedia_or_flickr_cc_review",
+          "rights_status": "per_item_license_review_required",
+          "status": "link_seed_manifest_recorded"
+        },
+        {
+          "source_id": "public_social_links",
+          "rights_status": "reference_only_no_download_no_scraping",
+          "status": "link_seed_manifest_recorded"
+        }
       ],
-      "capture_targets": ["guide_seat_downstream_low", "guide_seat_downstream_median", "guide_seat_downstream_high", "river_eye_downstream_environment_review", "rapid_entry_tongue", "swimmer_rescue_visibility"]
+      "capture_targets": [
+        "guide_seat_downstream_low",
+        "guide_seat_downstream_median",
+        "guide_seat_downstream_high",
+        "river_eye_downstream_environment_review",
+        "rapid_entry_tongue",
+        "swimmer_rescue_visibility"
+      ]
     },
     {
       "river_id": "colorado_river",
@@ -250,19 +357,62 @@
         "terrain_style": "large_scale_layered_canyon_walls_and_sand_bars",
         "foliage_style": "sparse_desert_riparian_banks",
         "water_style": "cold_dam_release_big_water_with_laterals_boils_wave_trains",
-        "procedural_layers": ["canyon_walls", "river_surface", "sand_bars", "large_boulders", "desert_riparian_foliage", "oar_rig_context", "big_water_foam_lines"]
+        "procedural_layers": [
+          "canyon_walls",
+          "river_surface",
+          "sand_bars",
+          "large_boulders",
+          "desert_riparian_foliage",
+          "oar_rig_context",
+          "big_water_foam_lines"
+        ]
       },
       "flow_levels": [
-        {"flow_band": "low_release_planning", "season": "low_release_planning", "discharge_cfs": 8000.0, "source": "USGS-09380000, USGS-09402500, USBR release review"},
-        {"flow_band": "moderate_release_planning", "season": "moderate_release_planning", "discharge_cfs": 12000.0, "source": "USGS-09380000, USGS-09402500, USBR release review"},
-        {"flow_band": "high_release_planning", "season": "high_release_planning", "discharge_cfs": 18000.0, "source": "USGS-09380000, USGS-09402500, USBR release review"}
+        {
+          "flow_band": "low_release_planning",
+          "season": "low_release_planning",
+          "discharge_cfs": 8000.0,
+          "source": "USGS-09380000, USGS-09402500, USBR release review"
+        },
+        {
+          "flow_band": "moderate_release_planning",
+          "season": "moderate_release_planning",
+          "discharge_cfs": 12000.0,
+          "source": "USGS-09380000, USGS-09402500, USBR release review"
+        },
+        {
+          "flow_band": "high_release_planning",
+          "season": "high_release_planning",
+          "discharge_cfs": 18000.0,
+          "source": "USGS-09380000, USGS-09402500, USBR release review"
+        }
       ],
       "river_map_sources": [
-        {"source_id": "nps_grand_canyon_river_trips", "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm", "status": "metadata_ready"},
-        {"source_id": "usgs_3dep", "url": "https://www.usgs.gov/3d-elevation-program", "status": "sample_attached_for_unreal_preview_drape"},
-        {"source_id": "usda_naip", "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer", "status": "sample_attached_for_unreal_preview_drape"},
-        {"source_id": "usgs_3dhp_nhd", "url": "https://www.usgs.gov/3d-hydrography-program", "status": "nhd_hu8_lees_ferry_bbox_extract_attached_review_gated"},
-        {"source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract", "url": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json", "status": "mainstem_candidate_attached_review_gated_not_river_mile_geometry"}
+        {
+          "source_id": "nps_grand_canyon_river_trips",
+          "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm",
+          "status": "metadata_ready"
+        },
+        {
+          "source_id": "usgs_3dep",
+          "url": "https://www.usgs.gov/3d-elevation-program",
+          "status": "sample_attached_for_unreal_preview_drape"
+        },
+        {
+          "source_id": "usda_naip",
+          "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer",
+          "status": "sample_attached_for_unreal_preview_drape"
+        },
+        {
+          "source_id": "usgs_3dhp_nhd",
+          "url": "https://www.usgs.gov/3d-hydrography-program",
+          "status": "nhd_hu8_lees_ferry_bbox_extract_attached_review_gated"
+        },
+        {
+          "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
+          "url": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
+          "status": "mainstem_candidate_attached_review_gated_not_river_mile_geometry"
+        }
       ],
       "source_sample_artifacts": [
         {
@@ -411,16 +561,47 @@
         }
       ],
       "flow_sources": [
-        {"source_id": "usgs_09380000", "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09380000/", "status": "daily_history_downloaded"},
-        {"source_id": "usgs_09402500", "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09402500/", "status": "daily_history_downloaded"},
-        {"source_id": "usbr_glen_canyon_releases", "url": "https://www.usbr.gov/uc/water/hydrodata/", "status": "planned"}
+        {
+          "source_id": "usgs_09380000",
+          "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09380000/",
+          "status": "daily_history_downloaded"
+        },
+        {
+          "source_id": "usgs_09402500",
+          "url": "https://waterdata.usgs.gov/monitoring-location/USGS-09402500/",
+          "status": "daily_history_downloaded"
+        },
+        {
+          "source_id": "usbr_glen_canyon_releases",
+          "url": "https://www.usbr.gov/uc/water/hydrodata/",
+          "status": "planned"
+        }
       ],
       "reference_media_sources": [
-        {"source_id": "nps_public_reference_pages", "rights_status": "record_nps_attribution_and_item_terms_before_use", "status": "link_seed_manifest_recorded"},
-        {"source_id": "oarsman_or_guide_permission", "rights_status": "explicit_permission_required", "status": "planned"},
-        {"source_id": "public_social_links", "rights_status": "reference_only_no_download_no_scraping", "status": "link_seed_manifest_recorded"}
+        {
+          "source_id": "nps_public_reference_pages",
+          "rights_status": "record_nps_attribution_and_item_terms_before_use",
+          "status": "link_seed_manifest_recorded"
+        },
+        {
+          "source_id": "oarsman_or_guide_permission",
+          "rights_status": "explicit_permission_required",
+          "status": "planned"
+        },
+        {
+          "source_id": "public_social_links",
+          "rights_status": "reference_only_no_download_no_scraping",
+          "status": "link_seed_manifest_recorded"
+        }
       ],
-      "capture_targets": ["guide_seat_downstream_low_release", "guide_seat_downstream_moderate_release", "guide_seat_downstream_high_release", "river_eye_downstream_environment_review", "big_water_lateral", "long_swimmer_rescue_visibility"]
+      "capture_targets": [
+        "guide_seat_downstream_low_release",
+        "guide_seat_downstream_moderate_release",
+        "guide_seat_downstream_high_release",
+        "river_eye_downstream_environment_review",
+        "big_water_lateral",
+        "long_swimmer_rescue_visibility"
+      ]
     },
     {
       "river_id": "pacuare",
@@ -433,29 +614,99 @@
         "terrain_style": "steep_wet_rainforest_gorge_with_waterfalls",
         "foliage_style": "dense_layered_tropical_canopy_understory_and_vines",
         "water_style": "rain_fed_green_turbid_water_with_mist_spray_and_woody_debris",
-        "procedural_layers": ["rainforest_gorge_walls", "river_surface", "waterfalls", "dense_canopy", "understory", "wet_rock", "woody_debris", "rain_mist"]
+        "procedural_layers": [
+          "rainforest_gorge_walls",
+          "river_surface",
+          "waterfalls",
+          "dense_canopy",
+          "understory",
+          "wet_rock",
+          "woody_debris",
+          "rain_mist"
+        ]
       },
       "flow_levels": [
-        {"flow_band": "clear_season_low_planning", "relative_flow": "low", "source": "blocked_until_costa_rica_hydrology_and_guide_review"},
-        {"flow_band": "rainfed_runnable_planning", "relative_flow": "medium", "source": "blocked_until_costa_rica_hydrology_and_guide_review"},
-        {"flow_band": "rainy_season_high_planning", "relative_flow": "high", "source": "blocked_until_costa_rica_hydrology_and_guide_review"},
-        {"flow_band": "flash_response_review_only", "relative_flow": "rapid_rise", "source": "review_only_until_rainfall_flash_response_evidence"}
+        {
+          "flow_band": "clear_season_low_planning",
+          "relative_flow": "low",
+          "source": "blocked_until_costa_rica_hydrology_and_guide_review"
+        },
+        {
+          "flow_band": "rainfed_runnable_planning",
+          "relative_flow": "medium",
+          "source": "blocked_until_costa_rica_hydrology_and_guide_review"
+        },
+        {
+          "flow_band": "rainy_season_high_planning",
+          "relative_flow": "high",
+          "source": "blocked_until_costa_rica_hydrology_and_guide_review"
+        },
+        {
+          "flow_band": "flash_response_review_only",
+          "relative_flow": "rapid_rise",
+          "source": "review_only_until_rainfall_flash_response_evidence"
+        }
       ],
       "river_map_sources": [
-        {"source_id": "snit_cr", "url": "https://www.snitcr.go.cr/", "status": "official_source_leads_attached"},
-        {"source_id": "copernicus_dem", "url": "https://registry.opendata.aws/copernicus-dem/", "status": "tile_samples_attached_for_pacuare_terrain_source"},
-        {"source_id": "hydrosheds", "url": "https://www.hydrosheds.org/", "status": "planned_basin_context"},
-        {"source_id": "opentopography", "url": "https://opentopography.org/", "status": "api_key_required_recorded"},
-        {"source_id": "osm", "url": "https://www.openstreetmap.org/copyright", "status": "planning_seed_only"}
+        {
+          "source_id": "snit_cr",
+          "url": "https://www.snitcr.go.cr/",
+          "status": "official_source_leads_attached"
+        },
+        {
+          "source_id": "copernicus_dem",
+          "url": "https://registry.opendata.aws/copernicus-dem/",
+          "status": "tile_samples_attached_for_pacuare_terrain_source"
+        },
+        {
+          "source_id": "hydrosheds",
+          "url": "https://www.hydrosheds.org/",
+          "status": "planned_basin_context"
+        },
+        {
+          "source_id": "opentopography",
+          "url": "https://opentopography.org/",
+          "status": "api_key_required_recorded"
+        },
+        {
+          "source_id": "osm",
+          "url": "https://www.openstreetmap.org/copyright",
+          "status": "planning_seed_only"
+        },
+        {
+          "source_id": "pacuare_unreal_preview_centerline_scaffold",
+          "url": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
+          "status": "generated_review_gated_preview_route_not_official_hydrography"
+        }
       ],
       "flow_sources": [
-        {"source_id": "imn_costa_rica", "url": "https://www.imn.ac.cr/", "status": "official_source_leads_attached"},
-        {"source_id": "ice_hydromet_review", "url": "https://www.ice.go.cr/", "status": "official_source_leads_attached"}
+        {
+          "source_id": "imn_costa_rica",
+          "url": "https://www.imn.ac.cr/",
+          "status": "official_source_leads_attached"
+        },
+        {
+          "source_id": "ice_hydromet_review",
+          "url": "https://www.ice.go.cr/",
+          "status": "official_source_leads_attached"
+        }
       ],
       "aerial_imagery_sources": [
-        {"source_id": "nasa_gibs", "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi", "status": "cloud_screened_sample_attached_for_unreal_preview_drape"},
-        {"source_id": "copernicus_sentinel", "url": "https://dataspace.copernicus.eu/terms-and-conditions", "status": "official_source_lead_attached"},
-        {"source_id": "landsat", "url": "https://www.usgs.gov/landsat-missions/landsat-data-access", "status": "official_source_lead_attached"}
+        {
+          "source_id": "nasa_gibs",
+          "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi",
+          "status": "cloud_screened_sample_attached_for_unreal_preview_drape"
+        },
+        {
+          "source_id": "copernicus_sentinel",
+          "url": "https://dataspace.copernicus.eu/terms-and-conditions",
+          "status": "official_source_lead_attached"
+        },
+        {
+          "source_id": "landsat",
+          "url": "https://www.usgs.gov/landsat-missions/landsat-data-access",
+          "status": "official_source_lead_attached"
+        }
       ],
       "source_sample_artifacts": [
         {
@@ -553,14 +804,41 @@
           "provider": "RaftSim geospatial preview utility from Copernicus DEM GLO-30 public tiles",
           "status": "active_unreal_preview_heightfield_review_gated_coarse_seed",
           "unreal_use": "2017px 16-bit grayscale Pacuare production-import placeholder heightfield sampled into generated preview gorge geometry; not a promoted Landscape import or conditioned production terrain"
+        },
+        {
+          "artifact_id": "pacuare_unreal_preview_centerline_scaffold",
+          "category": "derived_hydrography_preview_scaffold",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_centerline_scaffold.geojson; physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+          "provider": "RaftSim geospatial preview utility from Unreal Pacuare preview curve",
+          "status": "active_annotation_scaffold_review_gated_not_official_hydrography",
+          "unreal_use": "preview-only centerline/stationing scaffold for annotation placement, procedural rainforest dressing, and capture framing; not official Pacuare route geometry, banks, wetted width, or solver input"
         }
       ],
       "reference_media_sources": [
-        {"source_id": "first_party_field_capture", "rights_status": "preferred_for_shipping", "status": "planned"},
-        {"source_id": "outfitter_or_guide_permission", "rights_status": "explicit_permission_required", "status": "planned"},
-        {"source_id": "public_social_links", "rights_status": "reference_only_no_download_no_scraping", "status": "link_seed_manifest_recorded"}
+        {
+          "source_id": "first_party_field_capture",
+          "rights_status": "preferred_for_shipping",
+          "status": "planned"
+        },
+        {
+          "source_id": "outfitter_or_guide_permission",
+          "rights_status": "explicit_permission_required",
+          "status": "planned"
+        },
+        {
+          "source_id": "public_social_links",
+          "rights_status": "reference_only_no_download_no_scraping",
+          "status": "link_seed_manifest_recorded"
+        }
       ],
-      "capture_targets": ["guide_seat_downstream_clear_season", "guide_seat_downstream_rainfed", "guide_seat_downstream_high_rain", "river_eye_downstream_environment_review", "rainforest_gorge_entry", "swimmer_rescue_visibility_in_dense_foliage"]
+      "capture_targets": [
+        "guide_seat_downstream_clear_season",
+        "guide_seat_downstream_rainfed",
+        "guide_seat_downstream_high_rain",
+        "river_eye_downstream_environment_review",
+        "rainforest_gorge_entry",
+        "swimmer_rescue_visibility_in_dense_foliage"
+      ]
     }
   ],
   "unreal_generation": {
