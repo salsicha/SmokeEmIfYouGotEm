@@ -3,7 +3,7 @@
   "gap_register": "../production_environment_gap_register.json",
   "generated_on": "2026-07-06",
   "next_checkpoint_recommendation": [
-    "Broaden CDEC CBR/A25 seasonal windows and resolve A25 flags/routing.",
+    "Extend CDEC CBR/A25 context into multi-year representative seasonal windows and resolve A25 flags/routing.",
     "Run guide/geospatial review on NHD-derived centerline, banks, cross sections, eddy/recovery zones, and source masks.",
     "Attach permissioned or first-party South Fork reference photos/footage before photoreal material promotion."
   ],
@@ -92,12 +92,13 @@
         "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
         "hydrology/cdec_terms_flags_and_station_relation_review.json",
         "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+        "hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
         "hydrology/production_import_pilot/flow_band_review.json"
       ],
       "next_decision": "Keep flow-band visuals as review presets until seasonal windows and guide validation support retuning.",
       "preview_evidence_status": "attached_review_gated",
       "promotion_blockers": [
-        "broader representative CDEC CBR seasonal windows",
+        "multi-year representative CDEC CBR seasonal windows",
         "A25 flag/routing interpretation",
         "station-to-reach lag and routing review",
         "legal/redistribution signoff",

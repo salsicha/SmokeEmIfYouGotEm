@@ -354,6 +354,14 @@
           "unreal_use": "larger 2017px 16-bit grayscale South Fork pilot heightfield candidate sampled into preview terrain; not reprojected, hydrologically conditioned, channel-burned, or production-approved"
         },
         {
+          "artifact_id": "south_fork_cdec_seasonal_window_review_wy2026_to_2026_07_06",
+          "category": "seasonal_flow_or_release_history_review",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
+          "provider": "RaftSim review artifact from CDEC CBR flow/stage and A25 daily powerhouse context",
+          "status": "water_year_to_date_context_attached_review_gated",
+          "unreal_use": "Seasonal flow evidence for future low/median/high visual variant planning; not final water width, foam, wet-bank, hole stickiness, feature forcing, or gameplay tuning authority."
+        },
+        {
           "artifact_id": "south_fork_flow_band_review",
           "category": "seasonal_flow_or_release_history_review",
           "path": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json",
