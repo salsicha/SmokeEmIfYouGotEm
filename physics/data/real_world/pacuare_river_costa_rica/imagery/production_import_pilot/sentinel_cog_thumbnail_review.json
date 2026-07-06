@@ -1,0 +1,99 @@
+{
+  "allowed_use": [
+    "visual source triage",
+    "candidate date and tile selection review",
+    "editor reference thumbnails for guide/geospatial discussion"
+  ],
+  "attached_thumbnails": [
+    {
+      "bbox_wgs84": [
+        -83.7439023257064,
+        9.851329583910688,
+        -82.73466483299958,
+        10.850553117490108
+      ],
+      "catalog_cloud_cover_percent": 4.785432,
+      "epsg": 32617,
+      "product_id": "S2B_17PKM_20250119_0_L2A",
+      "product_name": "S2B_MSIL2A_20250119T160509_N0511_R054_T17PKM_20250119T211653",
+      "stac_item_sha256": "cb06e63bbe7ee31b8e14598a2c879230ece303d82a0d6c362fdf9335a86a70df",
+      "thumbnail_byte_count": 71852,
+      "thumbnail_dimensions_px": [
+        343,
+        343
+      ],
+      "thumbnail_path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_thumbnail.jpg",
+      "thumbnail_sha256": "c40c6892a088da25ed31cad93fa47a0b9bed636b211b50636e7bf3505a480d2f",
+      "thumbnail_url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/17/P/KM/2025/1/S2B_17PKM_20250119_0_L2A/thumbnail.jpg",
+      "tile_cloudy_pixel_percent": 0.0,
+      "tile_data_coverage_percent": 100.0,
+      "tile_id": "17PKM",
+      "tileinfo_path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tileinfo_metadata.json",
+      "tileinfo_sha256": "efc28ded60298d18b30c0b7af36059bc39ab51b9e2c5912e913091167d37fd23",
+      "tileinfo_url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/17/P/KM/2025/1/S2B_17PKM_20250119_0_L2A/tileinfo_metadata.json",
+      "vegetation_percent": 32.520351,
+      "visual_review_note": "Clear lower/coastal tile; useful for Caribbean outlet color and lowland context, not sufficient by itself for the full rainforest gorge.",
+      "water_percent": 59.78474
+    },
+    {
+      "bbox_wgs84": [
+        -84.27214053021162,
+        8.939548783069545,
+        -83.26428702442637,
+        9.940211441730609
+      ],
+      "catalog_cloud_cover_percent": 14.778528,
+      "epsg": 32616,
+      "product_id": "S2B_16PHR_20250119_0_L2A",
+      "product_name": "S2B_MSIL2A_20250119T160509_N0511_R054_T16PHR_20250119T211653",
+      "stac_item_sha256": "6fa38c9f181a78025f35eb7f0ac245e1961fbdd4218de927e1fe64718a0fc761",
+      "thumbnail_byte_count": 120285,
+      "thumbnail_dimensions_px": [
+        343,
+        343
+      ],
+      "thumbnail_path": "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_thumbnail.jpg",
+      "thumbnail_sha256": "36e68d81e6a6f8c8036d8e0f9fb304693b8916cb88f7c09ffa018dec54232b29",
+      "thumbnail_url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/16/P/HR/2025/1/S2B_16PHR_20250119_0_L2A/thumbnail.jpg",
+      "tile_cloudy_pixel_percent": 0.0,
+      "tile_data_coverage_percent": 100.0,
+      "tile_id": "16PHR",
+      "tileinfo_path": "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tileinfo_metadata.json",
+      "tileinfo_sha256": "aae2f3434a720b7c40970cee1ded61b3c513d8ea559c93ee929a2186bc422137",
+      "tileinfo_url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/16/P/HR/2025/1/S2B_16PHR_20250119_0_L2A/tileinfo_metadata.json",
+      "vegetation_percent": 57.413149,
+      "visual_review_note": "Inland/western companion tile with visible cloud scatter; useful for checking canopy and terrain texture leads, but not enough for mask authority.",
+      "water_percent": 20.293261
+    }
+  ],
+  "forbidden_use": [
+    "production source-drape replacement",
+    "water, vegetation, canopy, shadow, waterfall, mist, or wet-rock mask generation",
+    "claiming complete Pacuare corridor imagery coverage",
+    "photoreal material extraction or texture derivation"
+  ],
+  "generated_on": "2026-07-06",
+  "remaining_blockers": [
+    "Record terms/attribution and package policy for Sentinel COG use before committing any full-resolution bands or derived source drapes.",
+    "Perform windowed COG reads clipped to the Pacuare corridor and stitch all intersecting tiles before replacing the MODIS/GIBS drape.",
+    "Use SCL/QA bands and manual visual review to mask cloud, shadow, haze, water, canopy, wet rock, waterfalls, and mist.",
+    "Compare imagery date/season to rainfall and guide/outfitter observations before promoting river color, wetness, or flow-dependent visuals.",
+    "Keep thumbnails as review references only until full-resolution imagery and masks are approved."
+  ],
+  "review_decision": "Attach public Sentinel COG thumbnails and tile metadata as the first higher-resolution Pacuare visual reference beyond MODIS/GIBS. They are useful for selecting source imagery, but not adequate for production drapes, masks, or photoreal materials.",
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare_sentinel_cog_thumbnail_review.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "source_catalogs": [
+    "Copernicus Data Space OData product metadata",
+    "Element 84 / AWS Open Data Sentinel-2 L2A COG mirror"
+  ],
+  "source_scene_context": {
+    "collection": "sentinel-s2-l2a-cogs",
+    "datetime": "2025-01-19T16:10:30.004000Z",
+    "platform": "sentinel-2b",
+    "processing_level": "S2MSI2A",
+    "selection_reason": "January 19, 2025 was the lowest-cloud Sentinel-2 L2A candidate in the first expanded Copernicus metadata page for the Pacuare planning bounds."
+  },
+  "status": "public_sentinel_cog_thumbnail_and_tile_metadata_attached_review_gated_not_source_drape"
+}

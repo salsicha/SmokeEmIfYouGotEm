@@ -44,6 +44,7 @@ from raftsim.real_world import (
     PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE,
     PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
     PACUARE_RAINFALL_STATION_REVIEW_FILE,
+    PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE,
     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
     PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
@@ -1385,6 +1386,8 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
     assert PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE in classes["water_and_vegetation_masks"]["target_outputs"]
     assert PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE in classes["aerial_or_satellite_imagery"]["target_outputs"]
     assert PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE in classes["water_and_vegetation_masks"]["target_outputs"]
+    assert PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE in classes["aerial_or_satellite_imagery"]["target_outputs"]
+    assert PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE in classes["water_and_vegetation_masks"]["target_outputs"]
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE in classes["hydrography_and_centerline"]["target_outputs"]
@@ -1605,6 +1608,64 @@ def test_pacuare_landsat_product_access_gate_blocks_login_html_artifacts():
     assert attempts["landsat_lc80140532025345_mtl_json"]["response_class"] == "eros_registration_login_html"
     assert attempts["landsat_lc80140532025345_mtl_json"]["artifact_committed"] is False
     assert "claiming Landsat browse imagery is attached" in review["forbidden_use"]
+
+
+def test_pacuare_sentinel_cog_thumbnail_review_attaches_public_visual_triage_only():
+    pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
+    source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((pacuare_dir / "production_source_pull_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+    review = json.loads((pacuare_dir / PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE).read_text())
+    tiles = {tile["tile_id"]: tile for tile in review["attached_thumbnails"]}
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+    pacuare_sources = next(river for river in photoreal_sources["rivers"] if river["river_id"] == "pacuare")
+
+    assert PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE in source_manifest["artifacts"]["imagery"]
+    assert (
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_thumbnail.jpg"
+        in source_manifest["artifacts"]["imagery"]
+    )
+    assert (
+        "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tileinfo_metadata.json"
+        in source_manifest["artifacts"]["imagery"]
+    )
+    assert any(
+        artifact["artifact_id"] == "pacuare_sentinel_cog_thumbnail_review"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert (
+        "physics/data/real_world/pacuare_river_costa_rica/" + PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE
+        in rivers["pacuare"]["attached_sources_by_class"]["aerial_or_satellite_imagery"]["artifacts"]
+    )
+    assert (
+        "physics/data/real_world/pacuare_river_costa_rica/" + PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE
+        in rivers["pacuare"]["attached_sources_by_class"]["water_and_vegetation_masks"]["artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "pacuare_sentinel_cog_thumbnail_review"
+        for artifact in pacuare_sources["source_sample_artifacts"]
+    )
+    assert review["schema"] == "raftsim.pacuare_sentinel_cog_thumbnail_review.v1"
+    assert review["status"] == "public_sentinel_cog_thumbnail_and_tile_metadata_attached_review_gated_not_source_drape"
+    assert len(review["attached_thumbnails"]) == 2
+    assert tiles["17PKM"]["thumbnail_sha256"] == (
+        "c40c6892a088da25ed31cad93fa47a0b9bed636b211b50636e7bf3505a480d2f"
+    )
+    assert tiles["16PHR"]["thumbnail_sha256"] == (
+        "36e68d81e6a6f8c8036d8e0f9fb304693b8916cb88f7c09ffa018dec54232b29"
+    )
+    assert tiles["17PKM"]["catalog_cloud_cover_percent"] == 4.785432
+    assert tiles["16PHR"]["catalog_cloud_cover_percent"] == 14.778528
+    assert tiles["17PKM"]["epsg"] == 32617
+    assert tiles["16PHR"]["epsg"] == 32616
+    assert "production source-drape replacement" in review["forbidden_use"]
+    assert "windowed COG reads clipped to the Pacuare corridor" in review["remaining_blockers"][1]
 
 
 def test_pacuare_source_metadata_review_consolidates_metadata_without_promoting():
@@ -2199,6 +2260,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert PACUARE_CLOUD_SHADOW_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_RAINFALL_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_FLASH_RESPONSE_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]

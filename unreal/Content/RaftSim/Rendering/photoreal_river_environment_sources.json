@@ -1126,6 +1126,24 @@
             "source_drape_replacement_blocker",
             "bad_artifact_prevention"
           ]
+        },
+        {
+          "artifact_id": "pacuare_sentinel_cog_thumbnail_review",
+          "category": "high_resolution_sentinel_thumbnail_and_tile_metadata_review",
+          "paths": [
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_thumbnail.jpg",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tileinfo_metadata.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_thumbnail.jpg",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tileinfo_metadata.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_cog_thumbnail_review.json"
+          ],
+          "promotion_blocker": "Thumbnails and tile metadata are attached for review only; full-resolution COG bands, SCL masks, corridor clipping, manual QA, and guide/geospatial approval are still required before Unreal source-drape or material replacement.",
+          "status": "public_sentinel_cog_thumbnail_and_tile_metadata_attached_review_gated_not_source_drape",
+          "use_in_unreal": [
+            "visual_reference_review",
+            "future_source_drape_replacement_planning",
+            "sentinel_cog_access_validation"
+          ]
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
