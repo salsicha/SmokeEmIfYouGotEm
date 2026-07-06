@@ -35,7 +35,7 @@
   "production_blockers": [
     "Full corridor DEM/lidar tiles are not downloaded or conditioned yet.",
     "Aerial imagery and water/vegetation masks are not downloaded yet.",
-    "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract and an ordered South Fork mainstem candidate, but it still needs direction confirmation, reprojection, bank/cross-section derivation, NAIP/DEM alignment, and guide review.",
+    "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, an ordered South Fork mainstem candidate, and preview metric stationing, but it still needs direction confirmation, production CRS selection, bank/cross-section derivation, NAIP/DEM alignment, and guide review.",
     "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window, but broader seasonal windows, A25 X-flag interpretation, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet."
   ],
@@ -300,7 +300,8 @@
       "path": "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
       "provider": "RaftSim derived artifact from USGS National Hydrography Dataset HU8 18020129",
       "related_artifacts": [
-        "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson"
+        "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
+        "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json"
       ],
       "status": "derived_candidate_attached_review_required",
       "summary": {
@@ -315,6 +316,32 @@
         "future_stationing_seed",
         "rapid_review_overlay",
         "naip_dem_alignment_gate"
+      ]
+    },
+    {
+      "artifact_id": "nhd_hu8_18020129_mainstem_stationing_candidate",
+      "category": "hydrography_stationing_candidate",
+      "caveats": [
+        "Uses a local equirectangular preview transform, not the final production working CRS.",
+        "Station zero and downstream direction are inherited from the inferred east-to-west mainstem candidate and still require confirmation.",
+        "Left normals are cross-section seeds only; banks, shelves, islands, and side channels are not reviewed.",
+        "Do not use for solver or Unreal coordinate authority until production CRS, NAIP/DEM alignment, and guide review pass."
+      ],
+      "path": "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
+      "provider": "RaftSim derived artifact from the South Fork NHD mainstem candidate",
+      "status": "derived_metric_candidate_attached_review_required",
+      "summary": {
+        "length_m_geodesic_vertices": 26204.692,
+        "station_sample_count": 264,
+        "station_sample_interval_m": 100.0,
+        "transform": "local_equirectangular_preview_meters",
+        "vertex_count": 361
+      },
+      "use": [
+        "future_stationing_review",
+        "cross_section_seed_normals",
+        "naip_dem_alignment_gate",
+        "unreal_transform_review_input"
       ]
     },
     {

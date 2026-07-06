@@ -153,6 +153,7 @@
         "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
         "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
         "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
+        "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
         "hydrology/usgs_11445500_daily_discharge.json",
         "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
         "hydrology/south_fork_modern_flow_source_selection.json",
@@ -173,6 +174,7 @@
             "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
             "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
             "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
+            "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
             "hydrography/production_import_pilot/centerline.geojson",
             "hydrography/production_import_pilot/banks.geojson",
             "hydrography/production_import_pilot/cross_sections.geojson"
