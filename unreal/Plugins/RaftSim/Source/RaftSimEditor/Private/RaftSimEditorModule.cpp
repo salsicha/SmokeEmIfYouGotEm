@@ -1107,11 +1107,11 @@ bool SavePreviewWorld(UWorld* World, const FString& PackagePath, FString& OutSum
     return bSaved;
 }
 
-FString GetPreviewCaptureRelativePath(const FRaftSimEnvironmentPreviewSpec& Spec)
+FString GetPreviewCaptureRelativePath(const FRaftSimEnvironmentPreviewSpec& Spec, const FString& CaptureId)
 {
     return FPaths::Combine(
         TEXT("docs/environment-captures/photoreal_river_previews"),
-        Spec.RiverId + TEXT("_guide_seat_downstream.png"));
+        Spec.RiverId + TEXT("_") + CaptureId + TEXT(".png"));
 }
 
 FString GetPreviewFidelityNote(const FRaftSimEnvironmentPreviewSpec& Spec)
@@ -1124,7 +1124,7 @@ FString GetPreviewFidelityNote(const FRaftSimEnvironmentPreviewSpec& Spec)
     return TEXT("source-aware procedural blockout with generated valley, river, foam, rocks, foliage, and raft proxies; not yet production photoreal");
 }
 
-ACameraActor* FindPreviewCaptureCamera(UWorld* World)
+ACameraActor* FindPreviewCaptureCamera(UWorld* World, const FString& PreferredCameraLabel)
 {
     ACameraActor* FallbackCamera = nullptr;
     for (TActorIterator<ACameraActor> It(World); It; ++It)
@@ -1135,7 +1135,7 @@ ACameraActor* FindPreviewCaptureCamera(UWorld* World)
             FallbackCamera = Camera;
         }
 
-        if (Camera && Camera->GetActorLabel() == TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"))
+        if (Camera && Camera->GetActorLabel() == PreferredCameraLabel)
         {
             return Camera;
         }
@@ -1148,6 +1148,10 @@ bool CapturePreviewImageForSpec(
     const FRaftSimEnvironmentPreviewSpec& Spec,
     const FString& CaptureRoot,
     FString& OutRelativeCapturePath,
+    const FString& CameraLabel,
+    const FString& CaptureId,
+    const FString& CaptureDescription,
+    bool bHideForegroundRaftProxies,
     FString& OutSummary)
 {
     const FString MapFilename =
@@ -1168,10 +1172,10 @@ bool CapturePreviewImageForSpec(
     FlushAsyncLoading();
     World->FlushLevelStreaming(EFlushLevelStreamingType::Full);
 
-    ACameraActor* Camera = FindPreviewCaptureCamera(World);
+    ACameraActor* Camera = FindPreviewCaptureCamera(World, CameraLabel);
     if (!Camera || !Camera->GetCameraComponent())
     {
-        OutSummary += FString::Printf(TEXT("No guide-seat capture camera found in %s\n"), *Spec.MapPackagePath);
+        OutSummary += FString::Printf(TEXT("No %s capture camera found in %s\n"), *CaptureDescription, *Spec.MapPackagePath);
         return false;
     }
 
@@ -1206,6 +1210,17 @@ bool CapturePreviewImageForSpec(
     CaptureComponent->CaptureSource = SCS_FinalColorLDR;
     CaptureComponent->bCaptureEveryFrame = false;
     CaptureComponent->bCaptureOnMovement = false;
+    if (bHideForegroundRaftProxies)
+    {
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            AActor* Actor = *It;
+            if (Actor && Actor->GetActorLabel().StartsWith(TEXT("RaftSim_ForegroundRaft_")))
+            {
+                CaptureComponent->HideActorComponents(Actor);
+            }
+        }
+    }
     CaptureComponent->CaptureScene();
     FlushRenderingCommands();
 
@@ -1228,7 +1243,7 @@ bool CapturePreviewImageForSpec(
     TArray64<uint8> CompressedPng;
     FImageUtils::PNGCompressImageArray(CaptureWidth, CaptureHeight, MakeArrayView(ImageData), CompressedPng);
 
-    OutRelativeCapturePath = GetPreviewCaptureRelativePath(Spec);
+    OutRelativeCapturePath = GetPreviewCaptureRelativePath(Spec, CaptureId);
     const FString AbsoluteCapturePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), OutRelativeCapturePath));
     IFileManager::Get().MakeDirectory(*CaptureRoot, true);
     const bool bSaved = FFileHelper::SaveArrayToFile(CompressedPng, *AbsoluteCapturePath);
@@ -1237,8 +1252,9 @@ bool CapturePreviewImageForSpec(
     RenderTarget->ReleaseResource();
 
     OutSummary += FString::Printf(
-        TEXT("%s rendered guide-seat capture for %s -> %s\n"),
+        TEXT("%s rendered %s capture for %s -> %s\n"),
         bSaved ? TEXT("Saved") : TEXT("Failed"),
+        *CaptureDescription,
         *Spec.DisplayName,
         *AbsoluteCapturePath);
     return bSaved;
@@ -2400,9 +2416,27 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
     for (int32 Index = 0; Index < Specs.Num(); ++Index)
     {
         const FRaftSimEnvironmentPreviewSpec& Spec = Specs[Index];
-        FString CapturePath = GetPreviewCaptureRelativePath(Spec);
-        const bool bCaptured = CapturePreviewImageForSpec(Spec, CaptureRoot, CapturePath, OutSummary);
-        bAllCaptured &= bCaptured;
+        FString GuideSeatCapturePath = GetPreviewCaptureRelativePath(Spec, TEXT("guide_seat_downstream"));
+        FString RiverEyeCapturePath = GetPreviewCaptureRelativePath(Spec, TEXT("river_eye_downstream"));
+        const bool bGuideSeatCaptured = CapturePreviewImageForSpec(
+            Spec,
+            CaptureRoot,
+            GuideSeatCapturePath,
+            TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+            TEXT("guide_seat_downstream"),
+            TEXT("guide-seat downstream"),
+            false,
+            OutSummary);
+        const bool bRiverEyeCaptured = CapturePreviewImageForSpec(
+            Spec,
+            CaptureRoot,
+            RiverEyeCapturePath,
+            TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+            TEXT("river_eye_downstream"),
+            TEXT("river-eye downstream"),
+            true,
+            OutSummary);
+        bAllCaptured &= bGuideSeatCaptured && bRiverEyeCaptured;
 
         EntriesJson += FString::Printf(
             TEXT("%s    {\n")
@@ -2411,6 +2445,8 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("      \"map_package\": \"%s\",\n")
             TEXT("      \"source_manifest\": \"%s\",\n")
             TEXT("      \"capture\": \"%s\",\n")
+            TEXT("      \"guide_seat_capture\": \"%s\",\n")
+            TEXT("      \"river_eye_capture\": \"%s\",\n")
             TEXT("      \"status\": \"%s\",\n")
             TEXT("      \"aerial_drape_image\": \"%s\",\n")
             TEXT("      \"terrain_relief_image\": \"%s\",\n")
@@ -2422,8 +2458,10 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             *EscapeRaftSimJsonString(Spec.DisplayName),
             *EscapeRaftSimJsonString(Spec.MapPackagePath),
             *EscapeRaftSimJsonString(Spec.SourceManifest),
-            *EscapeRaftSimJsonString(CapturePath),
-            bCaptured && !Spec.SourceDrapeDescription.IsEmpty() ? TEXT("captured_source_derived_preview_render") : (bCaptured ? TEXT("captured_procedural_blockout_render") : TEXT("capture_failed")),
+            *EscapeRaftSimJsonString(GuideSeatCapturePath),
+            *EscapeRaftSimJsonString(GuideSeatCapturePath),
+            *EscapeRaftSimJsonString(RiverEyeCapturePath),
+            bGuideSeatCaptured && bRiverEyeCaptured && !Spec.SourceDrapeDescription.IsEmpty() ? TEXT("captured_source_derived_guide_and_river_eye_preview_renders") : (bGuideSeatCaptured && bRiverEyeCaptured ? TEXT("captured_procedural_guide_and_river_eye_blockout_renders") : TEXT("capture_failed")),
             *EscapeRaftSimJsonString(Spec.AerialDrapeImage),
             *EscapeRaftSimJsonString(Spec.TerrainReliefImage),
             *EscapeRaftSimJsonString(Spec.ElevationSample),
@@ -2433,14 +2471,14 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
     const FString Manifest = FString::Printf(
         TEXT("{\n")
         TEXT("  \"schema\": \"raftsim.unreal.environment_capture_manifest.v1\",\n")
-        TEXT("  \"capture_type\": \"guide_seat_downstream_unreal_preview\",\n")
+        TEXT("  \"capture_type\": \"guide_seat_and_river_eye_downstream_unreal_preview\",\n")
         TEXT("  \"source_plan\": \"unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json\",\n")
         TEXT("  \"status\": \"%s\",\n")
         TEXT("  \"captures\": [\n")
         TEXT("%s\n")
         TEXT("  ]\n")
         TEXT("}\n"),
-        bAllCaptured ? TEXT("south_fork_colorado_and_pacuare_source_draped_previews_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
+        bAllCaptured ? TEXT("south_fork_colorado_and_pacuare_source_draped_guide_and_river_eye_previews_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
         *EntriesJson);
 
     const FString ManifestPath = FPaths::Combine(CaptureRoot, TEXT("environment_capture_manifest.json"));
