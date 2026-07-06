@@ -1,0 +1,133 @@
+{
+  "schema": "raftsim.unreal.tool_validation_actions.v1",
+  "status": "ready_for_editor_button_wiring",
+  "module": "RaftSimEditor",
+  "registry_class": "URaftSimToolValidationActionRegistry",
+  "runner_class": "URaftSimToolValidationActionRunner",
+  "actions": [
+    {
+      "action_id": "source_checks",
+      "tool_id": "GeospatialValidator",
+      "kind": "source_check",
+      "display_name": "Validate Source",
+      "source_manifest": "unreal/Content/RaftSim/River/geospatial_import_pipeline.json",
+      "report_path": "physics/reports/milestone24/alpha_expansion_gate.json",
+      "command_preview": "Validate JSON source manifests, CRS metadata, rights/provenance, and source catalog links.",
+      "required_evidence": [
+        "physics/data/real_world/source_catalog.json",
+        "unreal/Content/RaftSim/River/geospatial_import_pipeline.json"
+      ],
+      "requires_editor_automation": false,
+      "blocks_promotion": true
+    },
+    {
+      "action_id": "deterministic_export",
+      "tool_id": "RapidRiverEditor",
+      "kind": "deterministic_export",
+      "display_name": "Export Deterministically",
+      "source_manifest": "unreal/Content/RaftSim/Tools/rapid_river_editor_shell.json",
+      "report_path": "unreal/Content/RaftSim/River/round_trip_validation.json",
+      "command_preview": "Export JSON/GeoJSON editor artifacts with stable ordering and manifest-recorded provenance.",
+      "required_evidence": [
+        "unreal/Content/RaftSim/River/rapid_river_editor.json",
+        "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
+      ],
+      "requires_editor_automation": false,
+      "blocks_promotion": true
+    },
+    {
+      "action_id": "regenerate_solver_package",
+      "tool_id": "RapidRiverEditor",
+      "kind": "solver_package_regeneration",
+      "display_name": "Regenerate Solver Package",
+      "source_manifest": "unreal/Content/RaftSim/River/round_trip_validation.json",
+      "report_path": "physics/reports/milestone20/report_set_lock.json",
+      "command_preview": "Regenerate solver-facing arrays and comparison inputs from exported river editor data.",
+      "required_evidence": [
+        "unreal/Content/RaftSim/River/round_trip_validation.json",
+        "physics/reports/milestone16/full_cpp_validation_gate.json"
+      ],
+      "requires_editor_automation": true,
+      "blocks_promotion": true
+    },
+    {
+      "action_id": "stitched_window_validation",
+      "tool_id": "GeospatialValidator",
+      "kind": "stitched_window_validation",
+      "display_name": "Validate Stitched Window",
+      "source_manifest": "unreal/Content/RaftSim/River/reach_local_streaming.json",
+      "report_path": "unreal/Content/RaftSim/River/round_trip_validation.json",
+      "command_preview": "Confirm reach-local authoring windows export stitched whole-window fields and conservation summaries.",
+      "required_evidence": [
+        "unreal/Content/RaftSim/River/reach_local_streaming.json",
+        "unreal/Content/RaftSim/River/round_trip_validation.json"
+      ],
+      "requires_editor_automation": false,
+      "blocks_promotion": true
+    },
+    {
+      "action_id": "live_water_smoke",
+      "tool_id": "ReplayDebugViewer",
+      "kind": "live_water_smoke",
+      "display_name": "Run Live-Water Smoke",
+      "source_manifest": "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json",
+      "report_path": "physics/reports/milestone20/live_water_unreal_smoke_suite.json",
+      "command_preview": "Automation RunTests RaftSim.Milestone20.LiveWaterSmokeSuite",
+      "required_evidence": [
+        "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json",
+        "physics/reports/milestone20/report_set_lock.json"
+      ],
+      "requires_editor_automation": true,
+      "blocks_promotion": true
+    },
+    {
+      "action_id": "round_trip_validation",
+      "tool_id": "RapidRiverEditor",
+      "kind": "round_trip_validation",
+      "display_name": "Run Round Trip",
+      "source_manifest": "unreal/Content/RaftSim/River/round_trip_validation.json",
+      "report_path": "unreal/Content/RaftSim/River/round_trip_validation.json",
+      "command_preview": "Validate that Unreal exports can regenerate solver packages, GeoClaw/C++ inputs, and fidelity overlays.",
+      "required_evidence": [
+        "unreal/Content/RaftSim/River/round_trip_validation.json",
+        "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json"
+      ],
+      "requires_editor_automation": false,
+      "blocks_promotion": true
+    },
+    {
+      "action_id": "open_latest_report",
+      "tool_id": "VerticalSliceLauncher",
+      "kind": "open_report",
+      "display_name": "Open Latest Report",
+      "source_manifest": "unreal/Content/RaftSim/Automation/vertical_slice_acceptance_gate.json",
+      "report_path": "physics/reports/milestone23/vertical_slice_acceptance_gate.json",
+      "command_preview": "Open the latest linked validation or acceptance report for reviewer inspection.",
+      "required_evidence": [
+        "physics/reports/milestone23/vertical_slice_acceptance_gate.json",
+        "physics/reports/milestone24/alpha_expansion_gate.json"
+      ],
+      "requires_editor_automation": false,
+      "blocks_promotion": false
+    }
+  ],
+  "button_groups": [
+    {
+      "group_id": "authoring_export",
+      "actions": [
+        "source_checks",
+        "deterministic_export",
+        "regenerate_solver_package",
+        "stitched_window_validation"
+      ]
+    },
+    {
+      "group_id": "runtime_review",
+      "actions": [
+        "live_water_smoke",
+        "round_trip_validation",
+        "open_latest_report"
+      ]
+    }
+  ]
+}

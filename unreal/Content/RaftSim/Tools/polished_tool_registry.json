@@ -2,6 +2,7 @@
   "schema": "raftsim.unreal.polished_tool_registry.v1",
   "status": "ready_for_editor_menu_registration",
   "module": "RaftSimEditor",
+  "validation_actions": "unreal/Content/RaftSim/Tools/tool_validation_actions.json",
   "menu": {
     "owner": "RaftSimTools",
     "main_menu_path": "LevelEditor.MainMenu",
