@@ -148,6 +148,8 @@ def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
     assert "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json" in manifest["artifacts"]["hydrography"]
     assert "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson" in manifest["artifacts"]["hydrography"]
     assert "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json" in manifest["artifacts"]["hydrography"]
+    assert "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json" in manifest["artifacts"]["imagery"]
+    assert "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png" in manifest["artifacts"]["imagery"]
 
 
 def test_south_fork_nhd_hu8_extract_records_selection_and_counts():
@@ -161,6 +163,15 @@ def test_south_fork_nhd_hu8_extract_records_selection_and_counts():
     cross_section_manifest = json.loads((hydro_dir / "nhd_hu8_18020129_cross_section_seed_manifest.json").read_text())
     cross_sections = json.loads((hydro_dir / "nhd_hu8_18020129_cross_section_seed_candidates.geojson").read_text())
     alignment = json.loads((hydro_dir / "nhd_hu8_18020129_naip_dem_alignment_diagnostic.json").read_text())
+    water_prior = json.loads(
+        (
+            REAL_WORLD_DATA_DIR
+            / "south_fork_american_chili_bar"
+            / "imagery"
+            / "production_import_pilot"
+            / "nhd_mainstem_water_prior_manifest.json"
+        ).read_text()
+    )
 
     assert manifest["selected_product"]["hydrologic_unit"] == "18020129"
     assert manifest["source_crs"]["epsg"] == "EPSG:4269"
@@ -190,6 +201,12 @@ def test_south_fork_nhd_hu8_extract_records_selection_and_counts():
     assert alignment["summary"]["station_samples_out_of_bounds"] == 4
     assert alignment["summary"]["station_water"]["ge_0_35_fraction"] == 0.3962
     assert alignment["summary"]["cross_sections_out_of_bounds"] == 3
+    assert water_prior["status"] == "generated_review_gated_alignment_prior_not_segmentation_truth"
+    assert water_prior["processing"]["line_width_px"] == 18
+    assert water_prior["processing"]["station_samples_outside_bbox"] == 4
+    assert water_prior["summary"]["nonzero_pixel_fraction"] == 0.044446
+    assert water_prior["summary"]["ge_128_pixel_fraction"] == 0.020542
+    assert water_prior["summary"]["sha256"] == "d01014e177ebced19c61583038a96f677fefde4a94ffc113704f744bab29ca17"
 
 
 def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_review_gates():
@@ -237,6 +254,12 @@ def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_revie
         "hydrography_and_centerline"
     ]["target_outputs"]
     assert classes["water_and_vegetation_masks"]["status"] == "requires_new_derivatives_from_pilot_imagery_and_hydrography"
+    assert "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json" in classes[
+        "water_and_vegetation_masks"
+    ]["target_outputs"]
+    assert "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png" in classes[
+        "water_and_vegetation_masks"
+    ]["target_outputs"]
     assert pilot["unreal_import_targets"]["future_production_map"] == "/Game/RaftSim/Maps/Production/L_SouthForkAmerican_ChiliBar"
 
 
@@ -378,6 +401,14 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     )
     assert (
         "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json"
+        in rivers["american_south_fork"]["attached_preview_inputs"]
+    )
+    assert (
+        "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json"
+        in rivers["american_south_fork"]["attached_preview_inputs"]
+    )
+    assert (
+        "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png"
         in rivers["american_south_fork"]["attached_preview_inputs"]
     )
     assert "USGS 11445500" in rivers["american_south_fork"]["procedural_generation_allowlist"][2]

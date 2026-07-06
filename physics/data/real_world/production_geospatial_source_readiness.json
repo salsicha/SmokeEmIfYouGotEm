@@ -270,10 +270,12 @@
             "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_water_mask_1024.png",
             "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png",
             "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/water_mask_2048.png",
-            "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/vegetation_mask_2048.png"
+            "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/vegetation_mask_2048.png",
+            "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json",
+            "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png"
           ],
-          "promotion_blocker": "Masks are deterministic preview derivatives from source imagery and a bounded channel prior; they require hydrography/bank alignment, scene review, seasonal variants, wet-rock classification, and guide/geospatial approval.",
-          "status": "preview_masks_and_pilot_stitched_masks_attached"
+          "promotion_blocker": "Masks are deterministic preview derivatives from source imagery plus a separate NHD mainstem water prior. The prior is useful for editor alignment but agrees with stationing by construction, so reviewed orthomosaic segmentation, bank polygons, seasonal variants, wet-rock classification, and guide/geospatial approval are still required.",
+          "status": "preview_masks_pilot_stitched_masks_and_nhd_water_prior_attached"
         }
       },
       "production_import_pilot": "physics/data/real_world/south_fork_american_chili_bar/production_import_pilot.json",
