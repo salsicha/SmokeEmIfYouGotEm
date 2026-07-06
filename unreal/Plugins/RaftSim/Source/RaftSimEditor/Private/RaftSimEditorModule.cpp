@@ -202,10 +202,12 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.SourceManifest = TEXT("physics/data/real_world/south_fork_american_chili_bar/source_manifest.json");
     SouthFork.AerialDrapeImage =
         TEXT("physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_sample_512.png");
+    SouthFork.TerrainReliefImage =
+        TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_relief_preview_512.png");
     SouthFork.ElevationSample =
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_sample_256.tif");
     SouthFork.SourceDrapeDescription =
-        TEXT("official USDA/APFO NAIP 512px aerial sample sampled into visible terrain overlay tiles; USGS 3DEP GeoTIFF sample recorded for follow-on elevation conditioning; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
+        TEXT("official USDA/APFO NAIP 512px aerial sample sampled into visible terrain overlay tiles; derived USGS 3DEP relief preview sampled into bank and valley terrain geometry; full elevation conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
     SouthFork.WaterColor = FLinearColor(0.04f, 0.32f, 0.36f);
     SouthFork.TerrainColor = FLinearColor(0.35f, 0.30f, 0.21f);
     SouthFork.RockColor = FLinearColor(0.38f, 0.36f, 0.31f);
@@ -214,6 +216,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.RiverHalfWidthCm = 335.0f;
     SouthFork.BankWidthCm = 720.0f;
     SouthFork.BendAmplitudeCm = 290.0f;
+    SouthFork.TerrainReliefAmplitudeCm = 180.0f;
     SouthFork.BoulderCount = 24;
     SouthFork.FoliageCount = 46;
     SouthFork.FoamTrainCount = 14;
@@ -226,10 +229,12 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.SourceManifest = TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json");
     Colorado.AerialDrapeImage =
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_sample_512.png");
+    Colorado.TerrainReliefImage =
+        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_relief_preview_512.png");
     Colorado.ElevationSample =
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_sample_256.tif");
     Colorado.SourceDrapeDescription =
-        TEXT("official USDA/APFO NAIP 512px Lees Ferry aerial sample sampled into visible canyon terrain overlay tiles; USGS 3DEP GeoTIFF sample recorded for follow-on canyon heightfield conditioning; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
+        TEXT("official USDA/APFO NAIP 512px Lees Ferry aerial sample sampled into visible canyon terrain overlay tiles; derived USGS 3DEP relief preview sampled into canyon bank geometry; full canyon heightfield conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
     Colorado.WaterColor = FLinearColor(0.28f, 0.20f, 0.12f);
     Colorado.TerrainColor = FLinearColor(0.48f, 0.30f, 0.18f);
     Colorado.RockColor = FLinearColor(0.55f, 0.32f, 0.20f);
@@ -238,6 +243,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.RiverHalfWidthCm = 520.0f;
     Colorado.BankWidthCm = 1500.0f;
     Colorado.BendAmplitudeCm = 360.0f;
+    Colorado.TerrainReliefAmplitudeCm = 650.0f;
     Colorado.BoulderCount = 20;
     Colorado.FoliageCount = 18;
     Colorado.FoamTrainCount = 9;

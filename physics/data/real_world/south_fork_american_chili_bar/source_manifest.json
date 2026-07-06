@@ -4,6 +4,8 @@
       "terrain/3dep_dem_tiles",
       "terrain/tnm_3dep_dem_products.json",
       "terrain/usgs_3dep_chili_bar_sample_256.tif",
+      "terrain/usgs_3dep_chili_bar_relief_preview_512.png",
+      "terrain/usgs_3dep_chili_bar_relief_preview_manifest.json",
       "course_elevation_extraction.json",
       "terrain/solver_bed_grid.npy"
     ],

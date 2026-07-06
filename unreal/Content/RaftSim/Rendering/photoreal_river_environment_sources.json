@@ -143,6 +143,14 @@
           "provider": "USGS 3D Elevation Program ImageServer",
           "status": "recorded_for_follow_on_heightfield_conditioning",
           "unreal_use": "provenance and import-pipeline smoke-test sample; full heightfield replacement still pending"
+        },
+        {
+          "artifact_id": "usgs_3dep_chili_bar_relief_preview_512",
+          "category": "derived_terrain_relief_preview",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_relief_preview_512.png",
+          "provider": "RaftSim geospatial preview utility from USGS 3DEP ImageServer sample",
+          "status": "sampled_by_unreal_preview_geometry",
+          "unreal_use": "preview-only bank and valley terrain relief perturbation for /Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview"
         }
       ],
       "flow_sources": [
@@ -195,6 +203,14 @@
           "provider": "USGS 3D Elevation Program ImageServer",
           "status": "recorded_for_follow_on_canyon_heightfield_conditioning",
           "unreal_use": "provenance and import-pipeline smoke-test sample; full canyon heightfield replacement still pending"
+        },
+        {
+          "artifact_id": "usgs_3dep_lees_ferry_relief_preview_512",
+          "category": "derived_terrain_relief_preview",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_relief_preview_512.png",
+          "provider": "RaftSim geospatial preview utility from USGS 3DEP ImageServer sample",
+          "status": "sampled_by_unreal_preview_geometry",
+          "unreal_use": "preview-only canyon bank terrain relief perturbation for /Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"
         }
       ],
       "flow_sources": [
