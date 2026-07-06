@@ -8,6 +8,7 @@ from raftsim.geospatial_preview import (
     build_pacuare_import_pilot_derivatives,
     build_source_imagery_masks,
     build_south_fork_import_pilot_derivatives,
+    build_south_fork_production_hydrography_drafts,
 )
 
 
@@ -101,6 +102,85 @@ def test_build_south_fork_import_pilot_derivatives_stitches_tiles_and_records_ma
     assert manifest["processing"]["north_up_mosaic"] == "pilot tile row 1 is placed above row 0"
     assert water_mask.mean() > 0.0
     assert vegetation_mask.mean() > 0.0
+
+
+def test_build_south_fork_production_hydrography_drafts_records_review_gates(tmp_path):
+    south_fork_root = tmp_path / "south_fork"
+    hydro_root = south_fork_root / "hydrography"
+    hydro_root.mkdir(parents=True)
+
+    stationing = {
+        "local_transform": {"station_axis": "downstream_from_inferred_upstream_endpoint_meters"},
+        "summary": {
+            "length_m_geodesic_vertices": 200.0,
+            "source_length_km_nhd_sum": 0.2,
+            "station_sample_count": 3,
+            "vertex_count": 3,
+        },
+        "vertices": [
+            {"lon": -120.0, "lat": 38.0},
+            {"lon": -120.001, "lat": 38.001},
+            {"lon": -120.002, "lat": 38.002},
+        ],
+        "station_samples": [
+            {"station_m": 0.0},
+            {"station_m": 100.0},
+            {"station_m": 200.0},
+        ],
+    }
+    cross_sections = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[-120.0, 37.999], [-120.0, 38.0], [-120.0, 38.001]],
+                },
+                "properties": {"cross_section_id": "xs_000", "half_width_m": 80.0, "station_m": 0.0},
+            },
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[-120.002, 38.001], [-120.002, 38.002], [-120.002, 38.003]],
+                },
+                "properties": {"cross_section_id": "xs_001", "half_width_m": 80.0, "station_m": 200.0},
+            },
+        ],
+    }
+    mainstem_manifest = {"derivation": {"orientation": "east_to_west_review_orientation"}}
+    (hydro_root / "nhd_hu8_18020129_mainstem_stationing_candidate.json").write_text(
+        json.dumps(stationing), encoding="utf-8"
+    )
+    (hydro_root / "nhd_hu8_18020129_cross_section_seed_candidates.geojson").write_text(
+        json.dumps(cross_sections), encoding="utf-8"
+    )
+    (hydro_root / "nhd_hu8_18020129_mainstem_candidate_manifest.json").write_text(
+        json.dumps(mainstem_manifest), encoding="utf-8"
+    )
+
+    build_south_fork_production_hydrography_drafts(south_fork_root, repo_root=tmp_path)
+
+    output_root = hydro_root / "production_import_pilot"
+    manifest = json.loads((output_root / "hydrography_draft_manifest.json").read_text(encoding="utf-8"))
+    centerline = json.loads((output_root / "centerline.geojson").read_text(encoding="utf-8"))
+    banks = json.loads((output_root / "banks.geojson").read_text(encoding="utf-8"))
+    generated_cross_sections = json.loads((output_root / "cross_sections.geojson").read_text(encoding="utf-8"))
+
+    assert manifest["schema"] == "raftsim.south_fork_production_hydrography_drafts.manifest.v1"
+    assert manifest["status"] == "draft_hydrography_artifacts_generated_review_required_not_production_authority"
+    assert manifest["summary"]["centerline_vertex_count"] == 3
+    assert manifest["summary"]["cross_section_count"] == 2
+    assert manifest["outputs"]["centerline"] == "south_fork/hydrography/production_import_pilot/centerline.geojson"
+    assert centerline["features"][0]["properties"]["status"] == (
+        "draft_from_nhd_mainstem_candidate_review_gated_not_final_centerline"
+    )
+    assert len(banks["features"]) == 2
+    assert banks["features"][0]["properties"]["status"] == "draft_offset_line_not_reviewed_bank"
+    assert generated_cross_sections["features"][0]["properties"]["status"] == (
+        "draft_production_import_cross_section_review_line_not_solver_section"
+    )
 
 
 def test_build_colorado_import_pilot_derivatives_stitches_tiles_and_records_manifest(tmp_path):

@@ -99,6 +99,28 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _geojson_bbox(features: list[dict[str, object]]) -> list[float]:
+    coordinates: list[tuple[float, float]] = []
+
+    def collect(value: object) -> None:
+        if isinstance(value, list) and len(value) >= 2 and all(isinstance(item, (int, float)) for item in value[:2]):
+            coordinates.append((float(value[0]), float(value[1])))
+            return
+        if isinstance(value, list):
+            for item in value:
+                collect(item)
+
+    for feature in features:
+        geometry = feature.get("geometry", {})
+        if isinstance(geometry, dict):
+            collect(geometry.get("coordinates"))
+    if not coordinates:
+        return [0.0, 0.0, 0.0, 0.0]
+    lons = [lon for lon, _lat in coordinates]
+    lats = [lat for _lon, lat in coordinates]
+    return [round(min(lons), 7), round(min(lats), 7), round(max(lons), 7), round(max(lats), 7)]
+
+
 def _smoothstep(edge0: np.ndarray | float, edge1: np.ndarray | float, value: np.ndarray) -> np.ndarray:
     t = np.clip((value - edge0) / np.maximum(1.0e-6, np.asarray(edge1) - np.asarray(edge0)), 0.0, 1.0)
     return t * t * (3.0 - 2.0 * t)
@@ -733,6 +755,183 @@ def build_south_fork_import_pilot_derivatives(
     )
 
 
+def build_south_fork_production_hydrography_drafts(south_fork_root: Path, repo_root: Path | None = None) -> None:
+    """Promote South Fork NHD review seeds into draft production-import hydrography artifacts."""
+
+    hydro_root = south_fork_root / "hydrography"
+    output_root = hydro_root / "production_import_pilot"
+    output_root.mkdir(parents=True, exist_ok=True)
+
+    stationing_path = hydro_root / "nhd_hu8_18020129_mainstem_stationing_candidate.json"
+    cross_section_seed_path = hydro_root / "nhd_hu8_18020129_cross_section_seed_candidates.geojson"
+    mainstem_manifest_path = hydro_root / "nhd_hu8_18020129_mainstem_candidate_manifest.json"
+    alignment_diagnostic_path = hydro_root / "nhd_hu8_18020129_naip_dem_alignment_diagnostic.json"
+    water_prior_manifest_path = south_fork_root / "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json"
+
+    stationing = json.loads(stationing_path.read_text(encoding="utf-8"))
+    cross_section_seeds = json.loads(cross_section_seed_path.read_text(encoding="utf-8"))
+    mainstem_manifest = json.loads(mainstem_manifest_path.read_text(encoding="utf-8"))
+    vertices = stationing["vertices"]
+    station_samples = stationing["station_samples"]
+    seed_features = cross_section_seeds["features"]
+
+    centerline_feature = {
+        "type": "Feature",
+        "geometry": {
+            "type": "LineString",
+            "coordinates": [[vertex["lon"], vertex["lat"]] for vertex in vertices],
+        },
+        "properties": {
+            "river_id": "american_south_fork",
+            "section_id": "chili_bar_to_coloma",
+            "source": "nhd_hu8_18020129_mainstem_stationing_candidate",
+            "status": "draft_from_nhd_mainstem_candidate_review_gated_not_final_centerline",
+            "station_axis": stationing["local_transform"]["station_axis"],
+            "length_m_preview": stationing["summary"]["length_m_geodesic_vertices"],
+            "source_length_km_nhd_sum": stationing["summary"]["source_length_km_nhd_sum"],
+            "vertex_count": stationing["summary"]["vertex_count"],
+            "station_sample_count": stationing["summary"]["station_sample_count"],
+            "promotion_gate": (
+                "Confirm flow direction, working CRS, NAIP/DEM alignment, bank offsets, rapid/access stationing, "
+                "and guide review before solver, Unreal, or gameplay authority."
+            ),
+        },
+    }
+    centerline = {
+        "type": "FeatureCollection",
+        "name": "south_fork_american_production_import_centerline_draft",
+        "bbox": _geojson_bbox([centerline_feature]),
+        "properties": {
+            "schema": "raftsim.south_fork_production_hydrography_drafts.centerline.v1",
+            "generated_on": "2026-07-06",
+            "review_status": "draft_review_required_not_final_centerline",
+            "source_stationing": _manifest_path(stationing_path, repo_root),
+        },
+        "features": [centerline_feature],
+    }
+
+    left_bank_coordinates = [feature["geometry"]["coordinates"][0] for feature in seed_features]
+    right_bank_coordinates = [feature["geometry"]["coordinates"][-1] for feature in seed_features]
+    bank_features = [
+        {
+            "type": "Feature",
+            "geometry": {"type": "LineString", "coordinates": left_bank_coordinates},
+            "properties": {
+                "bank_id": "draft_left_bank_offset_from_cross_section_seeds",
+                "side": "river_left",
+                "status": "draft_offset_line_not_reviewed_bank",
+                "source": "nhd_cross_section_seed_endpoints",
+                "offset_m_from_centerline": seed_features[0]["properties"]["half_width_m"],
+                "station_start_m": station_samples[0]["station_m"],
+                "station_end_m": station_samples[-1]["station_m"],
+                "promotion_gate": "Replace with NAIP/DEM/field-reviewed banks, shelves, side channels, and seasonal wetted widths.",
+            },
+        },
+        {
+            "type": "Feature",
+            "geometry": {"type": "LineString", "coordinates": right_bank_coordinates},
+            "properties": {
+                "bank_id": "draft_right_bank_offset_from_cross_section_seeds",
+                "side": "river_right",
+                "status": "draft_offset_line_not_reviewed_bank",
+                "source": "nhd_cross_section_seed_endpoints",
+                "offset_m_from_centerline": seed_features[0]["properties"]["half_width_m"],
+                "station_start_m": station_samples[0]["station_m"],
+                "station_end_m": station_samples[-1]["station_m"],
+                "promotion_gate": "Replace with NAIP/DEM/field-reviewed banks, shelves, side channels, and seasonal wetted widths.",
+            },
+        },
+    ]
+    banks = {
+        "type": "FeatureCollection",
+        "name": "south_fork_american_production_import_bank_offset_drafts",
+        "bbox": _geojson_bbox(bank_features),
+        "properties": {
+            "schema": "raftsim.south_fork_production_hydrography_drafts.banks.v1",
+            "generated_on": "2026-07-06",
+            "review_status": "offset_lines_review_required_not_banks_or_wetted_width",
+            "source_cross_sections": _manifest_path(cross_section_seed_path, repo_root),
+            "feature_count": len(bank_features),
+        },
+        "features": bank_features,
+    }
+
+    cross_section_features = []
+    for feature in seed_features:
+        properties = {
+            **feature["properties"],
+            "status": "draft_production_import_cross_section_review_line_not_solver_section",
+            "source": "nhd_hu8_18020129_cross_section_seed_candidates",
+            "promotion_gate": (
+                "Review against NAIP, DEM relief, water prior, guide notes, shelves, side channels, and seasonal flow "
+                "before accepting as a production cross section."
+            ),
+        }
+        cross_section_features.append({**feature, "properties": properties})
+    cross_sections = {
+        "type": "FeatureCollection",
+        "name": "south_fork_american_production_import_cross_section_drafts",
+        "bbox": _geojson_bbox(cross_section_features),
+        "properties": {
+            "schema": "raftsim.south_fork_production_hydrography_drafts.cross_sections.v1",
+            "generated_on": "2026-07-06",
+            "review_status": "draft_review_lines_not_solver_cross_sections",
+            "source_cross_sections": _manifest_path(cross_section_seed_path, repo_root),
+            "feature_count": len(cross_section_features),
+        },
+        "features": cross_section_features,
+    }
+
+    centerline_path = output_root / "centerline.geojson"
+    banks_path = output_root / "banks.geojson"
+    cross_sections_path = output_root / "cross_sections.geojson"
+    manifest_path = output_root / "hydrography_draft_manifest.json"
+
+    centerline_path.write_text(json.dumps(centerline, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    banks_path.write_text(json.dumps(banks, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    cross_sections_path.write_text(json.dumps(cross_sections, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    manifest = {
+        "schema": "raftsim.south_fork_production_hydrography_drafts.manifest.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "status": "draft_hydrography_artifacts_generated_review_required_not_production_authority",
+        "inputs": {
+            "stationing": _manifest_path(stationing_path, repo_root),
+            "cross_section_seeds": _manifest_path(cross_section_seed_path, repo_root),
+            "mainstem_manifest": _manifest_path(mainstem_manifest_path, repo_root),
+            "alignment_diagnostic": _manifest_path(alignment_diagnostic_path, repo_root),
+            "water_prior_manifest": _manifest_path(water_prior_manifest_path, repo_root),
+        },
+        "outputs": {
+            "centerline": _manifest_path(centerline_path, repo_root),
+            "banks": _manifest_path(banks_path, repo_root),
+            "cross_sections": _manifest_path(cross_sections_path, repo_root),
+        },
+        "summary": {
+            "centerline_vertex_count": len(vertices),
+            "centerline_station_sample_count": len(station_samples),
+            "cross_section_count": len(cross_section_features),
+            "bank_offset_line_count": len(bank_features),
+            "length_m_preview": stationing["summary"]["length_m_geodesic_vertices"],
+            "mainstem_orientation": mainstem_manifest["derivation"]["orientation"],
+        },
+        "review_gates": [
+            "Confirm the NHD-derived centerline direction, station zero, and working CRS.",
+            "Edit banks against NAIP, DEM relief, water prior masks, field observations, side channels, shelves, and guide notes.",
+            "Reject or repair out-of-bounds/low-water cross-section centers before solver grid generation.",
+            "Attach guide-reviewed rapid, eddy, access, and rescue annotations before gameplay or Unreal production authority.",
+        ],
+        "output_checksums": {
+            "centerline": {"sha256": _sha256(centerline_path)},
+            "banks": {"sha256": _sha256(banks_path)},
+            "cross_sections": {"sha256": _sha256(cross_sections_path)},
+        },
+    }
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
 def build_colorado_import_pilot_derivatives(
     colorado_root: Path,
     repo_root: Path | None = None,
@@ -1073,6 +1272,7 @@ def main() -> None:
         preview_corridor_half_width_cm=2750.0,
     )
     build_south_fork_import_pilot_derivatives(south_fork_root, repo_root=repo_root)
+    build_south_fork_production_hydrography_drafts(south_fork_root, repo_root=repo_root)
     build_dem_relief_preview(
         dem_path=colorado_root / "terrain/usgs_3dep_lees_ferry_sample_256.tif",
         output_relief_png_path=colorado_root / "terrain/usgs_3dep_lees_ferry_relief_preview_512.png",
