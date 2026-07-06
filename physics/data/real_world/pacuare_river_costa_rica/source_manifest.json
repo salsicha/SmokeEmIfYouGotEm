@@ -21,6 +21,7 @@
       "hydrology/costa_rica_gauge_search.json",
       "hydrology/rainfall_context.json",
       "hydrography/production_import_pilot/official_source_access_plan.json",
+      "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
       "flow_presets.json"
     ],
     "guide_references": [
@@ -32,6 +33,8 @@
       "hydrography/banks.geojson",
       "hydrography/tributary_context.geojson",
       "hydrography/production_import_pilot/official_source_access_plan.json",
+      "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_getcapabilities.xml",
+      "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
       "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
       "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
       "hydrography/production_import_pilot/preview_stationing_scaffold.json"
@@ -226,10 +229,10 @@
     {
       "category": "official_source_access_plan",
       "fetch_id": "pacuare_official_source_access_plan",
-      "notes": "Records official Costa Rica source catalogs and candidate layers for Pacuare hydrography, hydrology, protected-area, and access review. No features are downloaded or promoted; exact service/layer metadata, CRS, terms, attributes, and guide review remain required before import.",
+      "notes": "Records official Costa Rica source catalogs plus archived Direccion de Agua/SINIGIRH WMS capabilities metadata for Pacuare hydrography, hydrology, protected-area, and access review. No features are downloaded or promoted; exact service/layer terms, attributes, Pacuare intersection, and guide review remain required before import.",
       "source_id": "pacuare_official_source_access_plan",
-      "status": "official_service_catalogs_recorded_no_layer_download",
-      "target_artifact": "hydrography/production_import_pilot/official_source_access_plan.json",
+      "status": "official_service_catalogs_and_wms_capabilities_archived_no_feature_download",
+      "target_artifact": "hydrography/production_import_pilot/official_source_access_plan.json; hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_getcapabilities.xml; hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
       "url": "https://www.snitcr.go.cr/ico_servicios_ogc; https://mapas.da.go.cr/geoservicios.php"
     }
   ],
@@ -341,7 +344,7 @@
       "license_or_terms": "Official service catalogs only; layer downloads and derivatives require per-layer terms, CRS, attribution, and redistribution review.",
       "provider": "SNIT/IDECORI and MINAE Direccion de Agua/SINIGIRH",
       "source_id": "pacuare_official_source_access_plan",
-      "status": "official_service_catalogs_recorded_no_layer_download",
+      "status": "official_service_catalogs_and_wms_capabilities_archived_no_feature_download",
       "title": "Pacuare official hydrography, hydrology, and protected-area service access plan",
       "url": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/official_source_access_plan.json",
       "use_in_pipeline": [

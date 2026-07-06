@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 
@@ -25,6 +26,8 @@ from raftsim.real_world import (
     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
     PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
+    PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_FILE,
+    PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
     PACUARE_PRODUCTION_IMPORT_PILOT_FILE,
     PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE,
@@ -552,6 +555,8 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
     assert "nasa_gibs_modis_demshade_preview_drape" in seeds
     assert "pacuare_official_source_access_plan" in seeds
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in seeds["pacuare_official_source_access_plan"]["artifacts"]
+    assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_FILE in seeds["pacuare_official_source_access_plan"]["artifacts"]
+    assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE in seeds["pacuare_official_source_access_plan"]["artifacts"]
     assert {
         "terrain_dem_or_lidar",
         "hydrography_and_centerline",
@@ -573,6 +578,8 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
     )
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
+    assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE in classes["hydrography_and_centerline"]["target_outputs"]
@@ -595,14 +602,39 @@ def test_pacuare_official_source_access_plan_records_catalogs_without_downloads(
     assert {"snit_ogc_services_catalog", "snit_recurso_hidrico_viewer", "direccion_de_agua_sinigirh_geoservices"}.issubset(
         catalogs
     )
-    assert "DA_AFOROS" in catalogs["direccion_de_agua_sinigirh_geoservices"]["candidate_layers"]
-    assert "DA_UNIDADES HIDROLOGICAS" in catalogs["direccion_de_agua_sinigirh_geoservices"]["candidate_layers"]
-    assert "ICE_CUENCAS HIDROGRAFICAS" in catalogs["direccion_de_agua_sinigirh_geoservices"]["candidate_layers"]
+    assert "Aguas:DA_AFOROS" in catalogs["direccion_de_agua_sinigirh_geoservices"]["candidate_layers"]
+    assert "Aguas:JASEC_ESTACIONES_HIDROMETRICAS" in catalogs["direccion_de_agua_sinigirh_geoservices"]["candidate_layers"]
+    assert "Aguas:DA_UNIDADES_HIDROLOGICAS" in catalogs["direccion_de_agua_sinigirh_geoservices"]["candidate_layers"]
+    assert "Aguas:DA_Cuencas_Hidrograficas_CR" in catalogs["direccion_de_agua_sinigirh_geoservices"]["candidate_layers"]
     assert layer_queue["da_aforos"]["target_outputs"] == [
+        "hydrology/production_import_pilot/discharge_or_stage_station_review.json"
+    ]
+    assert layer_queue["jasec_estaciones_hidrometricas"]["target_outputs"] == [
         "hydrology/production_import_pilot/discharge_or_stage_station_review.json"
     ]
     assert any("terms" in item for item in plan["per_layer_required_metadata"])
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in plan["downstream_manifest_targets"]
+
+
+def test_pacuare_direccion_de_agua_capabilities_are_archived_as_metadata_only():
+    base = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
+    raw_path = base / PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_FILE
+    summary = json.loads((base / PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE).read_text())
+    selected_names = {layer["name"] for layer in summary["selected_candidate_layers"]}
+
+    assert raw_path.is_file()
+    assert summary["schema"] == "raftsim.pacuare.da_sinigirh_wms_capabilities_summary.v1"
+    assert summary["status"] == "capabilities_archived_layer_metadata_only_no_features_downloaded"
+    assert summary["advertised_named_layer_count"] == 52
+    assert summary["advertised_root_srs"] == ["EPSG:4326", "EPSG:5367", "EPSG:5456"]
+    assert summary["advertised_root_bbox_wgs84"]["minx"] < summary["pacuare_planning_bounds_wgs84"]["min_lon"]
+    assert summary["advertised_root_bbox_wgs84"]["maxx"] > summary["pacuare_planning_bounds_wgs84"]["max_lon"]
+    assert summary["raw_capabilities_sha256"] == hashlib.sha256(raw_path.read_bytes()).hexdigest()
+    assert "Aguas:DA_AFOROS" in selected_names
+    assert "Aguas:JASEC_ESTACIONES_HIDROMETRICAS" in selected_names
+    assert "Aguas:DA_UNIDADES_HIDROLOGICAS" in selected_names
+    assert "Aguas:DA_Cuencas_Hidrograficas_CR" in selected_names
+    assert all(layer["feature_download_status"] == "not_downloaded_metadata_only" for layer in summary["selected_candidate_layers"])
 
 
 def test_pacuare_preview_centerline_scaffold_is_not_official_hydrography():
@@ -733,6 +765,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert COLORADO_USBR_TOTAL_RELEASE_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE in rivers["pacuare"]["attached_preview_inputs"]

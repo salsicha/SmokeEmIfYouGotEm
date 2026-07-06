@@ -1,0 +1,993 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE WMT_MS_Capabilities SYSTEM "https://mapas.da.go.cr/be//schemas/wms/1.1.1/WMS_MS_Capabilities.dtd">
+<WMT_MS_Capabilities version="1.1.1" updateSequence="4678">
+  <Service>
+    <Name>OGC:WMS</Name>
+    <Title>GeoServer Web Map Service</Title>
+    <Abstract>A compliant implementation of WMS plus most of the SLD extension (dynamic styling). Can also generate PDF, SVG, KML, GeoRSS</Abstract>
+    <KeywordList>
+      <Keyword>WFS</Keyword>
+      <Keyword>WMS</Keyword>
+      <Keyword>GEOSERVER</Keyword>
+    </KeywordList>
+    <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://geoserver.sourceforge.net/html/index.php"/>
+    <ContactInformation>
+      <ContactPersonPrimary>
+        <ContactPerson>Claudius Ptolomaeus</ContactPerson>
+        <ContactOrganization>The ancient geographes INC</ContactOrganization>
+      </ContactPersonPrimary>
+      <ContactPosition>Chief geographer</ContactPosition>
+      <ContactAddress>
+        <AddressType>Work</AddressType>
+        <Address/>
+        <City>Alexandria</City>
+        <StateOrProvince/>
+        <PostCode/>
+        <Country>Egypt</Country>
+      </ContactAddress>
+      <ContactVoiceTelephone/>
+      <ContactFacsimileTelephone/>
+      <ContactElectronicMailAddress>claudius.ptolomaeus@gmail.com</ContactElectronicMailAddress>
+    </ContactInformation>
+    <Fees>NONE</Fees>
+    <AccessConstraints>NONE</AccessConstraints>
+  </Service>
+  <Capability>
+    <Request>
+      <GetCapabilities>
+        <Format>application/vnd.ogc.wms_xml</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?SERVICE=WMS&amp;"/>
+            </Get>
+            <Post>
+              <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?SERVICE=WMS&amp;"/>
+            </Post>
+          </HTTP>
+        </DCPType>
+      </GetCapabilities>
+      <GetMap>
+        <Format>image/png</Format>
+        <Format>application/atom xml</Format>
+        <Format>application/atom+xml</Format>
+        <Format>application/openlayers</Format>
+        <Format>application/pdf</Format>
+        <Format>application/rss xml</Format>
+        <Format>application/rss+xml</Format>
+        <Format>application/vnd.google-earth.kml</Format>
+        <Format>application/vnd.google-earth.kml xml</Format>
+        <Format>application/vnd.google-earth.kml+xml</Format>
+        <Format>application/vnd.google-earth.kml+xml;mode=networklink</Format>
+        <Format>application/vnd.google-earth.kmz</Format>
+        <Format>application/vnd.google-earth.kmz xml</Format>
+        <Format>application/vnd.google-earth.kmz+xml</Format>
+        <Format>application/vnd.google-earth.kmz;mode=networklink</Format>
+        <Format>atom</Format>
+        <Format>image/geotiff</Format>
+        <Format>image/geotiff8</Format>
+        <Format>image/gif</Format>
+        <Format>image/gif;subtype=animated</Format>
+        <Format>image/jpeg</Format>
+        <Format>image/png8</Format>
+        <Format>image/png; mode=8bit</Format>
+        <Format>image/svg</Format>
+        <Format>image/svg xml</Format>
+        <Format>image/svg+xml</Format>
+        <Format>image/tiff</Format>
+        <Format>image/tiff8</Format>
+        <Format>kml</Format>
+        <Format>kmz</Format>
+        <Format>openlayers</Format>
+        <Format>rss</Format>
+        <Format>text/html; subtype=openlayers</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?SERVICE=WMS&amp;"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetMap>
+      <GetFeatureInfo>
+        <Format>text/plain</Format>
+        <Format>application/vnd.ogc.gml</Format>
+        <Format>text/xml</Format>
+        <Format>application/vnd.ogc.gml/3.1.1</Format>
+        <Format>text/xml; subtype=gml/3.1.1</Format>
+        <Format>text/html</Format>
+        <Format>application/json</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?SERVICE=WMS&amp;"/>
+            </Get>
+            <Post>
+              <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?SERVICE=WMS&amp;"/>
+            </Post>
+          </HTTP>
+        </DCPType>
+      </GetFeatureInfo>
+      <DescribeLayer>
+        <Format>application/vnd.ogc.wms_xml</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?SERVICE=WMS&amp;"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </DescribeLayer>
+      <GetLegendGraphic>
+        <Format>image/png</Format>
+        <Format>image/jpeg</Format>
+        <Format>image/gif</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?SERVICE=WMS&amp;"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetLegendGraphic>
+      <GetStyles>
+        <Format>application/vnd.ogc.sld+xml</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?SERVICE=WMS&amp;"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetStyles>
+    </Request>
+    <Exception>
+      <Format>application/vnd.ogc.se_xml</Format>
+      <Format>application/vnd.ogc.se_inimage</Format>
+      <Format>application/vnd.ogc.se_blank</Format>
+    </Exception>
+    <UserDefinedSymbolization SupportSLD="1" UserLayer="1" UserStyle="1" RemoteWFS="1"/>
+    <Layer>
+      <Title>GeoServer Web Map Service</Title>
+      <Abstract>A compliant implementation of WMS plus most of the SLD extension (dynamic styling). Can also generate PDF, SVG, KML, GeoRSS</Abstract>
+      <!--All supported EPSG projections:-->
+      <SRS>EPSG:4326</SRS>
+      <SRS>EPSG:5367</SRS>
+      <SRS>EPSG:5456</SRS>
+      <SRS>EPSG:5457</SRS>
+      <SRS>EPSG:WGS84(DD)</SRS>
+      <LatLonBoundingBox minx="-87.14733170864939" miny="5.4984164817046866" maxx="-81.68437361109201" maxy="12.075318690389"/>                <Layer queryable="1">
+                    <Name>Aguas:AyA_AREA_DE_RESERVA_ACUIFERA_CUENCA_DEL_RIO_BANANITO</Name>
+                    <Title>AyA_AREA DE RESERVA ACUIFERA CUENCA DEL RIO BANANITO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_AyA_AREA_DE_RESERVA_ACUIFERA_CUENCA_DEL_RIO_BANANITO</Name>
+                      <Title>1style_AyA_AREA_DE_RESERVA_ACUIFERA_CUENCA_DEL_RIO_BANANITO</Title>
+                      <Abstract>1style_AyA_AREA_DE_RESERVA_ACUIFERA_CUENCA_DEL_RIO_BANANITO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3AAyA_AREA_DE_RESERVA_ACUIFERA_CUENCA_DEL_RIO_BANANITO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:AyA_AREA_DE_RESERVA_ACUIFERA_PUENTE_MULAS</Name>
+                    <Title>AyA_AREA DE RESERVA ACUIFERA PUENTE MULAS</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_AyA_AREA_DE_RESERVA_ACUIFERA_PUENTE_MULAS</Name>
+                      <Title>1style_AyA_AREA_DE_RESERVA_ACUIFERA_PUENTE_MULAS</Title>
+                      <Abstract>1style_AyA_AREA_DE_RESERVA_ACUIFERA_PUENTE_MULAS</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3AAyA_AREA_DE_RESERVA_ACUIFERA_PUENTE_MULAS"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:AyA_AREA_DE_RESERVA_ACUIFERA_RIO_BANANO</Name>
+                    <Title>AyA_AREA DE RESERVA ACUIFERA RIO BANANO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_AyA_AREA_DE_RESERVA_ACUIFERA_RIO_BANANO</Name>
+                      <Title>1style_AyA_AREA_DE_RESERVA_ACUIFERA_RIO_BANANO</Title>
+                      <Abstract>1style_AyA_AREA_DE_RESERVA_ACUIFERA_RIO_BANANO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3AAyA_AREA_DE_RESERVA_ACUIFERA_RIO_BANANO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:AyA_RESERVA_ACUIFERA_DE_GUACIMO</Name>
+                    <Title>AyA_ZONA DE RESERVA ACUIFERA DE GUACIMO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_AyA_RESERVA_ACUIFERA_DE_GUACIMO</Name>
+                      <Title>1style_AyA_RESERVA_ACUIFERA_DE_GUACIMO</Title>
+                      <Abstract>1style_AyA_RESERVA_ACUIFERA_DE_GUACIMO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3AAyA_RESERVA_ACUIFERA_DE_GUACIMO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:AyA_RESERVA_ACUIFERA_MOIN</Name>
+                    <Title>AyA_ZONA DE PROTECCION DEL ACUIFERO MOIN</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_AyA_RESERVA_ACUIFERA_MOIN</Name>
+                      <Title>1style_AyA_RESERVA_ACUIFERA_MOIN</Title>
+                      <Abstract>1style_AyA_RESERVA_ACUIFERA_MOIN</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3AAyA_RESERVA_ACUIFERA_MOIN"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:AyA_Zona_de_Reserva_Acuifera_Barranca_El_Roble</Name>
+                    <Title>AyA_ZONA DE RESERVA ACUIFERA BARRANCA-EL ROBLE</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_AyA_Zona_de_Reserva_Acuifera_Barranca_El_Roble</Name>
+                      <Title>1style_AyA_Zona_de_Reserva_Acuifera_Barranca_El_Roble</Title>
+                      <Abstract>1style_AyA_Zona_de_Reserva_Acuifera_Barranca_El_Roble</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3AAyA_Zona_de_Reserva_Acuifera_Barranca_El_Roble"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:CTI_AGUA_ACUIFERO_CAIMITAL_POTRERO</Name>
+                    <Title>CTI-AGUA_ACUIFERO CAIMITAL-POTRERO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_CTI_AGUA_ACUIFERO_CAIMITAL_POTRERO</Name>
+                      <Title>1style_CTI_AGUA_ACUIFERO_CAIMITAL_POTRERO</Title>
+                      <Abstract>1style_CTI_AGUA_ACUIFERO_CAIMITAL_POTRERO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ACTI_AGUA_ACUIFERO_CAIMITAL_POTRERO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:CTI_AGUA_ACUIFERO_EL_COCO_OCOTAL</Name>
+                    <Title>CTI-AGUA_ACUIFERO EL COCO-OCOTAL</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_CTI_AGUA_ACUIFERO_EL_COCO_OCOTAL</Name>
+                      <Title>1style_CTI_AGUA_ACUIFERO_EL_COCO_OCOTAL</Title>
+                      <Abstract>1style_CTI_AGUA_ACUIFERO_EL_COCO_OCOTAL</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ACTI_AGUA_ACUIFERO_EL_COCO_OCOTAL"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:CTI_AGUA_ACUIFERO_HUACAS_TAMARINDO</Name>
+                    <Title>CTI-AGUA_ACUIFERO HUACAS TAMARINDO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_CTI_AGUA_ACUIFERO_HUACAS_TAMARINDO</Name>
+                      <Title>1style_CTI_AGUA_ACUIFERO_HUACAS_TAMARINDO</Title>
+                      <Abstract>1style_CTI_AGUA_ACUIFERO_HUACAS_TAMARINDO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ACTI_AGUA_ACUIFERO_HUACAS_TAMARINDO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:CTI_AGUA_ACUIFERO_MARBELLA</Name>
+                    <Title>CTI-AGUA_ACUIFERO MARBELLA</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_CTI_AGUA_ACUIFERO_MARBELLA</Name>
+                      <Title>1style_CTI_AGUA_ACUIFERO_MARBELLA</Title>
+                      <Abstract>1style_CTI_AGUA_ACUIFERO_MARBELLA</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ACTI_AGUA_ACUIFERO_MARBELLA"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:CTI_AGUA_ACUIFERO_NIMBOYORES</Name>
+                    <Title>CTI-AGUA_ACUIFERO NIMBOYORES</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_CTI_AGUA_ACUIFERO_NIMBOYORES</Name>
+                      <Title>1style_CTI_AGUA_ACUIFERO_NIMBOYORES</Title>
+                      <Abstract>1style_CTI_AGUA_ACUIFERO_NIMBOYORES</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ACTI_AGUA_ACUIFERO_NIMBOYORES"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:CTI_AGUA_ACUIFERO_PLAYA_BRASILITO</Name>
+                    <Title>CTI-AGUA_ACUIFERO PLAYA BRASILITO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_CTI_AGUA_ACUIFERO_PLAYA_BRASILITO</Name>
+                      <Title>1style_CTI_AGUA_ACUIFERO_PLAYA_BRASILITO</Title>
+                      <Abstract>1style_CTI_AGUA_ACUIFERO_PLAYA_BRASILITO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ACTI_AGUA_ACUIFERO_PLAYA_BRASILITO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:CTI_AGUA_ACUIFERO_PLAYA_HERMOSA</Name>
+                    <Title>CTI-AGUA_ACUIFERO PLAYA HERMOSA</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_CTI_AGUA_ACUIFERO_PLAYA_HERMOSA</Name>
+                      <Title>1style_CTI_AGUA_ACUIFERO_PLAYA_HERMOSA</Title>
+                      <Abstract>1style_CTI_AGUA_ACUIFERO_PLAYA_HERMOSA</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ACTI_AGUA_ACUIFERO_PLAYA_HERMOSA"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:CTI_AGUA_ACUIFERO_PLAYA_PANAMA</Name>
+                    <Title>CTI-AGUA_ACUIFERO PLAYA PANAMA</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_CTI_AGUA_ACUIFERO_PLAYA_PANAMA</Name>
+                      <Title>1style_CTI_AGUA_ACUIFERO_PLAYA_PANAMA</Title>
+                      <Abstract>1style_CTI_AGUA_ACUIFERO_PLAYA_PANAMA</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ACTI_AGUA_ACUIFERO_PLAYA_PANAMA"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:CTI_AGUA_ACUIFERO_PLAYA_POTRERO</Name>
+                    <Title>CTI-AGUA_ACUIFERO PLAYA POTRERO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_CTI_AGUA_ACUIFERO_PLAYA_POTRERO</Name>
+                      <Title>1style_CTI_AGUA_ACUIFERO_PLAYA_POTRERO</Title>
+                      <Abstract>1style_CTI_AGUA_ACUIFERO_PLAYA_POTRERO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ACTI_AGUA_ACUIFERO_PLAYA_POTRERO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:CTI_AGUA_ACUIFERO_SAMARA_MALANOCHE</Name>
+                    <Title>CTI-AGUA_ACUIFERO SAMARA MALANOCHE</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_CTI_AGUA_ACUIFERO_SAMARA_MALANOCHE</Name>
+                      <Title>1style_CTI_AGUA_ACUIFERO_SAMARA_MALANOCHE</Title>
+                      <Abstract>1style_CTI_AGUA_ACUIFERO_SAMARA_MALANOCHE</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ACTI_AGUA_ACUIFERO_SAMARA_MALANOCHE"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:CTI_AGUA_ACUIFERO_SARDINAL</Name>
+                    <Title>CTI-AGUA_ACUIFERO SARDINAL</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_CTI_AGUA_ACUIFERO_SARDINAL</Name>
+                      <Title>1style_CTI_AGUA_ACUIFERO_SARDINAL</Title>
+                      <Abstract>1style_CTI_AGUA_ACUIFERO_SARDINAL</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ACTI_AGUA_ACUIFERO_SARDINAL"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:DA_AFOROS</Name>
+                    <Title>DA_AFOROS</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_DA_AFOROS</Name>
+                      <Title>1style_DA_AFOROS</Title>
+                      <Abstract>1style_DA_AFOROS</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ADA_AFOROS"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:DA_Concesiones</Name>
+                    <Title>DA_CONCESIONES</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_DA_Concesiones</Name>
+                      <Title>1style_DA_Concesiones</Title>
+                      <Abstract>1style_DA_Concesiones</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ADA_Concesiones"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:DA_Cuencas_Hidrograficas_CR</Name>
+                    <Title>ICE_CUENCAS HIDROGRAFICAS</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_DA_Cuencas_Hidrograficas_CR</Name>
+                      <Title>1style_DA_Cuencas_Hidrograficas_CR</Title>
+                      <Abstract>1style_DA_Cuencas_Hidrograficas_CR</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ADA_Cuencas_Hidrograficas_CR"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:DA_Dictamenes_Punto_Final</Name>
+                    <Title>DA_DICTAMENES PUNTO FINAL</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_DA_Dictamenes_Punto_Final</Name>
+                      <Title>1style_DA_Dictamenes_Punto_Final</Title>
+                      <Abstract>1style_DA_Dictamenes_Punto_Final</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ADA_Dictamenes_Punto_Final"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:DA_Dictamenes_Punto_Inicial</Name>
+                    <Title>DA_DICTAMENES PUNTO INICIAL</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_DA_Dictamenes_Punto_Inicial</Name>
+                      <Title>1style_DA_Dictamenes_Punto_Inicial</Title>
+                      <Abstract>1style_DA_Dictamenes_Punto_Inicial</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ADA_Dictamenes_Punto_Inicial"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:DA_GEOLOGIA_GENERAL</Name>
+                    <Title>DA_MAPAS LITOLOGICOS (VECTORES)</Title>
+                                        <Abstract>Unidades donde se identifica la caracterización litológica e información geológica.</Abstract>
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_DA_GEOLOGIA_GENERAL</Name>
+                      <Title>1style_DA_GEOLOGIA_GENERAL</Title>
+                      <Abstract>1style_DA_GEOLOGIA_GENERAL</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ADA_GEOLOGIA_GENERAL"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:DA_Monitoreo_Aguas_Subterraneas</Name>
+                    <Title>DA_MONITOREO DE AGUAS SUBTERRANEAS</Title>
+                                        <Abstract>Pozos seleccionados para el monitoreo permanente de los niveles de aguas subterráneas</Abstract>
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_DA_Monitoreo_Aguas_Subterraneas</Name>
+                      <Title>1style_DA_Monitoreo_Aguas_Subterraneas</Title>
+                      <Abstract>1style_DA_Monitoreo_Aguas_Subterraneas</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ADA_Monitoreo_Aguas_Subterraneas"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:DA_OBRAS_EN_CAUCE</Name>
+                    <Title>DA_OBRAS EN CAUCE</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_DA_OBRAS_EN_CAUCE</Name>
+                      <Title>1style_DA_OBRAS_EN_CAUCE</Title>
+                      <Abstract>1style_DA_OBRAS_EN_CAUCE</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ADA_OBRAS_EN_CAUCE"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:DA_PDF_Mapas_Litologicos</Name>
+                    <Title>DA_MAPAS LITOLOGICOS (PDF)</Title>
+                                        <Abstract>Cartografía litológica a escala 1:50.000, tomando como base las hojas topográficas del IGN en esta escala. Muestran la litología del área cartografiada, así como acuíferos con pozos clasificados según la matriz CIPS.</Abstract>
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_DA_PDF_Mapas_Litologicos</Name>
+                      <Title>1style_DA_PDF_Mapas_Litologicos</Title>
+                      <Abstract>1style_DA_PDF_Mapas_Litologicos</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ADA_PDF_Mapas_Litologicos"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:DA_UNIDADES_HIDROLOGICAS</Name>
+                    <Title>DA_UNIDADES HIDROLOGICAS</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_DA_UNIDADES_HIDROLOGICAS</Name>
+                      <Title>1style_DA_UNIDADES_HIDROLOGICAS</Title>
+                      <Abstract>1style_DA_UNIDADES_HIDROLOGICAS</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ADA_UNIDADES_HIDROLOGICAS"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:DA_Vertidos</Name>
+                    <Title>DA_VERTIDOS</Title>
+                                        <Abstract>Ubicación de vertidos de aguas residuales hacia cuerpos de agua superficiales de dominio público en el territorio nacional.</Abstract>
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_DA_Vertidos</Name>
+                      <Title>1style_DA_Vertidos</Title>
+                      <Abstract>1style_DA_Vertidos</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ADA_Vertidos"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:JASEC_ESTACIONES_HIDROMETRICAS</Name>
+                    <Title>JASEC_ESTACIONES HIDROMETRICAS</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_JASEC_ESTACIONES_HIDROMETRICAS</Name>
+                      <Title>1style_JASEC_ESTACIONES_HIDROMETRICAS</Title>
+                      <Abstract>1style_JASEC_ESTACIONES_HIDROMETRICAS</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3AJASEC_ESTACIONES_HIDROMETRICAS"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:OCAS_ORGANISMO_COMUNITARIO_DE_AGUA</Name>
+                    <Title>UNA_OBSERVATORIOS CIUDADANOS DEL AGUA (OCAS)</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_OCAS_ORGANISMO_COMUNITARIO_DE_AGUA</Name>
+                      <Title>1style_OCAS_ORGANISMO_COMUNITARIO_DE_AGUA</Title>
+                      <Abstract>1style_OCAS_ORGANISMO_COMUNITARIO_DE_AGUA</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3AOCAS_ORGANISMO_COMUNITARIO_DE_AGUA"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:OCAS_RADIO_DE_INFLUENCIA_DOS_PUNTOS</Name>
+                    <Title>UNA_RADIO DE INFLUENCIA DOS PUNTOS (OCAS)</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_OCAS_RADIO_DE_INFLUENCIA_DOS_PUNTOS</Name>
+                      <Title>1style_OCAS_RADIO_DE_INFLUENCIA_DOS_PUNTOS</Title>
+                      <Abstract>1style_OCAS_RADIO_DE_INFLUENCIA_DOS_PUNTOS</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3AOCAS_RADIO_DE_INFLUENCIA_DOS_PUNTOS"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:OCAS_RADIO_DE_INFLUENCIA_PTO_UNICO</Name>
+                    <Title>UNA_RADIO DE INFLUENCIA PUNTO UNICO (OCAS)</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_OCAS_RADIO_DE_INFLUENCIA_PTO_UNICO</Name>
+                      <Title>1style_OCAS_RADIO_DE_INFLUENCIA_PTO_UNICO</Title>
+                      <Abstract>1style_OCAS_RADIO_DE_INFLUENCIA_PTO_UNICO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3AOCAS_RADIO_DE_INFLUENCIA_PTO_UNICO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:OFICINAS_U_HIDROLOGICAS__1M_</Name>
+                    <Title>DA_OFICINAS DE UNIDADES HIDROLOGICAS</Title>
+                                        <Abstract>Ubicación de las oficinas centrales y regionales de la Dirección de Agua.</Abstract>
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_OFICINAS_U_HIDROLOGICAS__1M_</Name>
+                      <Title>1style_OFICINAS_U_HIDROLOGICAS__1M_</Title>
+                      <Abstract>1style_OFICINAS_U_HIDROLOGICAS__1M_</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3AOFICINAS_U_HIDROLOGICAS__1M_"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:PIAAG__1M_</Name>
+                    <Title>DA_PIAAG</Title>
+                                        <Abstract>Proyectos registrados en el marco del Programa Integral de Abastecimiento de Agua para Guanacaste.</Abstract>
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_PIAAG__1M_</Name>
+                      <Title>1style_PIAAG__1M_</Title>
+                      <Abstract>1style_PIAAG__1M_</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3APIAAG__1M_"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SENARA_ACUIFEROS_COSTEROS_SUR</Name>
+                    <Title>SENARA_ACUIFEROS COSTEROS SUR</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SENARA_ACUIFEROS_COSTEROS_SUR</Name>
+                      <Title>1style_SENARA_ACUIFEROS_COSTEROS_SUR</Title>
+                      <Abstract>1style_SENARA_ACUIFEROS_COSTEROS_SUR</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASENARA_ACUIFEROS_COSTEROS_SUR"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SENARA_ACUIFERO_CANAS</Name>
+                    <Title>SENARA_ACUIFERO CAÑAS</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SENARA_ACUIFERO_CANAS</Name>
+                      <Title>1style_SENARA_ACUIFERO_CANAS</Title>
+                      <Abstract>1style_SENARA_ACUIFERO_CANAS</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASENARA_ACUIFERO_CANAS"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SENARA_ACUIFERO_COLIMA</Name>
+                    <Title>SENARA_ACUIFERO COLIMA</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SENARA_ACUIFERO_COLIMA</Name>
+                      <Title>1style_SENARA_ACUIFERO_COLIMA</Title>
+                      <Abstract>1style_SENARA_ACUIFERO_COLIMA</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASENARA_ACUIFERO_COLIMA"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SENARA_ACUIFERO_TEMPISQUE</Name>
+                    <Title>SENARA_ACUIFERO TEMPISQUE</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SENARA_ACUIFERO_TEMPISQUE</Name>
+                      <Title>1style_SENARA_ACUIFERO_TEMPISQUE</Title>
+                      <Abstract>1style_SENARA_ACUIFERO_TEMPISQUE</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASENARA_ACUIFERO_TEMPISQUE"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SENARA_VULNERABILIDAD_ANDAMOJO</Name>
+                    <Title>SENARA_VULNERABILIDAD ANDAMOJO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SENARA_VULNERABILIDAD_ANDAMOJO</Name>
+                      <Title>1style_SENARA_VULNERABILIDAD_ANDAMOJO</Title>
+                      <Abstract>1style_SENARA_VULNERABILIDAD_ANDAMOJO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASENARA_VULNERABILIDAD_ANDAMOJO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SENARA_VULNERABILIDAD_BRASILITO_POTRERO</Name>
+                    <Title>SENARA_VULNERABILIDAD BRASILITO POTRERO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SENARA_VULNERABILIDAD_BRASILITO_POTRERO</Name>
+                      <Title>1style_SENARA_VULNERABILIDAD_BRASILITO_POTRERO</Title>
+                      <Abstract>1style_SENARA_VULNERABILIDAD_BRASILITO_POTRERO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASENARA_VULNERABILIDAD_BRASILITO_POTRERO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SENARA_VULNERABILIDAD_MORAVIA</Name>
+                    <Title>SENARA_VULNERABILIDAD MORAVIA</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SENARA_VULNERABILIDAD_MORAVIA</Name>
+                      <Title>1style_SENARA_VULNERABILIDAD_MORAVIA</Title>
+                      <Abstract>1style_SENARA_VULNERABILIDAD_MORAVIA</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASENARA_VULNERABILIDAD_MORAVIA"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SENARA_VULNERABILIDAD_NIMBOYORES</Name>
+                    <Title>SENARA_VULNERABILIDAD NIMBOYORES</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SENARA_VULNERABILIDAD_NIMBOYORES</Name>
+                      <Title>1style_SENARA_VULNERABILIDAD_NIMBOYORES</Title>
+                      <Abstract>1style_SENARA_VULNERABILIDAD_NIMBOYORES</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASENARA_VULNERABILIDAD_NIMBOYORES"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SENARA_VULNERABILIDAD_PLAYAS_DE_EL_COCO</Name>
+                    <Title>SENARA_VULNERABILIDAD PLAYAS DE EL COCO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SENARA_VULNERABILIDAD_PLAYAS_DE_EL_COCO</Name>
+                      <Title>1style_SENARA_VULNERABILIDAD_PLAYAS_DE_EL_COCO</Title>
+                      <Abstract>1style_SENARA_VULNERABILIDAD_PLAYAS_DE_EL_COCO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASENARA_VULNERABILIDAD_PLAYAS_DE_EL_COCO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SENARA_VULNERABILIDAD_SANTO_DOMINGO</Name>
+                    <Title>SENARA_VULNERABILIDAD SANTO DOMINGO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SENARA_VULNERABILIDAD_SANTO_DOMINGO</Name>
+                      <Title>1style_SENARA_VULNERABILIDAD_SANTO_DOMINGO</Title>
+                      <Abstract>1style_SENARA_VULNERABILIDAD_SANTO_DOMINGO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASENARA_VULNERABILIDAD_SANTO_DOMINGO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SENARA_VULNERABILIDAD_SAN_PABLO</Name>
+                    <Title>SENARA_VULNERABILIDAD SAN PABLO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SENARA_VULNERABILIDAD_SAN_PABLO</Name>
+                      <Title>1style_SENARA_VULNERABILIDAD_SAN_PABLO</Title>
+                      <Abstract>1style_SENARA_VULNERABILIDAD_SAN_PABLO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASENARA_VULNERABILIDAD_SAN_PABLO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SENARA_ZONA_DE_RESTRICCION_ABSOLUTA</Name>
+                    <Title>SENARA_ZONA RESTRICCION ABSOLUTA</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SENARA_ZONA_DE_RESTRICCION_ABSOLUTA</Name>
+                      <Title>1style_SENARA_ZONA_DE_RESTRICCION_ABSOLUTA</Title>
+                      <Abstract>1style_SENARA_ZONA_DE_RESTRICCION_ABSOLUTA</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASENARA_ZONA_DE_RESTRICCION_ABSOLUTA"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SENARA_ZONA_RESTRICCION_CON_ESTUDIO</Name>
+                    <Title>SENARA_ZONA RESTRICCION CON ESTUDIO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SENARA_ZONA_RESTRICCION_CON_ESTUDIO</Name>
+                      <Title>1style_SENARA_ZONA_RESTRICCION_CON_ESTUDIO</Title>
+                      <Abstract>1style_SENARA_ZONA_RESTRICCION_CON_ESTUDIO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASENARA_ZONA_RESTRICCION_CON_ESTUDIO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:SINAC_LEY_65</Name>
+                    <Title>SINAC_LEY 65</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_SINAC_LEY_65</Name>
+                      <Title>1style_SINAC_LEY_65</Title>
+                      <Abstract>1style_SINAC_LEY_65</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3ASINAC_LEY_65"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:ZONA_DE_INTERES_ESTRATEGICA_RIO_BANANO</Name>
+                    <Title>AyA_ZONA DE INTERES ESTRATEGICA RIO BANANO</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_ZONA_DE_INTERES_ESTRATEGICA_RIO_BANANO</Name>
+                      <Title>1style_ZONA_DE_INTERES_ESTRATEGICA_RIO_BANANO</Title>
+                      <Abstract>1style_ZONA_DE_INTERES_ESTRATEGICA_RIO_BANANO</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3AZONA_DE_INTERES_ESTRATEGICA_RIO_BANANO"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:shp_ac_quiriman_validado_cti3f956225</Name>
+                    <Title>CTI-AGUA_ACUIFERO QUIRIMAN</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_shp_ac_quiriman_validado_cti3f956225</Name>
+                      <Title>1style_shp_ac_quiriman_validado_cti3f956225</Title>
+                      <Abstract>1style_shp_ac_quiriman_validado_cti3f956225</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3Ashp_ac_quiriman_validado_cti3f956225"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:shp_da_drenaje_agricola_2023c53d940c</Name>
+                    <Title>DA_DRENAJE AGRICOLA</Title>
+                    
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_shp_da_drenaje_agricola_2023c53d940c</Name>
+                      <Title>1style_shp_da_drenaje_agricola_2023c53d940c</Title>
+                      <Abstract>1style_shp_da_drenaje_agricola_2023c53d940c</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3Ashp_da_drenaje_agricola_2023c53d940c"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>                <Layer queryable="1">
+                    <Name>Aguas:shp_ptos_monitoreo_calidad_aguadfee5c98</Name>
+                    <Title>DA_MONITOREO CALIDAD CUERPOS DE AGUA</Title>
+                                        <Abstract>Puntos de muestreo en el marco del Programa Nacional de Monitoreo de la Calidad de los Cuerpos de Agua</Abstract>
+                    <SRS>EPSG:5367</SRS>
+                    <LatLonBoundingBox minx="-87.14733170864938" miny="5.950346237975033" maxx="-82.54474531399609" maxy="11.224117503811387"/>
+                    <BoundingBox SRS="EPSG:5367" minx="156152.05" miny="658879.48" maxx="658921.82" maxy="1241133.94"/>
+                                        <Style>
+                      <Name>1style_shp_ptos_monitoreo_calidad_aguadfee5c98</Name>
+                      <Title>1style_shp_ptos_monitoreo_calidad_aguadfee5c98</Title>
+                      <Abstract>1style_shp_ptos_monitoreo_calidad_aguadfee5c98</Abstract>
+                      <LegendURL width="20" height="20">
+                        <Format>image/png</Format>
+                        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://mapas.da.go.cr/geopc.php?request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=Aguas%3Ashp_ptos_monitoreo_calidad_aguadfee5c98"/>
+                      </LegendURL>
+                    </Style>
+                  </Layer>    </Layer>
+  </Capability>
+</WMT_MS_Capabilities>
