@@ -1,0 +1,42 @@
+{
+  "asset_class": "URaftSimGeospatialHeightfieldImportTestConfig",
+  "schema": "raftsim.unreal.heightfield_import_test.v1",
+  "river_id": "colorado_river",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "status": "review_gated_not_enabled_for_preview_maps",
+  "source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json",
+  "heightfield_candidate": {
+    "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png",
+    "manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_manifest.json",
+    "format": "16-bit grayscale PNG",
+    "size_px": 1009,
+    "source_crs": "USGS ImageServer export sample; final canyon working CRS, river-mile stationing, and Unreal transform still require review",
+    "elevation_min_m": 934.4613647460938,
+    "elevation_max_m": 1938.5736083984375,
+    "normalization": "0..65535 maps linearly to recorded elevation_min_m..elevation_max_m"
+  },
+  "target_unreal": {
+    "preview_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview",
+    "intended_import_target": "Unreal Landscape import-test level or replacement terrain layer",
+    "enabled_for_automation": false,
+    "reason_disabled": "Heightfield is a Lees Ferry sample export, not a complete Grand Canyon corridor terrain with river-mile conditioning and guide/oarsman review."
+  },
+  "required_before_enable": [
+    "Replace the sample export with reviewed canyon corridor DEM/lidar tiles or explicitly approve a limited Lees Ferry import-test scope.",
+    "Record source CRS, working CRS, vertical datum handling, river-mile stationing, and WGS84/local/Unreal transforms.",
+    "Clip and condition the DEM to the reviewed canyon corridor, banks, bars, tributaries, and rowing line context.",
+    "Burn or otherwise encode the reviewed channel and large-volume river surface interface so the Landscape does not fight water validation.",
+    "Attach guide/oarsman review for scale, travel pacing, access, and safety-sensitive details.",
+    "Run editor import/export validation and refreshed guide-seat/river-eye captures before replacing procedural terrain."
+  ],
+  "validation_actions": [
+    "RaftSim.SourceChecks",
+    "RaftSim.RoundTripValidation",
+    "RaftSim.CreatePhotorealEnvironmentPreviewMaps",
+    "RaftSim.CapturePhotorealEnvironmentPreviews"
+  ],
+  "notes": [
+    "This contract gives the Colorado heightfield candidate a traceable Unreal-side target and gate.",
+    "It must not be treated as production terrain or solver geometry until the canyon conditioning gates pass."
+  ]
+}

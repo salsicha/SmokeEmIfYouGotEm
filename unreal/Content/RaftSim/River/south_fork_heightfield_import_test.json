@@ -1,0 +1,42 @@
+{
+  "asset_class": "URaftSimGeospatialHeightfieldImportTestConfig",
+  "schema": "raftsim.unreal.heightfield_import_test.v1",
+  "river_id": "american_south_fork",
+  "section_id": "chili_bar_to_coloma",
+  "status": "review_gated_not_enabled_for_preview_maps",
+  "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json",
+  "heightfield_candidate": {
+    "path": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
+    "manifest": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_manifest.json",
+    "format": "16-bit grayscale PNG",
+    "size_px": 1009,
+    "source_crs": "USGS ImageServer export sample; final section working CRS and Unreal transform still require review",
+    "elevation_min_m": 220.94493103027344,
+    "elevation_max_m": 1030.0355224609375,
+    "normalization": "0..65535 maps linearly to recorded elevation_min_m..elevation_max_m"
+  },
+  "target_unreal": {
+    "preview_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview",
+    "intended_import_target": "Unreal Landscape import-test level or replacement terrain layer",
+    "enabled_for_automation": false,
+    "reason_disabled": "Heightfield is a sample export, not a complete tiled, clipped, conditioned, channel-burned, guide-reviewed South Fork terrain."
+  },
+  "required_before_enable": [
+    "Replace the sample export with reviewed full-corridor DEM/lidar tiles or explicitly approve a proxy import-test scope.",
+    "Record source CRS, working CRS, vertical datum handling, and WGS84/local/Unreal transforms.",
+    "Clip and condition the DEM to the reviewed South Fork corridor and river centerline.",
+    "Burn or otherwise encode the reviewed channel, banks, shelves, boulder beds, and access edges.",
+    "Compare against existing South Fork solver corridor geometry and accepted water validation artifacts.",
+    "Run editor import/export validation and refreshed guide-seat/river-eye captures before replacing procedural terrain."
+  ],
+  "validation_actions": [
+    "RaftSim.SourceChecks",
+    "RaftSim.RoundTripValidation",
+    "RaftSim.CreatePhotorealEnvironmentPreviewMaps",
+    "RaftSim.CapturePhotorealEnvironmentPreviews"
+  ],
+  "notes": [
+    "This contract gives the South Fork heightfield candidate a traceable Unreal-side target and gate.",
+    "It must not be treated as production terrain or solver geometry until the conditioning gates pass."
+  ]
+}

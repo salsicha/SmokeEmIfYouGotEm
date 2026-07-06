@@ -7,6 +7,8 @@
       "terrain/usgs_3dep_chili_bar_relief_preview_512.png",
       "terrain/usgs_3dep_chili_bar_relief_preview_manifest.json",
       "terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
+      "terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
+      "terrain/usgs_3dep_chili_bar_corridor_heightfield_manifest.json",
       "terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png",
       "terrain/usgs_3dep_chili_bar_corridor_relief_preview_manifest.json",
       "course_elevation_extraction.json",
@@ -135,6 +137,15 @@
       "status": "downloaded",
       "target_artifact": "imagery/usda_naip_chili_bar_corridor_sample_1024.png",
       "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=png&f=image"
+    },
+    {
+      "category": "derived_heightfield_candidate",
+      "fetch_id": "sfa_3dep_chili_bar_corridor_heightfield_candidate",
+      "notes": "Review-gated 1009px 16-bit normalized PNG generated from the official USGS 3DEP corridor sample for Unreal Landscape import tests. This is not a complete reviewed corridor DEM, reprojected final terrain, hydrologically conditioned surface, or production Landscape replacement.",
+      "source_id": "usgs_3dep_chili_bar_corridor_sample_512",
+      "status": "generated_review_gated_import_candidate",
+      "target_artifact": "terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
+      "url": "physics/src/raftsim/geospatial_preview.py"
     },
     {
       "category": "gauge",

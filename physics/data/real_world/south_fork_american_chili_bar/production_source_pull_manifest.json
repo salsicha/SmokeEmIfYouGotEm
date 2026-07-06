@@ -189,6 +189,35 @@
       ]
     },
     {
+      "artifact_id": "usgs_3dep_chili_bar_corridor_heightfield_1009",
+      "category": "derived_heightfield_candidate",
+      "path": "terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
+      "provider": "RaftSim geospatial preview utility from larger USGS 3DEP ImageServer corridor sample",
+      "source_artifacts": [
+        "terrain/usgs_3dep_chili_bar_corridor_sample_512.tif"
+      ],
+      "status": "generated_review_gated_import_candidate",
+      "summary": {
+        "width": 1009,
+        "height": 1009,
+        "pixel_type": "U16",
+        "format": "16-bit grayscale PNG",
+        "size_bytes": 1435836,
+        "elevation_min_m": 220.94493103027344,
+        "elevation_max_m": 1030.0355224609375,
+        "processing_manifest": "terrain/usgs_3dep_chili_bar_corridor_heightfield_manifest.json"
+      },
+      "use": [
+        "unreal_landscape_import_test",
+        "terrain_scale_review",
+        "heightfield_conditioning_pipeline_proof"
+      ],
+      "caveats": [
+        "This is a normalized import candidate for tool testing, not production terrain.",
+        "The source DEM sample is not a complete reviewed corridor DEM and still needs clipping, reprojection, void/artifact review, hydrologic conditioning, river-channel burning, and guide review."
+      ]
+    },
+    {
       "artifact_id": "usda_naip_chili_bar_corridor_sample_1024",
       "category": "aerial_imagery_corridor_sample",
       "path": "imagery/usda_naip_chili_bar_corridor_sample_1024.png",

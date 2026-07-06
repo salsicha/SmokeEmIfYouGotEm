@@ -190,6 +190,35 @@
       ]
     },
     {
+      "artifact_id": "usgs_3dep_lees_ferry_corridor_heightfield_1009",
+      "category": "derived_heightfield_candidate",
+      "path": "terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png",
+      "provider": "RaftSim geospatial preview utility from larger USGS 3DEP ImageServer corridor sample",
+      "source_artifacts": [
+        "terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif"
+      ],
+      "status": "generated_review_gated_import_candidate",
+      "summary": {
+        "width": 1009,
+        "height": 1009,
+        "pixel_type": "U16",
+        "format": "16-bit grayscale PNG",
+        "size_bytes": 1308755,
+        "elevation_min_m": 934.4613647460938,
+        "elevation_max_m": 1938.5736083984375,
+        "processing_manifest": "terrain/usgs_3dep_lees_ferry_corridor_heightfield_manifest.json"
+      },
+      "use": [
+        "unreal_landscape_import_test",
+        "terrain_scale_review",
+        "heightfield_conditioning_pipeline_proof"
+      ],
+      "caveats": [
+        "This is a normalized import candidate for tool testing, not production terrain.",
+        "The source DEM sample is not a complete Grand Canyon corridor DEM and still needs reviewed tiling, reprojection, river-mile stationing, hydrologic conditioning, river-channel burning, and guide review."
+      ]
+    },
+    {
       "artifact_id": "usda_naip_lees_ferry_corridor_sample_1024",
       "category": "aerial_imagery_corridor_sample",
       "path": "imagery/usda_naip_lees_ferry_corridor_sample_1024.png",
