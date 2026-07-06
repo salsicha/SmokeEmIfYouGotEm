@@ -1,0 +1,154 @@
+{
+  "schema": "raftsim.unreal.river_flow_visual_bands.v1",
+  "generated_on": "2026-07-06",
+  "status": "preview_visual_contract_for_source_backed_flow_context; not_solver_validation_or_final_photoreal_water",
+  "policy": {
+    "flow_controls_visuals_only": true,
+    "must_record_selected_band_in_capture_manifest": true,
+    "must_not_hide_conservation_or_solver_failures": true,
+    "must_be_compared_to_solver_and_real_world_review_before_gameplay_authority": true,
+    "visual_parameters": [
+      "river_width_scale",
+      "water_level_offset_cm",
+      "foam_scale",
+      "wet_bank_scale",
+      "current_cue_scale"
+    ]
+  },
+  "rivers": [
+    {
+      "river_id": "american_south_fork",
+      "display_name": "South Fork American River",
+      "flow_presets": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+      "default_preview_flow_band": "median_runnable",
+      "source_context": "USGS-11445500 planning presets plus guide-review requirement",
+      "bands": [
+        {
+          "flow_band": "low_runnable",
+          "reference_discharge_cfs": 900.0,
+          "season": "late_summer_low_water",
+          "river_width_scale": 0.92,
+          "water_level_offset_cm": -8.0,
+          "foam_scale": 0.75,
+          "wet_bank_scale": 0.85,
+          "current_cue_scale": 0.82,
+          "visual_intent": "Expose more rocks and shallows, tighten tongues, and reduce sticky hydraulics unless guide review identifies low-water holes."
+        },
+        {
+          "flow_band": "median_runnable",
+          "reference_discharge_cfs": 1600.0,
+          "season": "summer_commercial",
+          "river_width_scale": 1.0,
+          "water_level_offset_cm": 0.0,
+          "foam_scale": 1.0,
+          "wet_bank_scale": 1.0,
+          "current_cue_scale": 1.0,
+          "visual_intent": "Default commercial-style validation band with readable tongues, wet rocks, eddy lines, and moderate wave trains."
+        },
+        {
+          "flow_band": "high_runnable",
+          "reference_discharge_cfs": 3000.0,
+          "season": "spring_runoff_or_release",
+          "river_width_scale": 1.12,
+          "water_level_offset_cm": 12.0,
+          "foam_scale": 1.25,
+          "wet_bank_scale": 1.25,
+          "current_cue_scale": 1.25,
+          "visual_intent": "Push water higher into banks, strengthen laterals and wave trains, and keep boulder hazards visible instead of visually washing them away."
+        }
+      ]
+    },
+    {
+      "river_id": "colorado_river",
+      "display_name": "Colorado River Grand Canyon",
+      "flow_presets": "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json",
+      "default_preview_flow_band": "moderate_release_planning",
+      "source_context": "USGS-09380000, USGS-09402500, and Glen Canyon Dam release context are required before these planning values become authoritative.",
+      "bands": [
+        {
+          "flow_band": "low_release_planning",
+          "reference_discharge_cfs": 8000.0,
+          "river_width_scale": 0.96,
+          "water_level_offset_cm": -6.0,
+          "foam_scale": 0.85,
+          "wet_bank_scale": 0.88,
+          "current_cue_scale": 0.90,
+          "visual_intent": "Lower release read with more exposed bars and sharper ferry setup while preserving big-water scale."
+        },
+        {
+          "flow_band": "moderate_release_planning",
+          "reference_discharge_cfs": 12000.0,
+          "river_width_scale": 1.08,
+          "water_level_offset_cm": 8.0,
+          "foam_scale": 1.15,
+          "wet_bank_scale": 1.10,
+          "current_cue_scale": 1.15,
+          "visual_intent": "Default rowing preview with longer tongues, lateral waves, and broad current streaks."
+        },
+        {
+          "flow_band": "high_release_planning",
+          "reference_discharge_cfs": 18000.0,
+          "river_width_scale": 1.18,
+          "water_level_offset_cm": 18.0,
+          "foam_scale": 1.35,
+          "wet_bank_scale": 1.30,
+          "current_cue_scale": 1.35,
+          "visual_intent": "Faster, higher big-water read with stronger wave trains and eddy fences while keeping shore and rescue cues inspectable."
+        }
+      ]
+    },
+    {
+      "river_id": "pacuare",
+      "display_name": "Pacuare River Rainforest",
+      "flow_presets": "physics/data/real_world/pacuare_river_costa_rica/flow_presets.json",
+      "default_preview_flow_band": "rainfed_runnable_planning",
+      "source_context": "Relative planning bands only until Costa Rica hydrology, rainfall history, flash-response, and guide review clear numeric ranges.",
+      "bands": [
+        {
+          "flow_band": "clear_season_low_planning",
+          "reference_discharge_cfs": null,
+          "relative_flow": "low",
+          "river_width_scale": 0.90,
+          "water_level_offset_cm": -9.0,
+          "foam_scale": 0.80,
+          "wet_bank_scale": 0.88,
+          "current_cue_scale": 0.82,
+          "visual_intent": "Clearer low-season planning read with exposed rocks, tighter tongues, and reduced bank-pressure cues."
+        },
+        {
+          "flow_band": "rainfed_runnable_planning",
+          "reference_discharge_cfs": null,
+          "relative_flow": "medium",
+          "river_width_scale": 1.05,
+          "water_level_offset_cm": 7.0,
+          "foam_scale": 1.20,
+          "wet_bank_scale": 1.20,
+          "current_cue_scale": 1.18,
+          "visual_intent": "Default rainforest runnable preview with pushy tongues, active wave trains, wet banks, and vegetation pressure after rain."
+        },
+        {
+          "flow_band": "rainy_season_high_planning",
+          "reference_discharge_cfs": null,
+          "relative_flow": "high",
+          "river_width_scale": 1.18,
+          "water_level_offset_cm": 20.0,
+          "foam_scale": 1.40,
+          "wet_bank_scale": 1.35,
+          "current_cue_scale": 1.35,
+          "visual_intent": "Review-only high water with faster reaction windows, larger laterals, fewer visible eddies, and stronger swimmer drift cues."
+        },
+        {
+          "flow_band": "flash_response_review_only",
+          "reference_discharge_cfs": null,
+          "relative_flow": "rapid_rise",
+          "river_width_scale": 1.30,
+          "water_level_offset_cm": 34.0,
+          "foam_scale": 1.55,
+          "wet_bank_scale": 1.50,
+          "current_cue_scale": 1.55,
+          "visual_intent": "Blocked from playable use until hydrology and guide review define safe visual and gameplay boundaries."
+        }
+      ]
+    }
+  ]
+}

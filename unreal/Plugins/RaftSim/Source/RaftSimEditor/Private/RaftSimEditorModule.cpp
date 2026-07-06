@@ -90,11 +90,21 @@ struct FRaftSimEnvironmentPreviewSpec
     FString HeightfieldPreviewImage;
     FString ElevationSample;
     FString SourceDrapeDescription;
+    FString FlowBandId;
+    FString FlowBandDisplayName;
+    FString FlowBandSource;
+    FString FlowVisualDescription;
     FLinearColor WaterColor = FLinearColor(0.05f, 0.26f, 0.32f);
     FLinearColor TerrainColor = FLinearColor(0.26f, 0.23f, 0.18f);
     FLinearColor RockColor = FLinearColor(0.35f, 0.33f, 0.29f);
     FLinearColor FoliageColor = FLinearColor(0.18f, 0.34f, 0.16f);
     FLinearColor RaftColor = FLinearColor(0.90f, 0.28f, 0.08f);
+    float FlowReferenceDischargeCfs = -1.0f;
+    float FlowWidthScale = 1.0f;
+    float FlowFoamScale = 1.0f;
+    float FlowWetBankScale = 1.0f;
+    float FlowCurrentCueScale = 1.0f;
+    float FlowWaterLevelOffsetCm = 0.0f;
     float CanyonHeightCm = 850.0f;
     float RiverHalfWidthCm = 360.0f;
     float BankWidthCm = 760.0f;
@@ -215,6 +225,12 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_sample_512.tif");
     SouthFork.SourceDrapeDescription =
         TEXT("larger official USDA/APFO NAIP 1024px corridor sample sampled into a denser terrain-conforming source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into bank and valley preview geometry; first-party procedural wet-bank, leaf-litter, talus, and vertex-color water-gradient detail generated as rights-safe proxy dressing; full elevation conditioning remains pending; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers");
+    SouthFork.FlowBandId = TEXT("median_runnable");
+    SouthFork.FlowBandDisplayName = TEXT("Median Runnable / Summer Commercial");
+    SouthFork.FlowBandSource = TEXT("physics/data/real_world/south_fork_american_chili_bar/flow_presets.json");
+    SouthFork.FlowVisualDescription =
+        TEXT("Default South Fork summer-commercial validation band from USGS-11445500 planning presets; keeps moderate tongues, wet rocks, and foam lines visible while low/high seasonal variants remain future capture targets.");
+    SouthFork.FlowReferenceDischargeCfs = 1600.0f;
     SouthFork.WaterColor = FLinearColor(0.05f, 0.42f, 0.47f);
     SouthFork.TerrainColor = FLinearColor(0.35f, 0.30f, 0.21f);
     SouthFork.RockColor = FLinearColor(0.38f, 0.36f, 0.31f);
@@ -245,6 +261,17 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif");
     Colorado.SourceDrapeDescription =
         TEXT("larger official USDA/APFO NAIP 1024px Lees Ferry corridor sample sampled into a denser terrain-conforming canyon source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into canyon bank preview geometry; first-party procedural strata, talus, wet-rock, and vertex-color water-gradient detail generated as rights-safe proxy dressing; full canyon heightfield conditioning remains pending; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers");
+    Colorado.FlowBandId = TEXT("moderate_release_planning");
+    Colorado.FlowBandDisplayName = TEXT("Moderate Release Planning");
+    Colorado.FlowBandSource = TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json");
+    Colorado.FlowVisualDescription =
+        TEXT("Default Grand Canyon rowing preview band from release-planning presets; slightly widens the big-water ribbon and strengthens long wave/current cues while release history and guide review remain required.");
+    Colorado.FlowReferenceDischargeCfs = 12000.0f;
+    Colorado.FlowWidthScale = 1.08f;
+    Colorado.FlowFoamScale = 1.15f;
+    Colorado.FlowWetBankScale = 1.10f;
+    Colorado.FlowCurrentCueScale = 1.15f;
+    Colorado.FlowWaterLevelOffsetCm = 8.0f;
     Colorado.WaterColor = FLinearColor(0.34f, 0.28f, 0.19f);
     Colorado.TerrainColor = FLinearColor(0.48f, 0.30f, 0.18f);
     Colorado.RockColor = FLinearColor(0.55f, 0.32f, 0.20f);
@@ -276,6 +303,16 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
         TEXT("larger deterministic 1024px preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, sampled into a denser terrain-conforming rainforest source-drape mosaic with cloud gaps filled by DEM-derived shading; larger derived 1024px Copernicus DEM relief preview and review-gated 1009px heightfield candidate sampled into Pacuare bank and gorge preview geometry; first-party procedural rainforest leaf-litter, wet-rock, talus, and vertex-color water-gradient detail generated as rights-safe proxy dressing; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water shaders, waterfalls, foam, raft, and lighting remain proxy layers");
+    Pacuare.FlowBandId = TEXT("rainfed_runnable_planning");
+    Pacuare.FlowBandDisplayName = TEXT("Rain-Fed Runnable Planning");
+    Pacuare.FlowBandSource = TEXT("physics/data/real_world/pacuare_river_costa_rica/flow_presets.json");
+    Pacuare.FlowVisualDescription =
+        TEXT("Default Pacuare planning band uses relative rainfed-runnable context only; numeric discharge stays unset until Costa Rica gauge, rainfall, flash-response, and guide review clear it.");
+    Pacuare.FlowWidthScale = 1.05f;
+    Pacuare.FlowFoamScale = 1.20f;
+    Pacuare.FlowWetBankScale = 1.20f;
+    Pacuare.FlowCurrentCueScale = 1.18f;
+    Pacuare.FlowWaterLevelOffsetCm = 7.0f;
     Pacuare.WaterColor = FLinearColor(0.04f, 0.35f, 0.28f);
     Pacuare.TerrainColor = FLinearColor(0.17f, 0.22f, 0.13f);
     Pacuare.RockColor = FLinearColor(0.20f, 0.24f, 0.20f);
@@ -696,6 +733,16 @@ float GetPreviewRiverCenterY(const FRaftSimEnvironmentPreviewSpec& Spec, float X
     return Primary + Secondary;
 }
 
+float GetPreviewActiveRiverHalfWidthCm(const FRaftSimEnvironmentPreviewSpec& Spec)
+{
+    return FMath::Max(80.0f, Spec.RiverHalfWidthCm * FMath::Max(0.35f, Spec.FlowWidthScale));
+}
+
+float GetPreviewWaterSurfaceBaseZCm(const FRaftSimEnvironmentPreviewSpec& Spec)
+{
+    return 10.0f + Spec.FlowWaterLevelOffsetCm;
+}
+
 float SamplePreviewTerrainReliefCm(
     const FRaftSimEnvironmentPreviewSpec& Spec,
     const FRaftSimPreviewImage* TerrainRelief,
@@ -713,9 +760,10 @@ float SamplePreviewTerrainReliefCm(
     const float HalfWidth = Spec.bDesertCanyon ? 4300.0f : 2750.0f;
     const float U = FMath::Clamp((X - MinX) / (MaxX - MinX), 0.0f, 1.0f);
     const float V = FMath::Clamp((Y + HalfWidth) / (HalfWidth * 2.0f), 0.0f, 1.0f);
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float ReliefMask = SmoothPreviewStep(
-        Spec.RiverHalfWidthCm + 110.0f,
-        Spec.RiverHalfWidthCm + Spec.BankWidthCm + 740.0f,
+        ActiveRiverHalfWidth + 110.0f,
+        ActiveRiverHalfWidth + Spec.BankWidthCm + 740.0f,
         ChannelOffset);
     return (TerrainRelief->SampleLuma(U, V) - 0.5f) * Spec.TerrainReliefAmplitudeCm * ReliefMask;
 }
@@ -737,9 +785,10 @@ float SamplePreviewHeightfieldCm(
     const float HalfWidth = Spec.bDesertCanyon ? 4300.0f : 2750.0f;
     const float U = FMath::Clamp((X - MinX) / (MaxX - MinX), 0.0f, 1.0f);
     const float V = FMath::Clamp((Y + HalfWidth) / (HalfWidth * 2.0f), 0.0f, 1.0f);
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float HeightfieldMask = SmoothPreviewStep(
-        Spec.RiverHalfWidthCm + 180.0f,
-        Spec.RiverHalfWidthCm + Spec.BankWidthCm + (Spec.bDesertCanyon ? 1450.0f : 820.0f),
+        ActiveRiverHalfWidth + 180.0f,
+        ActiveRiverHalfWidth + Spec.BankWidthCm + (Spec.bDesertCanyon ? 1450.0f : 820.0f),
         ChannelOffset);
     const float RidgePattern = (HeightfieldPreview->SampleLuma(U, V) - 0.5f) * Spec.HeightfieldPreviewAmplitudeCm;
     return RidgePattern * HeightfieldMask;
@@ -754,8 +803,9 @@ float GetPreviewTerrainHeightCm(
 {
     const float CenterY = GetPreviewRiverCenterY(Spec, X);
     const float Offset = FMath::Abs(Y - CenterY);
-    const float InnerBank = Spec.RiverHalfWidthCm;
-    const float OuterBank = Spec.RiverHalfWidthCm + Spec.BankWidthCm;
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+    const float InnerBank = ActiveRiverHalfWidth;
+    const float OuterBank = ActiveRiverHalfWidth + Spec.BankWidthCm;
     const float CanyonShoulder = OuterBank + (Spec.bDesertCanyon ? 1300.0f : 720.0f);
     const float BankT = SmoothPreviewStep(InnerBank, OuterBank, Offset);
     const float CanyonT = SmoothPreviewStep(OuterBank, CanyonShoulder, Offset);
@@ -906,12 +956,14 @@ void AddPreviewTerrainMesh(
             const float Z = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief, HeightfieldPreview);
             const float CenterY = GetPreviewRiverCenterY(Spec, X);
             const float Offset = FMath::Abs(Y - CenterY);
-            const float BankT = SmoothPreviewStep(Spec.RiverHalfWidthCm, Spec.RiverHalfWidthCm + Spec.BankWidthCm, Offset);
+            const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+            const float BankT = SmoothPreviewStep(ActiveRiverHalfWidth, ActiveRiverHalfWidth + Spec.BankWidthCm, Offset);
             const float CanyonT = SmoothPreviewStep(
-                Spec.RiverHalfWidthCm + Spec.BankWidthCm,
-                Spec.RiverHalfWidthCm + Spec.BankWidthCm + (Spec.bDesertCanyon ? 1400.0f : 820.0f),
+                ActiveRiverHalfWidth + Spec.BankWidthCm,
+                ActiveRiverHalfWidth + Spec.BankWidthCm + (Spec.bDesertCanyon ? 1400.0f : 820.0f),
                 Offset);
-            const float WetT = 1.0f - SmoothPreviewStep(Spec.RiverHalfWidthCm + 35.0f, Spec.RiverHalfWidthCm + 360.0f, Offset);
+            const float WetT = 1.0f -
+                SmoothPreviewStep(ActiveRiverHalfWidth + 35.0f, ActiveRiverHalfWidth + 360.0f * Spec.FlowWetBankScale, Offset);
             const float ColorNoise = 0.88f + 0.10f * FMath::Sin(X * 0.0031f + Y * 0.0047f) +
                 0.06f * FMath::Sin(X * 0.0013f - Y * 0.0029f);
             const FLinearColor ShoulderColor = Spec.bDesertCanyon
@@ -994,7 +1046,7 @@ void AddPreviewAerialDrapeTiles(
         {
             const float V = (static_cast<float>(YIndex) + 0.5f) / static_cast<float>(YTiles);
             const float Y = FMath::Lerp(-HalfWidth, HalfWidth, V);
-            if (FMath::Abs(Y - CenterY) < Spec.RiverHalfWidthCm + 180.0f)
+            if (FMath::Abs(Y - CenterY) < GetPreviewActiveRiverHalfWidthCm(Spec) + 180.0f)
             {
                 continue;
             }
@@ -1063,6 +1115,8 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
     const FLinearColor SurfaceGlint = Spec.bDesertCanyon
         ? FLinearColor(0.58f, 0.49f, 0.34f)
         : (Spec.bHasWaterfalls ? FLinearColor(0.13f, 0.58f, 0.48f) : FLinearColor(0.14f, 0.62f, 0.64f));
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+    const float WaterBaseZ = GetPreviewWaterSurfaceBaseZCm(Spec);
 
     for (int32 XIndex = 0; XIndex <= XSteps; ++XIndex)
     {
@@ -1070,7 +1124,7 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
         const float X = FMath::Lerp(MinX, MaxX, U);
         const float CenterY = GetPreviewRiverCenterY(Spec, X);
         const float Width =
-            Spec.RiverHalfWidthCm * (1.0f + 0.10f * FMath::Sin(X * 0.0012f) + (Spec.bDesertCanyon ? 0.18f : 0.05f));
+            ActiveRiverHalfWidth * (1.0f + 0.10f * FMath::Sin(X * 0.0012f) + (Spec.bDesertCanyon ? 0.18f : 0.05f));
         for (int32 CrossIndex = 0; CrossIndex <= CrossSteps; ++CrossIndex)
         {
             const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
@@ -1085,7 +1139,7 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
                 WaterColor,
                 SurfaceGlint,
                 FMath::Clamp((1.0f - EdgeT * 0.45f) * FlowNoise * (Spec.bDesertCanyon ? 0.12f : 0.16f), 0.0f, 0.22f));
-            Vertices.Add(FVector(X, CenterY + Lateral, 10.0f + Wave));
+            Vertices.Add(FVector(X, CenterY + Lateral, WaterBaseZ + Wave));
             UVs.Add(FVector2D(U * 18.0f, V));
             VertexColors.Add(ClampPreviewColor(WaterColor));
         }
@@ -1168,7 +1222,7 @@ void AddPreviewShoreRibbon(
             const float Y = CenterY + Offset;
             const float SurfaceWave = FMath::Sin(X * 0.011f + Y * 0.015f) * (Spec.bDesertCanyon ? 2.0f : 4.5f);
             const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief, HeightfieldPreview);
-            const float Z = FMath::Max(TerrainZ + ZOffset, 13.0f + SurfaceWave + ZOffset * 0.25f);
+            const float Z = FMath::Max(TerrainZ + ZOffset, GetPreviewWaterSurfaceBaseZCm(Spec) + 3.0f + SurfaceWave + ZOffset * 0.25f);
             const float Fleck = 0.92f + 0.08f * FMath::Sin(X * 0.0053f + Y * 0.0037f);
             Vertices.Add(FVector(X, Y, Z));
             UVs.Add(FVector2D(U * 16.0f, V));
@@ -1227,6 +1281,8 @@ void AddPreviewWetBankDressing(
     const FLinearColor GravelBand = Spec.bDesertCanyon
         ? FLinearColor(0.64f, 0.43f, 0.26f)
         : (Spec.bHasWaterfalls ? FLinearColor(0.08f, 0.13f, 0.08f) : FLinearColor(0.22f, 0.22f, 0.17f));
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+    const float WetBankScale = FMath::Max(0.35f, Spec.FlowWetBankScale);
 
     for (int32 SideIndex = 0; SideIndex < 2; ++SideIndex)
     {
@@ -1237,8 +1293,8 @@ void AddPreviewWetBankDressing(
             TerrainRelief,
             HeightfieldPreview,
             FString::Printf(TEXT("RaftSim_WetWaterline_%s_%s"), Side < 0.0f ? TEXT("Left") : TEXT("Right"), *Spec.RiverId),
-            Side * (Spec.RiverHalfWidthCm + 82.0f),
-            Spec.bDesertCanyon ? 145.0f : 105.0f,
+            Side * (ActiveRiverHalfWidth + 82.0f * WetBankScale),
+            (Spec.bDesertCanyon ? 145.0f : 105.0f) * WetBankScale,
             20.0f,
             WetEdge,
             BankBand);
@@ -1248,8 +1304,8 @@ void AddPreviewWetBankDressing(
             TerrainRelief,
             HeightfieldPreview,
             FString::Printf(TEXT("RaftSim_GravelMudBank_%s_%s"), Side < 0.0f ? TEXT("Left") : TEXT("Right"), *Spec.RiverId),
-            Side * (Spec.RiverHalfWidthCm + 260.0f),
-            Spec.bDesertCanyon ? 230.0f : 125.0f,
+            Side * (ActiveRiverHalfWidth + 260.0f * WetBankScale),
+            (Spec.bDesertCanyon ? 230.0f : 125.0f) * WetBankScale,
             24.0f,
             BankBand,
             GravelBand);
@@ -1269,7 +1325,8 @@ void AddPreviewProceduralEnvironmentDetail(
     }
 
     const int32 BandCount = Spec.bDesertCanyon ? 7 : (Spec.bHasWaterfalls ? 5 : 4);
-    const float BaseBandOffset = Spec.RiverHalfWidthCm +
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+    const float BaseBandOffset = ActiveRiverHalfWidth +
         (Spec.bDesertCanyon ? Spec.BankWidthCm * 0.72f + 380.0f : Spec.BankWidthCm * 0.35f + 190.0f);
     const float BandSpacing = Spec.bDesertCanyon ? 315.0f : (Spec.bHasWaterfalls ? 150.0f : 180.0f);
     const float BandWidth = Spec.bDesertCanyon ? 125.0f : (Spec.bHasWaterfalls ? 78.0f : 92.0f);
@@ -1327,7 +1384,7 @@ void AddPreviewProceduralEnvironmentDetail(
         const float CenterY = GetPreviewRiverCenterY(Spec, X);
         const float Side = (PebbleIndex % 2 == 0) ? -1.0f : 1.0f;
         const float BarJitter = FMath::Abs(FMath::Sin(static_cast<float>(PebbleIndex) * 1.31f));
-        const float Offset = Spec.RiverHalfWidthCm + (Spec.bDesertCanyon ? 120.0f : 85.0f) +
+        const float Offset = ActiveRiverHalfWidth + (Spec.bDesertCanyon ? 120.0f : 85.0f) +
             BarJitter * (Spec.bDesertCanyon ? 520.0f : 310.0f) +
             static_cast<float>(PebbleIndex % 4) * (Spec.bDesertCanyon ? 68.0f : 42.0f);
         const float Y = CenterY + Side * Offset;
@@ -1388,7 +1445,7 @@ void AddPreviewFoamRibbon(
         const float LocalHalfWidth = FMath::Max(6.0f, Width * (0.18f + 0.62f * Taper));
         const float CenterY = RiverCenterY + LateralOffset + Sway;
         const float SurfaceWave = FMath::Sin(X * 0.011f + CenterY * 0.015f) * (Spec.bDesertCanyon ? 2.0f : 4.5f);
-        const float Z = 25.0f + SurfaceWave + 2.0f * FMath::Sin(Phase * 1.7f + T * PI);
+        const float Z = GetPreviewWaterSurfaceBaseZCm(Spec) + 15.0f + SurfaceWave + 2.0f * FMath::Sin(Phase * 1.7f + T * PI);
 
         Vertices.Add(FVector(X, CenterY - LocalHalfWidth, Z));
         Vertices.Add(FVector(X, CenterY + LocalHalfWidth, Z + 0.6f));
@@ -1421,11 +1478,16 @@ void AddPreviewFoamAndHydraulics(UWorld* World, const FRaftSimEnvironmentPreview
         return;
     }
 
-    for (int32 FoamIndex = 0; FoamIndex < Spec.FoamTrainCount; ++FoamIndex)
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+    const float FoamScale = FMath::Max(0.35f, Spec.FlowFoamScale);
+    const int32 FlowAwareFoamTrainCount =
+        FMath::Max(1, FMath::RoundToInt(static_cast<float>(Spec.FoamTrainCount) * FMath::Clamp(FoamScale, 0.5f, 1.35f)));
+
+    for (int32 FoamIndex = 0; FoamIndex < FlowAwareFoamTrainCount; ++FoamIndex)
     {
-        const float X = -4050.0f + static_cast<float>(FoamIndex) * (28000.0f / FMath::Max(1, Spec.FoamTrainCount));
-        const float Offset = FMath::Sin(static_cast<float>(FoamIndex) * 1.7f) * Spec.RiverHalfWidthCm * 0.42f;
-        const float Length = Spec.bDesertCanyon ? 1420.0f : 1050.0f;
+        const float X = -4050.0f + static_cast<float>(FoamIndex) * (28000.0f / FMath::Max(1, FlowAwareFoamTrainCount));
+        const float Offset = FMath::Sin(static_cast<float>(FoamIndex) * 1.7f) * ActiveRiverHalfWidth * 0.42f;
+        const float Length = (Spec.bDesertCanyon ? 1420.0f : 1050.0f) * FoamScale;
         AddPreviewFoamRibbon(
             World,
             Spec,
@@ -1433,7 +1495,7 @@ void AddPreviewFoamAndHydraulics(UWorld* World, const FRaftSimEnvironmentPreview
             X - Length * 0.48f,
             Length,
             Offset,
-            54.0f + 12.0f * static_cast<float>(FoamIndex % 3),
+            (54.0f + 12.0f * static_cast<float>(FoamIndex % 3)) * FoamScale,
             static_cast<float>(FoamIndex) * 0.83f,
             FLinearColor(0.82f, 0.90f, 0.86f));
         AddPreviewFoamRibbon(
@@ -1443,7 +1505,7 @@ void AddPreviewFoamAndHydraulics(UWorld* World, const FRaftSimEnvironmentPreview
             X - Length * 0.26f,
             Length * 0.55f,
             Offset * 0.55f,
-            22.0f + 5.0f * static_cast<float>(FoamIndex % 2),
+            (22.0f + 5.0f * static_cast<float>(FoamIndex % 2)) * FoamScale,
             static_cast<float>(FoamIndex) * 1.19f + 0.4f,
             Spec.bDesertCanyon ? FLinearColor(0.78f, 0.82f, 0.76f) : FLinearColor(0.72f, 0.88f, 0.84f));
 
@@ -1454,9 +1516,9 @@ void AddPreviewFoamAndHydraulics(UWorld* World, const FRaftSimEnvironmentPreview
                 Spec,
                 FString::Printf(TEXT("RaftSim_EddyLine_%02d_%s"), FoamIndex, *Spec.RiverId),
                 X + 80.0f,
-                720.0f,
-                Spec.RiverHalfWidthCm * 0.76f,
-                18.0f,
+                720.0f * FoamScale,
+                ActiveRiverHalfWidth * 0.76f,
+                18.0f * FoamScale,
                 static_cast<float>(FoamIndex) * 0.47f,
                 FLinearColor(0.88f, 0.94f, 0.90f));
         }
@@ -1476,12 +1538,16 @@ void AddPreviewWaterSurfaceDetail(UWorld* World, const FRaftSimEnvironmentPrevie
     const FLinearColor CurrentShadow = Spec.bDesertCanyon
         ? FLinearColor(0.30f, 0.24f, 0.17f)
         : (Spec.bHasWaterfalls ? FLinearColor(0.03f, 0.31f, 0.25f) : FLinearColor(0.04f, 0.36f, 0.39f));
-    const int32 CurrentCount = Spec.bDesertCanyon ? 7 : (Spec.bHasWaterfalls ? 10 : 9);
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+    const float CurrentCueScale = FMath::Max(0.35f, Spec.FlowCurrentCueScale);
+    const int32 BaseCurrentCount = Spec.bDesertCanyon ? 7 : (Spec.bHasWaterfalls ? 10 : 9);
+    const int32 CurrentCount =
+        FMath::Max(1, FMath::RoundToInt(static_cast<float>(BaseCurrentCount) * FMath::Clamp(CurrentCueScale, 0.5f, 1.3f)));
     for (int32 CurrentIndex = 0; CurrentIndex < CurrentCount; ++CurrentIndex)
     {
         const float X = -2600.0f + static_cast<float>(CurrentIndex) * (26000.0f / FMath::Max(1, CurrentCount));
-        const float Lateral = FMath::Sin(static_cast<float>(CurrentIndex) * 1.37f) * Spec.RiverHalfWidthCm * 0.30f;
-        const float Length = Spec.bDesertCanyon ? 1380.0f : 980.0f;
+        const float Lateral = FMath::Sin(static_cast<float>(CurrentIndex) * 1.37f) * ActiveRiverHalfWidth * 0.30f;
+        const float Length = (Spec.bDesertCanyon ? 1380.0f : 980.0f) * CurrentCueScale;
         const FLinearColor DetailColor =
             FMath::Lerp(CurrentShadow, CurrentHighlight, 0.50f + 0.18f * FMath::Sin(static_cast<float>(CurrentIndex) * 0.91f));
         AddPreviewFoamRibbon(
@@ -1491,7 +1557,7 @@ void AddPreviewWaterSurfaceDetail(UWorld* World, const FRaftSimEnvironmentPrevie
             X,
             Length,
             Lateral,
-            9.0f + 3.0f * static_cast<float>(CurrentIndex % 3),
+            (9.0f + 3.0f * static_cast<float>(CurrentIndex % 3)) * CurrentCueScale,
             static_cast<float>(CurrentIndex) * 0.61f,
             DetailColor);
     }
@@ -1836,12 +1902,13 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     AddPreviewWaterSurfaceDetail(World, Spec);
     AddPreviewFoamAndHydraulics(World, Spec);
 
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     for (int32 BoulderIndex = 0; BoulderIndex < Spec.BoulderCount; ++BoulderIndex)
     {
         const float X = -3600.0f + static_cast<float>(BoulderIndex) * (28200.0f / FMath::Max(1, Spec.BoulderCount));
         const float CenterY = GetPreviewRiverCenterY(Spec, X);
         const float Side = (BoulderIndex % 2 == 0) ? -1.0f : 1.0f;
-        const float Y = CenterY + Side * (Spec.RiverHalfWidthCm * (0.32f + 0.55f * FMath::Abs(FMath::Sin(static_cast<float>(BoulderIndex) * 1.91f))));
+        const float Y = CenterY + Side * (ActiveRiverHalfWidth * (0.32f + 0.55f * FMath::Abs(FMath::Sin(static_cast<float>(BoulderIndex) * 1.91f))));
         const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainReliefPtr, HeightfieldPreviewPtr);
         const float Scale = Spec.bDesertCanyon ? 1.6f : 1.0f + 0.35f * static_cast<float>(BoulderIndex % 3);
         AddPreviewMeshActor(
@@ -1859,7 +1926,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         const float X = -2400.0f + static_cast<float>(FoliageIndex) * (28600.0f / FMath::Max(1, Spec.FoliageCount));
         const float CenterY = GetPreviewRiverCenterY(Spec, X);
         const float Side = (FoliageIndex % 2 == 0) ? -1.0f : 1.0f;
-        const float BankOffset = Spec.bDesertCanyon ? Spec.RiverHalfWidthCm + 1350.0f : Spec.RiverHalfWidthCm + 620.0f;
+        const float BankOffset = Spec.bDesertCanyon ? ActiveRiverHalfWidth + 1350.0f : ActiveRiverHalfWidth + 620.0f;
         const float Y = CenterY + Side * (BankOffset + 210.0f * FMath::Sin(static_cast<float>(FoliageIndex) * 1.31f));
         const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainReliefPtr, HeightfieldPreviewPtr);
         const float Height = Spec.bHasWaterfalls ? 2.35f + 0.28f * static_cast<float>(FoliageIndex % 5) : (Spec.bDesertCanyon ? 0.50f : 1.45f + 0.18f * static_cast<float>(FoliageIndex % 3));
@@ -3023,6 +3090,9 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             true,
             OutSummary);
         bAllCaptured &= bGuideSeatCaptured && bRiverEyeCaptured;
+        const FString FlowReferenceDischargeJson = Spec.FlowReferenceDischargeCfs >= 0.0f
+            ? FString::Printf(TEXT("%.1f"), Spec.FlowReferenceDischargeCfs)
+            : FString(TEXT("null"));
 
         EntriesJson += FString::Printf(
             TEXT("%s    {\n")
@@ -3030,6 +3100,16 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("      \"display_name\": \"%s\",\n")
             TEXT("      \"map_package\": \"%s\",\n")
             TEXT("      \"source_manifest\": \"%s\",\n")
+            TEXT("      \"flow_band_id\": \"%s\",\n")
+            TEXT("      \"flow_band_display_name\": \"%s\",\n")
+            TEXT("      \"flow_band_source\": \"%s\",\n")
+            TEXT("      \"flow_reference_discharge_cfs\": %s,\n")
+            TEXT("      \"flow_visual_width_scale\": %.3f,\n")
+            TEXT("      \"flow_visual_foam_scale\": %.3f,\n")
+            TEXT("      \"flow_visual_wet_bank_scale\": %.3f,\n")
+            TEXT("      \"flow_visual_current_cue_scale\": %.3f,\n")
+            TEXT("      \"flow_visual_water_level_offset_cm\": %.3f,\n")
+            TEXT("      \"flow_visual_note\": \"%s\",\n")
             TEXT("      \"capture\": \"%s\",\n")
             TEXT("      \"guide_seat_capture\": \"%s\",\n")
             TEXT("      \"river_eye_capture\": \"%s\",\n")
@@ -3045,6 +3125,16 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             *EscapeRaftSimJsonString(Spec.DisplayName),
             *EscapeRaftSimJsonString(Spec.MapPackagePath),
             *EscapeRaftSimJsonString(Spec.SourceManifest),
+            *EscapeRaftSimJsonString(Spec.FlowBandId),
+            *EscapeRaftSimJsonString(Spec.FlowBandDisplayName),
+            *EscapeRaftSimJsonString(Spec.FlowBandSource),
+            *FlowReferenceDischargeJson,
+            Spec.FlowWidthScale,
+            Spec.FlowFoamScale,
+            Spec.FlowWetBankScale,
+            Spec.FlowCurrentCueScale,
+            Spec.FlowWaterLevelOffsetCm,
+            *EscapeRaftSimJsonString(Spec.FlowVisualDescription),
             *EscapeRaftSimJsonString(GuideSeatCapturePath),
             *EscapeRaftSimJsonString(GuideSeatCapturePath),
             *EscapeRaftSimJsonString(RiverEyeCapturePath),

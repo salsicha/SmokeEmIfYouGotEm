@@ -12,6 +12,7 @@
     "capture_outputs": "docs/environment-captures/photoreal_river_previews"
   },
   "reference_media_link_manifest": "physics/data/real_world/reference_media_link_manifest.json",
+  "flow_visual_band_manifest": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
   "global_sources": [
     {
       "source_id": "usgs_3dep",
@@ -406,6 +407,7 @@
       "review_gated_heightfield_candidate_sampling_visible_in_capture_manifest",
       "first_party_procedural_strata_leaf_litter_wet_rock_and_talus_detail_recorded",
       "first_party_procedural_vertex_color_water_gradients_recorded",
+      "source_backed_flow_band_visual_parameters_recorded",
       "biome_specific_understory_and_scrub_proxy_layers_recorded",
       "current_streak_proxy_layers_recorded",
       "known_nonphotoreal_proxy_layers_explicitly_recorded"
