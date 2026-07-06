@@ -1,0 +1,102 @@
+{
+  "schema": "raftsim.unreal.polished_tooling_slice_gate.v1",
+  "automation_module": "RaftSimAutomation",
+  "automation_test_name": "RaftSim.Milestone25A.PolishedToolingSliceGateManifest",
+  "gate_id": "milestone25a_polished_tooling_slice",
+  "purpose": "Gate the first polished Unreal tooling slice on menu registration, sample-data loading, validation visibility, deterministic export readiness, one-click validation actions, editor build evidence, and workflow documentation.",
+  "source_manifests": {
+    "polished_tool_registry": "unreal/Content/RaftSim/Tools/polished_tool_registry.json",
+    "replay_debug_viewer": "unreal/Content/RaftSim/Tools/replay_debug_viewer.json",
+    "rapid_river_editor_shell": "unreal/Content/RaftSim/Tools/rapid_river_editor_shell.json",
+    "feature_tuning_editor_shell": "unreal/Content/RaftSim/Tools/feature_tuning_editor_shell.json",
+    "tool_validation_actions": "unreal/Content/RaftSim/Tools/tool_validation_actions.json",
+    "workflow_doc": "docs/raftsim-tools-workflow.md"
+  },
+  "tool_count": 5,
+  "validation_action_count": 7,
+  "tool_surfaces": [
+    {
+      "tool_id": "ReplayDebugViewer",
+      "menu_entry_required": true,
+      "sample_data_required": true,
+      "clear_validation_state_required": true,
+      "deterministic_export_required": false
+    },
+    {
+      "tool_id": "RapidRiverEditor",
+      "menu_entry_required": true,
+      "sample_data_required": true,
+      "clear_validation_state_required": true,
+      "deterministic_export_required": true
+    },
+    {
+      "tool_id": "FeatureTuningEditor",
+      "menu_entry_required": true,
+      "sample_data_required": true,
+      "clear_validation_state_required": true,
+      "deterministic_export_required": true
+    },
+    {
+      "tool_id": "GeospatialValidator",
+      "menu_entry_required": true,
+      "sample_data_required": true,
+      "clear_validation_state_required": true,
+      "deterministic_export_required": true
+    },
+    {
+      "tool_id": "VerticalSliceLauncher",
+      "menu_entry_required": true,
+      "sample_data_required": true,
+      "clear_validation_state_required": true,
+      "deterministic_export_required": false
+    }
+  ],
+  "gate_checks": [
+    {
+      "check_id": "editor_module_and_menu_registry",
+      "passed": true,
+      "summary": "RaftSimEditor registers the RaftSim Tools menu and source-controlled tool registry."
+    },
+    {
+      "check_id": "replay_debug_viewer_shell",
+      "passed": true,
+      "summary": "Replay + Debug Viewer shell binds Milestone 10 replay data, bookmarks, and live-water debug overlays."
+    },
+    {
+      "check_id": "rapid_river_editor_shell",
+      "passed": true,
+      "summary": "Rapid/River Editor shell exposes South Fork annotations, evidence, expected outcomes, validation state, and export blockers."
+    },
+    {
+      "check_id": "feature_tuning_editor_shell",
+      "passed": true,
+      "summary": "Feature Tuning Editor shell exposes conservative forcing controls, flow points, physics/presentation domains, and validation blockers."
+    },
+    {
+      "check_id": "one_click_validation_actions",
+      "passed": true,
+      "summary": "Validation actions cover source checks, deterministic export, solver regeneration, stitched-window validation, live-water smoke, round-trip validation, and report opening."
+    },
+    {
+      "check_id": "workflow_documentation",
+      "passed": true,
+      "summary": "A short workflow document explains how to open and review the polished tools."
+    },
+    {
+      "check_id": "editor_target_build",
+      "passed": true,
+      "summary": "SmokeEmIfYouGotEmEditor Mac Development target built after the tooling slice sources were added."
+    }
+  ],
+  "pass_policy": {
+    "requires_menu_entries": true,
+    "requires_sample_data": true,
+    "requires_clear_validation_state": true,
+    "requires_deterministic_export_when_applicable": true,
+    "requires_validation_actions": true,
+    "requires_workflow_doc": true,
+    "requires_editor_build": true
+  },
+  "report": "physics/reports/milestone25a/polished_tooling_slice_gate.json",
+  "status": "passed_unreal_automation_execution"
+}
