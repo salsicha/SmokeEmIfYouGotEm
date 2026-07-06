@@ -211,6 +211,12 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.DisplayName = TEXT("Colorado River Grand Canyon");
     Colorado.MapPackagePath = TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview");
     Colorado.SourceManifest = TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json");
+    Colorado.AerialDrapeImage =
+        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_sample_512.png");
+    Colorado.ElevationSample =
+        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_sample_256.tif");
+    Colorado.SourceDrapeDescription =
+        TEXT("official USDA/APFO NAIP 512px Lees Ferry aerial sample sampled into visible canyon terrain overlay tiles; USGS 3DEP GeoTIFF sample recorded for follow-on canyon heightfield conditioning; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
     Colorado.WaterColor = FLinearColor(0.28f, 0.20f, 0.12f);
     Colorado.TerrainColor = FLinearColor(0.48f, 0.30f, 0.18f);
     Colorado.RockColor = FLinearColor(0.55f, 0.32f, 0.20f);
@@ -2181,7 +2187,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("%s\n")
         TEXT("  ]\n")
         TEXT("}\n"),
-        bAllCaptured ? TEXT("south_fork_source_draped_preview_and_procedural_blockout_captures_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
+        bAllCaptured ? TEXT("south_fork_and_colorado_source_draped_previews_and_pacuare_procedural_blockout_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
         *EntriesJson);
 
     const FString ManifestPath = FPaths::Combine(CaptureRoot, TEXT("environment_capture_manifest.json"));
