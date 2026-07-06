@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import math
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -89,6 +91,14 @@ def _manifest_path(path: Path, repo_root: Path | None) -> str:
     return str(path.resolve().relative_to(repo_root.resolve()))
 
 
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as file:
+        for chunk in iter(lambda: file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def _smoothstep(edge0: np.ndarray | float, edge1: np.ndarray | float, value: np.ndarray) -> np.ndarray:
     t = np.clip((value - edge0) / np.maximum(1.0e-6, np.asarray(edge1) - np.asarray(edge0)), 0.0, 1.0)
     return t * t * (3.0 - 2.0 * t)
@@ -111,6 +121,229 @@ def _preview_channel_prior(
     center_y = primary + secondary
     offset = np.abs(y - center_y)
     return 1.0 - _smoothstep(river_half_width_cm * 0.82, river_half_width_cm + 260.0, offset)
+
+
+def _preview_river_center_y_cm(x_cm: np.ndarray, bend_amplitude_cm: float) -> np.ndarray:
+    primary = np.sin((x_cm + 3800.0) * 0.00043) * bend_amplitude_cm
+    secondary = np.sin((x_cm - 600.0) * 0.00019) * bend_amplitude_cm * 0.35
+    return primary + secondary
+
+
+def _preview_world_to_wgs84(
+    x_cm: float,
+    y_cm: float,
+    bounds: BoundsWgs84,
+    min_x_cm: float,
+    max_x_cm: float,
+    corridor_half_width_cm: float,
+) -> tuple[float, float]:
+    u = (x_cm - min_x_cm) / (max_x_cm - min_x_cm)
+    v = (y_cm + corridor_half_width_cm) / (2.0 * corridor_half_width_cm)
+    lon = bounds.min_lon + u * (bounds.max_lon - bounds.min_lon)
+    lat = bounds.max_lat - v * (bounds.max_lat - bounds.min_lat)
+    return round(float(lon), 7), round(float(lat), 7)
+
+
+def _preview_lon_lat_to_local_meters(lon: float, lat: float, origin_lon: float, origin_lat: float) -> tuple[float, float]:
+    meters_per_degree_lat = 111_320.0
+    meters_per_degree_lon = meters_per_degree_lat * math.cos(math.radians(origin_lat))
+    return (lon - origin_lon) * meters_per_degree_lon, (lat - origin_lat) * meters_per_degree_lat
+
+
+def _preview_interpolate_scalar(stations: np.ndarray, values: np.ndarray, station_m: float) -> float:
+    return float(np.interp(station_m, stations, values))
+
+
+def build_pacuare_preview_centerline_scaffold(
+    pacuare_root: Path,
+    repo_root: Path | None = None,
+    vertex_count: int = 129,
+    station_interval_m: float = 250.0,
+) -> dict[str, object]:
+    """Write a review-gated Pacuare centerline scaffold from the Unreal preview curve."""
+
+    bounds = BoundsWgs84(min_lon=-83.75, min_lat=9.72, max_lon=-83.42, max_lat=10.12)
+    min_x_cm = -5800.0
+    max_x_cm = 26500.0
+    corridor_half_width_cm = 2750.0
+    bend_amplitude_cm = 340.0
+    river_half_width_cm = 305.0 * 1.05
+
+    hydro_root = pacuare_root / "hydrography/production_import_pilot"
+    centerline_path = hydro_root / "preview_centerline_scaffold.geojson"
+    stationing_path = hydro_root / "preview_stationing_scaffold.json"
+    manifest_path = hydro_root / "preview_centerline_scaffold_manifest.json"
+    hydro_root.mkdir(parents=True, exist_ok=True)
+
+    xs_cm = np.linspace(min_x_cm, max_x_cm, vertex_count, dtype=np.float64)
+    ys_cm = _preview_river_center_y_cm(xs_cm, bend_amplitude_cm)
+    coordinates = [
+        _preview_world_to_wgs84(
+            float(x_cm),
+            float(y_cm),
+            bounds,
+            min_x_cm,
+            max_x_cm,
+            corridor_half_width_cm,
+        )
+        for x_cm, y_cm in zip(xs_cm, ys_cm)
+    ]
+    origin_lon, origin_lat = coordinates[0]
+    local_xy = np.asarray(
+        [_preview_lon_lat_to_local_meters(lon, lat, origin_lon, origin_lat) for lon, lat in coordinates],
+        dtype=np.float64,
+    )
+    segment_lengths = np.linalg.norm(np.diff(local_xy, axis=0), axis=1)
+    vertex_stations = np.concatenate(([0.0], np.cumsum(segment_lengths)))
+    total_length_m = float(vertex_stations[-1])
+    sample_stations = list(np.arange(0.0, total_length_m, station_interval_m, dtype=np.float64))
+    if not sample_stations or not math.isclose(float(sample_stations[-1]), total_length_m):
+        sample_stations.append(total_length_m)
+
+    lons = np.asarray([coordinate[0] for coordinate in coordinates], dtype=np.float64)
+    lats = np.asarray([coordinate[1] for coordinate in coordinates], dtype=np.float64)
+    station_samples = []
+    for index, station_m in enumerate(sample_stations):
+        lon = _preview_interpolate_scalar(vertex_stations, lons, float(station_m))
+        lat = _preview_interpolate_scalar(vertex_stations, lats, float(station_m))
+        preview_x_cm = _preview_interpolate_scalar(vertex_stations, xs_cm, float(station_m))
+        preview_y_cm = _preview_interpolate_scalar(vertex_stations, ys_cm, float(station_m))
+        lookahead_m = min(total_length_m, float(station_m) + 20.0)
+        lookbehind_m = max(0.0, float(station_m) - 20.0)
+        lon_a = _preview_interpolate_scalar(vertex_stations, lons, lookbehind_m)
+        lat_a = _preview_interpolate_scalar(vertex_stations, lats, lookbehind_m)
+        lon_b = _preview_interpolate_scalar(vertex_stations, lons, lookahead_m)
+        lat_b = _preview_interpolate_scalar(vertex_stations, lats, lookahead_m)
+        ax_m, ay_m = _preview_lon_lat_to_local_meters(lon_a, lat_a, origin_lon, origin_lat)
+        bx_m, by_m = _preview_lon_lat_to_local_meters(lon_b, lat_b, origin_lon, origin_lat)
+        tangent = np.asarray([bx_m - ax_m, by_m - ay_m], dtype=np.float64)
+        norm = float(np.linalg.norm(tangent))
+        if norm > 1.0e-9:
+            tangent = tangent / norm
+        normal_left = np.asarray([-tangent[1], tangent[0]], dtype=np.float64)
+        station_samples.append(
+            {
+                "sample_index": index,
+                "station_m": round(float(station_m), 3),
+                "lon": round(float(lon), 7),
+                "lat": round(float(lat), 7),
+                "preview_world_x_cm": round(float(preview_x_cm), 3),
+                "preview_world_y_cm": round(float(preview_y_cm), 3),
+                "downstream_tangent_local_m": [round(float(tangent[0]), 6), round(float(tangent[1]), 6)],
+                "river_left_normal_local_m": [round(float(normal_left[0]), 6), round(float(normal_left[1]), 6)],
+            }
+        )
+
+    centerline = {
+        "type": "FeatureCollection",
+        "name": "pacuare_preview_centerline_scaffold",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {
+                    "river_id": "pacuare",
+                    "section_id": "lower_pacuare_planning_corridor",
+                    "status": "preview_scaffold_from_unreal_curve_not_official_hydrography",
+                    "source_curve": "RaftSimEditor GetPreviewRiverCenterY Pacuare preview parameters",
+                    "stationing": "preview_stationing_scaffold.json",
+                    "promotion_gate": "Replace with official Costa Rica hydrography, reviewed working CRS, imagery/DEM alignment, banks, rapid/access stationing, and guide/outfitter validation before production use.",
+                },
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[lon, lat] for lon, lat in coordinates],
+                },
+            }
+        ],
+    }
+    centerline_path.write_text(json.dumps(centerline, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    stationing = {
+        "schema": "raftsim.pacuare_preview_stationing_scaffold.v1",
+        "review_status": "preview_metric_stationing_review_required_not_final_crs_or_official_route",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "source_centerline": _manifest_path(centerline_path, repo_root),
+        "local_transform": {
+            "type": "linearized_wgs84_planning_bounds_plus_local_equirectangular_preview_meters",
+            "origin_lon": origin_lon,
+            "origin_lat": origin_lat,
+            "bounds_wgs84": {
+                "min_lon": bounds.min_lon,
+                "min_lat": bounds.min_lat,
+                "max_lon": bounds.max_lon,
+                "max_lat": bounds.max_lat,
+            },
+            "limits": "This transform maps the Unreal preview curve into draft Pacuare planning bounds for editor scaffolding only; it is not a surveyed route or final Costa Rica CRS.",
+        },
+        "summary": {
+            "vertex_count": vertex_count,
+            "station_sample_count": len(station_samples),
+            "station_sample_interval_m": station_interval_m,
+            "preview_world_x_min_cm": min_x_cm,
+            "preview_world_x_max_cm": max_x_cm,
+            "preview_corridor_half_width_cm": corridor_half_width_cm,
+            "preview_bend_amplitude_cm": bend_amplitude_cm,
+            "preview_river_half_width_cm": round(river_half_width_cm, 3),
+            "length_m_preview_wgs84_linearized": round(total_length_m, 3),
+        },
+        "station_samples": station_samples,
+        "promotion_gate": [
+            "replace route with official SNIT/IDECORI/MINAE/HydroSHEDS-reviewed hydrography",
+            "select Costa Rica working CRS and record round-trip transform error",
+            "align against cloud-screened imagery, conditioned DEM, banks, waterfalls, tributaries, and access points",
+            "attach guide/outfitter stationing and rights-reviewed reference annotations",
+        ],
+    }
+    stationing_path.write_text(json.dumps(stationing, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    manifest = {
+        "schema": "raftsim.pacuare_preview_centerline_scaffold_manifest.v1",
+        "status": "generated_review_gated_preview_route_not_official_hydrography",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "generated_from": {
+            "unreal_preview_curve": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp:GetPreviewRiverCenterY",
+            "source_masks": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png",
+            "production_import_recipe": "physics/data/real_world/pacuare_river_costa_rica/production_import_pilot.json",
+        },
+        "outputs": {
+            "centerline_geojson": _manifest_path(centerline_path, repo_root),
+            "stationing_json": _manifest_path(stationing_path, repo_root),
+        },
+        "parameters": {
+            "vertex_count": vertex_count,
+            "station_interval_m": station_interval_m,
+            "preview_world_x_min_cm": min_x_cm,
+            "preview_world_x_max_cm": max_x_cm,
+            "preview_corridor_half_width_cm": corridor_half_width_cm,
+            "preview_bend_amplitude_cm": bend_amplitude_cm,
+            "preview_river_half_width_cm": round(river_half_width_cm, 3),
+            "bounds_wgs84": {
+                "min_lon": bounds.min_lon,
+                "min_lat": bounds.min_lat,
+                "max_lon": bounds.max_lon,
+                "max_lat": bounds.max_lat,
+            },
+        },
+        "summary": {
+            "centerline_vertex_count": vertex_count,
+            "station_sample_count": len(station_samples),
+            "length_m_preview_wgs84_linearized": round(total_length_m, 3),
+            "first_station": station_samples[0],
+            "last_station": station_samples[-1],
+        },
+        "output_checksums": {
+            "centerline_geojson": {"sha256": _sha256(centerline_path)},
+            "stationing_json": {"sha256": _sha256(stationing_path)},
+        },
+        "review_limits": [
+            "The scaffold is useful for rapid/access annotation placement, procedural dressing, and current Unreal preview capture framing.",
+            "It must not be promoted as authoritative Pacuare hydrography, bank geometry, wetted width, access stationing, or solver input.",
+            "Future official hydrography, cloud-screened imagery, conditioned DEM, protected-area review, and guide/outfitter annotations must replace or validate it.",
+        ],
+    }
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return manifest
 
 
 def build_source_imagery_masks(
@@ -928,6 +1161,7 @@ def main() -> None:
         preview_corridor_half_width_cm=2750.0,
     )
     build_pacuare_import_pilot_derivatives(pacuare_root, repo_root=repo_root)
+    build_pacuare_preview_centerline_scaffold(pacuare_root, repo_root=repo_root)
 
 
 if __name__ == "__main__":

@@ -22,6 +22,9 @@ from raftsim.real_world import (
     COLORADO_USBR_TOTAL_RELEASE_FILE,
     COURSE_ELEVATION_EXTRACTION_FILE,
     COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION,
+    PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
+    PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
+    PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
     PACUARE_PRODUCTION_IMPORT_PILOT_FILE,
     PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE,
     PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION,
@@ -561,11 +564,58 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
     assert "wet_rock_waterfall_mist_mask_2048.png" in " ".join(
         classes["water_and_vegetation_masks"]["target_outputs"]
     )
+    assert (
+        classes["hydrography_and_centerline"]["status"]
+        == "preview_centerline_scaffold_attached_official_hydrography_pending"
+    )
+    assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert pilot["procedural_generation_plan"]["status"] == "allowed_only_as_manifest_recorded_review_gated_fill"
     assert (
         pilot["unreal_import_targets"]["future_production_map"]
         == "/Game/RaftSim/Maps/Production/L_PacuareRainforest_LowerPacuare"
     )
+
+
+def test_pacuare_preview_centerline_scaffold_is_not_official_hydrography():
+    pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
+    source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((pacuare_dir / "production_source_pull_manifest.json").read_text())
+    manifest = json.loads((pacuare_dir / PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE).read_text())
+    centerline = json.loads((pacuare_dir / PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE).read_text())
+    stationing = json.loads((pacuare_dir / PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE).read_text())
+
+    assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE in source_manifest["artifacts"]["hydrography"]
+    assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE in source_manifest["artifacts"]["hydrography"]
+    assert PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE in source_manifest["artifacts"]["hydrography"]
+    assert any(
+        artifact["artifact_id"] == "pacuare_unreal_preview_centerline_scaffold"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert manifest["status"] == "generated_review_gated_preview_route_not_official_hydrography"
+    assert manifest["parameters"]["vertex_count"] == 129
+    assert manifest["parameters"]["station_interval_m"] == 250.0
+    assert manifest["summary"]["centerline_vertex_count"] == 129
+    assert manifest["summary"]["station_sample_count"] == 184
+    assert manifest["summary"]["length_m_preview_wgs84_linearized"] == 45642.42
+    assert manifest["output_checksums"]["centerline_geojson"]["sha256"] == (
+        "e1fe18636df9c16accc52633e718814028e1013b8e4ee96111d7614ad58f511e"
+    )
+    assert manifest["output_checksums"]["stationing_json"]["sha256"] == (
+        "fbedd0fe2aee67377d60b8ca3116424a767e39755aee3500c056d82fcc822ee4"
+    )
+    assert len(centerline["features"]) == 1
+    assert centerline["features"][0]["properties"]["status"] == (
+        "preview_scaffold_from_unreal_curve_not_official_hydrography"
+    )
+    assert len(centerline["features"][0]["geometry"]["coordinates"]) == 129
+    assert stationing["review_status"] == (
+        "preview_metric_stationing_review_required_not_final_crs_or_official_route"
+    )
+    assert stationing["summary"]["station_sample_count"] == 184
+    assert stationing["station_samples"][0]["station_m"] == 0.0
+    assert stationing["station_samples"][-1]["station_m"] == 45642.42
 
 
 def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_rivers():
@@ -655,6 +705,9 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert COLORADO_NHD_ALIGNMENT_DIAGNOSTIC_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_TOTAL_RELEASE_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert "waterfalls" in rivers["pacuare"]["completion_gate"]
 
 

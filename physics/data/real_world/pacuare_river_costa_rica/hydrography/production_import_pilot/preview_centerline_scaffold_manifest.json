@@ -1,0 +1,80 @@
+{
+  "generated_from": {
+    "production_import_recipe": "physics/data/real_world/pacuare_river_costa_rica/production_import_pilot.json",
+    "source_masks": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png",
+    "unreal_preview_curve": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp:GetPreviewRiverCenterY"
+  },
+  "output_checksums": {
+    "centerline_geojson": {
+      "sha256": "e1fe18636df9c16accc52633e718814028e1013b8e4ee96111d7614ad58f511e"
+    },
+    "stationing_json": {
+      "sha256": "fbedd0fe2aee67377d60b8ca3116424a767e39755aee3500c056d82fcc822ee4"
+    }
+  },
+  "outputs": {
+    "centerline_geojson": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
+    "stationing_json": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json"
+  },
+  "parameters": {
+    "bounds_wgs84": {
+      "max_lat": 10.12,
+      "max_lon": -83.42,
+      "min_lat": 9.72,
+      "min_lon": -83.75
+    },
+    "preview_bend_amplitude_cm": 340.0,
+    "preview_corridor_half_width_cm": 2750.0,
+    "preview_river_half_width_cm": 320.25,
+    "preview_world_x_max_cm": 26500.0,
+    "preview_world_x_min_cm": -5800.0,
+    "station_interval_m": 250.0,
+    "vertex_count": 129
+  },
+  "review_limits": [
+    "The scaffold is useful for rapid/access annotation placement, procedural dressing, and current Unreal preview capture framing.",
+    "It must not be promoted as authoritative Pacuare hydrography, bank geometry, wetted width, access stationing, or solver input.",
+    "Future official hydrography, cloud-screened imagery, conditioned DEM, protected-area review, and guide/outfitter annotations must replace or validate it."
+  ],
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare_preview_centerline_scaffold_manifest.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "generated_review_gated_preview_route_not_official_hydrography",
+  "summary": {
+    "centerline_vertex_count": 129,
+    "first_station": {
+      "downstream_tangent_local_m": [
+        0.783973,
+        -0.620795
+      ],
+      "lat": 9.9468549,
+      "lon": -83.75,
+      "preview_world_x_cm": -5800.0,
+      "preview_world_y_cm": -369.255,
+      "river_left_normal_local_m": [
+        0.620795,
+        0.783973
+      ],
+      "sample_index": 0,
+      "station_m": 0.0
+    },
+    "last_station": {
+      "downstream_tangent_local_m": [
+        0.707378,
+        -0.706836
+      ],
+      "lat": 9.9174311,
+      "lon": -83.42,
+      "preview_world_x_cm": 26500.0,
+      "preview_world_y_cm": 35.323,
+      "river_left_normal_local_m": [
+        0.706836,
+        0.707378
+      ],
+      "sample_index": 183,
+      "station_m": 45642.42
+    },
+    "length_m_preview_wgs84_linearized": 45642.42,
+    "station_sample_count": 184
+  }
+}

@@ -284,12 +284,41 @@
       "caveats": [
         "OpenTopography remains a valid future terrain path, but production pulls require a registered API key and terms review."
       ]
+    },
+    {
+      "artifact_id": "pacuare_unreal_preview_centerline_scaffold",
+      "category": "derived_hydrography_preview_scaffold",
+      "paths": [
+        "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
+        "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
+        "hydrography/production_import_pilot/preview_stationing_scaffold.json"
+      ],
+      "provider": "RaftSim geospatial preview utility from Unreal Pacuare preview curve",
+      "url": "physics/src/raftsim/geospatial_preview.py",
+      "status": "generated_review_gated_preview_route_not_official_hydrography",
+      "summary": {
+        "centerline_vertex_count": 129,
+        "station_sample_count": 184,
+        "station_interval_m": 250.0,
+        "length_m_preview_wgs84_linearized": 45642.42,
+        "processing_manifest": "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json"
+      },
+      "use": [
+        "rapid_and_access_annotation_scaffold",
+        "procedural_rainforest_dressing_seed",
+        "unreal_preview_capture_framing"
+      ],
+      "caveats": [
+        "Generated from the current Unreal preview curve and draft planning bounds, not an official Costa Rica hydrography layer.",
+        "Do not use as bank geometry, wetted width, solver centerline, access stationing, or production route authority.",
+        "Replace or validate with official hydrography, conditioned DEM, cloud-screened imagery, protected-area review, and guide/outfitter annotations."
+      ]
     }
   ],
   "production_blockers": [
     "Copernicus DEM tiles are downloaded but not clipped, reprojected, hydrologically conditioned, or imported as Unreal heightfields.",
     "NASA GIBS imagery is coarse and partly cloudy; production Pacuare art still needs higher-resolution cloud-screened Sentinel/Landsat/first-party imagery or licensed aerial references.",
-    "Authoritative Costa Rica hydrography, rainfall, discharge, access, and protected-area layers are still under source-rights review.",
+    "Authoritative Costa Rica hydrography, rainfall, discharge, access, and protected-area layers are still under source-rights review; the attached preview centerline is only an editor scaffold.",
     "No Pacuare field/social reference media has explicit game-use rights attached yet.",
     "Rain-fed flow bands remain relative until gauge/rainfall sources and guide feedback are reviewed."
   ]

@@ -1,0 +1,2982 @@
+{
+  "local_transform": {
+    "bounds_wgs84": {
+      "max_lat": 10.12,
+      "max_lon": -83.42,
+      "min_lat": 9.72,
+      "min_lon": -83.75
+    },
+    "limits": "This transform maps the Unreal preview curve into draft Pacuare planning bounds for editor scaffolding only; it is not a surveyed route or final Costa Rica CRS.",
+    "origin_lat": 9.9468549,
+    "origin_lon": -83.75,
+    "type": "linearized_wgs84_planning_bounds_plus_local_equirectangular_preview_meters"
+  },
+  "promotion_gate": [
+    "replace route with official SNIT/IDECORI/MINAE/HydroSHEDS-reviewed hydrography",
+    "select Costa Rica working CRS and record round-trip transform error",
+    "align against cloud-screened imagery, conditioned DEM, banks, waterfalls, tributaries, and access points",
+    "attach guide/outfitter stationing and rights-reviewed reference annotations"
+  ],
+  "review_status": "preview_metric_stationing_review_required_not_final_crs_or_official_route",
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare_preview_stationing_scaffold.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "source_centerline": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
+  "station_samples": [
+    {
+      "downstream_tangent_local_m": [
+        0.783973,
+        -0.620795
+      ],
+      "lat": 9.9468549,
+      "lon": -83.75,
+      "preview_world_x_cm": -5800.0,
+      "preview_world_y_cm": -369.255,
+      "river_left_normal_local_m": [
+        0.620795,
+        0.783973
+      ],
+      "sample_index": 0,
+      "station_m": 0.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.783973,
+        -0.620795
+      ],
+      "lat": 9.9454607,
+      "lon": -83.7482125,
+      "preview_world_x_cm": -5625.04,
+      "preview_world_y_cm": -350.085,
+      "river_left_normal_local_m": [
+        0.620795,
+        0.783973
+      ],
+      "sample_index": 1,
+      "station_m": 250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.751744,
+        -0.659455
+      ],
+      "lat": 9.9440181,
+      "lon": -83.746466,
+      "preview_world_x_cm": -5454.092,
+      "preview_world_y_cm": -330.25,
+      "river_left_normal_local_m": [
+        0.659455,
+        0.751744
+      ],
+      "sample_index": 2,
+      "station_m": 500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.728618,
+        -0.68492
+      ],
+      "lat": 9.9425335,
+      "lon": -83.7447554,
+      "preview_world_x_cm": -5286.657,
+      "preview_world_y_cm": -309.836,
+      "river_left_normal_local_m": [
+        0.68492,
+        0.728618
+      ],
+      "sample_index": 3,
+      "station_m": 750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.723941,
+        -0.689862
+      ],
+      "lat": 9.9409842,
+      "lon": -83.7431047,
+      "preview_world_x_cm": -5125.101,
+      "preview_world_y_cm": -288.533,
+      "river_left_normal_local_m": [
+        0.689862,
+        0.723941
+      ],
+      "sample_index": 4,
+      "station_m": 1000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.700697,
+        -0.713459
+      ],
+      "lat": 9.9394089,
+      "lon": -83.7414802,
+      "preview_world_x_cm": -4966.092,
+      "preview_world_y_cm": -266.872,
+      "river_left_normal_local_m": [
+        0.713459,
+        0.700697
+      ],
+      "sample_index": 5,
+      "station_m": 1250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.700697,
+        -0.713459
+      ],
+      "lat": 9.9378066,
+      "lon": -83.7398826,
+      "preview_world_x_cm": -4809.717,
+      "preview_world_y_cm": -244.841,
+      "river_left_normal_local_m": [
+        0.713459,
+        0.700697
+      ],
+      "sample_index": 6,
+      "station_m": 1500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.682054,
+        -0.731302
+      ],
+      "lat": 9.9361692,
+      "lon": -83.7383222,
+      "preview_world_x_cm": -4656.994,
+      "preview_world_y_cm": -222.326,
+      "river_left_normal_local_m": [
+        0.731302,
+        0.682054
+      ],
+      "sample_index": 7,
+      "station_m": 1750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.667852,
+        -0.744294
+      ],
+      "lat": 9.9345204,
+      "lon": -83.7367743,
+      "preview_world_x_cm": -4505.477,
+      "preview_world_y_cm": -199.656,
+      "river_left_normal_local_m": [
+        0.744294,
+        0.667852
+      ],
+      "sample_index": 8,
+      "station_m": 2000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.667852,
+        -0.744294
+      ],
+      "lat": 9.9328489,
+      "lon": -83.7352515,
+      "preview_world_x_cm": -4356.432,
+      "preview_world_y_cm": -176.672,
+      "river_left_normal_local_m": [
+        0.744294,
+        0.667852
+      ],
+      "sample_index": 9,
+      "station_m": 2250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.657994,
+        -0.753023
+      ],
+      "lat": 9.931167,
+      "lon": -83.7337406,
+      "preview_world_x_cm": -4208.55,
+      "preview_world_y_cm": -153.547,
+      "river_left_normal_local_m": [
+        0.753023,
+        0.657994
+      ],
+      "sample_index": 10,
+      "station_m": 2500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.657994,
+        -0.753023
+      ],
+      "lat": 9.9294759,
+      "lon": -83.7322404,
+      "preview_world_x_cm": -4061.71,
+      "preview_world_y_cm": -130.293,
+      "river_left_normal_local_m": [
+        0.753023,
+        0.657994
+      ],
+      "sample_index": 11,
+      "station_m": 2750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.652284,
+        -0.757974
+      ],
+      "lat": 9.9277758,
+      "lon": -83.7307506,
+      "preview_world_x_cm": -3915.897,
+      "preview_world_y_cm": -106.917,
+      "river_left_normal_local_m": [
+        0.757974,
+        0.652284
+      ],
+      "sample_index": 12,
+      "station_m": 3000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.650773,
+        -0.759273
+      ],
+      "lat": 9.9260733,
+      "lon": -83.7292637,
+      "preview_world_x_cm": -3770.352,
+      "preview_world_y_cm": -83.509,
+      "river_left_normal_local_m": [
+        0.759273,
+        0.650773
+      ],
+      "sample_index": 13,
+      "station_m": 3250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.650724,
+        -0.759314
+      ],
+      "lat": 9.9243681,
+      "lon": -83.72778,
+      "preview_world_x_cm": -3625.129,
+      "preview_world_y_cm": -60.061,
+      "river_left_normal_local_m": [
+        0.759314,
+        0.650724
+      ],
+      "sample_index": 14,
+      "station_m": 3500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.653238,
+        -0.757153
+      ],
+      "lat": 9.9226645,
+      "lon": -83.7262944,
+      "preview_world_x_cm": -3479.717,
+      "preview_world_y_cm": -36.636,
+      "river_left_normal_local_m": [
+        0.757153,
+        0.653238
+      ],
+      "sample_index": 15,
+      "station_m": 3750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.653238,
+        -0.757153
+      ],
+      "lat": 9.9209641,
+      "lon": -83.7248049,
+      "preview_world_x_cm": -3333.934,
+      "preview_world_y_cm": -13.256,
+      "river_left_normal_local_m": [
+        0.757153,
+        0.653238
+      ],
+      "sample_index": 16,
+      "station_m": 4000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.659846,
+        -0.751401
+      ],
+      "lat": 9.9192715,
+      "lon": -83.7233064,
+      "preview_world_x_cm": -3187.259,
+      "preview_world_y_cm": 10.017,
+      "river_left_normal_local_m": [
+        0.751401,
+        0.659846
+      ],
+      "sample_index": 17,
+      "station_m": 4250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.659846,
+        -0.751401
+      ],
+      "lat": 9.917584,
+      "lon": -83.7218019,
+      "preview_world_x_cm": -3040.007,
+      "preview_world_y_cm": 33.22,
+      "river_left_normal_local_m": [
+        0.751401,
+        0.659846
+      ],
+      "sample_index": 18,
+      "station_m": 4500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.670578,
+        -0.741839
+      ],
+      "lat": 9.9159157,
+      "lon": -83.7202756,
+      "preview_world_x_cm": -2890.611,
+      "preview_world_y_cm": 56.159,
+      "river_left_normal_local_m": [
+        0.741839,
+        0.670578
+      ],
+      "sample_index": 19,
+      "station_m": 4750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.685547,
+        -0.728028
+      ],
+      "lat": 9.9142561,
+      "lon": -83.7187396,
+      "preview_world_x_cm": -2740.267,
+      "preview_world_y_cm": 78.979,
+      "river_left_normal_local_m": [
+        0.728028,
+        0.685547
+      ],
+      "sample_index": 20,
+      "station_m": 5000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.685547,
+        -0.728028
+      ],
+      "lat": 9.9126211,
+      "lon": -83.7171765,
+      "preview_world_x_cm": -2587.273,
+      "preview_world_y_cm": 101.459,
+      "river_left_normal_local_m": [
+        0.728028,
+        0.685547
+      ],
+      "sample_index": 21,
+      "station_m": 5250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.704861,
+        -0.709345
+      ],
+      "lat": 9.9110095,
+      "lon": -83.7155889,
+      "preview_world_x_cm": -2431.881,
+      "preview_world_y_cm": 123.619,
+      "river_left_normal_local_m": [
+        0.709345,
+        0.704861
+      ],
+      "sample_index": 22,
+      "station_m": 5500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.709807,
+        -0.704396
+      ],
+      "lat": 9.9094165,
+      "lon": -83.7139818,
+      "preview_world_x_cm": -2274.582,
+      "preview_world_y_cm": 145.523,
+      "river_left_normal_local_m": [
+        0.704396,
+        0.709807
+      ],
+      "sample_index": 23,
+      "station_m": 5750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.728525,
+        -0.685019
+      ],
+      "lat": 9.9078755,
+      "lon": -83.7123232,
+      "preview_world_x_cm": -2112.245,
+      "preview_world_y_cm": 166.712,
+      "river_left_normal_local_m": [
+        0.685019,
+        0.728525
+      ],
+      "sample_index": 24,
+      "station_m": 6000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.756495,
+        -0.654
+      ],
+      "lat": 9.9063651,
+      "lon": -83.7106366,
+      "preview_world_x_cm": -1947.157,
+      "preview_world_y_cm": 187.481,
+      "river_left_normal_local_m": [
+        0.654,
+        0.756495
+      ],
+      "sample_index": 25,
+      "station_m": 6250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.756495,
+        -0.654
+      ],
+      "lat": 9.9048963,
+      "lon": -83.7089117,
+      "preview_world_x_cm": -1778.33,
+      "preview_world_y_cm": 207.676,
+      "river_left_normal_local_m": [
+        0.654,
+        0.756495
+      ],
+      "sample_index": 26,
+      "station_m": 6500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.788531,
+        -0.614995
+      ],
+      "lat": 9.903507,
+      "lon": -83.7071207,
+      "preview_world_x_cm": -1603.023,
+      "preview_world_y_cm": 226.779,
+      "river_left_normal_local_m": [
+        0.614995,
+        0.788531
+      ],
+      "sample_index": 27,
+      "station_m": 6750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.824037,
+        -0.566536
+      ],
+      "lat": 9.9021772,
+      "lon": -83.7052846,
+      "preview_world_x_cm": -1423.307,
+      "preview_world_y_cm": 245.063,
+      "river_left_normal_local_m": [
+        0.566536,
+        0.824037
+      ],
+      "sample_index": 28,
+      "station_m": 7000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.861821,
+        -0.507213
+      ],
+      "lat": 9.9009182,
+      "lon": -83.7033971,
+      "preview_world_x_cm": -1238.569,
+      "preview_world_y_cm": 262.374,
+      "river_left_normal_local_m": [
+        0.507213,
+        0.861821
+      ],
+      "sample_index": 29,
+      "station_m": 7250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.861821,
+        -0.507213
+      ],
+      "lat": 9.8997791,
+      "lon": -83.7014321,
+      "preview_world_x_cm": -1046.236,
+      "preview_world_y_cm": 278.037,
+      "river_left_normal_local_m": [
+        0.507213,
+        0.861821
+      ],
+      "sample_index": 30,
+      "station_m": 7500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.900092,
+        -0.4357
+      ],
+      "lat": 9.8987666,
+      "lon": -83.6993983,
+      "preview_world_x_cm": -847.172,
+      "preview_world_y_cm": 291.959,
+      "river_left_normal_local_m": [
+        0.4357,
+        0.900092
+      ],
+      "sample_index": 31,
+      "station_m": 7750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.936202,
+        -0.351461
+      ],
+      "lat": 9.8978887,
+      "lon": -83.6973023,
+      "preview_world_x_cm": -642.012,
+      "preview_world_y_cm": 304.03,
+      "river_left_normal_local_m": [
+        0.351461,
+        0.936202
+      ],
+      "sample_index": 32,
+      "station_m": 8000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.966931,
+        -0.255036
+      ],
+      "lat": 9.8971696,
+      "lon": -83.695145,
+      "preview_world_x_cm": -430.859,
+      "preview_world_y_cm": 313.918,
+      "river_left_normal_local_m": [
+        0.255036,
+        0.966931
+      ],
+      "sample_index": 33,
+      "station_m": 8250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.988845,
+        -0.148949
+      ],
+      "lat": 9.8966337,
+      "lon": -83.6929326,
+      "preview_world_x_cm": -214.319,
+      "preview_world_y_cm": 321.287,
+      "river_left_normal_local_m": [
+        0.148949,
+        0.988845
+      ],
+      "sample_index": 34,
+      "station_m": 8500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.996344,
+        -0.085428
+      ],
+      "lat": 9.896302,
+      "lon": -83.6906777,
+      "preview_world_x_cm": 6.388,
+      "preview_world_y_cm": 325.848,
+      "river_left_normal_local_m": [
+        0.085428,
+        0.996344
+      ],
+      "sample_index": 35,
+      "station_m": 8750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.999308,
+        -0.037189
+      ],
+      "lat": 9.8962185,
+      "lon": -83.6883993,
+      "preview_world_x_cm": 229.404,
+      "preview_world_y_cm": 326.997,
+      "river_left_normal_local_m": [
+        0.037189,
+        0.999308
+      ],
+      "sample_index": 36,
+      "station_m": 9000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.997195,
+        0.074848
+      ],
+      "lat": 9.8963563,
+      "lon": -83.686125,
+      "preview_world_x_cm": 452.006,
+      "preview_world_y_cm": 325.101,
+      "river_left_normal_local_m": [
+        -0.074848,
+        0.997195
+      ],
+      "sample_index": 37,
+      "station_m": 9250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.98332,
+        0.181884
+      ],
+      "lat": 9.8967036,
+      "lon": -83.683875,
+      "preview_world_x_cm": 672.241,
+      "preview_world_y_cm": 320.325,
+      "river_left_normal_local_m": [
+        -0.181884,
+        0.98332
+      ],
+      "sample_index": 38,
+      "station_m": 9500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.960139,
+        0.279522
+      ],
+      "lat": 9.8972427,
+      "lon": -83.6816644,
+      "preview_world_x_cm": 888.602,
+      "preview_world_y_cm": 312.912,
+      "river_left_normal_local_m": [
+        -0.279522,
+        0.960139
+      ],
+      "sample_index": 39,
+      "station_m": 9750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.930914,
+        0.365239
+      ],
+      "lat": 9.897951,
+      "lon": -83.6795031,
+      "preview_world_x_cm": 1100.146,
+      "preview_world_y_cm": 303.174,
+      "river_left_normal_local_m": [
+        -0.365239,
+        0.930914
+      ],
+      "sample_index": 40,
+      "station_m": 10000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.898923,
+        0.438107
+      ],
+      "lat": 9.8988045,
+      "lon": -83.6773955,
+      "preview_world_x_cm": 1306.446,
+      "preview_world_y_cm": 291.438,
+      "river_left_normal_local_m": [
+        -0.438107,
+        0.898923
+      ],
+      "sample_index": 41,
+      "station_m": 10250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.894072,
+        0.447924
+      ],
+      "lat": 9.8997884,
+      "lon": -83.6753459,
+      "preview_world_x_cm": 1507.059,
+      "preview_world_y_cm": 277.91,
+      "river_left_normal_local_m": [
+        -0.447924,
+        0.894072
+      ],
+      "sample_index": 42,
+      "station_m": 10500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.866866,
+        0.498542
+      ],
+      "lat": 9.9009006,
+      "lon": -83.6733654,
+      "preview_world_x_cm": 1700.907,
+      "preview_world_y_cm": 262.616,
+      "river_left_normal_local_m": [
+        -0.498542,
+        0.866866
+      ],
+      "sample_index": 43,
+      "station_m": 10750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.836669,
+        0.547709
+      ],
+      "lat": 9.902091,
+      "lon": -83.671433,
+      "preview_world_x_cm": 1890.04,
+      "preview_world_y_cm": 246.248,
+      "river_left_normal_local_m": [
+        -0.547709,
+        0.836669
+      ],
+      "sample_index": 44,
+      "station_m": 11000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.809645,
+        0.58692
+      ],
+      "lat": 9.9033466,
+      "lon": -83.6695432,
+      "preview_world_x_cm": 2075.007,
+      "preview_world_y_cm": 228.985,
+      "river_left_normal_local_m": [
+        -0.58692,
+        0.809645
+      ],
+      "sample_index": 45,
+      "station_m": 11250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.809645,
+        0.58692
+      ],
+      "lat": 9.9046647,
+      "lon": -83.6676972,
+      "preview_world_x_cm": 2255.697,
+      "preview_world_y_cm": 210.86,
+      "river_left_normal_local_m": [
+        -0.58692,
+        0.809645
+      ],
+      "sample_index": 46,
+      "station_m": 11500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.786499,
+        0.617591
+      ],
+      "lat": 9.9060443,
+      "lon": -83.6658983,
+      "preview_world_x_cm": 2431.772,
+      "preview_world_y_cm": 191.891,
+      "river_left_normal_local_m": [
+        -0.617591,
+        0.786499
+      ],
+      "sample_index": 47,
+      "station_m": 11750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.767674,
+        0.64084
+      ],
+      "lat": 9.9074551,
+      "lon": -83.6641246,
+      "preview_world_x_cm": 2605.382,
+      "preview_world_y_cm": 172.493,
+      "river_left_normal_local_m": [
+        -0.64084,
+        0.767674
+      ],
+      "sample_index": 48,
+      "station_m": 12000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.762084,
+        0.647478
+      ],
+      "lat": 9.9088942,
+      "lon": -83.6623743,
+      "preview_world_x_cm": 2776.704,
+      "preview_world_y_cm": 152.704,
+      "river_left_normal_local_m": [
+        -0.647478,
+        0.762084
+      ],
+      "sample_index": 49,
+      "station_m": 12250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.753269,
+        0.657712
+      ],
+      "lat": 9.9103707,
+      "lon": -83.6606562,
+      "preview_world_x_cm": 2944.862,
+      "preview_world_y_cm": 132.403,
+      "river_left_normal_local_m": [
+        -0.657712,
+        0.753269
+      ],
+      "sample_index": 50,
+      "station_m": 12500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.743354,
+        0.668898
+      ],
+      "lat": 9.9118598,
+      "lon": -83.6589496,
+      "preview_world_x_cm": 3111.901,
+      "preview_world_y_cm": 111.928,
+      "river_left_normal_local_m": [
+        -0.668898,
+        0.743354
+      ],
+      "sample_index": 51,
+      "station_m": 12750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.74199,
+        0.670411
+      ],
+      "lat": 9.913362,
+      "lon": -83.6572547,
+      "preview_world_x_cm": 3277.796,
+      "preview_world_y_cm": 91.272,
+      "river_left_normal_local_m": [
+        -0.670411,
+        0.74199
+      ],
+      "sample_index": 52,
+      "station_m": 13000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.737926,
+        0.674882
+      ],
+      "lat": 9.9148771,
+      "lon": -83.6555717,
+      "preview_world_x_cm": 3442.527,
+      "preview_world_y_cm": 70.44,
+      "river_left_normal_local_m": [
+        -0.674882,
+        0.737926
+      ],
+      "sample_index": 53,
+      "station_m": 13250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.736957,
+        0.67594
+      ],
+      "lat": 9.9163938,
+      "lon": -83.6538902,
+      "preview_world_x_cm": 3607.118,
+      "preview_world_y_cm": 49.586,
+      "river_left_normal_local_m": [
+        -0.67594,
+        0.736957
+      ],
+      "sample_index": 54,
+      "station_m": 13500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.736957,
+        0.67594
+      ],
+      "lat": 9.9179118,
+      "lon": -83.6522099,
+      "preview_world_x_cm": 3771.585,
+      "preview_world_y_cm": 28.714,
+      "river_left_normal_local_m": [
+        -0.67594,
+        0.736957
+      ],
+      "sample_index": 55,
+      "station_m": 13750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.74046,
+        0.6721
+      ],
+      "lat": 9.9194221,
+      "lon": -83.6505224,
+      "preview_world_x_cm": 3936.745,
+      "preview_world_y_cm": 7.946,
+      "river_left_normal_local_m": [
+        -0.6721,
+        0.74046
+      ],
+      "sample_index": 56,
+      "station_m": 14000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.74833,
+        0.663327
+      ],
+      "lat": 9.9209243,
+      "lon": -83.6488276,
+      "preview_world_x_cm": 4102.634,
+      "preview_world_y_cm": -12.709,
+      "river_left_normal_local_m": [
+        -0.663327,
+        0.74833
+      ],
+      "sample_index": 57,
+      "station_m": 14250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.74833,
+        0.663327
+      ],
+      "lat": 9.9224139,
+      "lon": -83.6471213,
+      "preview_world_x_cm": 4269.64,
+      "preview_world_y_cm": -33.191,
+      "river_left_normal_local_m": [
+        -0.663327,
+        0.74833
+      ],
+      "sample_index": 58,
+      "station_m": 14500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.760673,
+        0.649135
+      ],
+      "lat": 9.9238764,
+      "lon": -83.645391,
+      "preview_world_x_cm": 4439.002,
+      "preview_world_y_cm": -53.3,
+      "river_left_normal_local_m": [
+        -0.649135,
+        0.760673
+      ],
+      "sample_index": 59,
+      "station_m": 14750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.777386,
+        0.629024
+      ],
+      "lat": 9.9253175,
+      "lon": -83.6436426,
+      "preview_world_x_cm": 4610.137,
+      "preview_world_y_cm": -73.116,
+      "river_left_normal_local_m": [
+        -0.629024,
+        0.777386
+      ],
+      "sample_index": 60,
+      "station_m": 15000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.777386,
+        0.629024
+      ],
+      "lat": 9.9267301,
+      "lon": -83.6418701,
+      "preview_world_x_cm": 4783.62,
+      "preview_world_y_cm": -92.539,
+      "river_left_normal_local_m": [
+        -0.629024,
+        0.777386
+      ],
+      "sample_index": 61,
+      "station_m": 15250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.798323,
+        0.602229
+      ],
+      "lat": 9.9280878,
+      "lon": -83.640054,
+      "preview_world_x_cm": 4961.382,
+      "preview_world_y_cm": -111.206,
+      "river_left_normal_local_m": [
+        -0.602229,
+        0.798323
+      ],
+      "sample_index": 62,
+      "station_m": 15500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.823224,
+        0.567717
+      ],
+      "lat": 9.9294016,
+      "lon": -83.6382054,
+      "preview_world_x_cm": 5142.314,
+      "preview_world_y_cm": -129.272,
+      "river_left_normal_local_m": [
+        -0.567717,
+        0.823224
+      ],
+      "sample_index": 63,
+      "station_m": 15750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.85152,
+        0.524322
+      ],
+      "lat": 9.9306644,
+      "lon": -83.6363204,
+      "preview_world_x_cm": 5326.82,
+      "preview_world_y_cm": -146.635,
+      "river_left_normal_local_m": [
+        -0.524322,
+        0.85152
+      ],
+      "sample_index": 64,
+      "station_m": 16000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.85152,
+        0.524322
+      ],
+      "lat": 9.9318419,
+      "lon": -83.6343789,
+      "preview_world_x_cm": 5516.855,
+      "preview_world_y_cm": -162.826,
+      "river_left_normal_local_m": [
+        -0.524322,
+        0.85152
+      ],
+      "sample_index": 65,
+      "station_m": 16250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.882219,
+        0.470839
+      ],
+      "lat": 9.9329237,
+      "lon": -83.6323816,
+      "preview_world_x_cm": 5712.342,
+      "preview_world_y_cm": -177.701,
+      "river_left_normal_local_m": [
+        -0.470839,
+        0.882219
+      ],
+      "sample_index": 66,
+      "station_m": 16500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.913785,
+        0.406199
+      ],
+      "lat": 9.9339064,
+      "lon": -83.630333,
+      "preview_world_x_cm": 5912.852,
+      "preview_world_y_cm": -191.213,
+      "river_left_normal_local_m": [
+        -0.406199,
+        0.913785
+      ],
+      "sample_index": 67,
+      "station_m": 16750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.944064,
+        0.329764
+      ],
+      "lat": 9.9347709,
+      "lon": -83.6282304,
+      "preview_world_x_cm": 6118.659,
+      "preview_world_y_cm": -203.1,
+      "river_left_normal_local_m": [
+        -0.329764,
+        0.944064
+      ],
+      "sample_index": 68,
+      "station_m": 17000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.970328,
+        0.241791
+      ],
+      "lat": 9.9354957,
+      "lon": -83.6260731,
+      "preview_world_x_cm": 6329.815,
+      "preview_world_y_cm": -213.066,
+      "river_left_normal_local_m": [
+        -0.241791,
+        0.970328
+      ],
+      "sample_index": 69,
+      "station_m": 17250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.970334,
+        0.241767
+      ],
+      "lat": 9.9360387,
+      "lon": -83.6238607,
+      "preview_world_x_cm": 6546.365,
+      "preview_world_y_cm": -220.532,
+      "river_left_normal_local_m": [
+        -0.241767,
+        0.970334
+      ],
+      "sample_index": 70,
+      "station_m": 17500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.989584,
+        0.143955
+      ],
+      "lat": 9.9363807,
+      "lon": -83.6216081,
+      "preview_world_x_cm": 6766.845,
+      "preview_world_y_cm": -225.235,
+      "river_left_normal_local_m": [
+        -0.143955,
+        0.989584
+      ],
+      "sample_index": 71,
+      "station_m": 17750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.999226,
+        0.039348
+      ],
+      "lat": 9.9365226,
+      "lon": -83.6193349,
+      "preview_world_x_cm": 6989.346,
+      "preview_world_y_cm": -227.186,
+      "river_left_normal_local_m": [
+        -0.039348,
+        0.999226
+      ],
+      "sample_index": 72,
+      "station_m": 18000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.997719,
+        -0.067501
+      ],
+      "lat": 9.9364573,
+      "lon": -83.6170588,
+      "preview_world_x_cm": 7212.125,
+      "preview_world_y_cm": -226.288,
+      "river_left_normal_local_m": [
+        0.067501,
+        0.997719
+      ],
+      "sample_index": 73,
+      "station_m": 18250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.985122,
+        -0.171859
+      ],
+      "lat": 9.9361869,
+      "lon": -83.6147985,
+      "preview_world_x_cm": 7433.361,
+      "preview_world_y_cm": -222.57,
+      "river_left_normal_local_m": [
+        0.171859,
+        0.985122
+      ],
+      "sample_index": 74,
+      "station_m": 18500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.963084,
+        -0.269202
+      ],
+      "lat": 9.9357224,
+      "lon": -83.6125704,
+      "preview_world_x_cm": 7651.444,
+      "preview_world_y_cm": -216.183,
+      "river_left_normal_local_m": [
+        0.269202,
+        0.963084
+      ],
+      "sample_index": 75,
+      "station_m": 18750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.934244,
+        -0.356635
+      ],
+      "lat": 9.9350814,
+      "lon": -83.6103867,
+      "preview_world_x_cm": 7865.183,
+      "preview_world_y_cm": -207.369,
+      "river_left_normal_local_m": [
+        0.356635,
+        0.934244
+      ],
+      "sample_index": 76,
+      "station_m": 19000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.923771,
+        -0.382946
+      ],
+      "lat": 9.9342805,
+      "lon": -83.6082566,
+      "preview_world_x_cm": 8073.671,
+      "preview_world_y_cm": -196.357,
+      "river_left_normal_local_m": [
+        0.382946,
+        0.923771
+      ],
+      "sample_index": 77,
+      "station_m": 19250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.901646,
+        -0.432475
+      ],
+      "lat": 9.9333135,
+      "lon": -83.6061989,
+      "preview_world_x_cm": 8275.074,
+      "preview_world_y_cm": -183.061,
+      "river_left_normal_local_m": [
+        0.432475,
+        0.901646
+      ],
+      "sample_index": 78,
+      "station_m": 19500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.867957,
+        -0.49664
+      ],
+      "lat": 9.9322384,
+      "lon": -83.6041985,
+      "preview_world_x_cm": 8470.876,
+      "preview_world_y_cm": -168.278,
+      "river_left_normal_local_m": [
+        0.49664,
+        0.867957
+      ],
+      "sample_index": 79,
+      "station_m": 19750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.83536,
+        -0.549703
+      ],
+      "lat": 9.9310733,
+      "lon": -83.6022506,
+      "preview_world_x_cm": 8661.537,
+      "preview_world_y_cm": -152.257,
+      "river_left_normal_local_m": [
+        0.549703,
+        0.83536
+      ],
+      "sample_index": 80,
+      "station_m": 20000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.808288,
+        -0.588788
+      ],
+      "lat": 9.9298325,
+      "lon": -83.6003503,
+      "preview_world_x_cm": 8847.531,
+      "preview_world_y_cm": -135.196,
+      "river_left_normal_local_m": [
+        0.588788,
+        0.808288
+      ],
+      "sample_index": 81,
+      "station_m": 20250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.805278,
+        -0.592897
+      ],
+      "lat": 9.928501,
+      "lon": -83.5985143,
+      "preview_world_x_cm": 9027.239,
+      "preview_world_y_cm": -116.889,
+      "river_left_normal_local_m": [
+        0.592897,
+        0.805278
+      ],
+      "sample_index": 82,
+      "station_m": 20500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.778677,
+        -0.627425
+      ],
+      "lat": 9.9271183,
+      "lon": -83.5967182,
+      "preview_world_x_cm": 9203.031,
+      "preview_world_y_cm": -97.876,
+      "river_left_normal_local_m": [
+        0.627425,
+        0.778677
+      ],
+      "sample_index": 83,
+      "station_m": 20750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.756053,
+        -0.654511
+      ],
+      "lat": 9.9256965,
+      "lon": -83.5949536,
+      "preview_world_x_cm": 9375.757,
+      "preview_world_y_cm": -78.327,
+      "river_left_normal_local_m": [
+        0.654511,
+        0.756053
+      ],
+      "sample_index": 84,
+      "station_m": 21000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.756053,
+        -0.654511
+      ],
+      "lat": 9.9242267,
+      "lon": -83.5932297,
+      "preview_world_x_cm": 9544.486,
+      "preview_world_y_cm": -58.116,
+      "river_left_normal_local_m": [
+        0.654511,
+        0.756053
+      ],
+      "sample_index": 85,
+      "station_m": 21250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.737665,
+        -0.675166
+      ],
+      "lat": 9.9227237,
+      "lon": -83.5915358,
+      "preview_world_x_cm": 9710.291,
+      "preview_world_y_cm": -37.451,
+      "river_left_normal_local_m": [
+        0.675166,
+        0.737665
+      ],
+      "sample_index": 86,
+      "station_m": 21500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.723628,
+        -0.69019
+      ],
+      "lat": 9.9212014,
+      "lon": -83.5898596,
+      "preview_world_x_cm": 9874.352,
+      "preview_world_y_cm": -16.519,
+      "river_left_normal_local_m": [
+        0.69019,
+        0.723628
+      ],
+      "sample_index": 87,
+      "station_m": 21750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.723628,
+        -0.69019
+      ],
+      "lat": 9.9196514,
+      "lon": -83.5882097,
+      "preview_world_x_cm": 10035.838,
+      "preview_world_y_cm": 4.794,
+      "river_left_normal_local_m": [
+        0.69019,
+        0.723628
+      ],
+      "sample_index": 88,
+      "station_m": 22000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.713912,
+        -0.700235
+      ],
+      "lat": 9.9180874,
+      "lon": -83.5865735,
+      "preview_world_x_cm": 10195.99,
+      "preview_world_y_cm": 26.298,
+      "river_left_normal_local_m": [
+        0.700235,
+        0.713912
+      ],
+      "sample_index": 89,
+      "station_m": 22250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.710117,
+        -0.704084
+      ],
+      "lat": 9.9165144,
+      "lon": -83.5849461,
+      "preview_world_x_cm": 10355.274,
+      "preview_world_y_cm": 47.927,
+      "river_left_normal_local_m": [
+        0.704084,
+        0.710117
+      ],
+      "sample_index": 90,
+      "station_m": 22500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.708549,
+        -0.705662
+      ],
+      "lat": 9.9149297,
+      "lon": -83.5833306,
+      "preview_world_x_cm": 10513.402,
+      "preview_world_y_cm": 69.717,
+      "river_left_normal_local_m": [
+        0.705662,
+        0.708549
+      ],
+      "sample_index": 91,
+      "station_m": 22750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.707531,
+        -0.706682
+      ],
+      "lat": 9.9133439,
+      "lon": -83.5817161,
+      "preview_world_x_cm": 10671.427,
+      "preview_world_y_cm": 91.521,
+      "river_left_normal_local_m": [
+        0.706682,
+        0.707531
+      ],
+      "sample_index": 92,
+      "station_m": 23000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.707531,
+        -0.706682
+      ],
+      "lat": 9.9117569,
+      "lon": -83.5801029,
+      "preview_world_x_cm": 10829.321,
+      "preview_world_y_cm": 113.343,
+      "river_left_normal_local_m": [
+        0.706682,
+        0.707531
+      ],
+      "sample_index": 93,
+      "station_m": 23250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.710841,
+        -0.703353
+      ],
+      "lat": 9.9101761,
+      "lon": -83.5784833,
+      "preview_world_x_cm": 10987.84,
+      "preview_world_y_cm": 135.078,
+      "river_left_normal_local_m": [
+        0.703353,
+        0.710841
+      ],
+      "sample_index": 94,
+      "station_m": 23500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.718578,
+        -0.695446
+      ],
+      "lat": 9.9086009,
+      "lon": -83.5768582,
+      "preview_world_x_cm": 11146.909,
+      "preview_world_y_cm": 156.737,
+      "river_left_normal_local_m": [
+        0.695446,
+        0.718578
+      ],
+      "sample_index": 95,
+      "station_m": 23750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.718578,
+        -0.695446
+      ],
+      "lat": 9.9070391,
+      "lon": -83.5752198,
+      "preview_world_x_cm": 11307.274,
+      "preview_world_y_cm": 178.212,
+      "river_left_normal_local_m": [
+        0.695446,
+        0.718578
+      ],
+      "sample_index": 96,
+      "station_m": 24000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.730762,
+        -0.682632
+      ],
+      "lat": 9.9054967,
+      "lon": -83.5735626,
+      "preview_world_x_cm": 11469.476,
+      "preview_world_y_cm": 199.42,
+      "river_left_normal_local_m": [
+        0.682632,
+        0.730762
+      ],
+      "sample_index": 97,
+      "station_m": 24250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.74748,
+        -0.664284
+      ],
+      "lat": 9.9039689,
+      "lon": -83.5718916,
+      "preview_world_x_cm": 11633.036,
+      "preview_world_y_cm": 220.427,
+      "river_left_normal_local_m": [
+        0.664284,
+        0.74748
+      ],
+      "sample_index": 98,
+      "station_m": 24500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.74748,
+        -0.664284
+      ],
+      "lat": 9.9024771,
+      "lon": -83.5701873,
+      "preview_world_x_cm": 11799.846,
+      "preview_world_y_cm": 240.94,
+      "river_left_normal_local_m": [
+        0.664284,
+        0.74748
+      ],
+      "sample_index": 99,
+      "station_m": 24750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.768686,
+        -0.639626
+      ],
+      "lat": 9.9010193,
+      "lon": -83.5684533,
+      "preview_world_x_cm": 11969.569,
+      "preview_world_y_cm": 260.984,
+      "river_left_normal_local_m": [
+        0.639626,
+        0.768686
+      ],
+      "sample_index": 100,
+      "station_m": 25000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.794336,
+        -0.607479
+      ],
+      "lat": 9.8995933,
+      "lon": -83.5666922,
+      "preview_world_x_cm": 12141.942,
+      "preview_world_y_cm": 280.592,
+      "river_left_normal_local_m": [
+        0.607479,
+        0.794336
+      ],
+      "sample_index": 101,
+      "station_m": 25250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.794336,
+        -0.607479
+      ],
+      "lat": 9.898229,
+      "lon": -83.5648811,
+      "preview_world_x_cm": 12319.215,
+      "preview_world_y_cm": 299.351,
+      "river_left_normal_local_m": [
+        0.607479,
+        0.794336
+      ],
+      "sample_index": 102,
+      "station_m": 25500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.824027,
+        -0.566551
+      ],
+      "lat": 9.896931,
+      "lon": -83.5630212,
+      "preview_world_x_cm": 12501.262,
+      "preview_world_y_cm": 317.199,
+      "river_left_normal_local_m": [
+        0.566551,
+        0.824027
+      ],
+      "sample_index": 103,
+      "station_m": 25750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.857041,
+        -0.515248
+      ],
+      "lat": 9.8956988,
+      "lon": -83.5611161,
+      "preview_world_x_cm": 12687.725,
+      "preview_world_y_cm": 334.142,
+      "river_left_normal_local_m": [
+        0.515248,
+        0.857041
+      ],
+      "sample_index": 104,
+      "station_m": 26000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.881342,
+        -0.472479
+      ],
+      "lat": 9.8945458,
+      "lon": -83.5591597,
+      "preview_world_x_cm": 12879.21,
+      "preview_world_y_cm": 349.996,
+      "river_left_normal_local_m": [
+        0.472479,
+        0.881342
+      ],
+      "sample_index": 105,
+      "station_m": 26250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.891979,
+        -0.452076
+      ],
+      "lat": 9.8935305,
+      "lon": -83.557126,
+      "preview_world_x_cm": 13078.274,
+      "preview_world_y_cm": 363.956,
+      "river_left_normal_local_m": [
+        0.452076,
+        0.891979
+      ],
+      "sample_index": 106,
+      "station_m": 26500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.92676,
+        -0.375653
+      ],
+      "lat": 9.8926459,
+      "lon": -83.5550318,
+      "preview_world_x_cm": 13283.247,
+      "preview_world_y_cm": 376.119,
+      "river_left_normal_local_m": [
+        0.375653,
+        0.92676
+      ],
+      "sample_index": 107,
+      "station_m": 26750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.958355,
+        -0.28558
+      ],
+      "lat": 9.8919118,
+      "lon": -83.5528798,
+      "preview_world_x_cm": 13493.89,
+      "preview_world_y_cm": 386.213,
+      "river_left_normal_local_m": [
+        0.28558,
+        0.958355
+      ],
+      "sample_index": 108,
+      "station_m": 27000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.98316,
+        -0.182745
+      ],
+      "lat": 9.8913539,
+      "lon": -83.5506742,
+      "preview_world_x_cm": 13709.767,
+      "preview_world_y_cm": 393.884,
+      "river_left_normal_local_m": [
+        0.182745,
+        0.98316
+      ],
+      "sample_index": 109,
+      "station_m": 27250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.997533,
+        -0.070196
+      ],
+      "lat": 9.8909969,
+      "lon": -83.5484257,
+      "preview_world_x_cm": 13929.856,
+      "preview_world_y_cm": 398.793,
+      "river_left_normal_local_m": [
+        0.070196,
+        0.997533
+      ],
+      "sample_index": 110,
+      "station_m": 27500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.998963,
+        0.045529
+      ],
+      "lat": 9.8908597,
+      "lon": -83.546151,
+      "preview_world_x_cm": 14152.492,
+      "preview_world_y_cm": 400.679,
+      "river_left_normal_local_m": [
+        -0.045529,
+        0.998963
+      ],
+      "sample_index": 111,
+      "station_m": 27750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.997822,
+        0.065958
+      ],
+      "lat": 9.8909657,
+      "lon": -83.5438735,
+      "preview_world_x_cm": 14375.414,
+      "preview_world_y_cm": 399.222,
+      "river_left_normal_local_m": [
+        -0.065958,
+        0.997822
+      ],
+      "sample_index": 112,
+      "station_m": 28000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.986559,
+        0.163407
+      ],
+      "lat": 9.8913185,
+      "lon": -83.5416225,
+      "preview_world_x_cm": 14595.734,
+      "preview_world_y_cm": 394.371,
+      "river_left_normal_local_m": [
+        -0.163407,
+        0.986559
+      ],
+      "sample_index": 113,
+      "station_m": 28250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.962105,
+        0.272679
+      ],
+      "lat": 9.8918817,
+      "lon": -83.5394177,
+      "preview_world_x_cm": 14811.541,
+      "preview_world_y_cm": 386.627,
+      "river_left_normal_local_m": [
+        -0.272679,
+        0.962105
+      ],
+      "sample_index": 114,
+      "station_m": 28500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.928726,
+        0.370767
+      ],
+      "lat": 9.8926316,
+      "lon": -83.5372716,
+      "preview_world_x_cm": 15021.599,
+      "preview_world_y_cm": 376.316,
+      "river_left_normal_local_m": [
+        -0.370767,
+        0.928726
+      ],
+      "sample_index": 115,
+      "station_m": 28750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.890177,
+        0.455614
+      ],
+      "lat": 9.8935418,
+      "lon": -83.5351898,
+      "preview_world_x_cm": 15225.358,
+      "preview_world_y_cm": 363.8,
+      "river_left_normal_local_m": [
+        -0.455614,
+        0.890177
+      ],
+      "sample_index": 116,
+      "station_m": 29000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.849962,
+        0.526844
+      ],
+      "lat": 9.8945869,
+      "lon": -83.5331727,
+      "preview_world_x_cm": 15422.794,
+      "preview_world_y_cm": 349.431,
+      "river_left_normal_local_m": [
+        -0.526844,
+        0.849962
+      ],
+      "sample_index": 117,
+      "station_m": 29250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.849962,
+        0.526844
+      ],
+      "lat": 9.89577,
+      "lon": -83.5312347,
+      "preview_world_x_cm": 15612.48,
+      "preview_world_y_cm": 333.162,
+      "river_left_normal_local_m": [
+        -0.526844,
+        0.849962
+      ],
+      "sample_index": 118,
+      "station_m": 29500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.810751,
+        0.585391
+      ],
+      "lat": 9.8970592,
+      "lon": -83.5293689,
+      "preview_world_x_cm": 15795.111,
+      "preview_world_y_cm": 315.436,
+      "river_left_normal_local_m": [
+        -0.585391,
+        0.810751
+      ],
+      "sample_index": 119,
+      "station_m": 29750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.77435,
+        0.632758
+      ],
+      "lat": 9.8984177,
+      "lon": -83.5275545,
+      "preview_world_x_cm": 15972.7,
+      "preview_world_y_cm": 296.757,
+      "river_left_normal_local_m": [
+        -0.632758,
+        0.77435
+      ],
+      "sample_index": 120,
+      "station_m": 30000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.768096,
+        0.640334
+      ],
+      "lat": 9.8998387,
+      "lon": -83.5257889,
+      "preview_world_x_cm": 16145.505,
+      "preview_world_y_cm": 277.217,
+      "river_left_normal_local_m": [
+        -0.640334,
+        0.768096
+      ],
+      "sample_index": 121,
+      "station_m": 30250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.741696,
+        0.670736
+      ],
+      "lat": 9.9013409,
+      "lon": -83.5240942,
+      "preview_world_x_cm": 16311.384,
+      "preview_world_y_cm": 256.562,
+      "river_left_normal_local_m": [
+        -0.670736,
+        0.741696
+      ],
+      "sample_index": 122,
+      "station_m": 30500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.713392,
+        0.700765
+      ],
+      "lat": 9.902876,
+      "lon": -83.5224306,
+      "preview_world_x_cm": 16474.213,
+      "preview_world_y_cm": 235.455,
+      "river_left_normal_local_m": [
+        -0.700765,
+        0.713392
+      ],
+      "sample_index": 123,
+      "station_m": 30750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.713392,
+        0.700765
+      ],
+      "lat": 9.9044498,
+      "lon": -83.5208041,
+      "preview_world_x_cm": 16633.421,
+      "preview_world_y_cm": 213.816,
+      "river_left_normal_local_m": [
+        -0.700765,
+        0.713392
+      ],
+      "sample_index": 124,
+      "station_m": 31000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.68959,
+        0.7242
+      ],
+      "lat": 9.9060678,
+      "lon": -83.5192232,
+      "preview_world_x_cm": 16788.152,
+      "preview_world_y_cm": 191.567,
+      "river_left_normal_local_m": [
+        -0.7242,
+        0.68959
+      ],
+      "sample_index": 125,
+      "station_m": 31250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.670197,
+        0.742183
+      ],
+      "lat": 9.9077024,
+      "lon": -83.5176598,
+      "preview_world_x_cm": 16941.169,
+      "preview_world_y_cm": 169.092,
+      "river_left_normal_local_m": [
+        -0.742183,
+        0.670197
+      ],
+      "sample_index": 126,
+      "station_m": 31500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.670197,
+        0.742183
+      ],
+      "lat": 9.9093692,
+      "lon": -83.5161318,
+      "preview_world_x_cm": 17090.737,
+      "preview_world_y_cm": 146.173,
+      "river_left_normal_local_m": [
+        -0.742183,
+        0.670197
+      ],
+      "sample_index": 127,
+      "station_m": 31750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.655175,
+        0.755477
+      ],
+      "lat": 9.9110513,
+      "lon": -83.5146213,
+      "preview_world_x_cm": 17238.579,
+      "preview_world_y_cm": 123.044,
+      "river_left_normal_local_m": [
+        -0.755477,
+        0.655175
+      ],
+      "sample_index": 128,
+      "station_m": 32000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.655175,
+        0.755477
+      ],
+      "lat": 9.912748,
+      "lon": -83.5131275,
+      "preview_world_x_cm": 17384.795,
+      "preview_world_y_cm": 99.716,
+      "river_left_normal_local_m": [
+        -0.755477,
+        0.655175
+      ],
+      "sample_index": 129,
+      "station_m": 32250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.644383,
+        0.764703
+      ],
+      "lat": 9.9144609,
+      "lon": -83.5116531,
+      "preview_world_x_cm": 17529.11,
+      "preview_world_y_cm": 76.162,
+      "river_left_normal_local_m": [
+        -0.764703,
+        0.644383
+      ],
+      "sample_index": 130,
+      "station_m": 32500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.639602,
+        0.768706
+      ],
+      "lat": 9.9161787,
+      "lon": -83.5101844,
+      "preview_world_x_cm": 17672.866,
+      "preview_world_y_cm": 52.542,
+      "river_left_normal_local_m": [
+        -0.768706,
+        0.639602
+      ],
+      "sample_index": 131,
+      "station_m": 32750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.637691,
+        0.770293
+      ],
+      "lat": 9.9179086,
+      "lon": -83.5087304,
+      "preview_world_x_cm": 17815.175,
+      "preview_world_y_cm": 28.756,
+      "river_left_normal_local_m": [
+        -0.770293,
+        0.637691
+      ],
+      "sample_index": 132,
+      "station_m": 33000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.635007,
+        0.772507
+      ],
+      "lat": 9.9196398,
+      "lon": -83.507278,
+      "preview_world_x_cm": 17957.328,
+      "preview_world_y_cm": 4.952,
+      "river_left_normal_local_m": [
+        -0.772507,
+        0.635007
+      ],
+      "sample_index": 133,
+      "station_m": 33250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.635007,
+        0.772507
+      ],
+      "lat": 9.9213747,
+      "lon": -83.5058302,
+      "preview_world_x_cm": 18099.043,
+      "preview_world_y_cm": -18.902,
+      "river_left_normal_local_m": [
+        -0.772507,
+        0.635007
+      ],
+      "sample_index": 134,
+      "station_m": 33500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.636321,
+        0.771424
+      ],
+      "lat": 9.9231084,
+      "lon": -83.5043809,
+      "preview_world_x_cm": 18240.899,
+      "preview_world_y_cm": -42.741,
+      "river_left_normal_local_m": [
+        -0.771424,
+        0.636321
+      ],
+      "sample_index": 135,
+      "station_m": 33750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.636321,
+        0.771424
+      ],
+      "lat": 9.9248409,
+      "lon": -83.50293,
+      "preview_world_x_cm": 18382.907,
+      "preview_world_y_cm": -66.562,
+      "river_left_normal_local_m": [
+        -0.771424,
+        0.636321
+      ],
+      "sample_index": 136,
+      "station_m": 34000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.641652,
+        0.766996
+      ],
+      "lat": 9.9265663,
+      "lon": -83.5014707,
+      "preview_world_x_cm": 18525.752,
+      "preview_world_y_cm": -90.287,
+      "river_left_normal_local_m": [
+        -0.766996,
+        0.641652
+      ],
+      "sample_index": 137,
+      "station_m": 34250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.642919,
+        0.765934
+      ],
+      "lat": 9.9282888,
+      "lon": -83.5000077,
+      "preview_world_x_cm": 18668.95,
+      "preview_world_y_cm": -113.971,
+      "river_left_normal_local_m": [
+        -0.765934,
+        0.642919
+      ],
+      "sample_index": 138,
+      "station_m": 34500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.651094,
+        0.758997
+      ],
+      "lat": 9.9299944,
+      "lon": -83.4985244,
+      "preview_world_x_cm": 18814.126,
+      "preview_world_y_cm": -137.423,
+      "river_left_normal_local_m": [
+        -0.758997,
+        0.651094
+      ],
+      "sample_index": 139,
+      "station_m": 34750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.664684,
+        0.747124
+      ],
+      "lat": 9.9316935,
+      "lon": -83.4970335,
+      "preview_world_x_cm": 18960.048,
+      "preview_world_y_cm": -160.786,
+      "river_left_normal_local_m": [
+        -0.747124,
+        0.664684
+      ],
+      "sample_index": 140,
+      "station_m": 35000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.664684,
+        0.747124
+      ],
+      "lat": 9.9333714,
+      "lon": -83.495518,
+      "preview_world_x_cm": 19108.386,
+      "preview_world_y_cm": -183.857,
+      "river_left_normal_local_m": [
+        -0.747124,
+        0.664684
+      ],
+      "sample_index": 141,
+      "station_m": 35250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.682657,
+        0.730739
+      ],
+      "lat": 9.9350307,
+      "lon": -83.4939819,
+      "preview_world_x_cm": 19258.744,
+      "preview_world_y_cm": -206.673,
+      "river_left_normal_local_m": [
+        -0.730739,
+        0.682657
+      ],
+      "sample_index": 142,
+      "station_m": 35500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.682657,
+        0.730739
+      ],
+      "lat": 9.9366718,
+      "lon": -83.4924254,
+      "preview_world_x_cm": 19411.093,
+      "preview_world_y_cm": -229.238,
+      "river_left_normal_local_m": [
+        -0.730739,
+        0.682657
+      ],
+      "sample_index": 143,
+      "station_m": 35750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.705083,
+        0.709124
+      ],
+      "lat": 9.9382718,
+      "lon": -83.4908256,
+      "preview_world_x_cm": 19567.682,
+      "preview_world_y_cm": -251.237,
+      "river_left_normal_local_m": [
+        -0.709124,
+        0.705083
+      ],
+      "sample_index": 144,
+      "station_m": 36000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.732084,
+        0.681215
+      ],
+      "lat": 9.939849,
+      "lon": -83.4892029,
+      "preview_world_x_cm": 19726.503,
+      "preview_world_y_cm": -272.924,
+      "river_left_normal_local_m": [
+        -0.681215,
+        0.732084
+      ],
+      "sample_index": 145,
+      "station_m": 36250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.732084,
+        0.681215
+      ],
+      "lat": 9.9413789,
+      "lon": -83.4875337,
+      "preview_world_x_cm": 19889.883,
+      "preview_world_y_cm": -293.96,
+      "river_left_normal_local_m": [
+        -0.681215,
+        0.732084
+      ],
+      "sample_index": 146,
+      "station_m": 36500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.763544,
+        0.645756
+      ],
+      "lat": 9.9428531,
+      "lon": -83.4858144,
+      "preview_world_x_cm": 20058.166,
+      "preview_world_y_cm": -314.23,
+      "river_left_normal_local_m": [
+        -0.645756,
+        0.763544
+      ],
+      "sample_index": 147,
+      "station_m": 36750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.799094,
+        0.601206
+      ],
+      "lat": 9.9442815,
+      "lon": -83.4840558,
+      "preview_world_x_cm": 20230.291,
+      "preview_world_y_cm": -333.871,
+      "river_left_normal_local_m": [
+        -0.601206,
+        0.799094
+      ],
+      "sample_index": 148,
+      "station_m": 37000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.799094,
+        0.601206
+      ],
+      "lat": 9.9456317,
+      "lon": -83.4822339,
+      "preview_world_x_cm": 20408.625,
+      "preview_world_y_cm": -352.435,
+      "river_left_normal_local_m": [
+        -0.601206,
+        0.799094
+      ],
+      "sample_index": 149,
+      "station_m": 37250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.837927,
+        0.545782
+      ],
+      "lat": 9.9468819,
+      "lon": -83.4803408,
+      "preview_world_x_cm": 20593.919,
+      "preview_world_y_cm": -369.626,
+      "river_left_normal_local_m": [
+        -0.545782,
+        0.837927
+      ],
+      "sample_index": 150,
+      "station_m": 37500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.878462,
+        0.477812
+      ],
+      "lat": 9.9480384,
+      "lon": -83.4783883,
+      "preview_world_x_cm": 20785.024,
+      "preview_world_y_cm": -385.527,
+      "river_left_normal_local_m": [
+        -0.477812,
+        0.878462
+      ],
+      "sample_index": 151,
+      "station_m": 37750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.918244,
+        0.396016
+      ],
+      "lat": 9.9490808,
+      "lon": -83.4763703,
+      "preview_world_x_cm": 20982.547,
+      "preview_world_y_cm": -399.862,
+      "river_left_normal_local_m": [
+        -0.396016,
+        0.918244
+      ],
+      "sample_index": 152,
+      "station_m": 38000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.921997,
+        0.387198
+      ],
+      "lat": 9.9499702,
+      "lon": -83.4742767,
+      "preview_world_x_cm": 21187.464,
+      "preview_world_y_cm": -412.09,
+      "river_left_normal_local_m": [
+        -0.387198,
+        0.921997
+      ],
+      "sample_index": 153,
+      "station_m": 38250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.953873,
+        0.300209
+      ],
+      "lat": 9.9506584,
+      "lon": -83.4721071,
+      "preview_world_x_cm": 21399.824,
+      "preview_world_y_cm": -421.553,
+      "river_left_normal_local_m": [
+        -0.300209,
+        0.953873
+      ],
+      "sample_index": 154,
+      "station_m": 38500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.981417,
+        0.191889
+      ],
+      "lat": 9.9511502,
+      "lon": -83.4698851,
+      "preview_world_x_cm": 21617.308,
+      "preview_world_y_cm": -428.315,
+      "river_left_normal_local_m": [
+        -0.191889,
+        0.981417
+      ],
+      "sample_index": 155,
+      "station_m": 38750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.997198,
+        0.074809
+      ],
+      "lat": 9.9514241,
+      "lon": -83.4676259,
+      "preview_world_x_cm": 21838.436,
+      "preview_world_y_cm": -432.081,
+      "river_left_normal_local_m": [
+        -0.074809,
+        0.997198
+      ],
+      "sample_index": 156,
+      "station_m": 39000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.998974,
+        -0.045278
+      ],
+      "lat": 9.9514671,
+      "lon": -83.4653504,
+      "preview_world_x_cm": 22061.161,
+      "preview_world_y_cm": -432.672,
+      "river_left_normal_local_m": [
+        0.045278,
+        0.998974
+      ],
+      "sample_index": 157,
+      "station_m": 39250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.986771,
+        -0.162121
+      ],
+      "lat": 9.9512783,
+      "lon": -83.4630819,
+      "preview_world_x_cm": 22283.194,
+      "preview_world_y_cm": -430.077,
+      "river_left_normal_local_m": [
+        0.162121,
+        0.986771
+      ],
+      "sample_index": 158,
+      "station_m": 39500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.962857,
+        -0.270011
+      ],
+      "lat": 9.9508692,
+      "lon": -83.4608421,
+      "preview_world_x_cm": 22502.421,
+      "preview_world_y_cm": -424.453,
+      "river_left_normal_local_m": [
+        0.270011,
+        0.962857
+      ],
+      "sample_index": 159,
+      "station_m": 39750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.945745,
+        -0.324911
+      ],
+      "lat": 9.9502604,
+      "lon": -83.4586476,
+      "preview_world_x_cm": 22717.221,
+      "preview_world_y_cm": -416.081,
+      "river_left_normal_local_m": [
+        0.324911,
+        0.945745
+      ],
+      "sample_index": 160,
+      "station_m": 40000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.930864,
+        -0.365366
+      ],
+      "lat": 9.9494399,
+      "lon": -83.4565252,
+      "preview_world_x_cm": 22924.962,
+      "preview_world_y_cm": -404.798,
+      "river_left_normal_local_m": [
+        0.365366,
+        0.930864
+      ],
+      "sample_index": 161,
+      "station_m": 40250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.894712,
+        -0.446643
+      ],
+      "lat": 9.9484739,
+      "lon": -83.4544685,
+      "preview_world_x_cm": 23126.27,
+      "preview_world_y_cm": -391.516,
+      "river_left_normal_local_m": [
+        0.446643,
+        0.894712
+      ],
+      "sample_index": 162,
+      "station_m": 40500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.857703,
+        -0.514146
+      ],
+      "lat": 9.9473901,
+      "lon": -83.4524734,
+      "preview_world_x_cm": 23321.538,
+      "preview_world_y_cm": -376.613,
+      "river_left_normal_local_m": [
+        0.514146,
+        0.857703
+      ],
+      "sample_index": 163,
+      "station_m": 40750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.822315,
+        -0.569033
+      ],
+      "lat": 9.946209,
+      "lon": -83.4505351,
+      "preview_world_x_cm": 23511.258,
+      "preview_world_y_cm": -360.373,
+      "river_left_normal_local_m": [
+        0.569033,
+        0.822315
+      ],
+      "sample_index": 164,
+      "station_m": 41000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.822315,
+        -0.569033
+      ],
+      "lat": 9.944931,
+      "lon": -83.4486602,
+      "preview_world_x_cm": 23694.774,
+      "preview_world_y_cm": -342.802,
+      "river_left_normal_local_m": [
+        0.569033,
+        0.822315
+      ],
+      "sample_index": 165,
+      "station_m": 41250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.790079,
+        -0.613005
+      ],
+      "lat": 9.9435702,
+      "lon": -83.446847,
+      "preview_world_x_cm": 23872.245,
+      "preview_world_y_cm": -324.09,
+      "river_left_normal_local_m": [
+        0.613005,
+        0.790079
+      ],
+      "sample_index": 166,
+      "station_m": 41500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.761857,
+        -0.647745
+      ],
+      "lat": 9.9421617,
+      "lon": -83.4450719,
+      "preview_world_x_cm": 24045.992,
+      "preview_world_y_cm": -304.723,
+      "river_left_normal_local_m": [
+        0.647745,
+        0.761857
+      ],
+      "sample_index": 167,
+      "station_m": 41750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.761247,
+        -0.648462
+      ],
+      "lat": 9.940707,
+      "lon": -83.4433348,
+      "preview_world_x_cm": 24216.016,
+      "preview_world_y_cm": -284.721,
+      "river_left_normal_local_m": [
+        0.648462,
+        0.761247
+      ],
+      "sample_index": 168,
+      "station_m": 42000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.738071,
+        -0.674723
+      ],
+      "lat": 9.9391963,
+      "lon": -83.4416478,
+      "preview_world_x_cm": 24381.134,
+      "preview_world_y_cm": -263.949,
+      "river_left_normal_local_m": [
+        0.674723,
+        0.738071
+      ],
+      "sample_index": 169,
+      "station_m": 42250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.718847,
+        -0.695168
+      ],
+      "lat": 9.937663,
+      "lon": -83.4399822,
+      "preview_world_x_cm": 24544.168,
+      "preview_world_y_cm": -242.866,
+      "river_left_normal_local_m": [
+        0.695168,
+        0.718847
+      ],
+      "sample_index": 170,
+      "station_m": 42500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.718847,
+        -0.695168
+      ],
+      "lat": 9.9361018,
+      "lon": -83.4383432,
+      "preview_world_x_cm": 24704.593,
+      "preview_world_y_cm": -221.4,
+      "river_left_normal_local_m": [
+        0.695168,
+        0.718847
+      ],
+      "sample_index": 171,
+      "station_m": 42750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.704168,
+        -0.710034
+      ],
+      "lat": 9.9345133,
+      "lon": -83.4367316,
+      "preview_world_x_cm": 24862.33,
+      "preview_world_y_cm": -199.558,
+      "river_left_normal_local_m": [
+        0.710034,
+        0.704168
+      ],
+      "sample_index": 172,
+      "station_m": 43000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.693944,
+        -0.720029
+      ],
+      "lat": 9.9329139,
+      "lon": -83.435131,
+      "preview_world_x_cm": 25018.988,
+      "preview_world_y_cm": -177.567,
+      "river_left_normal_local_m": [
+        0.720029,
+        0.693944
+      ],
+      "sample_index": 173,
+      "station_m": 43250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.693944,
+        -0.720029
+      ],
+      "lat": 9.9312969,
+      "lon": -83.4335488,
+      "preview_world_x_cm": 25173.856,
+      "preview_world_y_cm": -155.332,
+      "river_left_normal_local_m": [
+        0.720029,
+        0.693944
+      ],
+      "sample_index": 174,
+      "station_m": 43500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.688086,
+        -0.725629
+      ],
+      "lat": 9.9296725,
+      "lon": -83.4319744,
+      "preview_world_x_cm": 25327.961,
+      "preview_world_y_cm": -132.997,
+      "river_left_normal_local_m": [
+        0.725629,
+        0.688086
+      ],
+      "sample_index": 175,
+      "station_m": 43750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.687883,
+        -0.725822
+      ],
+      "lat": 9.9280429,
+      "lon": -83.4304055,
+      "preview_world_x_cm": 25481.521,
+      "preview_world_y_cm": -110.59,
+      "river_left_normal_local_m": [
+        0.725822,
+        0.687883
+      ],
+      "sample_index": 176,
+      "station_m": 44000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.686518,
+        -0.727113
+      ],
+      "lat": 9.9264102,
+      "lon": -83.42884,
+      "preview_world_x_cm": 25634.753,
+      "preview_world_y_cm": -88.139,
+      "river_left_normal_local_m": [
+        0.727113,
+        0.686518
+      ],
+      "sample_index": 177,
+      "station_m": 44250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.689196,
+        -0.724575
+      ],
+      "lat": 9.9247789,
+      "lon": -83.4272729,
+      "preview_world_x_cm": 25788.139,
+      "preview_world_y_cm": -65.71,
+      "river_left_normal_local_m": [
+        0.724575,
+        0.689196
+      ],
+      "sample_index": 178,
+      "station_m": 44500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.689196,
+        -0.724575
+      ],
+      "lat": 9.9231517,
+      "lon": -83.4257015,
+      "preview_world_x_cm": 25941.948,
+      "preview_world_y_cm": -43.336,
+      "river_left_normal_local_m": [
+        0.724575,
+        0.689196
+      ],
+      "sample_index": 179,
+      "station_m": 44750.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.696174,
+        -0.717873
+      ],
+      "lat": 9.9215343,
+      "lon": -83.4241197,
+      "preview_world_x_cm": 26096.769,
+      "preview_world_y_cm": -21.097,
+      "river_left_normal_local_m": [
+        0.717873,
+        0.696174
+      ],
+      "sample_index": 180,
+      "station_m": 45000.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.703811,
+        -0.710388
+      ],
+      "lat": 9.9199228,
+      "lon": -83.4225317,
+      "preview_world_x_cm": 26252.201,
+      "preview_world_y_cm": 1.062,
+      "river_left_normal_local_m": [
+        0.710388,
+        0.703811
+      ],
+      "sample_index": 181,
+      "station_m": 45250.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.707378,
+        -0.706836
+      ],
+      "lat": 9.9183354,
+      "lon": -83.4209188,
+      "preview_world_x_cm": 26410.067,
+      "preview_world_y_cm": 22.888,
+      "river_left_normal_local_m": [
+        0.706836,
+        0.707378
+      ],
+      "sample_index": 182,
+      "station_m": 45500.0
+    },
+    {
+      "downstream_tangent_local_m": [
+        0.707378,
+        -0.706836
+      ],
+      "lat": 9.9174311,
+      "lon": -83.42,
+      "preview_world_x_cm": 26500.0,
+      "preview_world_y_cm": 35.323,
+      "river_left_normal_local_m": [
+        0.706836,
+        0.707378
+      ],
+      "sample_index": 183,
+      "station_m": 45642.42
+    }
+  ],
+  "summary": {
+    "length_m_preview_wgs84_linearized": 45642.42,
+    "preview_bend_amplitude_cm": 340.0,
+    "preview_corridor_half_width_cm": 2750.0,
+    "preview_river_half_width_cm": 320.25,
+    "preview_world_x_max_cm": 26500.0,
+    "preview_world_x_min_cm": -5800.0,
+    "station_sample_count": 184,
+    "station_sample_interval_m": 250.0,
+    "vertex_count": 129
+  }
+}
