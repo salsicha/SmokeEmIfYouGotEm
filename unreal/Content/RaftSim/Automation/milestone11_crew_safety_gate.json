@@ -1,0 +1,74 @@
+{
+  "schema": "raftsim.unreal.milestone11_crew_safety_gate.v1",
+  "status": "complete",
+  "automation_module": "RaftSimAutomation",
+  "automation_test_name": "RaftSim.Milestone11.CrewSafetyGate",
+  "completed_task_count": 4,
+  "required_manifests": {
+    "crew_overboard_safety_states": "RaftSim/Crew/crew_overboard_safety_states.json",
+    "swimming_skill_assignment": "RaftSim/Crew/swimming_skill_assignment.json",
+    "swimmer_rescue_gameplay": "RaftSim/Crew/swimmer_rescue_gameplay.json",
+    "gameplay_telemetry_scoring": "RaftSim/Crew/gameplay_telemetry_scoring.json"
+  },
+  "runtime_contracts": {
+    "module": "RaftSimCrew",
+    "safety_state_library": "URaftSimCrewSafetyStateLibrary",
+    "swimming_skill_library": "URaftSimSwimmingSkillLibrary",
+    "swimmer_rescue_library": "URaftSimSwimmerRescueLibrary",
+    "gameplay_scoring_library": "URaftSimGameplayScoringLibrary"
+  },
+  "gate_checks": [
+    {
+      "check_id": "crew_overboard_safety_state_model",
+      "todo_item": "Add a crew-overboard safety-state model: seated, at-risk, falling/ejected, swimming, rescue-targeted, rescued, re-seated/recovered, and failed-rescue.",
+      "passed": true,
+      "evidence": [
+        "RaftSim/Crew/crew_overboard_safety_states.json",
+        "FRaftSimCrewSafetyStateFrame",
+        "URaftSimCrewSafetyStateLibrary::CanTransitionSafetyState"
+      ]
+    },
+    {
+      "check_id": "passenger_swimming_skill_assignment",
+      "todo_item": "Add randomly assigned passenger swimming skills at run setup, including non-swimmers who cannot self-rescue.",
+      "passed": true,
+      "evidence": [
+        "RaftSim/Crew/swimming_skill_assignment.json",
+        "FRaftSimPassengerSwimmingSkillAssignment",
+        "URaftSimSwimmingSkillLibrary::AssignSwimmingSkillFromNormalizedValue"
+      ]
+    },
+    {
+      "check_id": "swimmer_rescue_gameplay",
+      "todo_item": "Add swimmer and rescue gameplay: swimmer drift/visibility, callouts, target selection, reach/paddle grab, throw-line support, pull-in timing, re-seat/recovery, and failed-rescue consequences.",
+      "passed": true,
+      "evidence": [
+        "RaftSim/Crew/swimmer_rescue_gameplay.json",
+        "FRaftSimSwimmerRescueFrame",
+        "URaftSimSwimmerRescueLibrary::EvaluateRescueAttempt"
+      ]
+    },
+    {
+      "check_id": "crew_safety_telemetry_scoring",
+      "todo_item": "Add crew safety telemetry and scoring for ejection trigger, swimmer position, time in water, rescue method, pull-in/re-seat outcome, fatigue/trust deltas, and safety-score impact.",
+      "passed": true,
+      "evidence": [
+        "RaftSim/Crew/gameplay_telemetry_scoring.json",
+        "FRaftSimGameplayScoringSignals",
+        "URaftSimGameplayScoringLibrary::EvaluateGameplayScore"
+      ]
+    }
+  ],
+  "native_runtime_checks": [
+    "overboard_transition_chain_and_failed_rescue_terminal_state",
+    "seeded_swim_skill_thresholds_and_non_swimmer_self_rescue_lockout",
+    "water_velocity_driven_swimmer_drift_and_reach_paddle_throwline_rescue_outcomes",
+    "safety_incident_failed_rescue_swim_time_and_recovery_penalties_reduce_total_score"
+  ],
+  "pass_policy": {
+    "all_four_milestone11_safety_items_checked": true,
+    "required_manifests_load_in_unreal_automation": true,
+    "native_runtime_contracts_are_exercised": true,
+    "scoring_penalizes_swims_failed_rescue_and_recovery_time": true
+  }
+}
