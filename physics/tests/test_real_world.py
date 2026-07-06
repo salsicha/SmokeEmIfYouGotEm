@@ -144,6 +144,7 @@ def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
         "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson"
         in manifest["artifacts"]["hydrography"]
     )
+    assert "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json" in manifest["artifacts"]["hydrography"]
 
 
 def test_south_fork_nhd_hu8_extract_records_selection_and_counts():
@@ -153,6 +154,7 @@ def test_south_fork_nhd_hu8_extract_records_selection_and_counts():
     flowlines = json.loads((hydro_dir / "nhd_hu8_18020129_flowline_bbox_extract.geojson").read_text())
     support = json.loads((hydro_dir / "nhd_hu8_18020129_support_layers_bbox_extract.geojson").read_text())
     mainstem = json.loads((hydro_dir / "nhd_hu8_18020129_south_fork_mainstem_candidate.geojson").read_text())
+    stationing = json.loads((hydro_dir / "nhd_hu8_18020129_mainstem_stationing_candidate.json").read_text())
 
     assert manifest["selected_product"]["hydrologic_unit"] == "18020129"
     assert manifest["source_crs"]["epsg"] == "EPSG:4269"
@@ -171,6 +173,10 @@ def test_south_fork_nhd_hu8_extract_records_selection_and_counts():
     assert mainstem_manifest["derivation"]["endpoint_snapping"] == "none_required_exact_7_decimal_endpoint_matches"
     assert mainstem["features"][0]["properties"]["length_km_nhd_sum"] == 26.19019554
     assert mainstem["features"][0]["geometry"]["type"] == "LineString"
+    assert stationing["local_transform"]["type"] == "local_equirectangular_preview_meters"
+    assert stationing["summary"]["vertex_count"] == 361
+    assert stationing["summary"]["station_sample_count"] == 264
+    assert stationing["summary"]["station_sample_interval_m"] == 100.0
 
 
 def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_review_gates():
@@ -201,11 +207,14 @@ def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_revie
         "protected_area_and_access_context",
         "guide_and_reference_media_annotations",
     }.issubset(classes)
-    assert classes["hydrography_and_centerline"]["status"] == "nhd_hu8_mainstem_candidate_attached_review_pending"
+    assert classes["hydrography_and_centerline"]["status"] == "nhd_hu8_stationing_candidate_attached_review_pending"
     assert "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json" in classes[
         "hydrography_and_centerline"
     ]["target_outputs"]
     assert "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson" in classes[
+        "hydrography_and_centerline"
+    ]["target_outputs"]
+    assert "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json" in classes[
         "hydrography_and_centerline"
     ]["target_outputs"]
     assert classes["water_and_vegetation_masks"]["status"] == "requires_new_derivatives_from_pilot_imagery_and_hydrography"
@@ -338,6 +347,10 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     )
     assert (
         "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson"
+        in rivers["american_south_fork"]["attached_preview_inputs"]
+    )
+    assert (
+        "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json"
         in rivers["american_south_fork"]["attached_preview_inputs"]
     )
     assert "USGS 11445500" in rivers["american_south_fork"]["procedural_generation_allowlist"][2]

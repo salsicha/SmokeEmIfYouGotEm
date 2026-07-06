@@ -42,6 +42,7 @@
       "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
       "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
       "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
+      "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
       "hydrography/centerline.geojson",
       "hydrography/banks.geojson",
       "hydrography/cross_sections.geojson"
