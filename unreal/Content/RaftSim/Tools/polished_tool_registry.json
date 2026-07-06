@@ -47,10 +47,14 @@
       "kind": "feature_tuning_editor",
       "required_module": "RaftSimRiver",
       "source_manifest": "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+      "shell_manifest": "unreal/Content/RaftSim/Tools/feature_tuning_editor_shell.json",
+      "config_class": "URaftSimFeatureTuningEditorShellConfig",
+      "view_model_class": "URaftSimFeatureTuningEditorShellViewModel",
       "loads_sample_data": [
         "unreal/Content/RaftSim/River/feature_tuning_editor.json",
         "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json"
       ],
+      "status": "editor_shell_implemented",
       "requires_validation_before_export": true,
       "polish_goal": "Expose flow-dependent forcing, feature tuning, and visual/audio-only cues with conservative defaults and validation warnings."
     },

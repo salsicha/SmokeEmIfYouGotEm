@@ -2,39 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "RaftSimEditorToolValidation.h"
 #include "RaftSimRapidRiverEditorConfig.h"
 #include "UObject/Object.h"
 
 #include "RaftSimRapidRiverEditorShell.generated.h"
-
-UENUM(BlueprintType)
-enum class ERaftSimToolValidationSeverity : uint8
-{
-    Info,
-    Warning,
-    Blocking
-};
-
-USTRUCT(BlueprintType)
-struct RAFTSIMEDITOR_API FRaftSimToolValidationMessage
-{
-    GENERATED_BODY()
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ToolValidation")
-    FName MessageId;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ToolValidation")
-    ERaftSimToolValidationSeverity Severity = ERaftSimToolValidationSeverity::Info;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ToolValidation")
-    FText Summary;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ToolValidation")
-    FString SourcePath;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|ToolValidation")
-    bool bBlocksExport = false;
-};
 
 USTRUCT(BlueprintType)
 struct RAFTSIMEDITOR_API FRaftSimRiverEditorShellEvidenceRef
