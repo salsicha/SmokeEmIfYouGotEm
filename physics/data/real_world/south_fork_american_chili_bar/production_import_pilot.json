@@ -1,0 +1,312 @@
+{
+  "acceptance_gate": [
+    "All planned pilot downloads have source metadata, checksums, CRS, acquisition dates, and attribution.",
+    "Conditioned heightfield and masks are generated from the pilot tiles and reviewed against hydrography and guide notes.",
+    "Unreal preview map can be regenerated from pilot artifacts with hazards, swimmer rescue targets, and water-readability cues still visible.",
+    "Screenshots look materially closer to the real South Fork corridor without claiming final photoreal approval."
+  ],
+  "bounds_wgs84": {
+    "max_lat": 38.83,
+    "max_lon": -120.72,
+    "min_lat": 38.74,
+    "min_lon": -120.9
+  },
+  "pilot_id": "south_fork_chili_bar_official_service_tile_pilot",
+  "provenance": {
+    "generated_by": "raftsim.real_world.build_south_fork_production_import_pilot",
+    "processing_version": "milestone_26_south_fork_import_pilot.v0",
+    "review_status": "recipe_only_downloads_and_imports_pending"
+  },
+  "readiness_manifest": "../production_geospatial_source_readiness.json",
+  "required_source_classes": [
+    {
+      "class_id": "terrain_dem_or_lidar",
+      "promotion_gate": "Download tiles, mosaic/clip, review voids and artifacts, hydrologically condition, burn the channel, and compare slope/banks to guide-reviewed rapids.",
+      "source_ids": [
+        "usgs_3dep"
+      ],
+      "status": "pilot_urls_planned",
+      "target_outputs": [
+        "terrain/production_import_pilot/3dep_tiles",
+        "terrain/production_import_pilot/conditioned_heightfield_2017.png",
+        "terrain/production_import_pilot/heightfield_manifest.json"
+      ]
+    },
+    {
+      "class_id": "hydrography_and_centerline",
+      "promotion_gate": "Clip official flowlines, align to imagery and DEM, hand-review banks/rapid stations, and keep OSM only as supplemental access context.",
+      "source_ids": [
+        "usgs_3dhp_nhd"
+      ],
+      "status": "metadata_attached_download_pending",
+      "target_outputs": [
+        "hydrography/production_import_pilot/centerline.geojson",
+        "hydrography/production_import_pilot/banks.geojson",
+        "hydrography/production_import_pilot/cross_sections.geojson"
+      ]
+    },
+    {
+      "class_id": "aerial_or_satellite_imagery",
+      "promotion_gate": "Attach acquisition year/date, resolution, CRS, attribution, and scene/tile metadata; use Landsat only for seasonal comparison unless resolution is adequate for masks.",
+      "source_ids": [
+        "usda_naip",
+        "landsat"
+      ],
+      "status": "pilot_urls_planned",
+      "target_outputs": [
+        "imagery/production_import_pilot/naip_tiles",
+        "imagery/production_import_pilot/source_drape_4096.png",
+        "imagery/production_import_pilot/source_drape_manifest.json"
+      ]
+    },
+    {
+      "class_id": "water_and_vegetation_masks",
+      "promotion_gate": "Derive masks from reviewed imagery and hydrography, then manually review water edge, seasonal exposure, vegetation, and hazard visibility.",
+      "source_ids": [
+        "usda_naip",
+        "usgs_3dhp_nhd",
+        "guide_review"
+      ],
+      "status": "requires_new_derivatives_from_pilot_imagery_and_hydrography",
+      "target_outputs": [
+        "imagery/production_import_pilot/water_mask.tif",
+        "imagery/production_import_pilot/vegetation_mask.tif",
+        "imagery/production_import_pilot/wet_rock_bank_mask.tif"
+      ]
+    },
+    {
+      "class_id": "seasonal_flow_or_release_history",
+      "promotion_gate": "Attach modern gauge/release context, stage where available, flow percentiles, and guide review for low/median/high visual variants.",
+      "source_ids": [
+        "usgs_water_services",
+        "noaa_nwps_nwm",
+        "usgs_streamstats"
+      ],
+      "status": "historical_daily_discharge_attached_modern_context_pending",
+      "target_outputs": [
+        "hydrology/production_import_pilot/usgs_11445500_instantaneous_discharge.json",
+        "hydrology/production_import_pilot/usgs_11445500_stage.json",
+        "hydrology/production_import_pilot/flow_band_review.json"
+      ]
+    },
+    {
+      "class_id": "protected_area_and_access_context",
+      "promotion_gate": "Review put-ins, take-outs, private/public land, evacuation points, sensitive locations, and what may appear in screenshots or maps.",
+      "source_ids": [
+        "official_land_access_review",
+        "guide_review"
+      ],
+      "status": "planned_review_required",
+      "target_outputs": [
+        "review/production_import_pilot/access_points.geojson",
+        "review/production_import_pilot/publication_sensitivity.json"
+      ]
+    },
+    {
+      "class_id": "guide_and_reference_media_annotations",
+      "promotion_gate": "Attach creator/date/reach/flow/weather/permission before using photos or footage for material, texture, or in-game reference.",
+      "source_ids": [
+        "reference_media_link_manifest",
+        "first_party_field_capture",
+        "explicit_guide_or_outfitter_permission"
+      ],
+      "status": "link_seeds_attached_no_media_rights",
+      "target_outputs": [
+        "review/production_import_pilot/reference_annotations.geojson",
+        "field_media/production_import_pilot/rights_manifest.json"
+      ]
+    }
+  ],
+  "river_id": "american_south_fork",
+  "schema": "raftsim.production_import_pilot.v0",
+  "section_id": "chili_bar_to_coloma",
+  "source_manifest": "source_manifest.json",
+  "status": "planned_review_gated_not_downloaded",
+  "tile_grid": {
+    "columns": 2,
+    "rows": 2,
+    "service_crs": "EPSG:3857",
+    "source_crs": "EPSG:4326",
+    "tiles": [
+      {
+        "bbox_epsg3857": {
+          "xmax": -13448507.6827,
+          "xmin": -13458526.4369,
+          "ymax": 4690923.3197,
+          "ymin": 4684496.9368
+        },
+        "bbox_wgs84": {
+          "max_lat": 38.785,
+          "max_lon": -120.81,
+          "min_lat": 38.74,
+          "min_lon": -120.9
+        },
+        "column": 0,
+        "download_specs": {
+          "3dep_dem_export": {
+            "format": "GeoTIFF_F32",
+            "provider": "USGS 3D Elevation Program ImageServer",
+            "size_px": [
+              1024,
+              1024
+            ],
+            "target_artifact": "terrain/production_import_pilot/3dep_tiles/sfa_chili_bar_tile_r0_c0.tif",
+            "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13448507.6827%2C4690923.3197&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image"
+          },
+          "naip_export": {
+            "format": "PNG_RGB",
+            "provider": "USDA/APFO NAIP ImageServer",
+            "size_px": [
+              2048,
+              2048
+            ],
+            "target_artifact": "imagery/production_import_pilot/naip_tiles/sfa_chili_bar_tile_r0_c0.png",
+            "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13448507.6827%2C4690923.3197&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=png&f=image"
+          }
+        },
+        "row": 0,
+        "status": "planned_not_downloaded",
+        "tile_id": "sfa_chili_bar_tile_r0_c0"
+      },
+      {
+        "bbox_epsg3857": {
+          "xmax": -13438488.9286,
+          "xmin": -13448507.6827,
+          "ymax": 4690923.3197,
+          "ymin": 4684496.9368
+        },
+        "bbox_wgs84": {
+          "max_lat": 38.785,
+          "max_lon": -120.72,
+          "min_lat": 38.74,
+          "min_lon": -120.81
+        },
+        "column": 1,
+        "download_specs": {
+          "3dep_dem_export": {
+            "format": "GeoTIFF_F32",
+            "provider": "USGS 3D Elevation Program ImageServer",
+            "size_px": [
+              1024,
+              1024
+            ],
+            "target_artifact": "terrain/production_import_pilot/3dep_tiles/sfa_chili_bar_tile_r0_c1.tif",
+            "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13448507.6827%2C4684496.9368%2C-13438488.9286%2C4690923.3197&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image"
+          },
+          "naip_export": {
+            "format": "PNG_RGB",
+            "provider": "USDA/APFO NAIP ImageServer",
+            "size_px": [
+              2048,
+              2048
+            ],
+            "target_artifact": "imagery/production_import_pilot/naip_tiles/sfa_chili_bar_tile_r0_c1.png",
+            "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13448507.6827%2C4684496.9368%2C-13438488.9286%2C4690923.3197&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=png&f=image"
+          }
+        },
+        "row": 0,
+        "status": "planned_not_downloaded",
+        "tile_id": "sfa_chili_bar_tile_r0_c1"
+      },
+      {
+        "bbox_epsg3857": {
+          "xmax": -13448507.6827,
+          "xmin": -13458526.4369,
+          "ymax": 4697349.7027,
+          "ymin": 4690923.3197
+        },
+        "bbox_wgs84": {
+          "max_lat": 38.83,
+          "max_lon": -120.81,
+          "min_lat": 38.785,
+          "min_lon": -120.9
+        },
+        "column": 0,
+        "download_specs": {
+          "3dep_dem_export": {
+            "format": "GeoTIFF_F32",
+            "provider": "USGS 3D Elevation Program ImageServer",
+            "size_px": [
+              1024,
+              1024
+            ],
+            "target_artifact": "terrain/production_import_pilot/3dep_tiles/sfa_chili_bar_tile_r1_c0.tif",
+            "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13458526.4369%2C4690923.3197%2C-13448507.6827%2C4697349.7027&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image"
+          },
+          "naip_export": {
+            "format": "PNG_RGB",
+            "provider": "USDA/APFO NAIP ImageServer",
+            "size_px": [
+              2048,
+              2048
+            ],
+            "target_artifact": "imagery/production_import_pilot/naip_tiles/sfa_chili_bar_tile_r1_c0.png",
+            "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13458526.4369%2C4690923.3197%2C-13448507.6827%2C4697349.7027&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=png&f=image"
+          }
+        },
+        "row": 1,
+        "status": "planned_not_downloaded",
+        "tile_id": "sfa_chili_bar_tile_r1_c0"
+      },
+      {
+        "bbox_epsg3857": {
+          "xmax": -13438488.9286,
+          "xmin": -13448507.6827,
+          "ymax": 4697349.7027,
+          "ymin": 4690923.3197
+        },
+        "bbox_wgs84": {
+          "max_lat": 38.83,
+          "max_lon": -120.72,
+          "min_lat": 38.785,
+          "min_lon": -120.81
+        },
+        "column": 1,
+        "download_specs": {
+          "3dep_dem_export": {
+            "format": "GeoTIFF_F32",
+            "provider": "USGS 3D Elevation Program ImageServer",
+            "size_px": [
+              1024,
+              1024
+            ],
+            "target_artifact": "terrain/production_import_pilot/3dep_tiles/sfa_chili_bar_tile_r1_c1.tif",
+            "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13448507.6827%2C4690923.3197%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image"
+          },
+          "naip_export": {
+            "format": "PNG_RGB",
+            "provider": "USDA/APFO NAIP ImageServer",
+            "size_px": [
+              2048,
+              2048
+            ],
+            "target_artifact": "imagery/production_import_pilot/naip_tiles/sfa_chili_bar_tile_r1_c1.png",
+            "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13448507.6827%2C4690923.3197%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=png&f=image"
+          }
+        },
+        "row": 1,
+        "status": "planned_not_downloaded",
+        "tile_id": "sfa_chili_bar_tile_r1_c1"
+      }
+    ]
+  },
+  "unreal_import_targets": {
+    "future_production_map": "/Game/RaftSim/Maps/Production/L_SouthForkAmerican_ChiliBar",
+    "heightfield_import_contract": "unreal/Content/RaftSim/River/south_fork_heightfield_import_test.json",
+    "preview_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview",
+    "review_captures": [
+      "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
+      "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png"
+    ]
+  },
+  "working_crs_decision": {
+    "candidate": "local_projected_corridor_crs_derived_from_epsg4326_bounds",
+    "required_review": [
+      "horizontal CRS and units",
+      "vertical datum handling for DEM elevations",
+      "Unreal origin and scale transform",
+      "round-trip error budget against source coordinates"
+    ],
+    "status": "required_before_unreal_promotion"
+  }
+}

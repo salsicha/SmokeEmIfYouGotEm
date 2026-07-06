@@ -49,11 +49,12 @@
       "scenario/bed.npy",
       "scenario/initial_state.npz"
     ],
+    "source_pulls": [
+      "production_source_pull_manifest.json",
+      "production_import_pilot.json"
+    ],
     "unreal": [
       "unreal/corridor_package_manifest.json"
-    ],
-    "source_pulls": [
-      "production_source_pull_manifest.json"
     ],
     "validation": [
       "validation_matrix.json"
@@ -90,7 +91,7 @@
     {
       "category": "elevation",
       "fetch_id": "sfa_3dep_dem",
-      "notes": "Representative bounding-box query for DEM discovery; production pull should pick highest-resolution 3DEP/state lidar product with metadata.",
+      "notes": "Representative bounding-box query for DEM discovery; if TNM product metadata is empty, use the official USGS 3DEP ImageServer/WCS path and record the zero-hit query in the production source-pull manifest.",
       "source_id": "usgs_3dep",
       "status": "metadata_ready",
       "target_artifact": "terrain/3dep_dem_tiles",
@@ -117,7 +118,7 @@
     {
       "category": "imagery",
       "fetch_id": "sfa_naip_imagery",
-      "notes": "Use most recent leaf-on/low-shadow NAIP where available, then compare with historic imagery at known gauge values.",
+      "notes": "Use most recent leaf-on/low-shadow NAIP where available, then compare with historic imagery at known gauge values. If TNM product metadata is empty, switch to an official NAIP/USDA image service or index.",
       "source_id": "usda_naip",
       "status": "planned",
       "target_artifact": "imagery/naip_tiles",
@@ -162,9 +163,9 @@
     {
       "category": "gauge",
       "fetch_id": "sfa_nwis_daily_discharge",
-      "notes": "Daily discharge query for preliminary flow percentiles. Add instantaneous values and stage parameter 00065 when building final presets.",
+      "notes": "Historical daily discharge query for preliminary flow percentiles. Add modern gauge/release context, instantaneous values, and stage parameter 00065 when building final presets.",
       "source_id": "usgs_nwis",
-      "status": "metadata_ready",
+      "status": "downloaded",
       "target_artifact": "hydrology/usgs_11445500_daily_discharge.json",
       "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=11445500&parameterCd=00060&startDT=1951-01-01&endDT=1995-12-31"
     },

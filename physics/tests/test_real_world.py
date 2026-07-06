@@ -11,6 +11,8 @@ from raftsim.real_world import (
     RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION,
     RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
     RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_SCHEMA_VERSION,
+    PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION,
+    SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE,
     adaptive_solver_parameters,
     build_candidate_river_inventory_package,
     build_course_elevation_extraction,
@@ -18,6 +20,7 @@ from raftsim.real_world import (
     build_rapid_review_editor_workflow,
     build_rapid_review_flow_difficulty_mapping,
     build_real_world_corridor_package,
+    build_south_fork_production_import_pilot,
     build_source_manifest,
     default_candidate_river_inventory,
     default_manual_rapid_review_labels,
@@ -114,6 +117,39 @@ def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
     )
     assert COURSE_ELEVATION_EXTRACTION_FILE in manifest["artifacts"]["elevation"]
     assert RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE in manifest["artifacts"]["guide_references"]
+    assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE in manifest["artifacts"]["source_pulls"]
+
+
+def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_review_gates():
+    pilot = build_south_fork_production_import_pilot()
+    classes = {entry["class_id"]: entry for entry in pilot["required_source_classes"]}
+    tiles = pilot["tile_grid"]["tiles"]
+
+    assert pilot["schema"] == PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION
+    assert pilot["status"] == "planned_review_gated_not_downloaded"
+    assert pilot["river_id"] == "american_south_fork"
+    assert len(tiles) == 4
+    assert {tile["tile_id"] for tile in tiles} == {
+        "sfa_chili_bar_tile_r0_c0",
+        "sfa_chili_bar_tile_r0_c1",
+        "sfa_chili_bar_tile_r1_c0",
+        "sfa_chili_bar_tile_r1_c1",
+    }
+    assert all("3dep_dem_export" in tile["download_specs"] for tile in tiles)
+    assert all("naip_export" in tile["download_specs"] for tile in tiles)
+    assert "elevation.nationalmap.gov" in tiles[0]["download_specs"]["3dep_dem_export"]["url"]
+    assert "gis.apfo.usda.gov" in tiles[0]["download_specs"]["naip_export"]["url"]
+    assert {
+        "terrain_dem_or_lidar",
+        "hydrography_and_centerline",
+        "aerial_or_satellite_imagery",
+        "water_and_vegetation_masks",
+        "seasonal_flow_or_release_history",
+        "protected_area_and_access_context",
+        "guide_and_reference_media_annotations",
+    }.issubset(classes)
+    assert classes["water_and_vegetation_masks"]["status"] == "requires_new_derivatives_from_pilot_imagery_and_hydrography"
+    assert pilot["unreal_import_targets"]["future_production_map"] == "/Game/RaftSim/Maps/Production/L_SouthForkAmerican_ChiliBar"
 
 
 def test_channel_indicators_and_rapid_candidates_find_complex_water():

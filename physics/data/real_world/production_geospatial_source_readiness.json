@@ -169,6 +169,7 @@
       "section_id": "chili_bar_to_coloma",
       "production_readiness": "preview_only_not_lifelike",
       "attached_source_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_source_pull_manifest.json",
+      "production_import_pilot": "physics/data/real_world/south_fork_american_chili_bar/production_import_pilot.json",
       "attached_sources_by_class": {
         "terrain_dem_or_lidar": {
           "status": "corridor_sample_and_heightfield_candidate_attached",

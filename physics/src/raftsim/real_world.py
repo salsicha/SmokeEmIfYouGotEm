@@ -30,9 +30,26 @@ from .scenario2_5d import (
 )
 from .schema_versions import SOURCE_MANIFEST_SCHEMA_VERSION
 
-DataCategory = Literal["elevation", "hydrography", "imagery", "gauge", "guide_reference", "field_media"]
+DataCategory = Literal[
+    "elevation",
+    "hydrography",
+    "imagery",
+    "gauge",
+    "guide_reference",
+    "field_media",
+    "derived_source_masks",
+    "derived_heightfield_candidate",
+]
 DifficultyPreset = Literal["beginner", "intermediate", "advanced", "expert"]
-SourceStatus = Literal["planned", "metadata_ready", "downloaded", "derived", "reviewed"]
+SourceStatus = Literal[
+    "planned",
+    "metadata_ready",
+    "downloaded",
+    "derived",
+    "reviewed",
+    "generated_review_gated_preview_masks",
+    "generated_review_gated_import_candidate",
+]
 RapidReviewLayerKind = Literal["raster", "vector", "table", "manifest", "annotation", "reference"]
 RapidReviewPanelKind = Literal["map", "profile", "hydrology", "evidence", "annotation_form"]
 
@@ -45,6 +62,8 @@ RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_SCHEMA_VERSION = "raftsim.rapid_review_flow
 RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE = "rapid_review_flow_difficulty_mapping.json"
 RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION = "raftsim.rapid_review_editor_workflow.v0"
 RAPID_REVIEW_EDITOR_WORKFLOW_FILE = "rapid_review_editor_workflow.json"
+PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION = "raftsim.production_import_pilot.v0"
+SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
 DIFFICULTY_PRESETS: tuple[DifficultyPreset, ...] = ("beginner", "intermediate", "advanced", "expert")
 
@@ -831,6 +850,62 @@ def south_fork_american_fetch_specs() -> tuple[RemoteFetchSpec, ...]:
             ),
         ),
         RemoteFetchSpec(
+            fetch_id="sfa_3dep_chili_bar_corridor_sample",
+            category="elevation",
+            source_id="usgs_3dep",
+            url=(
+                "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?"
+                "bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&"
+                "imageSR=3857&size=512%2C512&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image"
+            ),
+            target_artifact="terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
+            status="downloaded",
+            notes="Larger official USGS 3DEP ImageServer export for active Unreal preview relief; still not a complete conditioned corridor DEM.",
+        ),
+        RemoteFetchSpec(
+            fetch_id="sfa_naip_chili_bar_corridor_sample",
+            category="imagery",
+            source_id="usda_naip",
+            url=(
+                "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?"
+                "bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&"
+                "imageSR=3857&size=1024%2C1024&format=png&f=image"
+            ),
+            target_artifact="imagery/usda_naip_chili_bar_corridor_sample_1024.png",
+            status="downloaded",
+            notes="Larger official USDA/APFO NAIP ImageServer export for active Unreal preview drape; still not a complete production orthomosaic.",
+        ),
+        RemoteFetchSpec(
+            fetch_id="sfa_naip_chili_bar_corridor_masks",
+            category="derived_source_masks",
+            source_id="usda_naip_chili_bar_corridor_sample_1024",
+            url="physics/src/raftsim/geospatial_preview.py",
+            target_artifact=(
+                "imagery/usda_naip_chili_bar_corridor_water_mask_1024.png; "
+                "imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png; "
+                "imagery/usda_naip_chili_bar_corridor_masks_manifest.json"
+            ),
+            status="generated_review_gated_preview_masks",
+            notes=(
+                "Review-gated preview water and vegetation masks generated from the active 1024px USDA/APFO NAIP drape "
+                "plus a bounded generated-preview channel prior. These masks are sampled by Unreal preview terrain/drape "
+                "coloring but are not final segmentation, bank polygons, or production masks."
+            ),
+        ),
+        RemoteFetchSpec(
+            fetch_id="sfa_3dep_chili_bar_corridor_heightfield_candidate",
+            category="derived_heightfield_candidate",
+            source_id="usgs_3dep_chili_bar_corridor_sample_512",
+            url="physics/src/raftsim/geospatial_preview.py",
+            target_artifact="terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
+            status="generated_review_gated_import_candidate",
+            notes=(
+                "Review-gated 1009px 16-bit normalized PNG generated from the official USGS 3DEP corridor sample for Unreal "
+                "Landscape import tests. This is not a complete reviewed corridor DEM, reprojected final terrain, hydrologically "
+                "conditioned surface, or production Landscape replacement."
+            ),
+        ),
+        RemoteFetchSpec(
             fetch_id="sfa_nwis_daily_discharge",
             category="gauge",
             source_id="usgs_nwis",
@@ -863,6 +938,213 @@ def south_fork_american_fetch_specs() -> tuple[RemoteFetchSpec, ...]:
     )
 
 
+def _web_mercator_xy(lon: float, lat: float) -> tuple[float, float]:
+    radius_m = 6378137.0
+    clipped_lat = max(-85.05112878, min(85.05112878, lat))
+    x = radius_m * math.radians(lon)
+    y = radius_m * math.log(math.tan(math.pi / 4.0 + math.radians(clipped_lat) / 2.0))
+    return x, y
+
+
+def _service_tile_grid(bounds: BoundsWGS84, columns: int, rows: int) -> list[dict[str, object]]:
+    min_x, min_y = _web_mercator_xy(bounds.min_lon, bounds.min_lat)
+    max_x, max_y = _web_mercator_xy(bounds.max_lon, bounds.max_lat)
+    tiles: list[dict[str, object]] = []
+    for row in range(rows):
+        for column in range(columns):
+            tile_min_lon = bounds.min_lon + (bounds.max_lon - bounds.min_lon) * column / columns
+            tile_max_lon = bounds.min_lon + (bounds.max_lon - bounds.min_lon) * (column + 1) / columns
+            tile_min_lat = bounds.min_lat + (bounds.max_lat - bounds.min_lat) * row / rows
+            tile_max_lat = bounds.min_lat + (bounds.max_lat - bounds.min_lat) * (row + 1) / rows
+            tile_min_x = min_x + (max_x - min_x) * column / columns
+            tile_max_x = min_x + (max_x - min_x) * (column + 1) / columns
+            tile_min_y = min_y + (max_y - min_y) * row / rows
+            tile_max_y = min_y + (max_y - min_y) * (row + 1) / rows
+            bbox_3857 = f"{tile_min_x:.4f}%2C{tile_min_y:.4f}%2C{tile_max_x:.4f}%2C{tile_max_y:.4f}"
+            tile_id = f"sfa_chili_bar_tile_r{row}_c{column}"
+            tiles.append(
+                {
+                    "tile_id": tile_id,
+                    "row": row,
+                    "column": column,
+                    "status": "planned_not_downloaded",
+                    "bbox_wgs84": {
+                        "min_lon": round(tile_min_lon, 8),
+                        "min_lat": round(tile_min_lat, 8),
+                        "max_lon": round(tile_max_lon, 8),
+                        "max_lat": round(tile_max_lat, 8),
+                    },
+                    "bbox_epsg3857": {
+                        "xmin": round(tile_min_x, 4),
+                        "ymin": round(tile_min_y, 4),
+                        "xmax": round(tile_max_x, 4),
+                        "ymax": round(tile_max_y, 4),
+                    },
+                    "download_specs": {
+                        "3dep_dem_export": {
+                            "provider": "USGS 3D Elevation Program ImageServer",
+                            "format": "GeoTIFF_F32",
+                            "size_px": [1024, 1024],
+                            "url": (
+                                "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?"
+                                f"bbox={bbox_3857}&bboxSR=3857&imageSR=3857&size=1024%2C1024&"
+                                "format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image"
+                            ),
+                            "target_artifact": f"terrain/production_import_pilot/3dep_tiles/{tile_id}.tif",
+                        },
+                        "naip_export": {
+                            "provider": "USDA/APFO NAIP ImageServer",
+                            "format": "PNG_RGB",
+                            "size_px": [2048, 2048],
+                            "url": (
+                                "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?"
+                                f"bbox={bbox_3857}&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=png&f=image"
+                            ),
+                            "target_artifact": f"imagery/production_import_pilot/naip_tiles/{tile_id}.png",
+                        },
+                    },
+                }
+            )
+    return tiles
+
+
+def build_south_fork_production_import_pilot(section: CandidateRiverSection | None = None) -> dict[str, object]:
+    """Build the first executable production-source import recipe for South Fork.
+
+    The recipe is intentionally still planned/review-gated. It converts the broad
+    production-data TODO into a deterministic official-service tile plan without
+    pretending the current preview samples are production terrain or imagery.
+    """
+
+    target = section or south_fork_american_section()
+    columns = 2
+    rows = 2
+    return {
+        "schema": PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION,
+        "pilot_id": "south_fork_chili_bar_official_service_tile_pilot",
+        "river_id": target.river_id,
+        "section_id": target.section_id,
+        "status": "planned_review_gated_not_downloaded",
+        "source_manifest": SOURCE_MANIFEST_FILE,
+        "readiness_manifest": "../production_geospatial_source_readiness.json",
+        "bounds_wgs84": target.bounds_wgs84.to_json_dict(),
+        "working_crs_decision": {
+            "status": "required_before_unreal_promotion",
+            "candidate": "local_projected_corridor_crs_derived_from_epsg4326_bounds",
+            "required_review": [
+                "horizontal CRS and units",
+                "vertical datum handling for DEM elevations",
+                "Unreal origin and scale transform",
+                "round-trip error budget against source coordinates",
+            ],
+        },
+        "tile_grid": {
+            "columns": columns,
+            "rows": rows,
+            "source_crs": "EPSG:4326",
+            "service_crs": "EPSG:3857",
+            "tiles": _service_tile_grid(target.bounds_wgs84, columns, rows),
+        },
+        "required_source_classes": [
+            {
+                "class_id": "terrain_dem_or_lidar",
+                "status": "pilot_urls_planned",
+                "source_ids": ["usgs_3dep"],
+                "target_outputs": [
+                    "terrain/production_import_pilot/3dep_tiles",
+                    "terrain/production_import_pilot/conditioned_heightfield_2017.png",
+                    "terrain/production_import_pilot/heightfield_manifest.json",
+                ],
+                "promotion_gate": "Download tiles, mosaic/clip, review voids and artifacts, hydrologically condition, burn the channel, and compare slope/banks to guide-reviewed rapids.",
+            },
+            {
+                "class_id": "hydrography_and_centerline",
+                "status": "metadata_attached_download_pending",
+                "source_ids": ["usgs_3dhp_nhd"],
+                "target_outputs": [
+                    "hydrography/production_import_pilot/centerline.geojson",
+                    "hydrography/production_import_pilot/banks.geojson",
+                    "hydrography/production_import_pilot/cross_sections.geojson",
+                ],
+                "promotion_gate": "Clip official flowlines, align to imagery and DEM, hand-review banks/rapid stations, and keep OSM only as supplemental access context.",
+            },
+            {
+                "class_id": "aerial_or_satellite_imagery",
+                "status": "pilot_urls_planned",
+                "source_ids": ["usda_naip", "landsat"],
+                "target_outputs": [
+                    "imagery/production_import_pilot/naip_tiles",
+                    "imagery/production_import_pilot/source_drape_4096.png",
+                    "imagery/production_import_pilot/source_drape_manifest.json",
+                ],
+                "promotion_gate": "Attach acquisition year/date, resolution, CRS, attribution, and scene/tile metadata; use Landsat only for seasonal comparison unless resolution is adequate for masks.",
+            },
+            {
+                "class_id": "water_and_vegetation_masks",
+                "status": "requires_new_derivatives_from_pilot_imagery_and_hydrography",
+                "source_ids": ["usda_naip", "usgs_3dhp_nhd", "guide_review"],
+                "target_outputs": [
+                    "imagery/production_import_pilot/water_mask.tif",
+                    "imagery/production_import_pilot/vegetation_mask.tif",
+                    "imagery/production_import_pilot/wet_rock_bank_mask.tif",
+                ],
+                "promotion_gate": "Derive masks from reviewed imagery and hydrography, then manually review water edge, seasonal exposure, vegetation, and hazard visibility.",
+            },
+            {
+                "class_id": "seasonal_flow_or_release_history",
+                "status": "historical_daily_discharge_attached_modern_context_pending",
+                "source_ids": ["usgs_water_services", "noaa_nwps_nwm", "usgs_streamstats"],
+                "target_outputs": [
+                    "hydrology/production_import_pilot/usgs_11445500_instantaneous_discharge.json",
+                    "hydrology/production_import_pilot/usgs_11445500_stage.json",
+                    "hydrology/production_import_pilot/flow_band_review.json",
+                ],
+                "promotion_gate": "Attach modern gauge/release context, stage where available, flow percentiles, and guide review for low/median/high visual variants.",
+            },
+            {
+                "class_id": "protected_area_and_access_context",
+                "status": "planned_review_required",
+                "source_ids": ["official_land_access_review", "guide_review"],
+                "target_outputs": [
+                    "review/production_import_pilot/access_points.geojson",
+                    "review/production_import_pilot/publication_sensitivity.json",
+                ],
+                "promotion_gate": "Review put-ins, take-outs, private/public land, evacuation points, sensitive locations, and what may appear in screenshots or maps.",
+            },
+            {
+                "class_id": "guide_and_reference_media_annotations",
+                "status": "link_seeds_attached_no_media_rights",
+                "source_ids": ["reference_media_link_manifest", "first_party_field_capture", "explicit_guide_or_outfitter_permission"],
+                "target_outputs": [
+                    "review/production_import_pilot/reference_annotations.geojson",
+                    "field_media/production_import_pilot/rights_manifest.json",
+                ],
+                "promotion_gate": "Attach creator/date/reach/flow/weather/permission before using photos or footage for material, texture, or in-game reference.",
+            },
+        ],
+        "unreal_import_targets": {
+            "heightfield_import_contract": "unreal/Content/RaftSim/River/south_fork_heightfield_import_test.json",
+            "preview_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview",
+            "future_production_map": "/Game/RaftSim/Maps/Production/L_SouthForkAmerican_ChiliBar",
+            "review_captures": [
+                "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
+                "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
+            ],
+        },
+        "acceptance_gate": [
+            "All planned pilot downloads have source metadata, checksums, CRS, acquisition dates, and attribution.",
+            "Conditioned heightfield and masks are generated from the pilot tiles and reviewed against hydrography and guide notes.",
+            "Unreal preview map can be regenerated from pilot artifacts with hazards, swimmer rescue targets, and water-readability cues still visible.",
+            "Screenshots look materially closer to the real South Fork corridor without claiming final photoreal approval.",
+        ],
+        "provenance": {
+            "generated_by": "raftsim.real_world.build_south_fork_production_import_pilot",
+            "processing_version": "milestone_26_south_fork_import_pilot.v0",
+            "review_status": "recipe_only_downloads_and_imports_pending",
+        },
+    }
+
+
 def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[str, object]:
     """Build the source_manifest.json payload for a representative section."""
 
@@ -887,6 +1169,13 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 "terrain/3dep_dem_tiles",
                 "terrain/tnm_3dep_dem_products.json",
                 "terrain/usgs_3dep_chili_bar_sample_256.tif",
+                "terrain/usgs_3dep_chili_bar_relief_preview_512.png",
+                "terrain/usgs_3dep_chili_bar_relief_preview_manifest.json",
+                "terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
+                "terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
+                "terrain/usgs_3dep_chili_bar_corridor_heightfield_manifest.json",
+                "terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png",
+                "terrain/usgs_3dep_chili_bar_corridor_relief_preview_manifest.json",
                 COURSE_ELEVATION_EXTRACTION_FILE,
                 "terrain/solver_bed_grid.npy",
             ],
@@ -899,6 +1188,10 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
             "imagery": [
                 "imagery/tnm_naip_products.json",
                 "imagery/usda_naip_chili_bar_sample_512.png",
+                "imagery/usda_naip_chili_bar_corridor_sample_1024.png",
+                "imagery/usda_naip_chili_bar_corridor_water_mask_1024.png",
+                "imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png",
+                "imagery/usda_naip_chili_bar_corridor_masks_manifest.json",
                 "imagery/naip_tiles",
                 "imagery/water_mask.tif",
                 "imagery/foam_texture_mask.tif",
@@ -912,7 +1205,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
             ],
             "field_media": ["field_media/README.md"],
             "solver": ["scenario/scenario.json", "scenario/bed.npy", "scenario/initial_state.npz"],
-            "source_pulls": ["production_source_pull_manifest.json"],
+            "source_pulls": ["production_source_pull_manifest.json", SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE],
             "validation": ["validation_matrix.json"],
             "unreal": ["unreal/corridor_package_manifest.json"],
         },
@@ -1721,6 +2014,7 @@ def write_real_world_seed_package(directory: str | Path) -> Path:
     _write_json(data_dir / "rapid_candidates.geojson", _rapid_candidates_geojson(package.rapid_candidates, package.indicators))
     _write_json(data_dir / RAPID_REVIEW_EDITOR_WORKFLOW_FILE, build_rapid_review_editor_workflow(package).to_json_dict())
     _write_json(data_dir / "corridor_package_manifest.json", _corridor_manifest(package))
+    _write_json(data_dir / SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE, build_south_fork_production_import_pilot(package.section))
     generate_real_world_scenario2_5d().write_package(scenario_dir)
     cascading_dir = data_dir / "cascading_scenarios"
     for cascading_package in generate_south_fork_american_cascading_seed_scenarios():
