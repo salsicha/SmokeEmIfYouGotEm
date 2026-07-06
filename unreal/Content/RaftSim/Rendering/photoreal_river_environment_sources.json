@@ -311,12 +311,28 @@
       ],
       "source_sample_artifacts": [
         {
+          "artifact_id": "nasa_gibs_pacuare_truecolor_2025_04_02_1024",
+          "category": "satellite_imagery_sample",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
+          "provider": "NASA GIBS WMS",
+          "status": "larger_active_preview_input_recorded",
+          "unreal_use": "active upstream imagery input for the 1024px Pacuare NASA-plus-DEM source drape; preview-only because MODIS true-color is coarse and partly cloudy"
+        },
+        {
           "artifact_id": "pacuare_nasa_gibs_demshade_source_drape_2025_04_02",
           "category": "derived_preview_drape",
           "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
           "provider": "RaftSim source-preview tool from NASA GIBS WMS and Copernicus DEM GLO-30 inputs",
+          "status": "retained_preview_provenance_superseded_by_1024_active_drape",
+          "unreal_use": "retained 512px source-derived Pacuare drape; active Unreal preview now uses pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024"
+        },
+        {
+          "artifact_id": "pacuare_nasa_gibs_demshade_source_drape_2025_04_02_1024",
+          "category": "derived_preview_drape",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png",
+          "provider": "RaftSim source-preview tool from NASA GIBS WMS and Copernicus DEM GLO-30 inputs",
           "status": "draped_into_unreal_preview_terrain_conforming_mosaic",
-          "unreal_use": "source-derived denser terrain-conforming rainforest drape mosaic with DEM relief and cloud-gap preview fill for /Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
+          "unreal_use": "active 1024px source-derived terrain-conforming rainforest drape mosaic with DEM relief and cloud-gap preview fill for /Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
         },
         {
           "artifact_id": "copernicus_dem_glo30_pacuare_bounds_tiles",
@@ -331,8 +347,16 @@
           "category": "derived_terrain_relief",
           "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_512.png",
           "provider": "RaftSim source-preview tool from Copernicus DEM GLO-30 inputs",
+          "status": "retained_preview_provenance_superseded_by_1024_active_relief",
+          "unreal_use": "retained 512px preview terrain relief; active Unreal preview geometry now uses pacuare_dem_relief_preview_1024"
+        },
+        {
+          "artifact_id": "pacuare_dem_relief_preview_1024",
+          "category": "derived_terrain_relief",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_1024.png",
+          "provider": "RaftSim source-preview tool from Copernicus DEM GLO-30 inputs",
           "status": "sampled_by_unreal_preview_geometry",
-          "unreal_use": "preview-only terrain relief perturbation for Pacuare bank and gorge geometry; full Unreal heightfield import still pending"
+          "unreal_use": "active 1024px preview-only terrain relief perturbation for Pacuare bank and gorge geometry; full Unreal heightfield import still pending"
         }
       ],
       "reference_media_sources": [
@@ -369,5 +393,5 @@
       "desktop_and_vr_performance_captures"
     ]
   },
-  "status": "south_fork_and_colorado_larger_corridor_samples_plus_pacuare_source_draped_previews_available; production_geospatial_imports_and_photoreal_assets_pending"
+  "status": "south_fork_colorado_and_pacuare_larger_source_draped_previews_available; production_geospatial_imports_and_photoreal_assets_pending"
 }
