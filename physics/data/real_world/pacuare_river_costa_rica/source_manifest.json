@@ -33,6 +33,9 @@
       "imagery/canopy_and_water_masks.tif",
       "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
       "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png",
+      "imagery/pacuare_nasa_gibs_2025-04-02_water_mask_1024.png",
+      "imagery/pacuare_nasa_gibs_2025-04-02_vegetation_mask_1024.png",
+      "imagery/pacuare_nasa_gibs_2025-04-02_masks_manifest.json",
       "imagery/pacuare_source_drape_composite_manifest.json",
       "imagery/pacuare_source_drape_composite_manifest_1024.json",
       "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
@@ -113,6 +116,15 @@
       "source_id": "pacuare_nasa_gibs_demshade_composite",
       "status": "generated_preview_only",
       "target_artifact": "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png; imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png",
+      "url": "physics/src/raftsim/geospatial_preview.py"
+    },
+    {
+      "category": "derived_source_masks",
+      "fetch_id": "pacuare_nasa_gibs_demshade_masks",
+      "notes": "Review-gated preview water and vegetation masks generated from the active 1024px NASA GIBS/Copernicus source drape plus a bounded generated rainfed-runnable channel prior. These masks are sampled by Unreal preview terrain/drape coloring but are not final segmentation, bank polygons, or production masks.",
+      "source_id": "pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024",
+      "status": "generated_review_gated_preview_masks",
+      "target_artifact": "imagery/pacuare_nasa_gibs_2025-04-02_water_mask_1024.png; imagery/pacuare_nasa_gibs_2025-04-02_vegetation_mask_1024.png; imagery/pacuare_nasa_gibs_2025-04-02_masks_manifest.json",
       "url": "physics/src/raftsim/geospatial_preview.py"
     },
     {

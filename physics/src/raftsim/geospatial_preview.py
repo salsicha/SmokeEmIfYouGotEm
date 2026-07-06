@@ -89,6 +89,119 @@ def _manifest_path(path: Path, repo_root: Path | None) -> str:
     return str(path.resolve().relative_to(repo_root.resolve()))
 
 
+def _smoothstep(edge0: np.ndarray | float, edge1: np.ndarray | float, value: np.ndarray) -> np.ndarray:
+    t = np.clip((value - edge0) / np.maximum(1.0e-6, np.asarray(edge1) - np.asarray(edge0)), 0.0, 1.0)
+    return t * t * (3.0 - 2.0 * t)
+
+
+def _preview_channel_prior(
+    output_size_px: int,
+    river_half_width_cm: float,
+    bend_amplitude_cm: float,
+    corridor_half_width_cm: float,
+) -> np.ndarray:
+    min_x = -5600.0
+    max_x = 26000.0
+    xs = np.linspace(min_x, max_x, output_size_px, dtype=np.float32)
+    ys = np.linspace(-corridor_half_width_cm, corridor_half_width_cm, output_size_px, dtype=np.float32)
+    x, y = np.meshgrid(xs, ys)
+
+    primary = np.sin((x + 3800.0) * 0.00043) * bend_amplitude_cm
+    secondary = np.sin((x - 600.0) * 0.00019) * bend_amplitude_cm * 0.35
+    center_y = primary + secondary
+    offset = np.abs(y - center_y)
+    return 1.0 - _smoothstep(river_half_width_cm * 0.82, river_half_width_cm + 260.0, offset)
+
+
+def build_source_imagery_masks(
+    source_image_path: Path,
+    output_water_mask_path: Path,
+    output_vegetation_mask_path: Path,
+    output_manifest_path: Path,
+    source_id: str,
+    provider: str,
+    source_description: str,
+    repo_root: Path | None = None,
+    output_size_px: int = 1024,
+    preview_river_half_width_cm: float = 340.0,
+    preview_bend_amplitude_cm: float = 300.0,
+    preview_corridor_half_width_cm: float = 2750.0,
+) -> None:
+    """Build review-gated source-assisted water and vegetation masks for Unreal preview dressing."""
+
+    with Image.open(source_image_path) as image:
+        source = image.convert("RGBA").resize((output_size_px, output_size_px), Image.Resampling.BILINEAR)
+    rgba = np.asarray(source, dtype=np.float32) / 255.0
+    rgb = rgba[..., :3]
+    alpha = rgba[..., 3]
+    red = rgb[..., 0]
+    green = rgb[..., 1]
+    blue = rgb[..., 2]
+    brightness = rgb.mean(axis=2)
+    channel_range = rgb.max(axis=2) - rgb.min(axis=2)
+
+    cloud_or_snow = (brightness > 0.78) & (channel_range < 0.12)
+    excess_green = np.clip(2.0 * green - red - blue, 0.0, 1.0)
+    green_dominance = np.clip(green - np.maximum(red, blue), 0.0, 1.0)
+    vegetation = np.clip(excess_green * 1.85 + green_dominance * 2.20 + (green - brightness) * 1.10, 0.0, 1.0)
+
+    blue_green = np.clip((blue + green) * 0.5 - red, 0.0, 1.0)
+    muted_smooth = np.clip(0.42 - channel_range, 0.0, 1.0) * np.clip(0.70 - brightness, 0.0, 1.0)
+    color_water = np.clip(blue_green * 2.00 + muted_smooth * 1.35, 0.0, 1.0)
+    channel_prior = _preview_channel_prior(
+        output_size_px,
+        preview_river_half_width_cm,
+        preview_bend_amplitude_cm,
+        preview_corridor_half_width_cm,
+    )
+
+    water = np.clip(np.maximum(color_water, channel_prior * 0.78) * alpha, 0.0, 1.0)
+    vegetation = np.clip(vegetation * (1.0 - channel_prior * 0.82) * alpha, 0.0, 1.0)
+    water = np.where(cloud_or_snow, channel_prior * 0.50, water)
+    vegetation = np.where(cloud_or_snow, vegetation * 0.35, vegetation)
+
+    output_water_mask_path.parent.mkdir(parents=True, exist_ok=True)
+    Image.fromarray(np.clip(water * 255.0, 0, 255).astype(np.uint8), mode="L").save(output_water_mask_path)
+    Image.fromarray(np.clip(vegetation * 255.0, 0, 255).astype(np.uint8), mode="L").save(output_vegetation_mask_path)
+
+    manifest = {
+        "schema": "raftsim.source_imagery_masks.v1",
+        "status": "generated_review_gated_preview_masks_not_final_segmentation",
+        "source_id": source_id,
+        "provider": provider,
+        "source_description": source_description,
+        "input_image": _manifest_path(source_image_path, repo_root),
+        "outputs": {
+            "water_mask": _manifest_path(output_water_mask_path, repo_root),
+            "vegetation_mask": _manifest_path(output_vegetation_mask_path, repo_root),
+        },
+        "processing": {
+            "output_size_px": output_size_px,
+            "water_features": [
+                "visible_color_blue_green_or_muted_smooth_water_likelihood",
+                "bounded_preview_channel_prior_matching_generated_unreal_preview_geometry",
+            ],
+            "vegetation_features": [
+                "visible_green_excess",
+                "green_channel_dominance",
+                "channel_prior_suppression",
+            ],
+            "cloud_or_snow_filter": "brightness > 0.78 and channel range < 0.12 reduces mask confidence",
+            "coverage": {
+                "water_mean": float(np.mean(water)),
+                "vegetation_mean": float(np.mean(vegetation)),
+                "cloud_or_snow_fraction": float(np.mean(cloud_or_snow)),
+            },
+        },
+        "caveats": [
+            "Masks are deterministic source-assisted preview inputs, not production water or vegetation segmentation.",
+            "The water mask uses a bounded preview channel prior so the generated Unreal review map can consume the mask before final hydrography and hand-reviewed bank polygons are available.",
+            "Production masks still require reviewed orthomosaics or satellite scenes, hydrography/bank alignment, cloud/shadow review, and guide/geospatial approval.",
+        ],
+    }
+    output_manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
 def build_dem_relief_preview(
     dem_path: Path,
     output_relief_png_path: Path,
@@ -358,6 +471,20 @@ def main() -> None:
         source_description="South Fork American Chili Bar corridor ImageServer export sample; not a complete conditioned corridor DEM.",
         repo_root=repo_root,
     )
+    build_source_imagery_masks(
+        source_image_path=south_fork_root / "imagery/usda_naip_chili_bar_corridor_sample_1024.png",
+        output_water_mask_path=south_fork_root / "imagery/usda_naip_chili_bar_corridor_water_mask_1024.png",
+        output_vegetation_mask_path=south_fork_root / "imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png",
+        output_manifest_path=south_fork_root / "imagery/usda_naip_chili_bar_corridor_masks_manifest.json",
+        source_id="usda_naip_chili_bar_corridor_sample_1024",
+        provider="USDA/APFO NAIP ImageServer",
+        source_description="South Fork American active 1024px NAIP preview drape sample with generated preview-channel prior.",
+        repo_root=repo_root,
+        output_size_px=1024,
+        preview_river_half_width_cm=335.0,
+        preview_bend_amplitude_cm=290.0,
+        preview_corridor_half_width_cm=2750.0,
+    )
     build_dem_relief_preview(
         dem_path=colorado_root / "terrain/usgs_3dep_lees_ferry_sample_256.tif",
         output_relief_png_path=colorado_root / "terrain/usgs_3dep_lees_ferry_relief_preview_512.png",
@@ -383,6 +510,20 @@ def main() -> None:
         provider="USGS 3D Elevation Program ImageServer",
         source_description="Colorado River Lees Ferry corridor ImageServer export sample; not a complete conditioned Grand Canyon corridor DEM.",
         repo_root=repo_root,
+    )
+    build_source_imagery_masks(
+        source_image_path=colorado_root / "imagery/usda_naip_lees_ferry_corridor_sample_1024.png",
+        output_water_mask_path=colorado_root / "imagery/usda_naip_lees_ferry_corridor_water_mask_1024.png",
+        output_vegetation_mask_path=colorado_root / "imagery/usda_naip_lees_ferry_corridor_vegetation_mask_1024.png",
+        output_manifest_path=colorado_root / "imagery/usda_naip_lees_ferry_corridor_masks_manifest.json",
+        source_id="usda_naip_lees_ferry_corridor_sample_1024",
+        provider="USDA/APFO NAIP ImageServer",
+        source_description="Colorado River Lees Ferry active 1024px NAIP preview drape sample with generated big-water preview-channel prior.",
+        repo_root=repo_root,
+        output_size_px=1024,
+        preview_river_half_width_cm=520.0 * 1.08,
+        preview_bend_amplitude_cm=360.0,
+        preview_corridor_half_width_cm=4300.0,
     )
     build_pacuare_demshade_drape(
         nasa_truecolor_path=pacuare_root / "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
@@ -415,6 +556,20 @@ def main() -> None:
         bounds=BoundsWgs84(min_lon=-83.75, min_lat=9.72, max_lon=-83.42, max_lat=10.12),
         repo_root=repo_root,
         output_size_px=1009,
+    )
+    build_source_imagery_masks(
+        source_image_path=pacuare_root / "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png",
+        output_water_mask_path=pacuare_root / "imagery/pacuare_nasa_gibs_2025-04-02_water_mask_1024.png",
+        output_vegetation_mask_path=pacuare_root / "imagery/pacuare_nasa_gibs_2025-04-02_vegetation_mask_1024.png",
+        output_manifest_path=pacuare_root / "imagery/pacuare_nasa_gibs_2025-04-02_masks_manifest.json",
+        source_id="pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024",
+        provider="NASA GIBS MODIS/Terra true-color plus Copernicus DEM-derived source drape",
+        source_description="Pacuare active 1024px NASA GIBS/Copernicus preview drape with generated rainfed-runnable preview-channel prior.",
+        repo_root=repo_root,
+        output_size_px=1024,
+        preview_river_half_width_cm=305.0 * 1.05,
+        preview_bend_amplitude_cm=340.0,
+        preview_corridor_half_width_cm=2750.0,
     )
 
 

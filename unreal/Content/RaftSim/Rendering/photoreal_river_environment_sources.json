@@ -147,6 +147,14 @@
           "unreal_use": "larger source-derived terrain-conforming drape mosaic for /Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview"
         },
         {
+          "artifact_id": "usda_naip_chili_bar_corridor_source_masks_1024",
+          "category": "derived_water_and_vegetation_masks",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_water_mask_1024.png; physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png",
+          "provider": "RaftSim geospatial preview utility from USDA/APFO NAIP ImageServer sample plus bounded preview channel prior",
+          "status": "sampled_by_unreal_preview_terrain_and_drape_coloring",
+          "unreal_use": "review-gated preview water/vegetation masks sampled into South Fork terrain and source-drape color variation; not final segmentation or production masks"
+        },
+        {
           "artifact_id": "usgs_3dep_chili_bar_sample_256",
           "category": "terrain_sample",
           "path": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_sample_256.tif",
@@ -237,6 +245,14 @@
           "provider": "USDA/APFO NAIP ImageServer",
           "status": "draped_into_unreal_preview_terrain_conforming_mosaic",
           "unreal_use": "larger source-derived terrain-conforming canyon drape mosaic for /Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"
+        },
+        {
+          "artifact_id": "usda_naip_lees_ferry_corridor_source_masks_1024",
+          "category": "derived_water_and_vegetation_masks",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_water_mask_1024.png; physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_vegetation_mask_1024.png",
+          "provider": "RaftSim geospatial preview utility from USDA/APFO NAIP ImageServer sample plus bounded big-water preview channel prior",
+          "status": "sampled_by_unreal_preview_terrain_and_drape_coloring",
+          "unreal_use": "review-gated preview water/vegetation masks sampled into Colorado terrain and source-drape color variation; not final segmentation or production masks"
         },
         {
           "artifact_id": "usgs_3dep_lees_ferry_sample_256",
@@ -352,6 +368,14 @@
           "unreal_use": "active 1024px source-derived terrain-conforming rainforest drape mosaic with DEM relief and cloud-gap preview fill for /Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
         },
         {
+          "artifact_id": "pacuare_nasa_gibs_demshade_source_masks_1024",
+          "category": "derived_water_and_vegetation_masks",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_water_mask_1024.png; physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_vegetation_mask_1024.png",
+          "provider": "RaftSim source-preview tool from NASA GIBS/Copernicus source drape plus bounded rainfed-runnable preview channel prior",
+          "status": "sampled_by_unreal_preview_terrain_and_drape_coloring",
+          "unreal_use": "review-gated preview water/vegetation masks sampled into Pacuare terrain and source-drape color variation; not final segmentation or production masks"
+        },
+        {
           "artifact_id": "copernicus_dem_glo30_pacuare_bounds_tiles",
           "category": "terrain_sample",
           "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif",
@@ -405,6 +429,7 @@
       "one_downstream_guide_seat_and_one_raft_hidden_river_eye_screenshot_per_river",
       "source_manifest_and_rights_status_visible_in_capture_manifest",
       "review_gated_heightfield_candidate_sampling_visible_in_capture_manifest",
+      "review_gated_source_water_and_vegetation_masks_sampled_by_preview_rendering",
       "first_party_procedural_strata_leaf_litter_wet_rock_and_talus_detail_recorded",
       "first_party_procedural_vertex_color_water_gradients_recorded",
       "source_backed_flow_band_visual_parameters_recorded",
