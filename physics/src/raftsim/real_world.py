@@ -111,6 +111,7 @@ PACUARE_SNIT_OGC_CATALOG_FILE = "hydrography/production_import_pilot/snit_ogc_se
 PACUARE_SNIT_CONFIG_FILE = "hydrography/production_import_pilot/snit_config_ssnit.js"
 PACUARE_SNIT_LAYER_LIST_SCRIPT_FILE = "hydrography/production_import_pilot/snit_ico_servicios_ogc_lista_capas.js"
 PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE = "hydrography/production_import_pilot/snit_layer_catalog_summary.json"
+PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE = "hydrography/production_import_pilot/snit_layer_metadata_summary.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE = "production_import_pilot_derivatives_manifest.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
@@ -1593,11 +1594,12 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_SNIT_CONFIG_FILE,
                     PACUARE_SNIT_LAYER_LIST_SCRIPT_FILE,
                     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
+                    PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
                 ],
                 "limits": (
                     "Records official Costa Rica service catalogs, archived Direccion de Agua WMS capabilities metadata, "
-                    "archived SNIT node layer-list metadata, candidate layer names, and review gates only; no "
-                    "SNIT/Direccion de Agua/SINIGIRH features are "
+                    "archived SNIT node layer-list metadata, selected per-layer SNIT metadata JSON, candidate layer "
+                    "names, terms status, CRS leads, and review gates only; no SNIT/Direccion de Agua/SINIGIRH features are "
                     "downloaded, clipped, or promoted by this plan."
                 ),
             },
@@ -1627,6 +1629,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
                     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
+                    PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
                     PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
@@ -1680,6 +1683,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
                     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
+                    PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
                     "hydrology/production_import_pilot/rainfall_station_review.json",
                     "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
                     "hydrology/production_import_pilot/flash_response_review.json",
@@ -1698,6 +1702,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                 "target_outputs": [
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
+                    PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
                     "review/production_import_pilot/protected_area_publication_sensitivity.json",
                     "review/production_import_pilot/access_and_conservation_policy.json",
                 ],
@@ -2103,6 +2108,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
                     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
+                    PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
                     PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
@@ -2118,6 +2124,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                             PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
                             PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
+                            PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
                             PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
                             PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
                             PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
@@ -2144,6 +2151,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                             PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
                             PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
+                            PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
                             "hydrology/production_import_pilot/rainfall_station_review.json",
                             "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
                             "hydrology/production_import_pilot/flash_response_review.json",
@@ -2156,6 +2164,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                         "required_artifacts": [
                             PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                             PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
+                            PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
                             "review/production_import_pilot/protected_area_publication_sensitivity.json",
                             "review/production_import_pilot/access_and_conservation_policy.json",
                         ],

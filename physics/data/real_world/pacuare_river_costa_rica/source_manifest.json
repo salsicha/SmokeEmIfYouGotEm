@@ -23,6 +23,7 @@
       "hydrography/production_import_pilot/official_source_access_plan.json",
       "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
       "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+      "hydrography/production_import_pilot/snit_layer_metadata_summary.json",
       "flow_presets.json"
     ],
     "guide_references": [
@@ -40,6 +41,7 @@
       "hydrography/production_import_pilot/snit_config_ssnit.js",
       "hydrography/production_import_pilot/snit_ico_servicios_ogc_lista_capas.js",
       "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+      "hydrography/production_import_pilot/snit_layer_metadata_summary.json",
       "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json",
       "hydrography/production_import_pilot/preview_centerline_scaffold.geojson",
       "hydrography/production_import_pilot/preview_stationing_scaffold.json"
@@ -69,7 +71,8 @@
     "protected_area_review": [
       "review/sinac_protected_area_source_rights.json",
       "review/access_and_conservation_constraints.json",
-      "hydrography/production_import_pilot/snit_layer_catalog_summary.json"
+      "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+      "hydrography/production_import_pilot/snit_layer_metadata_summary.json"
     ],
     "source_pulls": [
       "production_source_pull_manifest.json",
@@ -235,10 +238,10 @@
     {
       "category": "official_source_access_plan",
       "fetch_id": "pacuare_official_source_access_plan",
-      "notes": "Records official Costa Rica source catalogs plus archived Direccion de Agua/SINIGIRH WMS capabilities metadata and SNIT node layer-list metadata for Pacuare hydrography, hydrology, protected-area, rainfall, and access review. No features are downloaded or promoted; exact service/layer terms, attributes, Pacuare intersection, and guide review remain required before import.",
+      "notes": "Records official Costa Rica source catalogs plus archived Direccion de Agua/SINIGIRH WMS capabilities metadata, SNIT node layer-list metadata, and selected per-layer SNIT metadata for Pacuare hydrography, hydrology, protected-area, rainfall, and access review. No features are downloaded or promoted; exact service/layer terms, attributes, Pacuare intersection, and guide review remain required before import.",
       "source_id": "pacuare_official_source_access_plan",
-      "status": "official_service_catalogs_wms_capabilities_and_snit_layer_lists_archived_no_feature_download",
-      "target_artifact": "hydrography/production_import_pilot/official_source_access_plan.json; hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_getcapabilities.xml; hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json; hydrography/production_import_pilot/snit_ogc_services_catalog.html; hydrography/production_import_pilot/snit_config_ssnit.js; hydrography/production_import_pilot/snit_ico_servicios_ogc_lista_capas.js; hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+      "status": "official_service_catalogs_wms_capabilities_snit_layer_lists_and_layer_metadata_archived_no_feature_download",
+      "target_artifact": "hydrography/production_import_pilot/official_source_access_plan.json; hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_getcapabilities.xml; hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json; hydrography/production_import_pilot/snit_ogc_services_catalog.html; hydrography/production_import_pilot/snit_config_ssnit.js; hydrography/production_import_pilot/snit_ico_servicios_ogc_lista_capas.js; hydrography/production_import_pilot/snit_layer_catalog_summary.json; hydrography/production_import_pilot/snit_layer_metadata_summary.json",
       "url": "https://www.snitcr.go.cr/ico_servicios_ogc; https://mapas.da.go.cr/geoservicios.php"
     }
   ],
