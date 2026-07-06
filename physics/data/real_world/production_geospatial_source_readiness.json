@@ -354,10 +354,12 @@
             "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_water_mask_1024.png",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_vegetation_mask_1024.png",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/water_mask_2048.png",
-            "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/vegetation_mask_2048.png"
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/vegetation_mask_2048.png",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png"
           ],
-          "promotion_blocker": "Masks are deterministic preview derivatives from source imagery and a bounded big-water channel prior; they require full-corridor water edge, sandbar, wet-rock, tamarisk/cottonwood/scrub classes, release-band variants, and guide/oarsman approval.",
-          "status": "preview_masks_and_pilot_stitched_masks_attached"
+          "promotion_blocker": "Preview water/vegetation masks and an NHD-aligned water prior are attached, but the prior agrees with stationing by construction and is not visible-water segmentation. Release-aware sandbar, wet-bank, side-channel, shadow/cloud, and oarsman-reviewed mask classes remain required before production use.",
+          "status": "nhd_water_prior_attached_release_sandbar_masks_pending"
         }
       },
       "production_import_pilot": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_import_pilot.json",

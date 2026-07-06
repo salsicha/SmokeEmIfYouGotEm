@@ -446,12 +446,49 @@
         "Out-of-bounds stations and seed lines reflect the current Lees Ferry pilot bbox and full-feature NHD candidate extent.",
         "River-mile stationing, accepted banks, sandbars, eddies, release-aware wet-bank classes, and oarsman/geospatial review remain required."
       ]
+    },
+    {
+      "artifact_id": "colorado_nhd_hu8_lees_ferry_water_prior",
+      "category": "derived_imagery_mask_prior",
+      "path": "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json",
+      "related_artifacts": [
+        "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png",
+        "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+        "imagery/production_import_pilot/water_mask_2048.png"
+      ],
+      "provider": "RaftSim preview mask-prior utility from Colorado NHD stationing",
+      "url": "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json",
+      "status": "generated_review_gated_alignment_prior_not_segmentation_truth",
+      "summary": {
+        "output_size_px": [
+          2048,
+          2048
+        ],
+        "line_width_px": 36,
+        "gaussian_blur_radius_px": 8,
+        "station_sample_count": 244,
+        "station_samples_outside_bbox": 25,
+        "nonzero_pixel_fraction": 0.076495,
+        "ge_128_pixel_fraction": 0.03533,
+        "water_prior_sha256": "c7cf5be58214c53a0b04aada52cd98faa96c8e3f7b670bb562bdebf6ff5d7936"
+      },
+      "use": [
+        "editor_water_prior_overlay",
+        "future_mask_generation_prior",
+        "water_edge_alignment_review_input",
+        "sandbar_and_release_wet_bank_review_input"
+      ],
+      "caveats": [
+        "The prior is drawn from the NHD mainstem candidate, so it agrees with stationing by construction.",
+        "It does not identify visible water, shelves, side channels, islands, sandbars, eddies, boils, holes, or release-dependent wetted width.",
+        "Do not replace source-derived water masks, reviewed banks, or solver cross sections with this prior."
+      ]
     }
   ],
   "production_blockers": [
     "Full canyon DEM/lidar tiles are not downloaded or conditioned yet.",
     "Full canyon aerial/satellite imagery and water/vegetation/rock masks are not downloaded yet.",
-    "A stitched Lees Ferry NHD HU8 source overlay, exact-graph Colorado mainstem candidate, preview metric stationing, and fixed-width cross-section seeds are attached, but river-mile stationing, accepted banks, sandbars, eddies, and rapid annotations are not clipped into a reviewed corridor workspace yet.",
+    "A stitched Lees Ferry NHD HU8 source overlay, exact-graph Colorado mainstem candidate, preview metric stationing, fixed-width cross-section seeds, preview alignment diagnostic, and NHD-aligned water prior are attached, but river-mile stationing, accepted banks, sandbars, eddies, release-aware wet-bank classes, and rapid annotations are not clipped into a reviewed corridor workspace yet.",
     "USBR Glen Canyon daily total-release context is attached, but unit/terms confirmation, hourly/subdaily release patterns, release-band review, and guide/oarsman review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet."
   ]

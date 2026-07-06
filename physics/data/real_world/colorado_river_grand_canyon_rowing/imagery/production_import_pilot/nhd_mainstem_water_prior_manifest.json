@@ -1,0 +1,41 @@
+{
+  "caveats": [
+    "This prior is drawn from the NHD mainstem candidate, so it will agree with stationing by construction.",
+    "It does not identify actual visible water, shelves, side channels, islands, sandbars, eddies, boils, holes, or release-dependent wetted width.",
+    "The current pilot bbox clips the upstream and downstream station samples because the NHD source extract preserved whole features near and beyond the bbox edge."
+  ],
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "existing_water_mask_for_grid_reference": "imagery/production_import_pilot/water_mask_2048.png",
+    "production_import_pilot_bounds": "production_import_pilot.json#bounds_wgs84",
+    "stationing_candidate": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json"
+  },
+  "output": "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png",
+  "processing": {
+    "outside_bbox_policy": "draw_in_bounds_station_polyline_and_clip_to_image_bounds",
+    "gaussian_blur_radius_px": 8,
+    "line_width_px": 36,
+    "lon_lat_to_pixel": "linear_wgs84_bbox_preview_mapping_north_up",
+    "output_size_px": [
+      2048,
+      2048
+    ],
+    "station_sample_count": 244,
+    "station_samples_outside_bbox": 25
+  },
+  "promotion_gates": [
+    "Use only as an editor overlay or mask-generation prior until reviewed river-mile stationing, banks, sandbars, and orthomosaic masks exist.",
+    "Do not replace the source-derived water mask or accept Colorado geometry from this prior alone.",
+    "Compare against NAIP, DEM relief, NHD waterbodies, Reclamation release context, NPS/GCMRC river-mile references, sandbars, and oarsman notes before deriving production wetted width."
+  ],
+  "river_id": "colorado_river",
+  "schema": "raftsim.nhd_mainstem_water_prior_manifest.v0",
+  "section_id": "lees_ferry_pilot_slice",
+  "status": "generated_review_gated_alignment_prior_not_segmentation_truth",
+  "summary": {
+    "ge_128_pixel_fraction": 0.03533,
+    "mean_value": 0.035321,
+    "nonzero_pixel_fraction": 0.076495,
+    "sha256": "c7cf5be58214c53a0b04aada52cd98faa96c8e3f7b670bb562bdebf6ff5d7936"
+  }
+}

@@ -15,6 +15,8 @@ from raftsim.real_world import (
     COLORADO_NHD_MAINSTEM_CANDIDATE_FILE,
     COLORADO_NHD_MAINSTEM_MANIFEST_FILE,
     COLORADO_NHD_MAINSTEM_STATIONING_FILE,
+    COLORADO_NHD_WATER_PRIOR_FILE,
+    COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE,
     COLORADO_PRODUCTION_IMPORT_PILOT_FILE,
     COLORADO_USBR_RELEASE_CONTEXT_FILE,
     COLORADO_USBR_TOTAL_RELEASE_FILE,
@@ -322,6 +324,9 @@ def test_colorado_production_import_pilot_exposes_lees_ferry_tile_plan_and_revie
     )
     assert COLORADO_USBR_TOTAL_RELEASE_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
+    assert classes["water_and_vegetation_masks"]["status"] == "nhd_water_prior_attached_release_sandbar_masks_pending"
+    assert COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE in classes["water_and_vegetation_masks"]["target_outputs"]
+    assert COLORADO_NHD_WATER_PRIOR_FILE in classes["water_and_vegetation_masks"]["target_outputs"]
     assert "sandbar_wet_bank_mask_2048.png" in " ".join(classes["water_and_vegetation_masks"]["target_outputs"])
     assert (
         pilot["unreal_import_targets"]["future_production_map"]
@@ -505,6 +510,28 @@ def test_colorado_nhd_alignment_diagnostic_samples_preview_masks_without_accepta
     assert diagnostic["sampling"]["note"].endswith("high agreement is not production acceptance.")
 
 
+def test_colorado_nhd_water_prior_is_editor_mask_aid_not_segmentation_truth():
+    colorado_dir = REAL_WORLD_DATA_DIR / "colorado_river_grand_canyon_rowing"
+    source_manifest = json.loads((colorado_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((colorado_dir / "production_source_pull_manifest.json").read_text())
+    manifest = json.loads((colorado_dir / COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE).read_text())
+
+    assert COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE in source_manifest["artifacts"]["imagery"]
+    assert COLORADO_NHD_WATER_PRIOR_FILE in source_manifest["artifacts"]["imagery"]
+    assert any(
+        artifact["artifact_id"] == "colorado_nhd_hu8_lees_ferry_water_prior"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert (colorado_dir / COLORADO_NHD_WATER_PRIOR_FILE).is_file()
+    assert manifest["status"] == "generated_review_gated_alignment_prior_not_segmentation_truth"
+    assert manifest["processing"]["station_sample_count"] == 244
+    assert manifest["processing"]["station_samples_outside_bbox"] == 25
+    assert manifest["processing"]["line_width_px"] == 36
+    assert manifest["processing"]["gaussian_blur_radius_px"] == 8
+    assert manifest["summary"]["nonzero_pixel_fraction"] == 0.076495
+    assert manifest["summary"]["sha256"] == "c7cf5be58214c53a0b04aada52cd98faa96c8e3f7b670bb562bdebf6ff5d7936"
+
+
 def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_gates():
     pilot = build_pacuare_production_import_pilot()
     classes = {entry["class_id"]: entry for entry in pilot["required_source_classes"]}
@@ -615,6 +642,8 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     )
     assert "USGS 11445500" in rivers["american_south_fork"]["procedural_generation_allowlist"][2]
     assert "release-band" in rivers["colorado_river"]["procedural_generation_allowlist"][2]
+    assert COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_NHD_WATER_PRIOR_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_NHD_HU8_MANIFEST_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_NHD_HU8_FLOWLINE_EXTRACT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_NHD_HU8_SUPPORT_EXTRACT_FILE in rivers["colorado_river"]["attached_preview_inputs"]

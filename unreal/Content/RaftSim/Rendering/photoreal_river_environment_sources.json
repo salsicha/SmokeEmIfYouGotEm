@@ -306,6 +306,14 @@
           "unreal_use": "larger review-gated Colorado pilot water/vegetation masks sampled into terrain/source-drape color and deterministic detail placement; not final segmentation, bank polygons, wet-rock masks, or release-band variants"
         },
         {
+          "artifact_id": "colorado_nhd_hu8_lees_ferry_water_prior",
+          "category": "derived_water_mask_prior",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json; physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png",
+          "provider": "RaftSim preview mask-prior utility from Colorado NHD stationing",
+          "status": "attached_review_gated_not_visible_water_segmentation",
+          "unreal_use": "editor overlay and future mask-generation prior for water-edge, sandbar, release wet-bank, and oarsman review; not accepted visible-water segmentation or wetted width"
+        },
+        {
           "artifact_id": "colorado_nhd_hu8_lees_ferry_bbox_extract",
           "category": "hydrography_source_overlay",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json; physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson; physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson",
