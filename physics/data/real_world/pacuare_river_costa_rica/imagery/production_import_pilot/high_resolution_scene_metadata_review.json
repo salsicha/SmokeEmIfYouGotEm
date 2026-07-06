@@ -1,0 +1,458 @@
+{
+  "bounds_wgs84": {
+    "max_lat": 10.12,
+    "max_lon": -83.42,
+    "min_lat": 9.72,
+    "min_lon": -83.75
+  },
+  "catalog_requests": [
+    {
+      "byte_count": 1196112,
+      "content_type": "application/geo+json; charset=utf-8",
+      "feature_count": 50,
+      "notes": "Default STAC page returned 50 Landsat Collection 2 Level-2 Surface Reflectance candidates; use pagination for a complete yearly inventory.",
+      "provider": "USGS LandsatLook STAC",
+      "raw_payload_committed": false,
+      "request_id": "usgs_landsatlook_c2l2_sr_2025_page",
+      "result_date_max": "2025-12-27T15:48:28.892939Z",
+      "result_date_min": "2025-06-17T15:54:01.373180Z",
+      "sha256": "2c720146e8baff416860c1dfa88e3afacec9f51f4b6e207133203fdbe6794c9e",
+      "status_code": 200,
+      "url": "https://landsatlook.usgs.gov/stac-server/collections/landsat-c2l2-sr/items?bbox=-83.75,9.72,-83.42,10.12&datetime=2025-01-01T00:00:00Z/2025-12-31T23:59:59Z&limit=50"
+    },
+    {
+      "byte_count": 72040,
+      "content_type": "application/geo+json; charset=utf-8",
+      "feature_count": 3,
+      "notes": "Cloud-cover filtered query returned three sub-20-percent Landsat candidates for the draft Pacuare bounds.",
+      "provider": "USGS LandsatLook STAC",
+      "raw_payload_committed": false,
+      "request_id": "usgs_landsatlook_c2l2_sr_2025_cloud_lt_20",
+      "sha256": "4db5e9fc8323464e647b33b73f36bde383fbc14f77c032bcb9b611232728b14f",
+      "status_code": 200,
+      "url": "https://landsatlook.usgs.gov/stac-server/collections/landsat-c2l2-sr/items?bbox=-83.75,9.72,-83.42,10.12&datetime=2025-01-01T00:00:00Z/2025-12-31T23:59:59Z&limit=50&query=%7B%22eo%3Acloud_cover%22%3A%7B%22lt%22%3A20%7D%7D"
+    },
+    {
+      "byte_count": 200561,
+      "content_type": "application/json",
+      "feature_count": 50,
+      "notes": "Expanded OData page includes product attributes such as cloudCover, processingLevel, productType, tileId, checksums, footprints, and S3 paths. The page is not a complete yearly inventory.",
+      "provider": "Copernicus Data Space OData",
+      "raw_payload_committed": false,
+      "request_id": "copernicus_data_space_sentinel2_2025_expanded_page",
+      "result_date_max": "2025-02-03T16:05:41.025000Z",
+      "result_date_min": "2025-01-04T16:05:11.024000Z",
+      "sha256": "459e6b580cad5db5f155959a74e081e7d860f10698aa757101627affcfe208c6",
+      "status_code": 200,
+      "url": "https://catalogue.dataspace.copernicus.eu/odata/v1/Products?$filter=Collection/Name eq 'SENTINEL-2' and OData.CSC.Intersects(area=geography'SRID=4326;POLYGON((-83.75 9.72,-83.42 9.72,-83.42 10.12,-83.75 10.12,-83.75 9.72))') and ContentDate/Start gt 2025-01-01T00:00:00.000Z and ContentDate/Start lt 2025-12-31T23:59:59.000Z&$expand=Attributes&$orderby=ContentDate/Start asc&$top=50"
+    },
+    {
+      "notes": "A cloudCover < 20 query was attempted after sandbox DNS failures were escalated; it timed out with zero bytes. Use paging or a more selective official catalog query before production image selection.",
+      "provider": "Copernicus Data Space OData",
+      "raw_payload_committed": false,
+      "request_id": "copernicus_data_space_sentinel2_2025_cloud_lt_20_attempt",
+      "status": "timeout_no_payload_after_30s"
+    }
+  ],
+  "generated_on": "2026-07-06",
+  "landsat_metadata": {
+    "best_candidate_scene_id": "LC80140532025345LGN00",
+    "best_cloud_cover_percent": 12.05,
+    "cloud_filtered_candidates": [
+      {
+        "cloud_cover_percent": 12.05,
+        "collection_category": "T2",
+        "datetime": "2025-12-11T15:48:30.763128Z",
+        "instruments": [
+          "OLI",
+          "TIRS"
+        ],
+        "item_id": "LC08_L2SP_014053_20251211_20251217_02_T2_SR",
+        "platform": "LANDSAT_8",
+        "scene_id": "LC80140532025345LGN00",
+        "wrs_path": "014",
+        "wrs_row": "053"
+      },
+      {
+        "cloud_cover_percent": 12.84,
+        "collection_category": "T2",
+        "datetime": "2025-01-09T15:48:19.616889Z",
+        "instruments": [
+          "OLI",
+          "TIRS"
+        ],
+        "item_id": "LC08_L2SP_014053_20250109_20250121_02_T2_SR",
+        "platform": "LANDSAT_8",
+        "scene_id": "LC80140532025009LGN00",
+        "wrs_path": "014",
+        "wrs_row": "053"
+      },
+      {
+        "cloud_cover_percent": 16.57,
+        "collection_category": "T1",
+        "datetime": "2025-03-05T15:54:16.641183Z",
+        "instruments": [
+          "OLI",
+          "TIRS"
+        ],
+        "item_id": "LC08_L2SP_015053_20250305_20250312_02_T1_SR",
+        "platform": "LANDSAT_8",
+        "scene_id": "LC80150532025064LGN00",
+        "wrs_path": "015",
+        "wrs_row": "053"
+      }
+    ],
+    "cloud_filtered_scene_count": 3,
+    "collection": "landsat-c2l2-sr",
+    "lowest_cloud_candidates_from_default_page": [
+      {
+        "cloud_cover_percent": 12.05,
+        "collection_category": "T2",
+        "datetime": "2025-12-11T15:48:30.763128Z",
+        "instruments": [
+          "OLI",
+          "TIRS"
+        ],
+        "item_id": "LC08_L2SP_014053_20251211_20251217_02_T2_SR",
+        "platform": "LANDSAT_8",
+        "scene_id": "LC80140532025345LGN00",
+        "wrs_path": "014",
+        "wrs_row": "053"
+      },
+      {
+        "cloud_cover_percent": 31.09,
+        "collection_category": "T1",
+        "datetime": "2025-10-08T15:48:29.976107Z",
+        "instruments": [
+          "OLI",
+          "TIRS"
+        ],
+        "item_id": "LC08_L2SP_014053_20251008_20251117_02_T1_SR",
+        "platform": "LANDSAT_8",
+        "scene_id": "LC80140532025281LGN00",
+        "wrs_path": "014",
+        "wrs_row": "053"
+      },
+      {
+        "cloud_cover_percent": 31.96,
+        "collection_category": "T2",
+        "datetime": "2025-10-31T15:54:42.644542Z",
+        "instruments": [
+          "OLI",
+          "TIRS"
+        ],
+        "item_id": "LC08_L2SP_015053_20251031_20251125_02_T2_SR",
+        "platform": "LANDSAT_8",
+        "scene_id": "LC80150532025304LGN00",
+        "wrs_path": "015",
+        "wrs_row": "053"
+      },
+      {
+        "cloud_cover_percent": 39.76,
+        "collection_category": "T1",
+        "datetime": "2025-08-13T15:48:17.957087Z",
+        "instruments": [
+          "OLI",
+          "TIRS"
+        ],
+        "item_id": "LC09_L2SP_014053_20250813_20250815_02_T1_SR",
+        "platform": "LANDSAT_9",
+        "scene_id": "LC90140532025225LGN00",
+        "wrs_path": "014",
+        "wrs_row": "053"
+      },
+      {
+        "cloud_cover_percent": 43.62,
+        "collection_category": "T1",
+        "datetime": "2025-12-18T15:54:40.186052Z",
+        "instruments": [
+          "OLI",
+          "TIRS"
+        ],
+        "item_id": "LC08_L2SP_015053_20251218_20251225_02_T1_SR",
+        "platform": "LANDSAT_8",
+        "scene_id": "LC80150532025352LGN00",
+        "wrs_path": "015",
+        "wrs_row": "053"
+      },
+      {
+        "cloud_cover_percent": 43.81,
+        "collection_category": "T1",
+        "datetime": "2025-12-19T15:48:38.046589Z",
+        "instruments": [
+          "OLI",
+          "TIRS"
+        ],
+        "item_id": "LC09_L2SP_014053_20251219_20251220_02_T1_SR",
+        "platform": "LANDSAT_9",
+        "scene_id": "LC90140532025353LGN00",
+        "wrs_path": "014",
+        "wrs_row": "053"
+      },
+      {
+        "cloud_cover_percent": 44.08,
+        "collection_category": "T1",
+        "datetime": "2025-08-12T15:54:26.705979Z",
+        "instruments": [
+          "OLI",
+          "TIRS"
+        ],
+        "item_id": "LC08_L2SP_015053_20250812_20250821_02_T1_SR",
+        "platform": "LANDSAT_8",
+        "scene_id": "LC80150532025224LGN00",
+        "wrs_path": "015",
+        "wrs_row": "053"
+      },
+      {
+        "cloud_cover_percent": 44.35,
+        "collection_category": "T1",
+        "datetime": "2025-07-20T15:48:05.976967Z",
+        "instruments": [
+          "OLI",
+          "TIRS"
+        ],
+        "item_id": "LC08_L2SP_014053_20250720_20250730_02_T1_SR",
+        "platform": "LANDSAT_8",
+        "scene_id": "LC80140532025201LGN00",
+        "wrs_path": "014",
+        "wrs_row": "053"
+      }
+    ],
+    "platform_counts_in_page": {
+      "LANDSAT_8": 25,
+      "LANDSAT_9": 25
+    },
+    "scene_page_count": 50
+  },
+  "purpose": "Identify higher-resolution official optical imagery candidates to replace the coarse NASA GIBS/MODIS Pacuare preview drape before production masks or photoreal rainforest materials are promoted.",
+  "raw_response_policy": {
+    "committed_payload_hashes": true,
+    "imagery_products_downloaded": false,
+    "raw_catalog_payloads_committed": false,
+    "raw_payload_location": "/private/tmp during generation only",
+    "reason": "Commit compact source metadata, request URLs, hashes, and candidate rankings without vendoring raw catalog pages or imagery products."
+  },
+  "remaining_blockers": [
+    "Page through full-year Sentinel and Landsat catalogs or use a validated cloud-cover/date query before choosing production imagery.",
+    "Download only approved imagery products after terms, attribution, storage, and package-size policy are recorded.",
+    "Manually inspect cloud, shadow, haze, river visibility, canopy texture, orthorectification, and season/flow relevance before generating masks or materials.",
+    "Compare candidate scenes against Pacuare guide/outfitter notes and rainfed flow context before promoting river-color or wetness visuals.",
+    "Record CRS, resolution, bands, scale factors, nodata, and reprojection plan before any source drape or Unreal material replacement."
+  ],
+  "review_decision": {
+    "allowed_use": [
+      "future imagery download planning",
+      "cloud-screening and seasonal source-selection review",
+      "guide/geospatial discussion about candidate dry/rainfed visual dates"
+    ],
+    "forbidden_use": [
+      "production photoreal material approval",
+      "water, vegetation, canopy, wet-rock, mist, or waterfall mask authority",
+      "claiming complete yearly scene inventory",
+      "claiming scene visual quality without downloaded imagery and manual cloud/shadow QA"
+    ],
+    "summary": "Official high-resolution scene metadata now identifies usable replacement candidates beyond the coarse MODIS/GIBS preview, including Landsat sub-20-percent-cloud scenes and Sentinel-2 January 19, 2025 low-cloud tiles."
+  },
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare_high_resolution_scene_metadata_review.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "sentinel_metadata": {
+    "best_cloud_cover_percent": 1.39395,
+    "best_l2a_candidate_name": "S2B_MSIL2A_20250119T160509_N0511_R054_T17PKM_20250119T211653.SAFE",
+    "collection": "SENTINEL-2",
+    "expanded_page_count": 50,
+    "lowest_cloud_candidates_from_expanded_page": [
+      {
+        "blake3": "1f90a8cfd373b1a7fa89cb3b976f98f15640ca3d111999373658404ac820e2af",
+        "cloud_cover_percent": 1.39395,
+        "content_length_bytes": 673214393,
+        "datetime": "2025-01-19T16:05:09.024000Z",
+        "md5": "9ffd5af4b05e94691f881c733e2c729f",
+        "name": "S2B_MSIL1C_20250119T160509_N0511_R054_T17PKM_20250119T210239.SAFE",
+        "online": true,
+        "platform": "SENTINEL-2",
+        "processing_level": "S2MSI1C",
+        "product_id": "7f8ed9d5-f34f-4083-8b89-d79b990d113f",
+        "product_type": "S2MSI1C",
+        "s3_path": "/eodata/Sentinel-2/MSI/L1C/2025/01/19/S2B_MSIL1C_20250119T160509_N0511_R054_T17PKM_20250119T210239.SAFE",
+        "tile_id": "17PKM"
+      },
+      {
+        "blake3": "b83d1dd53c6551e3c0687177074db959ae94455dcb496ab9f068bfa42622727b",
+        "cloud_cover_percent": 4.785432,
+        "content_length_bytes": 945614783,
+        "datetime": "2025-01-19T16:05:09.024000Z",
+        "md5": "5054a52f484941faa947ca092c312a51",
+        "name": "S2B_MSIL2A_20250119T160509_N0511_R054_T17PKM_20250119T211653.SAFE",
+        "online": true,
+        "platform": "SENTINEL-2",
+        "processing_level": "S2MSI2A",
+        "product_id": "bb7637ec-9e1f-4900-8d73-3b43acf2eb93",
+        "product_type": "S2MSI2A",
+        "s3_path": "/eodata/Sentinel-2/MSI/L2A/2025/01/19/S2B_MSIL2A_20250119T160509_N0511_R054_T17PKM_20250119T211653.SAFE",
+        "tile_id": "17PKM"
+      },
+      {
+        "blake3": "8954c436a056b1cca46c0682743820514b1f6443fb0e9b555a4fcbd21276e26e",
+        "cloud_cover_percent": 6.926603,
+        "content_length_bytes": 817837489,
+        "datetime": "2025-01-19T16:05:09.024000Z",
+        "md5": "21178af68daa89ec1475d130a17ceb9c",
+        "name": "S2B_MSIL1C_20250119T160509_N0511_R054_T17PKL_20250119T210239.SAFE",
+        "online": true,
+        "platform": "SENTINEL-2",
+        "processing_level": "S2MSI1C",
+        "product_id": "153f5976-d92c-435b-b46e-b4444e958424",
+        "product_type": "S2MSI1C",
+        "s3_path": "/eodata/Sentinel-2/MSI/L1C/2025/01/19/S2B_MSIL1C_20250119T160509_N0511_R054_T17PKL_20250119T210239.SAFE",
+        "tile_id": "17PKL"
+      },
+      {
+        "blake3": "cfdbf09a7e1e33990f6a5ec2ddde582362b8846e78f17b431047f083fd28aa1b",
+        "cloud_cover_percent": 7.317836,
+        "content_length_bytes": 794504654,
+        "datetime": "2025-01-19T16:05:09.024000Z",
+        "md5": "3cbb5b541ac290f7963877012fa2d3d4",
+        "name": "S2B_MSIL1C_20250119T160509_N0511_R054_T16PHR_20250119T210239.SAFE",
+        "online": true,
+        "platform": "SENTINEL-2",
+        "processing_level": "S2MSI1C",
+        "product_id": "2772f44c-ec38-4cfe-9795-0866d6dc17b9",
+        "product_type": "S2MSI1C",
+        "s3_path": "/eodata/Sentinel-2/MSI/L1C/2025/01/19/S2B_MSIL1C_20250119T160509_N0511_R054_T16PHR_20250119T210239.SAFE",
+        "tile_id": "16PHR"
+      },
+      {
+        "blake3": "76ede55d17f7bf5ccb1abbcf005abc1ba32c5cc293e3d22d715505e65e1ac68b",
+        "cloud_cover_percent": 9.489205,
+        "content_length_bytes": 814887663,
+        "datetime": "2025-01-19T16:05:09.024000Z",
+        "md5": "30b1ac0f46063fee2d6fa6ca1ffa750b",
+        "name": "S2B_MSIL1C_20250119T160509_N0511_R054_T16PHS_20250119T210239.SAFE",
+        "online": true,
+        "platform": "SENTINEL-2",
+        "processing_level": "S2MSI1C",
+        "product_id": "e947ee9b-ea1b-4628-994c-a7561c3b41dd",
+        "product_type": "S2MSI1C",
+        "s3_path": "/eodata/Sentinel-2/MSI/L1C/2025/01/19/S2B_MSIL1C_20250119T160509_N0511_R054_T16PHS_20250119T210239.SAFE",
+        "tile_id": "16PHS"
+      },
+      {
+        "blake3": "ff94aa2228410432ee690898281c76c041bd73d72b9e52a5854e33630104df0c",
+        "cloud_cover_percent": 14.08641,
+        "content_length_bytes": 1173356219,
+        "datetime": "2025-01-19T16:05:09.024000Z",
+        "md5": "2bacdbe0ec5fee0c1f558a0584f7cb53",
+        "name": "S2B_MSIL2A_20250119T160509_N0511_R054_T17PKL_20250119T211653.SAFE",
+        "online": true,
+        "platform": "SENTINEL-2",
+        "processing_level": "S2MSI2A",
+        "product_id": "4aaa5c07-bd3b-4de5-8364-ae024f0507b9",
+        "product_type": "S2MSI2A",
+        "s3_path": "/eodata/Sentinel-2/MSI/L2A/2025/01/19/S2B_MSIL2A_20250119T160509_N0511_R054_T17PKL_20250119T211653.SAFE",
+        "tile_id": "17PKL"
+      },
+      {
+        "blake3": "531334b4fa073e493a0734e85f7fe6985f0bb6783f2d9c1014bee67d5b8e61b0",
+        "cloud_cover_percent": 14.778528,
+        "content_length_bytes": 1126685566,
+        "datetime": "2025-01-19T16:05:09.024000Z",
+        "md5": "f0960cc0a9b3e55e89d3188f539627ce",
+        "name": "S2B_MSIL2A_20250119T160509_N0511_R054_T16PHR_20250119T211653.SAFE",
+        "online": true,
+        "platform": "SENTINEL-2",
+        "processing_level": "S2MSI2A",
+        "product_id": "c6bcea98-8a04-4349-8815-b5473ce5b304",
+        "product_type": "S2MSI2A",
+        "s3_path": "/eodata/Sentinel-2/MSI/L2A/2025/01/19/S2B_MSIL2A_20250119T160509_N0511_R054_T16PHR_20250119T211653.SAFE",
+        "tile_id": "16PHR"
+      },
+      {
+        "blake3": "c3a26bd749f4bbf1d9de9a4ad4e06edf506e323ada98fc881cda7e3bc48b00b9",
+        "cloud_cover_percent": 17.031682,
+        "content_length_bytes": 1148687785,
+        "datetime": "2025-01-19T16:05:09.024000Z",
+        "md5": "862529e974162ab0106cc906407b3462",
+        "name": "S2B_MSIL2A_20250119T160509_N0511_R054_T16PHS_20250119T211653.SAFE",
+        "online": true,
+        "platform": "SENTINEL-2",
+        "processing_level": "S2MSI2A",
+        "product_id": "58a38c11-9fec-4407-a280-2c0f84ee7d74",
+        "product_type": "S2MSI2A",
+        "s3_path": "/eodata/Sentinel-2/MSI/L2A/2025/01/19/S2B_MSIL2A_20250119T160509_N0511_R054_T16PHS_20250119T211653.SAFE",
+        "tile_id": "16PHS"
+      },
+      {
+        "blake3": "b0ae51da62e896013fa63cf6d53654af8f480d15b8222d3ae494f9bd428bd9c5",
+        "cloud_cover_percent": 18.10493,
+        "content_length_bytes": 778943550,
+        "datetime": "2025-01-29T16:05:09.025000Z",
+        "md5": "b28b61bbab988715dbde96170bd17dd8",
+        "name": "S2B_MSIL1C_20250129T160509_N0511_R054_T16PHR_20250129T203735.SAFE",
+        "online": true,
+        "platform": "SENTINEL-2",
+        "processing_level": "S2MSI1C",
+        "product_id": "336e4c3b-a403-4575-aee6-0ef549e3ec70",
+        "product_type": "S2MSI1C",
+        "s3_path": "/eodata/Sentinel-2/MSI/L1C/2025/01/29/S2B_MSIL1C_20250129T160509_N0511_R054_T16PHR_20250129T203735.SAFE",
+        "tile_id": "16PHR"
+      },
+      {
+        "blake3": "5286f2e8fbffc4977070aeec1294b34e1a93d25d125607403fa92f5f5d227b90",
+        "cloud_cover_percent": 27.202556,
+        "content_length_bytes": 1093818998,
+        "datetime": "2025-01-29T16:05:09.025000Z",
+        "md5": "e7723e23b722fbdaa0984d10e08ab9d7",
+        "name": "S2B_MSIL2A_20250129T160509_N0511_R054_T16PHR_20250129T204734.SAFE",
+        "online": true,
+        "platform": "SENTINEL-2",
+        "processing_level": "S2MSI2A",
+        "product_id": "fe6a5e5e-6fb5-41b7-9b76-687448583a19",
+        "product_type": "S2MSI2A",
+        "s3_path": "/eodata/Sentinel-2/MSI/L2A/2025/01/29/S2B_MSIL2A_20250129T160509_N0511_R054_T16PHR_20250129T204734.SAFE",
+        "tile_id": "16PHR"
+      },
+      {
+        "blake3": "4c299d373f0cd0a4ac36e0327d165223887a2d54671d0092511e9ed03e71bfd1",
+        "cloud_cover_percent": 45.619756,
+        "content_length_bytes": 764700579,
+        "datetime": "2025-01-24T16:05:41.025000Z",
+        "md5": "99fb7e6d8c05b9d4ff7add1d34858ebd",
+        "name": "S2C_MSIL1C_20250124T160541_N0511_R054_T17PKM_20250124T175109.SAFE",
+        "online": true,
+        "platform": "SENTINEL-2",
+        "processing_level": "S2MSI1C",
+        "product_id": "eebe6c9e-52bc-47aa-abf6-19c1bc2826ef",
+        "product_type": "S2MSI1C",
+        "s3_path": "/eodata/Sentinel-2/MSI/L1C/2025/01/24/S2C_MSIL1C_20250124T160541_N0511_R054_T17PKM_20250124T175109.SAFE",
+        "tile_id": "17PKM"
+      },
+      {
+        "blake3": "6eb7eb7ccf4522452c2b5227a28374fd4666f20e6fd99500d78c5edacf0c1a5b",
+        "cloud_cover_percent": 53.689868,
+        "content_length_bytes": 764368084,
+        "datetime": "2025-01-29T16:05:09.025000Z",
+        "md5": "b18eea982bbcd79acf80d1d81b182689",
+        "name": "S2B_MSIL1C_20250129T160509_N0511_R054_T17PKL_20250129T203735.SAFE",
+        "online": true,
+        "platform": "SENTINEL-2",
+        "processing_level": "S2MSI1C",
+        "product_id": "404c2ea8-d0b7-447f-ad4e-9814f5d22e24",
+        "product_type": "S2MSI1C",
+        "s3_path": "/eodata/Sentinel-2/MSI/L1C/2025/01/29/S2B_MSIL1C_20250129T160509_N0511_R054_T17PKL_20250129T203735.SAFE",
+        "tile_id": "17PKL"
+      }
+    ],
+    "processing_level_counts_in_page": {
+      "S2MSI1C": 24,
+      "S2MSI2A": 26
+    },
+    "tile_counts_in_page": {
+      "16PHR": 12,
+      "16PHS": 13,
+      "17PKL": 12,
+      "17PKM": 13
+    }
+  },
+  "status": "official_high_resolution_scene_metadata_attached_review_gated_no_imagery_downloaded"
+}

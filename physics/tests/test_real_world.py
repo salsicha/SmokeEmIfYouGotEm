@@ -41,6 +41,7 @@ from raftsim.real_world import (
     PACUARE_CLOUD_SHADOW_REVIEW_FILE,
     PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE,
     PACUARE_FLASH_RESPONSE_REVIEW_FILE,
+    PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE,
     PACUARE_RAINFALL_STATION_REVIEW_FILE,
     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
@@ -1379,6 +1380,8 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
         classes["hydrography_and_centerline"]["status"]
         == "preview_centerline_scaffold_attached_official_hydrography_pending"
     )
+    assert PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE in classes["aerial_or_satellite_imagery"]["target_outputs"]
+    assert PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE in classes["water_and_vegetation_masks"]["target_outputs"]
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE in classes["hydrography_and_centerline"]["target_outputs"]
@@ -1497,6 +1500,63 @@ def test_pacuare_cloud_screened_scene_index_tracks_retained_nasa_candidates():
         artifact["artifact_id"] == "pacuare_cloud_screened_scene_index"
         for artifact in pacuare_sources["source_sample_artifacts"]
     )
+
+
+def test_pacuare_high_resolution_scene_metadata_review_tracks_official_candidates_without_downloads():
+    pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
+    source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((pacuare_dir / "production_source_pull_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+    review = json.loads((pacuare_dir / PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE).read_text())
+    request_hashes = {request["request_id"]: request.get("sha256") for request in review["catalog_requests"]}
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+    pacuare_sources = next(river for river in photoreal_sources["rivers"] if river["river_id"] == "pacuare")
+
+    assert PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE in source_manifest["artifacts"]["imagery"]
+    assert any(
+        artifact["artifact_id"] == "pacuare_high_resolution_scene_metadata_review"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert (
+        "physics/data/real_world/pacuare_river_costa_rica/" + PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE
+        in rivers["pacuare"]["attached_sources_by_class"]["aerial_or_satellite_imagery"]["artifacts"]
+    )
+    assert (
+        "physics/data/real_world/pacuare_river_costa_rica/" + PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE
+        in rivers["pacuare"]["attached_sources_by_class"]["water_and_vegetation_masks"]["artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "pacuare_high_resolution_scene_metadata_review"
+        for artifact in pacuare_sources["source_sample_artifacts"]
+    )
+    assert review["schema"] == "raftsim.pacuare_high_resolution_scene_metadata_review.v1"
+    assert review["status"] == "official_high_resolution_scene_metadata_attached_review_gated_no_imagery_downloaded"
+    assert review["raw_response_policy"]["imagery_products_downloaded"] is False
+    assert review["raw_response_policy"]["raw_catalog_payloads_committed"] is False
+    assert request_hashes["usgs_landsatlook_c2l2_sr_2025_cloud_lt_20"] == (
+        "4db5e9fc8323464e647b33b73f36bde383fbc14f77c032bcb9b611232728b14f"
+    )
+    assert request_hashes["copernicus_data_space_sentinel2_2025_expanded_page"] == (
+        "459e6b580cad5db5f155959a74e081e7d860f10698aa757101627affcfe208c6"
+    )
+    assert review["landsat_metadata"]["cloud_filtered_scene_count"] == 3
+    assert review["landsat_metadata"]["best_cloud_cover_percent"] == 12.05
+    assert review["landsat_metadata"]["best_candidate_scene_id"] == "LC80140532025345LGN00"
+    assert review["sentinel_metadata"]["expanded_page_count"] == 50
+    assert review["sentinel_metadata"]["best_cloud_cover_percent"] == 1.39395
+    assert (
+        review["sentinel_metadata"]["best_l2a_candidate_name"]
+        == "S2B_MSIL2A_20250119T160509_N0511_R054_T17PKM_20250119T211653.SAFE"
+    )
+    assert review["catalog_requests"][-1]["status"] == "timeout_no_payload_after_30s"
+    assert "claiming complete yearly scene inventory" in review["review_decision"]["forbidden_use"]
+    assert "Page through full-year Sentinel and Landsat catalogs" in review["remaining_blockers"][0]
 
 
 def test_pacuare_source_metadata_review_consolidates_metadata_without_promoting():
@@ -2089,6 +2149,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert PACUARE_RAPID_ACCESS_STATIONING_DRAFT_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_CLOUD_SHADOW_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_RAINFALL_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_FLASH_RESPONSE_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]

@@ -439,6 +439,7 @@
         "review/production_import_pilot/source_metadata_review.json",
         "imagery/production_import_pilot/cloud_screened_scene_index.json",
         "imagery/production_import_pilot/cloud_shadow_review.json",
+        "imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
         "hydrography/production_import_pilot/official_source_access_plan.json",
         "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
         "hydrography/production_import_pilot/snit_layer_catalog_summary.json",

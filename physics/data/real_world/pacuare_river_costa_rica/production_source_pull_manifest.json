@@ -16,7 +16,8 @@
     "Pacuare flash-response review now links rainfall, discharge/stage, basin, and recharge metadata leads, but rainfall-to-stage lag, station time series, basin relation, unsafe-flow criteria, rescue readability, evacuation constraints, and guide/outfitter validation remain open before flash scenarios or high-water visuals can be promoted.",
     "Pacuare River reference annotations and rights manifest are attached as link-only review scaffolds, but no item-level media rights, first-party capture, station geometry, or guide approval is recorded yet.",
     "Pacuare cloud-screened scene index and cloud/shadow review are attached for retained MODIS/GIBS candidates, but production imagery still needs higher-resolution Sentinel/Landsat/local orthophoto or first-party/permissioned aerial sources.",
-    "Pacuare consolidated source metadata review is attached, but it only records local review-gated metadata and does not promote DEM, imagery, hydrography, hydrology, access, protected-area, or media sources to production use."
+    "Pacuare consolidated source metadata review is attached, but it only records local review-gated metadata and does not promote DEM, imagery, hydrography, hydrology, access, protected-area, or media sources to production use.",
+    "Pacuare high-resolution scene metadata review identifies official Landsat/Sentinel candidates, but production imagery still needs full-year paging, download approval, manual visual QA, CRS/band/scale review, and guide/geospatial signoff before replacing the MODIS/GIBS preview."
   ],
   "pulled_artifacts": [
     {
@@ -732,6 +733,38 @@
         "source_metadata_review_gate",
         "editor_overlay_provenance",
         "future_production_source_selection_checklist"
+      ]
+    },
+    {
+      "artifact_id": "pacuare_high_resolution_scene_metadata_review",
+      "category": "high_resolution_satellite_scene_metadata_review",
+      "caveats": [
+        "Records official catalog metadata only; no Landsat, Sentinel, orthophoto, or first-party imagery product is downloaded or promoted.",
+        "The successful Sentinel query is an expanded first page, not a complete yearly inventory; the cloud-filtered Copernicus query timed out and needs a more selective official search or paging.",
+        "Scene cloud-cover metadata is not mask authority; imagery still needs download approval, manual cloud/shadow QA, CRS/band/scale review, flow-season interpretation, and guide/geospatial approval."
+      ],
+      "path": "imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
+      "provider": "USGS LandsatLook STAC and Copernicus Data Space OData official scene catalogs",
+      "related_artifacts": [
+        "imagery/production_import_pilot/cloud_screened_scene_index.json",
+        "imagery/production_import_pilot/cloud_shadow_review.json",
+        "review/production_import_pilot/source_metadata_review.json"
+      ],
+      "status": "official_high_resolution_scene_metadata_attached_review_gated_no_imagery_downloaded",
+      "summary": {
+        "imagery_products_downloaded": 0,
+        "landsat_best_candidate_scene_id": "LC80140532025345LGN00",
+        "landsat_best_cloud_cover_percent": 12.05,
+        "landsat_cloud_filtered_scene_count": 3,
+        "raw_catalog_payloads_committed": false,
+        "sentinel_best_cloud_cover_percent": 1.39395,
+        "sentinel_best_l2a_candidate": "S2B_MSIL2A_20250119T160509_N0511_R054_T17PKM_20250119T211653.SAFE",
+        "sentinel_expanded_page_count": 50
+      },
+      "use": [
+        "high_resolution_imagery_source_selection",
+        "future_cloud_screened_drape_download_planning",
+        "production_mask_source_gate"
       ]
     }
   ],
