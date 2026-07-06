@@ -2,7 +2,7 @@
   "schema": "raftsim.unreal.environment_capture_manifest.v1",
   "capture_type": "guide_seat_downstream_unreal_preview",
   "source_plan": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
-  "status": "rendered_procedural_blockout_captures_available; photoreal source_data_and_asset_replacement_required",
+  "status": "south_fork_source_draped_preview_and_procedural_blockout_captures_available; photoreal source_data_and_asset_replacement_required",
   "captures": [
     {
       "river_id": "american_south_fork",
@@ -10,8 +10,10 @@
       "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview",
       "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json",
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
-      "status": "captured_procedural_blockout_render",
-      "fidelity_note": "source-aware procedural blockout with generated valley, river, foam, rocks, foliage, and raft proxies; not yet production photoreal"
+      "status": "captured_source_derived_preview_render",
+      "aerial_drape_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_sample_512.png",
+      "elevation_sample": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_sample_256.tif",
+      "fidelity_note": "official USDA/APFO NAIP 512px aerial sample sampled into visible terrain overlay tiles; USGS 3DEP GeoTIFF sample recorded for follow-on elevation conditioning; rocks, foliage, water, foam, raft, and lighting remain proxy layers"
     },
     {
       "river_id": "colorado_river",
@@ -20,6 +22,8 @@
       "source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json",
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "status": "captured_procedural_blockout_render",
+      "aerial_drape_image": "",
+      "elevation_sample": "",
       "fidelity_note": "source-aware procedural blockout with generated valley, river, foam, rocks, foliage, and raft proxies; not yet production photoreal"
     },
     {
@@ -29,6 +33,8 @@
       "source_manifest": "physics/data/real_world/pacuare_river_costa_rica/source_manifest.json",
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "status": "captured_procedural_blockout_render",
+      "aerial_drape_image": "",
+      "elevation_sample": "",
       "fidelity_note": "source-aware procedural blockout with generated valley, river, foam, rocks, foliage, and raft proxies; not yet production photoreal"
     }
   ]

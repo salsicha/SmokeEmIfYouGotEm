@@ -33,6 +33,10 @@
 #include "HAL/PlatformProcess.h"
 #include "HAL/PlatformMisc.h"
 #include "ImageUtils.h"
+#include "IImageWrapper.h"
+#include "IImageWrapperModule.h"
+#include "Materials/Material.h"
+#include "Materials/MaterialExpressionVectorParameter.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Misc/CommandLine.h"
 #include "Misc/CoreDelegates.h"
@@ -80,6 +84,9 @@ struct FRaftSimEnvironmentPreviewSpec
     FString DisplayName;
     FString MapPackagePath;
     FString SourceManifest;
+    FString AerialDrapeImage;
+    FString ElevationSample;
+    FString SourceDrapeDescription;
     FLinearColor WaterColor = FLinearColor(0.05f, 0.26f, 0.32f);
     FLinearColor TerrainColor = FLinearColor(0.26f, 0.23f, 0.18f);
     FLinearColor RockColor = FLinearColor(0.35f, 0.33f, 0.29f);
@@ -94,6 +101,36 @@ struct FRaftSimEnvironmentPreviewSpec
     int32 FoamTrainCount = 12;
     bool bHasWaterfalls = false;
     bool bDesertCanyon = false;
+};
+
+struct FRaftSimPreviewImage
+{
+    int32 Width = 0;
+    int32 Height = 0;
+    TArray<FLinearColor> Pixels;
+
+    bool IsValid() const
+    {
+        return Width > 0 && Height > 0 && Pixels.Num() == Width * Height;
+    }
+
+    FLinearColor Sample(float U, float V) const
+    {
+        if (!IsValid())
+        {
+            return FLinearColor::Black;
+        }
+
+        const int32 X = FMath::Clamp(FMath::RoundToInt(U * static_cast<float>(Width - 1)), 0, Width - 1);
+        const int32 Y = FMath::Clamp(FMath::RoundToInt((1.0f - V) * static_cast<float>(Height - 1)), 0, Height - 1);
+        FLinearColor Sampled = Pixels[Y * Width + X];
+        const float Luma = Sampled.R * 0.30f + Sampled.G * 0.59f + Sampled.B * 0.11f;
+        Sampled.R = FMath::Clamp((Luma + (Sampled.R - Luma) * 1.45f) * 1.28f, 0.0f, 1.0f);
+        Sampled.G = FMath::Clamp((Luma + (Sampled.G - Luma) * 1.65f) * 1.36f, 0.0f, 1.0f);
+        Sampled.B = FMath::Clamp((Luma + (Sampled.B - Luma) * 1.35f) * 1.18f, 0.0f, 1.0f);
+        Sampled.A = 1.0f;
+        return Sampled;
+    }
 };
 
 FRaftSimEditorToolDescriptor MakeToolDescriptor(
@@ -150,6 +187,12 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.DisplayName = TEXT("South Fork American River");
     SouthFork.MapPackagePath = TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview");
     SouthFork.SourceManifest = TEXT("physics/data/real_world/south_fork_american_chili_bar/source_manifest.json");
+    SouthFork.AerialDrapeImage =
+        TEXT("physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_sample_512.png");
+    SouthFork.ElevationSample =
+        TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_sample_256.tif");
+    SouthFork.SourceDrapeDescription =
+        TEXT("official USDA/APFO NAIP 512px aerial sample sampled into visible terrain overlay tiles; USGS 3DEP GeoTIFF sample recorded for follow-on elevation conditioning; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
     SouthFork.WaterColor = FLinearColor(0.04f, 0.32f, 0.36f);
     SouthFork.TerrainColor = FLinearColor(0.35f, 0.30f, 0.21f);
     SouthFork.RockColor = FLinearColor(0.38f, 0.36f, 0.31f);
@@ -220,11 +263,83 @@ UMaterialInterface* LoadPreviewMaterial(const TCHAR* MaterialPath)
     return Cast<UMaterialInterface>(StaticLoadObject(UMaterialInterface::StaticClass(), nullptr, MaterialPath));
 }
 
+void ConnectPreviewMaterialColorInput(FColorMaterialInput& Input, UMaterialExpression* Expression)
+{
+    Input.Expression = Expression;
+    Input.Mask = 1;
+    Input.MaskR = 1;
+    Input.MaskG = 1;
+    Input.MaskB = 1;
+    Input.MaskA = 0;
+}
+
+UMaterialInterface* LoadOrCreatePreviewColorMaterial()
+{
+    static const TCHAR* MaterialPackagePath = TEXT("/Game/RaftSim/Materials/M_RaftSim_UnlitColorPreview");
+    static const TCHAR* MaterialObjectPath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_UnlitColorPreview.M_RaftSim_UnlitColorPreview");
+
+    UMaterial* Material = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, MaterialObjectPath));
+    if (!Material)
+    {
+        UPackage* Package = CreatePackage(MaterialPackagePath);
+        if (!Package)
+        {
+            return nullptr;
+        }
+
+        Material = NewObject<UMaterial>(
+            Package,
+            TEXT("M_RaftSim_UnlitColorPreview"),
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (!Material)
+        {
+            return nullptr;
+        }
+
+        FAssetRegistryModule::AssetCreated(Material);
+        Material->Modify();
+        Material->SetShadingModel(MSM_Unlit);
+        Material->BlendMode = BLEND_Opaque;
+        Material->TwoSided = true;
+
+        UMaterialExpressionVectorParameter* ColorParameter = NewObject<UMaterialExpressionVectorParameter>(Material);
+        ColorParameter->ParameterName = TEXT("PreviewColor");
+        ColorParameter->DefaultValue = FLinearColor::White;
+        Material->GetExpressionCollection().AddExpression(ColorParameter);
+
+        UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, ColorParameter);
+        ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, ColorParameter);
+
+        Material->PostEditChange();
+        Package->MarkPackageDirty();
+
+        const FString Filename =
+            FPackageName::LongPackageNameToFilename(MaterialPackagePath, FPackageName::GetAssetPackageExtension());
+        IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+
+        FSavePackageArgs SaveArgs;
+        SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+        SaveArgs.SaveFlags = SAVE_NoError;
+        UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+    }
+
+    return Material;
+}
+
 UMaterialInstanceDynamic* CreatePreviewColorMaterial(UObject* Outer, const FLinearColor& Color)
 {
-    if (UMaterialInterface* BaseMaterial = LoadPreviewBaseMaterial())
+    UMaterialInterface* BaseMaterial = LoadOrCreatePreviewColorMaterial();
+    if (!BaseMaterial)
+    {
+        BaseMaterial = LoadPreviewBaseMaterial();
+    }
+
+    if (BaseMaterial)
     {
         UMaterialInstanceDynamic* Material = UMaterialInstanceDynamic::Create(BaseMaterial, Outer);
+        Material->SetVectorParameterValue(TEXT("PreviewColor"), Color);
         Material->SetVectorParameterValue(TEXT("Color"), Color);
         Material->SetVectorParameterValue(TEXT("BaseColor"), Color);
         Material->SetVectorParameterValue(TEXT("Albedo"), Color);
@@ -232,6 +347,61 @@ UMaterialInstanceDynamic* CreatePreviewColorMaterial(UObject* Outer, const FLine
     }
 
     return nullptr;
+}
+
+bool LoadPreviewPngImage(const FString& RelativePath, FRaftSimPreviewImage& OutImage)
+{
+    OutImage = FRaftSimPreviewImage();
+    if (RelativePath.IsEmpty())
+    {
+        return false;
+    }
+
+    const FString AbsolutePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), RelativePath));
+    TArray<uint8> CompressedImage;
+    if (!FFileHelper::LoadFileToArray(CompressedImage, *AbsolutePath))
+    {
+        UE_LOG(LogRaftSimEditor, Warning, TEXT("Failed to load preview drape image: %s"), *AbsolutePath);
+        return false;
+    }
+
+    IImageWrapperModule& ImageWrapperModule =
+        FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName(TEXT("ImageWrapper")));
+    TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG, *AbsolutePath);
+    if (!ImageWrapper.IsValid() || !ImageWrapper->SetCompressed(CompressedImage.GetData(), CompressedImage.Num()))
+    {
+        UE_LOG(LogRaftSimEditor, Warning, TEXT("Failed to decode preview drape image header: %s"), *AbsolutePath);
+        return false;
+    }
+
+    TArray<uint8> RawBgra;
+    if (!ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, RawBgra))
+    {
+        UE_LOG(LogRaftSimEditor, Warning, TEXT("Failed to decode preview drape pixels: %s"), *AbsolutePath);
+        return false;
+    }
+
+    OutImage.Width = ImageWrapper->GetWidth();
+    OutImage.Height = ImageWrapper->GetHeight();
+    if (OutImage.Width <= 0 || OutImage.Height <= 0 || RawBgra.Num() != OutImage.Width * OutImage.Height * 4)
+    {
+        UE_LOG(LogRaftSimEditor, Warning, TEXT("Preview drape image dimensions are invalid: %s"), *AbsolutePath);
+        OutImage = FRaftSimPreviewImage();
+        return false;
+    }
+
+    OutImage.Pixels.Reserve(OutImage.Width * OutImage.Height);
+    for (int32 PixelIndex = 0; PixelIndex < OutImage.Width * OutImage.Height; ++PixelIndex)
+    {
+        const int32 ByteIndex = PixelIndex * 4;
+        OutImage.Pixels.Add(FLinearColor(
+            static_cast<float>(RawBgra[ByteIndex + 2]) / 255.0f,
+            static_cast<float>(RawBgra[ByteIndex + 1]) / 255.0f,
+            static_cast<float>(RawBgra[ByteIndex]) / 255.0f,
+            static_cast<float>(RawBgra[ByteIndex + 3]) / 255.0f));
+    }
+
+    return true;
 }
 
 void ApplyPreviewColor(UMeshComponent* Component, const FLinearColor& Color)
@@ -334,7 +504,8 @@ AActor* AddPreviewProceduralMeshActor(
     const TArray<FVector>& Normals,
     const TArray<FVector2D>& UVs,
     const FLinearColor& Color,
-    UMaterialInterface* MaterialOverride = nullptr)
+    UMaterialInterface* MaterialOverride = nullptr,
+    const TArray<FLinearColor>* VertexColorOverride = nullptr)
 {
     if (!World || Vertices.IsEmpty() || Triangles.IsEmpty())
     {
@@ -363,7 +534,14 @@ AActor* AddPreviewProceduralMeshActor(
     MeshComponent->bUseComplexAsSimpleCollision = true;
 
     TArray<FLinearColor> VertexColors;
-    VertexColors.Init(Color, Vertices.Num());
+    if (VertexColorOverride && VertexColorOverride->Num() == Vertices.Num())
+    {
+        VertexColors = *VertexColorOverride;
+    }
+    else
+    {
+        VertexColors.Init(Color, Vertices.Num());
+    }
     TArray<FProcMeshTangent> Tangents;
     Tangents.Init(FProcMeshTangent(1.0f, 0.0f, 0.0f), Vertices.Num());
 
@@ -438,6 +616,73 @@ void AddPreviewTerrainMesh(UWorld* World, const FRaftSimEnvironmentPreviewSpec& 
         Normals,
         UVs,
         Spec.TerrainColor);
+}
+
+void AddPreviewAerialDrapeTiles(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
+{
+    if (!World || Spec.AerialDrapeImage.IsEmpty())
+    {
+        return;
+    }
+
+    FRaftSimPreviewImage AerialDrape;
+    if (!LoadPreviewPngImage(Spec.AerialDrapeImage, AerialDrape))
+    {
+        return;
+    }
+
+    constexpr int32 XTiles = 40;
+    constexpr int32 YTiles = 12;
+    const float MinX = -5600.0f;
+    const float MaxX = 26000.0f;
+    const float HalfWidth = Spec.bDesertCanyon ? 4300.0f : 2750.0f;
+    const float TileLength = (MaxX - MinX) / static_cast<float>(XTiles);
+    const float TileWidth = (HalfWidth * 2.0f) / static_cast<float>(YTiles);
+
+    for (int32 XIndex = 0; XIndex < XTiles; ++XIndex)
+    {
+        const float U = (static_cast<float>(XIndex) + 0.5f) / static_cast<float>(XTiles);
+        const float X = FMath::Lerp(MinX, MaxX, U);
+        const float CenterY = GetPreviewRiverCenterY(Spec, X);
+        for (int32 YIndex = 0; YIndex < YTiles; ++YIndex)
+        {
+            const float V = (static_cast<float>(YIndex) + 0.5f) / static_cast<float>(YTiles);
+            const float Y = FMath::Lerp(-HalfWidth, HalfWidth, V);
+            if (FMath::Abs(Y - CenterY) < Spec.RiverHalfWidthCm + 180.0f)
+            {
+                continue;
+            }
+
+            const float Z = GetPreviewTerrainHeightCm(Spec, X, Y) + 12.0f;
+            const FLinearColor AerialColor = FMath::Lerp(AerialDrape.Sample(U, V), Spec.TerrainColor, 0.08f);
+            const float HalfLength = TileLength * 0.50f;
+            const float HalfTileWidth = TileWidth * 0.50f;
+
+            TArray<FVector> Vertices;
+            Vertices.Add(FVector(X - HalfLength, Y - HalfTileWidth, Z));
+            Vertices.Add(FVector(X - HalfLength, Y + HalfTileWidth, Z));
+            Vertices.Add(FVector(X + HalfLength, Y - HalfTileWidth, Z));
+            Vertices.Add(FVector(X + HalfLength, Y + HalfTileWidth, Z));
+
+            TArray<int32> Triangles = {0, 2, 1, 1, 2, 3};
+            TArray<FVector> Normals;
+            Normals.Init(FVector::UpVector, Vertices.Num());
+            TArray<FVector2D> UVs = {
+                FVector2D(0.0f, 0.0f),
+                FVector2D(0.0f, 1.0f),
+                FVector2D(1.0f, 0.0f),
+                FVector2D(1.0f, 1.0f)};
+
+            AddPreviewProceduralMeshActor(
+                World,
+                FString::Printf(TEXT("RaftSim_SourceAerialDrapeTile_%02d_%02d_%s"), XIndex, YIndex, *Spec.RiverId),
+                Vertices,
+                Triangles,
+                Normals,
+                UVs,
+                AerialColor);
+        }
+    }
 }
 
 void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
@@ -654,10 +899,18 @@ void AddPreviewCameraAndLabels(UWorld* World, const FRaftSimEnvironmentPreviewSp
     if (Label && Label->GetTextRender())
     {
         Label->SetActorLabel(TEXT("RaftSim_SourceManifest_Label"));
+        const FString SourceLayerNote = Spec.SourceDrapeDescription.IsEmpty()
+            ? FString(TEXT("Proxy preview: replace with reviewed DEM, imagery, and assets."))
+            : FString::Printf(
+                  TEXT("Source preview layer: %s\nAerial: %s\nDEM sample: %s"),
+                  *Spec.SourceDrapeDescription,
+                  *Spec.AerialDrapeImage,
+                  *Spec.ElevationSample);
         Label->GetTextRender()->SetText(FText::FromString(FString::Printf(
-            TEXT("%s\n%s\nProxy preview: replace with reviewed DEM, imagery, and assets."),
+            TEXT("%s\n%s\n%s"),
             *Spec.DisplayName,
-            *Spec.SourceManifest)));
+            *Spec.SourceManifest,
+            *SourceLayerNote)));
         Label->GetTextRender()->SetHorizontalAlignment(EHTA_Left);
         Label->GetTextRender()->SetWorldSize(72.0f);
     }
@@ -684,6 +937,16 @@ FString GetPreviewCaptureRelativePath(const FRaftSimEnvironmentPreviewSpec& Spec
     return FPaths::Combine(
         TEXT("docs/environment-captures/photoreal_river_previews"),
         Spec.RiverId + TEXT("_guide_seat_downstream.png"));
+}
+
+FString GetPreviewFidelityNote(const FRaftSimEnvironmentPreviewSpec& Spec)
+{
+    if (!Spec.SourceDrapeDescription.IsEmpty())
+    {
+        return Spec.SourceDrapeDescription;
+    }
+
+    return TEXT("source-aware procedural blockout with generated valley, river, foam, rocks, foliage, and raft proxies; not yet production photoreal");
 }
 
 ACameraActor* FindPreviewCaptureCamera(UWorld* World)
@@ -825,6 +1088,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     AddPreviewLightRig(World, Spec);
 
     AddPreviewTerrainMesh(World, Spec);
+    AddPreviewAerialDrapeTiles(World, Spec);
     AddPreviewRiverRibbonMesh(World, Spec);
     AddPreviewRaftForeground(World, Spec, CubeMesh, CylinderMesh);
     AddPreviewFoamAndHydraulics(World, Spec, PlaneMesh);
@@ -1891,7 +2155,9 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("      \"source_manifest\": \"%s\",\n")
             TEXT("      \"capture\": \"%s\",\n")
             TEXT("      \"status\": \"%s\",\n")
-            TEXT("      \"fidelity_note\": \"source-aware procedural blockout with generated valley, river, foam, rocks, foliage, and raft proxies; not yet production photoreal\"\n")
+            TEXT("      \"aerial_drape_image\": \"%s\",\n")
+            TEXT("      \"elevation_sample\": \"%s\",\n")
+            TEXT("      \"fidelity_note\": \"%s\"\n")
             TEXT("    }"),
             Index == 0 ? TEXT("") : TEXT(",\n"),
             *EscapeRaftSimJsonString(Spec.RiverId),
@@ -1899,7 +2165,10 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             *EscapeRaftSimJsonString(Spec.MapPackagePath),
             *EscapeRaftSimJsonString(Spec.SourceManifest),
             *EscapeRaftSimJsonString(CapturePath),
-            bCaptured ? TEXT("captured_procedural_blockout_render") : TEXT("capture_failed"));
+            bCaptured && !Spec.SourceDrapeDescription.IsEmpty() ? TEXT("captured_source_derived_preview_render") : (bCaptured ? TEXT("captured_procedural_blockout_render") : TEXT("capture_failed")),
+            *EscapeRaftSimJsonString(Spec.AerialDrapeImage),
+            *EscapeRaftSimJsonString(Spec.ElevationSample),
+            *EscapeRaftSimJsonString(GetPreviewFidelityNote(Spec)));
     }
 
     const FString Manifest = FString::Printf(
@@ -1912,7 +2181,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("%s\n")
         TEXT("  ]\n")
         TEXT("}\n"),
-        bAllCaptured ? TEXT("rendered_procedural_blockout_captures_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
+        bAllCaptured ? TEXT("south_fork_source_draped_preview_and_procedural_blockout_captures_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
         *EntriesJson);
 
     const FString ManifestPath = FPaths::Combine(CaptureRoot, TEXT("environment_capture_manifest.json"));
