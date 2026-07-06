@@ -1,0 +1,1100 @@
+{
+  "candidate_id": "colorado_lees_ferry_nhd_mainstem_candidate",
+  "caveats": [
+    "This candidate is derived from named NHD Colorado River flowlines only; it is not river-mile stationing or accepted bank/sandbar geometry.",
+    "No endpoint snapping was used. The exact graph is clean for this pilot, but the direction still needs river-mile, aerial, NPS/GCMRC, and oarsman/geospatial review.",
+    "The source features are bbox-intersected full features, so parts of the candidate can extend outside the pilot bounds.",
+    "Use this line as an editor/review overlay and future stationing seed only until visible water edge, release-aware wet-bank classes, sandbars, eddies, and access/publication sensitivity are reviewed."
+  ],
+  "graph_diagnostic": {
+    "branch_node_count": 0,
+    "direction_inference": "source_digitized_order_used_after_exact_endpoint_graph_produced_one_start_one_end_no_branches; downstream direction still requires river-mile/oarsman review",
+    "end_nodes_outdegree_zero": [
+      [
+        -111.643659804,
+        36.79850281
+      ]
+    ],
+    "endpoint_rounding_degrees": 1e-09,
+    "ordered_segment_count": 57,
+    "snapping_used": false,
+    "start_nodes_indegree_zero": [
+      [
+        -111.516728471,
+        36.877735076
+      ]
+    ],
+    "unvisited_segment_count": 0
+  },
+  "ordered_segments": [
+    {
+      "coordinate_count": 14,
+      "end_node": [
+        -111.548850804,
+        36.874989876
+      ],
+      "lengthkm": 3.05531133,
+      "order_index": 0,
+      "permanent_id": "79250377",
+      "reachcode": "14070006000716",
+      "source_hu8": "14070006",
+      "source_record_index": 1483,
+      "start_node": [
+        -111.516728471,
+        36.877735076
+      ]
+    },
+    {
+      "coordinate_count": 9,
+      "end_node": [
+        -111.556506071,
+        36.873749876
+      ],
+      "lengthkm": 0.77731007,
+      "order_index": 1,
+      "permanent_id": "79250365",
+      "reachcode": "14070006000716",
+      "source_hu8": "14070006",
+      "source_record_index": 9452,
+      "start_node": [
+        -111.548850804,
+        36.874989876
+      ]
+    },
+    {
+      "coordinate_count": 3,
+      "end_node": [
+        -111.561827604,
+        36.874816009
+      ],
+      "lengthkm": 0.48685624,
+      "order_index": 2,
+      "permanent_id": "79250307",
+      "reachcode": "14070006000716",
+      "source_hu8": "14070006",
+      "source_record_index": 9467,
+      "start_node": [
+        -111.556506071,
+        36.873749876
+      ]
+    },
+    {
+      "coordinate_count": 5,
+      "end_node": [
+        -111.565623671,
+        36.873859676
+      ],
+      "lengthkm": 0.37099408,
+      "order_index": 3,
+      "permanent_id": "79250263",
+      "reachcode": "14070006000716",
+      "source_hu8": "14070006",
+      "source_record_index": 9447,
+      "start_node": [
+        -111.561827604,
+        36.874816009
+      ]
+    },
+    {
+      "coordinate_count": 9,
+      "end_node": [
+        -111.560527871,
+        36.863919009
+      ],
+      "lengthkm": 1.31328904,
+      "order_index": 4,
+      "permanent_id": "79250595",
+      "reachcode": "14070006000716",
+      "source_hu8": "14070006",
+      "source_record_index": 9440,
+      "start_node": [
+        -111.565623671,
+        36.873859676
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.559228471,
+        36.861819676
+      ],
+      "lengthkm": 0.26171829,
+      "order_index": 5,
+      "permanent_id": "79250659",
+      "reachcode": "14070006000716",
+      "source_hu8": "14070006",
+      "source_record_index": 9435,
+      "start_node": [
+        -111.560527871,
+        36.863919009
+      ]
+    },
+    {
+      "coordinate_count": 5,
+      "end_node": [
+        -111.543789004,
+        36.849828009
+      ],
+      "lengthkm": 1.91690354,
+      "order_index": 6,
+      "permanent_id": "79251115",
+      "reachcode": "14070006000716",
+      "source_hu8": "14070006",
+      "source_record_index": 9445,
+      "start_node": [
+        -111.559228471,
+        36.861819676
+      ]
+    },
+    {
+      "coordinate_count": 12,
+      "end_node": [
+        -111.557088671,
+        36.844125009
+      ],
+      "lengthkm": 1.7595764,
+      "order_index": 7,
+      "permanent_id": "79251293",
+      "reachcode": "14070006000714",
+      "source_hu8": "14070006",
+      "source_record_index": 9458,
+      "start_node": [
+        -111.543789004,
+        36.849828009
+      ]
+    },
+    {
+      "coordinate_count": 9,
+      "end_node": [
+        -111.565464204,
+        36.842927009
+      ],
+      "lengthkm": 0.77329208,
+      "order_index": 8,
+      "permanent_id": "79251237",
+      "reachcode": "14070006004652",
+      "source_hu8": "14070006",
+      "source_record_index": 9463,
+      "start_node": [
+        -111.557088671,
+        36.844125009
+      ]
+    },
+    {
+      "coordinate_count": 6,
+      "end_node": [
+        -111.569928871,
+        36.843586076
+      ],
+      "lengthkm": 0.4167628,
+      "order_index": 9,
+      "permanent_id": "79251233",
+      "reachcode": "14070006004650",
+      "source_hu8": "14070006",
+      "source_record_index": 9451,
+      "start_node": [
+        -111.565464204,
+        36.842927009
+      ]
+    },
+    {
+      "coordinate_count": 5,
+      "end_node": [
+        -111.572623471,
+        36.847685409
+      ],
+      "lengthkm": 0.54985686,
+      "order_index": 10,
+      "permanent_id": "79251205",
+      "reachcode": "14070006004641",
+      "source_hu8": "14070006",
+      "source_record_index": 9436,
+      "start_node": [
+        -111.569928871,
+        36.843586076
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.572821804,
+        36.848048076
+      ],
+      "lengthkm": 0.04424999,
+      "order_index": 11,
+      "permanent_id": "79251055",
+      "reachcode": "14070006004589",
+      "source_hu8": "14070006",
+      "source_record_index": 9439,
+      "start_node": [
+        -111.572623471,
+        36.847685409
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.574087071,
+        36.850114209
+      ],
+      "lengthkm": 0.25706302,
+      "order_index": 12,
+      "permanent_id": "79251041",
+      "reachcode": "14070006004584",
+      "source_hu8": "14070006",
+      "source_record_index": 9473,
+      "start_node": [
+        -111.572821804,
+        36.848048076
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.575414004,
+        36.852130676
+      ],
+      "lengthkm": 0.25452463,
+      "order_index": 13,
+      "permanent_id": "79250975",
+      "reachcode": "14070006004562",
+      "source_hu8": "14070006",
+      "source_record_index": 9446,
+      "start_node": [
+        -111.574087071,
+        36.850114209
+      ]
+    },
+    {
+      "coordinate_count": 7,
+      "end_node": [
+        -111.577535271,
+        36.858856609
+      ],
+      "lengthkm": 0.78419507,
+      "order_index": 14,
+      "permanent_id": "79250913",
+      "reachcode": "14070006004543",
+      "source_hu8": "14070006",
+      "source_record_index": 9450,
+      "start_node": [
+        -111.575414004,
+        36.852130676
+      ]
+    },
+    {
+      "coordinate_count": 6,
+      "end_node": [
+        -111.578062804,
+        36.862587809
+      ],
+      "lengthkm": 0.43357754,
+      "order_index": 15,
+      "permanent_id": "79250683",
+      "reachcode": "14070006004459",
+      "source_hu8": "14070006",
+      "source_record_index": 9443,
+      "start_node": [
+        -111.577535271,
+        36.858856609
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.578733271,
+        36.863637276
+      ],
+      "lengthkm": 0.13165367,
+      "order_index": 16,
+      "permanent_id": "79250571",
+      "reachcode": "14070006004422",
+      "source_hu8": "14070006",
+      "source_record_index": 9449,
+      "start_node": [
+        -111.578062804,
+        36.862587809
+      ]
+    },
+    {
+      "coordinate_count": 4,
+      "end_node": [
+        -111.58291891,
+        36.865162162
+      ],
+      "lengthkm": 0.41988675,
+      "order_index": 17,
+      "permanent_id": "{9DE592B5-A8E3-4BDF-972B-35BE88ABCEB5}",
+      "reachcode": "14070006009455",
+      "source_hu8": "14070006",
+      "source_record_index": 9431,
+      "start_node": [
+        -111.578733271,
+        36.863637276
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.584687671,
+        36.865428609
+      ],
+      "lengthkm": 0.15904279,
+      "order_index": 18,
+      "permanent_id": "{6A05DA33-5137-41BC-9FD7-1BE6D9E3D92F}",
+      "reachcode": "14070006009455",
+      "source_hu8": "14070006",
+      "source_record_index": 9231,
+      "start_node": [
+        -111.58291891,
+        36.865162162
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.586698056,
+        36.865026552
+      ],
+      "lengthkm": 0.18318147,
+      "order_index": 19,
+      "permanent_id": "{E424B4A0-27C8-40DD-BD57-89892E919AC2}",
+      "reachcode": "14070006009455",
+      "source_hu8": "14070006",
+      "source_record_index": 9230,
+      "start_node": [
+        -111.584687671,
+        36.865428609
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.587372791,
+        36.864891612
+      ],
+      "lengthkm": 0.06148048,
+      "order_index": 20,
+      "permanent_id": "{0EE8080B-40A1-45C0-B531-87EC0717D0D6}",
+      "reachcode": "14070006009455",
+      "source_hu8": "14070006",
+      "source_record_index": 9232,
+      "start_node": [
+        -111.586698056,
+        36.865026552
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.588522562,
+        36.864662024
+      ],
+      "lengthkm": 0.10475515,
+      "order_index": 21,
+      "permanent_id": "{2752E09B-FE9D-4154-985A-B1C193D5195B}",
+      "reachcode": "14070006009457",
+      "source_hu8": "14070006",
+      "source_record_index": 9422,
+      "start_node": [
+        -111.587372791,
+        36.864891612
+      ]
+    },
+    {
+      "coordinate_count": 5,
+      "end_node": [
+        -111.594464337,
+        36.860761723
+      ],
+      "lengthkm": 0.69547296,
+      "order_index": 22,
+      "permanent_id": "157450280",
+      "reachcode": "15010001017556",
+      "source_hu8": "14070006",
+      "source_record_index": 9457,
+      "start_node": [
+        -111.588522562,
+        36.864662024
+      ]
+    },
+    {
+      "coordinate_count": 3,
+      "end_node": [
+        -111.600961737,
+        36.858173943
+      ],
+      "lengthkm": 0.6433451,
+      "order_index": 23,
+      "permanent_id": "{F8A5E06F-8739-414B-A820-93F456E41443}",
+      "reachcode": "15010001016262",
+      "source_hu8": "15010001",
+      "source_record_index": 10550,
+      "start_node": [
+        -111.594464337,
+        36.860761723
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.602515204,
+        36.856383209
+      ],
+      "lengthkm": 0.2430704,
+      "order_index": 24,
+      "permanent_id": "157450281",
+      "reachcode": "15010001016262",
+      "source_hu8": "15010001",
+      "source_record_index": 9797,
+      "start_node": [
+        -111.600961737,
+        36.858173943
+      ]
+    },
+    {
+      "coordinate_count": 3,
+      "end_node": [
+        -111.604366122,
+        36.854438344
+      ],
+      "lengthkm": 0.27300354,
+      "order_index": 25,
+      "permanent_id": "{A277CD68-BD64-446A-BED5-7AA7F160D133}",
+      "reachcode": "15010001016218",
+      "source_hu8": "15010001",
+      "source_record_index": 10547,
+      "start_node": [
+        -111.602515204,
+        36.856383209
+      ]
+    },
+    {
+      "coordinate_count": 3,
+      "end_node": [
+        -111.607272737,
+        36.851292609
+      ],
+      "lengthkm": 0.43617752,
+      "order_index": 26,
+      "permanent_id": "161607207",
+      "reachcode": "15010001016218",
+      "source_hu8": "15010001",
+      "source_record_index": 2027,
+      "start_node": [
+        -111.604366122,
+        36.854438344
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.608160704,
+        36.850390757
+      ],
+      "lengthkm": 0.1279172,
+      "order_index": 27,
+      "permanent_id": "{EF46117A-EDFF-4C5A-8F86-1B7F15DD9FEA}",
+      "reachcode": "15010001016218",
+      "source_hu8": "15010001",
+      "source_record_index": 10545,
+      "start_node": [
+        -111.607272737,
+        36.851292609
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.610371179,
+        36.849699433
+      ],
+      "lengthkm": 0.21006893,
+      "order_index": 28,
+      "permanent_id": "{59F749B6-397C-41F6-8FE1-12F1B36ADC4C}",
+      "reachcode": "15010001016218",
+      "source_hu8": "15010001",
+      "source_record_index": 10543,
+      "start_node": [
+        -111.608160704,
+        36.850390757
+      ]
+    },
+    {
+      "coordinate_count": 3,
+      "end_node": [
+        -111.613694675,
+        36.849583046
+      ],
+      "lengthkm": 0.29512249,
+      "order_index": 29,
+      "permanent_id": "{61E0044C-5BDF-45A4-9642-07A3FB1A199C}",
+      "reachcode": "15010001016218",
+      "source_hu8": "15010001",
+      "source_record_index": 10541,
+      "start_node": [
+        -111.610371179,
+        36.849699433
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.615150071,
+        36.849386676
+      ],
+      "lengthkm": 0.13043576,
+      "order_index": 30,
+      "permanent_id": "{80C3CA0C-0ACD-42C8-8FC2-F5DF8A03C8AC}",
+      "reachcode": "15010001016218",
+      "source_hu8": "15010001",
+      "source_record_index": 10539,
+      "start_node": [
+        -111.613694675,
+        36.849583046
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.615986271,
+        36.848726476
+      ],
+      "lengthkm": 0.105,
+      "order_index": 31,
+      "permanent_id": "126013332",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 7158,
+      "start_node": [
+        -111.615150071,
+        36.849386676
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.616312671,
+        36.848089476
+      ],
+      "lengthkm": 0.077,
+      "order_index": 32,
+      "permanent_id": "126013334",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 3271,
+      "start_node": [
+        -111.615986271,
+        36.848726476
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.617324204,
+        36.843862209
+      ],
+      "lengthkm": 0.48198319,
+      "order_index": 33,
+      "permanent_id": "126013336",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 3272,
+      "start_node": [
+        -111.616312671,
+        36.848089476
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.617521271,
+        36.843000409
+      ],
+      "lengthkm": 0.09811376,
+      "order_index": 34,
+      "permanent_id": "126013338",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 3973,
+      "start_node": [
+        -111.617324204,
+        36.843862209
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.617562871,
+        36.841831876
+      ],
+      "lengthkm": 0.131,
+      "order_index": 35,
+      "permanent_id": "126013340",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 5915,
+      "start_node": [
+        -111.617521271,
+        36.843000409
+      ]
+    },
+    {
+      "coordinate_count": 3,
+      "end_node": [
+        -111.616877471,
+        36.839048076
+      ],
+      "lengthkm": 0.32042046,
+      "order_index": 36,
+      "permanent_id": "126013342",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 8520,
+      "start_node": [
+        -111.617562871,
+        36.841831876
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.616790271,
+        36.837716409
+      ],
+      "lengthkm": 0.14939938,
+      "order_index": 37,
+      "permanent_id": "126013344",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 461,
+      "start_node": [
+        -111.616877471,
+        36.839048076
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.617003671,
+        36.835706676
+      ],
+      "lengthkm": 0.226,
+      "order_index": 38,
+      "permanent_id": "126013346",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 5356,
+      "start_node": [
+        -111.616790271,
+        36.837716409
+      ]
+    },
+    {
+      "coordinate_count": 4,
+      "end_node": [
+        -111.619658207,
+        36.833341422
+      ],
+      "lengthkm": 0.36393095,
+      "order_index": 39,
+      "permanent_id": "126013347",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 8521,
+      "start_node": [
+        -111.617003671,
+        36.835706676
+      ]
+    },
+    {
+      "coordinate_count": 3,
+      "end_node": [
+        -111.621520671,
+        36.832158876
+      ],
+      "lengthkm": 0.21187662,
+      "order_index": 40,
+      "permanent_id": "{389FAA5D-EB65-423D-BB92-9ECD0D9A68C0}",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 10639,
+      "start_node": [
+        -111.619658207,
+        36.833341422
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.622100071,
+        36.831932876
+      ],
+      "lengthkm": 0.05711463,
+      "order_index": 41,
+      "permanent_id": "126013350",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 8954,
+      "start_node": [
+        -111.621520671,
+        36.832158876
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.625153404,
+        36.828933076
+      ],
+      "lengthkm": 0.431,
+      "order_index": 42,
+      "permanent_id": "126013353",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 10165,
+      "start_node": [
+        -111.622100071,
+        36.831932876
+      ]
+    },
+    {
+      "coordinate_count": 4,
+      "end_node": [
+        -111.626824004,
+        36.826837076
+      ],
+      "lengthkm": 0.28342102,
+      "order_index": 43,
+      "permanent_id": "126013351",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 6865,
+      "start_node": [
+        -111.625153404,
+        36.828933076
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.627697804,
+        36.825347076
+      ],
+      "lengthkm": 0.1839313,
+      "order_index": 44,
+      "permanent_id": "126014409",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 4692,
+      "start_node": [
+        -111.626824004,
+        36.826837076
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.628049004,
+        36.82495861
+      ],
+      "lengthkm": 0.053,
+      "order_index": 45,
+      "permanent_id": "126014411",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 4810,
+      "start_node": [
+        -111.627697804,
+        36.825347076
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.628372404,
+        36.82426501
+      ],
+      "lengthkm": 0.083,
+      "order_index": 46,
+      "permanent_id": "126014413",
+      "reachcode": "15010001000715",
+      "source_hu8": "15010001",
+      "source_record_index": 2252,
+      "start_node": [
+        -111.628049004,
+        36.82495861
+      ]
+    },
+    {
+      "coordinate_count": 3,
+      "end_node": [
+        -111.628815004,
+        36.82267541
+      ],
+      "lengthkm": 0.182,
+      "order_index": 47,
+      "permanent_id": "126014416",
+      "reachcode": "15010001014047",
+      "source_hu8": "15010001",
+      "source_record_index": 7771,
+      "start_node": [
+        -111.628372404,
+        36.82426501
+      ]
+    },
+    {
+      "coordinate_count": 3,
+      "end_node": [
+        -111.630752671,
+        36.818229076
+      ],
+      "lengthkm": 0.531,
+      "order_index": 48,
+      "permanent_id": "126014419",
+      "reachcode": "15010001014048",
+      "source_hu8": "15010001",
+      "source_record_index": 6957,
+      "start_node": [
+        -111.628815004,
+        36.82267541
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.633152804,
+        36.81463501
+      ],
+      "lengthkm": 0.455,
+      "order_index": 49,
+      "permanent_id": "126014421",
+      "reachcode": "15010001014049",
+      "source_hu8": "15010001",
+      "source_record_index": 1294,
+      "start_node": [
+        -111.630752671,
+        36.818229076
+      ]
+    },
+    {
+      "coordinate_count": 3,
+      "end_node": [
+        -111.634633804,
+        36.81010961
+      ],
+      "lengthkm": 0.524,
+      "order_index": 50,
+      "permanent_id": "126014425",
+      "reachcode": "15010001014050",
+      "source_hu8": "15010001",
+      "source_record_index": 7141,
+      "start_node": [
+        -111.633152804,
+        36.81463501
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.634896404,
+        36.80972161
+      ],
+      "lengthkm": 0.049,
+      "order_index": 51,
+      "permanent_id": "126014435",
+      "reachcode": "15010001014052",
+      "source_hu8": "15010001",
+      "source_record_index": 9684,
+      "start_node": [
+        -111.634633804,
+        36.81010961
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.63632847,
+        36.80847261
+      ],
+      "lengthkm": 0.189,
+      "order_index": 52,
+      "permanent_id": "126014439",
+      "reachcode": "15010001014053",
+      "source_hu8": "15010001",
+      "source_record_index": 3474,
+      "start_node": [
+        -111.634896404,
+        36.80972161
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.64065787,
+        36.805681876
+      ],
+      "lengthkm": 0.494,
+      "order_index": 53,
+      "permanent_id": "126014441",
+      "reachcode": "15010001014054",
+      "source_hu8": "15010001",
+      "source_record_index": 9141,
+      "start_node": [
+        -111.63632847,
+        36.80847261
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.642447204,
+        36.80479721
+      ],
+      "lengthkm": 0.187,
+      "order_index": 54,
+      "permanent_id": "126017619",
+      "reachcode": "15010001015978",
+      "source_hu8": "15010001",
+      "source_record_index": 9939,
+      "start_node": [
+        -111.64065787,
+        36.805681876
+      ]
+    },
+    {
+      "coordinate_count": 5,
+      "end_node": [
+        -111.643749004,
+        36.800089476
+      ],
+      "lengthkm": 0.59,
+      "order_index": 55,
+      "permanent_id": "126014442",
+      "reachcode": "15010001014055",
+      "source_hu8": "15010001",
+      "source_record_index": 8446,
+      "start_node": [
+        -111.642447204,
+        36.80479721
+      ]
+    },
+    {
+      "coordinate_count": 2,
+      "end_node": [
+        -111.643659804,
+        36.79850281
+      ],
+      "lengthkm": 0.178,
+      "order_index": 56,
+      "permanent_id": "126014444",
+      "reachcode": "15010001000740",
+      "source_hu8": "15010001",
+      "source_record_index": 4609,
+      "start_node": [
+        -111.643749004,
+        36.800089476
+      ]
+    }
+  ],
+  "output_artifacts": {
+    "mainstem_candidate_geojson": "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson"
+  },
+  "output_checksums": {
+    "mainstem_candidate_geojson": {
+      "sha256": "c6495f43181f46177a61674b3062df84b35a9a754f31746d5ec44dfd9ef5d692",
+      "size_bytes": 7011
+    }
+  },
+  "promotion_gate": "Attach river-mile markers and a working CRS, sample this line against NAIP/DEM/masks, generate cross-section and sandbar review seeds, and obtain oarsman/geospatial approval before production geometry use.",
+  "review_date": "2026-07-06",
+  "schema": "raftsim.colorado_nhd_hu8_mainstem_candidate.v0",
+  "selection": {
+    "duplicate_overlap_segment_count": 2,
+    "duplicate_overlap_segments": [
+      {
+        "coordinate_count": 2,
+        "duplicates_source_hu8": "14070006",
+        "duplicates_source_record_index": 9422,
+        "end_node": [
+          -111.588522562,
+          36.864662024
+        ],
+        "lengthkm": 0.10475515,
+        "permanent_id": "{2752E09B-FE9D-4154-985A-B1C193D5195B}",
+        "reachcode": "14070006009457",
+        "source_feature_bbox_wgs84": {
+          "max_lat": 36.86489161,
+          "max_lon": -111.58737279,
+          "min_lat": 36.86466202,
+          "min_lon": -111.58852256
+        },
+        "source_hu8": "15010001",
+        "source_record_index": 0,
+        "start_node": [
+          -111.587372791,
+          36.864891612
+        ]
+      },
+      {
+        "coordinate_count": 5,
+        "duplicates_source_hu8": "14070006",
+        "duplicates_source_record_index": 9457,
+        "end_node": [
+          -111.594464337,
+          36.860761723
+        ],
+        "lengthkm": 0.69547296,
+        "permanent_id": "157450280",
+        "reachcode": "15010001017556",
+        "source_feature_bbox_wgs84": {
+          "max_lat": 36.86466202,
+          "max_lon": -111.58852256,
+          "min_lat": 36.86076172,
+          "min_lon": -111.59446434
+        },
+        "source_hu8": "15010001",
+        "source_record_index": 2,
+        "start_node": [
+          -111.588522562,
+          36.864662024
+        ]
+      }
+    ],
+    "raw_named_feature_count": 59,
+    "selected_gnis_name": "Colorado River",
+    "source_hu8_counts_raw": {
+      "14070006": 23,
+      "15010001": 36
+    },
+    "source_hu8_counts_unique": {
+      "14070006": 23,
+      "15010001": 34
+    },
+    "unique_segment_count": 57
+  },
+  "source_artifacts": {
+    "bbox_extract_manifest": "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
+    "flowline_extract_geojson": "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson"
+  },
+  "status": "derived_review_gated_mainstem_candidate_not_river_mile_stationing",
+  "summary": {
+    "bbox_wgs84": {
+      "max_lat": 36.87975168,
+      "max_lon": -111.51672847,
+      "min_lat": 36.79850281,
+      "min_lon": -111.6441534
+    },
+    "candidate_vertex_count": 145,
+    "downstream_endpoint_lonlat": [
+      -111.643659804,
+      36.79850281
+    ],
+    "preview_local_length_m": 24223.694,
+    "source_length_km_sum": 24.205286,
+    "upstream_endpoint_lonlat": [
+      -111.516728471,
+      36.877735076
+    ]
+  }
+}

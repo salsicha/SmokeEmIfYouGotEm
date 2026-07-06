@@ -246,6 +246,8 @@
         "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
         "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
         "hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson",
+        "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
+        "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
         "hydrology/usgs_09380000_daily_discharge.json",
         "hydrology/usgs_09402500_daily_discharge.json",
         "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
@@ -257,11 +259,13 @@
       "display_name": "Colorado River, Grand Canyon Lees Ferry rowing prototype",
       "p0_next_pulls_or_attachments": [
         {
-          "promotion_gate": "Promote the attached stitched NHD HU8 source overlay only after ordered mainstem derivation, river mile stationing, visible flowline/water-edge alignment, exposed sandbars, eddies, camps/access sensitivity, and oarsman review pass.",
+          "promotion_gate": "Promote the attached stitched NHD HU8 source overlay and exact-graph mainstem candidate only after river mile stationing, visible flowline/water-edge alignment, exposed sandbars, eddies, camps/access sensitivity, and oarsman review pass.",
           "required_artifacts": [
             "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
             "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
             "hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson",
+            "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
+            "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
             "hydrography/production_import_pilot/centerline.geojson",
             "hydrography/production_import_pilot/river_mile_markers.geojson",
             "hydrography/production_import_pilot/sandbars.geojson"
