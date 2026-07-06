@@ -483,6 +483,35 @@
         "It does not identify visible water, shelves, side channels, islands, sandbars, eddies, boils, holes, or release-dependent wetted width.",
         "Do not replace source-derived water masks, reviewed banks, or solver cross sections with this prior."
       ]
+    },
+    {
+      "artifact_id": "colorado_production_hydrography_drafts",
+      "category": "derived_hydrography_review_artifacts",
+      "path": "hydrography/production_import_pilot/hydrography_draft_manifest.json",
+      "related_artifacts": [
+        "hydrography/production_import_pilot/centerline.geojson",
+        "hydrography/production_import_pilot/banks.geojson",
+        "hydrography/production_import_pilot/cross_sections.geojson"
+      ],
+      "provider": "RaftSim derived artifact from the Colorado NHD mainstem stationing and cross-section seeds",
+      "status": "generated_review_gated_drafts_not_production_geometry_or_river_miles",
+      "summary": {
+        "centerline_vertex_count": 145,
+        "cross_section_count": 123,
+        "bank_offset_line_count": 2,
+        "length_m_preview": 24223.694
+      },
+      "use": [
+        "editor_hydrography_overlay",
+        "manual_bank_and_sandbar_review_seed",
+        "future_solver_geometry_authoring",
+        "river_mile_and_oarsman_review_stationing_context"
+      ],
+      "caveats": [
+        "These are production-import folder overlays for editor review, not accepted river-mile or route authority.",
+        "Bank lines are fixed-offset seed endpoints from cross-section review lines, not observed wetted banks or sandbars.",
+        "Cross-section lines remain review seeds and must not be used as solver cross sections until river-mile, bank, sandbar, release, and oarsman review pass."
+      ]
     }
   ],
   "production_blockers": [

@@ -98,6 +98,12 @@ COLORADO_NHD_CROSS_SECTION_SEED_FILE = "hydrography/nhd_hu8_lees_ferry_cross_sec
 COLORADO_NHD_ALIGNMENT_DIAGNOSTIC_FILE = "hydrography/nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic.json"
 COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE = "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json"
 COLORADO_NHD_WATER_PRIOR_FILE = "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png"
+COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE = (
+    "hydrography/production_import_pilot/hydrography_draft_manifest.json"
+)
+COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE = "hydrography/production_import_pilot/centerline.geojson"
+COLORADO_PRODUCTION_BANKS_DRAFT_FILE = "hydrography/production_import_pilot/banks.geojson"
+COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE = "hydrography/production_import_pilot/cross_sections.geojson"
 COLORADO_USBR_TOTAL_RELEASE_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json"
 COLORADO_USBR_RELEASE_CONTEXT_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json"
 PACUARE_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
@@ -1377,7 +1383,10 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
                     COLORADO_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
                     COLORADO_NHD_CROSS_SECTION_SEED_FILE,
                     COLORADO_NHD_ALIGNMENT_DIAGNOSTIC_FILE,
-                    "hydrography/production_import_pilot/centerline.geojson",
+                    COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE,
+                    COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE,
+                    COLORADO_PRODUCTION_BANKS_DRAFT_FILE,
+                    COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
                     "hydrography/production_import_pilot/river_mile_markers.geojson",
                     "hydrography/production_import_pilot/sandbars.geojson",
                 ],
@@ -1416,8 +1425,9 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
                     "imagery/production_import_pilot/source_masks_manifest.json",
                 ],
                 "promotion_gate": (
-                    "Derive masks from reviewed imagery, hydrography, and release-band context, then manually review "
-                    "water edge, exposed sandbars, wet rock, tamarisk/cottonwood/scrub, and release-dependent visibility."
+                    "Derive masks from reviewed imagery, hydrography, release-band context, and the NHD prior as an "
+                    "editor aid, then manually review water edge, exposed sandbars, wet rock, tamarisk/cottonwood/scrub, "
+                    "and release-dependent visibility."
                 ),
             },
             {
@@ -2050,6 +2060,10 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     COLORADO_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
                     COLORADO_NHD_CROSS_SECTION_SEED_FILE,
                     COLORADO_NHD_ALIGNMENT_DIAGNOSTIC_FILE,
+                    COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE,
+                    COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE,
+                    COLORADO_PRODUCTION_BANKS_DRAFT_FILE,
+                    COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
                     "hydrology/usgs_09380000_daily_discharge.json",
                     "hydrology/usgs_09402500_daily_discharge.json",
                     COLORADO_USBR_TOTAL_RELEASE_FILE,
@@ -2069,7 +2083,10 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             COLORADO_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
                             COLORADO_NHD_CROSS_SECTION_SEED_FILE,
                             COLORADO_NHD_ALIGNMENT_DIAGNOSTIC_FILE,
-                            "hydrography/production_import_pilot/centerline.geojson",
+                            COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE,
+                            COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE,
+                            COLORADO_PRODUCTION_BANKS_DRAFT_FILE,
+                            COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
                             "hydrography/production_import_pilot/river_mile_markers.geojson",
                             "hydrography/production_import_pilot/sandbars.geojson",
                         ],

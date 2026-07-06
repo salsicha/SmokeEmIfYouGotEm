@@ -41,7 +41,11 @@
       "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
       "hydrography/nhd_hu8_lees_ferry_cross_section_seed_manifest.json",
       "hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson",
-      "hydrography/nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic.json"
+      "hydrography/nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic.json",
+      "hydrography/production_import_pilot/hydrography_draft_manifest.json",
+      "hydrography/production_import_pilot/centerline.geojson",
+      "hydrography/production_import_pilot/banks.geojson",
+      "hydrography/production_import_pilot/cross_sections.geojson"
     ],
     "imagery": [
       "imagery/usda_naip_lees_ferry_sample_512.png",

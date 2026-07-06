@@ -513,6 +513,14 @@
           "unreal_use": "editor overlay triage for water-edge, sandbar, wet-bank, river-mile, and oarsman review; not accepted production geometry or solver cross sections"
         },
         {
+          "artifact_id": "colorado_production_hydrography_drafts",
+          "category": "derived_hydrography_review_artifacts",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/hydrography_draft_manifest.json",
+          "provider": "RaftSim geospatial preview utility from Colorado NHD stationing and cross-section seeds",
+          "status": "editor_overlay_review_gated_not_river_mile_geometry",
+          "unreal_use": "Draft centerline, fixed-offset bank lines, and cross-section review overlays for editor annotation only; not accepted banks, sandbars, river-mile stationing, or production solver geometry."
+        },
+        {
           "artifact_id": "usgs_3dep_lees_ferry_sample_256",
           "category": "terrain_sample",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_sample_256.tif",
