@@ -67,6 +67,7 @@ PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION = "raftsim.production_environ
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE = "production_environment_gap_register.json"
 SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE = "hydrology/cdec_terms_flags_and_station_relation_review.json"
 SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE = "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json"
+SOUTH_FORK_FLOW_BAND_REVIEW_FILE = "hydrology/production_import_pilot/flow_band_review.json"
 SOUTH_FORK_NHD_HU8_MANIFEST_FILE = "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json"
 SOUTH_FORK_NHD_HU8_FLOWLINE_EXTRACT_FILE = "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson"
 SOUTH_FORK_NHD_HU8_SUPPORT_EXTRACT_FILE = "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson"
@@ -1245,7 +1246,7 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                     "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
                     SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                     SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
-                    "hydrology/production_import_pilot/flow_band_review.json",
+                    SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
                 ],
                 "promotion_gate": "Use CDEC CBR as the primary modern flow/stage candidate after the USGS 11445500 IV diagnostic; the first terms/flag/station review is attached, but broader representative windows, legal/redistribution signoff, release context, and guide review are still required before low/median/high visual variants are promoted.",
             },
@@ -1978,6 +1979,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
                     SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                     SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
+                    SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
                     "reference_media_link_manifest.json",
                 ],
                 "p0_next_pulls_or_attachments": [
@@ -2005,11 +2007,11 @@ def build_production_environment_gap_register() -> dict[str, object]:
                         "source_class": "seasonal_flow_or_release_history",
                         "required_artifacts": [
                             "hydrology/south_fork_modern_flow_source_selection.json",
-                            "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
-                            SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
-                            SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
-                            "hydrology/production_import_pilot/flow_band_review.json",
-                        ],
+                        "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+                        SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
+                        SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
+                        SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
+                    ],
                         "source_leads": ["cdec_cbr", "cdec_a25_powerhouse_context", "usgs_water_services", "guide_review"],
                         "promotion_gate": (
                             "USGS 11445500 returned no P30D instantaneous time series on 2026-07-06, and CDEC CBR now "
@@ -2306,6 +2308,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
                 SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                 SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
+                SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
                 "hydrology/flow_presets.json",
             ],
             "guide_references": [
@@ -2510,6 +2513,125 @@ def south_fork_american_flow_bands() -> tuple[FlowBand, ...]:
             confidence=0.25,
         ),
     )
+
+
+def build_south_fork_flow_band_review(
+    flow_presets: dict[str, object],
+    cdec_flow_context: dict[str, object],
+    source_selection: dict[str, object],
+) -> dict[str, object]:
+    """Compare South Fork planning flow bands to the attached CDEC review window."""
+
+    daily_rows = cdec_flow_context["daily_cbr_flow_stage_summary"]
+    valid_rows = [row for row in daily_rows if row.get("flow_valid_count", 0) > 0]
+    peak_values = [float(row["flow_peak_cfs"]) for row in valid_rows if row.get("flow_peak_cfs") is not None]
+    median_values = [float(row["flow_median_cfs"]) for row in valid_rows if row.get("flow_median_cfs") is not None]
+    stage_peaks = [float(row["stage_peak_ft"]) for row in valid_rows if row.get("stage_peak_ft") is not None]
+    total_valid_samples = int(sum(int(row.get("flow_valid_count", 0)) for row in valid_rows))
+    observed_max_cfs = max(peak_values) if peak_values else 0.0
+
+    def observed_hours(row: dict[str, object], threshold_cfs: float) -> float:
+        if math.isclose(threshold_cfs, 900.0):
+            return float(row.get("hours_flow_ge_low_runnable_900_cfs", 0.0) or 0.0)
+        if math.isclose(threshold_cfs, 1600.0):
+            return float(row.get("hours_flow_ge_median_runnable_1600_cfs", 0.0) or 0.0)
+        if threshold_cfs > observed_max_cfs:
+            return 0.0
+        return 0.0
+
+    reviewed_bands: list[dict[str, object]] = []
+    for band in flow_presets["flow_bands"]:
+        threshold_cfs = float(band["discharge_cfs"])
+        peak_rows = [row for row in valid_rows if float(row.get("flow_peak_cfs") or 0.0) >= threshold_cfs]
+        median_rows = [row for row in valid_rows if float(row.get("flow_median_cfs") or 0.0) >= threshold_cfs]
+        hours_ge_threshold = round(sum(observed_hours(row, threshold_cfs) for row in valid_rows), 3)
+        peak_dates = [
+            {
+                "date_local": row["date_local"],
+                "flow_peak_cfs": row["flow_peak_cfs"],
+                "flow_peak_time_local": row["flow_peak_time_local"],
+                "stage_peak_ft": row["stage_peak_ft"],
+            }
+            for row in sorted(peak_rows, key=lambda item: float(item.get("flow_peak_cfs") or 0.0), reverse=True)[:8]
+        ]
+        if peak_rows:
+            evidence_status = "observed_as_short_release_window_not_seasonal_validation"
+        else:
+            evidence_status = "not_observed_in_attached_30_day_context"
+        reviewed_bands.append(
+            {
+                "flow_band": band["flow_band"],
+                "season": band["season"],
+                "planning_discharge_cfs": threshold_cfs,
+                "planning_discharge_m3s": band["discharge_m3s"],
+                "planning_notes": band["notes"],
+                "planning_confidence": band["confidence"],
+                "observed_peak_days_ge_planning_flow": len(peak_rows),
+                "observed_median_days_ge_planning_flow": len(median_rows),
+                "observed_hours_ge_planning_flow": hours_ge_threshold,
+                "observed_peak_dates": peak_dates,
+                "evidence_status": evidence_status,
+                "promotion_decision": "blocked_pending_broader_windows_release_context_station_routing_guide_review",
+                "review_use": (
+                    "Use as a visual/gameplay discussion aid only; do not retune solver presets, holes, wave trains, "
+                    "wet banks, or lifelike water appearance from this 30-day window alone."
+                ),
+            }
+        )
+
+    return {
+        "schema": "raftsim.south_fork_flow_band_review.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "status": "review_gated_do_not_promote_presets",
+        "inputs": {
+            "flow_presets": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+            "cdec_context": "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+            "source_selection": "physics/data/real_world/south_fork_american_chili_bar/hydrology/south_fork_modern_flow_source_selection.json",
+            "terms_flags_station_relation_review": "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_terms_flags_and_station_relation_review.json",
+        },
+        "cdec_window_summary": {
+            "requested_start": cdec_flow_context["request_window"]["requested_start"],
+            "requested_end": cdec_flow_context["request_window"]["requested_end"],
+            "valid_sample_count": total_valid_samples,
+            "valid_day_count": len(valid_rows),
+            "flow_min_cfs": min(float(row["flow_min_cfs"]) for row in valid_rows),
+            "flow_median_of_daily_medians_cfs": round(float(np.median(median_values)), 3),
+            "flow_peak_max_cfs": observed_max_cfs,
+            "stage_peak_max_ft": max(stage_peaks) if stage_peaks else None,
+            "days_peak_ge_900_cfs": sum(1 for row in valid_rows if float(row.get("flow_peak_cfs") or 0.0) >= 900.0),
+            "days_peak_ge_1600_cfs": sum(1 for row in valid_rows if float(row.get("flow_peak_cfs") or 0.0) >= 1600.0),
+            "days_peak_ge_3000_cfs": sum(1 for row in valid_rows if float(row.get("flow_peak_cfs") or 0.0) >= 3000.0),
+            "total_hours_ge_900_cfs": round(sum(float(row.get("hours_flow_ge_low_runnable_900_cfs", 0.0) or 0.0) for row in valid_rows), 3),
+            "total_hours_ge_1600_cfs": round(sum(float(row.get("hours_flow_ge_median_runnable_1600_cfs", 0.0) or 0.0) for row in valid_rows), 3),
+            "a25_valid_daily_generation_samples": source_selection["cdec_30_day_context_window"]["summary"][
+                "a25_valid_daily_generation_samples"
+            ],
+            "a25_unlisted_flags_observed": source_selection["cdec_30_day_context_window"]["summary"][
+                "a25_unlisted_flags_observed"
+            ],
+        },
+        "reviewed_bands": reviewed_bands,
+        "promotion_blockers": [
+            "Attached evidence is a 30-day early-summer CDEC context window, not representative seasonal coverage.",
+            "A25 X-flag meaning and station-to-reach release routing are unresolved.",
+            "Legal/redistribution signoff, guide/outfitter validation, and hydrologic station-to-rapid relation remain open.",
+            "High-flow planning at 3000 cfs was not observed in the attached window and needs separate runoff/release evidence.",
+        ],
+        "allowed_use": [
+            "editor flow-band review",
+            "guide discussion",
+            "future low/median/high visual variant planning",
+            "identifying missing seasonal CDEC/A25 pulls",
+        ],
+        "forbidden_use": [
+            "final preset retuning",
+            "claiming accepted seasonal flow bands",
+            "hiding water-simulation conservation failures with visuals or forcing",
+            "production lifelike water approval",
+        ],
+    }
 
 
 def build_player_selection_model() -> dict[str, object]:

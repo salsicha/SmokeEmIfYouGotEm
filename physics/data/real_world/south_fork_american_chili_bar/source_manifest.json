@@ -27,6 +27,7 @@
       "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
       "hydrology/cdec_terms_flags_and_station_relation_review.json",
       "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+      "hydrology/production_import_pilot/flow_band_review.json",
       "hydrology/flow_presets.json"
     ],
     "guide_references": [

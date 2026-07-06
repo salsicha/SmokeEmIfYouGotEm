@@ -263,10 +263,11 @@
             "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
             "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_terms_flags_and_station_relation_review.json",
             "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+            "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json",
             "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"
           ],
-          "promotion_blocker": "USGS 11445500 returned no P30D instantaneous discharge or stage time series on 2026-07-06; CDEC CBR now has a first reproducible event-window pull, an attached terms/flag/station relation review, and a 30-day CBR/A25 context window. Broader seasonal windows, A25 X-flag interpretation, release context, hydrologic station-to-reach review, legal/redistribution signoff, and guide validation are still needed before all seasonal flow visuals are final.",
-          "status": "historical_daily_discharge_usgs_iv_no_data_cdec_candidate_first_window_terms_flag_review_and_30d_context_attached"
+          "promotion_blocker": "The South Fork CBR/A25 30-day context and flow-band review are attached: 25 local days peak at or above 900 cfs, 9 peak at or above 1600 cfs, and none reach the 3000 cfs high-flow planning band. Promotion remains blocked on broader seasonal windows, A25 X-flag interpretation, release routing, legal/redistribution signoff, station-to-reach review, and guide/outfitter validation.",
+          "status": "cdec_cbr_a25_context_and_flow_band_review_attached_promotion_blocked"
         },
         "terrain_dem_or_lidar": {
           "artifacts": [
