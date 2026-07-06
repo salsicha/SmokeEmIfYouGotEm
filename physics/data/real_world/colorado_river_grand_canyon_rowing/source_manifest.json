@@ -81,7 +81,8 @@
       "production_source_pull_manifest.json",
       "production_import_pilot.json",
       "production_import_pilot_pull_manifest.json",
-      "production_import_pilot_derivatives_manifest.json"
+      "production_import_pilot_derivatives_manifest.json",
+      "review/production_import_pilot/source_metadata_review.json"
     ],
     "unreal": [
       "unreal/colorado_rowing_route_editor_pass.json"

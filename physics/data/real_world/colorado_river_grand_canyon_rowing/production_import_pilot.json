@@ -40,7 +40,8 @@
         "terrain/production_import_pilot/3dep_tiles",
         "terrain/production_import_pilot/dem_relief_2048.png",
         "terrain/production_import_pilot/heightfield_candidate_2017.png",
-        "production_import_pilot_derivatives_manifest.json"
+        "production_import_pilot_derivatives_manifest.json",
+        "review/production_import_pilot/source_metadata_review.json"
       ]
     },
     {
@@ -81,7 +82,8 @@
       "target_outputs": [
         "imagery/production_import_pilot/naip_tiles",
         "imagery/production_import_pilot/source_drape_4096.png",
-        "production_import_pilot_derivatives_manifest.json"
+        "production_import_pilot_derivatives_manifest.json",
+        "review/production_import_pilot/source_metadata_review.json"
       ]
     },
     {
