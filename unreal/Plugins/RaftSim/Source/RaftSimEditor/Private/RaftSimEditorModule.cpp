@@ -258,19 +258,19 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.MapPackagePath = TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview");
     Colorado.SourceManifest = TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json");
     Colorado.AerialDrapeImage =
-        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_sample_1024.png");
+        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png");
     Colorado.TerrainReliefImage =
-        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_relief_preview_1024.png");
+        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/dem_relief_2048.png");
     Colorado.HeightfieldPreviewImage =
-        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png");
+        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/heightfield_candidate_2017.png");
     Colorado.WaterMaskImage =
-        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_water_mask_1024.png");
+        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/water_mask_2048.png");
     Colorado.VegetationMaskImage =
-        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_vegetation_mask_1024.png");
+        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/vegetation_mask_2048.png");
     Colorado.ElevationSample =
-        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif");
+        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles");
     Colorado.SourceDrapeDescription =
-        TEXT("larger official USDA/APFO NAIP 1024px Lees Ferry corridor sample sampled into a denser terrain-conforming canyon source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into canyon bank preview geometry; review-gated source water/vegetation masks sampled into terrain color and deterministic wet-rock, talus, sparse scrub, and boulder placement; first-party procedural strata, talus, wet-rock, and vertex-color water-gradient detail generated as rights-safe proxy dressing; full canyon heightfield conditioning remains pending; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers");
+        TEXT("stitched Colorado/Lees Ferry production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into canyon bank preview geometry; pilot source water/vegetation masks are sampled into terrain color and deterministic wet-rock, talus, sparse scrub, and boulder placement; all pilot derivatives remain review-gated until metadata review, mosaic/clip, river-mile stationing, hydrologic conditioning, release-aware masks, and guide/oarsman approval pass; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers");
     Colorado.FlowBandId = TEXT("moderate_release_planning");
     Colorado.FlowBandDisplayName = TEXT("Moderate Release Planning");
     Colorado.FlowBandSource = TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json");
