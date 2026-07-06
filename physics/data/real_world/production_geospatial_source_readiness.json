@@ -213,12 +213,13 @@
           "promotion_blocker": "Masks are deterministic preview derivatives from source imagery and a bounded channel prior; they require hydrography/bank alignment, scene review, seasonal variants, wet-rock classification, and guide/geospatial approval."
         },
         "seasonal_flow_or_release_history": {
-          "status": "historical_daily_discharge_attached",
+          "status": "historical_daily_discharge_and_usgs_iv_no_data_diagnostic_attached",
           "artifacts": [
             "physics/data/real_world/south_fork_american_chili_bar/hydrology/usgs_11445500_daily_discharge.json",
+            "physics/data/real_world/south_fork_american_chili_bar/hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
             "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"
           ],
-          "promotion_blocker": "Modern gauge/release context, instantaneous data, and guide review still needed before all seasonal flow visuals are final."
+          "promotion_blocker": "USGS 11445500 returned no P30D instantaneous discharge or stage time series on 2026-07-06; alternate official modern flow/release context and guide review are still needed before all seasonal flow visuals are final."
         },
         "protected_area_and_access_context": {
           "status": "not_attached_for_production_publication",

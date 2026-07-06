@@ -1,0 +1,76 @@
+{
+  "schema": "raftsim.usgs_iv_availability_diagnostic.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "american_south_fork",
+  "section_id": "chili_bar_to_coloma",
+  "site": {
+    "site_no": "11445500",
+    "name": "SF AMERICAN R NR LOTUS CA",
+    "provider": "USGS Water Services / NWIS"
+  },
+  "request": {
+    "url": "https://waterservices.usgs.gov/nwis/iv/?format=json&sites=11445500&parameterCd=00060,00065&period=P30D&siteStatus=all",
+    "period": "P30D",
+    "parameters": [
+      {
+        "parameter_cd": "00060",
+        "name": "Discharge",
+        "unit": "ft3/s"
+      },
+      {
+        "parameter_cd": "00065",
+        "name": "Gage height",
+        "unit": "ft"
+      }
+    ],
+    "request_dt_utc": "2026-07-06T14:11:02.641Z",
+    "request_id": "854dc700-7944-11f1-b3a8-2cea7f58f5ca"
+  },
+  "status": "source_reached_no_instantaneous_timeseries_returned",
+  "response_summary": {
+    "time_series_count": 0,
+    "returned_values_count": 0,
+    "query_url": "http://waterservices.usgs.gov/nwis/iv/format=json&sites=11445500&parameterCd=00060,00065&period=P30D&siteStatus=all",
+    "service_notes": [
+      {
+        "value": "[ALL:11445500]",
+        "title": "filter:sites"
+      },
+      {
+        "value": "[mode=PERIOD, period=P30D, modifiedSince=null]",
+        "title": "filter:timeRange"
+      },
+      {
+        "value": "methodIds=[ALL]",
+        "title": "filter:methodId"
+      },
+      {
+        "value": "2026-07-06T14:11:02.641Z",
+        "title": "requestDT"
+      },
+      {
+        "value": "854dc700-7944-11f1-b3a8-2cea7f58f5ca",
+        "title": "requestId"
+      },
+      {
+        "value": "Provisional data are subject to revision. Go to http://waterdata.usgs.gov/nwis/help/?provisional for more information.",
+        "title": "disclaimer"
+      },
+      {
+        "value": "vaas01",
+        "title": "server"
+      }
+    ]
+  },
+  "interpretation": [
+    "This is negative availability evidence, not a modern flow record.",
+    "The attached historical daily discharge record for USGS 11445500 ends on 1995-09-30, and this 2026-07-06 instantaneous-values request returned no P30D series.",
+    "South Fork low/median/high visual and gameplay bands still need modern official flow or release evidence plus guide review before promotion."
+  ],
+  "next_source_leads": [
+    "USGS site inventory and nearby active stations for South Fork American River context",
+    "California Data Exchange Center, SMUD, PG&E, or project/operator release records if public and terms permit",
+    "Guide/outfitter observed flow notes tied to date, reach, and weather/release context"
+  ],
+  "promotion_gate": "Do not treat USGS 11445500 as a live modern gauge until a service request returns current discharge/stage values or an official alternate source is attached."
+}
