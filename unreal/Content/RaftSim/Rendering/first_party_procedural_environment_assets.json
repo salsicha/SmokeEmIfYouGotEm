@@ -33,6 +33,7 @@
     "default_flow_visual_contract": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
     "current_renderer_coverage": [
       "terrain_and_source_drape_vertex_color_variation",
+      "source_drape_vertex_color_terrain_material_blend",
       "heightfield_and_dem_relief_sampling",
       "water_and_vegetation_mask_guided_detail_placement",
       "wet_bank_shore_ribbons",
