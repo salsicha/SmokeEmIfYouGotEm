@@ -81,6 +81,9 @@ SOUTH_FORK_NHD_WATER_PRIOR_FILE = "imagery/production_import_pilot/nhd_mainstem_
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
+COLORADO_NHD_HU8_MANIFEST_FILE = "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json"
+COLORADO_NHD_HU8_FLOWLINE_EXTRACT_FILE = "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson"
+COLORADO_NHD_HU8_SUPPORT_EXTRACT_FILE = "hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson"
 COLORADO_USBR_TOTAL_RELEASE_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json"
 COLORADO_USBR_RELEASE_CONTEXT_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json"
 PACUARE_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
@@ -1330,16 +1333,21 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
             },
             {
                 "class_id": "hydrography_and_centerline",
-                "status": "metadata_and_stationing_pending",
+                "status": "nhd_hu8_bbox_extract_attached_review_pending",
                 "source_ids": ["usgs_3dhp_nhd", "nps_grand_canyon", "gcmrc_or_river_mile_context"],
                 "target_outputs": [
+                    COLORADO_NHD_HU8_MANIFEST_FILE,
+                    COLORADO_NHD_HU8_FLOWLINE_EXTRACT_FILE,
+                    COLORADO_NHD_HU8_SUPPORT_EXTRACT_FILE,
                     "hydrography/production_import_pilot/centerline.geojson",
                     "hydrography/production_import_pilot/river_mile_markers.geojson",
                     "hydrography/production_import_pilot/sandbars.geojson",
                 ],
                 "promotion_gate": (
-                    "Align flowline, visible river edge, river-mile stations, sandbars, eddies, camps/access sensitivity, "
-                    "and oar-line review before using the data as authoritative gameplay geometry."
+                    "Use the attached stitched NHD HU8 source overlay as official flowline and watershed context, then "
+                    "derive and review a single ordered Colorado River mainstem, visible river edge, river-mile stations, "
+                    "sandbars, eddies, camps/access sensitivity, and oar-line review before using the data as "
+                    "authoritative gameplay geometry."
                 ),
             },
             {
@@ -1928,6 +1936,9 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "production_import_pilot/heightfield_candidate_2017.png",
                     "production_import_pilot/water_mask_2048.png",
                     "production_import_pilot/vegetation_mask_2048.png",
+                    COLORADO_NHD_HU8_MANIFEST_FILE,
+                    COLORADO_NHD_HU8_FLOWLINE_EXTRACT_FILE,
+                    COLORADO_NHD_HU8_SUPPORT_EXTRACT_FILE,
                     "hydrology/usgs_09380000_daily_discharge.json",
                     "hydrology/usgs_09402500_daily_discharge.json",
                     COLORADO_USBR_TOTAL_RELEASE_FILE,
@@ -1938,12 +1949,15 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     {
                         "source_class": "hydrography_and_centerline",
                         "required_artifacts": [
+                            COLORADO_NHD_HU8_MANIFEST_FILE,
+                            COLORADO_NHD_HU8_FLOWLINE_EXTRACT_FILE,
+                            COLORADO_NHD_HU8_SUPPORT_EXTRACT_FILE,
                             "hydrography/production_import_pilot/centerline.geojson",
                             "hydrography/production_import_pilot/river_mile_markers.geojson",
                             "hydrography/production_import_pilot/sandbars.geojson",
                         ],
                         "source_leads": ["usgs_3dhp", "nps_grand_canyon_media", "gcmrc_or_river_mile_context"],
-                        "promotion_gate": "Align river mile stationing, flowline, exposed sandbars, eddies, camps/access sensitivity, and oarsman review before gameplay authority.",
+                        "promotion_gate": "Promote the attached stitched NHD HU8 source overlay only after ordered mainstem derivation, river mile stationing, visible flowline/water-edge alignment, exposed sandbars, eddies, camps/access sensitivity, and oarsman review pass.",
                     },
                     {
                         "source_class": "seasonal_flow_or_release_history",

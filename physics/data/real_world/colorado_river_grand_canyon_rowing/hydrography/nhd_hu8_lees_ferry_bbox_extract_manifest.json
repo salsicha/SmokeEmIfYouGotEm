@@ -1,0 +1,1314 @@
+{
+  "caveats": [
+    "Features are selected by source-feature bbox intersection with the pilot bounds and are not clipped to the bounds.",
+    "This extract is not an ordered Colorado River centerline, not river-mile stationing, not accepted banks, and not sandbar geometry.",
+    "NHD 3DHP annual CONUS products were identified in the catalog but not downloaded because they are multi-gigabyte national packages; use them later when a tiled/local 3DHP extraction path is chosen.",
+    "Guide/oarsman review, river-mile references, NPS/GCMRC context, release-band wet-bank review, and Unreal CRS transform review remain required before gameplay authority."
+  ],
+  "extract_id": "colorado_lees_ferry_nhd_hu8_bbox_extract",
+  "layer_summary": {
+    "14070006": {
+      "NHDArea": {
+        "bbox_intersecting_feature_count": 2,
+        "fcode_or_huc12_counts": {
+          "46006": 2
+        },
+        "field_names": [
+          "permanent_",
+          "fdate",
+          "resolution",
+          "gnis_id",
+          "gnis_name",
+          "areasqkm",
+          "elevation",
+          "ftype",
+          "fcode",
+          "visibility",
+          "SHAPE_Leng",
+          "SHAPE_Area",
+          "ObjectID"
+        ],
+        "longest_or_largest_bbox_intersections": [
+          {
+            "areasqkm": 3.16494829,
+            "bbox_wgs84": {
+              "max_lat": 36.93666648,
+              "max_lon": -111.4787596,
+              "min_lat": 36.84199261,
+              "min_lon": -111.58910365
+            },
+            "fcode": 46006,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": null,
+            "name": "",
+            "permanent_id": "120008240",
+            "reachcode": "",
+            "source_record_index": 427
+          },
+          {
+            "areasqkm": 0.19976793,
+            "bbox_wgs84": {
+              "max_lat": 36.86511598,
+              "max_lon": -111.58811492,
+              "min_lat": 36.85629534,
+              "min_lon": -111.60261787
+            },
+            "fcode": 46006,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": null,
+            "name": "",
+            "permanent_id": "{109A80CC-CBAA-4EF6-80AE-857D3FDD1693}",
+            "reachcode": "",
+            "source_record_index": 426
+          }
+        ],
+        "named_feature_counts": {},
+        "total_record_count": 428,
+        "type_or_huc12_counts": {
+          "460": 2
+        }
+      },
+      "NHDFlowline": {
+        "bbox_intersecting_feature_count": 172,
+        "fcode_or_huc12_counts": {
+          "46003": 123,
+          "55800": 49
+        },
+        "field_names": [
+          "permanent_",
+          "fdate",
+          "resolution",
+          "gnis_id",
+          "gnis_name",
+          "lengthkm",
+          "reachcode",
+          "flowdir",
+          "wbarea_per",
+          "ftype",
+          "fcode",
+          "mainpath",
+          "innetwork",
+          "visibility",
+          "SHAPE_Leng",
+          "Enabled",
+          "ObjectID"
+        ],
+        "longest_or_largest_bbox_intersections": [
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.87975168,
+              "max_lon": -111.51672847,
+              "min_lat": 36.87498988,
+              "min_lon": -111.5488508
+            },
+            "fcode": 55800,
+            "ftype": 558,
+            "gnis_name": "Colorado River",
+            "huc12": "",
+            "lengthkm": 3.05531133,
+            "name": "",
+            "permanent_id": "79250377",
+            "reachcode": "14070006000716",
+            "source_record_index": 1483
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.89672321,
+              "max_lon": -111.55610027,
+              "min_lat": 36.88779988,
+              "min_lon": -111.5806142
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.70469227,
+            "name": "",
+            "permanent_id": "79249875",
+            "reachcode": "14070006004206",
+            "source_record_index": 3126
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.80359608,
+              "max_lon": -111.5784388,
+              "min_lat": 36.78916328,
+              "min_lon": -111.59092807
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.62240591,
+            "name": "",
+            "permanent_id": "79253689",
+            "reachcode": "14070006005581",
+            "source_record_index": 5676
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.81464841,
+              "max_lon": -111.56200367,
+              "min_lat": 36.79469508,
+              "min_lon": -111.56658947
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.48457655,
+            "name": "",
+            "permanent_id": "79253605",
+            "reachcode": "14070006005553",
+            "source_record_index": 8289
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.83650828,
+              "max_lon": -111.56791087,
+              "min_lat": 36.81985741,
+              "min_lon": -111.57254387
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "Fall Creek",
+            "huc12": "",
+            "lengthkm": 2.28423407,
+            "name": "",
+            "permanent_id": "79252141",
+            "reachcode": "14070006000168",
+            "source_record_index": 5869
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.80359608,
+              "max_lon": -111.57829407,
+              "min_lat": 36.78769188,
+              "min_lon": -111.58426427
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.12779694,
+            "name": "",
+            "permanent_id": "79253819",
+            "reachcode": "14070006005630",
+            "source_record_index": 3122
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.85122348,
+              "max_lon": -111.52437767,
+              "min_lat": 36.84743881,
+              "min_lon": -111.54339227
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.10556985,
+            "name": "",
+            "permanent_id": "79251257",
+            "reachcode": "14070006000728",
+            "source_record_index": 2310
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.83919568,
+              "max_lon": -111.56151887,
+              "min_lat": 36.82277601,
+              "min_lon": -111.56609287
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.049591,
+            "name": "",
+            "permanent_id": "79252099",
+            "reachcode": "14070006004995",
+            "source_record_index": 8803
+          }
+        ],
+        "named_feature_counts": {
+          "Colorado River": 23,
+          "Fall Creek": 8
+        },
+        "total_record_count": 10565,
+        "type_or_huc12_counts": {
+          "460": 123,
+          "558": 49
+        }
+      },
+      "NHDWaterbody": {
+        "bbox_intersecting_feature_count": 2,
+        "fcode_or_huc12_counts": {
+          "39001": 1,
+          "39009": 1
+        },
+        "field_names": [
+          "permanent_",
+          "fdate",
+          "resolution",
+          "gnis_id",
+          "gnis_name",
+          "areasqkm",
+          "elevation",
+          "reachcode",
+          "ftype",
+          "fcode",
+          "visibility",
+          "SHAPE_Leng",
+          "SHAPE_Area",
+          "ObjectID"
+        ],
+        "longest_or_largest_bbox_intersections": [
+          {
+            "areasqkm": 268.13101902,
+            "bbox_wgs84": {
+              "max_lat": 37.21135248,
+              "max_lon": -110.89352335,
+              "min_lat": 36.84380361,
+              "min_lon": -111.57655092
+            },
+            "fcode": 39009,
+            "ftype": 390,
+            "gnis_name": "Lake Powell",
+            "huc12": "",
+            "lengthkm": null,
+            "name": "",
+            "permanent_id": "120027977",
+            "reachcode": "14070006008574",
+            "source_record_index": 234
+          },
+          {
+            "areasqkm": 0.006,
+            "bbox_wgs84": {
+              "max_lat": 36.81528028,
+              "max_lon": -111.56395867,
+              "min_lat": 36.81453848,
+              "min_lon": -111.56500447
+            },
+            "fcode": 39001,
+            "ftype": 390,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": null,
+            "name": "",
+            "permanent_id": "79260343",
+            "reachcode": "14070006008468",
+            "source_record_index": 157
+          }
+        ],
+        "named_feature_counts": {
+          "Lake Powell": 1
+        },
+        "total_record_count": 238,
+        "type_or_huc12_counts": {
+          "390": 2
+        }
+      },
+      "WBDHU12": {
+        "bbox_intersecting_feature_count": 4,
+        "fcode_or_huc12_counts": {
+          "140700061102": 1,
+          "140700061103": 1,
+          "140700061104": 1,
+          "140700061105": 1
+        },
+        "field_names": [
+          "tnmid",
+          "metasource",
+          "sourcedata",
+          "sourceorig",
+          "sourcefeat",
+          "loaddate",
+          "referenceg",
+          "areaacres",
+          "areasqkm",
+          "states",
+          "huc12",
+          "name",
+          "hutype",
+          "humod",
+          "tohuc",
+          "noncontrib",
+          "noncontr_1",
+          "shape_Leng",
+          "shape_Area",
+          "ObjectID"
+        ],
+        "longest_or_largest_bbox_intersections": [
+          {
+            "areasqkm": 133.04,
+            "bbox_wgs84": {
+              "max_lat": 36.94158589,
+              "max_lon": -111.43463712,
+              "min_lat": 36.77184087,
+              "min_lon": -111.60152509
+            },
+            "fcode": null,
+            "ftype": null,
+            "gnis_name": "",
+            "huc12": "140700061105",
+            "lengthkm": null,
+            "name": "Honey Draw-Colorado River",
+            "permanent_id": "{AAAE4745-7F69-4249-9EE6-61A0FDD375D2}",
+            "reachcode": "",
+            "source_record_index": 6
+          },
+          {
+            "areasqkm": 92.07,
+            "bbox_wgs84": {
+              "max_lat": 36.99823579,
+              "max_lon": -111.50601263,
+              "min_lat": 36.89561796,
+              "min_lon": -111.66638281
+            },
+            "fcode": null,
+            "ftype": null,
+            "gnis_name": "",
+            "huc12": "140700061102",
+            "lengthkm": null,
+            "name": "Ferry Swale Canyon",
+            "permanent_id": "{078EC5B9-DD4F-4BCB-B18A-ACC2A2133CD9}",
+            "reachcode": "",
+            "source_record_index": 23
+          },
+          {
+            "areasqkm": 66.49,
+            "bbox_wgs84": {
+              "max_lat": 36.85976959,
+              "max_lon": -111.43486361,
+              "min_lat": 36.74159527,
+              "min_lon": -111.54365446
+            },
+            "fcode": null,
+            "ftype": null,
+            "gnis_name": "",
+            "huc12": "140700061103",
+            "lengthkm": null,
+            "name": "Water Holes Canyon",
+            "permanent_id": "{D4592B1E-44C4-4FD9-AEDD-EEE5785843AF}",
+            "reachcode": "",
+            "source_record_index": 25
+          },
+          {
+            "areasqkm": 33.95,
+            "bbox_wgs84": {
+              "max_lat": 36.84248584,
+              "max_lon": -111.5513691,
+              "min_lat": 36.70960025,
+              "min_lon": -111.61937665
+            },
+            "fcode": null,
+            "ftype": null,
+            "gnis_name": "",
+            "huc12": "140700061104",
+            "lengthkm": null,
+            "name": "Fall Creek",
+            "permanent_id": "{6EAF34F7-BA14-4834-A12E-EF6DAF106796}",
+            "reachcode": "",
+            "source_record_index": 9
+          }
+        ],
+        "named_feature_counts": {
+          "Fall Creek": 1,
+          "Ferry Swale Canyon": 1,
+          "Honey Draw-Colorado River": 1,
+          "Water Holes Canyon": 1
+        },
+        "total_record_count": 73,
+        "type_or_huc12_counts": {
+          "Fall Creek": 1,
+          "Ferry Swale Canyon": 1,
+          "Honey Draw-Colorado River": 1,
+          "Water Holes Canyon": 1
+        }
+      }
+    },
+    "14070007": {
+      "NHDArea": {
+        "bbox_intersecting_feature_count": 0,
+        "fcode_or_huc12_counts": {},
+        "field_names": [
+          "permanent_",
+          "fdate",
+          "resolution",
+          "gnis_id",
+          "gnis_name",
+          "areasqkm",
+          "elevation",
+          "ftype",
+          "fcode",
+          "visibility",
+          "SHAPE_Leng",
+          "SHAPE_Area",
+          "ObjectID"
+        ],
+        "longest_or_largest_bbox_intersections": [],
+        "named_feature_counts": {},
+        "total_record_count": 16,
+        "type_or_huc12_counts": {}
+      },
+      "NHDFlowline": {
+        "bbox_intersecting_feature_count": 61,
+        "fcode_or_huc12_counts": {
+          "46003": 49,
+          "46006": 12
+        },
+        "field_names": [
+          "permanent_",
+          "fdate",
+          "resolution",
+          "gnis_id",
+          "gnis_name",
+          "lengthkm",
+          "reachcode",
+          "flowdir",
+          "wbarea_per",
+          "ftype",
+          "fcode",
+          "mainpath",
+          "innetwork",
+          "visibility",
+          "SHAPE_Leng",
+          "Enabled",
+          "ObjectID"
+        ],
+        "longest_or_largest_bbox_intersections": [
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.90817968,
+              "max_lon": -111.6320754,
+              "min_lat": 36.89649668,
+              "min_lon": -111.6685016
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 4.217,
+            "name": "",
+            "permanent_id": "79080578",
+            "reachcode": "14070007000606",
+            "source_record_index": 901
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.90516528,
+              "max_lon": -111.63420507,
+              "min_lat": 36.89781608,
+              "min_lon": -111.6498362
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.34,
+            "name": "",
+            "permanent_id": "79080608",
+            "reachcode": "14070007004015",
+            "source_record_index": 5695
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.90255381,
+              "max_lon": -111.60059367,
+              "min_lat": 36.89884988,
+              "min_lon": -111.61923247
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.024,
+            "name": "",
+            "permanent_id": "79080714",
+            "reachcode": "14070007004055",
+            "source_record_index": 5787
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.90365808,
+              "max_lon": -111.63501967,
+              "min_lat": 36.89624408,
+              "min_lon": -111.64800347
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 1.964,
+            "name": "",
+            "permanent_id": "79080646",
+            "reachcode": "14070007004028",
+            "source_record_index": 2847
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.8731966,
+              "max_lon": -111.59171547,
+              "min_lat": 36.86384161,
+              "min_lon": -111.6000206
+            },
+            "fcode": 46006,
+            "ftype": 460,
+            "gnis_name": "Paria River",
+            "huc12": "",
+            "lengthkm": 1.87699534,
+            "name": "",
+            "permanent_id": "79081024",
+            "reachcode": "14070007004747",
+            "source_record_index": 917
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.88743601,
+              "max_lon": -111.59157,
+              "min_lat": 36.88378988,
+              "min_lon": -111.6058964
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 1.528,
+            "name": "",
+            "permanent_id": "79080874",
+            "reachcode": "14070007004110",
+            "source_record_index": 3695
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.88765468,
+              "max_lon": -111.62607567,
+              "min_lat": 36.88297068,
+              "min_lon": -111.63969887
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 1.484,
+            "name": "",
+            "permanent_id": "79080828",
+            "reachcode": "14070007000015",
+            "source_record_index": 3290
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.89449908,
+              "max_lon": -111.5962538,
+              "min_lat": 36.88715428,
+              "min_lon": -111.6058964
+            },
+            "fcode": 46003,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 1.395,
+            "name": "",
+            "permanent_id": "79080832",
+            "reachcode": "14070007004097",
+            "source_record_index": 2730
+          }
+        ],
+        "named_feature_counts": {
+          "Paria River": 12
+        },
+        "total_record_count": 6221,
+        "type_or_huc12_counts": {
+          "460": 61
+        }
+      },
+      "NHDWaterbody": {
+        "bbox_intersecting_feature_count": 2,
+        "fcode_or_huc12_counts": {
+          "39001": 2
+        },
+        "field_names": [
+          "permanent_",
+          "fdate",
+          "resolution",
+          "gnis_id",
+          "gnis_name",
+          "areasqkm",
+          "elevation",
+          "reachcode",
+          "ftype",
+          "fcode",
+          "visibility",
+          "SHAPE_Leng",
+          "SHAPE_Area",
+          "ObjectID"
+        ],
+        "longest_or_largest_bbox_intersections": [
+          {
+            "areasqkm": 0.001,
+            "bbox_wgs84": {
+              "max_lat": 36.87151821,
+              "max_lon": -111.59798867,
+              "min_lat": 36.87121608,
+              "min_lon": -111.5984264
+            },
+            "fcode": 39001,
+            "ftype": 390,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": null,
+            "name": "",
+            "permanent_id": "79081982",
+            "reachcode": "14070007004557",
+            "source_record_index": 72
+          },
+          {
+            "areasqkm": 0.001,
+            "bbox_wgs84": {
+              "max_lat": 36.87111181,
+              "max_lon": -111.597496,
+              "min_lat": 36.87066121,
+              "min_lon": -111.59794067
+            },
+            "fcode": 39001,
+            "ftype": 390,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": null,
+            "name": "",
+            "permanent_id": "79081984",
+            "reachcode": "14070007004558",
+            "source_record_index": 140
+          }
+        ],
+        "named_feature_counts": {},
+        "total_record_count": 201,
+        "type_or_huc12_counts": {
+          "390": 2
+        }
+      },
+      "WBDHU12": {
+        "bbox_intersecting_feature_count": 1,
+        "fcode_or_huc12_counts": {
+          "140700070706": 1
+        },
+        "field_names": [
+          "tnmid",
+          "metasource",
+          "sourcedata",
+          "sourceorig",
+          "sourcefeat",
+          "loaddate",
+          "referenceg",
+          "areaacres",
+          "areasqkm",
+          "states",
+          "huc12",
+          "name",
+          "hutype",
+          "humod",
+          "tohuc",
+          "noncontrib",
+          "noncontr_1",
+          "shape_Leng",
+          "shape_Area",
+          "ObjectID"
+        ],
+        "longest_or_largest_bbox_intersections": [
+          {
+            "areasqkm": 90.55,
+            "bbox_wgs84": {
+              "max_lat": 37.00637999,
+              "max_lon": -111.58727789,
+              "min_lat": 36.84649271,
+              "min_lon": -111.71574358
+            },
+            "fcode": null,
+            "ftype": null,
+            "gnis_name": "",
+            "huc12": "140700070706",
+            "lengthkm": null,
+            "name": "Johnson Point-Paria River",
+            "permanent_id": "{6ECBF3AC-20C7-4EA3-AF3A-F8DB61EF2BBB}",
+            "reachcode": "",
+            "source_record_index": 4
+          }
+        ],
+        "named_feature_counts": {
+          "Johnson Point-Paria River": 1
+        },
+        "total_record_count": 42,
+        "type_or_huc12_counts": {
+          "Johnson Point-Paria River": 1
+        }
+      }
+    },
+    "15010001": {
+      "NHDArea": {
+        "bbox_intersecting_feature_count": 3,
+        "fcode_or_huc12_counts": {
+          "46006": 3
+        },
+        "field_names": [
+          "permanent_",
+          "fdate",
+          "resolution",
+          "gnis_id",
+          "gnis_name",
+          "areasqkm",
+          "elevation",
+          "ftype",
+          "fcode",
+          "visibility",
+          "SHAPE_Leng",
+          "SHAPE_Area",
+          "ObjectID"
+        ],
+        "longest_or_largest_bbox_intersections": [
+          {
+            "areasqkm": 11.66773935,
+            "bbox_wgs84": {
+              "max_lat": 36.85670728,
+              "max_lon": -111.60209111,
+              "min_lat": 36.04317801,
+              "min_lon": -112.1112614
+            },
+            "fcode": 46006,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": null,
+            "name": "",
+            "permanent_id": "166162473",
+            "reachcode": "",
+            "source_record_index": 1
+          },
+          {
+            "areasqkm": 3.16494829,
+            "bbox_wgs84": {
+              "max_lat": 36.93666648,
+              "max_lon": -111.4787596,
+              "min_lat": 36.84199261,
+              "min_lon": -111.58910365
+            },
+            "fcode": 46006,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": null,
+            "name": "",
+            "permanent_id": "120008240",
+            "reachcode": "",
+            "source_record_index": 55
+          },
+          {
+            "areasqkm": 0.19976793,
+            "bbox_wgs84": {
+              "max_lat": 36.86511598,
+              "max_lon": -111.58811492,
+              "min_lat": 36.85629534,
+              "min_lon": -111.60261787
+            },
+            "fcode": 46006,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": null,
+            "name": "",
+            "permanent_id": "{109A80CC-CBAA-4EF6-80AE-857D3FDD1693}",
+            "reachcode": "",
+            "source_record_index": 54
+          }
+        ],
+        "named_feature_counts": {},
+        "total_record_count": 77,
+        "type_or_huc12_counts": {
+          "460": 3
+        }
+      },
+      "NHDFlowline": {
+        "bbox_intersecting_feature_count": 272,
+        "fcode_or_huc12_counts": {
+          "46003": 7,
+          "46006": 2,
+          "46007": 188,
+          "55800": 75
+        },
+        "field_names": [
+          "permanent_",
+          "fdate",
+          "resolution",
+          "gnis_id",
+          "gnis_name",
+          "lengthkm",
+          "reachcode",
+          "flowdir",
+          "wbarea_per",
+          "ftype",
+          "fcode",
+          "mainpath",
+          "innetwork",
+          "visibility",
+          "SHAPE_Leng",
+          "Enabled",
+          "ObjectID"
+        ],
+        "longest_or_largest_bbox_intersections": [
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.85908428,
+              "max_lon": -111.6399026,
+              "min_lat": 36.85298481,
+              "min_lon": -111.66161167
+            },
+            "fcode": 46007,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.896,
+            "name": "",
+            "permanent_id": "126013719",
+            "reachcode": "15010001000748",
+            "source_record_index": 5044
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.83317361,
+              "max_lon": -111.5933966,
+              "min_lat": 36.82963001,
+              "min_lon": -111.61951042
+            },
+            "fcode": 46007,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.68344269,
+            "name": "",
+            "permanent_id": "126013082",
+            "reachcode": "15010001013194",
+            "source_record_index": 10489
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.80373001,
+              "max_lon": -111.6566814,
+              "min_lat": 36.80050168,
+              "min_lon": -111.67877447
+            },
+            "fcode": 46007,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.586,
+            "name": "",
+            "permanent_id": "126014348",
+            "reachcode": "15010001000544",
+            "source_record_index": 10054
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.84853648,
+              "max_lon": -111.64247767,
+              "min_lat": 36.83437261,
+              "min_lon": -111.65131067
+            },
+            "fcode": 46007,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.179,
+            "name": "",
+            "permanent_id": "126013724",
+            "reachcode": "15010001013534",
+            "source_record_index": 8324
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.84949188,
+              "max_lon": -111.629096,
+              "min_lat": 36.84602241,
+              "min_lon": -111.64860947
+            },
+            "fcode": 46007,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.081,
+            "name": "",
+            "permanent_id": "126013721",
+            "reachcode": "15010001013533",
+            "source_record_index": 4007
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.87573324,
+              "max_lon": -111.63756703,
+              "min_lat": 36.86794291,
+              "min_lon": -111.65381025
+            },
+            "fcode": 46007,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.08099104,
+            "name": "",
+            "permanent_id": "{33EE4DE8-CB46-42BB-939F-03DFF7BCB799}",
+            "reachcode": "15010001016242",
+            "source_record_index": 10517
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.87892883,
+              "max_lon": -111.63756703,
+              "min_lat": 36.86796428,
+              "min_lon": -111.65124962
+            },
+            "fcode": 46007,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.07623568,
+            "name": "",
+            "permanent_id": "{E8CAAAFB-5CA9-47E4-BE7E-786240F772B1}",
+            "reachcode": "15010001016243",
+            "source_record_index": 10518
+          },
+          {
+            "areasqkm": null,
+            "bbox_wgs84": {
+              "max_lat": 36.86331208,
+              "max_lon": -111.63398487,
+              "min_lat": 36.85602601,
+              "min_lon": -111.6488424
+            },
+            "fcode": 46007,
+            "ftype": 460,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": 2.008,
+            "name": "",
+            "permanent_id": "126013739",
+            "reachcode": "15010001013548",
+            "source_record_index": 8756
+          }
+        ],
+        "named_feature_counts": {
+          "Cathedral Wash": 8,
+          "Colorado River": 36,
+          "Paria River": 3
+        },
+        "total_record_count": 12804,
+        "type_or_huc12_counts": {
+          "460": 197,
+          "558": 75
+        }
+      },
+      "NHDWaterbody": {
+        "bbox_intersecting_feature_count": 4,
+        "fcode_or_huc12_counts": {
+          "39001": 4
+        },
+        "field_names": [
+          "permanent_",
+          "fdate",
+          "resolution",
+          "gnis_id",
+          "gnis_name",
+          "areasqkm",
+          "elevation",
+          "reachcode",
+          "ftype",
+          "fcode",
+          "visibility",
+          "SHAPE_Leng",
+          "SHAPE_Area",
+          "ObjectID"
+        ],
+        "longest_or_largest_bbox_intersections": [
+          {
+            "areasqkm": 0.00956512,
+            "bbox_wgs84": {
+              "max_lat": 36.86458441,
+              "max_lon": -111.63098,
+              "min_lat": 36.86316107,
+              "min_lon": -111.63186256
+            },
+            "fcode": 39001,
+            "ftype": 390,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": null,
+            "name": "",
+            "permanent_id": "{D5A682E4-FDA4-49F3-8DA0-7F7CD5D88037}",
+            "reachcode": "15010001016257",
+            "source_record_index": 134
+          },
+          {
+            "areasqkm": 0.00261147,
+            "bbox_wgs84": {
+              "max_lat": 36.86004474,
+              "max_lon": -111.61790833,
+              "min_lat": 36.85946258,
+              "min_lon": -111.61849703
+            },
+            "fcode": 39001,
+            "ftype": 390,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": null,
+            "name": "",
+            "permanent_id": "{DD3446C2-DE8C-495B-9639-6B0D19AB59FD}",
+            "reachcode": "15010001016244",
+            "source_record_index": 67
+          },
+          {
+            "areasqkm": 0.00188105,
+            "bbox_wgs84": {
+              "max_lat": 36.86053533,
+              "max_lon": -111.61850357,
+              "min_lat": 36.86015594,
+              "min_lon": -111.61919694
+            },
+            "fcode": 39001,
+            "ftype": 390,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": null,
+            "name": "",
+            "permanent_id": "{F690804A-1D44-46AE-B127-20D97A1C7EF0}",
+            "reachcode": "15010001016245",
+            "source_record_index": 100
+          },
+          {
+            "areasqkm": 0.00091989,
+            "bbox_wgs84": {
+              "max_lat": 36.86017557,
+              "max_lon": -111.61881101,
+              "min_lat": 36.85984197,
+              "min_lon": -111.61930159
+            },
+            "fcode": 39001,
+            "ftype": 390,
+            "gnis_name": "",
+            "huc12": "",
+            "lengthkm": null,
+            "name": "",
+            "permanent_id": "{A5B671B7-2AD0-4E71-8C47-47BC23E72428}",
+            "reachcode": "15010001016246",
+            "source_record_index": 101
+          }
+        ],
+        "named_feature_counts": {},
+        "total_record_count": 234,
+        "type_or_huc12_counts": {
+          "390": 4
+        }
+      },
+      "WBDHU12": {
+        "bbox_intersecting_feature_count": 2,
+        "fcode_or_huc12_counts": {
+          "150100010302": 1,
+          "150100010303": 1
+        },
+        "field_names": [
+          "tnmid",
+          "metasource",
+          "sourcedata",
+          "sourceorig",
+          "sourcefeat",
+          "loaddate",
+          "referenceg",
+          "areaacres",
+          "areasqkm",
+          "states",
+          "huc12",
+          "name",
+          "hutype",
+          "humod",
+          "tohuc",
+          "noncontrib",
+          "noncontr_1",
+          "shape_Leng",
+          "shape_Area",
+          "ObjectID"
+        ],
+        "longest_or_largest_bbox_intersections": [
+          {
+            "areasqkm": 100.71,
+            "bbox_wgs84": {
+              "max_lat": 36.88857646,
+              "max_lon": -111.58634465,
+              "min_lat": 36.76876332,
+              "min_lon": -111.72229424
+            },
+            "fcode": null,
+            "ftype": null,
+            "gnis_name": "",
+            "huc12": "150100010303",
+            "lengthkm": null,
+            "name": "Cathedral Wash-Colorado River",
+            "permanent_id": "{6BAB018F-3C62-4280-9C57-28F6757EF786}",
+            "reachcode": "",
+            "source_record_index": 40
+          },
+          {
+            "areasqkm": 47.91,
+            "bbox_wgs84": {
+              "max_lat": 36.8274696,
+              "max_lon": -111.65601396,
+              "min_lat": 36.74210489,
+              "min_lon": -111.76885946
+            },
+            "fcode": null,
+            "ftype": null,
+            "gnis_name": "",
+            "huc12": "150100010302",
+            "lengthkm": null,
+            "name": "Badger Canyon Creek",
+            "permanent_id": "{D058E780-6A3B-4843-A2EA-738C2D96A63A}",
+            "reachcode": "",
+            "source_record_index": 39
+          }
+        ],
+        "named_feature_counts": {
+          "Badger Canyon Creek": 1,
+          "Cathedral Wash-Colorado River": 1
+        },
+        "total_record_count": 43,
+        "type_or_huc12_counts": {
+          "Badger Canyon Creek": 1,
+          "Cathedral Wash-Colorado River": 1
+        }
+      }
+    }
+  },
+  "mainstem_evidence": {
+    "interpretation": "The pilot window straddles HU8 boundaries. Colorado River labels appear in 14070006 and 15010001, Paria River context appears in 14070007/15010001, and multiple unnamed canal/ditch/stream-river features also intersect. Use this as an official source overlay only until an ordered river-mile centerline is derived and reviewed.",
+    "intersecting_huc12s": [
+      "140700061102 Ferry Swale Canyon",
+      "140700061103 Water Holes Canyon",
+      "140700061104 Fall Creek",
+      "140700061105 Honey Draw-Colorado River",
+      "140700070706 Johnson Point-Paria River",
+      "150100010302 Badger Canyon Creek",
+      "150100010303 Cathedral Wash-Colorado River"
+    ],
+    "named_cathedral_wash_flowline_hits": 8,
+    "named_colorado_river_flowline_hits": 59,
+    "named_paria_river_flowline_hits": 15
+  },
+  "output_artifacts": {
+    "flowline_geojson": "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
+    "support_layers_geojson": "hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson"
+  },
+  "output_checksums": {
+    "flowline_geojson": {
+      "sha256": "614b831f1b89eb027815d5af6d62d75d1eae6251ada3dbbb807a8eb7d8eddb97",
+      "size_bytes": 842383
+    },
+    "support_layers_geojson": {
+      "sha256": "889fbe56849a4a3d843f8fc41d12dc48c788a43dd0b4fa390a4eea807c914838",
+      "size_bytes": 2763850
+    }
+  },
+  "pilot_bounds_wgs84": {
+    "max_lat": 36.9,
+    "max_lon": -111.54,
+    "min_lat": 36.8,
+    "min_lon": -111.66
+  },
+  "promotion_gate": "Derive a single ordered Colorado mainstem candidate from this stitched official source overlay, align it to visible water/NAIP and river-mile references, attach sandbar/wet-bank review, and obtain oarsman/geospatial approval before using it as production geometry.",
+  "review_date": "2026-07-06",
+  "schema": "raftsim.colorado_nhd_hu8_bbox_extract.v0",
+  "source_catalog_query": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=National%20Hydrography%20Dataset%20%28NHD%29&bbox=-111.66,36.80,-111.54,36.90&prodFormats=Shapefile&outputFormat=JSON",
+  "source_crs": {
+    "epsg_inferred": "EPSG:4269",
+    "note": "NHD shapefiles are retained in their source geographic NAD83 coordinates for this review extract.",
+    "prj_wkt": "GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]]"
+  },
+  "source_products": [
+    {
+      "catalog_bbox_wgs84": {
+        "max_lat": 37.60949,
+        "max_lon": -110.67244,
+        "min_lat": 36.49891,
+        "min_lon": -111.91481
+      },
+      "catalog_size_bytes": 17833929,
+      "download_url": "https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/HU8/Shape/NHD_H_14070006_HU8_Shape.zip",
+      "downloaded_zip_sha256": "5fcd4a84562a40874db7302e5d31b0a8f532a505323b97b5d71b41f45b87e369",
+      "downloaded_zip_size_bytes": 17833929,
+      "hu8": "14070006",
+      "meta_url": "https://www.sciencebase.gov/catalog/item/5a3cf590e4b0d05ee8b8d1f8",
+      "publication_date": "2023-12-20",
+      "source_id": "5a3cf590e4b0d05ee8b8d1f8",
+      "title": "USGS National Hydrography Dataset Best Resolution (NHD) for Hydrological Unit (HU) 8 - 14070006 (published 20231220) Shapefile",
+      "vendor_meta_url": "https://thor-f5.er.usgs.gov/ngtoc/metadata/waf/hydrography/nhd/best_resolution/shapefile/NHD_H_14070006_HU8_Shape.xml"
+    },
+    {
+      "catalog_bbox_wgs84": {
+        "max_lat": 37.73896,
+        "max_lon": -111.58728,
+        "min_lat": 36.71805,
+        "min_lon": -112.32864
+      },
+      "catalog_size_bytes": 10469615,
+      "download_url": "https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/HU8/Shape/NHD_H_14070007_HU8_Shape.zip",
+      "downloaded_zip_sha256": "ca9b33814ff55335094b388d6a16bcd9686d76388449f6c5c421b5aab5613057",
+      "downloaded_zip_size_bytes": 10469615,
+      "hu8": "14070007",
+      "meta_url": "https://www.sciencebase.gov/catalog/item/5a58a69de4b00b291cd69b84",
+      "publication_date": "2023-12-20",
+      "source_id": "5a58a69de4b00b291cd69b84",
+      "title": "USGS National Hydrography Dataset Best Resolution (NHD) for Hydrological Unit (HU) 8 - 14070007 (published 20231220) Shapefile",
+      "vendor_meta_url": "https://thor-f5.er.usgs.gov/ngtoc/metadata/waf/hydrography/nhd/best_resolution/shapefile/NHD_H_14070007_HU8_Shape.xml"
+    },
+    {
+      "catalog_bbox_wgs84": {
+        "max_lat": 36.88858,
+        "max_lon": -111.5061,
+        "min_lat": 35.95998,
+        "min_lon": -112.18573
+      },
+      "catalog_size_bytes": 15770113,
+      "download_url": "https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/HU8/Shape/NHD_H_15010001_HU8_Shape.zip",
+      "downloaded_zip_sha256": "234b93cb9f0939454352b2b2775cd9e93f2b891c6d989f8e706a51ab647305a2",
+      "downloaded_zip_size_bytes": 15770113,
+      "hu8": "15010001",
+      "meta_url": "https://www.sciencebase.gov/catalog/item/5a58a6a0e4b00b291cd69bb5",
+      "publication_date": "2023-12-20",
+      "source_id": "5a58a6a0e4b00b291cd69bb5",
+      "title": "USGS National Hydrography Dataset Best Resolution (NHD) for Hydrological Unit (HU) 8 - 15010001 (published 20231220) Shapefile",
+      "vendor_meta_url": "https://thor-f5.er.usgs.gov/ngtoc/metadata/waf/hydrography/nhd/best_resolution/shapefile/NHD_H_15010001_HU8_Shape.xml"
+    }
+  ],
+  "status": "official_nhd_hu8_bbox_extract_attached_review_gated_not_ordered_centerline"
+}

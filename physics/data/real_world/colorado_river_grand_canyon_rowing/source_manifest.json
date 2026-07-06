@@ -32,7 +32,10 @@
     ],
     "hydrography": [
       "hydrography/centerline.geojson",
-      "hydrography/river_mile_markers.geojson"
+      "hydrography/river_mile_markers.geojson",
+      "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
+      "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
+      "hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson"
     ],
     "imagery": [
       "imagery/usda_naip_lees_ferry_sample_512.png",
@@ -71,9 +74,9 @@
   },
   "confidence": {
     "guide_review": 0.05,
-    "hydrography": 0.15,
+    "hydrography": 0.24,
     "hydrology": 0.48,
-    "overall": 0.3,
+    "overall": 0.33,
     "rapid_annotations": 0.05,
     "terrain": 0.25
   },
@@ -167,6 +170,19 @@
       "url": "https://www.usbr.gov/uc/water/hydrodata/reservoir_data/919/json/42.json",
       "status": "downloaded_review_gated",
       "notes": "Official Reclamation daily Total Release JSON pulled on 2026-07-06; use the derived release context manifest for checksums, summaries, unit caveat, and USGS comparisons."
+    },
+    {
+      "category": "hydrography",
+      "fetch_id": "colorado_nhd_hu8_lees_ferry_bbox_extract",
+      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
+      "status": "downloaded_and_generated_review_gated_extract",
+      "target_artifact": "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
+      "related_artifacts": [
+        "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
+        "hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson"
+      ],
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=National%20Hydrography%20Dataset%20%28NHD%29&bbox=-111.66,36.80,-111.54,36.90&prodFormats=Shapefile&outputFormat=JSON",
+      "notes": "Official TNM NHD HU8 products 14070006, 14070007, and 15010001 were downloaded and bbox-intersected into a stitched Lees Ferry pilot overlay. This is source context only, not accepted river-mile centerline or sandbar geometry."
     }
   ],
   "river_id": "colorado_river",
@@ -300,6 +316,21 @@
         "rapid_annotations",
         "oar_line_review",
         "rescue_context"
+      ]
+    },
+    {
+      "category": "hydrography",
+      "license_or_terms": "U.S. federal hydrography source; preserve USGS/TNM attribution, product metadata, catalog query, and per-product checksums.",
+      "provider": "USGS / The National Map",
+      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
+      "status": "bbox_extract_attached_review_gated",
+      "title": "NHD HU8 14070006, 14070007, and 15010001 Lees Ferry bbox source overlay",
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=National%20Hydrography%20Dataset%20%28NHD%29&bbox=-111.66,36.80,-111.54,36.90&prodFormats=Shapefile&outputFormat=JSON",
+      "use_in_pipeline": [
+        "flowline_context",
+        "tributary_context",
+        "river_mile_stationing_seed",
+        "visible_water_edge_alignment"
       ]
     }
   ]
