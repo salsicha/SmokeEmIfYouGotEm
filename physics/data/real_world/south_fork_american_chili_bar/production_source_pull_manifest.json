@@ -770,6 +770,38 @@
         "candidate_link_inventory",
         "permission_outreach_planning"
       ]
+    },
+    {
+      "artifact_id": "south_fork_access_annotation_scaffolds",
+      "category": "protected_area_and_access_context_review",
+      "caveats": [
+        "Coordinates are coarse offsets from the NHD stationing candidate, not official put-in, take-out, parcel, road, trail, or emergency-route geometry.",
+        "Use only for editor review until official access/land-status layers and guide/local review approve replacements.",
+        "Do not use these review seeds as public screenshot, map, evacuation, or gameplay authority."
+      ],
+      "paths": [
+        "review/production_import_pilot/access_points.geojson",
+        "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+        "review/production_import_pilot/evacuation_and_rescue_routes.geojson"
+      ],
+      "provider": "RaftSim generated review scaffolds from South Fork access-publication review and NHD stationing candidate",
+      "related_artifacts": [
+        "review/production_import_pilot/access_publication_sensitivity_review.json",
+        "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json"
+      ],
+      "status": "review_seed_annotation_scaffolds_attached_not_authoritative_geometry",
+      "summary": {
+        "access_point_feature_count": 3,
+        "evacuation_rescue_route_feature_count": 3,
+        "no_publish_polygon_feature_count": 3,
+        "stationing_source": "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json"
+      },
+      "use": [
+        "editor_access_annotation_seed",
+        "publication_sensitivity_review_overlay",
+        "evacuation_rescue_review_queue",
+        "future_official_layer_comparison"
+      ]
     }
   ],
   "river_id": "american_south_fork",

@@ -299,10 +299,13 @@
         },
         "protected_area_and_access_context": {
           "artifacts": [
-            "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/access_publication_sensitivity_review.json"
+            "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/access_publication_sensitivity_review.json",
+            "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/access_points.geojson",
+            "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+            "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/evacuation_and_rescue_routes.geojson"
           ],
-          "promotion_blocker": "The South Fork access/publication review attaches State Parks Marshall Gold Discovery and county GIS source leads, but exact put-in/take-out geometry, parcel/public-private land status, evacuation routes, sensitive-location screening, current restrictions, and guide/local approval remain open before detailed production maps or screenshots.",
-          "status": "official_state_park_and_county_gis_leads_attached_publication_geometry_pending"
+          "promotion_blocker": "South Fork access, no-publish, and evacuation/rescue review scaffolds are now attached from NHD stationing, but official access/land-status/road/trail/emergency-route layers, sensitive-location screening, and guide/local review are still required before detailed maps, screenshots, or gameplay access use.",
+          "status": "review_seed_annotation_scaffolds_attached_not_authoritative_geometry"
         },
         "seasonal_flow_or_release_history": {
           "artifacts": [

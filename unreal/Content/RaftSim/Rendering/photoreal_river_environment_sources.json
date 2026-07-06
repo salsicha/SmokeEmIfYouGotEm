@@ -383,6 +383,14 @@
           "provider": "RaftSim generated link-only media rights gate",
           "status": "candidate_links_only_no_rights_cleared",
           "unreal_use": "Blocks texture, photogrammetry, AI-training, packaged media, marketing, or production-art use until item-level rights and guide review are recorded."
+        },
+        {
+          "artifact_id": "south_fork_access_annotation_scaffolds",
+          "category": "protected_area_and_access_context_review",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/access_points.geojson; physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/no_publish_sensitive_polygons.geojson; physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/evacuation_and_rescue_routes.geojson",
+          "provider": "RaftSim generated review scaffolds from South Fork access review and NHD stationing candidate",
+          "status": "review_seed_annotation_scaffolds_attached_not_authoritative_geometry",
+          "unreal_use": "Editor overlays for access, no-publish, and evacuation/rescue review; not final access geometry or screenshot clearance."
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview"

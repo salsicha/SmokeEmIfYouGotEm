@@ -1,0 +1,174 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -120.7199883,
+              38.7770002
+            ],
+            [
+              -120.725909,
+              38.7742598
+            ],
+            [
+              -120.7246812,
+              38.7773488
+            ],
+            [
+              -120.7198979,
+              38.7802334
+            ],
+            [
+              -120.7199883,
+              38.7770002
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "annotation_id": "upstream_chili_bar_put_in_review_zone_no_publish_review_seed",
+        "feature_role": "no_publish_sensitive_context_review_seed",
+        "half_width_m": 180.0,
+        "needs": [
+          "exact put-in ownership and access rules",
+          "commercial/private launch constraints",
+          "parking and road approach source layer",
+          "guide validation before publishing map detail"
+        ],
+        "promotion_gate": "Use only as an editor reminder to screen cultural, private-property, access, and safety-sensitive details; replace with reviewed no-publish geometry before public route screenshots.",
+        "review_status": "candidate_only_no_official_geometry_attached",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "source_review_zone": "upstream_chili_bar_put_in_review_zone",
+        "station_end_m": 600.0,
+        "station_start_m": 0.0,
+        "stationing_status": "coarse_buffer_from_nhd_stationing_candidate_not_sensitive_polygon_authority"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -120.7261818,
+              38.7735733
+            ],
+            [
+              -120.7586706,
+              38.7749835
+            ],
+            [
+              -120.7546518,
+              38.7784483
+            ],
+            [
+              -120.7244084,
+              38.7780353
+            ],
+            [
+              -120.7261818,
+              38.7735733
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "annotation_id": "mid_reach_land_status_and_rescue_review_zone_no_publish_review_seed",
+        "feature_role": "no_publish_sensitive_context_review_seed",
+        "half_width_m": 260.0,
+        "needs": [
+          "public/private parcel review",
+          "evacuation and road/trail access context",
+          "sensitive-location and cultural-resource screening",
+          "rapid rescue visibility notes"
+        ],
+        "promotion_gate": "Use only as an editor reminder to screen cultural, private-property, access, and safety-sensitive details; replace with reviewed no-publish geometry before public route screenshots.",
+        "review_status": "requires_county_parcel_land_manager_and_guide_review",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "source_review_zone": "mid_reach_land_status_and_rescue_review_zone",
+        "station_end_m": 4200.0,
+        "station_start_m": 600.0,
+        "stationing_status": "coarse_buffer_from_nhd_stationing_candidate_not_sensitive_polygon_authority"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -120.7583615,
+              38.77525
+            ],
+            [
+              -120.7613016,
+              38.7772214
+            ],
+            [
+              -120.7652386,
+              38.779712
+            ],
+            [
+              -120.7549609,
+              38.7781818
+            ],
+            [
+              -120.7583615,
+              38.77525
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "annotation_id": "coloma_marshall_gold_downstream_review_zone_no_publish_review_seed",
+        "feature_role": "no_publish_sensitive_context_review_seed",
+        "half_width_m": 220.0,
+        "needs": [
+          "official park-boundary and access overlay review",
+          "take-out and visitor-flow validation",
+          "publication/cultural-resource sensitivity check",
+          "concession/outfitter guide review"
+        ],
+        "promotion_gate": "Use only as an editor reminder to screen cultural, private-property, access, and safety-sensitive details; replace with reviewed no-publish geometry before public route screenshots.",
+        "review_status": "official_state_park_source_lead_attached_geometry_pending",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "source_review_zone": "coloma_marshall_gold_downstream_review_zone",
+        "station_end_m": 5200.0,
+        "station_start_m": 4200.0,
+        "stationing_status": "coarse_buffer_from_nhd_stationing_candidate_not_sensitive_polygon_authority"
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-06",
+  "policy": {
+    "allowed_use": [
+      "editor annotation placement",
+      "guide/local review queue",
+      "publication-sensitivity checklist",
+      "future official layer comparison"
+    ],
+    "forbidden_use": [
+      "final access geometry",
+      "public/private land authority",
+      "emergency or evacuation route authority",
+      "shipping detailed route screenshots without review"
+    ],
+    "geometry_authority": "review_seed_from_nhd_stationing_not_official_access_geometry"
+  },
+  "river_id": "american_south_fork",
+  "schema": "raftsim.south_fork_no_publish_sensitive_polygons.geojson.v1",
+  "section_id": "chili_bar_to_coloma",
+  "source_access_review": "review/production_import_pilot/access_publication_sensitivity_review.json",
+  "stationing_source": "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
+  "status": "coarse_review_seed_no_publish_polygons_not_authoritative",
+  "type": "FeatureCollection"
+}

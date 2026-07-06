@@ -100,6 +100,9 @@ SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE = "hydrography/production_import_pil
 SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE = "hydrography/production_import_pilot/banks.geojson"
 SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE = "hydrography/production_import_pilot/cross_sections.geojson"
 SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE = "review/production_import_pilot/access_publication_sensitivity_review.json"
+SOUTH_FORK_ACCESS_POINTS_FILE = "review/production_import_pilot/access_points.geojson"
+SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE = "review/production_import_pilot/no_publish_sensitive_polygons.geojson"
+SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE = "review/production_import_pilot/evacuation_and_rescue_routes.geojson"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
@@ -1322,8 +1325,9 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                 ],
                 "target_outputs": [
                     SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
-                    "review/production_import_pilot/access_points.geojson",
-                    "review/production_import_pilot/publication_sensitivity.json",
+                    SOUTH_FORK_ACCESS_POINTS_FILE,
+                    SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
+                    SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE,
                 ],
                 "promotion_gate": "Review put-ins, take-outs, private/public land, evacuation points, sensitive locations, and what may appear in screenshots or maps.",
             },
@@ -3155,6 +3159,9 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
                     SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
                     SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
+                    SOUTH_FORK_ACCESS_POINTS_FILE,
+                    SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
+                    SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE,
                     "reference_media_link_manifest.json",
                     REFERENCE_MEDIA_ANNOTATIONS_FILE,
                     REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
@@ -3210,9 +3217,9 @@ def build_production_environment_gap_register() -> dict[str, object]:
                         "source_class": "protected_area_and_access_context",
                         "required_artifacts": [
                             SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
-                            "review/production_import_pilot/access_points.geojson",
-                            "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
-                            "review/production_import_pilot/evacuation_and_rescue_routes.geojson",
+                            SOUTH_FORK_ACCESS_POINTS_FILE,
+                            SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
+                            SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE,
                         ],
                         "source_leads": [
                             "ca_state_parks_marshall_gold_discovery",
@@ -3544,6 +3551,9 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
             ],
             "access_and_protected_context": [
                 SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
+                SOUTH_FORK_ACCESS_POINTS_FILE,
+                SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
+                SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE,
             ],
             "field_media": ["field_media/README.md", REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE],
             "solver": ["scenario/scenario.json", "scenario/bed.npy", "scenario/initial_state.npz"],
@@ -3856,9 +3866,9 @@ def build_south_fork_access_publication_review() -> dict[str, object]:
             },
         ],
         "required_editor_annotations": [
-            "review/production_import_pilot/access_points.geojson",
-            "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
-            "review/production_import_pilot/evacuation_and_rescue_routes.geojson",
+            SOUTH_FORK_ACCESS_POINTS_FILE,
+            SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
+            SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE,
             "review/production_import_pilot/guide_access_notes.json",
         ],
         "allowed_use": [
@@ -3880,6 +3890,244 @@ def build_south_fork_access_publication_review() -> dict[str, object]:
             "Cultural-resource, private-property, and sensitive-location publication rules need human review before route-detail screenshots.",
             "Guide/outfitter review is required before access, scouting, rescue, or passenger-dropoff gameplay uses these zones.",
         ],
+    }
+
+
+def _station_sample_near(stationing: dict[str, object], station_m: float) -> dict[str, object]:
+    samples = stationing.get("station_samples", [])
+    if not samples:
+        raise ValueError("Stationing must include station_samples")
+    return min(samples, key=lambda sample: abs(float(sample["station_m"]) - station_m))
+
+
+def _stationed_point(
+    stationing: dict[str, object],
+    station_m: float,
+    *,
+    offset_left_m: float = 0.0,
+    offset_downstream_m: float = 0.0,
+) -> tuple[list[float], dict[str, object]]:
+    sample = _station_sample_near(stationing, station_m)
+    lat = float(sample["lat"])
+    lon = float(sample["lon"])
+    east_m = float(sample.get("left_normal_east", 0.0)) * offset_left_m
+    east_m += float(sample.get("tangent_east", 0.0)) * offset_downstream_m
+    north_m = float(sample.get("left_normal_north", 0.0)) * offset_left_m
+    north_m += float(sample.get("tangent_north", 0.0)) * offset_downstream_m
+    meters_per_degree_lat = 111_320.0
+    meters_per_degree_lon = max(1.0, 111_320.0 * math.cos(math.radians(lat)))
+    return (
+        [round(lon + east_m / meters_per_degree_lon, 7), round(lat + north_m / meters_per_degree_lat, 7)],
+        {
+            "station_m": sample["station_m"],
+            "station_sample_index": sample["sample_index"],
+            "station_lon": sample["lon"],
+            "station_lat": sample["lat"],
+            "offset_left_m": offset_left_m,
+            "offset_downstream_m": offset_downstream_m,
+        },
+    )
+
+
+def _south_fork_access_zone(access_review: dict[str, object], zone_id: str) -> dict[str, object]:
+    for zone in access_review["station_review_zones"]:
+        if zone["zone_id"] == zone_id:
+            return zone
+    raise ValueError(f"Missing South Fork access zone {zone_id!r}")
+
+
+def _south_fork_access_annotation_policy() -> dict[str, object]:
+    return {
+        "geometry_authority": "review_seed_from_nhd_stationing_not_official_access_geometry",
+        "allowed_use": [
+            "editor annotation placement",
+            "guide/local review queue",
+            "publication-sensitivity checklist",
+            "future official layer comparison",
+        ],
+        "forbidden_use": [
+            "final access geometry",
+            "public/private land authority",
+            "emergency or evacuation route authority",
+            "shipping detailed route screenshots without review",
+        ],
+    }
+
+
+def build_south_fork_access_points_geojson(
+    access_review: dict[str, object],
+    stationing: dict[str, object],
+) -> dict[str, object]:
+    """Build review-only South Fork access point annotation seeds."""
+
+    definitions = [
+        (
+            "chili_bar_put_in_review_seed",
+            "upstream_chili_bar_put_in_review_zone",
+            0.0,
+            45.0,
+            "put_in_review_seed",
+        ),
+        (
+            "mid_reach_emergency_access_review_seed",
+            "mid_reach_land_status_and_rescue_review_zone",
+            2600.0,
+            -70.0,
+            "emergency_access_review_seed",
+        ),
+        (
+            "coloma_takeout_review_seed",
+            "coloma_marshall_gold_downstream_review_zone",
+            5200.0,
+            55.0,
+            "takeout_review_seed",
+        ),
+    ]
+    features: list[dict[str, object]] = []
+    for annotation_id, zone_id, station_m, offset_left_m, role in definitions:
+        zone = _south_fork_access_zone(access_review, zone_id)
+        coordinates, station_properties = _stationed_point(stationing, station_m, offset_left_m=offset_left_m)
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": {"type": "Point", "coordinates": coordinates},
+                "properties": {
+                    "annotation_id": annotation_id,
+                    "river_id": "american_south_fork",
+                    "section_id": "chili_bar_to_coloma",
+                    "feature_role": role,
+                    "source_review_zone": zone_id,
+                    "review_status": zone["review_status"],
+                    "needs": zone["needs"],
+                    "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative",
+                    **station_properties,
+                    "promotion_gate": (
+                        "Replace or approve this seed with official access, land-status, road/trail, and guide/local "
+                        "review before using it as gameplay access, rescue, or publication geometry."
+                    ),
+                },
+            }
+        )
+    return {
+        "type": "FeatureCollection",
+        "schema": "raftsim.south_fork_access_points.geojson.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "status": "review_seed_access_points_not_authoritative_geometry",
+        "source_access_review": SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
+        "stationing_source": SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
+        "policy": _south_fork_access_annotation_policy(),
+        "features": features,
+    }
+
+
+def build_south_fork_no_publish_sensitive_polygons_geojson(
+    access_review: dict[str, object],
+    stationing: dict[str, object],
+) -> dict[str, object]:
+    """Build coarse no-publish/sensitive-location polygons for editor review."""
+
+    zone_widths = {
+        "upstream_chili_bar_put_in_review_zone": 180.0,
+        "mid_reach_land_status_and_rescue_review_zone": 260.0,
+        "coloma_marshall_gold_downstream_review_zone": 220.0,
+    }
+    features: list[dict[str, object]] = []
+    for zone in access_review["station_review_zones"]:
+        start_m, end_m = zone["station_range_m"]
+        half_width = zone_widths.get(zone["zone_id"], 200.0)
+        start_left, start_props = _stationed_point(stationing, start_m, offset_left_m=half_width)
+        end_left, _ = _stationed_point(stationing, end_m, offset_left_m=half_width)
+        end_right, end_props = _stationed_point(stationing, end_m, offset_left_m=-half_width)
+        start_right, _ = _stationed_point(stationing, start_m, offset_left_m=-half_width)
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[start_left, end_left, end_right, start_right, start_left]],
+                },
+                "properties": {
+                    "annotation_id": f"{zone['zone_id']}_no_publish_review_seed",
+                    "river_id": "american_south_fork",
+                    "section_id": "chili_bar_to_coloma",
+                    "feature_role": "no_publish_sensitive_context_review_seed",
+                    "source_review_zone": zone["zone_id"],
+                    "review_status": zone["review_status"],
+                    "needs": zone["needs"],
+                    "station_start_m": start_props["station_m"],
+                    "station_end_m": end_props["station_m"],
+                    "half_width_m": half_width,
+                    "stationing_status": "coarse_buffer_from_nhd_stationing_candidate_not_sensitive_polygon_authority",
+                    "promotion_gate": (
+                        "Use only as an editor reminder to screen cultural, private-property, access, and safety-sensitive "
+                        "details; replace with reviewed no-publish geometry before public route screenshots."
+                    ),
+                },
+            }
+        )
+    return {
+        "type": "FeatureCollection",
+        "schema": "raftsim.south_fork_no_publish_sensitive_polygons.geojson.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "status": "coarse_review_seed_no_publish_polygons_not_authoritative",
+        "source_access_review": SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
+        "stationing_source": SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
+        "policy": _south_fork_access_annotation_policy(),
+        "features": features,
+    }
+
+
+def build_south_fork_evacuation_rescue_routes_geojson(
+    access_review: dict[str, object],
+    stationing: dict[str, object],
+) -> dict[str, object]:
+    """Build review-only South Fork evacuation/rescue route seed lines."""
+
+    features: list[dict[str, object]] = []
+    for zone in access_review["station_review_zones"]:
+        start_m, end_m = zone["station_range_m"]
+        mid_m = (float(start_m) + float(end_m)) / 2.0
+        coordinates = [
+            _stationed_point(stationing, start_m, offset_left_m=-95.0)[0],
+            _stationed_point(stationing, mid_m, offset_left_m=-120.0)[0],
+            _stationed_point(stationing, end_m, offset_left_m=-95.0)[0],
+        ]
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": {"type": "LineString", "coordinates": coordinates},
+                "properties": {
+                    "annotation_id": f"{zone['zone_id']}_evacuation_rescue_review_seed",
+                    "river_id": "american_south_fork",
+                    "section_id": "chili_bar_to_coloma",
+                    "feature_role": "evacuation_rescue_route_review_seed",
+                    "source_review_zone": zone["zone_id"],
+                    "review_status": zone["review_status"],
+                    "needs": zone["needs"],
+                    "station_range_m": zone["station_range_m"],
+                    "stationing_status": "coarse_offset_line_from_nhd_stationing_candidate_not_route_authority",
+                    "promotion_gate": (
+                        "Replace with official road/trail/access layers, emergency/local review, and guide validation "
+                        "before using as rescue, evacuation, passenger-dropoff, or gameplay route geometry."
+                    ),
+                },
+            }
+        )
+    return {
+        "type": "FeatureCollection",
+        "schema": "raftsim.south_fork_evacuation_rescue_routes.geojson.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "american_south_fork",
+        "section_id": "chili_bar_to_coloma",
+        "status": "coarse_review_seed_evacuation_rescue_routes_not_authoritative",
+        "source_access_review": SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
+        "stationing_source": SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
+        "policy": _south_fork_access_annotation_policy(),
+        "features": features,
     }
 
 
