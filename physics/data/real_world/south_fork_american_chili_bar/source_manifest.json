@@ -2,6 +2,8 @@
   "artifacts": {
     "elevation": [
       "terrain/3dep_dem_tiles",
+      "terrain/tnm_3dep_dem_products.json",
+      "terrain/usgs_3dep_chili_bar_sample_256.tif",
       "course_elevation_extraction.json",
       "terrain/solver_bed_grid.npy"
     ],
@@ -19,11 +21,13 @@
       "rapid_review_editor_workflow.json"
     ],
     "hydrography": [
+      "hydrography/tnm_nhd_products.json",
       "hydrography/centerline.geojson",
       "hydrography/banks.geojson",
       "hydrography/cross_sections.geojson"
     ],
     "imagery": [
+      "imagery/tnm_naip_products.json",
       "imagery/naip_tiles",
       "imagery/water_mask.tif",
       "imagery/foam_texture_mask.tif"
@@ -35,6 +39,9 @@
     ],
     "unreal": [
       "unreal/corridor_package_manifest.json"
+    ],
+    "source_pulls": [
+      "production_source_pull_manifest.json"
     ],
     "validation": [
       "validation_matrix.json"
@@ -65,7 +72,7 @@
     "generated_by": "raftsim.real_world.build_source_manifest",
     "processing_version": "milestone_9_seed.v0",
     "redistribution_notes": "Do not redistribute third-party imagery, guidebook text, or field media unless the manifest records explicit rights.",
-    "review_status": "seed_data_needs_human_geospatial_review"
+    "review_status": "seed_data_with_initial_official_source_slice_needs_human_geospatial_review"
   },
   "remote_fetches": [
     {
@@ -75,7 +82,7 @@
       "source_id": "usgs_3dep",
       "status": "metadata_ready",
       "target_artifact": "terrain/3dep_dem_tiles",
-      "url": "https://apps.nationalmap.gov/tnmaccess/api/products?datasets=Digital%20Elevation%20Model%20(DEM)&bbox=-120.90,38.74,-120.72,38.83"
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Elevation%20Products%20(3D%20Elevation%20Program%20Products%20and%20Services)&bbox=-120.90,38.74,-120.72,38.83"
     },
     {
       "category": "hydrography",
@@ -102,7 +109,7 @@
       "source_id": "usda_naip",
       "status": "planned",
       "target_artifact": "imagery/naip_tiles",
-      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=NAIP%20Plus&bbox=-120.90,38.74,-120.72,38.83"
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Imagery%20-%20NAIP%20(1%20meter%20to%20.5%20foot)&bbox=-120.90,38.74,-120.72,38.83"
     },
     {
       "category": "gauge",
@@ -111,7 +118,7 @@
       "source_id": "usgs_nwis",
       "status": "metadata_ready",
       "target_artifact": "hydrology/usgs_11445500_daily_discharge.json",
-      "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=11445500&parameterCd=00060&startDT=2000-01-01"
+      "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=11445500&parameterCd=00060&startDT=1951-01-01&endDT=1995-12-31"
     },
     {
       "category": "gauge",

@@ -83,6 +83,7 @@ Treat this as a rain-fed tropical gorge environment until authoritative hydrolog
 
 - First-pass river `.umap` assets now exist under `unreal/Content/RaftSim/Maps/EnvironmentPreviews/`.
 - Rendered guide-seat procedural blockout captures now exist under `docs/environment-captures/photoreal_river_previews/`, but they are not lifelike production evidence yet.
+- The first South Fork official source slice now exists at `physics/data/real_world/south_fork_american_chili_bar/production_source_pull_manifest.json`: historical USGS `11445500` daily discharge, TNM NHD product metadata, TNM DEM/NAIP zero-hit diagnostics, and a small USGS 3DEP GeoTIFF sample.
 - The existing default map path `/Game/RaftSim/Maps/L_RaftSimBoot` has no committed level asset yet.
 - Colorado and Pacuare still need real geospatial pulls, hydrology review, guide review, and rights-cleared field/reference media.
 - South Fork has the only solver corridor package, but its terrain, imagery, and field media are still representative placeholders rather than production pulls.
@@ -91,6 +92,7 @@ Treat this as a rain-fed tropical gorge environment until authoritative hydrolog
 ## Current Unreal Evidence
 
 - South Fork American: `/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview`, capture `docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png`.
+- South Fork source data: `physics/data/real_world/south_fork_american_chili_bar/production_source_pull_manifest.json` records the initial official pull; this is enough to prove provenance plumbing but not enough for production terrain/imagery.
 - Colorado River: `/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview`, capture `docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png`.
 - Pacuare River: `/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview`, capture `docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png`.
 - These captures verify editor automation, camera placement, generated valley terrain meshes, curved river ribbons, foam/hydraulic cue strips, boulder bars, foliage proxies, and per-river light/fog variants. They must be replaced by source-derived or rights-cleared photoreal passes before the goal is complete.

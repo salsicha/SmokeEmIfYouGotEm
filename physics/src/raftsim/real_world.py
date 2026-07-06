@@ -789,10 +789,16 @@ def south_fork_american_fetch_specs() -> tuple[RemoteFetchSpec, ...]:
             fetch_id="sfa_3dep_dem",
             category="elevation",
             source_id="usgs_3dep",
-            url=f"https://apps.nationalmap.gov/tnmaccess/api/products?datasets=Digital%20Elevation%20Model%20(DEM)&bbox={bbox}",
+            url=(
+                "https://tnmaccess.nationalmap.gov/api/v1/products?"
+                f"datasets=Elevation%20Products%20(3D%20Elevation%20Program%20Products%20and%20Services)&bbox={bbox}"
+            ),
             target_artifact="terrain/3dep_dem_tiles",
             status="metadata_ready",
-            notes="Representative bounding-box query for DEM discovery; production pull should pick highest-resolution 3DEP/state lidar product with metadata.",
+            notes=(
+                "Representative bounding-box query for DEM discovery; if TNM product metadata is empty, use the official "
+                "USGS 3DEP ImageServer/WCS path and record the zero-hit query in the production source-pull manifest."
+            ),
         ),
         RemoteFetchSpec(
             fetch_id="sfa_3dhp_nhd_flowlines",
@@ -816,19 +822,25 @@ def south_fork_american_fetch_specs() -> tuple[RemoteFetchSpec, ...]:
             fetch_id="sfa_naip_imagery",
             category="imagery",
             source_id="usda_naip",
-            url=f"https://tnmaccess.nationalmap.gov/api/v1/products?datasets=NAIP%20Plus&bbox={bbox}",
+            url=f"https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Imagery%20-%20NAIP%20(1%20meter%20to%20.5%20foot)&bbox={bbox}",
             target_artifact="imagery/naip_tiles",
             status="planned",
-            notes="Use most recent leaf-on/low-shadow NAIP where available, then compare with historic imagery at known gauge values.",
+            notes=(
+                "Use most recent leaf-on/low-shadow NAIP where available, then compare with historic imagery at known "
+                "gauge values. If TNM product metadata is empty, switch to an official NAIP/USDA image service or index."
+            ),
         ),
         RemoteFetchSpec(
             fetch_id="sfa_nwis_daily_discharge",
             category="gauge",
             source_id="usgs_nwis",
-            url="https://waterservices.usgs.gov/nwis/dv/?format=json&sites=11445500&parameterCd=00060&startDT=2000-01-01",
+            url="https://waterservices.usgs.gov/nwis/dv/?format=json&sites=11445500&parameterCd=00060&startDT=1951-01-01&endDT=1995-12-31",
             target_artifact="hydrology/usgs_11445500_daily_discharge.json",
-            status="metadata_ready",
-            notes="Daily discharge query for preliminary flow percentiles. Add instantaneous values and stage parameter 00065 when building final presets.",
+            status="downloaded",
+            notes=(
+                "Historical daily discharge query for preliminary flow percentiles. Add modern gauge/release context, "
+                "instantaneous values, and stage parameter 00065 when building final presets."
+            ),
         ),
         RemoteFetchSpec(
             fetch_id="sfa_nwps_nwm_context",
@@ -871,9 +883,25 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
         "sources": [source.to_json_dict() for source in default_source_catalog()],
         "remote_fetches": [fetch.to_json_dict() for fetch in south_fork_american_fetch_specs()],
         "artifacts": {
-            "elevation": ["terrain/3dep_dem_tiles", COURSE_ELEVATION_EXTRACTION_FILE, "terrain/solver_bed_grid.npy"],
-            "hydrography": ["hydrography/centerline.geojson", "hydrography/banks.geojson", "hydrography/cross_sections.geojson"],
-            "imagery": ["imagery/naip_tiles", "imagery/water_mask.tif", "imagery/foam_texture_mask.tif"],
+            "elevation": [
+                "terrain/3dep_dem_tiles",
+                "terrain/tnm_3dep_dem_products.json",
+                "terrain/usgs_3dep_chili_bar_sample_256.tif",
+                COURSE_ELEVATION_EXTRACTION_FILE,
+                "terrain/solver_bed_grid.npy",
+            ],
+            "hydrography": [
+                "hydrography/tnm_nhd_products.json",
+                "hydrography/centerline.geojson",
+                "hydrography/banks.geojson",
+                "hydrography/cross_sections.geojson",
+            ],
+            "imagery": [
+                "imagery/tnm_naip_products.json",
+                "imagery/naip_tiles",
+                "imagery/water_mask.tif",
+                "imagery/foam_texture_mask.tif",
+            ],
             "gauges": ["hydrology/usgs_11445500_daily_discharge.json", "hydrology/flow_presets.json"],
             "guide_references": [
                 "review/guide_reference_index.json",
@@ -883,13 +911,14 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
             ],
             "field_media": ["field_media/README.md"],
             "solver": ["scenario/scenario.json", "scenario/bed.npy", "scenario/initial_state.npz"],
+            "source_pulls": ["production_source_pull_manifest.json"],
             "validation": ["validation_matrix.json"],
             "unreal": ["unreal/corridor_package_manifest.json"],
         },
         "provenance": {
             "generated_by": "raftsim.real_world.build_source_manifest",
             "processing_version": "milestone_9_seed.v0",
-            "review_status": "seed_data_needs_human_geospatial_review",
+            "review_status": "seed_data_with_initial_official_source_slice_needs_human_geospatial_review",
             "redistribution_notes": "Do not redistribute third-party imagery, guidebook text, or field media unless the manifest records explicit rights.",
         },
         "confidence": {
