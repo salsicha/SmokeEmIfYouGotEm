@@ -1,0 +1,149 @@
+{
+  "flag_definitions": [
+    {
+      "code": "",
+      "meaning": "No Flag",
+      "pipeline_action": "accept_if_value_is_not_no_data_and_window_context_is_reviewed"
+    },
+    {
+      "code": "A",
+      "meaning": "Precipitation accumulation",
+      "pipeline_action": "not_expected_for_flow_stage_but_record_if_seen"
+    },
+    {
+      "code": "L",
+      "meaning": "Waiting for observer response",
+      "pipeline_action": "hold_for_review"
+    },
+    {
+      "code": "N",
+      "meaning": "Error in data",
+      "pipeline_action": "exclude_from_flow_band_statistics_until_reviewed"
+    },
+    {
+      "code": "c",
+      "meaning": "Calculated gridded precip",
+      "pipeline_action": "not_expected_for_flow_stage_but_record_if_seen"
+    },
+    {
+      "code": "e",
+      "meaning": "Estimated",
+      "pipeline_action": "allow_only_with_explicit_uncertainty_review"
+    },
+    {
+      "code": "o",
+      "meaning": "Calibration offset applied",
+      "pipeline_action": "record_and_review_against_station_metadata"
+    },
+    {
+      "code": "q",
+      "meaning": "New rating table",
+      "pipeline_action": "review_rating_change_before_cross_window_comparison"
+    },
+    {
+      "code": "r",
+      "meaning": "Revised",
+      "pipeline_action": "record_revision_and_recompute_derivatives"
+    },
+    {
+      "code": "s",
+      "meaning": "New shift started",
+      "pipeline_action": "review_shift_change_before_cross_window_comparison"
+    },
+    {
+      "code": "t",
+      "meaning": "Trace of precipitation",
+      "pipeline_action": "not_expected_for_flow_stage_but_record_if_seen"
+    },
+    {
+      "code": "v",
+      "meaning": "Out of Valid Range",
+      "pipeline_action": "exclude_from_flow_band_statistics_until_reviewed"
+    }
+  ],
+  "generated_on": "2026-07-06",
+  "linked_artifacts": [
+    "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+    "hydrology/south_fork_modern_flow_source_selection.json",
+    "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+    "production_source_pull_manifest.json",
+    "../production_geospatial_source_readiness.json",
+    "../production_environment_gap_register.json"
+  ],
+  "no_data_policy": {
+    "current_window_unique_flags": [
+      ""
+    ],
+    "excluded_from_statistics": true,
+    "normalized_to_null": true,
+    "observed_in_artifact": "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+    "observed_raw_no_data_value": -9999,
+    "required_followup": "Find or request an official CDEC no-data sentinel definition before promoted automation treats -9999 as universal across all sensors/durations."
+  },
+  "promotion_gate": "CDEC CBR remains the primary modern South Fork flow/stage candidate, and flags/terms are now recorded for the first pulled window. Do not retune presets or photoreal water bands until broader representative CBR/A25 windows, release context, legal/redistribution signoff, hydrologic station-to-rapid relation, and guide review are complete.",
+  "purpose": "Record the CDEC/DWR terms, data flag definitions, no-data treatment, and CBR/A25 station interpretation needed before South Fork flow windows can influence visual or gameplay flow bands.",
+  "retrieval_review": {
+    "api_docs_probe": "Official CDEC API PDFs were fetched; each pointed to the FlagList report endpoint for data flag definitions.",
+    "conditions_page_local_probe": "DWR Conditions of Use page fetched successfully and reviewed for reliability/no-guarantee language.",
+    "flag_list_probe": "The old /misc/flaglist.html URL returned 404; the current CDEC reportapp FlagList endpoint returned the data flag table.",
+    "legal_status": "engineering_source_review_only_not_legal_signoff",
+    "review_date": "2026-07-06"
+  },
+  "river_id": "american_south_fork",
+  "schema": "raftsim.cdec_terms_flags_station_relation_review.v1",
+  "section_id": "chili_bar_to_coloma",
+  "source_urls": {
+    "a25_station_metadata": "https://cdec.water.ca.gov/dynamicapp/staMeta?station_id=A25",
+    "cbr_event_flow_json": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2026-07-05T00:00&End=2026-07-06T23:59",
+    "cbr_event_stage_json": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=1&dur_code=E&Start=2026-07-05T00:00&End=2026-07-06T23:59",
+    "cbr_sensor_metadata_json": "https://cdec.water.ca.gov/dynamicapp/wsSensorData/getSensorsForStation?stationId=CBR",
+    "cbr_station_metadata": "https://cdec.water.ca.gov/dynamicapp/staMeta?station_id=CBR",
+    "cdec_daily_monthly_api_docs": "https://cdec.water.ca.gov/reportapp/javareports?name=WebDMAppsAPIDocs.pdf",
+    "cdec_flag_list_report": "https://cdec.water.ca.gov/reportapp/javareports?name=FlagList",
+    "cdec_home": "https://cdec.water.ca.gov/index.html",
+    "cdec_real_time_api_docs": "https://cdec.water.ca.gov/reportapp/javareports?name=WebRTAppsAPIDocs.pdf",
+    "cdec_web_service_api_docs": "https://cdec.water.ca.gov/reportapp/javareports?name=WebWSAppsAPIDocs.pdf",
+    "deprecated_flag_list_probe": "https://cdec.water.ca.gov/misc/flaglist.html",
+    "dwr_conditions_of_use": "https://water.ca.gov/Conditions-of-Use"
+  },
+  "station_relation_review": {
+    "a25": {
+      "accepted_for_now": "release timing and operations context",
+      "latitude": 38.771713,
+      "longitude": -120.813286,
+      "name": "CHILI BAR POWERHOUSE",
+      "not_accepted_yet": "sole authority for raftable river flow at downstream features",
+      "role": "secondary release-operation context",
+      "station_id": "A25"
+    },
+    "cbr": {
+      "accepted_for_now": "source_selection_and_review_windows_only",
+      "latitude": 38.772,
+      "longitude": -120.816,
+      "name": "AMERICAN RIVER AT CHILI BAR",
+      "not_accepted_yet": "direct gameplay or photoreal flow-band authority",
+      "role": "primary modern flow/stage candidate for South Fork Chili Bar review",
+      "station_id": "CBR"
+    },
+    "remaining_review_needed": [
+      "Hydrologic routing/lag from CBR/A25 to each authored rapid and recovery pool.",
+      "Guide/outfitter validation of low, commercial, high, too-low, and washout conditions.",
+      "Comparison against broader CBR event/hourly windows and historical USGS 11445500 context.",
+      "Explicit review of how each promoted band changes holes, exposed rocks, shelves, wave trains, eddies, boulder damping, and rescue visibility."
+    ]
+  },
+  "status": "terms_flags_and_station_relation_review_attached_promotion_still_blocked",
+  "terms_summary": {
+    "conditions_of_use_summary": [
+      "DWR publishes web information for convenient immediate access.",
+      "DWR says human or mechanical error remains possible and does not guarantee accuracy, completeness, timeliness, or sequencing.",
+      "Derived gameplay or visual bands must preserve source attribution, retrieval metadata, caveats, and a separate review status."
+    ],
+    "provider": "California Data Exchange Center / California Department of Water Resources",
+    "repository_policy": [
+      "Do not promote CDEC-derived flow bands without itemized station, sensor, time-window, units, flag, and retrieval provenance.",
+      "Do not present CDEC values as authoritative gameplay truth without guide review and release-context interpretation.",
+      "Do not package third-party reference media from CDEC pages; store links and derived metadata only unless rights are explicit."
+    ]
+  }
+}

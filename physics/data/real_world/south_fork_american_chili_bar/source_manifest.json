@@ -25,6 +25,7 @@
       "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
       "hydrology/south_fork_modern_flow_source_selection.json",
       "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+      "hydrology/cdec_terms_flags_and_station_relation_review.json",
       "hydrology/flow_presets.json"
     ],
     "guide_references": [
@@ -184,6 +185,24 @@
     },
     {
       "category": "gauge",
+      "fetch_id": "sfa_cdec_cbr_event_flow_stage_window",
+      "notes": "First reproducible CDEC CBR event-window flow/stage pull for South Fork modern flow review. Use with the paired stage request and terms/flag review before deriving gameplay bands.",
+      "source_id": "cdec_cbr",
+      "status": "downloaded",
+      "target_artifact": "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+      "url": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2026-07-05T00:00&End=2026-07-06T23:59"
+    },
+    {
+      "category": "gauge",
+      "fetch_id": "sfa_cdec_terms_flags_station_relation_review",
+      "notes": "Records DWR Conditions of Use, CDEC FlagList definitions, API documentation links, and the current CBR/A25 station-to-reach interpretation for review-gated South Fork flow-band promotion.",
+      "source_id": "cdec_cbr",
+      "status": "reviewed",
+      "target_artifact": "hydrology/cdec_terms_flags_and_station_relation_review.json",
+      "url": "https://cdec.water.ca.gov/reportapp/javareports?name=FlagList"
+    },
+    {
+      "category": "gauge",
       "fetch_id": "sfa_nwps_nwm_context",
       "notes": "Link NOAA/NWPS/NWM reach context after the gauge/COMID mapping is verified.",
       "source_id": "noaa_nwps_nwm",
@@ -268,6 +287,37 @@
         "flow_percentiles",
         "season_windows",
         "gauge_transfer_function"
+      ]
+    },
+    {
+      "access_notes": "Use as the primary South Fork modern flow/stage candidate only after flag, no-data, station relation, release context, and guide review are attached.",
+      "attribution": "Credit California Data Exchange Center / California Department of Water Resources and record CBR station and sensor numbers.",
+      "category": "gauge",
+      "license_or_terms": "Use under California Department of Water Resources Conditions of Use; preserve station, sensor, timestamp, flag, and retrieval metadata.",
+      "provider": "California Data Exchange Center / California Department of Water Resources",
+      "source_id": "cdec_cbr",
+      "title": "American River at Chili Bar CBR flow and stage",
+      "url": "https://cdec.water.ca.gov/dynamicapp/staMeta?station_id=CBR",
+      "use_in_pipeline": [
+        "modern_flow_stage_window",
+        "flow_band_review",
+        "release_pulse_context",
+        "season_windows"
+      ]
+    },
+    {
+      "access_notes": "Use as release-operation context only unless hydrologic routing and guide review confirm direct relation to raftable reach flow.",
+      "attribution": "Credit California Data Exchange Center / California Department of Water Resources and record A25 station and sensor numbers.",
+      "category": "gauge",
+      "license_or_terms": "Use under California Department of Water Resources Conditions of Use; preserve station, sensor, timestamp, flag, and retrieval metadata.",
+      "provider": "California Data Exchange Center / California Department of Water Resources",
+      "source_id": "cdec_a25_powerhouse_context",
+      "title": "Chili Bar Powerhouse A25 release-operation context",
+      "url": "https://cdec.water.ca.gov/dynamicapp/staMeta?station_id=A25",
+      "use_in_pipeline": [
+        "release_operation_context",
+        "flow_band_review",
+        "season_windows"
       ]
     },
     {

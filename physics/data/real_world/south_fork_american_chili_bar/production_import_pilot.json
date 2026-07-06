@@ -77,7 +77,7 @@
     },
     {
       "class_id": "seasonal_flow_or_release_history",
-      "promotion_gate": "Use CDEC CBR as the primary modern flow/stage candidate after the USGS 11445500 IV diagnostic; attach CDEC terms, flag meanings, broader representative windows, station-to-reach relation, release context, and guide review before low/median/high visual variants are promoted.",
+      "promotion_gate": "Use CDEC CBR as the primary modern flow/stage candidate after the USGS 11445500 IV diagnostic; the first terms/flag/station review is attached, but broader representative windows, legal/redistribution signoff, release context, and guide review are still required before low/median/high visual variants are promoted.",
       "source_ids": [
         "usgs_water_services",
         "cdec_cbr",
@@ -89,7 +89,7 @@
         "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
         "hydrology/south_fork_modern_flow_source_selection.json",
         "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
-        "hydrology/production_import_pilot/cdec_terms_flags_and_station_relation_review.json",
+        "hydrology/cdec_terms_flags_and_station_relation_review.json",
         "hydrology/production_import_pilot/flow_band_review.json"
       ]
     },

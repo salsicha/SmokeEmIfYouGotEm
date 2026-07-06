@@ -65,6 +65,7 @@ RAPID_REVIEW_EDITOR_WORKFLOW_FILE = "rapid_review_editor_workflow.json"
 PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION = "raftsim.production_import_pilot.v0"
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION = "raftsim.production_environment_gap_register.v0"
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE = "production_environment_gap_register.json"
+SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE = "hydrology/cdec_terms_flags_and_station_relation_review.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
@@ -740,6 +741,28 @@ def default_source_catalog() -> tuple[SourceCatalogEntry, ...]:
             use_in_pipeline=("gauge_history", "flow_percentiles", "season_windows", "gauge_transfer_function"),
         ),
         SourceCatalogEntry(
+            source_id="cdec_cbr",
+            category="gauge",
+            provider="California Data Exchange Center / California Department of Water Resources",
+            title="American River at Chili Bar CBR flow and stage",
+            url="https://cdec.water.ca.gov/dynamicapp/staMeta?station_id=CBR",
+            license_or_terms="Use under California Department of Water Resources Conditions of Use; preserve station, sensor, timestamp, flag, and retrieval metadata.",
+            attribution="Credit California Data Exchange Center / California Department of Water Resources and record CBR station and sensor numbers.",
+            access_notes="Use as the primary South Fork modern flow/stage candidate only after flag, no-data, station relation, release context, and guide review are attached.",
+            use_in_pipeline=("modern_flow_stage_window", "flow_band_review", "release_pulse_context", "season_windows"),
+        ),
+        SourceCatalogEntry(
+            source_id="cdec_a25_powerhouse_context",
+            category="gauge",
+            provider="California Data Exchange Center / California Department of Water Resources",
+            title="Chili Bar Powerhouse A25 release-operation context",
+            url="https://cdec.water.ca.gov/dynamicapp/staMeta?station_id=A25",
+            license_or_terms="Use under California Department of Water Resources Conditions of Use; preserve station, sensor, timestamp, flag, and retrieval metadata.",
+            attribution="Credit California Data Exchange Center / California Department of Water Resources and record A25 station and sensor numbers.",
+            access_notes="Use as release-operation context only unless hydrologic routing and guide review confirm direct relation to raftable reach flow.",
+            use_in_pipeline=("release_operation_context", "flow_band_review", "season_windows"),
+        ),
+        SourceCatalogEntry(
             source_id="noaa_nwps_nwm",
             category="gauge",
             provider="NOAA/NWS",
@@ -925,6 +948,30 @@ def south_fork_american_fetch_specs() -> tuple[RemoteFetchSpec, ...]:
             ),
         ),
         RemoteFetchSpec(
+            fetch_id="sfa_cdec_cbr_event_flow_stage_window",
+            category="gauge",
+            source_id="cdec_cbr",
+            url="https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2026-07-05T00:00&End=2026-07-06T23:59",
+            target_artifact="hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+            status="downloaded",
+            notes=(
+                "First reproducible CDEC CBR event-window flow/stage pull for South Fork modern flow review. "
+                "Use with the paired stage request and terms/flag review before deriving gameplay bands."
+            ),
+        ),
+        RemoteFetchSpec(
+            fetch_id="sfa_cdec_terms_flags_station_relation_review",
+            category="gauge",
+            source_id="cdec_cbr",
+            url="https://cdec.water.ca.gov/reportapp/javareports?name=FlagList",
+            target_artifact=SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
+            status="reviewed",
+            notes=(
+                "Records DWR Conditions of Use, CDEC FlagList definitions, API documentation links, and the current "
+                "CBR/A25 station-to-reach interpretation for review-gated South Fork flow-band promotion."
+            ),
+        ),
+        RemoteFetchSpec(
             fetch_id="sfa_nwps_nwm_context",
             category="gauge",
             source_id="noaa_nwps_nwm",
@@ -1106,10 +1153,10 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                     "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
                     "hydrology/south_fork_modern_flow_source_selection.json",
                     "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
-                    "hydrology/production_import_pilot/cdec_terms_flags_and_station_relation_review.json",
+                    SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                     "hydrology/production_import_pilot/flow_band_review.json",
                 ],
-                "promotion_gate": "Use CDEC CBR as the primary modern flow/stage candidate after the USGS 11445500 IV diagnostic; attach CDEC terms, flag meanings, broader representative windows, station-to-reach relation, release context, and guide review before low/median/high visual variants are promoted.",
+                "promotion_gate": "Use CDEC CBR as the primary modern flow/stage candidate after the USGS 11445500 IV diagnostic; the first terms/flag/station review is attached, but broader representative windows, legal/redistribution signoff, release context, and guide review are still required before low/median/high visual variants are promoted.",
             },
             {
                 "class_id": "protected_area_and_access_context",
@@ -1746,6 +1793,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
                     "hydrology/south_fork_modern_flow_source_selection.json",
                     "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+                    SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                     "reference_media_link_manifest.json",
                 ],
                 "p0_next_pulls_or_attachments": [
@@ -1764,14 +1812,15 @@ def build_production_environment_gap_register() -> dict[str, object]:
                         "required_artifacts": [
                             "hydrology/south_fork_modern_flow_source_selection.json",
                             "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
-                            "hydrology/production_import_pilot/cdec_terms_flags_and_station_relation_review.json",
+                            SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                             "hydrology/production_import_pilot/flow_band_review.json",
                         ],
                         "source_leads": ["cdec_cbr", "cdec_a25_powerhouse_context", "usgs_water_services", "guide_review"],
                         "promotion_gate": (
                             "USGS 11445500 returned no P30D instantaneous time series on 2026-07-06, and CDEC CBR now "
-                            "has a first reproducible event-window pull; tie low/median/high visual variants to broader "
-                            "CBR windows, QA/terms/flag review, release context, station-to-reach relation, and guide notes."
+                            "has a first reproducible event-window pull plus an attached terms/flag/station review; tie "
+                            "low/median/high visual variants to broader CBR windows, release context, legal/redistribution "
+                            "signoff, station-to-reach review, and guide notes."
                         ),
                     },
                     {
@@ -1988,6 +2037,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
                 "hydrology/south_fork_modern_flow_source_selection.json",
                 "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+                SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                 "hydrology/flow_presets.json",
             ],
             "guide_references": [
@@ -3324,9 +3374,10 @@ def _rapid_review_evidence_refs(candidate: RapidCandidate) -> dict[str, object]:
                 "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
                 "hydrology/south_fork_modern_flow_source_selection.json",
                 "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+                SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                 "hydrology/flow_presets.json",
             ],
-            "source_ids": ["usgs_nwis", "noaa_nwps_nwm", "usgs_streamstats"],
+            "source_ids": ["usgs_nwis", "cdec_cbr", "cdec_a25_powerhouse_context", "noaa_nwps_nwm", "usgs_streamstats"],
         },
         "flow_difficulty_mapping": {
             "layer_id": "flow_difficulty_mapping",
