@@ -218,19 +218,19 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.MapPackagePath = TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview");
     SouthFork.SourceManifest = TEXT("physics/data/real_world/south_fork_american_chili_bar/source_manifest.json");
     SouthFork.AerialDrapeImage =
-        TEXT("physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_sample_1024.png");
+        TEXT("physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png");
     SouthFork.TerrainReliefImage =
-        TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png");
+        TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/dem_relief_2048.png");
     SouthFork.HeightfieldPreviewImage =
-        TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png");
+        TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/heightfield_candidate_2017.png");
     SouthFork.WaterMaskImage =
-        TEXT("physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_water_mask_1024.png");
+        TEXT("physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/water_mask_2048.png");
     SouthFork.VegetationMaskImage =
-        TEXT("physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png");
+        TEXT("physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/vegetation_mask_2048.png");
     SouthFork.ElevationSample =
-        TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_sample_512.tif");
+        TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/3dep_tiles");
     SouthFork.SourceDrapeDescription =
-        TEXT("larger official USDA/APFO NAIP 1024px corridor sample sampled into a denser terrain-conforming source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into bank and valley preview geometry; review-gated source water/vegetation masks sampled into terrain color and deterministic wet-rock, talus, foliage, and understory placement; first-party procedural wet-bank, leaf-litter, talus, and vertex-color water-gradient detail generated as rights-safe proxy dressing; full elevation conditioning remains pending; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers");
+        TEXT("stitched South Fork production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into bank and valley preview geometry; pilot source water/vegetation masks are sampled into terrain color and deterministic wet-rock, talus, foliage, and understory placement; all pilot derivatives remain review-gated until metadata review, mosaic/clip, hydrologic conditioning, channel burning, masks, and guide/geospatial approval pass; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers");
     SouthFork.FlowBandId = TEXT("median_runnable");
     SouthFork.FlowBandDisplayName = TEXT("Median Runnable / Summer Commercial");
     SouthFork.FlowBandSource = TEXT("physics/data/real_world/south_fork_american_chili_bar/flow_presets.json");
