@@ -1102,6 +1102,18 @@
             "renderer_iteration_gate",
             "production_source_selection_checklist"
           ]
+        },
+        {
+          "artifact_id": "pacuare_high_resolution_scene_metadata_review",
+          "category": "high_resolution_satellite_scene_metadata_review",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
+          "promotion_blocker": "Scene metadata identifies official Landsat/Sentinel candidates only; no imagery product is downloaded or approved for photoreal Pacuare materials, masks, or lifelike captures.",
+          "status": "official_high_resolution_scene_metadata_attached_review_gated_no_imagery_downloaded",
+          "use_in_unreal": [
+            "future_source_drape_replacement_planning",
+            "cloud_screening_review_gate",
+            "production_mask_source_selection"
+          ]
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
