@@ -14,6 +14,7 @@ public class RaftSimEditor : ModuleRules
             "Slate",
             "SlateCore",
             "ToolMenus",
+            "AssetRegistry",
             "RaftSimAutomation",
             "RaftSimCore",
             "RaftSimDebug",
@@ -25,6 +26,8 @@ public class RaftSimEditor : ModuleRules
         PrivateDependencyModuleNames.AddRange(new[]
         {
             "LevelEditor",
+            "Json",
+            "Projects",
             "UnrealEd"
         });
     }

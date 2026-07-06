@@ -1,0 +1,6 @@
+{
+  "schema": "raftsim.unreal.tool_capture_manifest.v1",
+  "capture_type": "slate_screenshot_sequence",
+  "video_capture_status": "not_recorded; automated Slate screenshots captured; video requires native recorder integration or macOS Screen Recording permission",
+  "captured_files": ["docs/tool-captures/milestone25a/ReplayDebugViewer.png", "docs/tool-captures/milestone25a/RapidRiverEditor.png", "docs/tool-captures/milestone25a/FeatureTuningEditor.png", "docs/tool-captures/milestone25a/GeospatialValidator.png", "docs/tool-captures/milestone25a/VerticalSliceLauncher.png"]
+}

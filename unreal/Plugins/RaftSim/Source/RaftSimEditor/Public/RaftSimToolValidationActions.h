@@ -107,3 +107,11 @@ private:
     UPROPERTY()
     TObjectPtr<URaftSimToolValidationActionRegistry> Registry;
 };
+
+namespace RaftSimEditorValidation
+{
+    RAFTSIMEDITOR_API TArray<FRaftSimToolValidationAction> BuildDefaultValidationActions();
+    RAFTSIMEDITOR_API const FRaftSimToolValidationAction* FindDefaultValidationAction(FName ActionId);
+    RAFTSIMEDITOR_API FRaftSimToolValidationActionResult ExecuteAction(const FRaftSimToolValidationAction& Action);
+    RAFTSIMEDITOR_API FString ResolveWorkspacePath(const FString& SourcePath);
+}
