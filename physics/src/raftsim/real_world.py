@@ -65,6 +65,7 @@ RAPID_REVIEW_EDITOR_WORKFLOW_FILE = "rapid_review_editor_workflow.json"
 PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION = "raftsim.production_import_pilot.v0"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
+SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE = "production_import_pilot_derivatives_manifest.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
 DIFFICULTY_PRESETS: tuple[DifficultyPreset, ...] = ("beginner", "intermediate", "advanced", "expert")
 
@@ -1053,8 +1054,9 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                 "source_ids": ["usgs_3dep"],
                 "target_outputs": [
                     "terrain/production_import_pilot/3dep_tiles",
-                    "terrain/production_import_pilot/conditioned_heightfield_2017.png",
-                    "terrain/production_import_pilot/heightfield_manifest.json",
+                    "terrain/production_import_pilot/dem_relief_2048.png",
+                    "terrain/production_import_pilot/heightfield_candidate_2017.png",
+                    "production_import_pilot_derivatives_manifest.json",
                 ],
                 "promotion_gate": "Download tiles, mosaic/clip, review voids and artifacts, hydrologically condition, burn the channel, and compare slope/banks to guide-reviewed rapids.",
             },
@@ -1076,7 +1078,7 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                 "target_outputs": [
                     "imagery/production_import_pilot/naip_tiles",
                     "imagery/production_import_pilot/source_drape_4096.png",
-                    "imagery/production_import_pilot/source_drape_manifest.json",
+                    "production_import_pilot_derivatives_manifest.json",
                 ],
                 "promotion_gate": "Attach acquisition year/date, resolution, CRS, attribution, and scene/tile metadata; use Landsat only for seasonal comparison unless resolution is adequate for masks.",
             },
@@ -1085,9 +1087,9 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                 "status": "requires_new_derivatives_from_pilot_imagery_and_hydrography",
                 "source_ids": ["usda_naip", "usgs_3dhp_nhd", "guide_review"],
                 "target_outputs": [
-                    "imagery/production_import_pilot/water_mask.tif",
-                    "imagery/production_import_pilot/vegetation_mask.tif",
-                    "imagery/production_import_pilot/wet_rock_bank_mask.tif",
+                    "imagery/production_import_pilot/water_mask_2048.png",
+                    "imagery/production_import_pilot/vegetation_mask_2048.png",
+                    "imagery/production_import_pilot/source_masks_manifest.json",
                 ],
                 "promotion_gate": "Derive masks from reviewed imagery and hydrography, then manually review water edge, seasonal exposure, vegetation, and hazard visibility.",
             },
@@ -1177,6 +1179,9 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 "terrain/usgs_3dep_chili_bar_corridor_heightfield_manifest.json",
                 "terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png",
                 "terrain/usgs_3dep_chili_bar_corridor_relief_preview_manifest.json",
+                "terrain/production_import_pilot/3dep_tiles",
+                "terrain/production_import_pilot/dem_relief_2048.png",
+                "terrain/production_import_pilot/heightfield_candidate_2017.png",
                 COURSE_ELEVATION_EXTRACTION_FILE,
                 "terrain/solver_bed_grid.npy",
             ],
@@ -1193,6 +1198,11 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 "imagery/usda_naip_chili_bar_corridor_water_mask_1024.png",
                 "imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png",
                 "imagery/usda_naip_chili_bar_corridor_masks_manifest.json",
+                "imagery/production_import_pilot/naip_tiles",
+                "imagery/production_import_pilot/source_drape_4096.png",
+                "imagery/production_import_pilot/water_mask_2048.png",
+                "imagery/production_import_pilot/vegetation_mask_2048.png",
+                "imagery/production_import_pilot/source_masks_manifest.json",
                 "imagery/naip_tiles",
                 "imagery/water_mask.tif",
                 "imagery/foam_texture_mask.tif",
@@ -1210,6 +1220,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 "production_source_pull_manifest.json",
                 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE,
                 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE,
+                SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE,
             ],
             "validation": ["validation_matrix.json"],
             "unreal": ["unreal/corridor_package_manifest.json"],
