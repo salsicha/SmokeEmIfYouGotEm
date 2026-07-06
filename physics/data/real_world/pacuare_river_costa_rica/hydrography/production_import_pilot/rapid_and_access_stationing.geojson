@@ -1,0 +1,161 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -83.7496037,
+          9.9473479
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "pacuare_upper_access_review_seed",
+        "feature_role": "access_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 70.0,
+        "promotion_gate": "Replace with official hydrography/access stationing, flow/rain context, protected-area review, and guide/outfitter validation before gameplay or public route use.",
+        "review_status": "preview_stationing_seed_not_official_rapid_or_access_geometry",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "station_lat": 9.9468549,
+        "station_lon": -83.75,
+        "station_m": 0.0,
+        "station_sample_index": 0,
+        "stationing_status": "derived_from_unreal_preview_scaffold_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.6929326,
+          9.8966337
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "pacuare_rainforest_entry_wave_train_review_seed",
+        "feature_role": "rapid_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "promotion_gate": "Replace with official hydrography/access stationing, flow/rain context, protected-area review, and guide/outfitter validation before gameplay or public route use.",
+        "review_status": "preview_stationing_seed_not_official_rapid_or_access_geometry",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "station_lat": 9.8966337,
+        "station_lon": -83.6929326,
+        "station_m": 8500.0,
+        "station_sample_index": 34,
+        "stationing_status": "derived_from_unreal_preview_scaffold_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.6281101,
+          9.9344317
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "pacuare_gorge_hole_lateral_review_seed",
+        "feature_role": "rapid_feature_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": -40.0,
+        "promotion_gate": "Replace with official hydrography/access stationing, flow/rain context, protected-area review, and guide/outfitter validation before gameplay or public route use.",
+        "review_status": "preview_stationing_seed_not_official_rapid_or_access_geometry",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "station_lat": 9.9347709,
+        "station_lon": -83.6282304,
+        "station_m": 17000.0,
+        "station_sample_index": 68,
+        "stationing_status": "derived_from_unreal_preview_scaffold_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.5713767,
+          9.9045396
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "pacuare_waterfall_mist_reference_review_seed",
+        "feature_role": "environment_reference_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 85.0,
+        "promotion_gate": "Replace with official hydrography/access stationing, flow/rain context, protected-area review, and guide/outfitter validation before gameplay or public route use.",
+        "review_status": "preview_stationing_seed_not_official_rapid_or_access_geometry",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "station_lat": 9.9039689,
+        "station_lon": -83.5718916,
+        "station_m": 24500.0,
+        "station_sample_index": 98,
+        "stationing_status": "derived_from_unreal_preview_scaffold_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.5110952,
+          9.9139978
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "pacuare_rescue_visibility_review_seed",
+        "feature_role": "rescue_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": -80.0,
+        "promotion_gate": "Replace with official hydrography/access stationing, flow/rain context, protected-area review, and guide/outfitter validation before gameplay or public route use.",
+        "review_status": "preview_stationing_seed_not_official_rapid_or_access_geometry",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "station_lat": 9.9144609,
+        "station_lon": -83.5116531,
+        "station_m": 32500.0,
+        "station_sample_index": 130,
+        "stationing_status": "derived_from_unreal_preview_scaffold_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.4363107,
+          9.9349245
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "pacuare_downstream_takeout_review_seed",
+        "feature_role": "access_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 65.0,
+        "promotion_gate": "Replace with official hydrography/access stationing, flow/rain context, protected-area review, and guide/outfitter validation before gameplay or public route use.",
+        "review_status": "preview_stationing_seed_not_official_rapid_or_access_geometry",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "station_lat": 9.9345133,
+        "station_lon": -83.4367316,
+        "station_m": 43000.0,
+        "station_sample_index": 172,
+        "stationing_status": "derived_from_unreal_preview_scaffold_not_authoritative"
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare_rapid_access_stationing_draft.geojson.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "stationing_source": "hydrography/production_import_pilot/preview_stationing_scaffold.json",
+  "status": "preview_rapid_access_stationing_review_seeds_not_authoritative",
+  "type": "FeatureCollection"
+}

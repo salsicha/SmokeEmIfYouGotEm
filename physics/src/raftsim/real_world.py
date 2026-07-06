@@ -139,6 +139,9 @@ PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE = (
 )
 PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE = "hydrography/production_import_pilot/preview_centerline_scaffold.geojson"
 PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE = "hydrography/production_import_pilot/preview_stationing_scaffold.json"
+PACUARE_PRODUCTION_CENTERLINE_DRAFT_FILE = "hydrography/production_import_pilot/centerline.geojson"
+PACUARE_PRODUCTION_BANKS_DRAFT_FILE = "hydrography/production_import_pilot/banks.geojson"
+PACUARE_RAPID_ACCESS_STATIONING_DRAFT_FILE = "hydrography/production_import_pilot/rapid_and_access_stationing.geojson"
 PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE = "hydrography/production_import_pilot/official_source_access_plan.json"
 PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_FILE = (
     "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_getcapabilities.xml"
@@ -2803,10 +2806,10 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
                     PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
-                    "hydrography/production_import_pilot/centerline.geojson",
-                    "hydrography/production_import_pilot/banks.geojson",
+                    PACUARE_PRODUCTION_CENTERLINE_DRAFT_FILE,
+                    PACUARE_PRODUCTION_BANKS_DRAFT_FILE,
                     "hydrography/production_import_pilot/tributaries.geojson",
-                    "hydrography/production_import_pilot/rapid_and_access_stationing.geojson",
+                    PACUARE_RAPID_ACCESS_STATIONING_DRAFT_FILE,
                 ],
                 "promotion_gate": (
                     "Confirm exact official Costa Rica layers, terms, CRS, and attribution; use HydroSHEDS/OSM only as "
@@ -3378,6 +3381,9 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
                     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
                     PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
+                    PACUARE_PRODUCTION_CENTERLINE_DRAFT_FILE,
+                    PACUARE_PRODUCTION_BANKS_DRAFT_FILE,
+                    PACUARE_RAPID_ACCESS_STATIONING_DRAFT_FILE,
                     "hydrology/costa_rica_gauge_search.json",
                     "hydrology/rainfall_context.json",
                     PACUARE_RAINFALL_STATION_REVIEW_FILE,
@@ -3402,9 +3408,9 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
                             PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
                             PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
-                            "hydrography/production_import_pilot/centerline.geojson",
-                            "hydrography/production_import_pilot/banks.geojson",
-                            "hydrography/production_import_pilot/rapid_and_access_stationing.geojson",
+                            PACUARE_PRODUCTION_CENTERLINE_DRAFT_FILE,
+                            PACUARE_PRODUCTION_BANKS_DRAFT_FILE,
+                            PACUARE_RAPID_ACCESS_STATIONING_DRAFT_FILE,
                         ],
                         "source_leads": ["snit_cr_idecori", "hydrosheds", "guide_review"],
                         "promotion_gate": "Use the attached Unreal-curve scaffold only for review overlays/procedural dressing; confirm exact official Costa Rica layers and use HydroSHEDS/OSM only as fallback seeds until guide/outfitter stationing approves the route.",
@@ -4560,6 +4566,163 @@ def build_colorado_oarsman_route_publication_notes(
             "River-mile markers, sandbars, camps, beaches, and access points are review seeds only.",
             "NPS/current operating constraints and sensitive-resource publication rules still need human review before public route detail.",
         ],
+    }
+
+
+def _pacuare_station_sample_near(stationing: dict[str, object], station_m: float) -> dict[str, object]:
+    samples = stationing.get("station_samples", [])
+    if not samples:
+        raise ValueError("Pacuare stationing must include station_samples")
+    return min(samples, key=lambda sample: abs(float(sample["station_m"]) - station_m))
+
+
+def _pacuare_stationed_point(
+    stationing: dict[str, object],
+    station_m: float,
+    *,
+    offset_left_m: float = 0.0,
+    offset_downstream_m: float = 0.0,
+) -> tuple[list[float], dict[str, object]]:
+    sample = _pacuare_station_sample_near(stationing, station_m)
+    lat = float(sample["lat"])
+    lon = float(sample["lon"])
+    left_east, left_north = sample["river_left_normal_local_m"]
+    tangent_east, tangent_north = sample["downstream_tangent_local_m"]
+    east_m = float(left_east) * offset_left_m + float(tangent_east) * offset_downstream_m
+    north_m = float(left_north) * offset_left_m + float(tangent_north) * offset_downstream_m
+    meters_per_degree_lat = 111_320.0
+    meters_per_degree_lon = max(1.0, 111_320.0 * math.cos(math.radians(lat)))
+    return (
+        [round(lon + east_m / meters_per_degree_lon, 7), round(lat + north_m / meters_per_degree_lat, 7)],
+        {
+            "station_m": sample["station_m"],
+            "station_sample_index": sample["sample_index"],
+            "station_lon": sample["lon"],
+            "station_lat": sample["lat"],
+            "offset_left_m": offset_left_m,
+            "offset_downstream_m": offset_downstream_m,
+        },
+    )
+
+
+def build_pacuare_production_centerline_draft_geojson(preview_centerline: dict[str, object]) -> dict[str, object]:
+    """Build the Pacuare production-import centerline review draft from the preview scaffold."""
+
+    source_feature = preview_centerline["features"][0]
+    return {
+        "type": "FeatureCollection",
+        "name": "pacuare_production_centerline_draft_from_preview_scaffold",
+        "schema": "raftsim.pacuare_production_centerline_draft.geojson.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "status": "draft_from_preview_scaffold_review_required_not_official_hydrography",
+        "source_centerline": PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": source_feature["geometry"],
+                "properties": {
+                    "river_id": "pacuare",
+                    "section_id": "lower_pacuare_planning_corridor",
+                    "feature_role": "production_import_centerline_review_draft",
+                    "status": "draft_from_preview_scaffold_review_gated_not_final_centerline",
+                    "source_status": source_feature["properties"]["status"],
+                    "stationing": PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
+                    "promotion_gate": (
+                        "Replace or approve against official Costa Rica hydrography, working CRS, imagery/DEM alignment, "
+                        "banks, rapid/access stationing, protected-area review, and guide/outfitter validation before "
+                        "solver or Unreal production use."
+                    ),
+                },
+            }
+        ],
+    }
+
+
+def build_pacuare_production_banks_draft_geojson(stationing: dict[str, object]) -> dict[str, object]:
+    """Build Pacuare bank review draft lines from preview stationing normals."""
+
+    bank_features: list[dict[str, object]] = []
+    for side_label, side, offset_m in (("river_left", 1.0, 55.0), ("river_right", -1.0, -55.0)):
+        coordinates = [
+            _pacuare_stationed_point(stationing, sample["station_m"], offset_left_m=offset_m)[0]
+            for sample in stationing["station_samples"]
+        ]
+        bank_features.append(
+            {
+                "type": "Feature",
+                "geometry": {"type": "LineString", "coordinates": coordinates},
+                "properties": {
+                    "bank_id": f"pacuare_{side_label}_preview_bank_offset",
+                    "river_id": "pacuare",
+                    "section_id": "lower_pacuare_planning_corridor",
+                    "feature_role": "production_import_bank_review_draft",
+                    "river_side": side_label,
+                    "offset_m_from_preview_centerline": abs(offset_m) * side,
+                    "status": "draft_offset_from_preview_stationing_not_bank_or_wetted_width",
+                    "promotion_gate": (
+                        "Replace with bank/wetted-width geometry from official hydrography, conditioned DEM, "
+                        "cloud-screened imagery, flow review, and guide/outfitter validation."
+                    ),
+                },
+            }
+        )
+    return {
+        "type": "FeatureCollection",
+        "name": "pacuare_production_bank_review_drafts",
+        "schema": "raftsim.pacuare_production_banks_draft.geojson.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "status": "draft_bank_offsets_from_preview_stationing_review_required",
+        "stationing_source": PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
+        "features": bank_features,
+    }
+
+
+def build_pacuare_rapid_access_stationing_draft_geojson(stationing: dict[str, object]) -> dict[str, object]:
+    """Build Pacuare rapid/access station review points from preview stationing."""
+
+    definitions = [
+        ("pacuare_upper_access_review_seed", 0.0, "access_review_seed", 70.0),
+        ("pacuare_rainforest_entry_wave_train_review_seed", 8500.0, "rapid_review_seed", 0.0),
+        ("pacuare_gorge_hole_lateral_review_seed", 17000.0, "rapid_feature_review_seed", -40.0),
+        ("pacuare_waterfall_mist_reference_review_seed", 24500.0, "environment_reference_review_seed", 85.0),
+        ("pacuare_rescue_visibility_review_seed", 32500.0, "rescue_review_seed", -80.0),
+        ("pacuare_downstream_takeout_review_seed", 43000.0, "access_review_seed", 65.0),
+    ]
+    features: list[dict[str, object]] = []
+    for annotation_id, station_m, role, offset_left_m in definitions:
+        coordinates, station_props = _pacuare_stationed_point(stationing, station_m, offset_left_m=offset_left_m)
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": {"type": "Point", "coordinates": coordinates},
+                "properties": {
+                    "annotation_id": annotation_id,
+                    "river_id": "pacuare",
+                    "section_id": "lower_pacuare_planning_corridor",
+                    "feature_role": role,
+                    "review_status": "preview_stationing_seed_not_official_rapid_or_access_geometry",
+                    "stationing_status": "derived_from_unreal_preview_scaffold_not_authoritative",
+                    **station_props,
+                    "promotion_gate": (
+                        "Replace with official hydrography/access stationing, flow/rain context, protected-area review, "
+                        "and guide/outfitter validation before gameplay or public route use."
+                    ),
+                },
+            }
+        )
+    return {
+        "type": "FeatureCollection",
+        "schema": "raftsim.pacuare_rapid_access_stationing_draft.geojson.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "status": "preview_rapid_access_stationing_review_seeds_not_authoritative",
+        "stationing_source": PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
+        "features": features,
     }
 
 
