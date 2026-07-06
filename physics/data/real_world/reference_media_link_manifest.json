@@ -2,6 +2,7 @@
   "schema": "raftsim.reference_media_link_manifest.v1",
   "generated_on": "2026-07-06",
   "status": "link_seeds_recorded_no_media_downloaded",
+  "review_queue": "reference_media_review_queue.json",
   "policy": {
     "storage": "Link-only. Do not download, scrape, vendor, train on, or package third-party photos, footage, captions, or comments until explicit rights are recorded per item.",
     "shipping_rule": "First-party capture, official/public-domain media with item metadata, or explicit written permission is required before a reference can become a production asset.",

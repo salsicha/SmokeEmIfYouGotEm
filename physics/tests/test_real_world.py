@@ -711,6 +711,38 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert "waterfalls" in rivers["pacuare"]["completion_gate"]
 
 
+def test_reference_media_review_queue_is_link_only_and_station_aware():
+    queue = json.loads((REAL_WORLD_DATA_DIR / "reference_media_review_queue.json").read_text())
+    link_manifest = json.loads((REAL_WORLD_DATA_DIR / "reference_media_link_manifest.json").read_text())
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+
+    assert queue["schema"] == "raftsim.reference_media_review_queue.v1"
+    assert queue["status"] == "station_aware_review_queue_no_media_downloaded"
+    assert "Do not download" in queue["policy"]["storage"]
+    assert link_manifest["review_queue"] == "reference_media_review_queue.json"
+    assert (
+        photoreal_sources["reference_media_review_queue"]
+        == "physics/data/real_world/reference_media_review_queue.json"
+    )
+
+    targets_by_river = {}
+    for target in queue["review_targets"]:
+        targets_by_river.setdefault(target["river_id"], []).append(target)
+        assert target["candidate_source_ids"]
+        assert target["flow_context_needed"]
+        assert target["annotation_outputs"]
+        assert target["rights_status"] == "candidate_links_only"
+
+    assert {"american_south_fork", "colorado_river", "pacuare"} == set(targets_by_river)
+    assert all(len(targets) >= 3 for targets in targets_by_river.values())
+    assert any("rescue" in target["target_id"] for target in queue["review_targets"])
+
+
 def test_channel_indicators_and_rapid_candidates_find_complex_water():
     indicators = extract_channel_indicators(south_fork_american_centerline_stations())
     candidates = identify_candidate_rapids(indicators)
