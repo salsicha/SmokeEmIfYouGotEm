@@ -62,6 +62,8 @@
       "imagery/production_import_pilot/water_mask_2048.png",
       "imagery/production_import_pilot/vegetation_mask_2048.png",
       "imagery/production_import_pilot/source_masks_manifest.json",
+      "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json",
+      "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png",
       "imagery/naip_tiles",
       "imagery/water_mask.tif",
       "imagery/foam_texture_mask.tif"

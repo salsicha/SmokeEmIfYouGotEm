@@ -404,6 +404,38 @@
       ]
     },
     {
+      "artifact_id": "nhd_mainstem_water_prior_2048",
+      "category": "derived_hydrography_aligned_water_prior",
+      "caveats": [
+        "This is a rasterized NHD mainstem prior, not visible-water segmentation.",
+        "It agrees with the NHD stationing by construction and must not replace reviewed NAIP/DEM/bank masks.",
+        "It does not encode actual wetted width, shelves, side channels, islands, eddies, holes, flow level, or guide-reviewed hazards.",
+        "A few downstream station samples are clipped by the current pilot bbox because source features were preserved whole."
+      ],
+      "path": "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json",
+      "provider": "RaftSim derived artifact from the South Fork NHD mainstem stationing candidate",
+      "related_artifacts": [
+        "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png"
+      ],
+      "status": "generated_review_gated_alignment_prior_not_segmentation_truth",
+      "summary": {
+        "ge_128_pixel_fraction": 0.020542,
+        "line_width_px": 18,
+        "mean_value": 0.021432,
+        "nonzero_pixel_fraction": 0.044446,
+        "output_size_px": [
+          2048,
+          2048
+        ]
+      },
+      "use": [
+        "editor_alignment_overlay",
+        "future_mask_generation_prior",
+        "hydrography_visual_review",
+        "manual_bank_derivation_seed"
+      ]
+    },
+    {
       "artifact_id": "usgs_3dep_chili_bar_sample_256",
       "category": "terrain_sample",
       "caveats": [

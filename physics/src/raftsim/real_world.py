@@ -76,6 +76,8 @@ SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE = "hydrography/nhd_hu8_18020129_mainstem
 SOUTH_FORK_NHD_CROSS_SECTION_SEED_MANIFEST_FILE = "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json"
 SOUTH_FORK_NHD_CROSS_SECTION_SEED_FILE = "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson"
 SOUTH_FORK_NHD_ALIGNMENT_DIAGNOSTIC_FILE = "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json"
+SOUTH_FORK_NHD_WATER_PRIOR_MANIFEST_FILE = "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json"
+SOUTH_FORK_NHD_WATER_PRIOR_FILE = "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
@@ -1185,6 +1187,8 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                     "imagery/production_import_pilot/water_mask_2048.png",
                     "imagery/production_import_pilot/vegetation_mask_2048.png",
                     "imagery/production_import_pilot/source_masks_manifest.json",
+                    SOUTH_FORK_NHD_WATER_PRIOR_MANIFEST_FILE,
+                    SOUTH_FORK_NHD_WATER_PRIOR_FILE,
                 ],
                 "promotion_gate": "Derive masks from reviewed imagery and hydrography, then manually review water edge, seasonal exposure, vegetation, and hazard visibility.",
             },
@@ -1833,6 +1837,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "production_import_pilot/heightfield_candidate_2017.png",
                     "production_import_pilot/water_mask_2048.png",
                     "production_import_pilot/vegetation_mask_2048.png",
+                    SOUTH_FORK_NHD_WATER_PRIOR_MANIFEST_FILE,
+                    SOUTH_FORK_NHD_WATER_PRIOR_FILE,
                     SOUTH_FORK_NHD_HU8_MANIFEST_FILE,
                     SOUTH_FORK_NHD_HU8_FLOWLINE_EXTRACT_FILE,
                     SOUTH_FORK_NHD_HU8_SUPPORT_EXTRACT_FILE,
@@ -2101,6 +2107,8 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 "imagery/production_import_pilot/water_mask_2048.png",
                 "imagery/production_import_pilot/vegetation_mask_2048.png",
                 "imagery/production_import_pilot/source_masks_manifest.json",
+                SOUTH_FORK_NHD_WATER_PRIOR_MANIFEST_FILE,
+                SOUTH_FORK_NHD_WATER_PRIOR_FILE,
                 "imagery/naip_tiles",
                 "imagery/water_mask.tif",
                 "imagery/foam_texture_mask.tif",

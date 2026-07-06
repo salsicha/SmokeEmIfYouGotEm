@@ -148,6 +148,8 @@
         "production_import_pilot/heightfield_candidate_2017.png",
         "production_import_pilot/water_mask_2048.png",
         "production_import_pilot/vegetation_mask_2048.png",
+        "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json",
+        "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png",
         "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
         "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
         "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",

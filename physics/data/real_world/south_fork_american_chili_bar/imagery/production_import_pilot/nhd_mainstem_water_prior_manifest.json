@@ -1,0 +1,41 @@
+{
+  "caveats": [
+    "This prior is drawn from the NHD mainstem candidate, so it will agree with stationing by construction.",
+    "It does not identify actual visible water, shelves, side channels, islands, eddies, holes, or seasonal wetted width.",
+    "The current pilot bbox clips a few downstream station samples because the NHD source extract preserved whole features near the bbox edge."
+  ],
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "existing_water_mask_for_grid_reference": "imagery/production_import_pilot/water_mask_2048.png",
+    "production_import_pilot_bounds": "production_import_pilot.json#bounds_wgs84",
+    "stationing_candidate": "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json"
+  },
+  "output": "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png",
+  "processing": {
+    "downstream_outside_bbox_policy": "draw_then_clip_to_image_bounds",
+    "gaussian_blur_radius_px": 5,
+    "line_width_px": 18,
+    "lon_lat_to_pixel": "linear_wgs84_bbox_preview_mapping_north_up",
+    "output_size_px": [
+      2048,
+      2048
+    ],
+    "station_sample_count": 264,
+    "station_samples_outside_bbox": 4
+  },
+  "promotion_gates": [
+    "Use only as an editor overlay or mask-generation prior until reviewed banks and orthomosaic masks exist.",
+    "Do not replace the source-derived water mask or accept geometry from this prior alone.",
+    "Compare against NAIP, DEM relief, NHD waterbodies, CDEC flow context, and guide notes before deriving production wetted width."
+  ],
+  "river_id": "american_south_fork",
+  "schema": "raftsim.nhd_mainstem_water_prior_manifest.v0",
+  "section_id": "chili_bar_to_coloma",
+  "status": "generated_review_gated_alignment_prior_not_segmentation_truth",
+  "summary": {
+    "ge_128_pixel_fraction": 0.020542,
+    "mean_value": 0.021432,
+    "nonzero_pixel_fraction": 0.044446,
+    "sha256": "d01014e177ebced19c61583038a96f677fefde4a94ffc113704f744bab29ca17"
+  }
+}
