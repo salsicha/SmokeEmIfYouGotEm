@@ -1,0 +1,199 @@
+{
+  "candidate_links": [
+    {
+      "allowed_before_rights_clear": [
+        "manual visual comparison",
+        "guide/outfitter discussion",
+        "permission outreach planning",
+        "internal station annotation placeholders"
+      ],
+      "blocked_before_rights_clear": [
+        "download",
+        "scrape",
+        "vendor",
+        "train_on",
+        "texture_or_material_derivation",
+        "photogrammetry",
+        "packaged_media",
+        "marketing_or_public_promo_use"
+      ],
+      "notes": "NPS media is the preferred first review path for Colorado visual reference, but each image/video still needs item metadata and credit review.",
+      "provider": "National Park Service",
+      "rights_status": "official_us_government_media_page_per_item_public_domain_or_credit_review_required",
+      "source_id": "nps_grand_canyon_photos_multimedia",
+      "source_type": "official_media_page",
+      "url": "https://www.nps.gov/grca/learn/photosmultimedia/index.htm"
+    },
+    {
+      "allowed_before_rights_clear": [
+        "manual visual comparison",
+        "guide/outfitter discussion",
+        "permission outreach planning",
+        "internal station annotation placeholders"
+      ],
+      "blocked_before_rights_clear": [
+        "download",
+        "scrape",
+        "vendor",
+        "train_on",
+        "texture_or_material_derivation",
+        "photogrammetry",
+        "packaged_media",
+        "marketing_or_public_promo_use"
+      ],
+      "notes": "Use for contextual validation; do not treat embedded media as assets until item rights are recorded.",
+      "provider": "National Park Service",
+      "rights_status": "official_us_government_page_but_per_media_item_metadata_review_required",
+      "source_id": "nps_grand_canyon_river_trips",
+      "source_type": "official_context_page",
+      "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm"
+    },
+    {
+      "allowed_before_rights_clear": [
+        "manual visual comparison",
+        "guide/outfitter discussion",
+        "permission outreach planning",
+        "internal station annotation placeholders"
+      ],
+      "blocked_before_rights_clear": [
+        "download",
+        "scrape",
+        "vendor",
+        "train_on",
+        "texture_or_material_derivation",
+        "photogrammetry",
+        "packaged_media",
+        "marketing_or_public_promo_use"
+      ],
+      "notes": "Review each file page and avoid guidebook/caption reuse unless rights explicitly allow it.",
+      "provider": "Wikimedia Commons",
+      "rights_status": "per_file_license_attribution_and_model_property_review_required",
+      "source_id": "wikimedia_grand_canyon_rafting_search",
+      "source_type": "creative_commons_candidate_search",
+      "url": "https://commons.wikimedia.org/w/index.php?search=Grand+Canyon+Colorado+River+rafting&title=Special:MediaSearch&type=image"
+    },
+    {
+      "allowed_before_rights_clear": [
+        "manual visual comparison",
+        "guide/outfitter discussion",
+        "permission outreach planning",
+        "internal station annotation placeholders"
+      ],
+      "blocked_before_rights_clear": [
+        "download",
+        "scrape",
+        "vendor",
+        "train_on",
+        "texture_or_material_derivation",
+        "photogrammetry",
+        "packaged_media",
+        "marketing_or_public_promo_use"
+      ],
+      "notes": "Use only for manual fidelity notes and permission outreach; no media import without rights.",
+      "provider": "Instagram",
+      "rights_status": "reference_only_no_download_no_scraping_explicit_creator_permission_required",
+      "source_id": "instagram_grand_canyon_rafting_hashtag",
+      "source_type": "public_social_search_seed",
+      "url": "https://www.instagram.com/explore/tags/grandcanyonrafting/"
+    }
+  ],
+  "forbidden_use": [
+    "using public social media as source textures or training data",
+    "downloading thumbnails, videos, captions, comments, or audio without rights",
+    "claiming photoreal fidelity from unreviewed media",
+    "shipping third-party media or derived assets without explicit rights"
+  ],
+  "generated_on": "2026-07-06",
+  "policy": {
+    "blocked_use_before_rights_clear": "Texture extraction, photogrammetry, AI training, marketing screenshots, packaged media, copied captions, or derived shipping assets.",
+    "review_queue_promotion_gate": "Every promoted item needs creator, URL, date, approximate station or reach, observed flow or weather context, license or written permission, attribution, and allowed-use notes.",
+    "shipping_rule": "First-party capture, official/public-domain media with item metadata, or explicit written permission is required before a reference can become a production asset.",
+    "social_rule": "Public social links and hashtag/search pages are fidelity-review seeds only. Record platform, creator, date, observed flow context, and permission status before any asset use.",
+    "storage": "Link-only. Do not download, scrape, vendor, train on, or package third-party photos, footage, captions, or comments until explicit rights are recorded per item."
+  },
+  "promoted_items": [],
+  "reference_annotations": "review/production_import_pilot/reference_annotations.geojson",
+  "required_fields_before_promotion": [
+    "creator_or_rights_holder",
+    "source_url",
+    "capture_or_publication_date",
+    "approximate_station_or_reach",
+    "observed_flow_or_release_or_rain_context",
+    "license_or_written_permission",
+    "attribution_text",
+    "allowed_game_uses",
+    "guide_or_outfitter_review_notes"
+  ],
+  "review_targets": [
+    {
+      "anchor_hint": "Lees Ferry / Grand Canyon river-eye downstream frame",
+      "annotation_outputs": [
+        "review/production_import_pilot/reference_annotations.geojson",
+        "field_media/production_import_pilot/rights_manifest.json"
+      ],
+      "candidate_source_ids": [
+        "nps_grand_canyon_photos_multimedia",
+        "nps_grand_canyon_river_trips",
+        "wikimedia_grand_canyon_rafting_search",
+        "instagram_grand_canyon_rafting_hashtag"
+      ],
+      "flow_context_needed": [
+        "low_release_planning",
+        "moderate_release_planning",
+        "high_release_planning"
+      ],
+      "rights_status": "candidate_links_only",
+      "target_id": "colorado_river_eye_canyon_scale"
+    },
+    {
+      "anchor_hint": "Release-aware sandbar and wet-bank review",
+      "annotation_outputs": [
+        "hydrography/production_import_pilot/sandbars.geojson",
+        "review/production_import_pilot/release_reference_annotations.geojson"
+      ],
+      "candidate_source_ids": [
+        "nps_grand_canyon_photos_multimedia",
+        "wikimedia_grand_canyon_rafting_search",
+        "instagram_grand_canyon_rafting_hashtag"
+      ],
+      "flow_context_needed": [
+        "low_release_planning",
+        "moderate_release_planning",
+        "high_release_planning"
+      ],
+      "rights_status": "candidate_links_only",
+      "target_id": "colorado_release_wet_banks_and_sandbars"
+    },
+    {
+      "anchor_hint": "Long-water rescue and oar-rig sightline review",
+      "annotation_outputs": [
+        "review/production_import_pilot/rescue_visibility_annotations.geojson",
+        "field_media/production_import_pilot/rights_manifest.json"
+      ],
+      "candidate_source_ids": [
+        "nps_grand_canyon_river_trips",
+        "instagram_grand_canyon_rafting_hashtag"
+      ],
+      "flow_context_needed": [
+        "moderate_release_planning",
+        "high_release_planning"
+      ],
+      "rights_status": "candidate_links_only",
+      "target_id": "colorado_long_swimmer_rescue_visibility"
+    }
+  ],
+  "rights_summary": {
+    "candidate_link_count": 4,
+    "media_files_downloaded": 0,
+    "promoted_item_count": 0,
+    "review_target_count": 3,
+    "rights_cleared_for_asset_use": 0,
+    "status": "no_media_or_rights_promoted"
+  },
+  "river_id": "colorado_river",
+  "schema": "raftsim.reference_media_rights_manifest.v1",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "source_link_manifest": "physics/data/real_world/reference_media_link_manifest.json",
+  "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+  "status": "candidate_links_only_no_media_downloaded_no_rights_cleared"
+}

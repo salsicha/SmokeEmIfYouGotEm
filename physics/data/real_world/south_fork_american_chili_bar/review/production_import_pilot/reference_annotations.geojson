@@ -1,0 +1,121 @@
+{
+  "features": [
+    {
+      "geometry": null,
+      "properties": {
+        "anchor_hint": "Chili Bar to Coloma guide-seat downstream frame",
+        "annotation_id": "south_fork_guide_seat_boulder_garden",
+        "blocked_use_before_rights_clear": [
+          "media download or scraping",
+          "texture, photogrammetry, or material extraction",
+          "AI training or generated-asset prompting from third-party media",
+          "marketing or public screenshot claims based on unreviewed media"
+        ],
+        "candidate_source_ids": [
+          "blm_south_fork_american_recreation_page",
+          "wikimedia_south_fork_american_search",
+          "flickr_south_fork_american_search",
+          "instagram_south_fork_american_hashtag"
+        ],
+        "feature_role": "link_only_reference_media_review_target",
+        "flow_context_needed": [
+          "low_runnable",
+          "median_runnable",
+          "high_runnable"
+        ],
+        "promotion_gate": "Attach creator, URL, date, approximate station/reach, observed flow or weather context, license or written permission, attribution, and guide/outfitter approval before this reference can drive production art, water, or gameplay tuning.",
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "american_south_fork",
+        "source_review_queue_index": 0,
+        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "target_id": "south_fork_guide_seat_boulder_garden",
+        "visual_questions": [
+          "Are exposed rocks, bank trees, and water color believable at summer commercial flow?",
+          "Can a swimmer and throw-rope recovery zone remain visible behind foam and boulders?"
+        ]
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "anchor_hint": "Low-flow rock exposure and wet-bank comparison",
+        "annotation_id": "south_fork_late_summer_exposed_rocks",
+        "blocked_use_before_rights_clear": [
+          "media download or scraping",
+          "texture, photogrammetry, or material extraction",
+          "AI training or generated-asset prompting from third-party media",
+          "marketing or public screenshot claims based on unreviewed media"
+        ],
+        "candidate_source_ids": [
+          "wikimedia_south_fork_american_search",
+          "flickr_south_fork_american_search",
+          "instagram_south_fork_american_hashtag"
+        ],
+        "feature_role": "link_only_reference_media_review_target",
+        "flow_context_needed": [
+          "low_runnable"
+        ],
+        "promotion_gate": "Attach creator, URL, date, approximate station/reach, observed flow or weather context, license or written permission, attribution, and guide/outfitter approval before this reference can drive production art, water, or gameplay tuning.",
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "american_south_fork",
+        "source_review_queue_index": 1,
+        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "target_id": "south_fork_late_summer_exposed_rocks",
+        "visual_questions": [
+          "Which boulder faces should be dry, damp, or freshly splashed?",
+          "How much yellow grass and oak scrub should appear on late-season banks?"
+        ]
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "anchor_hint": "Spring runoff or release-driven high-flow review",
+        "annotation_id": "south_fork_high_flow_foam_lines",
+        "blocked_use_before_rights_clear": [
+          "media download or scraping",
+          "texture, photogrammetry, or material extraction",
+          "AI training or generated-asset prompting from third-party media",
+          "marketing or public screenshot claims based on unreviewed media"
+        ],
+        "candidate_source_ids": [
+          "flickr_south_fork_american_search",
+          "instagram_south_fork_american_hashtag"
+        ],
+        "feature_role": "link_only_reference_media_review_target",
+        "flow_context_needed": [
+          "high_runnable"
+        ],
+        "promotion_gate": "Attach creator, URL, date, approximate station/reach, observed flow or weather context, license or written permission, attribution, and guide/outfitter approval before this reference can drive production art, water, or gameplay tuning.",
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "american_south_fork",
+        "source_review_queue_index": 2,
+        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "target_id": "south_fork_high_flow_foam_lines",
+        "visual_questions": [
+          "Where should foam streaks and eddy fences strengthen without hiding hazards?",
+          "How high should wet banks and splash marks climb at high runnable flow?"
+        ]
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-06",
+  "policy": {
+    "allowed_use_before_rights_clear": "Manual visual comparison, guide discussion, source-planning notes, and internal annotation placeholders only.",
+    "blocked_use_before_rights_clear": "Texture extraction, photogrammetry, AI training, marketing screenshots, packaged media, copied captions, or derived shipping assets.",
+    "promotion_gate": "Every promoted item needs creator, URL, date, approximate station or reach, observed flow or weather context, license or written permission, attribution, and allowed-use notes.",
+    "storage": "Link-only review queue. Do not download, scrape, vendor, train on, or package third-party photos, footage, captions, comments, thumbnails, or audio."
+  },
+  "rights_manifest": "field_media/production_import_pilot/rights_manifest.json",
+  "river_id": "american_south_fork",
+  "schema": "raftsim.reference_media_annotations.geojson.v1",
+  "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+  "status": "link_only_annotation_targets_no_media_downloaded",
+  "type": "FeatureCollection"
+}

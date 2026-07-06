@@ -15,7 +15,8 @@
       "terrain/opentopography_srtmgl1_pacuare_probe_response.txt"
     ],
     "field_media": [
-      "field_media/rights_cleared_reference_index.json"
+      "field_media/rights_cleared_reference_index.json",
+      "field_media/production_import_pilot/rights_manifest.json"
     ],
     "gauges_and_rainfall": [
       "hydrology/costa_rica_gauge_search.json",
@@ -31,7 +32,8 @@
     ],
     "guide_references": [
       "review/guide_review_needs.json",
-      "review/field_media_annotation_needs.geojson"
+      "review/field_media_annotation_needs.geojson",
+      "review/production_import_pilot/reference_annotations.geojson"
     ],
     "hydrography": [
       "hydrography/centerline.geojson",

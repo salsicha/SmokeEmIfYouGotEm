@@ -203,7 +203,9 @@
         "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
         "hydrology/production_import_pilot/flow_band_review.json",
         "review/production_import_pilot/access_publication_sensitivity_review.json",
-        "reference_media_link_manifest.json"
+        "reference_media_link_manifest.json",
+        "review/production_import_pilot/reference_annotations.geojson",
+        "field_media/production_import_pilot/rights_manifest.json"
       ],
       "completion_gate": "Guide-seat and river-eye captures read as the South Fork corridor at reviewed low/median/high flow bands, with swimmer/rescue targets and rapid hazards still readable.",
       "current_strength": "strongest solver/source seed; official pilot DEM/NAIP tiles and derivatives are attached for a small corridor slice.",
@@ -318,7 +320,9 @@
         "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
         "hydrology/production_import_pilot/release_band_review.json",
         "review/production_import_pilot/access_publication_sensitivity_review.json",
-        "reference_media_link_manifest.json"
+        "reference_media_link_manifest.json",
+        "review/production_import_pilot/reference_annotations.geojson",
+        "field_media/production_import_pilot/rights_manifest.json"
       ],
       "completion_gate": "Captures read as Grand Canyon big-water rowing, with river-mile scale, canyon atmosphere, sandbar/wet-bank variation, oar-rig sightlines, and rescue visibility intact.",
       "current_strength": "Lees Ferry pilot tiles and derivatives are attached; daily USGS gauge histories exist, but full canyon stationing and release-aware masks are still missing.",
@@ -427,7 +431,10 @@
         "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
         "hydrology/production_import_pilot/flash_response_review.json",
         "review/sinac_protected_area_source_rights.json",
-        "review/access_and_conservation_constraints.json"
+        "review/access_and_conservation_constraints.json",
+        "reference_media_link_manifest.json",
+        "review/production_import_pilot/reference_annotations.geojson",
+        "field_media/production_import_pilot/rights_manifest.json"
       ],
       "completion_gate": "Captures read as a humid Pacuare rainforest gorge with believable canopy, waterfalls/mist, wet rocks, rainfed flow variation, and rescue readability under foliage.",
       "current_strength": "Copernicus DEM and NASA GIBS/Copernicus preview derivatives are normalized into the production folder shape, and a deterministic Unreal-curve centerline/stationing scaffold exists for annotation placement; imagery is still coarse/cloudy and local hydrology/hydrography are not authoritative.",

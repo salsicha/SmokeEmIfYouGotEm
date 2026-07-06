@@ -18,6 +18,9 @@
       "terrain/production_import_pilot/dem_relief_2048.png",
       "terrain/production_import_pilot/heightfield_candidate_2017.png"
     ],
+    "field_media": [
+      "field_media/production_import_pilot/rights_manifest.json"
+    ],
     "flow_presets": [
       "flow_presets.json"
     ],
@@ -32,7 +35,8 @@
     ],
     "guide_references": [
       "review/guide_review_needs.json",
-      "review/oar_line_annotations.geojson"
+      "review/oar_line_annotations.geojson",
+      "review/production_import_pilot/reference_annotations.geojson"
     ],
     "hydrography": [
       "hydrography/centerline.geojson",

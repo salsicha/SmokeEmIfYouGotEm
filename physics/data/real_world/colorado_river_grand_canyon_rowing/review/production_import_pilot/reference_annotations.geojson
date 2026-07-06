@@ -1,0 +1,124 @@
+{
+  "features": [
+    {
+      "geometry": null,
+      "properties": {
+        "anchor_hint": "Lees Ferry / Grand Canyon river-eye downstream frame",
+        "annotation_id": "colorado_river_eye_canyon_scale",
+        "blocked_use_before_rights_clear": [
+          "media download or scraping",
+          "texture, photogrammetry, or material extraction",
+          "AI training or generated-asset prompting from third-party media",
+          "marketing or public screenshot claims based on unreviewed media"
+        ],
+        "candidate_source_ids": [
+          "nps_grand_canyon_photos_multimedia",
+          "nps_grand_canyon_river_trips",
+          "wikimedia_grand_canyon_rafting_search",
+          "instagram_grand_canyon_rafting_hashtag"
+        ],
+        "feature_role": "link_only_reference_media_review_target",
+        "flow_context_needed": [
+          "low_release_planning",
+          "moderate_release_planning",
+          "high_release_planning"
+        ],
+        "promotion_gate": "Attach creator, URL, date, approximate station/reach, observed flow or weather context, license or written permission, attribution, and guide/outfitter approval before this reference can drive production art, water, or gameplay tuning.",
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "colorado_river",
+        "source_review_queue_index": 0,
+        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "target_id": "colorado_river_eye_canyon_scale",
+        "visual_questions": [
+          "Do canyon walls read at Grand Canyon scale from low raft height?",
+          "Are sandbars, talus, and sparse riparian shrubs distributed believably?"
+        ]
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "anchor_hint": "Release-aware sandbar and wet-bank review",
+        "annotation_id": "colorado_release_wet_banks_and_sandbars",
+        "blocked_use_before_rights_clear": [
+          "media download or scraping",
+          "texture, photogrammetry, or material extraction",
+          "AI training or generated-asset prompting from third-party media",
+          "marketing or public screenshot claims based on unreviewed media"
+        ],
+        "candidate_source_ids": [
+          "nps_grand_canyon_photos_multimedia",
+          "wikimedia_grand_canyon_rafting_search",
+          "instagram_grand_canyon_rafting_hashtag"
+        ],
+        "feature_role": "link_only_reference_media_review_target",
+        "flow_context_needed": [
+          "low_release_planning",
+          "moderate_release_planning",
+          "high_release_planning"
+        ],
+        "promotion_gate": "Attach creator, URL, date, approximate station/reach, observed flow or weather context, license or written permission, attribution, and guide/outfitter approval before this reference can drive production art, water, or gameplay tuning.",
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "colorado_river",
+        "source_review_queue_index": 1,
+        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "target_id": "colorado_release_wet_banks_and_sandbars",
+        "visual_questions": [
+          "Which sandbars should be exposed or damp across low, moderate, and high release bands?",
+          "Do current seams, boils, and lateral waves stay readable for an oarsman?"
+        ]
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "anchor_hint": "Long-water rescue and oar-rig sightline review",
+        "annotation_id": "colorado_long_swimmer_rescue_visibility",
+        "blocked_use_before_rights_clear": [
+          "media download or scraping",
+          "texture, photogrammetry, or material extraction",
+          "AI training or generated-asset prompting from third-party media",
+          "marketing or public screenshot claims based on unreviewed media"
+        ],
+        "candidate_source_ids": [
+          "nps_grand_canyon_river_trips",
+          "instagram_grand_canyon_rafting_hashtag"
+        ],
+        "feature_role": "link_only_reference_media_review_target",
+        "flow_context_needed": [
+          "moderate_release_planning",
+          "high_release_planning"
+        ],
+        "promotion_gate": "Attach creator, URL, date, approximate station/reach, observed flow or weather context, license or written permission, attribution, and guide/outfitter approval before this reference can drive production art, water, or gameplay tuning.",
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "colorado_river",
+        "source_review_queue_index": 2,
+        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "target_id": "colorado_long_swimmer_rescue_visibility",
+        "visual_questions": [
+          "Can the player read swimmer position at Grand Canyon scale?",
+          "Do boils, wave trains, canyon shadows, and oar frame foreground avoid hiding rescue targets?"
+        ]
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-06",
+  "policy": {
+    "allowed_use_before_rights_clear": "Manual visual comparison, guide discussion, source-planning notes, and internal annotation placeholders only.",
+    "blocked_use_before_rights_clear": "Texture extraction, photogrammetry, AI training, marketing screenshots, packaged media, copied captions, or derived shipping assets.",
+    "promotion_gate": "Every promoted item needs creator, URL, date, approximate station or reach, observed flow or weather context, license or written permission, attribution, and allowed-use notes.",
+    "storage": "Link-only review queue. Do not download, scrape, vendor, train on, or package third-party photos, footage, captions, comments, thumbnails, or audio."
+  },
+  "rights_manifest": "field_media/production_import_pilot/rights_manifest.json",
+  "river_id": "colorado_river",
+  "schema": "raftsim.reference_media_annotations.geojson.v1",
+  "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+  "status": "link_only_annotation_targets_no_media_downloaded",
+  "type": "FeatureCollection"
+}

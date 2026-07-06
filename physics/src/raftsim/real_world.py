@@ -66,6 +66,8 @@ RAPID_REVIEW_EDITOR_WORKFLOW_FILE = "rapid_review_editor_workflow.json"
 PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION = "raftsim.production_import_pilot.v0"
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION = "raftsim.production_environment_gap_register.v0"
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE = "production_environment_gap_register.json"
+REFERENCE_MEDIA_ANNOTATIONS_FILE = "review/production_import_pilot/reference_annotations.geojson"
+REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE = "field_media/production_import_pilot/rights_manifest.json"
 SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE = "hydrology/cdec_terms_flags_and_station_relation_review.json"
 SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE = "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json"
 SOUTH_FORK_FLOW_BAND_REVIEW_FILE = "hydrology/production_import_pilot/flow_band_review.json"
@@ -1313,8 +1315,8 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                 "status": "link_seeds_attached_no_media_rights",
                 "source_ids": ["reference_media_link_manifest", "first_party_field_capture", "explicit_guide_or_outfitter_permission"],
                 "target_outputs": [
-                    "review/production_import_pilot/reference_annotations.geojson",
-                    "field_media/production_import_pilot/rights_manifest.json",
+                    REFERENCE_MEDIA_ANNOTATIONS_FILE,
+                    REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
                 ],
                 "promotion_gate": "Attach creator/date/reach/flow/weather/permission before using photos or footage for material, texture, or in-game reference.",
             },
@@ -1534,8 +1536,8 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
                     "nps_grand_canyon",
                 ],
                 "target_outputs": [
-                    "review/production_import_pilot/reference_annotations.geojson",
-                    "field_media/production_import_pilot/rights_manifest.json",
+                    REFERENCE_MEDIA_ANNOTATIONS_FILE,
+                    REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
                 ],
                 "promotion_gate": (
                     "Attach creator, date, reach or river mile, flow/release context, permission, attribution, and allowed "
@@ -1835,6 +1837,163 @@ def build_colorado_access_publication_review() -> dict[str, object]:
             "NPS document dates and operational constraints must be manually reviewed before any game-facing route language.",
             "Cultural-resource, camp/beach, and sensitive-location publication rules need human review before detailed screenshots.",
             "Guide/oarsman review is required before access, scouting, rescue, or rowing-route gameplay uses these zones.",
+        ],
+    }
+
+
+def build_reference_media_annotations_geojson(
+    river_id: str,
+    review_queue: dict[str, object],
+) -> dict[str, object]:
+    """Build link-only station-aware media review annotations for a river."""
+
+    targets = [target for target in review_queue["review_targets"] if target["river_id"] == river_id]
+    if not targets:
+        raise ValueError(f"No reference media review targets found for river_id={river_id!r}")
+
+    features: list[dict[str, object]] = []
+    for index, target in enumerate(targets):
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "annotation_id": target["target_id"],
+                    "river_id": river_id,
+                    "target_id": target["target_id"],
+                    "anchor_hint": target["anchor_hint"],
+                    "feature_role": "link_only_reference_media_review_target",
+                    "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+                    "review_status": "candidate_links_only_no_media_downloaded",
+                    "rights_status": target["rights_status"],
+                    "visual_questions": target["visual_questions"],
+                    "candidate_source_ids": target["candidate_source_ids"],
+                    "flow_context_needed": target["flow_context_needed"],
+                    "source_review_queue_index": index,
+                    "promotion_gate": (
+                        "Attach creator, URL, date, approximate station/reach, observed flow or weather context, "
+                        "license or written permission, attribution, and guide/outfitter approval before this "
+                        "reference can drive production art, water, or gameplay tuning."
+                    ),
+                    "blocked_use_before_rights_clear": [
+                        "media download or scraping",
+                        "texture, photogrammetry, or material extraction",
+                        "AI training or generated-asset prompting from third-party media",
+                        "marketing or public screenshot claims based on unreviewed media",
+                    ],
+                },
+            }
+        )
+
+    return {
+        "type": "FeatureCollection",
+        "schema": "raftsim.reference_media_annotations.geojson.v1",
+        "generated_on": "2026-07-06",
+        "river_id": river_id,
+        "status": "link_only_annotation_targets_no_media_downloaded",
+        "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+        "rights_manifest": REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
+        "policy": review_queue["policy"],
+        "features": features,
+    }
+
+
+def build_reference_media_rights_manifest(
+    river_id: str,
+    link_manifest: dict[str, object],
+    review_queue: dict[str, object],
+) -> dict[str, object]:
+    """Build a link-only media rights manifest for a river's review targets."""
+
+    river_entry = next((river for river in link_manifest["rivers"] if river["river_id"] == river_id), None)
+    if river_entry is None:
+        raise ValueError(f"No reference media link manifest entry found for river_id={river_id!r}")
+    targets = [target for target in review_queue["review_targets"] if target["river_id"] == river_id]
+    if not targets:
+        raise ValueError(f"No reference media review targets found for river_id={river_id!r}")
+
+    candidate_links = []
+    for link in river_entry["candidate_links"]:
+        candidate_links.append(
+            {
+                "source_id": link["source_id"],
+                "source_type": link["source_type"],
+                "provider": link["provider"],
+                "url": link["url"],
+                "rights_status": link["rights_status"],
+                "allowed_before_rights_clear": [
+                    "manual visual comparison",
+                    "guide/outfitter discussion",
+                    "permission outreach planning",
+                    "internal station annotation placeholders",
+                ],
+                "blocked_before_rights_clear": [
+                    "download",
+                    "scrape",
+                    "vendor",
+                    "train_on",
+                    "texture_or_material_derivation",
+                    "photogrammetry",
+                    "packaged_media",
+                    "marketing_or_public_promo_use",
+                ],
+                "notes": link["notes"],
+            }
+        )
+
+    return {
+        "schema": "raftsim.reference_media_rights_manifest.v1",
+        "generated_on": "2026-07-06",
+        "river_id": river_id,
+        "section_id": river_entry["section_id"],
+        "status": "candidate_links_only_no_media_downloaded_no_rights_cleared",
+        "source_link_manifest": "physics/data/real_world/reference_media_link_manifest.json",
+        "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+        "reference_annotations": REFERENCE_MEDIA_ANNOTATIONS_FILE,
+        "policy": {
+            "storage": link_manifest["policy"]["storage"],
+            "shipping_rule": link_manifest["policy"]["shipping_rule"],
+            "social_rule": link_manifest["policy"]["social_rule"],
+            "review_queue_promotion_gate": review_queue["policy"]["promotion_gate"],
+            "blocked_use_before_rights_clear": review_queue["policy"]["blocked_use_before_rights_clear"],
+        },
+        "rights_summary": {
+            "candidate_link_count": len(candidate_links),
+            "review_target_count": len(targets),
+            "promoted_item_count": 0,
+            "media_files_downloaded": 0,
+            "rights_cleared_for_asset_use": 0,
+            "status": "no_media_or_rights_promoted",
+        },
+        "candidate_links": candidate_links,
+        "review_targets": [
+            {
+                "target_id": target["target_id"],
+                "anchor_hint": target["anchor_hint"],
+                "candidate_source_ids": target["candidate_source_ids"],
+                "flow_context_needed": target["flow_context_needed"],
+                "rights_status": target["rights_status"],
+                "annotation_outputs": target["annotation_outputs"],
+            }
+            for target in targets
+        ],
+        "promoted_items": [],
+        "required_fields_before_promotion": [
+            "creator_or_rights_holder",
+            "source_url",
+            "capture_or_publication_date",
+            "approximate_station_or_reach",
+            "observed_flow_or_release_or_rain_context",
+            "license_or_written_permission",
+            "attribution_text",
+            "allowed_game_uses",
+            "guide_or_outfitter_review_notes",
+        ],
+        "forbidden_use": [
+            "using public social media as source textures or training data",
+            "downloading thumbnails, videos, captions, comments, or audio without rights",
+            "claiming photoreal fidelity from unreviewed media",
+            "shipping third-party media or derived assets without explicit rights",
         ],
     }
 
@@ -2355,8 +2514,8 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                 "status": "link_seeds_attached_no_media_rights",
                 "source_ids": ["reference_media_link_manifest", "first_party_field_capture", "explicit_outfitter_or_guide_permission"],
                 "target_outputs": [
-                    "review/production_import_pilot/reference_annotations.geojson",
-                    "field_media/production_import_pilot/rights_manifest.json",
+                    REFERENCE_MEDIA_ANNOTATIONS_FILE,
+                    REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
                 ],
                 "promotion_gate": (
                     "Attach creator, date, reach, rain/flow context, permission, attribution, and allowed asset uses before "
@@ -2635,6 +2794,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
                     SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
                     "reference_media_link_manifest.json",
+                    REFERENCE_MEDIA_ANNOTATIONS_FILE,
+                    REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
                 ],
                 "p0_next_pulls_or_attachments": [
                     {
@@ -2677,8 +2838,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     {
                         "source_class": "guide_and_reference_media_annotations",
                         "required_artifacts": [
-                            "review/production_import_pilot/reference_annotations.geojson",
-                            "field_media/production_import_pilot/rights_manifest.json",
+                            REFERENCE_MEDIA_ANNOTATIONS_FILE,
+                            REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
                         ],
                         "source_leads": ["first_party_field_capture", "explicit_guide_or_outfitter_permission", "reference_media_link_manifest"],
                         "promotion_gate": "Attach creator/date/reach/flow/weather/permission before photos or footage influence production art.",
@@ -2742,6 +2903,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     COLORADO_RELEASE_BAND_REVIEW_FILE,
                     COLORADO_ACCESS_PUBLICATION_REVIEW_FILE,
                     "reference_media_link_manifest.json",
+                    REFERENCE_MEDIA_ANNOTATIONS_FILE,
+                    REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
                 ],
                 "p0_next_pulls_or_attachments": [
                     {
@@ -2779,8 +2942,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     {
                         "source_class": "guide_and_reference_media_annotations",
                         "required_artifacts": [
-                            "review/production_import_pilot/reference_annotations.geojson",
-                            "field_media/production_import_pilot/rights_manifest.json",
+                            REFERENCE_MEDIA_ANNOTATIONS_FILE,
+                            REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
                         ],
                         "source_leads": ["nps_grand_canyon_media", "first_party_field_capture", "explicit_oarsman_or_outfitter_permission"],
                         "promotion_gate": "Use official/public-domain media only after item metadata review; attach oarsman sightline notes before art or gameplay tuning.",
@@ -2839,6 +3002,9 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     PACUARE_FLASH_RESPONSE_REVIEW_FILE,
                     "review/sinac_protected_area_source_rights.json",
                     "review/access_and_conservation_constraints.json",
+                    "reference_media_link_manifest.json",
+                    REFERENCE_MEDIA_ANNOTATIONS_FILE,
+                    REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
                 ],
                 "p0_next_pulls_or_attachments": [
                     {
@@ -2897,8 +3063,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     {
                         "source_class": "guide_and_reference_media_annotations",
                         "required_artifacts": [
-                            "review/production_import_pilot/reference_annotations.geojson",
-                            "field_media/production_import_pilot/rights_manifest.json",
+                            REFERENCE_MEDIA_ANNOTATIONS_FILE,
+                            REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
                         ],
                         "source_leads": ["first_party_field_capture", "explicit_outfitter_or_guide_permission", "reference_media_link_manifest"],
                         "promotion_gate": "Attach permissioned rainforest, waterfall, canopy, mist, water-color, and rapid-behavior references before production art promotion.",
@@ -3008,11 +3174,12 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 "review/rapid_review_labels.json",
                 RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
                 RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
+                REFERENCE_MEDIA_ANNOTATIONS_FILE,
             ],
             "access_and_protected_context": [
                 SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
             ],
-            "field_media": ["field_media/README.md"],
+            "field_media": ["field_media/README.md", REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE],
             "solver": ["scenario/scenario.json", "scenario/bed.npy", "scenario/initial_state.npz"],
             "source_pulls": [
                 "production_source_pull_manifest.json",

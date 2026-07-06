@@ -12,7 +12,8 @@
     "A stitched Lees Ferry NHD HU8 source overlay, exact-graph Colorado mainstem candidate, preview metric stationing, fixed-width cross-section seeds, preview alignment diagnostic, and NHD-aligned water prior are attached, but river-mile stationing, accepted banks, sandbars, eddies, release-aware wet-bank classes, and rapid annotations are not clipped into a reviewed corridor workspace yet.",
     "USBR Glen Canyon daily total-release context is attached, but unit/terms confirmation, hourly/subdaily release patterns, release-band review, and guide/oarsman review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet.",
-    "NPS access/publication source leads are now attached, but exact launch/take-out, camp/beach, sensitive-location, river-mile, permit-language, and screenshot publication review remain required."
+    "NPS access/publication source leads are now attached, but exact launch/take-out, camp/beach, sensitive-location, river-mile, permit-language, and screenshot publication review remain required.",
+    "Colorado River reference annotations and rights manifest are attached as link-only review scaffolds, but no item-level media rights, first-party capture, station geometry, or guide approval is recorded yet."
   ],
   "pulled_artifacts": [
     {
@@ -571,6 +572,63 @@
         "publication_sensitivity_gate",
         "camp_beach_annotation_planning",
         "oarsman_review_handoff"
+      ]
+    },
+    {
+      "artifact_id": "colorado_river_reference_media_annotations",
+      "category": "guide_and_reference_media_annotations",
+      "caveats": [
+        "GeoJSON features intentionally have null geometry until an editor or guide assigns station/reach geometry.",
+        "No third-party photos, videos, thumbnails, captions, comments, or audio are downloaded or imported.",
+        "Reference targets cannot drive production art, water, gameplay tuning, or marketing until rights and guide review are recorded."
+      ],
+      "path": "review/production_import_pilot/reference_annotations.geojson",
+      "provider": "RaftSim generated link-only media review annotation scaffold",
+      "related_artifacts": [
+        "field_media/production_import_pilot/rights_manifest.json",
+        "../reference_media_review_queue.json"
+      ],
+      "status": "link_only_annotation_targets_no_media_downloaded",
+      "summary": {
+        "candidate_source_id_count": 4,
+        "feature_count": 3,
+        "geometry_status": "null_geometry_anchor_hints_only"
+      },
+      "use": [
+        "editor_reference_review_targets",
+        "guide_visual_fidelity_discussion",
+        "flow_variant_photo_review_planning",
+        "permission_outreach_queue"
+      ]
+    },
+    {
+      "artifact_id": "colorado_river_reference_media_rights_manifest",
+      "category": "field_media_rights_manifest",
+      "caveats": [
+        "using public social media as source textures or training data",
+        "downloading thumbnails, videos, captions, comments, or audio without rights",
+        "claiming photoreal fidelity from unreviewed media",
+        "shipping third-party media or derived assets without explicit rights"
+      ],
+      "path": "field_media/production_import_pilot/rights_manifest.json",
+      "provider": "RaftSim generated link-only media rights gate",
+      "related_artifacts": [
+        "review/production_import_pilot/reference_annotations.geojson",
+        "../reference_media_link_manifest.json"
+      ],
+      "status": "candidate_links_only_no_media_downloaded_no_rights_cleared",
+      "summary": {
+        "candidate_link_count": 4,
+        "media_files_downloaded": 0,
+        "promoted_item_count": 0,
+        "review_target_count": 3,
+        "rights_cleared_for_asset_use": 0,
+        "status": "no_media_or_rights_promoted"
+      },
+      "use": [
+        "rights_review_gate",
+        "candidate_link_inventory",
+        "permission_outreach_planning"
       ]
     }
   ],
