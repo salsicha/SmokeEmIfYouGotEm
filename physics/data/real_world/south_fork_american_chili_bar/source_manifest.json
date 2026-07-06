@@ -35,6 +35,7 @@
       "hydrology/cdec_terms_flags_and_station_relation_review.json",
       "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
       "hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
+      "hydrology/production_import_pilot/cdec_multiyear_flow_review_2021-10-01_2026-07-06.json",
       "hydrology/production_import_pilot/flow_band_review.json",
       "hydrology/flow_presets.json"
     ],
@@ -260,6 +261,15 @@
       "status": "downloaded",
       "target_artifact": "hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
       "url": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2025-10-01T00:00&End=2026-07-06T23:59"
+    },
+    {
+      "category": "gauge",
+      "fetch_id": "sfa_cdec_cbr_multiyear_flow_review_2021_10_01_2026_07_06",
+      "notes": "Compact multi-year CBR event-flow review artifact covering four complete water years plus partial WY2026. Use for representative seasonal-flow discussion only; high-flow peaks, A25 routing, legal signoff, station-to-rapid relation, and guide validation still block visual/gameplay promotion.",
+      "source_id": "cdec_cbr",
+      "status": "downloaded",
+      "target_artifact": "hydrology/production_import_pilot/cdec_multiyear_flow_review_2021-10-01_2026-07-06.json",
+      "url": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2021-10-01T00:00&End=2026-07-06T23:59"
     },
     {
       "category": "gauge",

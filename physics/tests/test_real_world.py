@@ -68,6 +68,7 @@ from raftsim.real_world import (
     PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION,
     SOUTH_FORK_ACCESS_POINTS_FILE,
     SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
+    SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE,
     SOUTH_FORK_CDEC_SEASONAL_WINDOW_REVIEW_FILE,
     SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE,
     SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
@@ -239,9 +240,14 @@ def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
         fetch["fetch_id"] == "sfa_cdec_cbr_a25_seasonal_window_wy2026_to_2026_07_06"
         for fetch in manifest["remote_fetches"]
     )
+    assert any(
+        fetch["fetch_id"] == "sfa_cdec_cbr_multiyear_flow_review_2021_10_01_2026_07_06"
+        for fetch in manifest["remote_fetches"]
+    )
     assert "hydrology/cdec_terms_flags_and_station_relation_review.json" in manifest["artifacts"]["gauges"]
     assert "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json" in manifest["artifacts"]["gauges"]
     assert SOUTH_FORK_CDEC_SEASONAL_WINDOW_REVIEW_FILE in manifest["artifacts"]["gauges"]
+    assert SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE in manifest["artifacts"]["gauges"]
     assert "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json" in manifest["artifacts"]["hydrography"]
     assert "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson" in manifest["artifacts"]["hydrography"]
     assert "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson" in manifest["artifacts"]["hydrography"]
@@ -462,6 +468,47 @@ def test_south_fork_cdec_seasonal_window_review_expands_context_without_promotin
     assert "final preset retuning" in review["forbidden_use"]
 
 
+def test_south_fork_cdec_multiyear_flow_review_adds_representative_context_without_promoting_presets():
+    south_fork_dir = REAL_WORLD_DATA_DIR / "south_fork_american_chili_bar"
+    source_manifest = json.loads((south_fork_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((south_fork_dir / "production_source_pull_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    review = json.loads((south_fork_dir / SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE).read_text())
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+
+    assert SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE in source_manifest["artifacts"]["gauges"]
+    assert any(
+        artifact["artifact_id"] == "cdec_cbr_multiyear_flow_review_2021_10_01_2026_07_06"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert (
+        f"physics/data/real_world/south_fork_american_chili_bar/{SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE}"
+        in rivers["american_south_fork"]["attached_sources_by_class"]["seasonal_flow_or_release_history"][
+            "artifacts"
+        ]
+    )
+    assert review["schema"] == "raftsim.south_fork_cdec_multiyear_flow_review.v1"
+    assert review["status"] == "multiyear_cdec_cbr_flow_context_attached_review_gated"
+    assert review["data_policy"]["negative_cbr_flow_values_normalized_to_null"] is True
+    assert review["data_policy"]["negative_cbr_flow_row_count"] == 144
+    assert review["series"]["valid_sample_count"] == 164992
+    assert review["requested_window_summary"]["valid_flow_day_count"] == 1740
+    assert review["requested_window_summary"]["flow_peak_max_cfs"] == 38489.0
+    assert review["requested_window_summary"]["days_peak_ge_900_cfs"] == 1439
+    assert review["requested_window_summary"]["days_peak_ge_1600_cfs"] == 1076
+    assert review["requested_window_summary"]["days_peak_ge_3000_cfs"] == 364
+    water_years = {item["water_year"]: item for item in review["water_year_summaries"]}
+    assert water_years[2023]["flow_peak_max_cfs"] == 38489.0
+    assert water_years[2023]["days_peak_ge_3000_cfs"] == 157
+    bands = {item["flow_band_hint"]: item for item in review["threshold_review"]}
+    assert bands["high_runnable"]["days_peak_ge_threshold"] == 364
+    assert review["high_flow_outlier_review"]["required"] is True
+    assert review["high_flow_outlier_review"]["sample_count_ge_trigger"] == 92
+    assert review["high_flow_outlier_review"]["peak_cfs"] == 38489.0
+    assert "final preset retuning" in review["forbidden_use"]
+    assert "high-flow preset or feature-forcing tuning before peak/outlier review" in review["forbidden_use"]
+
+
 def test_south_fork_production_source_gate_review_blocks_promotion_but_allows_next_renderer_iteration():
     south_fork_dir = REAL_WORLD_DATA_DIR / "south_fork_american_chili_bar"
     source_manifest = json.loads((south_fork_dir / "source_manifest.json").read_text())
@@ -501,7 +548,13 @@ def test_south_fork_production_source_gate_review_blocks_promotion_but_allows_ne
     assert SOUTH_FORK_CDEC_SEASONAL_WINDOW_REVIEW_FILE in gate_items["seasonal_flow_or_release_history"][
         "attached_artifacts"
     ]
+    assert SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE in gate_items["seasonal_flow_or_release_history"][
+        "attached_artifacts"
+    ]
     assert SOUTH_FORK_FLOW_BAND_REVIEW_FILE in gate_items["seasonal_flow_or_release_history"]["attached_artifacts"]
+    assert "official high-flow peak/outlier interpretation for flood-event samples" in gate_items[
+        "seasonal_flow_or_release_history"
+    ]["promotion_blockers"]
     assert "channel burning" in gate_items["terrain_dem_or_lidar"]["promotion_blockers"]
     assert "explicit permission or compatible license" in gate_items["guide_and_reference_media_annotations"][
         "promotion_blockers"
@@ -1769,6 +1822,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
         in rivers["american_south_fork"]["attached_preview_inputs"]
     )
     assert SOUTH_FORK_CDEC_SEASONAL_WINDOW_REVIEW_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
+    assert SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
     assert (
         "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json"
         in rivers["american_south_fork"]["attached_preview_inputs"]

@@ -36,7 +36,7 @@
     "Full corridor DEM/lidar tiles are not downloaded or conditioned yet.",
     "Aerial imagery and water/vegetation masks are not downloaded yet.",
     "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, an ordered South Fork mainstem candidate, preview metric stationing, cross-section seed lines, a preview NAIP/DEM alignment diagnostic, and generated production-import draft centerline/bank/cross-section overlays, but it still needs direction confirmation, production CRS selection, bank/cross-section review, stronger NAIP/DEM alignment, and guide review.",
-    "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window plus a water-year-to-date CDEC seasonal review, but multi-year representative windows, A25 X-flag interpretation, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
+    "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window, a water-year-to-date CDEC seasonal review, and a multi-year CBR flow review, but A25 X-flag/routing interpretation, official high-flow peak review, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
     "Access/publication source leads are now attached for South Fork, but exact access geometry, parcel/public-private land status, evacuation routes, sensitive-location screening, and guide/local approval remain open.",
     "No field/social reference media has explicit game-use rights attached yet.",
     "South Fork American reference annotations and rights manifest are attached as link-only review scaffolds, but no item-level media rights, first-party capture, station geometry, or guide approval is recorded yet."
@@ -127,7 +127,7 @@
       "caveats": [
         "CDEC -9999 values are normalized to null and excluded from statistics.",
         "The window includes a July 5 pulse near the median-runnable planning band and lower overnight values, but it is not enough to retune flow presets.",
-        "The CDEC terms/flag/station relation review is now attached, but broader representative windows, release schedule context, hydrologic station-to-reach review, legal/redistribution signoff, and guide review are required before promotion."
+        "The CDEC terms/flag/station relation review and multi-year CBR flow context are now attached, but release schedule/routing context, high-flow interpretation, hydrologic station-to-reach review, legal/redistribution signoff, and guide review are required before promotion."
       ],
       "path": "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
       "provider": "California Data Exchange Center / California Department of Water Resources",
@@ -204,7 +204,7 @@
         "This is a compact summary artifact, not a raw telemetry archive.",
         "CBR event-service rows returned a local 2026-06-06 23:00 first sample for the requested 2026-06-07 start.",
         "A25 daily generation discharge includes X-flagged -9999 rows; X is not defined by the attached CDEC FlagList and is excluded pending CDEC/station review.",
-        "Do not retune presets or photoreal water appearance until broader seasonal windows, release/routing interpretation, legal/redistribution signoff, and guide review pass."
+        "Do not retune presets or photoreal water appearance until the multi-year CBR context, release/routing interpretation, legal/redistribution signoff, high-flow interpretation, and guide review pass."
       ],
       "path": "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
       "provider": "California Data Exchange Center / California Department of Water Resources",
@@ -242,7 +242,7 @@
         "CBR event-service rows returned a local 2025-09-30 23:00 first sample for the requested 2025-10-01 start; that row is retained in daily evidence but excluded from water-year rollups.",
         "Unflagged negative CBR flow rows are nonphysical and normalized to null for review statistics.",
         "A25 daily generation discharge includes X-flagged -9999 rows; X is not defined by the attached CDEC FlagList and is excluded pending CDEC/station review.",
-        "Do not retune presets, feature forcing, hole stickiness, wave trains, wet banks, or photoreal water appearance until multi-year seasonal windows, release/routing interpretation, legal/redistribution signoff, and guide review pass."
+        "Do not retune presets, feature forcing, hole stickiness, wave trains, wet banks, or photoreal water appearance until multi-year context, release/routing interpretation, legal/redistribution signoff, and guide review pass."
       ],
       "path": "hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
       "provider": "California Data Exchange Center / California Department of Water Resources",
@@ -269,7 +269,51 @@
         "water_year_to_date_seasonal_flow_review",
         "high_flow_window_identification",
         "guide_discussion_seed",
-        "future_multi_year_cdec_window_planning"
+        "water_year_context_for_multiyear_review"
+      ]
+    },
+    {
+      "artifact_id": "cdec_cbr_multiyear_flow_review_2021_10_01_2026_07_06",
+      "category": "hydrology_multiyear_flow_context_window",
+      "caveats": [
+        "This is a compact derived review artifact; raw 26 MB CDEC API payloads are not committed.",
+        "CBR event-service rows returned a local 2021-09-30 23:00 first sample for the requested 2021-10-01 start; that row is retained in series evidence but excluded from requested-window rollups.",
+        "Unflagged negative CBR flow rows and -9999 no-data values are normalized to null for review statistics.",
+        "Official CDEC CBR peaks at or above 20000 cfs are retained as source evidence but require hydrology/guide review before unsafe-flow, high-flow, sticky-hole, washout, or visual tuning.",
+        "Do not retune presets, feature forcing, hole stickiness, wave trains, wet banks, or photoreal water appearance until A25 routing, station-to-reach relation, legal/redistribution signoff, high-flow interpretation, and guide review pass."
+      ],
+      "path": "hydrology/production_import_pilot/cdec_multiyear_flow_review_2021-10-01_2026-07-06.json",
+      "provider": "California Data Exchange Center / California Department of Water Resources",
+      "status": "official_multiyear_cbr_flow_context_pulled_review_required",
+      "summary": {
+        "cbr_flow_median_of_daily_medians_cfs": 880.75,
+        "cbr_flow_min_cfs": 0.0,
+        "cbr_flow_peak_max_cfs": 38489.0,
+        "cbr_flow_valid_event_samples": 164992,
+        "cbr_negative_flow_rows_normalized_to_null": 144,
+        "complete_water_years": [
+          2022,
+          2023,
+          2024,
+          2025
+        ],
+        "days_peak_ge_1600_cfs": 1076,
+        "days_peak_ge_3000_cfs": 364,
+        "days_peak_ge_900_cfs": 1439,
+        "high_flow_outlier_review_required": true,
+        "partial_water_years": [
+          2026
+        ],
+        "samples_ge_20000_cfs": 92,
+        "window_end": "2026-07-06T23:59",
+        "window_start": "2021-10-01T00:00"
+      },
+      "url": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2021-10-01T00:00&End=2026-07-06T23:59",
+      "use": [
+        "multi_year_seasonal_flow_review",
+        "high_flow_context_identification",
+        "guide_discussion_seed",
+        "future_flow_variant_planning_after_review"
       ]
     },
     {
@@ -686,7 +730,7 @@
         "Attached evidence is a 30-day early-summer CDEC context window, not representative seasonal coverage.",
         "A25 X-flag meaning and station-to-reach release routing are unresolved.",
         "Legal/redistribution signoff, guide/outfitter validation, and hydrologic station-to-rapid relation remain open.",
-        "High-flow planning at 3000 cfs was not observed in the attached window and needs separate runoff/release evidence."
+        "High-flow planning at 3000 cfs was not observed in the attached 30-day window; the multi-year CBR review adds high-flow context but still needs official peak/outlier interpretation, A25 routing, and guide review."
       ],
       "path": "hydrology/production_import_pilot/flow_band_review.json",
       "provider": "RaftSim review artifact from CDEC CBR/A25 context and South Fork planning flow presets",
@@ -694,7 +738,8 @@
         "flow_presets.json",
         "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
         "hydrology/south_fork_modern_flow_source_selection.json",
-        "hydrology/cdec_terms_flags_and_station_relation_review.json"
+        "hydrology/cdec_terms_flags_and_station_relation_review.json",
+        "hydrology/production_import_pilot/cdec_multiyear_flow_review_2021-10-01_2026-07-06.json"
       ],
       "status": "generated_review_gated_flow_band_comparison_not_preset_promotion",
       "summary": {
