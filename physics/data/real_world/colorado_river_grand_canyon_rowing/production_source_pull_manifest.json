@@ -346,12 +346,44 @@
         "The source features are bbox-intersected full features, so parts of the candidate can extend outside the pilot bounds.",
         "Use this line as an editor/review overlay and future stationing seed only until visible water edge, release-aware wet-bank classes, sandbars, eddies, and access/publication sensitivity are reviewed."
       ]
+    },
+    {
+      "artifact_id": "colorado_nhd_hu8_lees_ferry_mainstem_stationing_candidate",
+      "category": "derived_hydrography_stationing_candidate",
+      "path": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+      "related_artifacts": [
+        "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
+        "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson"
+      ],
+      "provider": "RaftSim preview stationing utility from the Colorado NHD mainstem candidate",
+      "url": "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
+      "status": "metric_stationing_candidate_review_required_not_final_crs_or_river_mile_stationing",
+      "summary": {
+        "vertex_count": 145,
+        "station_sample_count": 244,
+        "station_sample_interval_m": 100.0,
+        "length_m_geodesic_vertices": 24223.694,
+        "source_length_km_nhd_sum": 24.205286,
+        "stationing_sha256": "426cc8662a739c9b6bbd80eaf1b0ba11866917fb1de5c173c6cd6b292d776629"
+      },
+      "use": [
+        "editor_stationing_scaffold",
+        "future_cross_section_seed_basis",
+        "water_edge_alignment_sampling",
+        "river_mile_review_input"
+      ],
+      "caveats": [
+        "Confirm station zero, downstream direction, and river-mile relation with NPS/GCMRC references, DEM slope, Reclamation/USGS flow context, and oarsman/geospatial review.",
+        "Replace the preview equirectangular transform with the selected canyon working CRS before metric authoring.",
+        "Compare station samples against NAIP water edge, 3DEP terrain, release-dependent wet banks, sandbars, camps/access sensitivity, and rapid annotations.",
+        "Use left normals only as cross-section seeds until reviewed banks, shelves, eddies, sandbars, side channels, and hazard polygons are attached."
+      ]
     }
   ],
   "production_blockers": [
     "Full canyon DEM/lidar tiles are not downloaded or conditioned yet.",
     "Full canyon aerial/satellite imagery and water/vegetation/rock masks are not downloaded yet.",
-    "A stitched Lees Ferry NHD HU8 source overlay and exact-graph Colorado mainstem candidate are attached, but river-mile stationing, sandbars, banks, eddies, and rapid annotations are not clipped into a reviewed corridor workspace yet.",
+    "A stitched Lees Ferry NHD HU8 source overlay, exact-graph Colorado mainstem candidate, and preview metric stationing are attached, but river-mile stationing, sandbars, banks, eddies, and rapid annotations are not clipped into a reviewed corridor workspace yet.",
     "USBR Glen Canyon daily total-release context is attached, but unit/terms confirmation, hourly/subdaily release patterns, release-band review, and guide/oarsman review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet."
   ]
