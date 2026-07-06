@@ -35,12 +35,15 @@
     },
     {
       "class_id": "hydrography_and_centerline",
-      "promotion_gate": "Clip official flowlines, align to imagery and DEM, hand-review banks/rapid stations, and keep OSM only as supplemental access context.",
+      "promotion_gate": "Use the attached NHD HU8 extract as source evidence, then reproject, order the South Fork mainstem, align to NAIP and DEM relief, hand-review banks/rapid stations, and keep OSM only as supplemental access context.",
       "source_ids": [
         "usgs_3dhp_nhd"
       ],
-      "status": "metadata_attached_download_pending",
+      "status": "nhd_hu8_bbox_extract_attached_review_pending",
       "target_outputs": [
+        "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+        "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
+        "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
         "hydrography/production_import_pilot/centerline.geojson",
         "hydrography/production_import_pilot/banks.geojson",
         "hydrography/production_import_pilot/cross_sections.geojson"

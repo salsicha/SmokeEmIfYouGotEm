@@ -148,6 +148,9 @@
         "production_import_pilot/heightfield_candidate_2017.png",
         "production_import_pilot/water_mask_2048.png",
         "production_import_pilot/vegetation_mask_2048.png",
+        "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+        "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
+        "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
         "hydrology/usgs_11445500_daily_discharge.json",
         "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
         "hydrology/south_fork_modern_flow_source_selection.json",
@@ -161,8 +164,11 @@
       "display_name": "South Fork American River, Chili Bar to Coloma",
       "p0_next_pulls_or_attachments": [
         {
-          "promotion_gate": "Align official flowlines and bank polygons to NAIP, DEM relief, rapid stations, and guide-reviewed eddy/recovery geometry.",
+          "promotion_gate": "Promote the attached NHD HU8 source extract only after the mainstem is ordered, reprojected, and aligned to NAIP, DEM relief, rapid stations, and guide-reviewed eddy/recovery geometry.",
           "required_artifacts": [
+            "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+            "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
+            "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
             "hydrography/production_import_pilot/centerline.geojson",
             "hydrography/production_import_pilot/banks.geojson",
             "hydrography/production_import_pilot/cross_sections.geojson"

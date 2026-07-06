@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import numpy as np
 
@@ -53,6 +54,8 @@ from raftsim.cascading import (
 )
 from raftsim.scenario2_5d import read_scenario2_5d_package
 from raftsim.schema_versions import SOURCE_MANIFEST_SCHEMA_VERSION
+
+REAL_WORLD_DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "real_world"
 
 
 def test_candidate_inventory_covers_first_playable_sections_and_priorities():
@@ -133,6 +136,29 @@ def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE in manifest["artifacts"]["source_pulls"]
     assert "hydrology/cdec_terms_flags_and_station_relation_review.json" in manifest["artifacts"]["gauges"]
     assert "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json" in manifest["artifacts"]["gauges"]
+    assert "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json" in manifest["artifacts"]["hydrography"]
+    assert "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson" in manifest["artifacts"]["hydrography"]
+    assert "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson" in manifest["artifacts"]["hydrography"]
+
+
+def test_south_fork_nhd_hu8_extract_records_selection_and_counts():
+    hydro_dir = REAL_WORLD_DATA_DIR / "south_fork_american_chili_bar" / "hydrography"
+    manifest = json.loads((hydro_dir / "nhd_hu8_18020129_bbox_extract_manifest.json").read_text())
+    flowlines = json.loads((hydro_dir / "nhd_hu8_18020129_flowline_bbox_extract.geojson").read_text())
+    support = json.loads((hydro_dir / "nhd_hu8_18020129_support_layers_bbox_extract.geojson").read_text())
+
+    assert manifest["selected_product"]["hydrologic_unit"] == "18020129"
+    assert manifest["source_crs"]["epsg"] == "EPSG:4269"
+    assert manifest["layer_summary"]["NHDFlowline"]["bbox_intersecting_feature_count"] == 1816
+    assert manifest["adjacent_product_diagnostic"]["bbox_intersection_summary"]["NHDFlowline"][
+        "bbox_intersecting_feature_count"
+    ] == 0
+    assert len(flowlines["features"]) == 1816
+    assert len(support["features"]) == 129
+    assert any(
+        name["gnis_name"] == "South Fork American River" and name["count"] == 102
+        for name in manifest["layer_summary"]["NHDFlowline"]["top_named_features"]
+    )
 
 
 def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_review_gates():
@@ -163,6 +189,10 @@ def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_revie
         "protected_area_and_access_context",
         "guide_and_reference_media_annotations",
     }.issubset(classes)
+    assert classes["hydrography_and_centerline"]["status"] == "nhd_hu8_bbox_extract_attached_review_pending"
+    assert "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json" in classes[
+        "hydrography_and_centerline"
+    ]["target_outputs"]
     assert classes["water_and_vegetation_masks"]["status"] == "requires_new_derivatives_from_pilot_imagery_and_hydrography"
     assert pilot["unreal_import_targets"]["future_production_map"] == "/Game/RaftSim/Maps/Production/L_SouthForkAmerican_ChiliBar"
 
@@ -281,6 +311,14 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert "hydrology/cdec_terms_flags_and_station_relation_review.json" in rivers["american_south_fork"]["attached_preview_inputs"]
     assert (
         "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json"
+        in rivers["american_south_fork"]["attached_preview_inputs"]
+    )
+    assert (
+        "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json"
+        in rivers["american_south_fork"]["attached_preview_inputs"]
+    )
+    assert (
+        "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson"
         in rivers["american_south_fork"]["attached_preview_inputs"]
     )
     assert "USGS 11445500" in rivers["american_south_fork"]["procedural_generation_allowlist"][2]
