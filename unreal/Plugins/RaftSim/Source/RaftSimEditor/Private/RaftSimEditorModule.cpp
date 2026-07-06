@@ -34,6 +34,8 @@
 #include "IImageWrapper.h"
 #include "IImageWrapperModule.h"
 #include "Materials/Material.h"
+#include "Materials/MaterialExpressionConstant.h"
+#include "Materials/MaterialExpressionMultiply.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Misc/CommandLine.h"
@@ -208,7 +210,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_sample_256.tif");
     SouthFork.SourceDrapeDescription =
         TEXT("official USDA/APFO NAIP 512px aerial sample sampled into visible terrain overlay tiles; derived USGS 3DEP relief preview sampled into bank and valley terrain geometry; full elevation conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
-    SouthFork.WaterColor = FLinearColor(0.04f, 0.32f, 0.36f);
+    SouthFork.WaterColor = FLinearColor(0.05f, 0.42f, 0.47f);
     SouthFork.TerrainColor = FLinearColor(0.35f, 0.30f, 0.21f);
     SouthFork.RockColor = FLinearColor(0.38f, 0.36f, 0.31f);
     SouthFork.FoliageColor = FLinearColor(0.22f, 0.38f, 0.15f);
@@ -235,7 +237,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_sample_256.tif");
     Colorado.SourceDrapeDescription =
         TEXT("official USDA/APFO NAIP 512px Lees Ferry aerial sample sampled into visible canyon terrain overlay tiles; derived USGS 3DEP relief preview sampled into canyon bank geometry; full canyon heightfield conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
-    Colorado.WaterColor = FLinearColor(0.28f, 0.20f, 0.12f);
+    Colorado.WaterColor = FLinearColor(0.34f, 0.28f, 0.19f);
     Colorado.TerrainColor = FLinearColor(0.48f, 0.30f, 0.18f);
     Colorado.RockColor = FLinearColor(0.55f, 0.32f, 0.20f);
     Colorado.FoliageColor = FLinearColor(0.30f, 0.32f, 0.18f);
@@ -263,7 +265,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
         TEXT("deterministic preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, with cloud gaps filled by DEM-derived rainforest shading; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water, waterfalls, foam, raft, and lighting remain proxy layers");
-    Pacuare.WaterColor = FLinearColor(0.03f, 0.24f, 0.19f);
+    Pacuare.WaterColor = FLinearColor(0.04f, 0.35f, 0.28f);
     Pacuare.TerrainColor = FLinearColor(0.17f, 0.22f, 0.13f);
     Pacuare.RockColor = FLinearColor(0.20f, 0.24f, 0.20f);
     Pacuare.FoliageColor = FLinearColor(0.06f, 0.30f, 0.09f);
@@ -309,9 +311,9 @@ void ConnectPreviewMaterialColorInput(FColorMaterialInput& Input, UMaterialExpre
 
 UMaterialInterface* LoadOrCreatePreviewColorMaterial()
 {
-    static const TCHAR* MaterialPackagePath = TEXT("/Game/RaftSim/Materials/M_RaftSim_UnlitColorPreview");
+    static const TCHAR* MaterialPackagePath = TEXT("/Game/RaftSim/Materials/M_RaftSim_LitColorPreview");
     static const TCHAR* MaterialObjectPath =
-        TEXT("/Game/RaftSim/Materials/M_RaftSim_UnlitColorPreview.M_RaftSim_UnlitColorPreview");
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_LitColorPreview.M_RaftSim_LitColorPreview");
 
     UMaterial* Material = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, MaterialObjectPath));
     if (!Material)
@@ -324,7 +326,7 @@ UMaterialInterface* LoadOrCreatePreviewColorMaterial()
 
         Material = NewObject<UMaterial>(
             Package,
-            TEXT("M_RaftSim_UnlitColorPreview"),
+            TEXT("M_RaftSim_LitColorPreview"),
             RF_Public | RF_Standalone | RF_Transactional);
         if (!Material)
         {
@@ -333,7 +335,7 @@ UMaterialInterface* LoadOrCreatePreviewColorMaterial()
 
         FAssetRegistryModule::AssetCreated(Material);
         Material->Modify();
-        Material->SetShadingModel(MSM_Unlit);
+        Material->SetShadingModel(MSM_DefaultLit);
         Material->BlendMode = BLEND_Opaque;
         Material->TwoSided = true;
 
@@ -342,9 +344,18 @@ UMaterialInterface* LoadOrCreatePreviewColorMaterial()
         ColorParameter->DefaultValue = FLinearColor::White;
         Material->GetExpressionCollection().AddExpression(ColorParameter);
 
+        UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
+        EmissiveScale->R = 0.34f;
+        Material->GetExpressionCollection().AddExpression(EmissiveScale);
+
+        UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
+        EmissiveColor->A.Expression = ColorParameter;
+        EmissiveColor->B.Expression = EmissiveScale;
+        Material->GetExpressionCollection().AddExpression(EmissiveColor);
+
         UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
         ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, ColorParameter);
-        ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, ColorParameter);
+        ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
 
         Material->PostEditChange();
         Package->MarkPackageDirty();
@@ -381,6 +392,39 @@ UMaterialInstanceDynamic* CreatePreviewColorMaterial(UObject* Outer, const FLine
     }
 
     return nullptr;
+}
+
+TArray<FVector> ComputePreviewMeshNormals(const TArray<FVector>& Vertices, const TArray<int32>& Triangles)
+{
+    TArray<FVector> Normals;
+    Normals.Init(FVector::ZeroVector, Vertices.Num());
+
+    for (int32 TriangleIndex = 0; TriangleIndex + 2 < Triangles.Num(); TriangleIndex += 3)
+    {
+        const int32 A = Triangles[TriangleIndex];
+        const int32 B = Triangles[TriangleIndex + 1];
+        const int32 C = Triangles[TriangleIndex + 2];
+        if (!Vertices.IsValidIndex(A) || !Vertices.IsValidIndex(B) || !Vertices.IsValidIndex(C))
+        {
+            continue;
+        }
+
+        const FVector FaceNormal = FVector::CrossProduct(Vertices[B] - Vertices[A], Vertices[C] - Vertices[A]).GetSafeNormal();
+        Normals[A] += FaceNormal;
+        Normals[B] += FaceNormal;
+        Normals[C] += FaceNormal;
+    }
+
+    for (FVector& Normal : Normals)
+    {
+        Normal = Normal.GetSafeNormal(UE_SMALL_NUMBER, FVector::UpVector);
+        if (Normal.Z < 0.0f)
+        {
+            Normal *= -1.0f;
+        }
+    }
+
+    return Normals;
 }
 
 bool LoadPreviewPngImage(const FString& RelativePath, FRaftSimPreviewImage& OutImage)
@@ -652,7 +696,6 @@ void AddPreviewTerrainMesh(
             const float Y = FMath::Lerp(-HalfWidth, HalfWidth, V);
             const float Z = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief);
             Vertices.Add(FVector(X, Y, Z));
-            Normals.Add(FVector::UpVector);
             UVs.Add(FVector2D(U * 12.0f, V * 4.0f));
         }
     }
@@ -674,6 +717,7 @@ void AddPreviewTerrainMesh(
             Triangles.Add(D);
         }
     }
+    Normals = ComputePreviewMeshNormals(Vertices, Triangles);
 
     AddPreviewProceduralMeshActor(
         World,
@@ -723,20 +767,23 @@ void AddPreviewAerialDrapeTiles(
                 continue;
             }
 
-            const float Z = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief) + 12.0f;
             const FLinearColor AerialColor = FMath::Lerp(AerialDrape.Sample(U, V), Spec.TerrainColor, 0.08f);
             const float HalfLength = TileLength * 0.50f;
             const float HalfTileWidth = TileWidth * 0.50f;
+            const float TileZOffset = 14.0f;
+            const float X0 = X - HalfLength;
+            const float X1 = X + HalfLength;
+            const float Y0 = Y - HalfTileWidth;
+            const float Y1 = Y + HalfTileWidth;
 
             TArray<FVector> Vertices;
-            Vertices.Add(FVector(X - HalfLength, Y - HalfTileWidth, Z));
-            Vertices.Add(FVector(X - HalfLength, Y + HalfTileWidth, Z));
-            Vertices.Add(FVector(X + HalfLength, Y - HalfTileWidth, Z));
-            Vertices.Add(FVector(X + HalfLength, Y + HalfTileWidth, Z));
+            Vertices.Add(FVector(X0, Y0, GetPreviewTerrainHeightCm(Spec, X0, Y0, TerrainRelief) + TileZOffset));
+            Vertices.Add(FVector(X0, Y1, GetPreviewTerrainHeightCm(Spec, X0, Y1, TerrainRelief) + TileZOffset));
+            Vertices.Add(FVector(X1, Y0, GetPreviewTerrainHeightCm(Spec, X1, Y0, TerrainRelief) + TileZOffset));
+            Vertices.Add(FVector(X1, Y1, GetPreviewTerrainHeightCm(Spec, X1, Y1, TerrainRelief) + TileZOffset));
 
             TArray<int32> Triangles = {0, 2, 1, 1, 2, 3};
-            TArray<FVector> Normals;
-            Normals.Init(FVector::UpVector, Vertices.Num());
+            TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
             TArray<FVector2D> UVs = {
                 FVector2D(0.0f, 0.0f),
                 FVector2D(0.0f, 1.0f),
@@ -909,7 +956,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     if (Sun)
     {
         Sun->SetActorLabel(TEXT("RaftSim_Sun_LumenPreview"));
-        Sun->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 8.5f : 6.5f);
+        Sun->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 18.0f : 14.0f);
         Sun->GetLightComponent()->SetLightColor(Spec.bDesertCanyon ? FLinearColor(1.0f, 0.84f, 0.66f) : FLinearColor(0.93f, 0.97f, 1.0f));
     }
 
@@ -918,7 +965,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     if (SkyLight)
     {
         SkyLight->SetActorLabel(TEXT("RaftSim_SkyLight_PhotorealPreview"));
-        SkyLight->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 1.35f : 0.95f);
+        SkyLight->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 2.20f : 1.75f);
     }
 
     ASkyAtmosphere* Atmosphere = Cast<ASkyAtmosphere>(
