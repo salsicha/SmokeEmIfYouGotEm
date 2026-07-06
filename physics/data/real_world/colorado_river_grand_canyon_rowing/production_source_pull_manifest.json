@@ -310,12 +310,48 @@
         "NHD 3DHP annual CONUS products were identified in the catalog but not downloaded because they are multi-gigabyte national packages; use them later when a tiled/local 3DHP extraction path is chosen.",
         "Guide/oarsman review, river-mile references, NPS/GCMRC context, release-band wet-bank review, and Unreal CRS transform review remain required before gameplay authority."
       ]
+    },
+    {
+      "artifact_id": "colorado_nhd_hu8_lees_ferry_mainstem_candidate",
+      "category": "derived_hydrography_mainstem_candidate",
+      "path": "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
+      "related_artifacts": [
+        "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
+        "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
+        "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson"
+      ],
+      "provider": "RaftSim derived overlay from USGS / The National Map NHD HU8 shapefile products",
+      "url": "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
+      "status": "derived_review_gated_mainstem_candidate_not_river_mile_stationing",
+      "summary": {
+        "raw_named_feature_count": 59,
+        "unique_segment_count": 57,
+        "duplicate_overlap_segment_count": 2,
+        "branch_node_count": 0,
+        "snapping_used": false,
+        "candidate_vertex_count": 145,
+        "source_length_km_sum": 24.205286,
+        "preview_local_length_m": 24223.694,
+        "mainstem_sha256": "c6495f43181f46177a61674b3062df84b35a9a754f31746d5ec44dfd9ef5d692"
+      },
+      "use": [
+        "editor_review_overlay",
+        "river_mile_stationing_seed",
+        "water_edge_alignment_seed",
+        "future_cross_section_seed_basis"
+      ],
+      "caveats": [
+        "This candidate is derived from named NHD Colorado River flowlines only; it is not river-mile stationing or accepted bank/sandbar geometry.",
+        "No endpoint snapping was used. The exact graph is clean for this pilot, but the direction still needs river-mile, aerial, NPS/GCMRC, and oarsman/geospatial review.",
+        "The source features are bbox-intersected full features, so parts of the candidate can extend outside the pilot bounds.",
+        "Use this line as an editor/review overlay and future stationing seed only until visible water edge, release-aware wet-bank classes, sandbars, eddies, and access/publication sensitivity are reviewed."
+      ]
     }
   ],
   "production_blockers": [
     "Full canyon DEM/lidar tiles are not downloaded or conditioned yet.",
     "Full canyon aerial/satellite imagery and water/vegetation/rock masks are not downloaded yet.",
-    "A stitched Lees Ferry NHD HU8 source overlay is attached, but ordered river-mile centerline, sandbars, banks, eddies, and rapid annotations are not clipped into a reviewed corridor workspace yet.",
+    "A stitched Lees Ferry NHD HU8 source overlay and exact-graph Colorado mainstem candidate are attached, but river-mile stationing, sandbars, banks, eddies, and rapid annotations are not clipped into a reviewed corridor workspace yet.",
     "USBR Glen Canyon daily total-release context is attached, but unit/terms confirmation, hourly/subdaily release patterns, release-band review, and guide/oarsman review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet."
   ]

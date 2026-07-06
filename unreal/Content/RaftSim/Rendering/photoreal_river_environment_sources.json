@@ -262,7 +262,7 @@
         {"source_id": "usgs_3dep", "url": "https://www.usgs.gov/3d-elevation-program", "status": "sample_attached_for_unreal_preview_drape"},
         {"source_id": "usda_naip", "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer", "status": "sample_attached_for_unreal_preview_drape"},
         {"source_id": "usgs_3dhp_nhd", "url": "https://www.usgs.gov/3d-hydrography-program", "status": "nhd_hu8_lees_ferry_bbox_extract_attached_review_gated"},
-        {"source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract", "url": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json", "status": "attached_review_gated_not_ordered_centerline"}
+        {"source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract", "url": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json", "status": "mainstem_candidate_attached_review_gated_not_river_mile_geometry"}
       ],
       "source_sample_artifacts": [
         {
@@ -312,6 +312,14 @@
           "provider": "USGS / The National Map NHD HU8 shapefile products 14070006, 14070007, and 15010001",
           "status": "attached_review_gated_source_context_only",
           "unreal_use": "official flowline/waterbody/HUC12 overlay for editor review, future river-mile stationing, and water-edge alignment; not a promoted centerline, bank mesh, sandbar layer, or production geometry"
+        },
+        {
+          "artifact_id": "colorado_nhd_hu8_lees_ferry_mainstem_candidate",
+          "category": "hydrography_mainstem_candidate",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json; physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
+          "provider": "RaftSim exact-endpoint graph derivation from the stitched USGS/TNM NHD HU8 source overlay",
+          "status": "attached_review_gated_not_river_mile_geometry",
+          "unreal_use": "single Colorado River review line for editor overlays, future river-mile stationing, cross-section seed generation, and water-edge alignment; not accepted banks, sandbars, or production corridor geometry"
         },
         {
           "artifact_id": "usgs_3dep_lees_ferry_sample_256",

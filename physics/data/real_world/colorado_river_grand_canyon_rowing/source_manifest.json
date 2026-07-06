@@ -35,7 +35,9 @@
       "hydrography/river_mile_markers.geojson",
       "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
       "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
-      "hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson"
+      "hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson",
+      "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
+      "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson"
     ],
     "imagery": [
       "imagery/usda_naip_lees_ferry_sample_512.png",
@@ -74,9 +76,9 @@
   },
   "confidence": {
     "guide_review": 0.05,
-    "hydrography": 0.24,
+    "hydrography": 0.28,
     "hydrology": 0.48,
-    "overall": 0.33,
+    "overall": 0.34,
     "rapid_annotations": 0.05,
     "terrain": 0.25
   },
@@ -183,6 +185,20 @@
       ],
       "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=National%20Hydrography%20Dataset%20%28NHD%29&bbox=-111.66,36.80,-111.54,36.90&prodFormats=Shapefile&outputFormat=JSON",
       "notes": "Official TNM NHD HU8 products 14070006, 14070007, and 15010001 were downloaded and bbox-intersected into a stitched Lees Ferry pilot overlay. This is source context only, not accepted river-mile centerline or sandbar geometry."
+    },
+    {
+      "category": "hydrography",
+      "fetch_id": "colorado_nhd_hu8_lees_ferry_mainstem_candidate",
+      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
+      "status": "derived_review_gated_mainstem_candidate_not_river_mile_stationing",
+      "target_artifact": "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
+      "related_artifacts": [
+        "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
+        "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
+        "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson"
+      ],
+      "url": "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
+      "notes": "Derived a single exact-endpoint Colorado River mainstem candidate from named NHD flowlines in the stitched Lees Ferry HU8 overlay. This is an editor/review line only, not river-mile stationing, accepted banks, sandbars, or production geometry."
     }
   ],
   "river_id": "colorado_river",

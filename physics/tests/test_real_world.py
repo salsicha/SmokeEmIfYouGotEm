@@ -9,6 +9,8 @@ from raftsim.real_world import (
     COLORADO_NHD_HU8_FLOWLINE_EXTRACT_FILE,
     COLORADO_NHD_HU8_MANIFEST_FILE,
     COLORADO_NHD_HU8_SUPPORT_EXTRACT_FILE,
+    COLORADO_NHD_MAINSTEM_CANDIDATE_FILE,
+    COLORADO_NHD_MAINSTEM_MANIFEST_FILE,
     COLORADO_PRODUCTION_IMPORT_PILOT_FILE,
     COLORADO_USBR_RELEASE_CONTEXT_FILE,
     COLORADO_USBR_TOTAL_RELEASE_FILE,
@@ -301,10 +303,12 @@ def test_colorado_production_import_pilot_exposes_lees_ferry_tile_plan_and_revie
         "guide_and_reference_media_annotations",
     }.issubset(classes)
     assert "usbr_glen_canyon_release_context" in classes["seasonal_flow_or_release_history"]["source_ids"]
-    assert classes["hydrography_and_centerline"]["status"] == "nhd_hu8_bbox_extract_attached_review_pending"
+    assert classes["hydrography_and_centerline"]["status"] == "nhd_hu8_mainstem_candidate_attached_review_pending"
     assert COLORADO_NHD_HU8_MANIFEST_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert COLORADO_NHD_HU8_FLOWLINE_EXTRACT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert COLORADO_NHD_HU8_SUPPORT_EXTRACT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert COLORADO_NHD_MAINSTEM_MANIFEST_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert COLORADO_NHD_MAINSTEM_CANDIDATE_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert classes["seasonal_flow_or_release_history"]["status"] == (
         "usgs_daily_discharge_and_usbr_release_context_attached_review_pending"
     )
@@ -384,6 +388,40 @@ def test_colorado_nhd_hu8_lees_ferry_extract_records_stitched_source_overlay():
     )
     assert len(flowlines["features"]) == 505
     assert len(support["features"]) == 20
+
+
+def test_colorado_nhd_mainstem_candidate_orders_exact_graph_without_promotion():
+    colorado_dir = REAL_WORLD_DATA_DIR / "colorado_river_grand_canyon_rowing"
+    source_manifest = json.loads((colorado_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((colorado_dir / "production_source_pull_manifest.json").read_text())
+    manifest = json.loads((colorado_dir / COLORADO_NHD_MAINSTEM_MANIFEST_FILE).read_text())
+    mainstem = json.loads((colorado_dir / COLORADO_NHD_MAINSTEM_CANDIDATE_FILE).read_text())
+
+    assert COLORADO_NHD_MAINSTEM_MANIFEST_FILE in source_manifest["artifacts"]["hydrography"]
+    assert COLORADO_NHD_MAINSTEM_CANDIDATE_FILE in source_manifest["artifacts"]["hydrography"]
+    assert any(
+        artifact["artifact_id"] == "colorado_nhd_hu8_lees_ferry_mainstem_candidate"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+
+    assert manifest["status"] == "derived_review_gated_mainstem_candidate_not_river_mile_stationing"
+    assert manifest["selection"]["raw_named_feature_count"] == 59
+    assert manifest["selection"]["unique_segment_count"] == 57
+    assert manifest["selection"]["duplicate_overlap_segment_count"] == 2
+    assert manifest["graph_diagnostic"]["snapping_used"] is False
+    assert manifest["graph_diagnostic"]["branch_node_count"] == 0
+    assert manifest["graph_diagnostic"]["ordered_segment_count"] == 57
+    assert manifest["graph_diagnostic"]["unvisited_segment_count"] == 0
+    assert manifest["summary"]["candidate_vertex_count"] == 145
+    assert manifest["summary"]["source_length_km_sum"] == 24.205286
+    assert manifest["summary"]["preview_local_length_m"] == 24223.694
+    assert manifest["output_checksums"]["mainstem_candidate_geojson"]["sha256"] == (
+        "c6495f43181f46177a61674b3062df84b35a9a754f31746d5ec44dfd9ef5d692"
+    )
+    assert len(mainstem["features"]) == 1
+    assert mainstem["features"][0]["properties"]["status"] == (
+        "derived_review_gated_mainstem_candidate_not_river_mile_stationing"
+    )
 
 
 def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_gates():
@@ -499,6 +537,8 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert COLORADO_NHD_HU8_MANIFEST_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_NHD_HU8_FLOWLINE_EXTRACT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_NHD_HU8_SUPPORT_EXTRACT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_NHD_MAINSTEM_MANIFEST_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_NHD_MAINSTEM_CANDIDATE_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_TOTAL_RELEASE_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert "waterfalls" in rivers["pacuare"]["completion_gate"]
