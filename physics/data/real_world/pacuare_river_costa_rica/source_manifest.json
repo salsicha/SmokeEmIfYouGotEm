@@ -1,5 +1,13 @@
 {
   "artifacts": {
+    "access_and_protected_context": [
+      "review/sinac_protected_area_source_rights.json",
+      "review/access_and_conservation_constraints.json",
+      "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+      "hydrography/production_import_pilot/snit_layer_metadata_summary.json",
+      "review/production_import_pilot/protected_area_publication_sensitivity.json",
+      "review/production_import_pilot/access_and_conservation_policy.json"
+    ],
     "elevation": [
       "terrain/dem_source_research.json",
       "terrain/rainforest_gorge_corridor_dem.tif",
@@ -79,7 +87,9 @@
       "review/sinac_protected_area_source_rights.json",
       "review/access_and_conservation_constraints.json",
       "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
-      "hydrography/production_import_pilot/snit_layer_metadata_summary.json"
+      "hydrography/production_import_pilot/snit_layer_metadata_summary.json",
+      "review/production_import_pilot/protected_area_publication_sensitivity.json",
+      "review/production_import_pilot/access_and_conservation_policy.json"
     ],
     "source_pulls": [
       "production_source_pull_manifest.json",
@@ -386,13 +396,20 @@
       ]
     },
     {
+      "artifacts": [
+        "review/sinac_protected_area_source_rights.json",
+        "review/access_and_conservation_constraints.json",
+        "review/production_import_pilot/protected_area_publication_sensitivity.json",
+        "review/production_import_pilot/access_and_conservation_policy.json"
+      ],
       "category": "protected_area",
       "license_or_terms": "Record access, conservation, attribution, and redistribution constraints before packaging.",
+      "notes": "Generated publication-sensitivity and access/conservation policy artifacts are attached, but no protected-area or access geometry is imported or cleared for public route packages.",
       "provider": "SINAC/MINAE source-rights review",
       "source_id": "sinac_protected_area_review",
-      "status": "official_source_leads_attached",
+      "status": "policy_artifacts_attached_publication_not_cleared",
       "title": "Protected-area, conservation, and access review",
-      "url": "source_research_required",
+      "url": "review/production_import_pilot/protected_area_publication_sensitivity.json",
       "use_in_pipeline": [
         "access_constraints",
         "conservation_context",

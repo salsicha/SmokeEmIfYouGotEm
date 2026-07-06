@@ -1009,6 +1009,22 @@
           "provider": "RaftSim diagnostic from retained NASA GIBS MODIS true-color candidates",
           "status": "attached_review_gated_not_cloud_mask_acceptance",
           "unreal_use": "Flags active preview cloud/shadow limitations and required Sentinel/Landsat/orthophoto/first-party imagery before production Pacuare masks or materials are approved."
+        },
+        {
+          "artifact_id": "pacuare_protected_area_publication_sensitivity",
+          "category": "protected_area_and_access_context_review",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/protected_area_publication_sensitivity.json",
+          "provider": "RaftSim review artifact from SINAC/SNIT/SENARA metadata and access constraints",
+          "status": "metadata_only_protected_area_publication_policy_attached_review_gated",
+          "unreal_use": "Publication-sensitivity and no-publish annotation gate for Pacuare preview/production captures; not geometry, texture, or screenshot clearance."
+        },
+        {
+          "artifact_id": "pacuare_access_conservation_policy",
+          "category": "protected_area_and_access_context_review",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/access_and_conservation_policy.json",
+          "provider": "RaftSim review artifact from Pacuare access constraints and protected-context metadata",
+          "status": "access_conservation_policy_attached_no_geometry_review_gated",
+          "unreal_use": "Editor checklist for access, evacuation, conservation, flow-dependent access review, and guide signoff; not final route authority."
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"

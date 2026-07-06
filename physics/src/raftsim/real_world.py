@@ -145,6 +145,10 @@ PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE = "hydrography/production_import_pilot/
 PACUARE_RAINFALL_STATION_REVIEW_FILE = "hydrology/production_import_pilot/rainfall_station_review.json"
 PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE = "hydrology/production_import_pilot/discharge_or_stage_station_review.json"
 PACUARE_FLASH_RESPONSE_REVIEW_FILE = "hydrology/production_import_pilot/flash_response_review.json"
+PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE = (
+    "review/production_import_pilot/protected_area_publication_sensitivity.json"
+)
+PACUARE_ACCESS_CONSERVATION_POLICY_FILE = "review/production_import_pilot/access_and_conservation_policy.json"
 PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE = "imagery/production_import_pilot/cloud_screened_scene_index.json"
 PACUARE_CLOUD_SHADOW_REVIEW_FILE = "imagery/production_import_pilot/cloud_shadow_review.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
@@ -2338,6 +2342,314 @@ def build_pacuare_flash_response_review(
     }
 
 
+def _pacuare_protected_access_candidate_layers(
+    snit_layer_catalog_summary: dict[str, object],
+) -> list[dict[str, object]]:
+    """Return metadata-only SNIT layer leads relevant to protected/access review."""
+
+    candidate_layers = snit_layer_catalog_summary.get("selected_candidate_layers", [])
+    review_tokens = (
+        "sinac",
+        "senara",
+        "proteg",
+        "forestal",
+        "corredor",
+        "humedal",
+        "recarga",
+        "vulnerabilidad",
+    )
+    selected: list[dict[str, object]] = []
+    for layer in candidate_layers:
+        haystack = " ".join(
+            str(layer.get(key, ""))
+            for key in ("name", "layer", "institution", "node_name", "target_use", "review_reason")
+        ).lower()
+        if not any(token in haystack for token in review_tokens):
+            continue
+        selected.append(
+            {
+                "name": layer.get("name"),
+                "layer": layer.get("layer"),
+                "institution": layer.get("institution"),
+                "node_name": layer.get("node_name"),
+                "publication_or_catalog_date": layer.get("publication_or_catalog_date"),
+                "wms_available": layer.get("wms_available"),
+                "wfs_available": layer.get("wfs_available"),
+                "feature_download_status": layer.get("feature_download_status", "not_downloaded_metadata_only"),
+                "review_reason": layer.get("review_reason"),
+                "promotion_gate": layer.get(
+                    "promotion_gate",
+                    "Review terms, CRS, attributes, Pacuare corridor intersection, and local sensitivity before import.",
+                ),
+            }
+        )
+    return selected
+
+
+def _pacuare_protected_access_metadata_layers(
+    snit_layer_metadata_summary: dict[str, object],
+) -> list[dict[str, object]]:
+    """Return selected metadata rows for protected/access source-rights decisions."""
+
+    metadata_layers = snit_layer_metadata_summary.get("metadata_layers", [])
+    review_prefixes = ("sinac_", "senara_")
+    selected: list[dict[str, object]] = []
+    for layer in metadata_layers:
+        candidate_id = str(layer.get("candidate_id", ""))
+        if not candidate_id.startswith(review_prefixes):
+            continue
+        selected.append(
+            {
+                "candidate_id": layer.get("candidate_id"),
+                "node_id": layer.get("node_id"),
+                "selected_layer_name": layer.get("selected_layer_name"),
+                "metadata_title": layer.get("metadata_title"),
+                "crs": layer.get("crs"),
+                "terms_status": layer.get("terms_status"),
+                "feature_download_status": layer.get("feature_download_status"),
+                "promotion_gate": layer.get("promotion_gate"),
+            }
+        )
+    return selected
+
+
+def build_pacuare_protected_area_publication_sensitivity(
+    access_constraints: dict[str, object],
+    sinac_source_rights: dict[str, object],
+    snit_layer_catalog_summary: dict[str, object],
+    snit_layer_metadata_summary: dict[str, object],
+) -> dict[str, object]:
+    """Build the review-gated Pacuare protected-area publication policy artifact."""
+
+    candidate_layers = _pacuare_protected_access_candidate_layers(snit_layer_catalog_summary)
+    metadata_layers = _pacuare_protected_access_metadata_layers(snit_layer_metadata_summary)
+    rainforest_target = next(
+        (
+            target
+            for target in snit_layer_catalog_summary.get("candidate_review_targets", [])
+            if "protected" in str(target.get("target", "")).lower()
+            or "rainforest" in str(target.get("target", "")).lower()
+        ),
+        {},
+    )
+    return {
+        "schema": "raftsim.pacuare_protected_area_publication_sensitivity.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "status": "metadata_only_protected_area_publication_policy_attached_review_gated",
+        "inputs": {
+            "access_constraints": "physics/data/real_world/pacuare_river_costa_rica/review/access_and_conservation_constraints.json",
+            "sinac_source_rights": "physics/data/real_world/pacuare_river_costa_rica/review/sinac_protected_area_source_rights.json",
+            "snit_layer_catalog_summary": (
+                "physics/data/real_world/pacuare_river_costa_rica/"
+                + PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE
+            ),
+            "snit_layer_metadata_summary": (
+                "physics/data/real_world/pacuare_river_costa_rica/"
+                + PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE
+            ),
+        },
+        "input_statuses": {
+            "access_constraints": access_constraints.get("status"),
+            "sinac_source_rights": sinac_source_rights.get("status"),
+            "snit_layer_catalog_summary": snit_layer_catalog_summary.get("status"),
+            "snit_layer_metadata_summary": snit_layer_metadata_summary.get("status"),
+        },
+        "policy": {
+            "feature_downloads_performed": False,
+            "protected_area_geometry_imported": False,
+            "access_geometry_imported": False,
+            "map_tiles_imported": False,
+            "media_downloaded": False,
+            "publish_detailed_route_packages": False,
+            "publish_sensitive_polygons": False,
+            "use_as_publication_gate_only": True,
+        },
+        "protected_context_summary": {
+            "candidate_layer_count": len(candidate_layers),
+            "metadata_layer_count": len(metadata_layers),
+            "catalog_review_target": rainforest_target.get("target"),
+            "catalog_target_outputs": rainforest_target.get("target_outputs", []),
+            "metadata_review_findings": snit_layer_metadata_summary.get("review_findings", []),
+        },
+        "candidate_layers": candidate_layers,
+        "metadata_layers": metadata_layers,
+        "publication_sensitivity_zones": [
+            {
+                "zone_id": "upper_access_and_rainforest_approach_review_zone",
+                "station_range_m_preview": [0.0, 10000.0],
+                "review_status": "preview_stationing_only_sensitive_context_pending",
+                "needs": [
+                    "official protected-area/access layer intersection after terms review",
+                    "local guide/outfitter review before access labels or route screenshots",
+                    "generalized screenshot framing until sensitive polygons are approved",
+                ],
+            },
+            {
+                "zone_id": "central_gorge_habitat_and_rescue_visibility_review_zone",
+                "station_range_m_preview": [10000.0, 33000.0],
+                "review_status": "rainforest_gorge_publication_sensitivity_pending",
+                "needs": [
+                    "SINAC/SENARA forest, wetland, corridor, recharge, and vulnerability terms review",
+                    "no-publish polygon screening before detailed gorge captures",
+                    "rescue, swimmer, and guide-sightline annotation without exposing sensitive locations",
+                ],
+            },
+            {
+                "zone_id": "downstream_takeout_and_community_access_review_zone",
+                "station_range_m_preview": [33000.0, 45650.0],
+                "review_status": "access_and_community_context_pending",
+                "needs": [
+                    "approved put-in, take-out, road, bridge, and evacuation annotations",
+                    "local publication-risk review before detailed route or access geometry",
+                    "flow-dependent access and evacuation interpretation for rainfed/high-water variants",
+                ],
+            },
+        ],
+        "required_editor_annotations": [
+            "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+            "review/production_import_pilot/access_points.geojson",
+            "review/production_import_pilot/evacuation_and_rescue_routes.geojson",
+            "review/production_import_pilot/conservation_sensitive_reaches.geojson",
+            "review/production_import_pilot/guide_publication_notes.json",
+        ],
+        "allowed_use": [
+            "protected-area and conservation source triage",
+            "station-aware annotation planning",
+            "publication-sensitivity checklist gating",
+            "preventing detailed Pacuare screenshots or route packages before review",
+        ],
+        "forbidden_use": [
+            "final access geometry",
+            "route publication authority",
+            "protected-area clearance",
+            "shipping detailed screenshots that reveal sensitive access or conservation locations without review",
+            "using SNIT, SINAC, SENARA, or guide/social media maps, tiles, photos, or screenshots as texture or art assets",
+        ],
+        "promotion_blockers": [
+            "No protected-area, forest-cover, wetland, corridor, recharge, access, or no-publish geometries are imported.",
+            "SNIT/SINAC/SENARA layer terms, attribution, CRS, attributes, and redistribution limits still need final review.",
+            "Pacuare corridor intersections and sensitive-location policy are not approved.",
+            "Local guide/outfitter and conservation review is required before public route details or detailed screenshots.",
+        ],
+    }
+
+
+def build_pacuare_access_conservation_policy(
+    access_constraints: dict[str, object],
+    sinac_source_rights: dict[str, object],
+    snit_layer_catalog_summary: dict[str, object],
+    snit_layer_metadata_summary: dict[str, object],
+) -> dict[str, object]:
+    """Build the Pacuare access/conservation policy artifact for editor tooling."""
+
+    candidate_layers = _pacuare_protected_access_candidate_layers(snit_layer_catalog_summary)
+    metadata_layers = _pacuare_protected_access_metadata_layers(snit_layer_metadata_summary)
+    return {
+        "schema": "raftsim.pacuare_access_and_conservation_policy.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "status": "access_conservation_policy_attached_no_geometry_review_gated",
+        "inputs": {
+            "access_constraints": "physics/data/real_world/pacuare_river_costa_rica/review/access_and_conservation_constraints.json",
+            "sinac_source_rights": "physics/data/real_world/pacuare_river_costa_rica/review/sinac_protected_area_source_rights.json",
+            "snit_layer_catalog_summary": (
+                "physics/data/real_world/pacuare_river_costa_rica/"
+                + PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE
+            ),
+            "snit_layer_metadata_summary": (
+                "physics/data/real_world/pacuare_river_costa_rica/"
+                + PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE
+            ),
+        },
+        "policy": {
+            "use_generalized_access_language_until_review": True,
+            "do_not_ship_exact_access_or_evacuations_without_review": True,
+            "do_not_publish_sensitive_conservation_locations": True,
+            "social_and_outfitter_media_remain_link_only_without_item_rights": True,
+            "flow_dependent_access_review_required": True,
+            "procedural_generation_must_not_hide_missing_source_review": True,
+        },
+        "constraint_categories": access_constraints.get("constraint_categories", []),
+        "source_rights_policy": sinac_source_rights.get("policy", {}),
+        "source_rights_questions": sinac_source_rights.get("review_questions", []),
+        "candidate_layer_summary": {
+            "candidate_layer_count": len(candidate_layers),
+            "metadata_layer_count": len(metadata_layers),
+            "copyright_or_ip_restricted_metadata_layers": sum(
+                1
+                for layer in metadata_layers
+                if "copyright" in str(layer.get("terms_status", ""))
+                or "ip_restrictions" in str(layer.get("terms_status", ""))
+            ),
+            "unrestricted_claim_review_required_layers": sum(
+                1 for layer in metadata_layers if "unrestricted" in str(layer.get("terms_status", ""))
+            ),
+        },
+        "candidate_layers": candidate_layers,
+        "metadata_layer_terms": [
+            {
+                "candidate_id": layer.get("candidate_id"),
+                "selected_layer_name": layer.get("selected_layer_name"),
+                "terms_status": layer.get("terms_status"),
+                "promotion_gate": layer.get("promotion_gate"),
+            }
+            for layer in metadata_layers
+        ],
+        "editor_workflow": [
+            {
+                "step": "annotate_generalized_access_points",
+                "required_output": "review/production_import_pilot/access_points.geojson",
+                "review_gate": "Use approved first-party, official, or guide-reviewed geometry only; keep coordinates generalized for public previews until cleared.",
+            },
+            {
+                "step": "annotate_no_publish_and_sensitive_conservation_areas",
+                "required_output": "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+                "review_gate": "Do not expose exact protected, cultural, habitat, access, or rescue-sensitive geometry in screenshots or packaged maps.",
+            },
+            {
+                "step": "annotate_evacuation_rescue_and_flow_variant_constraints",
+                "required_output": "review/production_import_pilot/evacuation_and_rescue_routes.geojson",
+                "review_gate": "Review access and rescue feasibility separately for clear-season, rainfed-runnable, rainy-season-high, and flash-response conditions.",
+            },
+            {
+                "step": "record_local_guide_and_conservation_signoff",
+                "required_output": "review/production_import_pilot/guide_publication_notes.json",
+                "review_gate": "Capture reviewer, date, flow/rain context, publication limits, and allowed gameplay/art uses before promotion.",
+            },
+        ],
+        "required_editor_annotations": [
+            "review/production_import_pilot/access_points.geojson",
+            "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+            "review/production_import_pilot/evacuation_and_rescue_routes.geojson",
+            "review/production_import_pilot/conservation_sensitive_reaches.geojson",
+            "review/production_import_pilot/guide_publication_notes.json",
+        ],
+        "allowed_use": [
+            "editor access and conservation checklist",
+            "guide/outfitter review queue",
+            "flow-dependent access and evacuation planning",
+            "procedural rainforest dressing boundaries",
+        ],
+        "forbidden_use": [
+            "final access geometry",
+            "evacuation or rescue route authority",
+            "route publication authority",
+            "claiming protected-area clearance",
+            "shipping public route-detail screenshots without local and conservation review",
+        ],
+        "promotion_blockers": [
+            "Exact put-in, take-out, bridge, road, trail, evacuation, and rescue geometries are not attached.",
+            "Protected-area, corridor, wetland, forest, recharge, and vulnerability layer intersections are metadata leads only.",
+            "Flow-dependent access and rescue behavior is not validated against rainfall/stage history or guide review.",
+            "Item-level rights for guide, outfitter, public, or social media references are not attached.",
+        ],
+        "publication_gate": access_constraints.get("publication_gate", []),
+    }
+
+
 def pacuare_import_pilot_bounds() -> BoundsWGS84:
     """Return the current lower Pacuare planning bounds for production source review."""
 
@@ -2551,8 +2863,8 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
                     PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
-                    "review/production_import_pilot/protected_area_publication_sensitivity.json",
-                    "review/production_import_pilot/access_and_conservation_policy.json",
+                    PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE,
+                    PACUARE_ACCESS_CONSERVATION_POLICY_FILE,
                 ],
                 "promotion_gate": (
                     "Record exact layers, terms, sensitive-location policy, access constraints, and screenshot/publication "
@@ -3052,6 +3364,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     PACUARE_RAINFALL_STATION_REVIEW_FILE,
                     PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE,
                     PACUARE_FLASH_RESPONSE_REVIEW_FILE,
+                    PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE,
+                    PACUARE_ACCESS_CONSERVATION_POLICY_FILE,
                     "review/sinac_protected_area_source_rights.json",
                     "review/access_and_conservation_constraints.json",
                     "reference_media_link_manifest.json",
@@ -3106,8 +3420,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                             PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
                             PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
-                            "review/production_import_pilot/protected_area_publication_sensitivity.json",
-                            "review/production_import_pilot/access_and_conservation_policy.json",
+                            PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE,
+                            PACUARE_ACCESS_CONSERVATION_POLICY_FILE,
                         ],
                         "source_leads": ["sinac_minae", "senara_costa_rica", "guide_review"],
                         "promotion_gate": "Use the SNIT SINAC/SENARA layer lists only as metadata leads until protected-area, forest-cover, wetland, recharge, access, and sensitive-location terms clear public screenshots and route-detail publication.",

@@ -1,0 +1,277 @@
+{
+  "allowed_use": [
+    "editor access and conservation checklist",
+    "guide/outfitter review queue",
+    "flow-dependent access and evacuation planning",
+    "procedural rainforest dressing boundaries"
+  ],
+  "candidate_layer_summary": {
+    "candidate_layer_count": 8,
+    "copyright_or_ip_restricted_metadata_layers": 5,
+    "metadata_layer_count": 8,
+    "unrestricted_claim_review_required_layers": 3
+  },
+  "candidate_layers": [
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Sistema Nacional de Áreas de Conservación",
+      "layer": "areas_silvestres_protegidas",
+      "name": "Áreas Silvestres Protegidas",
+      "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "05-07-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Sistema Nacional de Áreas de Conservación",
+      "layer": "cobertura_forestal_2023",
+      "name": "Cobertura Forestal 2023",
+      "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "05-07-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Sistema Nacional de Áreas de Conservación",
+      "layer": "corredoresbiologicos",
+      "name": "Corredores Biológicos",
+      "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "05-07-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Sistema Nacional de Áreas de Conservación",
+      "layer": "registro_nacional_humedales",
+      "name": "Registro Nacional de Humedales",
+      "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "05-07-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - ESTACIONES METEOROLÓGICAS",
+      "layer": "estaciones_automaticas",
+      "name": "Estaciones Automáticas",
+      "node_name": "SENARA-Estaciones Meteorológicas",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - ESTACIONES METEOROLÓGICAS",
+      "layer": "estaciones_pluviometricas",
+      "name": "Estaciones Pluviométricas",
+      "node_name": "SENARA-Estaciones Meteorológicas",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - RECARGA",
+      "layer": "Recarga_Siquirres_SIRGAS",
+      "name": "Recarga_Siquirres_SIRGAS",
+      "node_name": "SENARA-RECARGA",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_reason": null,
+      "wfs_available": false,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - VULNERABILIDAD",
+      "layer": "Vulnerabilidad_LIVERPOOL",
+      "name": "Vulnerabilidad_LIVERPOOL",
+      "node_name": "SENARA-VULNERABILIDAD",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    }
+  ],
+  "constraint_categories": [
+    {
+      "category": "protected_area",
+      "decision_needed": "Which protected-area or conservation boundaries intersect the playable corridor and what detail may be published?",
+      "source_leads": [
+        "https://www.sinac.go.cr/",
+        "https://www.snitcr.go.cr/"
+      ]
+    },
+    {
+      "category": "access_points",
+      "decision_needed": "Which put-ins, take-outs, bridges, trails, and evacuation points are safe and appropriate to expose in-game?",
+      "source_leads": [
+        "official Costa Rica geospatial layers",
+        "rights-cleared guide/outfitter review",
+        "first-party field verification"
+      ]
+    },
+    {
+      "category": "sensitive_locations",
+      "decision_needed": "Which areas should be generalized, hidden, or omitted from detailed maps and screenshots?",
+      "source_leads": [
+        "SINAC/MINAE review",
+        "guide review",
+        "local conservation guidance"
+      ]
+    },
+    {
+      "category": "media_rights",
+      "decision_needed": "Which media can be used for texture, material, audio, animation, or review reference without violating rights?",
+      "source_leads": [
+        "first-party captures",
+        "explicit guide/outfitter permission",
+        "reference-only public/social links"
+      ]
+    }
+  ],
+  "editor_workflow": [
+    {
+      "required_output": "review/production_import_pilot/access_points.geojson",
+      "review_gate": "Use approved first-party, official, or guide-reviewed geometry only; keep coordinates generalized for public previews until cleared.",
+      "step": "annotate_generalized_access_points"
+    },
+    {
+      "required_output": "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+      "review_gate": "Do not expose exact protected, cultural, habitat, access, or rescue-sensitive geometry in screenshots or packaged maps.",
+      "step": "annotate_no_publish_and_sensitive_conservation_areas"
+    },
+    {
+      "required_output": "review/production_import_pilot/evacuation_and_rescue_routes.geojson",
+      "review_gate": "Review access and rescue feasibility separately for clear-season, rainfed-runnable, rainy-season-high, and flash-response conditions.",
+      "step": "annotate_evacuation_rescue_and_flow_variant_constraints"
+    },
+    {
+      "required_output": "review/production_import_pilot/guide_publication_notes.json",
+      "review_gate": "Capture reviewer, date, flow/rain context, publication limits, and allowed gameplay/art uses before promotion.",
+      "step": "record_local_guide_and_conservation_signoff"
+    }
+  ],
+  "forbidden_use": [
+    "final access geometry",
+    "evacuation or rescue route authority",
+    "route publication authority",
+    "claiming protected-area clearance",
+    "shipping public route-detail screenshots without local and conservation review"
+  ],
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "access_constraints": "physics/data/real_world/pacuare_river_costa_rica/review/access_and_conservation_constraints.json",
+    "sinac_source_rights": "physics/data/real_world/pacuare_river_costa_rica/review/sinac_protected_area_source_rights.json",
+    "snit_layer_catalog_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+    "snit_layer_metadata_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_metadata_summary.json"
+  },
+  "metadata_layer_terms": [
+    {
+      "candidate_id": "sinac_areas_silvestres_protegidas",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Áreas Silvestres Protegidas",
+      "terms_status": "unrestricted_metadata_claim_review_required"
+    },
+    {
+      "candidate_id": "sinac_cobertura_forestal_2023",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Cobertura Forestal 2023",
+      "terms_status": "copyright_or_ip_restrictions_recorded_import_blocked_until_terms_review"
+    },
+    {
+      "candidate_id": "sinac_corredores_biologicos",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Corredores Biológicos",
+      "terms_status": "unrestricted_metadata_claim_review_required"
+    },
+    {
+      "candidate_id": "sinac_registro_nacional_humedales",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Registro Nacional de Humedales",
+      "terms_status": "unrestricted_metadata_claim_review_required"
+    },
+    {
+      "candidate_id": "senara_estaciones_automaticas",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Estaciones Automáticas",
+      "terms_status": "copyright_or_ip_restrictions_recorded_import_blocked_until_terms_review"
+    },
+    {
+      "candidate_id": "senara_estaciones_pluviometricas",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Estaciones Pluviométricas",
+      "terms_status": "copyright_or_ip_restrictions_recorded_import_blocked_until_terms_review"
+    },
+    {
+      "candidate_id": "senara_recarga_siquirres",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Recarga_Siquirres_SIRGAS",
+      "terms_status": "copyright_or_ip_restrictions_recorded_import_blocked_until_terms_review"
+    },
+    {
+      "candidate_id": "senara_vulnerabilidad_liverpool",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Vulnerabilidad_LIVERPOOL",
+      "terms_status": "copyright_or_ip_restrictions_recorded_import_blocked_until_terms_review"
+    }
+  ],
+  "policy": {
+    "do_not_publish_sensitive_conservation_locations": true,
+    "do_not_ship_exact_access_or_evacuations_without_review": true,
+    "flow_dependent_access_review_required": true,
+    "procedural_generation_must_not_hide_missing_source_review": true,
+    "social_and_outfitter_media_remain_link_only_without_item_rights": true,
+    "use_generalized_access_language_until_review": true
+  },
+  "promotion_blockers": [
+    "Exact put-in, take-out, bridge, road, trail, evacuation, and rescue geometries are not attached.",
+    "Protected-area, corridor, wetland, forest, recharge, and vulnerability layer intersections are metadata leads only.",
+    "Flow-dependent access and rescue behavior is not validated against rainfall/stage history or guide review.",
+    "Item-level rights for guide, outfitter, public, or social media references are not attached."
+  ],
+  "publication_gate": [
+    "Record exact source layers and terms.",
+    "Attach guide or local review for access and safety-sensitive details.",
+    "Keep public/social media link-only until explicit rights are attached.",
+    "Do not package detailed conservation-sensitive coordinates until publication risk is reviewed."
+  ],
+  "required_editor_annotations": [
+    "review/production_import_pilot/access_points.geojson",
+    "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+    "review/production_import_pilot/evacuation_and_rescue_routes.geojson",
+    "review/production_import_pilot/conservation_sensitive_reaches.geojson",
+    "review/production_import_pilot/guide_publication_notes.json"
+  ],
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare_access_and_conservation_policy.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "source_rights_policy": {
+    "do_not_publish_detailed_access_or_route_packages_without_review": true,
+    "record_conservation_and_access_constraints_before_shipping": true,
+    "third_party_media_requires_item_level_rights": true
+  },
+  "source_rights_questions": [
+    "Which protected areas or conservation rules intersect the Pacuare planning corridor?",
+    "Are any access points, cultural sites, or sensitive habitats unsuitable for detailed publication?",
+    "What attribution and redistribution terms apply to official GIS layers?",
+    "Which guide/outfitter media can be used for texture, material, animation, or audio reference?"
+  ],
+  "status": "access_conservation_policy_attached_no_geometry_review_gated"
+}
