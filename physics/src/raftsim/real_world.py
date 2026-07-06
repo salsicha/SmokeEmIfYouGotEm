@@ -130,6 +130,7 @@ PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE = "hydrography/production_import_pilot/s
 PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE = "hydrography/production_import_pilot/snit_layer_metadata_summary.json"
 PACUARE_RAINFALL_STATION_REVIEW_FILE = "hydrology/production_import_pilot/rainfall_station_review.json"
 PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE = "hydrology/production_import_pilot/discharge_or_stage_station_review.json"
+PACUARE_FLASH_RESPONSE_REVIEW_FILE = "hydrology/production_import_pilot/flash_response_review.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE = "production_import_pilot_derivatives_manifest.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
@@ -1872,6 +1873,93 @@ def build_pacuare_discharge_stage_station_review(
     }
 
 
+def build_pacuare_flash_response_review(
+    rainfall_context: dict[str, object],
+    rainfall_station_review: dict[str, object],
+    discharge_stage_review: dict[str, object],
+    da_sinigirh_summary: dict[str, object],
+    snit_layer_catalog_summary: dict[str, object],
+) -> dict[str, object]:
+    """Summarize metadata-only Pacuare flash-response review blockers."""
+
+    flash_band = next(
+        item
+        for item in rainfall_context["seasonal_context_to_resolve"]
+        if item["flow_band"] == "flash_response_review_only"
+    )
+    da_basin_candidates = [
+        layer
+        for layer in da_sinigirh_summary["selected_candidate_layers"]
+        if layer["name"] in {"Aguas:DA_UNIDADES_HIDROLOGICAS", "Aguas:DA_Cuencas_Hidrograficas_CR"}
+    ]
+    snit_context_layers: list[dict[str, object]] = []
+    for node in snit_layer_catalog_summary["node_layer_archives"]:
+        if node["node_id"] not in {"snit_direccion_de_agua", "snit_senara_recarga"}:
+            continue
+        for layer in node.get("selected_candidate_layers", []):
+            if layer.get("layer") in {
+                "Aguas:DA_UNIDADES_HIDROLOGICAS",
+                "Recarga_Siquirres_SIRGAS",
+            }:
+                snit_context_layers.append(layer)
+
+    return {
+        "schema": "raftsim.pacuare_flash_response_review.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "pacuare",
+        "section_id": "lower_pacuare_planning_corridor",
+        "status": "metadata_only_flash_response_context_attached_model_blocked",
+        "inputs": {
+            "rainfall_context": "physics/data/real_world/pacuare_river_costa_rica/hydrology/rainfall_context.json",
+            "rainfall_station_review": "physics/data/real_world/pacuare_river_costa_rica/hydrology/production_import_pilot/rainfall_station_review.json",
+            "discharge_stage_station_review": "physics/data/real_world/pacuare_river_costa_rica/hydrology/production_import_pilot/discharge_or_stage_station_review.json",
+            "da_sinigirh_wms_capabilities_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
+            "snit_layer_catalog_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+        },
+        "policy": {
+            "feature_downloads_performed": False,
+            "station_time_series_imported": False,
+            "lag_model_built": False,
+            "flash_gameplay_promoted": False,
+            "use_as_metadata_review_only": True,
+        },
+        "flash_flow_band_question": {
+            "flow_band": flash_band["flow_band"],
+            "needed_evidence": flash_band["needed_evidence"],
+            "review_status": "blocked_until_rainfall_stage_lag_station_records_and_guide_review",
+        },
+        "rainfall_review_summary": rainfall_station_review["candidate_layer_summary"],
+        "discharge_stage_review_summary": discharge_stage_review["candidate_summary"],
+        "basin_and_recharge_context_candidates": {
+            "da_sinigirh_candidates": da_basin_candidates,
+            "snit_context_layers": snit_context_layers,
+        },
+        "next_actions": [
+            "Select station features and time series only after terms, CRS, attributes, and attribution are clear.",
+            "Relate rainfall and discharge/stage stations to the lower Pacuare basin and review upstream lag.",
+            "Define review-only unsafe flash-rise criteria before exposing flash scenarios in gameplay.",
+            "Ask guide/outfitter reviewers to annotate visible warning signs, no-go cues, swimmer rescue limits, and evacuation constraints.",
+        ],
+        "promotion_blockers": [
+            "No rainfall-to-stage or rainfall-to-discharge lag evidence is attached.",
+            "No station time series, station coordinates, basin relation, or quality flags are attached.",
+            "Basin/recharge layers are metadata leads only and do not establish runoff response.",
+            "Flash scenarios remain review-only until guide/outfitter safety review and rescue/readability gates pass.",
+        ],
+        "allowed_use": [
+            "flash-response source triage",
+            "future unsafe-flow checklist planning",
+            "guide/outfitter annotation queue",
+        ],
+        "forbidden_use": [
+            "numeric flash-response tuning",
+            "production high-water or flood visuals",
+            "unsafe/no-go gameplay authority",
+            "claiming accepted Pacuare rainfall-to-stage lag",
+        ],
+    }
+
+
 def pacuare_import_pilot_bounds() -> BoundsWGS84:
     """Return the current lower Pacuare planning bounds for production source review."""
 
@@ -2068,7 +2156,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
                     PACUARE_RAINFALL_STATION_REVIEW_FILE,
                     PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE,
-                    "hydrology/production_import_pilot/flash_response_review.json",
+                    PACUARE_FLASH_RESPONSE_REVIEW_FILE,
                     "hydrology/production_import_pilot/flow_band_review.json",
                 ],
                 "promotion_gate": (
@@ -2544,6 +2632,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "hydrology/rainfall_context.json",
                     PACUARE_RAINFALL_STATION_REVIEW_FILE,
                     PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE,
+                    PACUARE_FLASH_RESPONSE_REVIEW_FILE,
                     "review/sinac_protected_area_source_rights.json",
                     "review/access_and_conservation_constraints.json",
                 ],
@@ -2584,7 +2673,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
                             PACUARE_RAINFALL_STATION_REVIEW_FILE,
                             PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE,
-                            "hydrology/production_import_pilot/flash_response_review.json",
+                            PACUARE_FLASH_RESPONSE_REVIEW_FILE,
                         ],
                         "source_leads": ["imn_costa_rica", "ice_hydromet", "minae_direccion_agua", "guide_review"],
                         "promotion_gate": "Use the SNIT node layer-list summary as discovery metadata for IMN precipitation, SENARA station, and Direccion de Agua aforo candidates, but keep relative flow bands until station variables, units, time zones, access terms, rainfall/flow coverage, Pacuare basin relation, and guide review are attached.",

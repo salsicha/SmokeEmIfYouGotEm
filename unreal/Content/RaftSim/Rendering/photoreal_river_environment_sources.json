@@ -919,6 +919,14 @@
           "provider": "RaftSim review artifact from DA/SINIGIRH and SNIT metadata",
           "status": "metadata_only_discharge_stage_candidates_attached_numeric_flow_blocked",
           "unreal_use": "Source triage for future Pacuare discharge/stage and basin-relation review; not water level, foam, hole, swimmer, or flash-response tuning authority."
+        },
+        {
+          "artifact_id": "pacuare_flash_response_review",
+          "category": "seasonal_flow_or_release_history_review",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/hydrology/production_import_pilot/flash_response_review.json",
+          "provider": "RaftSim review artifact from rainfall/discharge/basin metadata",
+          "status": "metadata_only_flash_response_context_attached_model_blocked",
+          "unreal_use": "Source triage for future Pacuare flash/high-water visual variants and safety gates; not water level, foam, mist, swimmer drift, evacuation, or unsafe-flow tuning authority."
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
