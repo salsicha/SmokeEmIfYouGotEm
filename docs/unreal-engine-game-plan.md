@@ -105,6 +105,7 @@ The TODO roadmap now carries the full Unreal game build as explicit production m
 - Milestone 22: implement authoritative raft, crew, swimmer, and rescue gameplay over the validated water and selected contact runtime.
 - Milestone 23: deliver the first-person Unreal vertical slice from launch through scoring, replay, and physics/fidelity review.
 - Milestone 24: expand alpha content, systems depth, South Fork coverage, Colorado rowing, Pacuare third-river planning, crew AI, generated-rapid experiments, and multiplayer feasibility only after the single-player guide loop is stable.
+- Milestone 25A: polish the Unreal editor/runtime tooling slice so designers and reviewers can open Replay + Debug Viewer, Rapid/River Editor, Feature Tuning Editor, geospatial validation, and vertical-slice playtest launcher surfaces from Unreal without hand-editing JSON.
 - Milestone 25: harden performance, platform support, QA automation, accessibility, asset/provenance workflows, release compliance, beta playtests, and patch operations.
 
 Milestones 20-25 should not relax the water evidence rules: any new river, feature-forcing tune, raft/contact change, swimmer/rescue outcome, or content pipeline export must remain traceable to manifests, validation fixtures, telemetry, and replayable Unreal evidence.
@@ -282,6 +283,21 @@ Tasks:
 Deliverable:
 
 - Alpha-scale game loop with multiple playable river sections.
+
+### Phase 7A: Polished Tooling Slice
+
+Tasks:
+
+- Add a `RaftSimEditor` module with `RaftSim Tools` menu entries for Replay + Debug Viewer, Rapid/River Editor, Feature Tuning Editor, Geospatial Import/Export Validator, and Vertical Slice Playtest Launcher.
+- Keep JSON manifests source-controlled as canonical records, but expose them through generated/editor-facing config assets and tool descriptors.
+- Build Replay + Debug Viewer first so reviewers can load the Milestone 10 replay package, scrub bookmarks, and toggle depth, velocity, Froude, wet/dry, feature tags, conservation deltas, raft trajectory, contact probes, and runtime-budget overlays.
+- Build Rapid/River Editor and Feature Tuning Editor shells that show validation status, provenance, source rights, expected raft outcomes, conservative feature-forcing defaults, and deterministic export readiness.
+- Add one-click validation actions for source checks, deterministic export, solver package regeneration, stitched-window validation, live-water smoke, round-trip validation, and report opening.
+- Gate the tooling slice with automation/report evidence that each tool opens, loads South Fork sample data, reports validation errors clearly, exports deterministically, and has a short workflow doc.
+
+Deliverable:
+
+- A polished Unreal tooling slice that can inspect and validate the first South Fork vertical-slice data without hand-editing JSON.
 
 ### Phase 8: Optimization And Platform Hardening
 
