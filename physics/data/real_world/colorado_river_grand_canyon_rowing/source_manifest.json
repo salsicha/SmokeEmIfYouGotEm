@@ -7,6 +7,8 @@
       "terrain/usgs_3dep_lees_ferry_relief_preview_512.png",
       "terrain/usgs_3dep_lees_ferry_relief_preview_manifest.json",
       "terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif",
+      "terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png",
+      "terrain/usgs_3dep_lees_ferry_corridor_heightfield_manifest.json",
       "terrain/usgs_3dep_lees_ferry_corridor_relief_preview_1024.png",
       "terrain/usgs_3dep_lees_ferry_corridor_relief_preview_manifest.json"
     ],
@@ -121,6 +123,15 @@
       "target_artifact": "imagery/usda_naip_lees_ferry_corridor_sample_1024.png",
       "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-12429934.341976928%2C4411265.910262686%2C-12416576.003081735%2C4425177.2278650915&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=png&f=image",
       "notes": "Larger official USDA/APFO NAIP ImageServer export for active Unreal preview drape; still not a complete canyon orthomosaic."
+    },
+    {
+      "category": "derived_heightfield_candidate",
+      "fetch_id": "colorado_3dep_lees_ferry_corridor_heightfield_candidate",
+      "source_id": "usgs_3dep_lees_ferry_corridor_sample_512",
+      "status": "generated_review_gated_import_candidate",
+      "target_artifact": "terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png",
+      "url": "physics/src/raftsim/geospatial_preview.py",
+      "notes": "Review-gated 1009px 16-bit normalized PNG generated from the official USGS 3DEP Lees Ferry corridor sample for Unreal Landscape import tests. This is not a complete Grand Canyon corridor DEM, reprojected final terrain, river-mile conditioned surface, or production Landscape replacement."
     }
   ],
   "river_id": "colorado_river",

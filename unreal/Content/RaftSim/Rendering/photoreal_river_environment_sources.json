@@ -170,6 +170,14 @@
           "unreal_use": "larger official terrain source sample for South Fork preview relief and future heightfield-conditioning work"
         },
         {
+          "artifact_id": "usgs_3dep_chili_bar_corridor_heightfield_1009",
+          "category": "derived_heightfield_candidate",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
+          "provider": "RaftSim geospatial preview utility from larger USGS 3DEP ImageServer corridor sample",
+          "status": "generated_review_gated_import_candidate",
+          "unreal_use": "1009px 16-bit grayscale Unreal Landscape import-test candidate; not yet complete-corridor tiled, reprojected, hydrologically conditioned, channel-burned, or approved for production terrain"
+        },
+        {
           "artifact_id": "usgs_3dep_chili_bar_corridor_relief_preview_1024",
           "category": "derived_terrain_relief_preview",
           "path": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png",
@@ -252,6 +260,14 @@
           "provider": "USGS 3D Elevation Program ImageServer",
           "status": "recorded_for_follow_on_canyon_heightfield_conditioning",
           "unreal_use": "larger official terrain source sample for Colorado preview relief and future canyon heightfield-conditioning work"
+        },
+        {
+          "artifact_id": "usgs_3dep_lees_ferry_corridor_heightfield_1009",
+          "category": "derived_heightfield_candidate",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png",
+          "provider": "RaftSim geospatial preview utility from larger USGS 3DEP ImageServer corridor sample",
+          "status": "generated_review_gated_import_candidate",
+          "unreal_use": "1009px 16-bit grayscale Unreal Landscape import-test candidate; not yet complete-canyon tiled, reprojected, river-mile conditioned, channel-burned, or approved for production terrain"
         },
         {
           "artifact_id": "usgs_3dep_lees_ferry_corridor_relief_preview_1024",

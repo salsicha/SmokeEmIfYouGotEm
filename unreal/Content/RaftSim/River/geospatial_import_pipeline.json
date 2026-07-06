@@ -171,6 +171,20 @@
   ],
   "review_gated_import_tests": [
     {
+      "river_id": "american_south_fork",
+      "stage_id": "south_fork_heightfield_import_test",
+      "config": "unreal/Content/RaftSim/River/south_fork_heightfield_import_test.json",
+      "status": "review_gated_not_enabled_for_preview_maps",
+      "source_artifact": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png"
+    },
+    {
+      "river_id": "colorado_river",
+      "stage_id": "colorado_heightfield_import_test",
+      "config": "unreal/Content/RaftSim/River/colorado_heightfield_import_test.json",
+      "status": "review_gated_not_enabled_for_preview_maps",
+      "source_artifact": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png"
+    },
+    {
       "river_id": "pacuare",
       "stage_id": "pacuare_heightfield_import_test",
       "config": "unreal/Content/RaftSim/River/pacuare_heightfield_import_test.json",

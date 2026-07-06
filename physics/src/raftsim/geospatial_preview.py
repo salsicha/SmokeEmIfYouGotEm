@@ -126,6 +126,62 @@ def build_dem_relief_preview(
     output_manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
 
+def build_single_dem_heightfield_candidate(
+    dem_path: Path,
+    output_png_path: Path,
+    output_manifest_path: Path,
+    source_id: str,
+    provider: str,
+    source_description: str,
+    repo_root: Path | None = None,
+    output_size_px: int = 1009,
+) -> None:
+    """Export a review-gated 16-bit DEM sample for Unreal Landscape import tests."""
+
+    dem = _load_float_tiff(dem_path)
+    finite = np.isfinite(dem)
+    if not finite.any():
+        raise ValueError(f"DEM sample contains no finite elevations: {dem_path}")
+
+    fill_value = float(np.median(dem[finite]))
+    dem = np.where(finite, dem, fill_value).astype(np.float32)
+    elevation_min_m = float(np.min(dem))
+    elevation_max_m = float(np.max(dem))
+    elevation_span_m = max(1.0, elevation_max_m - elevation_min_m)
+    normalized = np.clip((dem - elevation_min_m) / elevation_span_m, 0.0, 1.0)
+
+    source_image = Image.fromarray(np.round(normalized * 65535.0).astype(np.uint16))
+    heightfield_image = source_image.resize((output_size_px, output_size_px), Image.Resampling.BILINEAR)
+
+    output_png_path.parent.mkdir(parents=True, exist_ok=True)
+    heightfield_image.save(output_png_path)
+
+    manifest = {
+        "schema": "raftsim.heightfield_candidate.v1",
+        "status": "generated_review_gated_not_conditioned_not_production_import",
+        "source_id": source_id,
+        "provider": provider,
+        "source_description": source_description,
+        "input_dem": _manifest_path(dem_path, repo_root),
+        "output_heightfield_png": _manifest_path(output_png_path, repo_root),
+        "processing": {
+            "output_size_px": output_size_px,
+            "pixel_format": "16_bit_grayscale_png",
+            "elevation_min_m": elevation_min_m,
+            "elevation_max_m": elevation_max_m,
+            "normalization": "input DEM min/max mapped linearly to 0..65535 before resizing",
+            "resize": "bilinear_to_unreal_landscape_test_size",
+            "unreal_import_note": "Use the recorded elevation min/max and chosen vertical scale when testing Landscape import.",
+        },
+        "caveats": [
+            "This is an import candidate for tool testing, not a production Unreal heightfield.",
+            "The source DEM sample is not a complete reviewed corridor DEM, and still needs clipping, reprojection, void/artifact review, hydrologic conditioning, and alignment to reviewed river geometry.",
+            "River channel burning, bank breaklines, boulder/bed features, access constraints, and guide review are still required before photoreal terrain promotion.",
+        ],
+    }
+    output_manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
 def build_pacuare_demshade_drape(
     nasa_truecolor_path: Path,
     southern_dem_path: Path,
@@ -293,6 +349,15 @@ def main() -> None:
         repo_root=repo_root,
         output_size_px=1024,
     )
+    build_single_dem_heightfield_candidate(
+        dem_path=south_fork_root / "terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
+        output_png_path=south_fork_root / "terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
+        output_manifest_path=south_fork_root / "terrain/usgs_3dep_chili_bar_corridor_heightfield_manifest.json",
+        source_id="usgs_3dep_chili_bar_corridor_sample_512",
+        provider="USGS 3D Elevation Program ImageServer",
+        source_description="South Fork American Chili Bar corridor ImageServer export sample; not a complete conditioned corridor DEM.",
+        repo_root=repo_root,
+    )
     build_dem_relief_preview(
         dem_path=colorado_root / "terrain/usgs_3dep_lees_ferry_sample_256.tif",
         output_relief_png_path=colorado_root / "terrain/usgs_3dep_lees_ferry_relief_preview_512.png",
@@ -309,6 +374,15 @@ def main() -> None:
         provider="USGS 3D Elevation Program ImageServer",
         repo_root=repo_root,
         output_size_px=1024,
+    )
+    build_single_dem_heightfield_candidate(
+        dem_path=colorado_root / "terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif",
+        output_png_path=colorado_root / "terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png",
+        output_manifest_path=colorado_root / "terrain/usgs_3dep_lees_ferry_corridor_heightfield_manifest.json",
+        source_id="usgs_3dep_lees_ferry_corridor_sample_512",
+        provider="USGS 3D Elevation Program ImageServer",
+        source_description="Colorado River Lees Ferry corridor ImageServer export sample; not a complete conditioned Grand Canyon corridor DEM.",
+        repo_root=repo_root,
     )
     build_pacuare_demshade_drape(
         nasa_truecolor_path=pacuare_root / "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",

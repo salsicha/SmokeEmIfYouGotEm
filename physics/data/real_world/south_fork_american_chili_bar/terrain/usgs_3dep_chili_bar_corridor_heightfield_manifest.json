@@ -1,0 +1,23 @@
+{
+  "schema": "raftsim.heightfield_candidate.v1",
+  "status": "generated_review_gated_not_conditioned_not_production_import",
+  "source_id": "usgs_3dep_chili_bar_corridor_sample_512",
+  "provider": "USGS 3D Elevation Program ImageServer",
+  "source_description": "South Fork American Chili Bar corridor ImageServer export sample; not a complete conditioned corridor DEM.",
+  "input_dem": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
+  "output_heightfield_png": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
+  "processing": {
+    "output_size_px": 1009,
+    "pixel_format": "16_bit_grayscale_png",
+    "elevation_min_m": 220.94493103027344,
+    "elevation_max_m": 1030.0355224609375,
+    "normalization": "input DEM min/max mapped linearly to 0..65535 before resizing",
+    "resize": "bilinear_to_unreal_landscape_test_size",
+    "unreal_import_note": "Use the recorded elevation min/max and chosen vertical scale when testing Landscape import."
+  },
+  "caveats": [
+    "This is an import candidate for tool testing, not a production Unreal heightfield.",
+    "The source DEM sample is not a complete reviewed corridor DEM, and still needs clipping, reprojection, void/artifact review, hydrologic conditioning, and alignment to reviewed river geometry.",
+    "River channel burning, bank breaklines, boulder/bed features, access constraints, and guide review are still required before photoreal terrain promotion."
+  ]
+}
