@@ -5,6 +5,8 @@
       "terrain/rainforest_gorge_corridor_dem.tif",
       "terrain/copernicus_dem_glo30_N09_W084.tif",
       "terrain/copernicus_dem_glo30_N10_W084.tif",
+      "terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png",
+      "terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json",
       "terrain/pacuare_dem_relief_preview_512.png",
       "terrain/pacuare_dem_relief_preview_1024.png",
       "terrain/opentopography_srtmgl1_pacuare_probe_response.txt"
@@ -123,6 +125,15 @@
       "url": "physics/src/raftsim/geospatial_preview.py"
     },
     {
+      "category": "derived_heightfield_candidate",
+      "fetch_id": "pacuare_copernicus_dem_corridor_heightfield_candidate",
+      "notes": "Review-gated 1009px 16-bit normalized PNG generated from the Pacuare Copernicus DEM GLO-30 tiles for Unreal Landscape import tests. This is not clipped to a surveyed corridor, reprojected to the final Costa Rica working CRS, hydrologically conditioned, or approved for production terrain.",
+      "source_id": "pacuare_copernicus_dem_heightfield_candidate",
+      "status": "generated_review_gated_import_candidate",
+      "target_artifact": "terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png",
+      "url": "physics/src/raftsim/geospatial_preview.py"
+    },
+    {
       "category": "elevation",
       "fetch_id": "pacuare_opentopography_srtmgl1_probe",
       "notes": "Probe confirmed OpenTopography global DEM access requires a registered API key before SRTMGL1 fallback pulls can be used.",
@@ -188,7 +199,7 @@
       "license_or_terms": "GLO-30 Public is available on a free basis for the general public under Copernicus DEM terms; preserve provider, tile ids, and access date.",
       "provider": "Copernicus DEM GLO-30 Public on AWS Open Data",
       "source_id": "copernicus_dem_glo30_public",
-      "status": "tile_samples_downloaded",
+      "status": "tile_samples_downloaded_with_review_gated_heightfield_candidate",
       "title": "Copernicus DEM GLO-30 public terrain tiles covering draft Pacuare bounds",
       "url": "https://registry.opendata.aws/copernicus-dem/",
       "use_in_pipeline": [
@@ -250,6 +261,20 @@
       "use_in_pipeline": [
         "unreal_preview_height_perturbation",
         "terrain_relief_visual_review"
+      ]
+    },
+    {
+      "category": "derived_heightfield_candidate",
+      "license_or_terms": "Derived from Copernicus DEM GLO-30 source samples; keep Copernicus terms, inputs, normalization range, and processing manifest attached. Review-gated until full terrain conditioning is complete.",
+      "provider": "RaftSim geospatial preview utility",
+      "source_id": "pacuare_copernicus_dem_heightfield_candidate",
+      "status": "generated_review_gated_import_candidate",
+      "title": "Pacuare Copernicus DEM 1009px 16-bit Unreal heightfield candidate",
+      "url": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json",
+      "use_in_pipeline": [
+        "unreal_landscape_import_test",
+        "terrain_scale_review",
+        "heightfield_conditioning_pipeline_proof"
       ]
     },
     {

@@ -1,0 +1,28 @@
+{
+  "schema": "raftsim.pacuare_heightfield_candidate.v1",
+  "status": "generated_review_gated_not_conditioned_not_production_import",
+  "bounds_wgs84": {
+    "min_lon": -83.75,
+    "min_lat": 9.72,
+    "max_lon": -83.42,
+    "max_lat": 10.12
+  },
+  "inputs": {
+    "copernicus_dem_glo30_southern_tile": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif",
+    "copernicus_dem_glo30_northern_tile": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif"
+  },
+  "output_heightfield_png": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png",
+  "processing": {
+    "output_size_px": 1009,
+    "pixel_format": "16_bit_grayscale_png",
+    "dem_sampling": "nearest_neighbor_from_copernicus_glo30_tiles",
+    "elevation_min_m": 16.122909545898438,
+    "elevation_max_m": 3230.446044921875,
+    "unreal_import_note": "Height samples are normalized to 0..65535; use the recorded elevation min/max and chosen vertical exaggeration when testing Landscape import."
+  },
+  "caveats": [
+    "This is an import candidate for tool testing, not a production Unreal heightfield.",
+    "DEM tiles are not yet clipped to a surveyed corridor, reprojected to the chosen Costa Rica working CRS, void/artifact reviewed, hydrologically conditioned, or aligned to a reviewed river centerline.",
+    "River channel burning, bank breaklines, boulder/bed features, access constraints, and guide review are still required before photoreal terrain promotion."
+  ]
+}
