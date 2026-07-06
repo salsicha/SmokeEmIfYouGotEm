@@ -214,7 +214,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.ElevationSample =
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_sample_512.tif");
     SouthFork.SourceDrapeDescription =
-        TEXT("larger official USDA/APFO NAIP 1024px corridor sample sampled into a denser terrain-conforming source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into bank and valley preview geometry; first-party procedural wet-bank, leaf-litter, and talus detail generated as rights-safe proxy dressing; full elevation conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
+        TEXT("larger official USDA/APFO NAIP 1024px corridor sample sampled into a denser terrain-conforming source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into bank and valley preview geometry; first-party procedural wet-bank, leaf-litter, talus, and vertex-color water-gradient detail generated as rights-safe proxy dressing; full elevation conditioning remains pending; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers");
     SouthFork.WaterColor = FLinearColor(0.05f, 0.42f, 0.47f);
     SouthFork.TerrainColor = FLinearColor(0.35f, 0.30f, 0.21f);
     SouthFork.RockColor = FLinearColor(0.38f, 0.36f, 0.31f);
@@ -244,7 +244,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.ElevationSample =
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif");
     Colorado.SourceDrapeDescription =
-        TEXT("larger official USDA/APFO NAIP 1024px Lees Ferry corridor sample sampled into a denser terrain-conforming canyon source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into canyon bank preview geometry; first-party procedural strata, talus, and wet-rock detail generated as rights-safe proxy dressing; full canyon heightfield conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers");
+        TEXT("larger official USDA/APFO NAIP 1024px Lees Ferry corridor sample sampled into a denser terrain-conforming canyon source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into canyon bank preview geometry; first-party procedural strata, talus, wet-rock, and vertex-color water-gradient detail generated as rights-safe proxy dressing; full canyon heightfield conditioning remains pending; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers");
     Colorado.WaterColor = FLinearColor(0.34f, 0.28f, 0.19f);
     Colorado.TerrainColor = FLinearColor(0.48f, 0.30f, 0.18f);
     Colorado.RockColor = FLinearColor(0.55f, 0.32f, 0.20f);
@@ -275,7 +275,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.ElevationSample =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
-        TEXT("larger deterministic 1024px preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, sampled into a denser terrain-conforming rainforest source-drape mosaic with cloud gaps filled by DEM-derived shading; larger derived 1024px Copernicus DEM relief preview and review-gated 1009px heightfield candidate sampled into Pacuare bank and gorge preview geometry; first-party procedural rainforest leaf-litter, wet-rock, and talus detail generated as rights-safe proxy dressing; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water, waterfalls, foam, raft, and lighting remain proxy layers");
+        TEXT("larger deterministic 1024px preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, sampled into a denser terrain-conforming rainforest source-drape mosaic with cloud gaps filled by DEM-derived shading; larger derived 1024px Copernicus DEM relief preview and review-gated 1009px heightfield candidate sampled into Pacuare bank and gorge preview geometry; first-party procedural rainforest leaf-litter, wet-rock, talus, and vertex-color water-gradient detail generated as rights-safe proxy dressing; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water shaders, waterfalls, foam, raft, and lighting remain proxy layers");
     Pacuare.WaterColor = FLinearColor(0.04f, 0.35f, 0.28f);
     Pacuare.TerrainColor = FLinearColor(0.17f, 0.22f, 0.13f);
     Pacuare.RockColor = FLinearColor(0.20f, 0.24f, 0.20f);
@@ -442,6 +442,97 @@ UMaterialInterface* LoadOrCreatePreviewVertexColorMaterial()
         SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
         SaveArgs.SaveFlags = SAVE_NoError;
         UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+    }
+
+    return Material;
+}
+
+UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial()
+{
+    static const TCHAR* MaterialPackagePath = TEXT("/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview");
+    static const TCHAR* MaterialObjectPath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview.M_RaftSim_VertexColorWaterPreview");
+
+    UMaterial* Material = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, MaterialObjectPath));
+    if (!Material)
+    {
+        UPackage* Package = CreatePackage(MaterialPackagePath);
+        if (!Package)
+        {
+            return nullptr;
+        }
+
+        Material = NewObject<UMaterial>(
+            Package,
+            TEXT("M_RaftSim_VertexColorWaterPreview"),
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (!Material)
+        {
+            return nullptr;
+        }
+
+        FAssetRegistryModule::AssetCreated(Material);
+        Material->Modify();
+        Material->SetShadingModel(MSM_Unlit);
+        Material->BlendMode = BLEND_Opaque;
+        Material->TwoSided = true;
+
+        UMaterialExpressionVertexColor* VertexColor = NewObject<UMaterialExpressionVertexColor>(Material);
+        Material->GetExpressionCollection().AddExpression(VertexColor);
+
+        UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
+        EmissiveScale->R = 1.0f;
+        Material->GetExpressionCollection().AddExpression(EmissiveScale);
+
+        UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
+        EmissiveColor->A.Expression = VertexColor;
+        EmissiveColor->B.Expression = EmissiveScale;
+        Material->GetExpressionCollection().AddExpression(EmissiveColor);
+
+        UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, VertexColor);
+        ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
+
+        Material->PostEditChange();
+        Package->MarkPackageDirty();
+
+        const FString Filename =
+            FPackageName::LongPackageNameToFilename(MaterialPackagePath, FPackageName::GetAssetPackageExtension());
+        IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+
+        FSavePackageArgs SaveArgs;
+        SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+        SaveArgs.SaveFlags = SAVE_NoError;
+        UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+    }
+
+    static bool bWaterMaterialConfigured = false;
+    if (Material && !bWaterMaterialConfigured)
+    {
+        Material->Modify();
+        Material->SetShadingModel(MSM_Unlit);
+        Material->BlendMode = BLEND_Opaque;
+        Material->TwoSided = true;
+        for (TObjectPtr<UMaterialExpression>& Expression : Material->GetExpressionCollection().Expressions)
+        {
+            if (UMaterialExpressionConstant* Constant = Cast<UMaterialExpressionConstant>(Expression.Get()))
+            {
+                Constant->R = 1.0f;
+            }
+        }
+        Material->PostEditChange();
+        UPackage* Package = Material->GetOutermost();
+        if (Package)
+        {
+            Package->MarkPackageDirty();
+            const FString Filename =
+                FPackageName::LongPackageNameToFilename(MaterialPackagePath, FPackageName::GetAssetPackageExtension());
+            FSavePackageArgs SaveArgs;
+            SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+            SaveArgs.SaveFlags = SAVE_NoError;
+            UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+        }
+        bWaterMaterialConfigured = true;
     }
 
     return Material;
@@ -950,18 +1041,28 @@ void AddPreviewAerialDrapeTiles(
 void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
 {
     constexpr int32 XSteps = 120;
-    constexpr int32 CrossSteps = 6;
+    constexpr int32 CrossSteps = 10;
     const float MinX = -5600.0f;
     const float MaxX = 26200.0f;
 
     TArray<FVector> Vertices;
     TArray<FVector> Normals;
     TArray<FVector2D> UVs;
+    TArray<FLinearColor> VertexColors;
     TArray<int32> Triangles;
     Vertices.Reserve((XSteps + 1) * (CrossSteps + 1));
     Normals.Reserve((XSteps + 1) * (CrossSteps + 1));
     UVs.Reserve((XSteps + 1) * (CrossSteps + 1));
+    VertexColors.Reserve((XSteps + 1) * (CrossSteps + 1));
     Triangles.Reserve(XSteps * CrossSteps * 6);
+
+    const FLinearColor DeepWater = ScalePreviewColor(Spec.WaterColor, Spec.bDesertCanyon ? 1.02f : 1.10f);
+    const FLinearColor ShallowWater = Spec.bDesertCanyon
+        ? FLinearColor(0.42f, 0.36f, 0.24f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.035f, 0.42f, 0.33f) : FLinearColor(0.055f, 0.50f, 0.53f));
+    const FLinearColor SurfaceGlint = Spec.bDesertCanyon
+        ? FLinearColor(0.58f, 0.49f, 0.34f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.13f, 0.58f, 0.48f) : FLinearColor(0.14f, 0.62f, 0.64f));
 
     for (int32 XIndex = 0; XIndex <= XSteps; ++XIndex)
     {
@@ -975,8 +1076,18 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
             const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
             const float Lateral = FMath::Lerp(-Width, Width, V);
             const float Wave = FMath::Sin(X * 0.011f + Lateral * 0.015f) * (Spec.bDesertCanyon ? 2.0f : 4.5f);
+            const float EdgeT = FMath::Pow(FMath::Abs(V - 0.5f) * 2.0f, 1.35f);
+            const float FlowNoise =
+                0.50f + 0.30f * FMath::Sin(X * 0.0048f + Lateral * 0.010f) +
+                0.20f * FMath::Sin(X * 0.013f - Lateral * 0.006f);
+            FLinearColor WaterColor = FMath::Lerp(DeepWater, ShallowWater, FMath::Clamp(EdgeT * 0.55f, 0.0f, 1.0f));
+            WaterColor = FMath::Lerp(
+                WaterColor,
+                SurfaceGlint,
+                FMath::Clamp((1.0f - EdgeT * 0.45f) * FlowNoise * (Spec.bDesertCanyon ? 0.12f : 0.16f), 0.0f, 0.22f));
             Vertices.Add(FVector(X, CenterY + Lateral, 10.0f + Wave));
             UVs.Add(FVector2D(U * 18.0f, V));
+            VertexColors.Add(ClampPreviewColor(WaterColor));
         }
     }
 
@@ -1006,7 +1117,9 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
         Triangles,
         Normals,
         UVs,
-        Spec.WaterColor);
+        Spec.WaterColor,
+        LoadOrCreatePreviewWaterVertexColorMaterial(),
+        &VertexColors);
 }
 
 void AddPreviewShoreRibbon(
@@ -1391,41 +1504,46 @@ void AddPreviewRaftForeground(UWorld* World, const FRaftSimEnvironmentPreviewSpe
         return;
     }
 
+    auto AddRaftProxyPart = [&](UStaticMesh* Mesh, const FString& Label, const FVector& Location, const FRotator& Rotation, const FVector& Scale, const FLinearColor& Color)
+    {
+        AStaticMeshActor* Actor = AddPreviewMeshActor(World, Mesh, Label, Location, Rotation, Scale, Color);
+        if (Actor && Actor->GetStaticMeshComponent())
+        {
+            Actor->GetStaticMeshComponent()->SetCastShadow(false);
+        }
+    };
+
     const float BaseX = -4920.0f;
     const float CenterY = GetPreviewRiverCenterY(Spec, BaseX);
     const float Z = 30.0f;
-    AddPreviewMeshActor(
-        World,
+    AddRaftProxyPart(
         CylinderMesh,
         FString::Printf(TEXT("RaftSim_ForegroundRaft_LeftTube_%s"), *Spec.RiverId),
         FVector(BaseX + 180.0f, CenterY - 92.0f, Z),
         FRotator(0.0f, 90.0f, 0.0f),
         FVector(0.38f, 0.38f, 2.9f),
         Spec.RaftColor);
-    AddPreviewMeshActor(
-        World,
+    AddRaftProxyPart(
         CylinderMesh,
         FString::Printf(TEXT("RaftSim_ForegroundRaft_RightTube_%s"), *Spec.RiverId),
         FVector(BaseX + 180.0f, CenterY + 92.0f, Z),
         FRotator(0.0f, 90.0f, 0.0f),
         FVector(0.38f, 0.38f, 2.9f),
         Spec.RaftColor);
-    AddPreviewMeshActor(
-        World,
+    AddRaftProxyPart(
         CylinderMesh,
         FString::Printf(TEXT("RaftSim_ForegroundRaft_Bow_%s"), *Spec.RiverId),
         FVector(BaseX + 470.0f, CenterY, Z + 3.0f),
         FRotator(90.0f, 0.0f, 0.0f),
         FVector(0.36f, 0.36f, 1.9f),
         Spec.RaftColor);
-    AddPreviewMeshActor(
-        World,
+    AddRaftProxyPart(
         CubeMesh,
         FString::Printf(TEXT("RaftSim_ForegroundRaft_Floor_%s"), *Spec.RiverId),
-        FVector(BaseX + 180.0f, CenterY, 16.0f),
+        FVector(BaseX + 92.0f, CenterY, 11.0f),
         FRotator::ZeroRotator,
-        FVector(2.6f, 1.0f, 0.05f),
-        FLinearColor(0.04f, 0.045f, 0.04f));
+        FVector(1.35f, 0.42f, 0.04f),
+        FLinearColor(0.08f, 0.085f, 0.075f));
 }
 
 void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
@@ -1485,6 +1603,12 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
         Camera->GetCameraComponent()->PostProcessSettings.VignetteIntensity = 0.10f;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_Sharpen = true;
         Camera->GetCameraComponent()->PostProcessSettings.Sharpen = 0.35f;
+        Camera->GetCameraComponent()->PostProcessSettings.bOverride_AutoExposureMethod = true;
+        Camera->GetCameraComponent()->PostProcessSettings.AutoExposureMethod = AEM_Manual;
+        Camera->GetCameraComponent()->PostProcessSettings.bOverride_AutoExposureBias = true;
+        Camera->GetCameraComponent()->PostProcessSettings.AutoExposureBias = 0.0f;
+        Camera->GetCameraComponent()->PostProcessSettings.bOverride_AutoExposureApplyPhysicalCameraExposure = true;
+        Camera->GetCameraComponent()->PostProcessSettings.AutoExposureApplyPhysicalCameraExposure = 0;
         GEditor->SelectActor(Camera, true, false, true);
     }
 
@@ -1629,6 +1753,9 @@ bool CapturePreviewImageForSpec(
     }
     CaptureComponent->CaptureScene();
     FlushRenderingCommands();
+    FPlatformProcess::Sleep(0.06f);
+    CaptureComponent->CaptureScene();
+    FlushRenderingCommands();
 
     FTextureRenderTargetResource* RenderTargetResource = RenderTarget->GameThread_GetRenderTargetResource();
     TArray<FColor> ImageData;
@@ -1707,7 +1834,6 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     AddPreviewWetBankDressing(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr);
     AddPreviewProceduralEnvironmentDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, SphereMesh);
     AddPreviewWaterSurfaceDetail(World, Spec);
-    AddPreviewRaftForeground(World, Spec, CubeMesh, CylinderMesh);
     AddPreviewFoamAndHydraulics(World, Spec);
 
     for (int32 BoulderIndex = 0; BoulderIndex < Spec.BoulderCount; ++BoulderIndex)
@@ -2868,6 +2994,16 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         const FRaftSimEnvironmentPreviewSpec& Spec = Specs[Index];
         FString GuideSeatCapturePath = GetPreviewCaptureRelativePath(Spec, TEXT("guide_seat_downstream"));
         FString RiverEyeCapturePath = GetPreviewCaptureRelativePath(Spec, TEXT("river_eye_downstream"));
+        FString WarmupGuideSeatCapturePath = GuideSeatCapturePath;
+        CapturePreviewImageForSpec(
+            Spec,
+            CaptureRoot,
+            WarmupGuideSeatCapturePath,
+            TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+            TEXT("guide_seat_downstream"),
+            TEXT("guide-seat downstream warm-up"),
+            true,
+            OutSummary);
         const bool bGuideSeatCaptured = CapturePreviewImageForSpec(
             Spec,
             CaptureRoot,
@@ -2875,7 +3011,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
             TEXT("guide_seat_downstream"),
             TEXT("guide-seat downstream"),
-            false,
+            true,
             OutSummary);
         const bool bRiverEyeCaptured = CapturePreviewImageForSpec(
             Spec,
