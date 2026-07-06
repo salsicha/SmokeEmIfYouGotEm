@@ -311,10 +311,12 @@
             "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
-            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json"
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_cross_section_seed_manifest.json",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson"
           ],
-          "promotion_blocker": "The stitched NHD HU8 source overlay, exact-endpoint Colorado mainstem candidate, and preview metric stationing record official flowline/waterbody/HUC12 context for Lees Ferry, but river-mile stationing, sandbars, banks, eddies, camps/access sensitivity, and oarsman review remain required before gameplay geometry authority.",
-          "status": "nhd_hu8_preview_stationing_attached_review_pending"
+          "promotion_blocker": "The stitched NHD HU8 source overlay, exact-endpoint Colorado mainstem candidate, preview metric stationing, and fixed-width cross-section review seeds record official flowline context for Lees Ferry, but river-mile stationing, accepted banks, sandbars, eddies, camps/access sensitivity, and oarsman review remain required before gameplay geometry authority.",
+          "status": "nhd_hu8_cross_section_seeds_attached_review_pending"
         },
         "protected_area_and_access_context": {
           "artifacts": [

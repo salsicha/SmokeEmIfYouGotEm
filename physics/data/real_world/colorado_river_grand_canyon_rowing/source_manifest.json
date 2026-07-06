@@ -38,7 +38,9 @@
       "hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson",
       "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
       "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
-      "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json"
+      "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+      "hydrography/nhd_hu8_lees_ferry_cross_section_seed_manifest.json",
+      "hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson"
     ],
     "imagery": [
       "imagery/usda_naip_lees_ferry_sample_512.png",
@@ -77,9 +79,9 @@
   },
   "confidence": {
     "guide_review": 0.05,
-    "hydrography": 0.31,
+    "hydrography": 0.34,
     "hydrology": 0.48,
-    "overall": 0.35,
+    "overall": 0.36,
     "rapid_annotations": 0.05,
     "terrain": 0.25
   },
@@ -213,6 +215,19 @@
       ],
       "url": "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
       "notes": "Generated preview metric stationing, downstream tangents, and river-left normal seeds from the exact-graph Colorado NHD mainstem candidate. This is local equirectangular edit scaffolding only, not final canyon CRS or river-mile stationing."
+    },
+    {
+      "category": "hydrography",
+      "fetch_id": "colorado_nhd_hu8_lees_ferry_cross_section_seed_candidates",
+      "source_id": "usgs_nhd_hu8_lees_ferry_stitched_extract",
+      "status": "seed_candidates_review_required_not_banks_or_cross_sections",
+      "target_artifact": "hydrography/nhd_hu8_lees_ferry_cross_section_seed_manifest.json",
+      "related_artifacts": [
+        "hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson",
+        "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json"
+      ],
+      "url": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+      "notes": "Generated fixed-width Colorado cross-section review seed lines from preview stationing normals. These are editor review aids only, not accepted banks, channel widths, sandbars, or production cross sections."
     }
   ],
   "river_id": "colorado_river",

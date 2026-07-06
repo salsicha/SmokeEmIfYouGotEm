@@ -249,6 +249,8 @@
         "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
         "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
         "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+        "hydrography/nhd_hu8_lees_ferry_cross_section_seed_manifest.json",
+        "hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson",
         "hydrology/usgs_09380000_daily_discharge.json",
         "hydrology/usgs_09402500_daily_discharge.json",
         "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
@@ -260,7 +262,7 @@
       "display_name": "Colorado River, Grand Canyon Lees Ferry rowing prototype",
       "p0_next_pulls_or_attachments": [
         {
-          "promotion_gate": "Promote the attached stitched NHD HU8 source overlay, exact-graph mainstem candidate, and preview metric stationing only after river mile stationing, visible flowline/water-edge alignment, exposed sandbars, eddies, camps/access sensitivity, and oarsman review pass.",
+          "promotion_gate": "Promote the attached stitched NHD HU8 source overlay, exact-graph mainstem candidate, preview metric stationing, and cross-section seeds only after river mile stationing, visible flowline/water-edge alignment, exposed sandbars, eddies, camps/access sensitivity, and oarsman review pass.",
           "required_artifacts": [
             "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
             "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
@@ -268,6 +270,8 @@
             "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
             "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
             "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+            "hydrography/nhd_hu8_lees_ferry_cross_section_seed_manifest.json",
+            "hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson",
             "hydrography/production_import_pilot/centerline.geojson",
             "hydrography/production_import_pilot/river_mile_markers.geojson",
             "hydrography/production_import_pilot/sandbars.geojson"
