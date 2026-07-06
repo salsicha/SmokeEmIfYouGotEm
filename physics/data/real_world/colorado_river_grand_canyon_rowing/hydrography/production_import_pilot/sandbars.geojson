@@ -1,0 +1,288 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -111.5318226,
+              36.8787945
+            ],
+            [
+              -111.5358182,
+              36.879288
+            ],
+            [
+              -111.5360581,
+              36.8780451
+            ],
+            [
+              -111.5320625,
+              36.8775516
+            ],
+            [
+              -111.5318226,
+              36.8787945
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "annotation_id": "lees_ferry_margin_sandbar_review_seed",
+        "feature_role": "release_sensitive_sandbar_review_seed",
+        "flow_dependency": "Review exposed/wet/submerged state across low, moderate, high, and subdaily release variants before using this as art, rowing, camp/beach, or rescue geometry.",
+        "promotion_gate": "Replace or approve against visible imagery, DEM relief, release-band history, NPS/GCMRC or guide/oarsman review, and access/publication sensitivity before production use.",
+        "review_status": "preview_sandbar_seed_not_geomorphic_boundary_or_camp_beach_authority",
+        "river_id": "colorado_river",
+        "river_side_hint": "river_left",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_end_m": 1600.0,
+        "station_m": 1600.0,
+        "station_sample_index": 16,
+        "stationing_status": "coarse_polygon_from_nhd_stationing_candidate_not_sandbar_authority"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -111.5615636,
+              36.8755846
+            ],
+            [
+              -111.5655932,
+              36.8753244
+            ],
+            [
+              -111.5657197,
+              36.876578
+            ],
+            [
+              -111.5616901,
+              36.8768382
+            ],
+            [
+              -111.5615636,
+              36.8755846
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "annotation_id": "paria_context_sandbar_review_seed",
+        "feature_role": "release_sensitive_sandbar_review_seed",
+        "flow_dependency": "Review exposed/wet/submerged state across low, moderate, high, and subdaily release variants before using this as art, rowing, camp/beach, or rescue geometry.",
+        "promotion_gate": "Replace or approve against visible imagery, DEM relief, release-band history, NPS/GCMRC or guide/oarsman review, and access/publication sensitivity before production use.",
+        "review_status": "preview_sandbar_seed_not_geomorphic_boundary_or_camp_beach_authority",
+        "river_id": "colorado_river",
+        "river_side_hint": "river_right",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_end_m": 4500.0,
+        "station_m": 4500.0,
+        "station_sample_index": 45,
+        "stationing_status": "coarse_polygon_from_nhd_stationing_candidate_not_sandbar_authority"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -111.5477899,
+              36.8541584
+            ],
+            [
+              -111.5448052,
+              36.851978
+            ],
+            [
+              -111.5437455,
+              36.8529068
+            ],
+            [
+              -111.5467302,
+              36.8550872
+            ],
+            [
+              -111.5477899,
+              36.8541584
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "annotation_id": "cathedral_wash_margin_sandbar_review_seed",
+        "feature_role": "release_sensitive_sandbar_review_seed",
+        "flow_dependency": "Review exposed/wet/submerged state across low, moderate, high, and subdaily release variants before using this as art, rowing, camp/beach, or rescue geometry.",
+        "promotion_gate": "Replace or approve against visible imagery, DEM relief, release-band history, NPS/GCMRC or guide/oarsman review, and access/publication sensitivity before production use.",
+        "review_status": "preview_sandbar_seed_not_geomorphic_boundary_or_camp_beach_authority",
+        "river_id": "colorado_river",
+        "river_side_hint": "river_left",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_end_m": 7800.0,
+        "station_m": 7800.0,
+        "station_sample_index": 78,
+        "stationing_status": "coarse_polygon_from_nhd_stationing_candidate_not_sandbar_authority"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -111.5712902,
+              36.8471838
+            ],
+            [
+              -111.5730721,
+              36.8500864
+            ],
+            [
+              -111.5716615,
+              36.8506409
+            ],
+            [
+              -111.5698796,
+              36.8477383
+            ],
+            [
+              -111.5712902,
+              36.8471838
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "annotation_id": "marble_canyon_bend_sandbar_review_seed",
+        "feature_role": "release_sensitive_sandbar_review_seed",
+        "flow_dependency": "Review exposed/wet/submerged state across low, moderate, high, and subdaily release variants before using this as art, rowing, camp/beach, or rescue geometry.",
+        "promotion_gate": "Replace or approve against visible imagery, DEM relief, release-band history, NPS/GCMRC or guide/oarsman review, and access/publication sensitivity before production use.",
+        "review_status": "preview_sandbar_seed_not_geomorphic_boundary_or_camp_beach_authority",
+        "river_id": "colorado_river",
+        "river_side_hint": "river_right",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_end_m": 11800.0,
+        "station_m": 11800.0,
+        "station_sample_index": 118,
+        "stationing_status": "coarse_polygon_from_nhd_stationing_candidate_not_sandbar_authority"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -111.6037544,
+              36.8539804
+            ],
+            [
+              -111.6061144,
+              36.8513551
+            ],
+            [
+              -111.6048384,
+              36.8506207
+            ],
+            [
+              -111.6024785,
+              36.8532461
+            ],
+            [
+              -111.6037544,
+              36.8539804
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "annotation_id": "rowing_recovery_bar_review_seed",
+        "feature_role": "release_sensitive_sandbar_review_seed",
+        "flow_dependency": "Review exposed/wet/submerged state across low, moderate, high, and subdaily release variants before using this as art, rowing, camp/beach, or rescue geometry.",
+        "promotion_gate": "Replace or approve against visible imagery, DEM relief, release-band history, NPS/GCMRC or guide/oarsman review, and access/publication sensitivity before production use.",
+        "review_status": "preview_sandbar_seed_not_geomorphic_boundary_or_camp_beach_authority",
+        "river_id": "colorado_river",
+        "river_side_hint": "river_left",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_end_m": 16600.0,
+        "station_m": 16600.0,
+        "station_sample_index": 166,
+        "stationing_status": "coarse_polygon_from_nhd_stationing_candidate_not_sandbar_authority"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -111.6292169,
+              36.824735
+            ],
+            [
+              -111.6300081,
+              36.8215637
+            ],
+            [
+              -111.6315487,
+              36.82181
+            ],
+            [
+              -111.6307575,
+              36.8249813
+            ],
+            [
+              -111.6292169,
+              36.824735
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "annotation_id": "downstream_wet_bank_sandbar_review_seed",
+        "feature_role": "release_sensitive_sandbar_review_seed",
+        "flow_dependency": "Review exposed/wet/submerged state across low, moderate, high, and subdaily release variants before using this as art, rowing, camp/beach, or rescue geometry.",
+        "promotion_gate": "Replace or approve against visible imagery, DEM relief, release-band history, NPS/GCMRC or guide/oarsman review, and access/publication sensitivity before production use.",
+        "review_status": "preview_sandbar_seed_not_geomorphic_boundary_or_camp_beach_authority",
+        "river_id": "colorado_river",
+        "river_side_hint": "river_right",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_end_m": 21000.0,
+        "station_m": 21000.0,
+        "station_sample_index": 210,
+        "stationing_status": "coarse_polygon_from_nhd_stationing_candidate_not_sandbar_authority"
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-06",
+  "policy": {
+    "allowed_use": [
+      "editor sandbar and wet-bank review",
+      "release-band visual planning",
+      "oarsman review queue"
+    ],
+    "forbidden_use": [
+      "camp or beach publication authority",
+      "final sandbar geometry",
+      "release-dependent gameplay clearance"
+    ],
+    "geometry_authority": "review_seed_from_nhd_stationing_not_geomorphic_or_camp_boundary"
+  },
+  "river_id": "colorado_river",
+  "schema": "raftsim.colorado_sandbar_review_seeds.geojson.v1",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "stationing_source": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+  "status": "release_sensitive_sandbar_review_seeds_not_authoritative",
+  "type": "FeatureCollection"
+}

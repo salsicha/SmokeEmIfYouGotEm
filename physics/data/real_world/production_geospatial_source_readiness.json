@@ -389,10 +389,12 @@
             "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/hydrography_draft_manifest.json",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/centerline.geojson",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/banks.geojson",
-            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/cross_sections.geojson"
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/cross_sections.geojson",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/river_mile_markers.geojson",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/sandbars.geojson"
           ],
-          "promotion_blocker": "The stitched NHD HU8 source overlay, exact-endpoint Colorado mainstem candidate, preview metric stationing, fixed-width cross-section review seeds, preview NAIP/DEM alignment diagnostic, and generated production-import draft centerline/bank/cross-section files record official flowline context for Lees Ferry. The drafts are editor review artifacts only; river-mile stationing, accepted banks, sandbars, eddies, camps/access sensitivity, release-aware wet-bank review, and oarsman approval remain required before gameplay geometry authority.",
-          "status": "draft_production_import_hydrography_attached_review_pending"
+          "promotion_blocker": "Colorado production river-mile and sandbar review seed overlays are attached from the NHD stationing candidate, but official Grand Canyon river-mile stationing, release-aware water-edge/sandbar review, camp/beach sensitivity, and oarsman/geospatial approval still block production route authority.",
+          "status": "preview_river_mile_and_sandbar_review_seeds_attached_not_authoritative"
         },
         "protected_area_and_access_context": {
           "artifacts": [

@@ -53,7 +53,9 @@
       "hydrography/production_import_pilot/hydrography_draft_manifest.json",
       "hydrography/production_import_pilot/centerline.geojson",
       "hydrography/production_import_pilot/banks.geojson",
-      "hydrography/production_import_pilot/cross_sections.geojson"
+      "hydrography/production_import_pilot/cross_sections.geojson",
+      "hydrography/production_import_pilot/river_mile_markers.geojson",
+      "hydrography/production_import_pilot/sandbars.geojson"
     ],
     "imagery": [
       "imagery/usda_naip_lees_ferry_sample_512.png",

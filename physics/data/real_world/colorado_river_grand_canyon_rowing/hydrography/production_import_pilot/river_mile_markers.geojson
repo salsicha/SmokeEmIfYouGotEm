@@ -1,0 +1,440 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -111.5167285,
+          36.8777351
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_000",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 0,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8777351,
+        "station_lon": -111.5167285,
+        "station_m": 0.0,
+        "station_sample_index": 0,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.5336833,
+          36.8797515
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_001",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 1,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8797515,
+        "station_lon": -111.5336833,
+        "station_m": 1600.0,
+        "station_sample_index": 16,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.5498509,
+          36.8742347
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_002",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 2,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8742347,
+        "station_lon": -111.5498509,
+        "station_m": 3200.0,
+        "station_sample_index": 32,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.5660628,
+          36.8732802
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_003",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 3,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8732802,
+        "station_lon": -111.5660628,
+        "station_m": 4800.0,
+        "station_sample_index": 48,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.5583587,
+          36.8611528
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_004",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 4,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8611528,
+        "station_lon": -111.5583587,
+        "station_m": 6400.0,
+        "station_sample_index": 64,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.5452767,
+          36.8512993
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_005",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 5,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8512993,
+        "station_lon": -111.5452767,
+        "station_m": 8000.0,
+        "station_sample_index": 80,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.5542852,
+          36.8431267
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_006",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 6,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8431267,
+        "station_lon": -111.5542852,
+        "station_m": 9700.0,
+        "station_sample_index": 97,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.5710122,
+          36.844307
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_007",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 7,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.844307,
+        "station_lon": -111.5710122,
+        "station_m": 11300.0,
+        "station_sample_index": 113,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.5775238,
+          36.8574662
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_008",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 8,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8574662,
+        "station_lon": -111.5775238,
+        "station_m": 12900.0,
+        "station_sample_index": 129,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.5879634,
+          36.8647737
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_009",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 9,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8647737,
+        "station_lon": -111.5879634,
+        "station_m": 14500.0,
+        "station_sample_index": 145,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.6022724,
+          36.8566631
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_010",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 10,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8566631,
+        "station_lon": -111.6022724,
+        "station_m": 16100.0,
+        "station_sample_index": 161,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.6158352,
+          36.8488458
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_011",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 11,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8488458,
+        "station_lon": -111.6158352,
+        "station_m": 17700.0,
+        "station_sample_index": 177,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.6177222,
+          36.8349193
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_012",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 12,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8349193,
+        "station_lon": -111.6177222,
+        "station_m": 19300.0,
+        "station_sample_index": 193,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.6284845,
+          36.8238861
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_013",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 13,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8238861,
+        "station_lon": -111.6284845,
+        "station_m": 20900.0,
+        "station_sample_index": 209,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.6345387,
+          36.8104575
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_014",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 14,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.8104575,
+        "station_lon": -111.6345387,
+        "station_m": 22500.0,
+        "station_sample_index": 225,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.6437223,
+          36.7996147
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_preview_river_mile_015",
+        "feature_role": "preview_river_mile_marker_review_seed",
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 0.0,
+        "preview_river_mile": 15,
+        "promotion_gate": "Replace or approve against official Grand Canyon river-mile stationing, NPS/GCMRC context, release-aware water edge review, and oarsman validation before production route use.",
+        "review_status": "nhd_stationing_preview_not_official_grand_canyon_river_mile",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "station_lat": 36.7996147,
+        "station_lon": -111.6437223,
+        "station_m": 24100.0,
+        "station_sample_index": 241,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-06",
+  "policy": {
+    "allowed_use": [
+      "editor route orientation",
+      "oarsman review queue",
+      "future NPS/GCMRC river-mile comparison"
+    ],
+    "forbidden_use": [
+      "official Grand Canyon river-mile stationing",
+      "permit or route-publication authority",
+      "production gameplay distance claims"
+    ],
+    "geometry_authority": "review_seed_from_nhd_stationing_not_official_river_miles"
+  },
+  "river_id": "colorado_river",
+  "schema": "raftsim.colorado_river_mile_markers.geojson.v1",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "stationing_source": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+  "status": "preview_river_mile_markers_from_nhd_stationing_not_official",
+  "type": "FeatureCollection"
+}
