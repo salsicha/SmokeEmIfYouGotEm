@@ -1,0 +1,2775 @@
+{
+  "schema": "raftsim.cdec_cbr_flow_stage_window.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "american_south_fork",
+  "section_id": "chili_bar_to_coloma",
+  "status": "official_time_series_pulled_review_required",
+  "provider": "California Data Exchange Center / California Department of Water Resources",
+  "station": {
+    "station_id": "CBR",
+    "station_name": "AMERICAN RIVER AT CHILI BAR",
+    "latitude": 38.772,
+    "longitude": -120.816,
+    "timezone": "local station time as returned by CDEC; QueryF page labels current view PDT",
+    "metadata_url": "https://cdec.water.ca.gov/dynamicapp/staMeta?station_id=CBR"
+  },
+  "request_window": {
+    "start": "2026-07-05T00:00",
+    "end": "2026-07-06T23:59",
+    "duration_code": "E",
+    "duration_name": "event"
+  },
+  "source_urls": {
+    "flow_cfs_json": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2026-07-05T00:00&End=2026-07-06T23:59",
+    "stage_ft_json": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=1&dur_code=E&Start=2026-07-05T00:00&End=2026-07-06T23:59",
+    "sensor_metadata_json": "https://cdec.water.ca.gov/dynamicapp/wsSensorData/getSensorsForStation?stationId=CBR"
+  },
+  "no_data_handling": {
+    "raw_no_data_value": -9999,
+    "normalized_to_null": true,
+    "excluded_from_statistics": true
+  },
+  "series": {
+    "flow_cfs": {
+      "sensor_num": 20,
+      "sensor_type": "FLOW",
+      "sensor_long_name": "FLOW, RIVER DISCHARGE",
+      "units": "CFS",
+      "summary": {
+        "sample_count": 192,
+        "valid_sample_count": 124,
+        "no_data_count": 68,
+        "first_datetime_local": "2026-7-4 23:00",
+        "last_datetime_local": "2026-7-6 22:45",
+        "first_valid_datetime_local": "2026-7-4 23:00",
+        "last_valid_datetime_local": "2026-7-6 5:45",
+        "min": 291.0,
+        "max": 1649.0,
+        "median": 304.0,
+        "unique_flags": [
+          ""
+        ]
+      },
+      "values": [
+        {
+          "datetime_local": "2026-7-4 23:00",
+          "obs_datetime_local": "2026-7-4 23:00",
+          "flow_cfs": 294.0,
+          "raw_value": 294,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-4 23:15",
+          "obs_datetime_local": "2026-7-4 23:15",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-4 23:30",
+          "obs_datetime_local": "2026-7-4 23:30",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-4 23:45",
+          "obs_datetime_local": "2026-7-4 23:45",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 0:00",
+          "obs_datetime_local": "2026-7-5 0:00",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 0:15",
+          "obs_datetime_local": "2026-7-5 0:15",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 0:30",
+          "obs_datetime_local": "2026-7-5 0:30",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 0:45",
+          "obs_datetime_local": "2026-7-5 0:45",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 1:00",
+          "obs_datetime_local": "2026-7-5 1:00",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 1:15",
+          "obs_datetime_local": "2026-7-5 1:15",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 1:30",
+          "obs_datetime_local": "2026-7-5 1:30",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 1:45",
+          "obs_datetime_local": "2026-7-5 1:45",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 2:00",
+          "obs_datetime_local": "2026-7-5 2:00",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 2:15",
+          "obs_datetime_local": "2026-7-5 2:15",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 2:30",
+          "obs_datetime_local": "2026-7-5 2:30",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 2:45",
+          "obs_datetime_local": "2026-7-5 2:45",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 3:00",
+          "obs_datetime_local": "2026-7-5 3:00",
+          "flow_cfs": 291.0,
+          "raw_value": 291,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 3:15",
+          "obs_datetime_local": "2026-7-5 3:15",
+          "flow_cfs": 321.0,
+          "raw_value": 321,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 3:30",
+          "obs_datetime_local": "2026-7-5 3:30",
+          "flow_cfs": 436.0,
+          "raw_value": 436,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 3:45",
+          "obs_datetime_local": "2026-7-5 3:45",
+          "flow_cfs": 557.0,
+          "raw_value": 557,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 4:00",
+          "obs_datetime_local": "2026-7-5 4:00",
+          "flow_cfs": 666.0,
+          "raw_value": 666,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 4:15",
+          "obs_datetime_local": "2026-7-5 4:15",
+          "flow_cfs": 781.0,
+          "raw_value": 781,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 4:30",
+          "obs_datetime_local": "2026-7-5 4:30",
+          "flow_cfs": 917.0,
+          "raw_value": 917,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 4:45",
+          "obs_datetime_local": "2026-7-5 4:45",
+          "flow_cfs": 1033.0,
+          "raw_value": 1033,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 5:00",
+          "obs_datetime_local": "2026-7-5 5:00",
+          "flow_cfs": 1141.0,
+          "raw_value": 1141,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 5:15",
+          "obs_datetime_local": "2026-7-5 5:15",
+          "flow_cfs": 1255.0,
+          "raw_value": 1255,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 5:30",
+          "obs_datetime_local": "2026-7-5 5:30",
+          "flow_cfs": 1395.0,
+          "raw_value": 1395,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 5:45",
+          "obs_datetime_local": "2026-7-5 5:45",
+          "flow_cfs": 1557.0,
+          "raw_value": 1557,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 6:00",
+          "obs_datetime_local": "2026-7-5 6:00",
+          "flow_cfs": 1610.0,
+          "raw_value": 1610,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 6:15",
+          "obs_datetime_local": "2026-7-5 6:15",
+          "flow_cfs": 1610.0,
+          "raw_value": 1610,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 6:30",
+          "obs_datetime_local": "2026-7-5 6:30",
+          "flow_cfs": 1618.0,
+          "raw_value": 1618,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 6:45",
+          "obs_datetime_local": "2026-7-5 6:45",
+          "flow_cfs": 1618.0,
+          "raw_value": 1618,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 7:00",
+          "obs_datetime_local": "2026-7-5 7:00",
+          "flow_cfs": 1618.0,
+          "raw_value": 1618,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 7:15",
+          "obs_datetime_local": "2026-7-5 7:15",
+          "flow_cfs": 1618.0,
+          "raw_value": 1618,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 7:30",
+          "obs_datetime_local": "2026-7-5 7:30",
+          "flow_cfs": 1626.0,
+          "raw_value": 1626,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 7:45",
+          "obs_datetime_local": "2026-7-5 7:45",
+          "flow_cfs": 1626.0,
+          "raw_value": 1626,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 8:00",
+          "obs_datetime_local": "2026-7-5 8:00",
+          "flow_cfs": 1626.0,
+          "raw_value": 1626,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 8:15",
+          "obs_datetime_local": "2026-7-5 8:15",
+          "flow_cfs": 1633.0,
+          "raw_value": 1633,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 8:30",
+          "obs_datetime_local": "2026-7-5 8:30",
+          "flow_cfs": 1633.0,
+          "raw_value": 1633,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 8:45",
+          "obs_datetime_local": "2026-7-5 8:45",
+          "flow_cfs": 1633.0,
+          "raw_value": 1633,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 9:00",
+          "obs_datetime_local": "2026-7-5 9:00",
+          "flow_cfs": 1633.0,
+          "raw_value": 1633,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 9:15",
+          "obs_datetime_local": "2026-7-5 9:15",
+          "flow_cfs": 1633.0,
+          "raw_value": 1633,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 9:30",
+          "obs_datetime_local": "2026-7-5 9:30",
+          "flow_cfs": 1633.0,
+          "raw_value": 1633,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 9:45",
+          "obs_datetime_local": "2026-7-5 9:45",
+          "flow_cfs": 1641.0,
+          "raw_value": 1641,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 10:00",
+          "obs_datetime_local": "2026-7-5 10:00",
+          "flow_cfs": 1641.0,
+          "raw_value": 1641,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 10:15",
+          "obs_datetime_local": "2026-7-5 10:15",
+          "flow_cfs": 1641.0,
+          "raw_value": 1641,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 10:30",
+          "obs_datetime_local": "2026-7-5 10:30",
+          "flow_cfs": 1641.0,
+          "raw_value": 1641,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 10:45",
+          "obs_datetime_local": "2026-7-5 10:45",
+          "flow_cfs": 1641.0,
+          "raw_value": 1641,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 11:00",
+          "obs_datetime_local": "2026-7-5 11:00",
+          "flow_cfs": 1649.0,
+          "raw_value": 1649,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 11:15",
+          "obs_datetime_local": "2026-7-5 11:15",
+          "flow_cfs": 1649.0,
+          "raw_value": 1649,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 11:30",
+          "obs_datetime_local": "2026-7-5 11:30",
+          "flow_cfs": 1649.0,
+          "raw_value": 1649,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 11:45",
+          "obs_datetime_local": "2026-7-5 11:45",
+          "flow_cfs": 1649.0,
+          "raw_value": 1649,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 12:00",
+          "obs_datetime_local": "2026-7-5 12:00",
+          "flow_cfs": 1649.0,
+          "raw_value": 1649,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 12:15",
+          "obs_datetime_local": "2026-7-5 12:15",
+          "flow_cfs": 1603.0,
+          "raw_value": 1603,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 12:30",
+          "obs_datetime_local": "2026-7-5 12:30",
+          "flow_cfs": 1446.0,
+          "raw_value": 1446,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 12:45",
+          "obs_datetime_local": "2026-7-5 12:45",
+          "flow_cfs": 1303.0,
+          "raw_value": 1303,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 13:00",
+          "obs_datetime_local": "2026-7-5 13:00",
+          "flow_cfs": 1174.0,
+          "raw_value": 1174,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 13:15",
+          "obs_datetime_local": "2026-7-5 13:15",
+          "flow_cfs": 1070.0,
+          "raw_value": 1070,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 13:30",
+          "obs_datetime_local": "2026-7-5 13:30",
+          "flow_cfs": 983.0,
+          "raw_value": 983,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 13:45",
+          "obs_datetime_local": "2026-7-5 13:45",
+          "flow_cfs": 888.0,
+          "raw_value": 888,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 14:00",
+          "obs_datetime_local": "2026-7-5 14:00",
+          "flow_cfs": 786.0,
+          "raw_value": 786,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 14:15",
+          "obs_datetime_local": "2026-7-5 14:15",
+          "flow_cfs": 690.0,
+          "raw_value": 690,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 14:30",
+          "obs_datetime_local": "2026-7-5 14:30",
+          "flow_cfs": 630.0,
+          "raw_value": 630,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 14:45",
+          "obs_datetime_local": "2026-7-5 14:45",
+          "flow_cfs": 591.0,
+          "raw_value": 591,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 15:00",
+          "obs_datetime_local": "2026-7-5 15:00",
+          "flow_cfs": 548.0,
+          "raw_value": 548,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 15:15",
+          "obs_datetime_local": "2026-7-5 15:15",
+          "flow_cfs": 499.0,
+          "raw_value": 499,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 15:30",
+          "obs_datetime_local": "2026-7-5 15:30",
+          "flow_cfs": 448.0,
+          "raw_value": 448,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 15:45",
+          "obs_datetime_local": "2026-7-5 15:45",
+          "flow_cfs": 406.0,
+          "raw_value": 406,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 16:00",
+          "obs_datetime_local": "2026-7-5 16:00",
+          "flow_cfs": 352.0,
+          "raw_value": 352,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 16:15",
+          "obs_datetime_local": "2026-7-5 16:15",
+          "flow_cfs": 311.0,
+          "raw_value": 311,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 16:30",
+          "obs_datetime_local": "2026-7-5 16:30",
+          "flow_cfs": 304.0,
+          "raw_value": 304,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 16:45",
+          "obs_datetime_local": "2026-7-5 16:45",
+          "flow_cfs": 304.0,
+          "raw_value": 304,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 17:00",
+          "obs_datetime_local": "2026-7-5 17:00",
+          "flow_cfs": 301.0,
+          "raw_value": 301,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 17:15",
+          "obs_datetime_local": "2026-7-5 17:15",
+          "flow_cfs": 301.0,
+          "raw_value": 301,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 17:30",
+          "obs_datetime_local": "2026-7-5 17:30",
+          "flow_cfs": 301.0,
+          "raw_value": 301,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 17:45",
+          "obs_datetime_local": "2026-7-5 17:45",
+          "flow_cfs": 301.0,
+          "raw_value": 301,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 18:00",
+          "obs_datetime_local": "2026-7-5 18:00",
+          "flow_cfs": 301.0,
+          "raw_value": 301,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 18:15",
+          "obs_datetime_local": "2026-7-5 18:15",
+          "flow_cfs": 301.0,
+          "raw_value": 301,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 18:30",
+          "obs_datetime_local": "2026-7-5 18:30",
+          "flow_cfs": 304.0,
+          "raw_value": 304,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 18:45",
+          "obs_datetime_local": "2026-7-5 18:45",
+          "flow_cfs": 304.0,
+          "raw_value": 304,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 19:00",
+          "obs_datetime_local": "2026-7-5 19:00",
+          "flow_cfs": 304.0,
+          "raw_value": 304,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 19:15",
+          "obs_datetime_local": "2026-7-5 19:15",
+          "flow_cfs": 304.0,
+          "raw_value": 304,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 19:30",
+          "obs_datetime_local": "2026-7-5 19:30",
+          "flow_cfs": 304.0,
+          "raw_value": 304,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 19:45",
+          "obs_datetime_local": "2026-7-5 19:45",
+          "flow_cfs": 304.0,
+          "raw_value": 304,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 20:00",
+          "obs_datetime_local": "2026-7-5 20:00",
+          "flow_cfs": 304.0,
+          "raw_value": 304,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 20:15",
+          "obs_datetime_local": "2026-7-5 20:15",
+          "flow_cfs": 301.0,
+          "raw_value": 301,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 20:30",
+          "obs_datetime_local": "2026-7-5 20:30",
+          "flow_cfs": 301.0,
+          "raw_value": 301,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 20:45",
+          "obs_datetime_local": "2026-7-5 20:45",
+          "flow_cfs": 301.0,
+          "raw_value": 301,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 21:00",
+          "obs_datetime_local": "2026-7-5 21:00",
+          "flow_cfs": 301.0,
+          "raw_value": 301,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 21:15",
+          "obs_datetime_local": "2026-7-5 21:15",
+          "flow_cfs": 301.0,
+          "raw_value": 301,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 21:30",
+          "obs_datetime_local": "2026-7-5 21:30",
+          "flow_cfs": 301.0,
+          "raw_value": 301,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 21:45",
+          "obs_datetime_local": "2026-7-5 21:45",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 22:00",
+          "obs_datetime_local": "2026-7-5 22:00",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 22:15",
+          "obs_datetime_local": "2026-7-5 22:15",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 22:30",
+          "obs_datetime_local": "2026-7-5 22:30",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 22:45",
+          "obs_datetime_local": "2026-7-5 22:45",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 23:00",
+          "obs_datetime_local": "2026-7-5 23:00",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 23:15",
+          "obs_datetime_local": "2026-7-5 23:15",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 23:30",
+          "obs_datetime_local": "2026-7-5 23:30",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 23:45",
+          "obs_datetime_local": "2026-7-5 23:45",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 0:00",
+          "obs_datetime_local": "2026-7-6 0:00",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 0:15",
+          "obs_datetime_local": "2026-7-6 0:15",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 0:30",
+          "obs_datetime_local": "2026-7-6 0:30",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 0:45",
+          "obs_datetime_local": "2026-7-6 0:45",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 1:00",
+          "obs_datetime_local": "2026-7-6 1:00",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 1:15",
+          "obs_datetime_local": "2026-7-6 1:15",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 1:30",
+          "obs_datetime_local": "2026-7-6 1:30",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 1:45",
+          "obs_datetime_local": "2026-7-6 1:45",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 2:00",
+          "obs_datetime_local": "2026-7-6 2:00",
+          "flow_cfs": 294.0,
+          "raw_value": 294,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 2:15",
+          "obs_datetime_local": "2026-7-6 2:15",
+          "flow_cfs": 294.0,
+          "raw_value": 294,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 2:30",
+          "obs_datetime_local": "2026-7-6 2:30",
+          "flow_cfs": 294.0,
+          "raw_value": 294,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 2:45",
+          "obs_datetime_local": "2026-7-6 2:45",
+          "flow_cfs": 294.0,
+          "raw_value": 294,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 3:00",
+          "obs_datetime_local": "2026-7-6 3:00",
+          "flow_cfs": 294.0,
+          "raw_value": 294,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 3:15",
+          "obs_datetime_local": "2026-7-6 3:15",
+          "flow_cfs": 294.0,
+          "raw_value": 294,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 3:30",
+          "obs_datetime_local": "2026-7-6 3:30",
+          "flow_cfs": 294.0,
+          "raw_value": 294,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 3:45",
+          "obs_datetime_local": "2026-7-6 3:45",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 4:00",
+          "obs_datetime_local": "2026-7-6 4:00",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 4:15",
+          "obs_datetime_local": "2026-7-6 4:15",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 4:30",
+          "obs_datetime_local": "2026-7-6 4:30",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 4:45",
+          "obs_datetime_local": "2026-7-6 4:45",
+          "flow_cfs": 294.0,
+          "raw_value": 294,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 5:00",
+          "obs_datetime_local": "2026-7-6 5:00",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 5:15",
+          "obs_datetime_local": "2026-7-6 5:15",
+          "flow_cfs": 298.0,
+          "raw_value": 298,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 5:30",
+          "obs_datetime_local": "2026-7-6 5:30",
+          "flow_cfs": 294.0,
+          "raw_value": 294,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 5:45",
+          "obs_datetime_local": "2026-7-6 5:45",
+          "flow_cfs": 338.0,
+          "raw_value": 338,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 6:00",
+          "obs_datetime_local": "2026-7-6 6:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 6:15",
+          "obs_datetime_local": "2026-7-6 6:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 6:30",
+          "obs_datetime_local": "2026-7-6 6:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 6:45",
+          "obs_datetime_local": "2026-7-6 6:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 7:00",
+          "obs_datetime_local": "2026-7-6 7:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 7:15",
+          "obs_datetime_local": "2026-7-6 7:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 7:30",
+          "obs_datetime_local": "2026-7-6 7:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 7:45",
+          "obs_datetime_local": "2026-7-6 7:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 8:00",
+          "obs_datetime_local": "2026-7-6 8:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 8:15",
+          "obs_datetime_local": "2026-7-6 8:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 8:30",
+          "obs_datetime_local": "2026-7-6 8:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 8:45",
+          "obs_datetime_local": "2026-7-6 8:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 9:00",
+          "obs_datetime_local": "2026-7-6 9:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 9:15",
+          "obs_datetime_local": "2026-7-6 9:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 9:30",
+          "obs_datetime_local": "2026-7-6 9:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 9:45",
+          "obs_datetime_local": "2026-7-6 9:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 10:00",
+          "obs_datetime_local": "2026-7-6 10:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 10:15",
+          "obs_datetime_local": "2026-7-6 10:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 10:30",
+          "obs_datetime_local": "2026-7-6 10:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 10:45",
+          "obs_datetime_local": "2026-7-6 10:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 11:00",
+          "obs_datetime_local": "2026-7-6 11:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 11:15",
+          "obs_datetime_local": "2026-7-6 11:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 11:30",
+          "obs_datetime_local": "2026-7-6 11:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 11:45",
+          "obs_datetime_local": "2026-7-6 11:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 12:00",
+          "obs_datetime_local": "2026-7-6 12:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 12:15",
+          "obs_datetime_local": "2026-7-6 12:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 12:30",
+          "obs_datetime_local": "2026-7-6 12:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 12:45",
+          "obs_datetime_local": "2026-7-6 12:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 13:00",
+          "obs_datetime_local": "2026-7-6 13:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 13:15",
+          "obs_datetime_local": "2026-7-6 13:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 13:30",
+          "obs_datetime_local": "2026-7-6 13:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 13:45",
+          "obs_datetime_local": "2026-7-6 13:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 14:00",
+          "obs_datetime_local": "2026-7-6 14:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 14:15",
+          "obs_datetime_local": "2026-7-6 14:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 14:30",
+          "obs_datetime_local": "2026-7-6 14:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 14:45",
+          "obs_datetime_local": "2026-7-6 14:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 15:00",
+          "obs_datetime_local": "2026-7-6 15:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 15:15",
+          "obs_datetime_local": "2026-7-6 15:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 15:30",
+          "obs_datetime_local": "2026-7-6 15:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 15:45",
+          "obs_datetime_local": "2026-7-6 15:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 16:00",
+          "obs_datetime_local": "2026-7-6 16:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 16:15",
+          "obs_datetime_local": "2026-7-6 16:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 16:30",
+          "obs_datetime_local": "2026-7-6 16:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 16:45",
+          "obs_datetime_local": "2026-7-6 16:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 17:00",
+          "obs_datetime_local": "2026-7-6 17:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 17:15",
+          "obs_datetime_local": "2026-7-6 17:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 17:30",
+          "obs_datetime_local": "2026-7-6 17:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 17:45",
+          "obs_datetime_local": "2026-7-6 17:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 18:00",
+          "obs_datetime_local": "2026-7-6 18:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 18:15",
+          "obs_datetime_local": "2026-7-6 18:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 18:30",
+          "obs_datetime_local": "2026-7-6 18:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 18:45",
+          "obs_datetime_local": "2026-7-6 18:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 19:00",
+          "obs_datetime_local": "2026-7-6 19:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 19:15",
+          "obs_datetime_local": "2026-7-6 19:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 19:30",
+          "obs_datetime_local": "2026-7-6 19:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 19:45",
+          "obs_datetime_local": "2026-7-6 19:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 20:00",
+          "obs_datetime_local": "2026-7-6 20:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 20:15",
+          "obs_datetime_local": "2026-7-6 20:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 20:30",
+          "obs_datetime_local": "2026-7-6 20:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 20:45",
+          "obs_datetime_local": "2026-7-6 20:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 21:00",
+          "obs_datetime_local": "2026-7-6 21:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 21:15",
+          "obs_datetime_local": "2026-7-6 21:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 21:30",
+          "obs_datetime_local": "2026-7-6 21:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 21:45",
+          "obs_datetime_local": "2026-7-6 21:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 22:00",
+          "obs_datetime_local": "2026-7-6 22:00",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 22:15",
+          "obs_datetime_local": "2026-7-6 22:15",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 22:30",
+          "obs_datetime_local": "2026-7-6 22:30",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 22:45",
+          "obs_datetime_local": "2026-7-6 22:45",
+          "flow_cfs": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        }
+      ]
+    },
+    "stage_ft": {
+      "sensor_num": 1,
+      "sensor_type": "RIV STG",
+      "sensor_long_name": "RIVER STAGE",
+      "units": "FEET",
+      "summary": {
+        "sample_count": 192,
+        "valid_sample_count": 124,
+        "no_data_count": 68,
+        "first_datetime_local": "2026-7-4 23:00",
+        "last_datetime_local": "2026-7-6 22:45",
+        "first_valid_datetime_local": "2026-7-4 23:00",
+        "last_valid_datetime_local": "2026-7-6 5:45",
+        "min": 1.5,
+        "max": 3.99,
+        "median": 1.53,
+        "unique_flags": [
+          ""
+        ]
+      },
+      "values": [
+        {
+          "datetime_local": "2026-7-4 23:00",
+          "obs_datetime_local": "2026-7-4 23:00",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-4 23:15",
+          "obs_datetime_local": "2026-7-4 23:15",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-4 23:30",
+          "obs_datetime_local": "2026-7-4 23:30",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-4 23:45",
+          "obs_datetime_local": "2026-7-4 23:45",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 0:00",
+          "obs_datetime_local": "2026-7-5 0:00",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 0:15",
+          "obs_datetime_local": "2026-7-5 0:15",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 0:30",
+          "obs_datetime_local": "2026-7-5 0:30",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 0:45",
+          "obs_datetime_local": "2026-7-5 0:45",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 1:00",
+          "obs_datetime_local": "2026-7-5 1:00",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 1:15",
+          "obs_datetime_local": "2026-7-5 1:15",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 1:30",
+          "obs_datetime_local": "2026-7-5 1:30",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 1:45",
+          "obs_datetime_local": "2026-7-5 1:45",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 2:00",
+          "obs_datetime_local": "2026-7-5 2:00",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 2:15",
+          "obs_datetime_local": "2026-7-5 2:15",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 2:30",
+          "obs_datetime_local": "2026-7-5 2:30",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 2:45",
+          "obs_datetime_local": "2026-7-5 2:45",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 3:00",
+          "obs_datetime_local": "2026-7-5 3:00",
+          "stage_ft": 1.5,
+          "raw_value": 1.5,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 3:15",
+          "obs_datetime_local": "2026-7-5 3:15",
+          "stage_ft": 1.59,
+          "raw_value": 1.59,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 3:30",
+          "obs_datetime_local": "2026-7-5 3:30",
+          "stage_ft": 1.91,
+          "raw_value": 1.91,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 3:45",
+          "obs_datetime_local": "2026-7-5 3:45",
+          "stage_ft": 2.2,
+          "raw_value": 2.2,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 4:00",
+          "obs_datetime_local": "2026-7-5 4:00",
+          "stage_ft": 2.46,
+          "raw_value": 2.46,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 4:15",
+          "obs_datetime_local": "2026-7-5 4:15",
+          "stage_ft": 2.68,
+          "raw_value": 2.68,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 4:30",
+          "obs_datetime_local": "2026-7-5 4:30",
+          "stage_ft": 2.92,
+          "raw_value": 2.92,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 4:45",
+          "obs_datetime_local": "2026-7-5 4:45",
+          "stage_ft": 3.11,
+          "raw_value": 3.11,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 5:00",
+          "obs_datetime_local": "2026-7-5 5:00",
+          "stage_ft": 3.28,
+          "raw_value": 3.28,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 5:15",
+          "obs_datetime_local": "2026-7-5 5:15",
+          "stage_ft": 3.45,
+          "raw_value": 3.45,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 5:30",
+          "obs_datetime_local": "2026-7-5 5:30",
+          "stage_ft": 3.65,
+          "raw_value": 3.65,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 5:45",
+          "obs_datetime_local": "2026-7-5 5:45",
+          "stage_ft": 3.87,
+          "raw_value": 3.87,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 6:00",
+          "obs_datetime_local": "2026-7-5 6:00",
+          "stage_ft": 3.94,
+          "raw_value": 3.94,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 6:15",
+          "obs_datetime_local": "2026-7-5 6:15",
+          "stage_ft": 3.94,
+          "raw_value": 3.94,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 6:30",
+          "obs_datetime_local": "2026-7-5 6:30",
+          "stage_ft": 3.95,
+          "raw_value": 3.95,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 6:45",
+          "obs_datetime_local": "2026-7-5 6:45",
+          "stage_ft": 3.94,
+          "raw_value": 3.94,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 7:00",
+          "obs_datetime_local": "2026-7-5 7:00",
+          "stage_ft": 3.95,
+          "raw_value": 3.95,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 7:15",
+          "obs_datetime_local": "2026-7-5 7:15",
+          "stage_ft": 3.95,
+          "raw_value": 3.95,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 7:30",
+          "obs_datetime_local": "2026-7-5 7:30",
+          "stage_ft": 3.95,
+          "raw_value": 3.95,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 7:45",
+          "obs_datetime_local": "2026-7-5 7:45",
+          "stage_ft": 3.96,
+          "raw_value": 3.96,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 8:00",
+          "obs_datetime_local": "2026-7-5 8:00",
+          "stage_ft": 3.96,
+          "raw_value": 3.96,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 8:15",
+          "obs_datetime_local": "2026-7-5 8:15",
+          "stage_ft": 3.96,
+          "raw_value": 3.96,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 8:30",
+          "obs_datetime_local": "2026-7-5 8:30",
+          "stage_ft": 3.97,
+          "raw_value": 3.97,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 8:45",
+          "obs_datetime_local": "2026-7-5 8:45",
+          "stage_ft": 3.97,
+          "raw_value": 3.97,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 9:00",
+          "obs_datetime_local": "2026-7-5 9:00",
+          "stage_ft": 3.97,
+          "raw_value": 3.97,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 9:15",
+          "obs_datetime_local": "2026-7-5 9:15",
+          "stage_ft": 3.97,
+          "raw_value": 3.97,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 9:30",
+          "obs_datetime_local": "2026-7-5 9:30",
+          "stage_ft": 3.97,
+          "raw_value": 3.97,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 9:45",
+          "obs_datetime_local": "2026-7-5 9:45",
+          "stage_ft": 3.98,
+          "raw_value": 3.98,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 10:00",
+          "obs_datetime_local": "2026-7-5 10:00",
+          "stage_ft": 3.98,
+          "raw_value": 3.98,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 10:15",
+          "obs_datetime_local": "2026-7-5 10:15",
+          "stage_ft": 3.98,
+          "raw_value": 3.98,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 10:30",
+          "obs_datetime_local": "2026-7-5 10:30",
+          "stage_ft": 3.98,
+          "raw_value": 3.98,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 10:45",
+          "obs_datetime_local": "2026-7-5 10:45",
+          "stage_ft": 3.98,
+          "raw_value": 3.98,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 11:00",
+          "obs_datetime_local": "2026-7-5 11:00",
+          "stage_ft": 3.99,
+          "raw_value": 3.99,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 11:15",
+          "obs_datetime_local": "2026-7-5 11:15",
+          "stage_ft": 3.99,
+          "raw_value": 3.99,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 11:30",
+          "obs_datetime_local": "2026-7-5 11:30",
+          "stage_ft": 3.99,
+          "raw_value": 3.99,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 11:45",
+          "obs_datetime_local": "2026-7-5 11:45",
+          "stage_ft": 3.99,
+          "raw_value": 3.99,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 12:00",
+          "obs_datetime_local": "2026-7-5 12:00",
+          "stage_ft": 3.99,
+          "raw_value": 3.99,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 12:15",
+          "obs_datetime_local": "2026-7-5 12:15",
+          "stage_ft": 3.93,
+          "raw_value": 3.93,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 12:30",
+          "obs_datetime_local": "2026-7-5 12:30",
+          "stage_ft": 3.72,
+          "raw_value": 3.72,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 12:45",
+          "obs_datetime_local": "2026-7-5 12:45",
+          "stage_ft": 3.52,
+          "raw_value": 3.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 13:00",
+          "obs_datetime_local": "2026-7-5 13:00",
+          "stage_ft": 3.33,
+          "raw_value": 3.33,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 13:15",
+          "obs_datetime_local": "2026-7-5 13:15",
+          "stage_ft": 3.16,
+          "raw_value": 3.16,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 13:30",
+          "obs_datetime_local": "2026-7-5 13:30",
+          "stage_ft": 3.03,
+          "raw_value": 3.03,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 13:45",
+          "obs_datetime_local": "2026-7-5 13:45",
+          "stage_ft": 2.87,
+          "raw_value": 2.87,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 14:00",
+          "obs_datetime_local": "2026-7-5 14:00",
+          "stage_ft": 2.69,
+          "raw_value": 2.69,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 14:15",
+          "obs_datetime_local": "2026-7-5 14:15",
+          "stage_ft": 2.51,
+          "raw_value": 2.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 14:30",
+          "obs_datetime_local": "2026-7-5 14:30",
+          "stage_ft": 2.38,
+          "raw_value": 2.38,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 14:45",
+          "obs_datetime_local": "2026-7-5 14:45",
+          "stage_ft": 2.29,
+          "raw_value": 2.29,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 15:00",
+          "obs_datetime_local": "2026-7-5 15:00",
+          "stage_ft": 2.19,
+          "raw_value": 2.19,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 15:15",
+          "obs_datetime_local": "2026-7-5 15:15",
+          "stage_ft": 2.07,
+          "raw_value": 2.07,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 15:30",
+          "obs_datetime_local": "2026-7-5 15:30",
+          "stage_ft": 1.94,
+          "raw_value": 1.94,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 15:45",
+          "obs_datetime_local": "2026-7-5 15:45",
+          "stage_ft": 1.83,
+          "raw_value": 1.83,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 16:00",
+          "obs_datetime_local": "2026-7-5 16:00",
+          "stage_ft": 1.68,
+          "raw_value": 1.68,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 16:15",
+          "obs_datetime_local": "2026-7-5 16:15",
+          "stage_ft": 1.56,
+          "raw_value": 1.56,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 16:30",
+          "obs_datetime_local": "2026-7-5 16:30",
+          "stage_ft": 1.54,
+          "raw_value": 1.54,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 16:45",
+          "obs_datetime_local": "2026-7-5 16:45",
+          "stage_ft": 1.54,
+          "raw_value": 1.54,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 17:00",
+          "obs_datetime_local": "2026-7-5 17:00",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 17:15",
+          "obs_datetime_local": "2026-7-5 17:15",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 17:30",
+          "obs_datetime_local": "2026-7-5 17:30",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 17:45",
+          "obs_datetime_local": "2026-7-5 17:45",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 18:00",
+          "obs_datetime_local": "2026-7-5 18:00",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 18:15",
+          "obs_datetime_local": "2026-7-5 18:15",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 18:30",
+          "obs_datetime_local": "2026-7-5 18:30",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 18:45",
+          "obs_datetime_local": "2026-7-5 18:45",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 19:00",
+          "obs_datetime_local": "2026-7-5 19:00",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 19:15",
+          "obs_datetime_local": "2026-7-5 19:15",
+          "stage_ft": 1.54,
+          "raw_value": 1.54,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 19:30",
+          "obs_datetime_local": "2026-7-5 19:30",
+          "stage_ft": 1.54,
+          "raw_value": 1.54,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 19:45",
+          "obs_datetime_local": "2026-7-5 19:45",
+          "stage_ft": 1.54,
+          "raw_value": 1.54,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 20:00",
+          "obs_datetime_local": "2026-7-5 20:00",
+          "stage_ft": 1.54,
+          "raw_value": 1.54,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 20:15",
+          "obs_datetime_local": "2026-7-5 20:15",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 20:30",
+          "obs_datetime_local": "2026-7-5 20:30",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 20:45",
+          "obs_datetime_local": "2026-7-5 20:45",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 21:00",
+          "obs_datetime_local": "2026-7-5 21:00",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 21:15",
+          "obs_datetime_local": "2026-7-5 21:15",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 21:30",
+          "obs_datetime_local": "2026-7-5 21:30",
+          "stage_ft": 1.53,
+          "raw_value": 1.53,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 21:45",
+          "obs_datetime_local": "2026-7-5 21:45",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 22:00",
+          "obs_datetime_local": "2026-7-5 22:00",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 22:15",
+          "obs_datetime_local": "2026-7-5 22:15",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 22:30",
+          "obs_datetime_local": "2026-7-5 22:30",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 22:45",
+          "obs_datetime_local": "2026-7-5 22:45",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 23:00",
+          "obs_datetime_local": "2026-7-5 23:00",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 23:15",
+          "obs_datetime_local": "2026-7-5 23:15",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 23:30",
+          "obs_datetime_local": "2026-7-5 23:30",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-5 23:45",
+          "obs_datetime_local": "2026-7-5 23:45",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 0:00",
+          "obs_datetime_local": "2026-7-6 0:00",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 0:15",
+          "obs_datetime_local": "2026-7-6 0:15",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 0:30",
+          "obs_datetime_local": "2026-7-6 0:30",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 0:45",
+          "obs_datetime_local": "2026-7-6 0:45",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 1:00",
+          "obs_datetime_local": "2026-7-6 1:00",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 1:15",
+          "obs_datetime_local": "2026-7-6 1:15",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 1:30",
+          "obs_datetime_local": "2026-7-6 1:30",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 1:45",
+          "obs_datetime_local": "2026-7-6 1:45",
+          "stage_ft": 1.52,
+          "raw_value": 1.52,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 2:00",
+          "obs_datetime_local": "2026-7-6 2:00",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 2:15",
+          "obs_datetime_local": "2026-7-6 2:15",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 2:30",
+          "obs_datetime_local": "2026-7-6 2:30",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 2:45",
+          "obs_datetime_local": "2026-7-6 2:45",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 3:00",
+          "obs_datetime_local": "2026-7-6 3:00",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 3:15",
+          "obs_datetime_local": "2026-7-6 3:15",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 3:30",
+          "obs_datetime_local": "2026-7-6 3:30",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 3:45",
+          "obs_datetime_local": "2026-7-6 3:45",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 4:00",
+          "obs_datetime_local": "2026-7-6 4:00",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 4:15",
+          "obs_datetime_local": "2026-7-6 4:15",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 4:30",
+          "obs_datetime_local": "2026-7-6 4:30",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 4:45",
+          "obs_datetime_local": "2026-7-6 4:45",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 5:00",
+          "obs_datetime_local": "2026-7-6 5:00",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 5:15",
+          "obs_datetime_local": "2026-7-6 5:15",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 5:30",
+          "obs_datetime_local": "2026-7-6 5:30",
+          "stage_ft": 1.51,
+          "raw_value": 1.51,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 5:45",
+          "obs_datetime_local": "2026-7-6 5:45",
+          "stage_ft": 1.64,
+          "raw_value": 1.64,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 6:00",
+          "obs_datetime_local": "2026-7-6 6:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 6:15",
+          "obs_datetime_local": "2026-7-6 6:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 6:30",
+          "obs_datetime_local": "2026-7-6 6:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 6:45",
+          "obs_datetime_local": "2026-7-6 6:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 7:00",
+          "obs_datetime_local": "2026-7-6 7:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 7:15",
+          "obs_datetime_local": "2026-7-6 7:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 7:30",
+          "obs_datetime_local": "2026-7-6 7:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 7:45",
+          "obs_datetime_local": "2026-7-6 7:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 8:00",
+          "obs_datetime_local": "2026-7-6 8:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 8:15",
+          "obs_datetime_local": "2026-7-6 8:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 8:30",
+          "obs_datetime_local": "2026-7-6 8:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 8:45",
+          "obs_datetime_local": "2026-7-6 8:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 9:00",
+          "obs_datetime_local": "2026-7-6 9:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 9:15",
+          "obs_datetime_local": "2026-7-6 9:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 9:30",
+          "obs_datetime_local": "2026-7-6 9:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 9:45",
+          "obs_datetime_local": "2026-7-6 9:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 10:00",
+          "obs_datetime_local": "2026-7-6 10:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 10:15",
+          "obs_datetime_local": "2026-7-6 10:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 10:30",
+          "obs_datetime_local": "2026-7-6 10:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 10:45",
+          "obs_datetime_local": "2026-7-6 10:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 11:00",
+          "obs_datetime_local": "2026-7-6 11:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 11:15",
+          "obs_datetime_local": "2026-7-6 11:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 11:30",
+          "obs_datetime_local": "2026-7-6 11:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 11:45",
+          "obs_datetime_local": "2026-7-6 11:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 12:00",
+          "obs_datetime_local": "2026-7-6 12:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 12:15",
+          "obs_datetime_local": "2026-7-6 12:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 12:30",
+          "obs_datetime_local": "2026-7-6 12:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 12:45",
+          "obs_datetime_local": "2026-7-6 12:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 13:00",
+          "obs_datetime_local": "2026-7-6 13:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 13:15",
+          "obs_datetime_local": "2026-7-6 13:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 13:30",
+          "obs_datetime_local": "2026-7-6 13:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 13:45",
+          "obs_datetime_local": "2026-7-6 13:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 14:00",
+          "obs_datetime_local": "2026-7-6 14:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 14:15",
+          "obs_datetime_local": "2026-7-6 14:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 14:30",
+          "obs_datetime_local": "2026-7-6 14:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 14:45",
+          "obs_datetime_local": "2026-7-6 14:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 15:00",
+          "obs_datetime_local": "2026-7-6 15:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 15:15",
+          "obs_datetime_local": "2026-7-6 15:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 15:30",
+          "obs_datetime_local": "2026-7-6 15:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 15:45",
+          "obs_datetime_local": "2026-7-6 15:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 16:00",
+          "obs_datetime_local": "2026-7-6 16:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 16:15",
+          "obs_datetime_local": "2026-7-6 16:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 16:30",
+          "obs_datetime_local": "2026-7-6 16:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 16:45",
+          "obs_datetime_local": "2026-7-6 16:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 17:00",
+          "obs_datetime_local": "2026-7-6 17:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 17:15",
+          "obs_datetime_local": "2026-7-6 17:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 17:30",
+          "obs_datetime_local": "2026-7-6 17:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 17:45",
+          "obs_datetime_local": "2026-7-6 17:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 18:00",
+          "obs_datetime_local": "2026-7-6 18:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 18:15",
+          "obs_datetime_local": "2026-7-6 18:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 18:30",
+          "obs_datetime_local": "2026-7-6 18:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 18:45",
+          "obs_datetime_local": "2026-7-6 18:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 19:00",
+          "obs_datetime_local": "2026-7-6 19:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 19:15",
+          "obs_datetime_local": "2026-7-6 19:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 19:30",
+          "obs_datetime_local": "2026-7-6 19:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 19:45",
+          "obs_datetime_local": "2026-7-6 19:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 20:00",
+          "obs_datetime_local": "2026-7-6 20:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 20:15",
+          "obs_datetime_local": "2026-7-6 20:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 20:30",
+          "obs_datetime_local": "2026-7-6 20:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 20:45",
+          "obs_datetime_local": "2026-7-6 20:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 21:00",
+          "obs_datetime_local": "2026-7-6 21:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 21:15",
+          "obs_datetime_local": "2026-7-6 21:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 21:30",
+          "obs_datetime_local": "2026-7-6 21:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 21:45",
+          "obs_datetime_local": "2026-7-6 21:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 22:00",
+          "obs_datetime_local": "2026-7-6 22:00",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 22:15",
+          "obs_datetime_local": "2026-7-6 22:15",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 22:30",
+          "obs_datetime_local": "2026-7-6 22:30",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        },
+        {
+          "datetime_local": "2026-7-6 22:45",
+          "obs_datetime_local": "2026-7-6 22:45",
+          "stage_ft": null,
+          "raw_value": -9999,
+          "data_flag": ""
+        }
+      ]
+    }
+  },
+  "interpretation": [
+    "This is the first reproducible CDEC CBR event-window pull for South Fork modern flow/stage source review.",
+    "The window includes a July 5 pulse near the current median-runnable planning band and lower overnight values, making it useful for time-varying release/low-flow review.",
+    "CDEC -9999 values are retained as raw values, normalized to null, and excluded from summary statistics.",
+    "Before promotion, record CDEC terms, flag meanings, station-to-reach relation, release schedule context, and guide/outfitter validation."
+  ],
+  "promotion_gate": "Do not update South Fork low/median/high presets or photoreal water appearance from this window alone; use it as reproducible modern-flow evidence for the next reviewed flow-band calibration pass."
+}

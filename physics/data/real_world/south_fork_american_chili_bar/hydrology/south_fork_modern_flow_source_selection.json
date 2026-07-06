@@ -3,7 +3,7 @@
   "generated_on": "2026-07-06",
   "river_id": "american_south_fork",
   "section_id": "chili_bar_to_coloma",
-  "status": "cdec_cbr_primary_candidate_identified_review_required",
+  "status": "cdec_cbr_primary_candidate_and_first_event_window_attached_review_required",
   "purpose": "Select a modern official flow/stage source candidate after USGS 11445500 returned no P30D instantaneous discharge or gage-height time series.",
   "usgs_screening": {
     "inactive_or_no_current_series_site": "USGS 11445500 SF AMERICAN R NR LOTUS CA",
@@ -34,25 +34,29 @@
         "role": "primary modern South Fork flow/stage candidate for Chili Bar reach visual-band review",
         "sensors": [
           {
-            "sensor_no": 7640,
+            "sensor_num": 20,
+            "plot_sensor_no": 7640,
             "description": "FLOW, RIVER DISCHARGE",
             "unit": "CFS",
             "duration": "event"
           },
           {
-            "sensor_no": 7638,
+            "sensor_num": 20,
+            "plot_sensor_no": 7638,
             "description": "FLOW, RIVER DISCHARGE",
             "unit": "CFS",
             "duration": "hourly"
           },
           {
-            "sensor_no": 7639,
+            "sensor_num": 1,
+            "plot_sensor_no": 7639,
             "description": "RIVER STAGE",
             "unit": "FEET",
             "duration": "event"
           },
           {
-            "sensor_no": 7637,
+            "sensor_num": 1,
+            "plot_sensor_no": 7637,
             "description": "RIVER STAGE",
             "unit": "FEET",
             "duration": "hourly"
@@ -102,9 +106,32 @@
     "stage_ft_max": 1.96,
     "sample_window_note": "Parsed from the CDEC QueryF latest page on 2026-07-06; use as source-selection evidence only until a formal CSV/JSON pull, QA flags, terms review, and guide validation are attached."
   },
+  "reproducible_cdec_event_window": {
+    "artifact": "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+    "status": "attached_review_required",
+    "flow_sensor_num": 20,
+    "stage_sensor_num": 1,
+    "duration_code": "E",
+    "window": {
+      "start": "2026-07-05T00:00",
+      "end": "2026-07-06T23:59"
+    },
+    "summary": {
+      "flow_cfs_valid_count": 124,
+      "flow_cfs_min": 291.0,
+      "flow_cfs_max": 1649.0,
+      "flow_cfs_median": 304.0,
+      "stage_ft_valid_count": 124,
+      "stage_ft_min": 1.5,
+      "stage_ft_max": 3.99,
+      "stage_ft_median": 1.53,
+      "cdec_no_data_value": -9999,
+      "no_data_normalized_to_null": true
+    }
+  },
   "required_before_flow_band_promotion": [
     "Record CDEC terms/conditions and attribution requirements for downloaded time series and derived gameplay bands.",
-    "Pull a reproducible CBR event/hourly CSV or JSON window with timestamps, units, sensor numbers, and QA/flag meanings.",
+    "Expand the reproducible CBR event/hourly pulls across representative low, commercial, high, and too-low windows with timestamps, units, sensor numbers, and QA/flag meanings.",
     "Compare CBR flow/stage to existing low/median/high presets and guide/outfitter notes for the Chili Bar to Coloma section.",
     "Use A25 powerhouse data only as release-operation context unless hydrologic routing and guide review confirm direct relation to raftable flow at the target reach.",
     "Record how selected flow bands alter holes, exposed rocks, wave trains, wet banks, boulder push/damping, and rescue visibility before Unreal promotion."

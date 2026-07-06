@@ -270,6 +270,10 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
         "guide_and_reference_media_annotations",
     }.issubset(pacuare_p0)
     assert "hydrology/south_fork_modern_flow_source_selection.json" in rivers["american_south_fork"]["attached_preview_inputs"]
+    assert (
+        "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json"
+        in rivers["american_south_fork"]["attached_preview_inputs"]
+    )
     assert "USGS 11445500" in rivers["american_south_fork"]["procedural_generation_allowlist"][2]
     assert "release-band" in rivers["colorado_river"]["procedural_generation_allowlist"][2]
     assert "waterfalls" in rivers["pacuare"]["completion_gate"]

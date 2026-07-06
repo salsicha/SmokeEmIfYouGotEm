@@ -1100,14 +1100,16 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
             },
             {
                 "class_id": "seasonal_flow_or_release_history",
-                "status": "historical_daily_discharge_attached_modern_context_pending",
-                "source_ids": ["usgs_water_services", "noaa_nwps_nwm", "usgs_streamstats"],
+                "status": "historical_daily_discharge_usgs_iv_diagnostic_and_cdec_cbr_window_attached_review_pending",
+                "source_ids": ["usgs_water_services", "cdec_cbr", "cdec_a25_powerhouse_context", "guide_review"],
                 "target_outputs": [
-                    "hydrology/production_import_pilot/usgs_11445500_instantaneous_discharge.json",
-                    "hydrology/production_import_pilot/usgs_11445500_stage.json",
+                    "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+                    "hydrology/south_fork_modern_flow_source_selection.json",
+                    "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+                    "hydrology/production_import_pilot/cdec_terms_flags_and_station_relation_review.json",
                     "hydrology/production_import_pilot/flow_band_review.json",
                 ],
-                "promotion_gate": "Attach modern gauge/release context, stage where available, flow percentiles, and guide review for low/median/high visual variants.",
+                "promotion_gate": "Use CDEC CBR as the primary modern flow/stage candidate after the USGS 11445500 IV diagnostic; attach CDEC terms, flag meanings, broader representative windows, station-to-reach relation, release context, and guide review before low/median/high visual variants are promoted.",
             },
             {
                 "class_id": "protected_area_and_access_context",
@@ -1743,6 +1745,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "hydrology/usgs_11445500_daily_discharge.json",
                     "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
                     "hydrology/south_fork_modern_flow_source_selection.json",
+                    "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
                     "reference_media_link_manifest.json",
                 ],
                 "p0_next_pulls_or_attachments": [
@@ -1760,15 +1763,15 @@ def build_production_environment_gap_register() -> dict[str, object]:
                         "source_class": "seasonal_flow_or_release_history",
                         "required_artifacts": [
                             "hydrology/south_fork_modern_flow_source_selection.json",
-                            "hydrology/production_import_pilot/current_discharge_or_release_series.json",
-                            "hydrology/production_import_pilot/current_stage_or_stage_unavailable_note.json",
+                            "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+                            "hydrology/production_import_pilot/cdec_terms_flags_and_station_relation_review.json",
                             "hydrology/production_import_pilot/flow_band_review.json",
                         ],
                         "source_leads": ["cdec_cbr", "cdec_a25_powerhouse_context", "usgs_water_services", "guide_review"],
                         "promotion_gate": (
-                            "USGS 11445500 returned no P30D instantaneous time series on 2026-07-06, and CDEC CBR is "
-                            "now the primary modern-flow candidate; tie low/median/high visual variants to reproducible "
-                            "CBR time-series pulls, QA/terms review, release context, and guide notes."
+                            "USGS 11445500 returned no P30D instantaneous time series on 2026-07-06, and CDEC CBR now "
+                            "has a first reproducible event-window pull; tie low/median/high visual variants to broader "
+                            "CBR windows, QA/terms/flag review, release context, station-to-reach relation, and guide notes."
                         ),
                     },
                     {
@@ -1984,6 +1987,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 "hydrology/usgs_11445500_daily_discharge.json",
                 "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
                 "hydrology/south_fork_modern_flow_source_selection.json",
+                "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
                 "hydrology/flow_presets.json",
             ],
             "guide_references": [
@@ -3319,6 +3323,7 @@ def _rapid_review_evidence_refs(candidate: RapidCandidate) -> dict[str, object]:
                 "hydrology/usgs_11445500_daily_discharge.json",
                 "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
                 "hydrology/south_fork_modern_flow_source_selection.json",
+                "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
                 "hydrology/flow_presets.json",
             ],
             "source_ids": ["usgs_nwis", "noaa_nwps_nwm", "usgs_streamstats"],

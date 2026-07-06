@@ -465,6 +465,7 @@
             "hydrology/usgs_11445500_daily_discharge.json",
             "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
             "hydrology/south_fork_modern_flow_source_selection.json",
+            "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
             "hydrology/flow_presets.json"
           ],
           "layer_id": "gauge_history",
@@ -671,6 +672,7 @@
             "hydrology/usgs_11445500_daily_discharge.json",
             "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
             "hydrology/south_fork_modern_flow_source_selection.json",
+            "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
             "hydrology/flow_presets.json"
           ],
           "layer_id": "gauge_history",
@@ -876,6 +878,7 @@
             "hydrology/usgs_11445500_daily_discharge.json",
             "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
             "hydrology/south_fork_modern_flow_source_selection.json",
+            "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
             "hydrology/flow_presets.json"
           ],
           "layer_id": "gauge_history",
@@ -1083,6 +1086,7 @@
             "hydrology/usgs_11445500_daily_discharge.json",
             "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
             "hydrology/south_fork_modern_flow_source_selection.json",
+            "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
             "hydrology/flow_presets.json"
           ],
           "layer_id": "gauge_history",
