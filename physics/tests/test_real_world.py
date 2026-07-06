@@ -1638,6 +1638,10 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     }.issubset(set(register["source_classes"]))
     assert {"american_south_fork", "colorado_river", "pacuare"} == set(rivers)
     assert any(lead["source_id"] == "snit_cr_idecori" for lead in register["reviewed_source_leads_2026_07_06"])
+    assert (
+        register["canonical_inputs"]["first_party_procedural_environment_assets"]
+        == "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json"
+    )
     assert any(target["target"] == "water_foam_spray_mist_and_wetness" for target in register["global_visual_replacement_targets"])
 
     south_fork_p0 = {item["source_class"] for item in rivers["american_south_fork"]["p0_next_pulls_or_attachments"]}

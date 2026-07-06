@@ -1,0 +1,226 @@
+{
+  "schema": "raftsim.unreal.first_party_procedural_environment_assets.v1",
+  "generated_on": "2026-07-06",
+  "status": "approved_first_party_procedural_equivalent_recipes_for_preview_to_lifelike_iteration_not_final_art",
+  "purpose": "Define the source-controlled procedural asset and material recipes that can replace proxy river-environment art when licensed or photogrammetry assets are unavailable, while keeping every layer traceable, tunable, and review-gated before lifelike screenshots are claimed.",
+  "policy": {
+    "first_party_geometry_and_materials_allowed": true,
+    "third_party_photos_social_media_and_footage_not_used_as_texture_or_training_sources_without_explicit_rights": true,
+    "source_drapes_masks_heightfields_and_flow_bands_must_be_manifest_recorded": true,
+    "procedural_layers_must_not_hide_hazards_rescue_targets_or_physics_failures": true,
+    "feature_forcing_visuals_must_remain_bounded_manifest_recorded_and_geo_claw_compared_when_physics_affecting": true,
+    "promotion_to_lifelike_requires_unreal_capture_evidence_and_guide_review": true
+  },
+  "required_target_layers": [
+    "canyon_walls_and_valley_banks",
+    "riverbed_and_shallow_shelves",
+    "wet_boulders_and_contact_rocks",
+    "shore_vegetation_and_deadfall",
+    "tropical_canopy_and_understory",
+    "water_surface_depth_turbidity_and_current_cues",
+    "foam_spray_mist_and_waterfalls",
+    "raft_foreground_and_oar_rig_silhouette",
+    "river_specific_lighting_atmosphere_and_camera"
+  ],
+  "unreal_integration": {
+    "generator_source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp",
+    "required_editor_commands": [
+      "RaftSim.CreatePhotorealEnvironmentPreviewMaps",
+      "RaftSim.CapturePhotorealEnvironmentPreviews"
+    ],
+    "capture_manifest_field": "procedural_asset_plan",
+    "default_source_plan": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
+    "default_flow_visual_contract": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
+    "current_renderer_coverage": [
+      "terrain_and_source_drape_vertex_color_variation",
+      "heightfield_and_dem_relief_sampling",
+      "water_and_vegetation_mask_guided_detail_placement",
+      "wet_bank_shore_ribbons",
+      "strata_leaf_litter_wet_rock_and_talus_bands",
+      "mask_biased_boulders_pebbles_foliage_and_understory",
+      "vertex_color_water_gradients",
+      "current_streaks_foam_tongues_wave_highlights_and_eddy_lines",
+      "river_specific_sun_skylight_fog_camera_exposure"
+    ],
+    "missing_renderer_coverage_before_lifelike": [
+      "production_landscape_or_nanite_terrain_material_layers",
+      "photoreal_rock_and_boulder_mesh_variation",
+      "dense_biome_specific_foliage_library_or_instanced_first_party_equivalent",
+      "physically_plausible_water_shader_reflection_refraction_depth_turbidity",
+      "niagara_or_equivalent_spray_mist_foam_particle_layers",
+      "approved_raft_and_oar_foreground_art",
+      "desktop_and_vr_performance_capture_evidence"
+    ]
+  },
+  "global_recipes": [
+    {
+      "recipe_id": "source_conditioned_terrain_bank_materials",
+      "target_layers": [
+        "canyon_walls_and_valley_banks",
+        "riverbed_and_shallow_shelves"
+      ],
+      "current_inputs": [
+        "per-river production-import source_drape_4096.png",
+        "per-river dem_relief_2048.png",
+        "per-river heightfield_candidate_2017.png",
+        "per-river water_mask_2048.png",
+        "per-river vegetation_mask_2048.png",
+        "per-river flow visual band"
+      ],
+      "procedural_method": "Layer terrain vertex colors and procedural mesh geometry from reviewed heightfield, DEM relief, aerial drape, water mask, vegetation mask, wet-bank scale, and deterministic noise; promote to Landscape/Nanite material layers only after CRS, conditioning, channel burning, and guide/geospatial review.",
+      "tunable_parameters": [
+        "bank_material_blend",
+        "wet_edge_width",
+        "gravel_bar_width",
+        "strata_band_spacing",
+        "heightfield_amplitude",
+        "source_drape_weight"
+      ],
+      "promotion_gate": "Must show source-aligned banks, shelves, exposed bars, and wet/dry edges in guide-seat and river-eye captures without covering rescue lines or rapid hazards."
+    },
+    {
+      "recipe_id": "wet_boulder_and_riverbed_contact_set",
+      "target_layers": [
+        "wet_boulders_and_contact_rocks",
+        "riverbed_and_shallow_shelves"
+      ],
+      "current_inputs": [
+        "water mask",
+        "vegetation mask",
+        "DEM relief",
+        "rapid/hazard stationing",
+        "contact geometry export"
+      ],
+      "procedural_method": "Generate first-party rock scale, color, wetness, moss/sediment, and abrasion variants from deterministic masks; keep contact boulders aligned with physics geometry and make wet/dry shoulders visible at flow-dependent waterlines.",
+      "tunable_parameters": [
+        "boulder_density",
+        "wetness_gain",
+        "moss_or_sediment_bias",
+        "contact_rock_scale",
+        "hazard_visibility_clearance"
+      ],
+      "promotion_gate": "Visible rocks must match collision/contact telemetry and remain readable for pins, flips, swims, and rescues."
+    },
+    {
+      "recipe_id": "biome_specific_foliage_and_deadfall",
+      "target_layers": [
+        "shore_vegetation_and_deadfall",
+        "tropical_canopy_and_understory"
+      ],
+      "current_inputs": [
+        "vegetation mask",
+        "water mask",
+        "protected-area/access review",
+        "reference media annotations",
+        "performance scalability budget"
+      ],
+      "procedural_method": "Use PCG or deterministic instancing to place river-specific trees, seedlings, shrubs, grasses, rainforest canopy, roots, deadfall, and leaf litter from masks and station annotations; density must open sightlines at hazards, swimmers, guide commands, and rescue targets.",
+      "tunable_parameters": [
+        "canopy_density",
+        "understory_density",
+        "bank_sightline_cutouts",
+        "deadfall_frequency",
+        "seasonal_color_variation",
+        "nanite_or_instance_budget"
+      ],
+      "promotion_gate": "Capture review must prove the corridor reads as the target biome while preserving water-reading and rescue visibility on desktop and VR settings."
+    },
+    {
+      "recipe_id": "flow_dependent_water_foam_spray_mist",
+      "target_layers": [
+        "water_surface_depth_turbidity_and_current_cues",
+        "foam_spray_mist_and_waterfalls"
+      ],
+      "current_inputs": [
+        "river_flow_visual_bands.json",
+        "solver telemetry or reviewed preview flow band",
+        "feature forcing manifest",
+        "water mask",
+        "rapid feature annotations"
+      ],
+      "procedural_method": "Layer water depth color, turbidity, current streaks, foam tongues, wave-train highlights, eddy lines, hole stickiness cues, lateral spray, waterfall mist, and wet rock response from bounded flow-band parameters and solver-reviewed rapid features.",
+      "tunable_parameters": [
+        "water_level_offset",
+        "foam_density",
+        "current_cue_density",
+        "turbidity",
+        "spray_intensity",
+        "mist_density",
+        "hole_retention_visual_strength"
+      ],
+      "promotion_gate": "Visual water tuning may improve gameplay readability but cannot be used to hide conservation, GeoClaw/C++ parity, raft-coupling, or feature-forcing failures."
+    },
+    {
+      "recipe_id": "guide_seat_raft_foreground_and_lighting",
+      "target_layers": [
+        "raft_foreground_and_oar_rig_silhouette",
+        "river_specific_lighting_atmosphere_and_camera"
+      ],
+      "current_inputs": [
+        "target Unreal preview map",
+        "guide-seat camera",
+        "river-eye camera",
+        "river-specific weather and lighting notes",
+        "capture manifest"
+      ],
+      "procedural_method": "Use first-party raft/oar silhouettes and river-specific sun, skylight, fog, mist, exposure, and color temperature presets for review captures; hide or replace crude placeholder raft parts until production raft art is approved.",
+      "tunable_parameters": [
+        "sun_angle",
+        "sky_intensity",
+        "fog_density",
+        "manual_exposure",
+        "raft_visibility",
+        "oar_rig_readability"
+      ],
+      "promotion_gate": "Guide-seat frames must read like a player view downriver, and river-eye frames must reveal terrain/water quality without placeholder art masking the environment."
+    }
+  ],
+  "river_overrides": [
+    {
+      "river_id": "american_south_fork",
+      "biome": "Sierra foothill mixed riparian granite/metamorphic corridor",
+      "priority_overrides": [
+        "granite_or_metamorphic_boulder_wetness_variants",
+        "foothill_grass_scrub_oak_pine_riparian_mix",
+        "summer_commercial_flow_foam_and_exposed_rock_variants",
+        "access_and_rescue_sightline_cutouts"
+      ],
+      "blocked_until": [
+        "full source corridor conditioning",
+        "guide-reviewed low_median_high flow variants",
+        "rights-reviewed field/reference media"
+      ]
+    },
+    {
+      "river_id": "colorado_river",
+      "biome": "Grand Canyon desert canyon big-water rowing corridor",
+      "priority_overrides": [
+        "layered_canyon_strata_and_talus_breakup",
+        "sandbar_and_wet_bank_release_variants",
+        "sparse_desert_riparian_scrub",
+        "long_big_water_wave_train_and_boils_without_overfoaming"
+      ],
+      "blocked_until": [
+        "accepted river-mile stationing",
+        "release-aware wet-bank and sandbar review",
+        "oarsman and NPS publication-sensitivity review"
+      ]
+    },
+    {
+      "river_id": "pacuare",
+      "biome": "humid tropical rainforest gorge",
+      "priority_overrides": [
+        "dense_canopy_understory_with_rescue_sightline_cutouts",
+        "wet_dark_boulders_moss_leaf_litter_and_talus",
+        "waterfalls_spray_mist_and_cloud_shadow_variants",
+        "rainfed_flow_and_flash-response_visual_states"
+      ],
+      "blocked_until": [
+        "official Costa Rica hydrography/rainfall/flow review",
+        "cloud-screened imagery or permissioned aerial references",
+        "protected-area access and publication clearance"
+      ]
+    }
+  ],
+  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are implemented in production-quality Unreal assets/materials and verified by captures."
+}
