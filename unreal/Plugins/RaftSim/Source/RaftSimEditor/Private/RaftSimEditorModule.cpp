@@ -978,6 +978,40 @@ void AddPreviewFoamAndHydraulics(UWorld* World, const FRaftSimEnvironmentPreview
     }
 }
 
+void AddPreviewWaterSurfaceDetail(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
+{
+    if (!World)
+    {
+        return;
+    }
+
+    const FLinearColor CurrentHighlight = Spec.bDesertCanyon
+        ? FLinearColor(0.38f, 0.31f, 0.21f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.05f, 0.39f, 0.32f) : FLinearColor(0.07f, 0.46f, 0.49f));
+    const FLinearColor CurrentShadow = Spec.bDesertCanyon
+        ? FLinearColor(0.30f, 0.24f, 0.17f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.03f, 0.31f, 0.25f) : FLinearColor(0.04f, 0.36f, 0.39f));
+    const int32 CurrentCount = Spec.bDesertCanyon ? 7 : (Spec.bHasWaterfalls ? 10 : 9);
+    for (int32 CurrentIndex = 0; CurrentIndex < CurrentCount; ++CurrentIndex)
+    {
+        const float X = -2600.0f + static_cast<float>(CurrentIndex) * (26000.0f / FMath::Max(1, CurrentCount));
+        const float Lateral = FMath::Sin(static_cast<float>(CurrentIndex) * 1.37f) * Spec.RiverHalfWidthCm * 0.30f;
+        const float Length = Spec.bDesertCanyon ? 1380.0f : 980.0f;
+        const FLinearColor DetailColor =
+            FMath::Lerp(CurrentShadow, CurrentHighlight, 0.50f + 0.18f * FMath::Sin(static_cast<float>(CurrentIndex) * 0.91f));
+        AddPreviewFoamRibbon(
+            World,
+            Spec,
+            FString::Printf(TEXT("RaftSim_CurrentStreak_%02d_%s"), CurrentIndex, *Spec.RiverId),
+            X,
+            Length,
+            Lateral,
+            9.0f + 3.0f * static_cast<float>(CurrentIndex % 3),
+            static_cast<float>(CurrentIndex) * 0.61f,
+            DetailColor);
+    }
+}
+
 void AddPreviewRaftForeground(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec, UStaticMesh* CubeMesh, UStaticMesh* CylinderMesh)
 {
     if (!World || !CubeMesh || !CylinderMesh)
@@ -1292,6 +1326,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     AddPreviewTerrainMesh(World, Spec, TerrainReliefPtr);
     AddPreviewAerialDrapeTiles(World, Spec, TerrainReliefPtr);
     AddPreviewRiverRibbonMesh(World, Spec);
+    AddPreviewWaterSurfaceDetail(World, Spec);
     AddPreviewRaftForeground(World, Spec, CubeMesh, CylinderMesh);
     AddPreviewFoamAndHydraulics(World, Spec);
 
