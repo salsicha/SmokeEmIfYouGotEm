@@ -1,140 +1,147 @@
 {
-  "schema": "raftsim.south_fork_modern_flow_source_selection.v1",
-  "generated_on": "2026-07-06",
-  "river_id": "american_south_fork",
-  "section_id": "chili_bar_to_coloma",
-  "status": "cdec_cbr_primary_candidate_and_first_event_window_attached_review_required",
-  "purpose": "Select a modern official flow/stage source candidate after USGS 11445500 returned no P30D instantaneous discharge or gage-height time series.",
-  "usgs_screening": {
-    "inactive_or_no_current_series_site": "USGS 11445500 SF AMERICAN R NR LOTUS CA",
-    "diagnostic_artifact": "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
-    "nearby_active_iv_query_url": "https://waterservices.usgs.gov/nwis/site/?format=rdb&bBox=-121.10,38.65,-120.55,38.95&parameterCd=00060&siteStatus=active&hasDataTypeCd=iv",
-    "nearby_active_iv_result": [
-      {
-        "agency": "USGS",
-        "site_no": "11427000",
-        "station_name": "NF AMERICAN R A NORTH FORK DAM CA",
-        "note": "Active IV discharge station found in the broad American River bounding box, but it is North Fork context and not the South Fork Chili Bar corridor."
-      }
-    ]
+  "cdec_cbr_latest_query_summary": {
+    "flow_cfs_max": 455.0,
+    "flow_cfs_min": 294.0,
+    "latest_sample": {
+      "datetime_pdt": "07/06/2026 06:45",
+      "flow_cfs": 338.0,
+      "reservoir_elevation_ft": 994.08,
+      "river_stage_ft": 1.64
+    },
+    "parsed_sample_count": 47,
+    "query_url": "https://cdec.water.ca.gov/dynamicapp/QueryF?s=CBR",
+    "sample_window_note": "Parsed from the CDEC QueryF latest page on 2026-07-06; use as source-selection evidence only until a formal CSV/JSON pull, QA flags, terms review, and guide validation are attached.",
+    "stage_ft_max": 1.96,
+    "stage_ft_min": 1.51,
+    "timezone": "PDT"
   },
   "cdec_station_search": {
-    "provider": "California Data Exchange Center / California Department of Water Resources",
-    "search_url": "https://cdec.water.ca.gov/dynamicapp/staSearch?sta_chk=on&sta=CHILI&active_chk=on&active=Y&display=sta",
     "candidate_stations": [
       {
-        "station_id": "CBR",
-        "station_name": "AMERICAN RIVER AT CHILI BAR",
-        "river_basin": "AMERICAN RIVER",
         "county": "EL DORADO",
+        "elevation_ft": 931,
         "latitude": 38.772,
         "longitude": -120.816,
-        "elevation_ft": 931,
         "metadata_url": "https://cdec.water.ca.gov/dynamicapp/staMeta?station_id=CBR",
+        "river_basin": "AMERICAN RIVER",
         "role": "primary modern South Fork flow/stage candidate for Chili Bar reach visual-band review",
         "sensors": [
           {
-            "sensor_num": 20,
+            "description": "FLOW, RIVER DISCHARGE",
+            "duration": "event",
             "plot_sensor_no": 7640,
-            "description": "FLOW, RIVER DISCHARGE",
-            "unit": "CFS",
-            "duration": "event"
-          },
-          {
             "sensor_num": 20,
-            "plot_sensor_no": 7638,
+            "unit": "CFS"
+          },
+          {
             "description": "FLOW, RIVER DISCHARGE",
-            "unit": "CFS",
-            "duration": "hourly"
+            "duration": "hourly",
+            "plot_sensor_no": 7638,
+            "sensor_num": 20,
+            "unit": "CFS"
           },
           {
-            "sensor_num": 1,
+            "description": "RIVER STAGE",
+            "duration": "event",
             "plot_sensor_no": 7639,
-            "description": "RIVER STAGE",
-            "unit": "FEET",
-            "duration": "event"
+            "sensor_num": 1,
+            "unit": "FEET"
           },
           {
-            "sensor_num": 1,
-            "plot_sensor_no": 7637,
             "description": "RIVER STAGE",
-            "unit": "FEET",
-            "duration": "hourly"
+            "duration": "hourly",
+            "plot_sensor_no": 7637,
+            "sensor_num": 1,
+            "unit": "FEET"
           }
-        ]
+        ],
+        "station_id": "CBR",
+        "station_name": "AMERICAN RIVER AT CHILI BAR"
       },
       {
-        "station_id": "A25",
-        "station_name": "CHILI BAR POWERHOUSE",
-        "river_basin": "AMERICAN RIVER",
         "county": "EL DORADO",
+        "elevation_ft": 1000,
         "latitude": 38.771713,
         "longitude": -120.813286,
-        "elevation_ft": 1000,
         "metadata_url": "https://cdec.water.ca.gov/dynamicapp/staMeta?station_id=A25",
+        "river_basin": "AMERICAN RIVER",
         "role": "secondary powerhouse/operator discharge context; use to interpret release timing, not as the sole river-stage source",
         "sensors": [
           {
-            "sensor_no": 35683,
             "description": "DISCHARGE, POWER GENERATION",
-            "unit": "CFS",
-            "duration": "daily"
+            "duration": "daily",
+            "sensor_no": 35683,
+            "unit": "CFS"
           },
           {
-            "sensor_no": 35684,
             "description": "OUTFLOW, VOLUME",
-            "unit": "AF",
-            "duration": "daily"
+            "duration": "daily",
+            "sensor_no": 35684,
+            "unit": "AF"
           }
-        ]
+        ],
+        "station_id": "A25",
+        "station_name": "CHILI BAR POWERHOUSE"
       }
-    ]
+    ],
+    "provider": "California Data Exchange Center / California Department of Water Resources",
+    "search_url": "https://cdec.water.ca.gov/dynamicapp/staSearch?sta_chk=on&sta=CHILI&active_chk=on&active=Y&display=sta"
   },
-  "cdec_cbr_latest_query_summary": {
-    "query_url": "https://cdec.water.ca.gov/dynamicapp/QueryF?s=CBR",
-    "timezone": "PDT",
-    "parsed_sample_count": 47,
-    "latest_sample": {
-      "datetime_pdt": "07/06/2026 06:45",
-      "river_stage_ft": 1.64,
-      "flow_cfs": 338.0,
-      "reservoir_elevation_ft": 994.08
-    },
-    "flow_cfs_min": 294.0,
-    "flow_cfs_max": 455.0,
-    "stage_ft_min": 1.51,
-    "stage_ft_max": 1.96,
-    "sample_window_note": "Parsed from the CDEC QueryF latest page on 2026-07-06; use as source-selection evidence only until a formal CSV/JSON pull, QA flags, terms review, and guide validation are attached."
-  },
+  "generated_on": "2026-07-06",
+  "promotion_gate": "CBR is the current primary official modern-flow candidate and the first CDEC terms/flag/station relation review is attached, but South Fork visual/gameplay flow bands remain blocked until broader windows, release context, legal/redistribution signoff, hydrologic station-to-reach review, and guide validation are attached.",
+  "purpose": "Select a modern official flow/stage source candidate after USGS 11445500 returned no P30D instantaneous discharge or gage-height time series.",
   "reproducible_cdec_event_window": {
     "artifact": "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
-    "status": "attached_review_required",
+    "duration_code": "E",
     "flow_sensor_num": 20,
     "stage_sensor_num": 1,
-    "duration_code": "E",
-    "window": {
-      "start": "2026-07-05T00:00",
-      "end": "2026-07-06T23:59"
-    },
+    "status": "attached_review_required",
     "summary": {
-      "flow_cfs_valid_count": 124,
-      "flow_cfs_min": 291.0,
+      "cdec_no_data_value": -9999,
       "flow_cfs_max": 1649.0,
       "flow_cfs_median": 304.0,
-      "stage_ft_valid_count": 124,
-      "stage_ft_min": 1.5,
+      "flow_cfs_min": 291.0,
+      "flow_cfs_valid_count": 124,
+      "no_data_normalized_to_null": true,
       "stage_ft_max": 3.99,
       "stage_ft_median": 1.53,
-      "cdec_no_data_value": -9999,
-      "no_data_normalized_to_null": true
+      "stage_ft_min": 1.5,
+      "stage_ft_valid_count": 124
+    },
+    "window": {
+      "end": "2026-07-06T23:59",
+      "start": "2026-07-05T00:00"
     }
   },
   "required_before_flow_band_promotion": [
-    "Record CDEC terms/conditions and attribution requirements for downloaded time series and derived gameplay bands.",
+    "Treat the attached CDEC terms/flags/station relation review as engineering provenance only until legal/redistribution signoff is complete.",
     "Expand the reproducible CBR event/hourly pulls across representative low, commercial, high, and too-low windows with timestamps, units, sensor numbers, and QA/flag meanings.",
     "Compare CBR flow/stage to existing low/median/high presets and guide/outfitter notes for the Chili Bar to Coloma section.",
     "Use A25 powerhouse data only as release-operation context unless hydrologic routing and guide review confirm direct relation to raftable flow at the target reach.",
     "Record how selected flow bands alter holes, exposed rocks, wave trains, wet banks, boulder push/damping, and rescue visibility before Unreal promotion."
   ],
-  "promotion_gate": "CBR is the current primary official modern-flow candidate, but South Fork visual/gameplay flow bands remain review-gated until terms, QA flags, reproducible time-series pulls, and guide validation are attached."
+  "river_id": "american_south_fork",
+  "schema": "raftsim.south_fork_modern_flow_source_selection.v1",
+  "section_id": "chili_bar_to_coloma",
+  "status": "cdec_cbr_primary_candidate_first_window_and_terms_flag_review_attached_promotion_blocked",
+  "terms_flags_station_relation_review": {
+    "artifact": "hydrology/cdec_terms_flags_and_station_relation_review.json",
+    "conditions_of_use_url": "https://water.ca.gov/Conditions-of-Use",
+    "flag_list_url": "https://cdec.water.ca.gov/reportapp/javareports?name=FlagList",
+    "review_summary": "CDEC flag definitions and DWR Conditions of Use are recorded for import provenance; CBR remains review-gated for broader windows, release context, station-to-reach routing, legal/redistribution signoff, and guide validation.",
+    "status": "attached_engineering_review_not_legal_signoff"
+  },
+  "usgs_screening": {
+    "diagnostic_artifact": "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+    "inactive_or_no_current_series_site": "USGS 11445500 SF AMERICAN R NR LOTUS CA",
+    "nearby_active_iv_query_url": "https://waterservices.usgs.gov/nwis/site/?format=rdb&bBox=-121.10,38.65,-120.55,38.95&parameterCd=00060&siteStatus=active&hasDataTypeCd=iv",
+    "nearby_active_iv_result": [
+      {
+        "agency": "USGS",
+        "note": "Active IV discharge station found in the broad American River bounding box, but it is North Fork context and not the South Fork Chili Bar corridor.",
+        "site_no": "11427000",
+        "station_name": "NF AMERICAN R A NORTH FORK DAM CA"
+      }
+    ]
+  }
 }

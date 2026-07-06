@@ -105,8 +105,10 @@ def test_candidate_river_inventory_package_links_primary_source_manifest():
 def test_source_catalog_records_required_categories_and_attribution():
     sources = default_source_catalog()
     categories = {source.category for source in sources}
+    source_ids = {source.source_id for source in sources}
 
     assert {"elevation", "hydrography", "imagery", "gauge", "guide_reference", "field_media"}.issubset(categories)
+    assert {"cdec_cbr", "cdec_a25_powerhouse_context"}.issubset(source_ids)
     assert all(source.license_or_terms for source in sources)
     assert all(source.attribution for source in sources)
 
@@ -129,6 +131,7 @@ def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE in manifest["artifacts"]["source_pulls"]
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE in manifest["artifacts"]["source_pulls"]
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE in manifest["artifacts"]["source_pulls"]
+    assert "hydrology/cdec_terms_flags_and_station_relation_review.json" in manifest["artifacts"]["gauges"]
 
 
 def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_review_gates():
@@ -274,6 +277,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
         "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json"
         in rivers["american_south_fork"]["attached_preview_inputs"]
     )
+    assert "hydrology/cdec_terms_flags_and_station_relation_review.json" in rivers["american_south_fork"]["attached_preview_inputs"]
     assert "USGS 11445500" in rivers["american_south_fork"]["procedural_generation_allowlist"][2]
     assert "release-band" in rivers["colorado_river"]["procedural_generation_allowlist"][2]
     assert "waterfalls" in rivers["pacuare"]["completion_gate"]

@@ -1,181 +1,254 @@
 {
-  "schema": "raftsim.production_source_pull_manifest.v1",
-  "generated_on": "2026-07-06",
-  "river_id": "american_south_fork",
-  "section_id": "chili_bar_to_coloma",
-  "status": "partial_official_source_slice_downloaded",
-  "source_manifest": "source_manifest.json",
   "bounds_wgs84": {
-    "min_lon": -120.9,
-    "min_lat": 38.74,
+    "max_lat": 38.83,
     "max_lon": -120.72,
-    "max_lat": 38.83
+    "min_lat": 38.74,
+    "min_lon": -120.9
   },
-  "sample_bounds_epsg3857": {
-    "xmin": -13458526.4369,
-    "ymin": 4684496.9368,
-    "xmax": -13438488.9286,
-    "ymax": 4697349.7027
-  },
+  "diagnostic_artifacts": [
+    {
+      "artifact_id": "tnm_3dep_dem_products_zero_hit",
+      "category": "terrain_metadata_query",
+      "next_action": "Use the USGS 3DEP ImageServer/WCS or a broader TNM product query for corridor DEM acquisition.",
+      "path": "terrain/tnm_3dep_dem_products.json",
+      "provider": "The National Map",
+      "status": "metadata_query_returned_zero_products",
+      "summary": {
+        "product_count": 0
+      },
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Elevation%20Products%20(3D%20Elevation%20Program%20Products%20and%20Services)&bbox=-120.90,38.74,-120.72,38.83"
+    },
+    {
+      "artifact_id": "tnm_naip_products_zero_hit",
+      "category": "imagery_metadata_query",
+      "next_action": "Use an official NAIP/USDA image service or product index query that returns California orthophoto tiles for the corridor.",
+      "path": "imagery/tnm_naip_products.json",
+      "provider": "The National Map",
+      "status": "metadata_query_returned_zero_products",
+      "summary": {
+        "product_count": 0
+      },
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Imagery%20-%20NAIP%20(1%20meter%20to%20.5%20foot)&bbox=-120.90,38.74,-120.72,38.83"
+    }
+  ],
+  "generated_on": "2026-07-06",
+  "production_blockers": [
+    "Full corridor DEM/lidar tiles are not downloaded or conditioned yet.",
+    "Aerial imagery and water/vegetation masks are not downloaded yet.",
+    "Hydrography products are discovered but not clipped into a reviewed corridor workspace yet.",
+    "Modern release/gauge context, broader CDEC windows, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
+    "No field/social reference media has explicit game-use rights attached yet."
+  ],
   "pulled_artifacts": [
     {
       "artifact_id": "usgs_11445500_daily_discharge",
       "category": "hydrology",
+      "caveats": [
+        "Gauge history is historical, not a current live release feed.",
+        "Current South Fork commercial/release bands still require modern gauge/release context and guide review."
+      ],
       "path": "hydrology/usgs_11445500_daily_discharge.json",
       "provider": "USGS Water Services / NWIS",
-      "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=11445500&parameterCd=00060&startDT=1951-01-01&endDT=1995-12-31",
       "status": "downloaded",
       "summary": {
-        "site": "11445500",
-        "parameter_cd": "00060",
-        "value_count": 16071,
         "first_datetime": "1951-10-01T00:00:00.000",
-        "last_datetime": "1995-09-30T00:00:00.000"
+        "last_datetime": "1995-09-30T00:00:00.000",
+        "parameter_cd": "00060",
+        "site": "11445500",
+        "value_count": 16071
       },
+      "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=11445500&parameterCd=00060&startDT=1951-01-01&endDT=1995-12-31",
       "use": [
         "historical_flow_percentiles",
         "seasonal_flow_band_review",
         "flow_visual_variant_calibration"
-      ],
-      "caveats": [
-        "Gauge history is historical, not a current live release feed.",
-        "Current South Fork commercial/release bands still require modern gauge/release context and guide review."
       ]
     },
     {
       "artifact_id": "usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic",
       "category": "hydrology_availability_diagnostic",
-      "path": "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
-      "provider": "USGS Water Services / NWIS",
-      "url": "https://waterservices.usgs.gov/nwis/iv/?format=json&sites=11445500&parameterCd=00060,00065&period=P30D&siteStatus=all",
-      "status": "source_reached_no_instantaneous_timeseries_returned",
-      "summary": {
-        "site": "11445500",
-        "parameter_cds": ["00060", "00065"],
-        "period": "P30D",
-        "request_dt_utc": "2026-07-06T14:11:02.641Z",
-        "time_series_count": 0
-      },
-      "use": [
-        "modern_flow_source_availability_check",
-        "flow_visual_gate_blocker_documentation",
-        "alternate_source_selection"
-      ],
       "caveats": [
         "This is negative availability evidence, not a modern flow record.",
         "USGS 11445500 returned no instantaneous discharge or gage-height time series for the P30D request on 2026-07-06.",
         "South Fork low/median/high visual and gameplay bands still need current official discharge, stage, release, or guide-validated flow context."
+      ],
+      "path": "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+      "provider": "USGS Water Services / NWIS",
+      "status": "source_reached_no_instantaneous_timeseries_returned",
+      "summary": {
+        "parameter_cds": [
+          "00060",
+          "00065"
+        ],
+        "period": "P30D",
+        "request_dt_utc": "2026-07-06T14:11:02.641Z",
+        "site": "11445500",
+        "time_series_count": 0
+      },
+      "url": "https://waterservices.usgs.gov/nwis/iv/?format=json&sites=11445500&parameterCd=00060,00065&period=P30D&siteStatus=all",
+      "use": [
+        "modern_flow_source_availability_check",
+        "flow_visual_gate_blocker_documentation",
+        "alternate_source_selection"
       ]
     },
     {
       "artifact_id": "south_fork_modern_flow_source_selection",
       "category": "hydrology_source_selection",
+      "caveats": [
+        "CBR is the primary official modern-flow candidate, not a promoted gameplay source yet.",
+        "The first CDEC terms/flag/station relation review is attached, but broader reproducible CSV/JSON pulls, release context, station-to-reach relation, legal/redistribution signoff, and guide/outfitter validation are required before flow bands are changed.",
+        "A25 powerhouse discharge is release-operation context and should not be used alone as raftable river flow without routing and guide review."
+      ],
       "path": "hydrology/south_fork_modern_flow_source_selection.json",
       "provider": "California Data Exchange Center / California Department of Water Resources",
-      "url": "https://cdec.water.ca.gov/dynamicapp/staSearch?sta_chk=on&sta=CHILI&active_chk=on&active=Y&display=sta",
       "status": "official_candidate_identified_review_required",
       "summary": {
-        "primary_candidate_station": "CBR",
-        "primary_candidate_name": "AMERICAN RIVER AT CHILI BAR",
-        "secondary_candidate_station": "A25",
-        "secondary_candidate_name": "CHILI BAR POWERHOUSE",
-        "latest_cbr_sample_datetime_pdt": "07/06/2026 06:45",
         "latest_cbr_flow_cfs": 338.0,
-        "latest_cbr_stage_ft": 1.64
+        "latest_cbr_sample_datetime_pdt": "07/06/2026 06:45",
+        "latest_cbr_stage_ft": 1.64,
+        "primary_candidate_name": "AMERICAN RIVER AT CHILI BAR",
+        "primary_candidate_station": "CBR",
+        "secondary_candidate_name": "CHILI BAR POWERHOUSE",
+        "secondary_candidate_station": "A25"
       },
+      "url": "https://cdec.water.ca.gov/dynamicapp/staSearch?sta_chk=on&sta=CHILI&active_chk=on&active=Y&display=sta",
       "use": [
         "modern_flow_source_selection",
         "future_low_median_high_flow_band_review",
         "release_context_for_visual_and_gameplay_tuning"
-      ],
-      "caveats": [
-        "CBR is the primary official modern-flow candidate, not a promoted gameplay source yet.",
-        "CDEC terms, QA flags, reproducible CSV/JSON pulls, station-to-reach relation, and guide/outfitter validation are required before flow bands are changed.",
-        "A25 powerhouse discharge is release-operation context and should not be used alone as raftable river flow without routing and guide review."
       ]
     },
     {
       "artifact_id": "cdec_cbr_event_flow_stage_2026_07_05_2026_07_06",
       "category": "hydrology_modern_flow_stage_window",
+      "caveats": [
+        "CDEC -9999 values are normalized to null and excluded from statistics.",
+        "The window includes a July 5 pulse near the median-runnable planning band and lower overnight values, but it is not enough to retune flow presets.",
+        "The CDEC terms/flag/station relation review is now attached, but broader representative windows, release schedule context, hydrologic station-to-reach review, legal/redistribution signoff, and guide review are required before promotion."
+      ],
       "path": "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
       "provider": "California Data Exchange Center / California Department of Water Resources",
-      "url": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2026-07-05T00:00&End=2026-07-06T23:59",
       "status": "official_time_series_pulled_review_required",
       "summary": {
-        "station": "CBR",
+        "cdec_no_data_value": -9999,
         "duration_code": "E",
-        "flow_sensor_num": 20,
-        "stage_sensor_num": 1,
-        "flow_valid_sample_count": 124,
-        "flow_min_cfs": 291.0,
         "flow_max_cfs": 1649.0,
         "flow_median_cfs": 304.0,
-        "stage_min_ft": 1.5,
+        "flow_min_cfs": 291.0,
+        "flow_sensor_num": 20,
+        "flow_valid_sample_count": 124,
         "stage_max_ft": 3.99,
         "stage_median_ft": 1.53,
-        "cdec_no_data_value": -9999
+        "stage_min_ft": 1.5,
+        "stage_sensor_num": 1,
+        "station": "CBR"
       },
+      "url": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2026-07-05T00:00&End=2026-07-06T23:59",
       "use": [
         "modern_flow_window_evidence",
         "release_pulse_and_low_flow_visual_review",
         "future_flow_band_calibration"
-      ],
+      ]
+    },
+    {
+      "artifact_id": "cdec_terms_flags_station_relation_review",
+      "category": "hydrology_terms_flags_station_review",
       "caveats": [
-        "CDEC -9999 values are normalized to null and excluded from statistics.",
-        "The window includes a July 5 pulse near the median-runnable planning band and lower overnight values, but it is not enough to retune flow presets.",
-        "CDEC terms, flag meanings, station-to-reach relation, release schedule context, and guide review are required before promotion."
+        "This is engineering source review, not legal signoff.",
+        "The first CBR window has only blank data flags after trimming, but broader windows may include flags requiring pipeline-specific handling.",
+        "The -9999 no-data sentinel is observed and normalized for the current artifact; official universal no-data semantics still require confirmation before broad automation.",
+        "CBR/A25 still need hydrologic routing, release context, and guide/outfitter validation before South Fork visual or gameplay flow bands change."
+      ],
+      "path": "hydrology/cdec_terms_flags_and_station_relation_review.json",
+      "provider": "California Data Exchange Center / California Department of Water Resources",
+      "status": "terms_flags_and_station_relation_review_attached_promotion_still_blocked",
+      "summary": {
+        "conditions_of_use_url": "https://water.ca.gov/Conditions-of-Use",
+        "current_window_unique_flags": [
+          ""
+        ],
+        "flag_codes_recorded": [
+          "",
+          "A",
+          "L",
+          "N",
+          "c",
+          "e",
+          "o",
+          "q",
+          "r",
+          "s",
+          "t",
+          "v"
+        ],
+        "flag_list_url": "https://cdec.water.ca.gov/reportapp/javareports?name=FlagList",
+        "observed_no_data_value": -9999,
+        "old_flaglist_probe_status": "https://cdec.water.ca.gov/misc/flaglist.html returned 404 on 2026-07-06",
+        "station_relation_status": "CBR primary candidate; A25 secondary release-operation context; direct flow-band authority still blocked"
+      },
+      "url": "https://cdec.water.ca.gov/reportapp/javareports?name=FlagList",
+      "use": [
+        "cdec_terms_and_attribution_review",
+        "cdec_flag_semantics_for_import_pipeline",
+        "south_fork_station_relation_gate",
+        "future_flow_band_calibration_prerequisite"
       ]
     },
     {
       "artifact_id": "tnm_nhd_products",
       "category": "hydrography_metadata",
+      "caveats": [
+        "This is product metadata only; selected NHD/3DHP products still need download, clipping, CRS review, and attribution."
+      ],
       "path": "hydrography/tnm_nhd_products.json",
       "provider": "The National Map",
-      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=National%20Hydrography%20Dataset%20(NHD)&bbox=-120.90,38.74,-120.72,38.83",
       "status": "metadata_downloaded",
       "summary": {
-        "product_count": 32,
         "preferred_product_kinds": [
           "National Hydrography Dataset Best Resolution GeoPackage",
           "National Hydrography Dataset Best Resolution FileGDB"
-        ]
+        ],
+        "product_count": 32
       },
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=National%20Hydrography%20Dataset%20(NHD)&bbox=-120.90,38.74,-120.72,38.83",
       "use": [
         "centerline_source_discovery",
         "flowline_alignment",
         "tributary_context"
-      ],
-      "caveats": [
-        "This is product metadata only; selected NHD/3DHP products still need download, clipping, CRS review, and attribution."
       ]
     },
     {
       "artifact_id": "usgs_3dep_chili_bar_sample_256",
       "category": "terrain_sample",
+      "caveats": [
+        "This is a small sample, not a complete production corridor DEM.",
+        "Full corridor terrain still needs reviewed raster tiling, reprojection, hydrologic conditioning, and LFS/package policy."
+      ],
       "path": "terrain/usgs_3dep_chili_bar_sample_256.tif",
       "provider": "USGS 3D Elevation Program ImageServer",
-      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=256%2C256&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
       "status": "sample_downloaded",
       "summary": {
-        "width": 256,
+        "format": "GeoTIFF",
         "height": 256,
         "pixel_type": "F32",
-        "format": "GeoTIFF",
-        "size_bytes": 263322
+        "size_bytes": 263322,
+        "width": 256
       },
+      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=256%2C256&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
       "use": [
         "import_pipeline_smoke_test",
         "terrain_material_and_heightfield_prototype",
         "source-provenance plumbing"
-      ],
-      "caveats": [
-        "This is a small sample, not a complete production corridor DEM.",
-        "Full corridor terrain still needs reviewed raster tiling, reprojection, hydrologic conditioning, and LFS/package policy."
       ]
     },
     {
       "artifact_id": "usgs_3dep_chili_bar_relief_preview_512",
       "category": "derived_terrain_relief_preview",
+      "caveats": [
+        "This is normalized relief from a small sample, not a production heightfield.",
+        "Full corridor terrain still needs reviewed raster tiling, reprojection, hydrologic conditioning, and Unreal landscape import."
+      ],
       "path": "terrain/usgs_3dep_chili_bar_relief_preview_512.png",
       "provider": "RaftSim geospatial preview utility from USGS 3DEP ImageServer sample",
       "source_artifacts": [
@@ -183,72 +256,72 @@
       ],
       "status": "derived_preview_generated",
       "summary": {
-        "width": 512,
-        "height": 512,
         "format": "PNG_L",
-        "processing_manifest": "terrain/usgs_3dep_chili_bar_relief_preview_manifest.json"
+        "height": 512,
+        "processing_manifest": "terrain/usgs_3dep_chili_bar_relief_preview_manifest.json",
+        "width": 512
       },
       "use": [
         "preview-only Unreal bank and valley height perturbation",
         "source-provenance plumbing",
         "terrain import path smoke test"
-      ],
-      "caveats": [
-        "This is normalized relief from a small sample, not a production heightfield.",
-        "Full corridor terrain still needs reviewed raster tiling, reprojection, hydrologic conditioning, and Unreal landscape import."
       ]
     },
     {
       "artifact_id": "usda_naip_chili_bar_sample_512",
       "category": "aerial_imagery_sample",
+      "caveats": [
+        "This is a small sample export, not a complete production orthomosaic corridor.",
+        "Full corridor imagery still needs official tile selection, acquisition-date review, attribution, reprojection, and LFS/package policy."
+      ],
       "path": "imagery/usda_naip_chili_bar_sample_512.png",
       "provider": "USDA/APFO NAIP ImageServer",
-      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=512%2C512&format=png&f=image",
       "status": "sample_downloaded",
       "summary": {
-        "width": 512,
+        "format": "PNG",
         "height": 512,
         "pixel_type": "RGB_U8",
-        "format": "PNG",
-        "size_bytes": 538725
+        "size_bytes": 538725,
+        "width": 512
       },
+      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=512%2C512&format=png&f=image",
       "use": [
         "aerial_reference_smoke_test",
         "vegetation_and_water_mask_prototype",
         "source-provenance plumbing"
-      ],
-      "caveats": [
-        "This is a small sample export, not a complete production orthomosaic corridor.",
-        "Full corridor imagery still needs official tile selection, acquisition-date review, attribution, reprojection, and LFS/package policy."
       ]
     },
     {
       "artifact_id": "usgs_3dep_chili_bar_corridor_sample_512",
       "category": "terrain_corridor_sample",
+      "caveats": [
+        "This is an improved corridor sample export, not a complete production DEM.",
+        "Full corridor terrain still needs reviewed raster tiling, reprojection, hydrologic conditioning, and Unreal landscape import."
+      ],
       "path": "terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
       "provider": "USGS 3D Elevation Program ImageServer",
-      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=512%2C512&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
       "status": "corridor_sample_downloaded",
       "summary": {
-        "width": 512,
+        "format": "GeoTIFF",
         "height": 512,
         "pixel_type": "F32",
-        "format": "GeoTIFF",
-        "size_bytes": 1049850
+        "size_bytes": 1049850,
+        "width": 512
       },
+      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=512%2C512&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
       "use": [
         "larger_preview_terrain_relief_source",
         "heightfield_conditioning_prototype",
         "source-provenance plumbing"
-      ],
-      "caveats": [
-        "This is an improved corridor sample export, not a complete production DEM.",
-        "Full corridor terrain still needs reviewed raster tiling, reprojection, hydrologic conditioning, and Unreal landscape import."
       ]
     },
     {
       "artifact_id": "usgs_3dep_chili_bar_corridor_relief_preview_1024",
       "category": "derived_terrain_relief_preview",
+      "caveats": [
+        "This is normalized relief from a corridor sample, not a production heightfield.",
+        "Full corridor terrain still needs reviewed raster tiling, reprojection, hydrologic conditioning, and Unreal landscape import."
+      ],
       "path": "terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png",
       "provider": "RaftSim geospatial preview utility from larger USGS 3DEP ImageServer corridor sample",
       "source_artifacts": [
@@ -256,25 +329,25 @@
       ],
       "status": "derived_preview_generated",
       "summary": {
-        "width": 1024,
-        "height": 1024,
         "format": "PNG_L",
+        "height": 1024,
+        "processing_manifest": "terrain/usgs_3dep_chili_bar_corridor_relief_preview_manifest.json",
         "size_bytes": 287863,
-        "processing_manifest": "terrain/usgs_3dep_chili_bar_corridor_relief_preview_manifest.json"
+        "width": 1024
       },
       "use": [
         "preview-only Unreal bank and valley height perturbation",
         "larger source-derived terrain readability",
         "terrain import path smoke test"
-      ],
-      "caveats": [
-        "This is normalized relief from a corridor sample, not a production heightfield.",
-        "Full corridor terrain still needs reviewed raster tiling, reprojection, hydrologic conditioning, and Unreal landscape import."
       ]
     },
     {
       "artifact_id": "usgs_3dep_chili_bar_corridor_heightfield_1009",
       "category": "derived_heightfield_candidate",
+      "caveats": [
+        "This is a normalized import candidate for tool testing, not production terrain.",
+        "The source DEM sample is not a complete reviewed corridor DEM and still needs clipping, reprojection, void/artifact review, hydrologic conditioning, river-channel burning, and guide review."
+      ],
       "path": "terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
       "provider": "RaftSim geospatial preview utility from larger USGS 3DEP ImageServer corridor sample",
       "source_artifacts": [
@@ -282,81 +355,55 @@
       ],
       "status": "generated_review_gated_import_candidate",
       "summary": {
-        "width": 1009,
+        "elevation_max_m": 1030.0355224609375,
+        "elevation_min_m": 220.94493103027344,
+        "format": "16-bit grayscale PNG",
         "height": 1009,
         "pixel_type": "U16",
-        "format": "16-bit grayscale PNG",
+        "processing_manifest": "terrain/usgs_3dep_chili_bar_corridor_heightfield_manifest.json",
         "size_bytes": 1435836,
-        "elevation_min_m": 220.94493103027344,
-        "elevation_max_m": 1030.0355224609375,
-        "processing_manifest": "terrain/usgs_3dep_chili_bar_corridor_heightfield_manifest.json"
+        "width": 1009
       },
       "use": [
         "unreal_landscape_import_test",
         "terrain_scale_review",
         "heightfield_conditioning_pipeline_proof"
-      ],
-      "caveats": [
-        "This is a normalized import candidate for tool testing, not production terrain.",
-        "The source DEM sample is not a complete reviewed corridor DEM and still needs clipping, reprojection, void/artifact review, hydrologic conditioning, river-channel burning, and guide review."
       ]
     },
     {
       "artifact_id": "usda_naip_chili_bar_corridor_sample_1024",
       "category": "aerial_imagery_corridor_sample",
+      "caveats": [
+        "This is an improved corridor sample export, not a complete production orthomosaic corridor.",
+        "Full corridor imagery still needs official tile selection, acquisition-date review, attribution, reprojection, and LFS/package policy."
+      ],
       "path": "imagery/usda_naip_chili_bar_corridor_sample_1024.png",
       "provider": "USDA/APFO NAIP ImageServer",
-      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=png&f=image",
       "status": "corridor_sample_downloaded",
       "summary": {
-        "width": 1024,
+        "format": "PNG",
         "height": 1024,
         "pixel_type": "RGB_U8",
-        "format": "PNG",
-        "size_bytes": 1909564
+        "size_bytes": 1909564,
+        "width": 1024
       },
+      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=png&f=image",
       "use": [
         "larger_unreal_source_drape",
         "vegetation_and_water_mask_prototype",
         "source-provenance plumbing"
-      ],
-      "caveats": [
-        "This is an improved corridor sample export, not a complete production orthomosaic corridor.",
-        "Full corridor imagery still needs official tile selection, acquisition-date review, attribution, reprojection, and LFS/package policy."
       ]
     }
   ],
-  "diagnostic_artifacts": [
-    {
-      "artifact_id": "tnm_3dep_dem_products_zero_hit",
-      "category": "terrain_metadata_query",
-      "path": "terrain/tnm_3dep_dem_products.json",
-      "provider": "The National Map",
-      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Elevation%20Products%20(3D%20Elevation%20Program%20Products%20and%20Services)&bbox=-120.90,38.74,-120.72,38.83",
-      "status": "metadata_query_returned_zero_products",
-      "summary": {
-        "product_count": 0
-      },
-      "next_action": "Use the USGS 3DEP ImageServer/WCS or a broader TNM product query for corridor DEM acquisition."
-    },
-    {
-      "artifact_id": "tnm_naip_products_zero_hit",
-      "category": "imagery_metadata_query",
-      "path": "imagery/tnm_naip_products.json",
-      "provider": "The National Map",
-      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Imagery%20-%20NAIP%20(1%20meter%20to%20.5%20foot)&bbox=-120.90,38.74,-120.72,38.83",
-      "status": "metadata_query_returned_zero_products",
-      "summary": {
-        "product_count": 0
-      },
-      "next_action": "Use an official NAIP/USDA image service or product index query that returns California orthophoto tiles for the corridor."
-    }
-  ],
-  "production_blockers": [
-    "Full corridor DEM/lidar tiles are not downloaded or conditioned yet.",
-    "Aerial imagery and water/vegetation masks are not downloaded yet.",
-    "Hydrography products are discovered but not clipped into a reviewed corridor workspace yet.",
-    "Modern release/gauge context and guide review are still required before flow bands are final.",
-    "No field/social reference media has explicit game-use rights attached yet."
-  ]
+  "river_id": "american_south_fork",
+  "sample_bounds_epsg3857": {
+    "xmax": -13438488.9286,
+    "xmin": -13458526.4369,
+    "ymax": 4697349.7027,
+    "ymin": 4684496.9368
+  },
+  "schema": "raftsim.production_source_pull_manifest.v1",
+  "section_id": "chili_bar_to_coloma",
+  "source_manifest": "source_manifest.json",
+  "status": "partial_official_source_slice_downloaded"
 }

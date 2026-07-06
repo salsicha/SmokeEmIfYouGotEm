@@ -65,6 +65,37 @@
       ]
     },
     {
+      "access_notes": "Use as the primary South Fork modern flow/stage candidate only after flag, no-data, station relation, release context, and guide review are attached.",
+      "attribution": "Credit California Data Exchange Center / California Department of Water Resources and record CBR station and sensor numbers.",
+      "category": "gauge",
+      "license_or_terms": "Use under California Department of Water Resources Conditions of Use; preserve station, sensor, timestamp, flag, and retrieval metadata.",
+      "provider": "California Data Exchange Center / California Department of Water Resources",
+      "source_id": "cdec_cbr",
+      "title": "American River at Chili Bar CBR flow and stage",
+      "url": "https://cdec.water.ca.gov/dynamicapp/staMeta?station_id=CBR",
+      "use_in_pipeline": [
+        "modern_flow_stage_window",
+        "flow_band_review",
+        "release_pulse_context",
+        "season_windows"
+      ]
+    },
+    {
+      "access_notes": "Use as release-operation context only unless hydrologic routing and guide review confirm direct relation to raftable reach flow.",
+      "attribution": "Credit California Data Exchange Center / California Department of Water Resources and record A25 station and sensor numbers.",
+      "category": "gauge",
+      "license_or_terms": "Use under California Department of Water Resources Conditions of Use; preserve station, sensor, timestamp, flag, and retrieval metadata.",
+      "provider": "California Data Exchange Center / California Department of Water Resources",
+      "source_id": "cdec_a25_powerhouse_context",
+      "title": "Chili Bar Powerhouse A25 release-operation context",
+      "url": "https://cdec.water.ca.gov/dynamicapp/staMeta?station_id=A25",
+      "use_in_pipeline": [
+        "release_operation_context",
+        "flow_band_review",
+        "season_windows"
+      ]
+    },
+    {
       "access_notes": "Use as forecast/model context, not as sole validation truth for historical runnable bands.",
       "attribution": "Credit NOAA National Water Prediction Service / National Water Model for modeled flow context.",
       "category": "gauge",
@@ -126,38 +157,6 @@
         "bridges",
         "named_features",
         "review_context"
-      ]
-    },
-    {
-      "access_notes": "Use for non-U.S. river basins when no vetted in-repo provider contract exists yet; replace with the authoritative provider and terms before numeric flow bands are promoted.",
-      "attribution": "Record the authoritative Costa Rica provider, retrieval date, station/basin identifiers, and service terms once selected.",
-      "category": "hydrology",
-      "license_or_terms": "Source-specific terms must be reviewed before data is stored or redistributed.",
-      "provider": "Costa Rica hydrology source review",
-      "source_id": "costa_rica_hydrology_gauge_search",
-      "title": "Costa Rica discharge, stage, rainfall, and basin source review",
-      "url": "source_research_required",
-      "use_in_pipeline": [
-        "rain_fed_flow_bands",
-        "rainfall_context",
-        "flash_rise_review",
-        "gauge_history"
-      ]
-    },
-    {
-      "access_notes": "Use for Pacuare access, conservation, protected-area, and source-rights constraints before producing public corridor packages.",
-      "attribution": "Record the responsible Costa Rica protected-area/source authority and required attribution once reviewed.",
-      "category": "protected_area",
-      "license_or_terms": "Source-specific access, conservation, attribution, and redistribution terms must be reviewed before content promotion.",
-      "provider": "SINAC/MINAE source-rights review",
-      "source_id": "sinac_protected_area_review",
-      "title": "Costa Rica protected-area and access source-rights review",
-      "url": "source_research_required",
-      "use_in_pipeline": [
-        "access_constraints",
-        "conservation_context",
-        "source_rights_review",
-        "sensitive_location_redaction"
       ]
     },
     {

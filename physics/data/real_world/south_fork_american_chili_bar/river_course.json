@@ -541,6 +541,18 @@
     "artifacts": {
       "elevation": [
         "terrain/3dep_dem_tiles",
+        "terrain/tnm_3dep_dem_products.json",
+        "terrain/usgs_3dep_chili_bar_sample_256.tif",
+        "terrain/usgs_3dep_chili_bar_relief_preview_512.png",
+        "terrain/usgs_3dep_chili_bar_relief_preview_manifest.json",
+        "terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
+        "terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
+        "terrain/usgs_3dep_chili_bar_corridor_heightfield_manifest.json",
+        "terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png",
+        "terrain/usgs_3dep_chili_bar_corridor_relief_preview_manifest.json",
+        "terrain/production_import_pilot/3dep_tiles",
+        "terrain/production_import_pilot/dem_relief_2048.png",
+        "terrain/production_import_pilot/heightfield_candidate_2017.png",
         "course_elevation_extraction.json",
         "terrain/solver_bed_grid.npy"
       ],
@@ -552,6 +564,7 @@
         "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
         "hydrology/south_fork_modern_flow_source_selection.json",
         "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+        "hydrology/cdec_terms_flags_and_station_relation_review.json",
         "hydrology/flow_presets.json"
       ],
       "guide_references": [
@@ -561,11 +574,23 @@
         "rapid_review_editor_workflow.json"
       ],
       "hydrography": [
+        "hydrography/tnm_nhd_products.json",
         "hydrography/centerline.geojson",
         "hydrography/banks.geojson",
         "hydrography/cross_sections.geojson"
       ],
       "imagery": [
+        "imagery/tnm_naip_products.json",
+        "imagery/usda_naip_chili_bar_sample_512.png",
+        "imagery/usda_naip_chili_bar_corridor_sample_1024.png",
+        "imagery/usda_naip_chili_bar_corridor_water_mask_1024.png",
+        "imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png",
+        "imagery/usda_naip_chili_bar_corridor_masks_manifest.json",
+        "imagery/production_import_pilot/naip_tiles",
+        "imagery/production_import_pilot/source_drape_4096.png",
+        "imagery/production_import_pilot/water_mask_2048.png",
+        "imagery/production_import_pilot/vegetation_mask_2048.png",
+        "imagery/production_import_pilot/source_masks_manifest.json",
         "imagery/naip_tiles",
         "imagery/water_mask.tif",
         "imagery/foam_texture_mask.tif"
@@ -574,6 +599,12 @@
         "scenario/scenario.json",
         "scenario/bed.npy",
         "scenario/initial_state.npz"
+      ],
+      "source_pulls": [
+        "production_source_pull_manifest.json",
+        "production_import_pilot.json",
+        "production_import_pilot_pull_manifest.json",
+        "production_import_pilot_derivatives_manifest.json"
       ],
       "unreal": [
         "unreal/corridor_package_manifest.json"
@@ -607,17 +638,17 @@
       "generated_by": "raftsim.real_world.build_source_manifest",
       "processing_version": "milestone_9_seed.v0",
       "redistribution_notes": "Do not redistribute third-party imagery, guidebook text, or field media unless the manifest records explicit rights.",
-      "review_status": "seed_data_needs_human_geospatial_review"
+      "review_status": "seed_data_with_initial_official_source_slice_needs_human_geospatial_review"
     },
     "remote_fetches": [
       {
         "category": "elevation",
         "fetch_id": "sfa_3dep_dem",
-        "notes": "Representative bounding-box query for DEM discovery; production pull should pick highest-resolution 3DEP/state lidar product with metadata.",
+        "notes": "Representative bounding-box query for DEM discovery; if TNM product metadata is empty, use the official USGS 3DEP ImageServer/WCS path and record the zero-hit query in the production source-pull manifest.",
         "source_id": "usgs_3dep",
         "status": "metadata_ready",
         "target_artifact": "terrain/3dep_dem_tiles",
-        "url": "https://apps.nationalmap.gov/tnmaccess/api/products?datasets=Digital%20Elevation%20Model%20(DEM)&bbox=-120.90,38.74,-120.72,38.83"
+        "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Elevation%20Products%20(3D%20Elevation%20Program%20Products%20and%20Services)&bbox=-120.90,38.74,-120.72,38.83"
       },
       {
         "category": "hydrography",
@@ -640,20 +671,74 @@
       {
         "category": "imagery",
         "fetch_id": "sfa_naip_imagery",
-        "notes": "Use most recent leaf-on/low-shadow NAIP where available, then compare with historic imagery at known gauge values.",
+        "notes": "Use most recent leaf-on/low-shadow NAIP where available, then compare with historic imagery at known gauge values. If TNM product metadata is empty, switch to an official NAIP/USDA image service or index.",
         "source_id": "usda_naip",
         "status": "planned",
         "target_artifact": "imagery/naip_tiles",
-        "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=NAIP%20Plus&bbox=-120.90,38.74,-120.72,38.83"
+        "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Imagery%20-%20NAIP%20(1%20meter%20to%20.5%20foot)&bbox=-120.90,38.74,-120.72,38.83"
+      },
+      {
+        "category": "elevation",
+        "fetch_id": "sfa_3dep_chili_bar_corridor_sample",
+        "notes": "Larger official USGS 3DEP ImageServer export for active Unreal preview relief; still not a complete conditioned corridor DEM.",
+        "source_id": "usgs_3dep",
+        "status": "downloaded",
+        "target_artifact": "terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
+        "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=512%2C512&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image"
+      },
+      {
+        "category": "imagery",
+        "fetch_id": "sfa_naip_chili_bar_corridor_sample",
+        "notes": "Larger official USDA/APFO NAIP ImageServer export for active Unreal preview drape; still not a complete production orthomosaic.",
+        "source_id": "usda_naip",
+        "status": "downloaded",
+        "target_artifact": "imagery/usda_naip_chili_bar_corridor_sample_1024.png",
+        "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=png&f=image"
+      },
+      {
+        "category": "derived_source_masks",
+        "fetch_id": "sfa_naip_chili_bar_corridor_masks",
+        "notes": "Review-gated preview water and vegetation masks generated from the active 1024px USDA/APFO NAIP drape plus a bounded generated-preview channel prior. These masks are sampled by Unreal preview terrain/drape coloring but are not final segmentation, bank polygons, or production masks.",
+        "source_id": "usda_naip_chili_bar_corridor_sample_1024",
+        "status": "generated_review_gated_preview_masks",
+        "target_artifact": "imagery/usda_naip_chili_bar_corridor_water_mask_1024.png; imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png; imagery/usda_naip_chili_bar_corridor_masks_manifest.json",
+        "url": "physics/src/raftsim/geospatial_preview.py"
+      },
+      {
+        "category": "derived_heightfield_candidate",
+        "fetch_id": "sfa_3dep_chili_bar_corridor_heightfield_candidate",
+        "notes": "Review-gated 1009px 16-bit normalized PNG generated from the official USGS 3DEP corridor sample for Unreal Landscape import tests. This is not a complete reviewed corridor DEM, reprojected final terrain, hydrologically conditioned surface, or production Landscape replacement.",
+        "source_id": "usgs_3dep_chili_bar_corridor_sample_512",
+        "status": "generated_review_gated_import_candidate",
+        "target_artifact": "terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
+        "url": "physics/src/raftsim/geospatial_preview.py"
       },
       {
         "category": "gauge",
         "fetch_id": "sfa_nwis_daily_discharge",
-        "notes": "Daily discharge query for preliminary flow percentiles. Add instantaneous values and stage parameter 00065 when building final presets.",
+        "notes": "Historical daily discharge query for preliminary flow percentiles. Add modern gauge/release context, instantaneous values, and stage parameter 00065 when building final presets.",
         "source_id": "usgs_nwis",
-        "status": "metadata_ready",
+        "status": "downloaded",
         "target_artifact": "hydrology/usgs_11445500_daily_discharge.json",
-        "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=11445500&parameterCd=00060&startDT=2000-01-01"
+        "url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=11445500&parameterCd=00060&startDT=1951-01-01&endDT=1995-12-31"
+      },
+      {
+        "category": "gauge",
+        "fetch_id": "sfa_cdec_cbr_event_flow_stage_window",
+        "notes": "First reproducible CDEC CBR event-window flow/stage pull for South Fork modern flow review. Use with the paired stage request and terms/flag review before deriving gameplay bands.",
+        "source_id": "cdec_cbr",
+        "status": "downloaded",
+        "target_artifact": "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+        "url": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2026-07-05T00:00&End=2026-07-06T23:59"
+      },
+      {
+        "category": "gauge",
+        "fetch_id": "sfa_cdec_terms_flags_station_relation_review",
+        "notes": "Records DWR Conditions of Use, CDEC FlagList definitions, API documentation links, and the current CBR/A25 station-to-reach interpretation for review-gated South Fork flow-band promotion.",
+        "source_id": "cdec_cbr",
+        "status": "reviewed",
+        "target_artifact": "hydrology/cdec_terms_flags_and_station_relation_review.json",
+        "url": "https://cdec.water.ca.gov/reportapp/javareports?name=FlagList"
       },
       {
         "category": "gauge",
@@ -741,6 +826,37 @@
           "flow_percentiles",
           "season_windows",
           "gauge_transfer_function"
+        ]
+      },
+      {
+        "access_notes": "Use as the primary South Fork modern flow/stage candidate only after flag, no-data, station relation, release context, and guide review are attached.",
+        "attribution": "Credit California Data Exchange Center / California Department of Water Resources and record CBR station and sensor numbers.",
+        "category": "gauge",
+        "license_or_terms": "Use under California Department of Water Resources Conditions of Use; preserve station, sensor, timestamp, flag, and retrieval metadata.",
+        "provider": "California Data Exchange Center / California Department of Water Resources",
+        "source_id": "cdec_cbr",
+        "title": "American River at Chili Bar CBR flow and stage",
+        "url": "https://cdec.water.ca.gov/dynamicapp/staMeta?station_id=CBR",
+        "use_in_pipeline": [
+          "modern_flow_stage_window",
+          "flow_band_review",
+          "release_pulse_context",
+          "season_windows"
+        ]
+      },
+      {
+        "access_notes": "Use as release-operation context only unless hydrologic routing and guide review confirm direct relation to raftable reach flow.",
+        "attribution": "Credit California Data Exchange Center / California Department of Water Resources and record A25 station and sensor numbers.",
+        "category": "gauge",
+        "license_or_terms": "Use under California Department of Water Resources Conditions of Use; preserve station, sensor, timestamp, flag, and retrieval metadata.",
+        "provider": "California Data Exchange Center / California Department of Water Resources",
+        "source_id": "cdec_a25_powerhouse_context",
+        "title": "Chili Bar Powerhouse A25 release-operation context",
+        "url": "https://cdec.water.ca.gov/dynamicapp/staMeta?station_id=A25",
+        "use_in_pipeline": [
+          "release_operation_context",
+          "flow_band_review",
+          "season_windows"
         ]
       },
       {
