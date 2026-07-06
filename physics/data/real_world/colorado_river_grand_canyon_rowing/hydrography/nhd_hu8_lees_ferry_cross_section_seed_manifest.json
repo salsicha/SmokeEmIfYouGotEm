@@ -1,0 +1,44 @@
+{
+  "caveats": [
+    "Fixed 200 m half-width is intentionally generous for Grand Canyon/Lees Ferry review and does not represent channel width.",
+    "Lines use preview stationing normals and inherit the direction, CRS, and river-mile caveats of the mainstem stationing candidate.",
+    "No imagery, DEM, hydrology, release-band, NPS/GCMRC, or oarsman validation has accepted these seed lines yet."
+  ],
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "source_mainstem_candidate": "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
+    "stationing_candidate": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json"
+  },
+  "output_checksums": {
+    "cross_section_seed_geojson": {
+      "sha256": "1a6978469e60cd07bb7a6d755ae0a79182a9198246bdf2114446f2b03c52a9ce",
+      "size_bytes": 74111
+    }
+  },
+  "outputs": {
+    "cross_section_seed_geojson": "hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson"
+  },
+  "parameters": {
+    "endpoint_policy": "include_final_station_even_when_not_on_interval",
+    "half_width_m_each_side": 200.0,
+    "interval_m": 200.0,
+    "line_total_width_m": 400.0
+  },
+  "promotion_gates": [
+    "Compare each seed line against NAIP water edge, 3DEP terrain relief, visible banks, and release-dependent wet-bank/sandbar exposure before deriving bank polygons.",
+    "Confirm canyon working CRS and river-mile stationing before using these offsets for solver or Unreal geometry.",
+    "Clip, move, delete, or add cross sections in the editor based on oarsman-reviewed lines, eddies, sandbars, side channels, camps/access sensitivity, and rapid-scale features.",
+    "Do not infer wetted width, bank truth, or hazard geometry from these fixed-width seed lines alone."
+  ],
+  "review_status": "seed_candidates_review_required_not_banks_or_cross_sections",
+  "river_id": "colorado_river",
+  "schema": "raftsim.nhd_cross_section_seed_manifest.v0",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "summary": {
+    "feature_count": 123,
+    "first_station_m": 0.0,
+    "last_station_m": 24223.694,
+    "source_station_sample_count": 244,
+    "source_vertex_count": 145
+  }
+}

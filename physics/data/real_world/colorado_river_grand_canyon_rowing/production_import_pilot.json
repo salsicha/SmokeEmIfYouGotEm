@@ -45,13 +45,13 @@
     },
     {
       "class_id": "hydrography_and_centerline",
-      "promotion_gate": "Use the attached stitched NHD HU8 source overlay, exact-graph mainstem candidate, and preview metric stationing as official flowline context, then review the line against visible river edge, river-mile stations, sandbars, eddies, camps/access sensitivity, and oar-line notes before using the data as authoritative gameplay geometry.",
+      "promotion_gate": "Use the attached stitched NHD HU8 source overlay, exact-graph mainstem candidate, and preview metric stationing/cross-section seeds as official flowline context, then review the line against visible river edge, river-mile stations, sandbars, eddies, camps/access sensitivity, and oar-line notes before using the data as authoritative gameplay geometry.",
       "source_ids": [
         "usgs_3dhp_nhd",
         "nps_grand_canyon",
         "gcmrc_or_river_mile_context"
       ],
-      "status": "nhd_hu8_preview_stationing_attached_review_pending",
+      "status": "nhd_hu8_cross_section_seeds_attached_review_pending",
       "target_outputs": [
         "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
         "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
@@ -59,6 +59,8 @@
         "hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
         "hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
         "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+        "hydrography/nhd_hu8_lees_ferry_cross_section_seed_manifest.json",
+        "hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson",
         "hydrography/production_import_pilot/centerline.geojson",
         "hydrography/production_import_pilot/river_mile_markers.geojson",
         "hydrography/production_import_pilot/sandbars.geojson"

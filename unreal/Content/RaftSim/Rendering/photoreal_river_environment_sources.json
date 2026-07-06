@@ -330,6 +330,14 @@
           "unreal_use": "preview metric station samples, downstream tangents, and river-left normal seeds for editor overlays and future cross-section review; not final canyon CRS or production river-mile stationing"
         },
         {
+          "artifact_id": "colorado_nhd_hu8_lees_ferry_cross_section_seed_candidates",
+          "category": "hydrography_cross_section_seed_candidates",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_cross_section_seed_manifest.json; physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson",
+          "provider": "RaftSim cross-section seed utility from Colorado preview stationing normals",
+          "status": "attached_review_gated_not_banks_or_cross_sections",
+          "unreal_use": "fixed-width editor review lines for future bank, sandbar, wet-bank, side-channel, and oarsman annotation work; not accepted banks, channel width, or solver cross sections"
+        },
+        {
           "artifact_id": "usgs_3dep_lees_ferry_sample_256",
           "category": "terrain_sample",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_sample_256.tif",
