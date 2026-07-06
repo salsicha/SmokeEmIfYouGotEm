@@ -1,0 +1,1360 @@
+{
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "bounds_wgs84": {
+      "max_lat": 36.9,
+      "max_lon": -111.54,
+      "min_lat": 36.8,
+      "min_lon": -111.66
+    },
+    "cross_section_seed_candidates": "hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson",
+    "dem_relief": "terrain/production_import_pilot/dem_relief_2048.png",
+    "stationing_candidate": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+    "vegetation_mask": "imagery/production_import_pilot/vegetation_mask_2048.png",
+    "water_mask": "imagery/production_import_pilot/water_mask_2048.png"
+  },
+  "promotion_gates": [
+    "Review low-water or out-of-bounds stations against NAIP, canyon DEM relief, release band, and river-mile context before accepting stationing.",
+    "Replace preview mask sampling with reviewed orthomosaic/DEM/working-CRS sampling before deriving Colorado banks, sandbars, or solver cross sections.",
+    "Use this diagnostic to prioritize manual editor and oarsman review, not to accept or reject geometry automatically."
+  ],
+  "review_flags": {
+    "cross_section_low_center_water_count": 27,
+    "cross_sections_out_of_bounds": [
+      "colorado_nhd_xs_seed_000",
+      "colorado_nhd_xs_seed_001",
+      "colorado_nhd_xs_seed_002",
+      "colorado_nhd_xs_seed_003",
+      "colorado_nhd_xs_seed_004",
+      "colorado_nhd_xs_seed_005",
+      "colorado_nhd_xs_seed_006",
+      "colorado_nhd_xs_seed_007",
+      "colorado_nhd_xs_seed_008",
+      "colorado_nhd_xs_seed_009",
+      "colorado_nhd_xs_seed_010",
+      "colorado_nhd_xs_seed_011",
+      "colorado_nhd_xs_seed_121",
+      "colorado_nhd_xs_seed_122"
+    ],
+    "station_low_water_samples_recorded_count": 56,
+    "station_samples_out_of_bounds_m": [
+      0.0,
+      100.0,
+      200.0,
+      300.0,
+      400.0,
+      500.0,
+      600.0,
+      700.0,
+      800.0,
+      900.0,
+      1000.0,
+      1100.0,
+      1200.0,
+      1300.0,
+      1400.0,
+      1500.0,
+      1600.0,
+      1700.0,
+      1800.0,
+      1900.0,
+      2000.0,
+      2100.0,
+      24100.0,
+      24200.0,
+      24223.694
+    ]
+  },
+  "river_id": "colorado_river",
+  "sample_records": {
+    "cross_sections_periodic_or_low_center_water": [
+      {
+        "center_relief": 0.502,
+        "center_vegetation": 0.0,
+        "center_water": 0.1608,
+        "cross_section_id": "colorado_nhd_xs_seed_014",
+        "left_water": 0.3765,
+        "right_water": 0.0196,
+        "station_m": 2800.0
+      },
+      {
+        "center_relief": 0.4863,
+        "center_vegetation": 0.0431,
+        "center_water": 0.2627,
+        "cross_section_id": "colorado_nhd_xs_seed_015",
+        "left_water": 0.1333,
+        "right_water": 0.0392,
+        "station_m": 3000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.4078,
+        "cross_section_id": "colorado_nhd_xs_seed_020",
+        "left_water": 0.3922,
+        "right_water": 0.0431,
+        "station_m": 4000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.3686,
+        "cross_section_id": "colorado_nhd_xs_seed_025",
+        "left_water": 0.3294,
+        "right_water": 0.2275,
+        "station_m": 5000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.3686,
+        "cross_section_id": "colorado_nhd_xs_seed_030",
+        "left_water": 0.0039,
+        "right_water": 0.3686,
+        "station_m": 6000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.7765,
+        "cross_section_id": "colorado_nhd_xs_seed_035",
+        "left_water": 0.7765,
+        "right_water": 0.7765,
+        "station_m": 7000.0
+      },
+      {
+        "center_relief": 0.4824,
+        "center_vegetation": 0.0,
+        "center_water": 0.7765,
+        "cross_section_id": "colorado_nhd_xs_seed_040",
+        "left_water": 0.7765,
+        "right_water": 0.7765,
+        "station_m": 8000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.4039,
+        "cross_section_id": "colorado_nhd_xs_seed_045",
+        "left_water": 0.2667,
+        "right_water": 0.2353,
+        "station_m": 9000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.4039,
+        "cross_section_id": "colorado_nhd_xs_seed_050",
+        "left_water": 0.3569,
+        "right_water": 0.0824,
+        "station_m": 10000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.4078,
+        "cross_section_id": "colorado_nhd_xs_seed_055",
+        "left_water": 0.1569,
+        "right_water": 0.4941,
+        "station_m": 11000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.7765,
+        "cross_section_id": "colorado_nhd_xs_seed_060",
+        "left_water": 0.7765,
+        "right_water": 0.7765,
+        "station_m": 12000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.3843,
+        "cross_section_id": "colorado_nhd_xs_seed_065",
+        "left_water": 0.0627,
+        "right_water": 0.3608,
+        "station_m": 13000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0078,
+        "center_water": 0.4039,
+        "cross_section_id": "colorado_nhd_xs_seed_070",
+        "left_water": 0.0824,
+        "right_water": 0.0706,
+        "station_m": 14000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0235,
+        "center_water": 0.3529,
+        "cross_section_id": "colorado_nhd_xs_seed_075",
+        "left_water": 0.051,
+        "right_water": 0.0588,
+        "station_m": 15000.0
+      },
+      {
+        "center_relief": 0.4824,
+        "center_vegetation": 0.1137,
+        "center_water": 0.2471,
+        "cross_section_id": "colorado_nhd_xs_seed_079",
+        "left_water": 0.3529,
+        "right_water": 0.0549,
+        "station_m": 15800.0
+      },
+      {
+        "center_relief": 0.4784,
+        "center_vegetation": 0.0,
+        "center_water": 0.502,
+        "cross_section_id": "colorado_nhd_xs_seed_080",
+        "left_water": 0.5647,
+        "right_water": 0.4235,
+        "station_m": 16000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0235,
+        "center_water": 0.7765,
+        "cross_section_id": "colorado_nhd_xs_seed_085",
+        "left_water": 0.7765,
+        "right_water": 0.7765,
+        "station_m": 17000.0
+      },
+      {
+        "center_relief": 0.4902,
+        "center_vegetation": 0.0,
+        "center_water": 0.7294,
+        "cross_section_id": "colorado_nhd_xs_seed_090",
+        "left_water": 0.5843,
+        "right_water": 0.7765,
+        "station_m": 18000.0
+      },
+      {
+        "center_relief": 0.498,
+        "center_vegetation": 0.0,
+        "center_water": 0.1333,
+        "cross_section_id": "colorado_nhd_xs_seed_092",
+        "left_water": 0.051,
+        "right_water": 0.1176,
+        "station_m": 18400.0
+      },
+      {
+        "center_relief": 0.4627,
+        "center_vegetation": 0.0431,
+        "center_water": 0.2784,
+        "cross_section_id": "colorado_nhd_xs_seed_094",
+        "left_water": 0.051,
+        "right_water": 0.0353,
+        "station_m": 18800.0
+      },
+      {
+        "center_relief": 0.4784,
+        "center_vegetation": 0.0,
+        "center_water": 0.3569,
+        "cross_section_id": "colorado_nhd_xs_seed_095",
+        "left_water": 0.0549,
+        "right_water": 0.0902,
+        "station_m": 19000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.1804,
+        "center_water": 0.1922,
+        "cross_section_id": "colorado_nhd_xs_seed_098",
+        "left_water": 0.1529,
+        "right_water": 0.0667,
+        "station_m": 19600.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.3176,
+        "center_water": 0.2275,
+        "cross_section_id": "colorado_nhd_xs_seed_099",
+        "left_water": 0.1569,
+        "right_water": 0.0078,
+        "station_m": 19800.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.3569,
+        "cross_section_id": "colorado_nhd_xs_seed_100",
+        "left_water": 0.1255,
+        "right_water": 0.1176,
+        "station_m": 20000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.349,
+        "cross_section_id": "colorado_nhd_xs_seed_101",
+        "left_water": 0.102,
+        "right_water": 0.0,
+        "station_m": 20200.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.3451,
+        "cross_section_id": "colorado_nhd_xs_seed_102",
+        "left_water": 0.0902,
+        "right_water": 0.0471,
+        "station_m": 20400.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.349,
+        "cross_section_id": "colorado_nhd_xs_seed_103",
+        "left_water": 0.0784,
+        "right_water": 0.0471,
+        "station_m": 20600.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.3608,
+        "center_water": 0.2078,
+        "cross_section_id": "colorado_nhd_xs_seed_104",
+        "left_water": 0.1098,
+        "right_water": 0.0,
+        "station_m": 20800.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.3412,
+        "cross_section_id": "colorado_nhd_xs_seed_105",
+        "left_water": 0.0824,
+        "right_water": 0.0275,
+        "station_m": 21000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.3373,
+        "cross_section_id": "colorado_nhd_xs_seed_106",
+        "left_water": 0.051,
+        "right_water": 0.0902,
+        "station_m": 21200.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.3373,
+        "cross_section_id": "colorado_nhd_xs_seed_107",
+        "left_water": 0.0549,
+        "right_water": 0.0196,
+        "station_m": 21400.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.3333,
+        "cross_section_id": "colorado_nhd_xs_seed_108",
+        "left_water": 0.0902,
+        "right_water": 0.0157,
+        "station_m": 21600.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.3412,
+        "cross_section_id": "colorado_nhd_xs_seed_109",
+        "left_water": 0.0275,
+        "right_water": 0.051,
+        "station_m": 21800.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.3451,
+        "center_water": 0.1961,
+        "cross_section_id": "colorado_nhd_xs_seed_110",
+        "left_water": 0.3333,
+        "right_water": 0.0706,
+        "station_m": 22000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.2824,
+        "center_water": 0.1569,
+        "cross_section_id": "colorado_nhd_xs_seed_111",
+        "left_water": 0.051,
+        "right_water": 0.0353,
+        "station_m": 22200.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.3098,
+        "center_water": 0.1608,
+        "cross_section_id": "colorado_nhd_xs_seed_112",
+        "left_water": 0.051,
+        "right_water": 0.0588,
+        "station_m": 22400.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.3294,
+        "cross_section_id": "colorado_nhd_xs_seed_113",
+        "left_water": 0.0941,
+        "right_water": 0.0196,
+        "station_m": 22600.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.2745,
+        "center_water": 0.1647,
+        "cross_section_id": "colorado_nhd_xs_seed_114",
+        "left_water": 0.1765,
+        "right_water": 0.0118,
+        "station_m": 22800.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.3294,
+        "cross_section_id": "colorado_nhd_xs_seed_115",
+        "left_water": 0.1608,
+        "right_water": 0.0157,
+        "station_m": 23000.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0,
+        "center_water": 0.3176,
+        "cross_section_id": "colorado_nhd_xs_seed_116",
+        "left_water": 0.2157,
+        "right_water": 0.0431,
+        "station_m": 23200.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.0235,
+        "center_water": 0.2706,
+        "cross_section_id": "colorado_nhd_xs_seed_117",
+        "left_water": 0.302,
+        "right_water": 0.0275,
+        "station_m": 23400.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.2667,
+        "center_water": 0.149,
+        "cross_section_id": "colorado_nhd_xs_seed_118",
+        "left_water": 0.302,
+        "right_water": 0.0902,
+        "station_m": 23600.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.2745,
+        "center_water": 0.1686,
+        "cross_section_id": "colorado_nhd_xs_seed_119",
+        "left_water": 0.2902,
+        "right_water": 0.0196,
+        "station_m": 23800.0
+      },
+      {
+        "center_relief": 0.502,
+        "center_vegetation": 0.0,
+        "center_water": 0.2196,
+        "cross_section_id": "colorado_nhd_xs_seed_120",
+        "left_water": 0.1765,
+        "right_water": 0.0588,
+        "station_m": 24000.0
+      }
+    ],
+    "station_samples_every_1000m_or_low_water": [
+      {
+        "lat": 36.877097,
+        "lon": -111.5455354,
+        "pixel_x": 1953,
+        "pixel_y": 469,
+        "relief": 0.4667,
+        "sample_index": 27,
+        "station_m": 2700.0,
+        "vegetation": 0.0,
+        "water": 0.2275
+      },
+      {
+        "lat": 36.8765893,
+        "lon": -111.5464615,
+        "pixel_x": 1937,
+        "pixel_y": 479,
+        "relief": 0.502,
+        "sample_index": 28,
+        "station_m": 2800.0,
+        "vegetation": 0.0,
+        "water": 0.1608
+      },
+      {
+        "lat": 36.8760184,
+        "lon": -111.5473278,
+        "pixel_x": 1922,
+        "pixel_y": 491,
+        "relief": 0.4902,
+        "sample_index": 29,
+        "station_m": 2900.0,
+        "vegetation": 0.2078,
+        "water": 0.2314
+      },
+      {
+        "lat": 36.8754389,
+        "lon": -111.5481859,
+        "pixel_x": 1907,
+        "pixel_y": 503,
+        "relief": 0.4863,
+        "sample_index": 30,
+        "station_m": 3000.0,
+        "vegetation": 0.0431,
+        "water": 0.2627
+      },
+      {
+        "lat": 36.87485,
+        "lon": -111.5490334,
+        "pixel_x": 1893,
+        "pixel_y": 515,
+        "relief": 0.4902,
+        "sample_index": 31,
+        "station_m": 3100.0,
+        "vegetation": 0.051,
+        "water": 0.0549
+      },
+      {
+        "lat": 36.8741268,
+        "lon": -111.5580162,
+        "pixel_x": 1740,
+        "pixel_y": 530,
+        "relief": 0.5059,
+        "sample_index": 40,
+        "station_m": 4000.0,
+        "vegetation": 0.0,
+        "water": 0.4078
+      },
+      {
+        "lat": 36.8715321,
+        "lon": -111.5665247,
+        "pixel_x": 1595,
+        "pixel_y": 583,
+        "relief": 0.5059,
+        "sample_index": 50,
+        "station_m": 5000.0,
+        "vegetation": 0.0,
+        "water": 0.3686
+      },
+      {
+        "lat": 36.8641476,
+        "lon": -111.5607508,
+        "pixel_x": 1693,
+        "pixel_y": 734,
+        "relief": 0.5059,
+        "sample_index": 60,
+        "station_m": 6000.0,
+        "vegetation": 0.0,
+        "water": 0.3686
+      },
+      {
+        "lat": 36.8574226,
+        "lon": -111.5534934,
+        "pixel_x": 1817,
+        "pixel_y": 872,
+        "relief": 0.5059,
+        "sample_index": 70,
+        "station_m": 7000.0,
+        "vegetation": 0.0,
+        "water": 0.7765
+      },
+      {
+        "lat": 36.8512993,
+        "lon": -111.5452767,
+        "pixel_x": 1957,
+        "pixel_y": 997,
+        "relief": 0.4824,
+        "sample_index": 80,
+        "station_m": 8000.0,
+        "vegetation": 0.0,
+        "water": 0.7765
+      },
+      {
+        "lat": 36.8440019,
+        "lon": -111.546717,
+        "pixel_x": 1932,
+        "pixel_y": 1146,
+        "relief": 0.5059,
+        "sample_index": 90,
+        "station_m": 9000.0,
+        "vegetation": 0.0,
+        "water": 0.4039
+      },
+      {
+        "lat": 36.8441923,
+        "lon": -111.5573516,
+        "pixel_x": 1751,
+        "pixel_y": 1142,
+        "relief": 0.5059,
+        "sample_index": 100,
+        "station_m": 10000.0,
+        "vegetation": 0.0,
+        "water": 0.4039
+      },
+      {
+        "lat": 36.842884,
+        "lon": -111.5681833,
+        "pixel_x": 1566,
+        "pixel_y": 1169,
+        "relief": 0.5059,
+        "sample_index": 110,
+        "station_m": 11000.0,
+        "vegetation": 0.0,
+        "water": 0.4078
+      },
+      {
+        "lat": 36.8499335,
+        "lon": -111.5739764,
+        "pixel_x": 1467,
+        "pixel_y": 1025,
+        "relief": 0.5059,
+        "sample_index": 120,
+        "station_m": 12000.0,
+        "vegetation": 0.0,
+        "water": 0.7765
+      },
+      {
+        "lat": 36.8583648,
+        "lon": -111.5775378,
+        "pixel_x": 1407,
+        "pixel_y": 852,
+        "relief": 0.5059,
+        "sample_index": 130,
+        "station_m": 13000.0,
+        "vegetation": 0.0,
+        "water": 0.3843
+      },
+      {
+        "lat": 36.8650981,
+        "lon": -111.5824936,
+        "pixel_x": 1322,
+        "pixel_y": 714,
+        "relief": 0.5059,
+        "sample_index": 140,
+        "station_m": 14000.0,
+        "vegetation": 0.0078,
+        "water": 0.4039
+      },
+      {
+        "lat": 36.8626388,
+        "lon": -111.5914093,
+        "pixel_x": 1170,
+        "pixel_y": 765,
+        "relief": 0.5059,
+        "sample_index": 149,
+        "station_m": 14900.0,
+        "vegetation": 0.0,
+        "water": 0.349
+      },
+      {
+        "lat": 36.8619334,
+        "lon": -111.5921057,
+        "pixel_x": 1158,
+        "pixel_y": 779,
+        "relief": 0.5059,
+        "sample_index": 150,
+        "station_m": 15000.0,
+        "vegetation": 0.0235,
+        "water": 0.3529
+      },
+      {
+        "lat": 36.8605263,
+        "lon": -111.5949639,
+        "pixel_x": 1109,
+        "pixel_y": 808,
+        "relief": 0.5059,
+        "sample_index": 153,
+        "station_m": 15300.0,
+        "vegetation": 0.0431,
+        "water": 0.3294
+      },
+      {
+        "lat": 36.8585434,
+        "lon": -111.5999954,
+        "pixel_x": 1024,
+        "pixel_y": 849,
+        "relief": 0.4824,
+        "sample_index": 158,
+        "station_m": 15800.0,
+        "vegetation": 0.1137,
+        "water": 0.2471
+      },
+      {
+        "lat": 36.8574016,
+        "lon": -111.6016317,
+        "pixel_x": 996,
+        "pixel_y": 872,
+        "relief": 0.4784,
+        "sample_index": 160,
+        "station_m": 16000.0,
+        "vegetation": 0.0,
+        "water": 0.502
+      },
+      {
+        "lat": 36.8503039,
+        "lon": -111.6084386,
+        "pixel_x": 880,
+        "pixel_y": 1017,
+        "relief": 0.5059,
+        "sample_index": 170,
+        "station_m": 17000.0,
+        "vegetation": 0.0235,
+        "water": 0.7765
+      },
+      {
+        "lat": 36.8462818,
+        "lon": -111.6167452,
+        "pixel_x": 738,
+        "pixel_y": 1100,
+        "relief": 0.4902,
+        "sample_index": 180,
+        "station_m": 18000.0,
+        "vegetation": 0.0,
+        "water": 0.7294
+      },
+      {
+        "lat": 36.8436303,
+        "lon": -111.6173772,
+        "pixel_x": 727,
+        "pixel_y": 1154,
+        "relief": 0.4902,
+        "sample_index": 183,
+        "station_m": 18300.0,
+        "vegetation": 0.1098,
+        "water": 0.2627
+      },
+      {
+        "lat": 36.8427411,
+        "lon": -111.6175305,
+        "pixel_x": 724,
+        "pixel_y": 1172,
+        "relief": 0.498,
+        "sample_index": 184,
+        "station_m": 18400.0,
+        "vegetation": 0.0,
+        "water": 0.1333
+      },
+      {
+        "lat": 36.8418417,
+        "lon": -111.6175625,
+        "pixel_x": 724,
+        "pixel_y": 1191,
+        "relief": 0.5059,
+        "sample_index": 185,
+        "station_m": 18500.0,
+        "vegetation": 0.0,
+        "water": 0.3451
+      },
+      {
+        "lat": 36.8392111,
+        "lon": -111.6169488,
+        "pixel_x": 734,
+        "pixel_y": 1244,
+        "relief": 0.4627,
+        "sample_index": 188,
+        "station_m": 18800.0,
+        "vegetation": 0.0431,
+        "water": 0.2784
+      },
+      {
+        "lat": 36.8374241,
+        "lon": -111.6168213,
+        "pixel_x": 737,
+        "pixel_y": 1281,
+        "relief": 0.4784,
+        "sample_index": 190,
+        "station_m": 19000.0,
+        "vegetation": 0.0,
+        "water": 0.3569
+      },
+      {
+        "lat": 36.8335857,
+        "lon": -111.6191178,
+        "pixel_x": 697,
+        "pixel_y": 1360,
+        "relief": 0.5059,
+        "sample_index": 195,
+        "station_m": 19500.0,
+        "vegetation": 0.0078,
+        "water": 0.3333
+      },
+      {
+        "lat": 36.8331374,
+        "lon": -111.6200892,
+        "pixel_x": 681,
+        "pixel_y": 1369,
+        "relief": 0.5059,
+        "sample_index": 196,
+        "station_m": 19600.0,
+        "vegetation": 0.1804,
+        "water": 0.1922
+      },
+      {
+        "lat": 36.8325538,
+        "lon": -111.620943,
+        "pixel_x": 666,
+        "pixel_y": 1381,
+        "relief": 0.5059,
+        "sample_index": 197,
+        "station_m": 19700.0,
+        "vegetation": 0.3176,
+        "water": 0.2275
+      },
+      {
+        "lat": 36.8320316,
+        "lon": -111.6218469,
+        "pixel_x": 651,
+        "pixel_y": 1391,
+        "relief": 0.5059,
+        "sample_index": 198,
+        "station_m": 19800.0,
+        "vegetation": 0.3176,
+        "water": 0.2275
+      },
+      {
+        "lat": 36.8307139,
+        "lon": -111.6233408,
+        "pixel_x": 625,
+        "pixel_y": 1418,
+        "relief": 0.5059,
+        "sample_index": 200,
+        "station_m": 20000.0,
+        "vegetation": 0.0,
+        "water": 0.3569
+      },
+      {
+        "lat": 36.8300169,
+        "lon": -111.6240503,
+        "pixel_x": 613,
+        "pixel_y": 1433,
+        "relief": 0.5059,
+        "sample_index": 201,
+        "station_m": 20100.0,
+        "vegetation": 0.0,
+        "water": 0.3451
+      },
+      {
+        "lat": 36.8293199,
+        "lon": -111.6247597,
+        "pixel_x": 601,
+        "pixel_y": 1447,
+        "relief": 0.5059,
+        "sample_index": 202,
+        "station_m": 20200.0,
+        "vegetation": 0.0,
+        "water": 0.349
+      },
+      {
+        "lat": 36.8286191,
+        "lon": -111.6254632,
+        "pixel_x": 589,
+        "pixel_y": 1461,
+        "relief": 0.5059,
+        "sample_index": 203,
+        "station_m": 20300.0,
+        "vegetation": 0.0,
+        "water": 0.3451
+      },
+      {
+        "lat": 36.8279519,
+        "lon": -111.6262138,
+        "pixel_x": 576,
+        "pixel_y": 1475,
+        "relief": 0.5059,
+        "sample_index": 204,
+        "station_m": 20400.0,
+        "vegetation": 0.0,
+        "water": 0.3451
+      },
+      {
+        "lat": 36.8271645,
+        "lon": -111.6266974,
+        "pixel_x": 568,
+        "pixel_y": 1491,
+        "relief": 0.5059,
+        "sample_index": 205,
+        "station_m": 20500.0,
+        "vegetation": 0.0,
+        "water": 0.349
+      },
+      {
+        "lat": 36.826333,
+        "lon": -111.6271196,
+        "pixel_x": 561,
+        "pixel_y": 1508,
+        "relief": 0.5059,
+        "sample_index": 206,
+        "station_m": 20600.0,
+        "vegetation": 0.0,
+        "water": 0.349
+      },
+      {
+        "lat": 36.8255188,
+        "lon": -111.6275971,
+        "pixel_x": 553,
+        "pixel_y": 1525,
+        "relief": 0.5059,
+        "sample_index": 207,
+        "station_m": 20700.0,
+        "vegetation": 0.3294,
+        "water": 0.2196
+      },
+      {
+        "lat": 36.824743,
+        "lon": -111.6281495,
+        "pixel_x": 543,
+        "pixel_y": 1541,
+        "relief": 0.5059,
+        "sample_index": 208,
+        "station_m": 20800.0,
+        "vegetation": 0.3608,
+        "water": 0.2078
+      },
+      {
+        "lat": 36.8238861,
+        "lon": -111.6284845,
+        "pixel_x": 538,
+        "pixel_y": 1558,
+        "relief": 0.5059,
+        "sample_index": 209,
+        "station_m": 20900.0,
+        "vegetation": 0.3725,
+        "water": 0.2157
+      },
+      {
+        "lat": 36.8230086,
+        "lon": -111.6287321,
+        "pixel_x": 533,
+        "pixel_y": 1576,
+        "relief": 0.5059,
+        "sample_index": 210,
+        "station_m": 21000.0,
+        "vegetation": 0.0,
+        "water": 0.3412
+      },
+      {
+        "lat": 36.8221163,
+        "lon": -111.6288568,
+        "pixel_x": 531,
+        "pixel_y": 1594,
+        "relief": 0.5059,
+        "sample_index": 211,
+        "station_m": 21100.0,
+        "vegetation": 0.0,
+        "water": 0.349
+      },
+      {
+        "lat": 36.8212603,
+        "lon": -111.6291477,
+        "pixel_x": 526,
+        "pixel_y": 1612,
+        "relief": 0.5059,
+        "sample_index": 212,
+        "station_m": 21200.0,
+        "vegetation": 0.0,
+        "water": 0.3373
+      },
+      {
+        "lat": 36.8204321,
+        "lon": -111.6295862,
+        "pixel_x": 519,
+        "pixel_y": 1629,
+        "relief": 0.5059,
+        "sample_index": 213,
+        "station_m": 21300.0,
+        "vegetation": 0.0,
+        "water": 0.3373
+      },
+      {
+        "lat": 36.8196039,
+        "lon": -111.6300247,
+        "pixel_x": 511,
+        "pixel_y": 1646,
+        "relief": 0.5059,
+        "sample_index": 214,
+        "station_m": 21400.0,
+        "vegetation": 0.0,
+        "water": 0.3373
+      },
+      {
+        "lat": 36.8187757,
+        "lon": -111.6304632,
+        "pixel_x": 504,
+        "pixel_y": 1663,
+        "relief": 0.5059,
+        "sample_index": 215,
+        "station_m": 21500.0,
+        "vegetation": 0.0,
+        "water": 0.3373
+      },
+      {
+        "lat": 36.8179594,
+        "lon": -111.6309328,
+        "pixel_x": 496,
+        "pixel_y": 1679,
+        "relief": 0.5059,
+        "sample_index": 216,
+        "station_m": 21600.0,
+        "vegetation": 0.0,
+        "water": 0.3333
+      },
+      {
+        "lat": 36.8171662,
+        "lon": -111.6314624,
+        "pixel_x": 487,
+        "pixel_y": 1696,
+        "relief": 0.5059,
+        "sample_index": 217,
+        "station_m": 21700.0,
+        "vegetation": 0.0078,
+        "water": 0.0
+      },
+      {
+        "lat": 36.8163731,
+        "lon": -111.6319921,
+        "pixel_x": 478,
+        "pixel_y": 1712,
+        "relief": 0.5059,
+        "sample_index": 218,
+        "station_m": 21800.0,
+        "vegetation": 0.0,
+        "water": 0.3412
+      },
+      {
+        "lat": 36.8155799,
+        "lon": -111.6325218,
+        "pixel_x": 469,
+        "pixel_y": 1728,
+        "relief": 0.5059,
+        "sample_index": 219,
+        "station_m": 21900.0,
+        "vegetation": 0.3451,
+        "water": 0.2
+      },
+      {
+        "lat": 36.8147867,
+        "lon": -111.6330515,
+        "pixel_x": 460,
+        "pixel_y": 1744,
+        "relief": 0.5059,
+        "sample_index": 220,
+        "station_m": 22000.0,
+        "vegetation": 0.3451,
+        "water": 0.1961
+      },
+      {
+        "lat": 36.8139404,
+        "lon": -111.6334233,
+        "pixel_x": 453,
+        "pixel_y": 1762,
+        "relief": 0.5059,
+        "sample_index": 221,
+        "station_m": 22100.0,
+        "vegetation": 0.3176,
+        "water": 0.1765
+      },
+      {
+        "lat": 36.8130815,
+        "lon": -111.6337577,
+        "pixel_x": 448,
+        "pixel_y": 1779,
+        "relief": 0.5059,
+        "sample_index": 222,
+        "station_m": 22200.0,
+        "vegetation": 0.2824,
+        "water": 0.1569
+      },
+      {
+        "lat": 36.8122153,
+        "lon": -111.6340579,
+        "pixel_x": 443,
+        "pixel_y": 1797,
+        "relief": 0.5059,
+        "sample_index": 223,
+        "station_m": 22300.0,
+        "vegetation": 0.3098,
+        "water": 0.1608
+      },
+      {
+        "lat": 36.8113364,
+        "lon": -111.6342983,
+        "pixel_x": 438,
+        "pixel_y": 1815,
+        "relief": 0.5059,
+        "sample_index": 224,
+        "station_m": 22400.0,
+        "vegetation": 0.3098,
+        "water": 0.1608
+      },
+      {
+        "lat": 36.8104575,
+        "lon": -111.6345387,
+        "pixel_x": 434,
+        "pixel_y": 1833,
+        "relief": 0.5059,
+        "sample_index": 225,
+        "station_m": 22500.0,
+        "vegetation": 0.3294,
+        "water": 0.1686
+      },
+      {
+        "lat": 36.8096464,
+        "lon": -111.6349826,
+        "pixel_x": 427,
+        "pixel_y": 1850,
+        "relief": 0.5059,
+        "sample_index": 226,
+        "station_m": 22600.0,
+        "vegetation": 0.0,
+        "water": 0.3294
+      },
+      {
+        "lat": 36.8089841,
+        "lon": -111.635742,
+        "pixel_x": 414,
+        "pixel_y": 1863,
+        "relief": 0.5059,
+        "sample_index": 227,
+        "station_m": 22700.0,
+        "vegetation": 0.2941,
+        "water": 0.1725
+      },
+      {
+        "lat": 36.8083443,
+        "lon": -111.6365275,
+        "pixel_x": 400,
+        "pixel_y": 1876,
+        "relief": 0.5059,
+        "sample_index": 228,
+        "station_m": 22800.0,
+        "vegetation": 0.2745,
+        "water": 0.1647
+      },
+      {
+        "lat": 36.8077807,
+        "lon": -111.6374019,
+        "pixel_x": 385,
+        "pixel_y": 1888,
+        "relief": 0.5059,
+        "sample_index": 229,
+        "station_m": 22900.0,
+        "vegetation": 0.0,
+        "water": 0.3333
+      },
+      {
+        "lat": 36.8072171,
+        "lon": -111.6382762,
+        "pixel_x": 371,
+        "pixel_y": 1899,
+        "relief": 0.5059,
+        "sample_index": 230,
+        "station_m": 23000.0,
+        "vegetation": 0.0,
+        "water": 0.3294
+      },
+      {
+        "lat": 36.8066535,
+        "lon": -111.6391506,
+        "pixel_x": 356,
+        "pixel_y": 1911,
+        "relief": 0.5059,
+        "sample_index": 231,
+        "station_m": 23100.0,
+        "vegetation": 0.0,
+        "water": 0.3255
+      },
+      {
+        "lat": 36.8060898,
+        "lon": -111.640025,
+        "pixel_x": 341,
+        "pixel_y": 1922,
+        "relief": 0.5059,
+        "sample_index": 232,
+        "station_m": 23200.0,
+        "vegetation": 0.0,
+        "water": 0.3176
+      },
+      {
+        "lat": 36.8055515,
+        "lon": -111.6409216,
+        "pixel_x": 325,
+        "pixel_y": 1933,
+        "relief": 0.5059,
+        "sample_index": 233,
+        "station_m": 23300.0,
+        "vegetation": 0.0,
+        "water": 0.3137
+      },
+      {
+        "lat": 36.8050794,
+        "lon": -111.6418765,
+        "pixel_x": 309,
+        "pixel_y": 1943,
+        "relief": 0.5059,
+        "sample_index": 234,
+        "station_m": 23400.0,
+        "vegetation": 0.0235,
+        "water": 0.2706
+      },
+      {
+        "lat": 36.8045633,
+        "lon": -111.6427916,
+        "pixel_x": 294,
+        "pixel_y": 1954,
+        "relief": 0.5059,
+        "sample_index": 235,
+        "station_m": 23500.0,
+        "vegetation": 0.0,
+        "water": 0.2863
+      },
+      {
+        "lat": 36.8039817,
+        "lon": -111.6436475,
+        "pixel_x": 279,
+        "pixel_y": 1965,
+        "relief": 0.5059,
+        "sample_index": 236,
+        "station_m": 23600.0,
+        "vegetation": 0.2667,
+        "water": 0.149
+      },
+      {
+        "lat": 36.8031802,
+        "lon": -111.6441015,
+        "pixel_x": 271,
+        "pixel_y": 1982,
+        "relief": 0.5059,
+        "sample_index": 237,
+        "station_m": 23700.0,
+        "vegetation": 0.2824,
+        "water": 0.1608
+      },
+      {
+        "lat": 36.8023059,
+        "lon": -111.6439435,
+        "pixel_x": 274,
+        "pixel_y": 2000,
+        "relief": 0.5059,
+        "sample_index": 238,
+        "station_m": 23800.0,
+        "vegetation": 0.2745,
+        "water": 0.1686
+      },
+      {
+        "lat": 36.8014118,
+        "lon": -111.6438423,
+        "pixel_x": 276,
+        "pixel_y": 2018,
+        "relief": 0.4667,
+        "sample_index": 239,
+        "station_m": 23900.0,
+        "vegetation": 0.0,
+        "water": 0.0745
+      },
+      {
+        "lat": 36.8005134,
+        "lon": -111.6437789,
+        "pixel_x": 277,
+        "pixel_y": 2036,
+        "relief": 0.502,
+        "sample_index": 240,
+        "station_m": 24000.0,
+        "vegetation": 0.0,
+        "water": 0.2196
+      }
+    ]
+  },
+  "sampling": {
+    "image_size_px": [
+      2048,
+      2048
+    ],
+    "lon_lat_to_pixel": "linear_wgs84_bbox_preview_mapping_north_up",
+    "note": "Masks are preview derivatives with a bounded channel prior; high agreement is not production acceptance.",
+    "water_thresholds": [
+      0.35,
+      0.5
+    ]
+  },
+  "schema": "raftsim.nhd_naip_dem_alignment_diagnostic.v0",
+  "section_id": "lees_ferry_pilot_slice",
+  "status": "diagnostic_preview_masks_not_alignment_acceptance",
+  "summary": {
+    "cross_section_center_relief": {
+      "count": 109,
+      "ge_0_35_fraction": 1.0,
+      "ge_0_50_fraction": 0.8349,
+      "max": 0.5059,
+      "mean": 0.5006,
+      "median": 0.5059,
+      "min": 0.3843
+    },
+    "cross_section_center_water": {
+      "count": 109,
+      "ge_0_35_fraction": 0.7523,
+      "ge_0_50_fraction": 0.2752,
+      "max": 0.7765,
+      "mean": 0.4566,
+      "median": 0.3922,
+      "min": 0.1333
+    },
+    "cross_section_count": 123,
+    "cross_section_left_endpoint_water": {
+      "count": 109,
+      "ge_0_35_fraction": 0.422,
+      "ge_0_50_fraction": 0.2661,
+      "max": 0.7765,
+      "mean": 0.346,
+      "median": 0.3059,
+      "min": 0.0039
+    },
+    "cross_section_right_endpoint_water": {
+      "count": 109,
+      "ge_0_35_fraction": 0.367,
+      "ge_0_50_fraction": 0.2752,
+      "max": 0.7765,
+      "mean": 0.3046,
+      "median": 0.1176,
+      "min": 0.0
+    },
+    "cross_sections_out_of_bounds": 14,
+    "cross_sections_with_center_in_bounds": 109,
+    "station_relief": {
+      "count": 219,
+      "ge_0_35_fraction": 1.0,
+      "ge_0_50_fraction": 0.8356,
+      "max": 0.5059,
+      "mean": 0.5005,
+      "median": 0.5059,
+      "min": 0.3725
+    },
+    "station_sample_count": 244,
+    "station_samples_in_bounds": 219,
+    "station_samples_out_of_bounds": 25,
+    "station_vegetation": {
+      "count": 219,
+      "ge_0_35_fraction": 0.0091,
+      "ge_0_50_fraction": 0.0,
+      "max": 0.3725,
+      "mean": 0.0314,
+      "median": 0.0,
+      "min": 0.0
+    },
+    "station_water": {
+      "count": 219,
+      "ge_0_35_fraction": 0.7443,
+      "ge_0_50_fraction": 0.2785,
+      "max": 0.7765,
+      "mean": 0.4545,
+      "median": 0.3922,
+      "min": 0.0
+    }
+  }
+}

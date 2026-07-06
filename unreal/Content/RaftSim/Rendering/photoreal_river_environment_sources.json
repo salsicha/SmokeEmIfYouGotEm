@@ -338,6 +338,14 @@
           "unreal_use": "fixed-width editor review lines for future bank, sandbar, wet-bank, side-channel, and oarsman annotation work; not accepted banks, channel width, or solver cross sections"
         },
         {
+          "artifact_id": "colorado_nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic",
+          "category": "hydrography_preview_alignment_diagnostic",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic.json",
+          "provider": "RaftSim preview diagnostic from Colorado NHD stationing, cross-section seeds, NAIP masks, and 3DEP relief",
+          "status": "attached_review_gated_not_alignment_acceptance",
+          "unreal_use": "editor overlay triage for water-edge, sandbar, wet-bank, river-mile, and oarsman review; not accepted production geometry or solver cross sections"
+        },
+        {
           "artifact_id": "usgs_3dep_lees_ferry_sample_256",
           "category": "terrain_sample",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_sample_256.tif",
