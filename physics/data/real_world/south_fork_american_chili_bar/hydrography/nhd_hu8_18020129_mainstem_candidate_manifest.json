@@ -1,0 +1,75 @@
+{
+  "caveats": [
+    "This is a derived source candidate from named NHD flowline segments, not a final raftable channel centerline.",
+    "One endpoint extends slightly outside the pilot bbox because the source extract preserved full bbox-intersecting features.",
+    "NHD flowlines do not encode rapid-scale banks, shelves, boulders, holes, boils, eddy lines, or seasonal wetted width.",
+    "No manual guide, imagery, terrain, or hydrology alignment has been completed for this candidate yet."
+  ],
+  "derivation": {
+    "bbox_wgs84": [
+      -120.9014949,
+      38.7629724,
+      -120.7199431,
+      38.8138133
+    ],
+    "connected_component_count": 1,
+    "downstream_endpoint_wgs84": [
+      -120.9014949,
+      38.8138133
+    ],
+    "endpoint_count": 2,
+    "endpoint_snapping": "none_required_exact_7_decimal_endpoint_matches",
+    "length_km_geodesic_vertices": 26.20469194,
+    "length_km_nhd_sum": 26.19019554,
+    "node_count": 103,
+    "ordered_feature_count": 102,
+    "orientation": "east_endpoint_to_west_endpoint_inferred_upstream_to_downstream_for_chili_bar_to_coloma_review",
+    "selected_feature_count": 102,
+    "unique_reachcodes_ordered": [
+      "18020129000075",
+      "18020129000074",
+      "18020129000073",
+      "18020129000072",
+      "18020129000071",
+      "18020129000070",
+      "18020129000069",
+      "18020129000068",
+      "18020129000067",
+      "18020129000066",
+      "18020129000065",
+      "18020129000064",
+      "18020129000063",
+      "18020129000062",
+      "18020129000061",
+      "18020129000060",
+      "18020129000059",
+      "18020129000058",
+      "18020129000057"
+    ],
+    "upstream_endpoint_wgs84": [
+      -120.7199431,
+      38.7786168
+    ],
+    "vertex_count": 361
+  },
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "selected_gnis_name": "South Fork American River",
+    "source_extract_manifest": "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+    "source_flowline_extract": "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson"
+  },
+  "outputs": {
+    "mainstem_candidate_geojson": "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson"
+  },
+  "promotion_gates": [
+    "Confirm the east-to-west orientation against official NHD flow direction, DEM slope, CDEC/USGS station context, and guide review.",
+    "Reproject from EPSG:4269 source coordinates into the selected working CRS before stationing or metric cross-section work.",
+    "Align the candidate line to the NAIP source drape, 3DEP heightfield, visible wetted channel, banks, islands, side channels, and access points.",
+    "Derive reviewed bank polygons and cross sections before replacing seed solver or Unreal corridor geometry.",
+    "Attach guide-reviewed rapid, eddy, recovery-pool, pin, surf, and rescue annotations before gameplay tuning uses this line."
+  ],
+  "review_status": "derived_candidate_review_required_not_authoritative_centerline",
+  "river_id": "american_south_fork",
+  "schema": "raftsim.nhd_mainstem_candidate_manifest.v0",
+  "section_id": "chili_bar_to_coloma"
+}

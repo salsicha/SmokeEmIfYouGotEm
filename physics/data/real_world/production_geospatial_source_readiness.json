@@ -224,10 +224,12 @@
             "physics/data/real_world/south_fork_american_chili_bar/hydrography/tnm_nhd_products.json",
             "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
             "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
-            "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson"
+            "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
+            "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+            "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson"
           ],
-          "promotion_blocker": "NHD HU8 18020129 is attached as a bbox-intersected source extract, but it still needs CRS/working-transform review, mainstem ordering, geometry/bank derivation, NAIP/DEM alignment, and guide rapid/eddy annotation before it can replace seed centerline geometry.",
-          "status": "nhd_hu8_bbox_extract_attached_review_pending"
+          "promotion_blocker": "NHD HU8 18020129 is attached as a bbox-intersected source extract with a derived South Fork mainstem candidate, but it still needs CRS/working-transform review, direction confirmation, geometry/bank derivation, NAIP/DEM alignment, and guide rapid/eddy annotation before it can replace seed centerline geometry.",
+          "status": "nhd_hu8_mainstem_candidate_attached_review_pending"
         },
         "protected_area_and_access_context": {
           "artifacts": [],
