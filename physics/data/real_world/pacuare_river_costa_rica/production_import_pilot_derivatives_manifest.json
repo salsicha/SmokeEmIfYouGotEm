@@ -1,39 +1,40 @@
 {
-  "schema": "raftsim.pacuare_import_pilot_derivatives.v1",
-  "status": "generated_review_gated_from_coarse_preview_seeds_not_production_import",
-  "source_recipe": "physics/data/real_world/pacuare_river_costa_rica/production_import_pilot.json",
-  "inputs": {
-    "nasa_gibs_truecolor": "physics/data/real_world/pacuare_river_costa_rica/imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
-    "copernicus_dem_glo30_southern_tile": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif",
-    "copernicus_dem_glo30_northern_tile": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif"
-  },
-  "outputs": {
-    "source_drape": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/source_drape_4096.png",
-    "source_drape_manifest": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/source_drape_composite_manifest.json",
-    "dem_relief": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/dem_relief_2048.png",
-    "heightfield_candidate": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/heightfield_candidate_2017.png",
-    "heightfield_manifest": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/heightfield_candidate_manifest.json",
-    "water_mask": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png",
-    "vegetation_mask": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png",
-    "mask_manifest": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/source_masks_manifest.json"
-  },
-  "processing": {
-    "source_drape_size_px": 4096,
-    "relief_size_px": 2048,
-    "heightfield_size_px": 2017,
-    "mask_size_px": 2048,
-    "heightfield_pixel_format": "16_bit_grayscale_png",
-    "bounds_wgs84": {
-      "min_lon": -83.75,
-      "min_lat": 9.72,
-      "max_lon": -83.42,
-      "max_lat": 10.12
-    }
-  },
   "caveats": [
     "These derivatives normalize the active Pacuare preview seeds into the production-import folder shape; they are not production photoreal terrain or imagery.",
     "NASA GIBS/MODIS is coarse and partly cloudy, and cloud-filled areas remain DEM-derived rainforest placeholders.",
     "Copernicus DEM tiles are not clipped to a surveyed corridor, reprojected to the final Costa Rica CRS, void-reviewed, hydrologically conditioned, or channel-burned.",
     "Masks are preview segmentation aids and must be replaced or approved through higher-resolution imagery, hydrography, rainfall/flow context, and guide/outfitter review."
-  ]
+  ],
+  "inputs": {
+    "copernicus_dem_glo30_northern_tile": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif",
+    "copernicus_dem_glo30_southern_tile": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif",
+    "nasa_gibs_truecolor": "physics/data/real_world/pacuare_river_costa_rica/imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png"
+  },
+  "metadata_review": "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/source_metadata_review.json",
+  "outputs": {
+    "dem_relief": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/dem_relief_2048.png",
+    "heightfield_candidate": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/heightfield_candidate_2017.png",
+    "heightfield_manifest": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/heightfield_candidate_manifest.json",
+    "mask_manifest": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/source_masks_manifest.json",
+    "source_drape": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/source_drape_4096.png",
+    "source_drape_manifest": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/source_drape_composite_manifest.json",
+    "vegetation_mask": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png",
+    "water_mask": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png"
+  },
+  "processing": {
+    "bounds_wgs84": {
+      "max_lat": 10.12,
+      "max_lon": -83.42,
+      "min_lat": 9.72,
+      "min_lon": -83.75
+    },
+    "heightfield_pixel_format": "16_bit_grayscale_png",
+    "heightfield_size_px": 2017,
+    "mask_size_px": 2048,
+    "relief_size_px": 2048,
+    "source_drape_size_px": 4096
+  },
+  "schema": "raftsim.pacuare_import_pilot_derivatives.v1",
+  "source_recipe": "physics/data/real_world/pacuare_river_costa_rica/production_import_pilot.json",
+  "status": "generated_review_gated_from_coarse_preview_seeds_not_production_import"
 }
