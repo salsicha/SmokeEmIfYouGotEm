@@ -17,8 +17,9 @@ Production modules:
 - `RaftSimCrew`: crew safety, swimming skill, swimmer/rescue, and high-side/weight-distribution gameplay state.
 - `RaftSimAudio`: interactive water/raft/crew audio, spatial presets, manifests, and validation telemetry.
 - `RaftSimAutomation`: regression fixture import, live-water smoke suites, report-lock checks, and Unreal automation contracts.
+- `RaftSimEditor`: editor-only RaftSim Tools menu, polished tooling registry, and launch surfaces for replay/debug review, river authoring, feature tuning, validation, and playtest workflows.
 - `RaftSimNetwork`: future multiplayer session, replication, prediction, voice, and scoring contracts.
 
 The production foundation manifest lives at `unreal/Content/RaftSim/Production/production_foundation.json` and ties these modules to the UE 5.8 project lock plus the accepted Milestone 20 water report-set lock.
 
-The plugin is intentionally source-first until Unreal Editor 5.8 is installed and can generate binary assets.
+The plugin remains source-first for tools and contracts. Unreal Editor 5.8 can now generate reviewed binary assets from these manifests when a workflow has passed its tooling gate.

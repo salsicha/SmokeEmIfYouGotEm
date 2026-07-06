@@ -82,6 +82,11 @@
       "LoadingPhase": "Default"
     },
     {
+      "Name": "RaftSimEditor",
+      "Type": "Editor",
+      "LoadingPhase": "Default"
+    },
+    {
       "Name": "RaftSimNetwork",
       "Type": "Runtime",
       "LoadingPhase": "Default"
