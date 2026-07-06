@@ -199,6 +199,16 @@ FString GetEnvironmentCaptureRoot()
         FPaths::Combine(GetRepoRoot(), TEXT("docs/environment-captures/photoreal_river_previews")));
 }
 
+FString GetPhotorealRiverSourcePlanRelativePath()
+{
+    return TEXT("unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json");
+}
+
+FString GetFirstPartyProceduralEnvironmentAssetPlanRelativePath()
+{
+    return TEXT("unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json");
+}
+
 FString EscapeRaftSimJsonString(const FString& Value)
 {
     FString Escaped = Value.Replace(TEXT("\\"), TEXT("\\\\"));
@@ -3186,18 +3196,26 @@ bool FRaftSimEditorModule::CaptureToolEvidence(FString& OutSummary)
 
 bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSummary)
 {
-    const FString SourcePlanRelativePath =
-        TEXT("unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json");
+    const FString SourcePlanRelativePath = GetPhotorealRiverSourcePlanRelativePath();
     const FString SourcePlanAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), SourcePlanRelativePath));
+    const FString ProceduralAssetPlanRelativePath = GetFirstPartyProceduralEnvironmentAssetPlanRelativePath();
+    const FString ProceduralAssetPlanAbsolutePath =
+        FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), ProceduralAssetPlanRelativePath));
 
     if (!FPaths::FileExists(SourcePlanAbsolutePath))
     {
         OutSummary += FString::Printf(TEXT("Missing photoreal river source plan: %s\n"), *SourcePlanAbsolutePath);
         return false;
     }
+    if (!FPaths::FileExists(ProceduralAssetPlanAbsolutePath))
+    {
+        OutSummary += FString::Printf(TEXT("Missing first-party procedural environment asset plan: %s\n"), *ProceduralAssetPlanAbsolutePath);
+        return false;
+    }
 
     OutSummary += FString::Printf(TEXT("Using photoreal river source plan: %s\n"), *SourcePlanRelativePath);
+    OutSummary += FString::Printf(TEXT("Using first-party procedural environment asset plan: %s\n"), *ProceduralAssetPlanRelativePath);
 
     bool bAllSaved = true;
     for (const FRaftSimEnvironmentPreviewSpec& Spec : GetEnvironmentPreviewSpecs())
@@ -3213,6 +3231,16 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
 {
     const FString CaptureRoot = GetEnvironmentCaptureRoot();
     IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    const FString SourcePlanRelativePath = GetPhotorealRiverSourcePlanRelativePath();
+    const FString ProceduralAssetPlanRelativePath = GetFirstPartyProceduralEnvironmentAssetPlanRelativePath();
+    const FString ProceduralAssetPlanAbsolutePath =
+        FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), ProceduralAssetPlanRelativePath));
+
+    if (!FPaths::FileExists(ProceduralAssetPlanAbsolutePath))
+    {
+        OutSummary += FString::Printf(TEXT("Missing first-party procedural environment asset plan for capture: %s\n"), *ProceduralAssetPlanAbsolutePath);
+        return false;
+    }
 
     FString EntriesJson;
     bool bAllCaptured = true;
@@ -3315,12 +3343,15 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("{\n")
         TEXT("  \"schema\": \"raftsim.unreal.environment_capture_manifest.v1\",\n")
         TEXT("  \"capture_type\": \"guide_seat_and_river_eye_downstream_unreal_preview\",\n")
-        TEXT("  \"source_plan\": \"unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json\",\n")
+        TEXT("  \"source_plan\": \"%s\",\n")
+        TEXT("  \"procedural_asset_plan\": \"%s\",\n")
         TEXT("  \"status\": \"%s\",\n")
         TEXT("  \"captures\": [\n")
         TEXT("%s\n")
         TEXT("  ]\n")
         TEXT("}\n"),
+        *EscapeRaftSimJsonString(SourcePlanRelativePath),
+        *EscapeRaftSimJsonString(ProceduralAssetPlanRelativePath),
         bAllCaptured ? TEXT("south_fork_colorado_and_pacuare_source_draped_guide_and_river_eye_previews_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
         *EntriesJson);
 

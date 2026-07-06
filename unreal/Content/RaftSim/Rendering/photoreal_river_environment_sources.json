@@ -1,4 +1,5 @@
 {
+  "first_party_procedural_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
   "flow_visual_band_manifest": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
   "generated_on": "2026-07-06",
   "global_sources": [
@@ -1074,10 +1075,12 @@
   },
   "status": "south_fork_colorado_and_pacuare_larger_source_draped_previews_available; production_geospatial_imports_and_photoreal_assets_pending",
   "unreal_generation": {
+    "first_party_procedural_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
     "final_acceptance": [
       "production_dem_or_reviewed_proxy_terrain",
       "aerial_or_satellite_derived_masks",
       "flow_band_visual_variants",
+      "approved_first_party_procedural_asset_recipes_or_rights_cleared_equivalent_assets",
       "dense_biome_specific_foliage",
       "wet_rocks_foam_spray_mist_and_atmosphere",
       "hazards_and_rescue_targets_readable",

@@ -3077,6 +3077,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
         "source_classes": source_classes,
         "canonical_inputs": {
             "photoreal_environment_sources": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
+            "first_party_procedural_environment_assets": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
             "geospatial_readiness": "physics/data/real_world/production_geospatial_source_readiness.json",
             "reference_media_links": "physics/data/real_world/reference_media_link_manifest.json",
             "art_asset_source_research": "unreal/Content/RaftSim/Rendering/art_asset_source_research.json",
@@ -3090,6 +3091,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "conditioned source heightfields or approved procedural terrain",
                     "bank breaklines and channel burning",
                     "biome-specific terrain material layering",
+                    "first_party_procedural_asset_recipe_coverage_or_rights_cleared_equivalent_assets",
                     "source-aligned wet/dry and exposed-bar masks",
                 ],
             },
