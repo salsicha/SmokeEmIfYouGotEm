@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Containers/Ticker.h"
 #include "HAL/IConsoleManager.h"
 #include "Modules/ModuleInterface.h"
 
@@ -25,6 +26,10 @@ private:
     void HandleOpenToolCommand(const TArray<FString>& Args);
     void HandleCreateReviewedDataAssetsCommand(const TArray<FString>& Args);
     void HandleCaptureToolEvidenceCommand(const TArray<FString>& Args);
+    void HandleCreatePhotorealEnvironmentPreviewMapsCommand(const TArray<FString>& Args);
+    void HandleCapturePhotorealEnvironmentPreviewsCommand(const TArray<FString>& Args);
+    void HandlePhotorealEnvironmentAutomationStartup();
+    bool TickPhotorealEnvironmentAutomationStartup(float DeltaSeconds);
     void ExecuteValidationAction(FName ActionId);
     const TArray<FRaftSimEditorToolDescriptor>& GetToolDescriptors();
     const FRaftSimEditorToolDescriptor* FindToolDescriptor(FName ToolId);
@@ -35,6 +40,8 @@ private:
     bool CreateReviewedToolDataAssets(FString& OutSummary);
     bool CaptureToolEvidence(FString& OutSummary);
     bool SaveWidgetScreenshot(const TSharedRef<SWidget>& Widget, const FString& BaseFileName, FString& OutPath) const;
+    bool CreatePhotorealEnvironmentPreviewMaps(FString& OutSummary);
+    bool CapturePhotorealEnvironmentPreviews(FString& OutSummary);
 
     TArray<FRaftSimEditorToolDescriptor> ToolDescriptors;
     TMap<FName, TWeakPtr<SDockTab>> OpenedToolTabs;
@@ -43,4 +50,12 @@ private:
     TUniquePtr<FAutoConsoleCommand> OpenAllToolsConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CreateReviewedDataAssetsConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CaptureToolEvidenceConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CreatePhotorealEnvironmentPreviewMapsConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CapturePhotorealEnvironmentPreviewsConsoleCommand;
+    FDelegateHandle PhotorealEnvironmentAutomationPostEngineInitHandle;
+    FTSTicker::FDelegateHandle PhotorealEnvironmentAutomationTickerHandle;
+    bool bCreatePhotorealEnvironmentPreviewMapsOnStartup = false;
+    bool bCapturePhotorealEnvironmentPreviewsOnStartup = false;
+    bool bExitAfterPhotorealEnvironmentAutomation = false;
+    int32 PhotorealEnvironmentAutomationStartupAttempts = 0;
 };

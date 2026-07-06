@@ -919,6 +919,20 @@ This milestone turns the alpha game into a shippable Unreal build.
 - [x] Decide whether Wwise/FMOD, paid asset libraries, professional field recordings, generated-river shipping features, multiplayer, and additional local AI features are required for release or deferred. Gated by `release_readiness_plan.release_or_defer_decisions`.
 - [x] Gate release on beta playtests, guide feedback, target-platform performance captures, legal/provenance review, content validation, photorealistic environment/foliage quality review, release branch lock, and patch workflow. Gated by `unreal/Content/RaftSim/Automation/release_readiness_gate.json`; shipping remains blocked until external signoff evidence is attached.
 
+## Milestone 26: Photoreal River Environment Production
+
+This milestone turns the three runnable river targets into complete, reviewable, lifelike Unreal environments.
+
+- [x] Set the active production goal for river maps, seasonal flow levels, aerial imagery, relevant reference/social links, additional data sources, procedural generation, complete environments, and lifelike in-engine photos. Goal is tracked in the Codex thread and source-controlled through `docs/photoreal-river-environment-production-plan.md`.
+- [x] Add the three-river photoreal environment source and capture manifest: `unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json` now records South Fork American, Colorado River, and Pacuare map, terrain, hydrography, flow, aerial/satellite, rights-reviewed media, procedural-generation, target-map, and capture requirements.
+- [x] Generate Unreal preview map packages for South Fork American, Colorado River, and Pacuare under `/Game/RaftSim/Maps/EnvironmentPreviews/`, using procedural terrain, river surface, banks, boulders, foliage, lighting, and camera placements as source-aware placeholders. Generated maps: `L_SouthForkAmerican_PhotorealPreview.umap`, `L_ColoradoGrandCanyon_PhotorealPreview.umap`, and `L_PacuareRainforest_PhotorealPreview.umap`.
+- [x] Capture downstream guide-seat screenshots from Unreal for each runnable river and write `docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json`. Current captures are rendered procedural blockouts, not production photoreal evidence.
+- [x] Upgrade the first-pass Unreal environment previews from flat proxy planes to generated valley terrain meshes, curved river ribbons, foam/hydraulic cue strips, boulder bars, river-specific foliage proxies, light/fog variants, and guide-seat camera framing.
+- [ ] Pull or attach reviewed production geospatial source data: DEM/lidar, hydrography, aerial/satellite imagery, water/vegetation masks, flow/gauge/rainfall history, protected-area/access context, and guide/media annotation references.
+- [ ] Replace proxy terrain, banks, rocks, foliage, water materials, foam/spray/mist, wetness, and lighting with source-derived or rights-cleared assets until screenshots read as lifelike without hiding hazards or rescue targets.
+- [ ] Add or license production-quality river environment asset packs/materials, or generate approved first-party procedural equivalents, for canyon walls, riverbeds, wet boulders, shore vegetation, tropical canopy, foam/spray/mist, raft foreground, and river-specific atmospheric lighting.
+- [ ] Add desktop and VR performance capture evidence for the three photoreal river environments before any river is marked production-playable.
+
 ## Technical Notes To Revisit
 
 - [ ] Decide when to physically remove legacy 2D code, tests, examples, and videos from the repo.

@@ -49,6 +49,10 @@
       "Enabled": true
     },
     {
+      "Name": "ProceduralMeshComponent",
+      "Enabled": true
+    },
+    {
       "Name": "RaftSim",
       "Enabled": true
     }

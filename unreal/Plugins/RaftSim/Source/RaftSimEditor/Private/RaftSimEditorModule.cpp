@@ -1,17 +1,47 @@
 #include "RaftSimEditorModule.h"
 
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "Camera/CameraActor.h"
+#include "Camera/CameraComponent.h"
+#include "Components/DirectionalLightComponent.h"
+#include "Components/ExponentialHeightFogComponent.h"
+#include "Components/LightComponent.h"
+#include "Components/MeshComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Components/SkyLightComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/SkyAtmosphereComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "Editor.h"
+#include "Engine/DirectionalLight.h"
+#include "Engine/ExponentialHeightFog.h"
+#include "Engine/PointLight.h"
+#include "Engine/SceneCapture2D.h"
+#include "Engine/SkyLight.h"
+#include "Engine/StaticMesh.h"
+#include "Engine/StaticMeshActor.h"
+#include "Engine/TextRenderActor.h"
+#include "Engine/TextureRenderTarget2D.h"
+#include "EngineUtils.h"
+#include "FileHelpers.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Framework/Commands/UIAction.h"
 #include "Framework/Docking/TabManager.h"
+#include "GameFramework/Actor.h"
+#include "GameFramework/PlayerStart.h"
 #include "HAL/IConsoleManager.h"
 #include "HAL/PlatformProcess.h"
+#include "HAL/PlatformMisc.h"
 #include "ImageUtils.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Misc/CommandLine.h"
+#include "Misc/CoreDelegates.h"
 #include "Misc/FileHelper.h"
 #include "Misc/PackageName.h"
+#include "Misc/Parse.h"
 #include "Misc/Paths.h"
 #include "Modules/ModuleManager.h"
+#include "ProceduralMeshComponent.h"
 #include "RaftSimEditorToolRegistry.h"
 #include "RaftSimFeatureTuningEditorShell.h"
 #include "RaftSimRapidRiverEditorShell.h"
@@ -20,6 +50,7 @@
 #include "Styling/CoreStyle.h"
 #include "ToolMenus.h"
 #include "UObject/SavePackage.h"
+#include "RenderingThread.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Input/SButton.h"
@@ -42,6 +73,28 @@ static const FName RapidRiverEditorTabId(TEXT("RaftSim.RapidRiverEditor"));
 static const FName FeatureTuningEditorTabId(TEXT("RaftSim.FeatureTuningEditor"));
 static const FName GeospatialValidatorTabId(TEXT("RaftSim.GeospatialValidator"));
 static const FName VerticalSliceLauncherTabId(TEXT("RaftSim.VerticalSliceLauncher"));
+
+struct FRaftSimEnvironmentPreviewSpec
+{
+    FString RiverId;
+    FString DisplayName;
+    FString MapPackagePath;
+    FString SourceManifest;
+    FLinearColor WaterColor = FLinearColor(0.05f, 0.26f, 0.32f);
+    FLinearColor TerrainColor = FLinearColor(0.26f, 0.23f, 0.18f);
+    FLinearColor RockColor = FLinearColor(0.35f, 0.33f, 0.29f);
+    FLinearColor FoliageColor = FLinearColor(0.18f, 0.34f, 0.16f);
+    FLinearColor RaftColor = FLinearColor(0.90f, 0.28f, 0.08f);
+    float CanyonHeightCm = 850.0f;
+    float RiverHalfWidthCm = 360.0f;
+    float BankWidthCm = 760.0f;
+    float BendAmplitudeCm = 240.0f;
+    int32 BoulderCount = 18;
+    int32 FoliageCount = 32;
+    int32 FoamTrainCount = 12;
+    bool bHasWaterfalls = false;
+    bool bDesertCanyon = false;
+};
 
 FRaftSimEditorToolDescriptor MakeToolDescriptor(
     FName ToolId,
@@ -71,6 +124,790 @@ FString GetRepoRoot()
 FString GetCaptureRoot()
 {
     return FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), TEXT("docs/tool-captures/milestone25a")));
+}
+
+FString GetEnvironmentCaptureRoot()
+{
+    return FPaths::ConvertRelativePathToFull(
+        FPaths::Combine(GetRepoRoot(), TEXT("docs/environment-captures/photoreal_river_previews")));
+}
+
+FString EscapeRaftSimJsonString(const FString& Value)
+{
+    FString Escaped = Value.Replace(TEXT("\\"), TEXT("\\\\"));
+    Escaped = Escaped.Replace(TEXT("\""), TEXT("\\\""));
+    Escaped = Escaped.Replace(TEXT("\r"), TEXT("\\r"));
+    Escaped = Escaped.Replace(TEXT("\n"), TEXT("\\n"));
+    return Escaped;
+}
+
+TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
+{
+    TArray<FRaftSimEnvironmentPreviewSpec> Specs;
+
+    FRaftSimEnvironmentPreviewSpec SouthFork;
+    SouthFork.RiverId = TEXT("american_south_fork");
+    SouthFork.DisplayName = TEXT("South Fork American River");
+    SouthFork.MapPackagePath = TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview");
+    SouthFork.SourceManifest = TEXT("physics/data/real_world/south_fork_american_chili_bar/source_manifest.json");
+    SouthFork.WaterColor = FLinearColor(0.04f, 0.32f, 0.36f);
+    SouthFork.TerrainColor = FLinearColor(0.35f, 0.30f, 0.21f);
+    SouthFork.RockColor = FLinearColor(0.38f, 0.36f, 0.31f);
+    SouthFork.FoliageColor = FLinearColor(0.22f, 0.38f, 0.15f);
+    SouthFork.CanyonHeightCm = 850.0f;
+    SouthFork.RiverHalfWidthCm = 335.0f;
+    SouthFork.BankWidthCm = 720.0f;
+    SouthFork.BendAmplitudeCm = 290.0f;
+    SouthFork.BoulderCount = 24;
+    SouthFork.FoliageCount = 46;
+    SouthFork.FoamTrainCount = 14;
+    Specs.Add(SouthFork);
+
+    FRaftSimEnvironmentPreviewSpec Colorado;
+    Colorado.RiverId = TEXT("colorado_river");
+    Colorado.DisplayName = TEXT("Colorado River Grand Canyon");
+    Colorado.MapPackagePath = TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview");
+    Colorado.SourceManifest = TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json");
+    Colorado.WaterColor = FLinearColor(0.28f, 0.20f, 0.12f);
+    Colorado.TerrainColor = FLinearColor(0.48f, 0.30f, 0.18f);
+    Colorado.RockColor = FLinearColor(0.55f, 0.32f, 0.20f);
+    Colorado.FoliageColor = FLinearColor(0.30f, 0.32f, 0.18f);
+    Colorado.CanyonHeightCm = 2600.0f;
+    Colorado.RiverHalfWidthCm = 520.0f;
+    Colorado.BankWidthCm = 1500.0f;
+    Colorado.BendAmplitudeCm = 360.0f;
+    Colorado.BoulderCount = 20;
+    Colorado.FoliageCount = 18;
+    Colorado.FoamTrainCount = 9;
+    Colorado.bDesertCanyon = true;
+    Specs.Add(Colorado);
+
+    FRaftSimEnvironmentPreviewSpec Pacuare;
+    Pacuare.RiverId = TEXT("pacuare");
+    Pacuare.DisplayName = TEXT("Pacuare River Rainforest");
+    Pacuare.MapPackagePath = TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview");
+    Pacuare.SourceManifest = TEXT("physics/data/real_world/pacuare_river_costa_rica/source_manifest.json");
+    Pacuare.WaterColor = FLinearColor(0.03f, 0.24f, 0.19f);
+    Pacuare.TerrainColor = FLinearColor(0.17f, 0.22f, 0.13f);
+    Pacuare.RockColor = FLinearColor(0.20f, 0.24f, 0.20f);
+    Pacuare.FoliageColor = FLinearColor(0.06f, 0.30f, 0.09f);
+    Pacuare.CanyonHeightCm = 1450.0f;
+    Pacuare.RiverHalfWidthCm = 305.0f;
+    Pacuare.BankWidthCm = 680.0f;
+    Pacuare.BendAmplitudeCm = 340.0f;
+    Pacuare.BoulderCount = 22;
+    Pacuare.FoliageCount = 84;
+    Pacuare.FoamTrainCount = 16;
+    Pacuare.bHasWaterfalls = true;
+    Specs.Add(Pacuare);
+
+    return Specs;
+}
+
+UStaticMesh* LoadPreviewMesh(const TCHAR* MeshPath)
+{
+    return Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), nullptr, MeshPath));
+}
+
+UMaterialInterface* LoadPreviewBaseMaterial()
+{
+    return Cast<UMaterialInterface>(
+        StaticLoadObject(UMaterialInterface::StaticClass(), nullptr, TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial")));
+}
+
+UMaterialInterface* LoadPreviewMaterial(const TCHAR* MaterialPath)
+{
+    return Cast<UMaterialInterface>(StaticLoadObject(UMaterialInterface::StaticClass(), nullptr, MaterialPath));
+}
+
+UMaterialInstanceDynamic* CreatePreviewColorMaterial(UObject* Outer, const FLinearColor& Color)
+{
+    if (UMaterialInterface* BaseMaterial = LoadPreviewBaseMaterial())
+    {
+        UMaterialInstanceDynamic* Material = UMaterialInstanceDynamic::Create(BaseMaterial, Outer);
+        Material->SetVectorParameterValue(TEXT("Color"), Color);
+        Material->SetVectorParameterValue(TEXT("BaseColor"), Color);
+        Material->SetVectorParameterValue(TEXT("Albedo"), Color);
+        return Material;
+    }
+
+    return nullptr;
+}
+
+void ApplyPreviewColor(UMeshComponent* Component, const FLinearColor& Color)
+{
+    if (!Component)
+    {
+        return;
+    }
+
+    if (UMaterialInstanceDynamic* Material = CreatePreviewColorMaterial(Component, Color))
+    {
+        const int32 MaterialCount = FMath::Max(1, Component->GetNumMaterials());
+        for (int32 MaterialIndex = 0; MaterialIndex < MaterialCount; ++MaterialIndex)
+        {
+            Component->SetMaterial(MaterialIndex, Material);
+        }
+    }
+}
+
+float SmoothPreviewStep(float Edge0, float Edge1, float Value)
+{
+    if (FMath::IsNearlyEqual(Edge0, Edge1))
+    {
+        return Value >= Edge1 ? 1.0f : 0.0f;
+    }
+
+    const float T = FMath::Clamp((Value - Edge0) / (Edge1 - Edge0), 0.0f, 1.0f);
+    return T * T * (3.0f - 2.0f * T);
+}
+
+float GetPreviewRiverCenterY(const FRaftSimEnvironmentPreviewSpec& Spec, float X)
+{
+    const float Primary = FMath::Sin((X + 3800.0f) * 0.00043f) * Spec.BendAmplitudeCm;
+    const float Secondary = FMath::Sin((X - 600.0f) * 0.00019f) * Spec.BendAmplitudeCm * 0.35f;
+    return Primary + Secondary;
+}
+
+float GetPreviewTerrainHeightCm(const FRaftSimEnvironmentPreviewSpec& Spec, float X, float Y)
+{
+    const float CenterY = GetPreviewRiverCenterY(Spec, X);
+    const float Offset = FMath::Abs(Y - CenterY);
+    const float InnerBank = Spec.RiverHalfWidthCm;
+    const float OuterBank = Spec.RiverHalfWidthCm + Spec.BankWidthCm;
+    const float CanyonShoulder = OuterBank + (Spec.bDesertCanyon ? 1300.0f : 720.0f);
+    const float BankT = SmoothPreviewStep(InnerBank, OuterBank, Offset);
+    const float CanyonT = SmoothPreviewStep(OuterBank, CanyonShoulder, Offset);
+    const float DownstreamSlope = -0.004f * (X + 5200.0f);
+    const float GravelNoise =
+        FMath::Sin(X * 0.0048f + Y * 0.0021f) * 18.0f + FMath::Sin(X * 0.0014f - Y * 0.0044f) * 11.0f;
+    const float BankLift = Spec.bDesertCanyon ? 250.0f : 145.0f;
+    const float CanyonLift = Spec.CanyonHeightCm * (Spec.bDesertCanyon ? 0.72f : 0.38f);
+
+    return -82.0f + DownstreamSlope + BankT * BankLift + CanyonT * CanyonLift + GravelNoise * (0.35f + BankT * 0.75f);
+}
+
+AStaticMeshActor* AddPreviewMeshActor(
+    UWorld* World,
+    UStaticMesh* Mesh,
+    const FString& Label,
+    const FVector& Location,
+    const FRotator& Rotation,
+    const FVector& Scale,
+    const FLinearColor& Color,
+    UMaterialInterface* MaterialOverride = nullptr,
+    bool bUseMeshDefaultMaterial = false)
+{
+    if (!World || !Mesh || !GEditor)
+    {
+        return nullptr;
+    }
+
+    AStaticMeshActor* Actor = Cast<AStaticMeshActor>(
+        GEditor->AddActor(World->GetCurrentLevel(), AStaticMeshActor::StaticClass(), FTransform(Rotation, Location, Scale), true, RF_Transactional, false));
+    if (!Actor)
+    {
+        return nullptr;
+    }
+
+    Actor->SetActorLabel(Label);
+    UStaticMeshComponent* Component = Actor->GetStaticMeshComponent();
+    Component->SetStaticMesh(Mesh);
+    Component->SetMobility(EComponentMobility::Static);
+    Component->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    if (MaterialOverride)
+    {
+        Component->SetMaterial(0, MaterialOverride);
+    }
+    else if (!bUseMeshDefaultMaterial)
+    {
+        ApplyPreviewColor(Component, Color);
+    }
+    return Actor;
+}
+
+AActor* AddPreviewProceduralMeshActor(
+    UWorld* World,
+    const FString& Label,
+    const TArray<FVector>& Vertices,
+    const TArray<int32>& Triangles,
+    const TArray<FVector>& Normals,
+    const TArray<FVector2D>& UVs,
+    const FLinearColor& Color,
+    UMaterialInterface* MaterialOverride = nullptr)
+{
+    if (!World || Vertices.IsEmpty() || Triangles.IsEmpty())
+    {
+        return nullptr;
+    }
+
+    AActor* Actor = World->SpawnActor<AActor>(AActor::StaticClass(), FTransform::Identity);
+    if (!Actor)
+    {
+        return nullptr;
+    }
+
+    Actor->SetActorLabel(Label);
+    UProceduralMeshComponent* MeshComponent =
+        NewObject<UProceduralMeshComponent>(Actor, *FString::Printf(TEXT("%s_Mesh"), *Label));
+    if (!MeshComponent)
+    {
+        Actor->Destroy();
+        return nullptr;
+    }
+
+    Actor->SetRootComponent(MeshComponent);
+    Actor->AddInstanceComponent(MeshComponent);
+    MeshComponent->RegisterComponent();
+    MeshComponent->SetMobility(EComponentMobility::Static);
+    MeshComponent->bUseComplexAsSimpleCollision = true;
+
+    TArray<FLinearColor> VertexColors;
+    VertexColors.Init(Color, Vertices.Num());
+    TArray<FProcMeshTangent> Tangents;
+    Tangents.Init(FProcMeshTangent(1.0f, 0.0f, 0.0f), Vertices.Num());
+
+    MeshComponent->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UVs, VertexColors, Tangents, true);
+    if (MaterialOverride)
+    {
+        MeshComponent->SetMaterial(0, MaterialOverride);
+    }
+    else
+    {
+        ApplyPreviewColor(MeshComponent, Color);
+    }
+
+    return Actor;
+}
+
+void AddPreviewTerrainMesh(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
+{
+    constexpr int32 XSteps = 112;
+    constexpr int32 YSteps = 38;
+    const float MinX = -5800.0f;
+    const float MaxX = 26500.0f;
+    const float HalfWidth = Spec.bDesertCanyon ? 4300.0f : 2750.0f;
+
+    TArray<FVector> Vertices;
+    TArray<FVector> Normals;
+    TArray<FVector2D> UVs;
+    TArray<int32> Triangles;
+    Vertices.Reserve((XSteps + 1) * (YSteps + 1));
+    Normals.Reserve((XSteps + 1) * (YSteps + 1));
+    UVs.Reserve((XSteps + 1) * (YSteps + 1));
+    Triangles.Reserve(XSteps * YSteps * 6);
+
+    for (int32 XIndex = 0; XIndex <= XSteps; ++XIndex)
+    {
+        const float U = static_cast<float>(XIndex) / static_cast<float>(XSteps);
+        const float X = FMath::Lerp(MinX, MaxX, U);
+        for (int32 YIndex = 0; YIndex <= YSteps; ++YIndex)
+        {
+            const float V = static_cast<float>(YIndex) / static_cast<float>(YSteps);
+            const float Y = FMath::Lerp(-HalfWidth, HalfWidth, V);
+            const float Z = GetPreviewTerrainHeightCm(Spec, X, Y);
+            Vertices.Add(FVector(X, Y, Z));
+            Normals.Add(FVector::UpVector);
+            UVs.Add(FVector2D(U * 12.0f, V * 4.0f));
+        }
+    }
+
+    const int32 RowSize = YSteps + 1;
+    for (int32 XIndex = 0; XIndex < XSteps; ++XIndex)
+    {
+        for (int32 YIndex = 0; YIndex < YSteps; ++YIndex)
+        {
+            const int32 A = XIndex * RowSize + YIndex;
+            const int32 B = A + 1;
+            const int32 C = (XIndex + 1) * RowSize + YIndex;
+            const int32 D = C + 1;
+            Triangles.Add(A);
+            Triangles.Add(C);
+            Triangles.Add(B);
+            Triangles.Add(B);
+            Triangles.Add(C);
+            Triangles.Add(D);
+        }
+    }
+
+    AddPreviewProceduralMeshActor(
+        World,
+        FString::Printf(TEXT("RaftSim_ProceduralValleyTerrain_%s"), *Spec.RiverId),
+        Vertices,
+        Triangles,
+        Normals,
+        UVs,
+        Spec.TerrainColor);
+}
+
+void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
+{
+    constexpr int32 XSteps = 120;
+    constexpr int32 CrossSteps = 6;
+    const float MinX = -5600.0f;
+    const float MaxX = 26200.0f;
+
+    TArray<FVector> Vertices;
+    TArray<FVector> Normals;
+    TArray<FVector2D> UVs;
+    TArray<int32> Triangles;
+    Vertices.Reserve((XSteps + 1) * (CrossSteps + 1));
+    Normals.Reserve((XSteps + 1) * (CrossSteps + 1));
+    UVs.Reserve((XSteps + 1) * (CrossSteps + 1));
+    Triangles.Reserve(XSteps * CrossSteps * 6);
+
+    for (int32 XIndex = 0; XIndex <= XSteps; ++XIndex)
+    {
+        const float U = static_cast<float>(XIndex) / static_cast<float>(XSteps);
+        const float X = FMath::Lerp(MinX, MaxX, U);
+        const float CenterY = GetPreviewRiverCenterY(Spec, X);
+        const float Width =
+            Spec.RiverHalfWidthCm * (1.0f + 0.10f * FMath::Sin(X * 0.0012f) + (Spec.bDesertCanyon ? 0.18f : 0.05f));
+        for (int32 CrossIndex = 0; CrossIndex <= CrossSteps; ++CrossIndex)
+        {
+            const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
+            const float Lateral = FMath::Lerp(-Width, Width, V);
+            const float Wave = FMath::Sin(X * 0.011f + Lateral * 0.015f) * (Spec.bDesertCanyon ? 2.0f : 4.5f);
+            Vertices.Add(FVector(X, CenterY + Lateral, 10.0f + Wave));
+            Normals.Add(FVector::UpVector);
+            UVs.Add(FVector2D(U * 18.0f, V));
+        }
+    }
+
+    const int32 RowSize = CrossSteps + 1;
+    for (int32 XIndex = 0; XIndex < XSteps; ++XIndex)
+    {
+        for (int32 CrossIndex = 0; CrossIndex < CrossSteps; ++CrossIndex)
+        {
+            const int32 A = XIndex * RowSize + CrossIndex;
+            const int32 B = A + 1;
+            const int32 C = (XIndex + 1) * RowSize + CrossIndex;
+            const int32 D = C + 1;
+            Triangles.Add(A);
+            Triangles.Add(C);
+            Triangles.Add(B);
+            Triangles.Add(B);
+            Triangles.Add(C);
+            Triangles.Add(D);
+        }
+    }
+
+    AddPreviewProceduralMeshActor(
+        World,
+        FString::Printf(TEXT("RaftSim_ProceduralRiverRibbon_%s"), *Spec.RiverId),
+        Vertices,
+        Triangles,
+        Normals,
+        UVs,
+        Spec.WaterColor);
+}
+
+void AddPreviewFoamAndHydraulics(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec, UStaticMesh* PlaneMesh)
+{
+    if (!World || !PlaneMesh)
+    {
+        return;
+    }
+
+    for (int32 FoamIndex = 0; FoamIndex < Spec.FoamTrainCount; ++FoamIndex)
+    {
+        const float X = -4050.0f + static_cast<float>(FoamIndex) * (28000.0f / FMath::Max(1, Spec.FoamTrainCount));
+        const float CenterY = GetPreviewRiverCenterY(Spec, X);
+        const float Offset = FMath::Sin(static_cast<float>(FoamIndex) * 1.7f) * Spec.RiverHalfWidthCm * 0.42f;
+        const float LengthScale = Spec.bDesertCanyon ? 4.0f : 3.2f;
+        AddPreviewMeshActor(
+            World,
+            PlaneMesh,
+            FString::Printf(TEXT("RaftSim_FoamTongue_%02d_%s"), FoamIndex, *Spec.RiverId),
+            FVector(X, CenterY + Offset, 24.0f + static_cast<float>(FoamIndex % 3)),
+            FRotator(0.0f, FMath::Sin(static_cast<float>(FoamIndex) * 0.62f) * 13.0f, 0.0f),
+            FVector(LengthScale, 0.18f + 0.04f * static_cast<float>(FoamIndex % 4), 1.0f),
+            FLinearColor(0.82f, 0.90f, 0.86f));
+
+        if (!Spec.bDesertCanyon && FoamIndex % 3 == 0)
+        {
+            AddPreviewMeshActor(
+                World,
+                PlaneMesh,
+                FString::Printf(TEXT("RaftSim_EddyLine_%02d_%s"), FoamIndex, *Spec.RiverId),
+                FVector(X + 420.0f, CenterY + Spec.RiverHalfWidthCm * 0.76f, 25.0f),
+                FRotator(0.0f, -21.0f, 0.0f),
+                FVector(2.2f, 0.08f, 1.0f),
+                FLinearColor(0.88f, 0.94f, 0.90f));
+        }
+    }
+}
+
+void AddPreviewRaftForeground(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec, UStaticMesh* CubeMesh, UStaticMesh* CylinderMesh)
+{
+    if (!World || !CubeMesh || !CylinderMesh)
+    {
+        return;
+    }
+
+    const float BaseX = -4920.0f;
+    const float CenterY = GetPreviewRiverCenterY(Spec, BaseX);
+    const float Z = 30.0f;
+    AddPreviewMeshActor(
+        World,
+        CylinderMesh,
+        FString::Printf(TEXT("RaftSim_ForegroundRaft_LeftTube_%s"), *Spec.RiverId),
+        FVector(BaseX + 180.0f, CenterY - 92.0f, Z),
+        FRotator(0.0f, 90.0f, 0.0f),
+        FVector(0.38f, 0.38f, 2.9f),
+        Spec.RaftColor);
+    AddPreviewMeshActor(
+        World,
+        CylinderMesh,
+        FString::Printf(TEXT("RaftSim_ForegroundRaft_RightTube_%s"), *Spec.RiverId),
+        FVector(BaseX + 180.0f, CenterY + 92.0f, Z),
+        FRotator(0.0f, 90.0f, 0.0f),
+        FVector(0.38f, 0.38f, 2.9f),
+        Spec.RaftColor);
+    AddPreviewMeshActor(
+        World,
+        CylinderMesh,
+        FString::Printf(TEXT("RaftSim_ForegroundRaft_Bow_%s"), *Spec.RiverId),
+        FVector(BaseX + 470.0f, CenterY, Z + 3.0f),
+        FRotator(90.0f, 0.0f, 0.0f),
+        FVector(0.36f, 0.36f, 1.9f),
+        Spec.RaftColor);
+    AddPreviewMeshActor(
+        World,
+        CubeMesh,
+        FString::Printf(TEXT("RaftSim_ForegroundRaft_Floor_%s"), *Spec.RiverId),
+        FVector(BaseX + 180.0f, CenterY, 16.0f),
+        FRotator::ZeroRotator,
+        FVector(2.6f, 1.0f, 0.05f),
+        FLinearColor(0.04f, 0.045f, 0.04f));
+}
+
+void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
+{
+    if (!World || !GEditor)
+    {
+        return;
+    }
+
+    ADirectionalLight* Sun = Cast<ADirectionalLight>(
+        GEditor->AddActor(World->GetCurrentLevel(), ADirectionalLight::StaticClass(), FTransform(FRotator(-32.0f, -38.0f, 0.0f))));
+    if (Sun)
+    {
+        Sun->SetActorLabel(TEXT("RaftSim_Sun_LumenPreview"));
+        Sun->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 8.5f : 6.5f);
+        Sun->GetLightComponent()->SetLightColor(Spec.bDesertCanyon ? FLinearColor(1.0f, 0.84f, 0.66f) : FLinearColor(0.93f, 0.97f, 1.0f));
+    }
+
+    ASkyLight* SkyLight = Cast<ASkyLight>(
+        GEditor->AddActor(World->GetCurrentLevel(), ASkyLight::StaticClass(), FTransform(FRotator::ZeroRotator, FVector(0.0f, 0.0f, 1000.0f))));
+    if (SkyLight)
+    {
+        SkyLight->SetActorLabel(TEXT("RaftSim_SkyLight_PhotorealPreview"));
+        SkyLight->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 1.35f : 0.95f);
+    }
+
+    ASkyAtmosphere* Atmosphere = Cast<ASkyAtmosphere>(
+        GEditor->AddActor(World->GetCurrentLevel(), ASkyAtmosphere::StaticClass(), FTransform::Identity));
+    if (Atmosphere)
+    {
+        Atmosphere->SetActorLabel(TEXT("RaftSim_SkyAtmosphere_SourceAware"));
+    }
+
+    AExponentialHeightFog* Fog = Cast<AExponentialHeightFog>(
+        GEditor->AddActor(World->GetCurrentLevel(), AExponentialHeightFog::StaticClass(), FTransform(FRotator::ZeroRotator, FVector(0.0f, 0.0f, 220.0f))));
+    if (Fog)
+    {
+        Fog->SetActorLabel(Spec.bHasWaterfalls ? TEXT("RaftSim_RainforestMist") : TEXT("RaftSim_CanyonAtmosphere"));
+        Fog->GetComponent()->SetFogDensity(Spec.bHasWaterfalls ? 0.026f : (Spec.bDesertCanyon ? 0.006f : 0.010f));
+    }
+}
+
+void AddPreviewCameraAndLabels(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
+{
+    if (!World || !GEditor)
+    {
+        return;
+    }
+
+    ACameraActor* Camera = Cast<ACameraActor>(
+        GEditor->AddActor(World->GetCurrentLevel(), ACameraActor::StaticClass(), FTransform(FRotator(-6.5f, 0.0f, 0.0f), FVector(-5250.0f, GetPreviewRiverCenterY(Spec, -5250.0f), 165.0f))));
+    if (Camera)
+    {
+        Camera->SetActorLabel(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"));
+        Camera->GetCameraComponent()->FieldOfView = Spec.bDesertCanyon ? 73.0f : 76.0f;
+        Camera->GetCameraComponent()->PostProcessSettings.bOverride_VignetteIntensity = true;
+        Camera->GetCameraComponent()->PostProcessSettings.VignetteIntensity = 0.10f;
+        Camera->GetCameraComponent()->PostProcessSettings.bOverride_Sharpen = true;
+        Camera->GetCameraComponent()->PostProcessSettings.Sharpen = 0.35f;
+        GEditor->SelectActor(Camera, true, false, true);
+    }
+
+    APlayerStart* PlayerStart = Cast<APlayerStart>(
+        GEditor->AddActor(World->GetCurrentLevel(), APlayerStart::StaticClass(), FTransform(FRotator::ZeroRotator, FVector(-5350.0f, GetPreviewRiverCenterY(Spec, -5350.0f), 120.0f))));
+    if (PlayerStart)
+    {
+        PlayerStart->SetActorLabel(TEXT("RaftSim_GuideSeat_PlayerStart"));
+    }
+
+    ATextRenderActor* Label = Cast<ATextRenderActor>(
+        GEditor->AddActor(World->GetCurrentLevel(), ATextRenderActor::StaticClass(), FTransform(FRotator(0.0f, 0.0f, 0.0f), FVector(-3600.0f, -1350.0f, 420.0f))));
+    if (Label && Label->GetTextRender())
+    {
+        Label->SetActorLabel(TEXT("RaftSim_SourceManifest_Label"));
+        Label->GetTextRender()->SetText(FText::FromString(FString::Printf(
+            TEXT("%s\n%s\nProxy preview: replace with reviewed DEM, imagery, and assets."),
+            *Spec.DisplayName,
+            *Spec.SourceManifest)));
+        Label->GetTextRender()->SetHorizontalAlignment(EHTA_Left);
+        Label->GetTextRender()->SetWorldSize(72.0f);
+    }
+}
+
+bool SavePreviewWorld(UWorld* World, const FString& PackagePath, FString& OutSummary)
+{
+    if (!World)
+    {
+        OutSummary += TEXT("No world to save.\n");
+        return false;
+    }
+
+    World->MarkPackageDirty();
+    const FString Filename = FPackageName::LongPackageNameToFilename(PackagePath, FPackageName::GetMapPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    const bool bSaved = FEditorFileUtils::SaveMap(World, Filename);
+    OutSummary += FString::Printf(TEXT("%s %s -> %s\n"), bSaved ? TEXT("Saved") : TEXT("Failed"), *PackagePath, *Filename);
+    return bSaved;
+}
+
+FString GetPreviewCaptureRelativePath(const FRaftSimEnvironmentPreviewSpec& Spec)
+{
+    return FPaths::Combine(
+        TEXT("docs/environment-captures/photoreal_river_previews"),
+        Spec.RiverId + TEXT("_guide_seat_downstream.png"));
+}
+
+ACameraActor* FindPreviewCaptureCamera(UWorld* World)
+{
+    ACameraActor* FallbackCamera = nullptr;
+    for (TActorIterator<ACameraActor> It(World); It; ++It)
+    {
+        ACameraActor* Camera = *It;
+        if (!FallbackCamera)
+        {
+            FallbackCamera = Camera;
+        }
+
+        if (Camera && Camera->GetActorLabel() == TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"))
+        {
+            return Camera;
+        }
+    }
+
+    return FallbackCamera;
+}
+
+bool CapturePreviewImageForSpec(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FString& CaptureRoot,
+    FString& OutRelativeCapturePath,
+    FString& OutSummary)
+{
+    const FString MapFilename =
+        FPackageName::LongPackageNameToFilename(Spec.MapPackagePath, FPackageName::GetMapPackageExtension());
+    if (!FPaths::FileExists(MapFilename))
+    {
+        OutSummary += FString::Printf(TEXT("Missing preview map for capture: %s\n"), *MapFilename);
+        return false;
+    }
+
+    UWorld* World = UEditorLoadingAndSavingUtils::LoadMap(MapFilename);
+    if (!World)
+    {
+        OutSummary += FString::Printf(TEXT("Failed to load preview map for capture: %s\n"), *Spec.MapPackagePath);
+        return false;
+    }
+
+    FlushAsyncLoading();
+    World->FlushLevelStreaming(EFlushLevelStreamingType::Full);
+
+    ACameraActor* Camera = FindPreviewCaptureCamera(World);
+    if (!Camera || !Camera->GetCameraComponent())
+    {
+        OutSummary += FString::Printf(TEXT("No guide-seat capture camera found in %s\n"), *Spec.MapPackagePath);
+        return false;
+    }
+
+    UTextureRenderTarget2D* RenderTarget =
+        NewObject<UTextureRenderTarget2D>(GetTransientPackage(), NAME_None, RF_Transient);
+    if (!RenderTarget)
+    {
+        OutSummary += FString::Printf(TEXT("Failed to allocate render target for %s\n"), *Spec.RiverId);
+        return false;
+    }
+
+    constexpr int32 CaptureWidth = 1280;
+    constexpr int32 CaptureHeight = 720;
+    RenderTarget->RenderTargetFormat = RTF_RGBA8_SRGB;
+    RenderTarget->ClearColor = FLinearColor::Black;
+    RenderTarget->InitAutoFormat(CaptureWidth, CaptureHeight);
+    RenderTarget->UpdateResourceImmediate(true);
+
+    ASceneCapture2D* SceneCapture =
+        World->SpawnActor<ASceneCapture2D>(ASceneCapture2D::StaticClass(), Camera->GetActorLocation(), Camera->GetActorRotation());
+    if (!SceneCapture || !SceneCapture->GetCaptureComponent2D())
+    {
+        OutSummary += FString::Printf(TEXT("Failed to spawn scene capture for %s\n"), *Spec.RiverId);
+        return false;
+    }
+
+    USceneCaptureComponent2D* CaptureComponent = SceneCapture->GetCaptureComponent2D();
+    FMinimalViewInfo CameraView;
+    Camera->GetCameraComponent()->GetCameraView(0.0f, CameraView);
+    CaptureComponent->SetCameraView(CameraView);
+    CaptureComponent->TextureTarget = RenderTarget;
+    CaptureComponent->CaptureSource = SCS_FinalColorLDR;
+    CaptureComponent->bCaptureEveryFrame = false;
+    CaptureComponent->bCaptureOnMovement = false;
+    CaptureComponent->CaptureScene();
+    FlushRenderingCommands();
+
+    FTextureRenderTargetResource* RenderTargetResource = RenderTarget->GameThread_GetRenderTargetResource();
+    TArray<FColor> ImageData;
+    if (!RenderTargetResource || !RenderTargetResource->ReadPixels(ImageData) ||
+        ImageData.Num() != CaptureWidth * CaptureHeight)
+    {
+        SceneCapture->Destroy();
+        RenderTarget->ReleaseResource();
+        OutSummary += FString::Printf(TEXT("Failed to read rendered pixels for %s\n"), *Spec.RiverId);
+        return false;
+    }
+
+    for (FColor& Pixel : ImageData)
+    {
+        Pixel.A = 255;
+    }
+
+    TArray64<uint8> CompressedPng;
+    FImageUtils::PNGCompressImageArray(CaptureWidth, CaptureHeight, MakeArrayView(ImageData), CompressedPng);
+
+    OutRelativeCapturePath = GetPreviewCaptureRelativePath(Spec);
+    const FString AbsoluteCapturePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), OutRelativeCapturePath));
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    const bool bSaved = FFileHelper::SaveArrayToFile(CompressedPng, *AbsoluteCapturePath);
+
+    SceneCapture->Destroy();
+    RenderTarget->ReleaseResource();
+
+    OutSummary += FString::Printf(
+        TEXT("%s rendered guide-seat capture for %s -> %s\n"),
+        bSaved ? TEXT("Saved") : TEXT("Failed"),
+        *Spec.DisplayName,
+        *AbsoluteCapturePath);
+    return bSaved;
+}
+
+bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString& OutSummary)
+{
+    UWorld* World = UEditorLoadingAndSavingUtils::NewBlankMap(false);
+    if (!World)
+    {
+        OutSummary += FString::Printf(TEXT("Failed to create blank map for %s\n"), *Spec.RiverId);
+        return false;
+    }
+
+    UStaticMesh* CubeMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
+    UStaticMesh* PlaneMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Plane.Plane"));
+    UStaticMesh* SphereMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
+    UStaticMesh* ConeMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Cone.Cone"));
+    UStaticMesh* CylinderMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
+    UStaticMesh* PcgBoulderMesh = LoadPreviewMesh(TEXT("/PCG/SampleContent/SimpleForest/Meshes/PCG_Boulder_02.PCG_Boulder_02"));
+
+    AddPreviewLightRig(World, Spec);
+
+    AddPreviewTerrainMesh(World, Spec);
+    AddPreviewRiverRibbonMesh(World, Spec);
+    AddPreviewRaftForeground(World, Spec, CubeMesh, CylinderMesh);
+    AddPreviewFoamAndHydraulics(World, Spec, PlaneMesh);
+
+    for (int32 BoulderIndex = 0; BoulderIndex < Spec.BoulderCount; ++BoulderIndex)
+    {
+        const float X = -3600.0f + static_cast<float>(BoulderIndex) * (28200.0f / FMath::Max(1, Spec.BoulderCount));
+        const float CenterY = GetPreviewRiverCenterY(Spec, X);
+        const float Side = (BoulderIndex % 2 == 0) ? -1.0f : 1.0f;
+        const float Y = CenterY + Side * (Spec.RiverHalfWidthCm * (0.32f + 0.55f * FMath::Abs(FMath::Sin(static_cast<float>(BoulderIndex) * 1.91f))));
+        const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y);
+        const float Scale = Spec.bDesertCanyon ? 1.6f : 1.0f + 0.35f * static_cast<float>(BoulderIndex % 3);
+        AddPreviewMeshActor(
+            World,
+            PcgBoulderMesh ? PcgBoulderMesh : SphereMesh,
+            FString::Printf(TEXT("RaftSim_SourceAwareBoulder_%02d_%s"), BoulderIndex, *Spec.RiverId),
+            FVector(X, Y, FMath::Max(24.0f, TerrainZ + 44.0f + 12.0f * static_cast<float>(BoulderIndex % 4))),
+            FRotator(0.0f, static_cast<float>(BoulderIndex * 31), 0.0f),
+            PcgBoulderMesh ? FVector(Scale * 1.25f, Scale * 1.05f, Scale * 0.72f) : FVector(Scale * 1.4f, Scale, Scale * 0.62f),
+            Spec.RockColor);
+    }
+
+    for (int32 FoliageIndex = 0; FoliageIndex < Spec.FoliageCount; ++FoliageIndex)
+    {
+        const float X = -4800.0f + static_cast<float>(FoliageIndex) * (31000.0f / FMath::Max(1, Spec.FoliageCount));
+        const float CenterY = GetPreviewRiverCenterY(Spec, X);
+        const float Side = (FoliageIndex % 2 == 0) ? -1.0f : 1.0f;
+        const float BankOffset = Spec.bDesertCanyon ? Spec.RiverHalfWidthCm + 1350.0f : Spec.RiverHalfWidthCm + 620.0f;
+        const float Y = CenterY + Side * (BankOffset + 210.0f * FMath::Sin(static_cast<float>(FoliageIndex) * 1.31f));
+        const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y);
+        const float Height = Spec.bHasWaterfalls ? 2.35f + 0.28f * static_cast<float>(FoliageIndex % 5) : (Spec.bDesertCanyon ? 0.50f : 1.45f + 0.18f * static_cast<float>(FoliageIndex % 3));
+        AddPreviewMeshActor(
+            World,
+            CylinderMesh,
+            FString::Printf(TEXT("RaftSim_FoliageTrunk_%02d_%s"), FoliageIndex, *Spec.RiverId),
+            FVector(X, Y, TerrainZ + 95.0f * Height * 0.45f),
+            FRotator::ZeroRotator,
+            FVector(Spec.bDesertCanyon ? 0.18f : 0.24f, Spec.bDesertCanyon ? 0.18f : 0.24f, Height),
+            Spec.bDesertCanyon ? FLinearColor(0.21f, 0.18f, 0.10f) : FLinearColor(0.20f, 0.12f, 0.07f));
+        AddPreviewMeshActor(
+            World,
+            ConeMesh,
+            FString::Printf(TEXT("RaftSim_FoliageCanopy_%02d_%s"), FoliageIndex, *Spec.RiverId),
+            FVector(X, Y, TerrainZ + 140.0f * Height),
+            FRotator(0.0f, static_cast<float>((FoliageIndex * 47) % 360), 0.0f),
+            FVector(Spec.bHasWaterfalls ? 1.55f : (Spec.bDesertCanyon ? 0.62f : 1.0f), Spec.bHasWaterfalls ? 1.55f : (Spec.bDesertCanyon ? 0.62f : 1.0f), Height * 0.86f),
+            Spec.FoliageColor);
+
+        if (!Spec.bDesertCanyon && FoliageIndex % 4 == 0)
+        {
+            const float UnderstoryX = X + 140.0f;
+            const float UnderstoryY = Y - Side * 180.0f;
+            AddPreviewMeshActor(
+                World,
+                ConeMesh,
+                FString::Printf(TEXT("RaftSim_Understory_%02d_%s"), FoliageIndex, *Spec.RiverId),
+                FVector(UnderstoryX, UnderstoryY, GetPreviewTerrainHeightCm(Spec, UnderstoryX, UnderstoryY) + 22.0f),
+                FRotator(0.0f, static_cast<float>((FoliageIndex * 29) % 360), 0.0f),
+                FVector(0.44f, 0.44f, 0.42f),
+                Spec.FoliageColor);
+        }
+    }
+
+    if (Spec.bHasWaterfalls)
+    {
+        for (int32 WaterfallIndex = 0; WaterfallIndex < 5; ++WaterfallIndex)
+        {
+            const float X = 4000.0f + static_cast<float>(WaterfallIndex) * 4300.0f;
+            const float Side = (WaterfallIndex % 2 == 0) ? -1.0f : 1.0f;
+            const float Y = GetPreviewRiverCenterY(Spec, X) + Side * 2200.0f;
+            AddPreviewMeshActor(
+                World,
+                CubeMesh,
+                FString::Printf(TEXT("RaftSim_RainforestWaterfall_%02d"), WaterfallIndex),
+                FVector(X, Y, 660.0f),
+                FRotator::ZeroRotator,
+                FVector(3.0f, 0.55f, 9.5f),
+                FLinearColor(0.72f, 0.92f, 0.94f));
+        }
+    }
+
+    AddPreviewCameraAndLabels(World, Spec);
+    return SavePreviewWorld(World, Spec.MapPackagePath, OutSummary);
 }
 
 FText SeverityText(ERaftSimToolValidationSeverity Severity)
@@ -230,6 +1067,27 @@ void FRaftSimEditorModule::StartupModule()
         TEXT("RaftSim.CaptureToolEvidence"),
         TEXT("Open RaftSim tool tabs and capture screenshot evidence."),
         FConsoleCommandWithArgsDelegate::CreateRaw(this, &FRaftSimEditorModule::HandleCaptureToolEvidenceCommand));
+    CreatePhotorealEnvironmentPreviewMapsConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+        TEXT("RaftSim.CreatePhotorealEnvironmentPreviewMaps"),
+        TEXT("Generate source-aware procedural preview maps for the runnable river environments."),
+        FConsoleCommandWithArgsDelegate::CreateRaw(this, &FRaftSimEditorModule::HandleCreatePhotorealEnvironmentPreviewMapsCommand));
+    CapturePhotorealEnvironmentPreviewsConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+        TEXT("RaftSim.CapturePhotorealEnvironmentPreviews"),
+        TEXT("Record the river environment preview capture manifest placeholder."),
+        FConsoleCommandWithArgsDelegate::CreateRaw(this, &FRaftSimEditorModule::HandleCapturePhotorealEnvironmentPreviewsCommand));
+
+    bCreatePhotorealEnvironmentPreviewMapsOnStartup =
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreatePhotorealEnvironmentPreviewMaps"));
+    bCapturePhotorealEnvironmentPreviewsOnStartup =
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimCapturePhotorealEnvironmentPreviews"));
+    bExitAfterPhotorealEnvironmentAutomation =
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimExitAfterEnvironmentAutomation"));
+
+    if (bCreatePhotorealEnvironmentPreviewMapsOnStartup || bCapturePhotorealEnvironmentPreviewsOnStartup)
+    {
+        PhotorealEnvironmentAutomationPostEngineInitHandle =
+            FCoreDelegates::GetOnPostEngineInit().AddRaw(this, &FRaftSimEditorModule::HandlePhotorealEnvironmentAutomationStartup);
+    }
 
     UToolMenus::RegisterStartupCallback(
         FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FRaftSimEditorModule::RegisterMenus));
@@ -237,10 +1095,23 @@ void FRaftSimEditorModule::StartupModule()
 
 void FRaftSimEditorModule::ShutdownModule()
 {
+    if (PhotorealEnvironmentAutomationPostEngineInitHandle.IsValid())
+    {
+        FCoreDelegates::GetOnPostEngineInit().Remove(PhotorealEnvironmentAutomationPostEngineInitHandle);
+        PhotorealEnvironmentAutomationPostEngineInitHandle.Reset();
+    }
+    if (PhotorealEnvironmentAutomationTickerHandle.IsValid())
+    {
+        FTSTicker::RemoveTicker(PhotorealEnvironmentAutomationTickerHandle);
+        PhotorealEnvironmentAutomationTickerHandle.Reset();
+    }
+
     OpenToolConsoleCommand.Reset();
     OpenAllToolsConsoleCommand.Reset();
     CreateReviewedDataAssetsConsoleCommand.Reset();
     CaptureToolEvidenceConsoleCommand.Reset();
+    CreatePhotorealEnvironmentPreviewMapsConsoleCommand.Reset();
+    CapturePhotorealEnvironmentPreviewsConsoleCommand.Reset();
     UnregisterToolTabs();
 
     if (UObjectInitialized())
@@ -342,6 +1213,30 @@ void FRaftSimEditorModule::PopulateRaftSimToolsMenu(UToolMenu* Menu)
                 CaptureToolEvidence(Summary);
                 UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
             })));
+    UtilitySection.AddMenuEntry(
+        TEXT("CreatePhotorealEnvironmentPreviewMaps"),
+        LOCTEXT("CreatePhotorealEnvironmentPreviewMaps", "Create River Preview Maps"),
+        LOCTEXT("CreatePhotorealEnvironmentPreviewMapsTooltip", "Generate source-aware procedural Unreal preview maps for South Fork, Colorado, and Pacuare."),
+        FSlateIcon(),
+        FUIAction(FExecuteAction::CreateLambda(
+            [this]()
+            {
+                FString Summary;
+                CreatePhotorealEnvironmentPreviewMaps(Summary);
+                UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+            })));
+    UtilitySection.AddMenuEntry(
+        TEXT("CapturePhotorealEnvironmentPreviews"),
+        LOCTEXT("CapturePhotorealEnvironmentPreviews", "Capture River Preview Evidence"),
+        LOCTEXT("CapturePhotorealEnvironmentPreviewsTooltip", "Record capture evidence placeholders for generated river environment previews."),
+        FSlateIcon(),
+        FUIAction(FExecuteAction::CreateLambda(
+            [this]()
+            {
+                FString Summary;
+                CapturePhotorealEnvironmentPreviews(Summary);
+                UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+            })));
 }
 
 void FRaftSimEditorModule::LaunchTool(FName ToolId)
@@ -392,6 +1287,76 @@ void FRaftSimEditorModule::HandleCaptureToolEvidenceCommand(const TArray<FString
     FString Summary;
     CaptureToolEvidence(Summary);
     UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+}
+
+void FRaftSimEditorModule::HandleCreatePhotorealEnvironmentPreviewMapsCommand(const TArray<FString>&)
+{
+    FString Summary;
+    CreatePhotorealEnvironmentPreviewMaps(Summary);
+    UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+}
+
+void FRaftSimEditorModule::HandleCapturePhotorealEnvironmentPreviewsCommand(const TArray<FString>&)
+{
+    FString Summary;
+    CapturePhotorealEnvironmentPreviews(Summary);
+    UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+}
+
+void FRaftSimEditorModule::HandlePhotorealEnvironmentAutomationStartup()
+{
+    if (PhotorealEnvironmentAutomationPostEngineInitHandle.IsValid())
+    {
+        FCoreDelegates::GetOnPostEngineInit().Remove(PhotorealEnvironmentAutomationPostEngineInitHandle);
+        PhotorealEnvironmentAutomationPostEngineInitHandle.Reset();
+    }
+
+    PhotorealEnvironmentAutomationTickerHandle = FTSTicker::GetCoreTicker().AddTicker(
+        FTickerDelegate::CreateRaw(this, &FRaftSimEditorModule::TickPhotorealEnvironmentAutomationStartup),
+        0.5f);
+}
+
+bool FRaftSimEditorModule::TickPhotorealEnvironmentAutomationStartup(float)
+{
+    ++PhotorealEnvironmentAutomationStartupAttempts;
+    if (!GEditor || !GEditor->GetEditorWorldContext().World())
+    {
+        if (PhotorealEnvironmentAutomationStartupAttempts < 120)
+        {
+            return true;
+        }
+
+        UE_LOG(LogRaftSimEditor, Error, TEXT("Timed out waiting for an editor world before photoreal environment automation."));
+        if (bExitAfterPhotorealEnvironmentAutomation)
+        {
+            FPlatformMisc::RequestExit(true, TEXT("RaftSim photoreal environment automation timed out"));
+        }
+        return false;
+    }
+
+    PhotorealEnvironmentAutomationTickerHandle.Reset();
+
+    FString Summary;
+    bool bSucceeded = true;
+
+    if (bCreatePhotorealEnvironmentPreviewMapsOnStartup)
+    {
+        bSucceeded &= CreatePhotorealEnvironmentPreviewMaps(Summary);
+    }
+
+    if (bCapturePhotorealEnvironmentPreviewsOnStartup)
+    {
+        bSucceeded &= CapturePhotorealEnvironmentPreviews(Summary);
+    }
+
+    UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+
+    if (bExitAfterPhotorealEnvironmentAutomation)
+    {
+        FPlatformMisc::RequestExit(!bSucceeded, TEXT("RaftSim photoreal environment automation complete"));
+    }
+
+    return false;
 }
 
 void FRaftSimEditorModule::ExecuteValidationAction(FName ActionId)
@@ -876,6 +1841,87 @@ bool FRaftSimEditorModule::CaptureToolEvidence(FString& OutSummary)
     FFileHelper::SaveStringToFile(Manifest, *FPaths::Combine(CaptureRoot, TEXT("tool_capture_manifest.json")));
 
     return bAllCaptured;
+}
+
+bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSummary)
+{
+    const FString SourcePlanRelativePath =
+        TEXT("unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json");
+    const FString SourcePlanAbsolutePath =
+        FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), SourcePlanRelativePath));
+
+    if (!FPaths::FileExists(SourcePlanAbsolutePath))
+    {
+        OutSummary += FString::Printf(TEXT("Missing photoreal river source plan: %s\n"), *SourcePlanAbsolutePath);
+        return false;
+    }
+
+    OutSummary += FString::Printf(TEXT("Using photoreal river source plan: %s\n"), *SourcePlanRelativePath);
+
+    bool bAllSaved = true;
+    for (const FRaftSimEnvironmentPreviewSpec& Spec : GetEnvironmentPreviewSpecs())
+    {
+        OutSummary += FString::Printf(TEXT("Generating %s preview map.\n"), *Spec.DisplayName);
+        bAllSaved &= BuildPreviewMapForSpec(Spec, OutSummary);
+    }
+
+    return bAllSaved;
+}
+
+bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSummary)
+{
+    const FString CaptureRoot = GetEnvironmentCaptureRoot();
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+
+    FString EntriesJson;
+    bool bAllCaptured = true;
+    const TArray<FRaftSimEnvironmentPreviewSpec> Specs = GetEnvironmentPreviewSpecs();
+    for (int32 Index = 0; Index < Specs.Num(); ++Index)
+    {
+        const FRaftSimEnvironmentPreviewSpec& Spec = Specs[Index];
+        FString CapturePath = GetPreviewCaptureRelativePath(Spec);
+        const bool bCaptured = CapturePreviewImageForSpec(Spec, CaptureRoot, CapturePath, OutSummary);
+        bAllCaptured &= bCaptured;
+
+        EntriesJson += FString::Printf(
+            TEXT("%s    {\n")
+            TEXT("      \"river_id\": \"%s\",\n")
+            TEXT("      \"display_name\": \"%s\",\n")
+            TEXT("      \"map_package\": \"%s\",\n")
+            TEXT("      \"source_manifest\": \"%s\",\n")
+            TEXT("      \"capture\": \"%s\",\n")
+            TEXT("      \"status\": \"%s\",\n")
+            TEXT("      \"fidelity_note\": \"source-aware procedural blockout with generated valley, river, foam, rocks, foliage, and raft proxies; not yet production photoreal\"\n")
+            TEXT("    }"),
+            Index == 0 ? TEXT("") : TEXT(",\n"),
+            *EscapeRaftSimJsonString(Spec.RiverId),
+            *EscapeRaftSimJsonString(Spec.DisplayName),
+            *EscapeRaftSimJsonString(Spec.MapPackagePath),
+            *EscapeRaftSimJsonString(Spec.SourceManifest),
+            *EscapeRaftSimJsonString(CapturePath),
+            bCaptured ? TEXT("captured_procedural_blockout_render") : TEXT("capture_failed"));
+    }
+
+    const FString Manifest = FString::Printf(
+        TEXT("{\n")
+        TEXT("  \"schema\": \"raftsim.unreal.environment_capture_manifest.v1\",\n")
+        TEXT("  \"capture_type\": \"guide_seat_downstream_unreal_preview\",\n")
+        TEXT("  \"source_plan\": \"unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json\",\n")
+        TEXT("  \"status\": \"%s\",\n")
+        TEXT("  \"captures\": [\n")
+        TEXT("%s\n")
+        TEXT("  ]\n")
+        TEXT("}\n"),
+        bAllCaptured ? TEXT("rendered_procedural_blockout_captures_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
+        *EntriesJson);
+
+    const FString ManifestPath = FPaths::Combine(CaptureRoot, TEXT("environment_capture_manifest.json"));
+    const bool bSaved = FFileHelper::SaveStringToFile(Manifest, *ManifestPath);
+    OutSummary += FString::Printf(
+        TEXT("%s environment preview capture manifest -> %s\n"),
+        bSaved ? TEXT("Saved") : TEXT("Failed"),
+        *ManifestPath);
+    return bSaved && bAllCaptured;
 }
 
 bool FRaftSimEditorModule::SaveWidgetScreenshot(
