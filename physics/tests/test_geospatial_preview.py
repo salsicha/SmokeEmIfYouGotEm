@@ -5,6 +5,7 @@ from PIL import Image
 
 from raftsim.geospatial_preview import (
     build_colorado_import_pilot_derivatives,
+    build_colorado_production_hydrography_drafts,
     build_pacuare_import_pilot_derivatives,
     build_source_imagery_masks,
     build_south_fork_import_pilot_derivatives,
@@ -180,6 +181,88 @@ def test_build_south_fork_production_hydrography_drafts_records_review_gates(tmp
     assert banks["features"][0]["properties"]["status"] == "draft_offset_line_not_reviewed_bank"
     assert generated_cross_sections["features"][0]["properties"]["status"] == (
         "draft_production_import_cross_section_review_line_not_solver_section"
+    )
+
+
+def test_build_colorado_production_hydrography_drafts_records_river_mile_review_gates(tmp_path):
+    colorado_root = tmp_path / "colorado"
+    hydro_root = colorado_root / "hydrography"
+    hydro_root.mkdir(parents=True)
+
+    stationing = {
+        "local_transform": {"station_axis": "downstream_from_exact_graph_upstream_endpoint_meters"},
+        "summary": {
+            "length_m_geodesic_vertices": 300.0,
+            "source_length_km_nhd_sum": 0.3,
+            "station_sample_count": 3,
+            "vertex_count": 3,
+        },
+        "vertices": [
+            {"lon": -111.5, "lat": 36.9},
+            {"lon": -111.55, "lat": 36.86},
+            {"lon": -111.6, "lat": 36.82},
+        ],
+        "station_samples": [
+            {"station_m": 0.0},
+            {"station_m": 150.0},
+            {"station_m": 300.0},
+        ],
+    }
+    cross_sections = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[-111.501, 36.9], [-111.5, 36.9], [-111.499, 36.9]],
+                },
+                "properties": {"cross_section_id": "xs_000", "half_width_m": 200.0, "station_m": 0.0},
+            },
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[-111.601, 36.82], [-111.6, 36.82], [-111.599, 36.82]],
+                },
+                "properties": {"cross_section_id": "xs_001", "half_width_m": 200.0, "station_m": 300.0},
+            },
+        ],
+    }
+    mainstem_manifest = {
+        "summary": {
+            "source_length_km_sum": 0.3,
+            "upstream_endpoint_lonlat": [-111.5, 36.9],
+            "downstream_endpoint_lonlat": [-111.6, 36.82],
+        }
+    }
+    (hydro_root / "nhd_hu8_lees_ferry_mainstem_stationing_candidate.json").write_text(
+        json.dumps(stationing), encoding="utf-8"
+    )
+    (hydro_root / "nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson").write_text(
+        json.dumps(cross_sections), encoding="utf-8"
+    )
+    (hydro_root / "nhd_hu8_lees_ferry_mainstem_candidate_manifest.json").write_text(
+        json.dumps(mainstem_manifest), encoding="utf-8"
+    )
+
+    build_colorado_production_hydrography_drafts(colorado_root, repo_root=tmp_path)
+
+    output_root = hydro_root / "production_import_pilot"
+    manifest = json.loads((output_root / "hydrography_draft_manifest.json").read_text(encoding="utf-8"))
+    centerline = json.loads((output_root / "centerline.geojson").read_text(encoding="utf-8"))
+    banks = json.loads((output_root / "banks.geojson").read_text(encoding="utf-8"))
+    generated_cross_sections = json.loads((output_root / "cross_sections.geojson").read_text(encoding="utf-8"))
+
+    assert manifest["schema"] == "raftsim.colorado_production_hydrography_drafts.manifest.v1"
+    assert manifest["summary"]["centerline_vertex_count"] == 3
+    assert manifest["summary"]["cross_section_count"] == 2
+    assert manifest["summary"]["mainstem_orientation"] == "upstream_endpoint_to_downstream_endpoint_from_exact_graph_review"
+    assert manifest["outputs"]["centerline"] == "colorado/hydrography/production_import_pilot/centerline.geojson"
+    assert "river-mile" in centerline["features"][0]["properties"]["promotion_gate"]
+    assert banks["properties"]["review_status"] == "offset_lines_review_required_not_banks_sandbars_or_wetted_width"
+    assert generated_cross_sections["properties"]["review_status"] == (
+        "draft_review_lines_not_solver_cross_sections_or_sandbar_boundaries"
     )
 
 

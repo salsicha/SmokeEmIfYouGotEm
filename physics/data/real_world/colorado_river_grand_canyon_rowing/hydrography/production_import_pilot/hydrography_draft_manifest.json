@@ -1,0 +1,53 @@
+{
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "alignment_diagnostic": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic.json",
+    "cross_section_seeds": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson",
+    "mainstem_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_mainstem_candidate_manifest.json",
+    "stationing": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+    "water_prior_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json"
+  },
+  "output_checksums": {
+    "banks": {
+      "sha256": "d1f363e6cd9f176b171ac602f8604d1773cc00fd4454c046deed9b6e415d3e47"
+    },
+    "centerline": {
+      "sha256": "0a6ff25d816b1cb30a3e63fe7bf7697201c7c24c56241af038c0e354881d5d2c"
+    },
+    "cross_sections": {
+      "sha256": "d6483910027e158a320a8f3fc7de869417d733a3fd2c1cb594b6189b02528ee2"
+    }
+  },
+  "outputs": {
+    "banks": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/banks.geojson",
+    "centerline": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/centerline.geojson",
+    "cross_sections": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/cross_sections.geojson"
+  },
+  "review_gates": [
+    "Confirm the NHD-derived centerline direction, station zero, canyon working CRS, and river-mile relation.",
+    "Edit banks against NAIP, DEM relief, water prior masks, release-band exposure, sandbars, eddies, camps/access sensitivity, and oarsman notes.",
+    "Reject or repair out-of-bounds/low-water cross-section centers before solver grid generation.",
+    "Attach river-mile, sandbar, eddy, access, rescue, and oar-line annotations before gameplay or Unreal production authority."
+  ],
+  "river_id": "colorado_river",
+  "schema": "raftsim.colorado_production_hydrography_drafts.manifest.v1",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "status": "draft_hydrography_artifacts_generated_review_required_not_production_authority",
+  "summary": {
+    "bank_offset_line_count": 2,
+    "centerline_station_sample_count": 244,
+    "centerline_vertex_count": 145,
+    "cross_section_count": 123,
+    "downstream_endpoint_wgs84": [
+      -111.643659804,
+      36.79850281
+    ],
+    "length_m_preview": 24223.694,
+    "mainstem_orientation": "upstream_endpoint_to_downstream_endpoint_from_exact_graph_review",
+    "source_length_km_nhd_sum": 24.205286,
+    "upstream_endpoint_wgs84": [
+      -111.516728471,
+      36.877735076
+    ]
+  }
+}

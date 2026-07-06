@@ -18,6 +18,10 @@ from raftsim.real_world import (
     COLORADO_NHD_MAINSTEM_STATIONING_FILE,
     COLORADO_NHD_WATER_PRIOR_FILE,
     COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE,
+    COLORADO_PRODUCTION_BANKS_DRAFT_FILE,
+    COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE,
+    COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
+    COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE,
     COLORADO_PRODUCTION_IMPORT_PILOT_FILE,
     COLORADO_USBR_RELEASE_CONTEXT_FILE,
     COLORADO_USBR_TOTAL_RELEASE_FILE,
@@ -382,6 +386,10 @@ def test_colorado_production_import_pilot_exposes_lees_ferry_tile_plan_and_revie
     assert COLORADO_NHD_CROSS_SECTION_SEED_MANIFEST_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert COLORADO_NHD_CROSS_SECTION_SEED_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert COLORADO_NHD_ALIGNMENT_DIAGNOSTIC_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert COLORADO_PRODUCTION_BANKS_DRAFT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
+    assert COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert classes["seasonal_flow_or_release_history"]["status"] == (
         "usgs_daily_discharge_and_usbr_release_context_attached_review_pending"
     )
@@ -593,6 +601,55 @@ def test_colorado_nhd_water_prior_is_editor_mask_aid_not_segmentation_truth():
     assert manifest["processing"]["gaussian_blur_radius_px"] == 8
     assert manifest["summary"]["nonzero_pixel_fraction"] == 0.076495
     assert manifest["summary"]["sha256"] == "c7cf5be58214c53a0b04aada52cd98faa96c8e3f7b670bb562bdebf6ff5d7936"
+
+
+def test_colorado_production_hydrography_drafts_are_review_gated():
+    colorado_dir = REAL_WORLD_DATA_DIR / "colorado_river_grand_canyon_rowing"
+    source_manifest = json.loads((colorado_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((colorado_dir / "production_source_pull_manifest.json").read_text())
+    manifest = json.loads((colorado_dir / COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE).read_text())
+    centerline = json.loads((colorado_dir / COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE).read_text())
+    banks = json.loads((colorado_dir / COLORADO_PRODUCTION_BANKS_DRAFT_FILE).read_text())
+    cross_sections = json.loads((colorado_dir / COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE).read_text())
+
+    assert COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE in source_manifest["artifacts"]["hydrography"]
+    assert COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE in source_manifest["artifacts"]["hydrography"]
+    assert COLORADO_PRODUCTION_BANKS_DRAFT_FILE in source_manifest["artifacts"]["hydrography"]
+    assert COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in source_manifest["artifacts"]["hydrography"]
+    assert any(
+        artifact["artifact_id"] == "colorado_production_hydrography_drafts"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert manifest["schema"] == "raftsim.colorado_production_hydrography_drafts.manifest.v1"
+    assert manifest["summary"]["centerline_vertex_count"] == 145
+    assert manifest["summary"]["centerline_station_sample_count"] == 244
+    assert manifest["summary"]["cross_section_count"] == 123
+    assert manifest["summary"]["bank_offset_line_count"] == 2
+    assert manifest["summary"]["length_m_preview"] == 24223.694
+    assert manifest["summary"]["mainstem_orientation"] == "upstream_endpoint_to_downstream_endpoint_from_exact_graph_review"
+    assert manifest["output_checksums"]["centerline"]["sha256"] == (
+        "0a6ff25d816b1cb30a3e63fe7bf7697201c7c24c56241af038c0e354881d5d2c"
+    )
+    assert manifest["output_checksums"]["banks"]["sha256"] == (
+        "d1f363e6cd9f176b171ac602f8604d1773cc00fd4454c046deed9b6e415d3e47"
+    )
+    assert manifest["output_checksums"]["cross_sections"]["sha256"] == (
+        "d6483910027e158a320a8f3fc7de869417d733a3fd2c1cb594b6189b02528ee2"
+    )
+    assert centerline["properties"]["review_status"] == "draft_review_required_not_final_centerline_or_river_miles"
+    assert centerline["features"][0]["properties"]["status"] == (
+        "draft_from_nhd_mainstem_candidate_review_gated_not_final_centerline"
+    )
+    assert banks["properties"]["review_status"] == "offset_lines_review_required_not_banks_sandbars_or_wetted_width"
+    assert len(banks["features"]) == 2
+    assert cross_sections["properties"]["review_status"] == (
+        "draft_review_lines_not_solver_cross_sections_or_sandbar_boundaries"
+    )
+    assert len(cross_sections["features"]) == 123
+    assert all(
+        feature["properties"]["status"] == "draft_production_import_cross_section_review_line_not_solver_section"
+        for feature in cross_sections["features"]
+    )
 
 
 def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_gates():
@@ -910,6 +967,10 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert COLORADO_NHD_CROSS_SECTION_SEED_MANIFEST_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_NHD_CROSS_SECTION_SEED_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_NHD_ALIGNMENT_DIAGNOSTIC_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_PRODUCTION_BANKS_DRAFT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_TOTAL_RELEASE_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in rivers["pacuare"]["attached_preview_inputs"]
