@@ -36,7 +36,7 @@
     "Full corridor DEM/lidar tiles are not downloaded or conditioned yet.",
     "Aerial imagery and water/vegetation masks are not downloaded yet.",
     "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, an ordered South Fork mainstem candidate, preview metric stationing, cross-section seed lines, a preview NAIP/DEM alignment diagnostic, and generated production-import draft centerline/bank/cross-section overlays, but it still needs direction confirmation, production CRS selection, bank/cross-section review, stronger NAIP/DEM alignment, and guide review.",
-    "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window, but broader seasonal windows, A25 X-flag interpretation, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
+    "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window plus a water-year-to-date CDEC seasonal review, but multi-year representative windows, A25 X-flag interpretation, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
     "Access/publication source leads are now attached for South Fork, but exact access geometry, parcel/public-private land status, evacuation routes, sensitive-location screening, and guide/local approval remain open.",
     "No field/social reference media has explicit game-use rights attached yet.",
     "South Fork American reference annotations and rights manifest are attached as link-only review scaffolds, but no item-level media rights, first-party capture, station geometry, or guide approval is recorded yet."
@@ -232,6 +232,44 @@
         "release_pulse_review",
         "future_flow_band_calibration_input",
         "guide_discussion_seed"
+      ]
+    },
+    {
+      "artifact_id": "cdec_cbr_a25_seasonal_window_wy2026_to_2026_07_06",
+      "category": "hydrology_seasonal_flow_stage_release_context_window",
+      "caveats": [
+        "This is a compact derived review artifact; raw multi-megabyte CDEC API payloads are not committed.",
+        "CBR event-service rows returned a local 2025-09-30 23:00 first sample for the requested 2025-10-01 start; that row is retained in daily evidence but excluded from water-year rollups.",
+        "Unflagged negative CBR flow rows are nonphysical and normalized to null for review statistics.",
+        "A25 daily generation discharge includes X-flagged -9999 rows; X is not defined by the attached CDEC FlagList and is excluded pending CDEC/station review.",
+        "Do not retune presets, feature forcing, hole stickiness, wave trains, wet banks, or photoreal water appearance until multi-year seasonal windows, release/routing interpretation, legal/redistribution signoff, and guide review pass."
+      ],
+      "path": "hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
+      "provider": "California Data Exchange Center / California Department of Water Resources",
+      "status": "official_water_year_to_date_context_pulled_review_required",
+      "summary": {
+        "a25_power_generation_valid_daily_samples": 263,
+        "a25_unlisted_flags_observed": [
+          "X"
+        ],
+        "cbr_flow_max_cfs": 5660.0,
+        "cbr_flow_median_of_daily_medians_cfs": 1077.0,
+        "cbr_flow_min_cfs": 198.0,
+        "cbr_flow_valid_event_samples": 26581,
+        "cbr_negative_flow_rows_normalized_to_null": 47,
+        "cbr_stage_max_ft": 7.53,
+        "days_peak_ge_1600_cfs": 182,
+        "days_peak_ge_3000_cfs": 48,
+        "days_peak_ge_900_cfs": 245,
+        "window_end": "2026-07-06T23:59",
+        "window_start": "2025-10-01T00:00"
+      },
+      "url": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2025-10-01T00:00&End=2026-07-06T23:59",
+      "use": [
+        "water_year_to_date_seasonal_flow_review",
+        "high_flow_window_identification",
+        "guide_discussion_seed",
+        "future_multi_year_cdec_window_planning"
       ]
     },
     {

@@ -204,6 +204,7 @@
         "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
         "hydrology/cdec_terms_flags_and_station_relation_review.json",
         "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+        "hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
         "hydrology/production_import_pilot/flow_band_review.json",
         "review/production_import_pilot/access_publication_sensitivity_review.json",
         "review/production_import_pilot/access_points.geojson",
@@ -242,12 +243,13 @@
           ]
         },
         {
-          "promotion_gate": "USGS 11445500 returned no P30D instantaneous time series on 2026-07-06, and CDEC CBR now has a first reproducible event-window pull, terms/flag/station review, and 30-day CBR/A25 context window; tie low/median/high visual variants to broader seasonal windows, release context, legal/redistribution signoff, station-to-reach review, and guide notes.",
+          "promotion_gate": "USGS 11445500 returned no P30D instantaneous time series on 2026-07-06, and CDEC CBR now has a first reproducible event-window pull, terms/flag/station review, 30-day CBR/A25 context window, and water-year-to-date seasonal review; tie low/median/high visual variants to multi-year seasonal windows, release context, legal/redistribution signoff, station-to-reach review, and guide notes.",
           "required_artifacts": [
             "hydrology/south_fork_modern_flow_source_selection.json",
             "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
             "hydrology/cdec_terms_flags_and_station_relation_review.json",
             "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+            "hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
             "hydrology/production_import_pilot/flow_band_review.json"
           ],
           "source_class": "seasonal_flow_or_release_history",
