@@ -1,0 +1,43 @@
+{
+  "asset_class": "URaftSimGeospatialHeightfieldImportTestConfig",
+  "schema": "raftsim.unreal.heightfield_import_test.v1",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "review_gated_not_enabled_for_preview_maps",
+  "source_manifest": "physics/data/real_world/pacuare_river_costa_rica/source_manifest.json",
+  "heightfield_candidate": {
+    "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png",
+    "manifest": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json",
+    "format": "16-bit grayscale PNG",
+    "size_px": 1009,
+    "source_crs": "EPSG:4326 source bounds; final Costa Rica working CRS not selected",
+    "elevation_min_m": 16.122909545898438,
+    "elevation_max_m": 3230.446044921875,
+    "normalization": "0..65535 maps linearly to recorded elevation_min_m..elevation_max_m"
+  },
+  "target_unreal": {
+    "preview_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview",
+    "intended_import_target": "Unreal Landscape import-test level or replacement terrain layer",
+    "enabled_for_automation": false,
+    "reason_disabled": "Heightfield is not clipped, reprojected, conditioned, channel-burned, or guide-reviewed."
+  },
+  "required_before_enable": [
+    "Select Costa Rica working CRS and record WGS84/local/Unreal transforms.",
+    "Clip the DEM to a reviewed Pacuare corridor rather than the current broad planning bounds.",
+    "Void/artifact review the Copernicus DEM and compare against official SNIT/IDECORI or field-reviewed sources.",
+    "Hydrologically condition the river channel, bank breaklines, access edges, shelves, and tributary context.",
+    "Burn or otherwise encode the reviewed river centerline/channel so the Landscape import does not fight the validated water geometry.",
+    "Attach protected-area/access review and guide review before publishing detailed route packages.",
+    "Run editor import/export validation and capture before replacing the current procedural preview terrain."
+  ],
+  "validation_actions": [
+    "RaftSim.SourceChecks",
+    "RaftSim.RoundTripValidation",
+    "RaftSim.CreatePhotorealEnvironmentPreviewMaps",
+    "RaftSim.CapturePhotorealEnvironmentPreviews"
+  ],
+  "notes": [
+    "This contract exists so the Pacuare heightfield artifact has a clear Unreal-side target and gate.",
+    "It must not be treated as production terrain or solver geometry until the conditioning gates pass."
+  ]
+}
