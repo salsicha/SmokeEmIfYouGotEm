@@ -83,7 +83,7 @@
     },
     {
       "class_id": "water_and_vegetation_masks",
-      "promotion_gate": "Derive masks from reviewed imagery, hydrography, and release-band context, then manually review water edge, exposed sandbars, wet rock, tamarisk/cottonwood/scrub, and release-dependent visibility.",
+      "promotion_gate": "Derive masks from reviewed imagery, hydrography, release-band context, and the NHD prior as an editor aid, then manually review water edge, exposed sandbars, wet rock, tamarisk/cottonwood/scrub, and release-dependent visibility.",
       "source_ids": [
         "usda_naip",
         "landsat",
@@ -91,10 +91,12 @@
         "usbr_glen_canyon_release_context",
         "guide_review"
       ],
-      "status": "requires_new_derivatives_from_pilot_imagery_hydrography_and_release_context",
+      "status": "nhd_water_prior_attached_release_sandbar_masks_pending",
       "target_outputs": [
         "imagery/production_import_pilot/water_mask_2048.png",
         "imagery/production_import_pilot/vegetation_mask_2048.png",
+        "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json",
+        "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png",
         "imagery/production_import_pilot/sandbar_wet_bank_mask_2048.png",
         "imagery/production_import_pilot/source_masks_manifest.json"
       ]

@@ -90,6 +90,8 @@ COLORADO_NHD_MAINSTEM_STATIONING_FILE = "hydrography/nhd_hu8_lees_ferry_mainstem
 COLORADO_NHD_CROSS_SECTION_SEED_MANIFEST_FILE = "hydrography/nhd_hu8_lees_ferry_cross_section_seed_manifest.json"
 COLORADO_NHD_CROSS_SECTION_SEED_FILE = "hydrography/nhd_hu8_lees_ferry_cross_section_seed_candidates.geojson"
 COLORADO_NHD_ALIGNMENT_DIAGNOSTIC_FILE = "hydrography/nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic.json"
+COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE = "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json"
+COLORADO_NHD_WATER_PRIOR_FILE = "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png"
 COLORADO_USBR_TOTAL_RELEASE_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json"
 COLORADO_USBR_RELEASE_CONTEXT_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json"
 PACUARE_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
@@ -1379,11 +1381,13 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
             },
             {
                 "class_id": "water_and_vegetation_masks",
-                "status": "requires_new_derivatives_from_pilot_imagery_hydrography_and_release_context",
+                "status": "nhd_water_prior_attached_release_sandbar_masks_pending",
                 "source_ids": ["usda_naip", "landsat", "usgs_3dhp_nhd", "usbr_glen_canyon_release_context", "guide_review"],
                 "target_outputs": [
                     "imagery/production_import_pilot/water_mask_2048.png",
                     "imagery/production_import_pilot/vegetation_mask_2048.png",
+                    COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE,
+                    COLORADO_NHD_WATER_PRIOR_FILE,
                     "imagery/production_import_pilot/sandbar_wet_bank_mask_2048.png",
                     "imagery/production_import_pilot/source_masks_manifest.json",
                 ],
@@ -1949,6 +1953,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "production_import_pilot/heightfield_candidate_2017.png",
                     "production_import_pilot/water_mask_2048.png",
                     "production_import_pilot/vegetation_mask_2048.png",
+                    COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE,
+                    COLORADO_NHD_WATER_PRIOR_FILE,
                     COLORADO_NHD_HU8_MANIFEST_FILE,
                     COLORADO_NHD_HU8_FLOWLINE_EXTRACT_FILE,
                     COLORADO_NHD_HU8_SUPPORT_EXTRACT_FILE,
