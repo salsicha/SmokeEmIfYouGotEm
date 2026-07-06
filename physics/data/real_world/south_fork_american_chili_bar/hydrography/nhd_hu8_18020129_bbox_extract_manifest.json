@@ -1,0 +1,266 @@
+{
+  "adjacent_product_diagnostic": {
+    "bbox_intersection_summary": {
+      "NHDArea": {
+        "archive_feature_count": 47,
+        "bbox_intersecting_feature_count": 0,
+        "fcode_counts": {},
+        "ftype_counts": {},
+        "top_named_features": []
+      },
+      "NHDFlowline": {
+        "archive_feature_count": 32881,
+        "bbox_intersecting_feature_count": 0,
+        "fcode_counts": {},
+        "ftype_counts": {},
+        "top_named_features": []
+      },
+      "NHDLine": {
+        "archive_feature_count": 56,
+        "bbox_intersecting_feature_count": 0,
+        "fcode_counts": {},
+        "ftype_counts": {},
+        "top_named_features": []
+      },
+      "NHDPoint": {
+        "archive_feature_count": 183,
+        "bbox_intersecting_feature_count": 0,
+        "fcode_counts": {},
+        "ftype_counts": {},
+        "top_named_features": []
+      },
+      "NHDWaterbody": {
+        "archive_feature_count": 532,
+        "bbox_intersecting_feature_count": 0,
+        "fcode_counts": {},
+        "ftype_counts": {},
+        "top_named_features": []
+      }
+    },
+    "bounding_box": {
+      "maxX": -120.14103,
+      "maxY": 39.32116,
+      "minX": -121.1725,
+      "minY": 38.70327
+    },
+    "download_url": "https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/HU8/Shape/NHD_H_18020128_HU8_Shape.zip",
+    "downloaded_zip_sha256": "32318dbaba798a54316309c652f1325fb6d7a08b5b3cea9d42105f20476153e3",
+    "extent": "HU-8 Subbasin",
+    "format": "Shapefile",
+    "hydrologic_unit": "18020128",
+    "last_updated": "2023-12-20T23:20:45.344-07:00",
+    "meta_url": "https://www.sciencebase.gov/catalog/item/5a58a76be4b00b291cd6a1d8",
+    "publication_date": "2023-12-20",
+    "selection_note": "This adjacent HU8 product intersects the query envelope metadata but has zero feature hits for the pilot bbox across the reviewed NHD layers, so HU8 18020129 is the corridor source product for this slice.",
+    "size_in_bytes": 19771574,
+    "source_id": "5a58a76be4b00b291cd6a1d8",
+    "title": "USGS National Hydrography Dataset Best Resolution (NHD) for Hydrological Unit (HU) 8 - 18020128 (published 20231220) Shapefile"
+  },
+  "attribution": "USGS National Hydrography Dataset Best Resolution HU8 18020129 via The National Map; preserve product title, sourceId, publication date, download URL, and metadata URL.",
+  "bounds_wgs84": {
+    "max_lat": 38.83,
+    "max_lon": -120.72,
+    "min_lat": 38.74,
+    "min_lon": -120.9
+  },
+  "caveats": [
+    "The extract is spatially bbox-filtered, not hydrologically ordered or geometry-clipped.",
+    "Polygon support features are preserved as raw shapefile part geometry; hole/island topology has not been manually reviewed.",
+    "NHD is a hydrography source, not a final raftable channel mesh; banks, shelves, boulders, eddy lines, and rapid features still need imagery, DEM, hydrology, and guide review.",
+    "Do not use this artifact to tune water physics or gameplay lines until it is aligned against the conditioned terrain and reviewed rapid annotations."
+  ],
+  "extract_method": {
+    "coordinate_rounding_decimal_places": 7,
+    "description": "Features whose source geometry bounding boxes intersect the South Fork pilot bbox are exported whole; geometries are not cut at bbox edges.",
+    "layers": [
+      "NHDFlowline",
+      "NHDWaterbody",
+      "NHDArea",
+      "NHDLine",
+      "NHDPoint"
+    ],
+    "type": "bbox_intersection_full_feature"
+  },
+  "generated_on": "2026-07-06",
+  "layer_summary": {
+    "NHDArea": {
+      "archive_feature_count": 13,
+      "bbox_intersecting_feature_count": 3,
+      "fcode_counts": {
+        "34306": 1,
+        "46006": 2
+      },
+      "ftype_counts": {
+        "343": 1,
+        "460": 2
+      },
+      "top_named_features": [
+        {
+          "count": 1,
+          "gnis_name": "Chili Bar Reservoir"
+        }
+      ]
+    },
+    "NHDFlowline": {
+      "archive_feature_count": 22837,
+      "bbox_intersecting_feature_count": 1816,
+      "fcode_counts": {
+        "33400": 2,
+        "33600": 25,
+        "42807": 4,
+        "46003": 359,
+        "46006": 137,
+        "46007": 1000,
+        "55800": 289
+      },
+      "ftype_counts": {
+        "334": 2,
+        "336": 25,
+        "428": 4,
+        "460": 1496,
+        "558": 289
+      },
+      "top_named_features": [
+        {
+          "count": 102,
+          "gnis_name": "South Fork American River"
+        },
+        {
+          "count": 40,
+          "gnis_name": "Rock Creek"
+        },
+        {
+          "count": 30,
+          "gnis_name": "One Eye Creek"
+        },
+        {
+          "count": 29,
+          "gnis_name": "Mosquito Creek"
+        },
+        {
+          "count": 20,
+          "gnis_name": "Jaybird Creek"
+        },
+        {
+          "count": 20,
+          "gnis_name": "White Rock Creek"
+        },
+        {
+          "count": 19,
+          "gnis_name": "Dutch Creek"
+        },
+        {
+          "count": 18,
+          "gnis_name": "Cold Springs Creek"
+        },
+        {
+          "count": 14,
+          "gnis_name": "Bear Creek"
+        },
+        {
+          "count": 12,
+          "gnis_name": "Weber Creek"
+        },
+        {
+          "count": 7,
+          "gnis_name": "Indian Creek"
+        },
+        {
+          "count": 6,
+          "gnis_name": "Gambler Creek"
+        }
+      ]
+    },
+    "NHDLine": {
+      "archive_feature_count": 87,
+      "bbox_intersecting_feature_count": 5,
+      "fcode_counts": {
+        "36200": 2,
+        "41100": 3
+      },
+      "ftype_counts": {
+        "362": 2,
+        "411": 3
+      },
+      "top_named_features": []
+    },
+    "NHDPoint": {
+      "archive_feature_count": 97,
+      "bbox_intersecting_feature_count": 10,
+      "fcode_counts": {
+        "36700": 2,
+        "36701": 6,
+        "45800": 2
+      },
+      "ftype_counts": {
+        "367": 8,
+        "458": 2
+      },
+      "top_named_features": []
+    },
+    "NHDWaterbody": {
+      "archive_feature_count": 863,
+      "bbox_intersecting_feature_count": 111,
+      "fcode_counts": {
+        "39000": 12,
+        "39001": 27,
+        "39004": 69,
+        "39005": 2,
+        "39009": 1
+      },
+      "ftype_counts": {
+        "390": 111
+      },
+      "top_named_features": [
+        {
+          "count": 1,
+          "gnis_name": "Finnon Reservoir"
+        },
+        {
+          "count": 1,
+          "gnis_name": "Teal Pond"
+        }
+      ]
+    }
+  },
+  "outputs": {
+    "flowline_geojson": "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
+    "support_layers_geojson": "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson"
+  },
+  "promotion_gates": [
+    "Confirm selected HU8 product and source CRS against TNM/USGS metadata before production use.",
+    "Reproject to the selected working CRS and align with the NAIP drape, 3DEP terrain, rapid stationing, banks, and guide-reviewed hazards.",
+    "Derive or review a single ordered South Fork mainstem centerline before replacing seed centerline geometry.",
+    "Use waterbody/area polygons as source evidence only until bank topology, islands/holes, reservoirs, side channels, and seasonal exposure are reviewed.",
+    "Record attribution and product identifiers in any Unreal corridor package that uses these features."
+  ],
+  "review_status": "attached_review_required_not_authoritative_centerline_or_banks",
+  "river_id": "american_south_fork",
+  "schema": "raftsim.nhd_hu8_bbox_extract_manifest.v0",
+  "section_id": "chili_bar_to_coloma",
+  "selected_product": {
+    "bounding_box": {
+      "maxX": -119.98293,
+      "maxY": 38.96562,
+      "minX": -121.1485,
+      "minY": 38.61455
+    },
+    "download_url": "https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/HU8/Shape/NHD_H_18020129_HU8_Shape.zip",
+    "downloaded_zip_sha256": "d75ca0bf998021d71b34c5b52f36a4ce9465a110cae9c3bb4350475a9eda0473",
+    "extent": "HU-8 Subbasin",
+    "format": "Shapefile",
+    "hydrologic_unit": "18020129",
+    "last_updated": "2023-12-20T23:20:48.666-07:00",
+    "meta_url": "https://www.sciencebase.gov/catalog/item/5a58a76be4b00b291cd6a1da",
+    "publication_date": "2023-12-20",
+    "size_in_bytes": 19558205,
+    "source_id": "5a58a76be4b00b291cd6a1da",
+    "title": "USGS National Hydrography Dataset Best Resolution (NHD) for Hydrological Unit (HU) 8 - 18020129 (published 20231220) Shapefile"
+  },
+  "source_crs": {
+    "epsg": "EPSG:4269",
+    "name": "NAD83 geographic degrees",
+    "prj_wkt": "GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]]",
+    "review_note": "Treat as source CRS. Reproject into the selected river working CRS before metric centerline, bank, cross-section, or Unreal transform work."
+  }
+}

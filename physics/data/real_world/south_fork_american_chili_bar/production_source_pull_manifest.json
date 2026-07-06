@@ -35,7 +35,7 @@
   "production_blockers": [
     "Full corridor DEM/lidar tiles are not downloaded or conditioned yet.",
     "Aerial imagery and water/vegetation masks are not downloaded yet.",
-    "Hydrography products are discovered but not clipped into a reviewed corridor workspace yet.",
+    "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, but the mainstem still needs ordering, reprojection, bank/cross-section derivation, NAIP/DEM alignment, and guide review.",
     "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window, but broader seasonal windows, A25 X-flag interpretation, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet."
   ],
@@ -236,7 +236,7 @@
       "artifact_id": "tnm_nhd_products",
       "category": "hydrography_metadata",
       "caveats": [
-        "This is product metadata only; selected NHD/3DHP products still need download, clipping, CRS review, and attribution."
+        "This is product metadata only; the selected HU8 shapefile extract is recorded separately and still needs review before production centerline/bank use."
       ],
       "path": "hydrography/tnm_nhd_products.json",
       "provider": "The National Map",
@@ -253,6 +253,37 @@
         "centerline_source_discovery",
         "flowline_alignment",
         "tributary_context"
+      ]
+    },
+    {
+      "artifact_id": "nhd_hu8_18020129_bbox_extract",
+      "category": "hydrography_source_extract",
+      "caveats": [
+        "The extract is bbox-intersected full source geometry, not clipped at bbox edges.",
+        "The selected source CRS is NAD83 geographic degrees; reproject into the section working CRS before metric authoring.",
+        "The extracted NHD flowlines are not an ordered raftable centerline and do not include reviewed banks, shelves, boulders, eddy lines, or rapid features.",
+        "Waterbody/area polygon topology, islands, side channels, and seasonal exposure still need imagery, DEM, hydrology, and guide review."
+      ],
+      "path": "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+      "provider": "USGS National Hydrography Dataset via The National Map",
+      "related_artifacts": [
+        "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
+        "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson"
+      ],
+      "status": "source_extract_attached_review_required",
+      "summary": {
+        "adjacent_hu8_18020128_feature_hits": 0,
+        "flowline_feature_count": 1816,
+        "named_south_fork_american_river_flowline_count": 102,
+        "selected_hu8": "18020129",
+        "support_feature_count": 129
+      },
+      "url": "https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/HU8/Shape/NHD_H_18020129_HU8_Shape.zip",
+      "use": [
+        "official_hydrography_source_alignment",
+        "future_ordered_centerline_review",
+        "tributary_waterbody_and_bank_context",
+        "naip_dem_alignment_gate"
       ]
     },
     {

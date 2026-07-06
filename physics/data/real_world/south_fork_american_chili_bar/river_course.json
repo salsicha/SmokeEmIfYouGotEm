@@ -576,6 +576,9 @@
       ],
       "hydrography": [
         "hydrography/tnm_nhd_products.json",
+        "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+        "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
+        "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
         "hydrography/centerline.geojson",
         "hydrography/banks.geojson",
         "hydrography/cross_sections.geojson"
@@ -659,6 +662,15 @@
         "status": "metadata_ready",
         "target_artifact": "hydrography/nhd_or_3dhp_flowlines",
         "url": "https://apps.nationalmap.gov/tnmaccess/api/products?datasets=National%20Hydrography%20Dataset%20(NHD)&bbox=-120.90,38.74,-120.72,38.83"
+      },
+      {
+        "category": "hydrography",
+        "fetch_id": "sfa_nhd_hu8_18020129_bbox_extract",
+        "notes": "Selected HU8 18020129 after comparing adjacent HU8 18020128 against the pilot bbox. The attached GeoJSON extract is bbox-intersected source evidence, not an ordered production centerline.",
+        "source_id": "usgs_3dhp_nhd",
+        "status": "downloaded",
+        "target_artifact": "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+        "url": "https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/HU8/Shape/NHD_H_18020129_HU8_Shape.zip"
       },
       {
         "category": "hydrography",

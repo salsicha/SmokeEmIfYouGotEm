@@ -67,6 +67,9 @@ PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION = "raftsim.production_environ
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE = "production_environment_gap_register.json"
 SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE = "hydrology/cdec_terms_flags_and_station_relation_review.json"
 SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE = "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json"
+SOUTH_FORK_NHD_HU8_MANIFEST_FILE = "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json"
+SOUTH_FORK_NHD_HU8_FLOWLINE_EXTRACT_FILE = "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson"
+SOUTH_FORK_NHD_HU8_SUPPORT_EXTRACT_FILE = "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
@@ -860,6 +863,18 @@ def south_fork_american_fetch_specs() -> tuple[RemoteFetchSpec, ...]:
             notes="Use 3DHP if available for the bbox; otherwise use NHD/NHDPlus flowlines and catchments.",
         ),
         RemoteFetchSpec(
+            fetch_id="sfa_nhd_hu8_18020129_bbox_extract",
+            category="hydrography",
+            source_id="usgs_3dhp_nhd",
+            url="https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/HU8/Shape/NHD_H_18020129_HU8_Shape.zip",
+            target_artifact=SOUTH_FORK_NHD_HU8_MANIFEST_FILE,
+            status="downloaded",
+            notes=(
+                "Selected HU8 18020129 after comparing adjacent HU8 18020128 against the pilot bbox. "
+                "The attached GeoJSON extract is bbox-intersected source evidence, not an ordered production centerline."
+            ),
+        ),
+        RemoteFetchSpec(
             fetch_id="sfa_osm_access",
             category="hydrography",
             source_id="osm",
@@ -1127,14 +1142,17 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
             },
             {
                 "class_id": "hydrography_and_centerline",
-                "status": "metadata_attached_download_pending",
+                "status": "nhd_hu8_bbox_extract_attached_review_pending",
                 "source_ids": ["usgs_3dhp_nhd"],
                 "target_outputs": [
+                    SOUTH_FORK_NHD_HU8_MANIFEST_FILE,
+                    SOUTH_FORK_NHD_HU8_FLOWLINE_EXTRACT_FILE,
+                    SOUTH_FORK_NHD_HU8_SUPPORT_EXTRACT_FILE,
                     "hydrography/production_import_pilot/centerline.geojson",
                     "hydrography/production_import_pilot/banks.geojson",
                     "hydrography/production_import_pilot/cross_sections.geojson",
                 ],
-                "promotion_gate": "Clip official flowlines, align to imagery and DEM, hand-review banks/rapid stations, and keep OSM only as supplemental access context.",
+                "promotion_gate": "Use the attached NHD HU8 extract as source evidence, then reproject, order the South Fork mainstem, align to NAIP and DEM relief, hand-review banks/rapid stations, and keep OSM only as supplemental access context.",
             },
             {
                 "class_id": "aerial_or_satellite_imagery",
@@ -1803,6 +1821,9 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "production_import_pilot/heightfield_candidate_2017.png",
                     "production_import_pilot/water_mask_2048.png",
                     "production_import_pilot/vegetation_mask_2048.png",
+                    SOUTH_FORK_NHD_HU8_MANIFEST_FILE,
+                    SOUTH_FORK_NHD_HU8_FLOWLINE_EXTRACT_FILE,
+                    SOUTH_FORK_NHD_HU8_SUPPORT_EXTRACT_FILE,
                     "hydrology/usgs_11445500_daily_discharge.json",
                     "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
                     "hydrology/south_fork_modern_flow_source_selection.json",
@@ -1815,12 +1836,15 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     {
                         "source_class": "hydrography_and_centerline",
                         "required_artifacts": [
+                            SOUTH_FORK_NHD_HU8_MANIFEST_FILE,
+                            SOUTH_FORK_NHD_HU8_FLOWLINE_EXTRACT_FILE,
+                            SOUTH_FORK_NHD_HU8_SUPPORT_EXTRACT_FILE,
                             "hydrography/production_import_pilot/centerline.geojson",
                             "hydrography/production_import_pilot/banks.geojson",
                             "hydrography/production_import_pilot/cross_sections.geojson",
                         ],
                         "source_leads": ["usgs_3dhp", "usgs_3dep", "guide_review"],
-                        "promotion_gate": "Align official flowlines and bank polygons to NAIP, DEM relief, rapid stations, and guide-reviewed eddy/recovery geometry.",
+                        "promotion_gate": "Promote the attached NHD HU8 source extract only after the mainstem is ordered, reprojected, and aligned to NAIP, DEM relief, rapid stations, and guide-reviewed eddy/recovery geometry.",
                     },
                     {
                         "source_class": "seasonal_flow_or_release_history",
@@ -2028,6 +2052,9 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
             ],
             "hydrography": [
                 "hydrography/tnm_nhd_products.json",
+                SOUTH_FORK_NHD_HU8_MANIFEST_FILE,
+                SOUTH_FORK_NHD_HU8_FLOWLINE_EXTRACT_FILE,
+                SOUTH_FORK_NHD_HU8_SUPPORT_EXTRACT_FILE,
                 "hydrography/centerline.geojson",
                 "hydrography/banks.geojson",
                 "hydrography/cross_sections.geojson",
@@ -3209,9 +3236,9 @@ def _rapid_review_layers() -> tuple[RapidReviewLayer, ...]:
             "flowlines",
             "Flowlines And Centerline",
             "vector",
-            "hydrography/centerline.geojson",
+            SOUTH_FORK_NHD_HU8_FLOWLINE_EXTRACT_FILE,
             ("usgs_3dhp_nhd", "osm"),
-            "River centerline, stationing, flow direction, and named/access hydrography context.",
+            "NHD source flowlines, future ordered centerline, stationing, flow direction, and named/access hydrography context.",
         ),
         RapidReviewLayer(
             "cross_sections",
@@ -3376,7 +3403,13 @@ def _rapid_review_evidence_refs(candidate: RapidCandidate) -> dict[str, object]:
         },
         "flowlines": {
             "layer_id": "flowlines",
-            "artifacts": ["hydrography/centerline.geojson", "hydrography/banks.geojson"],
+            "artifacts": [
+                SOUTH_FORK_NHD_HU8_MANIFEST_FILE,
+                SOUTH_FORK_NHD_HU8_FLOWLINE_EXTRACT_FILE,
+                SOUTH_FORK_NHD_HU8_SUPPORT_EXTRACT_FILE,
+                "hydrography/centerline.geojson",
+                "hydrography/banks.geojson",
+            ],
             "source_ids": ["usgs_3dhp_nhd", "osm"],
         },
         "cross_sections": {
