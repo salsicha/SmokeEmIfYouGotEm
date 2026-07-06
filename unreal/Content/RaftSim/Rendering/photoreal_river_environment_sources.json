@@ -13,6 +13,7 @@
   },
   "reference_media_link_manifest": "physics/data/real_world/reference_media_link_manifest.json",
   "production_geospatial_source_readiness_manifest": "physics/data/real_world/production_geospatial_source_readiness.json",
+  "production_environment_gap_register": "physics/data/real_world/production_environment_gap_register.json",
   "flow_visual_band_manifest": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
   "global_sources": [
     {
