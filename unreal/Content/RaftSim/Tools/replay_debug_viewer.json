@@ -1,0 +1,123 @@
+{
+  "schema": "raftsim.unreal.replay_debug_viewer.v1",
+  "status": "ready_for_editor_view_model_and_widget_shell",
+  "module": "RaftSimEditor",
+  "config_class": "URaftSimReplayDebugViewerConfig",
+  "view_model_class": "URaftSimReplayDebugViewerViewModel",
+  "source_data": {
+    "replay_manifest": "physics/data/readiness/milestone_10/unreal_visualization/manifest.json",
+    "replay_json": "physics/data/readiness/milestone_10/unreal_visualization/replay.json",
+    "force_telemetry_csv": "physics/data/readiness/milestone_10/unreal_visualization/telemetry_forces.csv",
+    "debug_views": "unreal/Content/RaftSim/Debug/live_water_debug_views.json",
+    "playback_manifest": "unreal/Content/RaftSim/Physics/replay_playback_manifest.json"
+  },
+  "timeline": {
+    "fixed_dt_seconds": 0.016666666666666666,
+    "frame_count": 5,
+    "scrub_range_seconds": [
+      0.0,
+      0.06666666666666667
+    ],
+    "default_time_seconds": 0.0,
+    "bookmarks": [
+      {
+        "bookmark_id": "entry",
+        "display_name": "Entry",
+        "time_seconds": 0.0,
+        "tags": [
+          "line_choice",
+          "initial_raft_pose"
+        ]
+      },
+      {
+        "bookmark_id": "first_contact_window",
+        "display_name": "First Contact Window",
+        "time_seconds": 0.016666666666666666,
+        "tags": [
+          "raft_contact",
+          "force_sample"
+        ]
+      },
+      {
+        "bookmark_id": "force_peak_review",
+        "display_name": "Force Peak Review",
+        "time_seconds": 0.05,
+        "tags": [
+          "buoyancy",
+          "drag",
+          "contact_probe"
+        ]
+      },
+      {
+        "bookmark_id": "exit_pose",
+        "display_name": "Exit Pose",
+        "time_seconds": 0.06666666666666667,
+        "tags": [
+          "finish",
+          "runtime_budget"
+        ]
+      }
+    ]
+  },
+  "overlays": [
+    {
+      "overlay_id": "depth",
+      "debug_view": "Depth",
+      "default_enabled": true
+    },
+    {
+      "overlay_id": "velocity",
+      "debug_view": "Velocity",
+      "default_enabled": true
+    },
+    {
+      "overlay_id": "froude",
+      "debug_view": "Froude",
+      "default_enabled": false
+    },
+    {
+      "overlay_id": "wet_dry_mask",
+      "debug_view": "WetDryMask",
+      "default_enabled": false
+    },
+    {
+      "overlay_id": "feature_tags",
+      "debug_view": "FeatureTags",
+      "default_enabled": false
+    },
+    {
+      "overlay_id": "conservation_deltas",
+      "debug_view": "ConservationDeltas",
+      "default_enabled": false
+    },
+    {
+      "overlay_id": "raft_trajectory",
+      "debug_view": "RaftTrajectory",
+      "default_enabled": true
+    },
+    {
+      "overlay_id": "contact_probes",
+      "debug_view": "ContactProbes",
+      "default_enabled": true
+    },
+    {
+      "overlay_id": "runtime_budgets",
+      "debug_view": "RuntimeBudgets",
+      "default_enabled": true
+    }
+  ],
+  "viewer_actions": [
+    "load_replay_manifest",
+    "scrub_timeline",
+    "jump_bookmark",
+    "toggle_overlay",
+    "export_review_capture"
+  ],
+  "validation_state": {
+    "loads_existing_sample_data": true,
+    "uses_existing_debug_view_manifest": true,
+    "requires_live_physics": false,
+    "requires_deterministic_export_for_capture": true,
+    "blocks_physics_promotion": false
+  }
+}
