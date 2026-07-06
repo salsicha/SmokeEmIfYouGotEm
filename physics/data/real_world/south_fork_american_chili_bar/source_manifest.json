@@ -51,7 +51,8 @@
     ],
     "source_pulls": [
       "production_source_pull_manifest.json",
-      "production_import_pilot.json"
+      "production_import_pilot.json",
+      "production_import_pilot_pull_manifest.json"
     ],
     "unreal": [
       "unreal/corridor_package_manifest.json"

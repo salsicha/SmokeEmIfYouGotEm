@@ -64,6 +64,7 @@ RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION = "raftsim.rapid_review_editor_workf
 RAPID_REVIEW_EDITOR_WORKFLOW_FILE = "rapid_review_editor_workflow.json"
 PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION = "raftsim.production_import_pilot.v0"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
+SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
 DIFFICULTY_PRESETS: tuple[DifficultyPreset, ...] = ("beginner", "intermediate", "advanced", "expert")
 
@@ -1205,7 +1206,11 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
             ],
             "field_media": ["field_media/README.md"],
             "solver": ["scenario/scenario.json", "scenario/bed.npy", "scenario/initial_state.npz"],
-            "source_pulls": ["production_source_pull_manifest.json", SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE],
+            "source_pulls": [
+                "production_source_pull_manifest.json",
+                SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE,
+                SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE,
+            ],
             "validation": ["validation_matrix.json"],
             "unreal": ["unreal/corridor_package_manifest.json"],
         },
