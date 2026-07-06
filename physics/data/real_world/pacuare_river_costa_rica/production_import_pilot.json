@@ -115,6 +115,9 @@
         "imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json",
         "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tci_review_1024.png",
         "imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json",
+        "imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_clip_review.png",
+        "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_clip_review.png",
         "production_import_pilot_derivatives_manifest.json",
         "review/production_import_pilot/source_metadata_review.json"
       ]
@@ -144,6 +147,9 @@
         "imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json",
         "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tci_review_1024.png",
         "imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json",
+        "imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_clip_review.png",
+        "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_clip_review.png",
         "review/production_import_pilot/source_metadata_review.json"
       ]
     },

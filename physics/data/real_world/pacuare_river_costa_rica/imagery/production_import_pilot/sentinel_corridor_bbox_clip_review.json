@@ -1,0 +1,133 @@
+{
+  "schema": "raftsim.pacuare_sentinel_corridor_bbox_clip_review.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "sentinel_corridor_bbox_window_clips_attached_review_only",
+  "goal": "Create small review-only Sentinel TCI raster-window previews for the draft Pacuare planning bounds without committing the full COGs or replacing the active source drape.",
+  "clip_scope": "draft_planning_bounds_bbox_not_route_polygon",
+  "planning_bounds_wgs84": {
+    "min_lon": -83.75,
+    "min_lat": 9.72,
+    "max_lon": -83.42,
+    "max_lat": 10.12
+  },
+  "method": {
+    "coordinate_transform": "Inline WGS84 to UTM Transverse Mercator calculation using WGS84 ellipsoid constants; used only for review-window planning.",
+    "pixel_model": "Sentinel-2 TCI COGs are treated as 10980x10980 rasters at 10 m/pixel using tileinfo tileOrigin coordinates.",
+    "clip_algorithm": "Transform draft WGS84 bounds corners into each tile native UTM zone, clamp against tile bounds, extract the native pixel window with sharp/libvips, and downsample each preview to width 1024 while preserving aspect ratio.",
+    "limitations": [
+      "Uses draft planning bbox corners, not an official Pacuare route polygon, wetted channel, bank polygon, or protected-area-safe publication geometry.",
+      "Does not use SCL, cloud, shadow, haze, nodata, water, canopy, wet-rock, waterfall, or mist QA masks.",
+      "Does not stitch the two clips, reproject into a final working CRS, or align to guide-reviewed stationing."
+    ]
+  },
+  "source_cogs": [
+    {
+      "tile_id": "17PKM",
+      "product_id": "S2B_17PKM_20250119_0_L2A",
+      "asset": "TCI.tif",
+      "epsg": 32617,
+      "full_cog_path": "/private/tmp/pacuare_sentinel_17pkm_tci.tif",
+      "full_cog_committed": false,
+      "full_cog_sha256": "11265277e6a4f3dd77e33872686a96d449e9883a462417664278cf9b18f4e37b",
+      "tileinfo_path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tileinfo_metadata.json"
+    },
+    {
+      "tile_id": "16PHR",
+      "product_id": "S2B_16PHR_20250119_0_L2A",
+      "asset": "TCI.tif",
+      "epsg": 32616,
+      "full_cog_path": "/private/tmp/pacuare_sentinel_16phr_tci.tif",
+      "full_cog_committed": false,
+      "full_cog_sha256": "f8d335a00197609e6c9f16341e826bdad4aa8c9a1c3b61b775e1784ed30607ee",
+      "tileinfo_path": "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tileinfo_metadata.json"
+    }
+  ],
+  "outputs": [
+    {
+      "tile_id": "17PKM",
+      "path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_clip_review.png",
+      "native_utm_bbox_m": [
+        199980.0,
+        1090200.0,
+        234802.26825388102,
+        1119951.75725909
+      ],
+      "pixel_window": {
+        "left": 0,
+        "top": 8004,
+        "width": 3483,
+        "height": 2976
+      },
+      "dimensions_px": [
+        1024,
+        875
+      ],
+      "mode": "RGB",
+      "byte_count": 1561041,
+      "sha256": "02e8950c329826c13db4665eba6572721e075411d01127475440622900d1f587",
+      "visual_review": "Useful eastern/lower-corridor rainforest and river-context preview, but heavy cloud and shadow remain visible over the western side of the bbox."
+    },
+    {
+      "tile_id": "16PHR",
+      "path": "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_clip_review.png",
+      "native_utm_bbox_m": [
+        856234.4249247197,
+        1076164.1952475146,
+        892925.9390099018,
+        1100040.0
+      ],
+      "pixel_window": {
+        "left": 5625,
+        "top": 0,
+        "width": 3670,
+        "height": 2388
+      },
+      "dimensions_px": [
+        1024,
+        666
+      ],
+      "mode": "RGB",
+      "byte_count": 1249511,
+      "sha256": "1070bcf391340b10189b418c7899626833307600670020a25514b46fec366ca3",
+      "visual_review": "Useful western/southern planning-bounds preview for terrain and settlement context, but cloud bands still block source-drape or mask promotion."
+    }
+  ],
+  "windowed_read_decision": {
+    "corridor_bbox_clip_previews_generated": true,
+    "exact_route_or_bank_clip_generated": false,
+    "stitched_corridor_mosaic_generated": false,
+    "scl_cloud_mask_applied": false,
+    "source_drape_replaced": false,
+    "mask_sources_replaced": false,
+    "full_cogs_committed": false,
+    "decision": "Retain active Pacuare Unreal preview on the existing NASA/Copernicus proxy drape until exact clipping, SCL/cloud QA, stitching, terms review, and guide/geospatial approval pass."
+  },
+  "source_links": {
+    "tile_coverage_review": "imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json",
+    "thumbnail_review": "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json",
+    "access_probe": "imagery/production_import_pilot/sentinel_cog_access_probe.json",
+    "review_png_17pkm": "imagery/production_import_pilot/sentinel_tci_review_preview.json",
+    "review_png_16phr": "imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json"
+  },
+  "allowed_use": [
+    "visual source triage",
+    "future native-crs clipping comparison",
+    "SCL/cloud QA planning",
+    "guide/geospatial discussion about imagery usability"
+  ],
+  "forbidden_use": [
+    "production source-drape replacement",
+    "production water or vegetation mask generation",
+    "photoreal material extraction",
+    "claiming Pacuare route imagery coverage",
+    "claiming lifelike Pacuare screenshot readiness"
+  ],
+  "promotion_blockers": [
+    "Replace draft bbox clipping with reviewed route/bank/corridor geometry in the selected Costa Rica working CRS.",
+    "Read and apply SCL/QA plus manual cloud, shadow, haze, river, canopy, wet-rock, waterfall, and mist review.",
+    "Stitch accepted 17PKM/16PHR windows and compare against guide-reviewed route stationing before source-drape replacement.",
+    "Record Sentinel terms, attribution, storage/LFS policy, and redistribution review before any production raster derivative is used."
+  ]
+}
