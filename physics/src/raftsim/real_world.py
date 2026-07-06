@@ -64,6 +64,7 @@ RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION = "raftsim.rapid_review_editor_workf
 RAPID_REVIEW_EDITOR_WORKFLOW_FILE = "rapid_review_editor_workflow.json"
 PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION = "raftsim.production_import_pilot.v0"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
+COLORADO_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE = "production_import_pilot_derivatives_manifest.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
@@ -948,7 +949,7 @@ def _web_mercator_xy(lon: float, lat: float) -> tuple[float, float]:
     return x, y
 
 
-def _service_tile_grid(bounds: BoundsWGS84, columns: int, rows: int) -> list[dict[str, object]]:
+def _service_tile_grid(bounds: BoundsWGS84, columns: int, rows: int, tile_prefix: str) -> list[dict[str, object]]:
     min_x, min_y = _web_mercator_xy(bounds.min_lon, bounds.min_lat)
     max_x, max_y = _web_mercator_xy(bounds.max_lon, bounds.max_lat)
     tiles: list[dict[str, object]] = []
@@ -963,7 +964,7 @@ def _service_tile_grid(bounds: BoundsWGS84, columns: int, rows: int) -> list[dic
             tile_min_y = min_y + (max_y - min_y) * row / rows
             tile_max_y = min_y + (max_y - min_y) * (row + 1) / rows
             bbox_3857 = f"{tile_min_x:.4f}%2C{tile_min_y:.4f}%2C{tile_max_x:.4f}%2C{tile_max_y:.4f}"
-            tile_id = f"sfa_chili_bar_tile_r{row}_c{column}"
+            tile_id = f"{tile_prefix}_tile_r{row}_c{column}"
             tiles.append(
                 {
                     "tile_id": tile_id,
@@ -1045,7 +1046,7 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
             "rows": rows,
             "source_crs": "EPSG:4326",
             "service_crs": "EPSG:3857",
-            "tiles": _service_tile_grid(target.bounds_wgs84, columns, rows),
+            "tiles": _service_tile_grid(target.bounds_wgs84, columns, rows, "sfa_chili_bar"),
         },
         "required_source_classes": [
             {
@@ -1143,6 +1144,200 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
         "provenance": {
             "generated_by": "raftsim.real_world.build_south_fork_production_import_pilot",
             "processing_version": "milestone_26_south_fork_import_pilot.v0",
+            "review_status": "recipe_only_downloads_and_imports_pending",
+        },
+    }
+
+
+def colorado_lees_ferry_import_pilot_bounds() -> BoundsWGS84:
+    """Return the current Lees Ferry official-service pilot bounds.
+
+    These bounds intentionally match the existing Colorado preview source pull,
+    not the full Lees Ferry-to-Diamond Creek rowing route. Expanding the canyon
+    corridor needs river-mile stationing, tiling, and publication review first.
+    """
+
+    return BoundsWGS84(min_lon=-111.66, min_lat=36.80, max_lon=-111.54, max_lat=36.90)
+
+
+def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) -> dict[str, object]:
+    """Build the Colorado/Lees Ferry production-source import pilot recipe."""
+
+    target_bounds = bounds or colorado_lees_ferry_import_pilot_bounds()
+    columns = 2
+    rows = 2
+    return {
+        "schema": PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION,
+        "pilot_id": "colorado_lees_ferry_official_service_tile_pilot",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "route_style": "rowing_oar_rig",
+        "status": "planned_review_gated_not_downloaded",
+        "source_manifest": SOURCE_MANIFEST_FILE,
+        "readiness_manifest": "../production_geospatial_source_readiness.json",
+        "bounds_wgs84": target_bounds.to_json_dict(),
+        "corridor_scope": {
+            "status": "lees_ferry_pilot_slice_not_full_canyon_route",
+            "reason": (
+                "The pilot reuses the existing official-service sample area near Lees Ferry to prove the canyon import "
+                "workflow before expanding river-mile tiles through the full rowing route."
+            ),
+            "full_route_requires": [
+                "river-mile stationing",
+                "canyon-local projected CRS",
+                "Grand Canyon publication and sensitivity review",
+                "guide or oarsman validation",
+            ],
+        },
+        "working_crs_decision": {
+            "status": "required_before_unreal_promotion",
+            "candidate": "river_mile_stationed_canyon_local_projected_crs_derived_from_epsg4326_bounds",
+            "required_review": [
+                "horizontal CRS and units",
+                "vertical datum handling for canyon DEM elevations",
+                "river-mile stationing and downstream transform",
+                "Unreal origin and scale transform",
+                "round-trip error budget against source coordinates",
+                "publication sensitivity for route detail and camps/access context",
+            ],
+        },
+        "tile_grid": {
+            "columns": columns,
+            "rows": rows,
+            "source_crs": "EPSG:4326",
+            "service_crs": "EPSG:3857",
+            "tiles": _service_tile_grid(target_bounds, columns, rows, "colorado_lees_ferry"),
+        },
+        "required_source_classes": [
+            {
+                "class_id": "terrain_dem_or_lidar",
+                "status": "pilot_urls_planned",
+                "source_ids": ["usgs_3dep"],
+                "target_outputs": [
+                    "terrain/production_import_pilot/3dep_tiles",
+                    "terrain/production_import_pilot/dem_relief_2048.png",
+                    "terrain/production_import_pilot/heightfield_candidate_2017.png",
+                    "production_import_pilot_derivatives_manifest.json",
+                ],
+                "promotion_gate": (
+                    "Download tiles, mosaic/clip, select canyon CRS, review voids and vertical datum, hydrologically "
+                    "condition, burn the channel, and compare canyon walls, shelves, and rapid approaches to river-mile "
+                    "references plus guide/oarsman notes."
+                ),
+            },
+            {
+                "class_id": "hydrography_and_centerline",
+                "status": "metadata_and_stationing_pending",
+                "source_ids": ["usgs_3dhp_nhd", "nps_grand_canyon", "gcmrc_or_river_mile_context"],
+                "target_outputs": [
+                    "hydrography/production_import_pilot/centerline.geojson",
+                    "hydrography/production_import_pilot/river_mile_markers.geojson",
+                    "hydrography/production_import_pilot/sandbars.geojson",
+                ],
+                "promotion_gate": (
+                    "Align flowline, visible river edge, river-mile stations, sandbars, eddies, camps/access sensitivity, "
+                    "and oar-line review before using the data as authoritative gameplay geometry."
+                ),
+            },
+            {
+                "class_id": "aerial_or_satellite_imagery",
+                "status": "pilot_urls_planned",
+                "source_ids": ["usda_naip", "landsat"],
+                "target_outputs": [
+                    "imagery/production_import_pilot/naip_tiles",
+                    "imagery/production_import_pilot/source_drape_4096.png",
+                    "production_import_pilot_derivatives_manifest.json",
+                ],
+                "promotion_gate": (
+                    "Attach acquisition year/date, resolution, CRS, attribution, terms, canyon color review, and Landsat "
+                    "seasonal context before replacing the current preview drape."
+                ),
+            },
+            {
+                "class_id": "water_and_vegetation_masks",
+                "status": "requires_new_derivatives_from_pilot_imagery_hydrography_and_release_context",
+                "source_ids": ["usda_naip", "landsat", "usgs_3dhp_nhd", "usbr_glen_canyon_release_context", "guide_review"],
+                "target_outputs": [
+                    "imagery/production_import_pilot/water_mask_2048.png",
+                    "imagery/production_import_pilot/vegetation_mask_2048.png",
+                    "imagery/production_import_pilot/sandbar_wet_bank_mask_2048.png",
+                    "imagery/production_import_pilot/source_masks_manifest.json",
+                ],
+                "promotion_gate": (
+                    "Derive masks from reviewed imagery, hydrography, and release-band context, then manually review "
+                    "water edge, exposed sandbars, wet rock, tamarisk/cottonwood/scrub, and release-dependent visibility."
+                ),
+            },
+            {
+                "class_id": "seasonal_flow_or_release_history",
+                "status": "usgs_daily_discharge_attached_release_context_pending",
+                "source_ids": [
+                    "usgs_water_services",
+                    "usgs_09380000_lees_ferry",
+                    "usgs_09402500_near_grand_canyon",
+                    "usbr_glen_canyon_release_context",
+                ],
+                "target_outputs": [
+                    "hydrology/production_import_pilot/usgs_09380000_instantaneous_discharge.json",
+                    "hydrology/production_import_pilot/usgs_09402500_instantaneous_discharge.json",
+                    "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
+                    "hydrology/production_import_pilot/release_band_review.json",
+                ],
+                "promotion_gate": (
+                    "Compare Glen Canyon release series against Lees Ferry and downstream USGS gauges, then record guide/"
+                    "oarsman review for low, moderate, high, and special-release visual/gameplay bands."
+                ),
+            },
+            {
+                "class_id": "protected_area_and_access_context",
+                "status": "planned_review_required",
+                "source_ids": ["nps_grand_canyon", "guide_review"],
+                "target_outputs": [
+                    "review/production_import_pilot/route_access_publication_sensitivity.json",
+                    "review/production_import_pilot/camps_and_sensitive_locations_policy.json",
+                ],
+                "promotion_gate": (
+                    "Review NPS route context, camps/access sensitivity, permit context, evacuation/publication limits, "
+                    "and screenshot safety before committing detailed route packages."
+                ),
+            },
+            {
+                "class_id": "guide_and_reference_media_annotations",
+                "status": "link_seeds_attached_no_media_rights",
+                "source_ids": [
+                    "reference_media_link_manifest",
+                    "first_party_field_capture",
+                    "explicit_oarsman_or_outfitter_permission",
+                    "nps_grand_canyon",
+                ],
+                "target_outputs": [
+                    "review/production_import_pilot/reference_annotations.geojson",
+                    "field_media/production_import_pilot/rights_manifest.json",
+                ],
+                "promotion_gate": (
+                    "Attach creator, date, reach or river mile, flow/release context, permission, attribution, and allowed "
+                    "asset uses before photos or footage drive textures, materials, or gameplay tuning."
+                ),
+            },
+        ],
+        "unreal_import_targets": {
+            "heightfield_import_contract": "unreal/Content/RaftSim/River/colorado_heightfield_import_test.json",
+            "preview_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview",
+            "future_production_map": "/Game/RaftSim/Maps/Production/L_ColoradoGrandCanyon_LeesFerryRowing",
+            "review_captures": [
+                "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
+                "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
+            ],
+        },
+        "acceptance_gate": [
+            "All planned pilot downloads have source metadata, checksums, CRS, acquisition dates, and attribution.",
+            "Conditioned heightfield and masks are generated from the pilot tiles and reviewed against hydrography, release bands, river-mile context, and guide/oarsman notes.",
+            "Unreal preview map can be regenerated from pilot artifacts with big-water readability, rowing sightlines, sandbars, swimmer rescue targets, and canyon-scale depth still visible.",
+            "Screenshots look materially closer to the real Lees Ferry/Grand Canyon corridor without claiming final photoreal approval.",
+        ],
+        "provenance": {
+            "generated_by": "raftsim.real_world.build_colorado_production_import_pilot",
+            "processing_version": "milestone_26_colorado_import_pilot.v0",
             "review_status": "recipe_only_downloads_and_imports_pending",
         },
     }

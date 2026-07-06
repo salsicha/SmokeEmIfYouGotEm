@@ -1,0 +1,334 @@
+{
+  "acceptance_gate": [
+    "All planned pilot downloads have source metadata, checksums, CRS, acquisition dates, and attribution.",
+    "Conditioned heightfield and masks are generated from the pilot tiles and reviewed against hydrography, release bands, river-mile context, and guide/oarsman notes.",
+    "Unreal preview map can be regenerated from pilot artifacts with big-water readability, rowing sightlines, sandbars, swimmer rescue targets, and canyon-scale depth still visible.",
+    "Screenshots look materially closer to the real Lees Ferry/Grand Canyon corridor without claiming final photoreal approval."
+  ],
+  "bounds_wgs84": {
+    "max_lat": 36.9,
+    "max_lon": -111.54,
+    "min_lat": 36.8,
+    "min_lon": -111.66
+  },
+  "corridor_scope": {
+    "full_route_requires": [
+      "river-mile stationing",
+      "canyon-local projected CRS",
+      "Grand Canyon publication and sensitivity review",
+      "guide or oarsman validation"
+    ],
+    "reason": "The pilot reuses the existing official-service sample area near Lees Ferry to prove the canyon import workflow before expanding river-mile tiles through the full rowing route.",
+    "status": "lees_ferry_pilot_slice_not_full_canyon_route"
+  },
+  "pilot_id": "colorado_lees_ferry_official_service_tile_pilot",
+  "provenance": {
+    "generated_by": "raftsim.real_world.build_colorado_production_import_pilot",
+    "processing_version": "milestone_26_colorado_import_pilot.v0",
+    "review_status": "recipe_only_downloads_and_imports_pending"
+  },
+  "readiness_manifest": "../production_geospatial_source_readiness.json",
+  "required_source_classes": [
+    {
+      "class_id": "terrain_dem_or_lidar",
+      "promotion_gate": "Download tiles, mosaic/clip, select canyon CRS, review voids and vertical datum, hydrologically condition, burn the channel, and compare canyon walls, shelves, and rapid approaches to river-mile references plus guide/oarsman notes.",
+      "source_ids": [
+        "usgs_3dep"
+      ],
+      "status": "pilot_urls_planned",
+      "target_outputs": [
+        "terrain/production_import_pilot/3dep_tiles",
+        "terrain/production_import_pilot/dem_relief_2048.png",
+        "terrain/production_import_pilot/heightfield_candidate_2017.png",
+        "production_import_pilot_derivatives_manifest.json"
+      ]
+    },
+    {
+      "class_id": "hydrography_and_centerline",
+      "promotion_gate": "Align flowline, visible river edge, river-mile stations, sandbars, eddies, camps/access sensitivity, and oar-line review before using the data as authoritative gameplay geometry.",
+      "source_ids": [
+        "usgs_3dhp_nhd",
+        "nps_grand_canyon",
+        "gcmrc_or_river_mile_context"
+      ],
+      "status": "metadata_and_stationing_pending",
+      "target_outputs": [
+        "hydrography/production_import_pilot/centerline.geojson",
+        "hydrography/production_import_pilot/river_mile_markers.geojson",
+        "hydrography/production_import_pilot/sandbars.geojson"
+      ]
+    },
+    {
+      "class_id": "aerial_or_satellite_imagery",
+      "promotion_gate": "Attach acquisition year/date, resolution, CRS, attribution, terms, canyon color review, and Landsat seasonal context before replacing the current preview drape.",
+      "source_ids": [
+        "usda_naip",
+        "landsat"
+      ],
+      "status": "pilot_urls_planned",
+      "target_outputs": [
+        "imagery/production_import_pilot/naip_tiles",
+        "imagery/production_import_pilot/source_drape_4096.png",
+        "production_import_pilot_derivatives_manifest.json"
+      ]
+    },
+    {
+      "class_id": "water_and_vegetation_masks",
+      "promotion_gate": "Derive masks from reviewed imagery, hydrography, and release-band context, then manually review water edge, exposed sandbars, wet rock, tamarisk/cottonwood/scrub, and release-dependent visibility.",
+      "source_ids": [
+        "usda_naip",
+        "landsat",
+        "usgs_3dhp_nhd",
+        "usbr_glen_canyon_release_context",
+        "guide_review"
+      ],
+      "status": "requires_new_derivatives_from_pilot_imagery_hydrography_and_release_context",
+      "target_outputs": [
+        "imagery/production_import_pilot/water_mask_2048.png",
+        "imagery/production_import_pilot/vegetation_mask_2048.png",
+        "imagery/production_import_pilot/sandbar_wet_bank_mask_2048.png",
+        "imagery/production_import_pilot/source_masks_manifest.json"
+      ]
+    },
+    {
+      "class_id": "seasonal_flow_or_release_history",
+      "promotion_gate": "Compare Glen Canyon release series against Lees Ferry and downstream USGS gauges, then record guide/oarsman review for low, moderate, high, and special-release visual/gameplay bands.",
+      "source_ids": [
+        "usgs_water_services",
+        "usgs_09380000_lees_ferry",
+        "usgs_09402500_near_grand_canyon",
+        "usbr_glen_canyon_release_context"
+      ],
+      "status": "usgs_daily_discharge_attached_release_context_pending",
+      "target_outputs": [
+        "hydrology/production_import_pilot/usgs_09380000_instantaneous_discharge.json",
+        "hydrology/production_import_pilot/usgs_09402500_instantaneous_discharge.json",
+        "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
+        "hydrology/production_import_pilot/release_band_review.json"
+      ]
+    },
+    {
+      "class_id": "protected_area_and_access_context",
+      "promotion_gate": "Review NPS route context, camps/access sensitivity, permit context, evacuation/publication limits, and screenshot safety before committing detailed route packages.",
+      "source_ids": [
+        "nps_grand_canyon",
+        "guide_review"
+      ],
+      "status": "planned_review_required",
+      "target_outputs": [
+        "review/production_import_pilot/route_access_publication_sensitivity.json",
+        "review/production_import_pilot/camps_and_sensitive_locations_policy.json"
+      ]
+    },
+    {
+      "class_id": "guide_and_reference_media_annotations",
+      "promotion_gate": "Attach creator, date, reach or river mile, flow/release context, permission, attribution, and allowed asset uses before photos or footage drive textures, materials, or gameplay tuning.",
+      "source_ids": [
+        "reference_media_link_manifest",
+        "first_party_field_capture",
+        "explicit_oarsman_or_outfitter_permission",
+        "nps_grand_canyon"
+      ],
+      "status": "link_seeds_attached_no_media_rights",
+      "target_outputs": [
+        "review/production_import_pilot/reference_annotations.geojson",
+        "field_media/production_import_pilot/rights_manifest.json"
+      ]
+    }
+  ],
+  "river_id": "colorado_river",
+  "route_style": "rowing_oar_rig",
+  "schema": "raftsim.production_import_pilot.v0",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "source_manifest": "source_manifest.json",
+  "status": "planned_review_gated_not_downloaded",
+  "tile_grid": {
+    "columns": 2,
+    "rows": 2,
+    "service_crs": "EPSG:3857",
+    "source_crs": "EPSG:4326",
+    "tiles": [
+      {
+        "bbox_epsg3857": {
+          "xmax": -12423255.1725,
+          "xmin": -12429934.342,
+          "ymax": 4418221.5691,
+          "ymin": 4411265.9103
+        },
+        "bbox_wgs84": {
+          "max_lat": 36.85,
+          "max_lon": -111.6,
+          "min_lat": 36.8,
+          "min_lon": -111.66
+        },
+        "column": 0,
+        "download_specs": {
+          "3dep_dem_export": {
+            "format": "GeoTIFF_F32",
+            "provider": "USGS 3D Elevation Program ImageServer",
+            "size_px": [
+              1024,
+              1024
+            ],
+            "target_artifact": "terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r0_c0.tif",
+            "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-12429934.3420%2C4411265.9103%2C-12423255.1725%2C4418221.5691&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image"
+          },
+          "naip_export": {
+            "format": "PNG_RGB",
+            "provider": "USDA/APFO NAIP ImageServer",
+            "size_px": [
+              2048,
+              2048
+            ],
+            "target_artifact": "imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r0_c0.png",
+            "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-12429934.3420%2C4411265.9103%2C-12423255.1725%2C4418221.5691&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=png&f=image"
+          }
+        },
+        "row": 0,
+        "status": "planned_not_downloaded",
+        "tile_id": "colorado_lees_ferry_tile_r0_c0"
+      },
+      {
+        "bbox_epsg3857": {
+          "xmax": -12416576.0031,
+          "xmin": -12423255.1725,
+          "ymax": 4418221.5691,
+          "ymin": 4411265.9103
+        },
+        "bbox_wgs84": {
+          "max_lat": 36.85,
+          "max_lon": -111.54,
+          "min_lat": 36.8,
+          "min_lon": -111.6
+        },
+        "column": 1,
+        "download_specs": {
+          "3dep_dem_export": {
+            "format": "GeoTIFF_F32",
+            "provider": "USGS 3D Elevation Program ImageServer",
+            "size_px": [
+              1024,
+              1024
+            ],
+            "target_artifact": "terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r0_c1.tif",
+            "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-12423255.1725%2C4411265.9103%2C-12416576.0031%2C4418221.5691&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image"
+          },
+          "naip_export": {
+            "format": "PNG_RGB",
+            "provider": "USDA/APFO NAIP ImageServer",
+            "size_px": [
+              2048,
+              2048
+            ],
+            "target_artifact": "imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r0_c1.png",
+            "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-12423255.1725%2C4411265.9103%2C-12416576.0031%2C4418221.5691&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=png&f=image"
+          }
+        },
+        "row": 0,
+        "status": "planned_not_downloaded",
+        "tile_id": "colorado_lees_ferry_tile_r0_c1"
+      },
+      {
+        "bbox_epsg3857": {
+          "xmax": -12423255.1725,
+          "xmin": -12429934.342,
+          "ymax": 4425177.2279,
+          "ymin": 4418221.5691
+        },
+        "bbox_wgs84": {
+          "max_lat": 36.9,
+          "max_lon": -111.6,
+          "min_lat": 36.85,
+          "min_lon": -111.66
+        },
+        "column": 0,
+        "download_specs": {
+          "3dep_dem_export": {
+            "format": "GeoTIFF_F32",
+            "provider": "USGS 3D Elevation Program ImageServer",
+            "size_px": [
+              1024,
+              1024
+            ],
+            "target_artifact": "terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r1_c0.tif",
+            "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-12429934.3420%2C4418221.5691%2C-12423255.1725%2C4425177.2279&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image"
+          },
+          "naip_export": {
+            "format": "PNG_RGB",
+            "provider": "USDA/APFO NAIP ImageServer",
+            "size_px": [
+              2048,
+              2048
+            ],
+            "target_artifact": "imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r1_c0.png",
+            "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-12429934.3420%2C4418221.5691%2C-12423255.1725%2C4425177.2279&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=png&f=image"
+          }
+        },
+        "row": 1,
+        "status": "planned_not_downloaded",
+        "tile_id": "colorado_lees_ferry_tile_r1_c0"
+      },
+      {
+        "bbox_epsg3857": {
+          "xmax": -12416576.0031,
+          "xmin": -12423255.1725,
+          "ymax": 4425177.2279,
+          "ymin": 4418221.5691
+        },
+        "bbox_wgs84": {
+          "max_lat": 36.9,
+          "max_lon": -111.54,
+          "min_lat": 36.85,
+          "min_lon": -111.6
+        },
+        "column": 1,
+        "download_specs": {
+          "3dep_dem_export": {
+            "format": "GeoTIFF_F32",
+            "provider": "USGS 3D Elevation Program ImageServer",
+            "size_px": [
+              1024,
+              1024
+            ],
+            "target_artifact": "terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r1_c1.tif",
+            "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-12423255.1725%2C4418221.5691%2C-12416576.0031%2C4425177.2279&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image"
+          },
+          "naip_export": {
+            "format": "PNG_RGB",
+            "provider": "USDA/APFO NAIP ImageServer",
+            "size_px": [
+              2048,
+              2048
+            ],
+            "target_artifact": "imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r1_c1.png",
+            "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-12423255.1725%2C4418221.5691%2C-12416576.0031%2C4425177.2279&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=png&f=image"
+          }
+        },
+        "row": 1,
+        "status": "planned_not_downloaded",
+        "tile_id": "colorado_lees_ferry_tile_r1_c1"
+      }
+    ]
+  },
+  "unreal_import_targets": {
+    "future_production_map": "/Game/RaftSim/Maps/Production/L_ColoradoGrandCanyon_LeesFerryRowing",
+    "heightfield_import_contract": "unreal/Content/RaftSim/River/colorado_heightfield_import_test.json",
+    "preview_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview",
+    "review_captures": [
+      "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
+      "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png"
+    ]
+  },
+  "working_crs_decision": {
+    "candidate": "river_mile_stationed_canyon_local_projected_crs_derived_from_epsg4326_bounds",
+    "required_review": [
+      "horizontal CRS and units",
+      "vertical datum handling for canyon DEM elevations",
+      "river-mile stationing and downstream transform",
+      "Unreal origin and scale transform",
+      "round-trip error budget against source coordinates",
+      "publication sensitivity for route detail and camps/access context"
+    ],
+    "status": "required_before_unreal_promotion"
+  }
+}

@@ -10,7 +10,10 @@
       "terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png",
       "terrain/usgs_3dep_lees_ferry_corridor_heightfield_manifest.json",
       "terrain/usgs_3dep_lees_ferry_corridor_relief_preview_1024.png",
-      "terrain/usgs_3dep_lees_ferry_corridor_relief_preview_manifest.json"
+      "terrain/usgs_3dep_lees_ferry_corridor_relief_preview_manifest.json",
+      "terrain/production_import_pilot/3dep_tiles",
+      "terrain/production_import_pilot/dem_relief_2048.png",
+      "terrain/production_import_pilot/heightfield_candidate_2017.png"
     ],
     "flow_presets": [
       "flow_presets.json"
@@ -35,10 +38,17 @@
       "imagery/usda_naip_lees_ferry_corridor_water_mask_1024.png",
       "imagery/usda_naip_lees_ferry_corridor_vegetation_mask_1024.png",
       "imagery/usda_naip_lees_ferry_corridor_masks_manifest.json",
-      "imagery/naip_or_satellite_corridor_tiles"
+      "imagery/naip_or_satellite_corridor_tiles",
+      "imagery/production_import_pilot/naip_tiles",
+      "imagery/production_import_pilot/source_drape_4096.png",
+      "imagery/production_import_pilot/water_mask_2048.png",
+      "imagery/production_import_pilot/vegetation_mask_2048.png",
+      "imagery/production_import_pilot/sandbar_wet_bank_mask_2048.png",
+      "imagery/production_import_pilot/source_masks_manifest.json"
     ],
     "source_pulls": [
-      "production_source_pull_manifest.json"
+      "production_source_pull_manifest.json",
+      "production_import_pilot.json"
     ],
     "unreal": [
       "unreal/colorado_rowing_route_editor_pass.json"
