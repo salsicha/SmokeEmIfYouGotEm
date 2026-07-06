@@ -1022,7 +1022,8 @@
       "related_artifacts": [
         "imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json",
         "imagery/production_import_pilot/sentinel_cog_access_probe.json",
-        "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json"
+        "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json",
+        "imagery/production_import_pilot/sentinel_corridor_bbox_scl_qa_review.json"
       ],
       "use": [
         "windowed_cog_preview_review",
@@ -1033,6 +1034,52 @@
         "The clips use draft planning-bounds bbox windows, not official route, bank, wetted-width, or protected-area-safe publication geometry.",
         "Clouds and shadows are visible; no SCL/cloud mask or manual QA has been applied.",
         "The clips are review references only and must not replace source drapes, masks, materials, or lifelike capture evidence."
+      ]
+    },
+    {
+      "artifact_id": "pacuare_sentinel_corridor_bbox_scl_qa_review",
+      "category": "sentinel_corridor_bbox_scl_cloud_shadow_qa_review",
+      "paths": [
+        "imagery/production_import_pilot/sentinel_corridor_bbox_scl_qa_review.json",
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_scl_qa_review.png",
+        "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_scl_qa_review.png"
+      ],
+      "provider": "RaftSim local SCL window extraction from temporary Sentinel SCL COGs using sharp/libvips",
+      "status": "sentinel_corridor_bbox_scl_qa_attached_promotion_blocked_by_clouds",
+      "summary": {
+        "clip_scope": "draft_planning_bounds_bbox_not_route_polygon",
+        "tile_ids": [
+          "17PKM",
+          "16PHR"
+        ],
+        "scl_qa_preview_generated": true,
+        "scl_mask_applied_to_source_drape": false,
+        "source_drape_replaced": false,
+        "mask_sources_replaced": false,
+        "cloud_screening_blocks_promotion": true,
+        "cloud_or_cirrus_fraction_by_tile": {
+          "17PKM": 0.243554,
+          "16PHR": 0.110896
+        },
+        "cloud_shadow_fraction_by_tile": {
+          "17PKM": 0.012988,
+          "16PHR": 0.014826
+        }
+      },
+      "related_artifacts": [
+        "imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
+        "imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json",
+        "imagery/production_import_pilot/sentinel_cog_access_probe.json"
+      ],
+      "use": [
+        "cloud_shadow_qa_review",
+        "cleaner_scene_selection",
+        "future_masking_tool_requirements"
+      ],
+      "caveats": [
+        "SCL QA is attached for draft bbox clips only, not exact route/bank geometry.",
+        "QA previews do not apply masks to the TCI clips and do not generate source drapes or production masks.",
+        "Visible cloud/shadow contamination blocks January 19, 2025 Pacuare imagery promotion unless a cleaner scene or reviewed masking/stitching pass replaces it."
       ]
     }
   ],

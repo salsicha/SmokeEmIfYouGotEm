@@ -100,7 +100,10 @@
       "imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json",
       "imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
       "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_clip_review.png",
-      "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_clip_review.png"
+      "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_clip_review.png",
+      "imagery/production_import_pilot/sentinel_corridor_bbox_scl_qa_review.json",
+      "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_scl_qa_review.png",
+      "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_scl_qa_review.png"
     ],
     "protected_area_review": [
       "review/sinac_protected_area_source_rights.json",

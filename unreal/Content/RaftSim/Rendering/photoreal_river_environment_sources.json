@@ -1214,6 +1214,22 @@
             "cloud_qa_planning",
             "future_source_drape_replacement_planning"
           ]
+        },
+        {
+          "artifact_id": "pacuare_sentinel_corridor_bbox_scl_qa_review",
+          "category": "sentinel_corridor_bbox_scl_cloud_shadow_qa_review",
+          "paths": [
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_corridor_bbox_scl_qa_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_scl_qa_review.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_scl_qa_review.png"
+          ],
+          "promotion_blocker": "SCL QA previews show the current January 19, 2025 Pacuare bbox clips are cloud/shadow affected; they are QA references only, not production drapes, masks, material inputs, or lifelike evidence.",
+          "status": "sentinel_corridor_bbox_scl_qa_attached_promotion_blocked_by_clouds",
+          "use_in_unreal": [
+            "cloud_shadow_qa_review",
+            "cleaner_scene_selection",
+            "future_masking_tool_requirements"
+          ]
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"

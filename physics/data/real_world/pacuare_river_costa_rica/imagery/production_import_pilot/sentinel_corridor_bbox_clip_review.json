@@ -102,14 +102,16 @@
     "source_drape_replaced": false,
     "mask_sources_replaced": false,
     "full_cogs_committed": false,
-    "decision": "Retain active Pacuare Unreal preview on the existing NASA/Copernicus proxy drape until exact clipping, SCL/cloud QA, stitching, terms review, and guide/geospatial approval pass."
+    "decision": "Retain active Pacuare Unreal preview on the existing NASA/Copernicus proxy drape until exact clipping, SCL/cloud QA, stitching, terms review, and guide/geospatial approval pass.",
+    "scl_qa_review_attached": true
   },
   "source_links": {
     "tile_coverage_review": "imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json",
     "thumbnail_review": "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json",
     "access_probe": "imagery/production_import_pilot/sentinel_cog_access_probe.json",
     "review_png_17pkm": "imagery/production_import_pilot/sentinel_tci_review_preview.json",
-    "review_png_16phr": "imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json"
+    "review_png_16phr": "imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json",
+    "scl_qa_review": "imagery/production_import_pilot/sentinel_corridor_bbox_scl_qa_review.json"
   },
   "allowed_use": [
     "visual source triage",
