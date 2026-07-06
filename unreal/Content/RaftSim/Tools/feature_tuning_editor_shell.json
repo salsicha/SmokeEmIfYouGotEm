@@ -1,0 +1,193 @@
+{
+  "schema": "raftsim.unreal.feature_tuning_editor_shell.v1",
+  "status": "ready_for_editor_widget_shell",
+  "module": "RaftSimEditor",
+  "config_class": "URaftSimFeatureTuningEditorShellConfig",
+  "view_model_class": "URaftSimFeatureTuningEditorShellViewModel",
+  "source_manifests": {
+    "feature_tuning_editor": "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+    "feature_forcing_defaults": "physics/config/feature_forcing_defaults.json",
+    "flow_presets": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+    "live_water_smoke_suite": "unreal/Content/RaftSim/Automation/live_water_smoke_suite.json"
+  },
+  "panels": [
+    "flow_band_curve_editor",
+    "feature_gain_bounds",
+    "hole_stickiness_washout",
+    "eddy_lateral_wave_train_tuning",
+    "boulder_shelf_pin_release_tuning",
+    "visual_audio_only_tuning",
+    "manifest_recording_and_validation"
+  ],
+  "feature_forcing_enabled_by_default": false,
+  "controls": [
+    {
+      "control_id": "hole_retention_gain",
+      "display_name": "Hole Retention Gain",
+      "feature_kind": "hole",
+      "domain": "solver_state",
+      "min_value": 0.0,
+      "max_value": 1.0,
+      "default_value": 0.05,
+      "enabled_by_default": false,
+      "affects_solver_state": true,
+      "affects_raft_coupling": true,
+      "manifest_recording_required": true,
+      "has_manifest_record": true,
+      "geoclaw_comparison_required": true,
+      "conservation_guard_required": true,
+      "can_hide_conservation_failures": false,
+      "flow_points": [
+        {
+          "flow_band": "low_runnable",
+          "discharge_cfs": 900.0,
+          "gain_multiplier": 0.15,
+          "stickiness_factor": 0.15,
+          "washout_factor": 0.1
+        },
+        {
+          "flow_band": "median_runnable",
+          "discharge_cfs": 1600.0,
+          "gain_multiplier": 1.0,
+          "stickiness_factor": 1.0,
+          "washout_factor": 0.05
+        },
+        {
+          "flow_band": "high_runnable",
+          "discharge_cfs": 3000.0,
+          "gain_multiplier": 0.2,
+          "stickiness_factor": 0.25,
+          "washout_factor": 0.85
+        }
+      ]
+    },
+    {
+      "control_id": "eddy_line_shear_gain",
+      "display_name": "Eddy Line Shear Gain",
+      "feature_kind": "eddy_line",
+      "domain": "raft_coupling",
+      "min_value": 0.0,
+      "max_value": 1.0,
+      "default_value": 0.04,
+      "enabled_by_default": false,
+      "affects_solver_state": false,
+      "affects_raft_coupling": true,
+      "manifest_recording_required": true,
+      "has_manifest_record": true,
+      "geoclaw_comparison_required": true,
+      "conservation_guard_required": true,
+      "can_hide_conservation_failures": false,
+      "flow_points": [
+        {
+          "flow_band": "low_runnable",
+          "discharge_cfs": 900.0,
+          "gain_multiplier": 0.35,
+          "stickiness_factor": 0.0,
+          "washout_factor": 0.0
+        },
+        {
+          "flow_band": "median_runnable",
+          "discharge_cfs": 1600.0,
+          "gain_multiplier": 1.0,
+          "stickiness_factor": 0.0,
+          "washout_factor": 0.0
+        }
+      ]
+    },
+    {
+      "control_id": "boulder_push_damping",
+      "display_name": "Boulder Push/Damping",
+      "feature_kind": "boulder_push_damping",
+      "domain": "raft_coupling",
+      "min_value": 0.0,
+      "max_value": 1.0,
+      "default_value": 0.05,
+      "enabled_by_default": false,
+      "affects_solver_state": false,
+      "affects_raft_coupling": true,
+      "manifest_recording_required": true,
+      "has_manifest_record": true,
+      "geoclaw_comparison_required": true,
+      "conservation_guard_required": true,
+      "can_hide_conservation_failures": false,
+      "flow_points": []
+    },
+    {
+      "control_id": "pin_release_threshold",
+      "display_name": "Pin Release Threshold",
+      "feature_kind": "pin_release",
+      "domain": "raft_coupling",
+      "min_value": 0.0,
+      "max_value": 1.0,
+      "default_value": 0.05,
+      "enabled_by_default": false,
+      "affects_solver_state": false,
+      "affects_raft_coupling": true,
+      "manifest_recording_required": true,
+      "has_manifest_record": true,
+      "geoclaw_comparison_required": true,
+      "conservation_guard_required": true,
+      "can_hide_conservation_failures": false,
+      "flow_points": []
+    },
+    {
+      "control_id": "wave_train_foam_density",
+      "display_name": "Wave Train Foam Density",
+      "feature_kind": "wave_train",
+      "domain": "visual_only",
+      "min_value": 0.0,
+      "max_value": 1.0,
+      "default_value": 0.25,
+      "enabled_by_default": true,
+      "affects_solver_state": false,
+      "affects_raft_coupling": false,
+      "manifest_recording_required": true,
+      "has_manifest_record": true,
+      "geoclaw_comparison_required": false,
+      "conservation_guard_required": false,
+      "can_hide_conservation_failures": false,
+      "flow_points": []
+    },
+    {
+      "control_id": "hole_audio_intensity",
+      "display_name": "Hole Audio Intensity",
+      "feature_kind": "hole",
+      "domain": "audio_only",
+      "min_value": 0.0,
+      "max_value": 1.0,
+      "default_value": 0.05,
+      "enabled_by_default": true,
+      "affects_solver_state": false,
+      "affects_raft_coupling": false,
+      "manifest_recording_required": true,
+      "has_manifest_record": true,
+      "geoclaw_comparison_required": false,
+      "conservation_guard_required": false,
+      "can_hide_conservation_failures": false,
+      "flow_points": []
+    }
+  ],
+  "validation_messages": [
+    {
+      "message_id": "feature_forcing_defaults_low",
+      "severity": "info",
+      "summary": "Feature forcing is disabled by default and all physics-facing gains start low until validation explicitly enables them.",
+      "source_path": "physics/config/feature_forcing_defaults.json",
+      "blocks_export": false
+    },
+    {
+      "message_id": "physics_edits_require_geoclaw",
+      "severity": "warning",
+      "summary": "Any changed solver-state or raft-coupling control must be manifest-recorded, GeoClaw-compared, and conservation-guarded before promotion.",
+      "source_path": "unreal/Content/RaftSim/River/feature_tuning_editor.json",
+      "blocks_export": false
+    }
+  ],
+  "export_readiness": {
+    "reject_unbounded_gain": true,
+    "manifest_record_every_edit": true,
+    "reject_conservation_failure_masking": true,
+    "require_geoclaw_comparison_before_signoff": true,
+    "visual_audio_only_cannot_change_solver_state": true
+  }
+}
