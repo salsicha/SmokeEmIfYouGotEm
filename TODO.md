@@ -896,6 +896,17 @@ This milestone expands beyond the vertical slice while preserving the validated 
 - [x] Expand manifest-approved art, audio, VFX, haptics, UI, accessibility, and platform scalability coverage for additional rivers, seasons, flow levels, raft setups, weather, and biomes, with highly detailed immersive landscapes and photorealistic foliage treated as core content goals: `unreal/Content/RaftSim/Production/alpha_content_coverage_manifest.json`, `unreal/Content/RaftSim/development_asset_source_policy.json`, and `docs/alpha-content-coverage-plan.md` now define South Fork, Colorado, and Pacuare biome coverage; photoreal landscape/foliage goals; art/audio/VFX/haptics/UI/accessibility/scalability discipline coverage; raft/weather/flow matrices; and source/provenance/platform promotion gates.
 - [x] Gate alpha expansion on automated content validation, physics regression replay, river-source provenance checks, and playable end-to-end river-section runs: `unreal/Content/RaftSim/Automation/alpha_expansion_gate.json`, `physics/reports/milestone24/alpha_expansion_gate.json`, and `docs/alpha-expansion-gate-plan.md` now define the four-lane alpha promotion gate, block unvalidated alpha promotion, keep South Fork as the first candidate after gate lanes pass, and keep Colorado/Pacuare planning-only until reviewed source, hydrology, geospatial, guide, protected-area, and field-media blockers close.
 
+## Milestone 25A: Polished Tooling Slice
+
+This milestone turns the current source-first Unreal contracts into usable editor/runtime tools that can be opened from Unreal, load sample data, show validation state, and export deterministic artifacts without hand-editing JSON.
+
+- [ ] Create the `RaftSimEditor` module and tool registry with Unreal menu entries for Rapid/River Editor, Feature Tuning Editor, Replay + Debug Viewer, Geospatial Import/Export Validator, and Vertical Slice Playtest Launcher.
+- [ ] Build the Replay + Debug Viewer shell that loads the existing Milestone 10 replay manifest, scrubs timeline bookmarks, and toggles depth, velocity, Froude, wet/dry, feature tags, conservation deltas, raft trajectory, contact probes, and runtime-budget overlays.
+- [ ] Build the polished Rapid/River Editor shell for station pins, reach/drop spans, polygons, raft lines, source/provenance status, guide notes, footage/gauge/aerial references, expected surf/flush/pin/release/flip outcomes, and export readiness warnings.
+- [ ] Build the Feature Tuning Editor shell for flow-band curves, feature-forcing gains, hole stickiness/washout, eddy lines, laterals, wave trains, shallow shelves, boulder push/damping, pin/release behavior, and visual/audio-only cue sliders with conservative defaults.
+- [ ] Add one-click validation actions for source checks, deterministic export, solver package regeneration, stitched-window validation, live-water smoke, round-trip validation, and report opening.
+- [ ] Gate the tooling slice with automation/report evidence that each tool opens, loads South Fork sample data, reports validation errors clearly, exports deterministically, and has a short user-facing workflow document.
+
 ## Milestone 25: Optimization, Platform Hardening, And Release Readiness
 
 This milestone turns the alpha game into a shippable Unreal build.
