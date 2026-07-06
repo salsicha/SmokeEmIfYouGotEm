@@ -96,11 +96,12 @@ def build_dem_relief_preview(
     source_id: str,
     provider: str,
     repo_root: Path | None = None,
+    output_size_px: int = 512,
 ) -> None:
     dem = _load_float_tiff(dem_path)
     _, relief = _normalized_relief(dem)
     relief_image = Image.fromarray(np.clip(relief * 255.0, 0, 255).astype(np.uint8), mode="L")
-    relief_image = relief_image.resize((512, 512), Image.Resampling.BILINEAR)
+    relief_image = relief_image.resize((output_size_px, output_size_px), Image.Resampling.BILINEAR)
 
     output_relief_png_path.parent.mkdir(parents=True, exist_ok=True)
     relief_image.save(output_relief_png_path)
@@ -113,7 +114,7 @@ def build_dem_relief_preview(
         "input_dem": _manifest_path(dem_path, repo_root),
         "output_relief": _manifest_path(output_relief_png_path, repo_root),
         "processing": {
-            "output_size_px": 512,
+            "output_size_px": output_size_px,
             "height_percentiles": "2_to_98",
             "relief": "slope_aware_normalized_grayscale_preview",
         },
@@ -220,12 +221,30 @@ def main() -> None:
         repo_root=repo_root,
     )
     build_dem_relief_preview(
+        dem_path=south_fork_root / "terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
+        output_relief_png_path=south_fork_root / "terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png",
+        output_manifest_path=south_fork_root / "terrain/usgs_3dep_chili_bar_corridor_relief_preview_manifest.json",
+        source_id="usgs_3dep_chili_bar_corridor_sample_512",
+        provider="USGS 3D Elevation Program ImageServer",
+        repo_root=repo_root,
+        output_size_px=1024,
+    )
+    build_dem_relief_preview(
         dem_path=colorado_root / "terrain/usgs_3dep_lees_ferry_sample_256.tif",
         output_relief_png_path=colorado_root / "terrain/usgs_3dep_lees_ferry_relief_preview_512.png",
         output_manifest_path=colorado_root / "terrain/usgs_3dep_lees_ferry_relief_preview_manifest.json",
         source_id="usgs_3dep_lees_ferry_sample_256",
         provider="USGS 3D Elevation Program ImageServer",
         repo_root=repo_root,
+    )
+    build_dem_relief_preview(
+        dem_path=colorado_root / "terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif",
+        output_relief_png_path=colorado_root / "terrain/usgs_3dep_lees_ferry_corridor_relief_preview_1024.png",
+        output_manifest_path=colorado_root / "terrain/usgs_3dep_lees_ferry_corridor_relief_preview_manifest.json",
+        source_id="usgs_3dep_lees_ferry_corridor_sample_512",
+        provider="USGS 3D Elevation Program ImageServer",
+        repo_root=repo_root,
+        output_size_px=1024,
     )
     build_pacuare_demshade_drape(
         nasa_truecolor_path=pacuare_root / "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
