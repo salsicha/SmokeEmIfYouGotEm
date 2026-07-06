@@ -12,6 +12,7 @@
     "capture_outputs": "docs/environment-captures/photoreal_river_previews"
   },
   "reference_media_link_manifest": "physics/data/real_world/reference_media_link_manifest.json",
+  "production_geospatial_source_readiness_manifest": "physics/data/real_world/production_geospatial_source_readiness.json",
   "flow_visual_band_manifest": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
   "global_sources": [
     {
