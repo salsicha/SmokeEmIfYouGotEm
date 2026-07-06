@@ -181,6 +181,10 @@ PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE = (
 )
 PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE = "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json"
 PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE = "imagery/production_import_pilot/sentinel_cog_access_probe.json"
+PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_FILE = "imagery/production_import_pilot/sentinel_tci_review_preview.json"
+PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_IMAGE_FILE = (
+    "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tci_review_1024.png"
+)
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE = "production_import_pilot_derivatives_manifest.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
@@ -3038,6 +3042,8 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
                     PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE,
                     PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE,
+                    PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_FILE,
+                    PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_IMAGE_FILE,
                     "production_import_pilot_derivatives_manifest.json",
                     PACUARE_SOURCE_METADATA_REVIEW_FILE,
                 ],
@@ -3061,6 +3067,8 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
                     PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE,
                     PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE,
+                    PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_FILE,
+                    PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_IMAGE_FILE,
                     PACUARE_SOURCE_METADATA_REVIEW_FILE,
                 ],
                 "promotion_gate": (
@@ -3612,6 +3620,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
                     PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE,
                     PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE,
+                    PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_FILE,
+                    PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_IMAGE_FILE,
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
                     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
@@ -3663,6 +3673,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
                             PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE,
                             PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE,
+                            PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_FILE,
+                            PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_IMAGE_FILE,
                         ],
                         "source_leads": ["copernicus_data_space", "landsat", "snit_cr_idecori", "first_party_aerial"],
                         "promotion_gate": "Replace MODIS/GIBS proxy drape with cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference.",

@@ -92,7 +92,9 @@
       "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_thumbnail.jpg",
       "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tileinfo_metadata.json",
       "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json",
-      "imagery/production_import_pilot/sentinel_cog_access_probe.json"
+      "imagery/production_import_pilot/sentinel_cog_access_probe.json",
+      "imagery/production_import_pilot/sentinel_tci_review_preview.json",
+      "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tci_review_1024.png"
     ],
     "protected_area_review": [
       "review/sinac_protected_area_source_rights.json",

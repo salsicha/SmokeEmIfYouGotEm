@@ -1,0 +1,67 @@
+{
+  "schema": "raftsim.pacuare_sentinel_tci_review_preview.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "sentinel_tci_downsampled_review_preview_attached_not_source_drape",
+  "goal": "Attach a small, review-only visual reference PNG from the selected public Sentinel-2 L2A TCI COG without committing the full COG or promoting Pacuare production imagery.",
+  "source_asset": {
+    "tile_id": "17PKM",
+    "product_id": "S2B_17PKM_20250119_0_L2A",
+    "asset": "TCI.tif",
+    "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/17/P/KM/2025/1/S2B_17PKM_20250119_0_L2A/TCI.tif",
+    "content_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+    "content_length_bytes": 224939987,
+    "etag": "428f0d15ad4090e3b97f2365a8739dda-27",
+    "download_sha256": "11265277e6a4f3dd77e33872686a96d449e9883a462417664278cf9b18f4e37b",
+    "download_location": "/private/tmp/pacuare_sentinel_17pkm_tci.tif",
+    "download_committed": false
+  },
+  "output": {
+    "path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tci_review_1024.png",
+    "dimensions_px": [
+      1024,
+      1024
+    ],
+    "mode": "RGB",
+    "byte_count": 1271614,
+    "sha256": "69ed0b1e5a54c39108e459b3e06b6f20f1023f8d079b570026424473ad7599ba",
+    "processing": "Full 10980x10980 TCI COG was downloaded to /private/tmp, decoded with sharp/libvips, and downsampled to a 1024x1024 PNG review image."
+  },
+  "coverage_and_limitations": {
+    "review_value": [
+      "Provides a higher-resolution public satellite view than the earlier 343px thumbnail for coastal/lowland Pacuare source selection.",
+      "Shows Caribbean coast, lowland vegetation, water color, visible cloud patches, and coastal settlement/context for guide/geospatial discussion."
+    ],
+    "limitations": [
+      "This is the full 17PKM tile downsample, not a Pacuare corridor clip or stitched lower-river source drape.",
+      "The lower gorge planning corridor also intersects the companion 16PHR tile, which is not processed by this preview.",
+      "No SCL/cloud mask, water/vegetation segmentation, CRS crop, terrain alignment, or manual guide QA is applied.",
+      "The review PNG must not be used as a texture, material source, photogrammetry input, AI-training source, production mask, or lifelike-capture evidence."
+    ]
+  },
+  "source_links": {
+    "access_probe": "imagery/production_import_pilot/sentinel_cog_access_probe.json",
+    "thumbnail_review": "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json",
+    "high_resolution_scene_metadata_review": "imagery/production_import_pilot/high_resolution_scene_metadata_review.json"
+  },
+  "promotion_blockers": [
+    "Record final Sentinel terms/attribution/package policy before using any Sentinel-derived imagery beyond review references.",
+    "Implement corridor-clipped COG reads for both 17PKM and 16PHR using a reviewed raster-window tool.",
+    "Apply SCL/cloud/shadow/haze QA and manual visual review before masks or source drapes are generated.",
+    "Compare imagery date and flow/rain context with guide/outfitter review before tuning river color, wetness, or flow-dependent visuals."
+  ],
+  "allowed_use": [
+    "visual source triage",
+    "editor-side reference discussion",
+    "raster-window extraction planning",
+    "cloud/coverage review planning"
+  ],
+  "forbidden_use": [
+    "production source-drape replacement",
+    "production water or vegetation mask generation",
+    "photoreal material extraction",
+    "claiming Pacuare corridor imagery coverage",
+    "claiming lifelike Pacuare screenshot readiness"
+  ]
+}

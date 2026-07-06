@@ -1156,6 +1156,21 @@
             "cog_window_read_tooling_gate",
             "production_mask_source_gate"
           ]
+        },
+        {
+          "artifact_id": "pacuare_sentinel_tci_review_preview",
+          "category": "sentinel_tci_downsampled_review_preview",
+          "paths": [
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_tci_review_preview.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tci_review_1024.png"
+          ],
+          "promotion_blocker": "This is a downsampled full-tile 17PKM TCI review image, not a Pacuare corridor clip, source drape, mask source, or lifelike evidence; production still needs 16PHR/corridor COG reads, SCL/cloud QA, terms review, and guide/geospatial approval.",
+          "status": "sentinel_tci_downsampled_review_preview_attached_not_source_drape",
+          "use_in_unreal": [
+            "visual_reference_review",
+            "future_source_drape_replacement_planning",
+            "cloud_and_corridor_clip_review"
+          ]
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
