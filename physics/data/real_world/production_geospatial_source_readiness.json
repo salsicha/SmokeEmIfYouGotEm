@@ -229,10 +229,11 @@
             "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
             "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
             "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
-            "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson"
+            "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+            "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json"
           ],
-          "promotion_blocker": "NHD HU8 18020129 is attached as a bbox-intersected source extract with derived South Fork mainstem, preview metric stationing, and fixed-width cross-section seed candidates, but it still needs production working-CRS review, direction confirmation, bank derivation, NAIP/DEM alignment, and guide rapid/eddy annotation before it can replace seed centerline or cross-section geometry.",
-          "status": "nhd_hu8_cross_section_seeds_attached_review_pending"
+          "promotion_blocker": "NHD HU8 18020129 is attached as a bbox-intersected source extract with derived South Fork mainstem, preview metric stationing, fixed-width cross-section seed candidates, and a preview NAIP/DEM alignment diagnostic. The diagnostic shows the current masks are not acceptance evidence, so production working-CRS review, direction confirmation, bank derivation, NAIP/DEM alignment, and guide rapid/eddy annotation are still required before replacing seed centerline or cross-section geometry.",
+          "status": "nhd_hu8_alignment_diagnostic_attached_review_pending"
         },
         "protected_area_and_access_context": {
           "artifacts": [],

@@ -35,7 +35,7 @@
   "production_blockers": [
     "Full corridor DEM/lidar tiles are not downloaded or conditioned yet.",
     "Aerial imagery and water/vegetation masks are not downloaded yet.",
-    "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, an ordered South Fork mainstem candidate, preview metric stationing, and cross-section seed lines, but it still needs direction confirmation, production CRS selection, bank/cross-section review, NAIP/DEM alignment, and guide review.",
+    "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, an ordered South Fork mainstem candidate, preview metric stationing, cross-section seed lines, and a preview NAIP/DEM alignment diagnostic, but it still needs direction confirmation, production CRS selection, bank/cross-section review, stronger NAIP/DEM alignment, and guide review.",
     "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window, but broader seasonal windows, A25 X-flag interpretation, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet."
   ],
@@ -359,7 +359,8 @@
       "path": "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
       "provider": "RaftSim derived artifact from the South Fork NHD stationing candidate",
       "related_artifacts": [
-        "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson"
+        "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+        "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json"
       ],
       "status": "derived_seed_candidates_attached_review_required",
       "summary": {
@@ -373,6 +374,33 @@
         "bank_and_width_review_seed",
         "naip_dem_alignment_gate",
         "future_solver_cross_section_authoring"
+      ]
+    },
+    {
+      "artifact_id": "nhd_hu8_18020129_naip_dem_alignment_diagnostic",
+      "category": "hydrography_imagery_dem_alignment_diagnostic",
+      "caveats": [
+        "This is a preview diagnostic against review-gated masks, not an alignment acceptance result.",
+        "The water mask includes a bounded preview channel prior, so high agreement would not prove production bank alignment.",
+        "Only about 40 percent of in-bounds station samples exceed the 0.35 preview water threshold, so manual review and improved masks are still required.",
+        "Four station samples and three cross-section centers fall outside the current pilot bbox because source features are preserved whole near the downstream edge."
+      ],
+      "path": "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
+      "provider": "RaftSim diagnostic sampling from NHD stationing, cross-section seeds, NAIP preview masks, vegetation mask, and DEM relief",
+      "status": "diagnostic_attached_review_required",
+      "summary": {
+        "cross_section_count": 133,
+        "cross_sections_out_of_bounds": 3,
+        "station_samples_in_bounds": 260,
+        "station_samples_out_of_bounds": 4,
+        "station_water_ge_0_35_fraction": 0.3962,
+        "station_water_median": 0.3196
+      },
+      "use": [
+        "manual_alignment_review_prioritization",
+        "mask_quality_diagnostic",
+        "bank_derivation_blocker_documentation",
+        "future_editor_review_overlay"
       ]
     },
     {

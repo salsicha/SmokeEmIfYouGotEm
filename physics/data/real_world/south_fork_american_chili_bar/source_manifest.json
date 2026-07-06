@@ -45,6 +45,7 @@
       "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
       "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
       "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+      "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
       "hydrography/centerline.geojson",
       "hydrography/banks.geojson",
       "hydrography/cross_sections.geojson"

@@ -1,0 +1,1370 @@
+{
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "bounds_wgs84": {
+      "max_lat": 38.83,
+      "max_lon": -120.72,
+      "min_lat": 38.74,
+      "min_lon": -120.9
+    },
+    "cross_section_seed_candidates": "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+    "dem_relief": "terrain/production_import_pilot/dem_relief_2048.png",
+    "stationing_candidate": "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
+    "vegetation_mask": "imagery/production_import_pilot/vegetation_mask_2048.png",
+    "water_mask": "imagery/production_import_pilot/water_mask_2048.png"
+  },
+  "promotion_gates": [
+    "Review low-water or out-of-bounds stations against source imagery, river mask generation, and mainstem direction before accepting stationing.",
+    "Replace preview mask sampling with reviewed orthomosaic/DEM/working-CRS sampling before deriving production banks.",
+    "Use this diagnostic to prioritize manual editor review, not to accept or reject geometry automatically."
+  ],
+  "review_flags": {
+    "cross_section_low_center_water_count": 30,
+    "cross_sections_out_of_bounds": [
+      "sfa_nhd_xs_seed_000",
+      "sfa_nhd_xs_seed_131",
+      "sfa_nhd_xs_seed_132"
+    ],
+    "station_low_water_samples_recorded_count": 65,
+    "station_samples_out_of_bounds_m": [
+      0.0,
+      26100.0,
+      26200.0,
+      26204.692
+    ]
+  },
+  "river_id": "american_south_fork",
+  "sample_records": {
+    "cross_sections_periodic_or_low_center_water": [
+      {
+        "center_relief": 0.6275,
+        "center_vegetation": 0.2235,
+        "center_water": 0.1333,
+        "cross_section_id": "sfa_nhd_xs_seed_006",
+        "left_water": 0.2353,
+        "right_water": 0.3882,
+        "station_m": 1200.0
+      },
+      {
+        "center_relief": 0.5765,
+        "center_vegetation": 0.4588,
+        "center_water": 0.2039,
+        "cross_section_id": "sfa_nhd_xs_seed_017",
+        "left_water": 0.3412,
+        "right_water": 0.2627,
+        "station_m": 3400.0
+      },
+      {
+        "center_relief": 0.5412,
+        "center_vegetation": 0.2157,
+        "center_water": 0.1294,
+        "cross_section_id": "sfa_nhd_xs_seed_018",
+        "left_water": 0.2824,
+        "right_water": 0.2745,
+        "station_m": 3600.0
+      },
+      {
+        "center_relief": 0.6039,
+        "center_vegetation": 0.1608,
+        "center_water": 0.1765,
+        "cross_section_id": "sfa_nhd_xs_seed_023",
+        "left_water": 0.2706,
+        "right_water": 0.302,
+        "station_m": 4600.0
+      },
+      {
+        "center_relief": 0.5843,
+        "center_vegetation": 0.1961,
+        "center_water": 0.4863,
+        "cross_section_id": "sfa_nhd_xs_seed_025",
+        "left_water": 0.3255,
+        "right_water": 0.6314,
+        "station_m": 5000.0
+      },
+      {
+        "center_relief": 0.4157,
+        "center_vegetation": 0.502,
+        "center_water": 0.2275,
+        "cross_section_id": "sfa_nhd_xs_seed_049",
+        "left_water": 0.3529,
+        "right_water": 0.4392,
+        "station_m": 9800.0
+      },
+      {
+        "center_relief": 0.451,
+        "center_vegetation": 0.4745,
+        "center_water": 0.2667,
+        "cross_section_id": "sfa_nhd_xs_seed_050",
+        "left_water": 0.3098,
+        "right_water": 0.4275,
+        "station_m": 10000.0
+      },
+      {
+        "center_relief": 0.4627,
+        "center_vegetation": 0.4588,
+        "center_water": 0.2353,
+        "cross_section_id": "sfa_nhd_xs_seed_051",
+        "left_water": 0.3569,
+        "right_water": 0.1647,
+        "station_m": 10200.0
+      },
+      {
+        "center_relief": 0.4667,
+        "center_vegetation": 0.4824,
+        "center_water": 0.1882,
+        "cross_section_id": "sfa_nhd_xs_seed_052",
+        "left_water": 0.3412,
+        "right_water": 0.4078,
+        "station_m": 10400.0
+      },
+      {
+        "center_relief": 0.4902,
+        "center_vegetation": 0.3098,
+        "center_water": 0.1961,
+        "cross_section_id": "sfa_nhd_xs_seed_060",
+        "left_water": 0.2431,
+        "right_water": 0.2314,
+        "station_m": 12000.0
+      },
+      {
+        "center_relief": 0.4353,
+        "center_vegetation": 0.5529,
+        "center_water": 0.2275,
+        "cross_section_id": "sfa_nhd_xs_seed_067",
+        "left_water": 0.4235,
+        "right_water": 0.2667,
+        "station_m": 13400.0
+      },
+      {
+        "center_relief": 0.4431,
+        "center_vegetation": 0.4392,
+        "center_water": 0.2471,
+        "cross_section_id": "sfa_nhd_xs_seed_069",
+        "left_water": 0.302,
+        "right_water": 0.302,
+        "station_m": 13800.0
+      },
+      {
+        "center_relief": 0.5176,
+        "center_vegetation": 0.4157,
+        "center_water": 0.2118,
+        "cross_section_id": "sfa_nhd_xs_seed_071",
+        "left_water": 0.2039,
+        "right_water": 0.2039,
+        "station_m": 14200.0
+      },
+      {
+        "center_relief": 0.4745,
+        "center_vegetation": 0.3529,
+        "center_water": 0.149,
+        "cross_section_id": "sfa_nhd_xs_seed_074",
+        "left_water": 0.2235,
+        "right_water": 0.2588,
+        "station_m": 14800.0
+      },
+      {
+        "center_relief": 0.4627,
+        "center_vegetation": 0.3529,
+        "center_water": 0.2157,
+        "cross_section_id": "sfa_nhd_xs_seed_075",
+        "left_water": 0.2824,
+        "right_water": 0.349,
+        "station_m": 15000.0
+      },
+      {
+        "center_relief": 0.4549,
+        "center_vegetation": 0.3529,
+        "center_water": 0.1961,
+        "cross_section_id": "sfa_nhd_xs_seed_079",
+        "left_water": 0.3725,
+        "right_water": 0.1569,
+        "station_m": 15800.0
+      },
+      {
+        "center_relief": 0.5451,
+        "center_vegetation": 0.1098,
+        "center_water": 0.098,
+        "cross_section_id": "sfa_nhd_xs_seed_084",
+        "left_water": 0.1098,
+        "right_water": 0.2353,
+        "station_m": 16800.0
+      },
+      {
+        "center_relief": 0.5451,
+        "center_vegetation": 0.3961,
+        "center_water": 0.2392,
+        "cross_section_id": "sfa_nhd_xs_seed_085",
+        "left_water": 0.3412,
+        "right_water": 0.0745,
+        "station_m": 17000.0
+      },
+      {
+        "center_relief": 0.5137,
+        "center_vegetation": 0.3176,
+        "center_water": 0.2039,
+        "cross_section_id": "sfa_nhd_xs_seed_086",
+        "left_water": 0.2588,
+        "right_water": 0.2471,
+        "station_m": 17200.0
+      },
+      {
+        "center_relief": 0.4157,
+        "center_vegetation": 0.3961,
+        "center_water": 0.1608,
+        "cross_section_id": "sfa_nhd_xs_seed_088",
+        "left_water": 0.1529,
+        "right_water": 0.1922,
+        "station_m": 17600.0
+      },
+      {
+        "center_relief": 0.3843,
+        "center_vegetation": 0.2588,
+        "center_water": 0.1176,
+        "cross_section_id": "sfa_nhd_xs_seed_089",
+        "left_water": 0.1255,
+        "right_water": 0.3294,
+        "station_m": 17800.0
+      },
+      {
+        "center_relief": 0.5098,
+        "center_vegetation": 0.3882,
+        "center_water": 0.2471,
+        "cross_section_id": "sfa_nhd_xs_seed_094",
+        "left_water": 0.1412,
+        "right_water": 0.3098,
+        "station_m": 18800.0
+      },
+      {
+        "center_relief": 0.5216,
+        "center_vegetation": 0.1725,
+        "center_water": 0.1843,
+        "cross_section_id": "sfa_nhd_xs_seed_095",
+        "left_water": 0.2431,
+        "right_water": 0.2745,
+        "station_m": 19000.0
+      },
+      {
+        "center_relief": 0.5608,
+        "center_vegetation": 0.0745,
+        "center_water": 0.7765,
+        "cross_section_id": "sfa_nhd_xs_seed_100",
+        "left_water": 0.7765,
+        "right_water": 0.7765,
+        "station_m": 20000.0
+      },
+      {
+        "center_relief": 0.5255,
+        "center_vegetation": 0.1569,
+        "center_water": 0.0627,
+        "cross_section_id": "sfa_nhd_xs_seed_108",
+        "left_water": 0.149,
+        "right_water": 0.2902,
+        "station_m": 21600.0
+      },
+      {
+        "center_relief": 0.5059,
+        "center_vegetation": 0.1882,
+        "center_water": 0.1608,
+        "cross_section_id": "sfa_nhd_xs_seed_109",
+        "left_water": 0.1765,
+        "right_water": 0.1569,
+        "station_m": 21800.0
+      },
+      {
+        "center_relief": 0.4902,
+        "center_vegetation": 0.2863,
+        "center_water": 0.1569,
+        "cross_section_id": "sfa_nhd_xs_seed_110",
+        "left_water": 0.1294,
+        "right_water": 0.1333,
+        "station_m": 22000.0
+      },
+      {
+        "center_relief": 0.4706,
+        "center_vegetation": 0.2667,
+        "center_water": 0.1647,
+        "cross_section_id": "sfa_nhd_xs_seed_117",
+        "left_water": 0.0784,
+        "right_water": 0.3647,
+        "station_m": 23400.0
+      },
+      {
+        "center_relief": 0.4824,
+        "center_vegetation": 0.4314,
+        "center_water": 0.2,
+        "cross_section_id": "sfa_nhd_xs_seed_122",
+        "left_water": 0.1922,
+        "right_water": 0.102,
+        "station_m": 24400.0
+      },
+      {
+        "center_relief": 0.4902,
+        "center_vegetation": 0.2235,
+        "center_water": 0.0941,
+        "cross_section_id": "sfa_nhd_xs_seed_123",
+        "left_water": 0.1059,
+        "right_water": 0.1843,
+        "station_m": 24600.0
+      },
+      {
+        "center_relief": 0.502,
+        "center_vegetation": 0.3961,
+        "center_water": 0.3059,
+        "cross_section_id": "sfa_nhd_xs_seed_125",
+        "left_water": 0.2745,
+        "right_water": 0.1608,
+        "station_m": 25000.0
+      },
+      {
+        "center_relief": 0.4314,
+        "center_vegetation": 0.2588,
+        "center_water": 0.149,
+        "cross_section_id": "sfa_nhd_xs_seed_128",
+        "left_water": 0.3843,
+        "right_water": 0.2157,
+        "station_m": 25600.0
+      },
+      {
+        "center_relief": 0.4706,
+        "center_vegetation": 0.1451,
+        "center_water": 0.0824,
+        "cross_section_id": "sfa_nhd_xs_seed_129",
+        "left_water": 0.0549,
+        "right_water": 0.1373,
+        "station_m": 25800.0
+      },
+      {
+        "center_relief": 0.502,
+        "center_vegetation": 0.1294,
+        "center_water": 0.0431,
+        "cross_section_id": "sfa_nhd_xs_seed_130",
+        "left_water": 0.2902,
+        "right_water": 0.2431,
+        "station_m": 26000.0
+      }
+    ],
+    "station_samples_every_1000m_or_low_water": [
+      {
+        "lat": 38.7771393,
+        "lon": -120.7226535,
+        "pixel_x": 2017,
+        "pixel_y": 1202,
+        "relief": 0.6078,
+        "sample_index": 3,
+        "station_m": 300.0,
+        "vegetation": 0.2706,
+        "water": 0.1569
+      },
+      {
+        "lat": 38.7760705,
+        "lon": -120.726397,
+        "pixel_x": 1974,
+        "pixel_y": 1227,
+        "relief": 0.6275,
+        "sample_index": 7,
+        "station_m": 700.0,
+        "vegetation": 0.2745,
+        "water": 0.2
+      },
+      {
+        "lat": 38.7773256,
+        "lon": -120.7293981,
+        "pixel_x": 1940,
+        "pixel_y": 1198,
+        "relief": 0.6118,
+        "sample_index": 10,
+        "station_m": 1000.0,
+        "vegetation": 0.4471,
+        "water": 0.2824
+      },
+      {
+        "lat": 38.7767317,
+        "lon": -120.7314359,
+        "pixel_x": 1917,
+        "pixel_y": 1212,
+        "relief": 0.6275,
+        "sample_index": 12,
+        "station_m": 1200.0,
+        "vegetation": 0.2235,
+        "water": 0.1333
+      },
+      {
+        "lat": 38.771858,
+        "lon": -120.7374491,
+        "pixel_x": 1849,
+        "pixel_y": 1322,
+        "relief": 0.5529,
+        "sample_index": 20,
+        "station_m": 2000.0,
+        "vegetation": 0.5176,
+        "water": 0.2784
+      },
+      {
+        "lat": 38.7768835,
+        "lon": -120.7414753,
+        "pixel_x": 1803,
+        "pixel_y": 1208,
+        "relief": 0.5922,
+        "sample_index": 27,
+        "station_m": 2700.0,
+        "vegetation": 0.3451,
+        "water": 0.2078
+      },
+      {
+        "lat": 38.777247,
+        "lon": -120.744816,
+        "pixel_x": 1765,
+        "pixel_y": 1200,
+        "relief": 0.5843,
+        "sample_index": 30,
+        "station_m": 3000.0,
+        "vegetation": 0.4588,
+        "water": 0.349
+      },
+      {
+        "lat": 38.7755891,
+        "lon": -120.7488126,
+        "pixel_x": 1719,
+        "pixel_y": 1238,
+        "relief": 0.5765,
+        "sample_index": 34,
+        "station_m": 3400.0,
+        "vegetation": 0.4588,
+        "water": 0.2039
+      },
+      {
+        "lat": 38.7749982,
+        "lon": -120.7496798,
+        "pixel_x": 1709,
+        "pixel_y": 1251,
+        "relief": 0.5569,
+        "sample_index": 35,
+        "station_m": 3500.0,
+        "vegetation": 0.3608,
+        "water": 0.1569
+      },
+      {
+        "lat": 38.7744973,
+        "lon": -120.7506273,
+        "pixel_x": 1699,
+        "pixel_y": 1262,
+        "relief": 0.5412,
+        "sample_index": 36,
+        "station_m": 3600.0,
+        "vegetation": 0.2157,
+        "water": 0.1294
+      },
+      {
+        "lat": 38.7745217,
+        "lon": -120.7517722,
+        "pixel_x": 1686,
+        "pixel_y": 1262,
+        "relief": 0.5412,
+        "sample_index": 37,
+        "station_m": 3700.0,
+        "vegetation": 0.1804,
+        "water": 0.0941
+      },
+      {
+        "lat": 38.7755365,
+        "lon": -120.754924,
+        "pixel_x": 1650,
+        "pixel_y": 1239,
+        "relief": 0.5176,
+        "sample_index": 40,
+        "station_m": 4000.0,
+        "vegetation": 0.4157,
+        "water": 0.3686
+      },
+      {
+        "lat": 38.7798548,
+        "lon": -120.7582479,
+        "pixel_x": 1612,
+        "pixel_y": 1141,
+        "relief": 0.6039,
+        "sample_index": 46,
+        "station_m": 4600.0,
+        "vegetation": 0.1608,
+        "water": 0.1765
+      },
+      {
+        "lat": 38.7798795,
+        "lon": -120.7618426,
+        "pixel_x": 1571,
+        "pixel_y": 1140,
+        "relief": 0.5843,
+        "sample_index": 50,
+        "station_m": 5000.0,
+        "vegetation": 0.1961,
+        "water": 0.4863
+      },
+      {
+        "lat": 38.7807591,
+        "lon": -120.7694477,
+        "pixel_x": 1485,
+        "pixel_y": 1120,
+        "relief": 0.5843,
+        "sample_index": 60,
+        "station_m": 6000.0,
+        "vegetation": 0.0471,
+        "water": 0.7765
+      },
+      {
+        "lat": 38.7829635,
+        "lon": -120.7793092,
+        "pixel_x": 1373,
+        "pixel_y": 1070,
+        "relief": 0.4941,
+        "sample_index": 70,
+        "station_m": 7000.0,
+        "vegetation": 0.0706,
+        "water": 0.7765
+      },
+      {
+        "lat": 38.7781469,
+        "lon": -120.7797192,
+        "pixel_x": 1368,
+        "pixel_y": 1179,
+        "relief": 0.4431,
+        "sample_index": 80,
+        "station_m": 8000.0,
+        "vegetation": 0.0902,
+        "water": 0.7765
+      },
+      {
+        "lat": 38.7720315,
+        "lon": -120.7811752,
+        "pixel_x": 1351,
+        "pixel_y": 1318,
+        "relief": 0.4275,
+        "sample_index": 90,
+        "station_m": 9000.0,
+        "vegetation": 0.3098,
+        "water": 0.3529
+      },
+      {
+        "lat": 38.7660123,
+        "lon": -120.781493,
+        "pixel_x": 1348,
+        "pixel_y": 1455,
+        "relief": 0.4353,
+        "sample_index": 97,
+        "station_m": 9700.0,
+        "vegetation": 0.4392,
+        "water": 0.2
+      },
+      {
+        "lat": 38.7651578,
+        "lon": -120.7811741,
+        "pixel_x": 1351,
+        "pixel_y": 1475,
+        "relief": 0.4157,
+        "sample_index": 98,
+        "station_m": 9800.0,
+        "vegetation": 0.502,
+        "water": 0.2275
+      },
+      {
+        "lat": 38.7638531,
+        "lon": -120.7821753,
+        "pixel_x": 1340,
+        "pixel_y": 1504,
+        "relief": 0.451,
+        "sample_index": 100,
+        "station_m": 10000.0,
+        "vegetation": 0.4745,
+        "water": 0.2667
+      },
+      {
+        "lat": 38.7640106,
+        "lon": -120.7832952,
+        "pixel_x": 1327,
+        "pixel_y": 1501,
+        "relief": 0.4588,
+        "sample_index": 101,
+        "station_m": 10100.0,
+        "vegetation": 0.2078,
+        "water": 0.1216
+      },
+      {
+        "lat": 38.7643488,
+        "lon": -120.7843608,
+        "pixel_x": 1315,
+        "pixel_y": 1493,
+        "relief": 0.4627,
+        "sample_index": 102,
+        "station_m": 10200.0,
+        "vegetation": 0.4588,
+        "water": 0.2353
+      },
+      {
+        "lat": 38.7654844,
+        "lon": -120.7861028,
+        "pixel_x": 1295,
+        "pixel_y": 1467,
+        "relief": 0.4667,
+        "sample_index": 104,
+        "station_m": 10400.0,
+        "vegetation": 0.4824,
+        "water": 0.1882
+      },
+      {
+        "lat": 38.7629781,
+        "lon": -120.7909864,
+        "pixel_x": 1240,
+        "pixel_y": 1524,
+        "relief": 0.4549,
+        "sample_index": 110,
+        "station_m": 11000.0,
+        "vegetation": 0.3961,
+        "water": 0.3059
+      },
+      {
+        "lat": 38.7686057,
+        "lon": -120.7949378,
+        "pixel_x": 1195,
+        "pixel_y": 1396,
+        "relief": 0.4863,
+        "sample_index": 119,
+        "station_m": 11900.0,
+        "vegetation": 0.3961,
+        "water": 0.1686
+      },
+      {
+        "lat": 38.7684916,
+        "lon": -120.796082,
+        "pixel_x": 1182,
+        "pixel_y": 1399,
+        "relief": 0.4902,
+        "sample_index": 120,
+        "station_m": 12000.0,
+        "vegetation": 0.3098,
+        "water": 0.1961
+      },
+      {
+        "lat": 38.7684897,
+        "lon": -120.7972185,
+        "pixel_x": 1169,
+        "pixel_y": 1399,
+        "relief": 0.4941,
+        "sample_index": 121,
+        "station_m": 12100.0,
+        "vegetation": 0.3373,
+        "water": 0.149
+      },
+      {
+        "lat": 38.7651552,
+        "lon": -120.8045172,
+        "pixel_x": 1086,
+        "pixel_y": 1475,
+        "relief": 0.4667,
+        "sample_index": 130,
+        "station_m": 13000.0,
+        "vegetation": 0.3961,
+        "water": 0.3882
+      },
+      {
+        "lat": 38.7658941,
+        "lon": -120.8086203,
+        "pixel_x": 1039,
+        "pixel_y": 1458,
+        "relief": 0.4353,
+        "sample_index": 134,
+        "station_m": 13400.0,
+        "vegetation": 0.5529,
+        "water": 0.2275
+      },
+      {
+        "lat": 38.7692949,
+        "lon": -120.8095447,
+        "pixel_x": 1029,
+        "pixel_y": 1381,
+        "relief": 0.4431,
+        "sample_index": 138,
+        "station_m": 13800.0,
+        "vegetation": 0.4392,
+        "water": 0.2471
+      },
+      {
+        "lat": 38.7701926,
+        "lon": -120.8094752,
+        "pixel_x": 1029,
+        "pixel_y": 1360,
+        "relief": 0.502,
+        "sample_index": 139,
+        "station_m": 13900.0,
+        "vegetation": 0.3294,
+        "water": 0.1608
+      },
+      {
+        "lat": 38.7710437,
+        "lon": -120.8095696,
+        "pixel_x": 1028,
+        "pixel_y": 1341,
+        "relief": 0.4941,
+        "sample_index": 140,
+        "station_m": 14000.0,
+        "vegetation": 0.4235,
+        "water": 0.2745
+      },
+      {
+        "lat": 38.7716959,
+        "lon": -120.8103637,
+        "pixel_x": 1019,
+        "pixel_y": 1326,
+        "relief": 0.5137,
+        "sample_index": 141,
+        "station_m": 14100.0,
+        "vegetation": 0.4745,
+        "water": 0.2275
+      },
+      {
+        "lat": 38.771883,
+        "lon": -120.8114286,
+        "pixel_x": 1007,
+        "pixel_y": 1322,
+        "relief": 0.5176,
+        "sample_index": 142,
+        "station_m": 14200.0,
+        "vegetation": 0.4157,
+        "water": 0.2118
+      },
+      {
+        "lat": 38.7717194,
+        "lon": -120.8125182,
+        "pixel_x": 995,
+        "pixel_y": 1326,
+        "relief": 0.5098,
+        "sample_index": 143,
+        "station_m": 14300.0,
+        "vegetation": 0.4588,
+        "water": 0.1922
+      },
+      {
+        "lat": 38.7713232,
+        "lon": -120.814747,
+        "pixel_x": 970,
+        "pixel_y": 1335,
+        "relief": 0.5216,
+        "sample_index": 145,
+        "station_m": 14500.0,
+        "vegetation": 0.3608,
+        "water": 0.2235
+      },
+      {
+        "lat": 38.7695709,
+        "lon": -120.8170247,
+        "pixel_x": 944,
+        "pixel_y": 1374,
+        "relief": 0.4745,
+        "sample_index": 148,
+        "station_m": 14800.0,
+        "vegetation": 0.3529,
+        "water": 0.149
+      },
+      {
+        "lat": 38.768011,
+        "lon": -120.8180245,
+        "pixel_x": 932,
+        "pixel_y": 1410,
+        "relief": 0.4627,
+        "sample_index": 150,
+        "station_m": 15000.0,
+        "vegetation": 0.3529,
+        "water": 0.2157
+      },
+      {
+        "lat": 38.7660066,
+        "lon": -120.8228603,
+        "pixel_x": 877,
+        "pixel_y": 1455,
+        "relief": 0.5098,
+        "sample_index": 155,
+        "station_m": 15500.0,
+        "vegetation": 0.2588,
+        "water": 0.0824
+      },
+      {
+        "lat": 38.7670701,
+        "lon": -120.824548,
+        "pixel_x": 858,
+        "pixel_y": 1431,
+        "relief": 0.4235,
+        "sample_index": 157,
+        "station_m": 15700.0,
+        "vegetation": 0.5373,
+        "water": 0.2392
+      },
+      {
+        "lat": 38.767745,
+        "lon": -120.8252362,
+        "pixel_x": 850,
+        "pixel_y": 1416,
+        "relief": 0.4549,
+        "sample_index": 158,
+        "station_m": 15800.0,
+        "vegetation": 0.3529,
+        "water": 0.1961
+      },
+      {
+        "lat": 38.7682362,
+        "lon": -120.8274478,
+        "pixel_x": 825,
+        "pixel_y": 1405,
+        "relief": 0.498,
+        "sample_index": 160,
+        "station_m": 16000.0,
+        "vegetation": 0.3294,
+        "water": 0.3608
+      },
+      {
+        "lat": 38.7701323,
+        "lon": -120.8325882,
+        "pixel_x": 767,
+        "pixel_y": 1362,
+        "relief": 0.5294,
+        "sample_index": 165,
+        "station_m": 16500.0,
+        "vegetation": 0.3098,
+        "water": 0.2235
+      },
+      {
+        "lat": 38.7713179,
+        "lon": -120.8343213,
+        "pixel_x": 747,
+        "pixel_y": 1335,
+        "relief": 0.5373,
+        "sample_index": 167,
+        "station_m": 16700.0,
+        "vegetation": 0.2824,
+        "water": 0.2039
+      },
+      {
+        "lat": 38.77179,
+        "lon": -120.8352918,
+        "pixel_x": 736,
+        "pixel_y": 1324,
+        "relief": 0.5451,
+        "sample_index": 168,
+        "station_m": 16800.0,
+        "vegetation": 0.1098,
+        "water": 0.098
+      },
+      {
+        "lat": 38.772028,
+        "lon": -120.8364,
+        "pixel_x": 723,
+        "pixel_y": 1319,
+        "relief": 0.5451,
+        "sample_index": 169,
+        "station_m": 16900.0,
+        "vegetation": 0.1725,
+        "water": 0.1373
+      },
+      {
+        "lat": 38.7720979,
+        "lon": -120.8375497,
+        "pixel_x": 710,
+        "pixel_y": 1317,
+        "relief": 0.5451,
+        "sample_index": 170,
+        "station_m": 17000.0,
+        "vegetation": 0.3961,
+        "water": 0.2392
+      },
+      {
+        "lat": 38.7720709,
+        "lon": -120.8387027,
+        "pixel_x": 697,
+        "pixel_y": 1318,
+        "relief": 0.5294,
+        "sample_index": 171,
+        "station_m": 17100.0,
+        "vegetation": 0.1647,
+        "water": 0.1255
+      },
+      {
+        "lat": 38.7718891,
+        "lon": -120.8398281,
+        "pixel_x": 684,
+        "pixel_y": 1322,
+        "relief": 0.5137,
+        "sample_index": 172,
+        "station_m": 17200.0,
+        "vegetation": 0.3176,
+        "water": 0.2039
+      },
+      {
+        "lat": 38.7714462,
+        "lon": -120.843167,
+        "pixel_x": 646,
+        "pixel_y": 1332,
+        "relief": 0.4392,
+        "sample_index": 175,
+        "station_m": 17500.0,
+        "vegetation": 0.3529,
+        "water": 0.1647
+      },
+      {
+        "lat": 38.7707742,
+        "lon": -120.8437929,
+        "pixel_x": 639,
+        "pixel_y": 1347,
+        "relief": 0.4157,
+        "sample_index": 176,
+        "station_m": 17600.0,
+        "vegetation": 0.3961,
+        "water": 0.1608
+      },
+      {
+        "lat": 38.7703338,
+        "lon": -120.8447939,
+        "pixel_x": 628,
+        "pixel_y": 1357,
+        "relief": 0.3961,
+        "sample_index": 177,
+        "station_m": 17700.0,
+        "vegetation": 0.4314,
+        "water": 0.1765
+      },
+      {
+        "lat": 38.7699719,
+        "lon": -120.8458497,
+        "pixel_x": 616,
+        "pixel_y": 1365,
+        "relief": 0.3843,
+        "sample_index": 178,
+        "station_m": 17800.0,
+        "vegetation": 0.2588,
+        "water": 0.1176
+      },
+      {
+        "lat": 38.7696116,
+        "lon": -120.8480857,
+        "pixel_x": 590,
+        "pixel_y": 1374,
+        "relief": 0.4431,
+        "sample_index": 180,
+        "station_m": 18000.0,
+        "vegetation": 0.3882,
+        "water": 0.3059
+      },
+      {
+        "lat": 38.7743359,
+        "lon": -120.8463696,
+        "pixel_x": 610,
+        "pixel_y": 1266,
+        "relief": 0.4431,
+        "sample_index": 187,
+        "station_m": 18700.0,
+        "vegetation": 0.1451,
+        "water": 0.102
+      },
+      {
+        "lat": 38.7751569,
+        "lon": -120.8458987,
+        "pixel_x": 615,
+        "pixel_y": 1247,
+        "relief": 0.5098,
+        "sample_index": 188,
+        "station_m": 18800.0,
+        "vegetation": 0.3882,
+        "water": 0.2471
+      },
+      {
+        "lat": 38.7760192,
+        "lon": -120.8455924,
+        "pixel_x": 619,
+        "pixel_y": 1228,
+        "relief": 0.5059,
+        "sample_index": 189,
+        "station_m": 18900.0,
+        "vegetation": 0.3333,
+        "water": 0.2275
+      },
+      {
+        "lat": 38.776906,
+        "lon": -120.8455233,
+        "pixel_x": 620,
+        "pixel_y": 1208,
+        "relief": 0.5216,
+        "sample_index": 190,
+        "station_m": 19000.0,
+        "vegetation": 0.1725,
+        "water": 0.1843
+      },
+      {
+        "lat": 38.7827732,
+        "lon": -120.852892,
+        "pixel_x": 536,
+        "pixel_y": 1074,
+        "relief": 0.5608,
+        "sample_index": 200,
+        "station_m": 20000.0,
+        "vegetation": 0.0745,
+        "water": 0.7765
+      },
+      {
+        "lat": 38.788092,
+        "lon": -120.8597525,
+        "pixel_x": 458,
+        "pixel_y": 953,
+        "relief": 0.5451,
+        "sample_index": 210,
+        "station_m": 21000.0,
+        "vegetation": 0.2667,
+        "water": 0.4118
+      },
+      {
+        "lat": 38.788874,
+        "lon": -120.8630488,
+        "pixel_x": 420,
+        "pixel_y": 935,
+        "relief": 0.5647,
+        "sample_index": 213,
+        "station_m": 21300.0,
+        "vegetation": 0.2392,
+        "water": 0.149
+      },
+      {
+        "lat": 38.7895389,
+        "lon": -120.8664011,
+        "pixel_x": 382,
+        "pixel_y": 920,
+        "relief": 0.5255,
+        "sample_index": 216,
+        "station_m": 21600.0,
+        "vegetation": 0.1569,
+        "water": 0.0627
+      },
+      {
+        "lat": 38.7899302,
+        "lon": -120.8674399,
+        "pixel_x": 370,
+        "pixel_y": 911,
+        "relief": 0.549,
+        "sample_index": 217,
+        "station_m": 21700.0,
+        "vegetation": 0.2745,
+        "water": 0.2078
+      },
+      {
+        "lat": 38.7902341,
+        "lon": -120.8685243,
+        "pixel_x": 358,
+        "pixel_y": 904,
+        "relief": 0.5059,
+        "sample_index": 218,
+        "station_m": 21800.0,
+        "vegetation": 0.1882,
+        "water": 0.1608
+      },
+      {
+        "lat": 38.7904934,
+        "lon": -120.8696265,
+        "pixel_x": 345,
+        "pixel_y": 899,
+        "relief": 0.502,
+        "sample_index": 219,
+        "station_m": 21900.0,
+        "vegetation": 0.2157,
+        "water": 0.1294
+      },
+      {
+        "lat": 38.7904941,
+        "lon": -120.8707634,
+        "pixel_x": 332,
+        "pixel_y": 899,
+        "relief": 0.4902,
+        "sample_index": 220,
+        "station_m": 22000.0,
+        "vegetation": 0.2863,
+        "water": 0.1569
+      },
+      {
+        "lat": 38.7903565,
+        "lon": -120.8718948,
+        "pixel_x": 320,
+        "pixel_y": 902,
+        "relief": 0.4745,
+        "sample_index": 221,
+        "station_m": 22100.0,
+        "vegetation": 0.1647,
+        "water": 0.1373
+      },
+      {
+        "lat": 38.7938488,
+        "lon": -120.8807877,
+        "pixel_x": 218,
+        "pixel_y": 822,
+        "relief": 0.4549,
+        "sample_index": 230,
+        "station_m": 23000.0,
+        "vegetation": 0.4392,
+        "water": 0.3216
+      },
+      {
+        "lat": 38.7964662,
+        "lon": -120.8813029,
+        "pixel_x": 213,
+        "pixel_y": 763,
+        "relief": 0.4784,
+        "sample_index": 233,
+        "station_m": 23300.0,
+        "vegetation": 0.1294,
+        "water": 0.1608
+      },
+      {
+        "lat": 38.7973574,
+        "lon": -120.8813805,
+        "pixel_x": 212,
+        "pixel_y": 742,
+        "relief": 0.4706,
+        "sample_index": 234,
+        "station_m": 23400.0,
+        "vegetation": 0.2667,
+        "water": 0.1647
+      },
+      {
+        "lat": 38.8001663,
+        "lon": -120.8851608,
+        "pixel_x": 169,
+        "pixel_y": 679,
+        "relief": 0.4863,
+        "sample_index": 239,
+        "station_m": 23900.0,
+        "vegetation": 0.2745,
+        "water": 0.149
+      },
+      {
+        "lat": 38.8004579,
+        "lon": -120.8862504,
+        "pixel_x": 156,
+        "pixel_y": 672,
+        "relief": 0.4902,
+        "sample_index": 240,
+        "station_m": 24000.0,
+        "vegetation": 0.4745,
+        "water": 0.3608
+      },
+      {
+        "lat": 38.8006501,
+        "lon": -120.8873775,
+        "pixel_x": 144,
+        "pixel_y": 668,
+        "relief": 0.4824,
+        "sample_index": 241,
+        "station_m": 24100.0,
+        "vegetation": 0.1294,
+        "water": 0.0941
+      },
+      {
+        "lat": 38.8014794,
+        "lon": -120.8906551,
+        "pixel_x": 106,
+        "pixel_y": 649,
+        "relief": 0.4824,
+        "sample_index": 244,
+        "station_m": 24400.0,
+        "vegetation": 0.4314,
+        "water": 0.2
+      },
+      {
+        "lat": 38.8021752,
+        "lon": -120.8913834,
+        "pixel_x": 98,
+        "pixel_y": 633,
+        "relief": 0.502,
+        "sample_index": 245,
+        "station_m": 24500.0,
+        "vegetation": 0.3294,
+        "water": 0.1176
+      },
+      {
+        "lat": 38.8029599,
+        "lon": -120.891932,
+        "pixel_x": 92,
+        "pixel_y": 615,
+        "relief": 0.4902,
+        "sample_index": 246,
+        "station_m": 24600.0,
+        "vegetation": 0.2235,
+        "water": 0.0941
+      },
+      {
+        "lat": 38.8038157,
+        "lon": -120.8922545,
+        "pixel_x": 88,
+        "pixel_y": 596,
+        "relief": 0.5059,
+        "sample_index": 247,
+        "station_m": 24700.0,
+        "vegetation": 0.1529,
+        "water": 0.102
+      },
+      {
+        "lat": 38.8059466,
+        "lon": -120.8940832,
+        "pixel_x": 67,
+        "pixel_y": 547,
+        "relief": 0.502,
+        "sample_index": 250,
+        "station_m": 25000.0,
+        "vegetation": 0.3961,
+        "water": 0.3059
+      },
+      {
+        "lat": 38.8098018,
+        "lon": -120.8965256,
+        "pixel_x": 40,
+        "pixel_y": 459,
+        "relief": 0.498,
+        "sample_index": 255,
+        "station_m": 25500.0,
+        "vegetation": 0.2863,
+        "water": 0.1529
+      },
+      {
+        "lat": 38.8106113,
+        "lon": -120.8968275,
+        "pixel_x": 36,
+        "pixel_y": 441,
+        "relief": 0.4314,
+        "sample_index": 256,
+        "station_m": 25600.0,
+        "vegetation": 0.2588,
+        "water": 0.149
+      },
+      {
+        "lat": 38.8113746,
+        "lon": -120.8974308,
+        "pixel_x": 29,
+        "pixel_y": 424,
+        "relief": 0.4941,
+        "sample_index": 257,
+        "station_m": 25700.0,
+        "vegetation": 0.3451,
+        "water": 0.2039
+      },
+      {
+        "lat": 38.8121802,
+        "lon": -120.8979196,
+        "pixel_x": 24,
+        "pixel_y": 405,
+        "relief": 0.4706,
+        "sample_index": 258,
+        "station_m": 25800.0,
+        "vegetation": 0.1451,
+        "water": 0.0824
+      },
+      {
+        "lat": 38.8130175,
+        "lon": -120.8982729,
+        "pixel_x": 20,
+        "pixel_y": 386,
+        "relief": 0.4863,
+        "sample_index": 259,
+        "station_m": 25900.0,
+        "vegetation": 0.2078,
+        "water": 0.1686
+      },
+      {
+        "lat": 38.8135435,
+        "lon": -120.8992056,
+        "pixel_x": 9,
+        "pixel_y": 374,
+        "relief": 0.502,
+        "sample_index": 260,
+        "station_m": 26000.0,
+        "vegetation": 0.1294,
+        "water": 0.0431
+      }
+    ]
+  },
+  "sampling": {
+    "image_size_px": [
+      2048,
+      2048
+    ],
+    "lon_lat_to_pixel": "linear_wgs84_bbox_preview_mapping_north_up",
+    "note": "Masks are preview derivatives with a bounded channel prior; high agreement is not production acceptance.",
+    "water_thresholds": [
+      0.35,
+      0.5
+    ]
+  },
+  "schema": "raftsim.nhd_naip_dem_alignment_diagnostic.v0",
+  "section_id": "chili_bar_to_coloma",
+  "status": "diagnostic_preview_masks_not_alignment_acceptance",
+  "summary": {
+    "cross_section_center_relief": {
+      "count": 130,
+      "ge_0_35_fraction": 1.0,
+      "ge_0_50_fraction": 0.5308,
+      "max": 0.6275,
+      "mean": 0.5082,
+      "median": 0.502,
+      "min": 0.3843
+    },
+    "cross_section_center_water": {
+      "count": 130,
+      "ge_0_35_fraction": 0.4154,
+      "ge_0_50_fraction": 0.1923,
+      "max": 0.7765,
+      "mean": 0.3792,
+      "median": 0.3196,
+      "min": 0.0431
+    },
+    "cross_section_count": 133,
+    "cross_section_left_endpoint_water": {
+      "count": 130,
+      "ge_0_35_fraction": 0.4154,
+      "ge_0_50_fraction": 0.1923,
+      "max": 0.7765,
+      "mean": 0.3729,
+      "median": 0.3314,
+      "min": 0.0549
+    },
+    "cross_section_right_endpoint_water": {
+      "count": 130,
+      "ge_0_35_fraction": 0.3692,
+      "ge_0_50_fraction": 0.2154,
+      "max": 0.7765,
+      "mean": 0.3834,
+      "median": 0.3216,
+      "min": 0.0549
+    },
+    "cross_sections_out_of_bounds": 3,
+    "cross_sections_with_center_in_bounds": 130,
+    "station_relief": {
+      "count": 260,
+      "ge_0_35_fraction": 1.0,
+      "ge_0_50_fraction": 0.5577,
+      "max": 0.6275,
+      "mean": 0.5103,
+      "median": 0.5039,
+      "min": 0.3843
+    },
+    "station_sample_count": 264,
+    "station_samples_in_bounds": 260,
+    "station_samples_out_of_bounds": 4,
+    "station_vegetation": {
+      "count": 260,
+      "ge_0_35_fraction": 0.4885,
+      "ge_0_50_fraction": 0.0538,
+      "max": 0.7176,
+      "mean": 0.3132,
+      "median": 0.3451,
+      "min": 0.0157
+    },
+    "station_water": {
+      "count": 260,
+      "ge_0_35_fraction": 0.3962,
+      "ge_0_50_fraction": 0.1962,
+      "max": 0.7765,
+      "mean": 0.3752,
+      "median": 0.3196,
+      "min": 0.0431
+    }
+  }
+}
