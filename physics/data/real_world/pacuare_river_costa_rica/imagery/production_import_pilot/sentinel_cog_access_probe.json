@@ -1,0 +1,122 @@
+{
+  "schema": "raftsim.pacuare_sentinel_cog_access_probe.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "public_sentinel_cog_range_access_verified_extraction_not_promoted",
+  "goal": "Verify that the selected public Sentinel-2 L2A COG candidates can be accessed with byte-range reads before committing any full-resolution bands, source-drape replacements, or production masks.",
+  "source_context": {
+    "collection": "sentinel-s2-l2a-cogs",
+    "provider": "Element 84 / AWS Open Data Sentinel-2 L2A COG mirror",
+    "catalog_context": "Copernicus Data Space Sentinel-2 metadata selected January 19, 2025 as the first low-cloud Pacuare candidate.",
+    "registry_url": "https://registry.opendata.aws/sentinel-2-l2a-cogs/",
+    "source_thumbnail_review": "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json"
+  },
+  "probe_policy": {
+    "full_resolution_bands_committed": false,
+    "full_resolution_band_derivatives_committed": false,
+    "source_drape_replaced": false,
+    "water_or_vegetation_masks_replaced": false,
+    "range_probe_bytes_committed": false,
+    "temporary_probe_location": "/private/tmp only; not source controlled",
+    "allowed_use": [
+      "download/access workflow validation",
+      "COG range-read planning",
+      "raster tooling requirement definition",
+      "future cloud and SCL QA planning"
+    ],
+    "forbidden_use": [
+      "production source-drape replacement",
+      "water, vegetation, canopy, wet-rock, waterfall, mist, or cloud-shadow mask authority",
+      "claiming full Pacuare high-resolution imagery coverage",
+      "claiming lifelike or photoreal Pacuare imagery evidence"
+    ]
+  },
+  "range_probe_results": [
+    {
+      "probe_id": "sentinel_17pkm_tci_header_range",
+      "tile_id": "17PKM",
+      "asset": "TCI.tif",
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/17/P/KM/2025/1/S2B_17PKM_20250119_0_L2A/TCI.tif",
+      "head_http_status": 200,
+      "range_http_status": 206,
+      "range_request": "bytes=0-16383",
+      "range_bytes_downloaded": 16384,
+      "content_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "content_length_bytes": 224939987,
+      "accept_ranges": "bytes",
+      "last_modified": "Sun, 19 Jan 2025 22:10:35 GMT",
+      "etag": "428f0d15ad4090e3b97f2365a8739dda-27",
+      "result": "range_read_succeeded_not_committed"
+    },
+    {
+      "probe_id": "sentinel_17pkm_b04_header_range",
+      "tile_id": "17PKM",
+      "asset": "B04.tif",
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/17/P/KM/2025/1/S2B_17PKM_20250119_0_L2A/B04.tif",
+      "head_http_status": 200,
+      "range_http_status": 206,
+      "range_request": "bytes=0-16383",
+      "range_bytes_downloaded": 16384,
+      "content_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "content_length_bytes": 171725097,
+      "accept_ranges": "bytes",
+      "last_modified": "Sun, 19 Jan 2025 22:15:42 GMT",
+      "etag": "654b4ffdd6d8b758345d84f0dcd5e6d9-21",
+      "result": "range_read_succeeded_not_committed"
+    },
+    {
+      "probe_id": "sentinel_16phr_tci_header_range",
+      "tile_id": "16PHR",
+      "asset": "TCI.tif",
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/16/P/HR/2025/1/S2B_16PHR_20250119_0_L2A/TCI.tif",
+      "head_http_status": 200,
+      "range_http_status": 206,
+      "range_request": "bytes=0-16383",
+      "range_bytes_downloaded": 16384,
+      "content_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "content_length_bytes": 280438635,
+      "accept_ranges": "bytes",
+      "last_modified": "Sun, 19 Jan 2025 22:28:41 GMT",
+      "etag": "92c5c9ed8f06efdd5a1e50e3a63716d3-34",
+      "result": "range_read_succeeded_not_committed"
+    },
+    {
+      "probe_id": "sentinel_16phr_scl_header_range",
+      "tile_id": "16PHR",
+      "asset": "SCL.tif",
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/16/P/HR/2025/1/S2B_16PHR_20250119_0_L2A/SCL.tif",
+      "head_http_status": 200,
+      "range_http_status": 206,
+      "range_request": "bytes=0-16383",
+      "range_bytes_downloaded": 16384,
+      "content_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "content_length_bytes": 2213150,
+      "accept_ranges": "bytes",
+      "last_modified": "Sun, 19 Jan 2025 22:39:05 GMT",
+      "etag": "658fb0036c2201d2eb525e916ce943fa",
+      "result": "range_read_succeeded_not_committed"
+    }
+  ],
+  "readiness_summary": {
+    "candidate_tile_count": 2,
+    "successful_range_probe_count": 4,
+    "total_full_resolution_bytes_advertised_for_probed_assets": 679418869,
+    "largest_asset_bytes": 280438635,
+    "scl_probe_available": true,
+    "technical_access_decision": "Public COG assets are reachable and support range reads, so the next production step should be a proper raster window reader rather than full-file commits.",
+    "current_tooling_gap": "The local validation environment does not have GDAL/rasterio available, so corridor-clipped COG reads and SCL/cloud masking are not yet implemented."
+  },
+  "promotion_blockers": [
+    "Add or vendor an approved raster window reader such as GDAL/rasterio/rio-tiler before deriving corridor clips.",
+    "Clip both intersecting MGRS tiles to reviewed Pacuare corridor bounds and stitch in a selected working CRS.",
+    "Use SCL/QA plus manual visual review for cloud, shadow, haze, water, canopy, wet rock, waterfall, and mist classification.",
+    "Record Sentinel legal notice, attribution, storage/LFS policy, and package redistribution review before committing any full-resolution bands or derivatives.",
+    "Compare selected imagery date/season against rainfall, guide/outfitter notes, and flow visual bands before using it for river color, wetness, or gameplay tuning."
+  ],
+  "next_actions": [
+    "Add a raster-window extraction dependency or standalone COG reader behind a small fixture test.",
+    "Generate tiny corridor-clipped review thumbnails from TCI plus SCL for both Pacuare tiles without committing full COGs.",
+    "Only after terms and QA pass, replace the MODIS/GIBS Pacuare source drape with a Sentinel-derived or first-party/permissioned aerial drape."
+  ]
+}

@@ -44,6 +44,7 @@ from raftsim.real_world import (
     PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE,
     PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
     PACUARE_RAINFALL_STATION_REVIEW_FILE,
+    PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE,
     PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE,
     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE,
     PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE,
@@ -1668,6 +1669,52 @@ def test_pacuare_sentinel_cog_thumbnail_review_attaches_public_visual_triage_onl
     assert "windowed COG reads clipped to the Pacuare corridor" in review["remaining_blockers"][1]
 
 
+def test_pacuare_sentinel_cog_access_probe_verifies_range_reads_without_promoting_imagery():
+    pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
+    source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((pacuare_dir / "production_source_pull_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+    review = json.loads((pacuare_dir / PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE).read_text())
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+    pacuare_sources = next(river for river in photoreal_sources["rivers"] if river["river_id"] == "pacuare")
+    probes = {probe["probe_id"]: probe for probe in review["range_probe_results"]}
+
+    assert PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE in source_manifest["artifacts"]["imagery"]
+    assert any(
+        artifact["artifact_id"] == "pacuare_sentinel_cog_access_probe"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert (
+        "physics/data/real_world/pacuare_river_costa_rica/" + PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE
+        in rivers["pacuare"]["attached_sources_by_class"]["aerial_or_satellite_imagery"]["artifacts"]
+    )
+    assert (
+        "physics/data/real_world/pacuare_river_costa_rica/" + PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE
+        in rivers["pacuare"]["attached_sources_by_class"]["water_and_vegetation_masks"]["artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "pacuare_sentinel_cog_access_probe"
+        for artifact in pacuare_sources["source_sample_artifacts"]
+    )
+    assert review["schema"] == "raftsim.pacuare_sentinel_cog_access_probe.v1"
+    assert review["status"] == "public_sentinel_cog_range_access_verified_extraction_not_promoted"
+    assert review["probe_policy"]["full_resolution_bands_committed"] is False
+    assert review["probe_policy"]["source_drape_replaced"] is False
+    assert review["readiness_summary"]["successful_range_probe_count"] == 4
+    assert review["readiness_summary"]["total_full_resolution_bytes_advertised_for_probed_assets"] == 679418869
+    assert review["readiness_summary"]["scl_probe_available"] is True
+    assert review["readiness_summary"]["current_tooling_gap"].startswith("The local validation environment")
+    assert probes["sentinel_17pkm_b04_header_range"]["range_http_status"] == 206
+    assert probes["sentinel_16phr_scl_header_range"]["content_length_bytes"] == 2213150
+    assert "production source-drape replacement" in review["probe_policy"]["forbidden_use"]
+
+
 def test_pacuare_source_metadata_review_consolidates_metadata_without_promoting():
     pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
     source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
@@ -2261,6 +2308,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_RAINFALL_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_FLASH_RESPONSE_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
