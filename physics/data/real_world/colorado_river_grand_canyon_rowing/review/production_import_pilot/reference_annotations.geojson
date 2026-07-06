@@ -1,7 +1,13 @@
 {
   "features": [
     {
-      "geometry": null,
+      "geometry": {
+        "coordinates": [
+          -111.5369924,
+          36.8792656
+        ],
+        "type": "Point"
+      },
       "properties": {
         "anchor_hint": "Lees Ferry / Grand Canyon river-eye downstream frame",
         "annotation_id": "colorado_river_eye_canyon_scale",
@@ -28,7 +34,11 @@
         "rights_status": "candidate_links_only",
         "river_id": "colorado_river",
         "source_review_queue_index": 0,
-        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "station_m": 1900.0,
+        "station_sample_index": 19,
+        "station_seed_fraction": 0.08,
+        "station_source": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+        "stationing_status": "review_seed_from_existing_stationing_scaffold_not_authoritative",
         "target_id": "colorado_river_eye_canyon_scale",
         "visual_questions": [
           "Do canyon walls read at Grand Canyon scale from low raft height?",
@@ -38,7 +48,13 @@
       "type": "Feature"
     },
     {
-      "geometry": null,
+      "geometry": {
+        "coordinates": [
+          -111.5648546,
+          36.8429798
+        ],
+        "type": "Point"
+      },
       "properties": {
         "anchor_hint": "Release-aware sandbar and wet-bank review",
         "annotation_id": "colorado_release_wet_banks_and_sandbars",
@@ -64,7 +80,11 @@
         "rights_status": "candidate_links_only",
         "river_id": "colorado_river",
         "source_review_queue_index": 1,
-        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "station_m": 10700.0,
+        "station_sample_index": 107,
+        "station_seed_fraction": 0.44,
+        "station_source": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+        "stationing_status": "review_seed_from_existing_stationing_scaffold_not_authoritative",
         "target_id": "colorado_release_wet_banks_and_sandbars",
         "visual_questions": [
           "Which sandbars should be exposed or damp across low, moderate, and high release bands?",
@@ -74,7 +94,13 @@
       "type": "Feature"
     },
     {
-      "geometry": null,
+      "geometry": {
+        "coordinates": [
+          -111.6127803,
+          36.8497097
+        ],
+        "type": "Point"
+      },
       "properties": {
         "anchor_hint": "Long-water rescue and oar-rig sightline review",
         "annotation_id": "colorado_long_swimmer_rescue_visibility",
@@ -98,7 +124,11 @@
         "rights_status": "candidate_links_only",
         "river_id": "colorado_river",
         "source_review_queue_index": 2,
-        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "station_m": 17400.0,
+        "station_sample_index": 174,
+        "station_seed_fraction": 0.72,
+        "station_source": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+        "stationing_status": "review_seed_from_existing_stationing_scaffold_not_authoritative",
         "target_id": "colorado_long_swimmer_rescue_visibility",
         "visual_questions": [
           "Can the player read swimmer position at Grand Canyon scale?",
@@ -119,6 +149,7 @@
   "river_id": "colorado_river",
   "schema": "raftsim.reference_media_annotations.geojson.v1",
   "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
-  "status": "link_only_annotation_targets_no_media_downloaded",
+  "stationing_source": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+  "status": "link_only_annotation_targets_with_review_seed_geometry_no_media_downloaded",
   "type": "FeatureCollection"
 }

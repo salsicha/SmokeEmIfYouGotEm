@@ -55,6 +55,7 @@ from raftsim.real_world import (
     PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION,
     SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
     SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
+    SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
     SOUTH_FORK_PRODUCTION_BANKS_DRAFT_FILE,
     SOUTH_FORK_PRODUCTION_CENTERLINE_DRAFT_FILE,
     SOUTH_FORK_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
@@ -1403,6 +1404,11 @@ def test_reference_media_annotations_and_rights_manifests_are_link_only_per_rive
         "colorado_river": "colorado_river_grand_canyon_rowing",
         "pacuare": "pacuare_river_costa_rica",
     }
+    stationing_files = {
+        "american_south_fork": SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
+        "colorado_river": COLORADO_NHD_MAINSTEM_STATIONING_FILE,
+        "pacuare": PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE,
+    }
     readiness_by_river = {river["river_id"]: river for river in readiness["rivers"]}
     photoreal_by_river = {river["river_id"]: river for river in photoreal_sources["rivers"]}
 
@@ -1411,17 +1417,28 @@ def test_reference_media_annotations_and_rights_manifests_are_link_only_per_rive
         source_manifest = json.loads((data_dir / "source_manifest.json").read_text())
         annotations = json.loads((data_dir / REFERENCE_MEDIA_ANNOTATIONS_FILE).read_text())
         rights = json.loads((data_dir / REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE).read_text())
-        expected_annotations = build_reference_media_annotations_geojson(river_id, queue)
+        stationing = json.loads((data_dir / stationing_files[river_id]).read_text())
+        expected_annotations = build_reference_media_annotations_geojson(
+            river_id,
+            queue,
+            stationing,
+            stationing_files[river_id],
+        )
         expected_rights = build_reference_media_rights_manifest(river_id, link_manifest, queue)
 
         assert annotations == expected_annotations
         assert rights == expected_rights
         assert annotations["type"] == "FeatureCollection"
-        assert annotations["status"] == "link_only_annotation_targets_no_media_downloaded"
+        assert annotations["status"] == "link_only_annotation_targets_with_review_seed_geometry_no_media_downloaded"
         assert len(annotations["features"]) == 3
-        assert all(feature["geometry"] is None for feature in annotations["features"])
+        assert all(feature["geometry"]["type"] == "Point" for feature in annotations["features"])
         assert all(
             feature["properties"]["review_status"] == "candidate_links_only_no_media_downloaded"
+            for feature in annotations["features"]
+        )
+        assert all(
+            feature["properties"]["stationing_status"]
+            == "review_seed_from_existing_stationing_scaffold_not_authoritative"
             for feature in annotations["features"]
         )
         assert rights["status"] == "candidate_links_only_no_media_downloaded_no_rights_cleared"

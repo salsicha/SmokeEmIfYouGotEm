@@ -717,7 +717,7 @@
       "artifact_id": "american_south_fork_reference_media_annotations",
       "category": "guide_and_reference_media_annotations",
       "caveats": [
-        "GeoJSON features intentionally have null geometry until an editor or guide assigns station/reach geometry.",
+        "GeoJSON point features are review seeds snapped to existing stationing scaffolds; editor/guide review must move or replace them before any station, reach, or source-media claim is authoritative.",
         "No third-party photos, videos, thumbnails, captions, comments, or audio are downloaded or imported.",
         "Reference targets cannot drive production art, water, gameplay tuning, or marketing until rights and guide review are recorded."
       ],
@@ -727,11 +727,12 @@
         "field_media/production_import_pilot/rights_manifest.json",
         "../reference_media_review_queue.json"
       ],
-      "status": "link_only_annotation_targets_no_media_downloaded",
+      "status": "link_only_annotation_targets_with_review_seed_geometry_no_media_downloaded",
       "summary": {
         "candidate_source_id_count": 4,
         "feature_count": 3,
-        "geometry_status": "null_geometry_anchor_hints_only"
+        "geometry_status": "review_seed_points_from_stationing_scaffold_not_authoritative",
+        "stationing_source": "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json"
       },
       "use": [
         "editor_reference_review_targets",

@@ -373,8 +373,8 @@
           "category": "guide_and_reference_media_annotations",
           "path": "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/reference_annotations.geojson",
           "provider": "RaftSim generated link-only media review annotation scaffold",
-          "status": "attached_no_media_downloaded_no_geometry_promoted",
-          "unreal_use": "Editor review targets for visual fidelity, flow context, rescue readability, and guide/outfitter discussion; features have null geometry until stationed and cannot drive production assets until rights clear."
+          "status": "attached_review_seed_geometry_no_media_downloaded",
+          "unreal_use": "Editor-visible review seed points for visual fidelity, flow context, rescue readability, and guide/outfitter discussion; points come from stationing scaffolds and cannot drive production assets until editor placement, item rights, and guide review pass."
         },
         {
           "artifact_id": "american_south_fork_reference_media_rights_manifest",
@@ -680,8 +680,8 @@
           "category": "guide_and_reference_media_annotations",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/reference_annotations.geojson",
           "provider": "RaftSim generated link-only media review annotation scaffold",
-          "status": "attached_no_media_downloaded_no_geometry_promoted",
-          "unreal_use": "Editor review targets for visual fidelity, flow context, rescue readability, and guide/outfitter discussion; features have null geometry until stationed and cannot drive production assets until rights clear."
+          "status": "attached_review_seed_geometry_no_media_downloaded",
+          "unreal_use": "Editor-visible review seed points for visual fidelity, flow context, rescue readability, and guide/outfitter discussion; points come from stationing scaffolds and cannot drive production assets until editor placement, item rights, and guide review pass."
         },
         {
           "artifact_id": "colorado_river_reference_media_rights_manifest",
@@ -983,8 +983,8 @@
           "category": "guide_and_reference_media_annotations",
           "path": "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/reference_annotations.geojson",
           "provider": "RaftSim generated link-only media review annotation scaffold",
-          "status": "attached_no_media_downloaded_no_geometry_promoted",
-          "unreal_use": "Editor review targets for visual fidelity, flow context, rescue readability, and guide/outfitter discussion; features have null geometry until stationed and cannot drive production assets until rights clear."
+          "status": "attached_review_seed_geometry_no_media_downloaded",
+          "unreal_use": "Editor-visible review seed points for visual fidelity, flow context, rescue readability, and guide/outfitter discussion; points come from stationing scaffolds and cannot drive production assets until editor placement, item rights, and guide review pass."
         },
         {
           "artifact_id": "pacuare_reference_media_rights_manifest",

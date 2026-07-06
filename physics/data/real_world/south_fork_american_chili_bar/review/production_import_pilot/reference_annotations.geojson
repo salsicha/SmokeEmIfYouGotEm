@@ -1,7 +1,13 @@
 {
   "features": [
     {
-      "geometry": null,
+      "geometry": {
+        "coordinates": [
+          -120.7458815,
+          38.776943
+        ],
+        "type": "Point"
+      },
       "properties": {
         "anchor_hint": "Chili Bar to Coloma guide-seat downstream frame",
         "annotation_id": "south_fork_guide_seat_boulder_garden",
@@ -28,7 +34,11 @@
         "rights_status": "candidate_links_only",
         "river_id": "american_south_fork",
         "source_review_queue_index": 0,
-        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "station_m": 3100.0,
+        "station_sample_index": 31,
+        "station_seed_fraction": 0.12,
+        "station_source": "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
+        "stationing_status": "review_seed_from_existing_stationing_scaffold_not_authoritative",
         "target_id": "south_fork_guide_seat_boulder_garden",
         "visual_questions": [
           "Are exposed rocks, bank trees, and water color believable at summer commercial flow?",
@@ -38,7 +48,13 @@
       "type": "Feature"
     },
     {
-      "geometry": null,
+      "geometry": {
+        "coordinates": [
+          -120.7972185,
+          38.7684897
+        ],
+        "type": "Point"
+      },
       "properties": {
         "anchor_hint": "Low-flow rock exposure and wet-bank comparison",
         "annotation_id": "south_fork_late_summer_exposed_rocks",
@@ -62,7 +78,11 @@
         "rights_status": "candidate_links_only",
         "river_id": "american_south_fork",
         "source_review_queue_index": 1,
-        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "station_m": 12100.0,
+        "station_sample_index": 121,
+        "station_seed_fraction": 0.46,
+        "station_source": "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
+        "stationing_status": "review_seed_from_existing_stationing_scaffold_not_authoritative",
         "target_id": "south_fork_late_summer_exposed_rocks",
         "visual_questions": [
           "Which boulder faces should be dry, damp, or freshly splashed?",
@@ -72,7 +92,13 @@
       "type": "Feature"
     },
     {
-      "geometry": null,
+      "geometry": {
+        "coordinates": [
+          -120.8471938,
+          38.7802078
+        ],
+        "type": "Point"
+      },
       "properties": {
         "anchor_hint": "Spring runoff or release-driven high-flow review",
         "annotation_id": "south_fork_high_flow_foam_lines",
@@ -95,7 +121,11 @@
         "rights_status": "candidate_links_only",
         "river_id": "american_south_fork",
         "source_review_queue_index": 2,
-        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "station_m": 19400.0,
+        "station_sample_index": 194,
+        "station_seed_fraction": 0.74,
+        "station_source": "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
+        "stationing_status": "review_seed_from_existing_stationing_scaffold_not_authoritative",
         "target_id": "south_fork_high_flow_foam_lines",
         "visual_questions": [
           "Where should foam streaks and eddy fences strengthen without hiding hazards?",
@@ -116,6 +146,7 @@
   "river_id": "american_south_fork",
   "schema": "raftsim.reference_media_annotations.geojson.v1",
   "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
-  "status": "link_only_annotation_targets_no_media_downloaded",
+  "stationing_source": "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
+  "status": "link_only_annotation_targets_with_review_seed_geometry_no_media_downloaded",
   "type": "FeatureCollection"
 }

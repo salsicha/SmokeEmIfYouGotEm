@@ -68,6 +68,17 @@ PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION = "raftsim.production_environ
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE = "production_environment_gap_register.json"
 REFERENCE_MEDIA_ANNOTATIONS_FILE = "review/production_import_pilot/reference_annotations.geojson"
 REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE = "field_media/production_import_pilot/rights_manifest.json"
+REFERENCE_MEDIA_TARGET_STATION_FRACTIONS = {
+    "south_fork_guide_seat_boulder_garden": 0.12,
+    "south_fork_late_summer_exposed_rocks": 0.46,
+    "south_fork_high_flow_foam_lines": 0.74,
+    "colorado_river_eye_canyon_scale": 0.08,
+    "colorado_release_wet_banks_and_sandbars": 0.44,
+    "colorado_long_swimmer_rescue_visibility": 0.72,
+    "pacuare_rainforest_gorge_density": 0.18,
+    "pacuare_waterfalls_mist_wet_rock": 0.56,
+    "pacuare_canopy_rescue_readability": 0.82,
+}
 SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE = "hydrology/cdec_terms_flags_and_station_relation_review.json"
 SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE = "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json"
 SOUTH_FORK_FLOW_BAND_REVIEW_FILE = "hydrology/production_import_pilot/flow_band_review.json"
@@ -1844,6 +1855,8 @@ def build_colorado_access_publication_review() -> dict[str, object]:
 def build_reference_media_annotations_geojson(
     river_id: str,
     review_queue: dict[str, object],
+    stationing: dict[str, object] | None = None,
+    stationing_source: str | None = None,
 ) -> dict[str, object]:
     """Build link-only station-aware media review annotations for a river."""
 
@@ -1851,19 +1864,49 @@ def build_reference_media_annotations_geojson(
     if not targets:
         raise ValueError(f"No reference media review targets found for river_id={river_id!r}")
 
+    station_samples = list(stationing.get("station_samples", [])) if stationing else []
+    station_end_m = float(station_samples[-1]["station_m"]) if station_samples else None
+
+    def station_sample_for_target(target_id: str) -> dict[str, object] | None:
+        if not station_samples or station_end_m is None:
+            return None
+        fraction = REFERENCE_MEDIA_TARGET_STATION_FRACTIONS.get(target_id, 0.5)
+        target_station = station_end_m * fraction
+        return min(station_samples, key=lambda sample: abs(float(sample["station_m"]) - target_station))
+
     features: list[dict[str, object]] = []
     for index, target in enumerate(targets):
+        station_sample = station_sample_for_target(target["target_id"])
+        geometry = None
+        station_properties: dict[str, object] = {
+            "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+            "station_source": None,
+            "station_m": None,
+            "station_sample_index": None,
+        }
+        if station_sample is not None:
+            geometry = {
+                "type": "Point",
+                "coordinates": [station_sample["lon"], station_sample["lat"]],
+            }
+            station_properties = {
+                "stationing_status": "review_seed_from_existing_stationing_scaffold_not_authoritative",
+                "station_source": stationing_source or "provided_stationing_scaffold",
+                "station_m": station_sample["station_m"],
+                "station_sample_index": station_sample["sample_index"],
+                "station_seed_fraction": REFERENCE_MEDIA_TARGET_STATION_FRACTIONS.get(target["target_id"], 0.5),
+            }
         features.append(
             {
                 "type": "Feature",
-                "geometry": None,
+                "geometry": geometry,
                 "properties": {
                     "annotation_id": target["target_id"],
                     "river_id": river_id,
                     "target_id": target["target_id"],
                     "anchor_hint": target["anchor_hint"],
                     "feature_role": "link_only_reference_media_review_target",
-                    "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+                    **station_properties,
                     "review_status": "candidate_links_only_no_media_downloaded",
                     "rights_status": target["rights_status"],
                     "visual_questions": target["visual_questions"],
@@ -1890,8 +1933,13 @@ def build_reference_media_annotations_geojson(
         "schema": "raftsim.reference_media_annotations.geojson.v1",
         "generated_on": "2026-07-06",
         "river_id": river_id,
-        "status": "link_only_annotation_targets_no_media_downloaded",
+        "status": (
+            "link_only_annotation_targets_with_review_seed_geometry_no_media_downloaded"
+            if station_samples
+            else "link_only_annotation_targets_no_media_downloaded"
+        ),
         "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+        "stationing_source": stationing_source,
         "rights_manifest": REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
         "policy": review_queue["policy"],
         "features": features,
