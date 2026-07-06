@@ -1,0 +1,47 @@
+{
+  "schema": "raftsim.colorado_import_pilot_derivatives.v1",
+  "status": "generated_review_gated_not_conditioned_not_production_import",
+  "source_recipe": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_import_pilot.json",
+  "source_pull_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_import_pilot_pull_manifest.json",
+  "inputs": {
+    "naip_tiles": [
+      "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r0_c0.png",
+      "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r0_c1.png",
+      "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r1_c0.png",
+      "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r1_c1.png"
+    ],
+    "dem_tiles": [
+      "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r0_c0.tif",
+      "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r0_c1.tif",
+      "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r1_c0.tif",
+      "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r1_c1.tif"
+    ]
+  },
+  "outputs": {
+    "source_drape": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png",
+    "dem_relief": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/dem_relief_2048.png",
+    "heightfield_candidate": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/heightfield_candidate_2017.png",
+    "water_mask": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/water_mask_2048.png",
+    "vegetation_mask": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/vegetation_mask_2048.png",
+    "mask_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_masks_manifest.json"
+  },
+  "processing": {
+    "tile_grid": {
+      "rows": 2,
+      "columns": 2
+    },
+    "north_up_mosaic": "pilot tile row 1 is placed above row 0",
+    "source_drape_size_px": 4096,
+    "relief_size_px": 2048,
+    "heightfield_size_px": 2017,
+    "mask_size_px": 2048,
+    "heightfield_pixel_format": "16_bit_grayscale_png",
+    "elevation_min_m": 933.4000244140625,
+    "elevation_max_m": 1933.9405517578125
+  },
+  "caveats": [
+    "This is a stitched derivative of the official-service pilot tiles, not final photoreal terrain.",
+    "The DEM mosaic is not yet reprojected to a selected working CRS, hydrologically conditioned, channel-burned, or guide/oarsman reviewed.",
+    "The source masks are preview segmentation aids and must be reviewed against hydrography, bank polygons, seasonal imagery, and guide/oarsman feedback before production use."
+  ]
+}

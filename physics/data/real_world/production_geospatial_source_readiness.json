@@ -240,16 +240,19 @@
       "attached_source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_source_pull_manifest.json",
       "production_import_pilot": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_import_pilot.json",
       "production_import_pilot_pull_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_import_pilot_pull_manifest.json",
+      "production_import_pilot_derivatives_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_import_pilot_derivatives_manifest.json",
       "attached_sources_by_class": {
         "terrain_dem_or_lidar": {
-          "status": "lees_ferry_corridor_sample_heightfield_candidate_and_pilot_dem_tiles_attached",
+          "status": "lees_ferry_corridor_sample_pilot_dem_tiles_relief_and_heightfield_candidate_attached",
           "artifacts": [
             "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_relief_preview_1024.png",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png",
-            "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles"
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/dem_relief_2048.png",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/heightfield_candidate_2017.png"
           ],
-          "promotion_blocker": "Covers only a preview sample near Lees Ferry plus a 2x2 official-service pilot tile pull; full canyon terrain still needs mosaic/clip, CRS and vertical-datum review, tiling expansion, stationing, hydrologic conditioning, canyon-wall material breakup, and guide/oarsman review."
+          "promotion_blocker": "Covers only a preview sample near Lees Ferry plus 2x2 official-service pilot derivatives; full canyon terrain still needs mosaic/clip, CRS and vertical-datum review, tiling expansion, stationing, hydrologic conditioning, canyon-wall material breakup, and guide/oarsman review."
         },
         "hydrography_and_centerline": {
           "status": "not_attached_for_full_corridor",
@@ -257,20 +260,23 @@
           "promotion_blocker": "Need 3DHP/NHD or NPS/GCMRC river-mile aligned centerline, rapid annotations, tributaries, camps/access context, and solver corridor stationing."
         },
         "aerial_or_satellite_imagery": {
-          "status": "naip_lees_ferry_corridor_sample_and_pilot_tiles_attached",
+          "status": "naip_lees_ferry_corridor_sample_pilot_tiles_and_stitched_source_drape_attached",
           "artifacts": [
             "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_sample_1024.png",
-            "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/naip_tiles"
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/naip_tiles",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png"
           ],
-          "promotion_blocker": "Sample export and 2x2 NAIP pilot tile pull do not cover the full rowing prototype corridor or canyon visual diversity; needs provider metadata/acquisition-date review, mosaic/clip, CRS/terms review, selected orthomosaics/satellite scenes, and review-gated stitched derivatives."
+          "promotion_blocker": "Sample export and 2x2 NAIP pilot drape do not cover the full rowing prototype corridor or canyon visual diversity; needs provider metadata/acquisition-date review, mosaic/clip, CRS/terms review, selected orthomosaics/satellite scenes, and guide/oarsman approval before production drape use."
         },
         "water_and_vegetation_masks": {
-          "status": "preview_masks_attached",
+          "status": "preview_masks_and_pilot_stitched_masks_attached",
           "artifacts": [
             "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_water_mask_1024.png",
-            "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_vegetation_mask_1024.png"
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_vegetation_mask_1024.png",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/water_mask_2048.png",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/vegetation_mask_2048.png"
           ],
-          "promotion_blocker": "Preview masks need full-corridor water edge, sandbar, wet-rock, tamarisk/cottonwood/scrub classes, and release-band variants."
+          "promotion_blocker": "Masks are deterministic preview derivatives from source imagery and a bounded big-water channel prior; they require full-corridor water edge, sandbar, wet-rock, tamarisk/cottonwood/scrub classes, release-band variants, and guide/oarsman approval."
         },
         "seasonal_flow_or_release_history": {
           "status": "usgs_daily_discharge_attached_release_context_pending",
