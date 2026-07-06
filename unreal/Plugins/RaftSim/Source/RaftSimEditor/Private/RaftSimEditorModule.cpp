@@ -11,7 +11,6 @@
 #include "Components/SkyLightComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkyAtmosphereComponent.h"
-#include "Components/TextRenderComponent.h"
 #include "Editor.h"
 #include "Engine/DirectionalLight.h"
 #include "Engine/ExponentialHeightFog.h"
@@ -20,7 +19,6 @@
 #include "Engine/SkyLight.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/StaticMeshActor.h"
-#include "Engine/TextRenderActor.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "EngineUtils.h"
 #include "FileHelpers.h"
@@ -236,6 +234,12 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.DisplayName = TEXT("Pacuare River Rainforest");
     Pacuare.MapPackagePath = TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview");
     Pacuare.SourceManifest = TEXT("physics/data/real_world/pacuare_river_costa_rica/source_manifest.json");
+    Pacuare.AerialDrapeImage =
+        TEXT("physics/data/real_world/pacuare_river_costa_rica/imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png");
+    Pacuare.ElevationSample =
+        TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
+    Pacuare.SourceDrapeDescription =
+        TEXT("official NASA GIBS MODIS/Terra true-color 512px sample, selected from five cloud-screened dates, sampled into visible rainforest terrain overlay tiles; Copernicus DEM GLO-30 public COG tiles recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water, waterfalls, foam, raft, and lighting remain proxy layers");
     Pacuare.WaterColor = FLinearColor(0.03f, 0.24f, 0.19f);
     Pacuare.TerrainColor = FLinearColor(0.17f, 0.22f, 0.13f);
     Pacuare.RockColor = FLinearColor(0.20f, 0.24f, 0.20f);
@@ -873,7 +877,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     }
 }
 
-void AddPreviewCameraAndLabels(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
+void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
 {
     if (!World || !GEditor)
     {
@@ -900,26 +904,6 @@ void AddPreviewCameraAndLabels(UWorld* World, const FRaftSimEnvironmentPreviewSp
         PlayerStart->SetActorLabel(TEXT("RaftSim_GuideSeat_PlayerStart"));
     }
 
-    ATextRenderActor* Label = Cast<ATextRenderActor>(
-        GEditor->AddActor(World->GetCurrentLevel(), ATextRenderActor::StaticClass(), FTransform(FRotator(0.0f, 0.0f, 0.0f), FVector(-3600.0f, -1350.0f, 420.0f))));
-    if (Label && Label->GetTextRender())
-    {
-        Label->SetActorLabel(TEXT("RaftSim_SourceManifest_Label"));
-        const FString SourceLayerNote = Spec.SourceDrapeDescription.IsEmpty()
-            ? FString(TEXT("Proxy preview: replace with reviewed DEM, imagery, and assets."))
-            : FString::Printf(
-                  TEXT("Source preview layer: %s\nAerial: %s\nDEM sample: %s"),
-                  *Spec.SourceDrapeDescription,
-                  *Spec.AerialDrapeImage,
-                  *Spec.ElevationSample);
-        Label->GetTextRender()->SetText(FText::FromString(FString::Printf(
-            TEXT("%s\n%s\n%s"),
-            *Spec.DisplayName,
-            *Spec.SourceManifest,
-            *SourceLayerNote)));
-        Label->GetTextRender()->SetHorizontalAlignment(EHTA_Left);
-        Label->GetTextRender()->SetWorldSize(72.0f);
-    }
 }
 
 bool SavePreviewWorld(UWorld* World, const FString& PackagePath, FString& OutSummary)
@@ -1176,7 +1160,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         }
     }
 
-    AddPreviewCameraAndLabels(World, Spec);
+    AddPreviewCameraAndStart(World, Spec);
     return SavePreviewWorld(World, Spec.MapPackagePath, OutSummary);
 }
 
@@ -2187,7 +2171,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("%s\n")
         TEXT("  ]\n")
         TEXT("}\n"),
-        bAllCaptured ? TEXT("south_fork_and_colorado_source_draped_previews_and_pacuare_procedural_blockout_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
+        bAllCaptured ? TEXT("south_fork_colorado_and_pacuare_source_draped_previews_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
         *EntriesJson);
 
     const FString ManifestPath = FPaths::Combine(CaptureRoot, TEXT("environment_capture_manifest.json"));

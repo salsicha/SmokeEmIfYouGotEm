@@ -49,6 +49,15 @@
       "pipeline_use": ["seasonal_water_masks", "vegetation_change", "historical_flow_context"]
     },
     {
+      "source_id": "nasa_gibs",
+      "category": "satellite_imagery",
+      "provider": "NASA Earthdata",
+      "title": "Global Imagery Browse Services WMS/WMTS",
+      "url": "https://gibs.earthdata.nasa.gov/",
+      "rights_status": "official_nasa_imagery_service_with_layer_date_crs_and_terms_metadata_required",
+      "pipeline_use": ["pacuare_cloud_screened_preview_imagery", "wide_area_rainforest_color_reference", "seasonal_cloud_screening"]
+    },
+    {
       "source_id": "copernicus_sentinel",
       "category": "satellite_imagery",
       "provider": "Copernicus Data Space Ecosystem",
@@ -56,6 +65,15 @@
       "url": "https://dataspace.copernicus.eu/terms-and-conditions",
       "rights_status": "sentinel_data_free_full_open_subject_to_sentinel_legal_notice; portal_content_noncommercial_without_extra_rights",
       "pipeline_use": ["pacuare_cloud_screened_imagery", "river_color", "vegetation_masks", "wide_area_change"]
+    },
+    {
+      "source_id": "copernicus_dem",
+      "category": "terrain",
+      "provider": "Copernicus DEM GLO-30 Public on AWS Open Data",
+      "title": "Copernicus Digital Elevation Model GLO-30 Public",
+      "url": "https://registry.opendata.aws/copernicus-dem/",
+      "rights_status": "free_public_copernicus_dem_terms_and_tile_metadata_required",
+      "pipeline_use": ["pacuare_gorge_dem", "terrain_slope", "bank_and_gorge_wall_context", "unreal_heightfield_input"]
     },
     {
       "source_id": "hydrosheds",
@@ -212,8 +230,9 @@
       ],
       "river_map_sources": [
         {"source_id": "snit_cr", "url": "https://www.snitcr.go.cr/", "status": "source_research_required"},
+        {"source_id": "copernicus_dem", "url": "https://registry.opendata.aws/copernicus-dem/", "status": "tile_samples_attached_for_pacuare_terrain_source"},
         {"source_id": "hydrosheds", "url": "https://www.hydrosheds.org/", "status": "planned_basin_context"},
-        {"source_id": "opentopography", "url": "https://opentopography.org/", "status": "planned_dem_review"},
+        {"source_id": "opentopography", "url": "https://opentopography.org/", "status": "api_key_required_recorded"},
         {"source_id": "osm", "url": "https://www.openstreetmap.org/copyright", "status": "planning_seed_only"}
       ],
       "flow_sources": [
@@ -221,8 +240,27 @@
         {"source_id": "ice_hydromet_review", "url": "https://www.ice.go.cr/", "status": "source_research_required"}
       ],
       "aerial_imagery_sources": [
+        {"source_id": "nasa_gibs", "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi", "status": "cloud_screened_sample_attached_for_unreal_preview_drape"},
         {"source_id": "copernicus_sentinel", "url": "https://dataspace.copernicus.eu/terms-and-conditions", "status": "planned"},
         {"source_id": "landsat", "url": "https://www.usgs.gov/landsat-missions/landsat-data-access", "status": "planned"}
+      ],
+      "source_sample_artifacts": [
+        {
+          "artifact_id": "nasa_gibs_pacuare_truecolor_2025_04_02",
+          "category": "satellite_imagery_sample",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
+          "provider": "NASA GIBS WMS",
+          "status": "draped_into_unreal_preview_terrain_overlay_tiles",
+          "unreal_use": "source-derived coarse rainforest terrain overlay layer for /Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
+        },
+        {
+          "artifact_id": "copernicus_dem_glo30_pacuare_bounds_tiles",
+          "category": "terrain_sample",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif",
+          "provider": "Copernicus DEM GLO-30 Public on AWS Open Data",
+          "status": "recorded_for_follow_on_rainforest_gorge_heightfield_conditioning",
+          "unreal_use": "provenance and import-pipeline terrain source; full clipped heightfield replacement still pending"
+        }
       ],
       "reference_media_sources": [
         {"source_id": "first_party_field_capture", "rights_status": "preferred_for_shipping", "status": "planned"},
@@ -256,5 +294,5 @@
       "desktop_and_vr_performance_captures"
     ]
   },
-  "status": "south_fork_and_colorado_naip_source_drapes_available; pacuare_remains_procedural_blockout; production_geospatial_imports_and_photoreal_assets_pending"
+  "status": "south_fork_colorado_and_pacuare_source_draped_previews_available; production_geospatial_imports_and_photoreal_assets_pending"
 }

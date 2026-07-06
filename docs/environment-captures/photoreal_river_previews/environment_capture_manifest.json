@@ -2,7 +2,7 @@
   "schema": "raftsim.unreal.environment_capture_manifest.v1",
   "capture_type": "guide_seat_downstream_unreal_preview",
   "source_plan": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
-  "status": "south_fork_and_colorado_source_draped_previews_and_pacuare_procedural_blockout_available; photoreal source_data_and_asset_replacement_required",
+  "status": "south_fork_colorado_and_pacuare_source_draped_previews_available; photoreal source_data_and_asset_replacement_required",
   "captures": [
     {
       "river_id": "american_south_fork",
@@ -32,10 +32,10 @@
       "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview",
       "source_manifest": "physics/data/real_world/pacuare_river_costa_rica/source_manifest.json",
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
-      "status": "captured_procedural_blockout_render",
-      "aerial_drape_image": "",
-      "elevation_sample": "",
-      "fidelity_note": "source-aware procedural blockout with generated valley, river, foam, rocks, foliage, and raft proxies; not yet production photoreal"
+      "status": "captured_source_derived_preview_render",
+      "aerial_drape_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",
+      "elevation_sample": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif",
+      "fidelity_note": "official NASA GIBS MODIS/Terra true-color 512px sample, selected from five cloud-screened dates, sampled into visible rainforest terrain overlay tiles; Copernicus DEM GLO-30 public COG tiles recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water, waterfalls, foam, raft, and lighting remain proxy layers"
     }
   ]
 }
