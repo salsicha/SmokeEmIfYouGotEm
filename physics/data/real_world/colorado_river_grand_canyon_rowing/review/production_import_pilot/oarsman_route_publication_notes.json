@@ -1,0 +1,88 @@
+{
+  "allowed_use": [
+    "oarsman review checklist",
+    "publication-sensitivity handoff",
+    "future river-mile and release-aware route validation"
+  ],
+  "forbidden_use": [
+    "permit or legal advice",
+    "current access operation claims",
+    "camp/beach publication clearance",
+    "final river-mile or route authority"
+  ],
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "access_publication_review": "review/production_import_pilot/access_publication_sensitivity_review.json",
+    "camps_and_beaches_review": "review/production_import_pilot/camps_and_beaches_review.geojson",
+    "river_mile_markers": "hydrography/production_import_pilot/river_mile_markers.geojson",
+    "sandbars": "hydrography/production_import_pilot/sandbars.geojson"
+  },
+  "promotion_blockers": [
+    "No completed oarsman reviewer identity, date, flow/release context, or approval is attached.",
+    "River-mile markers, sandbars, camps, beaches, and access points are review seeds only.",
+    "NPS/current operating constraints and sensitive-resource publication rules still need human review before public route detail."
+  ],
+  "required_oarsman_fields": [
+    "reviewer_name_or_role",
+    "review_date",
+    "flow_or_release_context",
+    "launch_and_rigging_sightline_notes",
+    "sandbar_wet_bank_release_notes",
+    "camp_beach_publication_limits",
+    "long_swimmer_and_rescue_visibility_notes",
+    "screenshot_or_map_detail_limits"
+  ],
+  "review_overlay_summary": {
+    "camp_beach_review_seed_count": 4,
+    "preview_river_mile_marker_count": 16,
+    "sandbar_review_seed_count": 6
+  },
+  "river_id": "colorado_river",
+  "schema": "raftsim.colorado_oarsman_route_publication_notes.v1",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "source_review_zones": [
+    {
+      "needs": [
+        "exact launch, rigging, parking, and staging geometry from approved source layers",
+        "river-mile zero and local working-CRS confirmation",
+        "permit/trip-document date review before any game-facing wording",
+        "oarsman validation of launch sightlines and traffic flow"
+      ],
+      "review_status": "official_nps_launch_context_attached_geometry_pending",
+      "river_mile_range": [
+        0.0,
+        1.0
+      ],
+      "zone_id": "lees_ferry_launch_review_zone"
+    },
+    {
+      "needs": [
+        "camp/beach/sandbar publication-sensitivity review",
+        "sensitive-resource and cultural-resource screening before detailed screenshots",
+        "river-mile stationing and release-dependent wet-bank/sandbar review",
+        "guide/oarsman notes for scouting, rescue, and long swimmer drift"
+      ],
+      "review_status": "route_context_leads_attached_publication_sensitivity_pending",
+      "river_mile_range": [
+        1.0,
+        224.0
+      ],
+      "zone_id": "grand_canyon_camps_beaches_sensitive_context_review_zone"
+    },
+    {
+      "needs": [
+        "exact take-out and road/access geometry from approved sources",
+        "current access, fee, and operating-constraint review",
+        "publication sensitivity and screenshot framing review",
+        "oarsman validation before production route package promotion"
+      ],
+      "review_status": "official_nps_takeout_context_attached_geometry_pending",
+      "river_mile_range": [
+        224.0,
+        226.0
+      ],
+      "zone_id": "diamond_creek_takeout_review_zone"
+    }
+  ],
+  "status": "oarsman_publication_notes_template_attached_review_required"
+}

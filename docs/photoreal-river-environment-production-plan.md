@@ -55,6 +55,7 @@ Treat this as a big-water rowing/oar-rig environment:
 - Flow levels: USGS `USGS-09380000` at Lees Ferry, USGS `USGS-09402500` near Grand Canyon, and Bureau of Reclamation Glen Canyon Dam release context.
 - Aerial imagery: Landsat/Sentinel for canyon-scale season and water-color history, plus approved U.S. imagery products where available.
 - Review media: NPS/public-domain or rights-cleared photos where terms permit, guide/oarsman footage by permission, and public social links as reference-only annotations.
+- Access/publication review: `review/production_import_pilot/access_points.geojson`, `no_publish_sensitive_polygons.geojson`, `camps_and_beaches_review.geojson`, and `oarsman_route_publication_notes.json` now seed editor review only; permit/legal guidance, official access geometry, camp/beach publication, sensitive-resource screening, Diamond Creek geometry, and oarsman approval remain blocked.
 
 ### Pacuare
 

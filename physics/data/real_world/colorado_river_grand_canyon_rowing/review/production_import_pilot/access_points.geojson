@@ -1,0 +1,110 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -111.5163615,
+          36.8770792
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "lees_ferry_launch_access_review_seed",
+        "feature_role": "launch_access_review_seed",
+        "needs": [
+          "exact launch, rigging, parking, and staging geometry from approved source layers",
+          "river-mile zero and local working-CRS confirmation",
+          "permit/trip-document date review before any game-facing wording",
+          "oarsman validation of launch sightlines and traffic flow"
+        ],
+        "offset_downstream_m": 0.0,
+        "offset_left_m": 80.0,
+        "promotion_gate": "Replace with official launch, rigging, parking, staging, and oarsman-reviewed geometry before production use.",
+        "review_status": "official_nps_launch_context_attached_geometry_pending",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "source_review_zone": "lees_ferry_launch_review_zone",
+        "station_lat": 36.8777351,
+        "station_lon": -111.5167285,
+        "station_m": 0.0,
+        "station_sample_index": 0,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.5727673,
+          36.8504088
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "lees_ferry_slice_route_context_review_seed",
+        "feature_role": "route_context_access_review_seed",
+        "needs": [
+          "camp/beach/sandbar publication-sensitivity review",
+          "sensitive-resource and cultural-resource screening before detailed screenshots",
+          "river-mile stationing and release-dependent wet-bank/sandbar review",
+          "guide/oarsman notes for scouting, rescue, and long swimmer drift"
+        ],
+        "offset_downstream_m": 0.0,
+        "offset_left_m": -120.0,
+        "promotion_gate": "Use as an editor note only until camp/beach/sensitive-resource and oarsman review assigns real geometry.",
+        "review_status": "route_context_leads_attached_publication_sensitivity_pending",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "source_review_zone": "grand_canyon_camps_beaches_sensitive_context_review_zone",
+        "station_lat": 36.8499335,
+        "station_lon": -111.5739764,
+        "station_m": 12000.0,
+        "station_sample_index": 120,
+        "stationing_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "annotation_id": "diamond_creek_takeout_outside_pilot_review_placeholder",
+        "feature_role": "out_of_pilot_takeout_review_placeholder",
+        "needs": [
+          "exact take-out and road/access geometry from approved sources",
+          "current access, fee, and operating-constraint review",
+          "publication sensitivity and screenshot framing review",
+          "oarsman validation before production route package promotion"
+        ],
+        "promotion_gate": "Do not create take-out geometry until full-route stationing and approved access sources are attached.",
+        "review_status": "official_nps_takeout_context_attached_geometry_pending",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "source_review_zone": "diamond_creek_takeout_review_zone",
+        "stationing_status": "outside_lees_ferry_pilot_slice_no_geometry_seeded"
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-06",
+  "policy": {
+    "allowed_use": [
+      "editor access and publication review",
+      "oarsman route-note placement",
+      "future NPS/GCMRC/manual layer comparison"
+    ],
+    "forbidden_use": [
+      "permit or legal advice",
+      "final launch, take-out, camp, beach, or road geometry",
+      "public camp/beach/sensitive-resource publication",
+      "production route authority"
+    ],
+    "geometry_authority": "review_seed_from_nhd_stationing_not_official_nps_access_or_camp_geometry"
+  },
+  "river_id": "colorado_river",
+  "schema": "raftsim.colorado_access_points.geojson.v1",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "source_access_review": "review/production_import_pilot/access_publication_sensitivity_review.json",
+  "stationing_source": "hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+  "status": "review_seed_access_points_not_authoritative_geometry",
+  "type": "FeatureCollection"
+}

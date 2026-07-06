@@ -7,7 +7,9 @@ import numpy as np
 from raftsim.real_world import (
     CANDIDATE_RIVER_INVENTORY_FILE,
     CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION,
+    COLORADO_ACCESS_POINTS_FILE,
     COLORADO_ACCESS_PUBLICATION_REVIEW_FILE,
+    COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE,
     COLORADO_NHD_ALIGNMENT_DIAGNOSTIC_FILE,
     COLORADO_NHD_CROSS_SECTION_SEED_FILE,
     COLORADO_NHD_CROSS_SECTION_SEED_MANIFEST_FILE,
@@ -19,6 +21,8 @@ from raftsim.real_world import (
     COLORADO_NHD_MAINSTEM_STATIONING_FILE,
     COLORADO_NHD_WATER_PRIOR_FILE,
     COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE,
+    COLORADO_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
+    COLORADO_OARSMAN_ROUTE_PUBLICATION_NOTES_FILE,
     COLORADO_PRODUCTION_BANKS_DRAFT_FILE,
     COLORADO_PRODUCTION_CENTERLINE_DRAFT_FILE,
     COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
@@ -74,7 +78,11 @@ from raftsim.real_world import (
     SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE,
     adaptive_solver_parameters,
     build_candidate_river_inventory_package,
+    build_colorado_access_points_geojson,
     build_colorado_access_publication_review,
+    build_colorado_camps_and_beaches_review_geojson,
+    build_colorado_no_publish_sensitive_polygons_geojson,
+    build_colorado_oarsman_route_publication_notes,
     build_colorado_production_import_pilot,
     build_colorado_river_mile_markers_geojson,
     build_colorado_release_band_review,
@@ -591,6 +599,10 @@ def test_colorado_production_import_pilot_exposes_lees_ferry_tile_plan_and_revie
     assert "nps_grand_canyon_river_trips_permits" in classes["protected_area_and_access_context"]["source_ids"]
     assert "nps_grand_canyon_noncommercial_river_trip_links" in classes["protected_area_and_access_context"]["source_ids"]
     assert COLORADO_ACCESS_PUBLICATION_REVIEW_FILE in classes["protected_area_and_access_context"]["target_outputs"]
+    assert COLORADO_ACCESS_POINTS_FILE in classes["protected_area_and_access_context"]["target_outputs"]
+    assert COLORADO_NO_PUBLISH_SENSITIVE_POLYGONS_FILE in classes["protected_area_and_access_context"]["target_outputs"]
+    assert COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE in classes["protected_area_and_access_context"]["target_outputs"]
+    assert COLORADO_OARSMAN_ROUTE_PUBLICATION_NOTES_FILE in classes["protected_area_and_access_context"]["target_outputs"]
     assert classes["water_and_vegetation_masks"]["status"] == "nhd_water_prior_attached_release_sandbar_masks_pending"
     assert COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE in classes["water_and_vegetation_masks"]["target_outputs"]
     assert COLORADO_NHD_WATER_PRIOR_FILE in classes["water_and_vegetation_masks"]["target_outputs"]
@@ -706,20 +718,61 @@ def test_colorado_access_publication_review_artifact_tracks_nps_source_leads():
         ).read_text()
     )
     review = json.loads((colorado_dir / COLORADO_ACCESS_PUBLICATION_REVIEW_FILE).read_text())
+    stationing = json.loads((colorado_dir / COLORADO_NHD_MAINSTEM_STATIONING_FILE).read_text())
+    river_miles = json.loads((colorado_dir / COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE).read_text())
+    sandbars = json.loads((colorado_dir / COLORADO_PRODUCTION_SANDBARS_FILE).read_text())
+    access_points = json.loads((colorado_dir / COLORADO_ACCESS_POINTS_FILE).read_text())
+    no_publish = json.loads((colorado_dir / COLORADO_NO_PUBLISH_SENSITIVE_POLYGONS_FILE).read_text())
+    camps = json.loads((colorado_dir / COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE).read_text())
+    oarsman_notes = json.loads((colorado_dir / COLORADO_OARSMAN_ROUTE_PUBLICATION_NOTES_FILE).read_text())
     builder_review = build_colorado_access_publication_review()
+    expected_access_points = build_colorado_access_points_geojson(builder_review, stationing)
+    expected_no_publish = build_colorado_no_publish_sensitive_polygons_geojson(builder_review, stationing)
+    expected_camps = build_colorado_camps_and_beaches_review_geojson(builder_review, stationing)
+    expected_oarsman_notes = build_colorado_oarsman_route_publication_notes(
+        builder_review,
+        river_miles,
+        sandbars,
+        camps,
+    )
 
     source_ids = {source["source_id"] for source in review["sources_checked"]}
     rivers = {river["river_id"]: river for river in readiness["rivers"]}
     colorado_sources = next(river for river in photoreal_sources["rivers"] if river["river_id"] == "colorado_river")
 
     assert review == builder_review
+    assert access_points == expected_access_points
+    assert no_publish == expected_no_publish
+    assert camps == expected_camps
+    assert oarsman_notes == expected_oarsman_notes
     assert COLORADO_ACCESS_PUBLICATION_REVIEW_FILE in source_manifest["artifacts"]["access_and_protected_context"]
+    assert COLORADO_ACCESS_POINTS_FILE in source_manifest["artifacts"]["access_and_protected_context"]
+    assert COLORADO_NO_PUBLISH_SENSITIVE_POLYGONS_FILE in source_manifest["artifacts"]["access_and_protected_context"]
+    assert COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE in source_manifest["artifacts"]["access_and_protected_context"]
+    assert COLORADO_OARSMAN_ROUTE_PUBLICATION_NOTES_FILE in source_manifest["artifacts"]["access_and_protected_context"]
     assert any(
         artifact["artifact_id"] == "colorado_access_publication_sensitivity_review"
         for artifact in pull_manifest["pulled_artifacts"]
     )
+    assert any(
+        artifact["artifact_id"] == "colorado_access_publication_annotation_scaffolds"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
     assert review["schema"] == "raftsim.colorado_access_publication_sensitivity_review.v1"
     assert review["status"] == "official_nps_river_access_publication_leads_attached_review_gated"
+    assert access_points["schema"] == "raftsim.colorado_access_points.geojson.v1"
+    assert access_points["status"] == "review_seed_access_points_not_authoritative_geometry"
+    assert no_publish["schema"] == "raftsim.colorado_no_publish_sensitive_polygons.geojson.v1"
+    assert no_publish["status"] == "coarse_review_seed_no_publish_polygons_not_authoritative"
+    assert camps["schema"] == "raftsim.colorado_camps_and_beaches_review.geojson.v1"
+    assert camps["status"] == "camp_beach_review_seeds_not_authoritative"
+    assert oarsman_notes["schema"] == "raftsim.colorado_oarsman_route_publication_notes.v1"
+    assert oarsman_notes["status"] == "oarsman_publication_notes_template_attached_review_required"
+    assert len(access_points["features"]) == 3
+    assert len(no_publish["features"]) == 3
+    assert len(camps["features"]) == 4
+    assert access_points["features"][-1]["geometry"] is None
+    assert no_publish["features"][-1]["geometry"] is None
     assert {
         "nps_grand_canyon_river_trips_permits",
         "nps_grand_canyon_noncommercial_river_trip_links",
@@ -730,13 +783,33 @@ def test_colorado_access_publication_review_artifact_tracks_nps_source_leads():
     assert review["sources_checked"][1]["page_updated"] == "2026-05-08"
     assert len(review["station_review_zones"]) == 3
     assert "permit or legal advice" in review["forbidden_use"]
-    assert "review/production_import_pilot/camps_and_beaches_review.geojson" in review["required_editor_annotations"]
+    assert COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE in review["required_editor_annotations"]
     assert (
         f"physics/data/real_world/colorado_river_grand_canyon_rowing/{COLORADO_ACCESS_PUBLICATION_REVIEW_FILE}"
         in rivers["colorado_river"]["attached_sources_by_class"]["protected_area_and_access_context"]["artifacts"]
     )
+    assert (
+        f"physics/data/real_world/colorado_river_grand_canyon_rowing/{COLORADO_ACCESS_POINTS_FILE}"
+        in rivers["colorado_river"]["attached_sources_by_class"]["protected_area_and_access_context"]["artifacts"]
+    )
+    assert (
+        f"physics/data/real_world/colorado_river_grand_canyon_rowing/{COLORADO_NO_PUBLISH_SENSITIVE_POLYGONS_FILE}"
+        in rivers["colorado_river"]["attached_sources_by_class"]["protected_area_and_access_context"]["artifacts"]
+    )
+    assert (
+        f"physics/data/real_world/colorado_river_grand_canyon_rowing/{COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE}"
+        in rivers["colorado_river"]["attached_sources_by_class"]["protected_area_and_access_context"]["artifacts"]
+    )
+    assert (
+        f"physics/data/real_world/colorado_river_grand_canyon_rowing/{COLORADO_OARSMAN_ROUTE_PUBLICATION_NOTES_FILE}"
+        in rivers["colorado_river"]["attached_sources_by_class"]["protected_area_and_access_context"]["artifacts"]
+    )
     assert any(
         artifact["artifact_id"] == "colorado_access_publication_sensitivity_review"
+        for artifact in colorado_sources["source_sample_artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "colorado_access_publication_annotation_scaffolds"
         for artifact in colorado_sources["source_sample_artifacts"]
     )
 
@@ -1596,6 +1669,10 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_RELEASE_BAND_REVIEW_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_ACCESS_PUBLICATION_REVIEW_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_ACCESS_POINTS_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_NO_PUBLISH_SENSITIVE_POLYGONS_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_CAMPS_AND_BEACHES_REVIEW_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_OARSMAN_ROUTE_PUBLICATION_NOTES_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert REFERENCE_MEDIA_ANNOTATIONS_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in rivers["pacuare"]["attached_preview_inputs"]
