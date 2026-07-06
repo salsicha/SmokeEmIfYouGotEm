@@ -272,12 +272,50 @@
         "Daily same-date comparisons do not resolve subdaily hydropower fluctuations, travel-time lag, tributary inflow, side storage, or downstream routing.",
         "All release bands remain review-gated until guide/oarsman and hydrologist review confirm gameplay/visual thresholds."
       ]
+    },
+    {
+      "artifact_id": "colorado_nhd_hu8_lees_ferry_bbox_extract",
+      "category": "hydrography",
+      "path": "hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
+      "related_artifacts": [
+        "hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
+        "hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson"
+      ],
+      "provider": "USGS / The National Map NHD HU8 shapefile products",
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=National%20Hydrography%20Dataset%20%28NHD%29&bbox=-111.66,36.80,-111.54,36.90&prodFormats=Shapefile&outputFormat=JSON",
+      "status": "official_nhd_hu8_bbox_extract_attached_review_gated_not_ordered_centerline",
+      "summary": {
+        "selected_hu8s": [
+          "14070006",
+          "14070007",
+          "15010001"
+        ],
+        "flowline_feature_count": 505,
+        "support_feature_count": 20,
+        "named_colorado_river_flowline_hits": 59,
+        "named_paria_river_flowline_hits": 15,
+        "named_cathedral_wash_flowline_hits": 8,
+        "flowline_sha256": "614b831f1b89eb027815d5af6d62d75d1eae6251ada3dbbb807a8eb7d8eddb97",
+        "support_layers_sha256": "889fbe56849a4a3d843f8fc41d12dc48c788a43dd0b4fa390a4eea807c914838"
+      },
+      "use": [
+        "official_flowline_context",
+        "river_mile_stationing_seed",
+        "tributary_context",
+        "water_edge_and_sandbar_review_input"
+      ],
+      "caveats": [
+        "Features are selected by source-feature bbox intersection with the pilot bounds and are not clipped to the bounds.",
+        "This extract is not an ordered Colorado River centerline, not river-mile stationing, not accepted banks, and not sandbar geometry.",
+        "NHD 3DHP annual CONUS products were identified in the catalog but not downloaded because they are multi-gigabyte national packages; use them later when a tiled/local 3DHP extraction path is chosen.",
+        "Guide/oarsman review, river-mile references, NPS/GCMRC context, release-band wet-bank review, and Unreal CRS transform review remain required before gameplay authority."
+      ]
     }
   ],
   "production_blockers": [
     "Full canyon DEM/lidar tiles are not downloaded or conditioned yet.",
     "Full canyon aerial/satellite imagery and water/vegetation/rock masks are not downloaded yet.",
-    "Hydrography, river-mile stationing, and rapid annotations are not clipped into a reviewed corridor workspace yet.",
+    "A stitched Lees Ferry NHD HU8 source overlay is attached, but ordered river-mile centerline, sandbars, banks, eddies, and rapid annotations are not clipped into a reviewed corridor workspace yet.",
     "USBR Glen Canyon daily total-release context is attached, but unit/terms confirmation, hourly/subdaily release patterns, release-band review, and guide/oarsman review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet."
   ]

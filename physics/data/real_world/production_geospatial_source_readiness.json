@@ -305,9 +305,13 @@
           "status": "link_seeds_attached_no_media_rights"
         },
         "hydrography_and_centerline": {
-          "artifacts": [],
-          "promotion_blocker": "Need 3DHP/NHD or NPS/GCMRC river-mile aligned centerline, rapid annotations, tributaries, camps/access context, and solver corridor stationing.",
-          "status": "not_attached_for_full_corridor"
+          "artifacts": [
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_flowline_bbox_extract.geojson",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_support_layers_bbox_extract.geojson"
+          ],
+          "promotion_blocker": "The stitched NHD HU8 source overlay records official flowline/waterbody/HUC12 context for Lees Ferry, but a single ordered Colorado mainstem, river-mile stationing, sandbars, banks, eddies, camps/access sensitivity, and oarsman review remain required before gameplay geometry authority.",
+          "status": "nhd_hu8_lees_ferry_bbox_extract_attached_review_pending"
         },
         "protected_area_and_access_context": {
           "artifacts": [
