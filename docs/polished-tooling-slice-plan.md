@@ -31,3 +31,7 @@ A tool is not considered polished until it:
 4. Add the Feature Tuning Editor shell with conservative defaults and explicit physics-vs-presentation labeling.
 5. Wire one-click validation actions to the existing Milestone 20, 21, 23, and 24 gate manifests.
 6. Add a tooling-slice gate report and user workflow docs before rolling the work into broader Milestone 25 release hardening.
+
+## Implemented Shells
+
+The Replay + Debug Viewer shell is the first implemented surface. `URaftSimReplayDebugViewerConfig`, `URaftSimReplayDebugViewerViewModel`, and `unreal/Content/RaftSim/Tools/replay_debug_viewer.json` load the existing Milestone 10 replay manifest, expose timeline bookmarks, clamp scrub time to the replay range, and manage overlay toggles for every live-water debug view. The shell intentionally works from replay data first so reviewers can validate visualization and overlay behavior before live physics is allowed to drive the scene.

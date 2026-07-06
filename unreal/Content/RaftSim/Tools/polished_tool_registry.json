@@ -14,10 +14,13 @@
       "kind": "replay_debug_viewer",
       "required_module": "RaftSimDebug",
       "source_manifest": "unreal/Content/RaftSim/Tools/replay_debug_viewer.json",
+      "config_class": "URaftSimReplayDebugViewerConfig",
+      "view_model_class": "URaftSimReplayDebugViewerViewModel",
       "loads_sample_data": [
         "physics/data/readiness/milestone_10/unreal_visualization/manifest.json",
         "unreal/Content/RaftSim/Debug/live_water_debug_views.json"
       ],
+      "status": "viewer_shell_implemented",
       "requires_validation_before_export": false,
       "polish_goal": "Open a timeline and overlay review surface without hand-editing replay JSON."
     },
