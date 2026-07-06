@@ -582,6 +582,75 @@
         "preview source-drape selection traceability",
         "future Sentinel/Landsat/orthophoto search planning"
       ]
+    },
+    {
+      "artifact_id": "pacuare_protected_area_publication_sensitivity",
+      "category": "protected_area_and_access_context_review",
+      "caveats": [
+        "No protected-area, forest-cover, wetland, corridor, recharge, access, or no-publish geometries are imported.",
+        "SNIT/SINAC/SENARA layer terms, attribution, CRS, attributes, and redistribution limits still need final review.",
+        "Pacuare corridor intersections and sensitive-location policy are not approved.",
+        "Local guide/outfitter and conservation review is required before public route details or detailed screenshots."
+      ],
+      "path": "review/production_import_pilot/protected_area_publication_sensitivity.json",
+      "provider": "RaftSim review artifact from SINAC/SNIT/SENARA metadata and access constraints",
+      "related_artifacts": [
+        "review/sinac_protected_area_source_rights.json",
+        "review/access_and_conservation_constraints.json",
+        "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+        "hydrography/production_import_pilot/snit_layer_metadata_summary.json"
+      ],
+      "status": "metadata_only_protected_area_publication_policy_attached_review_gated",
+      "summary": {
+        "candidate_layer_count": 8,
+        "catalog_review_target": "Pacuare rainforest/protected-area publication sensitivity",
+        "catalog_target_outputs": [
+          "review/production_import_pilot/protected_area_publication_sensitivity.json",
+          "review/production_import_pilot/access_and_conservation_policy.json",
+          "imagery/production_import_pilot/vegetation_mask_review.json"
+        ],
+        "metadata_layer_count": 8,
+        "metadata_review_findings": [
+          "Layer-specific metadata JSON is available through POST /Metadatos/get_full_metadata for selected metadata-bearing SNIT layers.",
+          "SINAC protected areas, biological corridors, and wetlands advertise unrestricted access/use in metadata, but import still needs layer terms, attribution, CRS axis-order, and corridor-intersection review.",
+          "SINAC forest-cover 2023, SENARA station/recharge/vulnerability layers, and ICE utility layers record copyright or intellectual-property restrictions, so they remain blocked from import until terms and attribution are explicitly approved.",
+          "Distribution entries are WMS/service metadata only; no WMS map tiles, WFS features, shapefiles, time series, station records, or geometries were fetched."
+        ]
+      },
+      "use": [
+        "publication_sensitivity_gate",
+        "protected_area_annotation_planning",
+        "no_publish_polygon_review_queue"
+      ]
+    },
+    {
+      "artifact_id": "pacuare_access_conservation_policy",
+      "category": "protected_area_and_access_context_review",
+      "caveats": [
+        "Exact put-in, take-out, bridge, road, trail, evacuation, and rescue geometries are not attached.",
+        "Protected-area, corridor, wetland, forest, recharge, and vulnerability layer intersections are metadata leads only.",
+        "Flow-dependent access and rescue behavior is not validated against rainfall/stage history or guide review.",
+        "Item-level rights for guide, outfitter, public, or social media references are not attached."
+      ],
+      "path": "review/production_import_pilot/access_and_conservation_policy.json",
+      "provider": "RaftSim review artifact from access constraints and SNIT protected-context metadata",
+      "related_artifacts": [
+        "review/sinac_protected_area_source_rights.json",
+        "review/access_and_conservation_constraints.json",
+        "review/production_import_pilot/protected_area_publication_sensitivity.json"
+      ],
+      "status": "access_conservation_policy_attached_no_geometry_review_gated",
+      "summary": {
+        "candidate_layer_count": 8,
+        "copyright_or_ip_restricted_metadata_layers": 5,
+        "metadata_layer_count": 8,
+        "unrestricted_claim_review_required_layers": 3
+      },
+      "use": [
+        "access_and_conservation_editor_checklist",
+        "flow_dependent_access_review",
+        "guide_publication_signoff_queue"
+      ]
     }
   ],
   "river_id": "pacuare",

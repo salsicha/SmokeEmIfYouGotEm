@@ -489,10 +489,12 @@
             "physics/data/real_world/pacuare_river_costa_rica/review/access_and_conservation_constraints.json",
             "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/official_source_access_plan.json",
             "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_catalog_summary.json",
-            "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_metadata_summary.json"
+            "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_metadata_summary.json",
+            "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/protected_area_publication_sensitivity.json",
+            "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/access_and_conservation_policy.json"
           ],
-          "promotion_blocker": "SNIT SINAC/SENARA protected-area, forest-cover, wetland, and recharge candidates are identified as metadata-only leads with selected per-layer terms/CRS recorded; exact import permissions, corridor intersections, sensitive-location policy, and local publication-risk review are required before detailed Pacuare route packages or screenshots.",
-          "status": "review_manifests_attached_publication_not_cleared"
+          "promotion_blocker": "Pacuare protected-area publication-sensitivity and access/conservation policy artifacts are attached from SNIT/SINAC/SENARA metadata and access constraints, but exact import permissions, geometry, corridor intersections, sensitive-location policy, and local guide/conservation review still block detailed route packages and public screenshots.",
+          "status": "review_policy_artifacts_attached_publication_not_cleared"
         },
         "seasonal_flow_or_release_history": {
           "artifacts": [

@@ -1,0 +1,292 @@
+{
+  "allowed_use": [
+    "protected-area and conservation source triage",
+    "station-aware annotation planning",
+    "publication-sensitivity checklist gating",
+    "preventing detailed Pacuare screenshots or route packages before review"
+  ],
+  "candidate_layers": [
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Sistema Nacional de Áreas de Conservación",
+      "layer": "areas_silvestres_protegidas",
+      "name": "Áreas Silvestres Protegidas",
+      "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "05-07-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Sistema Nacional de Áreas de Conservación",
+      "layer": "cobertura_forestal_2023",
+      "name": "Cobertura Forestal 2023",
+      "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "05-07-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Sistema Nacional de Áreas de Conservación",
+      "layer": "corredoresbiologicos",
+      "name": "Corredores Biológicos",
+      "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "05-07-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Sistema Nacional de Áreas de Conservación",
+      "layer": "registro_nacional_humedales",
+      "name": "Registro Nacional de Humedales",
+      "node_name": "Sistema Nacional de Áreas de Conservación (SINAC)",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "05-07-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - ESTACIONES METEOROLÓGICAS",
+      "layer": "estaciones_automaticas",
+      "name": "Estaciones Automáticas",
+      "node_name": "SENARA-Estaciones Meteorológicas",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - ESTACIONES METEOROLÓGICAS",
+      "layer": "estaciones_pluviometricas",
+      "name": "Estaciones Pluviométricas",
+      "node_name": "SENARA-Estaciones Meteorológicas",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - RECARGA",
+      "layer": "Recarga_Siquirres_SIRGAS",
+      "name": "Recarga_Siquirres_SIRGAS",
+      "node_name": "SENARA-RECARGA",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_reason": null,
+      "wfs_available": false,
+      "wms_available": true
+    },
+    {
+      "feature_download_status": "not_downloaded_metadata_only",
+      "institution": "Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento - VULNERABILIDAD",
+      "layer": "Vulnerabilidad_LIVERPOOL",
+      "name": "Vulnerabilidad_LIVERPOOL",
+      "node_name": "SENARA-VULNERABILIDAD",
+      "promotion_gate": "Review terms, CRS, attributes, layer extent, Pacuare corridor intersection, and local/guide interpretation before import or gameplay use.",
+      "publication_or_catalog_date": "28-06-2026",
+      "review_reason": null,
+      "wfs_available": true,
+      "wms_available": true
+    }
+  ],
+  "forbidden_use": [
+    "final access geometry",
+    "route publication authority",
+    "protected-area clearance",
+    "shipping detailed screenshots that reveal sensitive access or conservation locations without review",
+    "using SNIT, SINAC, SENARA, or guide/social media maps, tiles, photos, or screenshots as texture or art assets"
+  ],
+  "generated_on": "2026-07-06",
+  "input_statuses": {
+    "access_constraints": "constraints_review_required_before_detailed_route_publication",
+    "sinac_source_rights": "review_gated_source_leads_attached",
+    "snit_layer_catalog_summary": "snit_catalog_and_node_layer_lists_archived_metadata_only_no_features_downloaded",
+    "snit_layer_metadata_summary": "selected_snit_layer_metadata_archived_no_features_downloaded"
+  },
+  "inputs": {
+    "access_constraints": "physics/data/real_world/pacuare_river_costa_rica/review/access_and_conservation_constraints.json",
+    "sinac_source_rights": "physics/data/real_world/pacuare_river_costa_rica/review/sinac_protected_area_source_rights.json",
+    "snit_layer_catalog_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+    "snit_layer_metadata_summary": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_metadata_summary.json"
+  },
+  "metadata_layers": [
+    {
+      "candidate_id": "sinac_areas_silvestres_protegidas",
+      "crs": "CR05/CRTM05: EPSG:5367",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "metadata_title": "Áreas Silvestres Protegidas de Costa Rica a escala 1:5000 (Capa Oficial)",
+      "node_id": "snit_sinac",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Áreas Silvestres Protegidas",
+      "terms_status": "unrestricted_metadata_claim_review_required"
+    },
+    {
+      "candidate_id": "sinac_cobertura_forestal_2023",
+      "crs": "EPSG 8908",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "metadata_title": "Mapa de Cobertura Forestal 2023 escala 1: 5000",
+      "node_id": "snit_sinac",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Cobertura Forestal 2023",
+      "terms_status": "copyright_or_ip_restrictions_recorded_import_blocked_until_terms_review"
+    },
+    {
+      "candidate_id": "sinac_corredores_biologicos",
+      "crs": "EPSG 5367",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "metadata_title": "Corredores Biológicos de Costa Rica a escala 1:5000 (capa oficial)",
+      "node_id": "snit_sinac",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Corredores Biológicos",
+      "terms_status": "unrestricted_metadata_claim_review_required"
+    },
+    {
+      "candidate_id": "sinac_registro_nacional_humedales",
+      "crs": "EPSG:5367 CR05/CRTM05",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "metadata_title": "Registro Nacional de Humedales de Costa Rica a escala 1:5000 (Capa Oficial)",
+      "node_id": "snit_sinac",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Registro Nacional de Humedales",
+      "terms_status": "unrestricted_metadata_claim_review_required"
+    },
+    {
+      "candidate_id": "senara_estaciones_automaticas",
+      "crs": "EPSG 5367",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "metadata_title": "Estaciones Automáticas, 2023",
+      "node_id": "snit_senara_estaciones",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Estaciones Automáticas",
+      "terms_status": "copyright_or_ip_restrictions_recorded_import_blocked_until_terms_review"
+    },
+    {
+      "candidate_id": "senara_estaciones_pluviometricas",
+      "crs": "EPSG 5367",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "metadata_title": "Estaciones Pluviométricas, 2023",
+      "node_id": "snit_senara_estaciones",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Estaciones Pluviométricas",
+      "terms_status": "copyright_or_ip_restrictions_recorded_import_blocked_until_terms_review"
+    },
+    {
+      "candidate_id": "senara_recarga_siquirres",
+      "crs": "EPSG 8909",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "metadata_title": null,
+      "node_id": "snit_senara_recarga",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Recarga_Siquirres_SIRGAS",
+      "terms_status": "copyright_or_ip_restrictions_recorded_import_blocked_until_terms_review"
+    },
+    {
+      "candidate_id": "senara_vulnerabilidad_liverpool",
+      "crs": "CR-SIRGAS / CRTM05. EPSG: 8908",
+      "feature_download_status": "not_downloaded_metadata_only",
+      "metadata_title": "ESTUDIO HIDROGEOLÓGICO PARA LA SUBCUENCA DEL RÍO BLANCO, LIMÓN, COSTA RICA 1:10.000, Acuífero Liverpool (Capa oficial)",
+      "node_id": "snit_senara_vulnerabilidad",
+      "promotion_gate": "Do not import layer geometry, map tiles, time series, or derived masks until terms, CRS/axis order, attributes, corridor intersection, attribution, and guide/local review are recorded.",
+      "selected_layer_name": "Vulnerabilidad_LIVERPOOL",
+      "terms_status": "copyright_or_ip_restrictions_recorded_import_blocked_until_terms_review"
+    }
+  ],
+  "policy": {
+    "access_geometry_imported": false,
+    "feature_downloads_performed": false,
+    "map_tiles_imported": false,
+    "media_downloaded": false,
+    "protected_area_geometry_imported": false,
+    "publish_detailed_route_packages": false,
+    "publish_sensitive_polygons": false,
+    "use_as_publication_gate_only": true
+  },
+  "promotion_blockers": [
+    "No protected-area, forest-cover, wetland, corridor, recharge, access, or no-publish geometries are imported.",
+    "SNIT/SINAC/SENARA layer terms, attribution, CRS, attributes, and redistribution limits still need final review.",
+    "Pacuare corridor intersections and sensitive-location policy are not approved.",
+    "Local guide/outfitter and conservation review is required before public route details or detailed screenshots."
+  ],
+  "protected_context_summary": {
+    "candidate_layer_count": 8,
+    "catalog_review_target": "Pacuare rainforest/protected-area publication sensitivity",
+    "catalog_target_outputs": [
+      "review/production_import_pilot/protected_area_publication_sensitivity.json",
+      "review/production_import_pilot/access_and_conservation_policy.json",
+      "imagery/production_import_pilot/vegetation_mask_review.json"
+    ],
+    "metadata_layer_count": 8,
+    "metadata_review_findings": [
+      "Layer-specific metadata JSON is available through POST /Metadatos/get_full_metadata for selected metadata-bearing SNIT layers.",
+      "SINAC protected areas, biological corridors, and wetlands advertise unrestricted access/use in metadata, but import still needs layer terms, attribution, CRS axis-order, and corridor-intersection review.",
+      "SINAC forest-cover 2023, SENARA station/recharge/vulnerability layers, and ICE utility layers record copyright or intellectual-property restrictions, so they remain blocked from import until terms and attribution are explicitly approved.",
+      "Distribution entries are WMS/service metadata only; no WMS map tiles, WFS features, shapefiles, time series, station records, or geometries were fetched."
+    ]
+  },
+  "publication_sensitivity_zones": [
+    {
+      "needs": [
+        "official protected-area/access layer intersection after terms review",
+        "local guide/outfitter review before access labels or route screenshots",
+        "generalized screenshot framing until sensitive polygons are approved"
+      ],
+      "review_status": "preview_stationing_only_sensitive_context_pending",
+      "station_range_m_preview": [
+        0.0,
+        10000.0
+      ],
+      "zone_id": "upper_access_and_rainforest_approach_review_zone"
+    },
+    {
+      "needs": [
+        "SINAC/SENARA forest, wetland, corridor, recharge, and vulnerability terms review",
+        "no-publish polygon screening before detailed gorge captures",
+        "rescue, swimmer, and guide-sightline annotation without exposing sensitive locations"
+      ],
+      "review_status": "rainforest_gorge_publication_sensitivity_pending",
+      "station_range_m_preview": [
+        10000.0,
+        33000.0
+      ],
+      "zone_id": "central_gorge_habitat_and_rescue_visibility_review_zone"
+    },
+    {
+      "needs": [
+        "approved put-in, take-out, road, bridge, and evacuation annotations",
+        "local publication-risk review before detailed route or access geometry",
+        "flow-dependent access and evacuation interpretation for rainfed/high-water variants"
+      ],
+      "review_status": "access_and_community_context_pending",
+      "station_range_m_preview": [
+        33000.0,
+        45650.0
+      ],
+      "zone_id": "downstream_takeout_and_community_access_review_zone"
+    }
+  ],
+  "required_editor_annotations": [
+    "review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+    "review/production_import_pilot/access_points.geojson",
+    "review/production_import_pilot/evacuation_and_rescue_routes.geojson",
+    "review/production_import_pilot/conservation_sensitive_reaches.geojson",
+    "review/production_import_pilot/guide_publication_notes.json"
+  ],
+  "river_id": "pacuare",
+  "schema": "raftsim.pacuare_protected_area_publication_sensitivity.v1",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "metadata_only_protected_area_publication_policy_attached_review_gated"
+}

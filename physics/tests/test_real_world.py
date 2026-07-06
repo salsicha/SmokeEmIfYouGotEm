@@ -29,6 +29,7 @@ from raftsim.real_world import (
     COLORADO_USBR_TOTAL_RELEASE_FILE,
     COURSE_ELEVATION_EXTRACTION_FILE,
     COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION,
+    PACUARE_ACCESS_CONSERVATION_POLICY_FILE,
     PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE,
     PACUARE_CLOUD_SHADOW_REVIEW_FILE,
     PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE,
@@ -41,6 +42,7 @@ from raftsim.real_world import (
     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
     PACUARE_PRODUCTION_IMPORT_PILOT_FILE,
+    PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE,
     PACUARE_SNIT_CONFIG_FILE,
     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
     PACUARE_SNIT_LAYER_LIST_SCRIPT_FILE,
@@ -71,9 +73,11 @@ from raftsim.real_world import (
     build_colorado_production_import_pilot,
     build_colorado_release_band_review,
     build_course_elevation_extraction,
+    build_pacuare_access_conservation_policy,
     build_pacuare_discharge_stage_station_review,
     build_pacuare_flash_response_review,
     build_pacuare_production_import_pilot,
+    build_pacuare_protected_area_publication_sensitivity,
     build_pacuare_rainfall_station_review,
     build_player_selection_model,
     build_production_environment_gap_register,
@@ -945,6 +949,11 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
     assert PACUARE_FLASH_RESPONSE_REVIEW_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE in classes["protected_area_and_access_context"]["target_outputs"]
     assert PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE in classes["protected_area_and_access_context"]["target_outputs"]
+    assert (
+        PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE
+        in classes["protected_area_and_access_context"]["target_outputs"]
+    )
+    assert PACUARE_ACCESS_CONSERVATION_POLICY_FILE in classes["protected_area_and_access_context"]["target_outputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE in classes["hydrography_and_centerline"]["target_outputs"]
     assert PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE in classes["hydrography_and_centerline"]["target_outputs"]
@@ -1243,6 +1252,88 @@ def test_pacuare_flash_response_review_links_hydrology_metadata_without_model_pr
     )
 
 
+def test_pacuare_protected_area_policy_artifacts_are_review_gated():
+    pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
+    source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((pacuare_dir / "production_source_pull_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+    access_constraints = json.loads((pacuare_dir / "review/access_and_conservation_constraints.json").read_text())
+    sinac_source_rights = json.loads((pacuare_dir / "review/sinac_protected_area_source_rights.json").read_text())
+    catalog_summary = json.loads((pacuare_dir / PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE).read_text())
+    metadata_summary = json.loads((pacuare_dir / PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE).read_text())
+    sensitivity = json.loads((pacuare_dir / PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE).read_text())
+    policy = json.loads((pacuare_dir / PACUARE_ACCESS_CONSERVATION_POLICY_FILE).read_text())
+    builder_sensitivity = build_pacuare_protected_area_publication_sensitivity(
+        access_constraints,
+        sinac_source_rights,
+        catalog_summary,
+        metadata_summary,
+    )
+    builder_policy = build_pacuare_access_conservation_policy(
+        access_constraints,
+        sinac_source_rights,
+        catalog_summary,
+        metadata_summary,
+    )
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+    pacuare_sources = next(river for river in photoreal_sources["rivers"] if river["river_id"] == "pacuare")
+
+    assert sensitivity == builder_sensitivity
+    assert policy == builder_policy
+    assert (
+        PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE
+        in source_manifest["artifacts"]["access_and_protected_context"]
+    )
+    assert PACUARE_ACCESS_CONSERVATION_POLICY_FILE in source_manifest["artifacts"]["access_and_protected_context"]
+    assert any(
+        artifact["artifact_id"] == "pacuare_protected_area_publication_sensitivity"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "pacuare_access_conservation_policy"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert sensitivity["schema"] == "raftsim.pacuare_protected_area_publication_sensitivity.v1"
+    assert sensitivity["status"] == "metadata_only_protected_area_publication_policy_attached_review_gated"
+    assert sensitivity["policy"]["protected_area_geometry_imported"] is False
+    assert sensitivity["protected_context_summary"]["candidate_layer_count"] == 8
+    assert sensitivity["protected_context_summary"]["metadata_layer_count"] == 8
+    assert "route publication authority" in sensitivity["forbidden_use"]
+    assert "protected-area clearance" in sensitivity["forbidden_use"]
+    assert "review/production_import_pilot/no_publish_sensitive_polygons.geojson" in sensitivity[
+        "required_editor_annotations"
+    ]
+    assert policy["schema"] == "raftsim.pacuare_access_and_conservation_policy.v1"
+    assert policy["status"] == "access_conservation_policy_attached_no_geometry_review_gated"
+    assert policy["policy"]["flow_dependent_access_review_required"] is True
+    assert policy["candidate_layer_summary"]["metadata_layer_count"] == 8
+    assert "final access geometry" in policy["forbidden_use"]
+    assert "review/production_import_pilot/access_points.geojson" in policy["required_editor_annotations"]
+    assert (
+        "physics/data/real_world/pacuare_river_costa_rica/"
+        + PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE
+        in rivers["pacuare"]["attached_sources_by_class"]["protected_area_and_access_context"]["artifacts"]
+    )
+    assert (
+        "physics/data/real_world/pacuare_river_costa_rica/" + PACUARE_ACCESS_CONSERVATION_POLICY_FILE
+        in rivers["pacuare"]["attached_sources_by_class"]["protected_area_and_access_context"]["artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "pacuare_protected_area_publication_sensitivity"
+        for artifact in pacuare_sources["source_sample_artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "pacuare_access_conservation_policy"
+        for artifact in pacuare_sources["source_sample_artifacts"]
+    )
+
+
 def test_pacuare_preview_centerline_scaffold_is_not_official_hydrography():
     pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
     source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
@@ -1407,6 +1498,8 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert PACUARE_RAINFALL_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_FLASH_RESPONSE_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_ACCESS_CONSERVATION_POLICY_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert REFERENCE_MEDIA_ANNOTATIONS_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert "waterfalls" in rivers["pacuare"]["completion_gate"]
