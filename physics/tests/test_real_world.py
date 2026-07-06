@@ -23,6 +23,7 @@ from raftsim.real_world import (
     COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE,
     COLORADO_PRODUCTION_HYDROGRAPHY_DRAFT_MANIFEST_FILE,
     COLORADO_PRODUCTION_IMPORT_PILOT_FILE,
+    COLORADO_RELEASE_BAND_REVIEW_FILE,
     COLORADO_USBR_RELEASE_CONTEXT_FILE,
     COLORADO_USBR_TOTAL_RELEASE_FILE,
     COURSE_ELEVATION_EXTRACTION_FILE,
@@ -57,6 +58,7 @@ from raftsim.real_world import (
     adaptive_solver_parameters,
     build_candidate_river_inventory_package,
     build_colorado_production_import_pilot,
+    build_colorado_release_band_review,
     build_course_elevation_extraction,
     build_pacuare_production_import_pilot,
     build_player_selection_model,
@@ -436,6 +438,7 @@ def test_colorado_production_import_pilot_exposes_lees_ferry_tile_plan_and_revie
     )
     assert COLORADO_USBR_TOTAL_RELEASE_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
+    assert COLORADO_RELEASE_BAND_REVIEW_FILE in classes["seasonal_flow_or_release_history"]["target_outputs"]
     assert classes["water_and_vegetation_masks"]["status"] == "nhd_water_prior_attached_release_sandbar_masks_pending"
     assert COLORADO_NHD_WATER_PRIOR_MANIFEST_FILE in classes["water_and_vegetation_masks"]["target_outputs"]
     assert COLORADO_NHD_WATER_PRIOR_FILE in classes["water_and_vegetation_masks"]["target_outputs"]
@@ -477,6 +480,66 @@ def test_colorado_usbr_glen_canyon_release_context_records_official_series_and_g
     assert lees_comparison["comparison_id"] == "usbr_total_release_vs_usgs_09380000_lees_ferry_same_date"
     assert lees_comparison["overlapping_valid_days"] == 23122
     assert lees_comparison["mean_absolute_delta_cfs"] == 110.058
+
+
+def test_colorado_release_band_review_compares_usbr_history_to_planning_bands():
+    colorado_dir = REAL_WORLD_DATA_DIR / "colorado_river_grand_canyon_rowing"
+    flow_presets = json.loads((colorado_dir / "flow_presets.json").read_text())
+    usbr_total_release = json.loads((colorado_dir / COLORADO_USBR_TOTAL_RELEASE_FILE).read_text())
+    release_context = json.loads((colorado_dir / COLORADO_USBR_RELEASE_CONTEXT_FILE).read_text())
+    review = build_colorado_release_band_review(flow_presets, usbr_total_release, release_context)
+
+    bands = {band["flow_band"]: band for band in review["reviewed_bands"]}
+
+    assert review["status"] == "review_gated_do_not_promote_release_bands"
+    assert (
+        bands["low_release_planning"]["window_summaries"]["water_year_2026_to_date"]["days_ge_planning_flow"]
+        == 194
+    )
+    assert (
+        bands["moderate_release_planning"]["window_summaries"]["water_year_2026_to_date"]["days_ge_planning_flow"]
+        == 0
+    )
+    assert (
+        bands["high_release_planning"]["window_summaries"]["water_year_2026_to_date"]["days_ge_planning_flow"]
+        == 0
+    )
+    assert (
+        bands["high_release_planning"]["window_summaries"]["post_2000_operations"]["days_ge_planning_flow"]
+        == 278
+    )
+    assert bands["moderate_release_planning"]["evidence_status"] == (
+        "not_observed_in_water_year_2026_daily_release_context"
+    )
+    assert bands["low_release_planning"]["evidence_status"] == (
+        "observed_in_water_year_2026_daily_release_context_not_subdaily_validation"
+    )
+
+
+def test_colorado_release_band_review_artifact_is_review_gated():
+    colorado_dir = REAL_WORLD_DATA_DIR / "colorado_river_grand_canyon_rowing"
+    source_manifest = json.loads((colorado_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((colorado_dir / "production_source_pull_manifest.json").read_text())
+    review = json.loads((colorado_dir / COLORADO_RELEASE_BAND_REVIEW_FILE).read_text())
+
+    assert COLORADO_RELEASE_BAND_REVIEW_FILE in source_manifest["artifacts"]["gauges"]
+    assert any(artifact["artifact_id"] == "colorado_release_band_review" for artifact in pull_manifest["pulled_artifacts"])
+    assert review["schema"] == "raftsim.colorado_release_band_review.v1"
+    assert review["status"] == "review_gated_do_not_promote_release_bands"
+    bands = {band["flow_band"]: band for band in review["reviewed_bands"]}
+    assert (
+        bands["low_release_planning"]["window_summaries"]["water_year_2026_to_date"]["days_ge_planning_flow"]
+        == 194
+    )
+    assert (
+        bands["moderate_release_planning"]["window_summaries"]["water_year_2026_to_date"]["days_ge_planning_flow"]
+        == 0
+    )
+    assert (
+        bands["high_release_planning"]["window_summaries"]["post_2000_operations"]["days_ge_planning_flow"]
+        == 278
+    )
+    assert "final release-band promotion" in review["forbidden_use"]
 
 
 def test_colorado_nhd_hu8_lees_ferry_extract_records_stitched_source_overlay():
@@ -1015,6 +1078,7 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_TOTAL_RELEASE_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert COLORADO_USBR_RELEASE_CONTEXT_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_RELEASE_BAND_REVIEW_FILE in rivers["colorado_river"]["attached_preview_inputs"]
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE in rivers["pacuare"]["attached_preview_inputs"]

@@ -1,0 +1,577 @@
+{
+  "allowed_use": [
+    "editor release-band review",
+    "sandbar and wet-bank planning",
+    "guide/oarsman discussion",
+    "future low/moderate/high release visual variant planning"
+  ],
+  "forbidden_use": [
+    "final release-band promotion",
+    "claiming accepted river-mile hydrology",
+    "production lifelike water approval",
+    "hiding water-simulation conservation failures with visuals or forcing"
+  ],
+  "generated_on": "2026-07-06",
+  "inputs": {
+    "downstream_gauge": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/usgs_09402500_daily_discharge.json",
+    "flow_presets": "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json",
+    "lees_ferry_gauge": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/usgs_09380000_daily_discharge.json",
+    "release_context": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
+    "usbr_total_release": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json"
+  },
+  "promotion_blockers": [
+    "The USBR dashboard/JSON still needs explicit unit metadata and terms confirmation before final flow bands.",
+    "Daily total releases do not capture hourly/subdaily hydropower fluctuations, downstream routing, tributary inflow, or side storage.",
+    "River-mile travel-time review, sandbar/wet-bank masks, oar-line annotations, and guide/oarsman validation remain open.",
+    "The current 18000 cfs high-release planning band is not observed in water-year 2026 to date and needs separate high-release evidence."
+  ],
+  "release_context_summary": {
+    "all_available": {
+      "first_valid_date": "1963-03-14",
+      "last_valid_date": "2026-07-05",
+      "max_cfs": 92600.0,
+      "mean_cfs": 12904.162,
+      "median_cfs": 11833.119,
+      "min_cfs": 869.0,
+      "null_value_count": 1,
+      "p05_cfs": 5651.5,
+      "p25_cfs": 9509.807,
+      "p75_cfs": 14895.344,
+      "p95_cfs": 24000.0,
+      "valid_value_count": 23124
+    },
+    "daily_comparison_ids": [
+      "usbr_total_release_vs_usgs_09380000_lees_ferry_same_date",
+      "usbr_total_release_vs_usgs_09402500_near_grand_canyon_same_date"
+    ],
+    "last_365_available_days": {
+      "first_valid_date": "2025-07-06",
+      "last_valid_date": "2026-07-05",
+      "max_cfs": 12754.211,
+      "mean_cfs": 9066.979,
+      "median_cfs": 8494.579,
+      "min_cfs": 7044.695,
+      "null_value_count": 1,
+      "p05_cfs": 7187.138,
+      "p25_cfs": 8064.207,
+      "p75_cfs": 9662.905,
+      "p95_cfs": 12383.509,
+      "valid_value_count": 364
+    },
+    "post_2000_operations": {
+      "first_valid_date": "2000-01-01",
+      "last_valid_date": "2026-07-05",
+      "max_cfs": 42982.766,
+      "mean_cfs": 11646.191,
+      "median_cfs": 11151.733,
+      "min_cfs": 4017.23,
+      "null_value_count": 1,
+      "p05_cfs": 7943.203,
+      "p25_cfs": 9678.506,
+      "p75_cfs": 13364.982,
+      "p95_cfs": 15998.584,
+      "valid_value_count": 9682
+    },
+    "release_visual_band_candidates": {
+      "high_release_cfs": [
+        8605.693,
+        10303.314
+      ],
+      "low_release_cfs": [
+        7044.695,
+        7868.888
+      ],
+      "source_window": "water_year_2026_to_date",
+      "standard_release_cfs": [
+        7868.888,
+        8605.693
+      ],
+      "status": "review_gated_initial_thresholds_not_final_gameplay_bands",
+      "use": [
+        "preview water-level variants",
+        "sandbar/wet-bank exposure candidates",
+        "big-water boil and wave-train tuning seeds"
+      ],
+      "very_high_or_experimental_review_cfs": [
+        10303.314,
+        10878.062
+      ]
+    },
+    "water_year_2026_to_date": {
+      "first_valid_date": "2025-10-01",
+      "last_valid_date": "2026-07-05",
+      "max_cfs": 10878.062,
+      "mean_cfs": 8426.237,
+      "median_cfs": 8237.467,
+      "min_cfs": 7044.695,
+      "null_value_count": 1,
+      "p05_cfs": 7141.164,
+      "p25_cfs": 7868.888,
+      "p75_cfs": 8605.693,
+      "p95_cfs": 10303.314,
+      "valid_value_count": 277
+    }
+  },
+  "reviewed_bands": [
+    {
+      "display_name": "Low Release Planning",
+      "evidence_status": "observed_in_water_year_2026_daily_release_context_not_subdaily_validation",
+      "expected_rowing_behavior": "More exposed rocks and sharper ferry setup; slower current helps rescue but can increase wrap risk.",
+      "flow_band": "low_release_planning",
+      "planning_discharge_cfs": 8000.0,
+      "planning_discharge_m3s": 226.534772736,
+      "promotion_decision": "blocked_pending_units_subdaily_release_routing_sandbar_wet_bank_oarsman_review",
+      "review_priority": "high",
+      "review_use": "Use as a release-band discussion aid only; do not retune water level, sandbar exposure, wave trains, boils, swimmer drift, or rowing gameplay from daily release totals alone.",
+      "window_summaries": {
+        "all_available": {
+          "day_count": 23124,
+          "days_ge_planning_flow": 20272,
+          "fraction_ge_planning_flow": 0.876665,
+          "max_cfs": 92600.0,
+          "mean_cfs": 12904.162,
+          "median_cfs": 11833.119,
+          "min_cfs": 869.0,
+          "peak_examples": [
+            {
+              "date": "1983-06-29",
+              "release_cfs": 92600.0
+            },
+            {
+              "date": "1983-06-30",
+              "release_cfs": 86400.0
+            },
+            {
+              "date": "1983-06-28",
+              "release_cfs": 86000.0
+            },
+            {
+              "date": "1983-07-01",
+              "release_cfs": 85600.0
+            },
+            {
+              "date": "1983-07-02",
+              "release_cfs": 84100.0
+            },
+            {
+              "date": "1983-07-04",
+              "release_cfs": 83500.0
+            },
+            {
+              "date": "1983-07-03",
+              "release_cfs": 83100.0
+            },
+            {
+              "date": "1983-07-05",
+              "release_cfs": 81500.0
+            }
+          ]
+        },
+        "last_365_available_days": {
+          "day_count": 365,
+          "days_ge_planning_flow": 282,
+          "fraction_ge_planning_flow": 0.772603,
+          "max_cfs": 12754.211,
+          "mean_cfs": 9073.436,
+          "median_cfs": 8495.633,
+          "min_cfs": 7044.695,
+          "peak_examples": [
+            {
+              "date": "2025-08-01",
+              "release_cfs": 12754.211
+            },
+            {
+              "date": "2025-08-27",
+              "release_cfs": 12542.335
+            },
+            {
+              "date": "2025-08-05",
+              "release_cfs": 12475.747
+            },
+            {
+              "date": "2025-08-26",
+              "release_cfs": 12465.689
+            },
+            {
+              "date": "2025-08-07",
+              "release_cfs": 12446.92
+            },
+            {
+              "date": "2025-08-22",
+              "release_cfs": 12442.579
+            },
+            {
+              "date": "2025-08-20",
+              "release_cfs": 12438.467
+            },
+            {
+              "date": "2025-08-04",
+              "release_cfs": 12437.847
+            }
+          ]
+        },
+        "post_2000_operations": {
+          "day_count": 9682,
+          "days_ge_planning_flow": 9108,
+          "fraction_ge_planning_flow": 0.940715,
+          "max_cfs": 42982.766,
+          "mean_cfs": 11646.191,
+          "median_cfs": 11151.733,
+          "min_cfs": 4017.23,
+          "peak_examples": [
+            {
+              "date": "2012-11-20",
+              "release_cfs": 42982.766
+            },
+            {
+              "date": "2008-03-07",
+              "release_cfs": 40789.169
+            },
+            {
+              "date": "2008-03-06",
+              "release_cfs": 40563.992
+            },
+            {
+              "date": "2004-11-23",
+              "release_cfs": 39758.583
+            },
+            {
+              "date": "2012-11-21",
+              "release_cfs": 39757.242
+            },
+            {
+              "date": "2004-11-22",
+              "release_cfs": 39494.25
+            },
+            {
+              "date": "2023-04-26",
+              "release_cfs": 38878.937
+            },
+            {
+              "date": "2023-04-25",
+              "release_cfs": 38825.006
+            }
+          ]
+        },
+        "water_year_2026_to_date": {
+          "day_count": 277,
+          "days_ge_planning_flow": 194,
+          "fraction_ge_planning_flow": 0.700361,
+          "max_cfs": 10878.062,
+          "mean_cfs": 8426.237,
+          "median_cfs": 8237.467,
+          "min_cfs": 7044.695,
+          "peak_examples": [
+            {
+              "date": "2026-01-26",
+              "release_cfs": 10878.062
+            },
+            {
+              "date": "2026-01-27",
+              "release_cfs": 10591.737
+            },
+            {
+              "date": "2026-01-06",
+              "release_cfs": 10589.72
+            },
+            {
+              "date": "2026-01-07",
+              "release_cfs": 10565.447
+            },
+            {
+              "date": "2026-01-09",
+              "release_cfs": 10543.642
+            },
+            {
+              "date": "2026-01-05",
+              "release_cfs": 10537.623
+            },
+            {
+              "date": "2026-01-08",
+              "release_cfs": 10535.787
+            },
+            {
+              "date": "2026-01-02",
+              "release_cfs": 10518.355
+            }
+          ]
+        }
+      }
+    },
+    {
+      "display_name": "Moderate Release Planning",
+      "evidence_status": "not_observed_in_water_year_2026_daily_release_context",
+      "expected_rowing_behavior": "Default large-volume rowing baseline with readable tongues, lateral waves, and longer recovery pools.",
+      "flow_band": "moderate_release_planning",
+      "planning_discharge_cfs": 12000.0,
+      "planning_discharge_m3s": 339.802159104,
+      "promotion_decision": "blocked_pending_units_subdaily_release_routing_sandbar_wet_bank_oarsman_review",
+      "review_priority": "high",
+      "review_use": "Use as a release-band discussion aid only; do not retune water level, sandbar exposure, wave trains, boils, swimmer drift, or rowing gameplay from daily release totals alone.",
+      "window_summaries": {
+        "all_available": {
+          "day_count": 23124,
+          "days_ge_planning_flow": 11263,
+          "fraction_ge_planning_flow": 0.48707,
+          "max_cfs": 92600.0,
+          "mean_cfs": 12904.162,
+          "median_cfs": 11833.119,
+          "min_cfs": 869.0,
+          "peak_examples": [
+            {
+              "date": "1983-06-29",
+              "release_cfs": 92600.0
+            },
+            {
+              "date": "1983-06-30",
+              "release_cfs": 86400.0
+            },
+            {
+              "date": "1983-06-28",
+              "release_cfs": 86000.0
+            },
+            {
+              "date": "1983-07-01",
+              "release_cfs": 85600.0
+            },
+            {
+              "date": "1983-07-02",
+              "release_cfs": 84100.0
+            },
+            {
+              "date": "1983-07-04",
+              "release_cfs": 83500.0
+            },
+            {
+              "date": "1983-07-03",
+              "release_cfs": 83100.0
+            },
+            {
+              "date": "1983-07-05",
+              "release_cfs": 81500.0
+            }
+          ]
+        },
+        "last_365_available_days": {
+          "day_count": 365,
+          "days_ge_planning_flow": 29,
+          "fraction_ge_planning_flow": 0.079452,
+          "max_cfs": 12754.211,
+          "mean_cfs": 9073.436,
+          "median_cfs": 8495.633,
+          "min_cfs": 7044.695,
+          "peak_examples": [
+            {
+              "date": "2025-08-01",
+              "release_cfs": 12754.211
+            },
+            {
+              "date": "2025-08-27",
+              "release_cfs": 12542.335
+            },
+            {
+              "date": "2025-08-05",
+              "release_cfs": 12475.747
+            },
+            {
+              "date": "2025-08-26",
+              "release_cfs": 12465.689
+            },
+            {
+              "date": "2025-08-07",
+              "release_cfs": 12446.92
+            },
+            {
+              "date": "2025-08-22",
+              "release_cfs": 12442.579
+            },
+            {
+              "date": "2025-08-20",
+              "release_cfs": 12438.467
+            },
+            {
+              "date": "2025-08-04",
+              "release_cfs": 12437.847
+            }
+          ]
+        },
+        "post_2000_operations": {
+          "day_count": 9682,
+          "days_ge_planning_flow": 3926,
+          "fraction_ge_planning_flow": 0.405495,
+          "max_cfs": 42982.766,
+          "mean_cfs": 11646.191,
+          "median_cfs": 11151.733,
+          "min_cfs": 4017.23,
+          "peak_examples": [
+            {
+              "date": "2012-11-20",
+              "release_cfs": 42982.766
+            },
+            {
+              "date": "2008-03-07",
+              "release_cfs": 40789.169
+            },
+            {
+              "date": "2008-03-06",
+              "release_cfs": 40563.992
+            },
+            {
+              "date": "2004-11-23",
+              "release_cfs": 39758.583
+            },
+            {
+              "date": "2012-11-21",
+              "release_cfs": 39757.242
+            },
+            {
+              "date": "2004-11-22",
+              "release_cfs": 39494.25
+            },
+            {
+              "date": "2023-04-26",
+              "release_cfs": 38878.937
+            },
+            {
+              "date": "2023-04-25",
+              "release_cfs": 38825.006
+            }
+          ]
+        },
+        "water_year_2026_to_date": {
+          "day_count": 277,
+          "days_ge_planning_flow": 0,
+          "fraction_ge_planning_flow": 0.0,
+          "max_cfs": 10878.062,
+          "mean_cfs": 8426.237,
+          "median_cfs": 8237.467,
+          "min_cfs": 7044.695,
+          "peak_examples": []
+        }
+      }
+    },
+    {
+      "display_name": "High Release Planning",
+      "evidence_status": "not_observed_in_water_year_2026_daily_release_context",
+      "expected_rowing_behavior": "Faster big-water decisions, stronger wave trains/laterals, longer swimmer drift, and larger eddy fences.",
+      "flow_band": "high_release_planning",
+      "planning_discharge_cfs": 18000.0,
+      "planning_discharge_m3s": 509.703238656,
+      "promotion_decision": "blocked_pending_units_subdaily_release_routing_sandbar_wet_bank_oarsman_review",
+      "review_priority": "high",
+      "review_use": "Use as a release-band discussion aid only; do not retune water level, sandbar exposure, wave trains, boils, swimmer drift, or rowing gameplay from daily release totals alone.",
+      "window_summaries": {
+        "all_available": {
+          "day_count": 23124,
+          "days_ge_planning_flow": 3091,
+          "fraction_ge_planning_flow": 0.133671,
+          "max_cfs": 92600.0,
+          "mean_cfs": 12904.162,
+          "median_cfs": 11833.119,
+          "min_cfs": 869.0,
+          "peak_examples": [
+            {
+              "date": "1983-06-29",
+              "release_cfs": 92600.0
+            },
+            {
+              "date": "1983-06-30",
+              "release_cfs": 86400.0
+            },
+            {
+              "date": "1983-06-28",
+              "release_cfs": 86000.0
+            },
+            {
+              "date": "1983-07-01",
+              "release_cfs": 85600.0
+            },
+            {
+              "date": "1983-07-02",
+              "release_cfs": 84100.0
+            },
+            {
+              "date": "1983-07-04",
+              "release_cfs": 83500.0
+            },
+            {
+              "date": "1983-07-03",
+              "release_cfs": 83100.0
+            },
+            {
+              "date": "1983-07-05",
+              "release_cfs": 81500.0
+            }
+          ]
+        },
+        "last_365_available_days": {
+          "day_count": 365,
+          "days_ge_planning_flow": 0,
+          "fraction_ge_planning_flow": 0.0,
+          "max_cfs": 12754.211,
+          "mean_cfs": 9073.436,
+          "median_cfs": 8495.633,
+          "min_cfs": 7044.695,
+          "peak_examples": []
+        },
+        "post_2000_operations": {
+          "day_count": 9682,
+          "days_ge_planning_flow": 278,
+          "fraction_ge_planning_flow": 0.028713,
+          "max_cfs": 42982.766,
+          "mean_cfs": 11646.191,
+          "median_cfs": 11151.733,
+          "min_cfs": 4017.23,
+          "peak_examples": [
+            {
+              "date": "2012-11-20",
+              "release_cfs": 42982.766
+            },
+            {
+              "date": "2008-03-07",
+              "release_cfs": 40789.169
+            },
+            {
+              "date": "2008-03-06",
+              "release_cfs": 40563.992
+            },
+            {
+              "date": "2004-11-23",
+              "release_cfs": 39758.583
+            },
+            {
+              "date": "2012-11-21",
+              "release_cfs": 39757.242
+            },
+            {
+              "date": "2004-11-22",
+              "release_cfs": 39494.25
+            },
+            {
+              "date": "2023-04-26",
+              "release_cfs": 38878.937
+            },
+            {
+              "date": "2023-04-25",
+              "release_cfs": 38825.006
+            }
+          ]
+        },
+        "water_year_2026_to_date": {
+          "day_count": 277,
+          "days_ge_planning_flow": 0,
+          "fraction_ge_planning_flow": 0.0,
+          "max_cfs": 10878.062,
+          "mean_cfs": 8426.237,
+          "median_cfs": 8237.467,
+          "min_cfs": 7044.695,
+          "peak_examples": []
+        }
+      }
+    }
+  ],
+  "river_id": "colorado_river",
+  "schema": "raftsim.colorado_release_band_review.v1",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "status": "review_gated_do_not_promote_release_bands"
+}
