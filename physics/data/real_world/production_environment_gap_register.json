@@ -161,6 +161,7 @@
         "hydrology/usgs_11445500_daily_discharge.json",
         "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
         "hydrology/south_fork_modern_flow_source_selection.json",
+        "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
         "reference_media_link_manifest.json"
       ],
       "p0_next_pulls_or_attachments": [
@@ -182,8 +183,8 @@
           "source_class": "seasonal_flow_or_release_history",
           "required_artifacts": [
             "hydrology/south_fork_modern_flow_source_selection.json",
-            "hydrology/production_import_pilot/current_discharge_or_release_series.json",
-            "hydrology/production_import_pilot/current_stage_or_stage_unavailable_note.json",
+            "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+            "hydrology/production_import_pilot/cdec_terms_flags_and_station_relation_review.json",
             "hydrology/production_import_pilot/flow_band_review.json"
           ],
           "source_leads": [
@@ -192,7 +193,7 @@
             "usgs_water_services",
             "guide_review"
           ],
-          "promotion_gate": "USGS 11445500 returned no P30D instantaneous time series on 2026-07-06, and CDEC CBR is now the primary modern-flow candidate; tie low/median/high visual variants to reproducible CBR time-series pulls, QA/terms review, release context, and guide notes."
+          "promotion_gate": "USGS 11445500 returned no P30D instantaneous time series on 2026-07-06, and CDEC CBR now has a first reproducible event-window pull; tie low/median/high visual variants to broader CBR windows, QA/terms/flag review, release context, station-to-reach relation, and guide notes."
         },
         {
           "source_class": "guide_and_reference_media_annotations",

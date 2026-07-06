@@ -95,6 +95,38 @@
       ]
     },
     {
+      "artifact_id": "cdec_cbr_event_flow_stage_2026_07_05_2026_07_06",
+      "category": "hydrology_modern_flow_stage_window",
+      "path": "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+      "provider": "California Data Exchange Center / California Department of Water Resources",
+      "url": "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2026-07-05T00:00&End=2026-07-06T23:59",
+      "status": "official_time_series_pulled_review_required",
+      "summary": {
+        "station": "CBR",
+        "duration_code": "E",
+        "flow_sensor_num": 20,
+        "stage_sensor_num": 1,
+        "flow_valid_sample_count": 124,
+        "flow_min_cfs": 291.0,
+        "flow_max_cfs": 1649.0,
+        "flow_median_cfs": 304.0,
+        "stage_min_ft": 1.5,
+        "stage_max_ft": 3.99,
+        "stage_median_ft": 1.53,
+        "cdec_no_data_value": -9999
+      },
+      "use": [
+        "modern_flow_window_evidence",
+        "release_pulse_and_low_flow_visual_review",
+        "future_flow_band_calibration"
+      ],
+      "caveats": [
+        "CDEC -9999 values are normalized to null and excluded from statistics.",
+        "The window includes a July 5 pulse near the median-runnable planning band and lower overnight values, but it is not enough to retune flow presets.",
+        "CDEC terms, flag meanings, station-to-reach relation, release schedule context, and guide review are required before promotion."
+      ]
+    },
+    {
       "artifact_id": "tnm_nhd_products",
       "category": "hydrography_metadata",
       "path": "hydrography/tnm_nhd_products.json",
