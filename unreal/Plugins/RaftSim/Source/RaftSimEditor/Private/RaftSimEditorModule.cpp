@@ -88,6 +88,8 @@ struct FRaftSimEnvironmentPreviewSpec
     FString AerialDrapeImage;
     FString TerrainReliefImage;
     FString HeightfieldPreviewImage;
+    FString WaterMaskImage;
+    FString VegetationMaskImage;
     FString ElevationSample;
     FString SourceDrapeDescription;
     FString FlowBandId;
@@ -221,6 +223,10 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png");
     SouthFork.HeightfieldPreviewImage =
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png");
+    SouthFork.WaterMaskImage =
+        TEXT("physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_water_mask_1024.png");
+    SouthFork.VegetationMaskImage =
+        TEXT("physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png");
     SouthFork.ElevationSample =
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_sample_512.tif");
     SouthFork.SourceDrapeDescription =
@@ -257,6 +263,10 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_relief_preview_1024.png");
     Colorado.HeightfieldPreviewImage =
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png");
+    Colorado.WaterMaskImage =
+        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_water_mask_1024.png");
+    Colorado.VegetationMaskImage =
+        TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_vegetation_mask_1024.png");
     Colorado.ElevationSample =
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif");
     Colorado.SourceDrapeDescription =
@@ -299,6 +309,10 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_1024.png");
     Pacuare.HeightfieldPreviewImage =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png");
+    Pacuare.WaterMaskImage =
+        TEXT("physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_water_mask_1024.png");
+    Pacuare.VegetationMaskImage =
+        TEXT("physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_vegetation_mask_1024.png");
     Pacuare.ElevationSample =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
@@ -926,7 +940,9 @@ void AddPreviewTerrainMesh(
     UWorld* World,
     const FRaftSimEnvironmentPreviewSpec& Spec,
     const FRaftSimPreviewImage* TerrainRelief,
-    const FRaftSimPreviewImage* HeightfieldPreview)
+    const FRaftSimPreviewImage* HeightfieldPreview,
+    const FRaftSimPreviewImage* WaterMask,
+    const FRaftSimPreviewImage* VegetationMask)
 {
     constexpr int32 XSteps = 112;
     constexpr int32 YSteps = 38;
@@ -964,6 +980,8 @@ void AddPreviewTerrainMesh(
                 Offset);
             const float WetT = 1.0f -
                 SmoothPreviewStep(ActiveRiverHalfWidth + 35.0f, ActiveRiverHalfWidth + 360.0f * Spec.FlowWetBankScale, Offset);
+            const float SourceWaterT = WaterMask && WaterMask->IsValid() ? WaterMask->SampleLuma(U, V) : 0.0f;
+            const float SourceVegetationT = VegetationMask && VegetationMask->IsValid() ? VegetationMask->SampleLuma(U, V) : 0.0f;
             const float ColorNoise = 0.88f + 0.10f * FMath::Sin(X * 0.0031f + Y * 0.0047f) +
                 0.06f * FMath::Sin(X * 0.0013f - Y * 0.0029f);
             const FLinearColor ShoulderColor = Spec.bDesertCanyon
@@ -972,8 +990,18 @@ void AddPreviewTerrainMesh(
             const FLinearColor WetBankColor = Spec.bDesertCanyon
                 ? FLinearColor(0.30f, 0.23f, 0.16f)
                 : FMath::Lerp(ScalePreviewColor(Spec.WaterColor, 0.55f), ScalePreviewColor(Spec.RockColor, 0.62f), 0.48f);
+            const FLinearColor SourceVegetationColor = Spec.bDesertCanyon
+                ? FLinearColor(0.30f, 0.31f, 0.17f)
+                : ScalePreviewColor(Spec.FoliageColor, Spec.bHasWaterfalls ? 1.18f : 1.05f);
             FLinearColor TerrainColor = FMath::Lerp(Spec.TerrainColor, ShoulderColor, FMath::Clamp(BankT * 0.45f + CanyonT * 0.35f, 0.0f, 1.0f));
-            TerrainColor = FMath::Lerp(TerrainColor, WetBankColor, FMath::Clamp(WetT * 0.70f, 0.0f, 1.0f));
+            TerrainColor = FMath::Lerp(
+                TerrainColor,
+                SourceVegetationColor,
+                FMath::Clamp(SourceVegetationT * (Spec.bDesertCanyon ? 0.20f : 0.38f), 0.0f, 0.42f));
+            TerrainColor = FMath::Lerp(
+                TerrainColor,
+                WetBankColor,
+                FMath::Clamp(FMath::Max(WetT * 0.70f, SourceWaterT * 0.48f), 0.0f, 0.78f));
             TerrainColor = ScalePreviewColor(TerrainColor, ColorNoise);
             Vertices.Add(FVector(X, Y, Z));
             UVs.Add(FVector2D(U * 12.0f, V * 4.0f));
@@ -1016,7 +1044,9 @@ void AddPreviewAerialDrapeTiles(
     UWorld* World,
     const FRaftSimEnvironmentPreviewSpec& Spec,
     const FRaftSimPreviewImage* TerrainRelief,
-    const FRaftSimPreviewImage* HeightfieldPreview)
+    const FRaftSimPreviewImage* HeightfieldPreview,
+    const FRaftSimPreviewImage* WaterMask,
+    const FRaftSimPreviewImage* VegetationMask)
 {
     if (!World || Spec.AerialDrapeImage.IsEmpty())
     {
@@ -1052,6 +1082,16 @@ void AddPreviewAerialDrapeTiles(
             }
 
             FLinearColor AerialColor = FMath::Lerp(AerialDrape.Sample(U, V), Spec.TerrainColor, 0.08f);
+            const float SourceWaterT = WaterMask && WaterMask->IsValid() ? WaterMask->SampleLuma(U, V) : 0.0f;
+            const float SourceVegetationT = VegetationMask && VegetationMask->IsValid() ? VegetationMask->SampleLuma(U, V) : 0.0f;
+            AerialColor = FMath::Lerp(
+                AerialColor,
+                ScalePreviewColor(Spec.FoliageColor, Spec.bHasWaterfalls ? 1.24f : 1.08f),
+                FMath::Clamp(SourceVegetationT * (Spec.bDesertCanyon ? 0.10f : 0.22f), 0.0f, 0.28f));
+            AerialColor = FMath::Lerp(
+                AerialColor,
+                ScalePreviewColor(Spec.WaterColor, 0.68f),
+                FMath::Clamp(SourceWaterT * 0.16f, 0.0f, 0.18f));
             AerialColor.R = FMath::Max(AerialColor.R, Spec.TerrainColor.R * 0.80f + 0.04f);
             AerialColor.G = FMath::Max(AerialColor.G, Spec.TerrainColor.G * 0.80f + 0.04f);
             AerialColor.B = FMath::Max(AerialColor.B, Spec.TerrainColor.B * 0.80f + 0.04f);
@@ -1891,11 +1931,23 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     {
         HeightfieldPreviewPtr = &HeightfieldPreview;
     }
+    FRaftSimPreviewImage WaterMask;
+    const FRaftSimPreviewImage* WaterMaskPtr = nullptr;
+    if (!Spec.WaterMaskImage.IsEmpty() && LoadPreviewPngImage(Spec.WaterMaskImage, WaterMask))
+    {
+        WaterMaskPtr = &WaterMask;
+    }
+    FRaftSimPreviewImage VegetationMask;
+    const FRaftSimPreviewImage* VegetationMaskPtr = nullptr;
+    if (!Spec.VegetationMaskImage.IsEmpty() && LoadPreviewPngImage(Spec.VegetationMaskImage, VegetationMask))
+    {
+        VegetationMaskPtr = &VegetationMask;
+    }
 
     AddPreviewLightRig(World, Spec);
 
-    AddPreviewTerrainMesh(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr);
-    AddPreviewAerialDrapeTiles(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr);
+    AddPreviewTerrainMesh(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, WaterMaskPtr, VegetationMaskPtr);
+    AddPreviewAerialDrapeTiles(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, WaterMaskPtr, VegetationMaskPtr);
     AddPreviewRiverRibbonMesh(World, Spec);
     AddPreviewWetBankDressing(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr);
     AddPreviewProceduralEnvironmentDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, SphereMesh);
@@ -3117,6 +3169,8 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("      \"aerial_drape_image\": \"%s\",\n")
             TEXT("      \"terrain_relief_image\": \"%s\",\n")
             TEXT("      \"heightfield_preview_image\": \"%s\",\n")
+            TEXT("      \"water_mask_image\": \"%s\",\n")
+            TEXT("      \"vegetation_mask_image\": \"%s\",\n")
             TEXT("      \"elevation_sample\": \"%s\",\n")
             TEXT("      \"fidelity_note\": \"%s\"\n")
             TEXT("    }"),
@@ -3142,6 +3196,8 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             *EscapeRaftSimJsonString(Spec.AerialDrapeImage),
             *EscapeRaftSimJsonString(Spec.TerrainReliefImage),
             *EscapeRaftSimJsonString(Spec.HeightfieldPreviewImage),
+            *EscapeRaftSimJsonString(Spec.WaterMaskImage),
+            *EscapeRaftSimJsonString(Spec.VegetationMaskImage),
             *EscapeRaftSimJsonString(Spec.ElevationSample),
             *EscapeRaftSimJsonString(GetPreviewFidelityNote(Spec)));
     }

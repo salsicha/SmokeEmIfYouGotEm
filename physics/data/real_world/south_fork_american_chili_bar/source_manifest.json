@@ -37,6 +37,9 @@
       "imagery/tnm_naip_products.json",
       "imagery/usda_naip_chili_bar_sample_512.png",
       "imagery/usda_naip_chili_bar_corridor_sample_1024.png",
+      "imagery/usda_naip_chili_bar_corridor_water_mask_1024.png",
+      "imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png",
+      "imagery/usda_naip_chili_bar_corridor_masks_manifest.json",
       "imagery/naip_tiles",
       "imagery/water_mask.tif",
       "imagery/foam_texture_mask.tif"
@@ -137,6 +140,15 @@
       "status": "downloaded",
       "target_artifact": "imagery/usda_naip_chili_bar_corridor_sample_1024.png",
       "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=png&f=image"
+    },
+    {
+      "category": "derived_source_masks",
+      "fetch_id": "sfa_naip_chili_bar_corridor_masks",
+      "notes": "Review-gated preview water and vegetation masks generated from the active 1024px USDA/APFO NAIP drape plus a bounded generated-preview channel prior. These masks are sampled by Unreal preview terrain/drape coloring but are not final segmentation, bank polygons, or production masks.",
+      "source_id": "usda_naip_chili_bar_corridor_sample_1024",
+      "status": "generated_review_gated_preview_masks",
+      "target_artifact": "imagery/usda_naip_chili_bar_corridor_water_mask_1024.png; imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png; imagery/usda_naip_chili_bar_corridor_masks_manifest.json",
+      "url": "physics/src/raftsim/geospatial_preview.py"
     },
     {
       "category": "derived_heightfield_candidate",
