@@ -451,10 +451,12 @@
             "physics/data/real_world/pacuare_river_costa_rica/imagery/nasa_gibs_pacuare_truecolor_2025-04-02_1024.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_1024.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/source_drape_4096.png",
-            "physics/data/real_world/pacuare_river_costa_rica/imagery/aerial_source_research.json"
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/aerial_source_research.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/cloud_screened_scene_index.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/cloud_shadow_review.json"
           ],
-          "promotion_blocker": "Pacuare now has a coarse source-product pilot derivative, but MODIS/GIBS remains too coarse and partly cloudy; production needs Sentinel/Landsat scene metadata, official orthophoto discovery, or first-party/permissioned aerial reference.",
-          "status": "coarse_cloud_screened_preview_and_pilot_derivative_attached"
+          "promotion_blocker": "Pacuare has a retained NASA GIBS/MODIS cloud-screened candidate index and cloud/shadow diagnostic plus coarse production-import derivatives, but production still needs Sentinel/Landsat scene metadata, official orthophoto discovery, first-party/permissioned aerial reference, manual cloud/shadow review, and guide/geospatial approval before photoreal imagery or masks are promoted.",
+          "status": "coarse_cloud_screened_preview_scene_index_and_pilot_derivative_attached"
         },
         "guide_and_reference_media_annotations": {
           "artifacts": [

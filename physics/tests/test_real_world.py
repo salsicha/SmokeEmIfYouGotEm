@@ -29,6 +29,8 @@ from raftsim.real_world import (
     COLORADO_USBR_TOTAL_RELEASE_FILE,
     COURSE_ELEVATION_EXTRACTION_FILE,
     COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION,
+    PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE,
+    PACUARE_CLOUD_SHADOW_REVIEW_FILE,
     PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE,
     PACUARE_FLASH_RESPONSE_REVIEW_FILE,
     PACUARE_RAINFALL_STATION_REVIEW_FILE,
@@ -924,6 +926,8 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
     assert "wet_rock_waterfall_mist_mask_2048.png" in " ".join(
         classes["water_and_vegetation_masks"]["target_outputs"]
     )
+    assert PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE in classes["aerial_or_satellite_imagery"]["target_outputs"]
+    assert PACUARE_CLOUD_SHADOW_REVIEW_FILE in classes["aerial_or_satellite_imagery"]["target_outputs"]
     assert (
         classes["hydrography_and_centerline"]["status"]
         == "preview_centerline_scaffold_attached_official_hydrography_pending"
@@ -982,6 +986,55 @@ def test_pacuare_official_source_access_plan_records_catalogs_without_downloads(
     assert PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE in plan["downstream_manifest_targets"]
     assert PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE in plan["downstream_manifest_targets"]
     assert PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE in plan["downstream_manifest_targets"]
+
+
+def test_pacuare_cloud_screened_scene_index_tracks_retained_nasa_candidates():
+    pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
+    source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((pacuare_dir / "production_source_pull_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+    scene_index = json.loads((pacuare_dir / PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE).read_text())
+    cloud_review = json.loads((pacuare_dir / PACUARE_CLOUD_SHADOW_REVIEW_FILE).read_text())
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+    pacuare_sources = next(river for river in photoreal_sources["rivers"] if river["river_id"] == "pacuare")
+
+    assert PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE in source_manifest["artifacts"]["imagery"]
+    assert PACUARE_CLOUD_SHADOW_REVIEW_FILE in source_manifest["artifacts"]["imagery"]
+    assert any(
+        artifact["artifact_id"] == "pacuare_cloud_screened_scene_index"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert any(artifact["artifact_id"] == "pacuare_cloud_shadow_review" for artifact in pull_manifest["pulled_artifacts"])
+    assert scene_index["schema"] == "raftsim.pacuare.cloud_screened_scene_index.v1"
+    assert scene_index["status"] == "modis_gibs_candidates_indexed_review_gated_not_production_imagery"
+    assert scene_index["summary"]["candidate_count"] == 5
+    assert scene_index["summary"]["active_preview_date"] == "2025-04-02"
+    assert scene_index["summary"]["lowest_cloud_metric_date"] == "2025-03-08"
+    assert scene_index["summary"]["active_preview_cloud_like_fraction"] == 0.0557
+    assert scene_index["summary"]["active_preview_shadow_like_fraction"] == 0.3061
+    assert scene_index["candidates"][-1]["date"] == "2025-04-02"
+    assert scene_index["candidates"][-1]["active_preview_source"] is True
+    assert cloud_review["schema"] == "raftsim.pacuare.cloud_shadow_review.v1"
+    assert cloud_review["status"] == "review_gated_modis_cloud_shadow_diagnostic_not_acceptance"
+    assert cloud_review["active_preview"]["date"] == "2025-04-02"
+    assert any(
+        blocker.startswith("MODIS/GIBS is too coarse for production photoreal materials")
+        for blocker in cloud_review["promotion_blockers"]
+    )
+    assert (
+        f"physics/data/real_world/pacuare_river_costa_rica/{PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE}"
+        in rivers["pacuare"]["attached_sources_by_class"]["aerial_or_satellite_imagery"]["artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "pacuare_cloud_screened_scene_index"
+        for artifact in pacuare_sources["source_sample_artifacts"]
+    )
 
 
 def test_pacuare_direccion_de_agua_capabilities_are_archived_as_metadata_only():
@@ -1349,6 +1402,8 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_PREVIEW_STATIONING_SCAFFOLD_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_CLOUD_SHADOW_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_RAINFALL_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_FLASH_RESPONSE_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]

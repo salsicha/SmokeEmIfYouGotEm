@@ -418,6 +418,8 @@
         "production_import_pilot/heightfield_candidate_2017.png",
         "production_import_pilot/water_mask_2048.png",
         "production_import_pilot/vegetation_mask_2048.png",
+        "imagery/production_import_pilot/cloud_screened_scene_index.json",
+        "imagery/production_import_pilot/cloud_shadow_review.json",
         "hydrography/production_import_pilot/official_source_access_plan.json",
         "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
         "hydrography/production_import_pilot/snit_layer_catalog_summary.json",

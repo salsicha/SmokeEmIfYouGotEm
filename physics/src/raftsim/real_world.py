@@ -145,6 +145,8 @@ PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE = "hydrography/production_import_pilot/
 PACUARE_RAINFALL_STATION_REVIEW_FILE = "hydrology/production_import_pilot/rainfall_station_review.json"
 PACUARE_DISCHARGE_STAGE_STATION_REVIEW_FILE = "hydrology/production_import_pilot/discharge_or_stage_station_review.json"
 PACUARE_FLASH_RESPONSE_REVIEW_FILE = "hydrology/production_import_pilot/flash_response_review.json"
+PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE = "imagery/production_import_pilot/cloud_screened_scene_index.json"
+PACUARE_CLOUD_SHADOW_REVIEW_FILE = "imagery/production_import_pilot/cloud_shadow_review.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE = "production_import_pilot_derivatives_manifest.json"
 DISCHARGE_CFS_TO_M3S = 0.028316846592
@@ -2494,9 +2496,9 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                 "status": "coarse_preview_seed_attached_high_resolution_cloud_screening_pending",
                 "source_ids": ["copernicus_sentinel", "landsat", "nasa_gibs", "snit_cr_idecori", "first_party_aerial"],
                 "target_outputs": [
-                    "imagery/production_import_pilot/cloud_screened_scene_index.json",
+                    PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE,
                     "imagery/production_import_pilot/source_drape_4096.png",
-                    "imagery/production_import_pilot/cloud_shadow_review.json",
+                    PACUARE_CLOUD_SHADOW_REVIEW_FILE,
                     "production_import_pilot_derivatives_manifest.json",
                 ],
                 "promotion_gate": (
@@ -3036,6 +3038,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "production_import_pilot/heightfield_candidate_2017.png",
                     "production_import_pilot/water_mask_2048.png",
                     "production_import_pilot/vegetation_mask_2048.png",
+                    PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE,
+                    PACUARE_CLOUD_SHADOW_REVIEW_FILE,
                     PACUARE_OFFICIAL_SOURCE_ACCESS_PLAN_FILE,
                     PACUARE_DA_SINIGIRH_WMS_CAPABILITIES_SUMMARY_FILE,
                     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
@@ -3075,9 +3079,9 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     {
                         "source_class": "aerial_or_satellite_imagery",
                         "required_artifacts": [
-                            "imagery/production_import_pilot/cloud_screened_scene_index.json",
+                            PACUARE_CLOUD_SCREENED_SCENE_INDEX_FILE,
                             "imagery/production_import_pilot/source_drape_4096.png",
-                            "imagery/production_import_pilot/cloud_shadow_review.json",
+                            PACUARE_CLOUD_SHADOW_REVIEW_FILE,
                         ],
                         "source_leads": ["copernicus_data_space", "landsat", "snit_cr_idecori", "first_party_aerial"],
                         "promotion_gate": "Replace MODIS/GIBS proxy drape with cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference.",
