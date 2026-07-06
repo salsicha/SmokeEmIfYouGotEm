@@ -171,14 +171,17 @@
       "attached_source_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_source_pull_manifest.json",
       "production_import_pilot": "physics/data/real_world/south_fork_american_chili_bar/production_import_pilot.json",
       "production_import_pilot_pull_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_import_pilot_pull_manifest.json",
+      "production_import_pilot_derivatives_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_import_pilot_derivatives_manifest.json",
       "attached_sources_by_class": {
         "terrain_dem_or_lidar": {
-          "status": "corridor_sample_heightfield_candidate_and_pilot_dem_tiles_attached",
+          "status": "corridor_sample_pilot_dem_tiles_relief_and_heightfield_candidate_attached",
           "artifacts": [
             "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
             "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png",
             "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
-            "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/3dep_tiles"
+            "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/3dep_tiles",
+            "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/dem_relief_2048.png",
+            "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/heightfield_candidate_2017.png"
           ],
           "promotion_blocker": "Pilot DEM tiles are attached, but they still need mosaic/clip, CRS/vertical-datum review, void review, hydrologic conditioning, channel burning, and guide/geospatial approval before Landscape promotion."
         },
@@ -190,20 +193,23 @@
           "promotion_blocker": "Selected NHD/3DHP product still needs download, clipping, CRS review, imagery alignment, and guide rapid/eddy annotations."
         },
         "aerial_or_satellite_imagery": {
-          "status": "naip_corridor_sample_and_pilot_tiles_attached",
+          "status": "naip_corridor_sample_pilot_tiles_and_stitched_source_drape_attached",
           "artifacts": [
             "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_sample_1024.png",
-            "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/naip_tiles"
+            "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/naip_tiles",
+            "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png"
           ],
           "promotion_blocker": "Pilot NAIP tiles are attached, but they still need provider metadata/acquisition-date review, mosaic/clip, CRS/terms review, mask derivation, and guide/geospatial approval before production drape use."
         },
         "water_and_vegetation_masks": {
-          "status": "preview_masks_attached",
+          "status": "preview_masks_and_pilot_stitched_masks_attached",
           "artifacts": [
             "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_water_mask_1024.png",
-            "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png"
+            "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png",
+            "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/water_mask_2048.png",
+            "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/vegetation_mask_2048.png"
           ],
-          "promotion_blocker": "Masks are deterministic preview derivatives; they require hydrography/bank alignment, scene review, seasonal variants, and guide/geospatial approval."
+          "promotion_blocker": "Masks are deterministic preview derivatives from source imagery and a bounded channel prior; they require hydrography/bank alignment, scene review, seasonal variants, wet-rock classification, and guide/geospatial approval."
         },
         "seasonal_flow_or_release_history": {
           "status": "historical_daily_discharge_attached",

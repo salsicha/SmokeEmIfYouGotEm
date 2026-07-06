@@ -28,8 +28,9 @@
       "status": "pilot_urls_planned",
       "target_outputs": [
         "terrain/production_import_pilot/3dep_tiles",
-        "terrain/production_import_pilot/conditioned_heightfield_2017.png",
-        "terrain/production_import_pilot/heightfield_manifest.json"
+        "terrain/production_import_pilot/dem_relief_2048.png",
+        "terrain/production_import_pilot/heightfield_candidate_2017.png",
+        "production_import_pilot_derivatives_manifest.json"
       ]
     },
     {
@@ -56,7 +57,7 @@
       "target_outputs": [
         "imagery/production_import_pilot/naip_tiles",
         "imagery/production_import_pilot/source_drape_4096.png",
-        "imagery/production_import_pilot/source_drape_manifest.json"
+        "production_import_pilot_derivatives_manifest.json"
       ]
     },
     {
@@ -69,9 +70,9 @@
       ],
       "status": "requires_new_derivatives_from_pilot_imagery_and_hydrography",
       "target_outputs": [
-        "imagery/production_import_pilot/water_mask.tif",
-        "imagery/production_import_pilot/vegetation_mask.tif",
-        "imagery/production_import_pilot/wet_rock_bank_mask.tif"
+        "imagery/production_import_pilot/water_mask_2048.png",
+        "imagery/production_import_pilot/vegetation_mask_2048.png",
+        "imagery/production_import_pilot/source_masks_manifest.json"
       ]
     },
     {

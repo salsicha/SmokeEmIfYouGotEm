@@ -3,7 +3,7 @@ import json
 import numpy as np
 from PIL import Image
 
-from raftsim.geospatial_preview import build_source_imagery_masks
+from raftsim.geospatial_preview import build_source_imagery_masks, build_south_fork_import_pilot_derivatives
 
 
 def test_build_source_imagery_masks_records_outputs_and_coverage(tmp_path):
@@ -48,3 +48,51 @@ def test_build_source_imagery_masks_records_outputs_and_coverage(tmp_path):
     assert manifest["processing"]["coverage"]["vegetation_mean"] > 0.0
     assert water[:, 16].mean() > water[:, 2].mean()
     assert vegetation[:, 2].mean() > vegetation[:, 16].mean()
+
+
+def test_build_south_fork_import_pilot_derivatives_stitches_tiles_and_records_manifest(tmp_path):
+    south_fork_root = tmp_path / "south_fork"
+    naip_dir = south_fork_root / "imagery/production_import_pilot/naip_tiles"
+    dem_dir = south_fork_root / "terrain/production_import_pilot/3dep_tiles"
+    naip_dir.mkdir(parents=True)
+    dem_dir.mkdir(parents=True)
+    (south_fork_root / "production_import_pilot.json").write_text("{}", encoding="utf-8")
+    (south_fork_root / "production_import_pilot_pull_manifest.json").write_text("{}", encoding="utf-8")
+
+    for row in range(2):
+        for column in range(2):
+            tile_id = f"sfa_chili_bar_tile_r{row}_c{column}"
+            rgb = np.zeros((8, 8, 3), dtype=np.uint8)
+            rgb[..., 0] = 40 + column * 35
+            rgb[..., 1] = 120 + row * 45
+            rgb[..., 2] = 65 + row * 20
+            rgb[:, 3:5, 2] = 160
+            Image.fromarray(rgb, mode="RGB").save(naip_dir / f"{tile_id}.png")
+
+            dem = np.full((8, 8), 220.0 + row * 20.0 + column * 7.0, dtype=np.float32)
+            dem += np.linspace(0.0, 3.0, 8, dtype=np.float32)[None, :]
+            Image.fromarray(dem, mode="F").save(dem_dir / f"{tile_id}.tif")
+
+    build_south_fork_import_pilot_derivatives(
+        south_fork_root,
+        repo_root=tmp_path,
+        source_drape_size_px=16,
+        relief_size_px=16,
+        heightfield_size_px=17,
+        mask_size_px=16,
+    )
+
+    manifest_path = south_fork_root / "production_import_pilot_derivatives_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    source_drape = Image.open(south_fork_root / "imagery/production_import_pilot/source_drape_16.png")
+    heightfield = Image.open(south_fork_root / "terrain/production_import_pilot/heightfield_candidate_17.png")
+    water_mask = np.asarray(Image.open(south_fork_root / "imagery/production_import_pilot/water_mask_16.png"))
+    vegetation_mask = np.asarray(Image.open(south_fork_root / "imagery/production_import_pilot/vegetation_mask_16.png"))
+
+    assert manifest["schema"] == "raftsim.south_fork_import_pilot_derivatives.v1"
+    assert manifest["outputs"]["source_drape"] == "south_fork/imagery/production_import_pilot/source_drape_16.png"
+    assert source_drape.size == (16, 16)
+    assert heightfield.size == (17, 17)
+    assert manifest["processing"]["north_up_mosaic"] == "pilot tile row 1 is placed above row 0"
+    assert water_mask.mean() > 0.0
+    assert vegetation_mask.mean() > 0.0

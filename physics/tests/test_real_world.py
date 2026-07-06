@@ -12,6 +12,7 @@ from raftsim.real_world import (
     RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
     RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_SCHEMA_VERSION,
     PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION,
+    SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE,
     SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE,
     SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE,
     adaptive_solver_parameters,
@@ -120,6 +121,7 @@ def test_source_manifest_contains_fetch_specs_and_artifact_buckets():
     assert RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE in manifest["artifacts"]["guide_references"]
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE in manifest["artifacts"]["source_pulls"]
     assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE in manifest["artifacts"]["source_pulls"]
+    assert SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE in manifest["artifacts"]["source_pulls"]
 
 
 def test_south_fork_production_import_pilot_exposes_official_tile_plan_and_review_gates():
