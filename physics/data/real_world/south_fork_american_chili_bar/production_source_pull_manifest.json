@@ -35,7 +35,7 @@
   "production_blockers": [
     "Full corridor DEM/lidar tiles are not downloaded or conditioned yet.",
     "Aerial imagery and water/vegetation masks are not downloaded yet.",
-    "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, an ordered South Fork mainstem candidate, and preview metric stationing, but it still needs direction confirmation, production CRS selection, bank/cross-section derivation, NAIP/DEM alignment, and guide review.",
+    "Hydrography now has a bbox-intersected NHD HU8 18020129 source extract, an ordered South Fork mainstem candidate, preview metric stationing, and cross-section seed lines, but it still needs direction confirmation, production CRS selection, bank/cross-section review, NAIP/DEM alignment, and guide review.",
     "Modern release/gauge context is improved with a 30-day CDEC CBR/A25 window, but broader seasonal windows, A25 X-flag interpretation, station-to-reach routing, legal/redistribution signoff, and guide review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet."
   ],
@@ -329,6 +329,10 @@
       ],
       "path": "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
       "provider": "RaftSim derived artifact from the South Fork NHD mainstem candidate",
+      "related_artifacts": [
+        "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
+        "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson"
+      ],
       "status": "derived_metric_candidate_attached_review_required",
       "summary": {
         "length_m_geodesic_vertices": 26204.692,
@@ -342,6 +346,33 @@
         "cross_section_seed_normals",
         "naip_dem_alignment_gate",
         "unreal_transform_review_input"
+      ]
+    },
+    {
+      "artifact_id": "nhd_hu8_18020129_cross_section_seed_candidates",
+      "category": "hydrography_cross_section_seed_candidates",
+      "caveats": [
+        "These are fixed-width review lines, not accepted banks, wetted widths, or solver cross sections.",
+        "Each line is 80 m to each side of the preview mainstem station sample and inherits the preview CRS/direction caveats.",
+        "The seed lines must be moved, clipped, removed, or supplemented against NAIP, 3DEP terrain, guide notes, rapid features, side channels, and access constraints before production use."
+      ],
+      "path": "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
+      "provider": "RaftSim derived artifact from the South Fork NHD stationing candidate",
+      "related_artifacts": [
+        "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson"
+      ],
+      "status": "derived_seed_candidates_attached_review_required",
+      "summary": {
+        "feature_count": 133,
+        "half_width_m_each_side": 80.0,
+        "interval_m": 200.0,
+        "line_total_width_m": 160.0
+      },
+      "use": [
+        "rapid_review_cross_section_overlay",
+        "bank_and_width_review_seed",
+        "naip_dem_alignment_gate",
+        "future_solver_cross_section_authoring"
       ]
     },
     {
