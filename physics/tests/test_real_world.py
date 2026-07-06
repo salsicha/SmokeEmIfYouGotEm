@@ -9,6 +9,8 @@ from raftsim.real_world import (
     COURSE_ELEVATION_EXTRACTION_FILE,
     COURSE_ELEVATION_EXTRACTION_SCHEMA_VERSION,
     PACUARE_PRODUCTION_IMPORT_PILOT_FILE,
+    PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE,
+    PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION,
     RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
     RAPID_REVIEW_EDITOR_WORKFLOW_SCHEMA_VERSION,
     RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
@@ -23,6 +25,7 @@ from raftsim.real_world import (
     build_course_elevation_extraction,
     build_pacuare_production_import_pilot,
     build_player_selection_model,
+    build_production_environment_gap_register,
     build_rapid_review_editor_workflow,
     build_rapid_review_flow_difficulty_mapping,
     build_real_world_corridor_package,
@@ -234,6 +237,41 @@ def test_pacuare_production_import_pilot_exposes_source_product_plan_and_review_
         pilot["unreal_import_targets"]["future_production_map"]
         == "/Game/RaftSim/Maps/Production/L_PacuareRainforest_LowerPacuare"
     )
+
+
+def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_rivers():
+    register = build_production_environment_gap_register()
+    rivers = {entry["river_id"]: entry for entry in register["rivers"]}
+
+    assert register["schema"] == PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION
+    assert register["status"] == "active_goal_gap_register_all_rivers_preview_only_not_lifelike"
+    assert "social_media_reference_only_until_explicit_item_rights_clear" in register["policy"]
+    assert register["policy"]["do_not_download_scrape_train_on_or_package_third_party_media_without_rights"] is True
+    assert {
+        "terrain_dem_or_lidar",
+        "seasonal_flow_or_release_history",
+        "production_art_assets_or_first_party_procedural_equivalents",
+        "unreal_lifelike_capture_and_performance_evidence",
+    }.issubset(set(register["source_classes"]))
+    assert {"american_south_fork", "colorado_river", "pacuare"} == set(rivers)
+    assert any(lead["source_id"] == "snit_cr_idecori" for lead in register["reviewed_source_leads_2026_07_06"])
+    assert any(target["target"] == "water_foam_spray_mist_and_wetness" for target in register["global_visual_replacement_targets"])
+
+    south_fork_p0 = {item["source_class"] for item in rivers["american_south_fork"]["p0_next_pulls_or_attachments"]}
+    colorado_p0 = {item["source_class"] for item in rivers["colorado_river"]["p0_next_pulls_or_attachments"]}
+    pacuare_p0 = {item["source_class"] for item in rivers["pacuare"]["p0_next_pulls_or_attachments"]}
+
+    assert {"hydrography_and_centerline", "seasonal_flow_or_release_history", "guide_and_reference_media_annotations"}.issubset(south_fork_p0)
+    assert {"hydrography_and_centerline", "seasonal_flow_or_release_history", "guide_and_reference_media_annotations"}.issubset(colorado_p0)
+    assert {
+        "hydrography_and_centerline",
+        "aerial_or_satellite_imagery",
+        "seasonal_flow_or_release_history",
+        "guide_and_reference_media_annotations",
+    }.issubset(pacuare_p0)
+    assert "USGS 11445500" in rivers["american_south_fork"]["procedural_generation_allowlist"][2]
+    assert "release-band" in rivers["colorado_river"]["procedural_generation_allowlist"][2]
+    assert "waterfalls" in rivers["pacuare"]["completion_gate"]
 
 
 def test_channel_indicators_and_rapid_candidates_find_complex_water():
@@ -465,6 +503,7 @@ def test_write_real_world_seed_package_outputs_manifest_and_scenario(tmp_path):
 
     assert (output_dir.parent / CANDIDATE_RIVER_INVENTORY_FILE).exists()
     assert (output_dir.parent / "candidate_rivers.json").exists()
+    assert (output_dir.parent / PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE).exists()
     assert (output_dir / "source_manifest.json").exists()
     assert (output_dir / COURSE_ELEVATION_EXTRACTION_FILE).exists()
     assert (output_dir / RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE).exists()
