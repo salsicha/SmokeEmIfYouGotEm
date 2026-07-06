@@ -17,7 +17,7 @@
       "terrain_relief_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png",
       "heightfield_preview_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png",
       "elevation_sample": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
-      "fidelity_note": "larger official USDA/APFO NAIP 1024px corridor sample sampled into a denser terrain-conforming source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into bank and valley preview geometry; first-party procedural wet-bank, leaf-litter, and talus detail generated as rights-safe proxy dressing; full elevation conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers"
+      "fidelity_note": "larger official USDA/APFO NAIP 1024px corridor sample sampled into a denser terrain-conforming source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into bank and valley preview geometry; first-party procedural wet-bank, leaf-litter, talus, and vertex-color water-gradient detail generated as rights-safe proxy dressing; full elevation conditioning remains pending; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers"
     },
     {
       "river_id": "colorado_river",
@@ -32,7 +32,7 @@
       "terrain_relief_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_relief_preview_1024.png",
       "heightfield_preview_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png",
       "elevation_sample": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif",
-      "fidelity_note": "larger official USDA/APFO NAIP 1024px Lees Ferry corridor sample sampled into a denser terrain-conforming canyon source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into canyon bank preview geometry; first-party procedural strata, talus, and wet-rock detail generated as rights-safe proxy dressing; full canyon heightfield conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers"
+      "fidelity_note": "larger official USDA/APFO NAIP 1024px Lees Ferry corridor sample sampled into a denser terrain-conforming canyon source-drape mosaic; larger derived USGS 3DEP 1024px relief preview and review-gated 1009px heightfield candidate sampled into canyon bank preview geometry; first-party procedural strata, talus, wet-rock, and vertex-color water-gradient detail generated as rights-safe proxy dressing; full canyon heightfield conditioning remains pending; rocks, foliage, water shaders, foam, raft, and lighting remain proxy layers"
     },
     {
       "river_id": "pacuare",
@@ -47,7 +47,7 @@
       "terrain_relief_image": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_1024.png",
       "heightfield_preview_image": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png",
       "elevation_sample": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif",
-      "fidelity_note": "larger deterministic 1024px preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, sampled into a denser terrain-conforming rainforest source-drape mosaic with cloud gaps filled by DEM-derived shading; larger derived 1024px Copernicus DEM relief preview and review-gated 1009px heightfield candidate sampled into Pacuare bank and gorge preview geometry; first-party procedural rainforest leaf-litter, wet-rock, and talus detail generated as rights-safe proxy dressing; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water, waterfalls, foam, raft, and lighting remain proxy layers"
+      "fidelity_note": "larger deterministic 1024px preview drape generated from the selected official NASA GIBS MODIS/Terra true-color sample and Copernicus DEM GLO-30 relief, sampled into a denser terrain-conforming rainforest source-drape mosaic with cloud gaps filled by DEM-derived shading; larger derived 1024px Copernicus DEM relief preview and review-gated 1009px heightfield candidate sampled into Pacuare bank and gorge preview geometry; first-party procedural rainforest leaf-litter, wet-rock, talus, and vertex-color water-gradient detail generated as rights-safe proxy dressing; Copernicus DEM COG tiles remain recorded for follow-on Pacuare gorge heightfield conditioning; rocks, foliage, water shaders, waterfalls, foam, raft, and lighting remain proxy layers"
     }
   ]
 }
