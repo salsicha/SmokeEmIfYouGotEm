@@ -352,10 +352,11 @@
             "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/usgs_09402500_daily_discharge.json",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
-            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/usbr_glen_canyon_release_context.json"
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
+            "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/release_band_review.json"
           ],
-          "promotion_blocker": "USBR Glen Canyon daily total-release context is attached and compared against USGS daily gauges, but unit/terms confirmation, hourly/subdaily operations, release-band variants, river-mile travel-time review, and guide/oarsman approval are still required before final release-dependent visuals.",
-          "status": "usgs_daily_discharge_and_usbr_release_context_attached_review_pending"
+          "promotion_blocker": "USBR Glen Canyon daily total-release context and release-band review are attached. In water-year 2026 to date, 194 days meet the 8000 cfs low-release planning band, 0 days meet the 12000 cfs moderate band, and 0 days meet the 18000 cfs high band; post-2000 history contains higher-release examples, but final visuals still need unit/terms confirmation, hourly/subdaily operations, Lees Ferry/downstream gauge routing, river-mile travel-time review, sandbar/wet-bank masks, and guide/oarsman approval.",
+          "status": "usbr_release_context_and_release_band_review_attached_promotion_blocked"
         },
         "terrain_dem_or_lidar": {
           "artifacts": [

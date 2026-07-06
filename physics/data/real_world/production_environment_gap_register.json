@@ -278,6 +278,7 @@
         "hydrology/usgs_09402500_daily_discharge.json",
         "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
         "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
+        "hydrology/production_import_pilot/release_band_review.json",
         "reference_media_link_manifest.json"
       ],
       "p0_next_pulls_or_attachments": [

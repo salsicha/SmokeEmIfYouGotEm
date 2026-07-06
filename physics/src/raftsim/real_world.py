@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import math
+from datetime import date, timedelta
 from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Literal
@@ -107,6 +108,7 @@ COLORADO_PRODUCTION_BANKS_DRAFT_FILE = "hydrography/production_import_pilot/bank
 COLORADO_PRODUCTION_CROSS_SECTIONS_DRAFT_FILE = "hydrography/production_import_pilot/cross_sections.geojson"
 COLORADO_USBR_TOTAL_RELEASE_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json"
 COLORADO_USBR_RELEASE_CONTEXT_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json"
+COLORADO_RELEASE_BAND_REVIEW_FILE = "hydrology/production_import_pilot/release_band_review.json"
 PACUARE_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 PACUARE_PREVIEW_CENTERLINE_SCAFFOLD_MANIFEST_FILE = (
     "hydrography/production_import_pilot/preview_centerline_scaffold_manifest.json"
@@ -1445,7 +1447,7 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
                     "hydrology/production_import_pilot/usgs_09402500_instantaneous_discharge.json",
                     COLORADO_USBR_TOTAL_RELEASE_FILE,
                     COLORADO_USBR_RELEASE_CONTEXT_FILE,
-                    "hydrology/production_import_pilot/release_band_review.json",
+                    COLORADO_RELEASE_BAND_REVIEW_FILE,
                 ],
                 "promotion_gate": (
                     "Use the attached Reclamation daily total-release series as review-gated context, confirm units and terms, "
@@ -1505,6 +1507,121 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
             "processing_version": "milestone_26_colorado_import_pilot.v0",
             "review_status": "recipe_only_downloads_and_imports_pending",
         },
+    }
+
+
+def build_colorado_release_band_review(
+    flow_presets: dict[str, object],
+    usbr_total_release: dict[str, object],
+    release_context: dict[str, object],
+) -> dict[str, object]:
+    """Compare Colorado rowing planning bands to attached USBR Glen Canyon release history."""
+
+    rows: list[tuple[date, float]] = []
+    for raw_date, raw_value in usbr_total_release["data"]:
+        if raw_value is None:
+            continue
+        rows.append((date.fromisoformat(raw_date), float(raw_value)))
+    if not rows:
+        raise ValueError("USBR release series has no valid daily values")
+
+    latest_date = max(row_date for row_date, _value in rows)
+    last_365_start = latest_date - timedelta(days=365)
+    windows = {
+        "all_available": rows,
+        "post_2000_operations": [(row_date, value) for row_date, value in rows if row_date >= date(2000, 1, 1)],
+        "last_365_available_days": [(row_date, value) for row_date, value in rows if row_date >= last_365_start],
+        "water_year_2026_to_date": [(row_date, value) for row_date, value in rows if row_date >= date(2025, 10, 1)],
+    }
+
+    def summarize_window(window_rows: list[tuple[date, float]], threshold_cfs: float) -> dict[str, object]:
+        values = np.asarray([value for _row_date, value in window_rows], dtype=np.float64)
+        days_ge = [(row_date, value) for row_date, value in window_rows if value >= threshold_cfs]
+        peak_examples = sorted(days_ge, key=lambda item: item[1], reverse=True)[:8]
+        return {
+            "day_count": len(window_rows),
+            "days_ge_planning_flow": len(days_ge),
+            "fraction_ge_planning_flow": round(len(days_ge) / max(len(window_rows), 1), 6),
+            "min_cfs": round(float(np.min(values)), 3),
+            "median_cfs": round(float(np.median(values)), 3),
+            "mean_cfs": round(float(np.mean(values)), 3),
+            "max_cfs": round(float(np.max(values)), 3),
+            "peak_examples": [
+                {"date": row_date.isoformat(), "release_cfs": round(value, 3)} for row_date, value in peak_examples
+            ],
+        }
+
+    reviewed_bands: list[dict[str, object]] = []
+    for band in flow_presets["flow_bands"]:
+        threshold_cfs = float(band["discharge_cfs"])
+        window_summaries = {
+            window_name: summarize_window(window_rows, threshold_cfs)
+            for window_name, window_rows in windows.items()
+            if window_rows
+        }
+        wy_days = window_summaries["water_year_2026_to_date"]["days_ge_planning_flow"]
+        if wy_days > 0:
+            evidence_status = "observed_in_water_year_2026_daily_release_context_not_subdaily_validation"
+        else:
+            evidence_status = "not_observed_in_water_year_2026_daily_release_context"
+        reviewed_bands.append(
+            {
+                "flow_band": band["flow_band"],
+                "display_name": band["display_name"],
+                "planning_discharge_cfs": threshold_cfs,
+                "planning_discharge_m3s": band["discharge_m3s"],
+                "expected_rowing_behavior": band["expected_rowing_behavior"],
+                "review_priority": band["review_priority"],
+                "window_summaries": window_summaries,
+                "evidence_status": evidence_status,
+                "promotion_decision": "blocked_pending_units_subdaily_release_routing_sandbar_wet_bank_oarsman_review",
+                "review_use": (
+                    "Use as a release-band discussion aid only; do not retune water level, sandbar exposure, wave trains, "
+                    "boils, swimmer drift, or rowing gameplay from daily release totals alone."
+                ),
+            }
+        )
+
+    return {
+        "schema": "raftsim.colorado_release_band_review.v1",
+        "generated_on": "2026-07-06",
+        "river_id": "colorado_river",
+        "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+        "status": "review_gated_do_not_promote_release_bands",
+        "inputs": {
+            "flow_presets": "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json",
+            "usbr_total_release": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
+            "release_context": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
+            "lees_ferry_gauge": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/usgs_09380000_daily_discharge.json",
+            "downstream_gauge": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/usgs_09402500_daily_discharge.json",
+        },
+        "release_context_summary": {
+            "all_available": release_context["usbr_total_release_summary"]["all_available"],
+            "post_2000_operations": release_context["usbr_total_release_summary"]["post_2000_operations"],
+            "last_365_available_days": release_context["usbr_total_release_summary"]["last_365_available_days"],
+            "water_year_2026_to_date": release_context["usbr_total_release_summary"]["water_year_2026_to_date"],
+            "release_visual_band_candidates": release_context["release_visual_band_candidates"],
+            "daily_comparison_ids": [comparison["comparison_id"] for comparison in release_context["daily_comparisons"]],
+        },
+        "reviewed_bands": reviewed_bands,
+        "promotion_blockers": [
+            "The USBR dashboard/JSON still needs explicit unit metadata and terms confirmation before final flow bands.",
+            "Daily total releases do not capture hourly/subdaily hydropower fluctuations, downstream routing, tributary inflow, or side storage.",
+            "River-mile travel-time review, sandbar/wet-bank masks, oar-line annotations, and guide/oarsman validation remain open.",
+            "The current 18000 cfs high-release planning band is not observed in water-year 2026 to date and needs separate high-release evidence.",
+        ],
+        "allowed_use": [
+            "editor release-band review",
+            "sandbar and wet-bank planning",
+            "guide/oarsman discussion",
+            "future low/moderate/high release visual variant planning",
+        ],
+        "forbidden_use": [
+            "final release-band promotion",
+            "claiming accepted river-mile hydrology",
+            "production lifelike water approval",
+            "hiding water-simulation conservation failures with visuals or forcing",
+        ],
     }
 
 
@@ -2070,6 +2187,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "hydrology/usgs_09402500_daily_discharge.json",
                     COLORADO_USBR_TOTAL_RELEASE_FILE,
                     COLORADO_USBR_RELEASE_CONTEXT_FILE,
+                    COLORADO_RELEASE_BAND_REVIEW_FILE,
                     "reference_media_link_manifest.json",
                 ],
                 "p0_next_pulls_or_attachments": [
@@ -2100,7 +2218,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                         "required_artifacts": [
                             COLORADO_USBR_TOTAL_RELEASE_FILE,
                             COLORADO_USBR_RELEASE_CONTEXT_FILE,
-                            "hydrology/production_import_pilot/release_band_review.json",
+                            COLORADO_RELEASE_BAND_REVIEW_FILE,
                         ],
                         "source_leads": ["usgs_water_services", "usbr_glen_canyon_release_context", "guide_review"],
                         "promotion_gate": "Use the attached Reclamation daily total-release context as review-gated evidence, then add hourly/subdaily release patterns, final unit/terms confirmation, Lees Ferry/downstream gauge comparisons, and oarsman review before final release-dependent visuals.",

@@ -512,6 +512,38 @@
         "Bank lines are fixed-offset seed endpoints from cross-section review lines, not observed wetted banks or sandbars.",
         "Cross-section lines remain review seeds and must not be used as solver cross sections until river-mile, bank, sandbar, release, and oarsman review pass."
       ]
+    },
+    {
+      "artifact_id": "colorado_release_band_review",
+      "category": "seasonal_flow_or_release_history_review",
+      "path": "hydrology/production_import_pilot/release_band_review.json",
+      "related_artifacts": [
+        "flow_presets.json",
+        "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
+        "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
+        "hydrology/usgs_09380000_daily_discharge.json",
+        "hydrology/usgs_09402500_daily_discharge.json"
+      ],
+      "provider": "RaftSim review artifact from USBR Glen Canyon daily total release context and Colorado planning flow presets",
+      "status": "generated_review_gated_release_band_comparison_not_preset_promotion",
+      "summary": {
+        "water_year_2026_low_release_days_ge_8000_cfs": 194,
+        "water_year_2026_moderate_release_days_ge_12000_cfs": 0,
+        "water_year_2026_high_release_days_ge_18000_cfs": 0,
+        "post_2000_high_release_days_ge_18000_cfs": 278
+      },
+      "use": [
+        "editor_release_band_review",
+        "sandbar_and_wet_bank_planning",
+        "guide_oarsman_discussion",
+        "missing_subdaily_release_tracking"
+      ],
+      "caveats": [
+        "The USBR dashboard/JSON still needs explicit unit metadata and terms confirmation before final flow bands.",
+        "Daily total releases do not capture hourly/subdaily hydropower fluctuations, downstream routing, tributary inflow, or side storage.",
+        "River-mile travel-time review, sandbar/wet-bank masks, oar-line annotations, and guide/oarsman validation remain open.",
+        "The current 18000 cfs high-release planning band is not observed in water-year 2026 to date and needs separate high-release evidence."
+      ]
     }
   ],
   "production_blockers": [
