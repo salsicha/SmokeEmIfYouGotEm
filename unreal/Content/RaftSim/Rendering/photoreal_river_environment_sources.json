@@ -107,7 +107,25 @@
       "river_map_sources": [
         {"source_id": "usgs_3dep", "url": "https://apps.nationalmap.gov/tnmaccess/api/products?datasets=Digital%20Elevation%20Model%20(DEM)&bbox=-120.90,38.74,-120.72,38.83", "status": "metadata_ready"},
         {"source_id": "usgs_3dhp_nhd", "url": "https://apps.nationalmap.gov/tnmaccess/api/products?datasets=National%20Hydrography%20Dataset%20(NHD)&bbox=-120.90,38.74,-120.72,38.83", "status": "metadata_ready"},
-        {"source_id": "usda_naip", "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=NAIP%20Plus&bbox=-120.90,38.74,-120.72,38.83", "status": "planned"}
+        {"source_id": "usda_naip", "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=NAIP%20Plus&bbox=-120.90,38.74,-120.72,38.83", "status": "sample_attached_for_unreal_preview_drape"}
+      ],
+      "source_sample_artifacts": [
+        {
+          "artifact_id": "usda_naip_chili_bar_sample_512",
+          "category": "aerial_imagery_sample",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_sample_512.png",
+          "provider": "USDA/APFO NAIP ImageServer",
+          "status": "draped_into_unreal_preview_terrain_overlay_tiles",
+          "unreal_use": "source-derived visible terrain overlay layer for /Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview"
+        },
+        {
+          "artifact_id": "usgs_3dep_chili_bar_sample_256",
+          "category": "terrain_sample",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_sample_256.tif",
+          "provider": "USGS 3D Elevation Program ImageServer",
+          "status": "recorded_for_follow_on_heightfield_conditioning",
+          "unreal_use": "provenance and import-pipeline smoke-test sample; full heightfield replacement still pending"
+        }
       ],
       "flow_sources": [
         {"source_id": "usgs_11445500", "url": "https://waterdata.usgs.gov/monitoring-location/USGS-11445500/", "status": "metadata_ready"}
@@ -219,5 +237,5 @@
       "desktop_and_vr_performance_captures"
     ]
   },
-  "status": "procedural_blockout_preview_maps_and_rendered_captures_available; production_geospatial_imports_and_photoreal_assets_pending"
+  "status": "south_fork_naip_source_drape_available; colorado_and_pacuare_remain_procedural_blockouts; production_geospatial_imports_and_photoreal_assets_pending"
 }

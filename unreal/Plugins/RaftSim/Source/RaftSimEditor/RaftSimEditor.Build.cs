@@ -27,6 +27,7 @@ public class RaftSimEditor : ModuleRules
         {
             "LevelEditor",
             "Json",
+            "ImageWrapper",
             "Projects",
             "ProceduralMeshComponent",
             "RenderCore",
