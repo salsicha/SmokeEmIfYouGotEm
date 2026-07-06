@@ -550,6 +550,7 @@
       "gauges": [
         "hydrology/usgs_11445500_daily_discharge.json",
         "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+        "hydrology/south_fork_modern_flow_source_selection.json",
         "hydrology/flow_presets.json"
       ],
       "guide_references": [

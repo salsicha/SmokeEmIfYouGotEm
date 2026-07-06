@@ -68,6 +68,33 @@
       ]
     },
     {
+      "artifact_id": "south_fork_modern_flow_source_selection",
+      "category": "hydrology_source_selection",
+      "path": "hydrology/south_fork_modern_flow_source_selection.json",
+      "provider": "California Data Exchange Center / California Department of Water Resources",
+      "url": "https://cdec.water.ca.gov/dynamicapp/staSearch?sta_chk=on&sta=CHILI&active_chk=on&active=Y&display=sta",
+      "status": "official_candidate_identified_review_required",
+      "summary": {
+        "primary_candidate_station": "CBR",
+        "primary_candidate_name": "AMERICAN RIVER AT CHILI BAR",
+        "secondary_candidate_station": "A25",
+        "secondary_candidate_name": "CHILI BAR POWERHOUSE",
+        "latest_cbr_sample_datetime_pdt": "07/06/2026 06:45",
+        "latest_cbr_flow_cfs": 338.0,
+        "latest_cbr_stage_ft": 1.64
+      },
+      "use": [
+        "modern_flow_source_selection",
+        "future_low_median_high_flow_band_review",
+        "release_context_for_visual_and_gameplay_tuning"
+      ],
+      "caveats": [
+        "CBR is the primary official modern-flow candidate, not a promoted gameplay source yet.",
+        "CDEC terms, QA flags, reproducible CSV/JSON pulls, station-to-reach relation, and guide/outfitter validation are required before flow bands are changed.",
+        "A25 powerhouse discharge is release-operation context and should not be used alone as raftable river flow without routing and guide review."
+      ]
+    },
+    {
       "artifact_id": "tnm_nhd_products",
       "category": "hydrography_metadata",
       "path": "hydrography/tnm_nhd_products.json",
