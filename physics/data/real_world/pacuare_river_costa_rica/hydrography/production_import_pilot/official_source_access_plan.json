@@ -17,17 +17,45 @@
       "source_id": "snit_ogc_services_catalog",
       "provider": "Sistema Nacional de Informacion Territorial de Costa Rica / IDECORI",
       "url": "https://www.snitcr.go.cr/ico_servicios_ogc",
-      "review_status": "official_catalog_recorded_getcapabilities_review_pending",
+      "archived_catalog_file": "snit_ogc_services_catalog.html",
+      "endpoint_config_file": "snit_config_ssnit.js",
+      "layer_list_script_file": "snit_ico_servicios_ogc_lista_capas.js",
+      "layer_catalog_summary": "snit_layer_catalog_summary.json",
+      "review_status": "official_catalog_and_selected_node_layer_lists_archived_metadata_only",
+      "reviewed_nodes": [
+        "snit_direccion_de_agua",
+        "snit_imn",
+        "snit_sinac",
+        "snit_senara_estaciones",
+        "snit_senara_recarga",
+        "snit_senara_vulnerabilidad",
+        "snit_ice_sistema_electrico"
+      ],
+      "candidate_layers": [
+        "DA_AFOROS",
+        "DA_UNIDADES HIDROLOGICAS",
+        "DA_OBRAS EN CAUCE",
+        "Precipitación Anual: período 1960-2013",
+        "Estaciones Pluviométricas",
+        "Estaciones Automáticas",
+        "Áreas Silvestres Protegidas",
+        "Cobertura Forestal 2023",
+        "Corredores Biológicos",
+        "Registro Nacional de Humedales",
+        "Recarga_Siquirres_SIRGAS"
+      ],
       "candidate_uses": [
         "official hydrography layer discovery",
         "working CRS selection",
         "protected-area/access layer discovery",
-        "imagery or orthophoto layer discovery"
+        "rainfall and rain-fed flow-context discovery",
+        "imagery, forest-cover, wetland, or orthophoto layer discovery"
       ],
       "observed_catalog_topics": [
         "Recurso Hidrico themed viewer",
         "OGC service access",
-        "institutional Costa Rica data nodes"
+        "institutional Costa Rica data nodes",
+        "Direccion de Agua, IMN, SINAC, SENARA, and ICE node layer lists"
       ],
       "review_gate": "Record exact service URL, layer title/name, CRS, responsible institution, terms, attribution, publication sensitivity, and download/redistribution status before importing any features."
     },
@@ -137,6 +165,52 @@
       "promotion_gate": "Do not import until exact backing service/layer metadata, CRS, terms, attribute semantics, visible-imagery alignment, and guide/outfitter stationing review are complete."
     },
     {
+      "candidate_id": "snit_imn_precipitation_climatology",
+      "source_id": "snit_ogc_services_catalog",
+      "layer_or_service": "IMN precipitation climatology layers including Precipitación Anual: período 1960-2013",
+      "why_it_matters": "Pacuare flow behavior is rain-fed; IMN precipitation layers are official context for dry/rainy/flash-response visual and gameplay presets.",
+      "target_outputs": [
+        "hydrology/production_import_pilot/rainfall_station_review.json",
+        "hydrology/production_import_pilot/flash_response_review.json",
+        "hydrology/production_import_pilot/flow_band_review.json"
+      ],
+      "promotion_gate": "Use only after layer terms, CRS, units, interpolation semantics, station lineage, Pacuare basin relation, and guide interpretation are recorded."
+    },
+    {
+      "candidate_id": "snit_senara_pluviometric_stations",
+      "source_id": "snit_ogc_services_catalog",
+      "layer_or_service": "SENARA Estaciones Automáticas and Estaciones Pluviométricas",
+      "why_it_matters": "Rain-station locations can help identify whether nearby official rainfall observations explain Pacuare flash-response and sticky/washed-out feature windows.",
+      "target_outputs": [
+        "hydrology/production_import_pilot/rainfall_station_review.json",
+        "hydrology/production_import_pilot/flash_response_review.json"
+      ],
+      "promotion_gate": "Do not use for numeric flow bands until station locations, variables, units, temporal coverage, access terms, and Pacuare basin relation are reviewed."
+    },
+    {
+      "candidate_id": "snit_sinac_protected_area_and_forest_cover",
+      "source_id": "snit_ogc_services_catalog",
+      "layer_or_service": "SINAC protected areas, forest cover, biological corridors, and wetlands",
+      "why_it_matters": "Detailed Pacuare route packages, photoreal rainforest dressing, and public screenshots need conservation context and sensitive-location policy.",
+      "target_outputs": [
+        "review/production_import_pilot/protected_area_publication_sensitivity.json",
+        "review/production_import_pilot/access_and_conservation_policy.json",
+        "imagery/production_import_pilot/vegetation_mask_review.json"
+      ],
+      "promotion_gate": "Record layer terms, attribution, publication sensitivity, corridor intersection, and local conservation review before detailed route capture or production vegetation masks."
+    },
+    {
+      "candidate_id": "snit_senara_recarga_siquirres",
+      "source_id": "snit_ogc_services_catalog",
+      "layer_or_service": "Recarga_Siquirres_SIRGAS",
+      "why_it_matters": "Near-corridor hydrogeology context may inform lower Pacuare watershed review, but it is not direct river geometry or discharge authority.",
+      "target_outputs": [
+        "hydrology/production_import_pilot/basin_relation_review.geojson",
+        "review/production_import_pilot/access_and_conservation_policy.json"
+      ],
+      "promotion_gate": "Use only after CRS, terms, attributes, Pacuare corridor relation, and hydrology reviewer interpretation are recorded."
+    },
+    {
       "candidate_id": "snit_protected_area_access_layers",
       "source_id": "snit_ogc_services_catalog",
       "layer_or_service": "SNIT protected-area/access candidate services",
@@ -168,16 +242,20 @@
     "hydrography/production_import_pilot/official_source_access_plan.json",
     "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_getcapabilities.xml",
     "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
+    "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
     "hydrography/production_import_pilot/centerline.geojson",
     "hydrography/production_import_pilot/banks.geojson",
     "hydrology/production_import_pilot/discharge_or_stage_station_review.json",
     "hydrology/production_import_pilot/rainfall_station_review.json",
-    "review/production_import_pilot/protected_area_publication_sensitivity.json"
+    "hydrology/production_import_pilot/flash_response_review.json",
+    "review/production_import_pilot/protected_area_publication_sensitivity.json",
+    "review/production_import_pilot/access_and_conservation_policy.json",
+    "imagery/production_import_pilot/vegetation_mask_review.json"
   ],
   "next_actions": [
-    "Fetch and archive GetCapabilities metadata for the SNIT and Direccion de Agua services without importing features.",
+    "Review selected SNIT layer terms, CRS, attribute schema, WMS/WFS availability, and Pacuare corridor intersections before any feature or tile import.",
     "Identify whether DA_AFOROS or another official layer contains Pacuare-relevant discharge or stage stations.",
-    "Intersect hydrologic-unit candidates with the draft Pacuare bounds before selecting rainfall/stage stations.",
+    "Intersect hydrologic-unit, IMN precipitation, SENARA station/recharge, and SINAC protected-area candidates with the draft Pacuare bounds before selecting rainfall/stage stations or photoreal rainforest masks.",
     "Keep the Unreal-preview centerline as annotation scaffolding until official hydrography and guide stationing replace or validate it."
   ]
 }

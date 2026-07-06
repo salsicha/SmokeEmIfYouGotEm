@@ -1,0 +1,42 @@
+{
+    "resultado": true,
+    "success": true,
+    "data": [
+        {
+            "id": "Y2FwYTo6RXN0YWNpb25lcytNZXRlb3JvbCVDMyVCM2dpY2FzOjplc3RhY2lvbmVzX2F1dG9tYXRpY2Fz",
+            "nombre": "Estaciones Autom\u00e1ticas",
+            "layer": "estaciones_automaticas",
+            "url": "\/Visor\/index?k=Y2FwYTo6RXN0YWNpb25lcytNZXRlb3JvbCVDMyVCM2dpY2FzOjplc3RhY2lvbmVzX2F1dG9tYXRpY2Fz",
+            "institucion": "Servicio Nacional de Aguas Subterr\u00e1neas, Riego y Avenamiento - ESTACIONES METEOROL\u00d3GICAS",
+            "fecha": "28-06-2026",
+            "node_name": "SENARA-Estaciones Meteorol\u00f3gicas",
+            "node_status": "activo",
+            "NodoPadreKey": "bm9kbzo6MTAw",
+            "detalles": true,
+            "wms": true,
+            "wmts": false,
+            "wfs": true,
+            "Abstract": "La red de estaciones autom\u00e1ticas, es una red reciente, la cual fue creada para el monitoreo de los acu\u00edferos del proyecto Progirh del SENARA. Actualmente la red se mantiene con cinco estaciones localizadas en Grecia, Matapalo de Guanacaste, Savegre y dos estaciones en el sector de Ario, C\u00f3bano.",
+            "TieneMetadatos": true,
+            "Missing": false
+        },
+        {
+            "id": "Y2FwYTo6RXN0YWNpb25lcytNZXRlb3JvbCVDMyVCM2dpY2FzOjplc3RhY2lvbmVzX3BsdXZpb21ldHJpY2Fz",
+            "nombre": "Estaciones Pluviom\u00e9tricas",
+            "layer": "estaciones_pluviometricas",
+            "url": "\/Visor\/index?k=Y2FwYTo6RXN0YWNpb25lcytNZXRlb3JvbCVDMyVCM2dpY2FzOjplc3RhY2lvbmVzX3BsdXZpb21ldHJpY2Fz",
+            "institucion": "Servicio Nacional de Aguas Subterr\u00e1neas, Riego y Avenamiento - ESTACIONES METEOROL\u00d3GICAS",
+            "fecha": "28-06-2026",
+            "node_name": "SENARA-Estaciones Meteorol\u00f3gicas",
+            "node_status": "activo",
+            "NodoPadreKey": "bm9kbzo6MTAw",
+            "detalles": true,
+            "wms": true,
+            "wmts": false,
+            "wfs": true,
+            "Abstract": "La red es estaciones pluviom\u00e9tricas tuvo sus inicios de los a\u00f1os sesenta. Se caracteriza por contar con observadores, quienes son los encargados de realizar la recolecci\u00f3n de los datos diariamente. El par\u00e1metro registrado es la precipitaci\u00f3n. Las estaciones pluviom\u00e9tricas, fueron cerradas de acuerdo con el oficio SENARA-DIGH-OFI-004-2025. La informaci\u00f3n se encuentra disponible a junio del 2024.",
+            "TieneMetadatos": true,
+            "Missing": false
+        }
+    ]
+}
