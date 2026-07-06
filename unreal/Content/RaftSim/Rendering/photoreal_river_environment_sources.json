@@ -403,6 +403,7 @@
       "one_generated_unreal_preview_map_per_river",
       "one_downstream_guide_seat_and_one_raft_hidden_river_eye_screenshot_per_river",
       "source_manifest_and_rights_status_visible_in_capture_manifest",
+      "review_gated_heightfield_candidate_sampling_visible_in_capture_manifest",
       "biome_specific_understory_and_scrub_proxy_layers_recorded",
       "current_streak_proxy_layers_recorded",
       "known_nonphotoreal_proxy_layers_explicitly_recorded"
