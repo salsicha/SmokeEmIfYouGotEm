@@ -1,0 +1,177 @@
+{
+  "download_count": 8,
+  "downloads": [
+    {
+      "actual_size_px": [
+        1024,
+        1024
+      ],
+      "content_type": "image/tiff",
+      "download_kind": "3dep_dem_export",
+      "expected_size_px": [
+        1024,
+        1024
+      ],
+      "image_mode": "F",
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r0_c0.tif",
+      "provider": "USGS 3D Elevation Program ImageServer",
+      "sha256": "ea2b70bf25c0f82bb97494008fc410c57cfefcfab9d4d8d1f3287c7e80b6223d",
+      "size_bytes": 4195962,
+      "source_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-12429934.3420%2C4411265.9103%2C-12423255.1725%2C4418221.5691&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+      "status": "downloaded_review_pending",
+      "tile_id": "colorado_lees_ferry_tile_r0_c0"
+    },
+    {
+      "actual_size_px": [
+        2048,
+        2048
+      ],
+      "content_type": "image/png",
+      "download_kind": "naip_export",
+      "expected_size_px": [
+        2048,
+        2048
+      ],
+      "image_mode": "RGB",
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r0_c0.png",
+      "provider": "USDA/APFO NAIP ImageServer",
+      "sha256": "60c627be7f447ed90166f4bc25aae3204f4114471edbdeca5c8da9155226b728",
+      "size_bytes": 7598851,
+      "source_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-12429934.3420%2C4411265.9103%2C-12423255.1725%2C4418221.5691&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=png&f=image",
+      "status": "downloaded_review_pending",
+      "tile_id": "colorado_lees_ferry_tile_r0_c0"
+    },
+    {
+      "actual_size_px": [
+        1024,
+        1024
+      ],
+      "content_type": "image/tiff",
+      "download_kind": "3dep_dem_export",
+      "expected_size_px": [
+        1024,
+        1024
+      ],
+      "image_mode": "F",
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r0_c1.tif",
+      "provider": "USGS 3D Elevation Program ImageServer",
+      "sha256": "71fe8f13b1740ae588c0cdd20810a9904828f2b59f614d70440f8ba5c5a889af",
+      "size_bytes": 4195962,
+      "source_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-12423255.1725%2C4411265.9103%2C-12416576.0031%2C4418221.5691&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+      "status": "downloaded_review_pending",
+      "tile_id": "colorado_lees_ferry_tile_r0_c1"
+    },
+    {
+      "actual_size_px": [
+        2048,
+        2048
+      ],
+      "content_type": "image/png",
+      "download_kind": "naip_export",
+      "expected_size_px": [
+        2048,
+        2048
+      ],
+      "image_mode": "RGB",
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r0_c1.png",
+      "provider": "USDA/APFO NAIP ImageServer",
+      "sha256": "22fa3b69bfd54fc2f836e8f3d93c7b2fe230fc8359e710b21865a6005f5c8006",
+      "size_bytes": 8365591,
+      "source_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-12423255.1725%2C4411265.9103%2C-12416576.0031%2C4418221.5691&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=png&f=image",
+      "status": "downloaded_review_pending",
+      "tile_id": "colorado_lees_ferry_tile_r0_c1"
+    },
+    {
+      "actual_size_px": [
+        1024,
+        1024
+      ],
+      "content_type": "image/tiff",
+      "download_kind": "3dep_dem_export",
+      "expected_size_px": [
+        1024,
+        1024
+      ],
+      "image_mode": "F",
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r1_c0.tif",
+      "provider": "USGS 3D Elevation Program ImageServer",
+      "sha256": "1e73fcc827cf2eea06795e2561748466456f7ebcc22c5d7a954b4bad6ee311d1",
+      "size_bytes": 4195962,
+      "source_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-12429934.3420%2C4418221.5691%2C-12423255.1725%2C4425177.2279&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+      "status": "downloaded_review_pending",
+      "tile_id": "colorado_lees_ferry_tile_r1_c0"
+    },
+    {
+      "actual_size_px": [
+        2048,
+        2048
+      ],
+      "content_type": "image/png",
+      "download_kind": "naip_export",
+      "expected_size_px": [
+        2048,
+        2048
+      ],
+      "image_mode": "RGB",
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r1_c0.png",
+      "provider": "USDA/APFO NAIP ImageServer",
+      "sha256": "53424d46e2675818694837c6337bf8af8e52bdae2b4966c6cb3deaddd06f613e",
+      "size_bytes": 8514315,
+      "source_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-12429934.3420%2C4418221.5691%2C-12423255.1725%2C4425177.2279&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=png&f=image",
+      "status": "downloaded_review_pending",
+      "tile_id": "colorado_lees_ferry_tile_r1_c0"
+    },
+    {
+      "actual_size_px": [
+        1024,
+        1024
+      ],
+      "content_type": "image/tiff",
+      "download_kind": "3dep_dem_export",
+      "expected_size_px": [
+        1024,
+        1024
+      ],
+      "image_mode": "F",
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r1_c1.tif",
+      "provider": "USGS 3D Elevation Program ImageServer",
+      "sha256": "a1ee9f7a40682181332c9a8f070c60bff5fe213a80d4cad1bc1243a22e13efc3",
+      "size_bytes": 4195962,
+      "source_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-12423255.1725%2C4418221.5691%2C-12416576.0031%2C4425177.2279&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+      "status": "downloaded_review_pending",
+      "tile_id": "colorado_lees_ferry_tile_r1_c1"
+    },
+    {
+      "actual_size_px": [
+        2048,
+        2048
+      ],
+      "content_type": "image/png",
+      "download_kind": "naip_export",
+      "expected_size_px": [
+        2048,
+        2048
+      ],
+      "image_mode": "RGB",
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r1_c1.png",
+      "provider": "USDA/APFO NAIP ImageServer",
+      "sha256": "27726a165d82d37d3fa6c118a35d5257966f95d48c5fada00731962fdc505f3f",
+      "size_bytes": 8166021,
+      "source_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-12423255.1725%2C4418221.5691%2C-12416576.0031%2C4425177.2279&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=png&f=image",
+      "status": "downloaded_review_pending",
+      "tile_id": "colorado_lees_ferry_tile_r1_c1"
+    }
+  ],
+  "generated_on": "2026-07-06",
+  "review_gates": [
+    "Verify provider metadata and acquisition dates for every imagery tile.",
+    "Mosaic, clip, reproject, void-review, hydrologically condition, and channel-burn DEM tiles before Unreal Landscape promotion.",
+    "Derive water, vegetation, wet-rock, sandbar, and release-band masks only after hydrography, river-edge, and bank alignment review.",
+    "Do not treat downloaded reference tiles as final photoreal art until guide/oarsman and geospatial review passes."
+  ],
+  "river_id": "colorado_river",
+  "schema": "raftsim.production_import_pilot_pull_manifest.v1",
+  "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+  "source_recipe": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_import_pilot.json",
+  "status": "official_service_pilot_tiles_downloaded_review_pending"
+}
