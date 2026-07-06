@@ -81,6 +81,8 @@ SOUTH_FORK_NHD_WATER_PRIOR_FILE = "imagery/production_import_pilot/nhd_mainstem_
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 COLORADO_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
+COLORADO_USBR_TOTAL_RELEASE_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json"
+COLORADO_USBR_RELEASE_CONTEXT_FILE = "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json"
 PACUARE_PRODUCTION_IMPORT_PILOT_FILE = "production_import_pilot.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE = "production_import_pilot_pull_manifest.json"
 SOUTH_FORK_PRODUCTION_IMPORT_PILOT_DERIVATIVES_MANIFEST_FILE = "production_import_pilot_derivatives_manifest.json"
@@ -1371,7 +1373,7 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
             },
             {
                 "class_id": "seasonal_flow_or_release_history",
-                "status": "usgs_daily_discharge_attached_release_context_pending",
+                "status": "usgs_daily_discharge_and_usbr_release_context_attached_review_pending",
                 "source_ids": [
                     "usgs_water_services",
                     "usgs_09380000_lees_ferry",
@@ -1381,11 +1383,13 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
                 "target_outputs": [
                     "hydrology/production_import_pilot/usgs_09380000_instantaneous_discharge.json",
                     "hydrology/production_import_pilot/usgs_09402500_instantaneous_discharge.json",
-                    "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
+                    COLORADO_USBR_TOTAL_RELEASE_FILE,
+                    COLORADO_USBR_RELEASE_CONTEXT_FILE,
                     "hydrology/production_import_pilot/release_band_review.json",
                 ],
                 "promotion_gate": (
-                    "Compare Glen Canyon release series against Lees Ferry and downstream USGS gauges, then record guide/"
+                    "Use the attached Reclamation daily total-release series as review-gated context, confirm units and terms, "
+                    "compare with hourly/subdaily patterns plus Lees Ferry and downstream USGS gauges, then record guide/"
                     "oarsman review for low, moderate, high, and special-release visual/gameplay bands."
                 ),
             },
@@ -1926,6 +1930,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "production_import_pilot/vegetation_mask_2048.png",
                     "hydrology/usgs_09380000_daily_discharge.json",
                     "hydrology/usgs_09402500_daily_discharge.json",
+                    COLORADO_USBR_TOTAL_RELEASE_FILE,
+                    COLORADO_USBR_RELEASE_CONTEXT_FILE,
                     "reference_media_link_manifest.json",
                 ],
                 "p0_next_pulls_or_attachments": [
@@ -1942,11 +1948,12 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     {
                         "source_class": "seasonal_flow_or_release_history",
                         "required_artifacts": [
-                            "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
+                            COLORADO_USBR_TOTAL_RELEASE_FILE,
+                            COLORADO_USBR_RELEASE_CONTEXT_FILE,
                             "hydrology/production_import_pilot/release_band_review.json",
                         ],
                         "source_leads": ["usgs_water_services", "usbr_glen_canyon_release_context", "guide_review"],
-                        "promotion_gate": "Compare Glen Canyon release series with Lees Ferry and downstream gauges before final release-dependent visuals.",
+                        "promotion_gate": "Use the attached Reclamation daily total-release context as review-gated evidence, then add hourly/subdaily release patterns, final unit/terms confirmation, Lees Ferry/downstream gauge comparisons, and oarsman review before final release-dependent visuals.",
                     },
                     {
                         "source_class": "guide_and_reference_media_annotations",
@@ -3925,7 +3932,7 @@ def _corridor_manifest(package: RealWorldCorridorPackage) -> dict[str, object]:
 
 def _write_json(path: Path, data: dict[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+    path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def _clamp01(value: float) -> float:

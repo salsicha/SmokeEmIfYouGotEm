@@ -241,13 +241,44 @@
         "This is an improved Lees Ferry corridor sample export, not a complete canyon orthomosaic.",
         "Full corridor imagery still needs official tile selection, acquisition-date review, attribution, reprojection, and LFS/package policy."
       ]
+    },
+    {
+      "artifact_id": "usbr_glen_canyon_total_release_daily",
+      "category": "release_context",
+      "path": "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
+      "provider": "Bureau of Reclamation Upper Colorado Region hydrodata",
+      "url": "https://www.usbr.gov/uc/water/hydrodata/reservoir_data/919/json/42.json",
+      "status": "official_usbr_release_series_attached_review_gated",
+      "related_artifacts": [
+        "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json"
+      ],
+      "summary": {
+        "valid_value_count": 23124,
+        "all_available_first_valid_date": "1963-03-14",
+        "all_available_last_valid_date": "2026-07-05",
+        "water_year_2026_mean_cfs": 8426.237,
+        "water_year_2026_p25_cfs": 7868.888,
+        "water_year_2026_p75_cfs": 8605.693,
+        "raw_sha256": "41e5929b5dc6dc3e953943ed3e855284b5458001502ce8c449939c6c293c0ca0"
+      },
+      "use": [
+        "release_band_history",
+        "sandbar_wet_bank_exposure",
+        "big_water_visual_tuning",
+        "hydrograph_validation"
+      ],
+      "caveats": [
+        "The downloaded dashboard/JSON did not include explicit unit metadata, so cfs is inferred and must be confirmed before final gameplay tuning.",
+        "Daily same-date comparisons do not resolve subdaily hydropower fluctuations, travel-time lag, tributary inflow, side storage, or downstream routing.",
+        "All release bands remain review-gated until guide/oarsman and hydrologist review confirm gameplay/visual thresholds."
+      ]
     }
   ],
   "production_blockers": [
     "Full canyon DEM/lidar tiles are not downloaded or conditioned yet.",
     "Full canyon aerial/satellite imagery and water/vegetation/rock masks are not downloaded yet.",
     "Hydrography, river-mile stationing, and rapid annotations are not clipped into a reviewed corridor workspace yet.",
-    "USBR Glen Canyon release context and guide/oarsman review are still required before flow bands are final.",
+    "USBR Glen Canyon daily total-release context is attached, but unit/terms confirmation, hourly/subdaily release patterns, release-band review, and guide/oarsman review are still required before flow bands are final.",
     "No field/social reference media has explicit game-use rights attached yet."
   ]
 }

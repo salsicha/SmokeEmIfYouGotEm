@@ -22,7 +22,9 @@
       "hydrology/usgs_09380000_lees_ferry.json",
       "hydrology/usgs_09402500_near_grand_canyon.json",
       "hydrology/usgs_09380000_daily_discharge.json",
-      "hydrology/usgs_09402500_daily_discharge.json"
+      "hydrology/usgs_09402500_daily_discharge.json",
+      "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
+      "hydrology/production_import_pilot/usbr_glen_canyon_release_context.json"
     ],
     "guide_references": [
       "review/guide_review_needs.json",
@@ -70,8 +72,8 @@
   "confidence": {
     "guide_review": 0.05,
     "hydrography": 0.15,
-    "hydrology": 0.45,
-    "overall": 0.28,
+    "hydrology": 0.48,
+    "overall": 0.3,
     "rapid_annotations": 0.05,
     "terrain": 0.25
   },
@@ -156,6 +158,15 @@
       "target_artifact": "terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png",
       "url": "physics/src/raftsim/geospatial_preview.py",
       "notes": "Review-gated 1009px 16-bit normalized PNG generated from the official USGS 3DEP Lees Ferry corridor sample for Unreal Landscape import tests. This is not a complete Grand Canyon corridor DEM, reprojected final terrain, river-mile conditioned surface, or production Landscape replacement."
+    },
+    {
+      "fetch_id": "colorado_usbr_glen_canyon_total_release_daily",
+      "source_id": "usbr_glen_canyon_release_context",
+      "category": "release_context",
+      "target_artifact": "hydrology/production_import_pilot/usbr_glen_canyon_total_release_daily.json",
+      "url": "https://www.usbr.gov/uc/water/hydrodata/reservoir_data/919/json/42.json",
+      "status": "downloaded_review_gated",
+      "notes": "Official Reclamation daily Total Release JSON pulled on 2026-07-06; use the derived release context manifest for checksums, summaries, unit caveat, and USGS comparisons."
     }
   ],
   "river_id": "colorado_river",
@@ -191,6 +202,20 @@
         "travel_time_checks",
         "hydrograph_validation"
       ]
+    },
+    {
+      "source_id": "usbr_glen_canyon_release_context",
+      "provider": "Bureau of Reclamation Upper Colorado Region hydrodata",
+      "category": "release_context",
+      "title": "Lake Powell / Glen Canyon Dam Total Release",
+      "url": "https://www.usbr.gov/uc/water/hydrodata/reservoir_data/919/dashboard.html",
+      "license_or_terms": "Official Reclamation hydrodata; preserve dashboard URL, JSON endpoint, retrieval date, provisional-data note, and unit/terms review before final gameplay tuning.",
+      "use_in_pipeline": [
+        "release_band_history",
+        "sandbar_wet_bank_exposure",
+        "big_water_visual_tuning"
+      ],
+      "status": "daily_total_release_attached_review_gated"
     },
     {
       "category": "permit_context",
