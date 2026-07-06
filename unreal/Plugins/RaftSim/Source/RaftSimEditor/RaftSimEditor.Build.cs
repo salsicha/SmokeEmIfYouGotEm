@@ -28,6 +28,8 @@ public class RaftSimEditor : ModuleRules
             "LevelEditor",
             "Json",
             "Projects",
+            "ProceduralMeshComponent",
+            "RenderCore",
             "UnrealEd"
         });
     }

@@ -175,6 +175,8 @@ The alpha prototype for that route now lives in `unreal/Content/RaftSim/River/co
 
 The third runnable river target should be the Pacuare River in Costa Rica. Treat it as a distinct tropical rainforest/gorge whitewater package rather than another U.S. geodata-first section. The draft artifacts now live in `physics/data/real_world/pacuare_river_costa_rica/source_manifest.json`, `physics/data/real_world/pacuare_river_costa_rica/flow_presets.json`, and `unreal/Content/RaftSim/River/pacuare_river_third_target_editor_pass.json`. They intentionally use planning bounds and relative rain-fed flow bands only: numeric discharge ranges, solver packages, and Unreal corridor exports remain blocked until Costa Rica hydrology/gauge-source review, rainfall/flash-rise review, protected-area/source-rights review, and rights-cleared guide/field-media annotations replace the placeholders.
 
+The current photoreal environment source plan is `unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json`; the production workflow is described in `docs/photoreal-river-environment-production-plan.md`. That plan promotes river maps, seasonal/release/rainfall flow levels, aerial/satellite imagery, rights-reviewed guide and media references, and procedural generation into a single Unreal environment track for South Fork American, Colorado River, and Pacuare. Social media and outfitter media are reference-only links until explicit reuse rights are recorded.
+
 ## Rapid Identification From Aerial And Satellite Imagery
 
 Identify candidate rapids by combining terrain, hydrography, image analysis, and human review.
@@ -389,6 +391,8 @@ Each real-world river section must pass:
 ### Milestone F: Unreal Photoreal Corridor
 
 - Use latest stable UE5 rendering stack, Nanite foliage, Lumen, Virtual Shadow Maps, World Partition, PCG, Niagara, Substrate/material layering, and water visualization.
+- Use `RaftSim.CreatePhotorealEnvironmentPreviewMaps` and `RaftSim.CapturePhotorealEnvironmentPreviews` to generate and capture current procedural blockout evidence for South Fork American, Colorado River, and Pacuare under `/Game/RaftSim/Maps/EnvironmentPreviews/` and `docs/environment-captures/photoreal_river_previews/`.
+- Treat the current generated valley terrain, river ribbons, foam/hydraulic cues, boulder bars, foliage proxies, and light/fog variants as review blockouts only. Promotion to photoreal production requires reviewed DEM/aerial imports and rights-cleared or first-party terrain, rock, foliage, water-detail, mist/spray, and raft assets.
 - Validate performance against desktop/VR targets.
 
 ## Reference Sources To Re-check
