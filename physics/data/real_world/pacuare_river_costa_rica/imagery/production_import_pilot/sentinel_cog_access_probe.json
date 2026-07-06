@@ -21,7 +21,9 @@
     "range_probe_bytes_committed": false,
     "review_outputs": [
       "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tci_review_1024.png",
-      "imagery/production_import_pilot/sentinel_tci_review_preview.json"
+      "imagery/production_import_pilot/sentinel_tci_review_preview.json",
+      "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tci_review_1024.png",
+      "imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json"
     ],
     "temporary_probe_location": "/private/tmp only; not source controlled",
     "allowed_use": [
@@ -109,8 +111,13 @@
     "total_full_resolution_bytes_advertised_for_probed_assets": 679418869,
     "largest_asset_bytes": 280438635,
     "scl_probe_available": true,
-    "technical_access_decision": "Public COG assets are reachable and support range reads; a small 17PKM TCI review PNG is attached, but the next production step should be a proper raster window reader rather than full-file commits.",
-    "current_tooling_gap": "The local validation environment does not have GDAL/rasterio available, so corridor-clipped COG reads and SCL/cloud masking are not yet implemented."
+    "technical_access_decision": "Public COG assets are reachable and support range reads; small 17PKM and 16PHR TCI review PNGs are attached, but the next production step should be a proper raster window reader rather than full-file commits.",
+    "current_tooling_gap": "The local validation environment does not have GDAL/rasterio available, so corridor-clipped COG reads and SCL/cloud masking are not yet implemented.",
+    "review_tci_png_count": 2,
+    "review_tci_tiles_committed": [
+      "17PKM",
+      "16PHR"
+    ]
   },
   "promotion_blockers": [
     "Add or vendor an approved raster window reader such as GDAL/rasterio/rio-tiler before deriving corridor clips.",

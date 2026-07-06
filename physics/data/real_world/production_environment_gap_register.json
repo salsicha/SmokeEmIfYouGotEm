@@ -449,6 +449,8 @@
         "imagery/production_import_pilot/sentinel_cog_access_probe.json",
         "imagery/production_import_pilot/sentinel_tci_review_preview.json",
         "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tci_review_1024.png",
+        "imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json",
+        "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tci_review_1024.png",
         "hydrography/production_import_pilot/official_source_access_plan.json",
         "hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
         "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
@@ -498,7 +500,7 @@
           ]
         },
         {
-          "promotion_gate": "Replace the MODIS/GIBS proxy drape with cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference only after the successful Sentinel COG range-access path and 17PKM review PNG are upgraded into corridor-clipped raster reads, 16PHR coverage, SCL/cloud QA, terms review, and guide/geospatial approval.",
+          "promotion_gate": "Replace the MODIS/GIBS proxy drape with cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference only after the successful Sentinel COG range-access path and 17PKM/16PHR review PNGs are upgraded into corridor-clipped, stitched raster reads with SCL/cloud QA, terms review, and guide/geospatial approval.",
           "required_artifacts": [
             "imagery/production_import_pilot/cloud_screened_scene_index.json",
             "imagery/production_import_pilot/source_drape_4096.png",
@@ -508,7 +510,9 @@
             "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json",
             "imagery/production_import_pilot/sentinel_cog_access_probe.json",
             "imagery/production_import_pilot/sentinel_tci_review_preview.json",
-            "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tci_review_1024.png"
+            "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tci_review_1024.png",
+            "imagery/production_import_pilot/sentinel_tci_16phr_review_preview.json",
+            "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_tci_review_1024.png"
           ],
           "source_class": "aerial_or_satellite_imagery",
           "source_leads": [
