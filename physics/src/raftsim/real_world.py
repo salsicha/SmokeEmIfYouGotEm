@@ -85,6 +85,9 @@ SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE = "hydrology/cdec_cbr_a25_flow_context_2026-06
 SOUTH_FORK_CDEC_SEASONAL_WINDOW_REVIEW_FILE = (
     "hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json"
 )
+SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE = (
+    "hydrology/production_import_pilot/cdec_multiyear_flow_review_2021-10-01_2026-07-06.json"
+)
 SOUTH_FORK_FLOW_BAND_REVIEW_FILE = "hydrology/production_import_pilot/flow_band_review.json"
 SOUTH_FORK_NHD_HU8_MANIFEST_FILE = "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json"
 SOUTH_FORK_NHD_HU8_FLOWLINE_EXTRACT_FILE = "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson"
@@ -1141,6 +1144,19 @@ def south_fork_american_fetch_specs() -> tuple[RemoteFetchSpec, ...]:
             ),
         ),
         RemoteFetchSpec(
+            fetch_id="sfa_cdec_cbr_multiyear_flow_review_2021_10_01_2026_07_06",
+            category="gauge",
+            source_id="cdec_cbr",
+            url="https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=CBR&SensorNums=20&dur_code=E&Start=2021-10-01T00:00&End=2026-07-06T23:59",
+            target_artifact=SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE,
+            status="downloaded",
+            notes=(
+                "Compact multi-year CBR event-flow review artifact covering four complete water years plus partial "
+                "WY2026. Use for representative seasonal-flow discussion only; high-flow peaks, A25 routing, legal "
+                "signoff, station-to-rapid relation, and guide validation still block visual/gameplay promotion."
+            ),
+        ),
+        RemoteFetchSpec(
             fetch_id="sfa_nwps_nwm_context",
             category="gauge",
             source_id="noaa_nwps_nwm",
@@ -1337,9 +1353,10 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                     SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                     SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
                     SOUTH_FORK_CDEC_SEASONAL_WINDOW_REVIEW_FILE,
+                    SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE,
                     SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
                 ],
-                "promotion_gate": "Use CDEC CBR as the primary modern flow/stage candidate after the USGS 11445500 IV diagnostic; the first terms/flag/station review, 30-day CBR/A25 context, and water-year-to-date seasonal review are attached, but multi-year representative windows, legal/redistribution signoff, release context, and guide review are still required before low/median/high visual variants are promoted.",
+                "promotion_gate": "Use CDEC CBR as the primary modern flow/stage candidate after the USGS 11445500 IV diagnostic; the first terms/flag/station review, 30-day CBR/A25 context, water-year-to-date seasonal review, and multi-year CBR flow context are attached, but A25 routing, high-flow peak review, legal/redistribution signoff, station-to-reach relation, and guide review are still required before low/median/high visual variants are promoted.",
             },
             {
                 "class_id": "protected_area_and_access_context",
@@ -1475,11 +1492,12 @@ def build_south_fork_production_source_gate_review(section: CandidateRiverSectio
                 SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                 SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
                 SOUTH_FORK_CDEC_SEASONAL_WINDOW_REVIEW_FILE,
+                SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE,
                 SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
             ],
             "promotion_blockers": [
-                "multi-year representative CDEC CBR seasonal windows",
                 "A25 flag/routing interpretation",
+                "official high-flow peak/outlier interpretation for flood-event samples",
                 "station-to-reach lag and routing review",
                 "legal/redistribution signoff",
                 "guide/outfitter validation for low, median, high, and unsafe flows",
@@ -1540,7 +1558,7 @@ def build_south_fork_production_source_gate_review(section: CandidateRiverSectio
         },
         "source_gate_items": gate_items,
         "next_checkpoint_recommendation": [
-            "Extend CDEC CBR/A25 context into multi-year representative seasonal windows and resolve A25 flags/routing.",
+            "Resolve A25 flags/routing, official high-flow event interpretation, station-to-reach timing, legal/redistribution signoff, and guide/outfitter validation before tuning flow variants.",
             "Run guide/geospatial review on NHD-derived centerline, banks, cross sections, eddy/recovery zones, and source masks.",
             "Attach permissioned or first-party South Fork reference photos/footage before photoreal material promotion.",
         ],
@@ -3343,6 +3361,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                     SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
                     SOUTH_FORK_CDEC_SEASONAL_WINDOW_REVIEW_FILE,
+                    SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE,
                     SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
                     SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,
                     SOUTH_FORK_ACCESS_POINTS_FILE,
@@ -3381,15 +3400,16 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                             SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
                             SOUTH_FORK_CDEC_SEASONAL_WINDOW_REVIEW_FILE,
+                            SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE,
                             SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
                         ],
                         "source_leads": ["cdec_cbr", "cdec_a25_powerhouse_context", "usgs_water_services", "guide_review"],
                         "promotion_gate": (
                             "USGS 11445500 returned no P30D instantaneous time series on 2026-07-06, and CDEC CBR now "
                             "has a first reproducible event-window pull, terms/flag/station review, 30-day CBR/A25 "
-                            "context window, and water-year-to-date seasonal review; tie low/median/high visual variants "
-                            "to multi-year seasonal windows, release context, legal/redistribution signoff, "
-                            "station-to-reach review, and guide notes."
+                            "context window, water-year-to-date seasonal review, and multi-year CBR flow context; tie "
+                            "low/median/high visual variants to A25 routing, high-flow event interpretation, legal/"
+                            "redistribution signoff, station-to-reach review, and guide notes."
                         ),
                     },
                     {
@@ -3737,6 +3757,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 SOUTH_FORK_CDEC_TERMS_FLAGS_REVIEW_FILE,
                 SOUTH_FORK_CDEC_FLOW_CONTEXT_FILE,
                 SOUTH_FORK_CDEC_SEASONAL_WINDOW_REVIEW_FILE,
+                SOUTH_FORK_CDEC_MULTIYEAR_FLOW_REVIEW_FILE,
                 SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
                 "hydrology/flow_presets.json",
             ],

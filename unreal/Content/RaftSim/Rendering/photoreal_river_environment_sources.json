@@ -362,6 +362,14 @@
           "unreal_use": "Seasonal flow evidence for future low/median/high visual variant planning; not final water width, foam, wet-bank, hole stickiness, feature forcing, or gameplay tuning authority."
         },
         {
+          "artifact_id": "south_fork_cdec_multiyear_flow_review_2021_10_01_2026_07_06",
+          "category": "seasonal_flow_or_release_history_review",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/cdec_multiyear_flow_review_2021-10-01_2026-07-06.json",
+          "provider": "RaftSim review artifact from multi-year CDEC CBR event-flow context",
+          "status": "multiyear_context_attached_review_gated_high_flow_review_required",
+          "unreal_use": "Representative seasonal flow evidence for future low/median/high and unsafe-flow visual variants; not final water width, foam, wet-bank, hole stickiness, feature forcing, gameplay tuning, or lifelike-water authority."
+        },
+        {
           "artifact_id": "south_fork_flow_band_review",
           "category": "seasonal_flow_or_release_history_review",
           "path": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json",
@@ -1083,7 +1091,6 @@
   },
   "status": "south_fork_colorado_and_pacuare_larger_source_draped_previews_available; production_geospatial_imports_and_photoreal_assets_pending",
   "unreal_generation": {
-    "first_party_procedural_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
     "final_acceptance": [
       "production_dem_or_reviewed_proxy_terrain",
       "aerial_or_satellite_derived_masks",
@@ -1094,6 +1101,7 @@
       "hazards_and_rescue_targets_readable",
       "desktop_and_vr_performance_captures"
     ],
+    "first_party_procedural_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
     "first_pass_acceptance": [
       "one_generated_unreal_preview_map_per_river",
       "one_downstream_guide_seat_and_one_raft_hidden_river_eye_screenshot_per_river",

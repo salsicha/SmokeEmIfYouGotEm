@@ -317,11 +317,12 @@
             "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_terms_flags_and_station_relation_review.json",
             "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
             "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
+            "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/cdec_multiyear_flow_review_2021-10-01_2026-07-06.json",
             "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json",
             "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"
           ],
-          "promotion_blocker": "The South Fork CBR/A25 30-day context, water-year-to-date seasonal review, and flow-band review are attached: the water-year review records 245 local days peaking at or above 900 cfs, 182 at or above 1600 cfs, and 48 at or above 3000 cfs through July 6, 2026. Promotion remains blocked on multi-year representative windows, A25 X-flag interpretation, release routing, legal/redistribution signoff, station-to-reach review, and guide/outfitter validation.",
-          "status": "cdec_cbr_a25_water_year_context_and_flow_band_review_attached_promotion_blocked"
+          "promotion_blocker": "The South Fork CBR/A25 30-day context, water-year-to-date seasonal review, multi-year CBR flow review, and flow-band review are attached: the multi-year review covers four complete water years plus partial WY2026, records 1439 local days peaking at or above 900 cfs, 1076 at or above 1600 cfs, and 364 at or above 3000 cfs through July 6, 2026, and flags 92 official CBR samples at or above 20000 cfs for high-flow interpretation. Promotion remains blocked on A25 X-flag interpretation, release routing, official high-flow peak review, legal/redistribution signoff, station-to-reach review, and guide/outfitter validation.",
+          "status": "cdec_cbr_multiyear_context_and_flow_band_review_attached_promotion_blocked"
         },
         "terrain_dem_or_lidar": {
           "artifacts": [
