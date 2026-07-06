@@ -22,6 +22,7 @@ Each river environment must be driven by traceable river maps, seasonal or relea
 ## Canonical Outputs
 
 - `unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json`: source and capture manifest for the three river environments.
+- `physics/data/real_world/reference_media_link_manifest.json`: link-only candidate media manifest for official/public pages, Wikimedia/Flickr review seeds, and public social/search seeds. It records reference leads only; no third-party media is downloaded or cleared for game use by this file.
 - Per-river source manifests under `physics/data/real_world/**/source_manifest.json`.
 - Unreal preview maps under `/Game/RaftSim/Maps/EnvironmentPreviews/` once generated in the editor.
 - Screenshot evidence under `docs/environment-captures/photoreal_river_previews/`.
@@ -98,6 +99,7 @@ Initial source slice:
 - The first Colorado/Lees Ferry official source slice now exists at `physics/data/real_world/colorado_river_grand_canyon_rowing/production_source_pull_manifest.json`: USGS `09380000` and `09402500` daily discharge histories through July 4, 2026, a small USGS 3DEP GeoTIFF sample, and a small USDA/APFO NAIP aerial sample. The Colorado preview uses that NAIP sample as a source-derived visible canyon terrain overlay.
 - The Colorado preview now also uses `terrain/usgs_3dep_lees_ferry_relief_preview_512.png` as preview-only canyon bank relief in Unreal, while full Grand Canyon corridor terrain tiling, river-mile stationing, and heightfield import remain pending.
 - The first Pacuare public/global source slice now exists at `physics/data/real_world/pacuare_river_costa_rica/production_source_pull_manifest.json`: Copernicus DEM GLO-30 public COG tiles for the draft bounds, a NASA GIBS MODIS/Terra April 2, 2025 true-color preview sample selected from five cloud-screened dates, a deterministic NASA-plus-DEM preview drape, and an OpenTopography API-key gate probe. The Pacuare preview uses the derived drape as a source-derived visible rainforest terrain overlay.
+- `physics/data/real_world/reference_media_link_manifest.json` now records the first link-only reference media seed list for all three rivers: official/public pages, Wikimedia/Flickr review searches, and public social/search seeds. These are fidelity-review leads only and remain blocked from asset use until item-level rights, attribution, date, reach, observed flow/weather context, and permission status are recorded.
 - The preview generator now keeps source provenance out of the rendered guide-seat frame and records it in JSON instead. It also uses a lit preview material, computed procedural mesh normals, terrain-conforming source drape tiles, PCG sample foliage meshes where available, and curved procedural foam/wave/eddy-line ribbons. This improves depth and review readability but is still not production photoreal vegetation, rock, water, or terrain material work.
 - The existing default map path `/Game/RaftSim/Maps/L_RaftSimBoot` has no committed level asset yet.
 - Colorado and Pacuare still need full-corridor geospatial processing, hydrology review, guide review, and rights-cleared field/reference media.
