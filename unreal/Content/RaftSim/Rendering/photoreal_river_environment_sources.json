@@ -269,23 +269,39 @@
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_sample_512.png",
           "provider": "USDA/APFO NAIP ImageServer",
           "status": "retained_smoke_test_sample_superseded_by_corridor_sample",
-          "unreal_use": "provenance smoke-test sample retained; active preview drape now uses usda_naip_lees_ferry_corridor_sample_1024"
+          "unreal_use": "provenance smoke-test sample retained; active preview drape now uses the stitched Colorado production-import pilot source drape"
         },
         {
           "artifact_id": "usda_naip_lees_ferry_corridor_sample_1024",
           "category": "aerial_imagery_corridor_sample",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_sample_1024.png",
           "provider": "USDA/APFO NAIP ImageServer",
-          "status": "draped_into_unreal_preview_terrain_conforming_mosaic",
-          "unreal_use": "larger source-derived terrain-conforming canyon drape mosaic for /Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"
+          "status": "retained_corridor_sample_superseded_by_production_import_pilot_drape",
+          "unreal_use": "retained source sample; active preview drape now uses imagery/production_import_pilot/source_drape_4096.png"
         },
         {
           "artifact_id": "usda_naip_lees_ferry_corridor_source_masks_1024",
           "category": "derived_water_and_vegetation_masks",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_water_mask_1024.png; physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_vegetation_mask_1024.png",
           "provider": "RaftSim geospatial preview utility from USDA/APFO NAIP ImageServer sample plus bounded big-water preview channel prior",
-          "status": "sampled_by_unreal_preview_terrain_and_drape_coloring",
-          "unreal_use": "review-gated preview water/vegetation masks sampled into Colorado terrain and source-drape color variation; not final segmentation or production masks"
+          "status": "retained_preview_masks_superseded_by_production_import_pilot_masks",
+          "unreal_use": "retained preview masks; active preview masks now use the stitched Colorado pilot water/vegetation masks"
+        },
+        {
+          "artifact_id": "colorado_production_import_pilot_source_drape_4096",
+          "category": "stitched_aerial_imagery_pilot_drape",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png",
+          "provider": "RaftSim geospatial preview utility from four official USDA/APFO NAIP ImageServer pilot tiles",
+          "status": "active_unreal_preview_drape_review_gated",
+          "unreal_use": "larger stitched Colorado/Lees Ferry pilot source drape sampled by /Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview; not final orthomosaic or production canyon material"
+        },
+        {
+          "artifact_id": "colorado_production_import_pilot_source_masks_2048",
+          "category": "derived_water_and_vegetation_masks",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/water_mask_2048.png; physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/vegetation_mask_2048.png",
+          "provider": "RaftSim geospatial preview utility from the stitched Colorado pilot NAIP drape plus bounded big-water preview channel prior",
+          "status": "active_unreal_preview_masks_review_gated",
+          "unreal_use": "larger review-gated Colorado pilot water/vegetation masks sampled into terrain/source-drape color and deterministic detail placement; not final segmentation, bank polygons, wet-rock masks, or release-band variants"
         },
         {
           "artifact_id": "usgs_3dep_lees_ferry_sample_256",
@@ -301,7 +317,7 @@
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_relief_preview_512.png",
           "provider": "RaftSim geospatial preview utility from USGS 3DEP ImageServer sample",
           "status": "retained_smoke_test_relief_superseded_by_corridor_relief",
-          "unreal_use": "provenance smoke-test relief retained; active preview geometry now uses usgs_3dep_lees_ferry_corridor_relief_preview_1024"
+          "unreal_use": "provenance smoke-test relief retained; active preview geometry now uses the stitched Colorado pilot DEM relief and heightfield candidate"
         },
         {
           "artifact_id": "usgs_3dep_lees_ferry_corridor_sample_512",
@@ -316,16 +332,32 @@
           "category": "derived_heightfield_candidate",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png",
           "provider": "RaftSim geospatial preview utility from larger USGS 3DEP ImageServer corridor sample",
-          "status": "generated_review_gated_import_candidate",
-          "unreal_use": "1009px 16-bit grayscale Unreal Landscape import-test candidate; not yet complete-canyon tiled, reprojected, river-mile conditioned, channel-burned, or approved for production terrain"
+          "status": "retained_import_candidate_superseded_by_production_import_pilot_heightfield",
+          "unreal_use": "retained 1009px 16-bit grayscale Unreal Landscape import-test candidate; active preview geometry now samples the stitched pilot heightfield candidate"
         },
         {
           "artifact_id": "usgs_3dep_lees_ferry_corridor_relief_preview_1024",
           "category": "derived_terrain_relief_preview",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_relief_preview_1024.png",
           "provider": "RaftSim geospatial preview utility from larger USGS 3DEP ImageServer corridor sample",
-          "status": "sampled_by_unreal_preview_geometry",
-          "unreal_use": "larger preview-only canyon bank terrain relief perturbation for /Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"
+          "status": "retained_relief_preview_superseded_by_production_import_pilot_relief",
+          "unreal_use": "retained preview-only canyon bank terrain relief perturbation; active preview geometry now samples terrain/production_import_pilot/dem_relief_2048.png"
+        },
+        {
+          "artifact_id": "colorado_production_import_pilot_dem_relief_2048",
+          "category": "stitched_terrain_relief_preview",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/dem_relief_2048.png",
+          "provider": "RaftSim geospatial preview utility from four official USGS 3DEP ImageServer pilot DEM tiles",
+          "status": "active_unreal_preview_relief_review_gated",
+          "unreal_use": "larger stitched Colorado pilot DEM relief sampled into generated preview terrain; not hydrologically conditioned production canyon terrain"
+        },
+        {
+          "artifact_id": "colorado_production_import_pilot_heightfield_candidate_2017",
+          "category": "stitched_heightfield_candidate",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/heightfield_candidate_2017.png",
+          "provider": "RaftSim geospatial preview utility from four official USGS 3DEP ImageServer pilot DEM tiles",
+          "status": "active_unreal_preview_heightfield_review_gated",
+          "unreal_use": "2017px 16-bit grayscale stitched Colorado pilot heightfield sampled into generated preview canyon geometry; not a promoted Landscape import or conditioned production terrain"
         }
       ],
       "flow_sources": [
