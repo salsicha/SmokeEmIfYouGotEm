@@ -422,6 +422,7 @@
           "artifacts": [
             "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
             "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+            "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
             "hydrography/cross_sections.geojson"
           ],
           "layer_id": "cross_sections",
@@ -641,6 +642,7 @@
           "artifacts": [
             "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
             "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+            "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
             "hydrography/cross_sections.geojson"
           ],
           "layer_id": "cross_sections",
@@ -859,6 +861,7 @@
           "artifacts": [
             "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
             "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+            "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
             "hydrography/cross_sections.geojson"
           ],
           "layer_id": "cross_sections",
@@ -1079,6 +1082,7 @@
           "artifacts": [
             "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
             "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+            "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
             "hydrography/cross_sections.geojson"
           ],
           "layer_id": "cross_sections",
