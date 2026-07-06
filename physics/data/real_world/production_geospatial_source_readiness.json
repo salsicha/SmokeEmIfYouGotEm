@@ -274,7 +274,7 @@
             "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/reference_annotations.geojson",
             "physics/data/real_world/south_fork_american_chili_bar/field_media/production_import_pilot/rights_manifest.json"
           ],
-          "promotion_blocker": "Station-aware reference annotation and rights-manifest scaffolds are attached from link-only official/public/social seeds, but no media files, thumbnails, captions, comments, audio, item-level rights, first-party capture, station geometry, or guide approval are recorded yet.",
+          "promotion_blocker": "Station-aware reference annotation and rights-manifest scaffolds are attached from link-only official/public/social seeds, and annotation points are review seeds snapped to existing stationing scaffolds. No media files, thumbnails, captions, comments, audio, item-level rights, first-party capture, guide-approved station geometry, or production asset permission are recorded yet.",
           "status": "link_annotation_and_rights_scaffold_attached_no_media_rights"
         },
         "hydrography_and_centerline": {
@@ -369,7 +369,7 @@
             "physics/data/real_world/colorado_river_grand_canyon_rowing/review/production_import_pilot/reference_annotations.geojson",
             "physics/data/real_world/colorado_river_grand_canyon_rowing/field_media/production_import_pilot/rights_manifest.json"
           ],
-          "promotion_blocker": "Station-aware reference annotation and rights-manifest scaffolds are attached from link-only official/public/social seeds, but no media files, thumbnails, captions, comments, audio, item-level rights, first-party capture, station geometry, or guide approval are recorded yet.",
+          "promotion_blocker": "Station-aware reference annotation and rights-manifest scaffolds are attached from link-only official/public/social seeds, and annotation points are review seeds snapped to existing stationing scaffolds. No media files, thumbnails, captions, comments, audio, item-level rights, first-party capture, guide-approved station geometry, or production asset permission are recorded yet.",
           "status": "link_annotation_and_rights_scaffold_attached_no_media_rights"
         },
         "hydrography_and_centerline": {
@@ -463,7 +463,7 @@
             "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/reference_annotations.geojson",
             "physics/data/real_world/pacuare_river_costa_rica/field_media/production_import_pilot/rights_manifest.json"
           ],
-          "promotion_blocker": "Station-aware reference annotation and rights-manifest scaffolds are attached from link-only official/public/social seeds, but no media files, thumbnails, captions, comments, audio, item-level rights, first-party capture, station geometry, or guide approval are recorded yet.",
+          "promotion_blocker": "Station-aware reference annotation and rights-manifest scaffolds are attached from link-only official/public/social seeds, and annotation points are review seeds snapped to existing stationing scaffolds. No media files, thumbnails, captions, comments, audio, item-level rights, first-party capture, guide-approved station geometry, or production asset permission are recorded yet.",
           "status": "link_annotation_and_rights_scaffold_attached_no_media_rights"
         },
         "hydrography_and_centerline": {

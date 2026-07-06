@@ -1,7 +1,13 @@
 {
   "features": [
     {
-      "geometry": null,
+      "geometry": {
+        "coordinates": [
+          -83.695145,
+          9.8971696
+        ],
+        "type": "Point"
+      },
       "properties": {
         "anchor_hint": "Lower Pacuare rainforest gorge guide-seat frame",
         "annotation_id": "pacuare_rainforest_gorge_density",
@@ -28,7 +34,11 @@
         "rights_status": "candidate_links_only",
         "river_id": "pacuare",
         "source_review_queue_index": 0,
-        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "station_m": 8250.0,
+        "station_sample_index": 33,
+        "station_seed_fraction": 0.18,
+        "station_source": "hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "review_seed_from_existing_stationing_scaffold_not_authoritative",
         "target_id": "pacuare_rainforest_gorge_density",
         "visual_questions": [
           "How dense should canopy, vines, wet rock, and shadow be before rescue targets become unreadable?",
@@ -38,7 +48,13 @@
       "type": "Feature"
     },
     {
-      "geometry": null,
+      "geometry": {
+        "coordinates": [
+          -83.5648811,
+          9.898229
+        ],
+        "type": "Point"
+      },
       "properties": {
         "anchor_hint": "Waterfall, mist, and wet-rock detail pass",
         "annotation_id": "pacuare_waterfalls_mist_wet_rock",
@@ -63,7 +79,11 @@
         "rights_status": "candidate_links_only",
         "river_id": "pacuare",
         "source_review_queue_index": 1,
-        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "station_m": 25500.0,
+        "station_sample_index": 102,
+        "station_seed_fraction": 0.56,
+        "station_source": "hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "review_seed_from_existing_stationing_scaffold_not_authoritative",
         "target_id": "pacuare_waterfalls_mist_wet_rock",
         "visual_questions": [
           "Where should mist and side waterfalls add atmosphere without masking line choice?",
@@ -73,7 +93,13 @@
       "type": "Feature"
     },
     {
-      "geometry": null,
+      "geometry": {
+        "coordinates": [
+          -83.4803408,
+          9.9468819
+        ],
+        "type": "Point"
+      },
       "properties": {
         "anchor_hint": "Dense foliage swimmer/rescue visibility review",
         "annotation_id": "pacuare_canopy_rescue_readability",
@@ -97,7 +123,11 @@
         "rights_status": "candidate_links_only",
         "river_id": "pacuare",
         "source_review_queue_index": 2,
-        "stationing_status": "anchor_hint_only_needs_editor_station_or_geometry",
+        "station_m": 37500.0,
+        "station_sample_index": 150,
+        "station_seed_fraction": 0.82,
+        "station_source": "hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "review_seed_from_existing_stationing_scaffold_not_authoritative",
         "target_id": "pacuare_canopy_rescue_readability",
         "visual_questions": [
           "Can a swimmer be tracked under tree-shadow and mist?",
@@ -118,6 +148,7 @@
   "river_id": "pacuare",
   "schema": "raftsim.reference_media_annotations.geojson.v1",
   "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
-  "status": "link_only_annotation_targets_no_media_downloaded",
+  "stationing_source": "hydrography/production_import_pilot/preview_stationing_scaffold.json",
+  "status": "link_only_annotation_targets_with_review_seed_geometry_no_media_downloaded",
   "type": "FeatureCollection"
 }
