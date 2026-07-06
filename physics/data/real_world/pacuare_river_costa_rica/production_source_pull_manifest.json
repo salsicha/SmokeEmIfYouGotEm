@@ -112,6 +112,29 @@
       ]
     },
     {
+      "artifact_id": "pacuare_dem_relief_preview_512",
+      "category": "derived_terrain_relief",
+      "path": "terrain/pacuare_dem_relief_preview_512.png",
+      "provider": "RaftSim source-preview tool from Copernicus DEM GLO-30 inputs",
+      "url": "physics/src/raftsim/geospatial_preview.py",
+      "status": "generated_preview_only",
+      "summary": {
+        "width": 512,
+        "height": 512,
+        "pixel_type": "L_U8",
+        "format": "PNG",
+        "processing_manifest": "imagery/pacuare_source_drape_composite_manifest.json"
+      },
+      "use": [
+        "unreal_preview_height_perturbation",
+        "terrain_relief_visual_review"
+      ],
+      "caveats": [
+        "Preview relief is sampled into procedural geometry only; it is not a clipped, reprojected, hydrologically conditioned Unreal heightfield.",
+        "Full terrain import still requires proper geospatial conditioning and source-rights review."
+      ]
+    },
+    {
       "artifact_id": "nasa_gibs_pacuare_cloud_screen_candidates",
       "category": "satellite_imagery_cloud_screen_candidates",
       "paths": [

@@ -260,6 +260,14 @@
           "provider": "Copernicus DEM GLO-30 Public on AWS Open Data",
           "status": "recorded_for_follow_on_rainforest_gorge_heightfield_conditioning",
           "unreal_use": "provenance and import-pipeline terrain source; full clipped heightfield replacement still pending"
+        },
+        {
+          "artifact_id": "pacuare_dem_relief_preview_512",
+          "category": "derived_terrain_relief",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_512.png",
+          "provider": "RaftSim source-preview tool from Copernicus DEM GLO-30 inputs",
+          "status": "sampled_by_unreal_preview_geometry",
+          "unreal_use": "preview-only terrain relief perturbation for Pacuare bank and gorge geometry; full Unreal heightfield import still pending"
         }
       ],
       "reference_media_sources": [

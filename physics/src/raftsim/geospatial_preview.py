@@ -89,6 +89,7 @@ def build_pacuare_demshade_drape(
     northern_dem_path: Path,
     output_png_path: Path,
     output_manifest_path: Path,
+    output_relief_png_path: Path,
     bounds: BoundsWgs84,
     selected_date: str,
     repo_root: Path | None = None,
@@ -124,6 +125,8 @@ def build_pacuare_demshade_drape(
 
     output_png_path.parent.mkdir(parents=True, exist_ok=True)
     Image.fromarray(np.clip(rgba * 255.0, 0, 255).astype(np.uint8), mode="RGBA").save(output_png_path)
+    output_relief_png_path.parent.mkdir(parents=True, exist_ok=True)
+    Image.fromarray(np.clip(relief * 255.0, 0, 255).astype(np.uint8), mode="L").save(output_relief_png_path)
 
     def manifest_path(path: Path) -> str:
         if repo_root is None:
@@ -146,6 +149,7 @@ def build_pacuare_demshade_drape(
             "copernicus_dem_glo30_northern_tile": manifest_path(northern_dem_path),
         },
         "output": manifest_path(output_png_path),
+        "terrain_relief_output": manifest_path(output_relief_png_path),
         "processing": {
             "size_px": 512,
             "dem_sampling": "nearest_neighbor_from_copernicus_glo30_tiles",
@@ -174,6 +178,7 @@ def main() -> None:
         northern_dem_path=pacuare_root / "terrain/copernicus_dem_glo30_N10_W084.tif",
         output_png_path=pacuare_root / "imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png",
         output_manifest_path=pacuare_root / "imagery/pacuare_source_drape_composite_manifest.json",
+        output_relief_png_path=pacuare_root / "terrain/pacuare_dem_relief_preview_512.png",
         bounds=BoundsWgs84(min_lon=-83.75, min_lat=9.72, max_lon=-83.42, max_lat=10.12),
         selected_date="2025-04-02",
         repo_root=repo_root,

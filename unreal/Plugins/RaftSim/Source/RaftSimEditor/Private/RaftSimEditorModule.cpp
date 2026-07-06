@@ -83,6 +83,7 @@ struct FRaftSimEnvironmentPreviewSpec
     FString MapPackagePath;
     FString SourceManifest;
     FString AerialDrapeImage;
+    FString TerrainReliefImage;
     FString ElevationSample;
     FString SourceDrapeDescription;
     FLinearColor WaterColor = FLinearColor(0.05f, 0.26f, 0.32f);
@@ -94,6 +95,7 @@ struct FRaftSimEnvironmentPreviewSpec
     float RiverHalfWidthCm = 360.0f;
     float BankWidthCm = 760.0f;
     float BendAmplitudeCm = 240.0f;
+    float TerrainReliefAmplitudeCm = 0.0f;
     int32 BoulderCount = 18;
     int32 FoliageCount = 32;
     int32 FoamTrainCount = 12;
@@ -128,6 +130,19 @@ struct FRaftSimPreviewImage
         Sampled.B = FMath::Clamp((Luma + (Sampled.B - Luma) * 1.35f) * 1.18f, 0.0f, 1.0f);
         Sampled.A = 1.0f;
         return Sampled;
+    }
+
+    float SampleLuma(float U, float V) const
+    {
+        if (!IsValid())
+        {
+            return 0.5f;
+        }
+
+        const int32 X = FMath::Clamp(FMath::RoundToInt(U * static_cast<float>(Width - 1)), 0, Width - 1);
+        const int32 Y = FMath::Clamp(FMath::RoundToInt((1.0f - V) * static_cast<float>(Height - 1)), 0, Height - 1);
+        const FLinearColor Sampled = Pixels[Y * Width + X];
+        return FMath::Clamp(Sampled.R * 0.30f + Sampled.G * 0.59f + Sampled.B * 0.11f, 0.0f, 1.0f);
     }
 };
 
@@ -236,6 +251,8 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.SourceManifest = TEXT("physics/data/real_world/pacuare_river_costa_rica/source_manifest.json");
     Pacuare.AerialDrapeImage =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/imagery/pacuare_nasa_gibs_2025-04-02_demshade_source_drape_512.png");
+    Pacuare.TerrainReliefImage =
+        TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_dem_relief_preview_512.png");
     Pacuare.ElevationSample =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
@@ -248,6 +265,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.RiverHalfWidthCm = 305.0f;
     Pacuare.BankWidthCm = 680.0f;
     Pacuare.BendAmplitudeCm = 340.0f;
+    Pacuare.TerrainReliefAmplitudeCm = 420.0f;
     Pacuare.BoulderCount = 22;
     Pacuare.FoliageCount = 84;
     Pacuare.FoamTrainCount = 16;
@@ -449,7 +467,35 @@ float GetPreviewRiverCenterY(const FRaftSimEnvironmentPreviewSpec& Spec, float X
     return Primary + Secondary;
 }
 
-float GetPreviewTerrainHeightCm(const FRaftSimEnvironmentPreviewSpec& Spec, float X, float Y)
+float SamplePreviewTerrainReliefCm(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* TerrainRelief,
+    float X,
+    float Y,
+    float ChannelOffset)
+{
+    if (!TerrainRelief || !TerrainRelief->IsValid() || Spec.TerrainReliefAmplitudeCm <= 0.0f)
+    {
+        return 0.0f;
+    }
+
+    const float MinX = -5800.0f;
+    const float MaxX = 26500.0f;
+    const float HalfWidth = Spec.bDesertCanyon ? 4300.0f : 2750.0f;
+    const float U = FMath::Clamp((X - MinX) / (MaxX - MinX), 0.0f, 1.0f);
+    const float V = FMath::Clamp((Y + HalfWidth) / (HalfWidth * 2.0f), 0.0f, 1.0f);
+    const float ReliefMask = SmoothPreviewStep(
+        Spec.RiverHalfWidthCm + 110.0f,
+        Spec.RiverHalfWidthCm + Spec.BankWidthCm + 740.0f,
+        ChannelOffset);
+    return (TerrainRelief->SampleLuma(U, V) - 0.5f) * Spec.TerrainReliefAmplitudeCm * ReliefMask;
+}
+
+float GetPreviewTerrainHeightCm(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    float X,
+    float Y,
+    const FRaftSimPreviewImage* TerrainRelief = nullptr)
 {
     const float CenterY = GetPreviewRiverCenterY(Spec, X);
     const float Offset = FMath::Abs(Y - CenterY);
@@ -464,7 +510,9 @@ float GetPreviewTerrainHeightCm(const FRaftSimEnvironmentPreviewSpec& Spec, floa
     const float BankLift = Spec.bDesertCanyon ? 250.0f : 145.0f;
     const float CanyonLift = Spec.CanyonHeightCm * (Spec.bDesertCanyon ? 0.72f : 0.38f);
 
-    return -82.0f + DownstreamSlope + BankT * BankLift + CanyonT * CanyonLift + GravelNoise * (0.35f + BankT * 0.75f);
+    return -82.0f + DownstreamSlope + BankT * BankLift + CanyonT * CanyonLift +
+        GravelNoise * (0.35f + BankT * 0.75f) +
+        SamplePreviewTerrainReliefCm(Spec, TerrainRelief, X, Y, Offset);
 }
 
 AStaticMeshActor* AddPreviewMeshActor(
@@ -568,7 +616,10 @@ AActor* AddPreviewProceduralMeshActor(
     return Actor;
 }
 
-void AddPreviewTerrainMesh(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
+void AddPreviewTerrainMesh(
+    UWorld* World,
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* TerrainRelief)
 {
     constexpr int32 XSteps = 112;
     constexpr int32 YSteps = 38;
@@ -593,7 +644,7 @@ void AddPreviewTerrainMesh(UWorld* World, const FRaftSimEnvironmentPreviewSpec& 
         {
             const float V = static_cast<float>(YIndex) / static_cast<float>(YSteps);
             const float Y = FMath::Lerp(-HalfWidth, HalfWidth, V);
-            const float Z = GetPreviewTerrainHeightCm(Spec, X, Y);
+            const float Z = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief);
             Vertices.Add(FVector(X, Y, Z));
             Normals.Add(FVector::UpVector);
             UVs.Add(FVector2D(U * 12.0f, V * 4.0f));
@@ -628,7 +679,10 @@ void AddPreviewTerrainMesh(UWorld* World, const FRaftSimEnvironmentPreviewSpec& 
         Spec.TerrainColor);
 }
 
-void AddPreviewAerialDrapeTiles(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
+void AddPreviewAerialDrapeTiles(
+    UWorld* World,
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* TerrainRelief)
 {
     if (!World || Spec.AerialDrapeImage.IsEmpty())
     {
@@ -663,7 +717,7 @@ void AddPreviewAerialDrapeTiles(UWorld* World, const FRaftSimEnvironmentPreviewS
                 continue;
             }
 
-            const float Z = GetPreviewTerrainHeightCm(Spec, X, Y) + 12.0f;
+            const float Z = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief) + 12.0f;
             const FLinearColor AerialColor = FMath::Lerp(AerialDrape.Sample(U, V), Spec.TerrainColor, 0.08f);
             const float HalfLength = TileLength * 0.50f;
             const float HalfTileWidth = TileWidth * 0.50f;
@@ -1074,10 +1128,17 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     UStaticMesh* CylinderMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
     UStaticMesh* PcgBoulderMesh = LoadPreviewMesh(TEXT("/PCG/SampleContent/SimpleForest/Meshes/PCG_Boulder_02.PCG_Boulder_02"));
 
+    FRaftSimPreviewImage TerrainRelief;
+    const FRaftSimPreviewImage* TerrainReliefPtr = nullptr;
+    if (!Spec.TerrainReliefImage.IsEmpty() && LoadPreviewPngImage(Spec.TerrainReliefImage, TerrainRelief))
+    {
+        TerrainReliefPtr = &TerrainRelief;
+    }
+
     AddPreviewLightRig(World, Spec);
 
-    AddPreviewTerrainMesh(World, Spec);
-    AddPreviewAerialDrapeTiles(World, Spec);
+    AddPreviewTerrainMesh(World, Spec, TerrainReliefPtr);
+    AddPreviewAerialDrapeTiles(World, Spec, TerrainReliefPtr);
     AddPreviewRiverRibbonMesh(World, Spec);
     AddPreviewRaftForeground(World, Spec, CubeMesh, CylinderMesh);
     AddPreviewFoamAndHydraulics(World, Spec, PlaneMesh);
@@ -1088,7 +1149,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         const float CenterY = GetPreviewRiverCenterY(Spec, X);
         const float Side = (BoulderIndex % 2 == 0) ? -1.0f : 1.0f;
         const float Y = CenterY + Side * (Spec.RiverHalfWidthCm * (0.32f + 0.55f * FMath::Abs(FMath::Sin(static_cast<float>(BoulderIndex) * 1.91f))));
-        const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y);
+        const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainReliefPtr);
         const float Scale = Spec.bDesertCanyon ? 1.6f : 1.0f + 0.35f * static_cast<float>(BoulderIndex % 3);
         AddPreviewMeshActor(
             World,
@@ -1107,7 +1168,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         const float Side = (FoliageIndex % 2 == 0) ? -1.0f : 1.0f;
         const float BankOffset = Spec.bDesertCanyon ? Spec.RiverHalfWidthCm + 1350.0f : Spec.RiverHalfWidthCm + 620.0f;
         const float Y = CenterY + Side * (BankOffset + 210.0f * FMath::Sin(static_cast<float>(FoliageIndex) * 1.31f));
-        const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y);
+        const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainReliefPtr);
         const float Height = Spec.bHasWaterfalls ? 2.35f + 0.28f * static_cast<float>(FoliageIndex % 5) : (Spec.bDesertCanyon ? 0.50f : 1.45f + 0.18f * static_cast<float>(FoliageIndex % 3));
         const float CanopyWidth = Spec.bHasWaterfalls ? 1.35f + 0.18f * static_cast<float>(FoliageIndex % 4) : (Spec.bDesertCanyon ? 0.55f : 0.92f + 0.10f * static_cast<float>(FoliageIndex % 3));
         const FLinearColor CanopyColor = Spec.bDesertCanyon
@@ -1150,7 +1211,10 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
                 World,
                 SphereMesh,
                 FString::Printf(TEXT("RaftSim_Understory_%02d_%s"), FoliageIndex, *Spec.RiverId),
-                FVector(UnderstoryX, UnderstoryY, GetPreviewTerrainHeightCm(Spec, UnderstoryX, UnderstoryY) + 34.0f),
+                FVector(
+                    UnderstoryX,
+                    UnderstoryY,
+                    GetPreviewTerrainHeightCm(Spec, UnderstoryX, UnderstoryY, TerrainReliefPtr) + 34.0f),
                 FRotator(0.0f, static_cast<float>((FoliageIndex * 29) % 360), 0.0f),
                 FVector(0.56f, 0.42f, 0.28f),
                 CanopyColor);
@@ -2161,6 +2225,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("      \"capture\": \"%s\",\n")
             TEXT("      \"status\": \"%s\",\n")
             TEXT("      \"aerial_drape_image\": \"%s\",\n")
+            TEXT("      \"terrain_relief_image\": \"%s\",\n")
             TEXT("      \"elevation_sample\": \"%s\",\n")
             TEXT("      \"fidelity_note\": \"%s\"\n")
             TEXT("    }"),
@@ -2172,6 +2237,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             *EscapeRaftSimJsonString(CapturePath),
             bCaptured && !Spec.SourceDrapeDescription.IsEmpty() ? TEXT("captured_source_derived_preview_render") : (bCaptured ? TEXT("captured_procedural_blockout_render") : TEXT("capture_failed")),
             *EscapeRaftSimJsonString(Spec.AerialDrapeImage),
+            *EscapeRaftSimJsonString(Spec.TerrainReliefImage),
             *EscapeRaftSimJsonString(Spec.ElevationSample),
             *EscapeRaftSimJsonString(GetPreviewFidelityNote(Spec)));
     }
