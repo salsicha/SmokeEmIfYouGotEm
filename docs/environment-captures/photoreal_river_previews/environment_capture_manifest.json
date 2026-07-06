@@ -13,10 +13,10 @@
       "guide_seat_capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
       "river_eye_capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
       "status": "captured_source_derived_guide_and_river_eye_preview_renders",
-      "aerial_drape_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_sample_512.png",
-      "terrain_relief_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_relief_preview_512.png",
-      "elevation_sample": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_sample_256.tif",
-      "fidelity_note": "official USDA/APFO NAIP 512px aerial sample sampled into a denser terrain-conforming source-drape mosaic; derived USGS 3DEP relief preview sampled into bank and valley terrain geometry; full elevation conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers"
+      "aerial_drape_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_sample_1024.png",
+      "terrain_relief_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png",
+      "elevation_sample": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
+      "fidelity_note": "larger official USDA/APFO NAIP 1024px corridor sample sampled into a denser terrain-conforming source-drape mosaic; larger derived USGS 3DEP 1024px relief preview sampled into bank and valley terrain geometry; full elevation conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers"
     },
     {
       "river_id": "colorado_river",
@@ -27,10 +27,10 @@
       "guide_seat_capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "river_eye_capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
       "status": "captured_source_derived_guide_and_river_eye_preview_renders",
-      "aerial_drape_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_sample_512.png",
-      "terrain_relief_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_relief_preview_512.png",
-      "elevation_sample": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_sample_256.tif",
-      "fidelity_note": "official USDA/APFO NAIP 512px Lees Ferry aerial sample sampled into a denser terrain-conforming canyon source-drape mosaic; derived USGS 3DEP relief preview sampled into canyon bank geometry; full canyon heightfield conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers"
+      "aerial_drape_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_sample_1024.png",
+      "terrain_relief_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_relief_preview_1024.png",
+      "elevation_sample": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif",
+      "fidelity_note": "larger official USDA/APFO NAIP 1024px Lees Ferry corridor sample sampled into a denser terrain-conforming canyon source-drape mosaic; larger derived USGS 3DEP 1024px relief preview sampled into canyon bank geometry; full canyon heightfield conditioning remains pending; rocks, foliage, water, foam, raft, and lighting remain proxy layers"
     },
     {
       "river_id": "pacuare",

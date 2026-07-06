@@ -137,6 +137,80 @@
         "This is a small sample export, not a complete production orthomosaic corridor.",
         "Full corridor imagery still needs official tile selection, acquisition-date review, attribution, reprojection, and LFS/package policy."
       ]
+    },
+    {
+      "artifact_id": "usgs_3dep_chili_bar_corridor_sample_512",
+      "category": "terrain_corridor_sample",
+      "path": "terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
+      "provider": "USGS 3D Elevation Program ImageServer",
+      "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=512%2C512&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+      "status": "corridor_sample_downloaded",
+      "summary": {
+        "width": 512,
+        "height": 512,
+        "pixel_type": "F32",
+        "format": "GeoTIFF",
+        "size_bytes": 1049850
+      },
+      "use": [
+        "larger_preview_terrain_relief_source",
+        "heightfield_conditioning_prototype",
+        "source-provenance plumbing"
+      ],
+      "caveats": [
+        "This is an improved corridor sample export, not a complete production DEM.",
+        "Full corridor terrain still needs reviewed raster tiling, reprojection, hydrologic conditioning, and Unreal landscape import."
+      ]
+    },
+    {
+      "artifact_id": "usgs_3dep_chili_bar_corridor_relief_preview_1024",
+      "category": "derived_terrain_relief_preview",
+      "path": "terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png",
+      "provider": "RaftSim geospatial preview utility from larger USGS 3DEP ImageServer corridor sample",
+      "source_artifacts": [
+        "terrain/usgs_3dep_chili_bar_corridor_sample_512.tif"
+      ],
+      "status": "derived_preview_generated",
+      "summary": {
+        "width": 1024,
+        "height": 1024,
+        "format": "PNG_L",
+        "size_bytes": 287863,
+        "processing_manifest": "terrain/usgs_3dep_chili_bar_corridor_relief_preview_manifest.json"
+      },
+      "use": [
+        "preview-only Unreal bank and valley height perturbation",
+        "larger source-derived terrain readability",
+        "terrain import path smoke test"
+      ],
+      "caveats": [
+        "This is normalized relief from a corridor sample, not a production heightfield.",
+        "Full corridor terrain still needs reviewed raster tiling, reprojection, hydrologic conditioning, and Unreal landscape import."
+      ]
+    },
+    {
+      "artifact_id": "usda_naip_chili_bar_corridor_sample_1024",
+      "category": "aerial_imagery_corridor_sample",
+      "path": "imagery/usda_naip_chili_bar_corridor_sample_1024.png",
+      "provider": "USDA/APFO NAIP ImageServer",
+      "url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13458526.4369%2C4684496.9368%2C-13438488.9286%2C4697349.7027&bboxSR=3857&imageSR=3857&size=1024%2C1024&format=png&f=image",
+      "status": "corridor_sample_downloaded",
+      "summary": {
+        "width": 1024,
+        "height": 1024,
+        "pixel_type": "RGB_U8",
+        "format": "PNG",
+        "size_bytes": 1909564
+      },
+      "use": [
+        "larger_unreal_source_drape",
+        "vegetation_and_water_mask_prototype",
+        "source-provenance plumbing"
+      ],
+      "caveats": [
+        "This is an improved corridor sample export, not a complete production orthomosaic corridor.",
+        "Full corridor imagery still needs official tile selection, acquisition-date review, attribution, reprojection, and LFS/package policy."
+      ]
     }
   ],
   "diagnostic_artifacts": [

@@ -134,8 +134,16 @@
           "category": "aerial_imagery_sample",
           "path": "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_sample_512.png",
           "provider": "USDA/APFO NAIP ImageServer",
+          "status": "retained_smoke_test_sample_superseded_by_corridor_sample",
+          "unreal_use": "provenance smoke-test sample retained; active preview drape now uses usda_naip_chili_bar_corridor_sample_1024"
+        },
+        {
+          "artifact_id": "usda_naip_chili_bar_corridor_sample_1024",
+          "category": "aerial_imagery_corridor_sample",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_sample_1024.png",
+          "provider": "USDA/APFO NAIP ImageServer",
           "status": "draped_into_unreal_preview_terrain_conforming_mosaic",
-          "unreal_use": "source-derived denser terrain-conforming drape mosaic for /Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview"
+          "unreal_use": "larger source-derived terrain-conforming drape mosaic for /Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview"
         },
         {
           "artifact_id": "usgs_3dep_chili_bar_sample_256",
@@ -150,8 +158,24 @@
           "category": "derived_terrain_relief_preview",
           "path": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_relief_preview_512.png",
           "provider": "RaftSim geospatial preview utility from USGS 3DEP ImageServer sample",
+          "status": "retained_smoke_test_relief_superseded_by_corridor_relief",
+          "unreal_use": "provenance smoke-test relief retained; active preview geometry now uses usgs_3dep_chili_bar_corridor_relief_preview_1024"
+        },
+        {
+          "artifact_id": "usgs_3dep_chili_bar_corridor_sample_512",
+          "category": "terrain_corridor_sample",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_sample_512.tif",
+          "provider": "USGS 3D Elevation Program ImageServer",
+          "status": "recorded_for_follow_on_heightfield_conditioning",
+          "unreal_use": "larger official terrain source sample for South Fork preview relief and future heightfield-conditioning work"
+        },
+        {
+          "artifact_id": "usgs_3dep_chili_bar_corridor_relief_preview_1024",
+          "category": "derived_terrain_relief_preview",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_relief_preview_1024.png",
+          "provider": "RaftSim geospatial preview utility from larger USGS 3DEP ImageServer corridor sample",
           "status": "sampled_by_unreal_preview_geometry",
-          "unreal_use": "preview-only bank and valley terrain relief perturbation for /Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview"
+          "unreal_use": "larger preview-only bank and valley terrain relief perturbation for /Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview"
         }
       ],
       "flow_sources": [
@@ -194,8 +218,16 @@
           "category": "aerial_imagery_sample",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_sample_512.png",
           "provider": "USDA/APFO NAIP ImageServer",
+          "status": "retained_smoke_test_sample_superseded_by_corridor_sample",
+          "unreal_use": "provenance smoke-test sample retained; active preview drape now uses usda_naip_lees_ferry_corridor_sample_1024"
+        },
+        {
+          "artifact_id": "usda_naip_lees_ferry_corridor_sample_1024",
+          "category": "aerial_imagery_corridor_sample",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_sample_1024.png",
+          "provider": "USDA/APFO NAIP ImageServer",
           "status": "draped_into_unreal_preview_terrain_conforming_mosaic",
-          "unreal_use": "source-derived denser terrain-conforming canyon drape mosaic for /Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"
+          "unreal_use": "larger source-derived terrain-conforming canyon drape mosaic for /Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"
         },
         {
           "artifact_id": "usgs_3dep_lees_ferry_sample_256",
@@ -210,8 +242,24 @@
           "category": "derived_terrain_relief_preview",
           "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_relief_preview_512.png",
           "provider": "RaftSim geospatial preview utility from USGS 3DEP ImageServer sample",
+          "status": "retained_smoke_test_relief_superseded_by_corridor_relief",
+          "unreal_use": "provenance smoke-test relief retained; active preview geometry now uses usgs_3dep_lees_ferry_corridor_relief_preview_1024"
+        },
+        {
+          "artifact_id": "usgs_3dep_lees_ferry_corridor_sample_512",
+          "category": "terrain_corridor_sample",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_sample_512.tif",
+          "provider": "USGS 3D Elevation Program ImageServer",
+          "status": "recorded_for_follow_on_canyon_heightfield_conditioning",
+          "unreal_use": "larger official terrain source sample for Colorado preview relief and future canyon heightfield-conditioning work"
+        },
+        {
+          "artifact_id": "usgs_3dep_lees_ferry_corridor_relief_preview_1024",
+          "category": "derived_terrain_relief_preview",
+          "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_relief_preview_1024.png",
+          "provider": "RaftSim geospatial preview utility from larger USGS 3DEP ImageServer corridor sample",
           "status": "sampled_by_unreal_preview_geometry",
-          "unreal_use": "preview-only canyon bank terrain relief perturbation for /Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"
+          "unreal_use": "larger preview-only canyon bank terrain relief perturbation for /Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"
         }
       ],
       "flow_sources": [
@@ -321,5 +369,5 @@
       "desktop_and_vr_performance_captures"
     ]
   },
-  "status": "south_fork_colorado_and_pacuare_source_draped_previews_available; production_geospatial_imports_and_photoreal_assets_pending"
+  "status": "south_fork_and_colorado_larger_corridor_samples_plus_pacuare_source_draped_previews_available; production_geospatial_imports_and_photoreal_assets_pending"
 }
