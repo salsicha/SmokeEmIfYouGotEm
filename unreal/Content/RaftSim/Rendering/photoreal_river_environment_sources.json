@@ -1415,6 +1415,7 @@
       "source_drape_vertex_color_terrain_material_blend_recorded",
       "softened_source_drape_overlay_recorded",
       "source_aware_bank_breakup_texture_patches_recorded",
+      "flow_aware_bank_undercut_shelf_relief_recorded",
       "first_party_terrain_material_layer_facets_and_slope_shadow_patches_recorded",
       "first_party_landscape_nanite_material_layer_scaffold_recorded",
       "first_party_lit_terrain_vertex_color_material_recorded",

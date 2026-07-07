@@ -1178,6 +1178,38 @@ float SamplePreviewHeightfieldCm(
     return RidgePattern * HeightfieldMask;
 }
 
+float SamplePreviewBankUndercutShelfReliefCm(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    float X,
+    float Y,
+    float ChannelOffset)
+{
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+    const float WetBankScale = FMath::Max(0.35f, Spec.FlowWetBankScale);
+    const float BankDistance = FMath::Max(0.0f, ChannelOffset - ActiveRiverHalfWidth);
+    const float BankToeT = 1.0f - FMath::Clamp(
+        FMath::Abs(BankDistance - 115.0f * WetBankScale) / FMath::Max(1.0f, 210.0f * WetBankScale),
+        0.0f,
+        1.0f);
+    const float ShelfT = SmoothPreviewStep(120.0f * WetBankScale, 420.0f * WetBankScale, BankDistance) *
+        (1.0f - SmoothPreviewStep(640.0f * WetBankScale, 1120.0f * WetBankScale, BankDistance));
+    const float RootBenchT = SmoothPreviewStep(
+        ActiveRiverHalfWidth + (Spec.bDesertCanyon ? 360.0f : 260.0f),
+        ActiveRiverHalfWidth + (Spec.bDesertCanyon ? 940.0f : 620.0f),
+        ChannelOffset);
+    const float SideSign = Y >= GetPreviewRiverCenterY(Spec, X) ? 1.0f : -1.0f;
+    const float LongNoise = 0.55f + 0.45f * FMath::Sin(X * 0.0027f + SideSign * 1.73f);
+    const float CrossNoise = 0.50f + 0.50f * FMath::Sin(X * 0.0061f + Y * 0.0038f);
+    const float UndercutDrop = (Spec.bDesertCanyon ? 20.0f : (Spec.bHasWaterfalls ? 36.0f : 26.0f)) *
+        BankToeT * (0.58f + 0.42f * LongNoise);
+    const float ShelfLift = (Spec.bDesertCanyon ? 58.0f : (Spec.bHasWaterfalls ? 42.0f : 36.0f)) *
+        ShelfT * (0.46f + 0.54f * CrossNoise);
+    const float RootBenchLift = Spec.bHasWaterfalls
+        ? 34.0f * RootBenchT * (0.40f + 0.60f * LongNoise)
+        : (Spec.bDesertCanyon ? 22.0f : 16.0f) * RootBenchT * (0.30f + 0.70f * CrossNoise);
+    return ShelfLift + RootBenchLift - UndercutDrop;
+}
+
 float GetPreviewTerrainHeightCm(
     const FRaftSimEnvironmentPreviewSpec& Spec,
     float X,
@@ -1201,6 +1233,7 @@ float GetPreviewTerrainHeightCm(
 
     return -82.0f + DownstreamSlope + BankT * BankLift + CanyonT * CanyonLift +
         GravelNoise * (0.35f + BankT * 0.75f) +
+        SamplePreviewBankUndercutShelfReliefCm(Spec, X, Y, Offset) +
         SamplePreviewHeightfieldCm(Spec, HeightfieldPreview, X, Y, Offset) +
         SamplePreviewTerrainReliefCm(Spec, TerrainRelief, X, Y, Offset);
 }
@@ -1659,8 +1692,8 @@ void AddPreviewTerrainMesh(
     const FRaftSimPreviewImage* WaterMask,
     const FRaftSimPreviewImage* VegetationMask)
 {
-    constexpr int32 XSteps = 160;
-    constexpr int32 YSteps = 56;
+    constexpr int32 XSteps = 220;
+    constexpr int32 YSteps = 84;
     const float MinX = -5800.0f;
     const float MaxX = 26500.0f;
     const float HalfWidth = Spec.bDesertCanyon ? 4300.0f : 2750.0f;

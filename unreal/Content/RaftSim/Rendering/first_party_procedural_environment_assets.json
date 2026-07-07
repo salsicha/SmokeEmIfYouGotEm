@@ -42,6 +42,7 @@
       "terrain_proxy_luma_floor",
       "softened_source_drape_overlay",
       "heightfield_and_dem_relief_sampling",
+      "flow_aware_bank_undercut_shelf_relief",
       "water_and_vegetation_mask_guided_detail_placement",
       "wet_bank_shore_ribbons",
       "source_aware_bank_breakup_texture_patches",
