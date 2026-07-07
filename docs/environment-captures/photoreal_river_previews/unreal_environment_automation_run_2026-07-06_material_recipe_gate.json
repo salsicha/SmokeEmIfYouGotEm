@@ -2,7 +2,7 @@
   "schema": "raftsim.unreal.environment_automation_run.v1",
   "generated_on": "2026-07-06",
   "status": "succeeded_preview_only_not_lifelike",
-  "purpose": "Record the Unreal preview-map and capture automation run after the first-party procedural material recipe manifest and production geospatial attachment ledger became required inputs, after the softened source-drape plus boulder-contact foam preview renderer pass, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, soft-feathered terrain material patch edges, source-drape albedo normalization, terrain-proxy luma floors, shadowless terrain albedo review capture material, first-party terrain material layer facets and slope-shadow patches, first-party Landscape/Nanite material-layer scaffolds, a first-party lit terrain vertex-color material, soft-lit terrain vertex-color review material mode, flow-aware bank undercut/shelf relief, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, first-party dense biome foliage layer proxy clusters, first-party instanced procedural foliage-equivalent scaffolds, first-party procedural leaf-cluster geometry, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, first-party boulder wetness/abrasion/moss surface variants, first-party boulder crevice-shadow/albedo tuning, near-camera boulder readability clearance, flow-aware water mesh undulation, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, flow-aware micro-ripple glints, first-party water shader depth/reflection/refraction scaffolds, near-camera water-scaffold readability clearance, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, and refined first-party guide-seat raft/oar foreground proxies.",
+  "purpose": "Record the Unreal preview-map and capture automation run after the first-party procedural material recipe manifest and production geospatial attachment ledger became required inputs, after the softened source-drape plus boulder-contact foam preview renderer pass, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, soft-feathered terrain material patch edges, source-drape albedo normalization, terrain-proxy luma floors, shadowless terrain albedo review capture material, first-party terrain material layer facets and slope-shadow patches, first-party Landscape/Nanite material-layer scaffolds, a first-party lit terrain vertex-color material, soft-lit terrain vertex-color review material mode, flow-aware bank undercut/shelf relief, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, first-party dense biome foliage layer proxy clusters, first-party instanced procedural foliage-equivalent scaffolds, first-party procedural leaf-cluster geometry, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, first-party boulder wetness/abrasion/moss surface variants, first-party boulder crevice-shadow/albedo tuning, near-camera boulder readability clearance and occlusion demotion, flow-aware water mesh undulation, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, flow-aware micro-ripple glints, near-frame water-ribbon occlusion demotion, first-party water shader depth/reflection/refraction scaffolds, near-camera water-scaffold readability clearance, low-occlusion far-field water-scaffold tuning, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, and refined first-party guide-seat raft/oar foreground proxies.",
   "commands": {
     "editor_build": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Build/BatchFiles/Mac/Build.sh\" SmokeEmIfYouGotEmEditor Mac Development -Project=\"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -NoHotReload",
     "environment_automation": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Binaries/Mac/UnrealEditor-Cmd\" \"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -unattended -nop4 -nosplash -NoSound -RaftSimCreatePhotorealEnvironmentPreviewMaps -RaftSimCapturePhotorealEnvironmentPreviews -RaftSimExitAfterEnvironmentAutomation"
@@ -50,12 +50,15 @@
     "first_party_boulder_wetness_abrasion_moss_surface_variants": true,
     "first_party_boulder_crevice_shadow_and_albedo_tuning": true,
     "near_camera_boulder_readability_clearance": true,
+    "near_camera_boulder_occlusion_demotion": true,
     "flow_aware_water_mesh_undulation": true,
     "flow_band_depth_texture_ribbons": true,
     "flow_aware_water_surface_chop_and_turbidity_patches": true,
     "flow_aware_micro_ripple_glints": true,
+    "near_frame_water_ribbon_occlusion_demotion": true,
     "first_party_water_shader_depth_reflection_refraction_scaffold": true,
     "near_camera_water_scaffold_readability_clearance": true,
+    "low_occlusion_far_field_water_shader_scaffold": true,
     "pacuare_waterfall_curtain_plunge_mist_and_runout_proxies": true,
     "river_specific_cloud_haze_and_horizon_backdrop_cards": true,
     "first_party_guide_seat_raft_and_oar_foreground_proxies": true,
@@ -66,46 +69,46 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [70.24, 125.94, 128.66],
+      "rgb_mean": [69.4, 125.67, 128.47],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [69.14, 126.69, 129.77],
+      "rgb_mean": [68.05, 126.4, 129.56],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [115.26, 106.34, 90.0],
+      "rgb_mean": [114.4, 105.37, 88.89],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [115.25, 106.61, 90.42],
+      "rgb_mean": [114.37, 105.58, 89.21],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [49.33, 109.35, 102.41],
+      "rgb_mean": [48.36, 108.94, 101.99],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [48.27, 109.75, 102.98],
+      "rgb_mean": [47.1, 109.34, 102.54],
       "nonblank": true
     }
   ],
   "unreal_log_summary": [
     "Using first-party procedural material recipe plan: unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
     "Using production geospatial attachment ledger: physics/data/real_world/production_geospatial_attachment_ledger.json",
-    "Saved all three generated preview maps with softened source-drape overlays, boulder-contact foam laces, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, soft-feathered terrain material patch edges, source-drape albedo normalization, terrain-proxy luma floors, shadowless terrain albedo review capture material, first-party terrain material layer facets and slope-shadow patches, first-party Landscape/Nanite material-layer scaffolds, a first-party lit terrain vertex-color material, soft-lit terrain vertex-color review material mode, flow-aware bank undercut/shelf relief, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, first-party dense biome foliage layer proxy clusters, first-party instanced procedural foliage-equivalent scaffolds, first-party procedural leaf-cluster geometry, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, first-party boulder wetness/abrasion/moss surface variants, first-party boulder crevice-shadow/albedo tuning, near-camera boulder readability clearance, flow-aware water mesh undulation, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, flow-aware micro-ripple glints, first-party water shader depth/reflection/refraction scaffolds, near-camera water-scaffold readability clearance, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, and refined first-party guide-seat raft/oar foreground proxies.",
+    "Saved all three generated preview maps with softened source-drape overlays, boulder-contact foam laces, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, soft-feathered terrain material patch edges, source-drape albedo normalization, terrain-proxy luma floors, shadowless terrain albedo review capture material, first-party terrain material layer facets and slope-shadow patches, first-party Landscape/Nanite material-layer scaffolds, a first-party lit terrain vertex-color material, soft-lit terrain vertex-color review material mode, flow-aware bank undercut/shelf relief, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, first-party dense biome foliage layer proxy clusters, first-party instanced procedural foliage-equivalent scaffolds, first-party procedural leaf-cluster geometry, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, first-party boulder wetness/abrasion/moss surface variants, first-party boulder crevice-shadow/albedo tuning, near-camera boulder readability clearance and occlusion demotion, flow-aware water mesh undulation, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, flow-aware micro-ripple glints, near-frame water-ribbon occlusion demotion, first-party water shader depth/reflection/refraction scaffolds, near-camera water-scaffold readability clearance, low-occlusion far-field water-scaffold tuning, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, and refined first-party guide-seat raft/oar foreground proxies.",
     "Saved guide-seat and river-eye captures for South Fork American, Colorado River Grand Canyon, and Pacuare River Rainforest.",
     "Environment preview capture manifest saved successfully."
   ],
-  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate, the source attachment ledger gate, the first contact-foam/overlay-softening renderer pass, guide-seat foliage readability tuning, source-aware bank breakup texture patches, soft-feathered terrain material patch edges, source-drape albedo normalization, terrain-proxy luma floors, shadowless terrain albedo review capture material, first-party terrain material layer facets and slope-shadow patches, first-party Landscape/Nanite material-layer scaffolds, a first-party lit terrain vertex-color material, soft-lit terrain vertex-color review material mode, flow-aware bank undercut/shelf relief, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, first-party dense biome foliage layer proxy clusters, first-party instanced procedural foliage-equivalent scaffolds, first-party procedural leaf-cluster geometry, bounded flow-aware shoreline scatter, first-party irregular rock geometry variants, first-party boulder wetness/abrasion/moss surface variants, first-party boulder crevice-shadow/albedo tuning, near-camera boulder readability clearance, flow-aware water mesh undulation, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, flow-aware micro-ripple glints, first-party water shader depth/reflection/refraction scaffolds, near-camera water-scaffold readability clearance, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, and refined first-party guide-seat raft/oar foreground proxies. Guide-seat captures include proxy player-view context while river-eye captures hide the proxies for environment review. The images remain preview-only and cannot be called lifelike until production terrain/material/water/foliage assets, approved raft/oar foreground art, guide review, rights review, and performance evidence pass."
+  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate, the source attachment ledger gate, the first contact-foam/overlay-softening renderer pass, guide-seat foliage readability tuning, source-aware bank breakup texture patches, soft-feathered terrain material patch edges, source-drape albedo normalization, terrain-proxy luma floors, shadowless terrain albedo review capture material, first-party terrain material layer facets and slope-shadow patches, first-party Landscape/Nanite material-layer scaffolds, a first-party lit terrain vertex-color material, soft-lit terrain vertex-color review material mode, flow-aware bank undercut/shelf relief, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, first-party dense biome foliage layer proxy clusters, first-party instanced procedural foliage-equivalent scaffolds, first-party procedural leaf-cluster geometry, bounded flow-aware shoreline scatter, first-party irregular rock geometry variants, first-party boulder wetness/abrasion/moss surface variants, first-party boulder crevice-shadow/albedo tuning, near-camera boulder readability clearance and occlusion demotion, flow-aware water mesh undulation, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, flow-aware micro-ripple glints, near-frame water-ribbon occlusion demotion, first-party water shader depth/reflection/refraction scaffolds, near-camera water-scaffold readability clearance, low-occlusion far-field water-scaffold tuning, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, and refined first-party guide-seat raft/oar foreground proxies. Guide-seat captures include proxy player-view context while river-eye captures hide the proxies for environment review. The images remain preview-only and cannot be called lifelike until production terrain/material/water/foliage assets, approved raft/oar foreground art, guide review, rights review, and performance evidence pass."
 }

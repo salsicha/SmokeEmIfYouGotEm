@@ -170,6 +170,7 @@
         "muted_top_highlight",
         "review_frame_boulder_clearance",
         "near_camera_boulder_darkening",
+        "near_camera_boulder_occlusion_demotion",
         "foam_contact_stain"
       ],
       "tunable_parameters": [
@@ -178,7 +179,9 @@
         "roughness_variance",
         "contact_highlight_strength",
         "scale_noise",
-        "hazard_clearance_m"
+        "hazard_clearance_m",
+        "near_camera_boulder_scale",
+        "near_camera_boulder_highlight_gain"
       ],
       "river_bindings": {
         "american_south_fork": {
@@ -281,7 +284,7 @@
         "water_surface_depth_turbidity_and_current_cues"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
-      "unreal_status": "lit_vertex_color_water_preview_active_with_depth_reflection_refraction_scaffold_custom_shader_or_waterbody_integration_pending",
+      "unreal_status": "lit_vertex_color_water_preview_active_with_low_occlusion_far_field_depth_reflection_refraction_scaffold_custom_shader_or_waterbody_integration_pending",
       "required_source_inputs": [
         "river_flow_visual_bands.json",
         "solver_or_preview_flow_band_telemetry",
@@ -293,8 +296,10 @@
         "depth_tint",
         "depth_reflection_refraction_scaffold",
         "near_camera_water_scaffold_clearance",
+        "low_occlusion_far_field_water_scaffold",
         "flow_aware_water_mesh_undulation",
         "flow_aware_micro_ripple_glints",
+        "near_frame_water_ribbon_occlusion_demotion",
         "turbidity",
         "current_streak",
         "eddy_line_brightening",
@@ -306,9 +311,14 @@
         "water_mesh_undulation_amplitude_cm",
         "standing_wave_mesh_amplitude_cm",
         "depth_tint_strength",
+        "water_scaffold_far_field_start_m",
+        "water_scaffold_reflection_blend",
+        "water_scaffold_ribbon_width",
         "turbidity_strength",
         "micro_ripple_glint_density",
         "micro_ripple_glint_opacity",
+        "near_frame_water_ribbon_gain",
+        "near_frame_water_ribbon_width",
         "current_cue_density",
         "eddy_line_strength",
         "hole_retention_visual_strength"

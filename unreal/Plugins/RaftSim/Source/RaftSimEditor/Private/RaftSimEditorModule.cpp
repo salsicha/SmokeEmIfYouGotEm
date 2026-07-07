@@ -1773,7 +1773,8 @@ void AddPreviewBoulderSurfaceVariationDetail(
     const FVector& Scale,
     int32 BoulderIndex,
     float WaterMaskT,
-    float VegetationMaskT)
+    float VegetationMaskT,
+    bool bNearCameraReviewBoulder)
 {
     if (!World)
     {
@@ -1788,6 +1789,7 @@ void AddPreviewBoulderSurfaceVariationDetail(
     const float RadiusZ = FMath::Max(8.0f, Scale.Z * 100.0f);
     const float Wetness = FMath::Clamp(0.22f + WaterMaskT * 0.62f, 0.0f, 0.86f);
     const float MossSediment = FMath::Clamp((Spec.bHasWaterfalls ? 0.28f : 0.08f) + VegetationMaskT * 0.48f, 0.0f, 0.70f);
+    const float NearCameraFacetScale = bNearCameraReviewBoulder ? (Spec.bDesertCanyon ? 0.58f : 0.48f) : 1.0f;
 
     const FLinearColor WetFacet = FMath::Lerp(
         ScalePreviewColor(Spec.RockColor, Spec.bDesertCanyon ? 0.44f : 0.34f),
@@ -1821,7 +1823,7 @@ void AddPreviewBoulderSurfaceVariationDetail(
         Forward * (RadiusX * (0.22f + 0.10f * Wetness)),
         (Right * (RadiusY * 0.10f) + UpLift * (RadiusZ * 0.035f)),
         WetFacet,
-        FMath::Lerp(WetFacet, WetHighlight, 0.36f + Wetness * 0.28f));
+        ScalePreviewColor(FMath::Lerp(WetFacet, WetHighlight, 0.36f + Wetness * 0.28f), NearCameraFacetScale));
 
     const FVector AbrasionCenter = BaseLocation +
         Forward * (RadiusX * (0.10f + 0.22f * FMath::Sin(static_cast<float>(BoulderIndex) * 0.57f))) +
@@ -1834,7 +1836,7 @@ void AddPreviewBoulderSurfaceVariationDetail(
         (Forward * (RadiusX * 0.18f) + UpLift * (RadiusZ * 0.045f)),
         Right * (RadiusY * 0.10f),
         FMath::Lerp(ScalePreviewColor(Spec.RockColor, 0.64f), Abrasion, 0.38f),
-        Abrasion);
+        ScalePreviewColor(Abrasion, NearCameraFacetScale));
 
     const FVector TopCenter = BaseLocation +
         Forward * (RadiusX * (0.02f + 0.16f * FMath::Sin(static_cast<float>(BoulderIndex) * 0.41f))) +
@@ -1846,8 +1848,8 @@ void AddPreviewBoulderSurfaceVariationDetail(
         TopCenter,
         Forward * (RadiusX * 0.34f),
         Right * (RadiusY * 0.18f),
-        FMath::Lerp(Abrasion, TopHighlight, 0.28f),
-        TopHighlight);
+        ScalePreviewColor(FMath::Lerp(Abrasion, TopHighlight, 0.28f), NearCameraFacetScale),
+        ScalePreviewColor(TopHighlight, bNearCameraReviewBoulder ? NearCameraFacetScale * 0.82f : 1.0f));
 
     const FVector MossCenter = BaseLocation -
         Forward * (RadiusX * (0.18f + 0.06f * FMath::Cos(static_cast<float>(BoulderIndex) * 0.63f))) +
@@ -3164,17 +3166,24 @@ void AddPreviewFoamRibbon(
     UVs.Reserve((Segments + 1) * 2);
     Triangles.Reserve(Segments * 6);
 
+    const bool bNearFrameWaterRibbon = StartX + Length * 0.50f < 4200.0f;
+    const float NearFrameRibbonWidthScale = bNearFrameWaterRibbon ? 0.36f : 1.0f;
+    const FLinearColor RibbonColor = bNearFrameWaterRibbon
+        ? ClampPreviewColor(FMath::Lerp(Spec.WaterColor, Color, Spec.bDesertCanyon ? 0.20f : 0.26f))
+        : Color;
+
     for (int32 SegmentIndex = 0; SegmentIndex <= Segments; ++SegmentIndex)
     {
         const float T = static_cast<float>(SegmentIndex) / static_cast<float>(Segments);
         const float X = StartX + Length * T;
         const float RiverCenterY = GetPreviewRiverCenterY(Spec, X);
-        const float Sway = FMath::Sin(Phase + T * UE_TWO_PI) * Width * 0.32f;
+        const float Sway = FMath::Sin(Phase + T * UE_TWO_PI) * Width * 0.32f * NearFrameRibbonWidthScale;
         const float Taper = FMath::Sin(T * PI);
-        const float LocalHalfWidth = FMath::Max(6.0f, Width * (0.18f + 0.62f * Taper));
+        const float LocalHalfWidth = FMath::Max(3.0f, Width * NearFrameRibbonWidthScale * (0.18f + 0.62f * Taper));
         const float CenterY = RiverCenterY + LateralOffset + Sway;
         const float SurfaceWave = FMath::Sin(X * 0.011f + CenterY * 0.015f) * (Spec.bDesertCanyon ? 2.0f : 4.5f);
-        const float Z = GetPreviewWaterSurfaceBaseZCm(Spec) + 15.0f + SurfaceWave + 2.0f * FMath::Sin(Phase * 1.7f + T * PI);
+        const float Z = GetPreviewWaterSurfaceBaseZCm(Spec) + (bNearFrameWaterRibbon ? 8.0f : 15.0f) +
+            SurfaceWave + 2.0f * FMath::Sin(Phase * 1.7f + T * PI);
 
         Vertices.Add(FVector(X, CenterY - LocalHalfWidth, Z));
         Vertices.Add(FVector(X, CenterY + LocalHalfWidth, Z + 0.6f));
@@ -3197,7 +3206,7 @@ void AddPreviewFoamRibbon(
     }
 
     Normals = ComputePreviewMeshNormals(Vertices, Triangles);
-    AddPreviewProceduralMeshActor(World, Label, Vertices, Triangles, Normals, UVs, Color);
+    AddPreviewProceduralMeshActor(World, Label, Vertices, Triangles, Normals, UVs, RibbonColor);
 }
 
 void AddPreviewFlowTextureRibbon(
@@ -3238,13 +3247,20 @@ void AddPreviewFlowTextureRibbon(
             FMath::Sin(Phase + T * UE_TWO_PI) * Width * 0.34f +
             FMath::Sin(Phase * 0.67f + T * UE_TWO_PI * 2.0f) * Width * 0.16f;
         const float Taper = FMath::Sin(T * PI);
-        const float LocalHalfWidth = FMath::Max(5.0f, Width * (0.16f + 0.48f * Taper));
+        const float NearFrameWaterRibbonDemotion = SmoothPreviewStep(1800.0f, 5200.0f, X);
+        const float NearFrameWidthScale = FMath::Lerp(0.42f, 1.0f, NearFrameWaterRibbonDemotion);
+        const float LocalHalfWidth = FMath::Max(3.0f, Width * NearFrameWidthScale * (0.12f + 0.38f * Taper));
         const float CenterY = RiverCenterY + LateralOffset + Sway;
         const float SurfaceWave = FMath::Sin(X * 0.011f + CenterY * 0.015f) * (Spec.bDesertCanyon ? 2.0f : 4.5f);
-        const float Z = WaterBaseZ + 20.0f + SurfaceWave + 1.6f * FMath::Sin(Phase * 1.3f + T * PI);
+        const float Z = WaterBaseZ + FMath::Lerp(8.0f, 20.0f, NearFrameWaterRibbonDemotion) +
+            SurfaceWave + 1.6f * FMath::Sin(Phase * 1.3f + T * PI);
         const float Pulse =
             FMath::Clamp(0.44f + 0.34f * FMath::Sin(Phase + T * UE_TWO_PI * 3.0f) + 0.16f * Taper, 0.0f, 1.0f);
-        const FLinearColor FlowColor = ClampPreviewColor(FMath::Lerp(ShadowColor, HighlightColor, Pulse));
+        const FLinearColor RawFlowColor = ClampPreviewColor(FMath::Lerp(ShadowColor, HighlightColor, Pulse));
+        const FLinearColor FlowColor = ClampPreviewColor(FMath::Lerp(
+            Spec.WaterColor,
+            RawFlowColor,
+            FMath::Lerp(0.18f, 1.0f, NearFrameWaterRibbonDemotion)));
 
         Vertices.Add(FVector(X, CenterY - LocalHalfWidth, Z));
         Vertices.Add(FVector(X, CenterY + LocalHalfWidth, Z + 0.7f));
@@ -3508,9 +3524,9 @@ void AddPreviewWaterShaderDepthReflectionScaffoldDetail(UWorld* World, const FRa
         return;
     }
 
-    constexpr int32 XSteps = 112;
-    constexpr int32 CrossSteps = 8;
-    const float NearCameraWaterScaffoldClearanceMinX = -1800.0f;
+    constexpr int32 XSteps = 136;
+    constexpr int32 CrossSteps = 12;
+    const float NearCameraWaterScaffoldClearanceMinX = 3600.0f;
     const float MinX = NearCameraWaterScaffoldClearanceMinX;
     const float MaxX = 26000.0f;
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
@@ -3518,17 +3534,20 @@ void AddPreviewWaterShaderDepthReflectionScaffoldDetail(UWorld* World, const FRa
     const float FlowEnergy = FMath::Clamp(0.55f * Spec.FlowCurrentCueScale + 0.45f * Spec.FlowFoamScale, 0.48f, 1.45f);
 
     const FLinearColor DeepCore = Spec.bDesertCanyon
-        ? FLinearColor(0.19f, 0.20f, 0.16f)
-        : (Spec.bHasWaterfalls ? FLinearColor(0.010f, 0.17f, 0.145f) : FLinearColor(0.012f, 0.22f, 0.245f));
+        ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.19f, 0.20f, 0.16f), 0.32f)
+        : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.010f, 0.17f, 0.145f), 0.28f)
+                                : FMath::Lerp(Spec.WaterColor, FLinearColor(0.012f, 0.22f, 0.245f), 0.30f));
     const FLinearColor ShallowTint = Spec.bDesertCanyon
-        ? FLinearColor(0.47f, 0.40f, 0.27f)
-        : (Spec.bHasWaterfalls ? FLinearColor(0.055f, 0.36f, 0.25f) : FLinearColor(0.060f, 0.44f, 0.48f));
+        ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.47f, 0.40f, 0.27f), 0.26f)
+        : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.055f, 0.36f, 0.25f), 0.25f)
+                                : FMath::Lerp(Spec.WaterColor, FLinearColor(0.060f, 0.44f, 0.48f), 0.26f));
     const FLinearColor SkyReflection = Spec.bDesertCanyon
-        ? FLinearColor(0.64f, 0.58f, 0.43f)
-        : (Spec.bHasWaterfalls ? FLinearColor(0.22f, 0.64f, 0.56f) : FLinearColor(0.24f, 0.66f, 0.68f));
+        ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.64f, 0.58f, 0.43f), 0.30f)
+        : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.22f, 0.64f, 0.56f), 0.28f)
+                                : FMath::Lerp(Spec.WaterColor, FLinearColor(0.24f, 0.66f, 0.68f), 0.30f));
     const FLinearColor BankReflection = Spec.bDesertCanyon
-        ? FMath::Lerp(Spec.RockColor, FLinearColor(0.55f, 0.43f, 0.28f), 0.45f)
-        : FMath::Lerp(Spec.FoliageColor, Spec.WaterColor, Spec.bHasWaterfalls ? 0.42f : 0.56f);
+        ? FMath::Lerp(Spec.WaterColor, FMath::Lerp(Spec.RockColor, FLinearColor(0.55f, 0.43f, 0.28f), 0.45f), 0.32f)
+        : FMath::Lerp(Spec.WaterColor, Spec.FoliageColor, Spec.bHasWaterfalls ? 0.22f : 0.18f);
 
     TArray<FVector> Vertices;
     TArray<FVector> Normals;
@@ -3547,13 +3566,16 @@ void AddPreviewWaterShaderDepthReflectionScaffoldDetail(UWorld* World, const FRa
         const float X = FMath::Lerp(MinX, MaxX, U);
         const float CenterY = GetPreviewRiverCenterY(Spec, X);
         const float Width = ActiveRiverHalfWidth *
-            (0.94f + 0.08f * FMath::Sin(X * 0.0012f) + (Spec.bDesertCanyon ? 0.16f : 0.02f));
+            (Spec.bDesertCanyon ? 0.62f : 0.56f) *
+            (0.95f + 0.05f * FMath::Sin(X * 0.0012f));
+        const float LongitudinalFeather = SmoothPreviewStep(0.0f, 0.13f, U);
         for (int32 CrossIndex = 0; CrossIndex <= CrossSteps; ++CrossIndex)
         {
             const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
             const float Lateral = FMath::Lerp(-Width, Width, V);
             const float EdgeT = FMath::Pow(FMath::Abs(V - 0.5f) * 2.0f, 1.22f);
             const float DeepT = 1.0f - FMath::Clamp(EdgeT, 0.0f, 1.0f);
+            const float CenterFeather = SmoothPreviewStep(0.0f, 0.72f, DeepT);
             const float FlowLine =
                 FMath::Clamp(
                     0.48f + 0.28f * FMath::Sin(X * 0.0039f - Lateral * 0.0068f) +
@@ -3561,19 +3583,23 @@ void AddPreviewWaterShaderDepthReflectionScaffoldDetail(UWorld* World, const FRa
                     0.0f,
                     1.0f);
             const float FresnelEdge = FMath::Pow(FMath::Clamp(EdgeT, 0.0f, 1.0f), 2.15f);
-            const float ReflectionT = FMath::Clamp((0.18f + 0.26f * FlowLine) * FlowEnergy + FresnelEdge * 0.26f, 0.0f, 0.48f);
+            const float ReflectionT = FMath::Clamp(
+                ((0.055f + 0.085f * FlowLine) * FlowEnergy + FresnelEdge * 0.060f) * LongitudinalFeather,
+                0.0f,
+                0.18f);
             FLinearColor WaterColor = FMath::Lerp(ShallowTint, DeepCore, DeepT);
-            WaterColor = FMath::Lerp(WaterColor, BankReflection, FMath::Clamp(FresnelEdge * 0.22f, 0.0f, 0.28f));
+            WaterColor = FMath::Lerp(WaterColor, BankReflection, FMath::Clamp(FresnelEdge * 0.075f, 0.0f, 0.12f));
             WaterColor = FMath::Lerp(WaterColor, SkyReflection, ReflectionT);
             WaterColor = FMath::Lerp(
                 WaterColor,
                 Spec.WaterColor,
-                FMath::Clamp(0.14f + 0.18f * FMath::Sin(X * 0.0023f + Lateral * 0.0051f), 0.04f, 0.28f));
+                FMath::Clamp(0.44f + 0.16f * (1.0f - CenterFeather) + 0.10f * FMath::Sin(X * 0.0023f + Lateral * 0.0051f), 0.32f, 0.68f));
 
             const float SurfaceWave =
-                FMath::Sin(X * 0.011f + Lateral * 0.015f) * (Spec.bDesertCanyon ? 1.8f : 4.1f) +
-                FMath::Sin(X * 0.018f - Lateral * 0.006f) * (Spec.bDesertCanyon ? 0.8f : 1.7f);
-            Vertices.Add(FVector(X, CenterY + Lateral, WaterBaseZ + 8.0f + SurfaceWave));
+                (FMath::Sin(X * 0.011f + Lateral * 0.015f) * (Spec.bDesertCanyon ? 1.2f : 2.4f) +
+                 FMath::Sin(X * 0.018f - Lateral * 0.006f) * (Spec.bDesertCanyon ? 0.5f : 0.9f)) *
+                LongitudinalFeather;
+            Vertices.Add(FVector(X, CenterY + Lateral, WaterBaseZ + 3.6f + SurfaceWave));
             UVs.Add(FVector2D(U * 22.0f, V));
             VertexColors.Add(ClampPreviewColor(WaterColor));
         }
@@ -3620,8 +3646,8 @@ void AddPreviewWaterShaderDepthReflectionScaffoldDetail(UWorld* World, const FRa
             (Spec.bDesertCanyon ? 920.0f : 720.0f) *
             (0.72f + 0.12f * static_cast<float>(ReflectionIndex % 5)) * FMath::Clamp(FlowEnergy, 0.68f, 1.22f);
         const float Width =
-            (Spec.bDesertCanyon ? 34.0f : 28.0f) *
-            (0.78f + 0.12f * static_cast<float>(ReflectionIndex % 4));
+            (Spec.bDesertCanyon ? 20.0f : 17.0f) *
+            (0.74f + 0.10f * static_cast<float>(ReflectionIndex % 4));
         AddPreviewFlowTextureRibbon(
             World,
             Spec,
@@ -3631,8 +3657,8 @@ void AddPreviewWaterShaderDepthReflectionScaffoldDetail(UWorld* World, const FRa
             Lateral,
             Width,
             static_cast<float>(ReflectionIndex) * 0.67f,
-            SkyReflection,
-            BankReflection);
+            FMath::Lerp(Spec.WaterColor, SkyReflection, 0.48f),
+            FMath::Lerp(Spec.WaterColor, BankReflection, 0.44f));
     }
 
     const int32 RefractionSeamCount = Spec.bDesertCanyon ? 14 : (Spec.bHasWaterfalls ? 26 : 20);
@@ -3643,19 +3669,21 @@ void AddPreviewWaterShaderDepthReflectionScaffoldDetail(UWorld* World, const FRa
         const float Side = (SeamIndex % 2 == 0) ? -1.0f : 1.0f;
         const float Lateral = Side * ActiveRiverHalfWidth * (0.28f + 0.32f * FMath::Abs(FMath::Sin(static_cast<float>(SeamIndex) * 0.89f)));
         const FLinearColor SeamHighlight = Spec.bDesertCanyon
-            ? FLinearColor(0.58f, 0.50f, 0.34f)
-            : (Spec.bHasWaterfalls ? FLinearColor(0.12f, 0.55f, 0.42f) : FLinearColor(0.12f, 0.58f, 0.58f));
+            ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.58f, 0.50f, 0.34f), 0.34f)
+            : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.12f, 0.55f, 0.42f), 0.32f)
+                                    : FMath::Lerp(Spec.WaterColor, FLinearColor(0.12f, 0.58f, 0.58f), 0.34f));
         const FLinearColor SeamShadow = Spec.bDesertCanyon
-            ? FLinearColor(0.27f, 0.23f, 0.16f)
-            : (Spec.bHasWaterfalls ? FLinearColor(0.020f, 0.22f, 0.17f) : FLinearColor(0.025f, 0.27f, 0.29f));
+            ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.27f, 0.23f, 0.16f), 0.30f)
+            : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.020f, 0.22f, 0.17f), 0.28f)
+                                    : FMath::Lerp(Spec.WaterColor, FLinearColor(0.025f, 0.27f, 0.29f), 0.30f));
         AddPreviewFlowTextureRibbon(
             World,
             Spec,
             FString::Printf(TEXT("RaftSim_WaterShaderRefractionSeam_%03d_%s"), SeamIndex, *Spec.RiverId),
             X - 260.0f,
-            Spec.bDesertCanyon ? 760.0f : 610.0f,
+            Spec.bDesertCanyon ? 620.0f : 500.0f,
             Lateral,
-            Spec.bDesertCanyon ? 18.0f : 15.0f,
+            Spec.bDesertCanyon ? 10.0f : 8.0f,
             static_cast<float>(SeamIndex) * 0.91f,
             SeamHighlight,
             SeamShadow);
@@ -5212,20 +5240,20 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         }
         float BoulderCenterY = GetPreviewRiverCenterY(Spec, X);
         float BoulderLateralOffset = Y - BoulderCenterY;
-        const bool bNearCameraReviewBoulder = X < -2500.0f;
-        if (bNearCameraReviewBoulder && FMath::Abs(BoulderLateralOffset) < ActiveRiverHalfWidth * 0.62f)
+        const bool bNearCameraReviewBoulder = X < 3600.0f;
+        if (bNearCameraReviewBoulder && FMath::Abs(BoulderLateralOffset) < ActiveRiverHalfWidth * 0.78f)
         {
             const float ReviewClearanceSide = (BoulderIndex % 2 == 0) ? -1.0f : 1.0f;
-            X += Spec.bDesertCanyon ? 780.0f : 620.0f;
+            X += Spec.bDesertCanyon ? 1420.0f : 1160.0f;
             BoulderCenterY = GetPreviewRiverCenterY(Spec, X);
             BoulderLateralOffset =
-                ReviewClearanceSide * ActiveRiverHalfWidth * (Spec.bDesertCanyon ? 0.82f : 0.74f);
+                ReviewClearanceSide * ActiveRiverHalfWidth * (Spec.bDesertCanyon ? 0.96f : 0.88f);
             Y = BoulderCenterY + BoulderLateralOffset;
         }
 
         const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainReliefPtr, HeightfieldPreviewPtr);
         const float BaseScale = Spec.bDesertCanyon ? 1.6f : 1.0f + 0.35f * static_cast<float>(BoulderIndex % 3);
-        const float Scale = BaseScale * (bNearCameraReviewBoulder ? 0.68f : 1.0f);
+        const float Scale = BaseScale * (bNearCameraReviewBoulder ? (Spec.bDesertCanyon ? 0.50f : 0.44f) : 1.0f);
         const float BoulderWaterT = SamplePreviewMaskAtWorld(Spec, WaterMaskPtr, X, Y);
         const float BoulderVegetationT = SamplePreviewMaskAtWorld(Spec, VegetationMaskPtr, X, Y);
         const FLinearColor BoulderBaseColor = ScalePreviewColor(Spec.RockColor, Spec.bDesertCanyon ? 0.90f : 0.78f);
@@ -5234,7 +5262,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             FMath::Lerp(ScalePreviewColor(Spec.RockColor, 0.46f), ScalePreviewColor(Spec.WaterColor, 0.34f), 0.30f),
             FMath::Clamp(BoulderWaterT * 0.36f, 0.0f, 0.42f));
         const FLinearColor BoulderColor =
-            bNearCameraReviewBoulder ? ScalePreviewColor(UnadjustedBoulderColor, Spec.bDesertCanyon ? 0.72f : 0.68f) : UnadjustedBoulderColor;
+            bNearCameraReviewBoulder ? ScalePreviewColor(UnadjustedBoulderColor, Spec.bDesertCanyon ? 0.56f : 0.48f) : UnadjustedBoulderColor;
         const FVector BoulderScale(Scale * 1.18f, Scale * 0.92f, Scale * 0.54f);
         const FVector BoulderLocation(X, Y, FMath::Max(20.0f, TerrainZ + 18.0f + 8.0f * static_cast<float>(BoulderIndex % 4)));
         AddPreviewIrregularRockActor(
@@ -5253,7 +5281,8 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             BoulderScale,
             BoulderIndex,
             BoulderWaterT,
-            BoulderVegetationT);
+            BoulderVegetationT,
+            bNearCameraReviewBoulder);
         const float ContactFoamStrength =
             FMath::Clamp(0.45f + BoulderWaterT * 0.55f + Spec.FlowFoamScale * 0.20f, 0.0f, 1.0f);
         if (ContactFoamStrength > 0.52f)
