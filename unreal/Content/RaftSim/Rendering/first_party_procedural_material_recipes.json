@@ -153,6 +153,8 @@
         "submerged_base_darkening",
         "crevice_shadow_facet",
         "muted_top_highlight",
+        "review_frame_boulder_clearance",
+        "near_camera_boulder_darkening",
         "foam_contact_stain"
       ],
       "tunable_parameters": [
@@ -272,6 +274,7 @@
       "procedural_tokens": [
         "depth_tint",
         "depth_reflection_refraction_scaffold",
+        "near_camera_water_scaffold_clearance",
         "turbidity",
         "current_streak",
         "eddy_line_brightening",
