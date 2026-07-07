@@ -123,6 +123,9 @@
       "imagery/production_import_pilot/sentinel_20240204_draft_bank_window_tci_review.json",
       "imagery/production_import_pilot/sentinel_s2b_17pkm_20240204_draft_bank_window_clip_review.png",
       "imagery/production_import_pilot/sentinel_s2b_16phr_20240204_draft_bank_window_clip_review.png",
+      "imagery/production_import_pilot/sentinel_20240224_draft_bank_window_scl_probe.json",
+      "imagery/production_import_pilot/sentinel_s2b_17pkm_20240224_draft_bank_window_scl_qa_review.png",
+      "imagery/production_import_pilot/sentinel_s2b_16phr_20240224_draft_bank_window_scl_qa_review.png",
       "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_scl_qa_review.png",
       "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_scl_qa_review.png"
     ],
