@@ -2690,8 +2690,8 @@ void AddPreviewShoreRibbon(
         return;
     }
 
-    constexpr int32 Segments = 96;
-    constexpr int32 CrossSteps = 2;
+    constexpr int32 Segments = 72;
+    constexpr int32 CrossSteps = 3;
     const float MinX = -5520.0f;
     const float MaxX = 26000.0f;
     const float Side = SignedCenterOffset < 0.0f ? -1.0f : 1.0f;
@@ -2715,17 +2715,30 @@ void AddPreviewShoreRibbon(
         for (int32 CrossIndex = 0; CrossIndex <= CrossSteps; ++CrossIndex)
         {
             const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
-            const float Offset = SignedCenterOffset + Side * Width * (V - 0.5f);
+            const float Breakup = FMath::Clamp(
+                0.50f + 0.34f * FMath::Sin(X * 0.0023f + SignedCenterOffset * 0.0061f) +
+                    0.16f * FMath::Sin(X * 0.0067f - SignedCenterOffset * 0.0029f),
+                0.0f,
+                1.0f);
+            const float SegmentFade = SmoothPreviewStep(0.22f, 0.78f, Breakup);
+            const float LocalWidthScale = 0.26f + 0.48f * SegmentFade;
+            const float Offset = SignedCenterOffset + Side * Width * LocalWidthScale * (V - 0.5f);
             const float Y = CenterY + Offset;
             const float SurfaceWave = FMath::Sin(X * 0.011f + Y * 0.015f) * (Spec.bDesertCanyon ? 2.0f : 4.5f);
             const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief, HeightfieldPreview);
             const float Z = FMath::Max(TerrainZ + ZOffset, GetPreviewWaterSurfaceBaseZCm(Spec) + 3.0f + SurfaceWave + ZOffset * 0.25f);
-            const float Fleck = 0.92f + 0.08f * FMath::Sin(X * 0.0053f + Y * 0.0037f);
+            const float Fleck = 0.95f + 0.04f * FMath::Sin(X * 0.0053f + Y * 0.0037f);
+            const FLinearColor TerrainBase = GetPreviewSoftTerrainPatchFeatherBaseColor(
+                Spec,
+                X,
+                Y,
+                SignedCenterOffset * 0.013f);
+            const FLinearColor RibbonColor = NormalizePreviewTerrainProxyPatchColor(
+                Spec,
+                ScalePreviewColor(FMath::Lerp(InnerColor, OuterColor, V), Fleck));
             Vertices.Add(FVector(X, Y, Z));
             UVs.Add(FVector2D(U * 16.0f, V));
-            VertexColors.Add(NormalizePreviewTerrainProxyPatchColor(
-                Spec,
-                ScalePreviewColor(FMath::Lerp(InnerColor, OuterColor, V), Fleck)));
+            VertexColors.Add(ClampPreviewColor(FMath::Lerp(TerrainBase, RibbonColor, SegmentFade * 0.46f)));
         }
     }
 
@@ -2773,14 +2786,14 @@ void AddPreviewWetBankDressing(
     }
 
     const FLinearColor WetEdge = Spec.bDesertCanyon
-        ? FLinearColor(0.24f, 0.18f, 0.13f)
-        : FMath::Lerp(ScalePreviewColor(Spec.WaterColor, 0.48f), ScalePreviewColor(Spec.RockColor, 0.60f), 0.45f);
+        ? FLinearColor(0.20f, 0.16f, 0.12f)
+        : FMath::Lerp(ScalePreviewColor(Spec.WaterColor, 0.36f), ScalePreviewColor(Spec.RockColor, 0.48f), 0.48f);
     const FLinearColor BankBand = Spec.bDesertCanyon
-        ? FLinearColor(0.50f, 0.34f, 0.22f)
-        : (Spec.bHasWaterfalls ? FLinearColor(0.045f, 0.10f, 0.055f) : FLinearColor(0.16f, 0.17f, 0.13f));
+        ? FLinearColor(0.34f, 0.24f, 0.17f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.035f, 0.075f, 0.045f) : FLinearColor(0.13f, 0.14f, 0.11f));
     const FLinearColor GravelBand = Spec.bDesertCanyon
-        ? FLinearColor(0.64f, 0.43f, 0.26f)
-        : (Spec.bHasWaterfalls ? FLinearColor(0.08f, 0.13f, 0.08f) : FLinearColor(0.22f, 0.22f, 0.17f));
+        ? FLinearColor(0.45f, 0.32f, 0.22f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.052f, 0.095f, 0.058f) : FLinearColor(0.17f, 0.17f, 0.13f));
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float WetBankScale = FMath::Max(0.35f, Spec.FlowWetBankScale);
 
@@ -2793,9 +2806,9 @@ void AddPreviewWetBankDressing(
             TerrainRelief,
             HeightfieldPreview,
             FString::Printf(TEXT("RaftSim_WetWaterline_%s_%s"), Side < 0.0f ? TEXT("Left") : TEXT("Right"), *Spec.RiverId),
-            Side * (ActiveRiverHalfWidth + 82.0f * WetBankScale),
-            (Spec.bDesertCanyon ? 145.0f : 105.0f) * WetBankScale,
-            20.0f,
+            Side * (ActiveRiverHalfWidth + 66.0f * WetBankScale),
+            (Spec.bDesertCanyon ? 72.0f : 54.0f) * WetBankScale,
+            12.0f,
             WetEdge,
             BankBand);
         AddPreviewShoreRibbon(
@@ -2804,9 +2817,9 @@ void AddPreviewWetBankDressing(
             TerrainRelief,
             HeightfieldPreview,
             FString::Printf(TEXT("RaftSim_GravelMudBank_%s_%s"), Side < 0.0f ? TEXT("Left") : TEXT("Right"), *Spec.RiverId),
-            Side * (ActiveRiverHalfWidth + 260.0f * WetBankScale),
-            (Spec.bDesertCanyon ? 230.0f : 125.0f) * WetBankScale,
-            24.0f,
+            Side * (ActiveRiverHalfWidth + 205.0f * WetBankScale),
+            (Spec.bDesertCanyon ? 92.0f : 62.0f) * WetBankScale,
+            15.0f,
             BankBand,
             GravelBand);
     }
@@ -3598,12 +3611,12 @@ void AddPreviewProceduralEnvironmentDetail(
         return;
     }
 
-    const int32 BandCount = Spec.bDesertCanyon ? 7 : (Spec.bHasWaterfalls ? 5 : 4);
+    const int32 BandCount = Spec.bDesertCanyon ? 4 : (Spec.bHasWaterfalls ? 3 : 3);
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float BaseBandOffset = ActiveRiverHalfWidth +
         (Spec.bDesertCanyon ? Spec.BankWidthCm * 0.72f + 380.0f : Spec.BankWidthCm * 0.35f + 190.0f);
-    const float BandSpacing = Spec.bDesertCanyon ? 315.0f : (Spec.bHasWaterfalls ? 150.0f : 180.0f);
-    const float BandWidth = Spec.bDesertCanyon ? 125.0f : (Spec.bHasWaterfalls ? 78.0f : 92.0f);
+    const float BandSpacing = Spec.bDesertCanyon ? 360.0f : (Spec.bHasWaterfalls ? 190.0f : 220.0f);
+    const float BandWidth = Spec.bDesertCanyon ? 54.0f : (Spec.bHasWaterfalls ? 34.0f : 38.0f);
 
     for (int32 SideIndex = 0; SideIndex < 2; ++SideIndex)
     {
@@ -3617,18 +3630,18 @@ void AddPreviewProceduralEnvironmentDetail(
             FLinearColor OuterColor;
             if (Spec.bDesertCanyon)
             {
-                InnerColor = ScalePreviewColor(FLinearColor(0.42f, 0.28f, 0.17f), Warmth);
-                OuterColor = ScalePreviewColor(FLinearColor(0.70f, 0.51f, 0.32f), 0.90f + 0.03f * static_cast<float>(BandIndex % 2));
+                InnerColor = ScalePreviewColor(FLinearColor(0.30f, 0.21f, 0.15f), Warmth);
+                OuterColor = ScalePreviewColor(FLinearColor(0.43f, 0.31f, 0.21f), 0.88f + 0.03f * static_cast<float>(BandIndex % 2));
             }
             else if (Spec.bHasWaterfalls)
             {
-                InnerColor = ScalePreviewColor(FLinearColor(0.030f, 0.070f, 0.038f), 0.92f + 0.04f * static_cast<float>(BandIndex % 2));
-                OuterColor = ScalePreviewColor(FLinearColor(0.075f, 0.120f, 0.060f), 0.86f + 0.05f * static_cast<float>(BandIndex % 3));
+                InnerColor = ScalePreviewColor(FLinearColor(0.028f, 0.060f, 0.036f), 0.88f + 0.04f * static_cast<float>(BandIndex % 2));
+                OuterColor = ScalePreviewColor(FLinearColor(0.052f, 0.088f, 0.050f), 0.84f + 0.05f * static_cast<float>(BandIndex % 3));
             }
             else
             {
-                InnerColor = ScalePreviewColor(FLinearColor(0.14f, 0.13f, 0.10f), 0.92f + 0.04f * static_cast<float>(BandIndex % 2));
-                OuterColor = ScalePreviewColor(FLinearColor(0.29f, 0.25f, 0.17f), 0.88f + 0.04f * static_cast<float>(BandIndex % 3));
+                InnerColor = ScalePreviewColor(FLinearColor(0.12f, 0.12f, 0.095f), 0.88f + 0.04f * static_cast<float>(BandIndex % 2));
+                OuterColor = ScalePreviewColor(FLinearColor(0.20f, 0.18f, 0.13f), 0.86f + 0.04f * static_cast<float>(BandIndex % 3));
             }
 
             AddPreviewShoreRibbon(
