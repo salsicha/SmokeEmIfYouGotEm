@@ -2539,8 +2539,8 @@ void AddPreviewAerialDrapeTiles(
 
 void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
 {
-    constexpr int32 XSteps = 244;
-    constexpr int32 CrossSteps = 24;
+    constexpr int32 XSteps = 320;
+    constexpr int32 CrossSteps = 34;
     const float MinX = -5600.0f;
     const float MaxX = 26200.0f;
 
@@ -2555,10 +2555,14 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
     VertexColors.Reserve((XSteps + 1) * (CrossSteps + 1));
     Triangles.Reserve(XSteps * CrossSteps * 6);
 
-    const FLinearColor DeepWater = ScalePreviewColor(Spec.WaterColor, Spec.bDesertCanyon ? 1.02f : 1.10f);
+    const FLinearColor DeepWaterBase = ScalePreviewColor(Spec.WaterColor, Spec.bDesertCanyon ? 0.98f : 1.02f);
+    const FLinearColor DeepWater = Spec.bDesertCanyon
+        ? FMath::Lerp(DeepWaterBase, FLinearColor(0.20f, 0.18f, 0.13f), 0.35f)
+        : (Spec.bHasWaterfalls ? FMath::Lerp(DeepWaterBase, FLinearColor(0.010f, 0.19f, 0.145f), 0.34f)
+                                : FMath::Lerp(DeepWaterBase, FLinearColor(0.012f, 0.25f, 0.28f), 0.32f));
     const FLinearColor ShallowWater = Spec.bDesertCanyon
-        ? FLinearColor(0.42f, 0.36f, 0.24f)
-        : (Spec.bHasWaterfalls ? FLinearColor(0.035f, 0.42f, 0.33f) : FLinearColor(0.055f, 0.50f, 0.53f));
+        ? FLinearColor(0.34f, 0.30f, 0.22f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.030f, 0.34f, 0.27f) : FLinearColor(0.048f, 0.42f, 0.43f));
     const FLinearColor SurfaceGlint = Spec.bDesertCanyon
         ? FLinearColor(0.58f, 0.49f, 0.34f)
         : (Spec.bHasWaterfalls ? FLinearColor(0.13f, 0.58f, 0.48f) : FLinearColor(0.14f, 0.62f, 0.64f));
@@ -2568,6 +2572,15 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
     const FLinearColor NearFieldDarkSlick = Spec.bDesertCanyon
         ? FLinearColor(0.16f, 0.14f, 0.105f)
         : (Spec.bHasWaterfalls ? FLinearColor(0.010f, 0.105f, 0.085f) : FLinearColor(0.012f, 0.135f, 0.155f));
+    const FLinearColor BaseWaterDeepCurrentTongue = Spec.bDesertCanyon
+        ? FLinearColor(0.17f, 0.15f, 0.11f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.006f, 0.095f, 0.075f) : FLinearColor(0.008f, 0.12f, 0.145f));
+    const FLinearColor BaseWaterSedimentThread = Spec.bDesertCanyon
+        ? FLinearColor(0.36f, 0.30f, 0.20f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.045f, 0.21f, 0.14f) : FLinearColor(0.065f, 0.29f, 0.25f));
+    const FLinearColor BaseWaterSkyThread = Spec.bDesertCanyon
+        ? FLinearColor(0.46f, 0.42f, 0.32f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.085f, 0.34f, 0.29f) : FLinearColor(0.095f, 0.40f, 0.42f));
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float WaterBaseZ = GetPreviewWaterSurfaceBaseZCm(Spec);
     const float FlowEnergy = FMath::Clamp(Spec.FlowCurrentCueScale, 0.65f, 1.60f);
@@ -2577,7 +2590,7 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
         (Spec.bDesertCanyon ? 3.5f : (Spec.bHasWaterfalls ? 5.8f : 4.6f)) *
         FMath::Clamp(Spec.FlowFoamScale, 0.70f, 1.55f);
     const float NearFieldFineRippleAmplitudeCm =
-        (Spec.bDesertCanyon ? 1.2f : (Spec.bHasWaterfalls ? 2.4f : 2.0f)) * FlowEnergy;
+        (Spec.bDesertCanyon ? 1.6f : (Spec.bHasWaterfalls ? 3.1f : 2.6f)) * FlowEnergy;
 
     for (int32 XIndex = 0; XIndex <= XSteps; ++XIndex)
     {
@@ -2620,11 +2633,36 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
             const float FlowNoise =
                 0.50f + 0.30f * FMath::Sin(X * 0.0048f + Lateral * 0.010f) +
                 0.20f * FMath::Sin(X * 0.013f - Lateral * 0.006f);
+            const float BaseWaterDepthCurrentGradingT = FMath::Clamp(
+                CenterT *
+                    (0.52f + 0.28f * FMath::Sin(X * 0.0037f + Lateral * 0.0019f + FlowEnergy) +
+                     0.20f * FMath::Sin(X * 0.011f - Lateral * 0.0047f)),
+                0.0f,
+                1.0f);
+            const float BaseWaterCurrentTongueT = FMath::Clamp(
+                FMath::Pow(BaseWaterDepthCurrentGradingT, 1.35f) * FlowEnergy * 0.18f,
+                0.0f,
+                Spec.bDesertCanyon ? 0.15f : 0.18f);
+            const float BaseWaterSedimentThreadT = FMath::Clamp(
+                (0.40f + EdgeT * 0.60f) *
+                    (0.50f + 0.50f * FMath::Sin(X * 0.0068f + Lateral * 0.0036f + 2.1f)) *
+                    (Spec.bDesertCanyon ? 0.15f : 0.10f),
+                0.0f,
+                Spec.bDesertCanyon ? 0.15f : 0.10f);
+            const float BaseWaterSkyThreadT = FMath::Clamp(
+                CenterT *
+                    (0.50f + 0.50f * FMath::Sin(X * 0.015f + Lateral * 0.0023f - FlowEnergy * 0.6f)) *
+                    (Spec.bDesertCanyon ? 0.060f : 0.080f),
+                0.0f,
+                Spec.bDesertCanyon ? 0.060f : 0.080f);
             FLinearColor WaterColor = FMath::Lerp(DeepWater, ShallowWater, FMath::Clamp(EdgeT * 0.55f, 0.0f, 1.0f));
+            WaterColor = FMath::Lerp(WaterColor, BaseWaterDeepCurrentTongue, BaseWaterCurrentTongueT);
+            WaterColor = FMath::Lerp(WaterColor, BaseWaterSedimentThread, BaseWaterSedimentThreadT);
+            WaterColor = FMath::Lerp(WaterColor, BaseWaterSkyThread, BaseWaterSkyThreadT);
             WaterColor = FMath::Lerp(
                 WaterColor,
                 SurfaceGlint,
-                FMath::Clamp((1.0f - EdgeT * 0.45f) * FlowNoise * FlowEnergy * (Spec.bDesertCanyon ? 0.14f : 0.18f), 0.0f, 0.26f));
+                FMath::Clamp((1.0f - EdgeT * 0.45f) * FlowNoise * FlowEnergy * (Spec.bDesertCanyon ? 0.12f : 0.16f), 0.0f, 0.22f));
             const float NearFieldTextureGain = FMath::Clamp(0.36f + NearFieldWaterSurfaceGrainT * 0.64f, 0.0f, 1.0f);
             WaterColor = FMath::Lerp(
                 WaterColor,

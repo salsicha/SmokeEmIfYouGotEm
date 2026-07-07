@@ -84,6 +84,7 @@
       "lit_vertex_color_water_gradients",
       "first_party_photographic_water_exposure_calibration",
       "first_party_near_field_water_surface_grain",
+      "first_party_base_water_depth_current_grading",
       "flow_aware_water_mesh_undulation",
       "flow_band_depth_texture_ribbons",
       "flow_aware_water_surface_chop_and_turbidity_patches",
@@ -202,11 +203,14 @@
         "water mask",
         "rapid feature annotations"
       ],
-      "procedural_method": "Layer water depth color, turbidity, current streaks, foam tongues, wave-train highlights, eddy lines, hole stickiness cues, lateral spray, waterfall mist, and wet rock response from bounded flow-band parameters and solver-reviewed rapid features.",
+      "procedural_method": "Layer water depth color, base-ribbon current tongues, turbidity, sediment threads, current streaks, foam tongues, wave-train highlights, eddy lines, hole stickiness cues, lateral spray, waterfall mist, and wet rock response from bounded flow-band parameters and solver-reviewed rapid features.",
       "tunable_parameters": [
         "water_level_offset",
         "foam_density",
         "current_cue_density",
+        "base_water_current_tongue_contrast",
+        "base_water_sediment_thread_strength",
+        "base_water_sky_thread_strength",
         "turbidity",
         "spray_intensity",
         "mist_density",
