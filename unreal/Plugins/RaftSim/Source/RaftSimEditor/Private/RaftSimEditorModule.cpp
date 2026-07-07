@@ -2028,8 +2028,8 @@ void AddPreviewAerialDrapeTiles(
 
 void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
 {
-    constexpr int32 XSteps = 120;
-    constexpr int32 CrossSteps = 10;
+    constexpr int32 XSteps = 184;
+    constexpr int32 CrossSteps = 16;
     const float MinX = -5600.0f;
     const float MaxX = 26200.0f;
 
@@ -2053,6 +2053,12 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
         : (Spec.bHasWaterfalls ? FLinearColor(0.13f, 0.58f, 0.48f) : FLinearColor(0.14f, 0.62f, 0.64f));
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float WaterBaseZ = GetPreviewWaterSurfaceBaseZCm(Spec);
+    const float FlowEnergy = FMath::Clamp(Spec.FlowCurrentCueScale, 0.65f, 1.60f);
+    const float BaseWaveAmplitudeCm =
+        (Spec.bDesertCanyon ? 5.0f : (Spec.bHasWaterfalls ? 9.0f : 7.0f)) * FlowEnergy;
+    const float StandingWaveAmplitudeCm =
+        (Spec.bDesertCanyon ? 3.5f : (Spec.bHasWaterfalls ? 5.8f : 4.6f)) *
+        FMath::Clamp(Spec.FlowFoamScale, 0.70f, 1.55f);
 
     for (int32 XIndex = 0; XIndex <= XSteps; ++XIndex)
     {
@@ -2065,8 +2071,17 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
         {
             const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
             const float Lateral = FMath::Lerp(-Width, Width, V);
-            const float Wave = FMath::Sin(X * 0.011f + Lateral * 0.015f) * (Spec.bDesertCanyon ? 2.0f : 4.5f);
             const float EdgeT = FMath::Pow(FMath::Abs(V - 0.5f) * 2.0f, 1.35f);
+            const float CenterT = 1.0f - FMath::Clamp(EdgeT, 0.0f, 1.0f);
+            const float CrossWaveT = FMath::Sin((V - 0.5f) * PI);
+            const float Wave =
+                BaseWaveAmplitudeCm *
+                    (0.58f * FMath::Sin(X * 0.010f * FlowEnergy + Lateral * 0.010f) +
+                     0.28f * FMath::Sin(X * 0.021f - Lateral * 0.004f + FlowEnergy * 1.7f)) *
+                    (0.58f + CenterT * 0.42f) +
+                StandingWaveAmplitudeCm *
+                    FMath::Sin(X * (Spec.bDesertCanyon ? 0.0032f : 0.0049f) + CrossWaveT * 1.85f) *
+                    FMath::Pow(CenterT, Spec.bDesertCanyon ? 0.90f : 0.72f);
             const float FlowNoise =
                 0.50f + 0.30f * FMath::Sin(X * 0.0048f + Lateral * 0.010f) +
                 0.20f * FMath::Sin(X * 0.013f - Lateral * 0.006f);
@@ -2074,7 +2089,7 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
             WaterColor = FMath::Lerp(
                 WaterColor,
                 SurfaceGlint,
-                FMath::Clamp((1.0f - EdgeT * 0.45f) * FlowNoise * (Spec.bDesertCanyon ? 0.12f : 0.16f), 0.0f, 0.22f));
+                FMath::Clamp((1.0f - EdgeT * 0.45f) * FlowNoise * FlowEnergy * (Spec.bDesertCanyon ? 0.14f : 0.18f), 0.0f, 0.26f));
             Vertices.Add(FVector(X, CenterY + Lateral, WaterBaseZ + Wave));
             UVs.Add(FVector2D(U * 18.0f, V));
             VertexColors.Add(ClampPreviewColor(WaterColor));
