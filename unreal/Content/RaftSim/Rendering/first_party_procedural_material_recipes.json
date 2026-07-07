@@ -290,7 +290,7 @@
         "tropical_canopy_and_understory"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
-      "unreal_status": "first_party_procedural_only_generated_foliage_branch_frond_lattice_fine_twig_canopy_lace_crown_depth_leaflet_breakup_canopy_height_massing_and_photographic_foliage_tone_materials_active_stylized_pcg_sample_meshes_disabled_production_biome_library_pending",
+      "unreal_status": "first_party_procedural_only_generated_foliage_branch_frond_lattice_fine_twig_canopy_lace_crown_depth_leaflet_breakup_canopy_height_massing_tone_shadow_and_photographic_foliage_tone_materials_active_stylized_pcg_sample_meshes_disabled_production_biome_library_pending",
       "required_source_inputs": [
         "vegetation_mask_2048.png",
         "water_mask_2048.png",
@@ -320,6 +320,9 @@
         "first_party_procedural_only_foliage_review",
         "procedural_canopy_height_massing_profile",
         "river_specific_crown_height_width_bias",
+        "procedural_canopy_tone_compression",
+        "procedural_crown_shadow_profile",
+        "river_specific_canopy_tone_anchor",
         "bank_sightline_cutout",
         "seasonal_color_shift"
       ],
@@ -348,6 +351,9 @@
         "procedural_canopy_height_profile",
         "procedural_canopy_massing_width_scale",
         "procedural_trunk_height_profile",
+        "procedural_canopy_tone_compression",
+        "procedural_canopy_shadow_profile",
+        "river_specific_canopy_tone_anchor",
         "deadfall_frequency",
         "bank_sightline_cutout_width_m",
         "leaf_color_variance",
