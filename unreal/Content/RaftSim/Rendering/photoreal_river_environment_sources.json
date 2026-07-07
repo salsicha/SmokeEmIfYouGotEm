@@ -1421,6 +1421,7 @@
       "first_party_procedural_lit_vertex_color_water_gradients_recorded",
       "flow_band_depth_texture_ribbons_recorded",
       "flow_aware_water_surface_chop_and_turbidity_patches_recorded",
+      "first_party_water_shader_depth_reflection_refraction_scaffold_recorded",
       "first_party_mask_aware_ground_cover_and_canopy_cards_recorded",
       "biome_specific_deadfall_grass_root_ecology_props_recorded",
       "first_party_biome_foliage_silhouette_proxy_layers_recorded",

@@ -249,7 +249,7 @@
         "water_surface_depth_turbidity_and_current_cues"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
-      "unreal_status": "lit_vertex_color_water_preview_active_custom_shader_or_waterbody_integration_pending",
+      "unreal_status": "lit_vertex_color_water_preview_active_with_depth_reflection_refraction_scaffold_custom_shader_or_waterbody_integration_pending",
       "required_source_inputs": [
         "river_flow_visual_bands.json",
         "solver_or_preview_flow_band_telemetry",
@@ -259,6 +259,7 @@
       ],
       "procedural_tokens": [
         "depth_tint",
+        "depth_reflection_refraction_scaffold",
         "turbidity",
         "current_streak",
         "eddy_line_brightening",
