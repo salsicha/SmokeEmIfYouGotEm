@@ -561,6 +561,78 @@ UMaterialInterface* LoadOrCreatePreviewVertexColorMaterial()
     return Material;
 }
 
+UMaterialInterface* LoadOrCreatePreviewTerrainVertexColorMaterial()
+{
+    static const TCHAR* MaterialPackagePath = TEXT("/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview");
+    static const TCHAR* MaterialObjectPath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview.M_RaftSim_TerrainVertexColorLitPreview");
+
+    UMaterial* Material = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, MaterialObjectPath));
+    if (!Material)
+    {
+        UPackage* Package = CreatePackage(MaterialPackagePath);
+        if (!Package)
+        {
+            return nullptr;
+        }
+
+        Material = NewObject<UMaterial>(
+            Package,
+            TEXT("M_RaftSim_TerrainVertexColorLitPreview"),
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (!Material)
+        {
+            return nullptr;
+        }
+
+        FAssetRegistryModule::AssetCreated(Material);
+        Material->Modify();
+        Material->SetShadingModel(MSM_DefaultLit);
+        Material->BlendMode = BLEND_Opaque;
+        Material->TwoSided = true;
+
+        UMaterialExpressionVertexColor* VertexColor = NewObject<UMaterialExpressionVertexColor>(Material);
+        Material->GetExpressionCollection().AddExpression(VertexColor);
+
+        UMaterialExpressionConstant* Roughness = NewObject<UMaterialExpressionConstant>(Material);
+        Roughness->R = 0.86f;
+        Material->GetExpressionCollection().AddExpression(Roughness);
+
+        UMaterialExpressionConstant* Specular = NewObject<UMaterialExpressionConstant>(Material);
+        Specular->R = 0.16f;
+        Material->GetExpressionCollection().AddExpression(Specular);
+
+        UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
+        EmissiveScale->R = 0.035f;
+        Material->GetExpressionCollection().AddExpression(EmissiveScale);
+
+        UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
+        EmissiveColor->A.Expression = VertexColor;
+        EmissiveColor->B.Expression = EmissiveScale;
+        Material->GetExpressionCollection().AddExpression(EmissiveColor);
+
+        UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, VertexColor);
+        ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+
+        Material->PostEditChange();
+        Package->MarkPackageDirty();
+
+        const FString Filename =
+            FPackageName::LongPackageNameToFilename(MaterialPackagePath, FPackageName::GetAssetPackageExtension());
+        IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+
+        FSavePackageArgs SaveArgs;
+        SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+        SaveArgs.SaveFlags = SAVE_NoError;
+        UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+    }
+
+    return Material;
+}
+
 UMaterialInterface* LoadOrCreatePreviewTranslucentColorMaterial()
 {
     static const TCHAR* MaterialPackagePath = TEXT("/Game/RaftSim/Materials/M_RaftSim_TranslucentColorPreview");
@@ -1571,7 +1643,7 @@ void AddPreviewTerrainMesh(
         Normals,
         UVs,
         Spec.TerrainColor,
-        LoadOrCreatePreviewVertexColorMaterial(),
+        LoadOrCreatePreviewTerrainVertexColorMaterial(),
         &VertexColors);
 }
 
@@ -1833,7 +1905,7 @@ void AddPreviewShoreRibbon(
         Normals,
         UVs,
         InnerColor,
-        LoadOrCreatePreviewVertexColorMaterial(),
+        LoadOrCreatePreviewTerrainVertexColorMaterial(),
         &VertexColors);
 }
 
@@ -1974,7 +2046,7 @@ void AddPreviewBankBreakupPatch(
         Normals,
         UVs,
         InnerColor,
-        LoadOrCreatePreviewVertexColorMaterial(),
+        LoadOrCreatePreviewTerrainVertexColorMaterial(),
         &VertexColors);
 }
 

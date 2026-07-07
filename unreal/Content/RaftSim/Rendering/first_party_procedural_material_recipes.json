@@ -15,11 +15,19 @@
   },
   "active_preview_materials": [
     {
-      "material_path": "/Game/RaftSim/Materials/M_RaftSim_VertexColorPreview",
+      "material_path": "/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview",
       "current_use": [
         "terrain_vertex_color_layers",
         "wet_bank_ribbons",
         "source_detail_bands",
+        "source_aware_bank_breakup_patches"
+      ],
+      "replacement_target": "production_landscape_or_nanite_layered_terrain_material"
+    },
+    {
+      "material_path": "/Game/RaftSim/Materials/M_RaftSim_VertexColorPreview",
+      "current_use": [
+        "simple_vertex_color_proxy_meshes",
         "ground_cover_cards"
       ],
       "replacement_target": "production_landscape_or_nanite_layered_terrain_material"
@@ -61,8 +69,8 @@
         "canyon_walls_and_valley_banks",
         "riverbed_and_shallow_shelves"
       ],
-      "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorPreview",
-      "unreal_status": "preview_vertex_color_material_active_with_landscape_nanite_material_scaffold_production_layered_material_pending",
+      "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview",
+      "unreal_status": "terrain_specific_lit_vertex_color_material_active_with_landscape_nanite_material_scaffold_production_layered_material_pending",
       "required_source_inputs": [
         "source_drape_4096.png",
         "dem_relief_2048.png",
@@ -77,6 +85,7 @@
         "gravel_bar_noise",
         "strata_band_color",
         "landscape_nanite_material_scaffold",
+        "lit_terrain_vertex_color_roughness",
         "leaf_litter_or_sand_overlay",
         "source_drape_weight"
       ],
