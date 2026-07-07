@@ -99,6 +99,8 @@ from raftsim.real_world import (
     PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
     PACUARE_SNIT_OGC_CATALOG_FILE,
     PACUARE_SOURCE_METADATA_REVIEW_FILE,
+    PRODUCTION_ADDITIONAL_SOURCE_LEADS_REVIEW_FILE,
+    PRODUCTION_ADDITIONAL_SOURCE_LEADS_REVIEW_SCHEMA_VERSION,
     PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_FILE,
     PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_SCHEMA_VERSION,
     PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE,
@@ -2873,6 +2875,10 @@ def test_production_geospatial_attachment_ledger_lists_existing_review_gated_art
     assert ledger["canonical_inputs"]["source_readiness_matrix"] == "production_geospatial_source_readiness.json"
     assert ledger["canonical_inputs"]["source_attachment_audit"] == PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_FILE
     assert (
+        readiness["canonical_inputs"]["additional_source_leads_review"]
+        == "physics/data/real_world/production_additional_source_leads_review.json"
+    )
+    assert (
         gap_register["canonical_inputs"]["geospatial_attachment_ledger"]
         == "physics/data/real_world/production_geospatial_attachment_ledger.json"
     )
@@ -2937,6 +2943,34 @@ def test_production_geospatial_attachment_audit_matches_ledger_and_keeps_preview
     assert all("preview" in river["overall_status"] for river in rivers.values())
 
 
+def test_production_additional_source_leads_review_records_official_link_only_sources():
+    review = json.loads((REAL_WORLD_DATA_DIR / PRODUCTION_ADDITIONAL_SOURCE_LEADS_REVIEW_FILE).read_text())
+    lead_ids = {lead["source_id"] for lead in review["reviewed_web_sources"]}
+    river_ids = {river_id for lead in review["reviewed_web_sources"] for river_id in lead["river_ids"]}
+
+    assert review["schema"] == PRODUCTION_ADDITIONAL_SOURCE_LEADS_REVIEW_SCHEMA_VERSION
+    assert review["status"] == "official_and_rights_reviewable_leads_recorded_no_media_downloaded"
+    assert review["policy"]["official_sources_first"] is True
+    assert review["policy"]["no_media_downloaded_or_packaged"] is True
+    assert review["policy"]["source_leads_do_not_promote_lifelike_status"] is True
+    assert {"american_south_fork", "colorado_river", "pacuare"} == river_ids
+    assert {
+        "blm_south_fork_american_recreation_page",
+        "blm_south_fork_american_area_map_pdf",
+        "nps_grand_canyon_river_trips_permits_2026",
+        "nps_grand_canyon_photos_multimedia",
+        "snit_ogc_services_catalog_2026",
+        "direccion_de_agua_sinigirh_geoservices_2026",
+    } == lead_ids
+    for lead in review["reviewed_web_sources"]:
+        assert lead["url"].startswith("https://")
+        assert lead["source_classes"]
+        assert lead["observed_useful_evidence"]
+        assert lead["next_action"]
+        assert lead["promotion_gate"]
+    assert review["manual_social_reference_followup"]["canonical_manifest"] == "reference_media_link_manifest.json"
+
+
 def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_rivers():
     register = build_production_environment_gap_register()
     rivers = {entry["river_id"]: entry for entry in register["rivers"]}
@@ -2964,6 +2998,10 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert (
         register["canonical_inputs"]["geospatial_source_attachment_audit"]
         == "physics/data/real_world/production_geospatial_source_attachment_audit.json"
+    )
+    assert (
+        register["canonical_inputs"]["additional_source_leads_review"]
+        == "physics/data/real_world/production_additional_source_leads_review.json"
     )
     assert any(target["target"] == "water_foam_spray_mist_and_wetness" for target in register["global_visual_replacement_targets"])
 
