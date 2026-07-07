@@ -43,6 +43,7 @@
       "water_and_vegetation_mask_guided_detail_placement",
       "wet_bank_shore_ribbons",
       "source_aware_bank_breakup_texture_patches",
+      "first_party_terrain_material_layer_facets_and_slope_shadow_patches",
       "flow_aware_waterline_pebble_scatter",
       "first_party_irregular_rock_geometry_variants",
       "strata_leaf_litter_wet_rock_and_talus_bands",
