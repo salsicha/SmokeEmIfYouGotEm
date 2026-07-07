@@ -1421,6 +1421,7 @@
       "flow_aware_waterline_pebble_scatter_recorded",
       "first_party_irregular_rock_geometry_variants_recorded",
       "first_party_boulder_wetness_abrasion_moss_surface_variants_recorded",
+      "first_party_boulder_crevice_shadow_and_albedo_tuning_recorded",
       "first_party_procedural_strata_leaf_litter_wet_rock_and_talus_detail_recorded",
       "first_party_procedural_lit_vertex_color_water_gradients_recorded",
       "flow_band_depth_texture_ribbons_recorded",
