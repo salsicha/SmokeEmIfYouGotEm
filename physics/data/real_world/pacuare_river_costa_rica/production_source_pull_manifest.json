@@ -20,7 +20,7 @@
     "Pacuare high-resolution scene metadata review identifies official Landsat/Sentinel candidates, but production imagery still needs full-year paging, download approval, manual visual QA, CRS/band/scale review, and guide/geospatial signoff before replacing the MODIS/GIBS preview.",
     "Anonymous LandsatLook product asset URLs returned EROS login HTML for the best Pacuare Landsat candidate, so imagery downloads remain blocked until an approved access path returns expected JPEG/JSON/COG content.",
     "Pacuare Sentinel COG thumbnails and tile metadata are attached as visual triage, but full-resolution Sentinel bands, SCL/QA masks, corridor clipping, terms/attribution, and manual cloud/shadow QA are still required before source-drape or mask replacement.",
-    "Pacuare March 20, 2025 Sentinel SCL QA and matching TCI bbox clips are attached for review only; production imagery still needs exact native-CRS route/bank clipping, SCL masking, stitching, terms/attribution review, and guide/geospatial signoff."
+    "Pacuare March 20, 2025 Sentinel SCL QA, matching TCI bbox clips, and draft-bank window strips are attached for review only; production imagery still needs cleaner route-local coverage or exact native-CRS route/bank clipping with SCL masking, stitching, terms/attribution review, and guide/geospatial signoff."
   ],
   "pulled_artifacts": [
     {
@@ -1200,6 +1200,7 @@
       },
       "related_artifacts": [
         "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+        "imagery/production_import_pilot/sentinel_20250320_draft_bank_window_review.json",
         "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
         "imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
         "imagery/production_import_pilot/sentinel_cog_access_probe.json"
@@ -1213,6 +1214,51 @@
         "These are draft bbox clips, not exact route/bank clips, stitched source drapes, material inputs, production masks, or lifelike screenshot evidence.",
         "Scattered cloud and shadow remain visible in the review clips despite lower SCL cloud fractions than January 19.",
         "Production Pacuare imagery remains blocked until exact clipping, SCL masking, stitching, terms review, and guide/geospatial approval pass."
+      ]
+    },
+    {
+      "artifact_id": "pacuare_sentinel_20250320_draft_bank_window_review",
+      "category": "sentinel_draft_bank_window_tci_scl_review",
+      "paths": [
+        "imagery/production_import_pilot/sentinel_20250320_draft_bank_window_review.json",
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_draft_bank_window_clip_review.png",
+        "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_draft_bank_window_clip_review.png",
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_draft_bank_window_scl_qa_review.png",
+        "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_draft_bank_window_scl_qa_review.png"
+      ],
+      "provider": "RaftSim draft-bank window extraction from March 20 Sentinel TCI and SCL COGs",
+      "status": "draft_bank_window_review_attached_cloud_shadow_blocked",
+      "summary": {
+        "clip_scope": "draft_unreal_preview_bank_bbox_plus_250m_context_not_official_route_polygon",
+        "context_margin_m": 250,
+        "source_geometry_status": "preview_scaffold_not_official_hydrography",
+        "source_drape_replaced": false,
+        "mask_sources_replaced": false,
+        "cloud_screening_blocks_promotion": true,
+        "scl_cloud_or_cirrus_fraction_by_tile": {
+          "17PKM": 0.037358,
+          "16PHR": 0.050347
+        },
+        "scl_cloud_shadow_fraction_by_tile": {
+          "17PKM": 0.039898,
+          "16PHR": 0.038287
+        }
+      },
+      "related_artifacts": [
+        "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_clip_review.json",
+        "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+        "hydrography/production_import_pilot/centerline.geojson",
+        "hydrography/production_import_pilot/banks.geojson"
+      ],
+      "use": [
+        "route_window_visual_triage",
+        "cloud_shadow_qa_review",
+        "future_exact_route_clip_planning"
+      ],
+      "caveats": [
+        "Draft bank geometry comes from the Unreal preview scaffold, not official hydrography or guide-approved route geometry.",
+        "The narrower corridor-local window reveals enough cloud/shadow to block March 20 source-drape promotion.",
+        "Production Pacuare imagery remains blocked until cleaner route-local coverage or exact route-window SCL masking, stitching, terms review, and guide/geospatial approval pass."
       ]
     }
   ],

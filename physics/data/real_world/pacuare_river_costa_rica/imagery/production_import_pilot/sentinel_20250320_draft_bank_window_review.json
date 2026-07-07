@@ -1,0 +1,176 @@
+{
+  "schema": "raftsim.pacuare_sentinel_20250320_draft_bank_window_review.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "draft_bank_window_review_attached_cloud_shadow_blocked",
+  "goal": "Narrow the March 20, 2025 Sentinel review from draft planning bbox clips to a draft-bank window and measure whether the corridor-local cloud/shadow contamination allows source-drape promotion.",
+  "clip_scope": "draft_unreal_preview_bank_bbox_plus_250m_context_not_official_route_polygon",
+  "draft_bank_bounds_wgs84": {
+    "min_lon": -83.7503114,
+    "min_lat": 9.8903661,
+    "max_lon": -83.4196455,
+    "max_lat": 9.9519607,
+    "context_margin_m": 250
+  },
+  "source_geometry": {
+    "centerline": "hydrography/production_import_pilot/centerline.geojson",
+    "banks": "hydrography/production_import_pilot/banks.geojson",
+    "stationing": "hydrography/production_import_pilot/preview_stationing_scaffold.json",
+    "status": "preview_scaffold_not_official_hydrography"
+  },
+  "method": {
+    "coordinate_transform": "Inline WGS84 to UTM Transverse Mercator calculation using WGS84 ellipsoid constants; validated by reproducing the existing January/March planning-bbox pixel windows.",
+    "pixel_model": "Sentinel-2 TCI uses 10 m pixels at 10980x10980 and SCL uses 20 m pixels at 5490x5490 on the same tile origins.",
+    "clip_algorithm": "Compute a UTM bbox around the draft bank-line bounds plus 250 m context, clamp against each Sentinel tile, crop TCI and SCL windows, then downsample to 1024 px wide review strips.",
+    "limitations": [
+      "The source bank geometry is generated from the Unreal preview scaffold and is not official Costa Rica hydrography, surveyed bank geometry, wetted width, or protected-area-safe publication geometry.",
+      "The TCI strips are not masked by SCL; the companion SCL strips are QA references only.",
+      "The clips are narrow bbox strips around draft banks, not a polygon route clip, stitched mosaic, source drape, material input, or mask source."
+    ]
+  },
+  "source_links": {
+    "march_tci_bbox_clip_review": "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_clip_review.json",
+    "march_scl_qa_review": "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+    "january_bbox_clip_review": "imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
+    "cleaner_scene_search": "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json"
+  },
+  "outputs": [
+    {
+      "tile_id": "17PKM",
+      "kind": "tci",
+      "path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_draft_bank_window_clip_review.png",
+      "native_utm_bbox_m": [
+        198117.9806854698,
+        1094003.8168333934,
+        234954.2090065148,
+        1101602.7305757483
+      ],
+      "pixel_window": {
+        "left": 0,
+        "top": 9839,
+        "width": 3498,
+        "height": 761
+      },
+      "dimensions_px": [
+        1024,
+        223
+      ],
+      "mode": "RGB",
+      "byte_count": 445116,
+      "sha256": "4b6f86136d5f33e2b4b3bfedfcb6e6c0acf4fedd3b5aed76c42d1ccf991aa444",
+      "visual_review": "Narrow route-context strip is useful for seeing the draft corridor, but clouds and shadows intersect the right/eastern part of the draft-bank window."
+    },
+    {
+      "tile_id": "16PHR",
+      "kind": "tci",
+      "path": "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_draft_bank_window_clip_review.png",
+      "native_utm_bbox_m": [
+        856134.3739994016,
+        1094778.6924100376,
+        893013.8078169008,
+        1102473.5952565107
+      ],
+      "pixel_window": {
+        "left": 5615,
+        "top": 0,
+        "width": 3689,
+        "height": 527
+      },
+      "dimensions_px": [
+        1024,
+        146
+      ],
+      "mode": "RGB",
+      "byte_count": 299647,
+      "sha256": "b01b8f9b473084f8ac1e2f9a7ff1ecfa17c9b31fed6e29a36796e748b3ccf4db",
+      "visual_review": "Narrow route-context strip is cleaner than January but still has scattered cloud/shadow crossing the draft corridor."
+    },
+    {
+      "tile_id": "17PKM",
+      "kind": "scl",
+      "path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_draft_bank_window_scl_qa_review.png",
+      "pixel_window": {
+        "left": 0,
+        "top": 4919,
+        "width": 1749,
+        "height": 381
+      },
+      "dimensions_px": [
+        1024,
+        223
+      ],
+      "mode": "RGB",
+      "byte_count": 17141,
+      "sha256": "faba74b942a25c8626cf78df115922dcccefa15e40becdfeb0cf5589d133e9a8",
+      "native_pixel_count": 666369,
+      "class_summary": {
+        "cloud_or_cirrus_fraction": 0.037358,
+        "cloud_shadow_fraction": 0.039898,
+        "vegetation_fraction": 0.88367,
+        "water_fraction": 0.000189,
+        "unclassified_fraction": 0.001537
+      },
+      "review_decision": "Cloud/shadow fraction is higher in the draft-bank window than in the broader bbox, so this strip is blocked from source-drape promotion."
+    },
+    {
+      "tile_id": "16PHR",
+      "kind": "scl",
+      "path": "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_draft_bank_window_scl_qa_review.png",
+      "pixel_window": {
+        "left": 2807,
+        "top": 0,
+        "width": 1845,
+        "height": 264
+      },
+      "dimensions_px": [
+        1024,
+        147
+      ],
+      "mode": "RGB",
+      "byte_count": 13563,
+      "sha256": "a18cd6bff82f5637622167e13b025078730a41836e09962f5a62b581cbe4f99f",
+      "native_pixel_count": 487080,
+      "class_summary": {
+        "cloud_or_cirrus_fraction": 0.050347,
+        "cloud_shadow_fraction": 0.038287,
+        "vegetation_fraction": 0.857446,
+        "water_fraction": 0.0,
+        "unclassified_fraction": 0.001587
+      },
+      "review_decision": "Cloud/shadow fraction is higher in the draft-bank window than in the broader bbox, so this strip is blocked from source-drape promotion."
+    }
+  ],
+  "windowed_read_decision": {
+    "draft_bank_window_previews_generated": true,
+    "official_route_or_bank_clip_generated": false,
+    "scl_qa_review_attached": true,
+    "scl_mask_applied_to_tci": false,
+    "stitched_corridor_mosaic_generated": false,
+    "source_drape_replaced": false,
+    "mask_sources_replaced": false,
+    "full_cogs_committed": false,
+    "cloud_screening_blocks_promotion": true,
+    "decision": "The March 20 scene is a better candidate than January, but the draft-bank window has corridor-local cloud/shadow contamination and preview-scaffold bank geometry. Do not promote to Pacuare source drape or masks."
+  },
+  "recommended_next_step": "probe_alternate_scene_or_exact_route_scl_mask_before_source_drape",
+  "allowed_use": [
+    "route_window_visual_triage",
+    "cloud_shadow_qa_review",
+    "future_exact_route_clip_planning",
+    "guide/geospatial source discussion"
+  ],
+  "forbidden_use": [
+    "production source-drape replacement",
+    "production water or vegetation mask generation",
+    "photoreal material extraction",
+    "claiming Pacuare route imagery coverage",
+    "claiming lifelike Pacuare screenshot readiness"
+  ],
+  "promotion_blockers": [
+    "Replace preview-scaffold bank geometry with official or guide-approved route/bank geometry.",
+    "Find a cleaner same-date or alternate scene, or apply exact route-window SCL masking and prove enough usable corridor remains.",
+    "Stitch only after exact clipping, SCL/cloud/shadow QA, seam review, scale review, and terms review pass.",
+    "Record guide/geospatial approval before any imagery-derived Pacuare material or lifelike capture claim."
+  ]
+}
