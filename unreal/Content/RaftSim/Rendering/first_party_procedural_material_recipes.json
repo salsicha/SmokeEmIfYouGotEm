@@ -289,7 +289,7 @@
         "water_surface_depth_turbidity_and_current_cues"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
-      "unreal_status": "lit_vertex_color_water_preview_active_with_low_occlusion_far_field_depth_reflection_refraction_scaffold_custom_shader_or_waterbody_integration_pending",
+      "unreal_status": "lit_vertex_color_water_preview_active_with_shallow_water_clarity_aeration_and_low_occlusion_far_field_depth_reflection_refraction_scaffold_custom_shader_or_waterbody_integration_pending",
       "required_source_inputs": [
         "river_flow_visual_bands.json",
         "solver_or_preview_flow_band_telemetry",
@@ -305,6 +305,9 @@
         "flow_aware_water_mesh_undulation",
         "flow_aware_micro_ripple_glints",
         "near_frame_water_ribbon_occlusion_demotion",
+        "shallow_water_clarity_band",
+        "source_masked_shallow_bed_reveal",
+        "aeration_bubble_lace",
         "turbidity",
         "current_streak",
         "eddy_line_brightening",
@@ -324,6 +327,10 @@
         "micro_ripple_glint_opacity",
         "near_frame_water_ribbon_gain",
         "near_frame_water_ribbon_width",
+        "shallow_water_edge_band_width",
+        "shallow_water_bed_reveal_strength",
+        "aeration_bubble_lace_density",
+        "aeration_bubble_lace_opacity",
         "current_cue_density",
         "eddy_line_strength",
         "hole_retention_visual_strength"
