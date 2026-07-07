@@ -1647,6 +1647,69 @@ void AddPreviewProceduralEnvironmentDetail(
         return;
     }
 
+    const int32 WaterlinePebbleCount = Spec.bDesertCanyon ? 128 : (Spec.bHasWaterfalls ? 138 : 112);
+    const float WetBankScale = FMath::Max(0.35f, Spec.FlowWetBankScale);
+    const float WaterSurfaceZ = GetPreviewWaterSurfaceBaseZCm(Spec);
+    for (int32 PebbleIndex = 0; PebbleIndex < WaterlinePebbleCount; ++PebbleIndex)
+    {
+        const float T = static_cast<float>(PebbleIndex) / static_cast<float>(FMath::Max(1, WaterlinePebbleCount - 1));
+        const float Side = (PebbleIndex % 2 == 0) ? -1.0f : 1.0f;
+        const float BaseX = FMath::Lerp(850.0f, 25800.0f, T) +
+            95.0f * FMath::Sin(static_cast<float>(PebbleIndex) * 1.71f);
+        float X = BaseX;
+        float Y = GetPreviewRiverCenterY(Spec, X) + Side * (ActiveRiverHalfWidth + 48.0f * WetBankScale);
+        float BestScore = -1000.0f;
+        for (int32 CandidateIndex = 0; CandidateIndex < 4; ++CandidateIndex)
+        {
+            const float CandidateX = BaseX +
+                56.0f * FMath::Sin(static_cast<float>(PebbleIndex) * 0.47f + static_cast<float>(CandidateIndex) * 1.21f);
+            const float ShoreOffset = ActiveRiverHalfWidth + WetBankScale *
+                (24.0f + 42.0f * static_cast<float>(CandidateIndex) + 38.0f * FMath::Abs(FMath::Sin(static_cast<float>(PebbleIndex) * 1.19f)));
+            const float CandidateY = GetPreviewRiverCenterY(Spec, CandidateX) + Side * ShoreOffset;
+            const float WaterT = SamplePreviewMaskAtWorld(Spec, WaterMask, CandidateX, CandidateY);
+            const float VegetationT = SamplePreviewMaskAtWorld(Spec, VegetationMask, CandidateX, CandidateY);
+            const float EdgePreference = 1.0f -
+                FMath::Clamp(FMath::Abs(ShoreOffset - (ActiveRiverHalfWidth + 76.0f * WetBankScale)) / (170.0f * WetBankScale), 0.0f, 1.0f);
+            const float Score = EdgePreference * 1.35f + WaterT * 0.46f - VegetationT * 0.52f +
+                0.04f * FMath::Sin(static_cast<float>(PebbleIndex) * 0.91f + static_cast<float>(CandidateIndex));
+            if (Score > BestScore)
+            {
+                BestScore = Score;
+                X = CandidateX;
+                Y = CandidateY;
+            }
+        }
+
+        const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief, HeightfieldPreview);
+        const float PebbleScale = 0.62f + 0.16f * static_cast<float>(PebbleIndex % 6);
+        const FVector Scale = Spec.bDesertCanyon
+            ? FVector(0.115f * PebbleScale, 0.064f * PebbleScale, 0.014f * PebbleScale)
+            : FVector(0.084f * PebbleScale, 0.052f * PebbleScale, 0.013f * PebbleScale);
+        const FLinearColor DryPebbleColor = Spec.bDesertCanyon
+            ? ScalePreviewColor(FLinearColor(0.42f, 0.30f, 0.20f), 0.88f + 0.05f * static_cast<float>(PebbleIndex % 4))
+            : (Spec.bHasWaterfalls
+                  ? ScalePreviewColor(FLinearColor(0.035f, 0.055f, 0.045f), 0.86f + 0.05f * static_cast<float>(PebbleIndex % 5))
+                  : ScalePreviewColor(FLinearColor(0.16f, 0.15f, 0.12f), 0.88f + 0.04f * static_cast<float>(PebbleIndex % 4)));
+        const FLinearColor WetPebbleColor = FMath::Lerp(
+            ScalePreviewColor(Spec.RockColor, Spec.bDesertCanyon ? 0.50f : 0.42f),
+            ScalePreviewColor(Spec.WaterColor, Spec.bDesertCanyon ? 0.40f : 0.34f),
+            Spec.bDesertCanyon ? 0.22f : 0.36f);
+        const float WaterT = SamplePreviewMaskAtWorld(Spec, WaterMask, X, Y);
+        const FLinearColor PebbleColor = FMath::Lerp(
+            DryPebbleColor,
+            WetPebbleColor,
+            FMath::Clamp(0.24f + WaterT * 0.48f, 0.0f, 0.72f));
+
+        AddPreviewMeshActor(
+            World,
+            PebbleMesh,
+            FString::Printf(TEXT("RaftSim_FlowAwareWaterlinePebble_%03d_%s"), PebbleIndex, *Spec.RiverId),
+            FVector(X, Y, FMath::Max(TerrainZ + 13.0f, WaterSurfaceZ + 6.0f)),
+            FRotator(0.0f, static_cast<float>((PebbleIndex * 37) % 360), 0.0f),
+            Scale,
+            PebbleColor);
+    }
+
     const int32 PebbleCount = Spec.bDesertCanyon ? 96 : (Spec.bHasWaterfalls ? 86 : 72);
     for (int32 PebbleIndex = 0; PebbleIndex < PebbleCount; ++PebbleIndex)
     {
