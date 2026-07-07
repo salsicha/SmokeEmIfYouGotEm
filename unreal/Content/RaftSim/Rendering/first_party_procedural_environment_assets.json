@@ -49,6 +49,7 @@
       "mask_biased_boulders_pebbles_foliage_and_understory",
       "mask_aware_ground_cover_and_canopy_cards",
       "biome_specific_deadfall_grass_root_ecology_props",
+      "first_party_biome_foliage_silhouette_proxy_layers",
       "guide_seat_foliage_setback_and_scale_tuning",
       "lit_vertex_color_water_gradients",
       "flow_band_depth_texture_ribbons",
