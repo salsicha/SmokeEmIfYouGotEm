@@ -1446,6 +1446,7 @@
       "flow_aware_water_surface_chop_and_turbidity_patches_recorded",
       "flow_aware_micro_ripple_glints_recorded",
       "near_frame_water_ribbon_occlusion_demotion_recorded",
+      "first_party_near_frame_shoreline_scaffold_demotion_recorded",
       "first_party_water_shader_depth_reflection_refraction_scaffold_recorded",
       "first_party_shallow_water_clarity_and_aeration_layer_recorded",
       "near_camera_water_scaffold_readability_clearance_recorded",
