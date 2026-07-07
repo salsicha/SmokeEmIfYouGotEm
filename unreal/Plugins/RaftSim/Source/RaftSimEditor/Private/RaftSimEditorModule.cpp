@@ -2255,8 +2255,8 @@ void AddPreviewTerrainMesh(
     const FRaftSimPreviewImage* WaterMask,
     const FRaftSimPreviewImage* VegetationMask)
 {
-    constexpr int32 XSteps = 220;
-    constexpr int32 YSteps = 84;
+    constexpr int32 XSteps = 280;
+    constexpr int32 YSteps = 112;
     const float MinX = -5800.0f;
     const float MaxX = 26500.0f;
     const float HalfWidth = Spec.bDesertCanyon ? 4300.0f : 2750.0f;
@@ -2280,7 +2280,7 @@ void AddPreviewTerrainMesh(
         {
             const float V = static_cast<float>(YIndex) / static_cast<float>(YSteps);
             const float Y = FMath::Lerp(-HalfWidth, HalfWidth, V);
-            const float Z = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief, HeightfieldPreview);
+            const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief, HeightfieldPreview);
             const float CenterY = GetPreviewRiverCenterY(Spec, X);
             const float Offset = FMath::Abs(Y - CenterY);
             const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
@@ -2304,6 +2304,27 @@ void AddPreviewTerrainMesh(
             const FLinearColor SourceVegetationColor = Spec.bDesertCanyon
                 ? FLinearColor(0.30f, 0.31f, 0.17f)
                 : ScalePreviewColor(Spec.FoliageColor, Spec.bHasWaterfalls ? 1.18f : 1.05f);
+            const FLinearColor BaseTerrainMaterialGrainShadow = Spec.bDesertCanyon
+                ? FLinearColor(0.24f, 0.17f, 0.11f)
+                : (Spec.bHasWaterfalls ? FLinearColor(0.030f, 0.070f, 0.040f) : FLinearColor(0.16f, 0.15f, 0.10f));
+            const FLinearColor BaseTerrainMaterialGrainHighlight = Spec.bDesertCanyon
+                ? FLinearColor(0.56f, 0.40f, 0.25f)
+                : (Spec.bHasWaterfalls ? FLinearColor(0.075f, 0.160f, 0.070f) : FLinearColor(0.30f, 0.28f, 0.18f));
+            const float BaseTerrainSourceAwareMaterialGrainT = FMath::Clamp(
+                0.44f + 0.20f * FMath::Sin(X * 0.014f + Y * 0.010f) +
+                    0.18f * FMath::Sin(X * 0.031f - Y * 0.018f) +
+                    0.10f * FMath::Sin(X * 0.007f + Y * 0.027f + SourceVegetationT * 2.7f),
+                0.0f,
+                1.0f);
+            const float BaseTerrainMaterialBreakupT = FMath::Clamp(
+                0.24f + BankT * 0.34f + CanyonT * 0.42f + SourceVegetationT * 0.18f + (1.0f - WetT) * 0.10f,
+                0.0f,
+                1.0f);
+            const float BaseTerrainMicroReliefCm =
+                (BaseTerrainSourceAwareMaterialGrainT - 0.5f) *
+                (Spec.bDesertCanyon ? 16.0f : (Spec.bHasWaterfalls ? 12.0f : 10.0f)) *
+                BaseTerrainMaterialBreakupT *
+                SmoothPreviewStep(ActiveRiverHalfWidth + 80.0f, ActiveRiverHalfWidth + Spec.BankWidthCm + 880.0f, Offset);
             FLinearColor TerrainColor = FMath::Lerp(Spec.TerrainColor, ShoulderColor, FMath::Clamp(BankT * 0.45f + CanyonT * 0.35f, 0.0f, 1.0f));
             if (AerialDrape && AerialDrape->IsValid())
             {
@@ -2328,8 +2349,16 @@ void AddPreviewTerrainMesh(
                 TerrainColor,
                 WetBankColor,
                 FMath::Clamp(FMath::Max(WetT * 0.70f, SourceWaterT * 0.48f), 0.0f, 0.78f));
+            TerrainColor = FMath::Lerp(
+                TerrainColor,
+                BaseTerrainMaterialGrainShadow,
+                FMath::Clamp((1.0f - BaseTerrainSourceAwareMaterialGrainT) * BaseTerrainMaterialBreakupT * 0.11f, 0.0f, 0.12f));
+            TerrainColor = FMath::Lerp(
+                TerrainColor,
+                BaseTerrainMaterialGrainHighlight,
+                FMath::Clamp(BaseTerrainSourceAwareMaterialGrainT * BaseTerrainMaterialBreakupT * 0.14f, 0.0f, 0.15f));
             TerrainColor = ScalePreviewColor(TerrainColor, ColorNoise);
-            Vertices.Add(FVector(X, Y, Z));
+            Vertices.Add(FVector(X, Y, TerrainZ + BaseTerrainMicroReliefCm));
             UVs.Add(FVector2D(U * 12.0f, V * 4.0f));
             VertexColors.Add(NormalizePreviewTerrainProxyPatchColor(Spec, TerrainColor));
         }
