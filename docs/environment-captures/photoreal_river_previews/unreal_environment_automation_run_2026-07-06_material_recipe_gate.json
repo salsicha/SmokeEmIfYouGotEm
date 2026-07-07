@@ -50,6 +50,7 @@
     "first_party_procedural_leaf_cluster_geometry": true,
     "first_party_organic_canopy_leaf_spray_breakup": true,
     "first_party_organic_branch_frond_lattice_foliage": true,
+    "first_party_photographic_foliage_tone_calibration": true,
     "flow_aware_waterline_pebble_scatter": true,
     "first_party_irregular_rock_geometry_variants": true,
     "first_party_boulder_wetness_abrasion_moss_surface_variants": true,
@@ -77,37 +78,37 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [66.4, 104.46, 105.14],
+      "rgb_mean": [65.34, 103.12, 104.29],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [65.17, 104.7, 105.75],
+      "rgb_mean": [64.25, 103.44, 104.96],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [100.64, 91.51, 75.78],
+      "rgb_mean": [100.35, 91.26, 75.57],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [100.26, 91.41, 75.87],
+      "rgb_mean": [100.08, 91.24, 75.71],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [40.61, 86.8, 79.1],
+      "rgb_mean": [39.83, 84.89, 78.22],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [39.5, 86.85, 79.34],
+      "rgb_mean": [38.83, 85.0, 78.5],
       "nonblank": true
     }
   ],
@@ -116,6 +117,7 @@
     "Using production geospatial attachment ledger: physics/data/real_world/production_geospatial_attachment_ledger.json",
     "Replaced broad opaque source-drape overlay plates with first-party feathered, terrain-lit microtiles that sample local water and vegetation masks per vertex.",
     "Added first-party near-field water surface grain to the base river ribbon with higher mesh resolution, fine-ripple displacement, dark slicks, and subtle bright streaks.",
+    "Muted South Fork and Pacuare foliage base tints, reduced generic proxy emissive lift, and lowered branch/frond leaf-tip highlights for first-party photographic foliage tone calibration.",
     "Saved all three generated preview maps with softened source-drape overlays, boulder-contact foam laces, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, first-party irregular shoreline edge breakup, soft-feathered terrain material patch edges, source-drape albedo normalization, terrain-proxy luma floors, shadowless terrain albedo review capture material, first-party terrain material layer facets and slope-shadow patches, first-party Landscape/Nanite material-layer scaffolds, first-party terrain erosion-rill/bank-gully strips, a first-party lit terrain vertex-color material, soft-lit terrain vertex-color review material mode, flow-aware bank undercut/shelf relief, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, first-party dense biome foliage layer proxy clusters, first-party instanced procedural foliage-equivalent scaffolds, first-party procedural leaf-cluster geometry, first-party organic canopy leaf-spray breakup, first-party organic branch/frond lattice foliage, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, first-party boulder wetness/abrasion/moss surface variants, first-party boulder crevice-shadow/albedo tuning, near-camera boulder readability clearance and occlusion demotion, flow-aware water mesh undulation, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, flow-aware micro-ripple glints, near-frame water-ribbon occlusion demotion, first-party water shader depth/reflection/refraction scaffolds, source-aware shallow-water clarity and aeration layers, near-camera water-scaffold readability clearance, low-occlusion far-field water-scaffold tuning, first-party photographic water/exposure calibration, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, and refined first-party guide-seat raft/oar foreground proxies.",
     "Saved guide-seat and river-eye captures for South Fork American, Colorado River Grand Canyon, and Pacuare River Rainforest.",
     "Environment preview capture manifest saved successfully."
