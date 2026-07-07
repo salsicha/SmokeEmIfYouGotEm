@@ -1,0 +1,322 @@
+{
+  "schema": "raftsim.pacuare_sentinel_20250320_scl_qa_review.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "cleaner_scene_scl_qa_passed_tci_review_pending",
+  "goal": "Run the recommended March 20, 2025 Sentinel-2 SCL-first QA probe for the Pacuare corridor bbox before downloading matching TCI review clips.",
+  "clip_scope": "draft_planning_bounds_bbox_not_route_polygon",
+  "candidate_source": {
+    "search_review": "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
+    "date": "2025-03-20",
+    "platform": "sentinel-2b",
+    "required_tile_ids": [
+      "16PHR",
+      "17PKM"
+    ],
+    "max_catalog_cloud_cover_percent": 11.723126,
+    "catalog_decision": "same-date pair selected by Earth Search STAC metadata; acceptance depends on SCL window QA, not catalog cloud cover alone"
+  },
+  "class_palette": {
+    "0": {
+      "label": "no_data",
+      "rgb": [
+        0,
+        0,
+        0
+      ]
+    },
+    "1": {
+      "label": "saturated_or_defective",
+      "rgb": [
+        255,
+        0,
+        0
+      ]
+    },
+    "2": {
+      "label": "dark_area_pixels",
+      "rgb": [
+        80,
+        80,
+        80
+      ]
+    },
+    "3": {
+      "label": "cloud_shadows",
+      "rgb": [
+        90,
+        45,
+        120
+      ]
+    },
+    "4": {
+      "label": "vegetation",
+      "rgb": [
+        38,
+        130,
+        55
+      ]
+    },
+    "5": {
+      "label": "not_vegetated",
+      "rgb": [
+        180,
+        145,
+        85
+      ]
+    },
+    "6": {
+      "label": "water",
+      "rgb": [
+        40,
+        105,
+        210
+      ]
+    },
+    "7": {
+      "label": "unclassified",
+      "rgb": [
+        130,
+        130,
+        130
+      ]
+    },
+    "8": {
+      "label": "cloud_medium_probability",
+      "rgb": [
+        210,
+        210,
+        210
+      ]
+    },
+    "9": {
+      "label": "cloud_high_probability",
+      "rgb": [
+        255,
+        255,
+        255
+      ]
+    },
+    "10": {
+      "label": "thin_cirrus",
+      "rgb": [
+        140,
+        230,
+        230
+      ]
+    },
+    "11": {
+      "label": "snow_or_ice",
+      "rgb": [
+        220,
+        80,
+        180
+      ]
+    }
+  },
+  "method": {
+    "source": "Sentinel-2 L2A SCL COGs downloaded to /private/tmp and read with sharp/libvips.",
+    "pixel_model": "SCL is 20 m at 5490x5490, so windows are the 20 m equivalents of the prior 10 m TCI bbox clips.",
+    "qa_rule": "Cloud/cirrus fraction sums SCL classes 8, 9, and 10; cloud shadow uses class 3. This probe authorizes matching TCI review-clip downloads only if SCL contamination is low enough for human visual review."
+  },
+  "source_scl_cogs": [
+    {
+      "tile_id": "16PHR",
+      "asset": "SCL.tif",
+      "epsg": 32616,
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/16/P/HR/2025/3/S2B_16PHR_20250320_0_L2A/SCL.tif",
+      "byte_count": 1527878,
+      "sha256": "67cabeb86f2deb3cb009e06b80e160d7668e95068b39161356aaa06660930714",
+      "download_location": "/private/tmp/pacuare_sentinel_20250320_16phr_scl.tif",
+      "download_committed": false
+    },
+    {
+      "tile_id": "17PKM",
+      "asset": "SCL.tif",
+      "epsg": 32617,
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/17/P/KM/2025/3/S2B_17PKM_20250320_0_L2A/SCL.tif",
+      "byte_count": 1699610,
+      "sha256": "5e1fd3fb754a14cbe967824db65cf50e97d09e0942762d9f813e8cbec8c613ef",
+      "download_location": "/private/tmp/pacuare_sentinel_20250320_17pkm_scl.tif",
+      "download_committed": false
+    }
+  ],
+  "outputs": [
+    {
+      "tile_id": "17PKM",
+      "path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_corridor_bbox_scl_qa_review.png",
+      "pixel_window": {
+        "left": 0,
+        "top": 4002,
+        "width": 1742,
+        "height": 1488
+      },
+      "dimensions_px": [
+        1024,
+        875
+      ],
+      "mode": "RGB",
+      "byte_count": 43040,
+      "sha256": "6549c3832d8f7fdd71945b7c8e308b82dac5d82549f1a6b3857b91361e9db35b",
+      "native_pixel_count": 2592096,
+      "scl_classes": {
+        "dark_area_pixels": {
+          "class_value": 2,
+          "pixel_count": 9025,
+          "fraction": 0.003482
+        },
+        "cloud_shadows": {
+          "class_value": 3,
+          "pixel_count": 75298,
+          "fraction": 0.029049
+        },
+        "vegetation": {
+          "class_value": 4,
+          "pixel_count": 2351076,
+          "fraction": 0.907017
+        },
+        "not_vegetated": {
+          "class_value": 5,
+          "pixel_count": 65255,
+          "fraction": 0.025175
+        },
+        "water": {
+          "class_value": 6,
+          "pixel_count": 10510,
+          "fraction": 0.004055
+        },
+        "unclassified": {
+          "class_value": 7,
+          "pixel_count": 5744,
+          "fraction": 0.002216
+        },
+        "cloud_medium_probability": {
+          "class_value": 8,
+          "pixel_count": 43932,
+          "fraction": 0.016948
+        },
+        "cloud_high_probability": {
+          "class_value": 9,
+          "pixel_count": 31256,
+          "fraction": 0.012058
+        }
+      },
+      "class_summary": {
+        "cloud_or_cirrus_fraction": 0.029006,
+        "cloud_shadow_fraction": 0.029049,
+        "vegetation_fraction": 0.907017,
+        "water_fraction": 0.004055,
+        "unclassified_fraction": 0.002216
+      },
+      "review_decision": "Cleaner than the January 19 17PKM bbox by SCL cloud/cirrus fraction; acceptable for downloading a matching TCI review clip only, with shadow and route-clip QA still required."
+    },
+    {
+      "tile_id": "16PHR",
+      "path": "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_corridor_bbox_scl_qa_review.png",
+      "pixel_window": {
+        "left": 2812,
+        "top": 0,
+        "width": 1836,
+        "height": 1194
+      },
+      "dimensions_px": [
+        1024,
+        666
+      ],
+      "mode": "RGB",
+      "byte_count": 27744,
+      "sha256": "2d4a8750fc7abac6da78e4b32eee1cd04421f7ebb8616a5d1797eec757c1b3d2",
+      "native_pixel_count": 2192184,
+      "scl_classes": {
+        "dark_area_pixels": {
+          "class_value": 2,
+          "pixel_count": 3377,
+          "fraction": 0.00154
+        },
+        "cloud_shadows": {
+          "class_value": 3,
+          "pixel_count": 39681,
+          "fraction": 0.018101
+        },
+        "vegetation": {
+          "class_value": 4,
+          "pixel_count": 2045116,
+          "fraction": 0.932913
+        },
+        "not_vegetated": {
+          "class_value": 5,
+          "pixel_count": 54075,
+          "fraction": 0.024667
+        },
+        "water": {
+          "class_value": 6,
+          "pixel_count": 2902,
+          "fraction": 0.001324
+        },
+        "unclassified": {
+          "class_value": 7,
+          "pixel_count": 3134,
+          "fraction": 0.00143
+        },
+        "cloud_medium_probability": {
+          "class_value": 8,
+          "pixel_count": 26896,
+          "fraction": 0.012269
+        },
+        "cloud_high_probability": {
+          "class_value": 9,
+          "pixel_count": 17003,
+          "fraction": 0.007756
+        }
+      },
+      "class_summary": {
+        "cloud_or_cirrus_fraction": 0.020025,
+        "cloud_shadow_fraction": 0.018101,
+        "vegetation_fraction": 0.932913,
+        "water_fraction": 0.001324,
+        "unclassified_fraction": 0.00143
+      },
+      "review_decision": "Cleaner than the January 19 16PHR bbox by SCL cloud/cirrus fraction; acceptable for downloading a matching TCI review clip only, with route-clip and manual visual QA still required."
+    }
+  ],
+  "windowed_read_decision": {
+    "scl_qa_preview_generated": true,
+    "scl_qa_passed_for_tci_review": true,
+    "tci_review_clips_downloaded": false,
+    "scl_mask_applied_to_source_drape": false,
+    "source_drape_replaced": false,
+    "mask_sources_replaced": false,
+    "cloud_screening_blocks_production": true,
+    "decision": "March 20, 2025 SCL QA is clean enough to download matching 16PHR/17PKM TCI bbox review clips, but production Pacuare source drapes and masks remain blocked until exact route/bank clipping, stitching, manual visual QA, terms review, and guide/geospatial approval pass."
+  },
+  "recommended_next_step": "download_tci_bbox_clips_for_march_20_2025",
+  "source_links": {
+    "cleaner_scene_search": "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
+    "blocked_january_scl_qa": "imagery/production_import_pilot/sentinel_corridor_bbox_scl_qa_review.json",
+    "bbox_clip_review_template": "imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
+    "tile_coverage_review": "imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json",
+    "access_probe": "imagery/production_import_pilot/sentinel_cog_access_probe.json"
+  },
+  "allowed_use": [
+    "cleaner_scene_selection",
+    "tci_review_clip_download_gate",
+    "cloud_and_shadow_qa_review",
+    "future_source_drape_replacement_planning",
+    "guide/geospatial source discussion"
+  ],
+  "forbidden_use": [
+    "production source-drape replacement",
+    "production water or vegetation mask generation",
+    "photoreal material extraction",
+    "claiming clean Pacuare route imagery coverage",
+    "claiming lifelike Pacuare screenshot readiness"
+  ],
+  "promotion_blockers": [
+    "Download and review matching March 20, 2025 16PHR/17PKM TCI bbox clips before any source imagery replacement decision.",
+    "Clip to exact accepted route/bank geometry in native CRS instead of the draft planning bbox.",
+    "Stitch only after TCI and SCL windows pass manual cloud/shadow, seam, and scale review.",
+    "Record Sentinel terms, attribution, storage/LFS policy, and redistribution review before any production derivative is used.",
+    "Compare accepted imagery against rainfall, flow, and guide/outfitter context before using river color, wetness, or bank exposure for gameplay visuals."
+  ]
+}

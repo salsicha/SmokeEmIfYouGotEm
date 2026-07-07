@@ -489,11 +489,14 @@
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_clip_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_corridor_bbox_scl_qa_review.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_corridor_bbox_scl_qa_review.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250320_corridor_bbox_scl_qa_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_scl_qa_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_scl_qa_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/source_metadata_review.json"
           ],
-          "promotion_blocker": "Pacuare has retained NASA GIBS/MODIS cloud-screening evidence, coarse production-import derivatives, official Landsat/Sentinel high-resolution scene metadata, a Landsat access-gate review, Sentinel COG thumbnails/tile metadata, a successful Sentinel COG range-access probe, downsampled 17PKM/16PHR TCI review PNGs, bbox coverage and clip reviews, SCL QA showing January 19 cloud contamination, and a cleaner-scene STAC search identifying March 20, 2025 as the next SCL-first probe. Production still needs SCL QA on a cleaner scene, exact native-CRS route/bank clipping, stitching, CRS/band/scale review, terms/attribution review, and guide/geospatial approval before photoreal imagery or masks are promoted.",
+          "promotion_blocker": "Pacuare has retained NASA GIBS/MODIS cloud-screening evidence, coarse production-import derivatives, official Landsat/Sentinel high-resolution scene metadata, a Landsat access-gate review, Sentinel COG thumbnails/tile metadata, a successful Sentinel COG range-access probe, downsampled 17PKM/16PHR TCI review PNGs, bbox coverage and clip reviews, SCL QA showing January 19 cloud contamination, a cleaner-scene STAC search, and March 20, 2025 SCL QA that passes for TCI review-clip download only. Production still needs matching TCI clip review, exact native-CRS route/bank clipping, stitching, CRS/band/scale review, terms/attribution review, and guide/geospatial approval before photoreal imagery or masks are promoted.",
           "status": "coarse_preview_and_high_resolution_scene_metadata_attached_sentinel_full_tile_review_previews_extraction_blocked"
         },
         "guide_and_reference_media_annotations": {
@@ -597,10 +600,13 @@
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_clip_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_corridor_bbox_scl_qa_review.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_corridor_bbox_scl_qa_review.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250320_corridor_bbox_scl_qa_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_scl_qa_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_scl_qa_review.png"
           ],
-          "promotion_blocker": "Masks are coarse preview derivatives; high-resolution Landsat/Sentinel scene metadata, Landsat access-gate review, Sentinel thumbnail/tile metadata, Sentinel COG range-access probes, and 17PKM/16PHR TCI review PNGs identify candidate replacement imagery and access paths, but production still needs approved windowed reads, corridor clipping/stitching, SCL/QA review, hydrography alignment, water/canopy/wet-rock/waterfall/mist segmentation, approved terms, and guide review.",
+          "promotion_blocker": "Masks are coarse preview derivatives; high-resolution Landsat/Sentinel scene metadata, Landsat access-gate review, Sentinel thumbnail/tile metadata, Sentinel COG range-access probes, 17PKM/16PHR TCI review PNGs, and March 20 SCL QA identify candidate replacement imagery and access paths, but production still needs matching TCI clip review, approved route-window reads, corridor clipping/stitching, SCL/QA review, hydrography alignment, water/canopy/wet-rock/waterfall/mist segmentation, approved terms, and guide review.",
           "status": "preview_masks_and_pilot_derivative_masks_attached"
         }
       },

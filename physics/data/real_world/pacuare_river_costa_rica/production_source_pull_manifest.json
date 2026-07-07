@@ -19,7 +19,8 @@
     "Pacuare consolidated source metadata review is attached, but it only records local review-gated metadata and does not promote DEM, imagery, hydrography, hydrology, access, protected-area, or media sources to production use.",
     "Pacuare high-resolution scene metadata review identifies official Landsat/Sentinel candidates, but production imagery still needs full-year paging, download approval, manual visual QA, CRS/band/scale review, and guide/geospatial signoff before replacing the MODIS/GIBS preview.",
     "Anonymous LandsatLook product asset URLs returned EROS login HTML for the best Pacuare Landsat candidate, so imagery downloads remain blocked until an approved access path returns expected JPEG/JSON/COG content.",
-    "Pacuare Sentinel COG thumbnails and tile metadata are attached as visual triage, but full-resolution Sentinel bands, SCL/QA masks, corridor clipping, terms/attribution, and manual cloud/shadow QA are still required before source-drape or mask replacement."
+    "Pacuare Sentinel COG thumbnails and tile metadata are attached as visual triage, but full-resolution Sentinel bands, SCL/QA masks, corridor clipping, terms/attribution, and manual cloud/shadow QA are still required before source-drape or mask replacement.",
+    "Pacuare March 20, 2025 Sentinel SCL QA passes only as a TCI review-clip gate; production imagery still needs matching TCI clip review, exact native-CRS route/bank clipping, stitching, terms/attribution review, and guide/geospatial signoff."
   ],
   "pulled_artifacts": [
     {
@@ -1102,6 +1103,7 @@
       },
       "related_artifacts": [
         "imagery/production_import_pilot/sentinel_corridor_bbox_scl_qa_review.json",
+        "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
         "imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
         "imagery/production_import_pilot/sentinel_cog_access_probe.json",
         "imagery/production_import_pilot/high_resolution_scene_metadata_review.json"
@@ -1115,6 +1117,52 @@
         "Catalog cloud cover is tile-level metadata and did not match the January 19 corridor SCL fractions exactly; SCL window QA is required before TCI clips or source drapes.",
         "No raw STAC response, Sentinel image, SCL raster, source drape, or mask derivative is committed by this review.",
         "Production Pacuare imagery remains blocked until exact clipping, SCL/cloud QA, stitching, terms review, and guide/geospatial approval pass."
+      ]
+    },
+    {
+      "artifact_id": "pacuare_sentinel_20250320_scl_qa_review",
+      "category": "sentinel_cleaner_scene_scl_qa_review",
+      "paths": [
+        "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_corridor_bbox_scl_qa_review.png",
+        "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_corridor_bbox_scl_qa_review.png"
+      ],
+      "provider": "Element 84 / AWS Open Data Sentinel-2 L2A COG mirror processed with local sharp/libvips",
+      "status": "cleaner_scene_scl_qa_passed_tci_review_pending",
+      "summary": {
+        "date": "2025-03-20",
+        "tile_ids": [
+          "17PKM",
+          "16PHR"
+        ],
+        "scl_qa_passed_for_tci_review": true,
+        "tci_review_clips_downloaded": false,
+        "source_drape_replaced": false,
+        "mask_sources_replaced": false,
+        "cloud_or_cirrus_fraction_by_tile": {
+          "17PKM": 0.029006,
+          "16PHR": 0.020025
+        },
+        "cloud_shadow_fraction_by_tile": {
+          "17PKM": 0.029049,
+          "16PHR": 0.018101
+        }
+      },
+      "related_artifacts": [
+        "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
+        "imagery/production_import_pilot/sentinel_corridor_bbox_scl_qa_review.json",
+        "imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
+        "imagery/production_import_pilot/sentinel_cog_access_probe.json"
+      ],
+      "use": [
+        "cleaner_scene_selection",
+        "tci_review_clip_download_gate",
+        "cloud_screening_review"
+      ],
+      "caveats": [
+        "SCL QA is attached for draft bbox clips only, not exact route/bank geometry.",
+        "This probe permits matching March 20 TCI bbox review clips only; it does not promote a source drape, material input, production mask, or lifelike screenshot claim.",
+        "Production Pacuare imagery remains blocked until TCI clips, exact clipping, stitching, terms review, and guide/geospatial approval pass."
       ]
     }
   ],

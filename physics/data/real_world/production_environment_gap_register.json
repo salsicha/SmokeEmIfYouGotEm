@@ -457,6 +457,9 @@
         "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_clip_review.png",
         "imagery/production_import_pilot/sentinel_corridor_bbox_scl_qa_review.json",
         "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
+        "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_corridor_bbox_scl_qa_review.png",
+        "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_corridor_bbox_scl_qa_review.png",
         "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_scl_qa_review.png",
         "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_scl_qa_review.png",
         "hydrography/production_import_pilot/official_source_access_plan.json",
@@ -508,7 +511,7 @@
           ]
         },
         {
-          "promotion_gate": "Replace the MODIS/GIBS proxy drape with cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference only after the January 19 SCL QA block is resolved by a cleaner-scene SCL probe, exact native-CRS route/bank clips, stitched raster reads, terms review, and guide/geospatial approval.",
+          "promotion_gate": "Replace the MODIS/GIBS proxy drape with cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference only after the March 20 SCL-passed candidate has matching TCI review clips, exact native-CRS route/bank clips, stitched raster reads, terms review, and guide/geospatial approval.",
           "required_artifacts": [
             "imagery/production_import_pilot/cloud_screened_scene_index.json",
             "imagery/production_import_pilot/source_drape_4096.png",
@@ -527,6 +530,9 @@
             "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_clip_review.png",
             "imagery/production_import_pilot/sentinel_corridor_bbox_scl_qa_review.json",
             "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
+            "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+            "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_corridor_bbox_scl_qa_review.png",
+            "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_corridor_bbox_scl_qa_review.png",
             "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_scl_qa_review.png",
             "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_scl_qa_review.png"
           ],
