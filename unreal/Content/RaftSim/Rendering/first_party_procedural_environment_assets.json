@@ -60,6 +60,7 @@
       "first_party_bounded_terrain_ambient_fill",
       "first_party_base_terrain_material_grain_and_microrelief",
       "first_party_source_aware_terrain_photo_mottle_and_microrelief",
+      "first_party_source_conditioned_far_bank_albedo_calibration",
       "first_party_demoted_terrain_overlay_striping",
       "first_party_source_drape_smoothing_pass",
       "first_party_segmented_wet_bank_ribbons",
@@ -139,7 +140,7 @@
         "per-river vegetation_mask_2048.png",
         "per-river flow visual band"
       ],
-      "procedural_method": "Layer terrain vertex colors and procedural mesh geometry from reviewed heightfield, DEM relief, aerial drape, water mask, vegetation mask, wet-bank scale, and deterministic noise; promote to Landscape/Nanite material layers only after CRS, conditioning, channel burning, and guide/geospatial review.",
+      "procedural_method": "Layer terrain vertex colors and procedural mesh geometry from reviewed heightfield, DEM relief, aerial drape, water mask, vegetation mask, wet-bank scale, source-conditioned far-bank albedo/microrelief calibration, and deterministic noise; promote to Landscape/Nanite material layers only after CRS, conditioning, channel burning, and guide/geospatial review.",
       "tunable_parameters": [
         "bank_material_blend",
         "wet_edge_width",
@@ -148,6 +149,9 @@
         "heightfield_amplitude",
         "terrain_patch_edge_feather_width",
         "terrain_patch_feature_blend",
+        "far_bank_source_drape_gain",
+        "source_conditioned_terrain_luma_target",
+        "source_conditioned_far_bank_microrelief_cm",
         "source_drape_weight"
       ],
       "promotion_gate": "Must show source-aligned banks, shelves, exposed bars, and wet/dry edges in guide-seat and river-eye captures without covering rescue lines or rapid hazards."
