@@ -2759,7 +2759,9 @@ void AddPreviewShoreRibbon(
                 0.0f,
                 1.0f);
             const float SegmentFade = SmoothPreviewStep(0.22f, 0.78f, Breakup);
-            const float LocalWidthScale = 0.26f + 0.48f * SegmentFade;
+            const float NearFrameShorelineRibbonDemotion = SmoothPreviewStep(2200.0f, 7600.0f, X);
+            const float LocalWidthScale =
+                (0.12f + 0.24f * SegmentFade) * FMath::Lerp(0.38f, 1.0f, NearFrameShorelineRibbonDemotion);
             const float Offset = SignedCenterOffset + Side * Width * LocalWidthScale * (V - 0.5f);
             const float Y = CenterY + Offset;
             const float SurfaceWave = FMath::Sin(X * 0.011f + Y * 0.015f) * (Spec.bDesertCanyon ? 2.0f : 4.5f);
@@ -2776,7 +2778,10 @@ void AddPreviewShoreRibbon(
                 ScalePreviewColor(FMath::Lerp(InnerColor, OuterColor, V), Fleck));
             Vertices.Add(FVector(X, Y, Z));
             UVs.Add(FVector2D(U * 16.0f, V));
-            VertexColors.Add(ClampPreviewColor(FMath::Lerp(TerrainBase, RibbonColor, SegmentFade * 0.32f)));
+            VertexColors.Add(ClampPreviewColor(FMath::Lerp(
+                TerrainBase,
+                RibbonColor,
+                SegmentFade * FMath::Lerp(0.025f, 0.16f, NearFrameShorelineRibbonDemotion))));
         }
     }
 
@@ -4551,12 +4556,15 @@ void AddPreviewShallowWaterClarityAndAerationDetail(
                 SmoothPreviewStep(0.0f, 0.055f, U) * (1.0f - SmoothPreviewStep(0.965f, 1.0f, U)),
                 0.0f,
                 1.0f);
+            const float NearFrameShallowWaterBandDemotion = SmoothPreviewStep(2200.0f, 7600.0f, X);
+            const float BandInnerEdge = FMath::Lerp(0.984f, 0.955f, NearFrameShallowWaterBandDemotion);
+            const float BandOuterEdge = FMath::Lerp(0.994f, 0.985f, NearFrameShallowWaterBandDemotion);
 
             for (int32 CrossIndex = 0; CrossIndex <= CrossSteps; ++CrossIndex)
             {
                 const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
                 const float EdgeT = FMath::Pow(FMath::Clamp(V, 0.0f, 1.0f), 1.12f);
-                const float Lateral = Side * FMath::Lerp(Width * 0.94f, Width * 0.985f, EdgeT);
+                const float Lateral = Side * FMath::Lerp(Width * BandInnerEdge, Width * BandOuterEdge, EdgeT);
                 const float Sway =
                     Side * (FMath::Sin(X * 0.0049f + EdgeT * 2.2f) * 18.0f +
                             FMath::Sin(X * 0.013f + static_cast<float>(SideIndex) * 1.7f) * 8.0f) *
@@ -4576,7 +4584,10 @@ void AddPreviewShallowWaterClarityAndAerationDetail(
                 FLinearColor WaterColor = FMath::Lerp(CoreTint, ShallowBedTint, BedRevealT);
                 WaterColor = FMath::Lerp(WaterColor, AeratedTint, AerationT);
                 WaterColor = FMath::Lerp(WaterColor, Spec.WaterColor, FMath::Clamp(0.82f + SourceWaterT * 0.10f, 0.80f, 0.94f));
-                WaterColor = FMath::Lerp(Spec.WaterColor, WaterColor, 0.18f * LongitudinalFeather);
+                WaterColor = FMath::Lerp(
+                    Spec.WaterColor,
+                    WaterColor,
+                    FMath::Lerp(0.025f, 0.12f, NearFrameShallowWaterBandDemotion) * LongitudinalFeather);
 
                 const float SurfaceWave =
                     (FMath::Sin(X * 0.012f + EdgeT * 2.7f) * (Spec.bDesertCanyon ? 1.4f : 2.6f) +
@@ -4646,15 +4657,19 @@ void AddPreviewShallowWaterClarityAndAerationDetail(
         const float Lateral = Side * Width * EdgeLane +
             FMath::Sin(static_cast<float>(BubbleIndex) * 2.17f) * Width * 0.08f;
         const float SourceWaterT = SamplePreviewMaskAtWorld(Spec, WaterMask, X, RiverCenterY + Lateral);
+        const float NearFrameBubbleDemotion = SmoothPreviewStep(2200.0f, 7600.0f, X);
         const float Opacity =
             (Spec.bDesertCanyon ? 0.070f : (Spec.bHasWaterfalls ? 0.145f : 0.110f)) *
-            FMath::Clamp(0.74f + SourceWaterT * 0.42f + FlowEnergy * 0.18f, 0.55f, 1.25f);
+            FMath::Clamp(0.74f + SourceWaterT * 0.42f + FlowEnergy * 0.18f, 0.55f, 1.25f) *
+            FMath::Lerp(0.20f, 1.0f, NearFrameBubbleDemotion);
         const float LengthScale =
             (Spec.bDesertCanyon ? 0.14f : 0.11f) *
-            (0.70f + 0.10f * static_cast<float>(BubbleIndex % 5));
+            (0.70f + 0.10f * static_cast<float>(BubbleIndex % 5)) *
+            FMath::Lerp(0.42f, 1.0f, NearFrameBubbleDemotion);
         const float WidthScale =
             (Spec.bDesertCanyon ? 0.026f : 0.022f) *
-            (0.74f + 0.10f * static_cast<float>(BubbleIndex % 4));
+            (0.74f + 0.10f * static_cast<float>(BubbleIndex % 4)) *
+            FMath::Lerp(0.50f, 1.0f, NearFrameBubbleDemotion);
 
         AddPreviewTranslucentMeshActor(
             World,
