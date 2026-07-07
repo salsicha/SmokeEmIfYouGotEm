@@ -373,7 +373,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.ElevationSample =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
-        TEXT("review-gated Pacuare production-import derivative placeholders generated from the selected NASA GIBS MODIS/Terra true-color seed and Copernicus DEM GLO-30 relief, normalized into a 4096px source drape, 2048px DEM relief, 2017px heightfield candidate, and 2048px water/vegetation masks; these remain coarse/cloudy proxy inputs until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, source-aware bank breakup patches, biome-specific deadfall/log/grass/root ecology props, lit water variation, flow-band depth texture ribbons, dense mask-aware ground-cover/canopy cards, and humid atmospheric backdrop cards remain rights-safe proxy dressing; rocks, foliage, water, waterfalls, foam, raft, and lighting still include first-party procedural proxy layers");
+        TEXT("review-gated Pacuare production-import derivative placeholders generated from the selected NASA GIBS MODIS/Terra true-color seed and Copernicus DEM GLO-30 relief, normalized into a 4096px source drape, 2048px DEM relief, 2017px heightfield candidate, and 2048px water/vegetation masks; these remain coarse/cloudy proxy inputs until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, source-aware bank breakup patches, biome-specific deadfall/log/grass/root ecology props, waterfall curtain/plunge-mist proxy layers, lit water variation, flow-band depth texture ribbons, dense mask-aware ground-cover/canopy cards, and humid atmospheric backdrop cards remain rights-safe proxy dressing; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
     Pacuare.FlowBandId = TEXT("rainfed_runnable_planning");
     Pacuare.FlowBandDisplayName = TEXT("Rain-Fed Runnable Planning");
     Pacuare.FlowBandSource = TEXT("physics/data/real_world/pacuare_river_costa_rica/flow_presets.json");
@@ -2636,6 +2636,113 @@ void AddPreviewRiverAtmosphericBackdropDetail(
     }
 }
 
+void AddPreviewWaterfallAndPlungeMistDetail(
+    UWorld* World,
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* TerrainRelief,
+    const FRaftSimPreviewImage* HeightfieldPreview,
+    UStaticMesh* PlaneMesh,
+    UStaticMesh* CubeMesh)
+{
+    if (!World || !Spec.bHasWaterfalls || !PlaneMesh || !CubeMesh)
+    {
+        return;
+    }
+
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+    const float WaterBaseZ = GetPreviewWaterSurfaceBaseZCm(Spec);
+    const int32 WaterfallCount = 7;
+
+    for (int32 WaterfallIndex = 0; WaterfallIndex < WaterfallCount; ++WaterfallIndex)
+    {
+        const float T = static_cast<float>(WaterfallIndex) / static_cast<float>(FMath::Max(1, WaterfallCount - 1));
+        const float X = FMath::Lerp(2700.0f, 24200.0f, T) +
+            260.0f * FMath::Sin(static_cast<float>(WaterfallIndex) * 1.37f);
+        const float Side = (WaterfallIndex % 2 == 0) ? -1.0f : 1.0f;
+        const float RiverCenterY = GetPreviewRiverCenterY(Spec, X);
+        const float FootY = RiverCenterY + Side * (ActiveRiverHalfWidth + 86.0f + 24.0f * static_cast<float>(WaterfallIndex % 3));
+        const float CurtainY = RiverCenterY + Side * (ActiveRiverHalfWidth + 250.0f + 46.0f * static_cast<float>(WaterfallIndex % 2));
+        const float CliffY = RiverCenterY + Side * (ActiveRiverHalfWidth + 620.0f + 90.0f * static_cast<float>(WaterfallIndex % 4));
+        const float FootZ = FMath::Max(
+            WaterBaseZ + 50.0f,
+            GetPreviewTerrainHeightCm(Spec, X, FootY, TerrainRelief, HeightfieldPreview) + 42.0f);
+        const float TopZ = FMath::Max(
+            FootZ + 430.0f + 42.0f * static_cast<float>(WaterfallIndex % 4),
+            GetPreviewTerrainHeightCm(Spec, X, CliffY, TerrainRelief, HeightfieldPreview) + 145.0f);
+        const float MidZ = (FootZ + TopZ) * 0.5f;
+        const float CurtainHeightScale = FMath::Clamp((TopZ - FootZ) / 100.0f, 4.8f, 12.0f);
+        const float CurtainWidthScale = 2.55f + 0.24f * static_cast<float>(WaterfallIndex % 4);
+        const float Yaw = Side > 0.0f ? -5.0f : 5.0f;
+
+        AddPreviewMeshActor(
+            World,
+            CubeMesh,
+            FString::Printf(TEXT("RaftSim_PacuareWaterfallWetCliff_%02d_%s"), WaterfallIndex, *Spec.RiverId),
+            FVector(X - 18.0f, CurtainY + Side * 24.0f, MidZ - 10.0f),
+            FRotator(0.0f, Yaw, 0.0f),
+            FVector(1.10f + 0.12f * static_cast<float>(WaterfallIndex % 3), 0.045f, CurtainHeightScale * 0.54f),
+            ScalePreviewColor(FMath::Lerp(Spec.RockColor, Spec.FoliageColor, 0.22f), 0.48f));
+
+        AddPreviewTranslucentMeshActor(
+            World,
+            PlaneMesh,
+            FString::Printf(TEXT("RaftSim_PacuareWaterfallCurtain_%02d_%s"), WaterfallIndex, *Spec.RiverId),
+            FVector(X, CurtainY, MidZ),
+            FRotator(90.0f, Yaw * 0.25f, 0.0f),
+            FVector(CurtainHeightScale, CurtainWidthScale, 1.0f),
+            FLinearColor(0.66f, 0.94f, 0.90f, 1.0f),
+            0.43f);
+
+        AddPreviewTranslucentMeshActor(
+            World,
+            PlaneMesh,
+            FString::Printf(TEXT("RaftSim_PacuareWaterfallBrightCore_%02d_%s"), WaterfallIndex, *Spec.RiverId),
+            FVector(X + 14.0f * Side, CurtainY - Side * 5.0f, MidZ - 8.0f),
+            FRotator(90.0f, Yaw * 0.25f, 0.0f),
+            FVector(CurtainHeightScale * 0.96f, CurtainWidthScale * 0.36f, 1.0f),
+            FLinearColor(0.82f, 0.98f, 0.94f, 1.0f),
+            0.52f);
+
+        const float RunoutLengthScale = FMath::Clamp(FMath::Abs(CurtainY - FootY) / 100.0f, 2.0f, 4.6f);
+        AddPreviewTranslucentMeshActor(
+            World,
+            PlaneMesh,
+            FString::Printf(TEXT("RaftSim_PacuareWaterfallRunout_%02d_%s"), WaterfallIndex, *Spec.RiverId),
+            FVector(X + 44.0f, (CurtainY + FootY) * 0.5f, FootZ + 24.0f),
+            FRotator(0.0f, Side > 0.0f ? 90.0f : -90.0f, 0.0f),
+            FVector(RunoutLengthScale, 0.20f + 0.03f * static_cast<float>(WaterfallIndex % 2), 1.0f),
+            FLinearColor(0.46f, 0.84f, 0.76f, 1.0f),
+            0.28f);
+
+        for (int32 MistIndex = 0; MistIndex < 3; ++MistIndex)
+        {
+            const float MistPhase = static_cast<float>(WaterfallIndex * 3 + MistIndex);
+            AddPreviewTranslucentMeshActor(
+                World,
+                PlaneMesh,
+                FString::Printf(TEXT("RaftSim_PacuareWaterfallPlungeMist_%02d_%02d_%s"), WaterfallIndex, MistIndex, *Spec.RiverId),
+                FVector(
+                    X + 58.0f * FMath::Sin(MistPhase * 1.11f),
+                    FootY + Side * (30.0f + 38.0f * static_cast<float>(MistIndex)),
+                    FootZ + 54.0f + 34.0f * static_cast<float>(MistIndex)),
+                FRotator(72.0f, 0.0f, static_cast<float>((WaterfallIndex * 41 + MistIndex * 23) % 360)),
+                FVector(1.20f + 0.26f * static_cast<float>(MistIndex), 0.48f + 0.06f * static_cast<float>(WaterfallIndex % 2), 1.0f),
+                FLinearColor(0.62f, 0.90f, 0.82f, 1.0f),
+                0.23f);
+        }
+
+        AddPreviewTranslucentMeshActor(
+            World,
+            PlaneMesh,
+            FString::Printf(TEXT("RaftSim_PacuareWaterfallPlungeFoam_%02d_%s"), WaterfallIndex, *Spec.RiverId),
+            FVector(X + 36.0f, FootY, FootZ + 18.0f),
+            FRotator(0.0f, static_cast<float>((WaterfallIndex * 37) % 360), 0.0f),
+            FVector(0.88f + 0.08f * static_cast<float>(WaterfallIndex % 3), 0.30f, 1.0f),
+            FLinearColor(0.84f, 0.96f, 0.88f, 1.0f),
+            0.34f);
+    }
+}
+
 void AddPreviewBiomeBankEcologyDetail(
     UWorld* World,
     const FRaftSimEnvironmentPreviewSpec& Spec,
@@ -3162,6 +3269,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     AddPreviewFlowBandTextureDetail(World, Spec);
     AddPreviewFoamAndHydraulics(World, Spec);
     AddPreviewSurfaceAtmosphereAndSprayDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, PlaneMesh);
+    AddPreviewWaterfallAndPlungeMistDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, PlaneMesh, CubeMesh);
     AddPreviewRiverAtmosphericBackdropDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, PlaneMesh);
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
@@ -3405,24 +3513,6 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
                     FVector(0.24f, 0.18f, 0.12f),
                     ScrubColor);
             }
-        }
-    }
-
-    if (Spec.bHasWaterfalls)
-    {
-        for (int32 WaterfallIndex = 0; WaterfallIndex < 5; ++WaterfallIndex)
-        {
-            const float X = 4000.0f + static_cast<float>(WaterfallIndex) * 4300.0f;
-            const float Side = (WaterfallIndex % 2 == 0) ? -1.0f : 1.0f;
-            const float Y = GetPreviewRiverCenterY(Spec, X) + Side * 2200.0f;
-            AddPreviewMeshActor(
-                World,
-                PlaneMesh,
-                FString::Printf(TEXT("RaftSim_RainforestWaterfall_%02d"), WaterfallIndex),
-                FVector(X, Y, 660.0f),
-                FRotator(0.0f, 0.0f, 90.0f),
-                FVector(4.2f, 12.0f, 1.0f),
-                FLinearColor(0.72f, 0.92f, 0.94f));
         }
     }
 
