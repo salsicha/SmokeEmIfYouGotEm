@@ -1,0 +1,27 @@
+{
+  "schema": "raftsim.pacuare_wet_rock_waterfall_mist_mask_manifest.v1",
+  "generated_on": "2026-07-07",
+  "status": "generated_review_only_mask_no_media_downloaded_not_photoreal",
+  "river_id": "pacuare",
+  "target_id": "pacuare_waterfalls_mist_wet_rock",
+  "output": "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_2048.png",
+  "source_inputs": [
+    "imagery/production_import_pilot/water_mask_2048.png",
+    "imagery/production_import_pilot/vegetation_mask_2048.png",
+    "review/production_import_pilot/reference_annotations.geojson",
+    "field_media/production_import_pilot/rights_manifest.json"
+  ],
+  "channel_semantics": {
+    "red": "waterline and wet-rock candidate edge from existing review-gated water mask dilation; not a production wetness mask",
+    "green": "deterministic side-waterfall and mist review bands near the Pacuare waterfall target station; not imagery-derived waterfall geometry",
+    "blue": "dense canopy / rescue-readability caution from existing vegetation mask and deterministic mist proximity"
+  },
+  "policy": {
+    "allowed_use_before_rights_clear": "Editor-side review, guide/outfitter discussion, and procedural placeholder planning only.",
+    "blocked_use_before_rights_clear": "Photoreal material extraction, texture derivation, photogrammetry, AI training, marketing, or production waterfall/wet-rock authority.",
+    "third_party_media_downloaded": false
+  },
+  "promotion_gate": "Replace this deterministic review scaffold with guide/outfitter-approved, rights-cleared or first-party wet-rock, waterfall, mist, and rescue-readability annotations before production art or lifelike capture claims.",
+  "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+  "rights_manifest": "field_media/production_import_pilot/rights_manifest.json"
+}

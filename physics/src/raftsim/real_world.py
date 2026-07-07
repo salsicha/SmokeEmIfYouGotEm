@@ -73,6 +73,19 @@ PRODUCTION_ADDITIONAL_SOURCE_LEADS_REVIEW_FILE = "production_additional_source_l
 SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE = "production_source_gate_review.json"
 REFERENCE_MEDIA_ANNOTATIONS_FILE = "review/production_import_pilot/reference_annotations.geojson"
 REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE = "field_media/production_import_pilot/rights_manifest.json"
+SOUTH_FORK_WET_ROCK_REVIEW_FILE = "imagery/production_import_pilot/wet_rock_review.geojson"
+SOUTH_FORK_FLOW_VARIANT_REFERENCE_ANNOTATIONS_FILE = (
+    "review/production_import_pilot/flow_variant_reference_annotations.geojson"
+)
+COLORADO_RELEASE_REFERENCE_ANNOTATIONS_FILE = "review/production_import_pilot/release_reference_annotations.geojson"
+COLORADO_RESCUE_VISIBILITY_ANNOTATIONS_FILE = "review/production_import_pilot/rescue_visibility_annotations.geojson"
+PACUARE_WET_ROCK_WATERFALL_MIST_MASK_FILE = (
+    "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_2048.png"
+)
+PACUARE_WET_ROCK_WATERFALL_MIST_MASK_MANIFEST_FILE = (
+    "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_manifest.json"
+)
+PACUARE_RESCUE_VISIBILITY_ANNOTATIONS_FILE = "review/production_import_pilot/rescue_visibility_annotations.geojson"
 REFERENCE_MEDIA_TARGET_STATION_FRACTIONS = {
     "south_fork_guide_seat_boulder_garden": 0.12,
     "south_fork_late_summer_exposed_rocks": 0.46,
@@ -1505,6 +1518,8 @@ def build_south_fork_production_import_pilot(section: CandidateRiverSection | No
                 "target_outputs": [
                     REFERENCE_MEDIA_ANNOTATIONS_FILE,
                     REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
+                    SOUTH_FORK_WET_ROCK_REVIEW_FILE,
+                    SOUTH_FORK_FLOW_VARIANT_REFERENCE_ANNOTATIONS_FILE,
                 ],
                 "promotion_gate": "Attach creator/date/reach/flow/weather/permission before using photos or footage for material, texture, or in-game reference.",
             },
@@ -1886,6 +1901,8 @@ def build_colorado_production_import_pilot(bounds: BoundsWGS84 | None = None) ->
                 "target_outputs": [
                     REFERENCE_MEDIA_ANNOTATIONS_FILE,
                     REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
+                    COLORADO_RELEASE_REFERENCE_ANNOTATIONS_FILE,
+                    COLORADO_RESCUE_VISIBILITY_ANNOTATIONS_FILE,
                 ],
                 "promotion_gate": (
                     "Attach creator, date, reach or river mile, flow/release context, permission, attribution, and allowed "
@@ -3201,7 +3218,8 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     "imagery/production_import_pilot/water_mask_2048.png",
                     "imagery/production_import_pilot/vegetation_mask_2048.png",
                     "imagery/production_import_pilot/canopy_shadow_mask_2048.png",
-                    "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_2048.png",
+                    PACUARE_WET_ROCK_WATERFALL_MIST_MASK_FILE,
+                    PACUARE_WET_ROCK_WATERFALL_MIST_MASK_MANIFEST_FILE,
                     "imagery/production_import_pilot/source_masks_manifest.json",
                     PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE,
                     PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
@@ -3295,6 +3313,9 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                 "target_outputs": [
                     REFERENCE_MEDIA_ANNOTATIONS_FILE,
                     REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
+                    PACUARE_WET_ROCK_WATERFALL_MIST_MASK_FILE,
+                    PACUARE_WET_ROCK_WATERFALL_MIST_MASK_MANIFEST_FILE,
+                    PACUARE_RESCUE_VISIBILITY_ANNOTATIONS_FILE,
                     PACUARE_SOURCE_METADATA_REVIEW_FILE,
                 ],
                 "promotion_gate": (
@@ -3594,6 +3615,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "reference_media_link_manifest.json",
                     REFERENCE_MEDIA_ANNOTATIONS_FILE,
                     REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
+                    SOUTH_FORK_WET_ROCK_REVIEW_FILE,
+                    SOUTH_FORK_FLOW_VARIANT_REFERENCE_ANNOTATIONS_FILE,
                 ],
                 "p0_next_pulls_or_attachments": [
                     {
@@ -3713,6 +3736,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "reference_media_link_manifest.json",
                     REFERENCE_MEDIA_ANNOTATIONS_FILE,
                     REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
+                    COLORADO_RELEASE_REFERENCE_ANNOTATIONS_FILE,
+                    COLORADO_RESCUE_VISIBILITY_ANNOTATIONS_FILE,
                 ],
                 "p0_next_pulls_or_attachments": [
                     {
@@ -3861,6 +3886,9 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     "reference_media_link_manifest.json",
                     REFERENCE_MEDIA_ANNOTATIONS_FILE,
                     REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE,
+                    PACUARE_WET_ROCK_WATERFALL_MIST_MASK_FILE,
+                    PACUARE_WET_ROCK_WATERFALL_MIST_MASK_MANIFEST_FILE,
+                    PACUARE_RESCUE_VISIBILITY_ANNOTATIONS_FILE,
                 ],
                 "p0_next_pulls_or_attachments": [
                     {
@@ -4148,6 +4176,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 "imagery/production_import_pilot/source_masks_manifest.json",
                 SOUTH_FORK_NHD_WATER_PRIOR_MANIFEST_FILE,
                 SOUTH_FORK_NHD_WATER_PRIOR_FILE,
+                SOUTH_FORK_WET_ROCK_REVIEW_FILE,
                 "imagery/naip_tiles",
                 "imagery/water_mask.tif",
                 "imagery/foam_texture_mask.tif",
@@ -4170,6 +4199,7 @@ def build_source_manifest(section: CandidateRiverSection | None = None) -> dict[
                 RAPID_REVIEW_FLOW_DIFFICULTY_MAPPING_FILE,
                 RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
                 REFERENCE_MEDIA_ANNOTATIONS_FILE,
+                SOUTH_FORK_FLOW_VARIANT_REFERENCE_ANNOTATIONS_FILE,
             ],
             "access_and_protected_context": [
                 SOUTH_FORK_ACCESS_PUBLICATION_REVIEW_FILE,

@@ -1,0 +1,78 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -120.8471938,
+          38.7802078
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "south_fork_high_flow_foam_line_height",
+        "candidate_source_ids": [
+          "flickr_south_fork_american_search",
+          "instagram_south_fork_american_hashtag"
+        ],
+        "feature_role": "flow_variant_reference_seed",
+        "flow_context_needed": [
+          "high_runnable"
+        ],
+        "review_questions": [
+          "Annotate how far foam streaks climb out of the current tongue at spring or release-driven high runnable flow.",
+          "Record whether eddy fences remain visible enough for swimmer recovery and guide line choice."
+        ],
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "american_south_fork",
+        "station_m": 19400.0,
+        "target_id": "south_fork_high_flow_foam_lines"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.846326,
+          38.780704
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "south_fork_high_flow_wet_bank_limit",
+        "candidate_source_ids": [
+          "flickr_south_fork_american_search",
+          "instagram_south_fork_american_hashtag"
+        ],
+        "feature_role": "flow_variant_wet_bank_seed",
+        "flow_context_needed": [
+          "high_runnable"
+        ],
+        "review_questions": [
+          "Mark splash, wet-bank, and newly submerged rock limits for high-flow visual variants.",
+          "Confirm that stronger foam and wetness are visual cues only until gauge relation and guide review are attached."
+        ],
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "american_south_fork",
+        "station_m": 19400.0,
+        "target_id": "south_fork_high_flow_foam_lines"
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-07",
+  "policy": {
+    "allowed_use_before_rights_clear": "Manual visual comparison, guide discussion, source-planning notes, and internal annotation placeholders only.",
+    "blocked_use_before_rights_clear": "Texture extraction, photogrammetry, AI training, marketing screenshots, packaged media, copied captions, or derived shipping assets.",
+    "storage": "Link-only review queue. Do not download, scrape, vendor, train on, or package third-party photos, footage, captions, comments, thumbnails, or audio."
+  },
+  "rights_manifest": "field_media/production_import_pilot/rights_manifest.json",
+  "river_id": "american_south_fork",
+  "schema": "raftsim.reference_media_target_output.geojson.v1",
+  "source_reference_annotations": "review/production_import_pilot/reference_annotations.geojson",
+  "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+  "status": "link_only_target_annotation_scaffold_no_media_downloaded",
+  "target_id": "south_fork_high_flow_foam_lines",
+  "type": "FeatureCollection"
+}

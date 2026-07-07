@@ -41,7 +41,8 @@
     "guide_references": [
       "review/guide_review_needs.json",
       "review/field_media_annotation_needs.geojson",
-      "review/production_import_pilot/reference_annotations.geojson"
+      "review/production_import_pilot/reference_annotations.geojson",
+      "review/production_import_pilot/rescue_visibility_annotations.geojson"
     ],
     "hydrography": [
       "hydrography/centerline.geojson",
@@ -75,6 +76,8 @@
       "imagery/production_import_pilot/source_drape_4096.png",
       "imagery/production_import_pilot/water_mask_2048.png",
       "imagery/production_import_pilot/vegetation_mask_2048.png",
+      "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_2048.png",
+      "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_manifest.json",
       "imagery/production_import_pilot/source_drape_composite_manifest.json",
       "imagery/production_import_pilot/source_masks_manifest.json",
       "imagery/nasa_gibs_pacuare_truecolor_2025-04-02_512.png",

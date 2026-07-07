@@ -44,7 +44,8 @@
       "review/rapid_review_labels.json",
       "rapid_review_flow_difficulty_mapping.json",
       "rapid_review_editor_workflow.json",
-      "review/production_import_pilot/reference_annotations.geojson"
+      "review/production_import_pilot/reference_annotations.geojson",
+      "review/production_import_pilot/flow_variant_reference_annotations.geojson"
     ],
     "hydrography": [
       "hydrography/tnm_nhd_products.json",
@@ -76,6 +77,7 @@
       "imagery/production_import_pilot/source_masks_manifest.json",
       "imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json",
       "imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png",
+      "imagery/production_import_pilot/wet_rock_review.geojson",
       "imagery/naip_tiles",
       "imagery/water_mask.tif",
       "imagery/foam_texture_mask.tif"

@@ -1,0 +1,81 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -111.5648546,
+          36.8429798
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_release_sandbar_exposure_low_to_moderate",
+        "candidate_source_ids": [
+          "nps_grand_canyon_photos_multimedia",
+          "wikimedia_grand_canyon_rafting_search",
+          "instagram_grand_canyon_rafting_hashtag"
+        ],
+        "feature_role": "release_band_reference_seed",
+        "flow_context_needed": [
+          "low_release_planning",
+          "moderate_release_planning"
+        ],
+        "review_questions": [
+          "Annotate which sandbar and shelf faces should read dry, damp, or recently wetted across low and moderate release bands.",
+          "Compare only item-level reviewed references; do not derive textures, albedo, or geomorphology from uncleared media."
+        ],
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "colorado_river",
+        "station_m": 10700.0,
+        "target_id": "colorado_release_wet_banks_and_sandbars"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.565902,
+          36.843512
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_release_boils_laterals_oarsman_readability",
+        "candidate_source_ids": [
+          "nps_grand_canyon_photos_multimedia",
+          "instagram_grand_canyon_rafting_hashtag"
+        ],
+        "feature_role": "release_band_water_readability_seed",
+        "flow_context_needed": [
+          "moderate_release_planning",
+          "high_release_planning"
+        ],
+        "review_questions": [
+          "Record current seams, boils, laterals, and wave-train visibility for oarsman sightlines.",
+          "Confirm high-release water and foam layers do not hide sandbar edges, rocks, swimmers, or oar frame clearance."
+        ],
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "colorado_river",
+        "station_m": 10700.0,
+        "target_id": "colorado_release_wet_banks_and_sandbars"
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-07",
+  "policy": {
+    "allowed_use_before_rights_clear": "Manual visual comparison, guide discussion, source-planning notes, and internal annotation placeholders only.",
+    "blocked_use_before_rights_clear": "Texture extraction, photogrammetry, AI training, marketing screenshots, packaged media, copied captions, or derived shipping assets.",
+    "storage": "Link-only review queue. Do not download, scrape, vendor, train on, or package third-party photos, footage, captions, comments, thumbnails, or audio."
+  },
+  "rights_manifest": "field_media/production_import_pilot/rights_manifest.json",
+  "river_id": "colorado_river",
+  "schema": "raftsim.reference_media_target_output.geojson.v1",
+  "source_reference_annotations": "review/production_import_pilot/reference_annotations.geojson",
+  "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+  "status": "link_only_target_annotation_scaffold_no_media_downloaded",
+  "target_id": "colorado_release_wet_banks_and_sandbars",
+  "type": "FeatureCollection"
+}

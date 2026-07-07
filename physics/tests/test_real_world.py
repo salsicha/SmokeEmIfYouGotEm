@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 import numpy as np
+from PIL import Image
 
 from raftsim.real_world import (
     CANDIDATE_RIVER_INVENTORY_FILE,
@@ -30,7 +31,9 @@ from raftsim.real_world import (
     COLORADO_PRODUCTION_IMPORT_PILOT_FILE,
     COLORADO_PRODUCTION_RIVER_MILE_MARKERS_FILE,
     COLORADO_PRODUCTION_SANDBARS_FILE,
+    COLORADO_RELEASE_REFERENCE_ANNOTATIONS_FILE,
     COLORADO_RELEASE_BAND_REVIEW_FILE,
+    COLORADO_RESCUE_VISIBILITY_ANNOTATIONS_FILE,
     COLORADO_SOURCE_METADATA_REVIEW_FILE,
     COLORADO_USBR_RELEASE_CONTEXT_FILE,
     COLORADO_USBR_TOTAL_RELEASE_FILE,
@@ -93,12 +96,15 @@ from raftsim.real_world import (
     PACUARE_PRODUCTION_IMPORT_PILOT_FILE,
     PACUARE_PROTECTED_AREA_PUBLICATION_SENSITIVITY_FILE,
     PACUARE_RAPID_ACCESS_STATIONING_DRAFT_FILE,
+    PACUARE_RESCUE_VISIBILITY_ANNOTATIONS_FILE,
     PACUARE_SNIT_CONFIG_FILE,
     PACUARE_SNIT_LAYER_CATALOG_SUMMARY_FILE,
     PACUARE_SNIT_LAYER_LIST_SCRIPT_FILE,
     PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
     PACUARE_SNIT_OGC_CATALOG_FILE,
     PACUARE_SOURCE_METADATA_REVIEW_FILE,
+    PACUARE_WET_ROCK_WATERFALL_MIST_MASK_FILE,
+    PACUARE_WET_ROCK_WATERFALL_MIST_MASK_MANIFEST_FILE,
     PRODUCTION_ADDITIONAL_SOURCE_LEADS_REVIEW_FILE,
     PRODUCTION_ADDITIONAL_SOURCE_LEADS_REVIEW_SCHEMA_VERSION,
     PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_FILE,
@@ -118,6 +124,7 @@ from raftsim.real_world import (
     SOUTH_FORK_CDEC_SEASONAL_WINDOW_REVIEW_FILE,
     SOUTH_FORK_EVACUATION_RESCUE_ROUTES_FILE,
     SOUTH_FORK_FLOW_BAND_REVIEW_FILE,
+    SOUTH_FORK_FLOW_VARIANT_REFERENCE_ANNOTATIONS_FILE,
     SOUTH_FORK_NHD_MAINSTEM_CANDIDATE_FILE,
     SOUTH_FORK_NHD_MAINSTEM_STATIONING_FILE,
     SOUTH_FORK_NO_PUBLISH_SENSITIVE_POLYGONS_FILE,
@@ -130,6 +137,7 @@ from raftsim.real_world import (
     SOUTH_FORK_PRODUCTION_IMPORT_PILOT_PULL_MANIFEST_FILE,
     SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE,
     SOUTH_FORK_SOURCE_METADATA_REVIEW_FILE,
+    SOUTH_FORK_WET_ROCK_REVIEW_FILE,
     adaptive_solver_parameters,
     build_candidate_river_inventory_package,
     build_colorado_access_points_geojson,
@@ -2986,6 +2994,16 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
         "unreal_lifelike_capture_and_performance_evidence",
     }.issubset(set(register["source_classes"]))
     assert {"american_south_fork", "colorado_river", "pacuare"} == set(rivers)
+    assert SOUTH_FORK_WET_ROCK_REVIEW_FILE in rivers["american_south_fork"]["attached_preview_inputs"]
+    assert (
+        SOUTH_FORK_FLOW_VARIANT_REFERENCE_ANNOTATIONS_FILE
+        in rivers["american_south_fork"]["attached_preview_inputs"]
+    )
+    assert COLORADO_RELEASE_REFERENCE_ANNOTATIONS_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert COLORADO_RESCUE_VISIBILITY_ANNOTATIONS_FILE in rivers["colorado_river"]["attached_preview_inputs"]
+    assert PACUARE_WET_ROCK_WATERFALL_MIST_MASK_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_WET_ROCK_WATERFALL_MIST_MASK_MANIFEST_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_RESCUE_VISIBILITY_ANNOTATIONS_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert any(lead["source_id"] == "snit_cr_idecori" for lead in register["reviewed_source_leads_2026_07_06"])
     assert (
         register["canonical_inputs"]["first_party_procedural_environment_assets"]
@@ -3276,6 +3294,69 @@ def test_reference_media_annotations_and_rights_manifests_are_link_only_per_rive
             artifact["artifact_id"] == f"{river_id}_reference_media_annotations"
             for artifact in photoreal_by_river[river_id]["source_sample_artifacts"]
         )
+
+
+def test_reference_media_target_outputs_exist_and_remain_review_only():
+    queue = json.loads((REAL_WORLD_DATA_DIR / "reference_media_review_queue.json").read_text())
+    river_dirs = {
+        "american_south_fork": "south_fork_american_chili_bar",
+        "colorado_river": "colorado_river_grand_canyon_rowing",
+        "pacuare": "pacuare_river_costa_rica",
+    }
+    target_outputs_by_river = {
+        "american_south_fork": {
+            SOUTH_FORK_WET_ROCK_REVIEW_FILE,
+            SOUTH_FORK_FLOW_VARIANT_REFERENCE_ANNOTATIONS_FILE,
+        },
+        "colorado_river": {
+            COLORADO_RELEASE_REFERENCE_ANNOTATIONS_FILE,
+            COLORADO_RESCUE_VISIBILITY_ANNOTATIONS_FILE,
+        },
+        "pacuare": {
+            PACUARE_WET_ROCK_WATERFALL_MIST_MASK_FILE,
+            PACUARE_WET_ROCK_WATERFALL_MIST_MASK_MANIFEST_FILE,
+            PACUARE_RESCUE_VISIBILITY_ANNOTATIONS_FILE,
+        },
+    }
+
+    for river_id, expected_outputs in target_outputs_by_river.items():
+        data_dir = REAL_WORLD_DATA_DIR / river_dirs[river_id]
+        source_manifest = json.loads((data_dir / "source_manifest.json").read_text())
+        source_artifacts = {
+            artifact
+            for artifacts in source_manifest["artifacts"].values()
+            for artifact in artifacts
+        }
+        queue_outputs = {
+            output
+            for target in queue["review_targets"]
+            if target["river_id"] == river_id
+            for output in target["annotation_outputs"]
+        }
+        assert expected_outputs.issubset(queue_outputs | {PACUARE_WET_ROCK_WATERFALL_MIST_MASK_MANIFEST_FILE})
+        assert expected_outputs.issubset(source_artifacts)
+
+        for output in expected_outputs:
+            output_path = data_dir / output
+            assert output_path.exists(), output
+            if output.endswith(".geojson"):
+                data = json.loads(output_path.read_text())
+                assert data["schema"] == "raftsim.reference_media_target_output.geojson.v1"
+                assert data["status"] == "link_only_target_annotation_scaffold_no_media_downloaded"
+                assert data["source_review_queue"] == "physics/data/real_world/reference_media_review_queue.json"
+                assert data["features"]
+                assert all(
+                    feature["properties"]["review_status"] == "candidate_links_only_no_media_downloaded"
+                    for feature in data["features"]
+                )
+            elif output.endswith(".json"):
+                data = json.loads(output_path.read_text())
+                assert data["status"] == "generated_review_only_mask_no_media_downloaded_not_photoreal"
+                assert data["policy"]["third_party_media_downloaded"] is False
+            elif output.endswith(".png"):
+                with Image.open(output_path) as image:
+                    assert image.size == (2048, 2048)
+                    assert image.mode == "RGB"
 
 
 def test_channel_indicators_and_rapid_candidates_find_complex_water():

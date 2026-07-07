@@ -1,0 +1,79 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -120.7972185,
+          38.7684897
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "south_fork_late_summer_exposed_rocks_wet_dry_split",
+        "candidate_source_ids": [
+          "wikimedia_south_fork_american_search",
+          "flickr_south_fork_american_search",
+          "instagram_south_fork_american_hashtag"
+        ],
+        "feature_role": "wet_rock_review_seed",
+        "flow_context_needed": [
+          "low_runnable"
+        ],
+        "review_questions": [
+          "Mark which boulder faces read dry, damp, freshly splashed, or submerged at late-summer low runnable flow.",
+          "Check that exposed rock and wet-bank contrast does not hide swimmer or throw-rope recovery targets."
+        ],
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "american_south_fork",
+        "station_m": 12100.0,
+        "target_id": "south_fork_late_summer_exposed_rocks"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.796332,
+          38.768902
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "south_fork_late_summer_oak_scrub_bank_color",
+        "candidate_source_ids": [
+          "flickr_south_fork_american_search",
+          "instagram_south_fork_american_hashtag"
+        ],
+        "feature_role": "bank_color_and_dry_grass_review_seed",
+        "flow_context_needed": [
+          "low_runnable"
+        ],
+        "review_questions": [
+          "Record dry grass, oak scrub, and shaded riparian color at low flow before terrain and foliage material tuning.",
+          "Separate public social observations from asset rights; do not derive textures from uncleared media."
+        ],
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "american_south_fork",
+        "station_m": 12100.0,
+        "target_id": "south_fork_late_summer_exposed_rocks"
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-07",
+  "policy": {
+    "allowed_use_before_rights_clear": "Manual visual comparison, guide discussion, source-planning notes, and internal annotation placeholders only.",
+    "blocked_use_before_rights_clear": "Texture extraction, photogrammetry, AI training, marketing screenshots, packaged media, copied captions, or derived shipping assets.",
+    "storage": "Link-only review queue. Do not download, scrape, vendor, train on, or package third-party photos, footage, captions, comments, thumbnails, or audio."
+  },
+  "rights_manifest": "field_media/production_import_pilot/rights_manifest.json",
+  "river_id": "american_south_fork",
+  "schema": "raftsim.reference_media_target_output.geojson.v1",
+  "source_reference_annotations": "review/production_import_pilot/reference_annotations.geojson",
+  "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+  "status": "link_only_target_annotation_scaffold_no_media_downloaded",
+  "target_id": "south_fork_late_summer_exposed_rocks",
+  "type": "FeatureCollection"
+}
