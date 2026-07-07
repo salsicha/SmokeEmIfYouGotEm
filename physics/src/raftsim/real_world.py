@@ -179,6 +179,9 @@ PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE = (
 PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE = (
     "imagery/production_import_pilot/landsat_product_access_gate_review.json"
 )
+PACUARE_LOCAL_IMAGERY_ALTERNATIVE_SOURCE_REVIEW_FILE = (
+    "imagery/production_import_pilot/local_imagery_alternative_source_review.json"
+)
 PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE = "imagery/production_import_pilot/sentinel_cog_thumbnail_review.json"
 PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE = "imagery/production_import_pilot/sentinel_cog_access_probe.json"
 PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_FILE = "imagery/production_import_pilot/sentinel_tci_review_preview.json"
@@ -3139,6 +3142,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_CLOUD_SHADOW_REVIEW_FILE,
                     PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE,
                     PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
+                    PACUARE_LOCAL_IMAGERY_ALTERNATIVE_SOURCE_REVIEW_FILE,
                     PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE,
                     PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE,
                     PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_FILE,
@@ -3197,6 +3201,7 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     "imagery/production_import_pilot/source_masks_manifest.json",
                     PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE,
                     PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
+                    PACUARE_LOCAL_IMAGERY_ALTERNATIVE_SOURCE_REVIEW_FILE,
                     PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE,
                     PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE,
                     PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_FILE,
@@ -3783,6 +3788,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     PACUARE_CLOUD_SHADOW_REVIEW_FILE,
                     PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE,
                     PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
+                    PACUARE_LOCAL_IMAGERY_ALTERNATIVE_SOURCE_REVIEW_FILE,
                     PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE,
                     PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE,
                     PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_FILE,
@@ -3869,6 +3875,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             PACUARE_CLOUD_SHADOW_REVIEW_FILE,
                             PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE,
                             PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
+                            PACUARE_LOCAL_IMAGERY_ALTERNATIVE_SOURCE_REVIEW_FILE,
                             PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE,
                             PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE,
                             PACUARE_SENTINEL_TCI_REVIEW_PREVIEW_FILE,

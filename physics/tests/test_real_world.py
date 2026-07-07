@@ -43,6 +43,7 @@ from raftsim.real_world import (
     PACUARE_FLASH_RESPONSE_REVIEW_FILE,
     PACUARE_HIGH_RES_SCENE_METADATA_REVIEW_FILE,
     PACUARE_LANDSAT_PRODUCT_ACCESS_GATE_REVIEW_FILE,
+    PACUARE_LOCAL_IMAGERY_ALTERNATIVE_SOURCE_REVIEW_FILE,
     PACUARE_RAINFALL_STATION_REVIEW_FILE,
     PACUARE_SENTINEL_COG_ACCESS_PROBE_FILE,
     PACUARE_SENTINEL_COG_THUMBNAIL_REVIEW_FILE,
@@ -1644,6 +1645,61 @@ def test_pacuare_landsat_product_access_gate_blocks_login_html_artifacts():
     assert attempts["landsat_lc80140532025345_mtl_json"]["response_class"] == "eros_registration_login_html"
     assert attempts["landsat_lc80140532025345_mtl_json"]["artifact_committed"] is False
     assert "claiming Landsat browse imagery is attached" in review["forbidden_use"]
+
+
+def test_pacuare_local_imagery_alternative_review_is_mask_lead_only():
+    pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
+    source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((pacuare_dir / "production_source_pull_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+    review = json.loads((pacuare_dir / PACUARE_LOCAL_IMAGERY_ALTERNATIVE_SOURCE_REVIEW_FILE).read_text())
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+    pacuare_sources = next(river for river in photoreal_sources["rivers"] if river["river_id"] == "pacuare")
+
+    assert PACUARE_LOCAL_IMAGERY_ALTERNATIVE_SOURCE_REVIEW_FILE in source_manifest["artifacts"]["imagery"]
+    assert (pacuare_dir / PACUARE_LOCAL_IMAGERY_ALTERNATIVE_SOURCE_REVIEW_FILE).is_file()
+    assert any(
+        artifact["artifact_id"] == "pacuare_local_imagery_alternative_source_review"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert (
+        "physics/data/real_world/pacuare_river_costa_rica/"
+        + PACUARE_LOCAL_IMAGERY_ALTERNATIVE_SOURCE_REVIEW_FILE
+        in rivers["pacuare"]["attached_sources_by_class"]["aerial_or_satellite_imagery"]["artifacts"]
+    )
+    assert (
+        "physics/data/real_world/pacuare_river_costa_rica/"
+        + PACUARE_LOCAL_IMAGERY_ALTERNATIVE_SOURCE_REVIEW_FILE
+        in rivers["pacuare"]["attached_sources_by_class"]["water_and_vegetation_masks"]["artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "pacuare_local_imagery_alternative_source_review"
+        for artifact in pacuare_sources["source_sample_artifacts"]
+    )
+
+    assert review["schema"] == "raftsim.pacuare_local_imagery_alternative_source_review.v1"
+    assert review["status"] == "official_local_mask_source_leads_reviewed_no_drape_replacement"
+    assert review["policy"]["features_downloaded"] is False
+    assert review["policy"]["map_tiles_downloaded"] is False
+    assert review["policy"]["source_drape_replaced"] is False
+    assert review["policy"]["mask_sources_replaced"] is False
+
+    findings = {finding["finding_id"]: finding for finding in review["findings"]}
+    assert (
+        findings["direct_snit_orthophoto_service_not_found_in_archived_nodes"]["status"]
+        == "no_direct_orthophoto_endpoint_attached"
+    )
+    forest = findings["sinac_cobertura_forestal_2023_mask_candidate"]
+    assert forest["status"] == "mask_and_procedural_foliage_zone_candidate_terms_review_required"
+    assert forest["advertised_services"] == {"wms": True, "wfs": True, "wmts": False}
+    assert "photoreal source-drape replacement" in forest["blocked_use"]
+    assert "production source-drape replacement" in review["forbidden_use"]
 
 
 def test_pacuare_sentinel_cog_thumbnail_review_attaches_public_visual_triage_only():

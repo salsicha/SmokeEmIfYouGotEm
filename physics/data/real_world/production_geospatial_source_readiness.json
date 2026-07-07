@@ -473,6 +473,7 @@
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/cloud_shadow_review.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/landsat_product_access_gate_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/local_imagery_alternative_source_review.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_thumbnail.jpg",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tileinfo_metadata.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_thumbnail.jpg",
@@ -516,7 +517,7 @@
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_scl_qa_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/source_metadata_review.json"
           ],
-          "promotion_blocker": "Pacuare has retained NASA GIBS/MODIS cloud-screening evidence, coarse production-import derivatives, official Landsat/Sentinel high-resolution scene metadata, a Landsat access-gate review, Sentinel COG thumbnails/tile metadata, a successful Sentinel COG range-access probe, downsampled 17PKM/16PHR TCI review PNGs, bbox coverage and clip reviews, SCL QA showing January 19 cloud contamination, a cleaner-scene STAC search, March 20 SCL/TCI bbox clips, draft-bank strip review showing corridor-local cloud/shadow, March 5 and February 24 route-local SCL rejections, and February 4 SCL plus TCI route-window review showing visible cloud/shadow. Production still needs cleaner route-local coverage or exact native-CRS route/bank clipping with SCL masking, stitching, CRS/band/scale review, terms/attribution review, and guide/geospatial approval before photoreal imagery or masks are promoted.",
+          "promotion_blocker": "Pacuare has retained NASA GIBS/MODIS cloud-screening evidence, coarse production-import derivatives, official Landsat/Sentinel high-resolution scene metadata, a Landsat access-gate review, a local SINAC forest-cover mask/procedural-zoning lead, Sentinel COG thumbnails/tile metadata, a successful Sentinel COG range-access probe, downsampled 17PKM/16PHR TCI review PNGs, bbox coverage and clip reviews, SCL QA showing January 19 cloud contamination, a cleaner-scene STAC search, March 20 SCL/TCI bbox clips, draft-bank strip review showing corridor-local cloud/shadow, March 5 and February 24 route-local SCL rejections, and February 4 SCL plus TCI route-window review showing visible cloud/shadow. Production still needs cleaner route-local coverage or exact native-CRS route/bank clipping with SCL masking, stitching, CRS/band/scale review, terms/attribution review, and guide/geospatial approval before photoreal imagery or masks are promoted.",
           "status": "coarse_preview_and_high_resolution_scene_metadata_attached_sentinel_full_tile_review_previews_extraction_blocked"
         },
         "guide_and_reference_media_annotations": {
@@ -604,6 +605,7 @@
             "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/source_metadata_review.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/landsat_product_access_gate_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/local_imagery_alternative_source_review.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_thumbnail.jpg",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tileinfo_metadata.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_thumbnail.jpg",
@@ -646,7 +648,7 @@
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_scl_qa_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_scl_qa_review.png"
           ],
-          "promotion_blocker": "Masks are coarse preview derivatives; high-resolution Landsat/Sentinel scene metadata, Landsat access-gate review, Sentinel thumbnail/tile metadata, Sentinel COG range-access probes, 17PKM/16PHR TCI review PNGs, March 20 SCL/TCI bbox clips, draft-bank strip QA, March 5 and February 24 route-local SCL rejections, and February 4 SCL/TCI route-window review identify candidate replacement imagery and access paths, but visible cloud/shadow still blocks promotion until cleaner route-local coverage or approved route-window reads, corridor clipping/stitching, SCL/QA masking, hydrography alignment, water/canopy/wet-rock/waterfall/mist segmentation, approved terms, and guide review.",
+          "promotion_blocker": "Masks are coarse preview derivatives; high-resolution Landsat/Sentinel scene metadata, Landsat access-gate review, a local SINAC forest-cover mask/procedural-zoning lead, Sentinel thumbnail/tile metadata, Sentinel COG range-access probes, 17PKM/16PHR TCI review PNGs, March 20 SCL/TCI bbox clips, draft-bank strip QA, March 5 and February 24 route-local SCL rejections, and February 4 SCL/TCI route-window review identify candidate replacement imagery and access paths, but visible cloud/shadow and source-rights review still block promotion until cleaner route-local coverage or approved route-window reads, corridor clipping/stitching, SCL/QA masking, hydrography alignment, water/canopy/wet-rock/waterfall/mist segmentation, approved terms, and guide review.",
           "status": "preview_masks_and_pilot_derivative_masks_attached"
         }
       },

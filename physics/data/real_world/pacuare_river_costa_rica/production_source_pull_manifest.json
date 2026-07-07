@@ -19,6 +19,7 @@
     "Pacuare consolidated source metadata review is attached, but it only records local review-gated metadata and does not promote DEM, imagery, hydrography, hydrology, access, protected-area, or media sources to production use.",
     "Pacuare high-resolution scene metadata review identifies official Landsat/Sentinel candidates, but production imagery still needs full-year paging, download approval, manual visual QA, CRS/band/scale review, and guide/geospatial signoff before replacing the MODIS/GIBS preview.",
     "Anonymous LandsatLook product asset URLs returned EROS login HTML for the best Pacuare Landsat candidate, so imagery downloads remain blocked until an approved access path returns expected JPEG/JSON/COG content.",
+    "Pacuare local imagery alternative review identifies SINAC Cobertura Forestal 2023 as a classified canopy/mask/procedural-zoning lead, but no direct SNIT orthophoto source-drape replacement is attached and SINAC terms review is still required.",
     "Pacuare Sentinel COG thumbnails and tile metadata are attached as visual triage, but full-resolution Sentinel bands, SCL/QA masks, corridor clipping, terms/attribution, and manual cloud/shadow QA are still required before source-drape or mask replacement.",
     "Pacuare March 20, 2025 Sentinel SCL QA, matching TCI bbox clips, draft-bank window strips, a worse March 5 route-local SCL probe, February 4, 2024 SCL/TCI route-window review, and a failed February 24 SCL probe are attached for review only; production imagery still needs cleaner route-local coverage or exact native-CRS route/bank clipping with SCL masking, stitching, terms/attribution review, and guide/geospatial signoff."
   ],
@@ -799,6 +800,37 @@
         "download_access_gate",
         "production_imagery_workflow_planning",
         "anti_bad_artifact_check"
+      ]
+    },
+    {
+      "artifact_id": "pacuare_local_imagery_alternative_source_review",
+      "category": "local_imagery_and_mask_source_review",
+      "path": "imagery/production_import_pilot/local_imagery_alternative_source_review.json",
+      "provider": "RaftSim review of archived SNIT/SINAC metadata and layer-list artifacts",
+      "status": "official_local_mask_source_leads_reviewed_no_drape_replacement",
+      "summary": {
+        "direct_orthophoto_service_attached": false,
+        "features_downloaded": false,
+        "map_tiles_downloaded": false,
+        "source_drape_replaced": false,
+        "mask_sources_replaced": false,
+        "classified_mask_candidate": "SINAC Cobertura Forestal 2023",
+        "classified_mask_candidate_services": {
+          "wms": true,
+          "wfs": true,
+          "wmts": false
+        },
+        "terms_review_required": true
+      },
+      "use": [
+        "local_source_discovery",
+        "procedural_foliage_zone_planning",
+        "future_mask_source_planning"
+      ],
+      "caveats": [
+        "No direct Pacuare-ready SNIT orthophoto endpoint is attached in the archived source slice.",
+        "SINAC Cobertura Forestal 2023 is a classified canopy/mask lead, not a photoreal source drape or material source.",
+        "Copyright and intellectual-property restrictions require terms review before any feature, tile, mask, or packaged derivative is imported."
       ]
     },
     {
