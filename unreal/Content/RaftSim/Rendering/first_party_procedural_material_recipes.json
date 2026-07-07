@@ -62,7 +62,7 @@
         "riverbed_and_shallow_shelves"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorPreview",
-      "unreal_status": "preview_vertex_color_material_active_production_layered_material_pending",
+      "unreal_status": "preview_vertex_color_material_active_with_landscape_nanite_material_scaffold_production_layered_material_pending",
       "required_source_inputs": [
         "source_drape_4096.png",
         "dem_relief_2048.png",
@@ -76,6 +76,7 @@
         "wet_bank_darkening",
         "gravel_bar_noise",
         "strata_band_color",
+        "landscape_nanite_material_scaffold",
         "leaf_litter_or_sand_overlay",
         "source_drape_weight"
       ],
