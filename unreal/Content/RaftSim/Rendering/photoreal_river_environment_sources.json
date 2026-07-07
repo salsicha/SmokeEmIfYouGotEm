@@ -1230,6 +1230,18 @@
             "cleaner_scene_selection",
             "future_masking_tool_requirements"
           ]
+        },
+        {
+          "artifact_id": "pacuare_sentinel_cleaner_scene_search_review",
+          "category": "sentinel_cleaner_scene_search_review",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
+          "promotion_blocker": "This search identifies the next cleaner Sentinel candidate pair only; production still needs SCL-first QA, exact clipping, stitching, terms review, and guide/geospatial approval before Unreal source-drape replacement.",
+          "status": "cleaner_sentinel_candidates_identified_scl_probe_pending",
+          "use_in_unreal": [
+            "cleaner_scene_selection",
+            "future_source_drape_replacement_planning",
+            "cloud_screening_review"
+          ]
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"

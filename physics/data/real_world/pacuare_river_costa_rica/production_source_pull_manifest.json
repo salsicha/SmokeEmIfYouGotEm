@@ -1068,6 +1068,7 @@
       },
       "related_artifacts": [
         "imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
+        "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
         "imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json",
         "imagery/production_import_pilot/sentinel_cog_access_probe.json"
       ],
@@ -1080,6 +1081,40 @@
         "SCL QA is attached for draft bbox clips only, not exact route/bank geometry.",
         "QA previews do not apply masks to the TCI clips and do not generate source drapes or production masks.",
         "Visible cloud/shadow contamination blocks January 19, 2025 Pacuare imagery promotion unless a cleaner scene or reviewed masking/stitching pass replaces it."
+      ]
+    },
+    {
+      "artifact_id": "pacuare_sentinel_cleaner_scene_search_review",
+      "category": "sentinel_cleaner_scene_search_review",
+      "path": "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
+      "provider": "Element 84 Earth Search STAC / AWS Open Data Sentinel-2 L2A COG mirror",
+      "status": "cleaner_sentinel_candidates_identified_scl_probe_pending",
+      "summary": {
+        "feature_count": 19,
+        "required_tile_ids": [
+          "16PHR",
+          "17PKM"
+        ],
+        "recommended_next_probe_date": "2025-03-20",
+        "recommended_next_probe_max_catalog_cloud_cover_percent": 11.723126,
+        "raw_response_committed": false,
+        "decision": "download_scl_first_then_tci_only_if_qa_passes"
+      },
+      "related_artifacts": [
+        "imagery/production_import_pilot/sentinel_corridor_bbox_scl_qa_review.json",
+        "imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
+        "imagery/production_import_pilot/sentinel_cog_access_probe.json",
+        "imagery/production_import_pilot/high_resolution_scene_metadata_review.json"
+      ],
+      "use": [
+        "cleaner_scene_selection",
+        "next_scl_probe_planning",
+        "cloud_screening_review"
+      ],
+      "caveats": [
+        "Catalog cloud cover is tile-level metadata and did not match the January 19 corridor SCL fractions exactly; SCL window QA is required before TCI clips or source drapes.",
+        "No raw STAC response, Sentinel image, SCL raster, source drape, or mask derivative is committed by this review.",
+        "Production Pacuare imagery remains blocked until exact clipping, SCL/cloud QA, stitching, terms review, and guide/geospatial approval pass."
       ]
     }
   ],
