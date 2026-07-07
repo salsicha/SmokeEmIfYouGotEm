@@ -1,0 +1,141 @@
+{
+  "schema": "raftsim.pacuare_sentinel_20240204_draft_bank_tci_review.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "alternate_scene_tci_review_attached_cloud_shadow_blocked",
+  "goal": "Download and crop February 4, 2024 Sentinel TCI route-window strips after the SCL probe looked marginally competitive with March 20.",
+  "clip_scope": "draft_unreal_preview_bank_bbox_plus_250m_context_not_official_route_polygon",
+  "draft_bank_bounds_wgs84": {
+    "min_lon": -83.7503114,
+    "min_lat": 9.8903661,
+    "max_lon": -83.4196455,
+    "max_lat": 9.9519607,
+    "context_margin_m": 250
+  },
+  "source_geometry": {
+    "centerline": "hydrography/production_import_pilot/centerline.geojson",
+    "banks": "hydrography/production_import_pilot/banks.geojson",
+    "stationing": "hydrography/production_import_pilot/preview_stationing_scaffold.json",
+    "status": "preview_scaffold_not_official_hydrography"
+  },
+  "method": {
+    "coordinate_transform": "Reuse the same draft-bank native-CRS window math validated for the March 20 review.",
+    "pixel_model": "Sentinel-2 TCI uses 10 m pixels at 10980x10980 on the same tile origins as the companion SCL QA.",
+    "clip_algorithm": "Crop the already computed draft-bank pixel windows from full TCI COGs and downsample each strip to 1024 px wide review PNGs.",
+    "limitations": [
+      "The source bank geometry is generated from the Unreal preview scaffold and is not official Costa Rica hydrography, surveyed bank geometry, wetted width, or protected-area-safe publication geometry.",
+      "The TCI strips are not masked by SCL; the companion SCL strips remain QA references only.",
+      "The clips are narrow bbox strips around draft banks, not a polygon route clip, stitched mosaic, source drape, material input, or mask source."
+    ]
+  },
+  "source_tci_cogs": [
+    {
+      "tile_id": "17PKM",
+      "product_id": "S2B_17PKM_20240204_0_L2A",
+      "asset": "TCI.tif",
+      "epsg": 32617,
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/17/P/KM/2024/2/S2B_17PKM_20240204_0_L2A/TCI.tif",
+      "download_location": "/private/tmp/pacuare_sentinel_20240204_17pkm_tci.tif",
+      "byte_count": 247063336,
+      "sha256": "8cccd3d21417646230df290634d7dcbe1af000b6ee0670db0547fa1593b9b161",
+      "download_committed": false
+    },
+    {
+      "tile_id": "16PHR",
+      "product_id": "S2B_16PHR_20240204_0_L2A",
+      "asset": "TCI.tif",
+      "epsg": 32616,
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/16/P/HR/2024/2/S2B_16PHR_20240204_0_L2A/TCI.tif",
+      "download_location": "/private/tmp/pacuare_sentinel_20240204_16phr_tci.tif",
+      "byte_count": 286538059,
+      "sha256": "a5121477b0330cb0dad1d5432f3e628196a8a9d3204c7ca8652724f370fa4f1a",
+      "download_committed": false
+    }
+  ],
+  "outputs": [
+    {
+      "tile_id": "17PKM",
+      "kind": "tci",
+      "path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20240204_draft_bank_window_clip_review.png",
+      "native_utm_bbox_m": [
+        198117.9806854698,
+        1094003.8168333934,
+        234954.2090065148,
+        1101602.7305757483
+      ],
+      "pixel_window": {
+        "left": 0,
+        "top": 9839,
+        "width": 3498,
+        "height": 761
+      },
+      "dimensions_px": [
+        1024,
+        223
+      ],
+      "mode": "RGB",
+      "byte_count": 451279,
+      "sha256": "17a1bcf266cc4e745f0faa64be74882fcfe76d753e0efab8bf45e69569c7d49c",
+      "visual_review": "The route-context strip has visible cloud and shadow clusters across the left, middle, and right portions of the draft-bank window, so it cannot replace the Pacuare source drape."
+    },
+    {
+      "tile_id": "16PHR",
+      "kind": "tci",
+      "path": "imagery/production_import_pilot/sentinel_s2b_16phr_20240204_draft_bank_window_clip_review.png",
+      "native_utm_bbox_m": [
+        856134.3739994016,
+        1094778.6924100376,
+        893013.8078169008,
+        1102473.5952565107
+      ],
+      "pixel_window": {
+        "left": 5615,
+        "top": 0,
+        "width": 3689,
+        "height": 527
+      },
+      "dimensions_px": [
+        1024,
+        146
+      ],
+      "mode": "RGB",
+      "byte_count": 299998,
+      "sha256": "77881fc2e201e055a431392142c9a824dac5721132ef84d1baa521b381d6daae",
+      "visual_review": "The narrower 16PHR strip still contains visible cloud and shadow over the draft corridor and remains review-only."
+    }
+  ],
+  "related_scl_probe": "imagery/production_import_pilot/sentinel_20240204_draft_bank_window_scl_probe.json",
+  "windowed_read_decision": {
+    "tci_review_clips_downloaded": true,
+    "visual_review_completed": true,
+    "scl_qa_review_attached": true,
+    "scl_mask_applied_to_tci": false,
+    "stitched_corridor_mosaic_generated": false,
+    "source_drape_replaced": false,
+    "mask_sources_replaced": false,
+    "full_cogs_committed": false,
+    "cloud_screening_blocks_promotion": true,
+    "decision": "February 4 TCI strips confirm the marginal SCL candidate is still visibly cloud/shadow contaminated in the draft-bank route context. Do not promote this scene to Pacuare source drape, masks, materials, or lifelike screenshot evidence."
+  },
+  "recommended_next_step": "continue_cleaner_scene_search_or_exact_route_scl_masked_stitching",
+  "allowed_use": [
+    "alternate_scene_selection",
+    "route_window_visual_triage",
+    "cloud_shadow_qa_review",
+    "future_exact_route_clip_planning"
+  ],
+  "forbidden_use": [
+    "production source-drape replacement",
+    "production water or vegetation mask generation",
+    "photoreal material extraction",
+    "claiming Pacuare route imagery coverage",
+    "claiming lifelike Pacuare screenshot readiness"
+  ],
+  "promotion_blockers": [
+    "Find cleaner same-date coverage or prove exact route-window SCL masking leaves enough usable corridor texture.",
+    "Replace preview-scaffold bank geometry with official or guide-approved route/bank geometry.",
+    "Stitch only after exact clipping, SCL/cloud/shadow QA, seam review, scale review, and terms review pass.",
+    "Record guide/geospatial approval before any imagery-derived Pacuare material or lifelike capture claim."
+  ]
+}

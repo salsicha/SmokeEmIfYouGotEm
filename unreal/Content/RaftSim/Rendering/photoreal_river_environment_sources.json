@@ -1317,10 +1317,26 @@
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20240204_draft_bank_window_scl_qa_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20240204_draft_bank_window_scl_qa_review.png"
           ],
-          "promotion_blocker": "February 4 route-local SCL is marginal, not production-clean; TCI review is allowed only as source triage before any route-window masking or source-drape decision.",
-          "status": "alternate_scene_scl_probe_marginal_tci_review_pending",
+          "promotion_blocker": "February 4 route-local SCL was marginally competitive, but companion TCI review confirms visible cloud/shadow contamination; do not use for route-window masking or source-drape promotion.",
+          "status": "alternate_scene_scl_probe_tci_review_completed_cloud_shadow_blocked",
           "use_in_unreal": [
             "alternate_scene_selection",
+            "future_source_drape_replacement_planning",
+            "cloud_shadow_qa_review"
+          ]
+        },
+        {
+          "artifact_id": "pacuare_sentinel_20240204_draft_bank_tci_review",
+          "category": "sentinel_alternate_scene_route_local_tci_review",
+          "paths": [
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_20240204_draft_bank_window_tci_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20240204_draft_bank_window_clip_review.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20240204_draft_bank_window_clip_review.png"
+          ],
+          "promotion_blocker": "February 4 TCI route-window strips remain visibly cloud/shadow contaminated and are review-only; continue cleaner-scene search or exact route-window SCL-masked stitching before any source-drape decision.",
+          "status": "alternate_scene_tci_review_attached_cloud_shadow_blocked",
+          "use_in_unreal": [
+            "alternate_scene_rejection_record",
             "future_source_drape_replacement_planning",
             "cloud_shadow_qa_review"
           ]
