@@ -1145,6 +1145,123 @@ AActor* AddPreviewProceduralMeshActor(
     return Actor;
 }
 
+AActor* AddPreviewIrregularRockActor(
+    UWorld* World,
+    const FString& Label,
+    const FVector& BaseLocation,
+    float YawDegrees,
+    const FVector& Scale,
+    const FLinearColor& Color,
+    int32 Seed)
+{
+    if (!World)
+    {
+        return nullptr;
+    }
+
+    constexpr int32 RingCount = 4;
+    constexpr int32 SegmentCount = 9;
+    const float YawRadians = FMath::DegreesToRadians(YawDegrees);
+    const float CosYaw = FMath::Cos(YawRadians);
+    const float SinYaw = FMath::Sin(YawRadians);
+    const FVector Radii(
+        FMath::Max(4.0f, Scale.X * 100.0f),
+        FMath::Max(4.0f, Scale.Y * 100.0f),
+        FMath::Max(3.0f, Scale.Z * 100.0f));
+
+    TArray<FVector> Vertices;
+    TArray<FVector2D> UVs;
+    TArray<FLinearColor> VertexColors;
+    TArray<int32> Triangles;
+    Vertices.Reserve(RingCount * SegmentCount + 2);
+    UVs.Reserve(RingCount * SegmentCount + 2);
+    VertexColors.Reserve(RingCount * SegmentCount + 2);
+    Triangles.Reserve(RingCount * SegmentCount * 6);
+
+    for (int32 RingIndex = 0; RingIndex < RingCount; ++RingIndex)
+    {
+        const float V = static_cast<float>(RingIndex) / static_cast<float>(RingCount);
+        const float AngleFromBase = V * HALF_PI;
+        const float RingRadius = FMath::Cos(AngleFromBase);
+        const float Height = FMath::Sin(AngleFromBase);
+        for (int32 SegmentIndex = 0; SegmentIndex < SegmentCount; ++SegmentIndex)
+        {
+            const float U = static_cast<float>(SegmentIndex) / static_cast<float>(SegmentCount);
+            const float Angle = U * 2.0f * PI;
+            const float Noise =
+                0.82f +
+                0.20f * FMath::Sin(static_cast<float>(Seed) * 0.37f + static_cast<float>(RingIndex) * 1.19f + static_cast<float>(SegmentIndex) * 0.73f) +
+                0.10f * FMath::Sin(static_cast<float>(Seed) * 0.11f - static_cast<float>(RingIndex) * 0.61f + static_cast<float>(SegmentIndex) * 1.47f);
+            const float LocalX = FMath::Cos(Angle) * RingRadius * Radii.X * Noise;
+            const float LocalY = FMath::Sin(Angle) * RingRadius * Radii.Y *
+                (0.92f + 0.10f * FMath::Sin(static_cast<float>(Seed + SegmentIndex) * 0.53f));
+            const float LocalZ = Height * Radii.Z *
+                (0.88f + 0.10f * FMath::Sin(static_cast<float>(Seed) * 0.23f + static_cast<float>(SegmentIndex) * 0.91f));
+            Vertices.Add(FVector(
+                BaseLocation.X + LocalX * CosYaw - LocalY * SinYaw,
+                BaseLocation.Y + LocalX * SinYaw + LocalY * CosYaw,
+                BaseLocation.Z + LocalZ));
+            UVs.Add(FVector2D(U, V));
+            VertexColors.Add(ScalePreviewColor(Color, 0.58f + 0.10f * Noise + 0.03f * Height));
+        }
+    }
+
+    const int32 TopIndex = Vertices.Num();
+    Vertices.Add(FVector(BaseLocation.X, BaseLocation.Y, BaseLocation.Z + Radii.Z * 1.04f));
+    UVs.Add(FVector2D(0.5f, 1.0f));
+    VertexColors.Add(ScalePreviewColor(Color, 0.74f));
+
+    const int32 BottomIndex = Vertices.Num();
+    Vertices.Add(BaseLocation);
+    UVs.Add(FVector2D(0.5f, 0.0f));
+    VertexColors.Add(ScalePreviewColor(Color, 0.46f));
+
+    for (int32 RingIndex = 0; RingIndex < RingCount - 1; ++RingIndex)
+    {
+        const int32 CurrentRing = RingIndex * SegmentCount;
+        const int32 NextRing = (RingIndex + 1) * SegmentCount;
+        for (int32 SegmentIndex = 0; SegmentIndex < SegmentCount; ++SegmentIndex)
+        {
+            const int32 NextSegment = (SegmentIndex + 1) % SegmentCount;
+            const int32 A = CurrentRing + SegmentIndex;
+            const int32 B = CurrentRing + NextSegment;
+            const int32 C = NextRing + SegmentIndex;
+            const int32 D = NextRing + NextSegment;
+            Triangles.Add(A);
+            Triangles.Add(C);
+            Triangles.Add(B);
+            Triangles.Add(B);
+            Triangles.Add(C);
+            Triangles.Add(D);
+        }
+    }
+
+    const int32 LastRing = (RingCount - 1) * SegmentCount;
+    for (int32 SegmentIndex = 0; SegmentIndex < SegmentCount; ++SegmentIndex)
+    {
+        const int32 NextSegment = (SegmentIndex + 1) % SegmentCount;
+        Triangles.Add(LastRing + SegmentIndex);
+        Triangles.Add(TopIndex);
+        Triangles.Add(LastRing + NextSegment);
+
+        Triangles.Add(BottomIndex);
+        Triangles.Add(SegmentIndex + NextSegment);
+        Triangles.Add(SegmentIndex);
+    }
+
+    const TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    return AddPreviewProceduralMeshActor(
+        World,
+        Label,
+        Vertices,
+        Triangles,
+        Normals,
+        UVs,
+        Color,
+        LoadOrCreatePreviewVertexColorMaterial(),
+        &VertexColors);
+}
+
 void AddPreviewTerrainMesh(
     UWorld* World,
     const FRaftSimEnvironmentPreviewSpec& Spec,
@@ -1700,14 +1817,14 @@ void AddPreviewProceduralEnvironmentDetail(
             WetPebbleColor,
             FMath::Clamp(0.24f + WaterT * 0.48f, 0.0f, 0.72f));
 
-        AddPreviewMeshActor(
+        AddPreviewIrregularRockActor(
             World,
-            PebbleMesh,
             FString::Printf(TEXT("RaftSim_FlowAwareWaterlinePebble_%03d_%s"), PebbleIndex, *Spec.RiverId),
-            FVector(X, Y, FMath::Max(TerrainZ + 13.0f, WaterSurfaceZ + 6.0f)),
-            FRotator(0.0f, static_cast<float>((PebbleIndex * 37) % 360), 0.0f),
+            FVector(X, Y, FMath::Max(TerrainZ + 5.0f, WaterSurfaceZ + 3.0f)),
+            static_cast<float>((PebbleIndex * 37) % 360),
             Scale,
-            PebbleColor);
+            PebbleColor,
+            PebbleIndex + 1700);
     }
 
     const int32 PebbleCount = Spec.bDesertCanyon ? 96 : (Spec.bHasWaterfalls ? 86 : 72);
@@ -1755,14 +1872,14 @@ void AddPreviewProceduralEnvironmentDetail(
             FMath::Lerp(ScalePreviewColor(Spec.RockColor, 0.45f), ScalePreviewColor(Spec.WaterColor, 0.36f), 0.35f),
             FMath::Clamp(WetMaskT * 0.42f, 0.0f, 0.50f));
 
-        AddPreviewMeshActor(
+        AddPreviewIrregularRockActor(
             World,
-            PebbleMesh,
             FString::Printf(TEXT("RaftSim_ProceduralTalusPebble_%03d_%s"), PebbleIndex, *Spec.RiverId),
-            FVector(X, Y, TerrainZ + (Spec.bDesertCanyon ? 24.0f : 18.0f)),
-            FRotator(0.0f, static_cast<float>((PebbleIndex * 29) % 360), 0.0f),
+            FVector(X, Y, TerrainZ + (Spec.bDesertCanyon ? 7.0f : 6.0f)),
+            static_cast<float>((PebbleIndex * 29) % 360),
             Scale,
-            MaskAwarePebbleColor);
+            MaskAwarePebbleColor,
+            PebbleIndex + 2800);
     }
 }
 
@@ -2453,7 +2570,6 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     UStaticMesh* PlaneMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Plane.Plane"));
     UStaticMesh* SphereMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
     UStaticMesh* CylinderMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
-    UStaticMesh* PcgBoulderMesh = LoadPreviewMesh(TEXT("/PCG/SampleContent/SimpleForest/Meshes/PCG_Boulder_02.PCG_Boulder_02"));
     UStaticMesh* PcgTreeMeshA = LoadPreviewMesh(TEXT("/PCG/SampleContent/SimpleForest/Meshes/PCG_Tree_01.PCG_Tree_01"));
     UStaticMesh* PcgTreeMeshB = LoadPreviewMesh(TEXT("/PCG/SampleContent/SimpleForest/Meshes/PCG_Tree_02.PCG_Tree_02"));
     UStaticMesh* PcgTreeMeshC = LoadPreviewMesh(TEXT("/PCG/SampleContent/SimpleForest/Meshes/PCG_Tree_03.PCG_Tree_03"));
@@ -2542,14 +2658,14 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             Spec.RockColor,
             FMath::Lerp(ScalePreviewColor(Spec.RockColor, 0.46f), ScalePreviewColor(Spec.WaterColor, 0.34f), 0.30f),
             FMath::Clamp(BoulderWaterT * 0.36f, 0.0f, 0.42f));
-        AddPreviewMeshActor(
+        AddPreviewIrregularRockActor(
             World,
-            PcgBoulderMesh ? PcgBoulderMesh : SphereMesh,
             FString::Printf(TEXT("RaftSim_SourceAwareBoulder_%02d_%s"), BoulderIndex, *Spec.RiverId),
-            FVector(X, Y, FMath::Max(24.0f, TerrainZ + 44.0f + 12.0f * static_cast<float>(BoulderIndex % 4))),
-            FRotator(0.0f, static_cast<float>(BoulderIndex * 31), 0.0f),
-            PcgBoulderMesh ? FVector(Scale * 1.25f, Scale * 1.05f, Scale * 0.72f) : FVector(Scale * 1.4f, Scale, Scale * 0.62f),
-            BoulderColor);
+            FVector(X, Y, FMath::Max(20.0f, TerrainZ + 18.0f + 8.0f * static_cast<float>(BoulderIndex % 4))),
+            static_cast<float>(BoulderIndex * 31),
+            FVector(Scale * 1.18f, Scale * 0.92f, Scale * 0.54f),
+            BoulderColor,
+            BoulderIndex + 3900);
         const float BoulderLateralOffset = Y - GetPreviewRiverCenterY(Spec, X);
         const float ContactFoamStrength =
             FMath::Clamp(0.45f + BoulderWaterT * 0.55f + Spec.FlowFoamScale * 0.20f, 0.0f, 1.0f);
