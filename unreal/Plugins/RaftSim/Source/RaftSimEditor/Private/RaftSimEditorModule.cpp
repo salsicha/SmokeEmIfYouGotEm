@@ -5720,36 +5720,36 @@ void AddPreviewRaftForeground(UWorld* World, const FRaftSimEnvironmentPreviewSpe
         FVector(0.145f, 0.145f, 1.20f),
         TubeShadowColor);
     AddRaftProxyPart(
-        CubeMesh,
-        FString::Printf(TEXT("RaftSim_ForegroundRaft_Bow_%s"), *Spec.RiverId),
+        CylinderMesh,
+        FString::Printf(TEXT("RaftSim_ForegroundRaft_BowRounded_%s"), *Spec.RiverId),
         FVector(BaseX + 165.0f, CenterY, Z - 1.0f),
-        FRotator(0.0f, 0.0f, 0.0f),
-        FVector(0.070f, 0.78f, 0.025f),
+        FRotator(0.0f, 0.0f, 90.0f),
+        FVector(0.080f, 0.080f, 0.82f),
         TubeColor);
     AddRaftProxyPart(
         CubeMesh,
         FString::Printf(TEXT("RaftSim_ForegroundRaft_Floor_%s"), *Spec.RiverId),
-        FVector(BaseX - 22.0f, CenterY, -118.0f),
+        FVector(BaseX - 24.0f, CenterY, -126.0f),
         FRotator::ZeroRotator,
-        FVector(0.055f, 0.030f, 0.003f),
+        FVector(0.040f, 0.020f, 0.002f),
         ScalePreviewColor(FrameColor, 0.22f));
     AddRaftProxyPart(
-        CubeMesh,
-        FString::Printf(TEXT("RaftSim_ForegroundRaft_FrameBar_%s"), *Spec.RiverId),
+        CylinderMesh,
+        FString::Printf(TEXT("RaftSim_ForegroundRaft_FrameBarRounded_%s"), *Spec.RiverId),
         FVector(BaseX - 62.0f, CenterY, -4.0f),
-        FRotator::ZeroRotator,
-        FVector(0.026f, 0.44f, 0.010f),
+        FRotator(0.0f, 0.0f, 90.0f),
+        FVector(0.018f, 0.018f, 0.46f),
         FLinearColor(0.045f, 0.045f, 0.038f));
 
     for (int32 SeamIndex = 0; SeamIndex < 2; ++SeamIndex)
     {
         const float Side = (SeamIndex == 0) ? -1.0f : 1.0f;
         AddRaftProxyPart(
-            CubeMesh,
-            FString::Printf(TEXT("RaftSim_ForegroundRaft_TubeSeam_%d_%s"), SeamIndex, *Spec.RiverId),
+            CylinderMesh,
+            FString::Printf(TEXT("RaftSim_ForegroundRaft_TubeSeamRounded_%d_%s"), SeamIndex, *Spec.RiverId),
             FVector(BaseX + 38.0f, CenterY + Side * 88.0f, Z + 16.0f),
-            FRotator(0.0f, 0.0f, Side * 4.0f),
-            FVector(0.36f, 0.010f, 0.006f),
+            FRotator(90.0f, 0.0f, Side * 4.0f),
+            FVector(0.010f, 0.010f, 0.38f),
             TubeHighlightColor);
     }
 
@@ -5759,27 +5759,27 @@ void AddPreviewRaftForeground(UWorld* World, const FRaftSimEnvironmentPreviewSpe
     {
         const float Side = (OarIndex == 0) ? -1.0f : 1.0f;
         AddRaftProxyPart(
-            CubeMesh,
-            FString::Printf(TEXT("RaftSim_ForegroundRaft_OarShaft_%d_%s"), OarIndex, *Spec.RiverId),
+            CylinderMesh,
+            FString::Printf(TEXT("RaftSim_ForegroundRaft_OarShaftRounded_%d_%s"), OarIndex, *Spec.RiverId),
             FVector(BaseX + 38.0f, CenterY + Side * 178.0f, -14.0f + 1.0f * static_cast<float>(OarIndex)),
-            FRotator(0.0f, Side * 4.0f, Side > 0.0f ? 7.0f : -7.0f),
-            FVector(0.018f, OarLengthScale, 0.006f),
+            FRotator(0.0f, Side * 4.0f, 90.0f + (Side > 0.0f ? 7.0f : -7.0f)),
+            FVector(0.010f, 0.010f, OarLengthScale),
             OarShaftColor);
         AddRaftProxyPart(
             CubeMesh,
             FString::Printf(TEXT("RaftSim_ForegroundRaft_OarBlade_%d_%s"), OarIndex, *Spec.RiverId),
             FVector(BaseX + 140.0f, CenterY + Side * OarBladeOffset, -16.0f),
             FRotator(0.0f, 8.0f * Side, Side > 0.0f ? 13.0f : -13.0f),
-            FVector(0.050f, 0.13f, 0.006f),
+            FVector(0.040f, 0.10f, 0.004f),
             OarBladeColor);
     }
 
     AddRaftProxyPart(
-        CubeMesh,
-        FString::Printf(TEXT("RaftSim_ForegroundRaft_BowLine_%s"), *Spec.RiverId),
+        CylinderMesh,
+        FString::Printf(TEXT("RaftSim_ForegroundRaft_BowLineRounded_%s"), *Spec.RiverId),
         FVector(BaseX + 118.0f, CenterY, -3.0f),
-        FRotator(0.0f, 0.0f, 2.0f),
-        FVector(0.30f, 0.008f, 0.006f),
+        FRotator(90.0f, 0.0f, 2.0f),
+        FVector(0.006f, 0.006f, 0.32f),
         BowLineColor);
 }
 
