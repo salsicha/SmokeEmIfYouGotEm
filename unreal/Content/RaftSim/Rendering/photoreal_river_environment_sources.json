@@ -1427,6 +1427,7 @@
       "first_party_terrain_contrast_and_normal_calibration_recorded",
       "first_party_bounded_terrain_ambient_fill_recorded",
       "first_party_demoted_terrain_overlay_striping_recorded",
+      "first_party_source_drape_smoothing_pass_recorded",
       "terrain_proxy_luma_floor_recorded",
       "shadowless_terrain_albedo_review_capture_material_recorded",
       "flow_aware_waterline_pebble_scatter_recorded",
