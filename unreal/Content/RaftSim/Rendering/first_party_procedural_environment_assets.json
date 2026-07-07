@@ -59,6 +59,7 @@
       "translucent_surface_glints_foam_flecks_canyon_haze_and_rainforest_spray_mist",
       "pacuare_waterfall_curtain_plunge_mist_and_runout_proxies",
       "river_specific_cloud_haze_and_horizon_backdrop_cards",
+      "first_party_guide_seat_raft_and_oar_foreground_proxies",
       "first_party_material_recipe_manifest_required",
       "river_specific_sun_skylight_fog_camera_exposure"
     ],
@@ -183,7 +184,7 @@
         "river-specific weather and lighting notes",
         "capture manifest"
       ],
-      "procedural_method": "Use first-party raft/oar silhouettes and river-specific sun, skylight, fog, mist, exposure, and color temperature presets for review captures; hide or replace crude placeholder raft parts until production raft art is approved.",
+      "procedural_method": "Use first-party raft/oar silhouettes and river-specific sun, skylight, fog, mist, exposure, and color temperature presets for review captures; show low-footprint guide-seat raft/oar proxies for player-view context, keep river-eye captures foreground-hidden, and replace the proxies once production raft art is approved.",
       "tunable_parameters": [
         "sun_angle",
         "sky_intensity",

@@ -2,7 +2,7 @@
   "schema": "raftsim.unreal.environment_automation_run.v1",
   "generated_on": "2026-07-06",
   "status": "succeeded_preview_only_not_lifelike",
-  "purpose": "Record the Unreal preview-map and capture automation run after the first-party procedural material recipe manifest and production geospatial attachment ledger became required inputs, after the softened source-drape plus boulder-contact foam preview renderer pass, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, Pacuare waterfall/plunge-mist/runout proxies, and river-specific cloud/haze/horizon backdrop cards.",
+  "purpose": "Record the Unreal preview-map and capture automation run after the first-party procedural material recipe manifest and production geospatial attachment ledger became required inputs, after the softened source-drape plus boulder-contact foam preview renderer pass, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, and guide-seat raft/oar foreground proxies.",
   "commands": {
     "editor_build": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Build/BatchFiles/Mac/Build.sh\" SmokeEmIfYouGotEmEditor Mac Development -Project=\"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -NoHotReload",
     "environment_automation": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Binaries/Mac/UnrealEditor-Cmd\" \"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -unattended -nop4 -nosplash -NoSound -RaftSimCreatePhotorealEnvironmentPreviewMaps -RaftSimCapturePhotorealEnvironmentPreviews -RaftSimExitAfterEnvironmentAutomation"
@@ -39,13 +39,14 @@
     "flow_aware_water_surface_chop_and_turbidity_patches": true,
     "pacuare_waterfall_curtain_plunge_mist_and_runout_proxies": true,
     "river_specific_cloud_haze_and_horizon_backdrop_cards": true,
+    "first_party_guide_seat_raft_and_oar_foreground_proxies": true,
     "status": "preview_only_visual_readability_improvement_not_production_material_or_whitewater_approval"
   },
   "capture_pixel_sanity": [
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [75.57, 132.84, 135.63],
+      "rgb_mean": [78.60, 133.60, 135.71],
       "nonblank": true
     },
     {
@@ -57,7 +58,7 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [117.74, 109.16, 93.41],
+      "rgb_mean": [119.24, 110.46, 94.40],
       "nonblank": true
     },
     {
@@ -69,7 +70,7 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [54.44, 115.33, 109.41],
+      "rgb_mean": [57.15, 116.19, 109.87],
       "nonblank": true
     },
     {
@@ -82,9 +83,9 @@
   "unreal_log_summary": [
     "Using first-party procedural material recipe plan: unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
     "Using production geospatial attachment ledger: physics/data/real_world/production_geospatial_attachment_ledger.json",
-    "Saved all three generated preview maps with softened source-drape overlays, boulder-contact foam laces, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, Pacuare waterfall/plunge-mist/runout proxies, and river-specific cloud/haze/horizon backdrop cards.",
+    "Saved all three generated preview maps with softened source-drape overlays, boulder-contact foam laces, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, and guide-seat raft/oar foreground proxies.",
     "Saved guide-seat and river-eye captures for South Fork American, Colorado River Grand Canyon, and Pacuare River Rainforest.",
     "Environment preview capture manifest saved successfully."
   ],
-  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate, the source attachment ledger gate, the first contact-foam/overlay-softening renderer pass, guide-seat foliage readability tuning, source-aware bank breakup texture patches, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, bounded flow-aware shoreline scatter, first-party irregular rock geometry variants, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, Pacuare waterfall/plunge-mist/runout proxies, and river-specific cloud/haze/horizon backdrop cards. The images remain preview-only and cannot be called lifelike until production terrain/material/water/foliage assets, guide review, rights review, and performance evidence pass."
+  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate, the source attachment ledger gate, the first contact-foam/overlay-softening renderer pass, guide-seat foliage readability tuning, source-aware bank breakup texture patches, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, bounded flow-aware shoreline scatter, first-party irregular rock geometry variants, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, and first-party guide-seat raft/oar foreground proxies. Guide-seat captures now include proxy player-view context while river-eye captures hide the proxies for environment review. The images remain preview-only and cannot be called lifelike until production terrain/material/water/foliage assets, approved raft/oar foreground art, guide review, rights review, and performance evidence pass."
 }
