@@ -1708,6 +1708,119 @@ AActor* AddPreviewProceduralLeafClusterActor(
         &VertexColors);
 }
 
+AActor* AddPreviewOrganicLeafSprayActor(
+    UWorld* World,
+    const FString& Label,
+    const FVector& BaseLocation,
+    float YawDegrees,
+    const FVector& Scale,
+    const FLinearColor& Color,
+    int32 Seed,
+    bool bRainforest)
+{
+    if (!World)
+    {
+        return nullptr;
+    }
+
+    const int32 LeafCount = bRainforest ? 26 : 18;
+    const float YawRadians = FMath::DegreesToRadians(YawDegrees);
+    const FVector BaseForward(FMath::Cos(YawRadians), FMath::Sin(YawRadians), 0.0f);
+    const FVector BaseRight(-FMath::Sin(YawRadians), FMath::Cos(YawRadians), 0.0f);
+    const FVector Up(0.0f, 0.0f, 1.0f);
+    const FVector Radii(
+        FMath::Max(16.0f, Scale.X * 100.0f),
+        FMath::Max(12.0f, Scale.Y * 100.0f),
+        FMath::Max(10.0f, Scale.Z * 100.0f));
+
+    TArray<FVector> Vertices;
+    TArray<FVector2D> UVs;
+    TArray<FLinearColor> VertexColors;
+    TArray<int32> Triangles;
+    Vertices.Reserve(LeafCount * 4);
+    UVs.Reserve(LeafCount * 4);
+    VertexColors.Reserve(LeafCount * 4);
+    Triangles.Reserve(LeafCount * 6);
+
+    for (int32 LeafIndex = 0; LeafIndex < LeafCount; ++LeafIndex)
+    {
+        const float LeafT = static_cast<float>(LeafIndex) / static_cast<float>(FMath::Max(1, LeafCount - 1));
+        const float Angle = YawRadians + static_cast<float>(LeafIndex) * (bRainforest ? 2.399f : 2.117f) +
+            static_cast<float>(Seed) * 0.013f;
+        const float RadialT = FMath::Sqrt(FMath::Frac(0.211f + 0.618034f * static_cast<float>(LeafIndex)));
+        const float VerticalT = FMath::Sin(static_cast<float>(Seed) * 0.071f + static_cast<float>(LeafIndex) * 1.317f);
+        const FVector RadialDir(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
+        const FVector TangentDir = (RadialDir * (0.78f + 0.12f * FMath::Sin(LeafT * PI)) +
+            Up * (bRainforest ? 0.34f : 0.22f) * FMath::Sin(Angle * 1.7f + static_cast<float>(Seed) * 0.031f)).GetSafeNormal();
+        const FVector WidthDir = FVector::CrossProduct(TangentDir, Up).GetSafeNormal();
+        const FVector FallbackWidthDir =
+            (BaseRight * (0.72f + 0.18f * FMath::Sin(Angle)) + BaseForward * 0.18f).GetSafeNormal();
+        const FVector LeafWidthDir = WidthDir.IsNearlyZero() ? FallbackWidthDir : WidthDir;
+
+        const FVector LeafCenter = BaseLocation +
+            RadialDir * (Radii.X * RadialT * (0.28f + 0.44f * FMath::Abs(FMath::Sin(Angle * 0.73f)))) +
+            BaseRight * (Radii.Y * 0.20f * FMath::Sin(static_cast<float>(LeafIndex) * 1.91f + static_cast<float>(Seed) * 0.017f)) +
+            Up * (Radii.Z * (0.14f + 0.52f * LeafT + 0.18f * VerticalT));
+        const float LeafLength = Radii.X * (bRainforest ? 0.20f : 0.15f) *
+            (0.62f + 0.26f * FMath::Abs(FMath::Sin(static_cast<float>(LeafIndex) * 0.83f + static_cast<float>(Seed) * 0.029f)));
+        const float LeafWidth = Radii.Y * (bRainforest ? 0.050f : 0.040f) *
+            (0.78f + 0.18f * FMath::Abs(FMath::Cos(static_cast<float>(LeafIndex) * 1.23f)));
+        const float TipLift = Radii.Z * (bRainforest ? 0.030f : 0.020f) *
+            FMath::Sin(static_cast<float>(LeafIndex) * 0.61f + static_cast<float>(Seed) * 0.043f);
+
+        const int32 BaseVertexIndex = Vertices.Num();
+        Vertices.Add(LeafCenter - TangentDir * LeafLength - LeafWidthDir * LeafWidth);
+        Vertices.Add(LeafCenter - TangentDir * LeafLength * 0.30f + LeafWidthDir * LeafWidth * 0.82f + Up * TipLift);
+        Vertices.Add(LeafCenter + TangentDir * LeafLength + LeafWidthDir * LeafWidth * 0.34f + Up * TipLift * 1.4f);
+        Vertices.Add(LeafCenter + TangentDir * LeafLength * 0.22f - LeafWidthDir * LeafWidth * 0.92f);
+        UVs.Add(FVector2D(0.0f, 0.0f));
+        UVs.Add(FVector2D(0.0f, 1.0f));
+        UVs.Add(FVector2D(1.0f, 1.0f));
+        UVs.Add(FVector2D(1.0f, 0.0f));
+
+        const float LeafShade = 0.76f + 0.20f * LeafT +
+            0.10f * FMath::Sin(static_cast<float>(Seed) * 0.037f + static_cast<float>(LeafIndex) * 0.97f);
+        const FLinearColor InnerLeafColor = ScalePreviewColor(Color, LeafShade * (bRainforest ? 0.92f : 0.88f));
+        const FLinearColor OuterLeafColor = ScalePreviewColor(Color, LeafShade * (bRainforest ? 1.08f : 1.02f));
+        VertexColors.Add(InnerLeafColor);
+        VertexColors.Add(OuterLeafColor);
+        VertexColors.Add(ScalePreviewColor(OuterLeafColor, 0.96f));
+        VertexColors.Add(ScalePreviewColor(InnerLeafColor, 0.90f));
+
+        Triangles.Add(BaseVertexIndex);
+        Triangles.Add(BaseVertexIndex + 1);
+        Triangles.Add(BaseVertexIndex + 2);
+        Triangles.Add(BaseVertexIndex);
+        Triangles.Add(BaseVertexIndex + 2);
+        Triangles.Add(BaseVertexIndex + 3);
+    }
+
+    const TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    AActor* Actor = AddPreviewProceduralMeshActor(
+        World,
+        Label,
+        Vertices,
+        Triangles,
+        Normals,
+        UVs,
+        Color,
+        LoadOrCreatePreviewVertexColorMaterial(),
+        &VertexColors);
+    if (Actor)
+    {
+        TArray<UProceduralMeshComponent*> MeshComponents;
+        Actor->GetComponents<UProceduralMeshComponent>(MeshComponents);
+        for (UProceduralMeshComponent* MeshComponent : MeshComponents)
+        {
+            if (MeshComponent)
+            {
+                MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            }
+        }
+    }
+    return Actor;
+}
+
 void AddPreviewBoulderSurfaceFacet(
     UWorld* World,
     const FString& Label,
@@ -5422,6 +5535,30 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
                     FoliageIndex * 23 + LobeIndex + 6700,
                     Spec.bHasWaterfalls);
             }
+        }
+
+        const int32 OrganicLeafSprayCount = Spec.bDesertCanyon ? 2 : (Spec.bHasWaterfalls ? 5 : 3);
+        for (int32 SprayIndex = 0; SprayIndex < OrganicLeafSprayCount; ++SprayIndex)
+        {
+            const float SprayAngleRadians =
+                FMath::DegreesToRadians(static_cast<float>((FoliageIndex * 71 + SprayIndex * 113) % 360));
+            const float SprayRadius = Spec.bDesertCanyon ? 46.0f : (Spec.bHasWaterfalls ? 132.0f : 88.0f);
+            const FVector SprayLocation(
+                X + FMath::Cos(SprayAngleRadians) * SprayRadius,
+                Y + FMath::Sin(SprayAngleRadians) * SprayRadius,
+                TerrainZ + 112.0f * Height + (Spec.bHasWaterfalls ? 36.0f : 18.0f) * static_cast<float>(SprayIndex));
+            const FVector SprayScale = Spec.bDesertCanyon
+                ? FVector(0.28f, 0.20f, 0.090f)
+                : (Spec.bHasWaterfalls ? FVector(1.00f, 0.72f, 0.42f) : FVector(0.62f, 0.44f, 0.25f));
+            AddPreviewOrganicLeafSprayActor(
+                World,
+                FString::Printf(TEXT("RaftSim_OrganicCanopyLeafSpray_%02d_%02d_%s"), FoliageIndex, SprayIndex, *Spec.RiverId),
+                SprayLocation,
+                static_cast<float>((FoliageIndex * 59 + SprayIndex * 37) % 360),
+                SprayScale,
+                ScalePreviewColor(CanopyColor, 0.78f + 0.07f * static_cast<float>(SprayIndex % 4)),
+                FoliageIndex * 41 + SprayIndex + 8300,
+                Spec.bHasWaterfalls);
         }
 
         if (!Spec.bDesertCanyon && FoliageIndex % 2 == 0)
