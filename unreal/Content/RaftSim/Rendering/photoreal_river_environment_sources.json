@@ -1456,6 +1456,7 @@
       "first_party_procedural_material_recipe_manifest_recorded",
       "first_party_material_review_swatches_recorded",
       "source_drape_albedo_normalization_recorded",
+      "first_party_feathered_source_drape_microtiles_recorded",
       "source_backed_flow_band_visual_parameters_recorded",
       "biome_specific_understory_and_scrub_proxy_layers_recorded",
       "current_streak_proxy_layers_recorded",
