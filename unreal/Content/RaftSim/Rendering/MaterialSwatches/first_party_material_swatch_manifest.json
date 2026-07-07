@@ -1,0 +1,68 @@
+{
+  "schema": "raftsim.unreal.first_party_material_swatch_manifest.v1",
+  "generated_on": "2026-07-06",
+  "status": "review_only_first_party_procedural_material_swatches_generated_not_lifelike_capture",
+  "material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
+  "policy": {
+    "third_party_photo_texture_use_without_item_rights": false,
+    "social_media_or_footage_training_use_without_item_rights": false,
+    "source_inputs_must_be_manifest_recorded": true,
+    "procedural_materials_must_preserve_hazard_and_rescue_readability": true,
+    "water_visuals_must_not_hide_physics_or_conservation_failures": true,
+    "promotion_requires_unreal_capture_guide_review_and_performance_evidence": true
+  },
+  "swatches": [
+    {
+      "river_id": "american_south_fork",
+      "target_read": "Sierra foothill pool-drop whitewater with clear green water, exposed wet rocks, gravel bars, oak/conifer banks, and summer-commercial light.",
+      "path": "unreal/Content/RaftSim/Rendering/MaterialSwatches/american_south_fork_first_party_material_swatch.png",
+      "sha256": "40bb826c14e65b046ccba4be73c013ecee06c5a408696c3a19b43e36a3e0d0f4",
+      "width": 960,
+      "height": 720,
+      "recipe_ids": [
+        "terrain_bank_layered_material",
+        "wet_boulder_contact_material_set",
+        "biome_foliage_groundcover_materials",
+        "flow_dependent_water_surface_material",
+        "foam_spray_mist_atmosphere_materials",
+        "raft_foreground_review_materials"
+      ],
+      "status": "review_only_first_party_procedural_material_swatch_not_lifelike_capture"
+    },
+    {
+      "river_id": "colorado_river",
+      "target_read": "Grand Canyon big-water rowing corridor with layered canyon walls, sandbars, release-dependent wet banks, sparse desert riparian scrub, boils, and long wave trains.",
+      "path": "unreal/Content/RaftSim/Rendering/MaterialSwatches/colorado_river_first_party_material_swatch.png",
+      "sha256": "05fa44bd3d033b5cb90c9dbb7ccaae640d7047b9be06354e791a3929df76b5b1",
+      "width": 960,
+      "height": 720,
+      "recipe_ids": [
+        "terrain_bank_layered_material",
+        "wet_boulder_contact_material_set",
+        "biome_foliage_groundcover_materials",
+        "flow_dependent_water_surface_material",
+        "foam_spray_mist_atmosphere_materials",
+        "raft_foreground_review_materials"
+      ],
+      "status": "review_only_first_party_procedural_material_swatch_not_lifelike_capture"
+    },
+    {
+      "river_id": "pacuare",
+      "target_read": "Humid tropical rainforest gorge with dense canopy, wet dark boulders, moss, leaf litter, waterfalls, spray, mist, and rainfed flow states.",
+      "path": "unreal/Content/RaftSim/Rendering/MaterialSwatches/pacuare_first_party_material_swatch.png",
+      "sha256": "4bca71a06c83bfb77303fe95c991907c92f1837e75ef41f8b47030e0edbf2edb",
+      "width": 960,
+      "height": 720,
+      "recipe_ids": [
+        "terrain_bank_layered_material",
+        "wet_boulder_contact_material_set",
+        "biome_foliage_groundcover_materials",
+        "flow_dependent_water_surface_material",
+        "foam_spray_mist_atmosphere_materials",
+        "raft_foreground_review_materials"
+      ],
+      "status": "review_only_first_party_procedural_material_swatch_not_lifelike_capture"
+    }
+  ],
+  "current_decision": "Use these deterministic PNG contact sheets for material direction review and Unreal import experiments only. They are first-party procedural artifacts, not production texture sets and not lifelike in-engine screenshot evidence."
+}

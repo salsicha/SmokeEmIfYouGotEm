@@ -4,6 +4,7 @@
   "status": "approved_first_party_material_recipe_targets_for_preview_to_lifelike_iteration_not_final_art",
   "purpose": "Turn the broad first-party procedural environment asset plan into concrete Unreal material recipe targets, source inputs, tunable parameters, and promotion gates for South Fork American, Colorado River, and Pacuare photoreal environment work.",
   "parent_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
+  "review_swatch_manifest": "unreal/Content/RaftSim/Rendering/MaterialSwatches/first_party_material_swatch_manifest.json",
   "policy": {
     "third_party_photo_texture_use_without_item_rights": false,
     "social_media_or_footage_training_use_without_item_rights": false,

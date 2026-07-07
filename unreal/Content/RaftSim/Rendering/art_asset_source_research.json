@@ -129,6 +129,7 @@
   "first_party_procedural_equivalent_decision_2026_07_06": {
     "plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
     "material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
+    "material_swatch_manifest": "unreal/Content/RaftSim/Rendering/MaterialSwatches/first_party_material_swatch_manifest.json",
     "decision": "Use first-party procedural environment asset recipes as the active replacement path when free/open or licensed photoreal packs are unavailable or not yet cleared.",
     "covered_targets": [
       "canyon walls and valley banks",
