@@ -72,7 +72,7 @@
         "riverbed_and_shallow_shelves"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview",
-      "unreal_status": "terrain_specific_vertex_color_material_active_as_bounded_ambient_fill_soft_lit_review_material_with_source_aware_photo_mottle_microrelief_source_drape_smoothing_and_demoted_overlay_striping_terrain_contrast_floor_and_proxy_normal_softening_feathered_source_drape_microtiles_irregular_shoreline_edge_breakup_erosion_rills_and_landscape_nanite_material_scaffold_production_layered_material_pending",
+      "unreal_status": "terrain_specific_vertex_color_material_active_as_bounded_ambient_fill_soft_lit_review_material_with_source_aware_photo_mottle_microrelief_source_drape_smoothing_demoted_overlay_striping_source_masked_bank_bar_microgeometry_terrain_contrast_floor_and_proxy_normal_softening_feathered_source_drape_microtiles_irregular_shoreline_edge_breakup_erosion_rills_and_landscape_nanite_material_scaffold_production_layered_material_pending",
       "required_source_inputs": [
         "source_drape_4096.png",
         "dem_relief_2048.png",
@@ -114,6 +114,9 @@
         "terrain_erosion_rill",
         "bank_gully_shadow",
         "downslope_deposit_rim",
+        "source_masked_bank_bar_microgeometry",
+        "exposed_bar_micro_pebbles",
+        "bank_slope_material_flakes",
         "flow_aware_bank_undercut_shelf_relief",
         "leaf_litter_or_sand_overlay",
         "source_drape_albedo_normalization",
@@ -163,6 +166,10 @@
         "terrain_erosion_rill_count",
         "terrain_erosion_rill_width",
         "terrain_erosion_rill_length",
+        "exposed_bar_micro_pebble_density",
+        "bank_slope_material_flake_density",
+        "source_masked_microgeometry_scale",
+        "microgeometry_wetness_blend",
         "gravel_or_sand_bar_mix",
         "strata_spacing_m",
         "detail_noise_scale_m"
