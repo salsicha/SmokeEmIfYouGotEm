@@ -1464,11 +1464,14 @@ void AddPreviewBoulderSurfaceVariationDetail(
         ? FLinearColor(0.68f, 0.52f, 0.33f)
         : (Spec.bHasWaterfalls ? FLinearColor(0.17f, 0.19f, 0.16f) : FLinearColor(0.48f, 0.46f, 0.38f));
     const FLinearColor TopHighlight = Spec.bDesertCanyon
-        ? FLinearColor(0.82f, 0.66f, 0.43f)
-        : (Spec.bHasWaterfalls ? FLinearColor(0.22f, 0.26f, 0.20f) : FLinearColor(0.66f, 0.64f, 0.52f));
+        ? FLinearColor(0.66f, 0.52f, 0.34f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.16f, 0.20f, 0.15f) : FLinearColor(0.48f, 0.47f, 0.38f));
     const FLinearColor MossOrSediment = Spec.bDesertCanyon
         ? FLinearColor(0.42f, 0.30f, 0.16f)
         : (Spec.bHasWaterfalls ? FLinearColor(0.035f, 0.16f, 0.055f) : FLinearColor(0.18f, 0.25f, 0.11f));
+    const FLinearColor CreviceShadow = Spec.bDesertCanyon
+        ? FLinearColor(0.15f, 0.10f, 0.065f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.010f, 0.028f, 0.020f) : FLinearColor(0.10f, 0.10f, 0.080f));
 
     const FVector UpLift(0.0f, 0.0f, 1.0f);
     const FVector WetCenter = BaseLocation +
@@ -1522,6 +1525,19 @@ void AddPreviewBoulderSurfaceVariationDetail(
         (Right * (RadiusY * 0.12f) + UpLift * (RadiusZ * 0.030f)),
         FMath::Lerp(ScalePreviewColor(Spec.RockColor, 0.40f), MossOrSediment, MossSediment),
         MossOrSediment);
+
+    const FVector CreviceCenter = BaseLocation -
+        Forward * (RadiusX * (0.06f + 0.14f * FMath::Sin(static_cast<float>(BoulderIndex) * 0.49f))) -
+        Right * (RadiusY * (0.34f + 0.10f * FMath::Cos(static_cast<float>(BoulderIndex) * 1.17f))) +
+        UpLift * (RadiusZ * (0.30f + Wetness * 0.12f) + 3.0f);
+    AddPreviewBoulderSurfaceFacet(
+        World,
+        FString::Printf(TEXT("RaftSim_BoulderCreviceShadowFacet_%02d_%s"), BoulderIndex, *Spec.RiverId),
+        CreviceCenter,
+        Forward * (RadiusX * (0.18f + 0.05f * Wetness)),
+        (Right * (RadiusY * 0.075f) + UpLift * (RadiusZ * 0.020f)),
+        CreviceShadow,
+        FMath::Lerp(CreviceShadow, ScalePreviewColor(Spec.RockColor, 0.30f), 0.28f));
 }
 
 void AddPreviewTerrainMesh(
@@ -4760,8 +4776,9 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         const float Scale = Spec.bDesertCanyon ? 1.6f : 1.0f + 0.35f * static_cast<float>(BoulderIndex % 3);
         const float BoulderWaterT = SamplePreviewMaskAtWorld(Spec, WaterMaskPtr, X, Y);
         const float BoulderVegetationT = SamplePreviewMaskAtWorld(Spec, VegetationMaskPtr, X, Y);
+        const FLinearColor BoulderBaseColor = ScalePreviewColor(Spec.RockColor, Spec.bDesertCanyon ? 0.90f : 0.78f);
         const FLinearColor BoulderColor = FMath::Lerp(
-            Spec.RockColor,
+            BoulderBaseColor,
             FMath::Lerp(ScalePreviewColor(Spec.RockColor, 0.46f), ScalePreviewColor(Spec.WaterColor, 0.34f), 0.30f),
             FMath::Clamp(BoulderWaterT * 0.36f, 0.0f, 0.42f));
         const FVector BoulderScale(Scale * 1.18f, Scale * 0.92f, Scale * 0.54f);
