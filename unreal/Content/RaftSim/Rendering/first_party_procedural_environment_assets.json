@@ -52,6 +52,7 @@
       "guide_seat_foliage_setback_and_scale_tuning",
       "lit_vertex_color_water_gradients",
       "flow_band_depth_texture_ribbons",
+      "flow_aware_water_surface_chop_and_turbidity_patches",
       "current_streaks_foam_tongues_wave_highlights_and_eddy_lines",
       "boulder_contact_foam_lace",
       "translucent_surface_glints_foam_flecks_canyon_haze_and_rainforest_spray_mist",
