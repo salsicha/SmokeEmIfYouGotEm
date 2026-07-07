@@ -1423,6 +1423,7 @@
       "first_party_terrain_erosion_rill_and_bank_gully_detail_recorded",
       "first_party_lit_terrain_vertex_color_material_recorded",
       "soft_lit_terrain_vertex_color_review_material_recorded",
+      "first_party_photographic_terrain_emissive_calibration_recorded",
       "terrain_proxy_luma_floor_recorded",
       "shadowless_terrain_albedo_review_capture_material_recorded",
       "flow_aware_waterline_pebble_scatter_recorded",
