@@ -712,7 +712,7 @@ UMaterialInterface* LoadOrCreatePreviewTerrainVertexColorMaterial()
                 }
                 else
                 {
-                    Constant->R = 0.42f;
+                    Constant->R = 0.08f;
                 }
                 ++TerrainConstantIndex;
             }
