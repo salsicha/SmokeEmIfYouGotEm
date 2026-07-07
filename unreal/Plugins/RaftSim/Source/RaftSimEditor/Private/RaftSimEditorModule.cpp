@@ -298,7 +298,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.WaterColor = FLinearColor(0.038f, 0.285f, 0.300f);
     SouthFork.TerrainColor = FLinearColor(0.35f, 0.30f, 0.21f);
     SouthFork.RockColor = FLinearColor(0.38f, 0.36f, 0.31f);
-    SouthFork.FoliageColor = FLinearColor(0.22f, 0.38f, 0.15f);
+    SouthFork.FoliageColor = FLinearColor(0.16f, 0.29f, 0.105f);
     SouthFork.CanyonHeightCm = 850.0f;
     SouthFork.RiverHalfWidthCm = 335.0f;
     SouthFork.BankWidthCm = 720.0f;
@@ -388,7 +388,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.WaterColor = FLinearColor(0.026f, 0.255f, 0.205f);
     Pacuare.TerrainColor = FLinearColor(0.17f, 0.22f, 0.13f);
     Pacuare.RockColor = FLinearColor(0.20f, 0.24f, 0.20f);
-    Pacuare.FoliageColor = FLinearColor(0.06f, 0.30f, 0.09f);
+    Pacuare.FoliageColor = FLinearColor(0.035f, 0.20f, 0.055f);
     Pacuare.CanyonHeightCm = 1450.0f;
     Pacuare.RiverHalfWidthCm = 305.0f;
     Pacuare.BankWidthCm = 680.0f;
@@ -471,7 +471,7 @@ UMaterialInterface* LoadOrCreatePreviewColorMaterial()
         Material->GetExpressionCollection().AddExpression(ColorParameter);
 
         UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
-        EmissiveScale->R = 0.34f;
+        EmissiveScale->R = 0.22f;
         Material->GetExpressionCollection().AddExpression(EmissiveScale);
 
         UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
@@ -494,6 +494,36 @@ UMaterialInterface* LoadOrCreatePreviewColorMaterial()
         SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
         SaveArgs.SaveFlags = SAVE_NoError;
         UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+    }
+
+    static bool bLitColorMaterialConfigured = false;
+    if (Material && !bLitColorMaterialConfigured)
+    {
+        Material->Modify();
+        int32 ConstantIndex = 0;
+        for (TObjectPtr<UMaterialExpression>& Expression : Material->GetExpressionCollection().Expressions)
+        {
+            if (UMaterialExpressionConstant* Constant = Cast<UMaterialExpressionConstant>(Expression.Get()))
+            {
+                if (ConstantIndex == 0)
+                {
+                    Constant->R = 0.22f;
+                }
+                ++ConstantIndex;
+            }
+        }
+        Material->PostEditChange();
+        if (UPackage* Package = Material->GetOutermost())
+        {
+            Package->MarkPackageDirty();
+            const FString Filename =
+                FPackageName::LongPackageNameToFilename(MaterialPackagePath, FPackageName::GetAssetPackageExtension());
+            FSavePackageArgs SaveArgs;
+            SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+            SaveArgs.SaveFlags = SAVE_NoError;
+            UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+        }
+        bLitColorMaterialConfigured = true;
     }
 
     return Material;
@@ -533,7 +563,7 @@ UMaterialInterface* LoadOrCreatePreviewVertexColorMaterial()
         Material->GetExpressionCollection().AddExpression(VertexColor);
 
         UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
-        EmissiveScale->R = 0.18f;
+        EmissiveScale->R = 0.10f;
         Material->GetExpressionCollection().AddExpression(EmissiveScale);
 
         UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
@@ -556,6 +586,36 @@ UMaterialInterface* LoadOrCreatePreviewVertexColorMaterial()
         SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
         SaveArgs.SaveFlags = SAVE_NoError;
         UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+    }
+
+    static bool bVertexColorMaterialConfigured = false;
+    if (Material && !bVertexColorMaterialConfigured)
+    {
+        Material->Modify();
+        int32 ConstantIndex = 0;
+        for (TObjectPtr<UMaterialExpression>& Expression : Material->GetExpressionCollection().Expressions)
+        {
+            if (UMaterialExpressionConstant* Constant = Cast<UMaterialExpressionConstant>(Expression.Get()))
+            {
+                if (ConstantIndex == 0)
+                {
+                    Constant->R = 0.10f;
+                }
+                ++ConstantIndex;
+            }
+        }
+        Material->PostEditChange();
+        if (UPackage* Package = Material->GetOutermost())
+        {
+            Package->MarkPackageDirty();
+            const FString Filename =
+                FPackageName::LongPackageNameToFilename(MaterialPackagePath, FPackageName::GetAssetPackageExtension());
+            FSavePackageArgs SaveArgs;
+            SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+            SaveArgs.SaveFlags = SAVE_NoError;
+            UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+        }
+        bVertexColorMaterialConfigured = true;
     }
 
     return Material;
@@ -1948,8 +2008,8 @@ AActor* AddPreviewOrganicBranchFrondActor(
             const float LeafHalfWidth = Radii.Y * (bRainforest ? 0.024f : 0.020f) *
                 (0.66f + 0.18f * FMath::Abs(FMath::Cos(static_cast<float>(LeafIndex) * 0.91f)));
             const float Shade = 0.70f + 0.22f * LeafT + 0.08f * FMath::Sin(static_cast<float>(Seed) * 0.041f + static_cast<float>(LeafIndex) * 0.61f);
-            const FLinearColor LeafBaseColor = ScalePreviewColor(Color, Shade * (bRainforest ? 0.92f : 0.88f));
-            const FLinearColor LeafTipColor = ScalePreviewColor(Color, Shade * (bRainforest ? 1.10f : 1.02f));
+            const FLinearColor LeafBaseColor = ScalePreviewColor(Color, Shade * (bRainforest ? 0.78f : 0.76f));
+            const FLinearColor LeafTipColor = ScalePreviewColor(Color, Shade * (bRainforest ? 0.94f : 0.88f));
             AddQuad(
                 LeafCenter - LeafForward * LeafLength * 0.70f,
                 LeafCenter + LeafWidthDir * LeafHalfWidth,
@@ -6196,7 +6256,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             ? FLinearColor(0.22f, 0.28f, 0.13f)
             : FLinearColor(
                   FMath::Clamp(Spec.FoliageColor.R + 0.025f * static_cast<float>(FoliageIndex % 3), 0.0f, 1.0f),
-                  FMath::Clamp(Spec.FoliageColor.G + 0.055f * static_cast<float>((FoliageIndex + 1) % 4) + FoliageMaskT * 0.055f, 0.0f, 1.0f),
+                  FMath::Clamp(Spec.FoliageColor.G + 0.035f * static_cast<float>((FoliageIndex + 1) % 4) + FoliageMaskT * 0.035f, 0.0f, 1.0f),
                   FMath::Clamp(Spec.FoliageColor.B + 0.025f * static_cast<float>((FoliageIndex + 2) % 3), 0.0f, 1.0f));
         UStaticMesh* PcgFoliageMesh = nullptr;
         if (Spec.bDesertCanyon)
