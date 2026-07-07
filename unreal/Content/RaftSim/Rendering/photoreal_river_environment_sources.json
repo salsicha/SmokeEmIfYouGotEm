@@ -1452,6 +1452,7 @@
       "first_party_near_frame_shoreline_scaffold_demotion_recorded",
       "first_party_water_shader_depth_reflection_refraction_scaffold_recorded",
       "first_party_shallow_water_clarity_and_aeration_layer_recorded",
+      "first_party_flow_dependent_hydraulic_aeration_spray_recorded",
       "near_camera_water_scaffold_readability_clearance_recorded",
       "low_occlusion_far_field_water_shader_scaffold_recorded",
       "first_party_photographic_water_exposure_calibration_recorded",
