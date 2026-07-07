@@ -2506,7 +2506,8 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     {
         const float Side = (FoliageIndex % 2 == 0) ? -1.0f : 1.0f;
         const float BankOffset = Spec.bDesertCanyon ? ActiveRiverHalfWidth + 1350.0f : ActiveRiverHalfWidth + 620.0f;
-        const float BaseX = -2400.0f + static_cast<float>(FoliageIndex) * (28600.0f / FMath::Max(1, Spec.FoliageCount));
+        const float FoliageT = static_cast<float>(FoliageIndex) / static_cast<float>(FMath::Max(1, Spec.FoliageCount - 1));
+        const float BaseX = FMath::Lerp(850.0f, 25800.0f, FoliageT);
         float X = BaseX;
         float Y = GetPreviewRiverCenterY(Spec, X) + Side * (BankOffset + 210.0f * FMath::Sin(static_cast<float>(FoliageIndex) * 1.31f));
         float BestFoliageScore = -1000.0f;
@@ -2558,8 +2559,8 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         if (PcgFoliageMesh)
         {
             const float BaseScale = Spec.bHasWaterfalls
-                ? 0.46f + 0.05f * static_cast<float>(FoliageIndex % 4)
-                : (Spec.bDesertCanyon ? 0.34f + 0.04f * static_cast<float>(FoliageIndex % 3) : 0.36f + 0.04f * static_cast<float>(FoliageIndex % 3));
+                ? 0.30f + 0.035f * static_cast<float>(FoliageIndex % 4)
+                : (Spec.bDesertCanyon ? 0.30f + 0.035f * static_cast<float>(FoliageIndex % 3) : 0.27f + 0.03f * static_cast<float>(FoliageIndex % 3));
             AddPreviewMeshActor(
                 World,
                 PcgFoliageMesh,
