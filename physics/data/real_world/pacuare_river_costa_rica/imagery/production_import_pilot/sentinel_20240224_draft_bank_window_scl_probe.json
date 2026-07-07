@@ -1,0 +1,124 @@
+{
+  "schema": "raftsim.pacuare_sentinel_20240224_draft_bank_scl_probe.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "alternate_scene_scl_probe_failed_route_local_cloud_shadow",
+  "goal": "Probe the February 24, 2024 same-date Sentinel candidate with route-local SCL before deciding whether TCI review clips are worth downloading.",
+  "clip_scope": "draft_unreal_preview_bank_bbox_plus_250m_context_not_official_route_polygon",
+  "candidate_source": {
+    "search_result": "/private/tmp/pacuare_earth_search_sentinel_2024_2026_lt15.json",
+    "date": "2024-02-24",
+    "platform": "sentinel-2b",
+    "required_tile_ids": [
+      "16PHR",
+      "17PKM"
+    ],
+    "max_catalog_cloud_cover_percent": 14.978345,
+    "mean_catalog_cloud_cover_percent": 12.939785
+  },
+  "source_scl_cogs": [
+    {
+      "tile_id": "17PKM",
+      "product_id": "S2B_17PKM_20240224_0_L2A",
+      "asset": "SCL.tif",
+      "epsg": 32617,
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/17/P/KM/2024/2/S2B_17PKM_20240224_0_L2A/SCL.tif",
+      "download_location": "/private/tmp/pacuare_sentinel_20240224_17pkm_scl.tif",
+      "byte_count": 1721360,
+      "sha256": "ad99d203f9f13bf559e9bce9f2264c2b1142a04469bd38cdd18245f6d1593570",
+      "download_committed": false
+    },
+    {
+      "tile_id": "16PHR",
+      "product_id": "S2B_16PHR_20240224_0_L2A",
+      "asset": "SCL.tif",
+      "epsg": 32616,
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/16/P/HR/2024/2/S2B_16PHR_20240224_0_L2A/SCL.tif",
+      "download_location": "/private/tmp/pacuare_sentinel_20240224_16phr_scl.tif",
+      "byte_count": 2105148,
+      "sha256": "d0224db95ac82d09ba597e9c60c6cb84d6cba0520b4590caacbd0e3debf158e0",
+      "download_committed": false
+    }
+  ],
+  "outputs": [
+    {
+      "tile_id": "17PKM",
+      "path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20240224_draft_bank_window_scl_qa_review.png",
+      "pixel_window": {
+        "left": 0,
+        "top": 4919,
+        "width": 1749,
+        "height": 381
+      },
+      "dimensions_px": [
+        1024,
+        223
+      ],
+      "mode": "RGB",
+      "byte_count": 36689,
+      "sha256": "4484ae9a54495c9306727b9dfcd1b421f4f6c1ce12a6cdb2786beec8d1229285",
+      "native_pixel_count": 666369,
+      "class_summary": {
+        "cloud_or_cirrus_fraction": 0.445073,
+        "cloud_shadow_fraction": 0.139582,
+        "vegetation_fraction": 0.382227,
+        "water_fraction": 0.000194,
+        "unclassified_fraction": 0.005164
+      },
+      "review_decision": "Route-local cloud/cirrus and shadow are far above the March 20 and February 4 candidates, so no TCI clips should be downloaded."
+    },
+    {
+      "tile_id": "16PHR",
+      "path": "imagery/production_import_pilot/sentinel_s2b_16phr_20240224_draft_bank_window_scl_qa_review.png",
+      "pixel_window": {
+        "left": 2807,
+        "top": 0,
+        "width": 1845,
+        "height": 264
+      },
+      "dimensions_px": [
+        1024,
+        147
+      ],
+      "mode": "RGB",
+      "byte_count": 24258,
+      "sha256": "857fbb8594cf875a4eef508853afd324b391abbb3b8a6b1cb5393b80a36efc69",
+      "native_pixel_count": 487080,
+      "class_summary": {
+        "cloud_or_cirrus_fraction": 0.442627,
+        "cloud_shadow_fraction": 0.108325,
+        "vegetation_fraction": 0.408029,
+        "water_fraction": 0.000014,
+        "unclassified_fraction": 0.006395
+      },
+      "review_decision": "Route-local cloud/cirrus and shadow are far above the March 20 and February 4 candidates, so no TCI clips should be downloaded."
+    }
+  ],
+  "windowed_read_decision": {
+    "scl_qa_preview_generated": true,
+    "tci_review_clips_downloaded": false,
+    "source_drape_replaced": false,
+    "mask_sources_replaced": false,
+    "cloud_screening_blocks_promotion": true,
+    "decision": "February 24, 2024 fails route-local SCL screening and should not receive TCI download/review effort."
+  },
+  "recommended_next_step": "skip_february_24_tci_and_continue_cleaner_scene_search",
+  "allowed_use": [
+    "alternate_scene_rejection_record",
+    "route_window_cloud_shadow_qa_review",
+    "future_scene_selection"
+  ],
+  "forbidden_use": [
+    "production source-drape replacement",
+    "production water or vegetation mask generation",
+    "photoreal material extraction",
+    "claiming Pacuare route imagery coverage",
+    "claiming lifelike Pacuare screenshot readiness"
+  ],
+  "promotion_blockers": [
+    "February 24 route-window SCL is dominated by cloud/cirrus and cloud shadow.",
+    "Use exact official or guide-approved route/bank geometry before production clipping.",
+    "Record terms, attribution, stitching, SCL masking, and guide/geospatial approval before any production derivative is used."
+  ]
+}

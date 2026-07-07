@@ -1340,6 +1340,22 @@
             "future_source_drape_replacement_planning",
             "cloud_shadow_qa_review"
           ]
+        },
+        {
+          "artifact_id": "pacuare_sentinel_20240224_draft_bank_scl_probe",
+          "category": "sentinel_alternate_scene_route_local_scl_probe",
+          "paths": [
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_20240224_draft_bank_window_scl_probe.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20240224_draft_bank_window_scl_qa_review.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20240224_draft_bank_window_scl_qa_review.png"
+          ],
+          "promotion_blocker": "February 24 route-local SCL is much worse than February 4 and March 20, so no TCI clips should be downloaded for this scene.",
+          "status": "alternate_scene_scl_probe_failed_route_local_cloud_shadow",
+          "use_in_unreal": [
+            "alternate_scene_rejection_record",
+            "future_source_drape_replacement_planning",
+            "cloud_shadow_qa_review"
+          ]
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"

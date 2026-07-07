@@ -20,7 +20,7 @@
     "Pacuare high-resolution scene metadata review identifies official Landsat/Sentinel candidates, but production imagery still needs full-year paging, download approval, manual visual QA, CRS/band/scale review, and guide/geospatial signoff before replacing the MODIS/GIBS preview.",
     "Anonymous LandsatLook product asset URLs returned EROS login HTML for the best Pacuare Landsat candidate, so imagery downloads remain blocked until an approved access path returns expected JPEG/JSON/COG content.",
     "Pacuare Sentinel COG thumbnails and tile metadata are attached as visual triage, but full-resolution Sentinel bands, SCL/QA masks, corridor clipping, terms/attribution, and manual cloud/shadow QA are still required before source-drape or mask replacement.",
-    "Pacuare March 20, 2025 Sentinel SCL QA, matching TCI bbox clips, draft-bank window strips, a worse March 5 route-local SCL probe, and February 4, 2024 SCL/TCI route-window review are attached for review only; production imagery still needs cleaner route-local coverage or exact native-CRS route/bank clipping with SCL masking, stitching, terms/attribution review, and guide/geospatial signoff."
+    "Pacuare March 20, 2025 Sentinel SCL QA, matching TCI bbox clips, draft-bank window strips, a worse March 5 route-local SCL probe, February 4, 2024 SCL/TCI route-window review, and a failed February 24 SCL probe are attached for review only; production imagery still needs cleaner route-local coverage or exact native-CRS route/bank clipping with SCL masking, stitching, terms/attribution review, and guide/geospatial signoff."
   ],
   "pulled_artifacts": [
     {
@@ -1388,6 +1388,51 @@
       ],
       "caveats": [
         "February 4 TCI route-window strips remain visibly cloud/shadow contaminated and cannot replace the Pacuare source drape.",
+        "Draft bank geometry comes from the Unreal preview scaffold, not official hydrography or guide-approved route geometry.",
+        "Production Pacuare imagery remains blocked until cleaner route-local coverage or exact route-window SCL masking, stitching, terms review, and guide/geospatial approval pass."
+      ]
+    },
+    {
+      "artifact_id": "pacuare_sentinel_20240224_draft_bank_scl_probe",
+      "category": "sentinel_alternate_scene_route_local_scl_probe",
+      "paths": [
+        "imagery/production_import_pilot/sentinel_20240224_draft_bank_window_scl_probe.json",
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20240224_draft_bank_window_scl_qa_review.png",
+        "imagery/production_import_pilot/sentinel_s2b_16phr_20240224_draft_bank_window_scl_qa_review.png"
+      ],
+      "provider": "Element 84 / AWS Open Data Sentinel-2 L2A COG mirror processed with local Pillow window crops",
+      "status": "alternate_scene_scl_probe_failed_route_local_cloud_shadow",
+      "summary": {
+        "date": "2024-02-24",
+        "tile_ids": [
+          "17PKM",
+          "16PHR"
+        ],
+        "tci_review_clips_downloaded": false,
+        "source_drape_replaced": false,
+        "cloud_screening_blocks_promotion": true,
+        "scl_cloud_or_cirrus_fraction_by_tile": {
+          "17PKM": 0.445073,
+          "16PHR": 0.442627
+        },
+        "scl_cloud_shadow_fraction_by_tile": {
+          "17PKM": 0.139582,
+          "16PHR": 0.108325
+        }
+      },
+      "related_artifacts": [
+        "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
+        "imagery/production_import_pilot/sentinel_20250320_draft_bank_window_review.json",
+        "imagery/production_import_pilot/sentinel_20250305_draft_bank_window_scl_probe.json",
+        "imagery/production_import_pilot/sentinel_20240204_draft_bank_window_tci_review.json"
+      ],
+      "use": [
+        "alternate_scene_rejection_record",
+        "route_window_cloud_shadow_qa_review",
+        "future_scene_selection"
+      ],
+      "caveats": [
+        "February 24 route-local SCL is much worse than February 4 and March 20, so no TCI clips were downloaded.",
         "Draft bank geometry comes from the Unreal preview scaffold, not official hydrography or guide-approved route geometry.",
         "Production Pacuare imagery remains blocked until cleaner route-local coverage or exact route-window SCL masking, stitching, terms review, and guide/geospatial approval pass."
       ]
