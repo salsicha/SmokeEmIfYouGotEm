@@ -1430,6 +1430,7 @@
       "first_party_source_drape_smoothing_pass_recorded",
       "first_party_segmented_wet_bank_ribbons_recorded",
       "first_party_demoted_source_detail_contours_recorded",
+      "first_party_post_contour_terrain_readability_fill_recorded",
       "terrain_proxy_luma_floor_recorded",
       "shadowless_terrain_albedo_review_capture_material_recorded",
       "flow_aware_waterline_pebble_scatter_recorded",

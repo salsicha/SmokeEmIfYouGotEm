@@ -62,6 +62,7 @@
       "first_party_source_drape_smoothing_pass",
       "first_party_segmented_wet_bank_ribbons",
       "first_party_demoted_source_detail_contours",
+      "first_party_post_contour_terrain_readability_fill",
       "flow_aware_waterline_pebble_scatter",
       "first_party_irregular_rock_geometry_variants",
       "first_party_boulder_wetness_abrasion_moss_surface_variants",
