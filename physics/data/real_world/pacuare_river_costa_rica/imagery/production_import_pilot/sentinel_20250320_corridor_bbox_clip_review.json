@@ -1,0 +1,145 @@
+{
+  "schema": "raftsim.pacuare_sentinel_20250320_tci_bbox_clip_review.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "sentinel_20250320_tci_bbox_window_clips_attached_review_only",
+  "goal": "Create review-only March 20, 2025 Sentinel TCI raster-window previews after the matching SCL-first QA probe passed for TCI review.",
+  "clip_scope": "draft_planning_bounds_bbox_not_route_polygon",
+  "planning_bounds_wgs84": {
+    "min_lon": -83.75,
+    "min_lat": 9.72,
+    "max_lon": -83.42,
+    "max_lat": 10.12
+  },
+  "method": {
+    "coordinate_transform": "Reuses the January 19 bbox pixel windows derived from the same Sentinel MGRS tile grids and draft WGS84 planning bounds.",
+    "pixel_model": "Sentinel-2 TCI COGs are treated as 10980x10980 rasters at 10 m/pixel using the same tile grid as the prior 2025-01-19 bbox clip review.",
+    "clip_algorithm": "Open the full TCI COG with Pillow, crop the native pixel window, and downsample each preview to width 1024 while preserving aspect ratio.",
+    "limitations": [
+      "Uses draft planning bbox corners, not an official Pacuare route polygon, wetted channel, bank polygon, or protected-area-safe publication geometry.",
+      "Does not apply SCL, cloud, shadow, haze, nodata, water, canopy, wet-rock, waterfall, or mist QA masks to the TCI pixels.",
+      "Does not stitch the two clips, reproject into a final working CRS, or align to guide-reviewed stationing."
+    ]
+  },
+  "source_cogs": [
+    {
+      "tile_id": "17PKM",
+      "product_id": "S2B_17PKM_20250320_0_L2A",
+      "asset": "TCI.tif",
+      "epsg": 32617,
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/17/P/KM/2025/3/S2B_17PKM_20250320_0_L2A/TCI.tif",
+      "full_cog_path": "/private/tmp/pacuare_sentinel_20250320_17pkm_tci.tif",
+      "full_cog_byte_count": 320248217,
+      "full_cog_committed": false,
+      "full_cog_sha256": "5f3fbec512b86456dbb5c5e78aca777b40cad388f5434bb1897578fa534cdf22",
+      "scl_qa_review": "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json"
+    },
+    {
+      "tile_id": "16PHR",
+      "product_id": "S2B_16PHR_20250320_0_L2A",
+      "asset": "TCI.tif",
+      "epsg": 32616,
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/16/P/HR/2025/3/S2B_16PHR_20250320_0_L2A/TCI.tif",
+      "full_cog_path": "/private/tmp/pacuare_sentinel_20250320_16phr_tci.tif",
+      "full_cog_byte_count": 288880428,
+      "full_cog_committed": false,
+      "full_cog_sha256": "a1009ad7cecb14a9a6381abc535775906201fdf45788bc533f65e730b542b06c",
+      "scl_qa_review": "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json"
+    }
+  ],
+  "outputs": [
+    {
+      "tile_id": "17PKM",
+      "path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_corridor_bbox_clip_review.png",
+      "native_utm_bbox_m": [
+        199980.0,
+        1090200.0,
+        234802.26825388102,
+        1119951.75725909
+      ],
+      "pixel_window": {
+        "left": 0,
+        "top": 8004,
+        "width": 3483,
+        "height": 2976
+      },
+      "dimensions_px": [
+        1024,
+        875
+      ],
+      "mode": "RGB",
+      "byte_count": 1676580,
+      "sha256": "28fbf0ae030bd74c5570cd349bb444c9e6df6ea3fb668f39ce37490b34350d73",
+      "scl_cloud_or_cirrus_fraction": 0.029006,
+      "scl_cloud_shadow_fraction": 0.029049,
+      "visual_review": "Cleaner than the January 19 clip and useful for source review, but scattered clouds and cloud shadows remain visible; not route-clipped or stitch-ready."
+    },
+    {
+      "tile_id": "16PHR",
+      "path": "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_corridor_bbox_clip_review.png",
+      "native_utm_bbox_m": [
+        856234.4249247197,
+        1076164.1952475146,
+        892925.9390099018,
+        1100040.0
+      ],
+      "pixel_window": {
+        "left": 5625,
+        "top": 0,
+        "width": 3670,
+        "height": 2388
+      },
+      "dimensions_px": [
+        1024,
+        666
+      ],
+      "mode": "RGB",
+      "byte_count": 1245227,
+      "sha256": "a42a0931b739ca2c7571c57068e9ab3aa9c6318c411313a914f60ac209ead6eb",
+      "scl_cloud_or_cirrus_fraction": 0.020025,
+      "scl_cloud_shadow_fraction": 0.018101,
+      "visual_review": "Cleaner than the January 19 clip and useful for source review, but scattered clouds and shadows remain; not route-clipped or stitch-ready."
+    }
+  ],
+  "windowed_read_decision": {
+    "corridor_bbox_clip_previews_generated": true,
+    "scl_qa_review_attached": true,
+    "scl_qa_passed_for_tci_review": true,
+    "exact_route_or_bank_clip_generated": false,
+    "stitched_corridor_mosaic_generated": false,
+    "scl_cloud_mask_applied": false,
+    "source_drape_replaced": false,
+    "mask_sources_replaced": false,
+    "full_cogs_committed": false,
+    "decision": "March 20 TCI bbox clips are better visual review candidates than January 19, but remain blocked from production until exact route/bank clipping, SCL/cloud masking, seam/stitch review, terms review, and guide/geospatial approval pass."
+  },
+  "recommended_next_step": "clip_march_20_tci_to_exact_route_and_bank_geometry_with_scl_masks",
+  "source_links": {
+    "scl_qa_review": "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+    "cleaner_scene_search": "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
+    "blocked_january_bbox_clip_review": "imagery/production_import_pilot/sentinel_corridor_bbox_clip_review.json",
+    "tile_coverage_review": "imagery/production_import_pilot/sentinel_corridor_tile_coverage_review.json",
+    "access_probe": "imagery/production_import_pilot/sentinel_cog_access_probe.json"
+  },
+  "allowed_use": [
+    "visual source triage",
+    "future native-crs route clipping comparison",
+    "SCL/cloud QA planning",
+    "guide/geospatial discussion about imagery usability"
+  ],
+  "forbidden_use": [
+    "production source-drape replacement",
+    "production water or vegetation mask generation",
+    "photoreal material extraction",
+    "claiming Pacuare route imagery coverage",
+    "claiming lifelike Pacuare screenshot readiness"
+  ],
+  "promotion_blockers": [
+    "Replace draft bbox clipping with reviewed route/bank/corridor geometry in the selected Costa Rica working CRS.",
+    "Apply SCL/cloud/shadow masks to the exact route windows and review the resulting usable coverage.",
+    "Stitch 17PKM/16PHR only after native-CRS clipping, SCL/cloud/shadow QA, seam review, and scale review pass.",
+    "Record Sentinel terms, attribution, storage/LFS policy, and redistribution review before any production derivative is used.",
+    "Compare accepted imagery against rainfall, flow, and guide/outfitter context before using river color, wetness, or bank exposure for gameplay visuals."
+  ]
+}
