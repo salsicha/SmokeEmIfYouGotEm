@@ -46,6 +46,7 @@
       "first_party_terrain_material_layer_facets_and_slope_shadow_patches",
       "flow_aware_waterline_pebble_scatter",
       "first_party_irregular_rock_geometry_variants",
+      "first_party_boulder_wetness_abrasion_moss_surface_variants",
       "strata_leaf_litter_wet_rock_and_talus_bands",
       "mask_biased_boulders_pebbles_foliage_and_understory",
       "mask_aware_ground_cover_and_canopy_cards",
