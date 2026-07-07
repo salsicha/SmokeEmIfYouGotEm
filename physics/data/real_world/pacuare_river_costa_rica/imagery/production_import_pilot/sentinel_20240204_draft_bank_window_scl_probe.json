@@ -1,0 +1,124 @@
+{
+  "schema": "raftsim.pacuare_sentinel_20240204_draft_bank_scl_probe.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "alternate_scene_scl_probe_marginal_tci_review_pending",
+  "goal": "Probe the February 4, 2024 same-date Sentinel candidate with route-local SCL before deciding whether TCI review clips are worth downloading.",
+  "clip_scope": "draft_unreal_preview_bank_bbox_plus_250m_context_not_official_route_polygon",
+  "candidate_source": {
+    "search_result": "/private/tmp/pacuare_earth_search_sentinel_2024_2026_lt15.json",
+    "date": "2024-02-04",
+    "platform": "sentinel-2b",
+    "required_tile_ids": [
+      "16PHR",
+      "17PKM"
+    ],
+    "max_catalog_cloud_cover_percent": 13.069718,
+    "mean_catalog_cloud_cover_percent": 9.808628
+  },
+  "source_scl_cogs": [
+    {
+      "tile_id": "17PKM",
+      "product_id": "S2B_17PKM_20240204_0_L2A",
+      "asset": "SCL.tif",
+      "epsg": 32617,
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/17/P/KM/2024/2/S2B_17PKM_20240204_0_L2A/SCL.tif",
+      "download_location": "/private/tmp/pacuare_sentinel_20240204_17pkm_scl.tif",
+      "byte_count": 965348,
+      "sha256": "37cf918ea8591efbffba8ab910a93c3a0d79fbe289d4aa9ab46cd93df073994d",
+      "download_committed": false
+    },
+    {
+      "tile_id": "16PHR",
+      "product_id": "S2B_16PHR_20240204_0_L2A",
+      "asset": "SCL.tif",
+      "epsg": 32616,
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/16/P/HR/2024/2/S2B_16PHR_20240204_0_L2A/SCL.tif",
+      "download_location": "/private/tmp/pacuare_sentinel_20240204_16phr_scl.tif",
+      "byte_count": 1460756,
+      "sha256": "6e400298ac1362bc0a010f0dd7c1d1db0faf8f229c491dbb837f4cce44c84f4e",
+      "download_committed": false
+    }
+  ],
+  "outputs": [
+    {
+      "tile_id": "17PKM",
+      "path": "imagery/production_import_pilot/sentinel_s2b_17pkm_20240204_draft_bank_window_scl_qa_review.png",
+      "pixel_window": {
+        "left": 0,
+        "top": 4919,
+        "width": 1749,
+        "height": 381
+      },
+      "dimensions_px": [
+        1024,
+        223
+      ],
+      "mode": "RGB",
+      "byte_count": 18621,
+      "sha256": "3467ac11203122a45379fb0fe210a05e6998ea1947e356e229b12ce022eae92a",
+      "native_pixel_count": 666369,
+      "class_summary": {
+        "cloud_or_cirrus_fraction": 0.03646,
+        "cloud_shadow_fraction": 0.047691,
+        "vegetation_fraction": 0.881521,
+        "water_fraction": 0.000186,
+        "unclassified_fraction": 0.002367
+      },
+      "review_decision": "Cloud/cirrus is slightly better than March 20 but 17PKM shadow is higher; TCI review is marginal but plausible."
+    },
+    {
+      "tile_id": "16PHR",
+      "path": "imagery/production_import_pilot/sentinel_s2b_16phr_20240204_draft_bank_window_scl_qa_review.png",
+      "pixel_window": {
+        "left": 2807,
+        "top": 0,
+        "width": 1845,
+        "height": 264
+      },
+      "dimensions_px": [
+        1024,
+        147
+      ],
+      "mode": "RGB",
+      "byte_count": 13248,
+      "sha256": "53d48bf8b29e7ddb9e142b25693898f4162f7b057711454910c42f1cb74dd470",
+      "native_pixel_count": 487080,
+      "class_summary": {
+        "cloud_or_cirrus_fraction": 0.040882,
+        "cloud_shadow_fraction": 0.037567,
+        "vegetation_fraction": 0.881502,
+        "water_fraction": 0.000012,
+        "unclassified_fraction": 0.002497
+      },
+      "review_decision": "Cloud/cirrus is better than March 20 16PHR, with similar shadow; TCI review is marginal but plausible."
+    }
+  ],
+  "windowed_read_decision": {
+    "scl_qa_preview_generated": true,
+    "tci_review_clips_downloaded": false,
+    "source_drape_replaced": false,
+    "mask_sources_replaced": false,
+    "cloud_screening_blocks_promotion": true,
+    "decision": "February 4, 2024 is not clean enough for production, but it is competitive with March 20 and worth TCI review before choosing whether to continue scene search."
+  },
+  "recommended_next_step": "download_february_4_tci_for_route_window_visual_review",
+  "allowed_use": [
+    "alternate_scene_selection",
+    "route_window_cloud_shadow_qa_review",
+    "future_scene_selection"
+  ],
+  "forbidden_use": [
+    "production source-drape replacement",
+    "production water or vegetation mask generation",
+    "photoreal material extraction",
+    "claiming Pacuare route imagery coverage",
+    "claiming lifelike Pacuare screenshot readiness"
+  ],
+  "promotion_blockers": [
+    "Inspect February 4 TCI route-window clips before spending more work on this candidate.",
+    "Use exact official or guide-approved route/bank geometry before production clipping.",
+    "Record terms, attribution, stitching, SCL masking, and guide/geospatial approval before any production derivative is used."
+  ]
+}
