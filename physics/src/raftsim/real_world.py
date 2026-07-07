@@ -68,6 +68,8 @@ PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION = "raftsim.production_environ
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE = "production_environment_gap_register.json"
 PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_SCHEMA_VERSION = "raftsim.production_geospatial_attachment_audit.v1"
 PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_FILE = "production_geospatial_source_attachment_audit.json"
+PRODUCTION_ADDITIONAL_SOURCE_LEADS_REVIEW_SCHEMA_VERSION = "raftsim.production_additional_source_leads_review.v1"
+PRODUCTION_ADDITIONAL_SOURCE_LEADS_REVIEW_FILE = "production_additional_source_leads_review.json"
 SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE = "production_source_gate_review.json"
 REFERENCE_MEDIA_ANNOTATIONS_FILE = "review/production_import_pilot/reference_annotations.geojson"
 REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE = "field_media/production_import_pilot/rights_manifest.json"
@@ -3488,6 +3490,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
             "geospatial_source_attachment_audit": (
                 "physics/data/real_world/production_geospatial_source_attachment_audit.json"
             ),
+            "additional_source_leads_review": "physics/data/real_world/production_additional_source_leads_review.json",
             "reference_media_links": "physics/data/real_world/reference_media_link_manifest.json",
             "art_asset_source_research": "unreal/Content/RaftSim/Rendering/art_asset_source_research.json",
             "capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",

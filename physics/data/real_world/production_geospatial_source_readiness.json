@@ -1,5 +1,6 @@
 {
   "canonical_inputs": {
+    "additional_source_leads_review": "physics/data/real_world/production_additional_source_leads_review.json",
     "capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
     "flow_visual_bands": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
     "geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",

@@ -1,6 +1,7 @@
 {
   "blocking_rule": "No river can be marked production-playable or lifelike until every P0 source-data, visual-replacement, rights-review, guide-review, capture, and performance gate for that river is closed.",
   "canonical_inputs": {
+    "additional_source_leads_review": "physics/data/real_world/production_additional_source_leads_review.json",
     "art_asset_source_research": "unreal/Content/RaftSim/Rendering/art_asset_source_research.json",
     "capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
     "first_party_procedural_environment_assets": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",

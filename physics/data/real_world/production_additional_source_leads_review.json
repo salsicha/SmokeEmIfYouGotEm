@@ -1,0 +1,131 @@
+{
+  "schema": "raftsim.production_additional_source_leads_review.v1",
+  "generated_on": "2026-07-07",
+  "status": "official_and_rights_reviewable_leads_recorded_no_media_downloaded",
+  "purpose": "Record additional web-reviewed official or rights-reviewable source leads for the three runnable photoreal river environments without downloading third-party media or promoting any source to production use.",
+  "policy": {
+    "official_sources_first": true,
+    "link_only_until_terms_and_item_rights_clear": true,
+    "no_media_downloaded_or_packaged": true,
+    "source_leads_do_not_promote_lifelike_status": true,
+    "promotion_requires_exact_layer_or_item_metadata_crs_terms_attribution_guide_review_and_capture_evidence": true
+  },
+  "reviewed_web_sources": [
+    {
+      "source_id": "blm_south_fork_american_recreation_page",
+      "river_ids": ["american_south_fork"],
+      "provider": "Bureau of Land Management",
+      "url": "https://www.blm.gov/visit/south-fork-american-river",
+      "source_classes": [
+        "protected_area_and_access_context",
+        "guide_and_reference_media_annotations"
+      ],
+      "observed_useful_evidence": [
+        "official South Fork recreation context",
+        "official access and put-in/take-out lead text",
+        "BLM-hosted photo leads requiring item-level metadata review",
+        "outfitter and permit-context review lead"
+      ],
+      "next_action": "Attach exact map/PDF metadata, public-use constraints, access geometry, and item-level photo credits before using the page for production routes or art reference.",
+      "promotion_gate": "Use as source lead only until current access restrictions, map date, item rights, local guide/outfitter validation, and publication sensitivity review pass."
+    },
+    {
+      "source_id": "blm_south_fork_american_area_map_pdf",
+      "river_ids": ["american_south_fork"],
+      "provider": "Bureau of Land Management",
+      "url": "https://www.blm.gov/sites/blm.gov/files/documents/files/Maps_California_south-fork-of-the-american-river-map.pdf",
+      "source_classes": [
+        "hydrography_and_centerline",
+        "protected_area_and_access_context"
+      ],
+      "observed_useful_evidence": [
+        "official map lead linked from the BLM South Fork page",
+        "route/access context candidate for editor annotation review"
+      ],
+      "next_action": "Record map date, cartographic credits, scale, coordinate assumptions, and allowable derivative use before digitizing or packaging any route/access geometry.",
+      "promotion_gate": "Do not import geometry from the PDF until terms, attribution, current access status, and guide/local review are attached."
+    },
+    {
+      "source_id": "nps_grand_canyon_river_trips_permits_2026",
+      "river_ids": ["colorado_river"],
+      "provider": "National Park Service",
+      "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm",
+      "source_classes": [
+        "protected_area_and_access_context",
+        "guide_and_reference_media_annotations"
+      ],
+      "observed_last_updated": "2026-06-03",
+      "observed_useful_evidence": [
+        "official Lees Ferry to Diamond Creek trip-context lead",
+        "launch/take-out and trip-length review lead",
+        "official NPS image captions and credits requiring item-level review"
+      ],
+      "next_action": "Attach launch/take-out geometry, current permit/publication constraints, river-mile relation, and item-level photo/video rights before production route or art use.",
+      "promotion_gate": "Use only as official context until exact route geometry, NPS item metadata, oarsman review, and public screenshot sensitivity review pass."
+    },
+    {
+      "source_id": "nps_grand_canyon_photos_multimedia",
+      "river_ids": ["colorado_river"],
+      "provider": "National Park Service",
+      "url": "https://www.nps.gov/grca/learn/photosmultimedia/index.htm",
+      "source_classes": [
+        "guide_and_reference_media_annotations",
+        "production_art_assets_or_first_party_procedural_equivalents"
+      ],
+      "observed_last_updated": "2025-02-06",
+      "observed_useful_evidence": [
+        "official digital photo archive lead",
+        "official public-domain b-roll lead",
+        "Grand Canyon webcams and virtual-tour leads for atmosphere and lighting review"
+      ],
+      "next_action": "Review individual archive items for title, date, creator, license/public-domain status, credit line, location, and allowed use before any asset or texture reference promotion.",
+      "promotion_gate": "No photo, video, or frame may become an asset input until item-level metadata, attribution, and route/publication sensitivity review are recorded."
+    },
+    {
+      "source_id": "snit_ogc_services_catalog_2026",
+      "river_ids": ["pacuare"],
+      "provider": "Sistema Nacional de Informacion Territorial de Costa Rica / IDECORI",
+      "url": "https://www.snitcr.go.cr/ico_servicios_ogc",
+      "source_classes": [
+        "terrain_dem_or_lidar",
+        "hydrography_and_centerline",
+        "aerial_or_satellite_imagery",
+        "protected_area_and_access_context"
+      ],
+      "observed_useful_evidence": [
+        "official Costa Rica OGC service catalog lead",
+        "WMS, WMTS, and WFS service-type confirmation",
+        "CRTM05, CR05/CRTM05, and WGS84 projection availability note",
+        "IGN orthophoto, model, MINAE Direccion de Agua, IMN, SINAC, SENARA, and ICE node leads"
+      ],
+      "next_action": "Select exact Pacuare-relevant service layers, capture layer metadata, CRS, terms, responsible institution, and publication sensitivity before importing any raster or vector features.",
+      "promotion_gate": "Use only as discovery metadata until layer-level terms, attribution, CRS, corridor intersection, and guide/outfitter review pass."
+    },
+    {
+      "source_id": "direccion_de_agua_sinigirh_geoservices_2026",
+      "river_ids": ["pacuare"],
+      "provider": "MINAE Direccion de Agua / SINIGIRH",
+      "url": "https://mapas.da.go.cr/geoservicios.php",
+      "source_classes": [
+        "hydrography_and_centerline",
+        "seasonal_flow_or_release_history",
+        "protected_area_and_access_context"
+      ],
+      "observed_useful_evidence": [
+        "official WMS geoservice catalog lead",
+        "GetCapabilities URL recorded on page",
+        "DA_AFOROS station-layer candidate",
+        "JASEC hydrometric stations candidate",
+        "DA_UNIDADES HIDROLOGICAS and ICE_CUENCAS HIDROGRAFICAS basin-layer candidates"
+      ],
+      "next_action": "Capture station IDs, variable names, coordinates, units, temporal coverage, basin relation, terms, and guide interpretation before numeric Pacuare flow or rainfall-linked feature tuning.",
+      "promotion_gate": "Do not use these layers for gameplay flow bands or route geometry until attributes, terms, CRS, station relevance, and local guide/geospatial review pass."
+    }
+  ],
+  "manual_social_reference_followup": {
+    "status": "existing_link_only_social_searches_remain_reference_only",
+    "canonical_manifest": "reference_media_link_manifest.json",
+    "rule": "Public social links may guide manual fidelity questions, but no photo, video, caption, comment, thumbnail, audio, or model-training use is allowed without explicit item-level rights and creator permission."
+  },
+  "next_checkpoint": "Promote exact official layers or item-level media references only after metadata, terms, attribution, guide review, and public-screenshot sensitivity are recorded."
+}

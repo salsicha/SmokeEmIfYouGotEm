@@ -1,4 +1,5 @@
 {
+  "additional_source_leads_review": "physics/data/real_world/production_additional_source_leads_review.json",
   "first_party_procedural_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
   "first_party_procedural_material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
   "first_party_material_swatch_manifest": "unreal/Content/RaftSim/Rendering/MaterialSwatches/first_party_material_swatch_manifest.json",
