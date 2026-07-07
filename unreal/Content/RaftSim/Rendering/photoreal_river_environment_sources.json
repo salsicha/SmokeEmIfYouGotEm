@@ -1411,6 +1411,7 @@
       "review_gated_source_water_and_vegetation_masks_sampled_by_preview_rendering_and_detail_placement",
       "source_drape_vertex_color_terrain_material_blend_recorded",
       "softened_source_drape_overlay_recorded",
+      "source_aware_bank_breakup_texture_patches_recorded",
       "flow_aware_waterline_pebble_scatter_recorded",
       "first_party_irregular_rock_geometry_variants_recorded",
       "first_party_procedural_strata_leaf_litter_wet_rock_and_talus_detail_recorded",
