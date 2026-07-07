@@ -3,6 +3,7 @@
     "capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
     "flow_visual_bands": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
     "geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",
+    "geospatial_source_attachment_audit": "physics/data/real_world/production_geospatial_source_attachment_audit.json",
     "photoreal_environment_sources": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
     "production_environment_gap_register": "physics/data/real_world/production_environment_gap_register.json",
     "reference_media_links": "physics/data/real_world/reference_media_link_manifest.json",

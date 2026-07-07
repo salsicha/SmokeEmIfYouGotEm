@@ -4,6 +4,7 @@
   "first_party_material_swatch_manifest": "unreal/Content/RaftSim/Rendering/MaterialSwatches/first_party_material_swatch_manifest.json",
   "flow_visual_band_manifest": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
   "geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",
+  "geospatial_source_attachment_audit": "physics/data/real_world/production_geospatial_source_attachment_audit.json",
   "generated_on": "2026-07-06",
   "global_sources": [
     {
