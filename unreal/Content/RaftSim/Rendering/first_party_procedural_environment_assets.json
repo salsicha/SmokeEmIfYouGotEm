@@ -58,6 +58,7 @@
       "first_party_photographic_terrain_emissive_calibration",
       "first_party_terrain_contrast_and_normal_calibration",
       "first_party_bounded_terrain_ambient_fill",
+      "first_party_demoted_terrain_overlay_striping",
       "flow_aware_waterline_pebble_scatter",
       "first_party_irregular_rock_geometry_variants",
       "first_party_boulder_wetness_abrasion_moss_surface_variants",

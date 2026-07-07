@@ -3293,7 +3293,7 @@ void AddPreviewTerrainMaterialLayerDetail(
     }
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
-    const int32 LayerCount = Spec.bDesertCanyon ? 126 : (Spec.bHasWaterfalls ? 146 : 118);
+    const int32 LayerCount = Spec.bDesertCanyon ? 72 : (Spec.bHasWaterfalls ? 86 : 68);
     const int32 BandCount = Spec.bDesertCanyon ? 6 : (Spec.bHasWaterfalls ? 5 : 4);
     const float NearOffset = Spec.bDesertCanyon ? 780.0f : (Spec.bHasWaterfalls ? 430.0f : 390.0f);
     const float BandSpacing = Spec.bDesertCanyon ? 470.0f : (Spec.bHasWaterfalls ? 285.0f : 250.0f);
@@ -3345,40 +3345,40 @@ void AddPreviewTerrainMaterialLayerDetail(
         FLinearColor OuterColor;
         if (Spec.bDesertCanyon)
         {
-            const FLinearColor DarkStrata = FLinearColor(0.20f, 0.14f, 0.095f);
-            const FLinearColor Redwall = FLinearColor(0.52f, 0.30f, 0.17f);
-            const FLinearColor SunlitSandstone = FLinearColor(0.74f, 0.56f, 0.34f);
-            InnerColor = FMath::Lerp(DarkStrata, Redwall, 0.35f + BandT * 0.42f);
-            OuterColor = FMath::Lerp(Redwall, SunlitSandstone, 0.20f + BandT * 0.55f);
-            InnerColor = FMath::Lerp(InnerColor, DarkStrata, ShadowT * 0.24f);
+            const FLinearColor DarkStrata = FLinearColor(0.26f, 0.18f, 0.12f);
+            const FLinearColor Redwall = FLinearColor(0.46f, 0.29f, 0.18f);
+            const FLinearColor SunlitSandstone = FLinearColor(0.62f, 0.47f, 0.30f);
+            InnerColor = FMath::Lerp(DarkStrata, Redwall, 0.32f + BandT * 0.30f);
+            OuterColor = FMath::Lerp(Redwall, SunlitSandstone, 0.18f + BandT * 0.38f);
+            InnerColor = FMath::Lerp(InnerColor, DarkStrata, ShadowT * 0.12f);
         }
         else if (Spec.bHasWaterfalls)
         {
-            const FLinearColor WetStone = FLinearColor(0.025f, 0.045f, 0.038f);
-            const FLinearColor Moss = FLinearColor(0.045f, 0.18f, 0.070f);
-            const FLinearColor LeafHumus = FLinearColor(0.075f, 0.085f, 0.045f);
-            InnerColor = FMath::Lerp(WetStone, Moss, FMath::Clamp(0.22f + VegetationT * 0.64f, 0.0f, 1.0f));
-            OuterColor = FMath::Lerp(LeafHumus, Moss, FMath::Clamp(0.30f + VegetationT * 0.52f + BandT * 0.18f, 0.0f, 1.0f));
+            const FLinearColor WetStone = FLinearColor(0.055f, 0.085f, 0.060f);
+            const FLinearColor Moss = FLinearColor(0.060f, 0.165f, 0.070f);
+            const FLinearColor LeafHumus = FLinearColor(0.085f, 0.100f, 0.060f);
+            InnerColor = FMath::Lerp(WetStone, Moss, FMath::Clamp(0.18f + VegetationT * 0.48f, 0.0f, 0.76f));
+            OuterColor = FMath::Lerp(LeafHumus, Moss, FMath::Clamp(0.22f + VegetationT * 0.38f + BandT * 0.12f, 0.0f, 0.74f));
             InnerColor = FMath::Lerp(InnerColor, ScalePreviewColor(Spec.WaterColor, 0.34f), FMath::Clamp(WaterT * 0.22f, 0.0f, 0.30f));
         }
         else
         {
-            const FLinearColor GraniteShadow = FLinearColor(0.16f, 0.16f, 0.13f);
-            const FLinearColor DryGrass = FLinearColor(0.34f, 0.31f, 0.18f);
-            const FLinearColor FoothillSoil = FLinearColor(0.24f, 0.20f, 0.13f);
-            InnerColor = FMath::Lerp(GraniteShadow, FoothillSoil, 0.30f + BandT * 0.32f);
-            OuterColor = FMath::Lerp(FoothillSoil, DryGrass, FMath::Clamp(0.20f + VegetationT * 0.42f + BandT * 0.18f, 0.0f, 0.82f));
-            InnerColor = FMath::Lerp(InnerColor, ScalePreviewColor(Spec.RockColor, 0.54f), ShadowT * 0.20f);
+            const FLinearColor GraniteShadow = FLinearColor(0.20f, 0.20f, 0.16f);
+            const FLinearColor DryGrass = FLinearColor(0.30f, 0.28f, 0.18f);
+            const FLinearColor FoothillSoil = FLinearColor(0.25f, 0.22f, 0.15f);
+            InnerColor = FMath::Lerp(GraniteShadow, FoothillSoil, 0.28f + BandT * 0.22f);
+            OuterColor = FMath::Lerp(FoothillSoil, DryGrass, FMath::Clamp(0.16f + VegetationT * 0.28f + BandT * 0.12f, 0.0f, 0.64f));
+            InnerColor = FMath::Lerp(InnerColor, ScalePreviewColor(Spec.RockColor, 0.54f), ShadowT * 0.10f);
         }
 
         const FLinearColor WetTint = FMath::Lerp(ScalePreviewColor(Spec.RockColor, 0.42f), ScalePreviewColor(Spec.WaterColor, 0.32f), 0.36f);
         InnerColor = FMath::Lerp(InnerColor, WetTint, FMath::Clamp(WaterT * 0.18f, 0.0f, 0.24f));
         OuterColor = FMath::Lerp(OuterColor, WetTint, FMath::Clamp(WaterT * 0.12f, 0.0f, 0.18f));
 
-        const float Length = (Spec.bDesertCanyon ? 940.0f : (Spec.bHasWaterfalls ? 680.0f : 610.0f)) *
-            (0.70f + 0.12f * static_cast<float>(LayerIndex % 5));
-        const float Width = (Spec.bDesertCanyon ? 235.0f : (Spec.bHasWaterfalls ? 150.0f : 130.0f)) *
-            (0.72f + 0.08f * static_cast<float>(LayerIndex % 4));
+        const float Length = (Spec.bDesertCanyon ? 620.0f : (Spec.bHasWaterfalls ? 430.0f : 390.0f)) *
+            (0.62f + 0.08f * static_cast<float>(LayerIndex % 5));
+        const float Width = (Spec.bDesertCanyon ? 150.0f : (Spec.bHasWaterfalls ? 96.0f : 88.0f)) *
+            (0.62f + 0.06f * static_cast<float>(LayerIndex % 4));
         AddPreviewBankBreakupPatch(
             World,
             Spec,
@@ -3411,7 +3411,7 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const bool bRainforest = Spec.bHasWaterfalls;
-    const int32 FacetCount = Spec.bDesertCanyon ? 168 : (bRainforest ? 156 : 132);
+    const int32 FacetCount = Spec.bDesertCanyon ? 96 : (bRainforest ? 92 : 78);
     const float NearOffset = Spec.bDesertCanyon ? 610.0f : (bRainforest ? 315.0f : 340.0f);
     const float FarOffset = Spec.bDesertCanyon ? 3050.0f : (bRainforest ? 1750.0f : 1480.0f);
 
@@ -3460,37 +3460,37 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
         FLinearColor OuterColor;
         if (Spec.bDesertCanyon)
         {
-            const FLinearColor DeepStrata = FLinearColor(0.19f, 0.12f, 0.080f);
-            const FLinearColor Oxide = FLinearColor(0.56f, 0.32f, 0.18f);
-            const FLinearColor Sand = FLinearColor(0.78f, 0.62f, 0.39f);
-            InnerColor = FMath::Lerp(DeepStrata, Oxide, 0.28f + NoiseT * 0.42f);
-            OuterColor = FMath::Lerp(Oxide, Sand, 0.18f + NoiseT * 0.56f);
+            const FLinearColor DeepStrata = FLinearColor(0.26f, 0.17f, 0.11f);
+            const FLinearColor Oxide = FLinearColor(0.50f, 0.31f, 0.19f);
+            const FLinearColor Sand = FLinearColor(0.64f, 0.50f, 0.33f);
+            InnerColor = FMath::Lerp(DeepStrata, Oxide, 0.24f + NoiseT * 0.30f);
+            OuterColor = FMath::Lerp(Oxide, Sand, 0.16f + NoiseT * 0.38f);
         }
         else if (bRainforest)
         {
-            const FLinearColor WetBasalt = FLinearColor(0.018f, 0.030f, 0.028f);
-            const FLinearColor Moss = FLinearColor(0.040f, 0.16f, 0.060f);
-            const FLinearColor LeafLitter = FLinearColor(0.080f, 0.070f, 0.038f);
-            InnerColor = FMath::Lerp(WetBasalt, Moss, FMath::Clamp(0.18f + VegetationT * 0.70f, 0.0f, 1.0f));
-            OuterColor = FMath::Lerp(LeafLitter, Moss, FMath::Clamp(0.20f + VegetationT * 0.58f + NoiseT * 0.20f, 0.0f, 1.0f));
+            const FLinearColor WetBasalt = FLinearColor(0.050f, 0.078f, 0.056f);
+            const FLinearColor Moss = FLinearColor(0.060f, 0.155f, 0.064f);
+            const FLinearColor LeafLitter = FLinearColor(0.090f, 0.085f, 0.052f);
+            InnerColor = FMath::Lerp(WetBasalt, Moss, FMath::Clamp(0.16f + VegetationT * 0.52f, 0.0f, 0.78f));
+            OuterColor = FMath::Lerp(LeafLitter, Moss, FMath::Clamp(0.18f + VegetationT * 0.42f + NoiseT * 0.12f, 0.0f, 0.76f));
         }
         else
         {
-            const FLinearColor Granite = FLinearColor(0.17f, 0.17f, 0.14f);
-            const FLinearColor FoothillSoil = FLinearColor(0.25f, 0.21f, 0.14f);
-            const FLinearColor DryGrass = FLinearColor(0.38f, 0.34f, 0.19f);
-            InnerColor = FMath::Lerp(Granite, FoothillSoil, 0.26f + NoiseT * 0.34f);
-            OuterColor = FMath::Lerp(FoothillSoil, DryGrass, FMath::Clamp(0.12f + VegetationT * 0.34f + NoiseT * 0.30f, 0.0f, 0.86f));
+            const FLinearColor Granite = FLinearColor(0.20f, 0.20f, 0.16f);
+            const FLinearColor FoothillSoil = FLinearColor(0.26f, 0.23f, 0.16f);
+            const FLinearColor DryGrass = FLinearColor(0.32f, 0.29f, 0.18f);
+            InnerColor = FMath::Lerp(Granite, FoothillSoil, 0.22f + NoiseT * 0.24f);
+            OuterColor = FMath::Lerp(FoothillSoil, DryGrass, FMath::Clamp(0.10f + VegetationT * 0.24f + NoiseT * 0.18f, 0.0f, 0.62f));
         }
 
         const FLinearColor WetTint = FMath::Lerp(ScalePreviewColor(Spec.RockColor, 0.38f), ScalePreviewColor(Spec.WaterColor, 0.30f), 0.42f);
         InnerColor = FMath::Lerp(InnerColor, WetTint, FMath::Clamp(WaterT * 0.24f, 0.0f, 0.32f));
         OuterColor = FMath::Lerp(OuterColor, WetTint, FMath::Clamp(WaterT * 0.16f, 0.0f, 0.24f));
 
-        const float Length = (Spec.bDesertCanyon ? 560.0f : (bRainforest ? 420.0f : 460.0f)) *
-            (0.62f + 0.10f * static_cast<float>(FacetIndex % 7));
-        const float Width = (Spec.bDesertCanyon ? 126.0f : (bRainforest ? 92.0f : 96.0f)) *
-            (0.68f + 0.09f * static_cast<float>(FacetIndex % 5));
+        const float Length = (Spec.bDesertCanyon ? 390.0f : (bRainforest ? 285.0f : 300.0f)) *
+            (0.56f + 0.07f * static_cast<float>(FacetIndex % 7));
+        const float Width = (Spec.bDesertCanyon ? 82.0f : (bRainforest ? 60.0f : 64.0f)) *
+            (0.58f + 0.06f * static_cast<float>(FacetIndex % 5));
         AddPreviewBankBreakupPatch(
             World,
             Spec,
@@ -3507,7 +3507,7 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
             Spec.bDesertCanyon ? 36.0f : 28.0f);
     }
 
-    const int32 BandPerSide = Spec.bDesertCanyon ? 36 : (bRainforest ? 28 : 24);
+    const int32 BandPerSide = Spec.bDesertCanyon ? 18 : (bRainforest ? 14 : 12);
     for (int32 BandIndex = 0; BandIndex < BandPerSide * 2; ++BandIndex)
     {
         const float Side = (BandIndex % 2 == 0) ? -1.0f : 1.0f;
@@ -3523,18 +3523,18 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
         FLinearColor OuterColor;
         if (Spec.bDesertCanyon)
         {
-            InnerColor = FLinearColor(0.24f, 0.15f, 0.09f);
-            OuterColor = FLinearColor(0.68f, 0.47f, 0.27f);
+            InnerColor = FLinearColor(0.30f, 0.21f, 0.14f);
+            OuterColor = FLinearColor(0.52f, 0.38f, 0.24f);
         }
         else if (bRainforest)
         {
-            InnerColor = FLinearColor(0.016f, 0.040f, 0.030f);
-            OuterColor = FLinearColor(0.050f, 0.13f, 0.055f);
+            InnerColor = FLinearColor(0.055f, 0.090f, 0.060f);
+            OuterColor = FLinearColor(0.075f, 0.140f, 0.065f);
         }
         else
         {
-            InnerColor = FLinearColor(0.14f, 0.13f, 0.10f);
-            OuterColor = FLinearColor(0.32f, 0.29f, 0.16f);
+            InnerColor = FLinearColor(0.20f, 0.19f, 0.14f);
+            OuterColor = FLinearColor(0.28f, 0.25f, 0.17f);
         }
         AddPreviewBankBreakupPatch(
             World,
@@ -3543,16 +3543,16 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
             HeightfieldPreview,
             FString::Printf(TEXT("RaftSim_LandscapeNaniteStrataMicroBand_%03d_%s"), BandIndex, *Spec.RiverId),
             X - (Spec.bDesertCanyon ? 630.0f : 420.0f),
-            Spec.bDesertCanyon ? 1220.0f : 820.0f,
+            Spec.bDesertCanyon ? 720.0f : 480.0f,
             SignedOffset,
-            Spec.bDesertCanyon ? 46.0f : 36.0f,
+            Spec.bDesertCanyon ? 30.0f : 24.0f,
             Phase,
             InnerColor,
             OuterColor,
-            Spec.bDesertCanyon ? 48.0f : 34.0f);
+            Spec.bDesertCanyon ? 34.0f : 24.0f);
     }
 
-    const int32 OcclusionCount = Spec.bDesertCanyon ? 62 : (bRainforest ? 58 : 48);
+    const int32 OcclusionCount = Spec.bDesertCanyon ? 34 : (bRainforest ? 32 : 28);
     for (int32 OcclusionIndex = 0; OcclusionIndex < OcclusionCount; ++OcclusionIndex)
     {
         const float Side = (OcclusionIndex % 2 == 0) ? -1.0f : 1.0f;
@@ -3562,11 +3562,11 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
         const float SignedOffset = Side * (ActiveRiverHalfWidth + (Spec.bDesertCanyon ? 660.0f : 330.0f) +
             (Spec.bDesertCanyon ? 1260.0f : 520.0f) * FMath::Abs(FMath::Sin(Phase * 0.67f)));
         const FLinearColor ShadowColor = Spec.bDesertCanyon
-            ? FLinearColor(0.22f, 0.16f, 0.11f)
-            : (bRainforest ? FLinearColor(0.055f, 0.105f, 0.062f) : FLinearColor(0.18f, 0.17f, 0.13f));
+            ? FLinearColor(0.30f, 0.22f, 0.15f)
+            : (bRainforest ? FLinearColor(0.070f, 0.130f, 0.070f) : FLinearColor(0.21f, 0.20f, 0.15f));
         const FLinearColor RimColor = Spec.bDesertCanyon
-            ? FLinearColor(0.42f, 0.29f, 0.18f)
-            : (bRainforest ? FLinearColor(0.080f, 0.155f, 0.070f) : FLinearColor(0.27f, 0.25f, 0.16f));
+            ? FLinearColor(0.44f, 0.31f, 0.20f)
+            : (bRainforest ? FLinearColor(0.085f, 0.155f, 0.075f) : FLinearColor(0.27f, 0.25f, 0.17f));
         AddPreviewBankBreakupPatch(
             World,
             Spec,
@@ -3574,13 +3574,13 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
             HeightfieldPreview,
             FString::Printf(TEXT("RaftSim_LandscapeNaniteSlopeOcclusionPatch_%03d_%s"), OcclusionIndex, *Spec.RiverId),
             X - (Spec.bDesertCanyon ? 420.0f : 300.0f),
-            Spec.bDesertCanyon ? 850.0f : 620.0f,
+            Spec.bDesertCanyon ? 520.0f : 360.0f,
             SignedOffset,
-            Spec.bDesertCanyon ? 72.0f : 52.0f,
+            Spec.bDesertCanyon ? 48.0f : 34.0f,
             Phase,
             ShadowColor,
             RimColor,
-            Spec.bDesertCanyon ? 54.0f : 38.0f);
+            Spec.bDesertCanyon ? 34.0f : 24.0f);
     }
 }
 
