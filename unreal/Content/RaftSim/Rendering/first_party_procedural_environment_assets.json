@@ -50,6 +50,7 @@
       "soft_feathered_terrain_material_patches",
       "first_party_terrain_material_layer_facets_and_slope_shadow_patches",
       "first_party_landscape_nanite_material_layer_scaffold",
+      "first_party_terrain_erosion_rill_and_bank_gully_detail",
       "first_party_lit_terrain_vertex_color_material",
       "shadowless_terrain_albedo_review_capture_material",
       "soft_lit_terrain_vertex_color_review_material",
