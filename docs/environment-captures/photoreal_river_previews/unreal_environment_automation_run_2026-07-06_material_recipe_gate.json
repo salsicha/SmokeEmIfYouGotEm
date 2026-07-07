@@ -2,7 +2,7 @@
   "schema": "raftsim.unreal.environment_automation_run.v1",
   "generated_on": "2026-07-06",
   "status": "succeeded_preview_only_not_lifelike",
-  "purpose": "Record the Unreal preview-map and capture automation run after the first-party procedural material recipe manifest and production geospatial attachment ledger became required inputs, after the softened source-drape plus boulder-contact foam preview renderer pass, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, and flow-band depth texture ribbons.",
+  "purpose": "Record the Unreal preview-map and capture automation run after the first-party procedural material recipe manifest and production geospatial attachment ledger became required inputs, after the softened source-drape plus boulder-contact foam preview renderer pass, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, flow-band depth texture ribbons, and river-specific cloud/haze/horizon backdrop cards.",
   "commands": {
     "editor_build": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Build/BatchFiles/Mac/Build.sh\" SmokeEmIfYouGotEmEditor Mac Development -Project=\"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -NoHotReload",
     "environment_automation": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Binaries/Mac/UnrealEditor-Cmd\" \"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -unattended -nop4 -nosplash -NoSound -RaftSimCreatePhotorealEnvironmentPreviewMaps -RaftSimCapturePhotorealEnvironmentPreviews -RaftSimExitAfterEnvironmentAutomation"
@@ -34,6 +34,7 @@
     "flow_aware_waterline_pebble_scatter": true,
     "first_party_irregular_rock_geometry_variants": true,
     "flow_band_depth_texture_ribbons": true,
+    "river_specific_cloud_haze_and_horizon_backdrop_cards": true,
     "status": "preview_only_visual_readability_improvement_not_production_material_or_whitewater_approval"
   },
   "capture_pixel_sanity": [
@@ -52,25 +53,25 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [117.72, 109.13, 93.4],
+      "rgb_mean": [117.72, 109.13, 93.41],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [117.72, 109.13, 93.4],
+      "rgb_mean": [117.72, 109.13, 93.41],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [54.53, 115.36, 109.52],
+      "rgb_mean": [54.54, 115.36, 109.53],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [54.53, 115.36, 109.52],
+      "rgb_mean": [54.54, 115.36, 109.53],
       "nonblank": true
     }
   ],
@@ -81,5 +82,5 @@
     "Saved guide-seat and river-eye captures for South Fork American, Colorado River Grand Canyon, and Pacuare River Rainforest.",
     "Environment preview capture manifest saved successfully."
   ],
-  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate, the source attachment ledger gate, the first contact-foam/overlay-softening renderer pass, guide-seat foliage readability tuning, source-aware bank breakup texture patches, bounded flow-aware shoreline scatter, first-party irregular rock geometry variants, and flow-band depth texture ribbons. The images remain preview-only and cannot be called lifelike until production terrain/material/water/foliage assets, guide review, rights review, and performance evidence pass."
+  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate, the source attachment ledger gate, the first contact-foam/overlay-softening renderer pass, guide-seat foliage readability tuning, source-aware bank breakup texture patches, bounded flow-aware shoreline scatter, first-party irregular rock geometry variants, flow-band depth texture ribbons, and river-specific cloud/haze/horizon backdrop cards. The images remain preview-only and cannot be called lifelike until production terrain/material/water/foliage assets, guide review, rights review, and performance evidence pass."
 }

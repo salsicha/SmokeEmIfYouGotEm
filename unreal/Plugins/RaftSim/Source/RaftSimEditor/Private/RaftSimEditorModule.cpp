@@ -287,7 +287,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.ElevationSample =
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/3dep_tiles");
     SouthFork.SourceDrapeDescription =
-        TEXT("stitched South Fork production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into bank and valley preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware bank breakup patches, lit water variation, flow-band depth texture ribbons, deterministic wet-rock, talus, foliage, understory, and mask-aware ground-cover cards; all pilot derivatives remain review-gated until metadata review, mosaic/clip, hydrologic conditioning, channel burning, masks, and guide/geospatial approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
+        TEXT("stitched South Fork production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into bank and valley preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware bank breakup patches, lit water variation, flow-band depth texture ribbons, deterministic wet-rock, talus, foliage, understory, mask-aware ground-cover cards, and river-specific atmospheric backdrop cards; all pilot derivatives remain review-gated until metadata review, mosaic/clip, hydrologic conditioning, channel burning, masks, and guide/geospatial approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
     SouthFork.FlowBandId = TEXT("median_runnable");
     SouthFork.FlowBandDisplayName = TEXT("Median Runnable / Summer Commercial");
     SouthFork.FlowBandSource = TEXT("physics/data/real_world/south_fork_american_chili_bar/flow_presets.json");
@@ -327,7 +327,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.ElevationSample =
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles");
     Colorado.SourceDrapeDescription =
-        TEXT("stitched Colorado/Lees Ferry production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into canyon bank preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware bank breakup patches, lit water variation, flow-band depth texture ribbons, deterministic wet-rock, talus, sparse scrub, boulder placement, and mask-aware canyon ground-cover cards; all pilot derivatives remain review-gated until metadata review, mosaic/clip, river-mile stationing, hydrologic conditioning, release-aware masks, and guide/oarsman approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
+        TEXT("stitched Colorado/Lees Ferry production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into canyon bank preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware bank breakup patches, lit water variation, flow-band depth texture ribbons, deterministic wet-rock, talus, sparse scrub, boulder placement, mask-aware canyon ground-cover cards, and river-specific atmospheric backdrop cards; all pilot derivatives remain review-gated until metadata review, mosaic/clip, river-mile stationing, hydrologic conditioning, release-aware masks, and guide/oarsman approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
     Colorado.FlowBandId = TEXT("moderate_release_planning");
     Colorado.FlowBandDisplayName = TEXT("Moderate Release Planning");
     Colorado.FlowBandSource = TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json");
@@ -373,7 +373,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.ElevationSample =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
-        TEXT("review-gated Pacuare production-import derivative placeholders generated from the selected NASA GIBS MODIS/Terra true-color seed and Copernicus DEM GLO-30 relief, normalized into a 4096px source drape, 2048px DEM relief, 2017px heightfield candidate, and 2048px water/vegetation masks; these remain coarse/cloudy proxy inputs until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, source-aware bank breakup patches, lit water variation, flow-band depth texture ribbons, and dense mask-aware ground-cover/canopy cards remain rights-safe proxy dressing; rocks, foliage, water, waterfalls, foam, raft, and lighting still include first-party procedural proxy layers");
+        TEXT("review-gated Pacuare production-import derivative placeholders generated from the selected NASA GIBS MODIS/Terra true-color seed and Copernicus DEM GLO-30 relief, normalized into a 4096px source drape, 2048px DEM relief, 2017px heightfield candidate, and 2048px water/vegetation masks; these remain coarse/cloudy proxy inputs until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, source-aware bank breakup patches, lit water variation, flow-band depth texture ribbons, dense mask-aware ground-cover/canopy cards, and humid atmospheric backdrop cards remain rights-safe proxy dressing; rocks, foliage, water, waterfalls, foam, raft, and lighting still include first-party procedural proxy layers");
     Pacuare.FlowBandId = TEXT("rainfed_runnable_planning");
     Pacuare.FlowBandDisplayName = TEXT("Rain-Fed Runnable Planning");
     Pacuare.FlowBandSource = TEXT("physics/data/real_world/pacuare_river_costa_rica/flow_presets.json");
@@ -2572,6 +2572,70 @@ void AddPreviewSurfaceAtmosphereAndSprayDetail(
     }
 }
 
+void AddPreviewRiverAtmosphericBackdropDetail(
+    UWorld* World,
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* TerrainRelief,
+    const FRaftSimPreviewImage* HeightfieldPreview,
+    UStaticMesh* PlaneMesh)
+{
+    if (!World || !PlaneMesh)
+    {
+        return;
+    }
+
+    const FLinearColor CloudColor = Spec.bDesertCanyon
+        ? FLinearColor(0.78f, 0.69f, 0.54f, 1.0f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.58f, 0.82f, 0.72f, 1.0f) : FLinearColor(0.78f, 0.86f, 0.82f, 1.0f));
+    const FLinearColor HorizonColor = Spec.bDesertCanyon
+        ? FLinearColor(0.62f, 0.50f, 0.38f, 1.0f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.28f, 0.48f, 0.34f, 1.0f) : FLinearColor(0.48f, 0.58f, 0.46f, 1.0f));
+    const int32 CloudCount = Spec.bDesertCanyon ? 6 : (Spec.bHasWaterfalls ? 10 : 7);
+
+    for (int32 CloudIndex = 0; CloudIndex < CloudCount; ++CloudIndex)
+    {
+        const float T = static_cast<float>(CloudIndex) / static_cast<float>(FMath::Max(1, CloudCount - 1));
+        const float X = FMath::Lerp(5200.0f, 24600.0f, T) + 380.0f * FMath::Sin(static_cast<float>(CloudIndex) * 1.13f);
+        const float CenterY = GetPreviewRiverCenterY(Spec, X);
+        const float Side = (CloudIndex % 2 == 0) ? -1.0f : 1.0f;
+        const float CloudY = CenterY + Side * (Spec.bDesertCanyon ? 620.0f : 520.0f) +
+            260.0f * FMath::Sin(static_cast<float>(CloudIndex) * 0.71f);
+        const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, CenterY, TerrainRelief, HeightfieldPreview);
+        const float CloudZ = TerrainZ + (Spec.bDesertCanyon ? 1120.0f : (Spec.bHasWaterfalls ? 760.0f : 880.0f)) +
+            95.0f * FMath::Sin(static_cast<float>(CloudIndex) * 0.83f);
+        const float LengthScale = Spec.bDesertCanyon ? 13.0f : (Spec.bHasWaterfalls ? 11.5f : 12.0f);
+        const float HeightScale = Spec.bDesertCanyon ? 1.55f : (Spec.bHasWaterfalls ? 1.95f : 1.45f);
+        AddPreviewTranslucentMeshActor(
+            World,
+            PlaneMesh,
+            FString::Printf(TEXT("RaftSim_RiverSpecificCloudHaze_%02d_%s"), CloudIndex, *Spec.RiverId),
+            FVector(X, CloudY, CloudZ),
+            FRotator(78.0f, 0.0f, static_cast<float>((CloudIndex * 23) % 360)),
+            FVector(LengthScale * (0.82f + 0.06f * static_cast<float>(CloudIndex % 4)), HeightScale, 1.0f),
+            ScalePreviewColor(CloudColor, 0.92f + 0.05f * static_cast<float>(CloudIndex % 3)),
+            Spec.bDesertCanyon ? 0.17f : (Spec.bHasWaterfalls ? 0.24f : 0.19f));
+    }
+
+    const int32 HorizonBandCount = Spec.bDesertCanyon ? 5 : (Spec.bHasWaterfalls ? 8 : 6);
+    for (int32 BandIndex = 0; BandIndex < HorizonBandCount; ++BandIndex)
+    {
+        const float X = 6200.0f + static_cast<float>(BandIndex) * (Spec.bDesertCanyon ? 3300.0f : 2700.0f);
+        const float CenterY = GetPreviewRiverCenterY(Spec, X);
+        const float Side = (BandIndex % 2 == 0) ? -1.0f : 1.0f;
+        const float Offset = Spec.bDesertCanyon ? 1180.0f : (Spec.bHasWaterfalls ? 850.0f : 980.0f);
+        const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, CenterY + Side * Offset, TerrainRelief, HeightfieldPreview);
+        AddPreviewTranslucentMeshActor(
+            World,
+            PlaneMesh,
+            FString::Printf(TEXT("RaftSim_RiverSpecificHorizonVeil_%02d_%s"), BandIndex, *Spec.RiverId),
+            FVector(X, CenterY + Side * Offset, TerrainZ + (Spec.bDesertCanyon ? 520.0f : 360.0f)),
+            FRotator(83.0f, 0.0f, static_cast<float>((BandIndex * 31) % 360)),
+            FVector(Spec.bDesertCanyon ? 15.5f : 11.0f, Spec.bHasWaterfalls ? 3.4f : 2.8f, 1.0f),
+            ScalePreviewColor(HorizonColor, 0.90f + 0.04f * static_cast<float>(BandIndex % 4)),
+            Spec.bDesertCanyon ? 0.19f : (Spec.bHasWaterfalls ? 0.26f : 0.20f));
+    }
+}
+
 void AddPreviewRaftForeground(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec, UStaticMesh* CubeMesh, UStaticMesh* CylinderMesh)
 {
     if (!World || !CubeMesh || !CylinderMesh)
@@ -2938,6 +3002,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     AddPreviewFlowBandTextureDetail(World, Spec);
     AddPreviewFoamAndHydraulics(World, Spec);
     AddPreviewSurfaceAtmosphereAndSprayDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, PlaneMesh);
+    AddPreviewRiverAtmosphericBackdropDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, PlaneMesh);
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     for (int32 BoulderIndex = 0; BoulderIndex < Spec.BoulderCount; ++BoulderIndex)
