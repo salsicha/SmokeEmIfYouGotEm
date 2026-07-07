@@ -38,6 +38,8 @@
     "current_renderer_coverage": [
       "terrain_and_source_drape_vertex_color_variation",
       "source_drape_vertex_color_terrain_material_blend",
+      "source_drape_albedo_normalization",
+      "terrain_proxy_luma_floor",
       "softened_source_drape_overlay",
       "heightfield_and_dem_relief_sampling",
       "water_and_vegetation_mask_guided_detail_placement",
@@ -46,6 +48,7 @@
       "first_party_terrain_material_layer_facets_and_slope_shadow_patches",
       "first_party_landscape_nanite_material_layer_scaffold",
       "first_party_lit_terrain_vertex_color_material",
+      "shadowless_terrain_albedo_review_capture_material",
       "flow_aware_waterline_pebble_scatter",
       "first_party_irregular_rock_geometry_variants",
       "first_party_boulder_wetness_abrasion_moss_surface_variants",
