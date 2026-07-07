@@ -1452,6 +1452,7 @@
       "low_occlusion_far_field_water_shader_scaffold_recorded",
       "first_party_photographic_water_exposure_calibration_recorded",
       "first_party_near_field_water_surface_grain_recorded",
+      "first_party_base_water_depth_current_grading_recorded",
       "first_party_mask_aware_ground_cover_and_canopy_cards_recorded",
       "biome_specific_deadfall_grass_root_ecology_props_recorded",
       "first_party_biome_foliage_silhouette_proxy_layers_recorded",
