@@ -2,7 +2,7 @@
   "schema": "raftsim.unreal.environment_automation_run.v1",
   "generated_on": "2026-07-06",
   "status": "succeeded_preview_only_not_lifelike",
-  "purpose": "Record the Unreal preview-map and capture automation run after the first-party procedural material recipe manifest and production geospatial attachment ledger became required inputs, after the softened source-drape plus boulder-contact foam preview renderer pass, and after guide-seat foliage setback and scale tuning.",
+  "purpose": "Record the Unreal preview-map and capture automation run after the first-party procedural material recipe manifest and production geospatial attachment ledger became required inputs, after the softened source-drape plus boulder-contact foam preview renderer pass, guide-seat foliage setback and scale tuning, and flow-aware waterline pebble scatter.",
   "commands": {
     "editor_build": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Build/BatchFiles/Mac/Build.sh\" SmokeEmIfYouGotEmEditor Mac Development -Project=\"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -NoHotReload",
     "environment_automation": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Binaries/Mac/UnrealEditor-Cmd\" \"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -unattended -nop4 -nosplash -NoSound -RaftSimCreatePhotorealEnvironmentPreviewMaps -RaftSimCapturePhotorealEnvironmentPreviews -RaftSimExitAfterEnvironmentAutomation"
@@ -30,52 +30,53 @@
     "softened_source_drape_overlay": true,
     "boulder_contact_foam_lace": true,
     "guide_seat_foliage_setback_and_scale_tuning": true,
+    "flow_aware_waterline_pebble_scatter": true,
     "status": "preview_only_visual_readability_improvement_not_production_material_or_whitewater_approval"
   },
   "capture_pixel_sanity": [
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [75.99, 133.32, 136.17],
+      "rgb_mean": [76.04, 133.36, 136.2],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [75.99, 133.32, 136.17],
+      "rgb_mean": [76.04, 133.36, 136.2],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [118.08, 109.47, 93.71],
+      "rgb_mean": [118.16, 109.54, 93.77],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [118.08, 109.47, 93.71],
+      "rgb_mean": [118.16, 109.54, 93.77],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [55.02, 115.72, 109.96],
+      "rgb_mean": [55.05, 115.74, 109.98],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [55.02, 115.72, 109.96],
+      "rgb_mean": [55.05, 115.74, 109.98],
       "nonblank": true
     }
   ],
   "unreal_log_summary": [
     "Using first-party procedural material recipe plan: unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
     "Using production geospatial attachment ledger: physics/data/real_world/production_geospatial_attachment_ledger.json",
-    "Saved all three generated preview maps with softened source-drape overlays, boulder-contact foam laces, and guide-seat foliage setback and scale tuning.",
+    "Saved all three generated preview maps with softened source-drape overlays, boulder-contact foam laces, guide-seat foliage setback and scale tuning, and flow-aware waterline pebble scatter.",
     "Saved guide-seat and river-eye captures for South Fork American, Colorado River Grand Canyon, and Pacuare River Rainforest.",
     "Environment preview capture manifest saved successfully."
   ],
-  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate, the source attachment ledger gate, the first contact-foam/overlay-softening renderer pass, and guide-seat foliage readability tuning. The images remain preview-only and cannot be called lifelike until production terrain/material/water/foliage assets, guide review, rights review, and performance evidence pass."
+  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate, the source attachment ledger gate, the first contact-foam/overlay-softening renderer pass, guide-seat foliage readability tuning, and bounded flow-aware shoreline scatter. The images remain preview-only and cannot be called lifelike until production terrain/material/water/foliage assets, guide review, rights review, and performance evidence pass."
 }

@@ -42,6 +42,7 @@
       "heightfield_and_dem_relief_sampling",
       "water_and_vegetation_mask_guided_detail_placement",
       "wet_bank_shore_ribbons",
+      "flow_aware_waterline_pebble_scatter",
       "strata_leaf_litter_wet_rock_and_talus_bands",
       "mask_biased_boulders_pebbles_foliage_and_understory",
       "mask_aware_ground_cover_and_canopy_cards",
