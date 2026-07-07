@@ -3,6 +3,7 @@
   "capture_type": "guide_seat_and_river_eye_downstream_unreal_preview",
   "source_plan": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
   "procedural_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
+  "procedural_material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
   "status": "south_fork_colorado_and_pacuare_source_draped_guide_and_river_eye_previews_available; photoreal source_data_and_asset_replacement_required",
   "captures": [
     {
