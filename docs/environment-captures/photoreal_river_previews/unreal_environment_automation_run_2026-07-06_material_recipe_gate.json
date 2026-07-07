@@ -2,7 +2,7 @@
   "schema": "raftsim.unreal.environment_automation_run.v1",
   "generated_on": "2026-07-06",
   "status": "succeeded_preview_only_not_lifelike",
-  "purpose": "Record the first Unreal preview-map and capture automation run after the first-party procedural material recipe manifest became a required input.",
+  "purpose": "Record the Unreal preview-map and capture automation run after the first-party procedural material recipe manifest became a required input and after the softened source-drape plus boulder-contact foam preview renderer pass.",
   "commands": {
     "editor_build": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Build/BatchFiles/Mac/Build.sh\" SmokeEmIfYouGotEmEditor Mac Development -Project=\"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -NoHotReload",
     "environment_automation": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Binaries/Mac/UnrealEditor-Cmd\" \"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -unattended -nop4 -nosplash -NoSound -RaftSimCreatePhotorealEnvironmentPreviewMaps -RaftSimCapturePhotorealEnvironmentPreviews -RaftSimExitAfterEnvironmentAutomation"
@@ -25,49 +25,54 @@
     "saved_capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
     "capture_manifest_status": "south_fork_colorado_and_pacuare_source_draped_guide_and_river_eye_previews_available; photoreal source_data_and_asset_replacement_required"
   },
+  "renderer_update": {
+    "softened_source_drape_overlay": true,
+    "boulder_contact_foam_lace": true,
+    "status": "preview_only_visual_readability_improvement_not_production_material_or_whitewater_approval"
+  },
   "capture_pixel_sanity": [
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [71.88, 129.64, 128.86],
+      "rgb_mean": [71.31, 128.69, 128.1],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [71.88, 129.64, 128.86],
+      "rgb_mean": [71.31, 128.69, 128.1],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [119.77, 111.7, 96.24],
+      "rgb_mean": [118.07, 109.48, 93.71],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [119.77, 111.7, 96.24],
+      "rgb_mean": [118.07, 109.48, 93.71],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [47.65, 111.61, 100.15],
+      "rgb_mean": [47.16, 110.15, 99.69],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [47.65, 111.61, 100.15],
+      "rgb_mean": [47.16, 110.15, 99.69],
       "nonblank": true
     }
   ],
   "unreal_log_summary": [
     "Using first-party procedural material recipe plan: unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
-    "Saved all three generated preview maps.",
+    "Saved all three generated preview maps with softened source-drape overlays and boulder-contact foam laces.",
     "Saved guide-seat and river-eye captures for South Fork American, Colorado River Grand Canyon, and Pacuare River Rainforest.",
     "Environment preview capture manifest saved successfully."
   ],
-  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate. The images remain preview-only and cannot be called lifelike until production terrain/material/water/foliage assets, guide review, rights review, and performance evidence pass."
+  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate and the first contact-foam/overlay-softening renderer pass. The images remain preview-only and cannot be called lifelike until production terrain/material/water/foliage assets, guide review, rights review, and performance evidence pass."
 }

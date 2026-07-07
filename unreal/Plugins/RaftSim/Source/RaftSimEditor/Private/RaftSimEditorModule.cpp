@@ -1299,8 +1299,13 @@ void AddPreviewAerialDrapeTiles(
                 continue;
             }
 
-            const float DrapeWeight = Spec.bDesertCanyon ? 0.44f : (Spec.bHasWaterfalls ? 0.34f : 0.38f);
-            FLinearColor AerialColor = FMath::Lerp(Spec.TerrainColor, AerialDrape->Sample(U, V), DrapeWeight);
+            const float DrapeWeight = Spec.bDesertCanyon ? 0.26f : (Spec.bHasWaterfalls ? 0.20f : 0.24f);
+            FLinearColor SourceDrapeColor = AerialDrape->Sample(U, V);
+            SourceDrapeColor = FMath::Lerp(
+                SourceDrapeColor,
+                Spec.bDesertCanyon ? FLinearColor(0.50f, 0.34f, 0.21f) : Spec.TerrainColor,
+                Spec.bHasWaterfalls ? 0.44f : 0.34f);
+            FLinearColor AerialColor = FMath::Lerp(Spec.TerrainColor, SourceDrapeColor, DrapeWeight);
             const float SourceWaterT = WaterMask && WaterMask->IsValid() ? WaterMask->SampleLuma(U, V) : 0.0f;
             const float SourceVegetationT = VegetationMask && VegetationMask->IsValid() ? VegetationMask->SampleLuma(U, V) : 0.0f;
             AerialColor = FMath::Lerp(
@@ -2477,6 +2482,24 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             FRotator(0.0f, static_cast<float>(BoulderIndex * 31), 0.0f),
             PcgBoulderMesh ? FVector(Scale * 1.25f, Scale * 1.05f, Scale * 0.72f) : FVector(Scale * 1.4f, Scale, Scale * 0.62f),
             BoulderColor);
+        const float BoulderLateralOffset = Y - GetPreviewRiverCenterY(Spec, X);
+        const float ContactFoamStrength =
+            FMath::Clamp(0.45f + BoulderWaterT * 0.55f + Spec.FlowFoamScale * 0.20f, 0.0f, 1.0f);
+        if (ContactFoamStrength > 0.52f)
+        {
+            const float ContactLength = (Spec.bDesertCanyon ? 420.0f : 330.0f) * FMath::Max(0.55f, Spec.FlowFoamScale);
+            const float ContactWidth = (Spec.bDesertCanyon ? 26.0f : 34.0f) * ContactFoamStrength;
+            AddPreviewFoamRibbon(
+                World,
+                Spec,
+                FString::Printf(TEXT("RaftSim_BoulderContactFoam_%02d_%s"), BoulderIndex, *Spec.RiverId),
+                X - ContactLength * 0.34f,
+                ContactLength,
+                BoulderLateralOffset,
+                ContactWidth,
+                static_cast<float>(BoulderIndex) * 0.59f,
+                Spec.bDesertCanyon ? FLinearColor(0.78f, 0.78f, 0.68f) : FLinearColor(0.86f, 0.94f, 0.88f));
+        }
     }
 
     for (int32 FoliageIndex = 0; FoliageIndex < Spec.FoliageCount; ++FoliageIndex)
