@@ -1427,6 +1427,7 @@
       "first_party_terrain_contrast_and_normal_calibration_recorded",
       "first_party_bounded_terrain_ambient_fill_recorded",
       "first_party_base_terrain_material_grain_and_microrelief_recorded",
+      "first_party_source_aware_terrain_photo_mottle_and_microrelief_recorded",
       "first_party_demoted_terrain_overlay_striping_recorded",
       "first_party_source_drape_smoothing_pass_recorded",
       "first_party_segmented_wet_bank_ribbons_recorded",
