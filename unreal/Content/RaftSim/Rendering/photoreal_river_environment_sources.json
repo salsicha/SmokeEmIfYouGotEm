@@ -1412,6 +1412,7 @@
       "source_drape_vertex_color_terrain_material_blend_recorded",
       "softened_source_drape_overlay_recorded",
       "flow_aware_waterline_pebble_scatter_recorded",
+      "first_party_irregular_rock_geometry_variants_recorded",
       "first_party_procedural_strata_leaf_litter_wet_rock_and_talus_detail_recorded",
       "first_party_procedural_lit_vertex_color_water_gradients_recorded",
       "first_party_mask_aware_ground_cover_and_canopy_cards_recorded",
