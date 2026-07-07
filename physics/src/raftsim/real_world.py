@@ -3482,6 +3482,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
             "first_party_material_swatches": "unreal/Content/RaftSim/Rendering/MaterialSwatches/first_party_material_swatch_manifest.json",
             "first_party_procedural_material_recipes": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
             "geospatial_readiness": "physics/data/real_world/production_geospatial_source_readiness.json",
+            "geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",
             "reference_media_links": "physics/data/real_world/reference_media_link_manifest.json",
             "art_asset_source_research": "unreal/Content/RaftSim/Rendering/art_asset_source_research.json",
             "capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",

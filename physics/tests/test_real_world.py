@@ -2857,6 +2857,50 @@ def test_pacuare_production_hydrography_review_drafts_are_from_preview_scaffold(
     )
 
 
+def test_production_geospatial_attachment_ledger_lists_existing_review_gated_artifacts():
+    ledger = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_attachment_ledger.json").read_text())
+    gap_register = json.loads((REAL_WORLD_DATA_DIR / PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE).read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    required_classes = set(ledger["required_source_classes"])
+    rivers = {river["river_id"]: river for river in ledger["rivers"]}
+
+    assert ledger["schema"] == "raftsim.production_geospatial_attachment_ledger.v1"
+    assert ledger["status"] == "reviewed_attachment_ledger_preview_only_not_lifelike"
+    assert ledger["policy"]["source_artifacts_do_not_equal_production_promotion"] is True
+    assert ledger["canonical_inputs"]["source_readiness_matrix"] == "production_geospatial_source_readiness.json"
+    assert (
+        gap_register["canonical_inputs"]["geospatial_attachment_ledger"]
+        == "physics/data/real_world/production_geospatial_attachment_ledger.json"
+    )
+    assert (
+        readiness["canonical_inputs"]["geospatial_attachment_ledger"]
+        == "physics/data/real_world/production_geospatial_attachment_ledger.json"
+    )
+    assert {"american_south_fork", "colorado_river", "pacuare"} == set(rivers)
+
+    for river in rivers.values():
+        classes = {entry["source_class"]: entry for entry in river["attached_source_classes"]}
+
+        assert set(classes) == required_classes
+        assert "preview" in river["overall_status"]
+        assert river["next_source_action"]
+        for entry in classes.values():
+            assert entry["promotion_blockers"]
+            assert any(
+                flag in entry["status"]
+                for flag in ("review_gated", "not_promoted", "not_authoritative", "link_only")
+            )
+            assert entry["artifacts"]
+            for artifact in entry["artifacts"]:
+                artifact_path = REAL_WORLD_DATA_DIR / artifact["path"]
+                assert artifact_path.exists(), artifact["path"]
+                assert artifact["role"]
+
+    assert "strongest_source_seed" in rivers["american_south_fork"]["overall_status"]
+    assert "lees_ferry_pilot_slice" in rivers["colorado_river"]["overall_status"]
+    assert "rainforest_source_triage" in rivers["pacuare"]["overall_status"]
+
+
 def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_rivers():
     register = build_production_environment_gap_register()
     rivers = {entry["river_id"]: entry for entry in register["rivers"]}
@@ -2876,6 +2920,10 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert (
         register["canonical_inputs"]["first_party_procedural_environment_assets"]
         == "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json"
+    )
+    assert (
+        register["canonical_inputs"]["geospatial_attachment_ledger"]
+        == "physics/data/real_world/production_geospatial_attachment_ledger.json"
     )
     assert any(target["target"] == "water_foam_spray_mist_and_wetness" for target in register["global_visual_replacement_targets"])
 

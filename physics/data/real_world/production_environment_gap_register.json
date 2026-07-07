@@ -6,6 +6,7 @@
     "first_party_procedural_environment_assets": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
     "first_party_material_swatches": "unreal/Content/RaftSim/Rendering/MaterialSwatches/first_party_material_swatch_manifest.json",
     "first_party_procedural_material_recipes": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
+    "geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",
     "geospatial_readiness": "physics/data/real_world/production_geospatial_source_readiness.json",
     "photoreal_environment_sources": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
     "reference_media_links": "physics/data/real_world/reference_media_link_manifest.json"
