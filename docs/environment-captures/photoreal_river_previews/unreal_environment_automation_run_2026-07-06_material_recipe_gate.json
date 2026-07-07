@@ -2,7 +2,7 @@
   "schema": "raftsim.unreal.environment_automation_run.v1",
   "generated_on": "2026-07-06",
   "status": "succeeded_preview_only_not_lifelike",
-  "purpose": "Record the Unreal preview-map and capture automation run after the first-party procedural material recipe manifest became a required input, after the softened source-drape plus boulder-contact foam preview renderer pass, and after guide-seat foliage setback and scale tuning.",
+  "purpose": "Record the Unreal preview-map and capture automation run after the first-party procedural material recipe manifest and production geospatial attachment ledger became required inputs, after the softened source-drape plus boulder-contact foam preview renderer pass, and after guide-seat foliage setback and scale tuning.",
   "commands": {
     "editor_build": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Build/BatchFiles/Mac/Build.sh\" SmokeEmIfYouGotEmEditor Mac Development -Project=\"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -NoHotReload",
     "environment_automation": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Binaries/Mac/UnrealEditor-Cmd\" \"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -unattended -nop4 -nosplash -NoSound -RaftSimCreatePhotorealEnvironmentPreviewMaps -RaftSimCapturePhotorealEnvironmentPreviews -RaftSimExitAfterEnvironmentAutomation"
@@ -17,6 +17,7 @@
     "required_source_plan": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
     "required_procedural_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
     "required_material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
+    "required_geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",
     "saved_maps": [
       "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview.umap",
       "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview.umap",
@@ -71,9 +72,10 @@
   ],
   "unreal_log_summary": [
     "Using first-party procedural material recipe plan: unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
+    "Using production geospatial attachment ledger: physics/data/real_world/production_geospatial_attachment_ledger.json",
     "Saved all three generated preview maps with softened source-drape overlays, boulder-contact foam laces, and guide-seat foliage setback and scale tuning.",
     "Saved guide-seat and river-eye captures for South Fork American, Colorado River Grand Canyon, and Pacuare River Rainforest.",
     "Environment preview capture manifest saved successfully."
   ],
-  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate, the first contact-foam/overlay-softening renderer pass, and guide-seat foliage readability tuning. The images remain preview-only and cannot be called lifelike until production terrain/material/water/foliage assets, guide review, rights review, and performance evidence pass."
+  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate, the source attachment ledger gate, the first contact-foam/overlay-softening renderer pass, and guide-seat foliage readability tuning. The images remain preview-only and cannot be called lifelike until production terrain/material/water/foliage assets, guide review, rights review, and performance evidence pass."
 }
