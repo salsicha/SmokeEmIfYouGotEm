@@ -384,7 +384,7 @@
         "raft_foreground_and_oar_rig_silhouette"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
-      "unreal_status": "placeholder_raft_hidden_for_environment_review_production_raft_material_pending",
+      "unreal_status": "refined_first_party_raft_oar_foreground_proxy_active_production_raft_material_pending",
       "required_source_inputs": [
         "raft_asset_source_policy",
         "guide_seat_camera_contract",
@@ -396,6 +396,12 @@
         "wet_tube_highlight",
         "oar_blade_color",
         "guide_seat_silhouette",
+        "horizontal_tube_orientation",
+        "horizontal_bow_strip",
+        "flat_outboard_oar_shafts",
+        "low_occlusion_oar_blades",
+        "tube_seam_highlights",
+        "demoted_floor_occlusion",
         "placeholder_visibility_flag"
       ],
       "tunable_parameters": [
