@@ -1,0 +1,78 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -111.6127803,
+          36.8497097
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_long_water_swimmer_visibility",
+        "candidate_source_ids": [
+          "nps_grand_canyon_river_trips",
+          "instagram_grand_canyon_rafting_hashtag"
+        ],
+        "feature_role": "rescue_visibility_reference_seed",
+        "flow_context_needed": [
+          "moderate_release_planning",
+          "high_release_planning"
+        ],
+        "review_questions": [
+          "Mark the farthest distance at which a swimmer, paddle, or rescue signal remains readable from an oar rig.",
+          "Record where canyon shadow, long slicks, boils, and wave trains can add realism without masking rescue targets."
+        ],
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "colorado_river",
+        "station_m": 17400.0,
+        "target_id": "colorado_long_swimmer_rescue_visibility"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -111.611846,
+          36.849108
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "colorado_oar_frame_foreground_clearance",
+        "candidate_source_ids": [
+          "nps_grand_canyon_river_trips"
+        ],
+        "feature_role": "oar_frame_rescue_readability_seed",
+        "flow_context_needed": [
+          "moderate_release_planning"
+        ],
+        "review_questions": [
+          "Confirm oar frame, spare oars, raft bow, and horizon framing leave enough river-eye visibility for rescue play.",
+          "Record needed foreground culling or opacity rules before final raft art and camera presets are promoted."
+        ],
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "colorado_river",
+        "station_m": 17400.0,
+        "target_id": "colorado_long_swimmer_rescue_visibility"
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-07",
+  "policy": {
+    "allowed_use_before_rights_clear": "Manual visual comparison, guide discussion, source-planning notes, and internal annotation placeholders only.",
+    "blocked_use_before_rights_clear": "Texture extraction, photogrammetry, AI training, marketing screenshots, packaged media, copied captions, or derived shipping assets.",
+    "storage": "Link-only review queue. Do not download, scrape, vendor, train on, or package third-party photos, footage, captions, comments, thumbnails, or audio."
+  },
+  "rights_manifest": "field_media/production_import_pilot/rights_manifest.json",
+  "river_id": "colorado_river",
+  "schema": "raftsim.reference_media_target_output.geojson.v1",
+  "source_reference_annotations": "review/production_import_pilot/reference_annotations.geojson",
+  "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+  "status": "link_only_target_annotation_scaffold_no_media_downloaded",
+  "target_id": "colorado_long_swimmer_rescue_visibility",
+  "type": "FeatureCollection"
+}

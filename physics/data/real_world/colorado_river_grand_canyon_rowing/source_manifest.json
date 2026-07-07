@@ -40,7 +40,9 @@
     "guide_references": [
       "review/guide_review_needs.json",
       "review/oar_line_annotations.geojson",
-      "review/production_import_pilot/reference_annotations.geojson"
+      "review/production_import_pilot/reference_annotations.geojson",
+      "review/production_import_pilot/release_reference_annotations.geojson",
+      "review/production_import_pilot/rescue_visibility_annotations.geojson"
     ],
     "hydrography": [
       "hydrography/centerline.geojson",

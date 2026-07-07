@@ -1,0 +1,78 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -83.4803408,
+          9.9468819
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "pacuare_canopy_shadow_swimmer_visibility",
+        "candidate_source_ids": [
+          "instagram_pacuare_river_hashtag",
+          "youtube_pacuare_river_rafting_search"
+        ],
+        "feature_role": "rescue_visibility_reference_seed",
+        "flow_context_needed": [
+          "rainfed_runnable_planning",
+          "rainy_season_high_planning"
+        ],
+        "review_questions": [
+          "Mark where swimmers, paddles, throw bags, and guide signals remain visible under canopy shadow and mist.",
+          "Record foreground leaves, vines, and spray that must fade or cull near rescue targets."
+        ],
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "pacuare",
+        "station_m": 37500.0,
+        "target_id": "pacuare_canopy_rescue_readability"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.479522,
+          9.946304
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "annotation_id": "pacuare_rainfed_pushy_wave_rescue_read",
+        "candidate_source_ids": [
+          "youtube_pacuare_river_rafting_search"
+        ],
+        "feature_role": "rainfed_rescue_readability_seed",
+        "flow_context_needed": [
+          "rainy_season_high_planning"
+        ],
+        "review_questions": [
+          "Review whether pushy rainfed wave trains, side waterfalls, and mist should brighten, darken, or thin near swimmers.",
+          "Keep all video observations link-only until explicit permission and item metadata are recorded."
+        ],
+        "review_status": "candidate_links_only_no_media_downloaded",
+        "rights_status": "candidate_links_only",
+        "river_id": "pacuare",
+        "station_m": 37500.0,
+        "target_id": "pacuare_canopy_rescue_readability"
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-07",
+  "policy": {
+    "allowed_use_before_rights_clear": "Manual visual comparison, guide discussion, source-planning notes, and internal annotation placeholders only.",
+    "blocked_use_before_rights_clear": "Texture extraction, photogrammetry, AI training, marketing screenshots, packaged media, copied captions, or derived shipping assets.",
+    "storage": "Link-only review queue. Do not download, scrape, vendor, train on, or package third-party photos, footage, captions, comments, thumbnails, or audio."
+  },
+  "rights_manifest": "field_media/production_import_pilot/rights_manifest.json",
+  "river_id": "pacuare",
+  "schema": "raftsim.reference_media_target_output.geojson.v1",
+  "source_reference_annotations": "review/production_import_pilot/reference_annotations.geojson",
+  "source_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+  "status": "link_only_target_annotation_scaffold_no_media_downloaded",
+  "target_id": "pacuare_canopy_rescue_readability",
+  "type": "FeatureCollection"
+}

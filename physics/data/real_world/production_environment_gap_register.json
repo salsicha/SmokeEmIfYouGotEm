@@ -221,7 +221,9 @@
         "review/production_import_pilot/evacuation_and_rescue_routes.geojson",
         "reference_media_link_manifest.json",
         "review/production_import_pilot/reference_annotations.geojson",
-        "field_media/production_import_pilot/rights_manifest.json"
+        "field_media/production_import_pilot/rights_manifest.json",
+        "imagery/production_import_pilot/wet_rock_review.geojson",
+        "review/production_import_pilot/flow_variant_reference_annotations.geojson"
       ],
       "completion_gate": "Guide-seat and river-eye captures read as the South Fork corridor at reviewed low/median/high flow bands, with swimmer/rescue targets and rapid hazards still readable.",
       "current_strength": "strongest solver/source seed; official pilot DEM/NAIP tiles and derivatives are attached for a small corridor slice.",
@@ -274,7 +276,9 @@
           "promotion_gate": "Attach creator/date/reach/flow/weather/permission before photos or footage influence production art.",
           "required_artifacts": [
             "review/production_import_pilot/reference_annotations.geojson",
-            "field_media/production_import_pilot/rights_manifest.json"
+            "field_media/production_import_pilot/rights_manifest.json",
+            "imagery/production_import_pilot/wet_rock_review.geojson",
+            "review/production_import_pilot/flow_variant_reference_annotations.geojson"
           ],
           "source_class": "guide_and_reference_media_annotations",
           "source_leads": [
@@ -347,7 +351,9 @@
         "review/production_import_pilot/oarsman_route_publication_notes.json",
         "reference_media_link_manifest.json",
         "review/production_import_pilot/reference_annotations.geojson",
-        "field_media/production_import_pilot/rights_manifest.json"
+        "field_media/production_import_pilot/rights_manifest.json",
+        "review/production_import_pilot/release_reference_annotations.geojson",
+        "review/production_import_pilot/rescue_visibility_annotations.geojson"
       ],
       "completion_gate": "Captures read as Grand Canyon big-water rowing, with river-mile scale, canyon atmosphere, sandbar/wet-bank variation, oar-rig sightlines, and rescue visibility intact.",
       "current_strength": "Lees Ferry pilot tiles and derivatives are attached; daily USGS gauge histories exist, but full canyon stationing and release-aware masks are still missing.",
@@ -397,7 +403,9 @@
           "promotion_gate": "Use official/public-domain media only after item metadata review; attach oarsman sightline notes before art or gameplay tuning.",
           "required_artifacts": [
             "review/production_import_pilot/reference_annotations.geojson",
-            "field_media/production_import_pilot/rights_manifest.json"
+            "field_media/production_import_pilot/rights_manifest.json",
+            "review/production_import_pilot/release_reference_annotations.geojson",
+            "review/production_import_pilot/rescue_visibility_annotations.geojson"
           ],
           "source_class": "guide_and_reference_media_annotations",
           "source_leads": [
@@ -511,7 +519,10 @@
         "review/access_and_conservation_constraints.json",
         "reference_media_link_manifest.json",
         "review/production_import_pilot/reference_annotations.geojson",
-        "field_media/production_import_pilot/rights_manifest.json"
+        "field_media/production_import_pilot/rights_manifest.json",
+        "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_2048.png",
+        "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_manifest.json",
+        "review/production_import_pilot/rescue_visibility_annotations.geojson"
       ],
       "completion_gate": "Captures read as a humid Pacuare rainforest gorge with believable canopy, waterfalls/mist, wet rocks, rainfed flow variation, and rescue readability under foliage.",
       "current_strength": "Copernicus DEM and NASA GIBS/Copernicus preview derivatives are normalized into the production folder shape, and a deterministic Unreal-curve centerline/stationing scaffold exists for annotation placement; imagery is still coarse/cloudy and local hydrology/hydrography are not authoritative.",
@@ -632,7 +643,10 @@
           "promotion_gate": "Attach permissioned rainforest, waterfall, canopy, mist, water-color, and rapid-behavior references before production art promotion.",
           "required_artifacts": [
             "review/production_import_pilot/reference_annotations.geojson",
-            "field_media/production_import_pilot/rights_manifest.json"
+            "field_media/production_import_pilot/rights_manifest.json",
+            "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_2048.png",
+            "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_manifest.json",
+            "review/production_import_pilot/rescue_visibility_annotations.geojson"
           ],
           "source_class": "guide_and_reference_media_annotations",
           "source_leads": [
