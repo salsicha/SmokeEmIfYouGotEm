@@ -663,7 +663,7 @@ UMaterialInterface* LoadOrCreatePreviewTerrainVertexColorMaterial()
         Material->GetExpressionCollection().AddExpression(Specular);
 
         UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
-        EmissiveScale->R = 0.035f;
+        EmissiveScale->R = 0.16f;
         Material->GetExpressionCollection().AddExpression(EmissiveScale);
 
         UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
@@ -712,7 +712,7 @@ UMaterialInterface* LoadOrCreatePreviewTerrainVertexColorMaterial()
                 }
                 else
                 {
-                    Constant->R = 0.08f;
+                    Constant->R = 0.16f;
                 }
                 ++TerrainConstantIndex;
             }
