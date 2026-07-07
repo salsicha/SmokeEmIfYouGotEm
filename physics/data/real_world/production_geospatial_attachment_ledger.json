@@ -1,0 +1,644 @@
+{
+  "schema": "raftsim.production_geospatial_attachment_ledger.v1",
+  "generated_on": "2026-07-06",
+  "status": "reviewed_attachment_ledger_preview_only_not_lifelike",
+  "goal": "Track concrete, repository-attached source artifacts for the first three runnable rivers so production environment work can distinguish available reviewed inputs from missing promotion evidence.",
+  "canonical_inputs": {
+    "source_readiness_matrix": "production_geospatial_source_readiness.json",
+    "gap_register": "production_environment_gap_register.json",
+    "reference_media_links": "reference_media_link_manifest.json",
+    "photoreal_environment_sources": "../../unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+  },
+  "policy": {
+    "artifact_paths_are_relative_to": "physics/data/real_world",
+    "official_open_sources_first": true,
+    "source_artifacts_do_not_equal_production_promotion": true,
+    "social_and_third_party_media_link_only_until_item_rights_clear": true,
+    "procedural_generation_may_fill_visual_gaps_when_source_limits_are_manifested": true,
+    "promotion_requires_crs_terms_attribution_guide_review_and_lifelike_capture": true
+  },
+  "required_source_classes": [
+    "terrain_dem_or_lidar",
+    "hydrography_and_centerline",
+    "aerial_or_satellite_imagery",
+    "water_and_vegetation_masks",
+    "seasonal_flow_or_release_history",
+    "protected_area_and_access_context",
+    "guide_and_reference_media_annotations"
+  ],
+  "rivers": [
+    {
+      "river_id": "american_south_fork",
+      "section_id": "chili_bar_to_coloma",
+      "display_name": "South Fork American River, Chili Bar to Coloma",
+      "overall_status": "strongest_source_seed_preview_only",
+      "attached_source_classes": [
+        {
+          "source_class": "terrain_dem_or_lidar",
+          "status": "pilot_tiles_and_derivatives_attached_review_gated",
+          "artifacts": [
+            {
+              "path": "south_fork_american_chili_bar/production_import_pilot_pull_manifest.json",
+              "role": "official USGS 3DEP pilot tile pull manifest"
+            },
+            {
+              "path": "south_fork_american_chili_bar/review/production_import_pilot/source_metadata_review.json",
+              "role": "USGS 3DEP metadata, vertical-datum, and source-query review"
+            },
+            {
+              "path": "south_fork_american_chili_bar/terrain/production_import_pilot/dem_relief_2048.png",
+              "role": "review-only relief derivative for terrain readability"
+            },
+            {
+              "path": "south_fork_american_chili_bar/terrain/production_import_pilot/heightfield_candidate_2017.png",
+              "role": "review-only Unreal heightfield candidate"
+            }
+          ],
+          "promotion_blockers": [
+            "full-corridor clipping and tiling",
+            "working CRS and vertical-datum acceptance",
+            "void review, hydrologic conditioning, and channel burning",
+            "guide/geospatial terrain approval"
+          ]
+        },
+        {
+          "source_class": "hydrography_and_centerline",
+          "status": "nhd_extract_and_editor_drafts_attached_review_gated",
+          "artifacts": [
+            {
+              "path": "south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+              "role": "NHD HU8 source extract manifest"
+            },
+            {
+              "path": "south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
+              "role": "ordered South Fork mainstem review overlay"
+            },
+            {
+              "path": "south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
+              "role": "preview stationing for annotation and cross-section seeds"
+            },
+            {
+              "path": "south_fork_american_chili_bar/hydrography/production_import_pilot/hydrography_draft_manifest.json",
+              "role": "editor-ready centerline, banks, and cross-section draft manifest"
+            }
+          ],
+          "promotion_blockers": [
+            "hand-edited bank and wetted-width review",
+            "rapid/eddy/recovery pool guide annotations",
+            "NAIP/DEM alignment acceptance",
+            "solver-ready channel geometry export"
+          ]
+        },
+        {
+          "source_class": "aerial_or_satellite_imagery",
+          "status": "naip_samples_and_source_drape_attached_review_gated",
+          "artifacts": [
+            {
+              "path": "south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_sample_1024.png",
+              "role": "review-only NAIP corridor sample"
+            },
+            {
+              "path": "south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png",
+              "role": "stitched pilot source drape for preview iteration"
+            },
+            {
+              "path": "south_fork_american_chili_bar/imagery/tnm_naip_products.json",
+              "role": "NAIP product discovery metadata"
+            }
+          ],
+          "promotion_blockers": [
+            "full corridor orthomosaic selection",
+            "acquisition-year/material-season approval",
+            "terms and attribution signoff",
+            "guide review against visible rapid features"
+          ]
+        },
+        {
+          "source_class": "water_and_vegetation_masks",
+          "status": "deterministic_preview_masks_attached_not_authoritative",
+          "artifacts": [
+            {
+              "path": "south_fork_american_chili_bar/imagery/production_import_pilot/source_masks_manifest.json",
+              "role": "pilot mask derivation manifest"
+            },
+            {
+              "path": "south_fork_american_chili_bar/imagery/production_import_pilot/water_mask_2048.png",
+              "role": "review-only water mask"
+            },
+            {
+              "path": "south_fork_american_chili_bar/imagery/production_import_pilot/vegetation_mask_2048.png",
+              "role": "review-only vegetation mask"
+            },
+            {
+              "path": "south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
+              "role": "mask alignment diagnostic against NHD/DEM stationing"
+            }
+          ],
+          "promotion_blockers": [
+            "manual bank and wet/dry QA",
+            "flow-band waterline variants",
+            "false-positive review around shadows, roads, bars, and foam",
+            "hazard and swimmer visibility review"
+          ]
+        },
+        {
+          "source_class": "seasonal_flow_or_release_history",
+          "status": "multi_window_cdec_review_attached_presets_not_promoted",
+          "artifacts": [
+            {
+              "path": "south_fork_american_chili_bar/hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
+              "role": "water-year-to-date CDEC CBR/A25 context"
+            },
+            {
+              "path": "south_fork_american_chili_bar/hydrology/production_import_pilot/cdec_multiyear_flow_review_2021-10-01_2026-07-06.json",
+              "role": "multi-year CDEC CBR representative context"
+            },
+            {
+              "path": "south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json",
+              "role": "planning low/median/high flow-band comparison"
+            },
+            {
+              "path": "south_fork_american_chili_bar/flow_presets.json",
+              "role": "current planning flow presets"
+            }
+          ],
+          "promotion_blockers": [
+            "A25 routing and flag interpretation",
+            "station-to-rapid timing review",
+            "high-flow outlier interpretation",
+            "legal/redistribution and guide validation"
+          ]
+        },
+        {
+          "source_class": "protected_area_and_access_context",
+          "status": "official_leads_and_editor_overlays_attached_review_gated",
+          "artifacts": [
+            {
+              "path": "south_fork_american_chili_bar/review/production_import_pilot/access_publication_sensitivity_review.json",
+              "role": "state/county access and publication-sensitivity review"
+            },
+            {
+              "path": "south_fork_american_chili_bar/review/production_import_pilot/access_points.geojson",
+              "role": "stationed access overlay for editor review"
+            },
+            {
+              "path": "south_fork_american_chili_bar/review/production_import_pilot/no_publish_sensitive_polygons.geojson",
+              "role": "no-publish sensitive-area placeholder overlay"
+            },
+            {
+              "path": "south_fork_american_chili_bar/review/production_import_pilot/evacuation_and_rescue_routes.geojson",
+              "role": "review-only rescue/evacuation route overlay"
+            }
+          ],
+          "promotion_blockers": [
+            "current access/restriction verification",
+            "parcel and sensitive-location screening",
+            "local guide/outfitter approval",
+            "public screenshot publication approval"
+          ]
+        },
+        {
+          "source_class": "guide_and_reference_media_annotations",
+          "status": "link_only_queue_and_annotation_scaffold_attached",
+          "artifacts": [
+            {
+              "path": "reference_media_link_manifest.json",
+              "role": "link-only official, Creative Commons, and social review seeds"
+            },
+            {
+              "path": "south_fork_american_chili_bar/review/production_import_pilot/reference_annotations.geojson",
+              "role": "station-seeded editor annotation targets"
+            },
+            {
+              "path": "south_fork_american_chili_bar/field_media/production_import_pilot/rights_manifest.json",
+              "role": "rights review scaffold with no downloaded media"
+            }
+          ],
+          "promotion_blockers": [
+            "item-level author/license/permission review",
+            "guide/outfitter visual and hazard validation",
+            "first-party or rights-cleared field capture",
+            "no use of social media as texture, training, or packaged media"
+          ]
+        }
+      ],
+      "next_source_action": "Use the attached South Fork pilot data for the next renderer import iteration, but keep production terrain, water masks, and lifelike status blocked until the listed promotion blockers are closed."
+    },
+    {
+      "river_id": "colorado_river",
+      "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+      "display_name": "Colorado River, Grand Canyon rowing corridor",
+      "overall_status": "lees_ferry_pilot_slice_attached_preview_only",
+      "attached_source_classes": [
+        {
+          "source_class": "terrain_dem_or_lidar",
+          "status": "lees_ferry_3dep_pilot_tiles_and_derivatives_attached_review_gated",
+          "artifacts": [
+            {
+              "path": "colorado_river_grand_canyon_rowing/production_import_pilot_pull_manifest.json",
+              "role": "official USGS 3DEP pilot tile pull manifest"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/review/production_import_pilot/source_metadata_review.json",
+              "role": "USGS 3DEP and NAIP metadata review"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/terrain/production_import_pilot/dem_relief_2048.png",
+              "role": "review-only canyon relief derivative"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/terrain/production_import_pilot/heightfield_candidate_2017.png",
+              "role": "review-only Unreal heightfield candidate"
+            }
+          ],
+          "promotion_blockers": [
+            "expand beyond Lees Ferry pilot into selected rowing corridor",
+            "full canyon-scale tiling and vertical datum review",
+            "channel burning and wet-bank conditioning",
+            "oarsman/geospatial approval"
+          ]
+        },
+        {
+          "source_class": "hydrography_and_centerline",
+          "status": "nhd_mainstem_river_mile_and_sandbar_overlays_attached_review_gated",
+          "artifacts": [
+            {
+              "path": "colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_bbox_extract_manifest.json",
+              "role": "NHD HU8 Lees Ferry source extract manifest"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_colorado_mainstem_candidate.geojson",
+              "role": "Colorado mainstem candidate overlay"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/river_mile_markers.geojson",
+              "role": "river-mile review marker overlay"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/sandbars.geojson",
+              "role": "sandbar/wet-bank review seed overlay"
+            }
+          ],
+          "promotion_blockers": [
+            "river-mile authority review",
+            "Diamond Creek/takeout extension",
+            "sandbar and wet-bank release-state validation",
+            "oarsman route approval"
+          ]
+        },
+        {
+          "source_class": "aerial_or_satellite_imagery",
+          "status": "naip_samples_and_source_drape_attached_review_gated",
+          "artifacts": [
+            {
+              "path": "colorado_river_grand_canyon_rowing/imagery/usda_naip_lees_ferry_corridor_sample_1024.png",
+              "role": "review-only NAIP corridor sample"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png",
+              "role": "stitched Lees Ferry pilot source drape"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/production_source_pull_manifest.json",
+              "role": "Colorado source pull manifest"
+            }
+          ],
+          "promotion_blockers": [
+            "full corridor imagery selection",
+            "release-state water-color review",
+            "NPS/publication sensitivity review",
+            "terms and attribution signoff"
+          ]
+        },
+        {
+          "source_class": "water_and_vegetation_masks",
+          "status": "deterministic_preview_masks_attached_not_authoritative",
+          "artifacts": [
+            {
+              "path": "colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_masks_manifest.json",
+              "role": "pilot mask derivation manifest"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/imagery/production_import_pilot/water_mask_2048.png",
+              "role": "review-only water mask"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/imagery/production_import_pilot/vegetation_mask_2048.png",
+              "role": "review-only sparse riparian vegetation mask"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_naip_dem_alignment_diagnostic.json",
+              "role": "mask alignment diagnostic against NHD/DEM stationing"
+            }
+          ],
+          "promotion_blockers": [
+            "release-aware sandbar/wet-bank waterline review",
+            "canyon shadow false-positive cleanup",
+            "oarsman and hazard-readability review",
+            "solver feature alignment"
+          ]
+        },
+        {
+          "source_class": "seasonal_flow_or_release_history",
+          "status": "usgs_and_usbr_release_context_attached_presets_not_promoted",
+          "artifacts": [
+            {
+              "path": "colorado_river_grand_canyon_rowing/hydrology/usgs_09380000_daily_discharge.json",
+              "role": "USGS Lees Ferry daily discharge context"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/hydrology/usgs_09402500_daily_discharge.json",
+              "role": "USGS Grand Canyon daily discharge context"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
+              "role": "Glen Canyon release source context"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/release_band_review.json",
+              "role": "planning release-band comparison"
+            }
+          ],
+          "promotion_blockers": [
+            "hourly/subdaily release operation review",
+            "Lees Ferry to rapid travel-time interpretation",
+            "big-water feature/oarsman validation",
+            "final release-band gameplay tuning"
+          ]
+        },
+        {
+          "source_class": "protected_area_and_access_context",
+          "status": "nps_context_and_editor_overlays_attached_review_gated",
+          "artifacts": [
+            {
+              "path": "colorado_river_grand_canyon_rowing/review/production_import_pilot/access_publication_sensitivity_review.json",
+              "role": "NPS river trip and publication-sensitivity review"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/review/production_import_pilot/access_points.geojson",
+              "role": "launch/takeout review overlay"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/review/production_import_pilot/camps_and_beaches_review.geojson",
+              "role": "camps/beaches review overlay"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/review/production_import_pilot/oarsman_route_publication_notes.json",
+              "role": "oarsman route publication caveats"
+            }
+          ],
+          "promotion_blockers": [
+            "current NPS operating language review",
+            "sensitive-resource publication screening",
+            "camp/beach geometry approval",
+            "oarsman approval for public route detail"
+          ]
+        },
+        {
+          "source_class": "guide_and_reference_media_annotations",
+          "status": "link_only_queue_and_annotation_scaffold_attached",
+          "artifacts": [
+            {
+              "path": "reference_media_link_manifest.json",
+              "role": "link-only official, Creative Commons, and social review seeds"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/review/production_import_pilot/reference_annotations.geojson",
+              "role": "river-mile and sightline annotation targets"
+            },
+            {
+              "path": "colorado_river_grand_canyon_rowing/field_media/production_import_pilot/rights_manifest.json",
+              "role": "rights review scaffold with no downloaded media"
+            }
+          ],
+          "promotion_blockers": [
+            "item-level NPS/public-domain or permission review",
+            "oarsman validation for wave trains, laterals, boils, and rescue lines",
+            "no social-media import without explicit rights",
+            "first-party reference capture plan"
+          ]
+        }
+      ],
+      "next_source_action": "Expand the Lees Ferry pilot into the selected rowing corridor and bind release-state waterline, sandbar, and oarsman review before production canyon screenshots are claimed."
+    },
+    {
+      "river_id": "pacuare",
+      "section_id": "lower_pacuare_planning_corridor",
+      "display_name": "Pacuare River, Costa Rica rainforest corridor",
+      "overall_status": "rainforest_source_triage_attached_preview_only",
+      "attached_source_classes": [
+        {
+          "source_class": "terrain_dem_or_lidar",
+          "status": "copernicus_dem_tiles_and_heightfield_candidate_attached_review_gated",
+          "artifacts": [
+            {
+              "path": "pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif",
+              "role": "Copernicus DEM GLO-30 source tile"
+            },
+            {
+              "path": "pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif",
+              "role": "Copernicus DEM GLO-30 source tile"
+            },
+            {
+              "path": "pacuare_river_costa_rica/terrain/production_import_pilot/heightfield_candidate_manifest.json",
+              "role": "production-import heightfield candidate manifest"
+            },
+            {
+              "path": "pacuare_river_costa_rica/review/production_import_pilot/source_metadata_review.json",
+              "role": "consolidated source metadata and hash review"
+            }
+          ],
+          "promotion_blockers": [
+            "Costa Rica working CRS and official layer comparison",
+            "void/sink review and hydrologic conditioning",
+            "channel burning from reviewed banks",
+            "guide/local terrain approval"
+          ]
+        },
+        {
+          "source_class": "hydrography_and_centerline",
+          "status": "official_metadata_and_preview_overlays_attached_not_authoritative",
+          "artifacts": [
+            {
+              "path": "pacuare_river_costa_rica/hydrography/production_import_pilot/official_source_access_plan.json",
+              "role": "SNIT and Direccion de Agua official-source access plan"
+            },
+            {
+              "path": "pacuare_river_costa_rica/hydrography/production_import_pilot/direccion_de_agua_sinigirh_wms_capabilities_summary.json",
+              "role": "Direccion de Agua/SINIGIRH WMS metadata summary"
+            },
+            {
+              "path": "pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_metadata_summary.json",
+              "role": "selected SNIT layer metadata summary"
+            },
+            {
+              "path": "pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+              "role": "preview-derived centerline review overlay"
+            },
+            {
+              "path": "pacuare_river_costa_rica/hydrography/production_import_pilot/banks.geojson",
+              "role": "preview-derived bank review overlay"
+            }
+          ],
+          "promotion_blockers": [
+            "official hydrography feature import approval",
+            "bank/wetted-width and rapid stationing guide review",
+            "protected-area publication sensitivity",
+            "solver-ready geometry export"
+          ]
+        },
+        {
+          "source_class": "aerial_or_satellite_imagery",
+          "status": "gibs_and_sentinel_review_imagery_attached_not_promoted",
+          "artifacts": [
+            {
+              "path": "pacuare_river_costa_rica/imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
+              "role": "Landsat/Sentinel high-resolution scene metadata review"
+            },
+            {
+              "path": "pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_20250320_corridor_bbox_clip_review.json",
+              "role": "cleaner Sentinel bbox TCI clip provenance"
+            },
+            {
+              "path": "pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_corridor_bbox_clip_review.png",
+              "role": "review-only Sentinel TCI corridor-bbox clip"
+            },
+            {
+              "path": "pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250320_corridor_bbox_clip_review.png",
+              "role": "review-only Sentinel TCI corridor-bbox clip"
+            },
+            {
+              "path": "pacuare_river_costa_rica/imagery/production_import_pilot/source_drape_4096.png",
+              "role": "current review-gated preview source drape"
+            }
+          ],
+          "promotion_blockers": [
+            "route/bank polygon clipping and tile stitching",
+            "SCL/cloud/shadow masking approval",
+            "terms and attribution review",
+            "guide/geospatial approval for rainforest visual fidelity"
+          ]
+        },
+        {
+          "source_class": "water_and_vegetation_masks",
+          "status": "preview_masks_and_scl_qa_attached_not_authoritative",
+          "artifacts": [
+            {
+              "path": "pacuare_river_costa_rica/imagery/production_import_pilot/source_masks_manifest.json",
+              "role": "preview mask derivation manifest"
+            },
+            {
+              "path": "pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png",
+              "role": "review-only water mask"
+            },
+            {
+              "path": "pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png",
+              "role": "review-only rainforest vegetation mask"
+            },
+            {
+              "path": "pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+              "role": "cleaner Sentinel SCL/cloud QA review"
+            },
+            {
+              "path": "pacuare_river_costa_rica/imagery/production_import_pilot/cloud_shadow_review.json",
+              "role": "Pacuare cloud/shadow source review"
+            }
+          ],
+          "promotion_blockers": [
+            "cloud/shadow cleanup around gorge banks",
+            "exact route window and bank polygon masks",
+            "rainy/clear-season water color variants",
+            "rescue visibility under canopy"
+          ]
+        },
+        {
+          "source_class": "seasonal_flow_or_release_history",
+          "status": "rainfall_discharge_and_flash_response_triage_attached_review_gated_no_numeric_promotion",
+          "artifacts": [
+            {
+              "path": "pacuare_river_costa_rica/hydrology/production_import_pilot/rainfall_station_review.json",
+              "role": "rainfall/station source triage"
+            },
+            {
+              "path": "pacuare_river_costa_rica/hydrology/production_import_pilot/discharge_or_stage_station_review.json",
+              "role": "discharge/stage station source triage"
+            },
+            {
+              "path": "pacuare_river_costa_rica/hydrology/production_import_pilot/flash_response_review.json",
+              "role": "rainfall-to-flash-response review plan"
+            },
+            {
+              "path": "pacuare_river_costa_rica/flow_presets.json",
+              "role": "relative clear/rainy/flash planning flow bands"
+            }
+          ],
+          "promotion_blockers": [
+            "station IDs, variables, units, and time-zone authority",
+            "basin relation and lag model",
+            "unsafe-flow and rescue readability criteria",
+            "guide/outfitter validation"
+          ]
+        },
+        {
+          "source_class": "protected_area_and_access_context",
+          "status": "sinac_snit_senara_policy_reviews_attached_review_gated_publication_blocked",
+          "artifacts": [
+            {
+              "path": "pacuare_river_costa_rica/review/production_import_pilot/protected_area_publication_sensitivity.json",
+              "role": "protected-area publication-sensitivity review"
+            },
+            {
+              "path": "pacuare_river_costa_rica/review/production_import_pilot/access_and_conservation_policy.json",
+              "role": "access and conservation policy review"
+            },
+            {
+              "path": "pacuare_river_costa_rica/review/access_and_conservation_constraints.json",
+              "role": "planning access/conservation constraint summary"
+            },
+            {
+              "path": "pacuare_river_costa_rica/review/sinac_protected_area_source_rights.json",
+              "role": "SINAC protected-area source-rights review"
+            }
+          ],
+          "promotion_blockers": [
+            "no-publish sensitive-area geometry review",
+            "local guide/conservation signoff",
+            "route/access publication approval",
+            "rights and attribution for protected-area context"
+          ]
+        },
+        {
+          "source_class": "guide_and_reference_media_annotations",
+          "status": "link_only_queue_and_annotation_scaffold_attached",
+          "artifacts": [
+            {
+              "path": "reference_media_link_manifest.json",
+              "role": "link-only official, Creative Commons, and social review seeds"
+            },
+            {
+              "path": "pacuare_river_costa_rica/review/production_import_pilot/reference_annotations.geojson",
+              "role": "station-seeded rainforest/rapid annotation targets"
+            },
+            {
+              "path": "pacuare_river_costa_rica/field_media/production_import_pilot/rights_manifest.json",
+              "role": "rights review scaffold with no downloaded media"
+            }
+          ],
+          "promotion_blockers": [
+            "explicit outfitter/guide or creator permissions",
+            "rainforest gorge, waterfall, and canopy fidelity notes",
+            "observed rainfall/flow context per reference",
+            "no social-media import without explicit rights"
+          ]
+        }
+      ],
+      "next_source_action": "Use the March 2025 Sentinel and Copernicus DEM evidence for the next Pacuare preview iteration, but block production promotion until official hydrography, flow/rainfall authority, protected-area review, and guide/outfitter validation pass."
+    }
+  ],
+  "next_pipeline_actions": [
+    "Wire this attachment ledger into Unreal river-review tooling as a source-data checklist for each river.",
+    "Use the South Fork pilot as the first source-conditioned renderer pass because it has the most complete DEM, NAIP, hydrography, flow, access, and reference scaffolding.",
+    "Keep Colorado and Pacuare in pilot/triage mode until their corridor expansion, flow authority, and guide review gates catch up.",
+    "Do not mark the broad production-geospatial TODO complete until each river has production-approved terrain, imagery, masks, flow bands, media rights, guide review, lifelike captures, and performance evidence."
+  ]
+}
