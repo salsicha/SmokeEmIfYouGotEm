@@ -72,7 +72,7 @@
         "riverbed_and_shallow_shelves"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview",
-      "unreal_status": "terrain_specific_vertex_color_material_active_as_bounded_ambient_fill_soft_lit_review_material_with_source_drape_smoothing_and_demoted_overlay_striping_terrain_contrast_floor_and_proxy_normal_softening_feathered_source_drape_microtiles_irregular_shoreline_edge_breakup_erosion_rills_and_landscape_nanite_material_scaffold_production_layered_material_pending",
+      "unreal_status": "terrain_specific_vertex_color_material_active_as_bounded_ambient_fill_soft_lit_review_material_with_source_aware_photo_mottle_microrelief_source_drape_smoothing_and_demoted_overlay_striping_terrain_contrast_floor_and_proxy_normal_softening_feathered_source_drape_microtiles_irregular_shoreline_edge_breakup_erosion_rills_and_landscape_nanite_material_scaffold_production_layered_material_pending",
       "required_source_inputs": [
         "source_drape_4096.png",
         "dem_relief_2048.png",
@@ -97,6 +97,9 @@
         "base_terrain_material_grain",
         "base_terrain_microrelief",
         "source_masked_terrain_mottle",
+        "source_aware_terrain_photo_mottle",
+        "bank_cliff_mineral_speckle",
+        "mask_guided_leaf_litter_or_sand_mottle",
         "demoted_terrain_overlay_striping",
         "source_drape_smoothing_pass",
         "segmented_wet_bank_ribbons",
@@ -144,6 +147,9 @@
         "terrain_ambient_fill",
         "base_terrain_material_grain_strength",
         "base_terrain_microrelief_cm",
+        "terrain_photo_mottle_strength",
+        "bank_cliff_mottle_scale_m",
+        "terrain_photo_mottle_microrelief_cm",
         "base_terrain_mesh_resolution",
         "terrain_overlay_actor_count",
         "terrain_overlay_stripe_contrast",
