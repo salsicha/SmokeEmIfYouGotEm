@@ -66,6 +66,7 @@
       "first_party_demoted_terrain_overlay_striping",
       "first_party_source_drape_smoothing_pass",
       "first_party_segmented_wet_bank_ribbons",
+      "first_party_graphic_waterline_ribbon_demotion",
       "first_party_near_frame_shoreline_scaffold_demotion",
       "first_party_demoted_source_detail_contours",
       "first_party_post_contour_terrain_readability_fill",
