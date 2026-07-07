@@ -222,12 +222,15 @@
         "leaf_cluster_albedo",
         "understory_shadow",
         "deadfall_bark",
+        "procedural_leaf_cluster_lobes",
         "bank_sightline_cutout",
         "seasonal_color_shift"
       ],
       "tunable_parameters": [
         "canopy_density",
         "understory_density",
+        "leaf_cluster_lobe_count",
+        "leaf_cluster_color_variance",
         "deadfall_frequency",
         "bank_sightline_cutout_width_m",
         "leaf_color_variance",
