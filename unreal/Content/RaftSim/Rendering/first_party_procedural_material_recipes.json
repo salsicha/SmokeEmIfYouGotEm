@@ -362,7 +362,7 @@
         "water_surface_depth_turbidity_and_current_cues"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
-      "unreal_status": "lit_vertex_color_water_preview_active_with_photographic_water_exposure_calibration_near_field_surface_grain_base_water_depth_current_grading_shallow_water_clarity_aeration_and_low_occlusion_far_field_depth_reflection_refraction_scaffold_custom_shader_or_waterbody_integration_pending",
+      "unreal_status": "lit_vertex_color_water_preview_active_with_photographic_water_exposure_calibration_near_field_surface_grain_base_water_depth_current_grading_flow_cued_foam_slick_mottle_shallow_water_clarity_aeration_and_low_occlusion_far_field_depth_reflection_refraction_scaffold_custom_shader_or_waterbody_integration_pending",
       "required_source_inputs": [
         "river_flow_visual_bands.json",
         "solver_or_preview_flow_band_telemetry",
@@ -385,6 +385,9 @@
         "base_water_current_tongue",
         "base_water_sediment_threads",
         "base_water_sky_threads",
+        "flow_cued_foam_slick_mottle",
+        "base_river_ribbon_foam_seed",
+        "flow_volume_slick_variation",
         "flow_aware_water_mesh_undulation",
         "flow_aware_micro_ripple_glints",
         "near_frame_water_ribbon_occlusion_demotion",
@@ -415,6 +418,9 @@
         "base_water_current_tongue_contrast",
         "base_water_sediment_thread_strength",
         "base_water_sky_thread_strength",
+        "water_foam_slick_mottle_strength",
+        "flow_cued_foam_seed_scale",
+        "river_ribbon_slick_darkening",
         "turbidity_strength",
         "micro_ripple_glint_density",
         "micro_ripple_glint_opacity",

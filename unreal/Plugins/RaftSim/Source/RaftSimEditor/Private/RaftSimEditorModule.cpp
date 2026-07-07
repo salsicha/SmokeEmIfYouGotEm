@@ -288,7 +288,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.ElevationSample =
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/3dep_tiles");
     SouthFork.SourceDrapeDescription =
-        TEXT("stitched South Fork production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into bank and valley preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-aware bank breakup patches, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, first-party biome foliage silhouette cards, dense layered riparian canopy/understory proxy clusters, first-party instanced procedural foliage-equivalent canopy/trunk/understory scaffold, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, lit water variation, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, foliage, understory, mask-aware ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, hydrologic conditioning, channel burning, masks, and guide/geospatial approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
+        TEXT("stitched South Fork production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into bank and valley preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-aware bank breakup patches, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, first-party biome foliage silhouette cards, dense layered riparian canopy/understory proxy clusters, first-party instanced procedural foliage-equivalent canopy/trunk/understory scaffold, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, lit water variation, flow-cued water foam/slick mottle, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, foliage, understory, mask-aware ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, hydrologic conditioning, channel burning, masks, and guide/geospatial approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
     SouthFork.FlowBandId = TEXT("median_runnable");
     SouthFork.FlowBandDisplayName = TEXT("Median Runnable / Summer Commercial");
     SouthFork.FlowBandSource = TEXT("physics/data/real_world/south_fork_american_chili_bar/flow_presets.json");
@@ -328,7 +328,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.ElevationSample =
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles");
     Colorado.SourceDrapeDescription =
-        TEXT("stitched Colorado/Lees Ferry production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into canyon bank preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-aware bank breakup patches, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/sediment facets, biome-specific sparse deadfall/grass/root ecology props, first-party sparse desert scrub silhouettes, sparse desert riparian thicket proxy clusters, first-party instanced procedural desert-thicket/trunk scaffold, lit water variation, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, sparse scrub, boulder placement, mask-aware canyon ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, river-mile stationing, hydrologic conditioning, release-aware masks, and guide/oarsman approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
+        TEXT("stitched Colorado/Lees Ferry production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into canyon bank preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-aware bank breakup patches, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/sediment facets, biome-specific sparse deadfall/grass/root ecology props, first-party sparse desert scrub silhouettes, sparse desert riparian thicket proxy clusters, first-party instanced procedural desert-thicket/trunk scaffold, lit water variation, flow-cued water foam/slick mottle, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, sparse scrub, boulder placement, mask-aware canyon ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, river-mile stationing, hydrologic conditioning, release-aware masks, and guide/oarsman approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
     Colorado.FlowBandId = TEXT("moderate_release_planning");
     Colorado.FlowBandDisplayName = TEXT("Moderate Release Planning");
     Colorado.FlowBandSource = TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json");
@@ -374,7 +374,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.ElevationSample =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
-        TEXT("review-gated Pacuare production-import derivative placeholders generated from the selected NASA GIBS MODIS/Terra true-color seed and Copernicus DEM GLO-30 relief, normalized into a 4096px source drape, 2048px DEM relief, 2017px heightfield candidate, and 2048px water/vegetation masks; these remain coarse/cloudy proxy inputs until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, source-aware terrain photo mottle/microrelief, source-aware bank breakup patches, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, rainforest canopy/vine silhouette cards, dense layered rainforest canopy/understory proxy clusters, first-party instanced procedural rainforest canopy/trunk/understory scaffold, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, waterfall curtain/plunge-mist proxy layers, lit water variation, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, dense mask-aware ground-cover/canopy cards, refined guide-seat raft/oar foreground proxies, humid atmospheric backdrop cards, and source-aware sky-gradient/depth layers remain rights-safe proxy dressing; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
+        TEXT("review-gated Pacuare production-import derivative placeholders generated from the selected NASA GIBS MODIS/Terra true-color seed and Copernicus DEM GLO-30 relief, normalized into a 4096px source drape, 2048px DEM relief, 2017px heightfield candidate, and 2048px water/vegetation masks; these remain coarse/cloudy proxy inputs until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, source-aware terrain photo mottle/microrelief, source-aware bank breakup patches, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, rainforest canopy/vine silhouette cards, dense layered rainforest canopy/understory proxy clusters, first-party instanced procedural rainforest canopy/trunk/understory scaffold, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, waterfall curtain/plunge-mist proxy layers, lit water variation, flow-cued water foam/slick mottle, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, dense mask-aware ground-cover/canopy cards, refined guide-seat raft/oar foreground proxies, humid atmospheric backdrop cards, and source-aware sky-gradient/depth layers remain rights-safe proxy dressing; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
     Pacuare.FlowBandId = TEXT("rainfed_runnable_planning");
     Pacuare.FlowBandDisplayName = TEXT("Rain-Fed Runnable Planning");
     Pacuare.FlowBandSource = TEXT("physics/data/real_world/pacuare_river_costa_rica/flow_presets.json");
@@ -2869,6 +2869,12 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
     const FLinearColor BaseWaterSkyThread = Spec.bDesertCanyon
         ? FLinearColor(0.46f, 0.42f, 0.32f)
         : (Spec.bHasWaterfalls ? FLinearColor(0.085f, 0.34f, 0.29f) : FLinearColor(0.095f, 0.40f, 0.42f));
+    const FLinearColor FlowCuedWaterFoamMottleColor = Spec.bDesertCanyon
+        ? FLinearColor(0.58f, 0.53f, 0.40f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.52f, 0.76f, 0.66f) : FLinearColor(0.50f, 0.73f, 0.72f));
+    const FLinearColor FlowCuedWaterSlickMottleColor = Spec.bDesertCanyon
+        ? FLinearColor(0.12f, 0.105f, 0.082f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.004f, 0.070f, 0.058f) : FLinearColor(0.006f, 0.095f, 0.120f));
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float WaterBaseZ = GetPreviewWaterSurfaceBaseZCm(Spec);
     const float FlowEnergy = FMath::Clamp(Spec.FlowCurrentCueScale, 0.65f, 1.60f);
@@ -2943,10 +2949,40 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
                     (Spec.bDesertCanyon ? 0.060f : 0.080f),
                 0.0f,
                 Spec.bDesertCanyon ? 0.060f : 0.080f);
+            const float FlowCuedWaterFoamSeed =
+                FMath::Clamp(
+                    0.50f +
+                        0.30f * FMath::Sin(X * 0.018f + Lateral * 0.012f + FlowEnergy * 1.37f) +
+                        0.20f * FMath::Sin(X * 0.041f - Lateral * 0.020f),
+                    0.0f,
+                    1.0f);
+            const float FlowCuedWaterSlickSeed =
+                FMath::Clamp(
+                    0.50f +
+                        0.34f * FMath::Sin(X * 0.009f - Lateral * 0.014f + FlowEnergy * 0.61f) +
+                        0.16f * FMath::Sin(X * 0.026f + Lateral * 0.006f),
+                    0.0f,
+                    1.0f);
+            const float FlowCuedWaterFoamMottleT = FMath::Clamp(
+                FlowCuedWaterFoamSeed *
+                    (0.34f + CenterT * 0.50f + EdgeT * 0.20f) *
+                    Spec.FlowFoamScale *
+                    (Spec.bDesertCanyon ? 0.055f : (Spec.bHasWaterfalls ? 0.095f : 0.075f)),
+                0.0f,
+                Spec.bDesertCanyon ? 0.060f : (Spec.bHasWaterfalls ? 0.105f : 0.085f));
+            const float FlowCuedWaterSlickMottleT = FMath::Clamp(
+                FlowCuedWaterSlickSeed *
+                    CenterT *
+                    FlowEnergy *
+                    (Spec.bDesertCanyon ? 0.070f : 0.090f),
+                0.0f,
+                Spec.bDesertCanyon ? 0.075f : 0.095f);
             FLinearColor WaterColor = FMath::Lerp(DeepWater, ShallowWater, FMath::Clamp(EdgeT * 0.55f, 0.0f, 1.0f));
             WaterColor = FMath::Lerp(WaterColor, BaseWaterDeepCurrentTongue, BaseWaterCurrentTongueT);
             WaterColor = FMath::Lerp(WaterColor, BaseWaterSedimentThread, BaseWaterSedimentThreadT);
             WaterColor = FMath::Lerp(WaterColor, BaseWaterSkyThread, BaseWaterSkyThreadT);
+            WaterColor = FMath::Lerp(WaterColor, FlowCuedWaterSlickMottleColor, FlowCuedWaterSlickMottleT);
+            WaterColor = FMath::Lerp(WaterColor, FlowCuedWaterFoamMottleColor, FlowCuedWaterFoamMottleT);
             WaterColor = FMath::Lerp(
                 WaterColor,
                 SurfaceGlint,
@@ -2962,7 +2998,12 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
                 FMath::Clamp(FineRipple * (0.58f + CenterT * 0.42f) * NearFieldTextureGain * 0.055f, 0.0f, 0.065f));
             const float FineRippleWave =
                 (FineRipple - 0.5f) * NearFieldFineRippleAmplitudeCm * (0.45f + CenterT * 0.55f) * NearFieldTextureGain;
-            Vertices.Add(FVector(X, CenterY + Lateral, WaterBaseZ + Wave + FineRippleWave));
+            const float FlowCuedWaterMottleRippleCm =
+                (FlowCuedWaterFoamSeed - 0.5f) *
+                (Spec.bDesertCanyon ? 0.45f : (Spec.bHasWaterfalls ? 0.85f : 0.65f)) *
+                FMath::Clamp(Spec.FlowFoamScale, 0.70f, 1.55f) *
+                (0.35f + CenterT * 0.65f);
+            Vertices.Add(FVector(X, CenterY + Lateral, WaterBaseZ + Wave + FineRippleWave + FlowCuedWaterMottleRippleCm));
             UVs.Add(FVector2D(U * 18.0f, V));
             VertexColors.Add(ClampPreviewColor(WaterColor));
         }
