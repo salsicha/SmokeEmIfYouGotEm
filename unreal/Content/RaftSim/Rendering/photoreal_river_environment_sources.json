@@ -1128,6 +1128,18 @@
           ]
         },
         {
+          "artifact_id": "pacuare_local_imagery_alternative_source_review",
+          "category": "local_imagery_and_mask_source_review",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/local_imagery_alternative_source_review.json",
+          "promotion_blocker": "SINAC Cobertura Forestal 2023 is useful for future canopy masks and procedural foliage zones only after terms review; no direct SNIT orthophoto source-drape replacement is attached.",
+          "status": "official_local_mask_source_leads_reviewed_no_drape_replacement",
+          "use_in_unreal": [
+            "future_procedural_foliage_zone_planning",
+            "future_mask_source_planning",
+            "source_drape_replacement_blocker"
+          ]
+        },
+        {
           "artifact_id": "pacuare_sentinel_cog_thumbnail_review",
           "category": "high_resolution_sentinel_thumbnail_and_tile_metadata_review",
           "paths": [

@@ -1,0 +1,89 @@
+{
+  "schema": "raftsim.pacuare_local_imagery_alternative_source_review.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "official_local_mask_source_leads_reviewed_no_drape_replacement",
+  "goal": "Record non-Sentinel local imagery or classified-layer alternatives after the low-cloud Sentinel route-window candidates remained cloud/shadow blocked.",
+  "policy": {
+    "features_downloaded": false,
+    "map_tiles_downloaded": false,
+    "source_drape_replaced": false,
+    "mask_sources_replaced": false,
+    "use_as_discovery_metadata_only": true,
+    "terms_review_required_before_import": true
+  },
+  "reviewed_inputs": [
+    "hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+    "hydrography/production_import_pilot/snit_layer_metadata_summary.json",
+    "hydrography/production_import_pilot/snit_layer_lists/sinac_capas_de_nodo.json",
+    "hydrography/production_import_pilot/snit_layer_metadata/sinac_cobertura_forestal_2023_metadata.json",
+    "hydrography/production_import_pilot/snit_layer_metadata/sinac_registro_nacional_humedales_metadata.json",
+    "imagery/aerial_source_research.json"
+  ],
+  "findings": [
+    {
+      "finding_id": "direct_snit_orthophoto_service_not_found_in_archived_nodes",
+      "status": "no_direct_orthophoto_endpoint_attached",
+      "summary": "The archived selected SNIT node layer lists advertise WMS/WFS vector or classified layers, but no direct Pacuare-ready orthophoto or imagery-tile service is attached in the current source slice.",
+      "implication": "Do not replace the Pacuare source drape from the archived SNIT slice. Continue official orthophoto catalog search, first-party capture, or licensed aerial procurement."
+    },
+    {
+      "finding_id": "sinac_cobertura_forestal_2023_mask_candidate",
+      "status": "mask_and_procedural_foliage_zone_candidate_terms_review_required",
+      "source_node": "Sistema Nacional de Areas de Conservacion (SINAC)",
+      "layer_name": "Cobertura Forestal 2023",
+      "layer_id": "cobertura_forestal_2023",
+      "viewer_url": "https://www.snitcr.go.cr/Visor/index?k=Y2FwYTo6U0lOQUM6OmNvYmVydHVyYV9mb3Jlc3RhbF8yMDIz",
+      "advertised_services": {
+        "wms": true,
+        "wfs": true,
+        "wmts": false
+      },
+      "metadata_title": "Mapa de Cobertura Forestal 2023 escala 1: 5000",
+      "metadata_file": "hydrography/production_import_pilot/snit_layer_metadata/sinac_cobertura_forestal_2023_metadata.json",
+      "lineage_summary": "Reference layer for 2023 forest-cover mapping from the National Forest Inventory context, using a machine-learning model over Sentinel-1 and Sentinel-2 with cloud-free-year classification and a 0.5 hectare minimum mapping unit.",
+      "rights_flags": {
+        "access_restrictions": "Derechos de autor (Copyright)",
+        "use_restrictions": "Derechos de propiedad intelectual",
+        "other_restrictions": "Para cualquier trabajo relacionado, hacer referencia a la fuente. SINAC, 2021 \"Mapa de Bosques y Otras Coberturas 2021\"."
+      },
+      "allowed_review_use": [
+        "rainforest canopy mask planning",
+        "procedural foliage density zoning",
+        "forest/nonforest cross-check against Sentinel/Landsat masks",
+        "protected-area and publication-sensitivity discussion"
+      ],
+      "blocked_use": [
+        "photoreal source-drape replacement",
+        "direct material texture generation",
+        "packaged production mask without terms review",
+        "claiming Pacuare lifelike screenshot readiness"
+      ]
+    },
+    {
+      "finding_id": "sinac_humedales_metadata_mentions_orthophotos_as_lineage_only",
+      "status": "orthophoto_lineage_lead_not_downloadable_source",
+      "metadata_file": "hydrography/production_import_pilot/snit_layer_metadata/sinac_registro_nacional_humedales_metadata.json",
+      "summary": "The wetlands metadata lineage mentions 2005 official cartography and orthophotos plus high-resolution imagery used in some national coverage work, but the archived distribution is a vector WMS layer rather than an orthophoto service.",
+      "implication": "Use this as a lead for locating official Costa Rica orthophoto archives, not as an importable Pacuare imagery source."
+    }
+  ],
+  "recommended_next_steps": [
+    "Search official Costa Rica cartography or orthophoto archive access outside the currently archived SNIT node slice.",
+    "If SINAC forest-cover terms permit, import only as a classified mask candidate and compare against guide-reviewed banks and canopy density.",
+    "Keep pursuing first-party or permissioned aerial/field capture for Pacuare photoreal rainforest detail."
+  ],
+  "allowed_use": [
+    "local_source_discovery",
+    "procedural_foliage_zone_planning",
+    "future_mask_source_planning"
+  ],
+  "forbidden_use": [
+    "production source-drape replacement",
+    "production mask authority",
+    "photoreal material extraction",
+    "claiming Pacuare route imagery coverage",
+    "claiming lifelike Pacuare screenshot readiness"
+  ]
+}

@@ -87,6 +87,7 @@
       "imagery/production_import_pilot/cloud_shadow_review.json",
       "imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
       "imagery/production_import_pilot/landsat_product_access_gate_review.json",
+      "imagery/production_import_pilot/local_imagery_alternative_source_review.json",
       "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_thumbnail.jpg",
       "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_tileinfo_metadata.json",
       "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_thumbnail.jpg",
