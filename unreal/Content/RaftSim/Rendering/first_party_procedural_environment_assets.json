@@ -24,11 +24,15 @@
   ],
   "unreal_integration": {
     "generator_source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp",
+    "material_recipe_manifest": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
     "required_editor_commands": [
       "RaftSim.CreatePhotorealEnvironmentPreviewMaps",
       "RaftSim.CapturePhotorealEnvironmentPreviews"
     ],
-    "capture_manifest_field": "procedural_asset_plan",
+    "capture_manifest_fields": [
+      "procedural_asset_plan",
+      "procedural_material_recipe_plan"
+    ],
     "default_source_plan": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
     "default_flow_visual_contract": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
     "current_renderer_coverage": [
@@ -43,6 +47,7 @@
       "lit_vertex_color_water_gradients",
       "current_streaks_foam_tongues_wave_highlights_and_eddy_lines",
       "translucent_surface_glints_foam_flecks_canyon_haze_and_rainforest_spray_mist",
+      "first_party_material_recipe_manifest_required",
       "river_specific_sun_skylight_fog_camera_exposure"
     ],
     "missing_renderer_coverage_before_lifelike": [

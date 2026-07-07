@@ -210,6 +210,11 @@ FString GetFirstPartyProceduralEnvironmentAssetPlanRelativePath()
     return TEXT("unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json");
 }
 
+FString GetFirstPartyProceduralMaterialRecipePlanRelativePath()
+{
+    return TEXT("unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json");
+}
+
 class FScopedPhotorealPreviewWorldGcLeakFatalOverride
 {
 public:
@@ -3622,6 +3627,9 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
     const FString ProceduralAssetPlanRelativePath = GetFirstPartyProceduralEnvironmentAssetPlanRelativePath();
     const FString ProceduralAssetPlanAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), ProceduralAssetPlanRelativePath));
+    const FString ProceduralMaterialRecipePlanRelativePath = GetFirstPartyProceduralMaterialRecipePlanRelativePath();
+    const FString ProceduralMaterialRecipePlanAbsolutePath =
+        FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), ProceduralMaterialRecipePlanRelativePath));
 
     if (!FPaths::FileExists(SourcePlanAbsolutePath))
     {
@@ -3633,9 +3641,15 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
         OutSummary += FString::Printf(TEXT("Missing first-party procedural environment asset plan: %s\n"), *ProceduralAssetPlanAbsolutePath);
         return false;
     }
+    if (!FPaths::FileExists(ProceduralMaterialRecipePlanAbsolutePath))
+    {
+        OutSummary += FString::Printf(TEXT("Missing first-party procedural material recipe plan: %s\n"), *ProceduralMaterialRecipePlanAbsolutePath);
+        return false;
+    }
 
     OutSummary += FString::Printf(TEXT("Using photoreal river source plan: %s\n"), *SourcePlanRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party procedural environment asset plan: %s\n"), *ProceduralAssetPlanRelativePath);
+    OutSummary += FString::Printf(TEXT("Using first-party procedural material recipe plan: %s\n"), *ProceduralMaterialRecipePlanRelativePath);
 
     bool bAllSaved = true;
     for (const FRaftSimEnvironmentPreviewSpec& Spec : GetEnvironmentPreviewSpecs())
@@ -3657,10 +3671,18 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
     const FString ProceduralAssetPlanRelativePath = GetFirstPartyProceduralEnvironmentAssetPlanRelativePath();
     const FString ProceduralAssetPlanAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), ProceduralAssetPlanRelativePath));
+    const FString ProceduralMaterialRecipePlanRelativePath = GetFirstPartyProceduralMaterialRecipePlanRelativePath();
+    const FString ProceduralMaterialRecipePlanAbsolutePath =
+        FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), ProceduralMaterialRecipePlanRelativePath));
 
     if (!FPaths::FileExists(ProceduralAssetPlanAbsolutePath))
     {
         OutSummary += FString::Printf(TEXT("Missing first-party procedural environment asset plan for capture: %s\n"), *ProceduralAssetPlanAbsolutePath);
+        return false;
+    }
+    if (!FPaths::FileExists(ProceduralMaterialRecipePlanAbsolutePath))
+    {
+        OutSummary += FString::Printf(TEXT("Missing first-party procedural material recipe plan for capture: %s\n"), *ProceduralMaterialRecipePlanAbsolutePath);
         return false;
     }
 
@@ -3767,6 +3789,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("  \"capture_type\": \"guide_seat_and_river_eye_downstream_unreal_preview\",\n")
         TEXT("  \"source_plan\": \"%s\",\n")
         TEXT("  \"procedural_asset_plan\": \"%s\",\n")
+        TEXT("  \"procedural_material_recipe_plan\": \"%s\",\n")
         TEXT("  \"status\": \"%s\",\n")
         TEXT("  \"captures\": [\n")
         TEXT("%s\n")
@@ -3774,6 +3797,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("}\n"),
         *EscapeRaftSimJsonString(SourcePlanRelativePath),
         *EscapeRaftSimJsonString(ProceduralAssetPlanRelativePath),
+        *EscapeRaftSimJsonString(ProceduralMaterialRecipePlanRelativePath),
         bAllCaptured ? TEXT("south_fork_colorado_and_pacuare_source_draped_guide_and_river_eye_previews_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
         *EntriesJson);
 

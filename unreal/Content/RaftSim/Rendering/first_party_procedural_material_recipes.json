@@ -1,0 +1,457 @@
+{
+  "schema": "raftsim.unreal.first_party_procedural_material_recipes.v1",
+  "generated_on": "2026-07-06",
+  "status": "approved_first_party_material_recipe_targets_for_preview_to_lifelike_iteration_not_final_art",
+  "purpose": "Turn the broad first-party procedural environment asset plan into concrete Unreal material recipe targets, source inputs, tunable parameters, and promotion gates for South Fork American, Colorado River, and Pacuare photoreal environment work.",
+  "parent_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
+  "policy": {
+    "third_party_photo_texture_use_without_item_rights": false,
+    "social_media_or_footage_training_use_without_item_rights": false,
+    "source_inputs_must_be_manifest_recorded": true,
+    "procedural_materials_must_preserve_hazard_and_rescue_readability": true,
+    "water_visuals_must_not_hide_physics_or_conservation_failures": true,
+    "promotion_requires_unreal_capture_guide_review_and_performance_evidence": true
+  },
+  "active_preview_materials": [
+    {
+      "material_path": "/Game/RaftSim/Materials/M_RaftSim_VertexColorPreview",
+      "current_use": [
+        "terrain_vertex_color_layers",
+        "wet_bank_ribbons",
+        "source_detail_bands",
+        "ground_cover_cards"
+      ],
+      "replacement_target": "production_landscape_or_nanite_layered_terrain_material"
+    },
+    {
+      "material_path": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
+      "current_use": [
+        "boulders",
+        "talus",
+        "foliage_proxy_meshes",
+        "canyon_strata_cards"
+      ],
+      "replacement_target": "river_specific_rock_foliage_and_prop_material_instances"
+    },
+    {
+      "material_path": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
+      "current_use": [
+        "river_ribbon_depth_tint",
+        "flow_band_current_cues",
+        "foam_and_wave_highlight_color_support"
+      ],
+      "replacement_target": "production_water_shader_or_validated_waterbody_integration"
+    },
+    {
+      "material_path": "/Game/RaftSim/Materials/M_RaftSim_TranslucentColorPreview",
+      "current_use": [
+        "surface_glints",
+        "foam_flecks",
+        "canyon_haze",
+        "rainforest_spray_mist"
+      ],
+      "replacement_target": "niagara_or_equivalent_spray_mist_foam_and_atmosphere_materials"
+    }
+  ],
+  "material_recipes": [
+    {
+      "recipe_id": "terrain_bank_layered_material",
+      "target_layers": [
+        "canyon_walls_and_valley_banks",
+        "riverbed_and_shallow_shelves"
+      ],
+      "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorPreview",
+      "unreal_status": "preview_vertex_color_material_active_production_layered_material_pending",
+      "required_source_inputs": [
+        "source_drape_4096.png",
+        "dem_relief_2048.png",
+        "heightfield_candidate_2017.png",
+        "water_mask_2048.png",
+        "vegetation_mask_2048.png",
+        "river_flow_visual_bands.json"
+      ],
+      "procedural_tokens": [
+        "dry_bank_albedo",
+        "wet_bank_darkening",
+        "gravel_bar_noise",
+        "strata_band_color",
+        "leaf_litter_or_sand_overlay",
+        "source_drape_weight"
+      ],
+      "tunable_parameters": [
+        "source_drape_weight",
+        "wet_edge_width_m",
+        "bank_slope_darkening",
+        "gravel_or_sand_bar_mix",
+        "strata_spacing_m",
+        "detail_noise_scale_m"
+      ],
+      "river_bindings": {
+        "american_south_fork": {
+          "dominant_surface": "foothill_granite_metamorphic_bank_with_gravel_bars",
+          "source_evidence": "USDA/APFO NAIP and USGS 3DEP production-import pilot derivatives",
+          "material_bias": [
+            "muted_granite",
+            "dry_grass_bank",
+            "green_riparian_shadow",
+            "wet_rock_edges"
+          ]
+        },
+        "colorado_river": {
+          "dominant_surface": "layered_desert_canyon_wall_talus_and_sandbar",
+          "source_evidence": "USDA/APFO NAIP and USGS 3DEP Lees Ferry pilot derivatives",
+          "material_bias": [
+            "red_tan_strata",
+            "pale_sandbar",
+            "dark_wet_bank_line",
+            "talus_shadow"
+          ]
+        },
+        "pacuare": {
+          "dominant_surface": "humid_rainforest_gorge_bank_with_moss_leaf_litter_and_dark_wet_rock",
+          "source_evidence": "Copernicus DEM, NASA GIBS preview drape, Sentinel review-only scene triage, and SINAC forest-cover lead",
+          "material_bias": [
+            "dark_basalt_wetness",
+            "moss_green_edges",
+            "rainforest_leaf_litter",
+            "cloud_safe_low_detail_fill"
+          ]
+        }
+      },
+      "promotion_gate": "Can replace preview terrain only after source alignment, hydrologic conditioning, bank/wet-dry masks, guide/geospatial review, and capture readability pass."
+    },
+    {
+      "recipe_id": "wet_boulder_contact_material_set",
+      "target_layers": [
+        "wet_boulders_and_contact_rocks",
+        "riverbed_and_shallow_shelves"
+      ],
+      "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
+      "unreal_status": "preview_boulder_talus_color_variants_active_production_mesh_material_pending",
+      "required_source_inputs": [
+        "water_mask_2048.png",
+        "dem_relief_2048.png",
+        "contact_geometry_export",
+        "rapid_feature_annotations",
+        "river_flow_visual_bands.json"
+      ],
+      "procedural_tokens": [
+        "wet_sheen",
+        "abrasion_edge",
+        "moss_or_sediment_patch",
+        "submerged_base_darkening",
+        "foam_contact_stain"
+      ],
+      "tunable_parameters": [
+        "wetness_gain",
+        "moss_or_sediment_mix",
+        "roughness_variance",
+        "contact_highlight_strength",
+        "scale_noise",
+        "hazard_clearance_m"
+      ],
+      "river_bindings": {
+        "american_south_fork": {
+          "dominant_surface": "rounded_granite_or_metamorphic_boulder",
+          "source_evidence": "South Fork source masks plus guide-reviewed rapid/contact annotations",
+          "material_bias": [
+            "gray_granite",
+            "tea_green_wetness",
+            "light_sediment"
+          ]
+        },
+        "colorado_river": {
+          "dominant_surface": "sandstone_talus_and_dark_wet_contact_edges",
+          "source_evidence": "Colorado NAIP/DEM pilot derivatives plus release-band review",
+          "material_bias": [
+            "red_sandstone",
+            "tan_dust",
+            "narrow_wet_release_line"
+          ]
+        },
+        "pacuare": {
+          "dominant_surface": "dark_water_polished_boulders_with_moss_and_leaf_litter",
+          "source_evidence": "Pacuare DEM relief, water/vegetation masks, and rainforest source review",
+          "material_bias": [
+            "near_black_wet_rock",
+            "moss",
+            "fresh_leaf_litter"
+          ]
+        }
+      },
+      "promotion_gate": "Contact rocks must stay aligned with physics collision/contact telemetry and visible for pins, flips, swims, and rescues."
+    },
+    {
+      "recipe_id": "biome_foliage_groundcover_materials",
+      "target_layers": [
+        "shore_vegetation_and_deadfall",
+        "tropical_canopy_and_understory"
+      ],
+      "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
+      "unreal_status": "pcg_sample_and_generated_card_materials_active_production_biome_library_pending",
+      "required_source_inputs": [
+        "vegetation_mask_2048.png",
+        "water_mask_2048.png",
+        "reference_annotations.geojson",
+        "field_media_rights_manifest",
+        "performance_scalability_budget"
+      ],
+      "procedural_tokens": [
+        "leaf_cluster_albedo",
+        "understory_shadow",
+        "deadfall_bark",
+        "bank_sightline_cutout",
+        "seasonal_color_shift"
+      ],
+      "tunable_parameters": [
+        "canopy_density",
+        "understory_density",
+        "deadfall_frequency",
+        "bank_sightline_cutout_width_m",
+        "leaf_color_variance",
+        "instance_budget"
+      ],
+      "river_bindings": {
+        "american_south_fork": {
+          "dominant_surface": "oak_conifer_riparian_grass_scrub_mix",
+          "source_evidence": "NAIP vegetation mask, access review, and future guide media annotations",
+          "material_bias": [
+            "oak_green",
+            "pine_deep_green",
+            "dry_summer_grass"
+          ]
+        },
+        "colorado_river": {
+          "dominant_surface": "sparse_desert_riparian_scrub_sandbar_edge",
+          "source_evidence": "NAIP vegetation mask, NPS publication review, and future oarsman annotations",
+          "material_bias": [
+            "desert_scrub_green",
+            "cottonwood_shadow",
+            "sand_dust"
+          ]
+        },
+        "pacuare": {
+          "dominant_surface": "dense_humid_tropical_canopy_roots_and_understory",
+          "source_evidence": "Pacuare vegetation mask, SINAC forest-cover rights-gated lead, protected-area review, and future guide/outfitter annotations",
+          "material_bias": [
+            "broadleaf_rainforest",
+            "deep_understory",
+            "wet_root_and_vine"
+          ]
+        }
+      },
+      "promotion_gate": "Biome density must read as the target corridor while maintaining sightlines to holes, swimmers, rescue targets, and guide commands at desktop and VR settings."
+    },
+    {
+      "recipe_id": "flow_dependent_water_surface_material",
+      "target_layers": [
+        "water_surface_depth_turbidity_and_current_cues"
+      ],
+      "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
+      "unreal_status": "lit_vertex_color_water_preview_active_custom_shader_or_waterbody_integration_pending",
+      "required_source_inputs": [
+        "river_flow_visual_bands.json",
+        "solver_or_preview_flow_band_telemetry",
+        "water_mask_2048.png",
+        "rapid_feature_annotations",
+        "feature_forcing_manifest"
+      ],
+      "procedural_tokens": [
+        "depth_tint",
+        "turbidity",
+        "current_streak",
+        "eddy_line_brightening",
+        "hole_retention_visual",
+        "wet_bank_reflection"
+      ],
+      "tunable_parameters": [
+        "water_level_offset_cm",
+        "depth_tint_strength",
+        "turbidity_strength",
+        "current_cue_density",
+        "eddy_line_strength",
+        "hole_retention_visual_strength"
+      ],
+      "river_bindings": {
+        "american_south_fork": {
+          "dominant_surface": "clear_to_green_release_water_with_foam_lines",
+          "source_evidence": "South Fork flow-band review and source masks",
+          "material_bias": [
+            "clear_green",
+            "white_foam_lines",
+            "wet_rock_reflection"
+          ]
+        },
+        "colorado_river": {
+          "dominant_surface": "big_water_release_surface_with_long_wave_trains_and_boils",
+          "source_evidence": "USGS gauges, Glen Canyon release review, and source masks",
+          "material_bias": [
+            "green_brown_turbidity",
+            "long_current_slicks",
+            "subtle_boils"
+          ]
+        },
+        "pacuare": {
+          "dominant_surface": "rainfed_tropical_water_with_flash_response_wetness",
+          "source_evidence": "relative Pacuare rainfed flow bands, rainfall/station reviews, and source masks",
+          "material_bias": [
+            "deep_green_shadow",
+            "bright_foam",
+            "rain_wet_edges"
+          ]
+        }
+      },
+      "promotion_gate": "Flow visuals can improve readability, but must be bounded, manifest-recorded, compared against water validation where physics-affecting, and not used to hide conservation failures."
+    },
+    {
+      "recipe_id": "foam_spray_mist_atmosphere_materials",
+      "target_layers": [
+        "foam_spray_mist_and_waterfalls",
+        "river_specific_lighting_atmosphere_and_camera"
+      ],
+      "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_TranslucentColorPreview",
+      "unreal_status": "translucent_glint_foam_haze_mist_cards_active_niagara_and_lighting_replacement_pending",
+      "required_source_inputs": [
+        "river_flow_visual_bands.json",
+        "rapid_feature_annotations",
+        "reference_annotations.geojson",
+        "capture_manifest",
+        "desktop_and_vr_performance_budget"
+      ],
+      "procedural_tokens": [
+        "foam_fleck_alpha",
+        "spray_mist_falloff",
+        "canyon_distance_haze",
+        "rainforest_humidity",
+        "manual_exposure_anchor"
+      ],
+      "tunable_parameters": [
+        "foam_density",
+        "spray_intensity",
+        "mist_density",
+        "haze_distance_m",
+        "sun_angle",
+        "manual_exposure"
+      ],
+      "river_bindings": {
+        "american_south_fork": {
+          "dominant_surface": "sunlit_foothill_foam_and_low_mist",
+          "source_evidence": "South Fork flow-band review and future guide-seat annotations",
+          "material_bias": [
+            "small_foam_tongues",
+            "warm_summer_light",
+            "light_river_haze"
+          ]
+        },
+        "colorado_river": {
+          "dominant_surface": "dry_canyon_atmosphere_with_big_water_foam_and_distance_haze",
+          "source_evidence": "Colorado release review, NPS publication review, and future oarsman annotations",
+          "material_bias": [
+            "long_wave_foam",
+            "warm_canyon_haze",
+            "sandbar_bounce_light"
+          ]
+        },
+        "pacuare": {
+          "dominant_surface": "humid_rainforest_mist_waterfall_spray_and_bright_foam",
+          "source_evidence": "Pacuare rainfall/protected-area review, Sentinel/GIBS scene triage, and future guide/outfitter annotations",
+          "material_bias": [
+            "rainforest_spray",
+            "waterfall_mist",
+            "diffuse_canopy_light"
+          ]
+        }
+      },
+      "promotion_gate": "Spray, mist, and atmosphere must improve lifelike depth without obscuring hazards, rescue targets, route-publication sensitivity masks, or poor source alignment."
+    },
+    {
+      "recipe_id": "raft_foreground_review_materials",
+      "target_layers": [
+        "raft_foreground_and_oar_rig_silhouette"
+      ],
+      "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
+      "unreal_status": "placeholder_raft_hidden_for_environment_review_production_raft_material_pending",
+      "required_source_inputs": [
+        "raft_asset_source_policy",
+        "guide_seat_camera_contract",
+        "capture_manifest",
+        "platform_performance_budget"
+      ],
+      "procedural_tokens": [
+        "matte_rubber",
+        "wet_tube_highlight",
+        "oar_blade_color",
+        "guide_seat_silhouette",
+        "placeholder_visibility_flag"
+      ],
+      "tunable_parameters": [
+        "raft_visibility",
+        "rubber_roughness",
+        "wet_highlight_strength",
+        "oar_rig_readability",
+        "camera_occlusion_budget"
+      ],
+      "river_bindings": {
+        "american_south_fork": {
+          "dominant_surface": "paddle_raft_foreground_for_guide_seat_view",
+          "source_evidence": "future first-party raft and guide-seat capture review",
+          "material_bias": [
+            "dark_rubber",
+            "bright_paddle_blades"
+          ]
+        },
+        "colorado_river": {
+          "dominant_surface": "oar_rig_foreground_for_big_water_rowing",
+          "source_evidence": "future first-party rowing-rig and oarsman review",
+          "material_bias": [
+            "dark_rubber",
+            "metal_oar_frame",
+            "wood_or_composite_oars"
+          ]
+        },
+        "pacuare": {
+          "dominant_surface": "paddle_raft_foreground_for_rainforest_guiding",
+          "source_evidence": "future first-party raft and guide/outfitter review",
+          "material_bias": [
+            "wet_dark_rubber",
+            "canopy_reflections"
+          ]
+        }
+      },
+      "promotion_gate": "Environment screenshots may hide placeholders, but production gameplay captures require approved raft/oar art that does not block water-reading or rescue visibility."
+    }
+  ],
+  "river_profiles": [
+    {
+      "river_id": "american_south_fork",
+      "target_read": "Sierra foothill pool-drop whitewater with clear green water, exposed wet rocks, gravel bars, oak/conifer banks, and summer-commercial light.",
+      "default_flow_band": "median_runnable",
+      "production_material_blockers": [
+        "guide-reviewed low_median_high flow visual variants",
+        "full-corridor source conditioning",
+        "rights-cleared or first-party raft/field reference media"
+      ]
+    },
+    {
+      "river_id": "colorado_river",
+      "target_read": "Grand Canyon big-water rowing corridor with layered canyon walls, sandbars, release-dependent wet banks, sparse desert riparian scrub, boils, and long wave trains.",
+      "default_flow_band": "moderate_release_planning",
+      "production_material_blockers": [
+        "accepted river-mile and access-sensitive stationing",
+        "release-aware wet-bank and sandbar review",
+        "oarsman and publication-sensitivity review"
+      ]
+    },
+    {
+      "river_id": "pacuare",
+      "target_read": "Humid tropical rainforest gorge with dense canopy, wet dark boulders, moss, leaf litter, waterfalls, spray, mist, and rainfed flow states.",
+      "default_flow_band": "rainfed_runnable_planning",
+      "production_material_blockers": [
+        "official Costa Rica hydrography and rainfall/flow review",
+        "cloud-screened imagery or permissioned aerial references",
+        "protected-area access and publication clearance"
+      ]
+    }
+  ],
+  "current_decision": "Use this manifest as the concrete first-party procedural material target catalog for the next renderer iteration. The existing preview materials remain active fallbacks, and no river can claim lifelike status until production-quality materials/assets, captures, guide review, and performance evidence pass."
+}
