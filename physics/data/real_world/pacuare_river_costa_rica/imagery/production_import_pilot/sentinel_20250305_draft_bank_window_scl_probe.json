@@ -1,0 +1,131 @@
+{
+  "schema": "raftsim.pacuare_sentinel_20250305_draft_bank_scl_probe.v1",
+  "generated_on": "2026-07-06",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "alternate_scene_scl_probe_failed_route_local_cloud_shadow",
+  "goal": "Probe the March 5, 2025 same-date Sentinel candidate with route-local SCL before downloading TCI clips.",
+  "clip_scope": "draft_unreal_preview_bank_bbox_plus_250m_context_not_official_route_polygon",
+  "draft_bank_bounds_wgs84": {
+    "min_lon": -83.7503114,
+    "min_lat": 9.8903661,
+    "max_lon": -83.4196455,
+    "max_lat": 9.9519607,
+    "context_margin_m": 250
+  },
+  "candidate_source": {
+    "search_review": "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
+    "date": "2025-03-05",
+    "platform": "sentinel-2c",
+    "required_tile_ids": [
+      "16PHR",
+      "17PKM"
+    ],
+    "max_catalog_cloud_cover_percent": 13.949496,
+    "catalog_decision": "Same-date fallback candidate from the 2025 sub-20% catalog-cloud search; acceptance depends on route-local SCL, not catalog cloud cover."
+  },
+  "source_scl_cogs": [
+    {
+      "tile_id": "17PKM",
+      "product_id": "S2C_17PKM_20250305_0_L2A",
+      "asset": "SCL.tif",
+      "epsg": 32617,
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/17/P/KM/2025/3/S2C_17PKM_20250305_0_L2A/SCL.tif",
+      "download_location": "/private/tmp/pacuare_sentinel_20250305_17pkm_scl.tif",
+      "byte_count": 1397150,
+      "sha256": "0c53d90fed6b8cdb609fc24b29ee44a5258bc97544e7d3b45b4ffe540bb75188",
+      "download_committed": false
+    },
+    {
+      "tile_id": "16PHR",
+      "product_id": "S2C_16PHR_20250305_0_L2A",
+      "asset": "SCL.tif",
+      "epsg": 32616,
+      "url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/16/P/HR/2025/3/S2C_16PHR_20250305_0_L2A/SCL.tif",
+      "download_location": "/private/tmp/pacuare_sentinel_20250305_16phr_scl.tif",
+      "byte_count": 2106923,
+      "sha256": "f5ac3ec9be8d77ecb792b1e0cfef91b04d76f0310d35de121362dc4ff7a9ca1a",
+      "download_committed": false
+    }
+  ],
+  "outputs": [
+    {
+      "tile_id": "17PKM",
+      "path": "imagery/production_import_pilot/sentinel_s2c_17pkm_20250305_draft_bank_window_scl_qa_review.png",
+      "pixel_window": {
+        "left": 0,
+        "top": 4919,
+        "width": 1749,
+        "height": 381
+      },
+      "dimensions_px": [
+        1024,
+        223
+      ],
+      "mode": "RGB",
+      "byte_count": 23376,
+      "sha256": "a691ddc9a1cc86ca952b61fa86bf7ab3880b2ca083354d6170eb35ad6296ae35",
+      "native_pixel_count": 666369,
+      "class_summary": {
+        "cloud_or_cirrus_fraction": 0.099172,
+        "cloud_shadow_fraction": 0.088355,
+        "vegetation_fraction": 0.776727,
+        "water_fraction": 0.0002,
+        "unclassified_fraction": 0.001936
+      },
+      "review_decision": "Worse than the March 20 draft-bank window, so skip TCI download for this scene."
+    },
+    {
+      "tile_id": "16PHR",
+      "path": "imagery/production_import_pilot/sentinel_s2c_16phr_20250305_draft_bank_window_scl_qa_review.png",
+      "pixel_window": {
+        "left": 2807,
+        "top": 0,
+        "width": 1845,
+        "height": 264
+      },
+      "dimensions_px": [
+        1024,
+        147
+      ],
+      "mode": "RGB",
+      "byte_count": 17110,
+      "sha256": "515ab212d7d76949294fa3e5a52c0bf7697374d1a5d9b3317bfbce2866b6c43f",
+      "native_pixel_count": 487080,
+      "class_summary": {
+        "cloud_or_cirrus_fraction": 0.116973,
+        "cloud_shadow_fraction": 0.064959,
+        "vegetation_fraction": 0.769438,
+        "water_fraction": 0.000012,
+        "unclassified_fraction": 0.002256
+      },
+      "review_decision": "Worse than the March 20 draft-bank window, so skip TCI download for this scene."
+    }
+  ],
+  "windowed_read_decision": {
+    "scl_qa_preview_generated": true,
+    "tci_review_clips_downloaded": false,
+    "source_drape_replaced": false,
+    "mask_sources_replaced": false,
+    "cloud_screening_blocks_promotion": true,
+    "decision": "March 5, 2025 is worse than March 20 in the draft-bank window and should not consume TCI download/review effort for Pacuare source-drape replacement."
+  },
+  "recommended_next_step": "skip_march_5_tci_and_probe_next_cleaner_route_local_scene",
+  "allowed_use": [
+    "alternate_scene_rejection_record",
+    "route_window_cloud_shadow_qa_review",
+    "future_scene_selection"
+  ],
+  "forbidden_use": [
+    "production source-drape replacement",
+    "production water or vegetation mask generation",
+    "photoreal material extraction",
+    "claiming Pacuare route imagery coverage",
+    "claiming lifelike Pacuare screenshot readiness"
+  ],
+  "promotion_blockers": [
+    "Find a cleaner same-date or alternate scene with lower route-local cloud/shadow than March 20.",
+    "Use exact official or guide-approved route/bank geometry before production clipping.",
+    "Record terms, attribution, stitching, SCL masking, and guide/geospatial approval before any production derivative is used."
+  ]
+}

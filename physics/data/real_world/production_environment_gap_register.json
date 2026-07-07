@@ -468,6 +468,9 @@
         "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_draft_bank_window_clip_review.png",
         "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_draft_bank_window_scl_qa_review.png",
         "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_draft_bank_window_scl_qa_review.png",
+        "imagery/production_import_pilot/sentinel_20250305_draft_bank_window_scl_probe.json",
+        "imagery/production_import_pilot/sentinel_s2c_17pkm_20250305_draft_bank_window_scl_qa_review.png",
+        "imagery/production_import_pilot/sentinel_s2c_16phr_20250305_draft_bank_window_scl_qa_review.png",
         "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_scl_qa_review.png",
         "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_scl_qa_review.png",
         "hydrography/production_import_pilot/official_source_access_plan.json",
@@ -519,7 +522,7 @@
           ]
         },
         {
-          "promotion_gate": "Replace the MODIS/GIBS proxy drape with cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference only after the draft-bank strip cloud/shadow block is resolved by cleaner route-local coverage or exact native-CRS route/bank clips, SCL-masked stitched raster reads, terms review, and guide/geospatial approval.",
+          "promotion_gate": "Replace the MODIS/GIBS proxy drape with cloud-screened Sentinel/Landsat/local orthophoto or first-party/permissioned aerial reference only after the draft-bank strip cloud/shadow block is resolved by cleaner route-local coverage than March 20/March 5 or exact native-CRS route/bank clips, SCL-masked stitched raster reads, terms review, and guide/geospatial approval.",
           "required_artifacts": [
             "imagery/production_import_pilot/cloud_screened_scene_index.json",
             "imagery/production_import_pilot/source_drape_4096.png",
@@ -549,6 +552,9 @@
             "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_draft_bank_window_clip_review.png",
             "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_draft_bank_window_scl_qa_review.png",
             "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_draft_bank_window_scl_qa_review.png",
+            "imagery/production_import_pilot/sentinel_20250305_draft_bank_window_scl_probe.json",
+            "imagery/production_import_pilot/sentinel_s2c_17pkm_20250305_draft_bank_window_scl_qa_review.png",
+            "imagery/production_import_pilot/sentinel_s2c_16phr_20250305_draft_bank_window_scl_qa_review.png",
             "imagery/production_import_pilot/sentinel_s2b_17pkm_20250119_corridor_bbox_scl_qa_review.png",
             "imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_scl_qa_review.png"
           ],
