@@ -44,6 +44,7 @@
       "wet_bank_shore_ribbons",
       "source_aware_bank_breakup_texture_patches",
       "first_party_terrain_material_layer_facets_and_slope_shadow_patches",
+      "first_party_landscape_nanite_material_layer_scaffold",
       "flow_aware_waterline_pebble_scatter",
       "first_party_irregular_rock_geometry_variants",
       "first_party_boulder_wetness_abrasion_moss_surface_variants",
