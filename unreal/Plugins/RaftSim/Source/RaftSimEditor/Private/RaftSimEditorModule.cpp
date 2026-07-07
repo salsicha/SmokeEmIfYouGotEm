@@ -1094,8 +1094,8 @@ FLinearColor NormalizePreviewSourceDrapeAlbedo(
     SourceColor.A = 1.0f;
 
     const float Luma = FMath::Max(0.001f, SourceColor.R * 0.2126f + SourceColor.G * 0.7152f + SourceColor.B * 0.0722f);
-    const float MinLuma = Spec.bDesertCanyon ? 0.21f : (Spec.bHasWaterfalls ? 0.095f : 0.16f);
-    const float MaxLuma = Spec.bDesertCanyon ? 0.70f : (Spec.bHasWaterfalls ? 0.46f : 0.58f);
+    const float MinLuma = Spec.bDesertCanyon ? 0.23f : (Spec.bHasWaterfalls ? 0.125f : 0.18f);
+    const float MaxLuma = Spec.bDesertCanyon ? 0.38f : (Spec.bHasWaterfalls ? 0.24f : 0.34f);
     float TargetLuma = Luma;
     if (Luma < MinLuma)
     {
@@ -1110,7 +1110,7 @@ FLinearColor NormalizePreviewSourceDrapeAlbedo(
     }
     else if (Luma > MaxLuma)
     {
-        TargetLuma = FMath::Lerp(MaxLuma, Luma, 0.18f);
+        TargetLuma = FMath::Lerp(MaxLuma, Luma, 0.06f);
     }
     const float AdjustedLuma = FMath::Max(
         0.001f,
@@ -1222,8 +1222,8 @@ FLinearColor BlendPreviewSoftTerrainPatchColor(
     float Coverage)
 {
     const FLinearColor FeatherBase = GetPreviewSoftTerrainPatchFeatherBaseColor(Spec, X, Y, Phase);
-    const float MaxFeatureBlend = Spec.bDesertCanyon ? 0.46f : (Spec.bHasWaterfalls ? 0.40f : 0.42f);
-    const float Blend = FMath::Clamp(Coverage * MaxFeatureBlend, 0.0f, 0.52f);
+    const float MaxFeatureBlend = Spec.bDesertCanyon ? 0.14f : (Spec.bHasWaterfalls ? 0.12f : 0.13f);
+    const float Blend = FMath::Clamp(Coverage * MaxFeatureBlend, 0.0f, 0.16f);
     return ClampPreviewColor(FMath::Lerp(FeatherBase, FeatureColor, Blend));
 }
 
@@ -2312,12 +2312,12 @@ void AddPreviewTerrainMesh(
                     AerialDrape->Sample(U, V),
                     SourceWaterT,
                     SourceVegetationT,
-                    Spec.bHasWaterfalls ? 0.36f : (Spec.bDesertCanyon ? 0.30f : 0.28f));
+                    Spec.bHasWaterfalls ? 0.42f : (Spec.bDesertCanyon ? 0.36f : 0.34f));
                 const float SourceBlend = FMath::Clamp(
-                    (Spec.bDesertCanyon ? 0.46f : (Spec.bHasWaterfalls ? 0.36f : 0.40f)) *
-                        (0.35f + BankT * 0.45f + CanyonT * 0.32f + SourceVegetationT * 0.18f + SourceWaterT * 0.08f),
+                    (Spec.bDesertCanyon ? 0.10f : (Spec.bHasWaterfalls ? 0.075f : 0.09f)) *
+                        (0.24f + BankT * 0.22f + CanyonT * 0.16f + SourceVegetationT * 0.08f + SourceWaterT * 0.03f),
                     0.0f,
-                    Spec.bDesertCanyon ? 0.46f : 0.40f);
+                    Spec.bDesertCanyon ? 0.10f : 0.09f);
                 TerrainColor = FMath::Lerp(TerrainColor, SourceDrapeColor, SourceBlend);
             }
             TerrainColor = FMath::Lerp(
@@ -2381,8 +2381,8 @@ void AddPreviewAerialDrapeTiles(
         return;
     }
 
-    constexpr int32 XTiles = 72;
-    constexpr int32 YTiles = 24;
+    constexpr int32 XTiles = 48;
+    constexpr int32 YTiles = 18;
     constexpr int32 MicrotileSubdivisions = 4;
     const float MinX = -5600.0f;
     const float MaxX = 26000.0f;
@@ -2404,7 +2404,7 @@ void AddPreviewAerialDrapeTiles(
                 continue;
             }
 
-            const float DrapeWeight = Spec.bDesertCanyon ? 0.18f : (Spec.bHasWaterfalls ? 0.15f : 0.17f);
+            const float DrapeWeight = Spec.bDesertCanyon ? 0.024f : (Spec.bHasWaterfalls ? 0.018f : 0.022f);
             const float HalfLength = TileLength * 0.48f;
             const float HalfTileWidth = TileWidth * 0.48f;
             const float TileZOffset = 9.0f;
@@ -2477,16 +2477,16 @@ void AddPreviewAerialDrapeTiles(
                         AerialDrape->Sample(SampleSceneU, SampleSceneV),
                         SourceWaterT,
                         SourceVegetationT,
-                        Spec.bHasWaterfalls ? 0.46f : (Spec.bDesertCanyon ? 0.40f : 0.42f));
+                        Spec.bHasWaterfalls ? 0.44f : (Spec.bDesertCanyon ? 0.38f : 0.38f));
                     const float EdgeDistance = FMath::Min(
                         FMath::Min(LocalU, 1.0f - LocalU),
                         FMath::Min(LocalV, 1.0f - LocalV));
                     const float EdgeFeather = SmoothPreviewStep(0.02f, 0.34f, EdgeDistance);
-                    const float PatchMottle = 0.74f + 0.18f * FMath::Sin(SampleX * 0.017f + SampleY * 0.013f + static_cast<float>(XIndex + YIndex) * 0.31f);
+                    const float PatchMottle = 0.84f + 0.08f * FMath::Sin(SampleX * 0.017f + SampleY * 0.013f + static_cast<float>(XIndex + YIndex) * 0.31f);
                     FLinearColor AerialColor = FMath::Lerp(
                         TerrainColor,
                         SourceDrapeColor,
-                        FMath::Clamp(DrapeWeight * EdgeFeather * PatchMottle, 0.0f, 0.22f));
+                        FMath::Clamp(DrapeWeight * EdgeFeather * PatchMottle, 0.0f, 0.028f));
                     AerialColor.R = FMath::Max(AerialColor.R, Spec.TerrainColor.R * 0.78f + 0.035f);
                     AerialColor.G = FMath::Max(AerialColor.G, Spec.TerrainColor.G * 0.78f + 0.035f);
                     AerialColor.B = FMath::Max(AerialColor.B, Spec.TerrainColor.B * 0.78f + 0.035f);
@@ -3122,9 +3122,9 @@ void AddPreviewTerrainErosionRillDetail(
     }
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
-    const int32 RillCount = Spec.bDesertCanyon ? 54 : (Spec.bHasWaterfalls ? 72 : 58);
+    const int32 RillCount = Spec.bDesertCanyon ? 30 : (Spec.bHasWaterfalls ? 34 : 30);
     const float InnerOffset = ActiveRiverHalfWidth + (Spec.bDesertCanyon ? 760.0f : 420.0f);
-    const float RillLength = Spec.bDesertCanyon ? 1380.0f : (Spec.bHasWaterfalls ? 780.0f : 900.0f);
+    const float RillLength = Spec.bDesertCanyon ? 760.0f : (Spec.bHasWaterfalls ? 460.0f : 520.0f);
     const FLinearColor CenterShadow = Spec.bDesertCanyon
         ? FLinearColor(0.21f, 0.15f, 0.10f)
         : (Spec.bHasWaterfalls ? FLinearColor(0.014f, 0.038f, 0.026f) : FLinearColor(0.095f, 0.105f, 0.078f));
@@ -3158,8 +3158,8 @@ void AddPreviewTerrainErosionRillDetail(
             }
         }
 
-        const float Width = (Spec.bDesertCanyon ? 76.0f : (Spec.bHasWaterfalls ? 48.0f : 56.0f)) *
-            (0.70f + 0.11f * static_cast<float>(RillIndex % 5));
+        const float Width = (Spec.bDesertCanyon ? 42.0f : (Spec.bHasWaterfalls ? 30.0f : 34.0f)) *
+            (0.66f + 0.07f * static_cast<float>(RillIndex % 5));
         const FLinearColor LocalCenter = FMath::Lerp(
             CenterShadow,
             ScalePreviewColor(Spec.WaterColor, Spec.bDesertCanyon ? 0.34f : 0.28f),
@@ -3200,7 +3200,7 @@ void AddPreviewSourceAwareBankBreakupDetail(
     }
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
-    const int32 PatchCount = Spec.bDesertCanyon ? 96 : (Spec.bHasWaterfalls ? 118 : 104);
+    const int32 PatchCount = Spec.bDesertCanyon ? 48 : (Spec.bHasWaterfalls ? 54 : 46);
     const float NearOffset = Spec.bDesertCanyon ? 430.0f : 190.0f;
     const float FarOffset = Spec.bDesertCanyon ? 2500.0f : (Spec.bHasWaterfalls ? 1420.0f : 1220.0f);
 
@@ -3268,10 +3268,10 @@ void AddPreviewSourceAwareBankBreakupDetail(
             TerrainRelief,
             HeightfieldPreview,
             FString::Printf(TEXT("RaftSim_SourceAwareBankBreakupPatch_%03d_%s"), PatchIndex, *Spec.RiverId),
-            X - (Spec.bDesertCanyon ? 310.0f : 230.0f),
-            (Spec.bDesertCanyon ? 660.0f : 470.0f) * (0.78f + 0.10f * static_cast<float>(PatchIndex % 5)),
+            X - (Spec.bDesertCanyon ? 210.0f : 155.0f),
+            (Spec.bDesertCanyon ? 430.0f : 310.0f) * (0.64f + 0.07f * static_cast<float>(PatchIndex % 5)),
             SignedOffset,
-            (Spec.bDesertCanyon ? 155.0f : 118.0f) * (0.74f + 0.08f * static_cast<float>(PatchIndex % 4)),
+            (Spec.bDesertCanyon ? 88.0f : 70.0f) * (0.62f + 0.06f * static_cast<float>(PatchIndex % 4)),
             Phase,
             InnerColor,
             OuterColor,
@@ -3293,7 +3293,7 @@ void AddPreviewTerrainMaterialLayerDetail(
     }
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
-    const int32 LayerCount = Spec.bDesertCanyon ? 72 : (Spec.bHasWaterfalls ? 86 : 68);
+    const int32 LayerCount = Spec.bDesertCanyon ? 42 : (Spec.bHasWaterfalls ? 48 : 38);
     const int32 BandCount = Spec.bDesertCanyon ? 6 : (Spec.bHasWaterfalls ? 5 : 4);
     const float NearOffset = Spec.bDesertCanyon ? 780.0f : (Spec.bHasWaterfalls ? 430.0f : 390.0f);
     const float BandSpacing = Spec.bDesertCanyon ? 470.0f : (Spec.bHasWaterfalls ? 285.0f : 250.0f);
@@ -3375,10 +3375,10 @@ void AddPreviewTerrainMaterialLayerDetail(
         InnerColor = FMath::Lerp(InnerColor, WetTint, FMath::Clamp(WaterT * 0.18f, 0.0f, 0.24f));
         OuterColor = FMath::Lerp(OuterColor, WetTint, FMath::Clamp(WaterT * 0.12f, 0.0f, 0.18f));
 
-        const float Length = (Spec.bDesertCanyon ? 620.0f : (Spec.bHasWaterfalls ? 430.0f : 390.0f)) *
-            (0.62f + 0.08f * static_cast<float>(LayerIndex % 5));
-        const float Width = (Spec.bDesertCanyon ? 150.0f : (Spec.bHasWaterfalls ? 96.0f : 88.0f)) *
-            (0.62f + 0.06f * static_cast<float>(LayerIndex % 4));
+        const float Length = (Spec.bDesertCanyon ? 400.0f : (Spec.bHasWaterfalls ? 285.0f : 260.0f)) *
+            (0.56f + 0.06f * static_cast<float>(LayerIndex % 5));
+        const float Width = (Spec.bDesertCanyon ? 84.0f : (Spec.bHasWaterfalls ? 58.0f : 54.0f)) *
+            (0.56f + 0.05f * static_cast<float>(LayerIndex % 4));
         AddPreviewBankBreakupPatch(
             World,
             Spec,
@@ -3411,7 +3411,7 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const bool bRainforest = Spec.bHasWaterfalls;
-    const int32 FacetCount = Spec.bDesertCanyon ? 96 : (bRainforest ? 92 : 78);
+    const int32 FacetCount = Spec.bDesertCanyon ? 54 : (bRainforest ? 50 : 44);
     const float NearOffset = Spec.bDesertCanyon ? 610.0f : (bRainforest ? 315.0f : 340.0f);
     const float FarOffset = Spec.bDesertCanyon ? 3050.0f : (bRainforest ? 1750.0f : 1480.0f);
 
@@ -3487,10 +3487,10 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
         InnerColor = FMath::Lerp(InnerColor, WetTint, FMath::Clamp(WaterT * 0.24f, 0.0f, 0.32f));
         OuterColor = FMath::Lerp(OuterColor, WetTint, FMath::Clamp(WaterT * 0.16f, 0.0f, 0.24f));
 
-        const float Length = (Spec.bDesertCanyon ? 390.0f : (bRainforest ? 285.0f : 300.0f)) *
-            (0.56f + 0.07f * static_cast<float>(FacetIndex % 7));
-        const float Width = (Spec.bDesertCanyon ? 82.0f : (bRainforest ? 60.0f : 64.0f)) *
-            (0.58f + 0.06f * static_cast<float>(FacetIndex % 5));
+        const float Length = (Spec.bDesertCanyon ? 255.0f : (bRainforest ? 190.0f : 205.0f)) *
+            (0.52f + 0.06f * static_cast<float>(FacetIndex % 7));
+        const float Width = (Spec.bDesertCanyon ? 46.0f : (bRainforest ? 36.0f : 38.0f)) *
+            (0.52f + 0.05f * static_cast<float>(FacetIndex % 5));
         AddPreviewBankBreakupPatch(
             World,
             Spec,
@@ -3507,7 +3507,7 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
             Spec.bDesertCanyon ? 36.0f : 28.0f);
     }
 
-    const int32 BandPerSide = Spec.bDesertCanyon ? 18 : (bRainforest ? 14 : 12);
+    const int32 BandPerSide = Spec.bDesertCanyon ? 10 : (bRainforest ? 8 : 7);
     for (int32 BandIndex = 0; BandIndex < BandPerSide * 2; ++BandIndex)
     {
         const float Side = (BandIndex % 2 == 0) ? -1.0f : 1.0f;
@@ -3543,16 +3543,16 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
             HeightfieldPreview,
             FString::Printf(TEXT("RaftSim_LandscapeNaniteStrataMicroBand_%03d_%s"), BandIndex, *Spec.RiverId),
             X - (Spec.bDesertCanyon ? 630.0f : 420.0f),
-            Spec.bDesertCanyon ? 720.0f : 480.0f,
+            Spec.bDesertCanyon ? 390.0f : 270.0f,
             SignedOffset,
-            Spec.bDesertCanyon ? 30.0f : 24.0f,
+            Spec.bDesertCanyon ? 18.0f : 14.0f,
             Phase,
             InnerColor,
             OuterColor,
             Spec.bDesertCanyon ? 34.0f : 24.0f);
     }
 
-    const int32 OcclusionCount = Spec.bDesertCanyon ? 34 : (bRainforest ? 32 : 28);
+    const int32 OcclusionCount = Spec.bDesertCanyon ? 18 : (bRainforest ? 16 : 14);
     for (int32 OcclusionIndex = 0; OcclusionIndex < OcclusionCount; ++OcclusionIndex)
     {
         const float Side = (OcclusionIndex % 2 == 0) ? -1.0f : 1.0f;
@@ -3573,10 +3573,10 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
             TerrainRelief,
             HeightfieldPreview,
             FString::Printf(TEXT("RaftSim_LandscapeNaniteSlopeOcclusionPatch_%03d_%s"), OcclusionIndex, *Spec.RiverId),
-            X - (Spec.bDesertCanyon ? 420.0f : 300.0f),
-            Spec.bDesertCanyon ? 520.0f : 360.0f,
+            X - (Spec.bDesertCanyon ? 250.0f : 185.0f),
+            Spec.bDesertCanyon ? 310.0f : 220.0f,
             SignedOffset,
-            Spec.bDesertCanyon ? 48.0f : 34.0f,
+            Spec.bDesertCanyon ? 28.0f : 22.0f,
             Phase,
             ShadowColor,
             RimColor,

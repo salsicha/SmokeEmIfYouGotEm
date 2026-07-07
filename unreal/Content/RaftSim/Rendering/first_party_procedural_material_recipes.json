@@ -72,7 +72,7 @@
         "riverbed_and_shallow_shelves"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview",
-      "unreal_status": "terrain_specific_vertex_color_material_active_as_bounded_ambient_fill_soft_lit_review_material_with_demoted_overlay_striping_terrain_contrast_floor_and_proxy_normal_softening_feathered_source_drape_microtiles_irregular_shoreline_edge_breakup_erosion_rills_and_landscape_nanite_material_scaffold_production_layered_material_pending",
+      "unreal_status": "terrain_specific_vertex_color_material_active_as_bounded_ambient_fill_soft_lit_review_material_with_source_drape_smoothing_and_demoted_overlay_striping_terrain_contrast_floor_and_proxy_normal_softening_feathered_source_drape_microtiles_irregular_shoreline_edge_breakup_erosion_rills_and_landscape_nanite_material_scaffold_production_layered_material_pending",
       "required_source_inputs": [
         "source_drape_4096.png",
         "dem_relief_2048.png",
@@ -95,6 +95,7 @@
         "proxy_terrain_normal_softening",
         "bounded_terrain_ambient_fill",
         "demoted_terrain_overlay_striping",
+        "source_drape_smoothing_pass",
         "terrain_proxy_luma_floor",
         "soft_feathered_terrain_patch_edges",
         "irregular_shoreline_edge_breakup",
@@ -129,6 +130,9 @@
         "terrain_ambient_fill",
         "terrain_overlay_actor_count",
         "terrain_overlay_stripe_contrast",
+        "source_drape_luma_clamp",
+        "source_drape_tile_density",
+        "terrain_overlay_smoothing_actor_count",
         "terrain_patch_height_feather",
         "shoreline_edge_patch_count",
         "shoreline_edge_patch_width",
