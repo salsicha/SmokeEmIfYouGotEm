@@ -288,6 +288,7 @@
         "depth_tint",
         "depth_reflection_refraction_scaffold",
         "near_camera_water_scaffold_clearance",
+        "flow_aware_water_mesh_undulation",
         "flow_aware_micro_ripple_glints",
         "turbidity",
         "current_streak",
@@ -297,6 +298,8 @@
       ],
       "tunable_parameters": [
         "water_level_offset_cm",
+        "water_mesh_undulation_amplitude_cm",
+        "standing_wave_mesh_amplitude_cm",
         "depth_tint_strength",
         "turbidity_strength",
         "micro_ripple_glint_density",

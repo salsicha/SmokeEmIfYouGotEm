@@ -66,6 +66,7 @@
       "first_party_procedural_leaf_cluster_geometry",
       "guide_seat_foliage_setback_and_scale_tuning",
       "lit_vertex_color_water_gradients",
+      "flow_aware_water_mesh_undulation",
       "flow_band_depth_texture_ribbons",
       "flow_aware_water_surface_chop_and_turbidity_patches",
       "flow_aware_micro_ripple_glints",
