@@ -66,6 +66,7 @@
       "first_party_dense_biome_foliage_layer_proxy_clusters",
       "first_party_instanced_procedural_foliage_equivalent_scaffold",
       "first_party_procedural_leaf_cluster_geometry",
+      "first_party_organic_canopy_leaf_spray_breakup",
       "guide_seat_foliage_setback_and_scale_tuning",
       "lit_vertex_color_water_gradients",
       "flow_aware_water_mesh_undulation",

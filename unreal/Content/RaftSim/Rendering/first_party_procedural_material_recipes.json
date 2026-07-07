@@ -221,7 +221,7 @@
         "tropical_canopy_and_understory"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
-      "unreal_status": "pcg_sample_and_generated_card_materials_active_production_biome_library_pending",
+      "unreal_status": "pcg_sample_generated_card_and_organic_leaf_spray_materials_active_production_biome_library_pending",
       "required_source_inputs": [
         "vegetation_mask_2048.png",
         "water_mask_2048.png",
@@ -234,6 +234,8 @@
         "understory_shadow",
         "deadfall_bark",
         "procedural_leaf_cluster_lobes",
+        "organic_leaf_spray_lobes",
+        "organic_canopy_breakup",
         "bank_sightline_cutout",
         "seasonal_color_shift"
       ],
@@ -242,6 +244,9 @@
         "understory_density",
         "leaf_cluster_lobe_count",
         "leaf_cluster_color_variance",
+        "organic_leaf_spray_count",
+        "organic_leaf_spray_lobe_scale",
+        "organic_leaf_spray_color_variance",
         "deadfall_frequency",
         "bank_sightline_cutout_width_m",
         "leaf_color_variance",
