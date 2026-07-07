@@ -1078,6 +1078,11 @@ FLinearColor ScalePreviewColor(const FLinearColor& Color, float Scale)
     return ClampPreviewColor(FLinearColor(Color.R * Scale, Color.G * Scale, Color.B * Scale, Color.A));
 }
 
+float GetPreviewColorLuma(const FLinearColor& Color)
+{
+    return FMath::Max(0.001f, Color.R * 0.2126f + Color.G * 0.7152f + Color.B * 0.0722f);
+}
+
 FLinearColor NormalizePreviewSourceDrapeAlbedo(
     const FRaftSimEnvironmentPreviewSpec& Spec,
     const FLinearColor& RawColor,
@@ -1140,18 +1145,24 @@ FLinearColor NormalizePreviewTerrainProxyPatchColor(
     FLinearColor Color = ClampPreviewColor(RawColor);
     Color.A = RawColor.A;
 
-    const float Luma = FMath::Max(0.001f, Color.R * 0.2126f + Color.G * 0.7152f + Color.B * 0.0722f);
-    const float MinLuma = Spec.bDesertCanyon ? 0.185f : (Spec.bHasWaterfalls ? 0.115f : 0.145f);
+    const float Luma = GetPreviewColorLuma(Color);
+    const float MinLuma = Spec.bDesertCanyon ? 0.300f : (Spec.bHasWaterfalls ? 0.220f : 0.260f);
     if (Luma >= MinLuma)
     {
         return Color;
     }
 
     const FLinearColor FillColor = Spec.bDesertCanyon
-        ? FLinearColor(0.34f, 0.24f, 0.15f, Color.A)
-        : (Spec.bHasWaterfalls ? FLinearColor(0.060f, 0.145f, 0.070f, Color.A)
-                                : FLinearColor(0.22f, 0.21f, 0.145f, Color.A));
-    return ClampPreviewColor(FMath::Lerp(Color, FillColor, FMath::Clamp((MinLuma - Luma) / MinLuma * 0.86f, 0.0f, 0.86f)));
+        ? FLinearColor(0.42f, 0.30f, 0.19f, Color.A)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.075f, 0.185f, 0.085f, Color.A)
+                                : FLinearColor(0.27f, 0.25f, 0.17f, Color.A));
+    const float LiftT = FMath::Clamp((MinLuma - Luma) / MinLuma, 0.0f, 1.0f);
+    FLinearColor LiftedColor = FMath::Lerp(Color, FillColor, FMath::Clamp(LiftT * 0.78f, 0.0f, 0.78f));
+    const float LiftedLuma = GetPreviewColorLuma(LiftedColor);
+    const float TargetLuma = FMath::Lerp(MinLuma, Luma, Spec.bHasWaterfalls ? 0.18f : 0.14f);
+    LiftedColor = ScalePreviewColor(LiftedColor, TargetLuma / LiftedLuma);
+    LiftedColor.A = Color.A;
+    return ClampPreviewColor(LiftedColor);
 }
 
 FLinearColor GetPreviewSoftTerrainPatchFeatherBaseColor(
@@ -1211,9 +1222,28 @@ FLinearColor BlendPreviewSoftTerrainPatchColor(
     float Coverage)
 {
     const FLinearColor FeatherBase = GetPreviewSoftTerrainPatchFeatherBaseColor(Spec, X, Y, Phase);
-    const float MaxFeatureBlend = Spec.bDesertCanyon ? 0.80f : (Spec.bHasWaterfalls ? 0.70f : 0.73f);
-    const float Blend = FMath::Clamp(Coverage * MaxFeatureBlend, 0.0f, 0.86f);
+    const float MaxFeatureBlend = Spec.bDesertCanyon ? 0.46f : (Spec.bHasWaterfalls ? 0.40f : 0.42f);
+    const float Blend = FMath::Clamp(Coverage * MaxFeatureBlend, 0.0f, 0.52f);
     return ClampPreviewColor(FMath::Lerp(FeatherBase, FeatureColor, Blend));
+}
+
+float GetPreviewTerrainNormalSofteningBlend(const FRaftSimEnvironmentPreviewSpec& Spec)
+{
+    return Spec.bDesertCanyon ? 0.62f : (Spec.bHasWaterfalls ? 0.74f : 0.70f);
+}
+
+void SoftenPreviewTerrainNormals(TArray<FVector>& Normals, float UpBlend)
+{
+    const float Blend = FMath::Clamp(UpBlend, 0.0f, 0.85f);
+    for (FVector& Normal : Normals)
+    {
+        FVector SourceNormal = Normal.GetSafeNormal(UE_SMALL_NUMBER, FVector::UpVector);
+        if (SourceNormal.Z < 0.0f)
+        {
+            SourceNormal *= -1.0f;
+        }
+        Normal = (SourceNormal * (1.0f - Blend) + FVector::UpVector * Blend).GetSafeNormal();
+    }
 }
 
 float GetPreviewRiverCenterY(const FRaftSimEnvironmentPreviewSpec& Spec, float X)
@@ -2301,7 +2331,7 @@ void AddPreviewTerrainMesh(
             TerrainColor = ScalePreviewColor(TerrainColor, ColorNoise);
             Vertices.Add(FVector(X, Y, Z));
             UVs.Add(FVector2D(U * 12.0f, V * 4.0f));
-            VertexColors.Add(TerrainColor);
+            VertexColors.Add(NormalizePreviewTerrainProxyPatchColor(Spec, TerrainColor));
         }
     }
 
@@ -2323,6 +2353,7 @@ void AddPreviewTerrainMesh(
         }
     }
     Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    SoftenPreviewTerrainNormals(Normals, GetPreviewTerrainNormalSofteningBlend(Spec));
 
     AddPreviewProceduralMeshActor(
         World,
@@ -2460,6 +2491,7 @@ void AddPreviewAerialDrapeTiles(
                     AerialColor.G = FMath::Max(AerialColor.G, Spec.TerrainColor.G * 0.78f + 0.035f);
                     AerialColor.B = FMath::Max(AerialColor.B, Spec.TerrainColor.B * 0.78f + 0.035f);
                     AerialColor.A = 1.0f;
+                    AerialColor = NormalizePreviewTerrainProxyPatchColor(Spec, AerialColor);
 
                     Vertices.Add(FVector(
                         SampleX,
@@ -2489,6 +2521,7 @@ void AddPreviewAerialDrapeTiles(
                 }
             }
             TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+            SoftenPreviewTerrainNormals(Normals, GetPreviewTerrainNormalSofteningBlend(Spec));
 
             AddPreviewProceduralMeshActor(
                 World,
@@ -2715,6 +2748,7 @@ void AddPreviewShoreRibbon(
     }
 
     Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    SoftenPreviewTerrainNormals(Normals, GetPreviewTerrainNormalSofteningBlend(Spec));
     AddPreviewProceduralMeshActor(
         World,
         Label,
@@ -2870,6 +2904,7 @@ void AddPreviewBankBreakupPatch(
     }
 
     Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    SoftenPreviewTerrainNormals(Normals, GetPreviewTerrainNormalSofteningBlend(Spec));
     AddPreviewProceduralMeshActor(
         World,
         Label,
@@ -3060,6 +3095,7 @@ void AddPreviewTerrainErosionRillActor(
     }
 
     Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    SoftenPreviewTerrainNormals(Normals, GetPreviewTerrainNormalSofteningBlend(Spec));
     AddPreviewProceduralMeshActor(
         World,
         Label,
