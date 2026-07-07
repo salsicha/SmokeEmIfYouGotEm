@@ -1274,6 +1274,24 @@
             "future_source_drape_replacement_planning",
             "cloud_screening_review"
           ]
+        },
+        {
+          "artifact_id": "pacuare_sentinel_20250320_draft_bank_window_review",
+          "category": "sentinel_draft_bank_window_tci_scl_review",
+          "paths": [
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_20250320_draft_bank_window_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_draft_bank_window_clip_review.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250320_draft_bank_window_clip_review.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_draft_bank_window_scl_qa_review.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250320_draft_bank_window_scl_qa_review.png"
+          ],
+          "promotion_blocker": "Draft-bank strip review shows route-local cloud/shadow and uses preview-scaffold bank geometry; production still needs cleaner route-local coverage or exact approved route/bank clipping with SCL masking, stitching, terms review, and guide/geospatial approval.",
+          "status": "draft_bank_window_review_attached_cloud_shadow_blocked",
+          "use_in_unreal": [
+            "route_window_visual_triage",
+            "future_source_drape_replacement_planning",
+            "cloud_shadow_qa_review"
+          ]
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
