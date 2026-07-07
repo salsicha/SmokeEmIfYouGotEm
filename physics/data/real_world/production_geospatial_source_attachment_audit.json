@@ -1,0 +1,216 @@
+{
+  "generated_on": "2026-07-06",
+  "missing_artifacts": [],
+  "policy": {
+    "artifact_existence_does_not_promote_production_use": true,
+    "lifelike_status_requires_unreal_capture_and_performance_evidence": true,
+    "source_classes_remain_review_gated_until_promotion_blockers_close": true
+  },
+  "remaining_global_blockers": [
+    "Artifact existence is satisfied only for currently recorded preview/review inputs.",
+    "CRS, vertical datum, hydrologic conditioning, terms, attribution, and guide review still block production promotion.",
+    "Lifelike Unreal captures and desktop/VR performance evidence remain required before any river leaves preview-only status."
+  ],
+  "required_source_classes": [
+    "terrain_dem_or_lidar",
+    "hydrography_and_centerline",
+    "aerial_or_satellite_imagery",
+    "water_and_vegetation_masks",
+    "seasonal_flow_or_release_history",
+    "protected_area_and_access_context",
+    "guide_and_reference_media_annotations"
+  ],
+  "rivers": [
+    {
+      "artifact_count": 26,
+      "display_name": "South Fork American River, Chili Bar to Coloma",
+      "missing_artifact_count": 0,
+      "overall_status": "strongest_source_seed_preview_only",
+      "promotion_blocker_count": 28,
+      "river_id": "american_south_fork",
+      "source_class_count": 7,
+      "source_classes": [
+        {
+          "artifact_count": 4,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "terrain_dem_or_lidar",
+          "status": "pilot_tiles_and_derivatives_attached_review_gated"
+        },
+        {
+          "artifact_count": 4,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "hydrography_and_centerline",
+          "status": "nhd_extract_and_editor_drafts_attached_review_gated"
+        },
+        {
+          "artifact_count": 3,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "aerial_or_satellite_imagery",
+          "status": "naip_samples_and_source_drape_attached_review_gated"
+        },
+        {
+          "artifact_count": 4,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "water_and_vegetation_masks",
+          "status": "deterministic_preview_masks_attached_not_authoritative"
+        },
+        {
+          "artifact_count": 4,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "seasonal_flow_or_release_history",
+          "status": "multi_window_cdec_review_attached_presets_not_promoted"
+        },
+        {
+          "artifact_count": 4,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "protected_area_and_access_context",
+          "status": "official_leads_and_editor_overlays_attached_review_gated"
+        },
+        {
+          "artifact_count": 3,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "guide_and_reference_media_annotations",
+          "status": "link_only_queue_and_annotation_scaffold_attached"
+        }
+      ]
+    },
+    {
+      "artifact_count": 26,
+      "display_name": "Colorado River, Grand Canyon rowing corridor",
+      "missing_artifact_count": 0,
+      "overall_status": "lees_ferry_pilot_slice_attached_preview_only",
+      "promotion_blocker_count": 28,
+      "river_id": "colorado_river",
+      "source_class_count": 7,
+      "source_classes": [
+        {
+          "artifact_count": 4,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "terrain_dem_or_lidar",
+          "status": "lees_ferry_3dep_pilot_tiles_and_derivatives_attached_review_gated"
+        },
+        {
+          "artifact_count": 4,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "hydrography_and_centerline",
+          "status": "nhd_mainstem_river_mile_and_sandbar_overlays_attached_review_gated"
+        },
+        {
+          "artifact_count": 3,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "aerial_or_satellite_imagery",
+          "status": "naip_samples_and_source_drape_attached_review_gated"
+        },
+        {
+          "artifact_count": 4,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "water_and_vegetation_masks",
+          "status": "deterministic_preview_masks_attached_not_authoritative"
+        },
+        {
+          "artifact_count": 4,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "seasonal_flow_or_release_history",
+          "status": "usgs_and_usbr_release_context_attached_presets_not_promoted"
+        },
+        {
+          "artifact_count": 4,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "protected_area_and_access_context",
+          "status": "nps_context_and_editor_overlays_attached_review_gated"
+        },
+        {
+          "artifact_count": 3,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "guide_and_reference_media_annotations",
+          "status": "link_only_queue_and_annotation_scaffold_attached"
+        }
+      ]
+    },
+    {
+      "artifact_count": 30,
+      "display_name": "Pacuare River, Costa Rica rainforest corridor",
+      "missing_artifact_count": 0,
+      "overall_status": "rainforest_source_triage_attached_preview_only",
+      "promotion_blocker_count": 28,
+      "river_id": "pacuare",
+      "source_class_count": 7,
+      "source_classes": [
+        {
+          "artifact_count": 4,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "terrain_dem_or_lidar",
+          "status": "copernicus_dem_tiles_and_heightfield_candidate_attached_review_gated"
+        },
+        {
+          "artifact_count": 5,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "hydrography_and_centerline",
+          "status": "official_metadata_and_preview_overlays_attached_not_authoritative"
+        },
+        {
+          "artifact_count": 5,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "aerial_or_satellite_imagery",
+          "status": "gibs_and_sentinel_review_imagery_attached_not_promoted"
+        },
+        {
+          "artifact_count": 5,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "water_and_vegetation_masks",
+          "status": "preview_masks_and_scl_qa_attached_not_authoritative"
+        },
+        {
+          "artifact_count": 4,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "seasonal_flow_or_release_history",
+          "status": "rainfall_discharge_and_flash_response_triage_attached_review_gated_no_numeric_promotion"
+        },
+        {
+          "artifact_count": 4,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "protected_area_and_access_context",
+          "status": "sinac_snit_senara_policy_reviews_attached_review_gated_publication_blocked"
+        },
+        {
+          "artifact_count": 3,
+          "missing_artifacts": [],
+          "promotion_blocker_count": 4,
+          "source_class": "guide_and_reference_media_annotations",
+          "status": "link_only_queue_and_annotation_scaffold_attached"
+        }
+      ]
+    }
+  ],
+  "schema": "raftsim.production_geospatial_attachment_audit.v1",
+  "source_ledger": "production_geospatial_attachment_ledger.json",
+  "status": "all_recorded_source_artifacts_exist_preview_only_not_lifelike",
+  "totals": {
+    "missing_artifacts": 0,
+    "promotion_blockers": 84,
+    "recorded_artifacts": 82,
+    "required_source_classes": 7,
+    "rivers": 3,
+    "source_class_records": 21
+  }
+}

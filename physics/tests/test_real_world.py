@@ -99,6 +99,8 @@ from raftsim.real_world import (
     PACUARE_SNIT_LAYER_METADATA_SUMMARY_FILE,
     PACUARE_SNIT_OGC_CATALOG_FILE,
     PACUARE_SOURCE_METADATA_REVIEW_FILE,
+    PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_FILE,
+    PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_SCHEMA_VERSION,
     PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE,
     PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION,
     RAPID_REVIEW_EDITOR_WORKFLOW_FILE,
@@ -149,6 +151,7 @@ from raftsim.real_world import (
     build_pacuare_rainfall_station_review,
     build_player_selection_model,
     build_production_environment_gap_register,
+    build_production_geospatial_attachment_audit,
     build_rapid_review_editor_workflow,
     build_rapid_review_flow_difficulty_mapping,
     build_real_world_corridor_package,
@@ -2868,6 +2871,7 @@ def test_production_geospatial_attachment_ledger_lists_existing_review_gated_art
     assert ledger["status"] == "reviewed_attachment_ledger_preview_only_not_lifelike"
     assert ledger["policy"]["source_artifacts_do_not_equal_production_promotion"] is True
     assert ledger["canonical_inputs"]["source_readiness_matrix"] == "production_geospatial_source_readiness.json"
+    assert ledger["canonical_inputs"]["source_attachment_audit"] == PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_FILE
     assert (
         gap_register["canonical_inputs"]["geospatial_attachment_ledger"]
         == "physics/data/real_world/production_geospatial_attachment_ledger.json"
@@ -2875,6 +2879,10 @@ def test_production_geospatial_attachment_ledger_lists_existing_review_gated_art
     assert (
         readiness["canonical_inputs"]["geospatial_attachment_ledger"]
         == "physics/data/real_world/production_geospatial_attachment_ledger.json"
+    )
+    assert (
+        readiness["canonical_inputs"]["geospatial_source_attachment_audit"]
+        == "physics/data/real_world/production_geospatial_source_attachment_audit.json"
     )
     assert {"american_south_fork", "colorado_river", "pacuare"} == set(rivers)
 
@@ -2901,6 +2909,34 @@ def test_production_geospatial_attachment_ledger_lists_existing_review_gated_art
     assert "rainforest_source_triage" in rivers["pacuare"]["overall_status"]
 
 
+def test_production_geospatial_attachment_audit_matches_ledger_and_keeps_preview_gate():
+    ledger = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_attachment_ledger.json").read_text())
+    audit_path = REAL_WORLD_DATA_DIR / PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_FILE
+    audit = json.loads(audit_path.read_text())
+    expected = build_production_geospatial_attachment_audit(ledger, REAL_WORLD_DATA_DIR)
+    rivers = {river["river_id"]: river for river in audit["rivers"]}
+
+    assert audit == expected
+    assert audit["schema"] == PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_SCHEMA_VERSION
+    assert audit["status"] == "all_recorded_source_artifacts_exist_preview_only_not_lifelike"
+    assert audit["policy"]["artifact_existence_does_not_promote_production_use"] is True
+    assert audit["totals"] == {
+        "missing_artifacts": 0,
+        "promotion_blockers": 84,
+        "recorded_artifacts": 82,
+        "required_source_classes": 7,
+        "rivers": 3,
+        "source_class_records": 21,
+    }
+    assert audit["missing_artifacts"] == []
+    assert {"american_south_fork", "colorado_river", "pacuare"} == set(rivers)
+    assert rivers["american_south_fork"]["artifact_count"] == 26
+    assert rivers["colorado_river"]["artifact_count"] == 26
+    assert rivers["pacuare"]["artifact_count"] == 30
+    assert all(river["missing_artifact_count"] == 0 for river in rivers.values())
+    assert all("preview" in river["overall_status"] for river in rivers.values())
+
+
 def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_rivers():
     register = build_production_environment_gap_register()
     rivers = {entry["river_id"]: entry for entry in register["rivers"]}
@@ -2924,6 +2960,10 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert (
         register["canonical_inputs"]["geospatial_attachment_ledger"]
         == "physics/data/real_world/production_geospatial_attachment_ledger.json"
+    )
+    assert (
+        register["canonical_inputs"]["geospatial_source_attachment_audit"]
+        == "physics/data/real_world/production_geospatial_source_attachment_audit.json"
     )
     assert any(target["target"] == "water_foam_spray_mist_and_wetness" for target in register["global_visual_replacement_targets"])
 

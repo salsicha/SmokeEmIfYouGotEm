@@ -66,6 +66,8 @@ RAPID_REVIEW_EDITOR_WORKFLOW_FILE = "rapid_review_editor_workflow.json"
 PRODUCTION_IMPORT_PILOT_SCHEMA_VERSION = "raftsim.production_import_pilot.v0"
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_SCHEMA_VERSION = "raftsim.production_environment_gap_register.v0"
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_FILE = "production_environment_gap_register.json"
+PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_SCHEMA_VERSION = "raftsim.production_geospatial_attachment_audit.v1"
+PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_FILE = "production_geospatial_source_attachment_audit.json"
 SOUTH_FORK_PRODUCTION_SOURCE_GATE_REVIEW_FILE = "production_source_gate_review.json"
 REFERENCE_MEDIA_ANNOTATIONS_FILE = "review/production_import_pilot/reference_annotations.geojson"
 REFERENCE_MEDIA_RIGHTS_MANIFEST_FILE = "field_media/production_import_pilot/rights_manifest.json"
@@ -3483,6 +3485,9 @@ def build_production_environment_gap_register() -> dict[str, object]:
             "first_party_procedural_material_recipes": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
             "geospatial_readiness": "physics/data/real_world/production_geospatial_source_readiness.json",
             "geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",
+            "geospatial_source_attachment_audit": (
+                "physics/data/real_world/production_geospatial_source_attachment_audit.json"
+            ),
             "reference_media_links": "physics/data/real_world/reference_media_link_manifest.json",
             "art_asset_source_research": "unreal/Content/RaftSim/Rendering/art_asset_source_research.json",
             "capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
@@ -3972,6 +3977,103 @@ def build_production_environment_gap_register() -> dict[str, object]:
             "Close Pacuare official hydrography, cloud-screened imagery, rainfall/flow, and protected-area review before claiming local fidelity.",
             "Replace proxy art using rights-cleared assets or first-party procedural equivalents and regenerate guide-seat plus river-eye captures after each river pass.",
             "Add desktop and VR performance evidence before any river leaves preview-only status.",
+        ],
+    }
+
+
+def build_production_geospatial_attachment_audit(
+    ledger: dict[str, object],
+    real_world_data_dir: str | Path,
+) -> dict[str, object]:
+    """Summarize whether the geospatial attachment ledger resolves to committed artifacts."""
+
+    data_root = Path(real_world_data_dir)
+    required_source_classes = list(ledger["required_source_classes"])
+    audited_rivers: list[dict[str, object]] = []
+    missing_artifacts: list[dict[str, str]] = []
+    total_artifacts = 0
+    total_blockers = 0
+    source_class_records = 0
+
+    for river in ledger["rivers"]:
+        source_classes: list[dict[str, object]] = []
+        river_artifact_count = 0
+        river_blocker_count = 0
+        for source_class in river["attached_source_classes"]:
+            artifacts = source_class["artifacts"]
+            blockers = source_class["promotion_blockers"]
+            source_class_missing: list[str] = []
+            for artifact in artifacts:
+                artifact_path = artifact["path"]
+                if not (data_root / artifact_path).exists():
+                    source_class_missing.append(artifact_path)
+                    missing_artifacts.append(
+                        {
+                            "river_id": river["river_id"],
+                            "source_class": source_class["source_class"],
+                            "path": artifact_path,
+                        }
+                    )
+
+            artifact_count = len(artifacts)
+            blocker_count = len(blockers)
+            river_artifact_count += artifact_count
+            river_blocker_count += blocker_count
+            total_artifacts += artifact_count
+            total_blockers += blocker_count
+            source_class_records += 1
+            source_classes.append(
+                {
+                    "source_class": source_class["source_class"],
+                    "status": source_class["status"],
+                    "artifact_count": artifact_count,
+                    "promotion_blocker_count": blocker_count,
+                    "missing_artifacts": source_class_missing,
+                }
+            )
+
+        audited_rivers.append(
+            {
+                "river_id": river["river_id"],
+                "display_name": river["display_name"],
+                "overall_status": river["overall_status"],
+                "source_class_count": len(source_classes),
+                "artifact_count": river_artifact_count,
+                "promotion_blocker_count": river_blocker_count,
+                "missing_artifact_count": sum(len(entry["missing_artifacts"]) for entry in source_classes),
+                "source_classes": source_classes,
+            }
+        )
+
+    return {
+        "schema": PRODUCTION_GEOSPATIAL_ATTACHMENT_AUDIT_SCHEMA_VERSION,
+        "generated_on": "2026-07-06",
+        "status": (
+            "missing_artifacts_found_preview_only_not_lifelike"
+            if missing_artifacts
+            else "all_recorded_source_artifacts_exist_preview_only_not_lifelike"
+        ),
+        "source_ledger": "production_geospatial_attachment_ledger.json",
+        "policy": {
+            "artifact_existence_does_not_promote_production_use": True,
+            "source_classes_remain_review_gated_until_promotion_blockers_close": True,
+            "lifelike_status_requires_unreal_capture_and_performance_evidence": True,
+        },
+        "required_source_classes": required_source_classes,
+        "totals": {
+            "rivers": len(audited_rivers),
+            "required_source_classes": len(required_source_classes),
+            "source_class_records": source_class_records,
+            "recorded_artifacts": total_artifacts,
+            "promotion_blockers": total_blockers,
+            "missing_artifacts": len(missing_artifacts),
+        },
+        "rivers": audited_rivers,
+        "missing_artifacts": missing_artifacts,
+        "remaining_global_blockers": [
+            "Artifact existence is satisfied only for currently recorded preview/review inputs.",
+            "CRS, vertical datum, hydrologic conditioning, terms, attribution, and guide review still block production promotion.",
+            "Lifelike Unreal captures and desktop/VR performance evidence remain required before any river leaves preview-only status.",
         ],
     }
 
