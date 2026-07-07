@@ -270,7 +270,7 @@
         "tropical_canopy_and_understory"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
-      "unreal_status": "pcg_sample_generated_card_organic_leaf_spray_branch_frond_lattice_and_photographic_foliage_tone_materials_active_production_biome_library_pending",
+      "unreal_status": "pcg_sample_generated_card_organic_leaf_spray_branch_frond_lattice_fine_twig_canopy_lace_and_photographic_foliage_tone_materials_active_production_biome_library_pending",
       "required_source_inputs": [
         "vegetation_mask_2048.png",
         "water_mask_2048.png",
@@ -286,6 +286,8 @@
         "organic_leaf_spray_lobes",
         "organic_canopy_breakup",
         "organic_branch_frond_lattice",
+        "fine_twig_canopy_lace",
+        "fine_leaflet_silhouette_breakup",
         "procedural_branch_ribbons",
         "procedural_leaf_diamond_fronds",
         "photographic_foliage_tone_calibration",
@@ -306,6 +308,9 @@
         "organic_branch_frond_leaf_count",
         "organic_branch_frond_width",
         "organic_branch_frond_color_variance",
+        "fine_twig_lace_density",
+        "fine_leaflet_scale",
+        "fine_twig_lace_color_variance",
         "foliage_material_emissive_lift",
         "leaf_tip_highlight_gain",
         "biome_foliage_base_tint",
