@@ -462,7 +462,7 @@
         "river_specific_lighting_atmosphere_and_camera"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_TranslucentColorPreview",
-      "unreal_status": "translucent_glint_foam_haze_mist_cards_active_niagara_and_lighting_replacement_pending",
+      "unreal_status": "translucent_glint_foam_haze_mist_cards_source_aware_sky_gradient_depth_layers_active_niagara_and_lighting_replacement_pending",
       "required_source_inputs": [
         "river_flow_visual_bands.json",
         "rapid_feature_annotations",
@@ -475,6 +475,9 @@
         "spray_mist_falloff",
         "canyon_distance_haze",
         "rainforest_humidity",
+        "source_aware_sky_gradient_bands",
+        "sun_warmth_veil",
+        "atmospheric_depth_sheets",
         "manual_exposure_anchor"
       ],
       "tunable_parameters": [
@@ -482,6 +485,9 @@
         "spray_intensity",
         "mist_density",
         "haze_distance_m",
+        "sky_gradient_band_count",
+        "sky_horizon_warmth_strength",
+        "atmosphere_depth_sheet_opacity",
         "sun_angle",
         "manual_exposure"
       ],
