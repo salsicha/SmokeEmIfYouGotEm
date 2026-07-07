@@ -288,7 +288,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.ElevationSample =
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/3dep_tiles");
     SouthFork.SourceDrapeDescription =
-        TEXT("stitched South Fork production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into bank and valley preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-aware bank breakup patches, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, first-party biome foliage silhouette cards, dense layered riparian canopy/understory proxy clusters, first-party instanced procedural foliage-equivalent canopy/trunk/understory scaffold, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, lit water variation, flow-cued water foam/slick mottle, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, foliage, understory, mask-aware ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, hydrologic conditioning, channel burning, masks, and guide/geospatial approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
+        TEXT("stitched South Fork production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into bank and valley preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-aware bank breakup patches, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, first-party biome foliage silhouette cards, dense layered riparian canopy/understory proxy clusters, first-party instanced procedural foliage-equivalent canopy/trunk/understory scaffold, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, lit water variation, flow-cued water foam/slick mottle, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, foliage, understory, mask-aware ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, hydrologic conditioning, channel burning, masks, and guide/geospatial approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
     SouthFork.FlowBandId = TEXT("median_runnable");
     SouthFork.FlowBandDisplayName = TEXT("Median Runnable / Summer Commercial");
     SouthFork.FlowBandSource = TEXT("physics/data/real_world/south_fork_american_chili_bar/flow_presets.json");
@@ -328,7 +328,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.ElevationSample =
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles");
     Colorado.SourceDrapeDescription =
-        TEXT("stitched Colorado/Lees Ferry production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into canyon bank preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-aware bank breakup patches, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/sediment facets, biome-specific sparse deadfall/grass/root ecology props, first-party sparse desert scrub silhouettes, sparse desert riparian thicket proxy clusters, first-party instanced procedural desert-thicket/trunk scaffold, lit water variation, flow-cued water foam/slick mottle, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, sparse scrub, boulder placement, mask-aware canyon ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, river-mile stationing, hydrologic conditioning, release-aware masks, and guide/oarsman approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
+        TEXT("stitched Colorado/Lees Ferry production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into canyon bank preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-aware bank breakup patches, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/sediment facets, biome-specific sparse deadfall/grass/root ecology props, first-party sparse desert scrub silhouettes, sparse desert riparian thicket proxy clusters, first-party instanced procedural desert-thicket/trunk scaffold, first-party foliage crown depth and leaflet breakup, lit water variation, flow-cued water foam/slick mottle, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, sparse scrub, boulder placement, mask-aware canyon ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, river-mile stationing, hydrologic conditioning, release-aware masks, and guide/oarsman approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
     Colorado.FlowBandId = TEXT("moderate_release_planning");
     Colorado.FlowBandDisplayName = TEXT("Moderate Release Planning");
     Colorado.FlowBandSource = TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json");
@@ -374,7 +374,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.ElevationSample =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
-        TEXT("review-gated Pacuare production-import derivative placeholders generated from the selected NASA GIBS MODIS/Terra true-color seed and Copernicus DEM GLO-30 relief, normalized into a 4096px source drape, 2048px DEM relief, 2017px heightfield candidate, and 2048px water/vegetation masks; these remain coarse/cloudy proxy inputs until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, source-aware terrain photo mottle/microrelief, source-aware bank breakup patches, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, rainforest canopy/vine silhouette cards, dense layered rainforest canopy/understory proxy clusters, first-party instanced procedural rainforest canopy/trunk/understory scaffold, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, waterfall curtain/plunge-mist proxy layers, lit water variation, flow-cued water foam/slick mottle, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, dense mask-aware ground-cover/canopy cards, refined guide-seat raft/oar foreground proxies, humid atmospheric backdrop cards, and source-aware sky-gradient/depth layers remain rights-safe proxy dressing; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
+        TEXT("review-gated Pacuare production-import derivative placeholders generated from the selected NASA GIBS MODIS/Terra true-color seed and Copernicus DEM GLO-30 relief, normalized into a 4096px source drape, 2048px DEM relief, 2017px heightfield candidate, and 2048px water/vegetation masks; these remain coarse/cloudy proxy inputs until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, source-aware terrain photo mottle/microrelief, source-aware bank breakup patches, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, rainforest canopy/vine silhouette cards, dense layered rainforest canopy/understory proxy clusters, first-party instanced procedural rainforest canopy/trunk/understory scaffold, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, waterfall curtain/plunge-mist proxy layers, lit water variation, flow-cued water foam/slick mottle, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, dense mask-aware ground-cover/canopy cards, refined guide-seat raft/oar foreground proxies, humid atmospheric backdrop cards, and source-aware sky-gradient/depth layers remain rights-safe proxy dressing; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
     Pacuare.FlowBandId = TEXT("rainfed_runnable_planning");
     Pacuare.FlowBandDisplayName = TEXT("Rain-Fed Runnable Planning");
     Pacuare.FlowBandSource = TEXT("physics/data/real_world/pacuare_river_costa_rica/flow_presets.json");
@@ -2314,6 +2314,235 @@ AActor* AddPreviewFineTwigCanopyLaceActor(
         }
     }
     return Actor;
+}
+
+void AddPreviewFoliageCrownDepthAndLeafletBreakupDetail(
+    UWorld* World,
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* TerrainRelief,
+    const FRaftSimPreviewImage* HeightfieldPreview,
+    const FRaftSimPreviewImage* WaterMask,
+    const FRaftSimPreviewImage* VegetationMask)
+{
+    if (!World)
+    {
+        return;
+    }
+
+    const bool bRainforest = Spec.bHasWaterfalls;
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+    const int32 CrownCount = Spec.bDesertCanyon ? 32 : (bRainforest ? 132 : 78);
+    const int32 ShadowQuadsPerCrown = Spec.bDesertCanyon ? 1 : (bRainforest ? 3 : 2);
+    const int32 LeafletsPerCrown = Spec.bDesertCanyon ? 5 : (bRainforest ? 18 : 12);
+    const float NearBankOffset = Spec.bDesertCanyon ? 1120.0f : (bRainforest ? 700.0f : 720.0f);
+    const float FarBankOffset = Spec.bDesertCanyon ? 2200.0f : (bRainforest ? 1680.0f : 1260.0f);
+    const FVector Up(0.0f, 0.0f, 1.0f);
+
+    TArray<FVector> Vertices;
+    TArray<FVector2D> UVs;
+    TArray<FLinearColor> VertexColors;
+    TArray<int32> Triangles;
+    Vertices.Reserve(CrownCount * (ShadowQuadsPerCrown + LeafletsPerCrown) * 4);
+    UVs.Reserve(CrownCount * (ShadowQuadsPerCrown + LeafletsPerCrown) * 4);
+    VertexColors.Reserve(CrownCount * (ShadowQuadsPerCrown + LeafletsPerCrown) * 4);
+    Triangles.Reserve(CrownCount * (ShadowQuadsPerCrown + LeafletsPerCrown) * 6);
+
+    auto AddQuad = [&Vertices, &UVs, &VertexColors, &Triangles](
+                       const FVector& A,
+                       const FVector& B,
+                       const FVector& C,
+                       const FVector& D,
+                       const FLinearColor& ColorA,
+                       const FLinearColor& ColorB)
+    {
+        const int32 BaseVertexIndex = Vertices.Num();
+        Vertices.Add(A);
+        Vertices.Add(B);
+        Vertices.Add(C);
+        Vertices.Add(D);
+        UVs.Add(FVector2D(0.0f, 0.0f));
+        UVs.Add(FVector2D(0.0f, 1.0f));
+        UVs.Add(FVector2D(1.0f, 1.0f));
+        UVs.Add(FVector2D(1.0f, 0.0f));
+        VertexColors.Add(ColorA);
+        VertexColors.Add(ScalePreviewColor(ColorA, 0.94f));
+        VertexColors.Add(ColorB);
+        VertexColors.Add(ScalePreviewColor(ColorB, 0.90f));
+        Triangles.Add(BaseVertexIndex);
+        Triangles.Add(BaseVertexIndex + 1);
+        Triangles.Add(BaseVertexIndex + 2);
+        Triangles.Add(BaseVertexIndex);
+        Triangles.Add(BaseVertexIndex + 2);
+        Triangles.Add(BaseVertexIndex + 3);
+    };
+
+    for (int32 CrownIndex = 0; CrownIndex < CrownCount; ++CrownIndex)
+    {
+        const float T = static_cast<float>(CrownIndex) / static_cast<float>(FMath::Max(1, CrownCount - 1));
+        const float Phase = static_cast<float>(CrownIndex) * 1.237f;
+        const float Side = (CrownIndex % 2 == 0) ? -1.0f : 1.0f;
+        const float BaseX = FMath::Lerp(2700.0f, 26050.0f, T) +
+            220.0f * FMath::Sin(Phase * 1.09f) +
+            90.0f * FMath::Sin(Phase * 0.41f);
+        const float OffsetWave = FMath::Pow(
+            FMath::Abs(FMath::Sin(Phase * (Spec.bDesertCanyon ? 0.58f : 0.63f))),
+            Spec.bDesertCanyon ? 0.72f : 0.48f);
+        const float BaseOffset = ActiveRiverHalfWidth + NearBankOffset + FarBankOffset * OffsetWave;
+
+        float X = BaseX;
+        float SignedOffset = Side * BaseOffset;
+        float BestScore = -1000.0f;
+        for (int32 CandidateIndex = 0; CandidateIndex < 6; ++CandidateIndex)
+        {
+            const float CandidateX = BaseX + 185.0f * FMath::Sin(Phase + static_cast<float>(CandidateIndex) * 0.93f);
+            const float CandidateOffset = FMath::Max(
+                ActiveRiverHalfWidth + NearBankOffset * 0.70f,
+                BaseOffset + 215.0f * FMath::Sin(Phase * 0.46f + static_cast<float>(CandidateIndex) * 1.17f));
+            const float CandidateY = GetPreviewRiverCenterY(Spec, CandidateX) + Side * CandidateOffset;
+            const float WaterT = SamplePreviewMaskAtWorld(Spec, WaterMask, CandidateX, CandidateY);
+            const float VegetationT = SamplePreviewMaskAtWorld(Spec, VegetationMask, CandidateX, CandidateY);
+            const float BankPreference =
+                1.0f - FMath::Clamp(
+                    FMath::Abs(CandidateOffset - (ActiveRiverHalfWidth + NearBankOffset + FarBankOffset * 0.34f)) /
+                        FMath::Max(1.0f, FarBankOffset),
+                    0.0f,
+                    1.0f);
+            const float Score = Spec.bDesertCanyon
+                ? BankPreference * 0.82f + (1.0f - WaterT) * 0.44f + (1.0f - VegetationT) * 0.08f
+                : BankPreference * 0.58f + VegetationT * (bRainforest ? 1.44f : 1.02f) - WaterT * 0.58f;
+            if (Score > BestScore)
+            {
+                BestScore = Score;
+                X = CandidateX;
+                SignedOffset = Side * CandidateOffset;
+            }
+        }
+
+        if (X < 3150.0f && FMath::Abs(SignedOffset) < ActiveRiverHalfWidth + 1060.0f)
+        {
+            continue;
+        }
+
+        const float Y = GetPreviewRiverCenterY(Spec, X) + SignedOffset;
+        const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief, HeightfieldPreview);
+        const float VegetationT = SamplePreviewMaskAtWorld(Spec, VegetationMask, X, Y);
+        const float WaterT = SamplePreviewMaskAtWorld(Spec, WaterMask, X, Y);
+        const float YawDegrees = static_cast<float>((CrownIndex * 47) % 360);
+        const float YawRadians = FMath::DegreesToRadians(YawDegrees);
+        const FVector BaseForward(FMath::Cos(YawRadians), FMath::Sin(YawRadians), 0.0f);
+        const FVector BaseRight(-FMath::Sin(YawRadians), FMath::Cos(YawRadians), 0.0f);
+        const FVector CrownCenter(
+            X,
+            Y,
+            TerrainZ + (Spec.bDesertCanyon ? 82.0f : (bRainforest ? 350.0f : 214.0f)) +
+                18.0f * FMath::Sin(Phase));
+        const float CrownRadiusX = Spec.bDesertCanyon ? 70.0f : (bRainforest ? 210.0f : 138.0f);
+        const float CrownRadiusY = Spec.bDesertCanyon ? 42.0f : (bRainforest ? 148.0f : 96.0f);
+        const float CrownRadiusZ = Spec.bDesertCanyon ? 42.0f : (bRainforest ? 145.0f : 86.0f);
+        const FLinearColor CanopyLow = Spec.bDesertCanyon
+            ? FLinearColor(0.19f, 0.20f, 0.10f)
+            : (bRainforest ? FLinearColor(0.014f, 0.070f, 0.024f) : FLinearColor(0.070f, 0.150f, 0.045f));
+        const FLinearColor CanopyHigh = Spec.bDesertCanyon
+            ? FLinearColor(0.38f, 0.35f, 0.18f)
+            : (bRainforest ? FLinearColor(0.070f, 0.245f, 0.060f) : FLinearColor(0.165f, 0.280f, 0.080f));
+        const FLinearColor CrownBaseColor = ScalePreviewColor(
+            FMath::Lerp(CanopyLow, FMath::Lerp(Spec.FoliageColor, CanopyHigh, 0.50f), 0.48f + VegetationT * 0.30f),
+            0.78f + 0.06f * static_cast<float>(CrownIndex % 5) - WaterT * 0.05f);
+        const FLinearColor CrownShadowColor = Spec.bDesertCanyon
+            ? ScalePreviewColor(FLinearColor(0.090f, 0.090f, 0.050f), 0.78f)
+            : ScalePreviewColor(
+                  bRainforest ? FLinearColor(0.008f, 0.025f, 0.012f) : FLinearColor(0.030f, 0.055f, 0.022f),
+                  0.86f);
+
+        for (int32 ShadowIndex = 0; ShadowIndex < ShadowQuadsPerCrown; ++ShadowIndex)
+        {
+            const float ShadowT =
+                (static_cast<float>(ShadowIndex) + 1.0f) / static_cast<float>(ShadowQuadsPerCrown + 1);
+            const float Angle = YawRadians +
+                (ShadowT - 0.5f) * (bRainforest ? 2.20f : 1.65f) +
+                0.35f * FMath::Sin(Phase + static_cast<float>(ShadowIndex));
+            const FVector RadialDir(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
+            const FVector WidthDir = (BaseRight * 0.68f + RadialDir * 0.32f).GetSafeNormal();
+            const FVector ShadowCenter = CrownCenter +
+                RadialDir * (CrownRadiusX * (0.10f + 0.18f * ShadowT)) -
+                BaseForward * (CrownRadiusY * 0.10f) -
+                Up * (CrownRadiusZ * (0.18f + 0.08f * FMath::Sin(Phase)));
+            const float ShadowWidth = CrownRadiusY * (Spec.bDesertCanyon ? 0.36f : (bRainforest ? 0.58f : 0.50f));
+            const float ShadowHeight = CrownRadiusZ * (Spec.bDesertCanyon ? 0.50f : (bRainforest ? 0.64f : 0.58f));
+            AddQuad(
+                ShadowCenter - WidthDir * ShadowWidth - Up * ShadowHeight * 0.48f,
+                ShadowCenter + WidthDir * ShadowWidth - Up * ShadowHeight * 0.40f,
+                ShadowCenter + WidthDir * ShadowWidth * 0.78f + Up * ShadowHeight * 0.48f,
+                ShadowCenter - WidthDir * ShadowWidth * 0.72f + Up * ShadowHeight * 0.42f,
+                ScalePreviewColor(CrownShadowColor, 0.74f + ShadowT * 0.08f),
+                ScalePreviewColor(CrownBaseColor, 0.54f + ShadowT * 0.10f));
+        }
+
+        for (int32 LeafletIndex = 0; LeafletIndex < LeafletsPerCrown; ++LeafletIndex)
+        {
+            const float LeafT = static_cast<float>(LeafletIndex) / static_cast<float>(FMath::Max(1, LeafletsPerCrown - 1));
+            const float Angle = YawRadians +
+                static_cast<float>(LeafletIndex) * (bRainforest ? 2.399f : 2.117f) +
+                static_cast<float>(CrownIndex) * 0.037f;
+            const float RadialT = FMath::Sqrt(FMath::Frac(0.257f + 0.618034f * static_cast<float>(LeafletIndex)));
+            const FVector RadialDir(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
+            const FVector LeafForward =
+                (RadialDir * (0.78f + 0.10f * FMath::Sin(LeafT * PI)) +
+                 BaseForward * (0.12f * FMath::Sin(Phase + static_cast<float>(LeafletIndex) * 0.77f)) +
+                 Up * (Spec.bDesertCanyon ? 0.08f : (bRainforest ? 0.30f : 0.20f)))
+                    .GetSafeNormal();
+            const FVector LeafWidthDirRaw = FVector::CrossProduct(LeafForward, Up).GetSafeNormal();
+            const FVector LeafWidthDir = LeafWidthDirRaw.IsNearlyZero() ? BaseRight : LeafWidthDirRaw;
+            const FVector LeafCenter = CrownCenter +
+                RadialDir * (CrownRadiusX * (0.22f + 0.58f * RadialT)) +
+                BaseRight * (CrownRadiusY * 0.16f * FMath::Sin(Phase * 0.73f + static_cast<float>(LeafletIndex) * 1.31f)) +
+                Up * (CrownRadiusZ * (-0.18f + 0.70f * LeafT + 0.12f * FMath::Sin(Angle)));
+            const float LeafLength = CrownRadiusX * (Spec.bDesertCanyon ? 0.16f : (bRainforest ? 0.12f : 0.11f)) *
+                (0.70f + 0.20f * FMath::Abs(FMath::Sin(Phase + static_cast<float>(LeafletIndex) * 0.91f)));
+            const float LeafHalfWidth = CrownRadiusY * (Spec.bDesertCanyon ? 0.038f : (bRainforest ? 0.026f : 0.030f)) *
+                (0.70f + 0.16f * FMath::Abs(FMath::Cos(Angle * 0.73f)));
+            const float Shade = 0.66f + 0.24f * LeafT +
+                0.08f * FMath::Sin(Phase * 0.91f + static_cast<float>(LeafletIndex) * 0.83f);
+            const FLinearColor LeafBaseColor = ScalePreviewColor(CrownBaseColor, Shade * (bRainforest ? 0.74f : 0.78f));
+            const FLinearColor LeafTipColor = ScalePreviewColor(CrownBaseColor, Shade * (bRainforest ? 1.02f : 0.96f));
+            AddQuad(
+                LeafCenter - LeafForward * LeafLength * 0.74f,
+                LeafCenter + LeafWidthDir * LeafHalfWidth,
+                LeafCenter + LeafForward * LeafLength + Up * (LeafLength * (bRainforest ? 0.16f : 0.10f)),
+                LeafCenter - LeafWidthDir * LeafHalfWidth,
+                LeafBaseColor,
+                LeafTipColor);
+        }
+    }
+
+    if (Vertices.IsEmpty() || Triangles.IsEmpty())
+    {
+        return;
+    }
+
+    const TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    AActor* Actor = AddPreviewProceduralMeshActor(
+        World,
+        FString::Printf(TEXT("RaftSim_FoliageCrownDepthAndLeafletBreakup_%s"), *Spec.RiverId),
+        Vertices,
+        Triangles,
+        Normals,
+        UVs,
+        Spec.FoliageColor,
+        LoadOrCreatePreviewVertexColorMaterial(),
+        &VertexColors);
+    if (Actor)
+    {
+        TArray<UProceduralMeshComponent*> MeshComponents;
+        Actor->GetComponents<UProceduralMeshComponent>(MeshComponents);
+        for (UProceduralMeshComponent* MeshComponent : MeshComponents)
+        {
+            if (MeshComponent)
+            {
+                MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            }
+        }
+    }
 }
 
 void AddPreviewBoulderSurfaceFacet(
@@ -6657,6 +6886,13 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         VegetationMaskPtr,
         SphereMesh,
         CylinderMesh);
+    AddPreviewFoliageCrownDepthAndLeafletBreakupDetail(
+        World,
+        Spec,
+        TerrainReliefPtr,
+        HeightfieldPreviewPtr,
+        WaterMaskPtr,
+        VegetationMaskPtr);
     AddPreviewWaterSurfaceDetail(World, Spec);
     AddPreviewFlowBandTextureDetail(World, Spec);
     AddPreviewWaterSurfaceChopAndTurbidityDetail(World, Spec);
