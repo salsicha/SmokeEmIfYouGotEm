@@ -2290,8 +2290,9 @@ void AddPreviewAerialDrapeTiles(
         return;
     }
 
-    constexpr int32 XTiles = 64;
-    constexpr int32 YTiles = 20;
+    constexpr int32 XTiles = 72;
+    constexpr int32 YTiles = 24;
+    constexpr int32 MicrotileSubdivisions = 4;
     const float MinX = -5600.0f;
     const float MaxX = 26000.0f;
     const float HalfWidth = Spec.bDesertCanyon ? 4300.0f : 2750.0f;
@@ -2312,58 +2313,133 @@ void AddPreviewAerialDrapeTiles(
                 continue;
             }
 
-            const float DrapeWeight = Spec.bDesertCanyon ? 0.26f : (Spec.bHasWaterfalls ? 0.20f : 0.24f);
-            const float SourceWaterT = WaterMask && WaterMask->IsValid() ? WaterMask->SampleLuma(U, V) : 0.0f;
-            const float SourceVegetationT = VegetationMask && VegetationMask->IsValid() ? VegetationMask->SampleLuma(U, V) : 0.0f;
-            FLinearColor SourceDrapeColor = NormalizePreviewSourceDrapeAlbedo(
-                Spec,
-                AerialDrape->Sample(U, V),
-                SourceWaterT,
-                SourceVegetationT,
-                Spec.bHasWaterfalls ? 0.58f : (Spec.bDesertCanyon ? 0.50f : 0.52f));
-            FLinearColor AerialColor = FMath::Lerp(Spec.TerrainColor, SourceDrapeColor, DrapeWeight);
-            AerialColor = FMath::Lerp(
-                AerialColor,
-                ScalePreviewColor(Spec.FoliageColor, Spec.bHasWaterfalls ? 1.24f : 1.08f),
-                FMath::Clamp(SourceVegetationT * (Spec.bDesertCanyon ? 0.10f : 0.22f), 0.0f, 0.28f));
-            AerialColor = FMath::Lerp(
-                AerialColor,
-                ScalePreviewColor(Spec.WaterColor, 0.68f),
-                FMath::Clamp(SourceWaterT * 0.16f, 0.0f, 0.18f));
-            AerialColor.R = FMath::Max(AerialColor.R, Spec.TerrainColor.R * 0.92f + 0.055f);
-            AerialColor.G = FMath::Max(AerialColor.G, Spec.TerrainColor.G * 0.92f + 0.055f);
-            AerialColor.B = FMath::Max(AerialColor.B, Spec.TerrainColor.B * 0.92f + 0.055f);
-            AerialColor.A = 1.0f;
-            const float HalfLength = TileLength * 0.56f;
-            const float HalfTileWidth = TileWidth * 0.56f;
-            const float TileZOffset = 14.0f;
+            const float DrapeWeight = Spec.bDesertCanyon ? 0.18f : (Spec.bHasWaterfalls ? 0.15f : 0.17f);
+            const float HalfLength = TileLength * 0.48f;
+            const float HalfTileWidth = TileWidth * 0.48f;
+            const float TileZOffset = 9.0f;
             const float X0 = X - HalfLength;
             const float X1 = X + HalfLength;
             const float Y0 = Y - HalfTileWidth;
             const float Y1 = Y + HalfTileWidth;
 
             TArray<FVector> Vertices;
-            Vertices.Add(FVector(X0, Y0, GetPreviewTerrainHeightCm(Spec, X0, Y0, TerrainRelief, HeightfieldPreview) + TileZOffset));
-            Vertices.Add(FVector(X0, Y1, GetPreviewTerrainHeightCm(Spec, X0, Y1, TerrainRelief, HeightfieldPreview) + TileZOffset));
-            Vertices.Add(FVector(X1, Y0, GetPreviewTerrainHeightCm(Spec, X1, Y0, TerrainRelief, HeightfieldPreview) + TileZOffset));
-            Vertices.Add(FVector(X1, Y1, GetPreviewTerrainHeightCm(Spec, X1, Y1, TerrainRelief, HeightfieldPreview) + TileZOffset));
+            TArray<FLinearColor> VertexColors;
+            TArray<FVector2D> UVs;
+            TArray<int32> Triangles;
+            Vertices.Reserve((MicrotileSubdivisions + 1) * (MicrotileSubdivisions + 1));
+            VertexColors.Reserve((MicrotileSubdivisions + 1) * (MicrotileSubdivisions + 1));
+            UVs.Reserve((MicrotileSubdivisions + 1) * (MicrotileSubdivisions + 1));
+            Triangles.Reserve(MicrotileSubdivisions * MicrotileSubdivisions * 6);
+            for (int32 LocalXIndex = 0; LocalXIndex <= MicrotileSubdivisions; ++LocalXIndex)
+            {
+                const float LocalU = static_cast<float>(LocalXIndex) / static_cast<float>(MicrotileSubdivisions);
+                for (int32 LocalYIndex = 0; LocalYIndex <= MicrotileSubdivisions; ++LocalYIndex)
+                {
+                    const float LocalV = static_cast<float>(LocalYIndex) / static_cast<float>(MicrotileSubdivisions);
+                    const float SampleX = FMath::Lerp(X0, X1, LocalU);
+                    const float SampleY = FMath::Lerp(Y0, Y1, LocalV);
+                    const float SampleSceneU = FMath::Clamp((SampleX - MinX) / (MaxX - MinX), 0.0f, 1.0f);
+                    const float SampleSceneV = FMath::Clamp((SampleY + HalfWidth) / (HalfWidth * 2.0f), 0.0f, 1.0f);
+                    const float SampleCenterY = GetPreviewRiverCenterY(Spec, SampleX);
+                    const float Offset = FMath::Abs(SampleY - SampleCenterY);
+                    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+                    const float BankT = SmoothPreviewStep(ActiveRiverHalfWidth, ActiveRiverHalfWidth + Spec.BankWidthCm, Offset);
+                    const float CanyonT = SmoothPreviewStep(
+                        ActiveRiverHalfWidth + Spec.BankWidthCm,
+                        ActiveRiverHalfWidth + Spec.BankWidthCm + (Spec.bDesertCanyon ? 1400.0f : 820.0f),
+                        Offset);
+                    const float WetT = 1.0f - SmoothPreviewStep(
+                        ActiveRiverHalfWidth + 35.0f,
+                        ActiveRiverHalfWidth + 360.0f * Spec.FlowWetBankScale,
+                        Offset);
+                    const float SourceWaterT =
+                        WaterMask && WaterMask->IsValid() ? WaterMask->SampleLuma(SampleSceneU, SampleSceneV) : 0.0f;
+                    const float SourceVegetationT = VegetationMask && VegetationMask->IsValid()
+                        ? VegetationMask->SampleLuma(SampleSceneU, SampleSceneV)
+                        : 0.0f;
+                    const FLinearColor ShoulderColor = Spec.bDesertCanyon
+                        ? FLinearColor(0.62f, 0.40f, 0.24f)
+                        : ScalePreviewColor(Spec.TerrainColor, Spec.bHasWaterfalls ? 0.72f : 1.12f);
+                    const FLinearColor WetBankColor = Spec.bDesertCanyon
+                        ? FLinearColor(0.30f, 0.23f, 0.16f)
+                        : FMath::Lerp(ScalePreviewColor(Spec.WaterColor, 0.55f), ScalePreviewColor(Spec.RockColor, 0.62f), 0.48f);
+                    const FLinearColor SourceVegetationColor = Spec.bDesertCanyon
+                        ? FLinearColor(0.30f, 0.31f, 0.17f)
+                        : ScalePreviewColor(Spec.FoliageColor, Spec.bHasWaterfalls ? 1.18f : 1.05f);
+                    FLinearColor TerrainColor = FMath::Lerp(
+                        Spec.TerrainColor,
+                        ShoulderColor,
+                        FMath::Clamp(BankT * 0.45f + CanyonT * 0.35f, 0.0f, 1.0f));
+                    TerrainColor = FMath::Lerp(
+                        TerrainColor,
+                        SourceVegetationColor,
+                        FMath::Clamp(SourceVegetationT * (Spec.bDesertCanyon ? 0.12f : 0.26f), 0.0f, 0.32f));
+                    TerrainColor = FMath::Lerp(
+                        TerrainColor,
+                        WetBankColor,
+                        FMath::Clamp(FMath::Max(WetT * 0.42f, SourceWaterT * 0.28f), 0.0f, 0.54f));
+                    TerrainColor = ScalePreviewColor(
+                        TerrainColor,
+                        0.92f + 0.06f * FMath::Sin(SampleX * 0.0059f + SampleY * 0.0042f));
+                    FLinearColor SourceDrapeColor = NormalizePreviewSourceDrapeAlbedo(
+                        Spec,
+                        AerialDrape->Sample(SampleSceneU, SampleSceneV),
+                        SourceWaterT,
+                        SourceVegetationT,
+                        Spec.bHasWaterfalls ? 0.46f : (Spec.bDesertCanyon ? 0.40f : 0.42f));
+                    const float EdgeDistance = FMath::Min(
+                        FMath::Min(LocalU, 1.0f - LocalU),
+                        FMath::Min(LocalV, 1.0f - LocalV));
+                    const float EdgeFeather = SmoothPreviewStep(0.02f, 0.34f, EdgeDistance);
+                    const float PatchMottle = 0.74f + 0.18f * FMath::Sin(SampleX * 0.017f + SampleY * 0.013f + static_cast<float>(XIndex + YIndex) * 0.31f);
+                    FLinearColor AerialColor = FMath::Lerp(
+                        TerrainColor,
+                        SourceDrapeColor,
+                        FMath::Clamp(DrapeWeight * EdgeFeather * PatchMottle, 0.0f, 0.22f));
+                    AerialColor.R = FMath::Max(AerialColor.R, Spec.TerrainColor.R * 0.78f + 0.035f);
+                    AerialColor.G = FMath::Max(AerialColor.G, Spec.TerrainColor.G * 0.78f + 0.035f);
+                    AerialColor.B = FMath::Max(AerialColor.B, Spec.TerrainColor.B * 0.78f + 0.035f);
+                    AerialColor.A = 1.0f;
 
-            TArray<int32> Triangles = {0, 2, 1, 1, 2, 3};
+                    Vertices.Add(FVector(
+                        SampleX,
+                        SampleY,
+                        GetPreviewTerrainHeightCm(Spec, SampleX, SampleY, TerrainRelief, HeightfieldPreview) +
+                            TileZOffset + EdgeFeather * 2.5f));
+                    UVs.Add(FVector2D(LocalU, LocalV));
+                    VertexColors.Add(AerialColor);
+                }
+            }
+
+            const int32 RowSize = MicrotileSubdivisions + 1;
+            for (int32 LocalXIndex = 0; LocalXIndex < MicrotileSubdivisions; ++LocalXIndex)
+            {
+                for (int32 LocalYIndex = 0; LocalYIndex < MicrotileSubdivisions; ++LocalYIndex)
+                {
+                    const int32 A = LocalXIndex * RowSize + LocalYIndex;
+                    const int32 B = A + 1;
+                    const int32 C = (LocalXIndex + 1) * RowSize + LocalYIndex;
+                    const int32 D = C + 1;
+                    Triangles.Add(A);
+                    Triangles.Add(C);
+                    Triangles.Add(B);
+                    Triangles.Add(B);
+                    Triangles.Add(C);
+                    Triangles.Add(D);
+                }
+            }
             TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
-            TArray<FVector2D> UVs = {
-                FVector2D(0.0f, 0.0f),
-                FVector2D(0.0f, 1.0f),
-                FVector2D(1.0f, 0.0f),
-                FVector2D(1.0f, 1.0f)};
 
             AddPreviewProceduralMeshActor(
                 World,
-                FString::Printf(TEXT("RaftSim_SourceAerialDrapeTile_%02d_%02d_%s"), XIndex, YIndex, *Spec.RiverId),
+                FString::Printf(TEXT("RaftSim_SourceAerialDrapeMicroTile_%02d_%02d_%s"), XIndex, YIndex, *Spec.RiverId),
                 Vertices,
                 Triangles,
                 Normals,
                 UVs,
-                AerialColor);
+                Spec.TerrainColor,
+                LoadOrCreatePreviewTerrainVertexColorMaterial(),
+                &VertexColors);
         }
     }
 }

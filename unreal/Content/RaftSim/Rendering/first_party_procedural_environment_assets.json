@@ -41,6 +41,7 @@
       "source_drape_albedo_normalization",
       "terrain_proxy_luma_floor",
       "softened_source_drape_overlay",
+      "first_party_feathered_source_drape_microtiles",
       "heightfield_and_dem_relief_sampling",
       "flow_aware_bank_undercut_shelf_relief",
       "water_and_vegetation_mask_guided_detail_placement",
