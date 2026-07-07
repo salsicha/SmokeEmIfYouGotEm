@@ -2738,7 +2738,7 @@ void AddPreviewShoreRibbon(
                 ScalePreviewColor(FMath::Lerp(InnerColor, OuterColor, V), Fleck));
             Vertices.Add(FVector(X, Y, Z));
             UVs.Add(FVector2D(U * 16.0f, V));
-            VertexColors.Add(ClampPreviewColor(FMath::Lerp(TerrainBase, RibbonColor, SegmentFade * 0.46f)));
+            VertexColors.Add(ClampPreviewColor(FMath::Lerp(TerrainBase, RibbonColor, SegmentFade * 0.32f)));
         }
     }
 
@@ -3611,7 +3611,7 @@ void AddPreviewProceduralEnvironmentDetail(
         return;
     }
 
-    const int32 BandCount = Spec.bDesertCanyon ? 4 : (Spec.bHasWaterfalls ? 3 : 3);
+    const int32 BandCount = 0;
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float BaseBandOffset = ActiveRiverHalfWidth +
         (Spec.bDesertCanyon ? Spec.BankWidthCm * 0.72f + 380.0f : Spec.BankWidthCm * 0.35f + 190.0f);
