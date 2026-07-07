@@ -1094,6 +1094,68 @@ FLinearColor NormalizePreviewTerrainProxyPatchColor(
     return ClampPreviewColor(FMath::Lerp(Color, FillColor, FMath::Clamp((MinLuma - Luma) / MinLuma * 0.86f, 0.0f, 0.86f)));
 }
 
+FLinearColor GetPreviewSoftTerrainPatchFeatherBaseColor(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    float X,
+    float Y,
+    float Phase)
+{
+    const float BroadNoise = FMath::Clamp(
+        0.50f + 0.34f * FMath::Sin(Phase * 0.67f + X * 0.00042f) +
+            0.16f * FMath::Sin(Phase * 1.31f - Y * 0.00058f),
+        0.0f,
+        1.0f);
+
+    FLinearColor BaseColor;
+    if (Spec.bDesertCanyon)
+    {
+        BaseColor = FMath::Lerp(FLinearColor(0.33f, 0.23f, 0.15f), FLinearColor(0.57f, 0.40f, 0.24f), BroadNoise);
+    }
+    else if (Spec.bHasWaterfalls)
+    {
+        BaseColor = FMath::Lerp(FLinearColor(0.028f, 0.060f, 0.038f), FLinearColor(0.070f, 0.130f, 0.060f), BroadNoise);
+        BaseColor = FMath::Lerp(BaseColor, ScalePreviewColor(Spec.FoliageColor, 0.52f), 0.24f);
+    }
+    else
+    {
+        BaseColor = FMath::Lerp(FLinearColor(0.18f, 0.17f, 0.12f), FLinearColor(0.30f, 0.28f, 0.16f), BroadNoise);
+        BaseColor = FMath::Lerp(BaseColor, ScalePreviewColor(Spec.TerrainColor, 0.88f), 0.38f);
+    }
+
+    const float LumaJitter = 0.94f + 0.07f * FMath::Sin(Phase * 0.43f + X * 0.00071f - Y * 0.00039f);
+    return NormalizePreviewTerrainProxyPatchColor(Spec, ScalePreviewColor(BaseColor, LumaJitter));
+}
+
+float GetPreviewSoftTerrainPatchCoverage(float U, float V, float Phase)
+{
+    const float StartFeather = SmoothPreviewStep(0.035f, 0.24f, U);
+    const float EndFeather = 1.0f - SmoothPreviewStep(0.76f, 0.965f, U);
+    const float CrossCenterT = 1.0f - FMath::Clamp(FMath::Abs(V - 0.5f) * 2.0f, 0.0f, 1.0f);
+    const float CrossFeather = SmoothPreviewStep(0.0f, 0.70f, CrossCenterT);
+    const float OrganicFeather = FMath::Clamp(
+        0.82f + 0.12f * FMath::Sin(Phase + U * 5.9f + V * 2.7f) +
+            0.06f * FMath::Sin(Phase * 0.47f + U * 13.0f - V * 4.1f),
+        0.62f,
+        1.0f);
+    return FMath::Clamp(StartFeather * EndFeather * CrossFeather * OrganicFeather, 0.0f, 1.0f);
+}
+
+FLinearColor BlendPreviewSoftTerrainPatchColor(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FLinearColor& FeatureColor,
+    float X,
+    float Y,
+    float U,
+    float V,
+    float Phase,
+    float Coverage)
+{
+    const FLinearColor FeatherBase = GetPreviewSoftTerrainPatchFeatherBaseColor(Spec, X, Y, Phase);
+    const float MaxFeatureBlend = Spec.bDesertCanyon ? 0.80f : (Spec.bHasWaterfalls ? 0.70f : 0.73f);
+    const float Blend = FMath::Clamp(Coverage * MaxFeatureBlend, 0.0f, 0.86f);
+    return ClampPreviewColor(FMath::Lerp(FeatherBase, FeatureColor, Blend));
+}
+
 float GetPreviewRiverCenterY(const FRaftSimEnvironmentPreviewSpec& Spec, float X)
 {
     const float Primary = FMath::Sin((X + 3800.0f) * 0.00043f) * Spec.BendAmplitudeCm;
@@ -2285,8 +2347,8 @@ void AddPreviewBankBreakupPatch(
         return;
     }
 
-    constexpr int32 Segments = 8;
-    constexpr int32 CrossSteps = 2;
+    constexpr int32 Segments = 16;
+    constexpr int32 CrossSteps = 6;
     TArray<FVector> Vertices;
     TArray<FVector> Normals;
     TArray<FVector2D> UVs;
@@ -2308,21 +2370,29 @@ void AddPreviewBankBreakupPatch(
         for (int32 CrossIndex = 0; CrossIndex <= CrossSteps; ++CrossIndex)
         {
             const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
-            const float Cross = (V - 0.5f) * Width * (0.45f + 0.55f * LongitudinalTaper);
+            const float CrossCenterT = 1.0f - FMath::Clamp(FMath::Abs(V - 0.5f) * 2.0f, 0.0f, 1.0f);
+            const float EdgeT = 1.0f - CrossCenterT;
+            const float PatchCoverage = GetPreviewSoftTerrainPatchCoverage(U, V, Phase);
+            const float Cross =
+                (V - 0.5f) * Width * (0.45f + 0.55f * LongitudinalTaper) +
+                FMath::Sin(Phase * 1.17f + U * 8.3f + V * 5.1f) * Width * 0.035f * EdgeT;
             const float Sway =
                 FMath::Sin(Phase + U * UE_TWO_PI) * Width * 0.18f +
                 FMath::Sin(Phase * 0.37f + U * UE_TWO_PI * 2.0f) * Width * 0.07f;
             const float Y = RiverCenterY + SignedCenterOffset + Side * Sway + Cross;
-            const float Z = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief, HeightfieldPreview) + ZOffset;
+            const float ZFeather = 0.42f + 0.58f * PatchCoverage;
+            const float Z = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief, HeightfieldPreview) +
+                FMath::Max(Spec.bDesertCanyon ? 8.0f : 5.0f, ZOffset * ZFeather);
             const float Fleck = FMath::Clamp(
                 0.86f + 0.10f * FMath::Sin(Phase + U * 5.7f) + 0.06f * FMath::Sin(Phase * 0.71f + V * 4.3f),
                 0.68f,
                 1.04f);
             Vertices.Add(FVector(X, Y, Z));
-            UVs.Add(FVector2D(U * 3.0f, V));
-            VertexColors.Add(NormalizePreviewTerrainProxyPatchColor(
+            UVs.Add(FVector2D(U * 4.5f, V));
+            const FLinearColor FeatureColor = NormalizePreviewTerrainProxyPatchColor(
                 Spec,
-                ScalePreviewColor(FMath::Lerp(InnerColor, OuterColor, V), Fleck)));
+                ScalePreviewColor(FMath::Lerp(InnerColor, OuterColor, V), Fleck));
+            VertexColors.Add(BlendPreviewSoftTerrainPatchColor(Spec, FeatureColor, X, Y, U, V, Phase, PatchCoverage));
         }
     }
 
