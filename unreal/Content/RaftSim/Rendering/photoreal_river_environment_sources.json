@@ -1419,6 +1419,7 @@
       "first_party_terrain_material_layer_facets_and_slope_shadow_patches_recorded",
       "first_party_landscape_nanite_material_layer_scaffold_recorded",
       "first_party_lit_terrain_vertex_color_material_recorded",
+      "soft_lit_terrain_vertex_color_review_material_recorded",
       "terrain_proxy_luma_floor_recorded",
       "shadowless_terrain_albedo_review_capture_material_recorded",
       "flow_aware_waterline_pebble_scatter_recorded",

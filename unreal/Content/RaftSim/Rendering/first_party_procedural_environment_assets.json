@@ -50,6 +50,7 @@
       "first_party_landscape_nanite_material_layer_scaffold",
       "first_party_lit_terrain_vertex_color_material",
       "shadowless_terrain_albedo_review_capture_material",
+      "soft_lit_terrain_vertex_color_review_material",
       "flow_aware_waterline_pebble_scatter",
       "first_party_irregular_rock_geometry_variants",
       "first_party_boulder_wetness_abrasion_moss_surface_variants",

@@ -634,17 +634,27 @@ UMaterialInterface* LoadOrCreatePreviewTerrainVertexColorMaterial()
     if (Material && !bTerrainMaterialConfigured)
     {
         Material->Modify();
-        Material->SetShadingModel(MSM_Unlit);
+        Material->SetShadingModel(MSM_DefaultLit);
         Material->BlendMode = BLEND_Opaque;
         Material->TwoSided = true;
+        int32 TerrainConstantIndex = 0;
         for (TObjectPtr<UMaterialExpression>& Expression : Material->GetExpressionCollection().Expressions)
         {
             if (UMaterialExpressionConstant* Constant = Cast<UMaterialExpressionConstant>(Expression.Get()))
             {
-                if (Constant->R <= 0.05f)
+                if (TerrainConstantIndex == 0)
                 {
-                    Constant->R = 1.0f;
+                    Constant->R = 0.92f;
                 }
+                else if (TerrainConstantIndex == 1)
+                {
+                    Constant->R = 0.08f;
+                }
+                else
+                {
+                    Constant->R = 0.42f;
+                }
+                ++TerrainConstantIndex;
             }
         }
         Material->PostEditChange();
