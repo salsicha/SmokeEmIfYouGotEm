@@ -3148,7 +3148,8 @@ void AddPreviewWaterShaderDepthReflectionScaffoldDetail(UWorld* World, const FRa
 
     constexpr int32 XSteps = 112;
     constexpr int32 CrossSteps = 8;
-    const float MinX = -5480.0f;
+    const float NearCameraWaterScaffoldClearanceMinX = -1800.0f;
+    const float MinX = NearCameraWaterScaffoldClearanceMinX;
     const float MaxX = 26000.0f;
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float WaterBaseZ = GetPreviewWaterSurfaceBaseZCm(Spec);
@@ -3250,7 +3251,7 @@ void AddPreviewWaterShaderDepthReflectionScaffoldDetail(UWorld* World, const FRa
     for (int32 ReflectionIndex = 0; ReflectionIndex < ReflectionRibbonCount; ++ReflectionIndex)
     {
         const float T = FMath::Frac(0.081f + 0.618034f * static_cast<float>(ReflectionIndex));
-        const float X = FMath::Lerp(-5050.0f, 25300.0f, T);
+        const float X = FMath::Lerp(NearCameraWaterScaffoldClearanceMinX, 25300.0f, T);
         const float Side = (ReflectionIndex % 2 == 0) ? -1.0f : 1.0f;
         const float Lateral = Side * ActiveRiverHalfWidth * (0.58f + 0.22f * FMath::Sin(static_cast<float>(ReflectionIndex) * 0.73f));
         const float Length =
@@ -3276,7 +3277,7 @@ void AddPreviewWaterShaderDepthReflectionScaffoldDetail(UWorld* World, const FRa
     for (int32 SeamIndex = 0; SeamIndex < RefractionSeamCount; ++SeamIndex)
     {
         const float T = FMath::Frac(0.143f + 0.414214f * static_cast<float>(SeamIndex));
-        const float X = FMath::Lerp(-4200.0f, 24800.0f, T);
+        const float X = FMath::Lerp(NearCameraWaterScaffoldClearanceMinX, 24800.0f, T);
         const float Side = (SeamIndex % 2 == 0) ? -1.0f : 1.0f;
         const float Lateral = Side * ActiveRiverHalfWidth * (0.28f + 0.32f * FMath::Abs(FMath::Sin(static_cast<float>(SeamIndex) * 0.89f)));
         const FLinearColor SeamHighlight = Spec.bDesertCanyon
@@ -4785,15 +4786,31 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
                 Y = CandidateY;
             }
         }
+        float BoulderCenterY = GetPreviewRiverCenterY(Spec, X);
+        float BoulderLateralOffset = Y - BoulderCenterY;
+        const bool bNearCameraReviewBoulder = X < -2500.0f;
+        if (bNearCameraReviewBoulder && FMath::Abs(BoulderLateralOffset) < ActiveRiverHalfWidth * 0.62f)
+        {
+            const float ReviewClearanceSide = (BoulderIndex % 2 == 0) ? -1.0f : 1.0f;
+            X += Spec.bDesertCanyon ? 780.0f : 620.0f;
+            BoulderCenterY = GetPreviewRiverCenterY(Spec, X);
+            BoulderLateralOffset =
+                ReviewClearanceSide * ActiveRiverHalfWidth * (Spec.bDesertCanyon ? 0.82f : 0.74f);
+            Y = BoulderCenterY + BoulderLateralOffset;
+        }
+
         const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainReliefPtr, HeightfieldPreviewPtr);
-        const float Scale = Spec.bDesertCanyon ? 1.6f : 1.0f + 0.35f * static_cast<float>(BoulderIndex % 3);
+        const float BaseScale = Spec.bDesertCanyon ? 1.6f : 1.0f + 0.35f * static_cast<float>(BoulderIndex % 3);
+        const float Scale = BaseScale * (bNearCameraReviewBoulder ? 0.68f : 1.0f);
         const float BoulderWaterT = SamplePreviewMaskAtWorld(Spec, WaterMaskPtr, X, Y);
         const float BoulderVegetationT = SamplePreviewMaskAtWorld(Spec, VegetationMaskPtr, X, Y);
         const FLinearColor BoulderBaseColor = ScalePreviewColor(Spec.RockColor, Spec.bDesertCanyon ? 0.90f : 0.78f);
-        const FLinearColor BoulderColor = FMath::Lerp(
+        const FLinearColor UnadjustedBoulderColor = FMath::Lerp(
             BoulderBaseColor,
             FMath::Lerp(ScalePreviewColor(Spec.RockColor, 0.46f), ScalePreviewColor(Spec.WaterColor, 0.34f), 0.30f),
             FMath::Clamp(BoulderWaterT * 0.36f, 0.0f, 0.42f));
+        const FLinearColor BoulderColor =
+            bNearCameraReviewBoulder ? ScalePreviewColor(UnadjustedBoulderColor, Spec.bDesertCanyon ? 0.72f : 0.68f) : UnadjustedBoulderColor;
         const FVector BoulderScale(Scale * 1.18f, Scale * 0.92f, Scale * 0.54f);
         const FVector BoulderLocation(X, Y, FMath::Max(20.0f, TerrainZ + 18.0f + 8.0f * static_cast<float>(BoulderIndex % 4)));
         AddPreviewIrregularRockActor(
@@ -4813,7 +4830,6 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             BoulderIndex,
             BoulderWaterT,
             BoulderVegetationT);
-        const float BoulderLateralOffset = Y - GetPreviewRiverCenterY(Spec, X);
         const float ContactFoamStrength =
             FMath::Clamp(0.45f + BoulderWaterT * 0.55f + Spec.FlowFoamScale * 0.20f, 0.0f, 1.0f);
         if (ContactFoamStrength > 0.52f)
