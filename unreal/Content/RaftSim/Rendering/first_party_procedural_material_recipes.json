@@ -72,7 +72,7 @@
         "riverbed_and_shallow_shelves"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview",
-      "unreal_status": "terrain_specific_vertex_color_material_active_as_soft_lit_review_material_with_soft_feathered_patch_edges_and_landscape_nanite_material_scaffold_production_layered_material_pending",
+      "unreal_status": "terrain_specific_vertex_color_material_active_as_soft_lit_review_material_with_irregular_shoreline_edge_breakup_and_landscape_nanite_material_scaffold_production_layered_material_pending",
       "required_source_inputs": [
         "source_drape_4096.png",
         "dem_relief_2048.png",
@@ -92,6 +92,9 @@
         "soft_lit_terrain_review_mode",
         "terrain_proxy_luma_floor",
         "soft_feathered_terrain_patch_edges",
+        "irregular_shoreline_edge_breakup",
+        "waterline_scallop_shadow",
+        "source_masked_bank_toe_deposit",
         "flow_aware_bank_undercut_shelf_relief",
         "leaf_litter_or_sand_overlay",
         "source_drape_albedo_normalization",
@@ -108,6 +111,9 @@
         "terrain_patch_edge_feather_width",
         "terrain_patch_center_feature_blend",
         "terrain_patch_height_feather",
+        "shoreline_edge_patch_count",
+        "shoreline_edge_patch_width",
+        "shoreline_edge_patch_length",
         "gravel_or_sand_bar_mix",
         "strata_spacing_m",
         "detail_noise_scale_m"

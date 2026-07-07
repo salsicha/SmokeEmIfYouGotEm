@@ -45,6 +45,7 @@
       "flow_aware_bank_undercut_shelf_relief",
       "water_and_vegetation_mask_guided_detail_placement",
       "wet_bank_shore_ribbons",
+      "first_party_irregular_shoreline_edge_breakup",
       "source_aware_bank_breakup_texture_patches",
       "soft_feathered_terrain_material_patches",
       "first_party_terrain_material_layer_facets_and_slope_shadow_patches",
