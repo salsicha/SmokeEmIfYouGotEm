@@ -60,6 +60,7 @@
       "first_party_bounded_terrain_ambient_fill",
       "first_party_demoted_terrain_overlay_striping",
       "first_party_source_drape_smoothing_pass",
+      "first_party_segmented_wet_bank_ribbons",
       "flow_aware_waterline_pebble_scatter",
       "first_party_irregular_rock_geometry_variants",
       "first_party_boulder_wetness_abrasion_moss_surface_variants",
