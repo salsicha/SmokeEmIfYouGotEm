@@ -295,7 +295,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.FlowVisualDescription =
         TEXT("Default South Fork summer-commercial validation band from USGS-11445500 planning presets; keeps moderate tongues, wet rocks, and foam lines visible while low/high seasonal variants remain future capture targets.");
     SouthFork.FlowReferenceDischargeCfs = 1600.0f;
-    SouthFork.WaterColor = FLinearColor(0.045f, 0.36f, 0.38f);
+    SouthFork.WaterColor = FLinearColor(0.038f, 0.285f, 0.300f);
     SouthFork.TerrainColor = FLinearColor(0.35f, 0.30f, 0.21f);
     SouthFork.RockColor = FLinearColor(0.38f, 0.36f, 0.31f);
     SouthFork.FoliageColor = FLinearColor(0.22f, 0.38f, 0.15f);
@@ -385,7 +385,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.FlowWetBankScale = 1.20f;
     Pacuare.FlowCurrentCueScale = 1.18f;
     Pacuare.FlowWaterLevelOffsetCm = 7.0f;
-    Pacuare.WaterColor = FLinearColor(0.035f, 0.32f, 0.27f);
+    Pacuare.WaterColor = FLinearColor(0.026f, 0.255f, 0.205f);
     Pacuare.TerrainColor = FLinearColor(0.17f, 0.22f, 0.13f);
     Pacuare.RockColor = FLinearColor(0.20f, 0.24f, 0.20f);
     Pacuare.FoliageColor = FLinearColor(0.06f, 0.30f, 0.09f);
@@ -779,7 +779,7 @@ UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial()
         Material->GetExpressionCollection().AddExpression(VertexColor);
 
         UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
-        EmissiveScale->R = 0.42f;
+        EmissiveScale->R = 0.26f;
         Material->GetExpressionCollection().AddExpression(EmissiveScale);
 
         UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
@@ -815,7 +815,7 @@ UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial()
         {
             if (UMaterialExpressionConstant* Constant = Cast<UMaterialExpressionConstant>(Expression.Get()))
             {
-                Constant->R = 0.42f;
+                Constant->R = 0.26f;
             }
         }
         Material->PostEditChange();
@@ -5588,8 +5588,11 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     if (Sun)
     {
         Sun->SetActorLabel(TEXT("RaftSim_Sun_LumenPreview"));
-        Sun->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 11.0f : 9.4f);
-        Sun->GetLightComponent()->SetLightColor(Spec.bDesertCanyon ? FLinearColor(1.0f, 0.88f, 0.72f) : FLinearColor(0.96f, 0.99f, 1.0f));
+        Sun->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 9.2f : (Spec.bHasWaterfalls ? 7.4f : 7.8f));
+        Sun->GetLightComponent()->SetLightColor(
+            Spec.bDesertCanyon ? FLinearColor(1.0f, 0.84f, 0.66f)
+                                : (Spec.bHasWaterfalls ? FLinearColor(0.88f, 0.96f, 0.90f)
+                                                       : FLinearColor(0.98f, 0.96f, 0.88f)));
     }
 
     ASkyLight* SkyLight = Cast<ASkyLight>(
@@ -5597,7 +5600,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     if (SkyLight)
     {
         SkyLight->SetActorLabel(TEXT("RaftSim_SkyLight_PhotorealPreview"));
-        SkyLight->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 4.60f : 3.90f);
+        SkyLight->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 3.35f : (Spec.bHasWaterfalls ? 2.95f : 2.70f));
     }
 
     ASkyAtmosphere* Atmosphere = Cast<ASkyAtmosphere>(
@@ -5632,11 +5635,11 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_VignetteIntensity = true;
         Camera->GetCameraComponent()->PostProcessSettings.VignetteIntensity = 0.10f;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_Sharpen = true;
-        Camera->GetCameraComponent()->PostProcessSettings.Sharpen = 0.35f;
+        Camera->GetCameraComponent()->PostProcessSettings.Sharpen = 0.18f;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_AutoExposureMethod = true;
         Camera->GetCameraComponent()->PostProcessSettings.AutoExposureMethod = AEM_Manual;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_AutoExposureBias = true;
-        Camera->GetCameraComponent()->PostProcessSettings.AutoExposureBias = 0.0f;
+        Camera->GetCameraComponent()->PostProcessSettings.AutoExposureBias = Spec.bDesertCanyon ? 0.0f : -0.04f;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_AutoExposureApplyPhysicalCameraExposure = true;
         Camera->GetCameraComponent()->PostProcessSettings.AutoExposureApplyPhysicalCameraExposure = 0;
         GEditor->SelectActor(Camera, true, false, true);
