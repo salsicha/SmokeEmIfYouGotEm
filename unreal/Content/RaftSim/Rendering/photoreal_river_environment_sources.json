@@ -3,6 +3,7 @@
   "first_party_procedural_material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
   "first_party_material_swatch_manifest": "unreal/Content/RaftSim/Rendering/MaterialSwatches/first_party_material_swatch_manifest.json",
   "flow_visual_band_manifest": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
+  "geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",
   "generated_on": "2026-07-06",
   "global_sources": [
     {
@@ -1405,6 +1406,7 @@
       "one_generated_unreal_preview_map_per_river",
       "one_downstream_guide_seat_and_one_raft_hidden_river_eye_screenshot_per_river",
       "source_manifest_and_rights_status_visible_in_capture_manifest",
+      "geospatial_attachment_ledger_visible_in_capture_manifest",
       "review_gated_heightfield_candidate_sampling_visible_in_capture_manifest",
       "review_gated_source_water_and_vegetation_masks_sampled_by_preview_rendering_and_detail_placement",
       "source_drape_vertex_color_terrain_material_blend_recorded",

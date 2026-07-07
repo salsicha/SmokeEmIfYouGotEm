@@ -215,6 +215,11 @@ FString GetFirstPartyProceduralMaterialRecipePlanRelativePath()
     return TEXT("unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json");
 }
 
+FString GetProductionGeospatialAttachmentLedgerRelativePath()
+{
+    return TEXT("physics/data/real_world/production_geospatial_attachment_ledger.json");
+}
+
 class FScopedPhotorealPreviewWorldGcLeakFatalOverride
 {
 public:
@@ -3654,6 +3659,9 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
     const FString ProceduralMaterialRecipePlanRelativePath = GetFirstPartyProceduralMaterialRecipePlanRelativePath();
     const FString ProceduralMaterialRecipePlanAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), ProceduralMaterialRecipePlanRelativePath));
+    const FString GeospatialAttachmentLedgerRelativePath = GetProductionGeospatialAttachmentLedgerRelativePath();
+    const FString GeospatialAttachmentLedgerAbsolutePath =
+        FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), GeospatialAttachmentLedgerRelativePath));
 
     if (!FPaths::FileExists(SourcePlanAbsolutePath))
     {
@@ -3670,10 +3678,16 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
         OutSummary += FString::Printf(TEXT("Missing first-party procedural material recipe plan: %s\n"), *ProceduralMaterialRecipePlanAbsolutePath);
         return false;
     }
+    if (!FPaths::FileExists(GeospatialAttachmentLedgerAbsolutePath))
+    {
+        OutSummary += FString::Printf(TEXT("Missing production geospatial attachment ledger: %s\n"), *GeospatialAttachmentLedgerAbsolutePath);
+        return false;
+    }
 
     OutSummary += FString::Printf(TEXT("Using photoreal river source plan: %s\n"), *SourcePlanRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party procedural environment asset plan: %s\n"), *ProceduralAssetPlanRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party procedural material recipe plan: %s\n"), *ProceduralMaterialRecipePlanRelativePath);
+    OutSummary += FString::Printf(TEXT("Using production geospatial attachment ledger: %s\n"), *GeospatialAttachmentLedgerRelativePath);
 
     bool bAllSaved = true;
     for (const FRaftSimEnvironmentPreviewSpec& Spec : GetEnvironmentPreviewSpecs())
@@ -3698,6 +3712,9 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
     const FString ProceduralMaterialRecipePlanRelativePath = GetFirstPartyProceduralMaterialRecipePlanRelativePath();
     const FString ProceduralMaterialRecipePlanAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), ProceduralMaterialRecipePlanRelativePath));
+    const FString GeospatialAttachmentLedgerRelativePath = GetProductionGeospatialAttachmentLedgerRelativePath();
+    const FString GeospatialAttachmentLedgerAbsolutePath =
+        FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), GeospatialAttachmentLedgerRelativePath));
 
     if (!FPaths::FileExists(ProceduralAssetPlanAbsolutePath))
     {
@@ -3709,6 +3726,12 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         OutSummary += FString::Printf(TEXT("Missing first-party procedural material recipe plan for capture: %s\n"), *ProceduralMaterialRecipePlanAbsolutePath);
         return false;
     }
+    if (!FPaths::FileExists(GeospatialAttachmentLedgerAbsolutePath))
+    {
+        OutSummary += FString::Printf(TEXT("Missing production geospatial attachment ledger for capture: %s\n"), *GeospatialAttachmentLedgerAbsolutePath);
+        return false;
+    }
+    OutSummary += FString::Printf(TEXT("Using production geospatial attachment ledger: %s\n"), *GeospatialAttachmentLedgerRelativePath);
 
     FString EntriesJson;
     bool bAllCaptured = true;
@@ -3814,6 +3837,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("  \"source_plan\": \"%s\",\n")
         TEXT("  \"procedural_asset_plan\": \"%s\",\n")
         TEXT("  \"procedural_material_recipe_plan\": \"%s\",\n")
+        TEXT("  \"geospatial_attachment_ledger\": \"%s\",\n")
         TEXT("  \"status\": \"%s\",\n")
         TEXT("  \"captures\": [\n")
         TEXT("%s\n")
@@ -3822,6 +3846,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         *EscapeRaftSimJsonString(SourcePlanRelativePath),
         *EscapeRaftSimJsonString(ProceduralAssetPlanRelativePath),
         *EscapeRaftSimJsonString(ProceduralMaterialRecipePlanRelativePath),
+        *EscapeRaftSimJsonString(GeospatialAttachmentLedgerRelativePath),
         bAllCaptured ? TEXT("south_fork_colorado_and_pacuare_source_draped_guide_and_river_eye_previews_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
         *EntriesJson);
 
