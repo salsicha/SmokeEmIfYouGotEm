@@ -20,7 +20,7 @@
     "Pacuare high-resolution scene metadata review identifies official Landsat/Sentinel candidates, but production imagery still needs full-year paging, download approval, manual visual QA, CRS/band/scale review, and guide/geospatial signoff before replacing the MODIS/GIBS preview.",
     "Anonymous LandsatLook product asset URLs returned EROS login HTML for the best Pacuare Landsat candidate, so imagery downloads remain blocked until an approved access path returns expected JPEG/JSON/COG content.",
     "Pacuare Sentinel COG thumbnails and tile metadata are attached as visual triage, but full-resolution Sentinel bands, SCL/QA masks, corridor clipping, terms/attribution, and manual cloud/shadow QA are still required before source-drape or mask replacement.",
-    "Pacuare March 20, 2025 Sentinel SCL QA, matching TCI bbox clips, draft-bank window strips, a worse March 5 route-local SCL probe, and a marginal February 4, 2024 SCL candidate are attached for review only; production imagery still needs cleaner route-local coverage or exact native-CRS route/bank clipping with SCL masking, stitching, terms/attribution review, and guide/geospatial signoff."
+    "Pacuare March 20, 2025 Sentinel SCL QA, matching TCI bbox clips, draft-bank window strips, a worse March 5 route-local SCL probe, and February 4, 2024 SCL/TCI route-window review are attached for review only; production imagery still needs cleaner route-local coverage or exact native-CRS route/bank clipping with SCL masking, stitching, terms/attribution review, and guide/geospatial signoff."
   ],
   "pulled_artifacts": [
     {
@@ -1314,14 +1314,14 @@
         "imagery/production_import_pilot/sentinel_s2b_16phr_20240204_draft_bank_window_scl_qa_review.png"
       ],
       "provider": "Element 84 / AWS Open Data Sentinel-2 L2A COG mirror processed with local Pillow window crops",
-      "status": "alternate_scene_scl_probe_marginal_tci_review_pending",
+      "status": "alternate_scene_scl_probe_tci_review_completed_cloud_shadow_blocked",
       "summary": {
         "date": "2024-02-04",
         "tile_ids": [
           "17PKM",
           "16PHR"
         ],
-        "tci_review_clips_downloaded": false,
+        "tci_review_clips_downloaded": true,
         "source_drape_replaced": false,
         "cloud_screening_blocks_promotion": true,
         "scl_cloud_or_cirrus_fraction_by_tile": {
@@ -1336,7 +1336,8 @@
       "related_artifacts": [
         "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
         "imagery/production_import_pilot/sentinel_20250320_draft_bank_window_review.json",
-        "imagery/production_import_pilot/sentinel_20250305_draft_bank_window_scl_probe.json"
+        "imagery/production_import_pilot/sentinel_20250305_draft_bank_window_scl_probe.json",
+        "imagery/production_import_pilot/sentinel_20240204_draft_bank_window_tci_review.json"
       ],
       "use": [
         "alternate_scene_selection",
@@ -1344,9 +1345,51 @@
         "future_scene_selection"
       ],
       "caveats": [
-        "February 4 is not clean enough for production, but route-local SCL is competitive with March 20 and may justify TCI review.",
+        "February 4 is not clean enough for production. It was competitive enough with March 20 to justify TCI review, but the TCI strips confirm visible cloud/shadow contamination.",
         "Draft bank geometry comes from the Unreal preview scaffold, not official hydrography or guide-approved route geometry.",
-        "Production Pacuare imagery remains blocked until TCI review, cleaner route-local coverage or exact route-window SCL masking, stitching, terms review, and guide/geospatial approval pass."
+        "Production Pacuare imagery remains blocked until cleaner route-local coverage or exact route-window SCL masking, stitching, terms review, and guide/geospatial approval pass."
+      ]
+    },
+    {
+      "artifact_id": "pacuare_sentinel_20240204_draft_bank_tci_review",
+      "category": "sentinel_alternate_scene_route_local_tci_review",
+      "paths": [
+        "imagery/production_import_pilot/sentinel_20240204_draft_bank_window_tci_review.json",
+        "imagery/production_import_pilot/sentinel_s2b_17pkm_20240204_draft_bank_window_clip_review.png",
+        "imagery/production_import_pilot/sentinel_s2b_16phr_20240204_draft_bank_window_clip_review.png"
+      ],
+      "provider": "Element 84 / AWS Open Data Sentinel-2 L2A COG mirror processed with local Pillow window crops",
+      "status": "alternate_scene_tci_review_attached_cloud_shadow_blocked",
+      "summary": {
+        "date": "2024-02-04",
+        "tile_ids": [
+          "17PKM",
+          "16PHR"
+        ],
+        "tci_review_clips_downloaded": true,
+        "source_drape_replaced": false,
+        "mask_sources_replaced": false,
+        "cloud_screening_blocks_promotion": true,
+        "output_sha256_by_tile": {
+          "17PKM": "17a1bcf266cc4e745f0faa64be74882fcfe76d753e0efab8bf45e69569c7d49c",
+          "16PHR": "77881fc2e201e055a431392142c9a824dac5721132ef84d1baa521b381d6daae"
+        }
+      },
+      "related_artifacts": [
+        "imagery/production_import_pilot/sentinel_cleaner_scene_search_review.json",
+        "imagery/production_import_pilot/sentinel_20240204_draft_bank_window_scl_probe.json",
+        "imagery/production_import_pilot/sentinel_20250320_draft_bank_window_review.json",
+        "imagery/production_import_pilot/sentinel_20250305_draft_bank_window_scl_probe.json"
+      ],
+      "use": [
+        "alternate_scene_rejection_record",
+        "route_window_visual_triage",
+        "future_scene_selection"
+      ],
+      "caveats": [
+        "February 4 TCI route-window strips remain visibly cloud/shadow contaminated and cannot replace the Pacuare source drape.",
+        "Draft bank geometry comes from the Unreal preview scaffold, not official hydrography or guide-approved route geometry.",
+        "Production Pacuare imagery remains blocked until cleaner route-local coverage or exact route-window SCL masking, stitching, terms review, and guide/geospatial approval pass."
       ]
     }
   ],
