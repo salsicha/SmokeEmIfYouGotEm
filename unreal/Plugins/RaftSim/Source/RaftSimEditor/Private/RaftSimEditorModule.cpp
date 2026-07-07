@@ -3505,6 +3505,67 @@ void AddPreviewWaterSurfaceDetail(UWorld* World, const FRaftSimEnvironmentPrevie
     }
 }
 
+void AddPreviewWaterMicroRippleGlintDetail(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec, UStaticMesh* PlaneMesh)
+{
+    if (!World || !PlaneMesh)
+    {
+        return;
+    }
+
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+    const float FlowEnergy = FMath::Clamp(0.55f * Spec.FlowCurrentCueScale + 0.45f * Spec.FlowFoamScale, 0.55f, 1.45f);
+    const int32 BaseRippleCount = Spec.bDesertCanyon ? 86 : (Spec.bHasWaterfalls ? 132 : 112);
+    const int32 RippleCount =
+        FMath::Max(1, FMath::RoundToInt(static_cast<float>(BaseRippleCount) * FMath::Clamp(FlowEnergy, 0.68f, 1.28f)));
+
+    const FLinearColor BrightGlint = Spec.bDesertCanyon
+        ? FLinearColor(0.78f, 0.70f, 0.52f, 1.0f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.48f, 0.92f, 0.76f, 1.0f) : FLinearColor(0.52f, 0.92f, 0.92f, 1.0f));
+    const FLinearColor DarkRipple = Spec.bDesertCanyon
+        ? FLinearColor(0.26f, 0.24f, 0.17f, 1.0f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.020f, 0.22f, 0.17f, 1.0f) : FLinearColor(0.025f, 0.27f, 0.30f, 1.0f));
+    const FLinearColor BankTint = Spec.bDesertCanyon
+        ? FLinearColor(0.50f, 0.40f, 0.26f, 1.0f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.11f, 0.36f, 0.24f, 1.0f) : FLinearColor(0.12f, 0.42f, 0.38f, 1.0f));
+
+    for (int32 RippleIndex = 0; RippleIndex < RippleCount; ++RippleIndex)
+    {
+        const float SequenceT = static_cast<float>(RippleIndex) / static_cast<float>(FMath::Max(1, RippleCount - 1));
+        const float Phase = static_cast<float>(RippleIndex) * 1.6180339f;
+        const float X = FMath::Lerp(-4300.0f, 24850.0f, FMath::Frac(0.071f + SequenceT * 0.91f + 0.019f * FMath::Sin(Phase)));
+        const float Width =
+            ActiveRiverHalfWidth * (0.93f + 0.09f * FMath::Sin(X * 0.0012f) + (Spec.bDesertCanyon ? 0.15f : 0.04f));
+        const float LateralT = FMath::Sin(Phase * 0.77f) * 0.62f + FMath::Sin(Phase * 1.31f) * 0.22f;
+        const float Lateral = FMath::Clamp(LateralT, -0.92f, 0.92f) * Width;
+        const float EdgeT = FMath::Pow(FMath::Abs(Lateral) / FMath::Max(1.0f, Width), 1.35f);
+        const bool bBright = (RippleIndex % 4) != 0;
+        const FLinearColor RippleColor = bBright
+            ? FMath::Lerp(BrightGlint, BankTint, FMath::Clamp(EdgeT * 0.42f, 0.0f, 0.48f))
+            : FMath::Lerp(DarkRipple, BankTint, FMath::Clamp(EdgeT * 0.32f, 0.0f, 0.42f));
+        const float LengthCm =
+            (Spec.bDesertCanyon ? 620.0f : 520.0f) *
+            (0.74f + 0.24f * static_cast<float>(RippleIndex % 5)) *
+            FMath::Clamp(FlowEnergy, 0.72f, 1.18f);
+        const float WidthCm =
+            (Spec.bDesertCanyon ? 13.0f : 11.0f) *
+            (0.82f + 0.18f * static_cast<float>(RippleIndex % 4));
+        const FLinearColor RibbonHighlight = bBright ? RippleColor : FMath::Lerp(RippleColor, BrightGlint, 0.18f);
+        const FLinearColor RibbonShadow = bBright ? FMath::Lerp(DarkRipple, RippleColor, 0.35f) : RippleColor;
+
+        AddPreviewFlowTextureRibbon(
+            World,
+            Spec,
+            FString::Printf(TEXT("RaftSim_WaterMicroRippleGlint_%03d_%s"), RippleIndex, *Spec.RiverId),
+            X - LengthCm * 0.50f,
+            LengthCm,
+            Lateral,
+            WidthCm,
+            Phase,
+            RibbonHighlight,
+            RibbonShadow);
+    }
+}
+
 void AddPreviewSurfaceAtmosphereAndSprayDetail(
     UWorld* World,
     const FRaftSimEnvironmentPreviewSpec& Spec,
@@ -4869,6 +4930,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     AddPreviewFlowBandTextureDetail(World, Spec);
     AddPreviewWaterSurfaceChopAndTurbidityDetail(World, Spec);
     AddPreviewWaterShaderDepthReflectionScaffoldDetail(World, Spec);
+    AddPreviewWaterMicroRippleGlintDetail(World, Spec, PlaneMesh);
     AddPreviewFoamAndHydraulics(World, Spec);
     AddPreviewSurfaceAtmosphereAndSprayDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, PlaneMesh);
     AddPreviewWaterfallAndPlungeMistDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, PlaneMesh, CubeMesh);

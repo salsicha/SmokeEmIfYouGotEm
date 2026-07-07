@@ -65,6 +65,7 @@
       "lit_vertex_color_water_gradients",
       "flow_band_depth_texture_ribbons",
       "flow_aware_water_surface_chop_and_turbidity_patches",
+      "flow_aware_micro_ripple_glints",
       "first_party_water_shader_depth_reflection_refraction_scaffold",
       "near_camera_water_scaffold_readability_clearance",
       "current_streaks_foam_tongues_wave_highlights_and_eddy_lines",

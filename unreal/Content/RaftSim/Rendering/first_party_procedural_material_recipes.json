@@ -279,6 +279,7 @@
         "depth_tint",
         "depth_reflection_refraction_scaffold",
         "near_camera_water_scaffold_clearance",
+        "flow_aware_micro_ripple_glints",
         "turbidity",
         "current_streak",
         "eddy_line_brightening",
@@ -289,6 +290,8 @@
         "water_level_offset_cm",
         "depth_tint_strength",
         "turbidity_strength",
+        "micro_ripple_glint_density",
+        "micro_ripple_glint_opacity",
         "current_cue_density",
         "eddy_line_strength",
         "hole_retention_visual_strength"
