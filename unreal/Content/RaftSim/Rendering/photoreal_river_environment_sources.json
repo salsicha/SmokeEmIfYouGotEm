@@ -1242,6 +1242,22 @@
             "future_source_drape_replacement_planning",
             "cloud_screening_review"
           ]
+        },
+        {
+          "artifact_id": "pacuare_sentinel_20250320_scl_qa_review",
+          "category": "sentinel_cleaner_scene_scl_qa_review",
+          "paths": [
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_corridor_bbox_scl_qa_review.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250320_corridor_bbox_scl_qa_review.png"
+          ],
+          "promotion_blocker": "March 20, 2025 SCL QA passes for matching TCI review-clip download only; production still needs TCI clip review, exact route/bank clipping, stitching, terms review, and guide/geospatial approval.",
+          "status": "cleaner_scene_scl_qa_passed_tci_review_pending",
+          "use_in_unreal": [
+            "cleaner_scene_selection",
+            "future_source_drape_replacement_planning",
+            "cloud_screening_review"
+          ]
         }
       ],
       "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"

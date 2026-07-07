@@ -256,7 +256,9 @@
     "visual_hrefs": {
       "16PHR": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/16/P/HR/2025/3/S2B_16PHR_20250320_0_L2A/TCI.tif",
       "17PKM": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/17/P/KM/2025/3/S2B_17PKM_20250320_0_L2A/TCI.tif"
-    }
+    },
+    "follow_up_scl_qa_review": "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+    "follow_up_status": "scl_qa_passed_for_tci_review_only"
   },
   "blocked_scene_context": {
     "blocked_date": "2025-01-19",
