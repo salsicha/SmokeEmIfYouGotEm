@@ -61,6 +61,7 @@
       "first_party_base_terrain_material_grain_and_microrelief",
       "first_party_source_aware_terrain_photo_mottle_and_microrelief",
       "first_party_source_conditioned_far_bank_albedo_calibration",
+      "first_party_broad_slope_terrain_exposure_fill",
       "first_party_demoted_terrain_overlay_striping",
       "first_party_source_drape_smoothing_pass",
       "first_party_segmented_wet_bank_ribbons",
