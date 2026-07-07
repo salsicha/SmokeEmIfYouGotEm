@@ -2446,8 +2446,8 @@ void AddPreviewAerialDrapeTiles(
 
 void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
 {
-    constexpr int32 XSteps = 184;
-    constexpr int32 CrossSteps = 16;
+    constexpr int32 XSteps = 244;
+    constexpr int32 CrossSteps = 24;
     const float MinX = -5600.0f;
     const float MaxX = 26200.0f;
 
@@ -2469,6 +2469,12 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
     const FLinearColor SurfaceGlint = Spec.bDesertCanyon
         ? FLinearColor(0.58f, 0.49f, 0.34f)
         : (Spec.bHasWaterfalls ? FLinearColor(0.13f, 0.58f, 0.48f) : FLinearColor(0.14f, 0.62f, 0.64f));
+    const FLinearColor NearFieldBrightRipple = Spec.bDesertCanyon
+        ? FLinearColor(0.42f, 0.37f, 0.27f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.070f, 0.37f, 0.30f) : FLinearColor(0.075f, 0.42f, 0.43f));
+    const FLinearColor NearFieldDarkSlick = Spec.bDesertCanyon
+        ? FLinearColor(0.16f, 0.14f, 0.105f)
+        : (Spec.bHasWaterfalls ? FLinearColor(0.010f, 0.105f, 0.085f) : FLinearColor(0.012f, 0.135f, 0.155f));
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float WaterBaseZ = GetPreviewWaterSurfaceBaseZCm(Spec);
     const float FlowEnergy = FMath::Clamp(Spec.FlowCurrentCueScale, 0.65f, 1.60f);
@@ -2477,6 +2483,8 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
     const float StandingWaveAmplitudeCm =
         (Spec.bDesertCanyon ? 3.5f : (Spec.bHasWaterfalls ? 5.8f : 4.6f)) *
         FMath::Clamp(Spec.FlowFoamScale, 0.70f, 1.55f);
+    const float NearFieldFineRippleAmplitudeCm =
+        (Spec.bDesertCanyon ? 1.2f : (Spec.bHasWaterfalls ? 2.4f : 2.0f)) * FlowEnergy;
 
     for (int32 XIndex = 0; XIndex <= XSteps; ++XIndex)
     {
@@ -2500,6 +2508,22 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
                 StandingWaveAmplitudeCm *
                     FMath::Sin(X * (Spec.bDesertCanyon ? 0.0032f : 0.0049f) + CrossWaveT * 1.85f) *
                     FMath::Pow(CenterT, Spec.bDesertCanyon ? 0.90f : 0.72f);
+            const float NearFieldWaterSurfaceGrainT =
+                1.0f - SmoothPreviewStep(4200.0f, 7600.0f, X);
+            const float FineRipple =
+                FMath::Clamp(
+                    0.50f +
+                        0.28f * FMath::Sin(X * 0.032f + Lateral * 0.018f + FlowEnergy * 0.73f) +
+                        0.22f * FMath::Sin(X * 0.055f - Lateral * 0.009f),
+                    0.0f,
+                    1.0f);
+            const float FineSlick =
+                FMath::Clamp(
+                    0.50f +
+                        0.30f * FMath::Sin(X * 0.020f - Lateral * 0.021f) +
+                        0.20f * FMath::Sin(X * 0.061f + Lateral * 0.004f + FlowEnergy),
+                    0.0f,
+                    1.0f);
             const float FlowNoise =
                 0.50f + 0.30f * FMath::Sin(X * 0.0048f + Lateral * 0.010f) +
                 0.20f * FMath::Sin(X * 0.013f - Lateral * 0.006f);
@@ -2508,7 +2532,18 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
                 WaterColor,
                 SurfaceGlint,
                 FMath::Clamp((1.0f - EdgeT * 0.45f) * FlowNoise * FlowEnergy * (Spec.bDesertCanyon ? 0.14f : 0.18f), 0.0f, 0.26f));
-            Vertices.Add(FVector(X, CenterY + Lateral, WaterBaseZ + Wave));
+            const float NearFieldTextureGain = FMath::Clamp(0.36f + NearFieldWaterSurfaceGrainT * 0.64f, 0.0f, 1.0f);
+            WaterColor = FMath::Lerp(
+                WaterColor,
+                NearFieldDarkSlick,
+                FMath::Clamp(FineSlick * CenterT * NearFieldTextureGain * 0.070f, 0.0f, 0.085f));
+            WaterColor = FMath::Lerp(
+                WaterColor,
+                NearFieldBrightRipple,
+                FMath::Clamp(FineRipple * (0.58f + CenterT * 0.42f) * NearFieldTextureGain * 0.055f, 0.0f, 0.065f));
+            const float FineRippleWave =
+                (FineRipple - 0.5f) * NearFieldFineRippleAmplitudeCm * (0.45f + CenterT * 0.55f) * NearFieldTextureGain;
+            Vertices.Add(FVector(X, CenterY + Lateral, WaterBaseZ + Wave + FineRippleWave));
             UVs.Add(FVector2D(U * 18.0f, V));
             VertexColors.Add(ClampPreviewColor(WaterColor));
         }
