@@ -62,6 +62,7 @@
       "first_party_biome_foliage_silhouette_proxy_layers",
       "first_party_dense_biome_foliage_layer_proxy_clusters",
       "first_party_instanced_procedural_foliage_equivalent_scaffold",
+      "first_party_procedural_leaf_cluster_geometry",
       "guide_seat_foliage_setback_and_scale_tuning",
       "lit_vertex_color_water_gradients",
       "flow_band_depth_texture_ribbons",

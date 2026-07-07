@@ -1515,6 +1515,127 @@ AActor* AddPreviewIrregularRockActor(
         &VertexColors);
 }
 
+AActor* AddPreviewProceduralLeafClusterActor(
+    UWorld* World,
+    const FString& Label,
+    const FVector& BaseLocation,
+    float YawDegrees,
+    const FVector& Scale,
+    const FLinearColor& Color,
+    int32 Seed,
+    bool bRainforest)
+{
+    if (!World)
+    {
+        return nullptr;
+    }
+
+    constexpr int32 RingCount = 5;
+    constexpr int32 SegmentCount = 8;
+    const float YawRadians = FMath::DegreesToRadians(YawDegrees);
+    const float CosYaw = FMath::Cos(YawRadians);
+    const float SinYaw = FMath::Sin(YawRadians);
+    const FVector Radii(
+        FMath::Max(8.0f, Scale.X * 100.0f),
+        FMath::Max(8.0f, Scale.Y * 100.0f),
+        FMath::Max(6.0f, Scale.Z * 100.0f));
+
+    TArray<FVector> Vertices;
+    TArray<FVector2D> UVs;
+    TArray<FLinearColor> VertexColors;
+    TArray<int32> Triangles;
+    Vertices.Reserve(RingCount * SegmentCount + 2);
+    UVs.Reserve(RingCount * SegmentCount + 2);
+    VertexColors.Reserve(RingCount * SegmentCount + 2);
+    Triangles.Reserve(RingCount * SegmentCount * 6);
+
+    for (int32 RingIndex = 0; RingIndex < RingCount; ++RingIndex)
+    {
+        const float RingT = static_cast<float>(RingIndex) / static_cast<float>(RingCount - 1);
+        const float LocalZUnit = FMath::Lerp(-0.58f, 0.72f, RingT);
+        const float RingRadius = FMath::Sqrt(FMath::Max(0.0f, 1.0f - LocalZUnit * LocalZUnit));
+        for (int32 SegmentIndex = 0; SegmentIndex < SegmentCount; ++SegmentIndex)
+        {
+            const float SegmentT = static_cast<float>(SegmentIndex) / static_cast<float>(SegmentCount);
+            const float Angle = SegmentT * 2.0f * PI;
+            const float LobeNoise =
+                0.72f +
+                0.22f * FMath::Sin(static_cast<float>(Seed) * 0.31f + static_cast<float>(RingIndex) * 1.13f + static_cast<float>(SegmentIndex) * 0.91f) +
+                0.18f * FMath::Sin(static_cast<float>(Seed) * 0.17f - static_cast<float>(RingIndex) * 0.47f + static_cast<float>(SegmentIndex) * 1.61f);
+            const float LeafGap =
+                0.90f + 0.12f * FMath::Sin(static_cast<float>(SegmentIndex) * (bRainforest ? 2.31f : 1.73f) + static_cast<float>(Seed) * 0.07f);
+            const float LocalX = FMath::Cos(Angle) * RingRadius * Radii.X * LobeNoise;
+            const float LocalY = FMath::Sin(Angle) * RingRadius * Radii.Y * LeafGap;
+            const float LocalZ = LocalZUnit * Radii.Z *
+                (0.86f + 0.14f * FMath::Sin(static_cast<float>(Seed) * 0.19f + static_cast<float>(SegmentIndex) * 0.67f));
+            Vertices.Add(FVector(
+                BaseLocation.X + LocalX * CosYaw - LocalY * SinYaw,
+                BaseLocation.Y + LocalX * SinYaw + LocalY * CosYaw,
+                BaseLocation.Z + LocalZ));
+            UVs.Add(FVector2D(SegmentT, RingT));
+            const float HeightTint = 0.82f + 0.16f * RingT;
+            const float LeafTint = 0.82f + 0.12f * LobeNoise + (bRainforest ? 0.04f : 0.0f);
+            VertexColors.Add(ScalePreviewColor(Color, HeightTint * LeafTint));
+        }
+    }
+
+    const int32 TopIndex = Vertices.Num();
+    Vertices.Add(FVector(BaseLocation.X, BaseLocation.Y, BaseLocation.Z + Radii.Z * 0.86f));
+    UVs.Add(FVector2D(0.5f, 1.0f));
+    VertexColors.Add(ScalePreviewColor(Color, bRainforest ? 1.08f : 1.02f));
+
+    const int32 BottomIndex = Vertices.Num();
+    Vertices.Add(FVector(BaseLocation.X, BaseLocation.Y, BaseLocation.Z - Radii.Z * 0.56f));
+    UVs.Add(FVector2D(0.5f, 0.0f));
+    VertexColors.Add(ScalePreviewColor(Color, 0.58f));
+
+    for (int32 RingIndex = 0; RingIndex < RingCount - 1; ++RingIndex)
+    {
+        const int32 CurrentRing = RingIndex * SegmentCount;
+        const int32 NextRing = (RingIndex + 1) * SegmentCount;
+        for (int32 SegmentIndex = 0; SegmentIndex < SegmentCount; ++SegmentIndex)
+        {
+            const int32 NextSegment = (SegmentIndex + 1) % SegmentCount;
+            const int32 A = CurrentRing + SegmentIndex;
+            const int32 B = CurrentRing + NextSegment;
+            const int32 C = NextRing + SegmentIndex;
+            const int32 D = NextRing + NextSegment;
+            Triangles.Add(A);
+            Triangles.Add(C);
+            Triangles.Add(B);
+            Triangles.Add(B);
+            Triangles.Add(C);
+            Triangles.Add(D);
+        }
+    }
+
+    const int32 FirstRing = 0;
+    const int32 LastRing = (RingCount - 1) * SegmentCount;
+    for (int32 SegmentIndex = 0; SegmentIndex < SegmentCount; ++SegmentIndex)
+    {
+        const int32 NextSegment = (SegmentIndex + 1) % SegmentCount;
+        Triangles.Add(LastRing + SegmentIndex);
+        Triangles.Add(TopIndex);
+        Triangles.Add(LastRing + NextSegment);
+
+        Triangles.Add(BottomIndex);
+        Triangles.Add(FirstRing + NextSegment);
+        Triangles.Add(FirstRing + SegmentIndex);
+    }
+
+    const TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    return AddPreviewProceduralMeshActor(
+        World,
+        Label,
+        Vertices,
+        Triangles,
+        Normals,
+        UVs,
+        Color,
+        LoadOrCreatePreviewVertexColorMaterial(),
+        &VertexColors);
+}
+
 void AddPreviewBoulderSurfaceFacet(
     UWorld* World,
     const FString& Label,
@@ -5124,6 +5245,30 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
                 FRotator(0.0f, static_cast<float>((FoliageIndex * 43) % 360), 0.0f),
                 FVector(BaseScale, BaseScale, BaseScale * (Spec.bHasWaterfalls ? 1.22f : 1.0f)),
                 CanopyColor);
+
+            const int32 SupplementalLeafLobes = Spec.bDesertCanyon ? 1 : (Spec.bHasWaterfalls ? 3 : 2);
+            const float CrownZ = TerrainZ + (Spec.bHasWaterfalls ? 305.0f : (Spec.bDesertCanyon ? 82.0f : 205.0f));
+            for (int32 LobeIndex = 0; LobeIndex < SupplementalLeafLobes; ++LobeIndex)
+            {
+                const float AngleRadians = FMath::DegreesToRadians(static_cast<float>((FoliageIndex * 61 + LobeIndex * 127) % 360));
+                const float Radius = Spec.bDesertCanyon ? 24.0f : (Spec.bHasWaterfalls ? 84.0f : 58.0f);
+                const FVector ClusterLocation(
+                    X + FMath::Cos(AngleRadians) * Radius,
+                    Y + FMath::Sin(AngleRadians) * Radius,
+                    CrownZ + 24.0f * FMath::Sin(static_cast<float>(LobeIndex) * 1.17f));
+                const FVector ClusterScale = Spec.bDesertCanyon
+                    ? FVector(0.20f, 0.15f, 0.090f)
+                    : (Spec.bHasWaterfalls ? FVector(0.70f, 0.52f, 0.34f) : FVector(0.44f, 0.34f, 0.22f));
+                AddPreviewProceduralLeafClusterActor(
+                    World,
+                    FString::Printf(TEXT("RaftSim_ProceduralLeafClusterSupplement_%02d_%02d_%s"), FoliageIndex, LobeIndex, *Spec.RiverId),
+                    ClusterLocation,
+                    static_cast<float>((FoliageIndex * 43 + LobeIndex * 31) % 360),
+                    ClusterScale,
+                    ScalePreviewColor(CanopyColor, 0.92f + 0.05f * static_cast<float>(LobeIndex)),
+                    FoliageIndex * 19 + LobeIndex + 6100,
+                    Spec.bHasWaterfalls);
+            }
         }
         else
         {
@@ -5143,14 +5288,15 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
                 const float Radius = (LobeIndex == 0) ? 0.0f : (Spec.bHasWaterfalls ? 82.0f : 56.0f);
                 const float LobeX = X + FMath::Cos(AngleRadians) * Radius;
                 const float LobeY = Y + FMath::Sin(AngleRadians) * Radius;
-                AddPreviewMeshActor(
+                AddPreviewProceduralLeafClusterActor(
                     World,
-                    SphereMesh,
                     FString::Printf(TEXT("RaftSim_FoliageCanopy_%02d_%02d_%s"), FoliageIndex, LobeIndex, *Spec.RiverId),
                     FVector(LobeX, LobeY, TerrainZ + 112.0f * Height + 18.0f * static_cast<float>(LobeIndex % 3)),
-                    FRotator(0.0f, static_cast<float>((FoliageIndex * 47 + LobeIndex * 19) % 360), 0.0f),
+                    static_cast<float>((FoliageIndex * 47 + LobeIndex * 19) % 360),
                     FVector(CanopyWidth * (1.08f - 0.08f * static_cast<float>(LobeIndex % 2)), CanopyWidth * (0.82f + 0.07f * static_cast<float>(LobeIndex % 3)), Height * (Spec.bHasWaterfalls ? 0.34f : 0.28f)),
-                    CanopyColor);
+                    CanopyColor,
+                    FoliageIndex * 23 + LobeIndex + 6700,
+                    Spec.bHasWaterfalls);
             }
         }
 
@@ -5199,14 +5345,15 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
                 }
                 else
                 {
-                    AddPreviewMeshActor(
+                    AddPreviewProceduralLeafClusterActor(
                         World,
-                        SphereMesh,
                         FString::Printf(TEXT("RaftSim_Understory_%02d_%02d_%s"), FoliageIndex, UnderstoryIndex, *Spec.RiverId),
                         FVector(UnderstoryX, UnderstoryY, UnderstoryZ + 30.0f),
-                        FRotator(0.0f, static_cast<float>((FoliageIndex * 29 + UnderstoryIndex * 67) % 360), 0.0f),
+                        static_cast<float>((FoliageIndex * 29 + UnderstoryIndex * 67) % 360),
                         FVector(0.48f, 0.36f, 0.22f),
-                        UnderstoryColor);
+                        UnderstoryColor,
+                        FoliageIndex * 31 + UnderstoryIndex + 7100,
+                        Spec.bHasWaterfalls);
                 }
             }
         }
@@ -5229,14 +5376,15 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             }
             else
             {
-                AddPreviewMeshActor(
+                AddPreviewProceduralLeafClusterActor(
                     World,
-                    SphereMesh,
                     FString::Printf(TEXT("RaftSim_CanyonScrub_%02d_%s"), FoliageIndex, *Spec.RiverId),
                     FVector(ScrubX, ScrubY, ScrubZ + 18.0f),
-                    FRotator(0.0f, static_cast<float>((FoliageIndex * 37) % 360), 0.0f),
+                    static_cast<float>((FoliageIndex * 37) % 360),
                     FVector(0.24f, 0.18f, 0.12f),
-                    ScrubColor);
+                    ScrubColor,
+                    FoliageIndex + 7500,
+                    false);
             }
         }
     }
