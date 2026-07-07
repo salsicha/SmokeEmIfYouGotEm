@@ -46,6 +46,7 @@
       "water_and_vegetation_mask_guided_detail_placement",
       "wet_bank_shore_ribbons",
       "source_aware_bank_breakup_texture_patches",
+      "soft_feathered_terrain_material_patches",
       "first_party_terrain_material_layer_facets_and_slope_shadow_patches",
       "first_party_landscape_nanite_material_layer_scaffold",
       "first_party_lit_terrain_vertex_color_material",
@@ -114,6 +115,8 @@
         "gravel_bar_width",
         "strata_band_spacing",
         "heightfield_amplitude",
+        "terrain_patch_edge_feather_width",
+        "terrain_patch_feature_blend",
         "source_drape_weight"
       ],
       "promotion_gate": "Must show source-aligned banks, shelves, exposed bars, and wet/dry edges in guide-seat and river-eye captures without covering rescue lines or rapid hazards."
