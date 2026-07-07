@@ -288,7 +288,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.ElevationSample =
         TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/3dep_tiles");
     SouthFork.SourceDrapeDescription =
-        TEXT("stitched South Fork production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into bank and valley preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, broad-slope terrain exposure fill and relief, minimized source overlay plate artifacts, graphic waterline ribbon demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, first-party biome foliage silhouette cards, dense layered riparian canopy/understory proxy clusters, first-party instanced procedural foliage-equivalent canopy/trunk/understory scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, lit water variation, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, foliage, understory, mask-aware ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, hydrologic conditioning, channel burning, masks, and guide/geospatial approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
+        TEXT("stitched South Fork production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into bank and valley preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, broad-slope terrain exposure fill and relief, minimized source overlay plate artifacts, graphic waterline ribbon demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, first-party biome foliage silhouette cards, dense layered riparian canopy/understory proxy clusters, first-party instanced procedural foliage-equivalent canopy/trunk/understory scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party foliage card/canopy artifact demotion, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, lit water variation, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, foliage, understory, mask-aware ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, hydrologic conditioning, channel burning, masks, and guide/geospatial approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
     SouthFork.FlowBandId = TEXT("median_runnable");
     SouthFork.FlowBandDisplayName = TEXT("Median Runnable / Summer Commercial");
     SouthFork.FlowBandSource = TEXT("physics/data/real_world/south_fork_american_chili_bar/flow_presets.json");
@@ -306,7 +306,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.TerrainReliefAmplitudeCm = 180.0f;
     SouthFork.HeightfieldPreviewAmplitudeCm = 115.0f;
     SouthFork.BoulderCount = 24;
-    SouthFork.FoliageCount = 46;
+    SouthFork.FoliageCount = 36;
     SouthFork.FoamTrainCount = 14;
     Specs.Add(SouthFork);
 
@@ -328,7 +328,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.ElevationSample =
         TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles");
     Colorado.SourceDrapeDescription =
-        TEXT("stitched Colorado/Lees Ferry production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into canyon bank preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, broad-slope terrain exposure fill and relief, minimized source overlay plate artifacts, graphic waterline ribbon demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/sediment facets, biome-specific sparse deadfall/grass/root ecology props, first-party sparse desert scrub silhouettes, sparse desert riparian thicket proxy clusters, first-party instanced procedural desert-thicket/trunk scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party foliage crown depth and leaflet breakup, lit water variation, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, sparse scrub, boulder placement, mask-aware canyon ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, river-mile stationing, hydrologic conditioning, release-aware masks, and guide/oarsman approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
+        TEXT("stitched Colorado/Lees Ferry production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into canyon bank preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, broad-slope terrain exposure fill and relief, minimized source overlay plate artifacts, graphic waterline ribbon demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/sediment facets, biome-specific sparse deadfall/grass/root ecology props, first-party sparse desert scrub silhouettes, sparse desert riparian thicket proxy clusters, first-party instanced procedural desert-thicket/trunk scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party foliage card/canopy artifact demotion, first-party foliage crown depth and leaflet breakup, lit water variation, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, sparse scrub, boulder placement, mask-aware canyon ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, river-mile stationing, hydrologic conditioning, release-aware masks, and guide/oarsman approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
     Colorado.FlowBandId = TEXT("moderate_release_planning");
     Colorado.FlowBandDisplayName = TEXT("Moderate Release Planning");
     Colorado.FlowBandSource = TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json");
@@ -351,7 +351,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.TerrainReliefAmplitudeCm = 650.0f;
     Colorado.HeightfieldPreviewAmplitudeCm = 360.0f;
     Colorado.BoulderCount = 20;
-    Colorado.FoliageCount = 18;
+    Colorado.FoliageCount = 16;
     Colorado.FoamTrainCount = 9;
     Colorado.bDesertCanyon = true;
     Specs.Add(Colorado);
@@ -374,7 +374,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.ElevationSample =
         TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif");
     Pacuare.SourceDrapeDescription =
-        TEXT("review-gated Pacuare production-import derivative placeholders generated from the selected NASA GIBS MODIS/Terra true-color seed and Copernicus DEM GLO-30 relief, normalized into a 4096px source drape, 2048px DEM relief, 2017px heightfield candidate, and 2048px water/vegetation masks; these remain coarse/cloudy proxy inputs until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, broad-slope terrain exposure fill and relief, minimized source overlay plate artifacts, graphic waterline ribbon demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, rainforest canopy/vine silhouette cards, dense layered rainforest canopy/understory proxy clusters, first-party instanced procedural rainforest canopy/trunk/understory scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, waterfall curtain/plunge-mist proxy layers, lit water variation, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, dense mask-aware ground-cover/canopy cards, refined guide-seat raft/oar foreground proxies, humid atmospheric backdrop cards, and source-aware sky-gradient/depth layers remain rights-safe proxy dressing; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
+        TEXT("review-gated Pacuare production-import derivative placeholders generated from the selected NASA GIBS MODIS/Terra true-color seed and Copernicus DEM GLO-30 relief, normalized into a 4096px source drape, 2048px DEM relief, 2017px heightfield candidate, and 2048px water/vegetation masks; these remain coarse/cloudy proxy inputs until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, broad-slope terrain exposure fill and relief, minimized source overlay plate artifacts, graphic waterline ribbon demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, rainforest canopy/vine silhouette cards, dense layered rainforest canopy/understory proxy clusters, first-party instanced procedural rainforest canopy/trunk/understory scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party foliage card/canopy artifact demotion, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, waterfall curtain/plunge-mist proxy layers, lit water variation, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, dense mask-aware ground-cover/canopy cards, refined guide-seat raft/oar foreground proxies, humid atmospheric backdrop cards, and source-aware sky-gradient/depth layers remain rights-safe proxy dressing; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers");
     Pacuare.FlowBandId = TEXT("rainfed_runnable_planning");
     Pacuare.FlowBandDisplayName = TEXT("Rain-Fed Runnable Planning");
     Pacuare.FlowBandSource = TEXT("physics/data/real_world/pacuare_river_costa_rica/flow_presets.json");
@@ -396,7 +396,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.TerrainReliefAmplitudeCm = 420.0f;
     Pacuare.HeightfieldPreviewAmplitudeCm = 260.0f;
     Pacuare.BoulderCount = 22;
-    Pacuare.FoliageCount = 84;
+    Pacuare.FoliageCount = 62;
     Pacuare.FoamTrainCount = 16;
     Pacuare.bHasWaterfalls = true;
     Specs.Add(Pacuare);
@@ -1956,10 +1956,11 @@ AActor* AddPreviewProceduralLeafClusterActor(
     const float YawRadians = FMath::DegreesToRadians(YawDegrees);
     const float CosYaw = FMath::Cos(YawRadians);
     const float SinYaw = FMath::Sin(YawRadians);
+    const float FirstPartyProceduralCanopyBlobDemotion = bRainforest ? 0.72f : 0.82f;
     const FVector Radii(
-        FMath::Max(8.0f, Scale.X * 100.0f),
-        FMath::Max(8.0f, Scale.Y * 100.0f),
-        FMath::Max(6.0f, Scale.Z * 100.0f));
+        FMath::Max(8.0f, Scale.X * 100.0f * FirstPartyProceduralCanopyBlobDemotion),
+        FMath::Max(8.0f, Scale.Y * 100.0f * FirstPartyProceduralCanopyBlobDemotion),
+        FMath::Max(6.0f, Scale.Z * 100.0f * (bRainforest ? 0.86f : 0.90f)));
 
     TArray<FVector> Vertices;
     TArray<FVector2D> UVs;
@@ -1996,14 +1997,14 @@ AActor* AddPreviewProceduralLeafClusterActor(
             UVs.Add(FVector2D(SegmentT, RingT));
             const float HeightTint = 0.82f + 0.16f * RingT;
             const float LeafTint = 0.82f + 0.12f * LobeNoise + (bRainforest ? 0.04f : 0.0f);
-            VertexColors.Add(ScalePreviewColor(Color, HeightTint * LeafTint));
+            VertexColors.Add(ScalePreviewColor(Color, HeightTint * LeafTint * (bRainforest ? 0.86f : 0.90f)));
         }
     }
 
     const int32 TopIndex = Vertices.Num();
     Vertices.Add(FVector(BaseLocation.X, BaseLocation.Y, BaseLocation.Z + Radii.Z * 0.86f));
     UVs.Add(FVector2D(0.5f, 1.0f));
-    VertexColors.Add(ScalePreviewColor(Color, bRainforest ? 1.08f : 1.02f));
+    VertexColors.Add(ScalePreviewColor(Color, bRainforest ? 0.90f : 0.88f));
 
     const int32 BottomIndex = Vertices.Num();
     Vertices.Add(FVector(BaseLocation.X, BaseLocation.Y, BaseLocation.Z - Radii.Z * 0.56f));
@@ -2072,7 +2073,7 @@ AActor* AddPreviewOrganicLeafSprayActor(
         return nullptr;
     }
 
-    const int32 LeafCount = bRainforest ? 26 : 18;
+    const int32 LeafCount = bRainforest ? 18 : 12;
     const float YawRadians = FMath::DegreesToRadians(YawDegrees);
     const FVector BaseForward(FMath::Cos(YawRadians), FMath::Sin(YawRadians), 0.0f);
     const FVector BaseRight(-FMath::Sin(YawRadians), FMath::Cos(YawRadians), 0.0f);
@@ -2081,6 +2082,8 @@ AActor* AddPreviewOrganicLeafSprayActor(
         FMath::Max(16.0f, Scale.X * 100.0f),
         FMath::Max(12.0f, Scale.Y * 100.0f),
         FMath::Max(10.0f, Scale.Z * 100.0f));
+    const float FoliageCardSilhouetteDemotion = bRainforest ? 0.62f : 0.70f;
+    const float LeafCardWidthScale = bRainforest ? 0.54f : 0.62f;
 
     TArray<FVector> Vertices;
     TArray<FVector2D> UVs;
@@ -2110,9 +2113,9 @@ AActor* AddPreviewOrganicLeafSprayActor(
             RadialDir * (Radii.X * RadialT * (0.28f + 0.44f * FMath::Abs(FMath::Sin(Angle * 0.73f)))) +
             BaseRight * (Radii.Y * 0.20f * FMath::Sin(static_cast<float>(LeafIndex) * 1.91f + static_cast<float>(Seed) * 0.017f)) +
             Up * (Radii.Z * (0.14f + 0.52f * LeafT + 0.18f * VerticalT));
-        const float LeafLength = Radii.X * (bRainforest ? 0.20f : 0.15f) *
+        const float LeafLength = Radii.X * (bRainforest ? 0.20f : 0.15f) * FoliageCardSilhouetteDemotion *
             (0.62f + 0.26f * FMath::Abs(FMath::Sin(static_cast<float>(LeafIndex) * 0.83f + static_cast<float>(Seed) * 0.029f)));
-        const float LeafWidth = Radii.Y * (bRainforest ? 0.050f : 0.040f) *
+        const float LeafWidth = Radii.Y * (bRainforest ? 0.050f : 0.040f) * LeafCardWidthScale *
             (0.78f + 0.18f * FMath::Abs(FMath::Cos(static_cast<float>(LeafIndex) * 1.23f)));
         const float TipLift = Radii.Z * (bRainforest ? 0.030f : 0.020f) *
             FMath::Sin(static_cast<float>(LeafIndex) * 0.61f + static_cast<float>(Seed) * 0.043f);
@@ -2130,7 +2133,7 @@ AActor* AddPreviewOrganicLeafSprayActor(
         const float LeafShade = 0.76f + 0.20f * LeafT +
             0.10f * FMath::Sin(static_cast<float>(Seed) * 0.037f + static_cast<float>(LeafIndex) * 0.97f);
         const FLinearColor InnerLeafColor = ScalePreviewColor(Color, LeafShade * (bRainforest ? 0.92f : 0.88f));
-        const FLinearColor OuterLeafColor = ScalePreviewColor(Color, LeafShade * (bRainforest ? 1.08f : 1.02f));
+        const FLinearColor OuterLeafColor = ScalePreviewColor(Color, LeafShade * (bRainforest ? 0.92f : 0.90f));
         VertexColors.Add(InnerLeafColor);
         VertexColors.Add(OuterLeafColor);
         VertexColors.Add(ScalePreviewColor(OuterLeafColor, 0.96f));
@@ -2513,11 +2516,13 @@ void AddPreviewFoliageCrownDepthAndLeafletBreakupDetail(
 
     const bool bRainforest = Spec.bHasWaterfalls;
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
-    const int32 CrownCount = Spec.bDesertCanyon ? 32 : (bRainforest ? 132 : 78);
-    const int32 ShadowQuadsPerCrown = Spec.bDesertCanyon ? 1 : (bRainforest ? 3 : 2);
-    const int32 LeafletsPerCrown = Spec.bDesertCanyon ? 5 : (bRainforest ? 18 : 12);
+    const int32 CrownCount = Spec.bDesertCanyon ? 28 : (bRainforest ? 96 : 58);
+    const int32 ShadowQuadsPerCrown = Spec.bDesertCanyon ? 1 : (bRainforest ? 2 : 2);
+    const int32 LeafletsPerCrown = Spec.bDesertCanyon ? 4 : (bRainforest ? 12 : 8);
     const float NearBankOffset = Spec.bDesertCanyon ? 1120.0f : (bRainforest ? 700.0f : 720.0f);
     const float FarBankOffset = Spec.bDesertCanyon ? 2200.0f : (bRainforest ? 1680.0f : 1260.0f);
+    const float FoliageCardSilhouetteDemotion = Spec.bDesertCanyon ? 0.86f : (bRainforest ? 0.58f : 0.66f);
+    const float FirstPartyProceduralCanopyBlobDemotion = Spec.bDesertCanyon ? 0.86f : (bRainforest ? 0.68f : 0.74f);
     const FVector Up(0.0f, 0.0f, 1.0f);
 
     TArray<FVector> Vertices;
@@ -2618,9 +2623,9 @@ void AddPreviewFoliageCrownDepthAndLeafletBreakupDetail(
             Y,
             TerrainZ + (Spec.bDesertCanyon ? 82.0f : (bRainforest ? 350.0f : 214.0f)) +
                 18.0f * FMath::Sin(Phase));
-        const float CrownRadiusX = Spec.bDesertCanyon ? 70.0f : (bRainforest ? 210.0f : 138.0f);
-        const float CrownRadiusY = Spec.bDesertCanyon ? 42.0f : (bRainforest ? 148.0f : 96.0f);
-        const float CrownRadiusZ = Spec.bDesertCanyon ? 42.0f : (bRainforest ? 145.0f : 86.0f);
+        const float CrownRadiusX = (Spec.bDesertCanyon ? 70.0f : (bRainforest ? 210.0f : 138.0f)) * FirstPartyProceduralCanopyBlobDemotion;
+        const float CrownRadiusY = (Spec.bDesertCanyon ? 42.0f : (bRainforest ? 148.0f : 96.0f)) * FirstPartyProceduralCanopyBlobDemotion;
+        const float CrownRadiusZ = (Spec.bDesertCanyon ? 42.0f : (bRainforest ? 145.0f : 86.0f)) * (Spec.bDesertCanyon ? 0.88f : (bRainforest ? 0.78f : 0.82f));
         const FLinearColor CanopyLow = Spec.bDesertCanyon
             ? FLinearColor(0.19f, 0.20f, 0.10f)
             : (bRainforest ? FLinearColor(0.014f, 0.070f, 0.024f) : FLinearColor(0.070f, 0.150f, 0.045f));
@@ -2649,8 +2654,10 @@ void AddPreviewFoliageCrownDepthAndLeafletBreakupDetail(
                 RadialDir * (CrownRadiusX * (0.10f + 0.18f * ShadowT)) -
                 BaseForward * (CrownRadiusY * 0.10f) -
                 Up * (CrownRadiusZ * (0.18f + 0.08f * FMath::Sin(Phase)));
-            const float ShadowWidth = CrownRadiusY * (Spec.bDesertCanyon ? 0.36f : (bRainforest ? 0.58f : 0.50f));
-            const float ShadowHeight = CrownRadiusZ * (Spec.bDesertCanyon ? 0.50f : (bRainforest ? 0.64f : 0.58f));
+            const float ShadowWidth =
+                CrownRadiusY * (Spec.bDesertCanyon ? 0.36f : (bRainforest ? 0.58f : 0.50f)) * FoliageCardSilhouetteDemotion;
+            const float ShadowHeight =
+                CrownRadiusZ * (Spec.bDesertCanyon ? 0.50f : (bRainforest ? 0.64f : 0.58f)) * FoliageCardSilhouetteDemotion;
             AddQuad(
                 ShadowCenter - WidthDir * ShadowWidth - Up * ShadowHeight * 0.48f,
                 ShadowCenter + WidthDir * ShadowWidth - Up * ShadowHeight * 0.40f,
@@ -2680,13 +2687,15 @@ void AddPreviewFoliageCrownDepthAndLeafletBreakupDetail(
                 BaseRight * (CrownRadiusY * 0.16f * FMath::Sin(Phase * 0.73f + static_cast<float>(LeafletIndex) * 1.31f)) +
                 Up * (CrownRadiusZ * (-0.18f + 0.70f * LeafT + 0.12f * FMath::Sin(Angle)));
             const float LeafLength = CrownRadiusX * (Spec.bDesertCanyon ? 0.16f : (bRainforest ? 0.12f : 0.11f)) *
+                FoliageCardSilhouetteDemotion *
                 (0.70f + 0.20f * FMath::Abs(FMath::Sin(Phase + static_cast<float>(LeafletIndex) * 0.91f)));
             const float LeafHalfWidth = CrownRadiusY * (Spec.bDesertCanyon ? 0.038f : (bRainforest ? 0.026f : 0.030f)) *
+                (Spec.bDesertCanyon ? 0.72f : (bRainforest ? 0.52f : 0.58f)) *
                 (0.70f + 0.16f * FMath::Abs(FMath::Cos(Angle * 0.73f)));
             const float Shade = 0.66f + 0.24f * LeafT +
                 0.08f * FMath::Sin(Phase * 0.91f + static_cast<float>(LeafletIndex) * 0.83f);
             const FLinearColor LeafBaseColor = ScalePreviewColor(CrownBaseColor, Shade * (bRainforest ? 0.74f : 0.78f));
-            const FLinearColor LeafTipColor = ScalePreviewColor(CrownBaseColor, Shade * (bRainforest ? 1.02f : 0.96f));
+            const FLinearColor LeafTipColor = ScalePreviewColor(CrownBaseColor, Shade * (bRainforest ? 0.88f : 0.86f));
             AddQuad(
                 LeafCenter - LeafForward * LeafLength * 0.74f,
                 LeafCenter + LeafWidthDir * LeafHalfWidth,
@@ -4866,9 +4875,10 @@ void AddPreviewProceduralBankTextureCards(
     }
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
-    const int32 CardsPerSide = Spec.bDesertCanyon ? 74 : (Spec.bHasWaterfalls ? 178 : 126);
+    const int32 CardsPerSide = Spec.bDesertCanyon ? 74 : (Spec.bHasWaterfalls ? 142 : 104);
     const float NearBankOffset = Spec.bDesertCanyon ? 520.0f : 260.0f;
     const float FarBankOffset = Spec.bDesertCanyon ? 1880.0f : (Spec.bHasWaterfalls ? 1180.0f : 980.0f);
+    const float FoliageCardVisibilityBreakupT = Spec.bHasWaterfalls ? 0.42f : 0.52f;
 
     for (int32 SideIndex = 0; SideIndex < 2; ++SideIndex)
     {
@@ -4911,8 +4921,8 @@ void AddPreviewProceduralBankTextureCards(
             const float WaterT = SamplePreviewMaskAtWorld(Spec, WaterMask, X, Y);
             const bool bCanopyCard =
                 Spec.bHasWaterfalls &&
-                CardIndex % 9 == 0 &&
-                BaseOffset < ActiveRiverHalfWidth + NearBankOffset + FarBankOffset * 0.62f;
+                CardIndex % 13 == 0 &&
+                BaseOffset < ActiveRiverHalfWidth + NearBankOffset + FarBankOffset * 0.48f;
             const float Noise = 0.86f + 0.10f * FMath::Sin(Phase * 1.77f) + 0.05f * FMath::Sin(Phase * 0.43f);
 
             FLinearColor GroundColor;
@@ -4948,18 +4958,19 @@ void AddPreviewProceduralBankTextureCards(
             {
                 const FLinearColor CanopyCardColor = ScalePreviewColor(
                     FMath::Lerp(GroundColor, Spec.FoliageColor, Spec.bHasWaterfalls ? 0.62f : 0.48f),
-                    Spec.bHasWaterfalls ? 1.18f : 1.08f);
-                AddPreviewMeshActor(
+                    (Spec.bHasWaterfalls ? 0.82f : 0.90f) * FoliageCardVisibilityBreakupT);
+                AddPreviewTranslucentMeshActor(
                     World,
                     PlaneMesh,
                     FString::Printf(TEXT("RaftSim_MaskAwareCanopyCard_%03d_%s"), CardIndex + SideIndex * CardsPerSide, *Spec.RiverId),
                     FVector(X, Y, TerrainZ + 78.0f),
                     FRotator(48.0f + 4.0f * FMath::Sin(Phase), Yaw, 0.0f),
                     FVector(
-                        0.86f + 0.18f * FMath::Abs(FMath::Sin(Phase)),
-                        0.22f,
+                        0.46f + 0.10f * FMath::Abs(FMath::Sin(Phase)),
+                        0.12f,
                         1.0f),
-                    CanopyCardColor);
+                    CanopyCardColor,
+                    0.28f);
             }
             else
             {
@@ -6536,9 +6547,10 @@ void AddPreviewBiomeFoliageSilhouetteDetail(
     }
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
-    const int32 SilhouetteCount = Spec.bDesertCanyon ? 34 : (Spec.bHasWaterfalls ? 140 : 86);
+    const int32 SilhouetteCount = Spec.bDesertCanyon ? 28 : (Spec.bHasWaterfalls ? 88 : 58);
     const float NearBankOffset = Spec.bDesertCanyon ? 760.0f : (Spec.bHasWaterfalls ? 520.0f : 560.0f);
     const float FarBankOffset = Spec.bDesertCanyon ? 2120.0f : (Spec.bHasWaterfalls ? 1550.0f : 1240.0f);
+    const float FoliageCardVisibilityBreakupT = Spec.bHasWaterfalls ? 0.44f : 0.54f;
 
     for (int32 FoliageIndex = 0; FoliageIndex < SilhouetteCount; ++FoliageIndex)
     {
@@ -6586,18 +6598,18 @@ void AddPreviewBiomeFoliageSilhouetteDetail(
         const float VegetationT = SamplePreviewMaskAtWorld(Spec, VegetationMask, X, Y);
         const float Yaw = static_cast<float>((FoliageIndex * 43) % 360);
 
-        if (Spec.bHasWaterfalls && FoliageIndex % 5 == 0)
+        if (Spec.bHasWaterfalls && FoliageIndex % 8 == 0)
         {
             const FLinearColor VineColor = ScalePreviewColor(
                 FMath::Lerp(FLinearColor(0.018f, 0.10f, 0.035f), Spec.FoliageColor, 0.64f + VegetationT * 0.22f),
-                0.86f + 0.10f * static_cast<float>(FoliageIndex % 4));
+                (0.72f + 0.06f * static_cast<float>(FoliageIndex % 4)) * FoliageCardVisibilityBreakupT);
             AddPreviewMeshActor(
                 World,
                 PlaneMesh,
                 FString::Printf(TEXT("RaftSim_RainforestVineCurtain_%03d_%s"), FoliageIndex, *Spec.RiverId),
                 FVector(X, Y, TerrainZ + 215.0f + 20.0f * static_cast<float>(FoliageIndex % 3)),
                 FRotator(78.0f + 4.0f * FMath::Sin(Phase), Yaw, 0.0f),
-                FVector(0.62f + 0.12f * FMath::Abs(FMath::Sin(Phase)), 1.90f + 0.24f * static_cast<float>(FoliageIndex % 3), 1.0f),
+                FVector(0.36f + 0.06f * FMath::Abs(FMath::Sin(Phase)), 1.18f + 0.16f * static_cast<float>(FoliageIndex % 3), 1.0f),
                 VineColor);
         }
         else if (Spec.bDesertCanyon)
@@ -6668,9 +6680,11 @@ void AddPreviewDenseBiomeFoliageLayerDetail(
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const bool bRainforest = Spec.bHasWaterfalls;
-    const int32 ClusterCount = Spec.bDesertCanyon ? 56 : (bRainforest ? 180 : 118);
+    const int32 ClusterCount = Spec.bDesertCanyon ? 44 : (bRainforest ? 116 : 76);
     const float NearBankOffset = Spec.bDesertCanyon ? 1080.0f : (bRainforest ? 620.0f : 660.0f);
     const float FarBankOffset = Spec.bDesertCanyon ? 2200.0f : (bRainforest ? 1720.0f : 1360.0f);
+    const float FirstPartyProceduralCanopyBlobDemotion = Spec.bDesertCanyon ? 0.88f : (bRainforest ? 0.72f : 0.78f);
+    const float FoliageCardSilhouetteDemotion = Spec.bDesertCanyon ? 0.90f : (bRainforest ? 0.68f : 0.74f);
 
     for (int32 ClusterIndex = 0; ClusterIndex < ClusterCount; ++ClusterIndex)
     {
@@ -6774,10 +6788,10 @@ void AddPreviewDenseBiomeFoliageLayerDetail(
             FVector(X, Y, TerrainZ + (bRainforest ? 335.0f : 192.0f) + 22.0f * FMath::Sin(Phase)),
             Yaw,
             FVector(
-                bRainforest ? 1.28f + 0.14f * static_cast<float>(ClusterIndex % 5) : 0.84f + 0.10f * static_cast<float>(ClusterIndex % 4),
-                bRainforest ? 1.74f : 1.12f,
-                bRainforest ? 1.44f : 0.96f),
-            CanopyColor,
+                (bRainforest ? 1.28f + 0.14f * static_cast<float>(ClusterIndex % 5) : 0.84f + 0.10f * static_cast<float>(ClusterIndex % 4)) * FirstPartyProceduralCanopyBlobDemotion,
+                (bRainforest ? 1.74f : 1.12f) * FirstPartyProceduralCanopyBlobDemotion,
+                (bRainforest ? 1.44f : 0.96f) * (bRainforest ? 0.80f : 0.86f)),
+            ScalePreviewColor(CanopyColor, bRainforest ? 0.84f : 0.88f),
             ClusterIndex * 59 + 10100,
             bRainforest,
             false);
@@ -6792,10 +6806,10 @@ void AddPreviewDenseBiomeFoliageLayerDetail(
                     TerrainZ + (bRainforest ? 354.0f : 206.0f) + 18.0f * FMath::Sin(Phase)),
                 Yaw + 29.0f,
                 FVector(
-                    bRainforest ? 1.04f + 0.10f * static_cast<float>(ClusterIndex % 4) : 0.66f + 0.08f * static_cast<float>(ClusterIndex % 3),
-                    bRainforest ? 1.16f : 0.72f,
-                    bRainforest ? 0.78f : 0.46f),
-                ScalePreviewColor(CanopyColor, bRainforest ? 0.74f : 0.70f),
+                    (bRainforest ? 1.04f + 0.10f * static_cast<float>(ClusterIndex % 4) : 0.66f + 0.08f * static_cast<float>(ClusterIndex % 3)) * FoliageCardSilhouetteDemotion,
+                    (bRainforest ? 1.16f : 0.72f) * FoliageCardSilhouetteDemotion,
+                    (bRainforest ? 0.78f : 0.46f) * (bRainforest ? 0.82f : 0.88f)),
+                ScalePreviewColor(CanopyColor, bRainforest ? 0.62f : 0.62f),
                 ClusterIndex * 89 + 16100,
                 bRainforest);
         }
@@ -6809,9 +6823,9 @@ void AddPreviewDenseBiomeFoliageLayerDetail(
             FVector(X + 62.0f * FMath::Sin(Phase * 0.91f), Y + SideNudge, TerrainZ + (bRainforest ? 132.0f : 74.0f)),
             Yaw + 73.0f,
             FVector(
-                bRainforest ? 0.82f + 0.10f * static_cast<float>(ClusterIndex % 4) : 0.52f + 0.08f * static_cast<float>(ClusterIndex % 4),
-                bRainforest ? 1.08f : 0.66f,
-                bRainforest ? 0.84f : 0.48f),
+                (bRainforest ? 0.82f + 0.10f * static_cast<float>(ClusterIndex % 4) : 0.52f + 0.08f * static_cast<float>(ClusterIndex % 4)) * FoliageCardSilhouetteDemotion,
+                (bRainforest ? 1.08f : 0.66f) * FoliageCardSilhouetteDemotion,
+                (bRainforest ? 0.84f : 0.48f) * (bRainforest ? 0.84f : 0.88f)),
             UnderstoryColor,
             ClusterIndex * 61 + 11700,
             bRainforest,
@@ -6832,7 +6846,7 @@ void AddPreviewDenseBiomeFoliageLayerDetail(
                 TrunkColor);
         }
 
-        if (bRainforest && ClusterIndex % 5 == 0)
+        if (bRainforest && ClusterIndex % 8 == 0)
         {
             const FLinearColor FrondColor = ScalePreviewColor(
                 FMath::Lerp(FLinearColor(0.018f, 0.12f, 0.035f), Spec.FoliageColor, 0.72f),
@@ -6842,8 +6856,8 @@ void AddPreviewDenseBiomeFoliageLayerDetail(
                 FString::Printf(TEXT("RaftSim_DenseBiomeOrganicPalmFrondLattice_%03d_%s"), ClusterIndex, *Spec.RiverId),
                 FVector(X + 88.0f * FMath::Cos(Phase), Y - SideNudge, TerrainZ + 235.0f + 20.0f * FMath::Sin(Phase)),
                 Yaw + 116.0f,
-                FVector(0.58f, 1.78f + 0.16f * static_cast<float>(ClusterIndex % 4), 1.12f),
-                FrondColor,
+                FVector(0.42f, 1.18f + 0.12f * static_cast<float>(ClusterIndex % 4), 0.84f),
+                ScalePreviewColor(FrondColor, 0.72f),
                 ClusterIndex * 67 + 12900,
                 true,
                 false);
@@ -6868,15 +6882,16 @@ void AddPreviewInstancedProceduralFoliageEquivalentDetail(
 
     const bool bRainforest = Spec.bHasWaterfalls;
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
-    const int32 ClusterCount = Spec.bDesertCanyon ? 44 : (bRainforest ? 128 : 88);
+    const int32 ClusterCount = Spec.bDesertCanyon ? 34 : (bRainforest ? 84 : 58);
     const float NearBankOffset = Spec.bDesertCanyon ? 980.0f : (bRainforest ? 720.0f : 760.0f);
     const float FarBankOffset = Spec.bDesertCanyon ? 2350.0f : (bRainforest ? 1820.0f : 1480.0f);
+    const float FirstPartyProceduralCanopyBlobDemotion = Spec.bDesertCanyon ? 0.88f : (bRainforest ? 0.68f : 0.74f);
 
     UInstancedStaticMeshComponent* CanopyInstances = AddPreviewInstancedMeshComponent(
         World,
         SphereMesh,
         FString::Printf(TEXT("RaftSim_InstancedProceduralFoliageCanopyLibrary_%s"), *Spec.RiverId),
-        Spec.bDesertCanyon ? FLinearColor(0.24f, 0.29f, 0.13f) : ScalePreviewColor(Spec.FoliageColor, bRainforest ? 0.92f : 0.86f));
+        Spec.bDesertCanyon ? FLinearColor(0.22f, 0.25f, 0.12f) : ScalePreviewColor(Spec.FoliageColor, bRainforest ? 0.74f : 0.76f));
     UInstancedStaticMeshComponent* TrunkInstances = AddPreviewInstancedMeshComponent(
         World,
         CylinderMesh,
@@ -6976,7 +6991,7 @@ void AddPreviewInstancedProceduralFoliageEquivalentDetail(
             continue;
         }
 
-        const int32 LobeCount = bRainforest ? 5 : 4;
+        const int32 LobeCount = 3;
         const float CrownBaseZ = TerrainZ + (bRainforest ? 315.0f : 185.0f) + 22.0f * FMath::Sin(Phase);
         for (int32 LobeIndex = 0; LobeIndex < LobeCount; ++LobeIndex)
         {
@@ -6990,9 +7005,9 @@ void AddPreviewInstancedProceduralFoliageEquivalentDetail(
                     FRotator(0.0f, Yaw + static_cast<float>(LobeIndex) * 21.0f, 0.0f),
                     FVector(LobeX, LobeY, CrownBaseZ + 18.0f * static_cast<float>(LobeIndex % 3)),
                     FVector(
-                        (bRainforest ? 0.44f : 0.30f) * SizeNoise,
-                        (bRainforest ? 0.34f : 0.24f) * SizeNoise,
-                        (bRainforest ? 0.22f : 0.17f) * SizeNoise)),
+                        (bRainforest ? 0.44f : 0.30f) * SizeNoise * FirstPartyProceduralCanopyBlobDemotion,
+                        (bRainforest ? 0.34f : 0.24f) * SizeNoise * FirstPartyProceduralCanopyBlobDemotion,
+                        (bRainforest ? 0.22f : 0.17f) * SizeNoise * (bRainforest ? 0.78f : 0.84f))),
                 true);
         }
 
@@ -7673,8 +7688,12 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             ? 78.0f + 8.0f * static_cast<float>(FoliageIndex % 3)
             : (Spec.bHasWaterfalls ? 330.0f + 28.0f * static_cast<float>(FoliageIndex % 5)
                                     : 218.0f + 18.0f * static_cast<float>(FoliageIndex % 4));
-        const float FirstPartyProceduralCanopyWidthScale = Spec.bDesertCanyon ? 1.0f : (Spec.bHasWaterfalls ? 1.22f : 1.16f);
-        const float FirstPartyProceduralCanopyVerticalScale = Spec.bDesertCanyon ? 1.0f : (Spec.bHasWaterfalls ? 1.26f : 1.18f);
+        const float FirstPartyProceduralCanopyBlobDemotion = Spec.bDesertCanyon ? 0.90f : (Spec.bHasWaterfalls ? 0.70f : 0.76f);
+        const float FoliageCardSilhouetteDemotion = Spec.bDesertCanyon ? 0.88f : (Spec.bHasWaterfalls ? 0.64f : 0.70f);
+        const float FirstPartyProceduralCanopyWidthScale =
+            (Spec.bDesertCanyon ? 1.0f : (Spec.bHasWaterfalls ? 1.22f : 1.16f)) * FirstPartyProceduralCanopyBlobDemotion;
+        const float FirstPartyProceduralCanopyVerticalScale =
+            (Spec.bDesertCanyon ? 1.0f : (Spec.bHasWaterfalls ? 1.26f : 1.18f)) * (Spec.bHasWaterfalls ? 0.82f : 0.88f);
         const float FirstPartyProceduralCrownZ = TerrainZ + FirstPartyProceduralCanopyHeightCm;
         const float FirstPartyProceduralTrunkCenterZ = TerrainZ + FirstPartyProceduralTrunkHeightCm * 0.50f;
         const float FoliageMaskT = SamplePreviewMaskAtWorld(Spec, VegetationMaskPtr, X, Y);
@@ -7769,11 +7788,11 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
                     FirstPartyProceduralTrunkHeightCm * 0.010f),
                 Spec.bDesertCanyon ? FLinearColor(0.21f, 0.18f, 0.10f) : FLinearColor(0.20f, 0.12f, 0.07f));
 
-            const int32 CanopyLobes = Spec.bHasWaterfalls ? 5 : (Spec.bDesertCanyon ? 2 : 3);
+            const int32 CanopyLobes = Spec.bHasWaterfalls ? 3 : (Spec.bDesertCanyon ? 2 : 2);
             for (int32 LobeIndex = 0; LobeIndex < CanopyLobes; ++LobeIndex)
             {
                 const float AngleRadians = FMath::DegreesToRadians(static_cast<float>((FoliageIndex * 47 + LobeIndex * 83) % 360));
-                const float Radius = (LobeIndex == 0) ? 0.0f : (Spec.bHasWaterfalls ? 112.0f : 76.0f);
+                const float Radius = ((LobeIndex == 0) ? 0.0f : (Spec.bHasWaterfalls ? 112.0f : 76.0f)) * FirstPartyProceduralCanopyBlobDemotion;
                 const float LobeX = X + FMath::Cos(AngleRadians) * Radius;
                 const float LobeY = Y + FMath::Sin(AngleRadians) * Radius;
                 AddPreviewProceduralLeafClusterActor(
@@ -7791,19 +7810,19 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             }
         }
 
-        const int32 OrganicLeafSprayCount = Spec.bDesertCanyon ? 2 : (Spec.bHasWaterfalls ? 5 : 3);
+        const int32 OrganicLeafSprayCount = Spec.bDesertCanyon ? 1 : (Spec.bHasWaterfalls ? 3 : 2);
         for (int32 SprayIndex = 0; SprayIndex < OrganicLeafSprayCount; ++SprayIndex)
         {
             const float SprayAngleRadians =
                 FMath::DegreesToRadians(static_cast<float>((FoliageIndex * 71 + SprayIndex * 113) % 360));
-            const float SprayRadius = Spec.bDesertCanyon ? 46.0f : (Spec.bHasWaterfalls ? 132.0f : 88.0f);
+            const float SprayRadius = (Spec.bDesertCanyon ? 46.0f : (Spec.bHasWaterfalls ? 132.0f : 88.0f)) * FirstPartyProceduralCanopyBlobDemotion;
             const FVector SprayLocation(
                 X + FMath::Cos(SprayAngleRadians) * SprayRadius,
                 Y + FMath::Sin(SprayAngleRadians) * SprayRadius,
                 FirstPartyProceduralCrownZ + (Spec.bHasWaterfalls ? 42.0f : 22.0f) * static_cast<float>(SprayIndex));
             const FVector SprayScale = Spec.bDesertCanyon
                 ? FVector(0.28f, 0.20f, 0.090f)
-                : (Spec.bHasWaterfalls ? FVector(1.18f, 0.84f, 0.54f) : FVector(0.76f, 0.54f, 0.32f));
+                : (Spec.bHasWaterfalls ? FVector(1.18f, 0.84f, 0.54f) * FoliageCardSilhouetteDemotion : FVector(0.76f, 0.54f, 0.32f) * FoliageCardSilhouetteDemotion);
             AddPreviewOrganicLeafSprayActor(
                 World,
                 FString::Printf(TEXT("RaftSim_OrganicCanopyLeafSpray_%02d_%02d_%s"), FoliageIndex, SprayIndex, *Spec.RiverId),
@@ -7826,9 +7845,9 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
                     FirstPartyProceduralCrownZ - (Spec.bHasWaterfalls ? 46.0f : 32.0f)),
                 static_cast<float>((FoliageIndex * 67 + 19) % 360),
                 FVector(
-                    CanopyWidth * (Spec.bHasWaterfalls ? 0.94f : 0.74f),
-                    CanopyWidth * (Spec.bHasWaterfalls ? 0.78f : 0.60f),
-                    Height * (Spec.bHasWaterfalls ? 0.46f : 0.32f)),
+                    CanopyWidth * (Spec.bHasWaterfalls ? 0.94f : 0.74f) * FoliageCardSilhouetteDemotion,
+                    CanopyWidth * (Spec.bHasWaterfalls ? 0.78f : 0.60f) * FoliageCardSilhouetteDemotion,
+                    Height * (Spec.bHasWaterfalls ? 0.46f : 0.32f) * (Spec.bHasWaterfalls ? 0.84f : 0.88f)),
                 ScalePreviewColor(FirstPartyProceduralCanopyShadowColor, Spec.bHasWaterfalls ? 0.92f : 0.88f),
                 FoliageIndex * 71 + 13600,
                 Spec.bHasWaterfalls,
@@ -7842,9 +7861,9 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
                     FirstPartyProceduralCrownZ + (Spec.bHasWaterfalls ? 34.0f : 20.0f)),
                 static_cast<float>((FoliageIndex * 73 + 11) % 360),
                 FVector(
-                    CanopyWidth * (Spec.bHasWaterfalls ? 1.08f : 0.82f),
-                    CanopyWidth * (Spec.bHasWaterfalls ? 0.88f : 0.66f),
-                    Height * (Spec.bHasWaterfalls ? 0.52f : 0.36f)),
+                    CanopyWidth * (Spec.bHasWaterfalls ? 1.08f : 0.82f) * FoliageCardSilhouetteDemotion,
+                    CanopyWidth * (Spec.bHasWaterfalls ? 0.88f : 0.66f) * FoliageCardSilhouetteDemotion,
+                    Height * (Spec.bHasWaterfalls ? 0.52f : 0.36f) * (Spec.bHasWaterfalls ? 0.84f : 0.88f)),
                 ScalePreviewColor(FirstPartyProceduralCanopyToneColor, Spec.bHasWaterfalls ? 0.68f : 0.66f),
                 FoliageIndex * 83 + 15100,
                 Spec.bHasWaterfalls);
