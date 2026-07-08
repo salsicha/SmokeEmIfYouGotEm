@@ -170,6 +170,57 @@ def _draw_noise_rect(
         draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=color)
 
 
+def _hash_unit(x: int, y: int, seed: int) -> float:
+    value = (x * 374761393 + y * 668265263 + seed * 1442695040888963407) & 0xFFFFFFFF
+    value = (value ^ (value >> 13)) * 1274126177
+    value = value ^ (value >> 16)
+    return (value & 0xFFFF) / 65535.0
+
+
+def _apply_material_microtexture(image: Image.Image, recipe: dict, river_id: str) -> Image.Image:
+    kind = _recipe_kind(recipe["recipe_id"])
+    palette = _palette_for(recipe, river_id)
+    seed = _seed_for("atlas-photo-microtexture", river_id, recipe["recipe_id"])
+    amplitude_by_kind = {
+        "terrain": 0.22,
+        "rock": 0.20,
+        "foliage": 0.24,
+        "water": 0.16,
+        "mist": 0.10,
+        "raft": 0.14,
+    }
+    chroma_by_kind = {
+        "terrain": 0.14,
+        "rock": 0.12,
+        "foliage": 0.18,
+        "water": 0.10,
+        "mist": 0.08,
+        "raft": 0.10,
+    }
+    amplitude = amplitude_by_kind[kind]
+    chroma = chroma_by_kind[kind]
+    pixels = image.load()
+    width, height = image.size
+    for y in range(height):
+        for x in range(width):
+            n0 = _hash_unit(x, y, seed)
+            n1 = _hash_unit(x // 3, y // 3, seed + 17)
+            n2 = _hash_unit(x // 11, y // 11, seed + 31)
+            ridge = math.sin((x + seed % 97) * 0.071 + (y - seed % 53) * 0.043)
+            shade = (n0 - 0.5) * amplitude + (n1 - 0.5) * amplitude * 0.55 + ridge * amplitude * 0.18
+            target = palette[int(n2 * len(palette)) % len(palette)]
+            r, g, b = pixels[x, y]
+            r = r * (1.0 - chroma) + target[0] * chroma
+            g = g * (1.0 - chroma) + target[1] * chroma
+            b = b * (1.0 - chroma) + target[2] * chroma
+            pixels[x, y] = (
+                _clamp_byte(r + shade * 255.0),
+                _clamp_byte(g + (shade * 0.86 + (n1 - 0.5) * 0.045) * 255.0),
+                _clamp_byte(b + (shade * 0.72 + (n2 - 0.5) * 0.035) * 255.0),
+            )
+    return image
+
+
 def _draw_terrain(draw: ImageDraw.ImageDraw, rect: tuple[int, int, int, int], palette: list[tuple[int, int, int]], rng: random.Random) -> None:
     x0, y0, x1, y1 = rect
     height = y1 - y0
@@ -315,7 +366,7 @@ def _draw_albedo_tile(recipe: dict, river_id: str, tile_size: int) -> Image.Imag
         for _ in range(18):
             y = rng.randint(40, tile_size - 40)
             draw.line((0, y, tile_size, y + rng.randint(-8, 8)), fill=_shade(palette[0], rng.uniform(-0.16, 0.16)), width=2)
-    return image.filter(ImageFilter.GaussianBlur(radius=0.35))
+    return _apply_material_microtexture(image.filter(ImageFilter.GaussianBlur(radius=0.22)), recipe, river_id)
 
 
 def _height_tile(recipe: dict, river_id: str, tile_size: int) -> Image.Image:
