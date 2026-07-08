@@ -40,6 +40,7 @@
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionVertexColor.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
+#include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Misc/CommandLine.h"
 #include "Misc/CoreDelegates.h"
@@ -238,6 +239,16 @@ FString GetFirstPartyMaterialTextureAtlasManifestRelativePath()
 FString GetFirstPartyMaterialInstanceCandidateManifestRelativePath()
 {
     return TEXT("unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json");
+}
+
+FString GetFirstPartyMaterialInstanceReviewAssetRootRelativePath()
+{
+    return TEXT("unreal/Content/RaftSim/Materials/MaterialInstances");
+}
+
+FString GetFirstPartyMaterialInstanceReviewAssetStatus()
+{
+    return TEXT("created_unreal_material_instance_constant_review_assets_not_lifelike");
 }
 
 FString GetFirstPartyMaterialTextureAtlasAlbedoRelativePath(const FString& RiverId)
@@ -967,6 +978,251 @@ UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial()
     }
 
     return Material;
+}
+
+struct FRaftSimFirstPartyMaterialInstanceCandidateSpec
+{
+    FString RiverId;
+    FString RiverAssetName;
+    FString RecipeId;
+    FString RecipeAssetName;
+    FString ParentMaterialObjectPath;
+    int32 AtlasTileIndex = 0;
+    float AtlasBlendWeight = 0.25f;
+    float NormalIntensity = 0.15f;
+    float RoughnessScale = 0.75f;
+    float HeightScale = 0.08f;
+
+    FString GetMaterialInstancePath() const
+    {
+        return FString::Printf(
+            TEXT("/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_%s_%s_AtlasCandidate"),
+            *RiverAssetName,
+            *RecipeAssetName);
+    }
+};
+
+TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialInstanceCandidateSpecs()
+{
+    struct FRecipeSpec
+    {
+        const TCHAR* RecipeId;
+        const TCHAR* RecipeAssetName;
+        const TCHAR* ParentMaterialObjectPath;
+        int32 AtlasTileIndex;
+        float AtlasBlendWeight;
+        float NormalIntensity;
+        float RoughnessScale;
+        float HeightScale;
+    };
+
+    const FRecipeSpec RecipeSpecs[] = {
+        {
+            TEXT("terrain_bank_layered_material"),
+            TEXT("TerrainBank"),
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview.M_RaftSim_TerrainVertexColorLitPreview"),
+            0,
+            0.58f,
+            0.28f,
+            0.92f,
+            0.18f,
+        },
+        {
+            TEXT("wet_boulder_contact_material_set"),
+            TEXT("WetBoulderContact"),
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_LitColorPreview.M_RaftSim_LitColorPreview"),
+            1,
+            0.52f,
+            0.42f,
+            0.64f,
+            0.22f,
+        },
+        {
+            TEXT("biome_foliage_groundcover_materials"),
+            TEXT("BiomeFoliageGroundcover"),
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_LitColorPreview.M_RaftSim_LitColorPreview"),
+            2,
+            0.48f,
+            0.24f,
+            0.78f,
+            0.14f,
+        },
+        {
+            TEXT("flow_dependent_water_surface_material"),
+            TEXT("FlowDependentWaterSurface"),
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview.M_RaftSim_VertexColorWaterPreview"),
+            3,
+            0.28f,
+            0.18f,
+            0.62f,
+            0.06f,
+        },
+        {
+            TEXT("foam_spray_mist_atmosphere_materials"),
+            TEXT("FoamSprayMistAtmosphere"),
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_TranslucentColorPreview.M_RaftSim_TranslucentColorPreview"),
+            4,
+            0.26f,
+            0.08f,
+            0.40f,
+            0.04f,
+        },
+        {
+            TEXT("raft_foreground_review_materials"),
+            TEXT("RaftForegroundReview"),
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_LitColorPreview.M_RaftSim_LitColorPreview"),
+            5,
+            0.32f,
+            0.18f,
+            0.56f,
+            0.08f,
+        },
+    };
+
+    struct FRiverSpec
+    {
+        const TCHAR* RiverId;
+        const TCHAR* RiverAssetName;
+    };
+
+    const FRiverSpec RiverSpecs[] = {
+        {TEXT("american_south_fork"), TEXT("AmericanSouthFork")},
+        {TEXT("colorado_river"), TEXT("ColoradoRiver")},
+        {TEXT("pacuare"), TEXT("Pacuare")},
+    };
+
+    TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> Specs;
+    for (const FRiverSpec& RiverSpec : RiverSpecs)
+    {
+        for (const FRecipeSpec& RecipeSpec : RecipeSpecs)
+        {
+            FRaftSimFirstPartyMaterialInstanceCandidateSpec Spec;
+            Spec.RiverId = RiverSpec.RiverId;
+            Spec.RiverAssetName = RiverSpec.RiverAssetName;
+            Spec.RecipeId = RecipeSpec.RecipeId;
+            Spec.RecipeAssetName = RecipeSpec.RecipeAssetName;
+            Spec.ParentMaterialObjectPath = RecipeSpec.ParentMaterialObjectPath;
+            Spec.AtlasTileIndex = RecipeSpec.AtlasTileIndex;
+            Spec.AtlasBlendWeight = RecipeSpec.AtlasBlendWeight;
+            Spec.NormalIntensity = RecipeSpec.NormalIntensity;
+            Spec.RoughnessScale = RecipeSpec.RoughnessScale;
+            Spec.HeightScale = RecipeSpec.HeightScale;
+            Specs.Add(Spec);
+        }
+    }
+
+    return Specs;
+}
+
+bool CreateOrUpdateFirstPartyMaterialInstanceCandidateAsset(
+    const FRaftSimFirstPartyMaterialInstanceCandidateSpec& Spec,
+    FString& OutSummary)
+{
+    UMaterialInterface* ParentMaterial = LoadPreviewMaterial(*Spec.ParentMaterialObjectPath);
+    if (!ParentMaterial)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Missing parent material for candidate %s: %s\n"),
+            *Spec.GetMaterialInstancePath(),
+            *Spec.ParentMaterialObjectPath);
+        return false;
+    }
+
+    const FString PackagePath = Spec.GetMaterialInstancePath();
+    const FString AssetName = FPackageName::GetLongPackageAssetName(PackagePath);
+    const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, *AssetName);
+
+    UPackage* Package = CreatePackage(*PackagePath);
+    if (!Package)
+    {
+        OutSummary += FString::Printf(TEXT("Failed to create material instance package %s\n"), *PackagePath);
+        return false;
+    }
+
+    UMaterialInstanceConstant* Instance =
+        Cast<UMaterialInstanceConstant>(StaticLoadObject(UMaterialInstanceConstant::StaticClass(), nullptr, *ObjectPath));
+    if (!Instance)
+    {
+        Instance = FindObject<UMaterialInstanceConstant>(Package, *AssetName);
+    }
+    if (!Instance)
+    {
+        Instance = NewObject<UMaterialInstanceConstant>(Package, *AssetName, RF_Public | RF_Standalone | RF_Transactional);
+        FAssetRegistryModule::AssetCreated(Instance);
+    }
+    if (!Instance)
+    {
+        OutSummary += FString::Printf(TEXT("Failed to create material instance candidate %s\n"), *ObjectPath);
+        return false;
+    }
+
+    const int32 AtlasColumn = Spec.AtlasTileIndex % 3;
+    const int32 AtlasRow = Spec.AtlasTileIndex / 3;
+    const FLinearColor AtlasTileOriginScale(
+        static_cast<float>(AtlasColumn) / 3.0f,
+        static_cast<float>(AtlasRow) / 2.0f,
+        1.0f / 3.0f,
+        1.0f / 2.0f);
+
+    Instance->Modify();
+    Instance->SetParentEditorOnly(ParentMaterial);
+    Instance->SetVectorParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("AtlasTileOriginScale")),
+        AtlasTileOriginScale);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("AtlasTileIndex")),
+        static_cast<float>(Spec.AtlasTileIndex));
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("AtlasBlendWeight")),
+        Spec.AtlasBlendWeight);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("NormalIntensity")),
+        Spec.NormalIntensity);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("RoughnessScale")),
+        Spec.RoughnessScale);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("HeightScale")),
+        Spec.HeightScale);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("ReviewAssetOnlyNotLifelike")),
+        1.0f);
+    Instance->PostEditChange();
+    Package->MarkPackageDirty();
+
+    const FString Filename =
+        FPackageName::LongPackageNameToFilename(PackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+
+    const bool bSaved = UPackage::SavePackage(Package, Instance, *Filename, SaveArgs);
+    OutSummary += FString::Printf(
+        TEXT("%s first-party material instance review asset %s (%s/%s) -> %s\n"),
+        bSaved ? TEXT("Saved") : TEXT("Failed"),
+        *ObjectPath,
+        *Spec.RiverId,
+        *Spec.RecipeId,
+        *Filename);
+    return bSaved;
+}
+
+bool CreateFirstPartyMaterialInstanceCandidateAssets(FString& OutSummary)
+{
+    bool bAllSaved = true;
+    LoadOrCreatePreviewColorMaterial();
+    LoadOrCreatePreviewTerrainVertexColorMaterial();
+    LoadOrCreatePreviewTranslucentColorMaterial();
+    LoadOrCreatePreviewWaterVertexColorMaterial();
+
+    for (const FRaftSimFirstPartyMaterialInstanceCandidateSpec& Spec : GetFirstPartyMaterialInstanceCandidateSpecs())
+    {
+        bAllSaved &= CreateOrUpdateFirstPartyMaterialInstanceCandidateAsset(Spec, OutSummary);
+    }
+
+    return bAllSaved;
 }
 
 UMaterialInstanceDynamic* CreatePreviewColorMaterial(UObject* Outer, const FLinearColor& Color)
@@ -10267,6 +10523,7 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
     const FString MaterialInstanceCandidateManifestRelativePath = GetFirstPartyMaterialInstanceCandidateManifestRelativePath();
     const FString MaterialInstanceCandidateManifestAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), MaterialInstanceCandidateManifestRelativePath));
+    const FString MaterialInstanceReviewAssetRootRelativePath = GetFirstPartyMaterialInstanceReviewAssetRootRelativePath();
     const FString GeospatialAttachmentLedgerRelativePath = GetProductionGeospatialAttachmentLedgerRelativePath();
     const FString GeospatialAttachmentLedgerAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), GeospatialAttachmentLedgerRelativePath));
@@ -10307,9 +10564,10 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
     OutSummary += FString::Printf(TEXT("Using first-party procedural material recipe plan: %s\n"), *ProceduralMaterialRecipePlanRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material texture atlas manifest: %s\n"), *MaterialTextureAtlasManifestRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material instance candidate manifest: %s\n"), *MaterialInstanceCandidateManifestRelativePath);
+    OutSummary += FString::Printf(TEXT("Using first-party material instance review asset root: %s\n"), *MaterialInstanceReviewAssetRootRelativePath);
     OutSummary += FString::Printf(TEXT("Using production geospatial attachment ledger: %s\n"), *GeospatialAttachmentLedgerRelativePath);
 
-    bool bAllSaved = true;
+    bool bAllSaved = CreateFirstPartyMaterialInstanceCandidateAssets(OutSummary);
     for (const FRaftSimEnvironmentPreviewSpec& Spec : GetEnvironmentPreviewSpecs())
     {
         OutSummary += FString::Printf(TEXT("Generating %s preview map.\n"), *Spec.DisplayName);
@@ -10338,6 +10596,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
     const FString MaterialInstanceCandidateManifestRelativePath = GetFirstPartyMaterialInstanceCandidateManifestRelativePath();
     const FString MaterialInstanceCandidateManifestAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), MaterialInstanceCandidateManifestRelativePath));
+    const FString MaterialInstanceReviewAssetRootRelativePath = GetFirstPartyMaterialInstanceReviewAssetRootRelativePath();
     const FString GeospatialAttachmentLedgerRelativePath = GetProductionGeospatialAttachmentLedgerRelativePath();
     const FString GeospatialAttachmentLedgerAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), GeospatialAttachmentLedgerRelativePath));
@@ -10369,6 +10628,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
     }
     OutSummary += FString::Printf(TEXT("Using first-party material texture atlas manifest: %s\n"), *MaterialTextureAtlasManifestRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material instance candidate manifest: %s\n"), *MaterialInstanceCandidateManifestRelativePath);
+    OutSummary += FString::Printf(TEXT("Using first-party material instance review asset root: %s\n"), *MaterialInstanceReviewAssetRootRelativePath);
     OutSummary += FString::Printf(TEXT("Using production geospatial attachment ledger: %s\n"), *GeospatialAttachmentLedgerRelativePath);
 
     FString EntriesJson;
@@ -10477,6 +10737,8 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("  \"procedural_material_recipe_plan\": \"%s\",\n")
         TEXT("  \"first_party_material_texture_atlas_manifest\": \"%s\",\n")
         TEXT("  \"first_party_material_instance_candidate_manifest\": \"%s\",\n")
+        TEXT("  \"first_party_material_instance_review_asset_root\": \"%s\",\n")
+        TEXT("  \"first_party_material_instance_review_asset_status\": \"%s\",\n")
         TEXT("  \"geospatial_attachment_ledger\": \"%s\",\n")
         TEXT("  \"status\": \"%s\",\n")
         TEXT("  \"captures\": [\n")
@@ -10488,6 +10750,8 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         *EscapeRaftSimJsonString(ProceduralMaterialRecipePlanRelativePath),
         *EscapeRaftSimJsonString(MaterialTextureAtlasManifestRelativePath),
         *EscapeRaftSimJsonString(MaterialInstanceCandidateManifestRelativePath),
+        *EscapeRaftSimJsonString(MaterialInstanceReviewAssetRootRelativePath),
+        *EscapeRaftSimJsonString(GetFirstPartyMaterialInstanceReviewAssetStatus()),
         *EscapeRaftSimJsonString(GeospatialAttachmentLedgerRelativePath),
         bAllCaptured ? TEXT("south_fork_colorado_and_pacuare_source_draped_guide_and_river_eye_previews_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
         *EntriesJson);

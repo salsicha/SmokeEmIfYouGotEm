@@ -1397,7 +1397,7 @@
     "social_media_is_reference_only_until_explicit_rights_clear": true,
     "third_party_photos_require_per_item_license_review": true
   },
-  "status": "south_fork_colorado_and_pacuare_larger_source_draped_previews_available; production_geospatial_imports_and_photoreal_assets_pending_with_first_party_texture_atlas_manifest_atlas_vertex_color_application",
+  "status": "south_fork_colorado_and_pacuare_larger_source_draped_previews_available; production_geospatial_imports_and_photoreal_assets_pending_with_first_party_texture_atlas_manifest_atlas_vertex_color_application_and_material_instance_review_assets",
   "unreal_generation": {
     "final_acceptance": [
       "production_dem_or_reviewed_proxy_terrain",
@@ -1531,6 +1531,7 @@
       "first_party_material_texture_atlas_manifest_recorded",
       "first_party_material_texture_atlas_vertex_color_application_recorded",
       "first_party_material_instance_candidate_manifest_recorded",
+      "first_party_material_instance_review_assets_created_recorded",
       "first_party_atlas_normal_ao_roughness_height_preview_response_recorded"
     ],
     "preview_capture_root": "docs/environment-captures/photoreal_river_previews",
@@ -1541,7 +1542,9 @@
     ],
     "visual_target": "lifelike_downstream_guide_seat_and_river_eye_screenshots_before_playable_promotion",
     "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
-    "first_party_material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json"
+    "first_party_material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json",
+    "first_party_material_instance_review_asset_root": "unreal/Content/RaftSim/Materials/MaterialInstances",
+    "first_party_material_instance_review_asset_status": "created_unreal_material_instance_constant_review_assets_not_lifelike_pending_texture_import_shader_graph_capture_guide_review_hazard_readability_and_performance_evidence"
   },
   "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
   "first_party_material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json"
