@@ -173,7 +173,9 @@
       "first_party_integrated_corridor_water_terrain_capture_grade",
       "automated_capture_quality_gate_passed_without_proxy_blockers",
       "photoreal_human_lifelike_review_handoff_recorded",
-      "zero_blocker_capture_set_human_review_domains_recorded"
+      "zero_blocker_capture_set_human_review_domains_recorded",
+      "photoreal_human_lifelike_review_packet_recorded",
+      "zero_blocker_capture_set_review_packet_markdown_recorded"
     ],
     "missing_renderer_coverage_before_lifelike": [
       "production_landscape_or_nanite_terrain_material_layers",
@@ -301,6 +303,14 @@
           "reference_media_review_target_count": 3
         }
       }
+    },
+    "photoreal_human_lifelike_review_packet": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_packet.md",
+    "photoreal_human_lifelike_review_packet_status": "awaiting_human_lifelike_review_not_approved",
+    "photoreal_human_lifelike_review_packet_summary": {
+      "river_count": 3,
+      "capture_count": 6,
+      "review_domain_count": 7,
+      "open_human_review_gate_count": 21
     }
   },
   "global_recipes": [
@@ -495,5 +505,5 @@
       ]
     }
   ],
-  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are promoted from review Texture2D/MIC/material assets into production-quality Unreal assets/materials and verified by human art, guide, geospatial, hazard-readability, rights, and performance review. The first importable first-party texture atlas pack is recorded, imported as review-only Unreal Texture2D assets with explicit import settings, bound into review-only material instance candidates, sampled by the review-only M_RaftSim_AtlasSampleReview parent material, and assigned to durable saved-map terrain, water, boulder, foliage, and raft proxy surfaces for review captures. The automated capture-quality gate now has zero blocker counts, but that only promotes the captures to human lifelike review; it does not approve production visuals. The human lifelike review handoff now records all seven open review domains for the zero-blocker capture set so candidate screenshots cannot be promoted without reviewer evidence."
+  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are promoted from review Texture2D/MIC/material assets into production-quality Unreal assets/materials and verified by human art, guide, geospatial, hazard-readability, rights, and performance review. The first importable first-party texture atlas pack is recorded, imported as review-only Unreal Texture2D assets with explicit import settings, bound into review-only material instance candidates, sampled by the review-only M_RaftSim_AtlasSampleReview parent material, and assigned to durable saved-map terrain, water, boulder, foliage, and raft proxy surfaces for review captures. The automated capture-quality gate now has zero blocker counts, but that only promotes the captures to human lifelike review; it does not approve production visuals. The human lifelike review handoff now records all seven open review domains for the zero-blocker capture set so candidate screenshots cannot be promoted without reviewer evidence. The human-readable Markdown review packet now embeds the six zero-blocker capture candidates, flow/source context, reviewer prompts, and promotion rule for the same seven-domain gate."
 }

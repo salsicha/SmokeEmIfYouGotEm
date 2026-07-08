@@ -98,6 +98,14 @@
           "reference_media_review_target_count": 3
         }
       }
+    },
+    "photoreal_human_lifelike_review_packet": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_packet.md",
+    "photoreal_human_lifelike_review_packet_status": "awaiting_human_lifelike_review_not_approved",
+    "photoreal_human_lifelike_review_packet_summary": {
+      "river_count": 3,
+      "capture_count": 6,
+      "review_domain_count": 7,
+      "open_human_review_gate_count": 21
     }
   },
   "reviewed_source_leads_2026_07_06": [
@@ -762,7 +770,7 @@
     }
   ],
   "next_checkpoint_order": [
-    "Use the zero-blocker capture handoff to collect human art, guide, geospatial, rights, hazard-readability, production-material, and desktop/VR performance review evidence before any lifelike screenshot claim.",
+    "Open the zero-blocker Markdown review packet, collect human art, guide, geospatial, rights, hazard-readability, production-material, and desktop/VR performance review evidence, and record signoff before any lifelike screenshot claim.",
     "Replace remaining proxy terrain, rocks, foliage, mist/foam, lighting, and review-only materials with production source-derived or rights-cleared assets before any lifelike screenshot claim.",
     "Close South Fork hydrography/flow/media annotations enough to test a true source-conditioned terrain and material pass.",
     "Close Colorado river-mile/release/media annotations before expanding beyond the Lees Ferry pilot slice.",

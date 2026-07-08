@@ -207,7 +207,15 @@
         }
       }
     },
-    "human_review_note": "The zero-blocker captures are ready for a structured human review pass, but remain unapproved until all seven handoff domains record accepted evidence."
+    "human_review_note": "The zero-blocker captures are ready for a structured human review pass using the Markdown packet, but remain unapproved until all seven handoff domains record accepted evidence.",
+    "photoreal_human_lifelike_review_packet": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_packet.md",
+    "photoreal_human_lifelike_review_packet_status": "awaiting_human_lifelike_review_not_approved",
+    "photoreal_human_lifelike_review_packet_summary": {
+      "river_count": 3,
+      "capture_count": 6,
+      "review_domain_count": 7,
+      "open_human_review_gate_count": 21
+    }
   },
   "buy_paid_assets_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true
 }
