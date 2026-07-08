@@ -40,7 +40,11 @@
       "first_party_atlas_sampler_review_material_status",
       "first_party_material_instance_review_asset_root",
       "first_party_material_instance_review_asset_status",
-      "first_party_material_instance_scene_assignment_status"
+      "first_party_material_instance_scene_assignment_status",
+      "source_conditioned_material_map_manifest",
+      "source_conditioned_material_texture_asset_root",
+      "source_conditioned_material_texture_asset_status",
+      "source_conditioned_material_instance_binding_status"
     ],
     "default_source_plan": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
     "default_flow_visual_contract": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
@@ -180,7 +184,11 @@
       "source_conditioned_material_map_manifest_recorded",
       "source_conditioned_macro_albedo_material_maps_recorded",
       "source_conditioned_material_zone_maps_recorded",
-      "source_conditioned_ao_roughness_height_maps_recorded"
+      "source_conditioned_ao_roughness_height_maps_recorded",
+      "source_conditioned_material_texture2d_review_assets_declared",
+      "source_conditioned_material_instance_texture_bindings_recorded",
+      "source_conditioned_material_zone_weight_controls_recorded",
+      "source_conditioned_shader_graph_sampler_wiring_recorded"
     ],
     "missing_renderer_coverage_before_lifelike": [
       "production_landscape_or_nanite_terrain_material_layers",
@@ -337,7 +345,10 @@
         "material_zones",
         "ao_roughness_height"
       ]
-    }
+    },
+    "source_conditioned_material_texture_asset_root": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures",
+    "source_conditioned_material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_source_conditioned_material_instances_not_lifelike",
+    "source_conditioned_material_instance_binding_status": "bound_to_review_material_instance_parameters_with_regenerated_capture_review_not_lifelike"
   },
   "global_recipes": [
     {
@@ -531,5 +542,5 @@
       ]
     }
   ],
-  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are promoted from review Texture2D/MIC/material assets into production-quality Unreal assets/materials and verified by human art, guide, geospatial, hazard-readability, rights, and performance review. The first importable first-party texture atlas pack is recorded, imported as review-only Unreal Texture2D assets with explicit import settings, bound into review-only material instance candidates, sampled by the review-only M_RaftSim_AtlasSampleReview parent material, and assigned to durable saved-map terrain, water, boulder, foliage, and raft proxy surfaces for review captures. The automated capture-quality gate now has zero blocker counts, but that only promotes the captures to human lifelike review; it does not approve production visuals. The human lifelike review handoff now records all seven open review domains for the zero-blocker capture set so candidate screenshots cannot be promoted without reviewer evidence. The human-readable Markdown review packet now embeds the six zero-blocker capture candidates, flow/source context, reviewer prompts, and promotion rule for the same seven-domain gate. The paired review-results JSON template gives external reviewers a machine-readable place to record reviewer identity, evidence, blockers, follow-up actions, and final river decisions without defaulting any gate to approval. Source-conditioned macro albedo, material-zone, and AO/roughness/height maps now derive from the active review-gated aerial drapes, DEM relief, water masks, and vegetation masks for all three rivers; they are material replacement candidates only until in-engine assignment, capture comparison, guide/geospatial review, rights review, hazard readability, and performance evidence pass."
+  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are promoted from review Texture2D/MIC/material assets into production-quality Unreal assets/materials and verified by human art, guide, geospatial, hazard-readability, rights, and performance review. The first importable first-party texture atlas pack is recorded, imported as review-only Unreal Texture2D assets with explicit import settings, bound into review-only material instance candidates, sampled by the review-only M_RaftSim_AtlasSampleReview parent material, and assigned to durable saved-map terrain, water, boulder, foliage, and raft proxy surfaces for review captures. The automated capture-quality gate now has zero blocker counts, but that only promotes the captures to human lifelike review; it does not approve production visuals. The human lifelike review handoff now records all seven open review domains for the zero-blocker capture set so candidate screenshots cannot be promoted without reviewer evidence. The human-readable Markdown review packet now embeds the six zero-blocker capture candidates, flow/source context, reviewer prompts, and promotion rule for the same seven-domain gate. The paired review-results JSON template gives external reviewers a machine-readable place to record reviewer identity, evidence, blockers, follow-up actions, and final river decisions without defaulting any gate to approval. Source-conditioned macro albedo, material-zone, and AO/roughness/height maps now derive from the active review-gated aerial drapes, DEM relief, water masks, and vegetation masks for all three rivers; they are material replacement candidates only until in-engine assignment, capture comparison, guide/geospatial review, rights review, hazard readability, and performance evidence pass. Unreal automation now declares and imports source-conditioned Texture2D review assets from those maps and binds them to the review material instances with per-surface source zone weights; this is still pending regenerated capture review and human promotion gates."
 }

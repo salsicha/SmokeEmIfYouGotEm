@@ -145,7 +145,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
-          "sha256": "7b07f0f881f4fafdbb2a709f5dcf352d924e053aa722de33b695fb42d82315a1",
+          "sha256": "99ee03ddc480bd2365f5281d3f2d01fc06ac76a2ef6de651c91c5b091207fcb6",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -185,7 +185,7 @@
         {
           "view_id": "river_eye_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
-          "sha256": "5d393822868189d60bafbada8fec6b9ae86263b92d2f45288004038e2bbea71b",
+          "sha256": "ecfcbd67242334d2574d21656abb0566f0747e4483069cfa361d4eb23d1c7eb1",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -482,7 +482,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
-          "sha256": "c859d2d7df6be66a1b469277222de454e4a46ebb7b35644b5622c8f4c015fb90",
+          "sha256": "01206a1ed48a3e89c07987f5b83f5c6f1a685fe7c7c6fd33b600f6df3969db86",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -822,7 +822,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
-          "sha256": "5a1f7d55a948200af73b53ff4f0f2502a18d90dbac90dbf6c0f2f75b7314a5b8",
+          "sha256": "a9db1e23cf29ec753c14faeb2117bda09c3daf3e39a0bc7af1710039cf5bcdad",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {

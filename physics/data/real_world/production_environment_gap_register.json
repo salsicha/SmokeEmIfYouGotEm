@@ -127,7 +127,10 @@
         "material_zones",
         "ao_roughness_height"
       ]
-    }
+    },
+    "source_conditioned_material_texture_asset_root": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures",
+    "source_conditioned_material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_source_conditioned_material_instances_not_lifelike",
+    "source_conditioned_material_instance_binding_status": "bound_to_review_material_instance_parameters_with_regenerated_capture_review_not_lifelike"
   },
   "reviewed_source_leads_2026_07_06": [
     {
@@ -791,7 +794,7 @@
     }
   ],
   "next_checkpoint_order": [
-    "Open the zero-blocker Markdown review packet, fill the review-results JSON template with human art, guide, geospatial, rights, hazard-readability, production-material, and desktop/VR performance evidence, and record signoff before any lifelike screenshot claim.",
+    "Run Unreal map-generation and capture automation after source-conditioned Texture2D assets are imported and bound to review material instances, then review the regenerated guide-seat and river-eye captures before any lifelike screenshot claim.",
     "Assign the source-conditioned macro albedo, material-zone, and AO/roughness/height maps to Unreal terrain, water-edge, vegetation, wet-bank, and relief material instances, then regenerate captures before claiming any visual-replacement progress beyond review-gated candidate maps.",
     "Close South Fork hydrography/flow/media annotations enough to test a true source-conditioned terrain and material pass.",
     "Close Colorado river-mile/release/media annotations before expanding beyond the Lees Ferry pilot slice.",
