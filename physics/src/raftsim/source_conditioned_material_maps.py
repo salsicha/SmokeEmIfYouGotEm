@@ -56,6 +56,13 @@ UNREAL_TEXTURE_ASSET_BY_MAP_ID = {
         "srgb": False,
         "lod_group": "TEXTUREGROUP_World",
     },
+    "normal_detail": {
+        "parameter": "SourceConditionedNormalDetail",
+        "asset_suffix": "SourceConditionedNormalDetail",
+        "compression_settings": "TC_Normalmap",
+        "srgb": False,
+        "lod_group": "TEXTUREGROUP_WorldNormalMap",
+    },
 }
 
 
@@ -160,6 +167,51 @@ def _ao_roughness_height(relief: Image.Image, water_mask: Image.Image, vegetatio
     return Image.merge("RGB", (ao, roughness, height))
 
 
+def _normal_detail(relief: Image.Image, water_mask: Image.Image, vegetation_mask: Image.Image) -> Image.Image:
+    height = ImageOps.autocontrast(relief).filter(ImageFilter.GaussianBlur(radius=1.0))
+    water = water_mask.filter(ImageFilter.GaussianBlur(radius=0.9))
+    vegetation = vegetation_mask.filter(ImageFilter.GaussianBlur(radius=1.1))
+    wet_bank = ImageChops.subtract(water.filter(ImageFilter.MaxFilter(35)), water).filter(ImageFilter.GaussianBlur(radius=1.0))
+
+    height_px = height.load()
+    water_px = water.load()
+    vegetation_px = vegetation.load()
+    wet_bank_px = wet_bank.load()
+    width, height_px_count = height.size
+    normal = Image.new("RGB", height.size)
+    normal_px = normal.load()
+
+    for y in range(height_px_count):
+        y_prev = max(0, y - 1)
+        y_next = min(height_px_count - 1, y + 1)
+        for x in range(width):
+            x_prev = max(0, x - 1)
+            x_next = min(width - 1, x + 1)
+            dx = (height_px[x_next, y] - height_px[x_prev, y]) / 255.0
+            dy = (height_px[x, y_next] - height_px[x, y_prev]) / 255.0
+
+            water_t = water_px[x, y] / 255.0
+            vegetation_t = vegetation_px[x, y] / 255.0
+            wet_bank_t = wet_bank_px[x, y] / 255.0
+            terrain_t = max(0.0, 1.0 - water_t)
+            strength = (
+                2.25 * terrain_t
+                + 0.72 * vegetation_t
+                + 1.20 * wet_bank_t
+                + 0.18 * water_t
+            )
+            nx = -dx * strength
+            ny = -dy * strength
+            nz = 1.0
+            inv_len = (nx * nx + ny * ny + nz * nz) ** -0.5
+            normal_px[x, y] = (
+                max(0, min(255, int((nx * inv_len * 0.5 + 0.5) * 255))),
+                max(0, min(255, int((ny * inv_len * 0.5 + 0.5) * 255))),
+                max(0, min(255, int((nz * inv_len * 0.5 + 0.5) * 255))),
+            )
+    return normal
+
+
 def _record_for_capture(repo_root: Path, capture: dict[str, object], output_root: Path) -> SourceConditionedMaterialMapRecord:
     river_id = str(capture["river_id"])
     source_inputs = {
@@ -178,6 +230,7 @@ def _record_for_capture(repo_root: Path, capture: dict[str, object], output_root
         "macro_albedo": _macro_albedo(source_drape, relief, water, vegetation),
         "material_zones": _material_zones(water, vegetation),
         "ao_roughness_height": _ao_roughness_height(relief, water, vegetation),
+        "normal_detail": _normal_detail(relief, water, vegetation),
     }
     output_root.mkdir(parents=True, exist_ok=True)
     outputs = {
@@ -272,14 +325,17 @@ def _records_to_manifest(repo_root: Path, records: Iterable[SourceConditionedMat
             "SourceConditionedMacroAlbedo",
             "SourceConditionedMaterialZones",
             "SourceConditionedAORoughnessHeight",
+            "SourceConditionedNormalDetail",
             "SourceConditionedZoneWeights",
             "SourceConditionedMacroAlbedoWeight",
             "SourceConditionedSurfaceResponseWeight",
+            "SourceConditionedNormalDetailWeight",
         ],
         "map_semantics": {
             "macro_albedo": "Source-drape-colored material macro map with bounded water, wet-bank, vegetation, and DEM-relief shading.",
             "material_zones": "RGB material-zone weights: R=terrain/wet bank, G=vegetation away from water, B=visible water.",
             "ao_roughness_height": "Packed RGB map: R=relief-derived ambient-occlusion proxy, G=material roughness candidate, B=DEM relief height candidate.",
+            "normal_detail": "Tangent-space normal-detail candidate derived from DEM relief plus water, wet-bank, and vegetation masks; visible water is deliberately low-strength so material response does not invent hidden hydraulic geometry.",
         },
         "rivers": river_maps,
         "current_decision": (

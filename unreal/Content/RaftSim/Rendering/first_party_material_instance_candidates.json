@@ -27,7 +27,9 @@
     "SourceConditionedAORoughnessHeight": "Packed source-conditioned R=AO proxy, G=roughness, B=height map for conservative review material response.",
     "SourceConditionedZoneWeights": "Per-material RGB zone weights selecting terrain/wet bank, vegetation, or water channels from SourceConditionedMaterialZones.",
     "SourceConditionedMacroAlbedoWeight": "Conservative source macro-albedo blend scalar gated by SourceConditionedZoneWeights and material-zone mask.",
-    "SourceConditionedSurfaceResponseWeight": "Conservative source AO/roughness/height response blend scalar gated by SourceConditionedZoneWeights and material-zone mask."
+    "SourceConditionedSurfaceResponseWeight": "Conservative source AO/roughness/height response blend scalar gated by SourceConditionedZoneWeights and material-zone mask.",
+    "SourceConditionedNormalDetail": "DEM/mask-derived source-conditioned tangent-space normal-detail Texture2D sampled through material-zone and conservative blend weights.",
+    "SourceConditionedNormalDetailWeight": "Conservative source normal-detail blend scalar gated by SourceConditionedZoneWeights and material-zone mask."
   },
   "candidates": [
     {
@@ -75,7 +77,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_TerrainBank_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -110,7 +113,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.28,
         "SourceConditionedSurfaceResponseWeight": 0.22,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.16
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -172,7 +176,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -185,11 +190,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -220,6 +226,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
           "sha256": "d1e3e1f8d3a3d5efb7cc017ad272d1ade77136a236f7b82b8b6f21fc72e249de"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+          "sha256": "4d933f35776f9bd499a45923b1b0ea4ba67cfa50dad75a224cde96d6b5c38662"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -270,6 +280,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -321,7 +348,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_WetBoulderContact_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -356,7 +384,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.08,
         "SourceConditionedSurfaceResponseWeight": 0.1,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.12
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -418,7 +447,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -431,11 +461,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -466,6 +497,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
           "sha256": "d1e3e1f8d3a3d5efb7cc017ad272d1ade77136a236f7b82b8b6f21fc72e249de"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+          "sha256": "4d933f35776f9bd499a45923b1b0ea4ba67cfa50dad75a224cde96d6b5c38662"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -516,6 +551,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -567,7 +619,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_BiomeFoliageGroundcover_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -602,7 +655,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.2,
         "SourceConditionedSurfaceResponseWeight": 0.12,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.08
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -664,7 +718,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -677,11 +732,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -712,6 +768,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
           "sha256": "d1e3e1f8d3a3d5efb7cc017ad272d1ade77136a236f7b82b8b6f21fc72e249de"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+          "sha256": "4d933f35776f9bd499a45923b1b0ea4ba67cfa50dad75a224cde96d6b5c38662"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -762,6 +822,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -813,7 +890,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_FlowDependentWaterSurface_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -848,7 +926,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.18,
         "SourceConditionedSurfaceResponseWeight": 0.16,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.01
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -910,7 +989,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -923,11 +1003,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -958,6 +1039,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
           "sha256": "d1e3e1f8d3a3d5efb7cc017ad272d1ade77136a236f7b82b8b6f21fc72e249de"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+          "sha256": "4d933f35776f9bd499a45923b1b0ea4ba67cfa50dad75a224cde96d6b5c38662"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -1008,6 +1093,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -1059,7 +1161,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_FoamSprayMistAtmosphere_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -1094,7 +1197,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.04,
         "SourceConditionedSurfaceResponseWeight": 0.04,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.01
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -1156,7 +1260,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -1169,11 +1274,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -1204,6 +1310,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
           "sha256": "d1e3e1f8d3a3d5efb7cc017ad272d1ade77136a236f7b82b8b6f21fc72e249de"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+          "sha256": "4d933f35776f9bd499a45923b1b0ea4ba67cfa50dad75a224cde96d6b5c38662"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -1254,6 +1364,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -1305,7 +1432,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_RaftForegroundReview_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -1340,7 +1468,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.0,
         "SourceConditionedSurfaceResponseWeight": 0.0,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.0
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -1402,7 +1531,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -1415,11 +1545,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -1450,6 +1581,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
           "sha256": "d1e3e1f8d3a3d5efb7cc017ad272d1ade77136a236f7b82b8b6f21fc72e249de"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+          "sha256": "4d933f35776f9bd499a45923b1b0ea4ba67cfa50dad75a224cde96d6b5c38662"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -1503,6 +1638,23 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
         }
       }
     },
@@ -1551,7 +1703,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_TerrainBank_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -1586,7 +1739,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.28,
         "SourceConditionedSurfaceResponseWeight": 0.22,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.16
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -1648,7 +1802,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -1661,11 +1816,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -1696,6 +1852,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
           "sha256": "c5d529bdda226e37eddaf0ec4f9fd3e2e6fdbd96af1b602203b1d891411ea99d"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+          "sha256": "227561c0890789968e2430963c2c9c6d16425264b44f5ab7cc546c23cdd995b0"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -1746,6 +1906,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -1797,7 +1974,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_WetBoulderContact_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -1832,7 +2010,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.08,
         "SourceConditionedSurfaceResponseWeight": 0.1,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.12
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -1894,7 +2073,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -1907,11 +2087,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -1942,6 +2123,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
           "sha256": "c5d529bdda226e37eddaf0ec4f9fd3e2e6fdbd96af1b602203b1d891411ea99d"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+          "sha256": "227561c0890789968e2430963c2c9c6d16425264b44f5ab7cc546c23cdd995b0"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -1992,6 +2177,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -2043,7 +2245,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_BiomeFoliageGroundcover_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -2078,7 +2281,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.2,
         "SourceConditionedSurfaceResponseWeight": 0.12,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.08
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -2140,7 +2344,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -2153,11 +2358,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -2188,6 +2394,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
           "sha256": "c5d529bdda226e37eddaf0ec4f9fd3e2e6fdbd96af1b602203b1d891411ea99d"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+          "sha256": "227561c0890789968e2430963c2c9c6d16425264b44f5ab7cc546c23cdd995b0"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -2238,6 +2448,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -2289,7 +2516,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_FlowDependentWaterSurface_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -2324,7 +2552,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.18,
         "SourceConditionedSurfaceResponseWeight": 0.16,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.01
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -2386,7 +2615,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -2399,11 +2629,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -2434,6 +2665,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
           "sha256": "c5d529bdda226e37eddaf0ec4f9fd3e2e6fdbd96af1b602203b1d891411ea99d"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+          "sha256": "227561c0890789968e2430963c2c9c6d16425264b44f5ab7cc546c23cdd995b0"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -2484,6 +2719,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -2535,7 +2787,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_FoamSprayMistAtmosphere_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -2570,7 +2823,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.04,
         "SourceConditionedSurfaceResponseWeight": 0.04,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.01
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -2632,7 +2886,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -2645,11 +2900,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -2680,6 +2936,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
           "sha256": "c5d529bdda226e37eddaf0ec4f9fd3e2e6fdbd96af1b602203b1d891411ea99d"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+          "sha256": "227561c0890789968e2430963c2c9c6d16425264b44f5ab7cc546c23cdd995b0"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -2730,6 +2990,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -2781,7 +3058,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_RaftForegroundReview_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -2816,7 +3094,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.0,
         "SourceConditionedSurfaceResponseWeight": 0.0,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.0
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -2878,7 +3157,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -2891,11 +3171,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -2926,6 +3207,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
           "sha256": "c5d529bdda226e37eddaf0ec4f9fd3e2e6fdbd96af1b602203b1d891411ea99d"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+          "sha256": "227561c0890789968e2430963c2c9c6d16425264b44f5ab7cc546c23cdd995b0"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -2979,6 +3264,23 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
         }
       }
     },
@@ -3027,7 +3329,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_TerrainBank_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -3062,7 +3365,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.28,
         "SourceConditionedSurfaceResponseWeight": 0.22,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.16
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -3124,7 +3428,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -3137,11 +3442,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -3172,6 +3478,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
           "sha256": "caf89c0c98d117dbe3e164b3a5cc506e7b6d92cac7439309770babfa031e7ebb"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+          "sha256": "983d47b52d2ffc789f5d0fe7993dc234197459284e74a76a8c03870e03cb69c1"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -3222,6 +3532,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -3273,7 +3600,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_WetBoulderContact_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -3308,7 +3636,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.08,
         "SourceConditionedSurfaceResponseWeight": 0.1,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.12
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -3370,7 +3699,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -3383,11 +3713,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -3418,6 +3749,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
           "sha256": "caf89c0c98d117dbe3e164b3a5cc506e7b6d92cac7439309770babfa031e7ebb"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+          "sha256": "983d47b52d2ffc789f5d0fe7993dc234197459284e74a76a8c03870e03cb69c1"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -3468,6 +3803,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -3519,7 +3871,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_BiomeFoliageGroundcover_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -3554,7 +3907,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.2,
         "SourceConditionedSurfaceResponseWeight": 0.12,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.08
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -3616,7 +3970,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -3629,11 +3984,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -3664,6 +4020,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
           "sha256": "caf89c0c98d117dbe3e164b3a5cc506e7b6d92cac7439309770babfa031e7ebb"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+          "sha256": "983d47b52d2ffc789f5d0fe7993dc234197459284e74a76a8c03870e03cb69c1"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -3714,6 +4074,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -3765,7 +4142,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_FlowDependentWaterSurface_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -3800,7 +4178,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.18,
         "SourceConditionedSurfaceResponseWeight": 0.16,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.01
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -3862,7 +4241,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -3875,11 +4255,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -3910,6 +4291,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
           "sha256": "caf89c0c98d117dbe3e164b3a5cc506e7b6d92cac7439309770babfa031e7ebb"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+          "sha256": "983d47b52d2ffc789f5d0fe7993dc234197459284e74a76a8c03870e03cb69c1"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -3960,6 +4345,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -4011,7 +4413,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_FoamSprayMistAtmosphere_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -4046,7 +4449,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.04,
         "SourceConditionedSurfaceResponseWeight": 0.04,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.01
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -4108,7 +4512,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -4121,11 +4526,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -4156,6 +4562,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
           "sha256": "caf89c0c98d117dbe3e164b3a5cc506e7b6d92cac7439309770babfa031e7ebb"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+          "sha256": "983d47b52d2ffc789f5d0fe7993dc234197459284e74a76a8c03870e03cb69c1"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -4206,6 +4616,23 @@
             "compression_settings": "TC_Masks",
             "mip_gen_settings": "TMGS_FromTextureGroup",
             "lod_group": "TEXTUREGROUP_World",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
@@ -4257,7 +4684,8 @@
           0.0
         ],
         "SourceConditionedMacroAlbedoWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
-        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
+        "SourceConditionedSurfaceResponseWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review",
+        "SourceConditionedNormalDetailWeight": "bounded_per_surface_by_source_material_zone_hazard_readability_and_capture_review"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_RaftForegroundReview_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -4292,7 +4720,8 @@
         ],
         "SourceConditionedMacroAlbedoWeight": 0.0,
         "SourceConditionedSurfaceResponseWeight": 0.0,
-        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0
+        "SourceConditionedMaterialAssignmentReviewOnlyNotLifelike": 1.0,
+        "SourceConditionedNormalDetailWeight": 0.0
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -4354,7 +4783,8 @@
           "AORoughnessHeightAtlas",
           "SourceConditionedMacroAlbedo",
           "SourceConditionedMaterialZones",
-          "SourceConditionedAORoughnessHeight"
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail"
         ],
         "tuning_parameters": [
           "AtlasTileOriginScale",
@@ -4367,11 +4797,12 @@
           "RoughnessFloor",
           "SourceConditionedZoneWeights",
           "SourceConditionedMacroAlbedoWeight",
-          "SourceConditionedSurfaceResponseWeight"
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight"
         ],
         "output_wiring": {
           "BaseColor": "lerp(lerp(lerp(PreviewColor, vertex_color, VertexColorWeight), AlbedoAtlas(atlas_uv), AtlasBlendWeight), SourceConditionedMacroAlbedo(corridor_uv), SourceConditionedMacroAlbedoWeight * material_zone_mask)",
-          "Normal": "lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity)",
+          "Normal": "lerp(lerp(flat_tangent_normal, NormalAtlas(atlas_uv), NormalIntensity), SourceConditionedNormalDetail(corridor_uv), SourceConditionedNormalDetailWeight * material_zone_mask)",
           "AmbientOcclusion": "lerp(AORoughnessHeightAtlas.red, SourceConditionedAORoughnessHeight.red, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "Roughness": "lerp(saturate(AORoughnessHeightAtlas.green * RoughnessScale + RoughnessFloor), SourceConditionedAORoughnessHeight.green, SourceConditionedSurfaceResponseWeight * material_zone_mask)",
           "PixelDepthOffset": "lerp(AORoughnessHeightAtlas.blue * HeightScale, SourceConditionedAORoughnessHeight.blue * HeightScale, SourceConditionedSurfaceResponseWeight * material_zone_mask)"
@@ -4402,6 +4833,10 @@
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
           "sha256": "caf89c0c98d117dbe3e164b3a5cc506e7b6d92cac7439309770babfa031e7ebb"
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+          "sha256": "983d47b52d2ffc789f5d0fe7993dc234197459284e74a76a8c03870e03cb69c1"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -4455,12 +4890,29 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        },
+        "SourceConditionedNormalDetail": {
+          "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail",
+          "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail.uasset",
+          "parameter": "SourceConditionedNormalDetail",
+          "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+          "status": "created_unreal_texture2d_review_asset_not_lifelike",
+          "import_settings": {
+            "source_pixel_format": "TSF_BGRA8",
+            "source_png_mode": "RGB",
+            "srgb": false,
+            "compression_settings": "TC_Normalmap",
+            "mip_gen_settings": "TMGS_FromTextureGroup",
+            "lod_group": "TEXTUREGROUP_WorldNormalMap",
+            "compression_no_alpha": true,
+            "virtual_texture_streaming": false
+          }
         }
       }
     }
   ],
   "promotion_gate": "Review material-instance assets, bound Texture2D atlas assets, the atlas sampler parent material, and saved-map review scene assignments are created, but production promotion still requires capture comparison, guide/geospatial review, hazard readability, desktop/VR performance evidence, and final material approval.",
-  "current_decision": "Use these reviewed Unreal Material Instance Constant assets as the canonical handoff from first-party atlas Texture2D assets to shader and scene-assignment work. The editor automation creates the nine atlas Texture2D review assets, creates the M_RaftSim_AtlasSampleReview parent material with albedo, normal, AO, roughness, and height sampler wiring, parents all 18 MI_RaftSim_*_AtlasCandidate assets to it, and assigns durable terrain, water, boulder, foliage, and raft preview-map surface proxies to the review MICs. They remain review-only until capture comparison, production material promotion, guide/geospatial review, hazard readability, and performance gates pass. Source-conditioned macro albedo, material-zone, and packed AO/roughness/height maps are now declared as review-only Texture2D inputs and bound to the atlas sampler review material instances with conservative zone weights; regenerated captures and human review are still required before any lifelike or production-material claim.",
+  "current_decision": "Use these review-only material instance candidates to bind first-party atlas textures plus source-conditioned macro albedo, zones, AO/roughness/height, and bounded normal-detail maps through M_RaftSim_AtlasSampleReview into saved Unreal preview surfaces. They are material-assignment evidence only, not lifelike approval.",
   "material_texture_asset_root": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
   "material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike",
   "material_instance_review_asset_status": "created_unreal_material_instance_constant_review_assets_with_texture_bindings_sampler_parent_and_scene_assignment_not_lifelike",

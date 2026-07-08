@@ -84,6 +84,10 @@ Source inputs for review:
 - `heightfield_preview_image`: `physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/heightfield_candidate_2017.png`
 - `water_mask_image`: `physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/water_mask_2048.png`
 - `vegetation_mask_image`: `physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/vegetation_mask_2048.png`
+- `source_conditioned_macro_albedo_image`: `unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_macro_albedo.png`
+- `source_conditioned_material_zones_image`: `unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_material_zones.png`
+- `source_conditioned_ao_roughness_height_image`: `unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png`
+- `source_conditioned_normal_detail_image`: `unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png`
 - `elevation_sample`: `physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/3dep_tiles`
 
 Captures:
@@ -162,6 +166,10 @@ Source inputs for review:
 - `heightfield_preview_image`: `physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/heightfield_candidate_2017.png`
 - `water_mask_image`: `physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/water_mask_2048.png`
 - `vegetation_mask_image`: `physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/vegetation_mask_2048.png`
+- `source_conditioned_macro_albedo_image`: `unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_macro_albedo.png`
+- `source_conditioned_material_zones_image`: `unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_material_zones.png`
+- `source_conditioned_ao_roughness_height_image`: `unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png`
+- `source_conditioned_normal_detail_image`: `unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png`
 - `elevation_sample`: `physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles`
 
 Captures:
@@ -239,6 +247,10 @@ Source inputs for review:
 - `heightfield_preview_image`: `physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/heightfield_candidate_2017.png`
 - `water_mask_image`: `physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png`
 - `vegetation_mask_image`: `physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png`
+- `source_conditioned_macro_albedo_image`: `unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_macro_albedo.png`
+- `source_conditioned_material_zones_image`: `unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_material_zones.png`
+- `source_conditioned_ao_roughness_height_image`: `unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png`
+- `source_conditioned_normal_detail_image`: `unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png`
 - `elevation_sample`: `physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif`
 
 Captures:

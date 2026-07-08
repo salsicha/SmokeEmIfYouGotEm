@@ -539,6 +539,12 @@ def _capture_static_inventory(
             "heightfield_preview_image": river.get("heightfield_preview_image"),
             "water_mask_image": river.get("water_mask_image"),
             "vegetation_mask_image": river.get("vegetation_mask_image"),
+            "source_conditioned_macro_albedo_image": river.get("source_conditioned_macro_albedo_image"),
+            "source_conditioned_material_zones_image": river.get("source_conditioned_material_zones_image"),
+            "source_conditioned_ao_roughness_height_image": river.get(
+                "source_conditioned_ao_roughness_height_image"
+            ),
+            "source_conditioned_normal_detail_image": river.get("source_conditioned_normal_detail_image"),
         },
     }
 
@@ -875,6 +881,12 @@ def build_human_lifelike_review_handoff(repo_root: Path, generated_on: str = "20
                     "heightfield_preview_image": river.get("heightfield_preview_image"),
                     "water_mask_image": river.get("water_mask_image"),
                     "vegetation_mask_image": river.get("vegetation_mask_image"),
+                    "source_conditioned_macro_albedo_image": river.get("source_conditioned_macro_albedo_image"),
+                    "source_conditioned_material_zones_image": river.get("source_conditioned_material_zones_image"),
+                    "source_conditioned_ao_roughness_height_image": river.get(
+                        "source_conditioned_ao_roughness_height_image"
+                    ),
+                    "source_conditioned_normal_detail_image": river.get("source_conditioned_normal_detail_image"),
                     "elevation_sample": river.get("elevation_sample"),
                 },
                 "captures": captures,

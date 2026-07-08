@@ -124,7 +124,20 @@
         "review_date": "2026-07-05",
         "current_use": "official U.S. DEM, hydrography, and imagery source already used for sample pulls; full-corridor source pulls and conditioning remain required"
       }
-    ]
+    ],
+    "source_conditioned_material_map_summary": {
+      "river_count": 3,
+      "map_count": 12,
+      "map_size_px": 2048,
+      "map_ids": [
+        "macro_albedo",
+        "material_zones",
+        "ao_roughness_height",
+        "normal_detail"
+      ]
+    },
+    "source_conditioned_material_map_note": "Generated from review-gated aerial drapes, DEM relief, water masks, and vegetation masks for all three rivers, now including bounded DEM/mask-derived normal-detail maps; candidate material inputs only, not production texture approval or lifelike evidence.",
+    "source_conditioned_material_texture_note": "Unreal automation imports the source-conditioned maps as review-only Texture2D assets and binds them to material instances with conservative terrain/vegetation/water zone weights and normal-detail blend weights; regenerated capture and human review are still required."
   },
   "first_party_procedural_equivalent_decision_2026_07_06": {
     "plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
@@ -229,12 +242,13 @@
     "source_conditioned_material_map_status": "generated_review_gated_source_conditioned_material_maps_not_lifelike",
     "source_conditioned_material_map_summary": {
       "river_count": 3,
-      "map_count": 9,
+      "map_count": 12,
       "map_size_px": 2048,
       "map_ids": [
         "macro_albedo",
         "material_zones",
-        "ao_roughness_height"
+        "ao_roughness_height",
+        "normal_detail"
       ]
     },
     "source_conditioned_material_map_note": "Generated from review-gated aerial drapes, DEM relief, water masks, and vegetation masks for all three rivers; candidate material inputs only, not production texture approval or lifelike evidence.",
