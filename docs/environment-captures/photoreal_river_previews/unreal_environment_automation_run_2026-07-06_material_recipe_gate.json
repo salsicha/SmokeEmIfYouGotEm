@@ -51,6 +51,7 @@
     "first_party_broad_slope_terrain_exposure_fill": true,
     "first_party_source_aware_macro_terrain_ridge_facets": true,
     "first_party_source_aware_terrain_slope_facet_texture": true,
+    "first_party_source_aware_riparian_canopy_mass_texture": true,
     "first_party_source_overlay_plate_artifact_demotion": true,
     "first_party_demoted_terrain_overlay_striping": true,
     "first_party_source_drape_smoothing_pass": true,
@@ -128,37 +129,37 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [52.87, 83.64, 88.49],
+      "rgb_mean": [52.82, 83.63, 88.45],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [44.09, 82.72, 90.1],
+      "rgb_mean": [44.05, 82.71, 90.07],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [71.04, 65.63, 55.56],
+      "rgb_mean": [70.95, 65.58, 55.52],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [69.04, 64.69, 54.9],
+      "rgb_mean": [68.96, 64.64, 54.86],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [32.52, 67.36, 66.87],
+      "rgb_mean": [32.43, 67.37, 66.86],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [27.63, 66.62, 67.59],
+      "rgb_mean": [27.54, 66.64, 67.58],
       "nonblank": true
     }
   ],
@@ -183,6 +184,7 @@
     "Added first-party broad-slope terrain exposure fill and low-frequency relief so far banks, canyon walls, and rainforest gorge slopes remain readable without turning wet edges or water masks into painted slabs.",
     "Added first-party source-aware macro terrain ridge/facet relief so generated canyon, valley-bank, and rainforest slopes receive bounded mesh relief plus paired shadow/highlight facets without floating overlay plates.",
     "Added first-party source-aware terrain slope facet texture directly to the base generated terrain mesh so broad banks, canyon walls, and rainforest gorge slopes receive bounded sun-face, crease, strata/vegetation color, and relief variation instead of reading as single-color proxy walls.",
+    "Added first-party source-aware riparian canopy mass texture directly to the base generated terrain mesh so South Fork and Pacuare banks get denser vegetation-shadow/leaf breakup while Colorado gets muted scrub/sand variation without spawning more icon-like tree props.",
     "Demoted first-party source-overlay plate artifacts by reducing source aerial microtile density/height/weight plus terrain material and Landscape/Nanite scaffold facet counts, sizes, and contrast.",
     "Demoted graphic waterline ribbons by narrowing wet-bank and gravel/mud ribbons, lowering lift and color gain, adding intermittent visibility breakup, and reducing shallow-water edge-band blend.",
     "Added first-party source-masked bank/bar microgeometry so exposed-bar micro pebbles and bank-slope material flakes add small geometric gravel, sand, leaf-litter, and strata breakup without claiming production terrain assets.",
