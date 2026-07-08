@@ -384,7 +384,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.FlowVisualDescription =
         TEXT("Default South Fork summer-commercial validation band from USGS-11445500 planning presets; keeps moderate tongues, wet rocks, and foam lines visible while low/high seasonal variants remain future capture targets.");
     SouthFork.FlowReferenceDischargeCfs = 1600.0f;
-    SouthFork.WaterColor = FLinearColor(0.038f, 0.285f, 0.300f);
+    SouthFork.WaterColor = FLinearColor(0.070f, 0.205f, 0.115f);
     SouthFork.TerrainColor = FLinearColor(0.35f, 0.30f, 0.21f);
     SouthFork.RockColor = FLinearColor(0.38f, 0.36f, 0.31f);
     SouthFork.FoliageColor = FLinearColor(0.16f, 0.29f, 0.105f);
@@ -429,7 +429,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.FlowWetBankScale = 1.10f;
     Colorado.FlowCurrentCueScale = 1.15f;
     Colorado.FlowWaterLevelOffsetCm = 8.0f;
-    Colorado.WaterColor = FLinearColor(0.34f, 0.28f, 0.19f);
+    Colorado.WaterColor = FLinearColor(0.320f, 0.255f, 0.175f);
     Colorado.TerrainColor = FLinearColor(0.48f, 0.30f, 0.18f);
     Colorado.RockColor = FLinearColor(0.55f, 0.32f, 0.20f);
     Colorado.FoliageColor = FLinearColor(0.30f, 0.32f, 0.18f);
@@ -474,7 +474,7 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.FlowWetBankScale = 1.20f;
     Pacuare.FlowCurrentCueScale = 1.18f;
     Pacuare.FlowWaterLevelOffsetCm = 7.0f;
-    Pacuare.WaterColor = FLinearColor(0.026f, 0.255f, 0.205f);
+    Pacuare.WaterColor = FLinearColor(0.050f, 0.190f, 0.095f);
     Pacuare.TerrainColor = FLinearColor(0.17f, 0.22f, 0.13f);
     Pacuare.RockColor = FLinearColor(0.20f, 0.24f, 0.20f);
     Pacuare.FoliageColor = FLinearColor(0.035f, 0.20f, 0.055f);
@@ -909,9 +909,9 @@ UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial()
     static const TCHAR* MaterialPackagePath = TEXT("/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview");
     static const TCHAR* MaterialObjectPath =
         TEXT("/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview.M_RaftSim_VertexColorWaterPreview");
-    const float FirstPartyLitWaterNormalResponseEmissiveFill = 0.22f;
-    const float FirstPartyLitWaterNormalResponseRoughness = 0.62f;
-    const float FirstPartyLitWaterNormalResponseSpecular = 0.32f;
+    const float FirstPartyLitWaterNormalResponseEmissiveFill = 0.38f;
+    const float FirstPartyLitWaterNormalResponseRoughness = 0.96f;
+    const float FirstPartyLitWaterNormalResponseSpecular = 0.0f;
 
     UMaterial* Material = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, MaterialObjectPath));
     if (!Material)
@@ -1478,13 +1478,14 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
     ReviewBaseColor->B.Expression = AlbedoSample;
     ReviewBaseColor->Alpha.Expression = AtlasBlendWeight;
 
-    UMaterialExpressionConstant* EmissiveScale = AddExpression(NewObject<UMaterialExpressionConstant>(Material), 120, -80);
-    EmissiveScale->R = 0.20f;
+    UMaterialExpressionConstant* FirstPartyAtlasReviewEmissiveFillScale =
+        AddExpression(NewObject<UMaterialExpressionConstant>(Material), 120, -80);
+    FirstPartyAtlasReviewEmissiveFillScale->R = 0.42f;
 
     UMaterialExpressionMultiply* EmissiveColor =
         AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 360, -160);
     EmissiveColor->A.Expression = ReviewBaseColor;
-    EmissiveColor->B.Expression = EmissiveScale;
+    EmissiveColor->B.Expression = FirstPartyAtlasReviewEmissiveFillScale;
 
     UMaterialExpressionComponentMask* AmbientOcclusionMask =
         AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), 120, 180);
@@ -1542,7 +1543,7 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
     HeightOffset->B.Expression = HeightScale;
 
     UMaterialExpressionConstant* Specular = AddExpression(NewObject<UMaterialExpressionConstant>(Material), 560, 520);
-    Specular->R = 0.06f;
+    Specular->R = 0.0f;
 
     if (UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData())
     {
@@ -1661,13 +1662,13 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             TEXT("FlowDependentWaterSurface"),
             TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             3,
-            0.08f,
-            0.14f,
-            0.62f,
-            0.025f,
-            FLinearColor(0.030f, 0.32f, 0.34f),
+            0.38f,
+            0.26f,
+            0.52f,
+            0.040f,
+            FLinearColor(0.095f, 0.300f, 0.170f),
             1.0f,
-            0.70f,
+            0.90f,
         },
         {
             TEXT("foam_spray_mist_atmosphere_materials"),
@@ -1687,13 +1688,13 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             TEXT("RaftForegroundReview"),
             TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             5,
-            0.22f,
-            0.12f,
+            0.16f,
+            0.10f,
             0.56f,
             0.035f,
-            FLinearColor(0.32f, 0.11f, 0.045f),
-            0.0f,
-            0.64f,
+            FLinearColor(0.680f, 0.220f, 0.080f),
+            1.0f,
+            0.70f,
         },
     };
 
@@ -4967,17 +4968,17 @@ void AddPreviewRiverRibbonMesh(
     const FLinearColor DeepWaterBase = ScalePreviewColor(Spec.WaterColor, Spec.bDesertCanyon ? 0.98f : 1.02f);
     const FLinearColor DeepWater = Spec.bDesertCanyon
         ? FMath::Lerp(DeepWaterBase, FLinearColor(0.20f, 0.18f, 0.13f), 0.35f)
-        : (Spec.bHasWaterfalls ? FMath::Lerp(DeepWaterBase, FLinearColor(0.010f, 0.19f, 0.145f), 0.34f)
-                                : FMath::Lerp(DeepWaterBase, FLinearColor(0.012f, 0.25f, 0.28f), 0.32f));
+        : (Spec.bHasWaterfalls ? FMath::Lerp(DeepWaterBase, FLinearColor(0.018f, 0.170f, 0.090f), 0.34f)
+                                : FMath::Lerp(DeepWaterBase, FLinearColor(0.028f, 0.205f, 0.115f), 0.32f));
     const FLinearColor ShallowWater = Spec.bDesertCanyon
         ? FLinearColor(0.34f, 0.30f, 0.22f)
-        : (Spec.bHasWaterfalls ? FLinearColor(0.030f, 0.34f, 0.27f) : FLinearColor(0.048f, 0.42f, 0.43f));
+        : (Spec.bHasWaterfalls ? FLinearColor(0.050f, 0.310f, 0.170f) : FLinearColor(0.078f, 0.340f, 0.205f));
     const FLinearColor SurfaceGlint = Spec.bDesertCanyon
         ? FLinearColor(0.58f, 0.49f, 0.34f)
-        : (Spec.bHasWaterfalls ? FLinearColor(0.13f, 0.58f, 0.48f) : FLinearColor(0.14f, 0.62f, 0.64f));
+        : (Spec.bHasWaterfalls ? FLinearColor(0.18f, 0.520f, 0.320f) : FLinearColor(0.20f, 0.540f, 0.360f));
     const FLinearColor NearFieldBrightRipple = Spec.bDesertCanyon
         ? FLinearColor(0.42f, 0.37f, 0.27f)
-        : (Spec.bHasWaterfalls ? FLinearColor(0.070f, 0.37f, 0.30f) : FLinearColor(0.075f, 0.42f, 0.43f));
+        : (Spec.bHasWaterfalls ? FLinearColor(0.080f, 0.330f, 0.190f) : FLinearColor(0.095f, 0.360f, 0.220f));
     const FLinearColor NearFieldDarkSlick = Spec.bDesertCanyon
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.16f, 0.14f, 0.105f), 0.46f)
         : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.010f, 0.105f, 0.085f), 0.38f)
@@ -4991,10 +4992,10 @@ void AddPreviewRiverRibbonMesh(
         : (Spec.bHasWaterfalls ? FLinearColor(0.045f, 0.21f, 0.14f) : FLinearColor(0.065f, 0.29f, 0.25f));
     const FLinearColor BaseWaterSkyThread = Spec.bDesertCanyon
         ? FLinearColor(0.46f, 0.42f, 0.32f)
-        : (Spec.bHasWaterfalls ? FLinearColor(0.085f, 0.34f, 0.29f) : FLinearColor(0.095f, 0.40f, 0.42f));
+        : (Spec.bHasWaterfalls ? FLinearColor(0.100f, 0.300f, 0.185f) : FLinearColor(0.120f, 0.340f, 0.220f));
     const FLinearColor FlowCuedWaterFoamMottleColor = Spec.bDesertCanyon
         ? FLinearColor(0.58f, 0.53f, 0.40f)
-        : (Spec.bHasWaterfalls ? FLinearColor(0.52f, 0.76f, 0.66f) : FLinearColor(0.50f, 0.73f, 0.72f));
+        : (Spec.bHasWaterfalls ? FLinearColor(0.48f, 0.70f, 0.54f) : FLinearColor(0.50f, 0.70f, 0.56f));
     const FLinearColor FlowCuedWaterSlickMottleColor = Spec.bDesertCanyon
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.12f, 0.105f, 0.082f), 0.42f)
         : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.004f, 0.070f, 0.058f), 0.34f)
@@ -5005,28 +5006,28 @@ void AddPreviewRiverRibbonMesh(
                                 : FMath::Lerp(Spec.WaterColor, FLinearColor(0.010f, 0.185f, 0.205f), 0.24f));
     const FLinearColor BaseWaterCrossChannelHighlight = Spec.bDesertCanyon
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.46f, 0.39f, 0.265f), 0.24f)
-        : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.090f, 0.45f, 0.36f), 0.22f)
-                                : FMath::Lerp(Spec.WaterColor, FLinearColor(0.090f, 0.49f, 0.50f), 0.20f));
+        : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.100f, 0.400f, 0.240f), 0.22f)
+                                : FMath::Lerp(Spec.WaterColor, FLinearColor(0.115f, 0.430f, 0.270f), 0.20f));
     const FLinearColor BaseWaterFlowThreadShadow = Spec.bDesertCanyon
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.23f, 0.195f, 0.135f), 0.32f)
         : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.006f, 0.150f, 0.115f), 0.30f)
                                 : FMath::Lerp(Spec.WaterColor, FLinearColor(0.008f, 0.185f, 0.205f), 0.28f));
     const FLinearColor BaseWaterFlowThreadHighlight = Spec.bDesertCanyon
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.56f, 0.49f, 0.34f), 0.28f)
-        : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.130f, 0.55f, 0.430f), 0.28f)
-                                : FMath::Lerp(Spec.WaterColor, FLinearColor(0.140f, 0.58f, 0.580f), 0.25f));
+        : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.140f, 0.480f, 0.290f), 0.28f)
+                                : FMath::Lerp(Spec.WaterColor, FLinearColor(0.155f, 0.500f, 0.320f), 0.25f));
     const FLinearColor BaseWaterFlowThreadFoamGlint = Spec.bDesertCanyon
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.70f, 0.64f, 0.48f), 0.20f)
-        : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.42f, 0.78f, 0.66f), 0.18f)
-                                : FMath::Lerp(Spec.WaterColor, FLinearColor(0.42f, 0.80f, 0.79f), 0.16f));
+        : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.42f, 0.72f, 0.52f), 0.18f)
+                                : FMath::Lerp(Spec.WaterColor, FLinearColor(0.45f, 0.74f, 0.54f), 0.16f));
     const FLinearColor NearCameraWaterMacroRippleShadow = Spec.bDesertCanyon
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.22f, 0.185f, 0.125f), 0.34f)
         : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.004f, 0.145f, 0.112f), 0.30f)
                                 : FMath::Lerp(Spec.WaterColor, FLinearColor(0.006f, 0.190f, 0.205f), 0.28f));
     const FLinearColor NearCameraWaterMacroRippleHighlight = Spec.bDesertCanyon
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.54f, 0.47f, 0.330f), 0.26f)
-        : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.135f, 0.52f, 0.405f), 0.28f)
-                                : FMath::Lerp(Spec.WaterColor, FLinearColor(0.140f, 0.55f, 0.555f), 0.24f));
+        : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.140f, 0.460f, 0.270f), 0.28f)
+                                : FMath::Lerp(Spec.WaterColor, FLinearColor(0.150f, 0.480f, 0.300f), 0.24f));
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float WaterBaseZ = GetPreviewWaterSurfaceBaseZCm(Spec);
     const float FlowEnergy = FMath::Clamp(Spec.FlowCurrentCueScale, 0.65f, 1.60f);
@@ -5323,10 +5324,10 @@ void AddPreviewRiverRibbonMesh(
                     Spec.bDesertCanyon ? 0.098f : 0.122f));
             WaterColor = FMath::Lerp(WaterColor, BaseWaterFlowThreadFoamGlint, BaseWaterFlowThreadFoamGlintT);
             const float FirstPartyMaterialAtlasWaterBlend = FMath::Clamp(
-                (0.026f + EdgeT * 0.018f + CenterT * 0.012f + FlowEnergy * 0.006f) *
-                    (1.0f - BaseWaterResidualCenterSeamEraseT * 0.42f),
+                (0.048f + EdgeT * 0.032f + CenterT * 0.026f + FlowEnergy * 0.014f) *
+                    (1.0f - BaseWaterResidualCenterSeamEraseT * 0.18f),
                 0.0f,
-                Spec.bHasWaterfalls ? 0.070f : 0.060f);
+                Spec.bHasWaterfalls ? 0.145f : (Spec.bDesertCanyon ? 0.105f : 0.130f));
             WaterColor = ApplyFirstPartyMaterialAtlasTint(
                 Spec,
                 MaterialAtlasAlbedo,
@@ -5344,10 +5345,49 @@ void AddPreviewRiverRibbonMesh(
                 U * 16.0f + FlowNoise * 0.43f,
                 V * 2.7f + BaseWaterFlowThreadLongBand * 0.31f,
                 FirstPartyMaterialAtlasWaterBlend);
+            const float FirstPartyPostSeamWaterSurfaceGrainNoise = FMath::Clamp(
+                0.50f +
+                    0.31f * FMath::Sin(X * 0.019f + Lateral * 0.031f + FlowEnergy * 0.43f) +
+                    0.24f * FMath::Sin(X * 0.047f - Lateral * 0.017f) +
+                    0.14f * FMath::Sin(X * 0.083f + Lateral * 0.061f),
+                0.0f,
+                1.0f);
+            const float FirstPartyPostSeamWaterSurfaceGrainT = FMath::Clamp(
+                (0.26f + CenterT * 0.34f + EdgeT * 0.28f) *
+                    (0.72f + NearFieldWaterSurfaceGrainT * 0.28f) *
+                    (1.0f - BaseWaterResidualCenterSeamEraseT * 0.18f),
+                0.0f,
+                1.0f);
+            const FLinearColor FirstPartyPostSeamWaterSurfaceGrainShadow = Spec.bDesertCanyon
+                ? FLinearColor(0.250f, 0.215f, 0.145f)
+                : (Spec.bHasWaterfalls ? FLinearColor(0.030f, 0.220f, 0.115f)
+                                        : FLinearColor(0.045f, 0.255f, 0.145f));
+            const FLinearColor FirstPartyPostSeamWaterSurfaceGrainHighlight = Spec.bDesertCanyon
+                ? FLinearColor(0.550f, 0.490f, 0.340f)
+                : (Spec.bHasWaterfalls ? FLinearColor(0.180f, 0.440f, 0.260f)
+                                        : FLinearColor(0.200f, 0.470f, 0.300f));
+            WaterColor = FMath::Lerp(
+                WaterColor,
+                FirstPartyPostSeamWaterSurfaceGrainShadow,
+                FMath::Clamp(
+                    SmoothPreviewStep(0.10f, 0.44f, 1.0f - FirstPartyPostSeamWaterSurfaceGrainNoise) *
+                        FirstPartyPostSeamWaterSurfaceGrainT *
+                        (Spec.bDesertCanyon ? 0.085f : 0.105f),
+                    0.0f,
+                    Spec.bDesertCanyon ? 0.090f : 0.112f));
+            WaterColor = FMath::Lerp(
+                WaterColor,
+                FirstPartyPostSeamWaterSurfaceGrainHighlight,
+                FMath::Clamp(
+                    SmoothPreviewStep(0.56f, 0.92f, FirstPartyPostSeamWaterSurfaceGrainNoise) *
+                        FirstPartyPostSeamWaterSurfaceGrainT *
+                        (Spec.bDesertCanyon ? 0.095f : 0.118f),
+                    0.0f,
+                    Spec.bDesertCanyon ? 0.100f : 0.124f));
             const FLinearColor BaseWaterResidualDarkStreakLumaFloor = Spec.bDesertCanyon
-                ? FLinearColor(0.29f, 0.245f, 0.170f)
-                : (Spec.bHasWaterfalls ? FLinearColor(0.0f, 0.225f, 0.190f)
-                                        : FLinearColor(0.0f, 0.275f, 0.290f));
+                ? FLinearColor(0.310f, 0.260f, 0.185f)
+                : (Spec.bHasWaterfalls ? FLinearColor(0.050f, 0.255f, 0.140f)
+                                        : FLinearColor(0.060f, 0.280f, 0.170f));
             WaterColor.R = FMath::Max(WaterColor.R, BaseWaterResidualDarkStreakLumaFloor.R);
             WaterColor.G = FMath::Max(WaterColor.G, BaseWaterResidualDarkStreakLumaFloor.G);
             WaterColor.B = FMath::Max(WaterColor.B, BaseWaterResidualDarkStreakLumaFloor.B);
@@ -9153,7 +9193,7 @@ void AddPreviewRaftForeground(
         Spec,
         MaterialAtlasAlbedo,
         RaftForegroundReviewMaterialTile,
-        FMath::Lerp(ScalePreviewColor(Spec.RaftColor, 0.42f), FLinearColor(0.34f, 0.095f, 0.035f), 0.60f),
+        FMath::Lerp(ScalePreviewColor(Spec.RaftColor, 0.78f), FLinearColor(0.82f, 0.22f, 0.075f), 0.28f),
         0.28f,
         0.36f,
         0.18f);
@@ -9161,7 +9201,7 @@ void AddPreviewRaftForeground(
         Spec,
         MaterialAtlasAlbedo,
         RaftForegroundReviewMaterialTile,
-        ScalePreviewColor(TubeColor, 0.44f),
+        ScalePreviewColor(TubeColor, 0.72f),
         0.64f,
         0.54f,
         0.12f);
@@ -9169,7 +9209,7 @@ void AddPreviewRaftForeground(
         Spec,
         MaterialAtlasAlbedo,
         RaftForegroundReviewMaterialTile,
-        FMath::Lerp(TubeColor, FLinearColor(0.70f, 0.25f, 0.09f), 0.14f),
+        FMath::Lerp(TubeColor, FLinearColor(0.90f, 0.36f, 0.13f), 0.18f),
         0.18f,
         0.18f,
         0.10f);
@@ -9177,7 +9217,7 @@ void AddPreviewRaftForeground(
         Spec,
         MaterialAtlasAlbedo,
         RaftForegroundReviewMaterialTile,
-        Spec.bDesertCanyon ? FLinearColor(0.12f, 0.095f, 0.065f) : FLinearColor(0.065f, 0.075f, 0.058f),
+        Spec.bDesertCanyon ? FLinearColor(0.240f, 0.180f, 0.100f) : FLinearColor(0.200f, 0.180f, 0.120f),
         0.50f,
         0.70f,
         0.12f);
@@ -9185,7 +9225,7 @@ void AddPreviewRaftForeground(
         Spec,
         MaterialAtlasAlbedo,
         RaftForegroundReviewMaterialTile,
-        Spec.bDesertCanyon ? FLinearColor(0.24f, 0.15f, 0.075f) : FLinearColor(0.27f, 0.16f, 0.075f),
+        Spec.bDesertCanyon ? FLinearColor(0.440f, 0.285f, 0.135f) : FLinearColor(0.480f, 0.300f, 0.130f),
         0.42f,
         0.86f,
         0.16f);
@@ -9193,7 +9233,7 @@ void AddPreviewRaftForeground(
         Spec,
         MaterialAtlasAlbedo,
         RaftForegroundReviewMaterialTile,
-        Spec.bDesertCanyon ? FLinearColor(0.22f, 0.15f, 0.075f) : FLinearColor(0.24f, 0.10f, 0.045f),
+        Spec.bDesertCanyon ? FLinearColor(0.500f, 0.310f, 0.135f) : FLinearColor(0.580f, 0.220f, 0.080f),
         0.76f,
         0.84f,
         0.18f);
@@ -9226,14 +9266,14 @@ void AddPreviewRaftForeground(
         FVector(BaseX - 24.0f, CenterY, -126.0f),
         FRotator::ZeroRotator,
         FVector(0.040f, 0.020f, 0.002f),
-        ScalePreviewColor(FrameColor, 0.22f));
+        ScalePreviewColor(FrameColor, 0.58f));
     AddRaftProxyPart(
         CylinderMesh,
         FString::Printf(TEXT("RaftSim_ForegroundRaft_FrameBarRounded_%s"), *Spec.RiverId),
         FVector(BaseX - 62.0f, CenterY, -4.0f),
         FRotator(0.0f, 0.0f, 90.0f),
         FVector(0.018f, 0.018f, 0.46f),
-        FLinearColor(0.045f, 0.045f, 0.038f));
+        ScalePreviewColor(FrameColor, 0.72f));
 
     for (int32 SeamIndex = 0; SeamIndex < 2; ++SeamIndex)
     {
@@ -9296,30 +9336,30 @@ AActor* AddPreviewRiverEyeCenterArtifactCover(UWorld* World, const FRaftSimEnvir
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.30f, 0.245f, 0.145f, 1.0f), 0.18f)
         : FMath::Lerp(
               Spec.WaterColor,
-              Spec.bHasWaterfalls ? FLinearColor(0.04f, 0.25f, 0.20f, 1.0f)
-                                  : FLinearColor(0.04f, 0.31f, 0.33f, 1.0f),
+              Spec.bHasWaterfalls ? FLinearColor(0.055f, 0.220f, 0.120f, 1.0f)
+                                  : FLinearColor(0.065f, 0.260f, 0.155f, 1.0f),
               Spec.bHasWaterfalls ? 0.22f : 0.18f);
     const FLinearColor RiverEyeCenterCoverSkyHighlightColor = Spec.bDesertCanyon
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.53f, 0.44f, 0.32f, 1.0f), 0.10f)
         : FMath::Lerp(
               Spec.WaterColor,
-              Spec.bHasWaterfalls ? FLinearColor(0.30f, 0.50f, 0.44f, 1.0f)
-                                  : FLinearColor(0.26f, 0.48f, 0.50f, 1.0f),
+              Spec.bHasWaterfalls ? FLinearColor(0.28f, 0.44f, 0.27f, 1.0f)
+                                  : FLinearColor(0.28f, 0.46f, 0.30f, 1.0f),
               0.11f);
     const float RiverEyeCenterCoverMacroRippleMottleT = 1.0f;
     const FLinearColor RiverEyeCenterCoverMacroShadowColor = Spec.bDesertCanyon
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.22f, 0.185f, 0.125f, 1.0f), 0.30f)
         : FMath::Lerp(
               Spec.WaterColor,
-              Spec.bHasWaterfalls ? FLinearColor(0.010f, 0.145f, 0.115f, 1.0f)
-                                  : FLinearColor(0.014f, 0.190f, 0.205f, 1.0f),
+              Spec.bHasWaterfalls ? FLinearColor(0.018f, 0.145f, 0.075f, 1.0f)
+                                  : FLinearColor(0.026f, 0.180f, 0.095f, 1.0f),
               Spec.bHasWaterfalls ? 0.32f : 0.28f);
     const FLinearColor RiverEyeCenterCoverMacroHighlightColor = Spec.bDesertCanyon
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.56f, 0.47f, 0.32f, 1.0f), 0.24f)
         : FMath::Lerp(
               Spec.WaterColor,
-              Spec.bHasWaterfalls ? FLinearColor(0.16f, 0.54f, 0.42f, 1.0f)
-                                  : FLinearColor(0.17f, 0.57f, 0.57f, 1.0f),
+              Spec.bHasWaterfalls ? FLinearColor(0.18f, 0.46f, 0.26f, 1.0f)
+                                  : FLinearColor(0.20f, 0.48f, 0.30f, 1.0f),
               0.28f);
 
     TArray<FVector> Vertices;
@@ -9398,8 +9438,16 @@ AActor* AddPreviewRiverEyeCenterArtifactCover(UWorld* World, const FRaftSimEnvir
             CoverColor = FMath::Lerp(CoverColor, Spec.WaterColor, EdgeReblendT);
             CoverColor = ScalePreviewColor(
                 CoverColor,
-                0.985f + 0.018f * FMath::Sin(X * 0.0180f + Lateral * 0.0100f) +
+                (Spec.bHasWaterfalls ? 1.085f : 1.025f) +
+                    0.018f * FMath::Sin(X * 0.0180f + Lateral * 0.0100f) +
                     0.012f * FMath::Sin(X * 0.0410f - Lateral * 0.0170f));
+            const FLinearColor RiverEyeCenterCoverForegroundLumaFloor = Spec.bDesertCanyon
+                ? FLinearColor(0.300f, 0.250f, 0.175f)
+                : (Spec.bHasWaterfalls ? FLinearColor(0.060f, 0.255f, 0.135f)
+                                        : FLinearColor(0.070f, 0.275f, 0.160f));
+            CoverColor.R = FMath::Max(CoverColor.R, RiverEyeCenterCoverForegroundLumaFloor.R);
+            CoverColor.G = FMath::Max(CoverColor.G, RiverEyeCenterCoverForegroundLumaFloor.G);
+            CoverColor.B = FMath::Max(CoverColor.B, RiverEyeCenterCoverForegroundLumaFloor.B);
             CoverColor.A = 1.0f;
             Vertices.Add(FVector(X, CenterY + Lateral, WaterBaseZ + 132.0f + SurfaceWave));
             UVs.Add(FVector2D(U * 8.0f, V));
@@ -9462,7 +9510,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     if (SkyLight)
     {
         SkyLight->SetActorLabel(TEXT("RaftSim_SkyLight_PhotorealPreview"));
-        SkyLight->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 3.35f : (Spec.bHasWaterfalls ? 2.95f : 2.70f));
+        SkyLight->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 1.95f : (Spec.bHasWaterfalls ? 1.55f : 1.45f));
     }
 
     ASkyAtmosphere* Atmosphere = Cast<ASkyAtmosphere>(
@@ -9477,7 +9525,11 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     if (Fog)
     {
         Fog->SetActorLabel(Spec.bHasWaterfalls ? TEXT("RaftSim_RainforestMist") : TEXT("RaftSim_CanyonAtmosphere"));
-        Fog->GetComponent()->SetFogDensity(Spec.bHasWaterfalls ? 0.026f : (Spec.bDesertCanyon ? 0.006f : 0.010f));
+        Fog->GetComponent()->SetFogDensity(Spec.bHasWaterfalls ? 0.014f : (Spec.bDesertCanyon ? 0.004f : 0.006f));
+        Fog->GetComponent()->SetFogInscatteringColor(
+            Spec.bDesertCanyon ? FLinearColor(0.62f, 0.53f, 0.40f)
+                                : (Spec.bHasWaterfalls ? FLinearColor(0.42f, 0.54f, 0.42f)
+                                                       : FLinearColor(0.50f, 0.54f, 0.45f)));
     }
 }
 
@@ -9489,11 +9541,11 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
     }
 
     ACameraActor* Camera = Cast<ACameraActor>(
-        GEditor->AddActor(World->GetCurrentLevel(), ACameraActor::StaticClass(), FTransform(FRotator(-6.5f, 0.0f, 0.0f), FVector(-5250.0f, GetPreviewRiverCenterY(Spec, -5250.0f), 165.0f))));
+        GEditor->AddActor(World->GetCurrentLevel(), ACameraActor::StaticClass(), FTransform(FRotator(-13.5f, 0.0f, 0.0f), FVector(-5250.0f, GetPreviewRiverCenterY(Spec, -5250.0f), 140.0f))));
     if (Camera)
     {
         Camera->SetActorLabel(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"));
-        Camera->GetCameraComponent()->FieldOfView = Spec.bDesertCanyon ? 73.0f : 76.0f;
+        Camera->GetCameraComponent()->FieldOfView = Spec.bDesertCanyon ? 66.0f : 68.0f;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_VignetteIntensity = true;
         Camera->GetCameraComponent()->PostProcessSettings.VignetteIntensity = 0.10f;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_Sharpen = true;

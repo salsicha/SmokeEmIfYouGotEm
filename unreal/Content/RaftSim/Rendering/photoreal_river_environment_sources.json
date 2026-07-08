@@ -1539,6 +1539,11 @@
       "first_party_atlas_sampler_review_parent_material_created_recorded",
       "first_party_material_shader_graph_sampler_wiring_recorded",
       "first_party_material_instance_scene_assignment_recorded",
+      "first_party_post_seam_water_surface_grain_recorded",
+      "first_party_water_luma_floor_blocker_reduction_recorded",
+      "first_party_low_specular_water_capture_material_tuning_recorded",
+      "first_party_capture_camera_flat_blue_field_reduction_recorded",
+      "first_party_foreground_raft_luma_blocker_reduction_recorded",
       "photoreal_capture_quality_review_blockers_recorded"
     ],
     "preview_capture_root": "docs/environment-captures/photoreal_river_previews",
@@ -1563,23 +1568,20 @@
       "capture_count": 6,
       "blocking_capture_count": 6,
       "blocker_counts": {
-        "dark_foreground_proxy": 5,
         "excess_low_gradient_area": 6,
-        "large_flat_blue_field": 3,
         "low_color_texture_entropy": 6,
         "low_edge_density": 3,
-        "low_luma_variation": 1
+        "low_luma_variation": 3
       },
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "dark_foreground_proxy",
             "excess_low_gradient_area",
-            "large_flat_blue_field",
             "low_color_texture_entropy",
-            "low_edge_density"
+            "low_edge_density",
+            "low_luma_variation"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1587,11 +1589,10 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "dark_foreground_proxy",
             "excess_low_gradient_area",
-            "large_flat_blue_field",
             "low_color_texture_entropy",
-            "low_edge_density"
+            "low_edge_density",
+            "low_luma_variation"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1599,9 +1600,7 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "dark_foreground_proxy",
             "excess_low_gradient_area",
-            "large_flat_blue_field",
             "low_color_texture_entropy",
             "low_edge_density",
             "low_luma_variation"
@@ -1609,6 +1608,20 @@
           "status": "preview_only_not_lifelike_quality_blockers"
         }
       }
+    },
+    "visual_blocker_reduction_checkpoint_2026_07_08": {
+      "status": "captures_still_preview_only_not_lifelike",
+      "removed_blocker_classes": [
+        "dark_foreground_proxy",
+        "large_flat_blue_field"
+      ],
+      "remaining_blocker_counts": {
+        "excess_low_gradient_area": 6,
+        "low_color_texture_entropy": 6,
+        "low_edge_density": 3,
+        "low_luma_variation": 3
+      },
+      "next_visual_art_blocker": "replace smooth low-entropy proxy water/terrain/raft/material fields with higher-detail source-derived or rights-cleared production assets without hiding hazards"
     }
   },
   "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",

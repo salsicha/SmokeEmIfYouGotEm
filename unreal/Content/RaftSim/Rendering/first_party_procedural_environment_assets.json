@@ -161,6 +161,11 @@
       "first_party_atlas_sampler_review_parent_material_created",
       "first_party_material_shader_graph_sampler_wiring_recorded",
       "first_party_material_instance_scene_assignment_recorded",
+      "first_party_post_seam_water_surface_grain",
+      "first_party_water_luma_floor_blocker_reduction",
+      "first_party_low_specular_water_capture_material_tuning",
+      "first_party_capture_camera_flat_blue_field_reduction",
+      "first_party_foreground_raft_luma_blocker_reduction",
       "photoreal_capture_quality_review_blockers_recorded"
     ],
     "missing_renderer_coverage_before_lifelike": [
@@ -191,23 +196,20 @@
       "capture_count": 6,
       "blocking_capture_count": 6,
       "blocker_counts": {
-        "dark_foreground_proxy": 5,
         "excess_low_gradient_area": 6,
-        "large_flat_blue_field": 3,
         "low_color_texture_entropy": 6,
         "low_edge_density": 3,
-        "low_luma_variation": 1
+        "low_luma_variation": 3
       },
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "dark_foreground_proxy",
             "excess_low_gradient_area",
-            "large_flat_blue_field",
             "low_color_texture_entropy",
-            "low_edge_density"
+            "low_edge_density",
+            "low_luma_variation"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -215,11 +217,10 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "dark_foreground_proxy",
             "excess_low_gradient_area",
-            "large_flat_blue_field",
             "low_color_texture_entropy",
-            "low_edge_density"
+            "low_edge_density",
+            "low_luma_variation"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -227,9 +228,7 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "dark_foreground_proxy",
             "excess_low_gradient_area",
-            "large_flat_blue_field",
             "low_color_texture_entropy",
             "low_edge_density",
             "low_luma_variation"
@@ -237,6 +236,64 @@
           "status": "preview_only_not_lifelike_quality_blockers"
         }
       }
+    },
+    "visual_blocker_reduction_checkpoint_2026_07_08": {
+      "status": "preview_only_not_lifelike_flat_blue_and_dark_foreground_blockers_removed_low_detail_blockers_remain",
+      "capture_quality_summary": {
+        "capture_count": 6,
+        "blocking_capture_count": 6,
+        "blocker_counts": {
+          "excess_low_gradient_area": 6,
+          "low_color_texture_entropy": 6,
+          "low_edge_density": 3,
+          "low_luma_variation": 3
+        },
+        "per_river": {
+          "american_south_fork": {
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density",
+              "low_luma_variation"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "colorado_river": {
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density",
+              "low_luma_variation"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "pacuare": {
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density",
+              "low_luma_variation"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          }
+        }
+      },
+      "closed_blocker_classes": [
+        "dark_foreground_proxy",
+        "large_flat_blue_field"
+      ],
+      "remaining_blocker_classes": [
+        "excess_low_gradient_area",
+        "low_color_texture_entropy",
+        "low_edge_density",
+        "low_luma_variation"
+      ]
     }
   },
   "global_recipes": [
