@@ -1408,7 +1408,6 @@
       "approved_raft_and_oar_foreground_art",
       "dense_biome_specific_foliage",
       "wet_rocks_foam_spray_mist_and_atmosphere",
-      "replace_visible_capture_quality_water_fleck_cards_with_integrated_water_material_or_vfx",
       "hazards_and_rescue_targets_readable",
       "desktop_and_vr_performance_captures",
       "approved_first_party_texture_atlas_import_or_rights_cleared_texture_assets",
@@ -1498,7 +1497,7 @@
       "first_party_base_water_flow_thread_texture_recorded",
       "first_party_flow_cued_water_foam_slick_mottle_recorded",
       "first_party_integrated_base_water_chroma_microbreakup_recorded",
-      "first_party_capture_quality_water_texture_fleck_cards_recorded",
+      "first_party_integrated_water_fleck_microtexture_recorded",
       "first_party_mask_aware_ground_cover_and_canopy_cards_recorded",
       "biome_specific_deadfall_grass_root_ecology_props_recorded",
       "first_party_biome_foliage_silhouette_proxy_layers_recorded",
@@ -1572,7 +1571,7 @@
       "blocking_capture_count": 6,
       "blocker_counts": {
         "low_color_texture_entropy": 6,
-        "visible_proxy_water_card_geometry": 6
+        "low_edge_density": 1
       },
       "per_river": {
         "american_south_fork": {
@@ -1580,7 +1579,7 @@
           "blocking_capture_count": 2,
           "blockers": [
             "low_color_texture_entropy",
-            "visible_proxy_water_card_geometry"
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1588,8 +1587,7 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy",
-            "visible_proxy_water_card_geometry"
+            "low_color_texture_entropy"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1597,15 +1595,14 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy",
-            "visible_proxy_water_card_geometry"
+            "low_color_texture_entropy"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         }
       }
     },
     "visual_blocker_reduction_checkpoint_2026_07_08": {
-      "status": "integrated_water_chroma_overlay_retired_low_entropy_and_water_card_blockers_recorded",
+      "status": "visible_water_card_blocker_retired_low_entropy_and_edge_blockers_recorded",
       "removed_blocker_classes": [
         "dark_foreground_proxy",
         "excess_low_gradient_area",
@@ -1615,10 +1612,11 @@
       ],
       "remaining_blocker_counts": {
         "low_color_texture_entropy": 6,
-        "visible_proxy_water_card_geometry": 6
+        "low_edge_density": 1
       },
-      "next_visual_art_blocker": "replace visible water fleck card geometry and low-entropy smooth proxy terrain/water/rocks/foliage with integrated production water material or VFX plus source-derived or rights-cleared assets without hiding hazards",
+      "next_visual_art_blocker": "raise integrated water, bank, terrain, rock, and foliage texture entropy and edge detail without reintroducing visible card geometry or hiding hazards",
       "removed_renderer_blocker_classes": [
+        "visible_proxy_water_card_geometry",
         "visible_proxy_water_overlay_geometry"
       ]
     }
