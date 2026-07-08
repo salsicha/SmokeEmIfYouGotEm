@@ -38,7 +38,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_albedo.png",
-          "sha256": "fd30378dde6d3414c121eeef1e0a25bc0c0481167c51953b8b61113559fde1d4"
+          "sha256": "7607eabcebe6697fcffe9a8398cef22be77cedf60ede4cd5bda1e8d45c28da33"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_normal.png",
@@ -194,7 +194,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_albedo.png",
-          "sha256": "fd30378dde6d3414c121eeef1e0a25bc0c0481167c51953b8b61113559fde1d4"
+          "sha256": "7607eabcebe6697fcffe9a8398cef22be77cedf60ede4cd5bda1e8d45c28da33"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_normal.png",
@@ -350,7 +350,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_albedo.png",
-          "sha256": "fd30378dde6d3414c121eeef1e0a25bc0c0481167c51953b8b61113559fde1d4"
+          "sha256": "7607eabcebe6697fcffe9a8398cef22be77cedf60ede4cd5bda1e8d45c28da33"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_normal.png",
@@ -506,7 +506,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_albedo.png",
-          "sha256": "fd30378dde6d3414c121eeef1e0a25bc0c0481167c51953b8b61113559fde1d4"
+          "sha256": "7607eabcebe6697fcffe9a8398cef22be77cedf60ede4cd5bda1e8d45c28da33"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_normal.png",
@@ -662,7 +662,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_albedo.png",
-          "sha256": "fd30378dde6d3414c121eeef1e0a25bc0c0481167c51953b8b61113559fde1d4"
+          "sha256": "7607eabcebe6697fcffe9a8398cef22be77cedf60ede4cd5bda1e8d45c28da33"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_normal.png",
@@ -818,7 +818,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_albedo.png",
-          "sha256": "fd30378dde6d3414c121eeef1e0a25bc0c0481167c51953b8b61113559fde1d4"
+          "sha256": "7607eabcebe6697fcffe9a8398cef22be77cedf60ede4cd5bda1e8d45c28da33"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_normal.png",
@@ -974,7 +974,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_albedo.png",
-          "sha256": "4bb2b4cc73daa2ad694f9414d4c9004b43b6bcf55b5467867918e5112670c790"
+          "sha256": "a3e9ab80ada656fdbae534984ff1746b4ad160ceac7c226278b760ca050d6962"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_normal.png",
@@ -1130,7 +1130,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_albedo.png",
-          "sha256": "4bb2b4cc73daa2ad694f9414d4c9004b43b6bcf55b5467867918e5112670c790"
+          "sha256": "a3e9ab80ada656fdbae534984ff1746b4ad160ceac7c226278b760ca050d6962"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_normal.png",
@@ -1286,7 +1286,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_albedo.png",
-          "sha256": "4bb2b4cc73daa2ad694f9414d4c9004b43b6bcf55b5467867918e5112670c790"
+          "sha256": "a3e9ab80ada656fdbae534984ff1746b4ad160ceac7c226278b760ca050d6962"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_normal.png",
@@ -1442,7 +1442,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_albedo.png",
-          "sha256": "4bb2b4cc73daa2ad694f9414d4c9004b43b6bcf55b5467867918e5112670c790"
+          "sha256": "a3e9ab80ada656fdbae534984ff1746b4ad160ceac7c226278b760ca050d6962"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_normal.png",
@@ -1598,7 +1598,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_albedo.png",
-          "sha256": "4bb2b4cc73daa2ad694f9414d4c9004b43b6bcf55b5467867918e5112670c790"
+          "sha256": "a3e9ab80ada656fdbae534984ff1746b4ad160ceac7c226278b760ca050d6962"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_normal.png",
@@ -1754,7 +1754,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_albedo.png",
-          "sha256": "4bb2b4cc73daa2ad694f9414d4c9004b43b6bcf55b5467867918e5112670c790"
+          "sha256": "a3e9ab80ada656fdbae534984ff1746b4ad160ceac7c226278b760ca050d6962"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_normal.png",
@@ -1910,7 +1910,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_albedo.png",
-          "sha256": "f16a2059efb9b7008ac7d1bf075644d51599afe1f9971c5119f5d409a81e2863"
+          "sha256": "91d41856b980f9c0fb30c03b78d1a4288f6ae7cdc925482b0122ef393bd759a5"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_normal.png",
@@ -2066,7 +2066,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_albedo.png",
-          "sha256": "f16a2059efb9b7008ac7d1bf075644d51599afe1f9971c5119f5d409a81e2863"
+          "sha256": "91d41856b980f9c0fb30c03b78d1a4288f6ae7cdc925482b0122ef393bd759a5"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_normal.png",
@@ -2222,7 +2222,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_albedo.png",
-          "sha256": "f16a2059efb9b7008ac7d1bf075644d51599afe1f9971c5119f5d409a81e2863"
+          "sha256": "91d41856b980f9c0fb30c03b78d1a4288f6ae7cdc925482b0122ef393bd759a5"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_normal.png",
@@ -2378,7 +2378,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_albedo.png",
-          "sha256": "f16a2059efb9b7008ac7d1bf075644d51599afe1f9971c5119f5d409a81e2863"
+          "sha256": "91d41856b980f9c0fb30c03b78d1a4288f6ae7cdc925482b0122ef393bd759a5"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_normal.png",
@@ -2534,7 +2534,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_albedo.png",
-          "sha256": "f16a2059efb9b7008ac7d1bf075644d51599afe1f9971c5119f5d409a81e2863"
+          "sha256": "91d41856b980f9c0fb30c03b78d1a4288f6ae7cdc925482b0122ef393bd759a5"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_normal.png",
@@ -2690,7 +2690,7 @@
       "texture_bindings": {
         "AlbedoAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_albedo.png",
-          "sha256": "f16a2059efb9b7008ac7d1bf075644d51599afe1f9971c5119f5d409a81e2863"
+          "sha256": "91d41856b980f9c0fb30c03b78d1a4288f6ae7cdc925482b0122ef393bd759a5"
         },
         "NormalAtlas": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_normal.png",
