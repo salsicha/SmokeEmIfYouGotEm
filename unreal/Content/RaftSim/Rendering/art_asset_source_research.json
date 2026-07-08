@@ -148,8 +148,12 @@
     "texture_atlas_renderer_application_status": "albedo_tiles_sampled_into_preview_vertex_colors_for_terrain_water_boulders_foliage_and_raft_oars_review_only_not_lifelike_evidence",
     "material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json",
     "texture_atlas_normal_packed_renderer_application_status": "normal_and_packed_ao_roughness_height_tiles_sampled_into_bounded_preview_surface_response_and_tiny_microrelief_review_only_not_lifelike_evidence",
-    "material_instance_candidate_status": "candidate_paths_created_as_unreal_material_instance_constant_review_assets_not_promoted_to_lifelike_materials",
-    "material_instance_review_asset_root": "unreal/Content/RaftSim/Materials/MaterialInstances"
+    "material_instance_candidate_status": "candidate_paths_created_as_unreal_material_instance_constant_review_assets_with_bound_texture2d_atlases_not_promoted_to_lifelike_materials",
+    "material_instance_review_asset_root": "unreal/Content/RaftSim/Materials/MaterialInstances",
+    "material_texture_asset_root": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
+    "material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike",
+    "texture_atlas_unreal_import_status": "nine_unreal_texture2d_review_assets_created_with_recorded_import_settings_not_lifelike_evidence",
+    "material_instance_review_asset_status": "created_unreal_material_instance_constant_review_assets_with_texture_bindings_not_lifelike"
   },
   "buy_paid_assets_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true
 }
