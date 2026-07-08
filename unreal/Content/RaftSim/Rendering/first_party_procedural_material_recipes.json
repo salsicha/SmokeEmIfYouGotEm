@@ -726,6 +726,11 @@
         "tube_seam_highlights",
         "rounded_tube_bow_frame_oar_shafts",
         "demoted_floor_occlusion",
+        "tagged_river_eye_foreground_proxy_cull",
+        "low_luma_oar_blade_and_shaft_demotion",
+        "near_field_water_source_tile_demotion",
+        "near_field_inboard_bank_shelf_cull",
+        "near_camera_inwater_debris_occlusion_cull",
         "placeholder_visibility_flag"
       ],
       "tunable_parameters": [
@@ -734,6 +739,11 @@
         "wet_highlight_strength",
         "oar_rig_readability",
         "rounded_foreground_proxy_radius",
+        "foreground_proxy_luma_floor",
+        "river_eye_hidden_actor_tag_cull",
+        "near_field_water_source_tile_demotion_gain",
+        "near_field_bank_shelf_inboard_clearance",
+        "near_camera_debris_active_water_clearance",
         "camera_occlusion_budget"
       ],
       "river_bindings": {
