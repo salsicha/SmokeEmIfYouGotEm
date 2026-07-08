@@ -161,14 +161,12 @@
     "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
     "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
     "photoreal_capture_quality_blockers": {
-      "low_color_texture_entropy": 6,
-      "low_edge_density": 3
+      "low_color_texture_entropy": 6
     },
     "visual_blocker_reduction_checkpoint_2026_07_08": {
-      "status": "low_gradient_luma_flat_blue_and_dark_foreground_blockers_removed_all_rivers_still_preview_only",
+      "status": "edge_gradient_luma_flat_blue_and_dark_foreground_blockers_removed_all_rivers_still_preview_only",
       "remaining_blocker_counts": {
-        "low_color_texture_entropy": 6,
-        "low_edge_density": 3
+        "low_color_texture_entropy": 6
       },
       "art_direction_note": "The current preview is less blue and less dark, but it remains smooth, pale, low-entropy proxy art requiring production terrain, water, raft, foliage, foam, mist, and lighting replacement."
     }

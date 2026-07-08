@@ -280,10 +280,10 @@ def build_capture_quality_review(repo_root: Path, generated_on: str = "2026-07-0
         "captures": captures,
         "current_decision": (
             "Use this automated review as a regression gate for the photoreal environment track. "
-            "The current captures remain preview-only because they still show low texture entropy in all six captures "
-            "and selected low-edge river-eye failures; the July 8 near-field dressing pass removed the flat-blue, "
-            "dark-foreground, low-gradient, and low-luma blocker classes, but passing those checks still does not "
-            "replace guide, geospatial, rights, hazard-readability, performance, and art-direction approval."
+            "The current captures remain preview-only because they still show low texture entropy in all six captures; "
+            "the July 8 near-field and fleck-detail passes removed the flat-blue, dark-foreground, low-gradient, "
+            "low-luma, and river-eye low-edge blocker classes, but passing those checks still does not replace guide, "
+            "geospatial, rights, hazard-readability, performance, and art-direction approval."
         ),
     }
 
