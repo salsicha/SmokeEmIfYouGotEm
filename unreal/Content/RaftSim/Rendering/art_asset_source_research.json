@@ -159,12 +159,16 @@
     "shader_graph_sampler_wiring_status": "review_parent_material_samples_albedo_normal_ao_roughness_height_atlases_with_preview_color_vertex_color_weight_and_roughness_floor_not_lifelike_evidence",
     "material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
     "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
-    "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved",
-    "photoreal_capture_quality_blockers": {},
+    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
+    "photoreal_capture_quality_blockers": {
+      "visible_proxy_water_overlay_geometry": 6
+    },
     "visual_blocker_reduction_checkpoint_2026_07_08": {
-      "status": "automated_capture_quality_blockers_removed_all_rivers_candidate_for_human_review_not_art_approved",
-      "remaining_blocker_counts": {},
-      "art_direction_note": "The current preview clears automated screenshot blockers, but it still shows proxy water marks, smooth terrain, placeholder rocks/foliage, and review-only material instances requiring production terrain, water, raft, foliage, foam, mist, and lighting replacement."
+      "status": "pixel_metric_blockers_removed_visible_proxy_water_overlay_still_blocks_lifelike_review",
+      "remaining_blocker_counts": {
+        "visible_proxy_water_overlay_geometry": 6
+      },
+      "art_direction_note": "The current preview clears the old pixel-metric screenshot blockers, but all six captures are still blocked by visible proxy water overlay geometry plus smooth terrain, placeholder rocks/foliage, and review-only material instances requiring production terrain, water, raft, foliage, foam, mist, and lighting replacement."
     }
   },
   "buy_paid_assets_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true

@@ -16,6 +16,7 @@ from PIL import Image
 CAPTURE_ROOT_RELATIVE_PATH = Path("docs/environment-captures/photoreal_river_previews")
 CAPTURE_MANIFEST_RELATIVE_PATH = CAPTURE_ROOT_RELATIVE_PATH / "environment_capture_manifest.json"
 CAPTURE_QUALITY_REVIEW_RELATIVE_PATH = CAPTURE_ROOT_RELATIVE_PATH / "photoreal_capture_quality_review.json"
+PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID = "first_party_source_aware_tapered_water_chroma_microbreakup"
 
 
 @dataclass(frozen=True)
@@ -137,6 +138,35 @@ def _blockers(metrics: dict[str, float], thresholds: CaptureQualityThresholds) -
     return blockers
 
 
+def _renderer_proxy_blockers(repo_root: Path, capture_manifest: dict) -> list[dict[str, str | float]]:
+    procedural_asset_plan = capture_manifest.get("procedural_asset_plan")
+    if not isinstance(procedural_asset_plan, str):
+        return []
+
+    asset_plan_path = repo_root / procedural_asset_plan
+    if not asset_plan_path.exists():
+        return []
+
+    asset_plan = json.loads(asset_plan_path.read_text(encoding="utf-8"))
+    unreal_integration = asset_plan.get("unreal_integration", {})
+    renderer_coverage = set(unreal_integration.get("current_renderer_coverage", []))
+    if PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID not in renderer_coverage:
+        return []
+
+    return [
+        {
+            "id": "visible_proxy_water_overlay_geometry",
+            "metric": "renderer_coverage",
+            "value": PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID,
+            "threshold": "production_water_material_or_human_approved_proxy_replacement",
+            "why_it_blocks_lifelike_review": (
+                "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, "
+                "so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+            ),
+        }
+    ]
+
+
 def analyze_capture(
     repo_root: Path,
     capture_relative_path: str,
@@ -231,6 +261,11 @@ def build_capture_quality_review(repo_root: Path, generated_on: str = "2026-07-0
         analyze_capture(repo_root, capture_path, river_id, view_id, thresholds)
         for river_id, view_id, capture_path in _capture_entries(capture_manifest)
     ]
+    renderer_proxy_blockers = _renderer_proxy_blockers(repo_root, capture_manifest)
+    if renderer_proxy_blockers:
+        for capture in captures:
+            capture["blockers"].extend(renderer_proxy_blockers)
+            capture["status"] = "preview_only_not_lifelike_quality_blockers"
 
     blocker_counts: Counter[str] = Counter(
         blocker["id"]
@@ -273,9 +308,9 @@ def build_capture_quality_review(repo_root: Path, generated_on: str = "2026-07-0
         if blocking_capture_count == 0
         else (
             "Use this automated review as a regression gate for the photoreal environment track. "
-            "The current captures remain preview-only because at least one automated blocker is present; "
-            "passing these checks still does not replace guide, geospatial, rights, hazard-readability, "
-            "performance, and art-direction approval."
+            "The current captures remain preview-only because at least one automated or source-aware blocker "
+            "is present; passing pixel checks still does not replace guide, geospatial, rights, "
+            "hazard-readability, performance, and art-direction approval."
         )
     )
 
