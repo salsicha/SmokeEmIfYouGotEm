@@ -29,6 +29,8 @@ PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID = "first_party_source_aware_tapered_wat
 VISIBLE_WATER_CARD_RENDERER_COVERAGE_IDS = {
     "first_party_capture_quality_water_texture_fleck_cards",
 }
+FACETED_WATER_MESH_RENDERER_COVERAGE_ID = "flow_aware_water_mesh_undulation"
+SMOOTHED_WATER_MESH_RENDERER_COVERAGE_ID = "first_party_smoothed_near_field_water_surface_faceting_demotion"
 REFERENCE_MEDIA_REVIEW_QUEUE_RELATIVE_PATH = Path("physics/data/real_world/reference_media_review_queue.json")
 PRODUCTION_ENVIRONMENT_GAP_REGISTER_RELATIVE_PATH = Path(
     "physics/data/real_world/production_environment_gap_register.json"
@@ -255,6 +257,24 @@ def _renderer_proxy_blockers(repo_root: Path, capture_manifest: dict) -> list[di
                 "why_it_blocks_lifelike_review": (
                     "Water detail is still carried by visible preview card geometry; it must be folded into the "
                     "water material, Niagara/equivalent VFX, or a human-approved replacement before lifelike review."
+                ),
+            }
+        )
+
+    if (
+        FACETED_WATER_MESH_RENDERER_COVERAGE_ID in renderer_coverage
+        and SMOOTHED_WATER_MESH_RENDERER_COVERAGE_ID not in renderer_coverage
+    ):
+        blockers.append(
+            {
+                "id": "faceted_proxy_water_surface_mesh",
+                "metric": "renderer_coverage",
+                "value": FACETED_WATER_MESH_RENDERER_COVERAGE_ID,
+                "threshold": SMOOTHED_WATER_MESH_RENDERER_COVERAGE_ID,
+                "why_it_blocks_lifelike_review": (
+                    "The base river surface still depends on visibly faceted preview mesh undulation. "
+                    "Near-field water must use smoothed displacement and material-scale flow cues before "
+                    "the capture can be treated as a lifelike-review candidate."
                 ),
             }
         )

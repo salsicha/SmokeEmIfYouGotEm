@@ -794,16 +794,16 @@
     }
   ],
   "next_checkpoint_order": [
-    "Run Unreal map-generation and capture automation after source-conditioned Texture2D assets are imported and bound to review material instances, then review the regenerated guide-seat and river-eye captures before any lifelike screenshot claim.",
-    "Assign the source-conditioned macro albedo, material-zone, and AO/roughness/height maps to Unreal terrain, water-edge, vegetation, wet-bank, and relief material instances, then regenerate captures before claiming any visual-replacement progress beyond review-gated candidate maps.",
+    "Review the regenerated source-conditioned guide-seat captures for visible faceted base-water mesh artifacts, then keep the source-aware blocker active until the near-field water surface is smoothed and recaptured.",
+    "Replace proxy terrain, banks, rocks, foliage, water materials, foam/spray/mist, wetness, and lighting with source-derived or rights-cleared assets or first-party production equivalents until screenshots read as lifelike without hiding hazards or rescue targets.",
     "Close South Fork hydrography/flow/media annotations enough to test a true source-conditioned terrain and material pass.",
     "Close Colorado river-mile/release/media annotations before expanding beyond the Lees Ferry pilot slice.",
     "Close Pacuare official hydrography, cloud-screened imagery, rainfall/flow, and protected-area review before claiming local fidelity.",
-    "Replace proxy art using rights-cleared assets or first-party procedural equivalents and regenerate guide-seat plus river-eye captures after each river pass.",
+    "Regenerate guide-seat and river-eye captures after each renderer/material/environment replacement pass and keep the human review package synchronized with the current hashes.",
     "Add desktop and VR performance evidence before any river leaves preview-only status."
   ],
   "visual_blocker_reduction_checkpoint_2026_07_08": {
-    "status": "automated_capture_quality_gate_cleared_candidate_for_human_lifelike_review_not_approved",
+    "status": "automated_capture_quality_gate_cleared_after_source_aware_proxy_water_and_faceted_mesh_blockers_candidate_for_human_lifelike_review_not_approved",
     "remaining_blocker_counts": {},
     "closed_blocker_classes": [
       "dark_foreground_proxy",
@@ -815,7 +815,8 @@
     ],
     "closed_renderer_blocker_classes": [
       "visible_proxy_water_card_geometry",
-      "visible_proxy_water_overlay_geometry"
+      "visible_proxy_water_overlay_geometry",
+      "faceted_proxy_water_surface_mesh"
     ],
     "remaining_human_review_gates": [
       "human_art_guide_and_geospatial_lifelike_review_after_automated_gate",
