@@ -1483,6 +1483,7 @@
       "first_party_procedural_lit_vertex_color_water_gradients_recorded",
       "first_party_lit_water_normal_response_scaffold_recorded",
       "flow_aware_water_mesh_undulation_recorded",
+      "first_party_smoothed_near_field_water_surface_faceting_demotion_recorded",
       "flow_band_depth_texture_ribbons_recorded",
       "flow_aware_water_surface_chop_and_turbidity_patches_recorded",
       "flow_aware_micro_ripple_glints_recorded",

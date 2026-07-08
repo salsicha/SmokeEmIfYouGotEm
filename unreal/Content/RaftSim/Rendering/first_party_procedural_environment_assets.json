@@ -127,6 +127,7 @@
       "first_party_base_water_residual_center_seam_erase",
       "first_party_flow_cued_water_foam_slick_mottle",
       "flow_aware_water_mesh_undulation",
+      "first_party_smoothed_near_field_water_surface_faceting_demotion",
       "flow_band_depth_texture_ribbons",
       "flow_aware_water_surface_chop_and_turbidity_patches",
       "first_party_turbidity_depth_patch_artifact_demotion",
