@@ -1,7 +1,7 @@
 {
   "schema": "raftsim.production_environment_gap_register.v0",
   "generated_on": "2026-07-06",
-  "status": "active_goal_gap_register_all_rivers_preview_only_not_lifelike_first_party_texture2d_atlas_assets_bound_material_instances_and_sampler_parent_recorded",
+  "status": "active_goal_gap_register_all_rivers_preview_only_not_lifelike_capture_quality_blockers_recorded",
   "goal": "Drive South Fork American, Colorado River, and Pacuare from source-aware Unreal previews to complete photoreal river environments by tracking maps, seasonal flows, aerial imagery, rights-reviewed reference media, additional source data, procedural substitutes, lifelike captures, and performance evidence.",
   "blocking_rule": "No river can be marked production-playable or lifelike until every P0 source-data, visual-replacement, rights-review, guide-review, capture, and performance gate for that river is closed.",
   "policy": {
@@ -41,7 +41,9 @@
     "first_party_material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike",
     "first_party_atlas_sampler_review_material": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
     "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
-    "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike"
+    "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
+    "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
+    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded"
   },
   "reviewed_source_leads_2026_07_06": [
     {
@@ -157,7 +159,8 @@
         "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
         "approved_unreal_material_instances_from_candidate_manifest_or_rights_cleared_equivalent_materials",
         "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
-        "review_material_instance_scene_assignment_capture_review_and_production_promotion"
+        "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+        "automated_capture_quality_gate_passed_without_proxy_blockers"
       ]
     },
     {
@@ -171,7 +174,8 @@
         "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
         "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
         "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
-        "review_material_instance_scene_assignment_capture_review_and_production_promotion"
+        "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+        "automated_capture_quality_gate_passed_without_proxy_blockers"
       ]
     },
     {
@@ -185,7 +189,8 @@
         "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
         "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
         "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
-        "review_material_instance_scene_assignment_capture_review_and_production_promotion"
+        "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+        "automated_capture_quality_gate_passed_without_proxy_blockers"
       ]
     },
     {
@@ -199,7 +204,8 @@
         "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
         "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
         "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
-        "review_material_instance_scene_assignment_capture_review_and_production_promotion"
+        "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+        "automated_capture_quality_gate_passed_without_proxy_blockers"
       ]
     },
     {
@@ -209,7 +215,8 @@
         "HDRI or first-party sky/atmosphere setup with rights recorded",
         "manual exposure/camera language matching guide-seat review",
         "desktop and VR performance captures with settings recorded",
-        "review_material_instance_scene_assignment_capture_review_and_production_promotion"
+        "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+        "automated_capture_quality_gate_passed_without_proxy_blockers"
       ]
     }
   ],
@@ -694,6 +701,7 @@
     }
   ],
   "next_checkpoint_order": [
+    "Fix capture-quality blockers: low entropy, low detail, flat blue fields, and dark foreground proxy artifacts before any lifelike screenshot claim.",
     "Close South Fork hydrography/flow/media annotations enough to test a true source-conditioned terrain and material pass.",
     "Close Colorado river-mile/release/media annotations before expanding beyond the Lees Ferry pilot slice.",
     "Close Pacuare official hydrography, cloud-screened imagery, rainfall/flow, and protected-area review before claiming local fidelity.",

@@ -160,7 +160,8 @@
       "first_party_material_instance_texture_asset_bindings_recorded",
       "first_party_atlas_sampler_review_parent_material_created",
       "first_party_material_shader_graph_sampler_wiring_recorded",
-      "first_party_material_instance_scene_assignment_recorded"
+      "first_party_material_instance_scene_assignment_recorded",
+      "photoreal_capture_quality_review_blockers_recorded"
     ],
     "missing_renderer_coverage_before_lifelike": [
       "production_landscape_or_nanite_terrain_material_layers",
@@ -172,7 +173,8 @@
       "desktop_and_vr_performance_capture_evidence",
       "production_material_instances_using_texture_atlases_normal_ao_roughness_height_or_rights_cleared_equivalent_maps",
       "guide_geospatial_hazard_readability_and_performance_reviewed_material_promotion",
-      "review_material_instance_scene_assignment_capture_review_and_production_promotion"
+      "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+      "automated_capture_quality_gate_passed_without_proxy_blockers"
     ],
     "material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
     "material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json",
@@ -182,7 +184,60 @@
     "material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike",
     "atlas_sampler_review_material": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
     "atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
-    "material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike"
+    "material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
+    "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
+    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
+    "photoreal_capture_quality_summary": {
+      "capture_count": 6,
+      "blocking_capture_count": 6,
+      "blocker_counts": {
+        "dark_foreground_proxy": 5,
+        "excess_low_gradient_area": 6,
+        "large_flat_blue_field": 3,
+        "low_color_texture_entropy": 6,
+        "low_edge_density": 3,
+        "low_luma_variation": 1
+      },
+      "per_river": {
+        "american_south_fork": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "dark_foreground_proxy",
+            "excess_low_gradient_area",
+            "large_flat_blue_field",
+            "low_color_texture_entropy",
+            "low_edge_density"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        },
+        "colorado_river": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "dark_foreground_proxy",
+            "excess_low_gradient_area",
+            "large_flat_blue_field",
+            "low_color_texture_entropy",
+            "low_edge_density"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        },
+        "pacuare": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "dark_foreground_proxy",
+            "excess_low_gradient_area",
+            "large_flat_blue_field",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        }
+      }
+    }
   },
   "global_recipes": [
     {
@@ -376,5 +431,5 @@
       ]
     }
   ],
-  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are promoted from review Texture2D/MIC/material assets into production-quality Unreal assets/materials and verified by captures. The first importable first-party texture atlas pack is recorded, imported as review-only Unreal Texture2D assets with explicit import settings, bound into review-only material instance candidates, sampled by the review-only M_RaftSim_AtlasSampleReview parent material, and assigned to durable saved-map terrain, water, boulder, foliage, and raft proxy surfaces for review captures. Final lifelike status remains blocked on guide/geospatial approval, hazard readability, production material promotion, and performance evidence."
+  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are promoted from review Texture2D/MIC/material assets into production-quality Unreal assets/materials and verified by captures. The first importable first-party texture atlas pack is recorded, imported as review-only Unreal Texture2D assets with explicit import settings, bound into review-only material instance candidates, sampled by the review-only M_RaftSim_AtlasSampleReview parent material, and assigned to durable saved-map terrain, water, boulder, foliage, and raft proxy surfaces for review captures. Final lifelike status remains blocked on guide/geospatial approval, hazard readability, production material promotion, performance evidence, and passing the automated capture-quality gate without proxy blockers."
 }
