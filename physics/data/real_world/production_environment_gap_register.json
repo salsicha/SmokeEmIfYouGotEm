@@ -40,7 +40,8 @@
     "first_party_material_texture_assets": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
     "first_party_material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike",
     "first_party_atlas_sampler_review_material": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
-    "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike"
+    "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+    "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike"
   },
   "reviewed_source_leads_2026_07_06": [
     {
@@ -155,7 +156,8 @@
         "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
         "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
         "approved_unreal_material_instances_from_candidate_manifest_or_rights_cleared_equivalent_materials",
-        "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph"
+        "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+        "review_material_instance_scene_assignment_capture_review_and_production_promotion"
       ]
     },
     {
@@ -168,7 +170,8 @@
         "first_party_rock_texture_atlas_or_rights_cleared_rock_texture_maps",
         "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
         "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
-        "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph"
+        "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+        "review_material_instance_scene_assignment_capture_review_and_production_promotion"
       ]
     },
     {
@@ -181,7 +184,8 @@
         "first_party_foliage_texture_atlas_or_rights_cleared_biome_foliage_texture_maps",
         "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
         "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
-        "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph"
+        "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+        "review_material_instance_scene_assignment_capture_review_and_production_promotion"
       ]
     },
     {
@@ -194,7 +198,8 @@
         "first_party_water_foam_mist_texture_atlas_or_approved_water_material_textures",
         "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
         "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
-        "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph"
+        "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+        "review_material_instance_scene_assignment_capture_review_and_production_promotion"
       ]
     },
     {
@@ -203,7 +208,8 @@
         "river-specific time-of-day and weather presets",
         "HDRI or first-party sky/atmosphere setup with rights recorded",
         "manual exposure/camera language matching guide-seat review",
-        "desktop and VR performance captures with settings recorded"
+        "desktop and VR performance captures with settings recorded",
+        "review_material_instance_scene_assignment_capture_review_and_production_promotion"
       ]
     }
   ],

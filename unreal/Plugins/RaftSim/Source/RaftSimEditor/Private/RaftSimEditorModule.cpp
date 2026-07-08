@@ -256,7 +256,12 @@ FString GetFirstPartyMaterialInstanceReviewAssetRootRelativePath()
 
 FString GetFirstPartyMaterialInstanceReviewAssetStatus()
 {
-    return TEXT("created_unreal_material_instance_constant_review_assets_with_texture_bindings_and_sampler_parent_not_lifelike");
+    return TEXT("created_unreal_material_instance_constant_review_assets_with_texture_bindings_sampler_parent_and_scene_assignment_not_lifelike");
+}
+
+FString GetFirstPartyMaterialInstanceSceneAssignmentStatus()
+{
+    return TEXT("assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike");
 }
 
 FString GetFirstPartyMaterialTextureAssetRootRelativePath()
@@ -1438,23 +1443,43 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
     PackedSample->SortPriority = 30;
 
     UMaterialExpressionVertexColor* VertexColor =
-        AddExpression(NewObject<UMaterialExpressionVertexColor>(Material), -180, -480);
+        AddExpression(NewObject<UMaterialExpressionVertexColor>(Material), -180, -560);
+
+    UMaterialExpressionVectorParameter* PreviewColor =
+        AddExpression(NewObject<UMaterialExpressionVectorParameter>(Material), -180, -420);
+    PreviewColor->ParameterName = TEXT("PreviewColor");
+    PreviewColor->DefaultValue = FLinearColor(0.30f, 0.31f, 0.27f);
+    PreviewColor->Group = TEXT("FirstPartyAtlas");
+    PreviewColor->SortPriority = 35;
+
+    UMaterialExpressionScalarParameter* VertexColorWeight =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -180, -300);
+    VertexColorWeight->ParameterName = TEXT("VertexColorWeight");
+    VertexColorWeight->DefaultValue = 1.0f;
+    VertexColorWeight->Group = TEXT("FirstPartyAtlas");
+    VertexColorWeight->SortPriority = 38;
+
+    UMaterialExpressionLinearInterpolate* ReviewSurfaceBaseColor =
+        AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 120, -500);
+    ReviewSurfaceBaseColor->A.Expression = PreviewColor;
+    ReviewSurfaceBaseColor->B.Expression = VertexColor;
+    ReviewSurfaceBaseColor->Alpha.Expression = VertexColorWeight;
 
     UMaterialExpressionScalarParameter* AtlasBlendWeight =
         AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -180, -360);
     AtlasBlendWeight->ParameterName = TEXT("AtlasBlendWeight");
-    AtlasBlendWeight->DefaultValue = 0.42f;
+    AtlasBlendWeight->DefaultValue = 0.16f;
     AtlasBlendWeight->Group = TEXT("FirstPartyAtlas");
     AtlasBlendWeight->SortPriority = 40;
 
     UMaterialExpressionLinearInterpolate* ReviewBaseColor =
         AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 120, -320);
-    ReviewBaseColor->A.Expression = VertexColor;
+    ReviewBaseColor->A.Expression = ReviewSurfaceBaseColor;
     ReviewBaseColor->B.Expression = AlbedoSample;
     ReviewBaseColor->Alpha.Expression = AtlasBlendWeight;
 
     UMaterialExpressionConstant* EmissiveScale = AddExpression(NewObject<UMaterialExpressionConstant>(Material), 120, -80);
-    EmissiveScale->R = 0.035f;
+    EmissiveScale->R = 0.20f;
 
     UMaterialExpressionMultiply* EmissiveColor =
         AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 360, -160);
@@ -1483,9 +1508,21 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
     RoughnessScaled->A.Expression = RoughnessMask;
     RoughnessScaled->B.Expression = RoughnessScale;
 
+    UMaterialExpressionScalarParameter* RoughnessFloor =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), 360, 500);
+    RoughnessFloor->ParameterName = TEXT("RoughnessFloor");
+    RoughnessFloor->DefaultValue = 0.62f;
+    RoughnessFloor->Group = TEXT("FirstPartyAtlas");
+    RoughnessFloor->SortPriority = 55;
+
+    UMaterialExpressionAdd* RoughnessWithFloor =
+        AddExpression(NewObject<UMaterialExpressionAdd>(Material), 560, 420);
+    RoughnessWithFloor->A.Expression = RoughnessScaled;
+    RoughnessWithFloor->B.Expression = RoughnessFloor;
+
     UMaterialExpressionSaturate* RoughnessSaturated =
-        AddExpression(NewObject<UMaterialExpressionSaturate>(Material), 560, 360);
-    RoughnessSaturated->Input.Expression = RoughnessScaled;
+        AddExpression(NewObject<UMaterialExpressionSaturate>(Material), 760, 420);
+    RoughnessSaturated->Input.Expression = RoughnessWithFloor;
 
     UMaterialExpressionComponentMask* HeightMask =
         AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), 120, 620);
@@ -1505,7 +1542,7 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
     HeightOffset->B.Expression = HeightScale;
 
     UMaterialExpressionConstant* Specular = AddExpression(NewObject<UMaterialExpressionConstant>(Material), 560, 520);
-    Specular->R = 0.16f;
+    Specular->R = 0.06f;
 
     if (UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData())
     {
@@ -1549,6 +1586,9 @@ struct FRaftSimFirstPartyMaterialInstanceCandidateSpec
     float NormalIntensity = 0.15f;
     float RoughnessScale = 0.75f;
     float HeightScale = 0.08f;
+    FLinearColor PreviewColor = FLinearColor(0.30f, 0.31f, 0.27f);
+    float VertexColorWeight = 1.0f;
+    float RoughnessFloor = 0.62f;
 
     FString GetMaterialInstancePath() const
     {
@@ -1571,6 +1611,9 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
         float NormalIntensity;
         float RoughnessScale;
         float HeightScale;
+        FLinearColor PreviewColor;
+        float VertexColorWeight;
+        float RoughnessFloor;
     };
 
     const FRecipeSpec RecipeSpecs[] = {
@@ -1579,60 +1622,78 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             TEXT("TerrainBank"),
             TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             0,
-            0.58f,
-            0.28f,
+            0.16f,
+            0.22f,
             0.92f,
-            0.18f,
+            0.08f,
+            FLinearColor(0.34f, 0.32f, 0.24f),
+            1.0f,
+            0.72f,
         },
         {
             TEXT("wet_boulder_contact_material_set"),
             TEXT("WetBoulderContact"),
             TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             1,
-            0.52f,
-            0.42f,
+            0.18f,
+            0.30f,
             0.64f,
-            0.22f,
+            0.10f,
+            FLinearColor(0.24f, 0.23f, 0.20f),
+            1.0f,
+            0.66f,
         },
         {
             TEXT("biome_foliage_groundcover_materials"),
             TEXT("BiomeFoliageGroundcover"),
             TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             2,
-            0.48f,
-            0.24f,
-            0.78f,
             0.14f,
+            0.18f,
+            0.78f,
+            0.06f,
+            FLinearColor(0.055f, 0.15f, 0.055f),
+            0.72f,
+            0.68f,
         },
         {
             TEXT("flow_dependent_water_surface_material"),
             TEXT("FlowDependentWaterSurface"),
             TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             3,
-            0.28f,
-            0.18f,
+            0.08f,
+            0.14f,
             0.62f,
-            0.06f,
+            0.025f,
+            FLinearColor(0.030f, 0.32f, 0.34f),
+            1.0f,
+            0.70f,
         },
         {
             TEXT("foam_spray_mist_atmosphere_materials"),
             TEXT("FoamSprayMistAtmosphere"),
             TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             4,
-            0.26f,
-            0.08f,
+            0.10f,
+            0.06f,
             0.40f,
-            0.04f,
+            0.015f,
+            FLinearColor(0.78f, 0.84f, 0.75f),
+            0.0f,
+            0.74f,
         },
         {
             TEXT("raft_foreground_review_materials"),
             TEXT("RaftForegroundReview"),
             TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             5,
-            0.32f,
-            0.18f,
+            0.22f,
+            0.12f,
             0.56f,
-            0.08f,
+            0.035f,
+            FLinearColor(0.32f, 0.11f, 0.045f),
+            0.0f,
+            0.64f,
         },
     };
 
@@ -1664,6 +1725,9 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             Spec.NormalIntensity = RecipeSpec.NormalIntensity;
             Spec.RoughnessScale = RecipeSpec.RoughnessScale;
             Spec.HeightScale = RecipeSpec.HeightScale;
+            Spec.PreviewColor = RecipeSpec.PreviewColor;
+            Spec.VertexColorWeight = RecipeSpec.VertexColorWeight;
+            Spec.RoughnessFloor = RecipeSpec.RoughnessFloor;
             Specs.Add(Spec);
         }
     }
@@ -1727,6 +1791,9 @@ bool CreateOrUpdateFirstPartyMaterialInstanceCandidateAsset(
     Instance->SetVectorParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("AtlasTileOriginScale")),
         AtlasTileOriginScale);
+    Instance->SetVectorParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("PreviewColor")),
+        Spec.PreviewColor);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("AtlasTileIndex")),
         static_cast<float>(Spec.AtlasTileIndex));
@@ -1740,8 +1807,14 @@ bool CreateOrUpdateFirstPartyMaterialInstanceCandidateAsset(
         FMaterialParameterInfo(TEXT("RoughnessScale")),
         Spec.RoughnessScale);
     Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("RoughnessFloor")),
+        Spec.RoughnessFloor);
+    Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("HeightScale")),
         Spec.HeightScale);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("VertexColorWeight")),
+        Spec.VertexColorWeight);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("ReviewAssetOnlyNotLifelike")),
         1.0f);
@@ -1814,6 +1887,170 @@ bool CreateFirstPartyMaterialInstanceCandidateAssets(FString& OutSummary)
     }
 
     return bAllSaved;
+}
+
+FString GetFirstPartyMaterialRiverAssetName(const FString& RiverId)
+{
+    if (RiverId == TEXT("american_south_fork"))
+    {
+        return TEXT("AmericanSouthFork");
+    }
+    if (RiverId == TEXT("colorado_river"))
+    {
+        return TEXT("ColoradoRiver");
+    }
+    if (RiverId == TEXT("pacuare"))
+    {
+        return TEXT("Pacuare");
+    }
+
+    return FString();
+}
+
+UMaterialInterface* LoadFirstPartyMaterialInstanceCandidate(const FString& RiverId, const TCHAR* RecipeAssetName)
+{
+    const FString RiverAssetName = GetFirstPartyMaterialRiverAssetName(RiverId);
+    if (RiverAssetName.IsEmpty())
+    {
+        return nullptr;
+    }
+
+    const FString MaterialPath = FString::Printf(
+        TEXT("/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_%s_%s_AtlasCandidate.MI_RaftSim_%s_%s_AtlasCandidate"),
+        *RiverAssetName,
+        RecipeAssetName,
+        *RiverAssetName,
+        RecipeAssetName);
+    return LoadPreviewMaterial(*MaterialPath);
+}
+
+struct FRaftSimFirstPartyMaterialAssignmentSet
+{
+    UMaterialInterface* TerrainBank = nullptr;
+    UMaterialInterface* WetBoulderContact = nullptr;
+    UMaterialInterface* BiomeFoliageGroundcover = nullptr;
+    UMaterialInterface* FlowDependentWaterSurface = nullptr;
+    UMaterialInterface* RaftForegroundReview = nullptr;
+
+    bool IsCompleteForDurableSurfaceReview() const
+    {
+        return TerrainBank && WetBoulderContact && BiomeFoliageGroundcover && FlowDependentWaterSurface && RaftForegroundReview;
+    }
+};
+
+FRaftSimFirstPartyMaterialAssignmentSet LoadFirstPartyMaterialAssignmentSetForSpec(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    FString& OutSummary)
+{
+    FRaftSimFirstPartyMaterialAssignmentSet Assignments;
+    Assignments.TerrainBank = LoadFirstPartyMaterialInstanceCandidate(Spec.RiverId, TEXT("TerrainBank"));
+    Assignments.WetBoulderContact = LoadFirstPartyMaterialInstanceCandidate(Spec.RiverId, TEXT("WetBoulderContact"));
+    Assignments.BiomeFoliageGroundcover =
+        LoadFirstPartyMaterialInstanceCandidate(Spec.RiverId, TEXT("BiomeFoliageGroundcover"));
+    Assignments.FlowDependentWaterSurface =
+        LoadFirstPartyMaterialInstanceCandidate(Spec.RiverId, TEXT("FlowDependentWaterSurface"));
+    Assignments.RaftForegroundReview = LoadFirstPartyMaterialInstanceCandidate(Spec.RiverId, TEXT("RaftForegroundReview"));
+
+    OutSummary += FString::Printf(
+        TEXT("%s review material-instance scene assignment set for %s.\n"),
+        Assignments.IsCompleteForDurableSurfaceReview() ? TEXT("Loaded") : TEXT("Incomplete"),
+        *Spec.RiverId);
+    return Assignments;
+}
+
+UMaterialInterface* SelectFirstPartyMaterialForPreviewActor(
+    const FString& ActorLabel,
+    const FRaftSimFirstPartyMaterialAssignmentSet& Assignments)
+{
+    if (ActorLabel.StartsWith(TEXT("RaftSim_ProceduralValleyTerrain_")) ||
+        ActorLabel.StartsWith(TEXT("RaftSim_SourceAerialDrapeMicroTile_")))
+    {
+        return Assignments.TerrainBank;
+    }
+
+    if (ActorLabel.StartsWith(TEXT("RaftSim_ProceduralRiverRibbon_")))
+    {
+        return Assignments.FlowDependentWaterSurface;
+    }
+
+    if (ActorLabel.StartsWith(TEXT("RaftSim_SourceAwareBoulder_")) ||
+        ActorLabel.StartsWith(TEXT("RaftSim_BoulderSurfaceVariation_")))
+    {
+        return Assignments.WetBoulderContact;
+    }
+
+    if (ActorLabel.StartsWith(TEXT("RaftSim_SourceAwareFoliage_")) ||
+        ActorLabel.StartsWith(TEXT("RaftSim_FoliageTrunk_")) ||
+        ActorLabel.StartsWith(TEXT("RaftSim_FoliageCanopy_")) ||
+        ActorLabel.StartsWith(TEXT("RaftSim_ProceduralLeafClusterSupplement_")) ||
+        ActorLabel.StartsWith(TEXT("RaftSim_OrganicCanopyLeafSpray_")) ||
+        ActorLabel.StartsWith(TEXT("RaftSim_OrganicBranchFrondSupplement_")) ||
+        ActorLabel.StartsWith(TEXT("RaftSim_FineTwigCanopyLace_")) ||
+        ActorLabel.StartsWith(TEXT("RaftSim_SourceAwareUnderstory_")) ||
+        ActorLabel.StartsWith(TEXT("RaftSim_Understory_")) ||
+        ActorLabel.StartsWith(TEXT("RaftSim_CanyonScrub_")))
+    {
+        return Assignments.BiomeFoliageGroundcover;
+    }
+
+    if (ActorLabel.StartsWith(TEXT("RaftSim_ForegroundRaft_")))
+    {
+        return Assignments.RaftForegroundReview;
+    }
+
+    return nullptr;
+}
+
+int32 AssignFirstPartyMaterialInstancesToPreviewScene(
+    UWorld* World,
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimFirstPartyMaterialAssignmentSet& Assignments,
+    FString& OutSummary)
+{
+    if (!World)
+    {
+        return 0;
+    }
+
+    int32 AssignedComponentCount = 0;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (!Actor)
+        {
+            continue;
+        }
+
+        UMaterialInterface* Material = SelectFirstPartyMaterialForPreviewActor(Actor->GetActorLabel(), Assignments);
+        if (!Material)
+        {
+            continue;
+        }
+
+        TArray<UMeshComponent*> MeshComponents;
+        Actor->GetComponents<UMeshComponent>(MeshComponents);
+        for (UMeshComponent* MeshComponent : MeshComponents)
+        {
+            if (!MeshComponent)
+            {
+                continue;
+            }
+
+            const int32 MaterialCount = FMath::Max(1, MeshComponent->GetNumMaterials());
+            for (int32 MaterialIndex = 0; MaterialIndex < MaterialCount; ++MaterialIndex)
+            {
+                MeshComponent->SetMaterial(MaterialIndex, Material);
+            }
+            ++AssignedComponentCount;
+        }
+    }
+
+    OutSummary += FString::Printf(
+        TEXT("Assigned %d review material-instance surface components in %s (%s).\n"),
+        AssignedComponentCount,
+        *Spec.RiverId,
+        *GetFirstPartyMaterialInstanceSceneAssignmentStatus());
+    return AssignedComponentCount;
 }
 
 UMaterialInstanceDynamic* CreatePreviewColorMaterial(UObject* Outer, const FLinearColor& Color)
@@ -9304,7 +9541,7 @@ FString GetPreviewCaptureRelativePath(const FRaftSimEnvironmentPreviewSpec& Spec
 
 FString GetPreviewFidelityNote(const FRaftSimEnvironmentPreviewSpec& Spec)
 {
-    const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, river water, primary boulder, foliage, and raft/oar vertex colors, while the normal plus packed AO/roughness/height atlases drive bounded preview material response and tiny terrain/water microrelief; atlas use remains preview-only until production material instances, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass");
+    const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, river water, primary boulder, foliage, and raft/oar vertex colors, while the normal plus packed AO/roughness/height atlases drive bounded preview material response and tiny terrain/water microrelief; review-only MI_RaftSim_*_AtlasCandidate material instances are also assigned to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass");
     if (!Spec.SourceDrapeDescription.IsEmpty())
     {
         return Spec.SourceDrapeDescription + AtlasApplicationNote;
@@ -9601,6 +9838,8 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     {
         MaterialAtlasPackedPtr = &MaterialAtlasPacked;
     }
+    const FRaftSimFirstPartyMaterialAssignmentSet FirstPartyMaterialAssignments =
+        LoadFirstPartyMaterialAssignmentSetForSpec(Spec, OutSummary);
 
     AddPreviewLightRig(World, Spec);
 
@@ -10158,7 +10397,17 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     }
 
     AddPreviewRaftForeground(World, Spec, CubeMesh, CylinderMesh, MaterialAtlasAlbedoPtr);
+    const int32 AssignedReviewMaterialComponentCount = FirstPartyMaterialAssignments.IsCompleteForDurableSurfaceReview()
+        ? AssignFirstPartyMaterialInstancesToPreviewScene(World, Spec, FirstPartyMaterialAssignments, OutSummary)
+        : 0;
     AddPreviewCameraAndStart(World, Spec);
+    if (!FirstPartyMaterialAssignments.IsCompleteForDurableSurfaceReview() || AssignedReviewMaterialComponentCount <= 0)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Failed first-party review material-instance scene assignment gate for %s.\n"),
+            *Spec.RiverId);
+        return false;
+    }
     return SavePreviewWorld(World, Spec.MapPackagePath, OutSummary);
 }
 
@@ -11297,7 +11546,8 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("      \"water_mask_image\": \"%s\",\n")
             TEXT("      \"vegetation_mask_image\": \"%s\",\n")
             TEXT("      \"elevation_sample\": \"%s\",\n")
-            TEXT("      \"fidelity_note\": \"%s\"\n")
+            TEXT("      \"fidelity_note\": \"%s\",\n")
+            TEXT("      \"first_party_material_instance_scene_assignment_status\": \"%s\"\n")
             TEXT("    }"),
             Index == 0 ? TEXT("") : TEXT(",\n"),
             *EscapeRaftSimJsonString(Spec.RiverId),
@@ -11324,7 +11574,8 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             *EscapeRaftSimJsonString(Spec.WaterMaskImage),
             *EscapeRaftSimJsonString(Spec.VegetationMaskImage),
             *EscapeRaftSimJsonString(Spec.ElevationSample),
-            *EscapeRaftSimJsonString(GetPreviewFidelityNote(Spec)));
+            *EscapeRaftSimJsonString(GetPreviewFidelityNote(Spec)),
+            *EscapeRaftSimJsonString(GetFirstPartyMaterialInstanceSceneAssignmentStatus()));
     }
 
     const FString Manifest = FString::Printf(
@@ -11342,6 +11593,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("  \"first_party_atlas_sampler_review_material_status\": \"%s\",\n")
         TEXT("  \"first_party_material_instance_review_asset_root\": \"%s\",\n")
         TEXT("  \"first_party_material_instance_review_asset_status\": \"%s\",\n")
+        TEXT("  \"first_party_material_instance_scene_assignment_status\": \"%s\",\n")
         TEXT("  \"geospatial_attachment_ledger\": \"%s\",\n")
         TEXT("  \"status\": \"%s\",\n")
         TEXT("  \"captures\": [\n")
@@ -11359,6 +11611,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         *EscapeRaftSimJsonString(GetFirstPartyAtlasSampleReviewMaterialStatus()),
         *EscapeRaftSimJsonString(MaterialInstanceReviewAssetRootRelativePath),
         *EscapeRaftSimJsonString(GetFirstPartyMaterialInstanceReviewAssetStatus()),
+        *EscapeRaftSimJsonString(GetFirstPartyMaterialInstanceSceneAssignmentStatus()),
         *EscapeRaftSimJsonString(GeospatialAttachmentLedgerRelativePath),
         bAllCaptured ? TEXT("south_fork_colorado_and_pacuare_source_draped_guide_and_river_eye_previews_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
         *EntriesJson);

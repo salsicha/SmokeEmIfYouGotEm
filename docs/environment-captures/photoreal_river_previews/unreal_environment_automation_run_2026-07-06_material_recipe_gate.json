@@ -2,7 +2,7 @@
   "schema": "raftsim.unreal.environment_automation_run.v1",
   "generated_on": "2026-07-08",
   "status": "succeeded_preview_only_not_lifelike",
-  "purpose": "Record the Unreal preview-map and capture automation run after the first-party procedural material recipe manifest and production geospatial attachment ledger became required inputs, after the softened source-drape plus boulder-contact foam preview renderer pass, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, first-party irregular shoreline edge breakup, soft-feathered terrain material patch edges, source-drape albedo normalization, terrain-proxy luma floors, shadowless terrain albedo review capture material, first-party terrain material layer facets and slope-shadow patches, first-party Landscape/Nanite material-layer scaffolds, first-party terrain erosion-rill/bank-gully strips, a first-party lit terrain vertex-color material, soft-lit terrain vertex-color review material mode, first-party photographic terrain emissive calibration, first-party terrain contrast and proxy-normal calibration, first-party bounded terrain ambient fill, base terrain material grain and microrelief, first-party source-aware terrain photo mottle and microrelief, source-conditioned far-bank albedo/microrelief calibration, first-party broad-slope terrain exposure fill and relief, source-overlay plate artifact demotion, graphic waterline ribbon demotion, demoted terrain overlay striping, source-drape smoothing, segmented wet-bank ribbons, near-frame shoreline scaffold demotion, demoted source-detail contours, post-contour terrain readability fill, first-party source-masked bank/bar microgeometry, flow-aware bank undercut/shelf relief, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, first-party dense biome foliage layer proxy clusters, first-party instanced procedural foliage-equivalent scaffolds, first-party procedural leaf-cluster geometry, first-party organic canopy leaf-spray breakup, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height/massing profile, first-party procedural canopy tone/shadow profile, first-party foliage card/canopy artifact demotion, square foliage/source-card artifact demotion, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, first-party boulder wetness/abrasion/moss surface variants, first-party boulder crevice-shadow/albedo tuning, near-camera boulder readability clearance and occlusion demotion, flow-aware water mesh undulation, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, first-party turbidity-depth patch artifact demotion, flow-aware micro-ripple glints, first-party dark micro-ripple artifact demotion, first-party flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, near-frame water-ribbon occlusion demotion, first-party water shader depth/reflection/refraction scaffolds, source-aware shallow-water clarity and aeration layers, near-camera water-scaffold readability clearance, low-occlusion far-field water-scaffold tuning, remaining water overlay slab demotion, long dark water streak demotion, current streak and waterline rail artifact demotion, central water scaffold plate demotion, base-water center guide-stripe breakup, first-party photographic water/exposure calibration, base water depth/current grading, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, first-party source-aware sky gradient and atmosphere-depth layers, refined first-party guide-seat raft/oar foreground proxies, and rounded first-party raft/oar foreground proxies, and first-party Material Instance Constant review assets created from the atlas candidate manifest.",
+  "purpose": "Record the Unreal preview-map and capture automation run after the first-party procedural material recipe manifest and production geospatial attachment ledger became required inputs, after the softened source-drape plus boulder-contact foam preview renderer pass, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, first-party irregular shoreline edge breakup, soft-feathered terrain material patch edges, source-drape albedo normalization, terrain-proxy luma floors, shadowless terrain albedo review capture material, first-party terrain material layer facets and slope-shadow patches, first-party Landscape/Nanite material-layer scaffolds, first-party terrain erosion-rill/bank-gully strips, a first-party lit terrain vertex-color material, soft-lit terrain vertex-color review material mode, first-party photographic terrain emissive calibration, first-party terrain contrast and proxy-normal calibration, first-party bounded terrain ambient fill, base terrain material grain and microrelief, first-party source-aware terrain photo mottle and microrelief, source-conditioned far-bank albedo/microrelief calibration, first-party broad-slope terrain exposure fill and relief, source-overlay plate artifact demotion, graphic waterline ribbon demotion, demoted terrain overlay striping, source-drape smoothing, segmented wet-bank ribbons, near-frame shoreline scaffold demotion, demoted source-detail contours, post-contour terrain readability fill, first-party source-masked bank/bar microgeometry, flow-aware bank undercut/shelf relief, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, first-party dense biome foliage layer proxy clusters, first-party instanced procedural foliage-equivalent scaffolds, first-party procedural leaf-cluster geometry, first-party organic canopy leaf-spray breakup, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height/massing profile, first-party procedural canopy tone/shadow profile, first-party foliage card/canopy artifact demotion, square foliage/source-card artifact demotion, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, first-party boulder wetness/abrasion/moss surface variants, first-party boulder crevice-shadow/albedo tuning, near-camera boulder readability clearance and occlusion demotion, flow-aware water mesh undulation, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, first-party turbidity-depth patch artifact demotion, flow-aware micro-ripple glints, first-party dark micro-ripple artifact demotion, first-party flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, near-frame water-ribbon occlusion demotion, first-party water shader depth/reflection/refraction scaffolds, source-aware shallow-water clarity and aeration layers, near-camera water-scaffold readability clearance, low-occlusion far-field water-scaffold tuning, remaining water overlay slab demotion, long dark water streak demotion, current streak and waterline rail artifact demotion, central water scaffold plate demotion, base-water center guide-stripe breakup, first-party photographic water/exposure calibration, base water depth/current grading, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, first-party source-aware sky gradient and atmosphere-depth layers, refined first-party guide-seat raft/oar foreground proxies, and rounded first-party raft/oar foreground proxies, first-party Material Instance Constant review assets created from the atlas candidate manifest, and saved preview-map durable surface proxies assigned to those review material instances.",
   "commands": {
     "editor_build": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Build/BatchFiles/Mac/Build.sh\" SmokeEmIfYouGotEmEditor Mac Development -Project=\"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -NoHotReload",
     "environment_automation": "\"/Users/Shared/Epic Games/UE_5.8/Engine/Binaries/Mac/UnrealEditor-Cmd\" \"/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject\" -unattended -nop4 -nosplash -NoSound -RaftSimCreatePhotorealEnvironmentPreviewMaps -RaftSimCapturePhotorealEnvironmentPreviews -RaftSimExitAfterEnvironmentAutomation"
@@ -47,7 +47,7 @@
       "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_FoamSprayMistAtmosphere_AtlasCandidate.uasset",
       "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_RaftForegroundReview_AtlasCandidate.uasset"
     ],
-    "material_instance_review_asset_status": "18_created_unreal_material_instance_constant_review_assets_with_texture_bindings_and_sampler_parent_not_lifelike",
+    "material_instance_review_asset_status": "18_created_unreal_material_instance_constant_review_assets_with_texture_bindings_sampler_parent_and_scene_assignment_not_lifelike",
     "material_texture_asset_root": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
     "saved_material_texture_assets": [
       "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_AmericanSouthFork_AlbedoAtlas.uasset",
@@ -62,7 +62,8 @@
     ],
     "material_texture_asset_status": "9_created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike",
     "atlas_sampler_review_material": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
-    "atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike"
+    "atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+    "material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike"
   },
   "renderer_update": {
     "softened_source_drape_overlay": true,
@@ -161,12 +162,13 @@
     "raft_hidden_river_eye_primitive_component_hard_hide": true,
     "raft_hidden_river_eye_center_artifact_cover": true,
     "raft_hidden_river_eye_textured_center_artifact_cover": true,
-    "status": "preview_only_visual_readability_improvement_not_production_material_or_whitewater_approval",
+    "status": "preview_only_visual_readability_improvement_not_production_material_or_whitewater_approval; review_material_instance_scene_assignment_recorded_not_lifelike",
     "first_party_material_instance_review_assets_created": true,
     "first_party_material_texture2d_review_assets_created": true,
     "first_party_material_instance_texture_asset_bindings_recorded": true,
     "first_party_atlas_sampler_review_parent_material_created": true,
-    "first_party_material_shader_graph_sampler_wiring_recorded": true
+    "first_party_material_shader_graph_sampler_wiring_recorded": true,
+    "first_party_material_instance_scene_assignment_recorded": true
   },
   "capture_pixel_sanity": [
     {
@@ -176,9 +178,9 @@
         720
       ],
       "rgb_mean": [
-        52.87,
-        83.67,
-        88.51
+        83.87,
+        115.93,
+        143.68
       ],
       "nonblank": true
     },
@@ -189,9 +191,9 @@
         720
       ],
       "rgb_mean": [
-        44.06,
-        82.72,
-        90.11
+        48.12,
+        88.53,
+        98.15
       ],
       "nonblank": true
     },
@@ -202,9 +204,9 @@
         720
       ],
       "rgb_mean": [
-        70.97,
-        65.94,
-        56.14
+        98.11,
+        119.41,
+        134.41
       ],
       "nonblank": true
     },
@@ -215,9 +217,9 @@
         720
       ],
       "rgb_mean": [
-        69.08,
-        64.78,
-        55.04
+        88.12,
+        90.15,
+        83.52
       ],
       "nonblank": true
     },
@@ -228,9 +230,9 @@
         720
       ],
       "rgb_mean": [
-        32.49,
-        67.33,
-        67.07
+        68.35,
+        105.25,
+        134.62
       ],
       "nonblank": true
     },
@@ -241,9 +243,9 @@
         720
       ],
       "rgb_mean": [
-        27.61,
-        66.64,
-        67.64
+        37.2,
+        76.73,
+        81.45
       ],
       "nonblank": true
     }
@@ -305,11 +307,13 @@
     "Saved all three generated preview maps with softened source-drape overlays, boulder-contact foam laces, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, first-party irregular shoreline edge breakup, soft-feathered terrain material patch edges, source-drape albedo normalization, terrain-proxy luma floors, shadowless terrain albedo review capture material, first-party terrain material layer facets and slope-shadow patches, first-party Landscape/Nanite material-layer scaffolds, first-party terrain erosion-rill/bank-gully strips, a first-party lit terrain vertex-color material, soft-lit terrain vertex-color review material mode, first-party photographic terrain emissive calibration, first-party terrain contrast and proxy-normal calibration, first-party bounded terrain ambient fill, base terrain material grain and microrelief, source-aware terrain photo mottle and microrelief, source-conditioned far-bank albedo/microrelief calibration, first-party broad-slope terrain exposure fill and relief, source-overlay plate artifact demotion, graphic waterline ribbon demotion, demoted terrain overlay striping, source-drape smoothing, segmented wet-bank ribbons, near-frame shoreline scaffold demotion, demoted source-detail contours, post-contour terrain readability fill, first-party source-masked bank/bar microgeometry, flow-aware bank undercut/shelf relief, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, first-party dense biome foliage layer proxy clusters, first-party instanced procedural foliage-equivalent scaffolds, first-party procedural leaf-cluster geometry, first-party organic canopy leaf-spray breakup, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height/massing profile, first-party procedural canopy tone/shadow profile, first-party foliage card/canopy artifact demotion, square foliage/source-card artifact demotion, remaining square card cull, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, first-party boulder wetness/abrasion/moss surface variants, first-party boulder crevice-shadow/albedo tuning, near-camera boulder readability clearance and occlusion demotion, flow-aware water mesh undulation, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, first-party turbidity-depth patch artifact demotion, flow-aware micro-ripple glints, first-party dark micro-ripple artifact demotion, first-party flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, near-frame water-ribbon occlusion demotion, first-party water shader depth/reflection/refraction scaffolds, source-aware shallow-water clarity and aeration layers, near-camera water-scaffold readability clearance, low-occlusion far-field water-scaffold tuning, remaining water overlay slab demotion, long dark water streak demotion, current streak and waterline rail artifact demotion, central water scaffold plate demotion, base-water center guide-stripe breakup, first-party base-water residual center-seam erase, primitive-component hard-hide and temporary water-color center artifact cover for raft-hidden river-eye captures, first-party photographic water/exposure calibration, base water depth/current grading, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, first-party source-aware sky gradient and atmosphere-depth layers, refined first-party guide-seat raft/oar foreground proxies, and rounded first-party raft/oar foreground proxies.",
     "Saved guide-seat and river-eye captures for South Fork American, Colorado River Grand Canyon, and Pacuare River Rainforest.",
     "Environment preview capture manifest saved successfully.",
-    "Created 18 first-party review-only Material Instance Constant assets under unreal/Content/RaftSim/Materials/MaterialInstances from first_party_material_instance_candidates.json; production material promotion remains open."
+    "Created 18 first-party review-only Material Instance Constant assets under unreal/Content/RaftSim/Materials/MaterialInstances from first_party_material_instance_candidates.json; production material promotion remains open.",
+    "Assigned review-only MI_RaftSim_*_AtlasCandidate material instances to saved preview-map durable terrain, water, boulder, foliage, and raft proxy surfaces; this exercises the Unreal material handoff but does not promote captures to lifelike evidence."
   ],
-  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate, including creation of nine review-only first-party atlas Texture2D assets, the M_RaftSim_AtlasSampleReview parent material with albedo/normal/AO/roughness/height sampler wiring, and 18 review-only material instance candidates parented to that graph. The captures remain preview-only and not lifelike until production material promotion, guide/geospatial review, hazard readability, and performance gates pass.",
+  "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate, including creation of nine review-only first-party atlas Texture2D assets, the M_RaftSim_AtlasSampleReview parent material with albedo/normal/AO/roughness/height sampler wiring plus PreviewColor, VertexColorWeight, and RoughnessFloor controls, 18 review-only material instance candidates parented to that graph, and saved preview-map durable surface assignment to those review MICs. The captures remain preview-only and not lifelike until production material promotion, guide/geospatial review, hazard readability, and performance gates pass.",
   "notes": [
     "Created 9 first-party review-only Texture2D atlas assets under unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures and bound them to the 18 MI_RaftSim_*_AtlasCandidate review material instances; production material promotion remains open.",
-    "Created M_RaftSim_AtlasSampleReview as a review-only parent material that samples AlbedoAtlas, NormalAtlas, and AORoughnessHeightAtlas through AtlasTileOriginScale, AtlasBlendWeight, NormalIntensity, RoughnessScale, and HeightScale; production material promotion remains open."
+    "Created M_RaftSim_AtlasSampleReview as a review-only parent material that samples AlbedoAtlas, NormalAtlas, and AORoughnessHeightAtlas through AtlasTileOriginScale, AtlasBlendWeight, NormalIntensity, RoughnessScale, and HeightScale; production material promotion remains open.",
+    "Assigned the review-only material instances to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; this is material handoff evidence, not lifelike art approval."
   ]
 }
