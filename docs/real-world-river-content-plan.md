@@ -179,6 +179,8 @@ The current photoreal environment source plan is `unreal/Content/RaftSim/Renderi
 
 The July 8 preview capture passes removed the automated `large_flat_blue_field`, `dark_foreground_proxy`, `excess_low_gradient_area`, `low_luma_variation`, and `low_edge_density` blocker classes from all six current South Fork, Colorado, and Pacuare guide-seat/river-eye captures by retuning generated water color, fog/sky contribution, capture composition, raft review materials, near-field water texture, foam-lace, wet-rock, bank-drape dressing, bank/water texture flecks, and river-eye current contrast. The same quality review still blocks lifelike status for every capture because low-color-texture-entropy proxy fields remain.
 
+The follow-up source-drape promotion pass increases terrain tessellation and raises the approved aerial microtile overlays above the procedural bank drape so source-derived corridor texture is visible in the generated maps. It does not clear the remaining entropy blocker; the next environment fidelity step needs true texture-sampled source/atlas materials or rights-cleared production terrain, water, rock, and foliage assets.
+
 ## Rapid Identification From Aerial And Satellite Imagery
 
 Identify candidate rapids by combining terrain, hydrography, image analysis, and human review.
