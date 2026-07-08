@@ -3423,6 +3423,14 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.46f, 0.39f, 0.265f), 0.24f)
         : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.090f, 0.45f, 0.36f), 0.22f)
                                 : FMath::Lerp(Spec.WaterColor, FLinearColor(0.090f, 0.49f, 0.50f), 0.20f));
+    const FLinearColor NearCameraWaterMacroRippleShadow = Spec.bDesertCanyon
+        ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.22f, 0.185f, 0.125f), 0.34f)
+        : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.004f, 0.145f, 0.112f), 0.30f)
+                                : FMath::Lerp(Spec.WaterColor, FLinearColor(0.006f, 0.190f, 0.205f), 0.28f));
+    const FLinearColor NearCameraWaterMacroRippleHighlight = Spec.bDesertCanyon
+        ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.54f, 0.47f, 0.330f), 0.26f)
+        : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.135f, 0.52f, 0.405f), 0.28f)
+                                : FMath::Lerp(Spec.WaterColor, FLinearColor(0.140f, 0.55f, 0.555f), 0.24f));
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float WaterBaseZ = GetPreviewWaterSurfaceBaseZCm(Spec);
     const float FlowEnergy = FMath::Clamp(Spec.FlowCurrentCueScale, 0.65f, 1.60f);
@@ -3436,6 +3444,8 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
         FMath::Clamp(Spec.FlowFoamScale, 0.70f, 1.55f);
     const float NearFieldFineRippleAmplitudeCm =
         (Spec.bDesertCanyon ? 1.6f : (Spec.bHasWaterfalls ? 3.1f : 2.6f)) * FlowEnergy;
+    const float NearCameraWaterMacroRippleMottleT = 1.0f;
+    const float NearCameraWaterMacroRippleReliefT = 1.0f;
 
     for (int32 XIndex = 0; XIndex <= XSteps; ++XIndex)
     {
@@ -3564,6 +3574,33 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
             const float BaseWaterCrossChannelHighlightT =
                 SmoothPreviewStep(0.56f, 0.92f, BaseWaterCrossChannelBreakupNoise) *
                 BaseWaterCrossChannelBreakupT;
+            const float NearCameraWaterMacroRippleReachT = FMath::Clamp(
+                SmoothPreviewStep(-5600.0f, -5000.0f, X) * (1.0f - SmoothPreviewStep(10200.0f, 22400.0f, X)),
+                0.0f,
+                1.0f);
+            const float NearCameraWaterMacroRippleNoise = FMath::Clamp(
+                0.50f +
+                    0.24f * FMath::Sin(X * 0.0044f + Lateral * 0.012f + FlowEnergy * 0.17f) +
+                    0.21f * FMath::Sin(X * 0.0130f - Lateral * 0.021f + FlowEnergy * 0.77f) +
+                    0.11f * FMath::Sin(X * 0.0300f + Lateral * 0.037f),
+                0.0f,
+                1.0f);
+            const float NearCameraWaterMacroRippleSeamGuardT =
+                1.0f - SmoothPreviewStep(0.92f, 1.0f, CenterT) * 0.32f;
+            const float NearCameraWaterMacroRipplePatchT = FMath::Clamp(
+                (0.42f + CenterT * 0.30f + EdgeT * 0.18f) *
+                    NearCameraWaterMacroRippleReachT *
+                    NearCameraWaterMacroRippleSeamGuardT *
+                    NearCameraWaterMacroRippleMottleT *
+                    (0.84f + FlowEnergy * 0.14f),
+                0.0f,
+                1.0f);
+            const float NearCameraWaterMacroRippleShadowT =
+                SmoothPreviewStep(0.12f, 0.43f, 1.0f - NearCameraWaterMacroRippleNoise) *
+                NearCameraWaterMacroRipplePatchT;
+            const float NearCameraWaterMacroRippleHighlightT =
+                SmoothPreviewStep(0.56f, 0.91f, NearCameraWaterMacroRippleNoise) *
+                NearCameraWaterMacroRipplePatchT;
             const float BaseWaterCenterSeamDiffusionT =
                 SmoothPreviewStep(0.72f, 0.98f, CenterT) *
                 (0.62f + CenterStripeBreakupT * 0.20f) *
@@ -3626,6 +3663,21 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
                 WaterColor,
                 BaseWaterResidualCenterSeamEraseColor,
                 FMath::Clamp(BaseWaterResidualCenterSeamEraseT * (Spec.bDesertCanyon ? 0.62f : 0.72f), 0.0f, 0.78f));
+            WaterColor = FMath::Lerp(
+                WaterColor,
+                NearCameraWaterMacroRippleShadow,
+                FMath::Clamp(
+                    NearCameraWaterMacroRippleShadowT * (Spec.bDesertCanyon ? 0.092f : (Spec.bHasWaterfalls ? 0.112f : 0.104f)),
+                    0.0f,
+                    Spec.bDesertCanyon ? 0.092f : 0.112f));
+            WaterColor = FMath::Lerp(
+                WaterColor,
+                NearCameraWaterMacroRippleHighlight,
+                FMath::Clamp(
+                    NearCameraWaterMacroRippleHighlightT *
+                        (Spec.bDesertCanyon ? 0.092f : (Spec.bHasWaterfalls ? 0.112f : 0.104f)),
+                    0.0f,
+                    Spec.bDesertCanyon ? 0.098f : 0.118f));
             const FLinearColor BaseWaterResidualDarkStreakLumaFloor = Spec.bDesertCanyon
                 ? FLinearColor(0.29f, 0.245f, 0.170f)
                 : (Spec.bHasWaterfalls ? FLinearColor(0.0f, 0.225f, 0.190f)
@@ -3646,13 +3698,21 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
                 FMath::Clamp(0.35f + CenterT * 0.35f + EdgeT * 0.30f, 0.0f, 1.0f);
             const float BaseWaterResidualCenterSeamReliefDampingT =
                 FMath::Clamp(BaseWaterResidualCenterSeamEraseT * 0.88f, 0.0f, 0.94f);
+            const float NearCameraWaterMacroRippleReliefCm =
+                (NearCameraWaterMacroRippleNoise - 0.5f) *
+                (Spec.bDesertCanyon ? 1.35f : (Spec.bHasWaterfalls ? 3.10f : 2.45f)) *
+                NearCameraWaterMacroRipplePatchT *
+                NearCameraWaterMacroRippleReliefT *
+                FMath::Clamp(0.55f + CenterT * 0.28f + EdgeT * 0.17f, 0.0f, 1.0f);
             Vertices.Add(FVector(
                 X,
                 CenterY + Lateral,
                 WaterBaseZ + Wave +
                     FineRippleWave * (1.0f - BaseWaterResidualCenterSeamReliefDampingT * 0.26f) +
                     FlowCuedWaterMottleRippleCm * (1.0f - BaseWaterResidualCenterSeamReliefDampingT * 0.34f) +
-                    BaseWaterCrossChannelReliefCm * (1.0f - BaseWaterResidualCenterSeamReliefDampingT)));
+                    BaseWaterCrossChannelReliefCm * (1.0f - BaseWaterResidualCenterSeamReliefDampingT) +
+                    NearCameraWaterMacroRippleReliefCm *
+                        (1.0f - BaseWaterResidualCenterSeamReliefDampingT * 0.22f)));
             UVs.Add(FVector2D(U * 18.0f, V));
             VertexColors.Add(ClampPreviewColor(WaterColor));
         }
@@ -7466,6 +7526,21 @@ AActor* AddPreviewRiverEyeCenterArtifactCover(UWorld* World, const FRaftSimEnvir
               Spec.bHasWaterfalls ? FLinearColor(0.30f, 0.50f, 0.44f, 1.0f)
                                   : FLinearColor(0.26f, 0.48f, 0.50f, 1.0f),
               0.11f);
+    const float RiverEyeCenterCoverMacroRippleMottleT = 1.0f;
+    const FLinearColor RiverEyeCenterCoverMacroShadowColor = Spec.bDesertCanyon
+        ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.22f, 0.185f, 0.125f, 1.0f), 0.30f)
+        : FMath::Lerp(
+              Spec.WaterColor,
+              Spec.bHasWaterfalls ? FLinearColor(0.010f, 0.145f, 0.115f, 1.0f)
+                                  : FLinearColor(0.014f, 0.190f, 0.205f, 1.0f),
+              Spec.bHasWaterfalls ? 0.32f : 0.28f);
+    const FLinearColor RiverEyeCenterCoverMacroHighlightColor = Spec.bDesertCanyon
+        ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.56f, 0.47f, 0.32f, 1.0f), 0.24f)
+        : FMath::Lerp(
+              Spec.WaterColor,
+              Spec.bHasWaterfalls ? FLinearColor(0.16f, 0.54f, 0.42f, 1.0f)
+                                  : FLinearColor(0.17f, 0.57f, 0.57f, 1.0f),
+              0.28f);
 
     TArray<FVector> Vertices;
     TArray<FVector> Normals;
@@ -7500,6 +7575,23 @@ AActor* AddPreviewRiverEyeCenterArtifactCover(UWorld* World, const FRaftSimEnvir
                          0.08f * FMath::Sin((X + Lateral) * 0.0210f)),
                 0.0f,
                 1.0f);
+            const float CoverMacroRippleNoise = FMath::Clamp(
+                0.50f +
+                    0.24f * FMath::Sin(X * 0.0044f + Lateral * 0.012f + EdgeT * 0.61f) +
+                    0.20f * FMath::Sin(X * 0.0130f - Lateral * 0.021f) +
+                    0.11f * FMath::Sin(X * 0.0300f + Lateral * 0.037f),
+                0.0f,
+                1.0f);
+            const float CoverMacroRipplePatchT = FMath::Clamp(
+                (0.46f + ChannelT * 0.34f + EdgeT * 0.12f) *
+                    LongFeather *
+                    RiverEyeCenterCoverMacroRippleMottleT,
+                0.0f,
+                1.0f);
+            const float CoverMacroRippleShadowT =
+                SmoothPreviewStep(0.12f, 0.43f, 1.0f - CoverMacroRippleNoise) * CoverMacroRipplePatchT;
+            const float CoverMacroRippleHighlightT =
+                SmoothPreviewStep(0.56f, 0.91f, CoverMacroRippleNoise) * CoverMacroRipplePatchT;
             const float DepthBandT = SmoothPreviewStep(0.36f, 0.78f, FlowMottle) * ChannelT * LongFeather;
             const float HighlightT =
                 SmoothPreviewStep(0.66f, 0.95f, FlowMottle) * (Spec.bDesertCanyon ? 0.050f : 0.070f) * LongFeather;
@@ -7507,13 +7599,22 @@ AActor* AddPreviewRiverEyeCenterArtifactCover(UWorld* World, const FRaftSimEnvir
             const float SurfaceWave =
                 (FMath::Sin(X * 0.011f + Lateral * 0.016f) * (Spec.bDesertCanyon ? 0.9f : 1.4f) +
                  FMath::Sin(X * 0.023f - Lateral * 0.011f) * (Spec.bDesertCanyon ? 0.35f : 0.55f) * ChannelT +
-                 (FlowMottle - 0.5f) * (Spec.bDesertCanyon ? 1.15f : 1.75f) * ChannelT) *
+                 (FlowMottle - 0.5f) * (Spec.bDesertCanyon ? 1.15f : 1.75f) * ChannelT +
+                 (CoverMacroRippleNoise - 0.5f) * (Spec.bDesertCanyon ? 1.35f : 2.35f) * CoverMacroRipplePatchT) *
                 LongFeather * RiverEyeTexturedCenterCoverT;
             FLinearColor CoverColor = FMath::Lerp(
                 Spec.WaterColor,
                 RiverEyeCenterCoverDeepCurrentColor,
                 DepthBandT * (Spec.bDesertCanyon ? 0.42f : 0.50f) * RiverEyeTexturedCenterCoverT);
             CoverColor = FMath::Lerp(CoverColor, RiverEyeCenterCoverSkyHighlightColor, HighlightT);
+            CoverColor = FMath::Lerp(
+                CoverColor,
+                RiverEyeCenterCoverMacroShadowColor,
+                FMath::Clamp(CoverMacroRippleShadowT * (Spec.bDesertCanyon ? 0.120f : 0.150f), 0.0f, 0.160f));
+            CoverColor = FMath::Lerp(
+                CoverColor,
+                RiverEyeCenterCoverMacroHighlightColor,
+                FMath::Clamp(CoverMacroRippleHighlightT * (Spec.bDesertCanyon ? 0.110f : 0.145f), 0.0f, 0.154f));
             CoverColor = FMath::Lerp(CoverColor, Spec.WaterColor, EdgeReblendT);
             CoverColor = ScalePreviewColor(
                 CoverColor,

@@ -97,6 +97,7 @@
     "first_party_central_water_scaffold_plate_demotion": true,
     "first_party_photographic_water_exposure_calibration": true,
     "first_party_near_field_water_surface_grain": true,
+    "first_party_near_camera_water_macro_ripple_mottle": true,
     "first_party_base_water_depth_current_grading": true,
     "first_party_base_water_center_guide_stripe_breakup": true,
     "first_party_base_water_cross_channel_breakup": true,
@@ -121,37 +122,37 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [52.85, 87.73, 92.66],
+      "rgb_mean": [52.85, 87.58, 92.51],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [44.07, 87.6, 95.12],
+      "rgb_mean": [44.07, 87.72, 95.22],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [76.31, 70.32, 59.3],
+      "rgb_mean": [76.19, 70.3, 59.29],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [75.03, 70.02, 59.2],
+      "rgb_mean": [74.96, 70.0, 59.2],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [32.52, 71.22, 70.21],
+      "rgb_mean": [32.51, 71.13, 70.13],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [27.6, 71.41, 71.66],
+      "rgb_mean": [27.6, 71.47, 71.78],
       "nonblank": true
     }
   ],
@@ -160,6 +161,7 @@
     "Using production geospatial attachment ledger: physics/data/real_world/production_geospatial_attachment_ledger.json",
     "Replaced broad opaque source-drape overlay plates with first-party feathered, terrain-lit microtiles that sample local water and vegetation masks per vertex.",
     "Added first-party near-field water surface grain to the base river ribbon with higher mesh resolution, fine-ripple displacement, dark slicks, and subtle bright streaks.",
+    "Added first-party near-camera water macro-ripple mottle to the base river ribbon and river-eye center cover with non-linear shadow/highlight patches and small bounded relief, guarded against straight center seams and still preview-only before production water shader approval.",
     "Added first-party base water depth/current grading to the river ribbon with muted river-specific deep water, center current tongues, sediment threads, and sky-thread variation.",
     "Added first-party flow-cued water foam/slick mottle directly to the base river ribbon so flow-band energy seeds bounded aeration flecks and dark current slicks without claiming solver-driven foam or production water shader approval.",
     "Added first-party flow-dependent hydraulic aeration mats, wave-train foam laces, and bounded spray beads over authored flow bands without changing solver authority or hiding conservation failures.",
