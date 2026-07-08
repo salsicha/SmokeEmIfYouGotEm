@@ -98,6 +98,7 @@
     "first_party_near_field_water_surface_grain": true,
     "first_party_base_water_depth_current_grading": true,
     "first_party_base_water_center_guide_stripe_breakup": true,
+    "first_party_base_water_cross_channel_breakup": true,
     "first_party_flow_cued_water_foam_slick_mottle": true,
     "first_party_flow_dependent_hydraulic_aeration_spray": true,
     "pacuare_waterfall_curtain_plunge_mist_and_runout_proxies": true,
@@ -112,37 +113,37 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [52.86, 90.07, 94.92],
+      "rgb_mean": [52.85, 89.98, 94.83],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [51.25, 89.83, 95.08],
+      "rgb_mean": [51.25, 89.73, 94.99],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [79.77, 73.62, 62.17],
+      "rgb_mean": [79.6, 73.52, 62.12],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [79.07, 73.21, 61.99],
+      "rgb_mean": [78.9, 73.11, 61.94],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [32.33, 73.39, 72.17],
+      "rgb_mean": [32.34, 73.32, 72.04],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [30.92, 73.04, 72.06],
+      "rgb_mean": [30.92, 72.97, 71.92],
       "nonblank": true
     }
   ],
@@ -178,6 +179,8 @@
     "Tightened current-streak, flow-texture, shallow-edge, and waterline-rail artifact demotion by reducing explicit overlay count, length, width, tint strength, and near-frame reach while moving the water shader scaffold farther downstream.",
     "Demoted the remaining central water scaffold plate and base-ribbon dark guide stripe by moving the depth/reflection/refraction scaffold to 200 m downstream, narrowing its width, lowering reflection gain, reducing base river center-current/slick gains, and reblending toward base water color.",
     "Demoted base-water center guide-stripe artifacts with odd cross-river tessellation, center-stripe breakup noise, near-field center-current demotion, stronger centerline reblending, centerline flow-ribbon fading/culling, and broad center-lane erase blending; a residual foreground seam remains for production shader/WaterBody replacement.",
+    "Set explicit current-streak overlay tint to zero for review so base-water cross-channel breakup carries subtle flow texture without relying on dark guide-line overlays.",
+    "Added first-party base-water cross-channel breakup to the generated river ribbon with subtle flow-aware shadow/highlight bands, center-seam diffusion, and tiny bounded relief without changing solver authority.",
     "Added first-party fine twig canopy lace geometry to source-aware and dense biome foliage crowns so tree silhouettes break into smaller twig/leaflet clusters without claiming production foliage assets.",
     "Added first-party foliage crown depth and leaflet breakup so mask-guided darker crown interiors and smaller deterministic leaflets reduce the flat foliage-card read without claiming production foliage assets.",
     "Disabled stylized PCG sample tree and seedling meshes for photoreal review maps so the first-party procedural foliage-only path drives trees, scrub, understory, branch/frond lattice, twig lace, and crown breakup.",
