@@ -794,13 +794,13 @@
     }
   ],
   "next_checkpoint_order": [
-    "Review the regenerated source-conditioned guide-seat captures for visible faceted base-water mesh artifacts, then keep the source-aware blocker active until the near-field water surface is smoothed and recaptured.",
+    "Run human art, guide, geospatial, rights, hazard-readability, and production-material review on the current zero-blocker source-conditioned capture set before any lifelike claim.",
     "Replace proxy terrain, banks, rocks, foliage, water materials, foam/spray/mist, wetness, and lighting with source-derived or rights-cleared assets or first-party production equivalents until screenshots read as lifelike without hiding hazards or rescue targets.",
     "Close South Fork hydrography/flow/media annotations enough to test a true source-conditioned terrain and material pass.",
     "Close Colorado river-mile/release/media annotations before expanding beyond the Lees Ferry pilot slice.",
     "Close Pacuare official hydrography, cloud-screened imagery, rainfall/flow, and protected-area review before claiming local fidelity.",
     "Regenerate guide-seat and river-eye captures after each renderer/material/environment replacement pass and keep the human review package synchronized with the current hashes.",
-    "Add desktop and VR performance evidence before any river leaves preview-only status."
+    "Attach measured desktop and VR Unreal profiling captures before any river leaves preview-only status."
   ],
   "visual_blocker_reduction_checkpoint_2026_07_08": {
     "status": "automated_capture_quality_gate_cleared_after_source_aware_proxy_water_and_faceted_mesh_blockers_candidate_for_human_lifelike_review_not_approved",
@@ -825,5 +825,33 @@
       "desktop_and_vr_performance_capture_evidence",
       "production_material_asset_or_first_party_equivalent_promotion"
     ]
+  },
+  "performance_evidence_checkpoint_2026_07_08": {
+    "status": "static_desktop_vr_performance_packet_attached_measured_profiles_required_not_approved",
+    "source_performance_review": "docs/environment-captures/photoreal_river_previews/photoreal_environment_performance_review.json",
+    "covered_profiles": [
+      "american_south_fork_desktop",
+      "american_south_fork_vr",
+      "colorado_river_desktop",
+      "colorado_river_vr",
+      "pacuare_desktop",
+      "pacuare_vr"
+    ],
+    "records": [
+      "preview map package path, size, and hash for each river",
+      "guide-seat and river-eye capture path, size, hash, and source dimensions",
+      "first-party and source-conditioned material asset inventory",
+      "runtime budget targets for desktop and VR"
+    ],
+    "required_before_approval": [
+      "measured Unreal frame-time p50 and p95",
+      "game, render, and GPU thread p95 measurements",
+      "draw-call or visible-primitive/triangle counts",
+      "GPU memory measurements",
+      "scalability preset or HMD render-target settings",
+      "VR comfort and motion-readability notes",
+      "hazard and rescue readability notes"
+    ],
+    "blocking_rule": "The static packet is traceability evidence only; all river/profile performance decisions remain unapproved until measured Unreal profiling captures fill the required fields."
   }
 }

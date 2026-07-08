@@ -1,0 +1,457 @@
+{
+  "schema": "raftsim.unreal.photoreal_environment_performance_review.v1",
+  "generated_on": "2026-07-08",
+  "status": "awaiting_measured_desktop_vr_performance_capture_not_approved",
+  "source_capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
+  "source_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
+  "source_runtime_budgets": "physics/config/runtime_budgets.json",
+  "policy": {
+    "static_inventory_is_not_performance_approval": true,
+    "desktop_and_vr_profiles_required_before_production_playable": true,
+    "vr_profile_requires_comfort_and_hazard_readability_notes": true,
+    "performance_must_not_trade_away_hazard_rescue_or_water_readability": true
+  },
+  "summary": {
+    "river_count": 3,
+    "profile_count": 6,
+    "profile_ids": [
+      "desktop",
+      "vr"
+    ],
+    "measured_profile_count": 0,
+    "open_profile_measurement_count": 6,
+    "automated_capture_blocking_count": 0,
+    "approved_river_count": 0
+  },
+  "shared_asset_inventory": {
+    "first_party_material_texture_assets": {
+      "root": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
+      "exists": true,
+      "file_count": 9,
+      "total_bytes": 16155412
+    },
+    "source_conditioned_material_texture_assets": {
+      "root": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures",
+      "exists": true,
+      "file_count": 9,
+      "total_bytes": 60934119
+    },
+    "material_instance_review_assets": {
+      "root": "unreal/Content/RaftSim/Materials/MaterialInstances",
+      "exists": true,
+      "file_count": 18,
+      "total_bytes": 234861
+    }
+  },
+  "profiling_capture_plan": {
+    "desktop": [
+      "Open each generated preview map from the guide-seat camera.",
+      "Record scalability preset, resolution, frame-time distribution, game/render/GPU thread costs, draw calls/primitives, and GPU memory.",
+      "Attach a screenshot or video clip proving hazards, swimmers/rescue targets, and water cues remain readable at the measured setting."
+    ],
+    "vr": [
+      "Run the same map path in the OpenXR/VR profile or the target HMD simulator with comfort settings recorded.",
+      "Record target render resolution, refresh rate, frame-time distribution, thread/GPU costs, dropped/reprojected frames, and GPU memory.",
+      "Attach comfort, motion readability, hazard/rescue readability, and guide-seat visibility notes."
+    ]
+  },
+  "rivers": [
+    {
+      "river_id": "american_south_fork",
+      "display_name": "South Fork American River",
+      "status": "static_capture_inventory_recorded_performance_measurement_required",
+      "approved_for_production_playable": false,
+      "flow_context": {
+        "flow_band_id": "median_runnable",
+        "flow_band_display_name": "Median Runnable / Summer Commercial",
+        "flow_reference_discharge_cfs": 1600.0,
+        "flow_visual_width_scale": 1.0,
+        "flow_visual_foam_scale": 1.0,
+        "flow_visual_current_cue_scale": 1.0
+      },
+      "static_inventory": {
+        "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview",
+        "map_asset": {
+          "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview.umap",
+          "exists": true,
+          "size_bytes": 227745511,
+          "sha256": "a4f66b13406b53ceaf14b3e13f7904c07dbf35a921939e0a7df28c01d2b26b4d"
+        },
+        "captures": [
+          {
+            "view_id": "guide_seat_downstream",
+            "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
+            "exists": true,
+            "sha256": "5c6672c2db41dd0cd3202cbd821381d8733b9be301da14ca065fbd3a44d09a3f",
+            "size_bytes": 1132690,
+            "source_size": [
+              1280,
+              720
+            ],
+            "automated_blocker_count": 0,
+            "automated_status": "candidate_for_human_lifelike_review_not_approved"
+          },
+          {
+            "view_id": "river_eye_downstream",
+            "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
+            "exists": true,
+            "sha256": "243a68bb99c1fc038166629a6322a028ea33fa888582aa0aac2745a80ea7a261",
+            "size_bytes": 1133781,
+            "source_size": [
+              1280,
+              720
+            ],
+            "automated_blocker_count": 0,
+            "automated_status": "candidate_for_human_lifelike_review_not_approved"
+          }
+        ],
+        "total_capture_png_bytes": 2266471,
+        "source_inputs": {
+          "aerial_drape_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png",
+          "terrain_relief_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/dem_relief_2048.png",
+          "heightfield_preview_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/heightfield_candidate_2017.png",
+          "water_mask_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/water_mask_2048.png",
+          "vegetation_mask_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/vegetation_mask_2048.png"
+        }
+      },
+      "profiles": [
+        {
+          "profile_id": "desktop",
+          "render_target_hz": 60,
+          "target_frame_time_ms": 16.667,
+          "physics_tick_hz": 120,
+          "total_physics_budget_ms": 4.0,
+          "water_solver_budget_ms": 2.4,
+          "raft_coupling_budget_ms": 0.8,
+          "probe_telemetry_budget_ms": 0.4,
+          "max_runtime_multiplier": 2.0,
+          "status": "requires_measured_unreal_profile_capture",
+          "approved": false,
+          "evidence_attached": false,
+          "required_measurements": {
+            "scalability_preset": null,
+            "resolution_or_hmd_render_target": null,
+            "frame_time_ms_p50": null,
+            "frame_time_ms_p95": null,
+            "game_thread_ms_p95": null,
+            "render_thread_ms_p95": null,
+            "gpu_ms_p95": null,
+            "draw_calls": null,
+            "visible_primitives_or_triangles": null,
+            "gpu_memory_mb": null,
+            "vr_comfort_or_motion_readability_notes": null,
+            "hazard_and_rescue_readability_notes": null
+          },
+          "blocking_open_measurements": [
+            "measured_frame_time_distribution",
+            "game_render_gpu_thread_breakdown",
+            "gpu_memory_and_draw_call_or_primitive_count",
+            "scalability_settings_and_capture_hardware",
+            "desktop_readability_notes"
+          ]
+        },
+        {
+          "profile_id": "vr",
+          "render_target_hz": 90,
+          "target_frame_time_ms": 11.111,
+          "physics_tick_hz": 120,
+          "total_physics_budget_ms": 3.0,
+          "water_solver_budget_ms": 1.6,
+          "raft_coupling_budget_ms": 0.6,
+          "probe_telemetry_budget_ms": 0.25,
+          "max_runtime_multiplier": 1.5,
+          "status": "requires_measured_unreal_profile_capture",
+          "approved": false,
+          "evidence_attached": false,
+          "required_measurements": {
+            "scalability_preset": null,
+            "resolution_or_hmd_render_target": null,
+            "frame_time_ms_p50": null,
+            "frame_time_ms_p95": null,
+            "game_thread_ms_p95": null,
+            "render_thread_ms_p95": null,
+            "gpu_ms_p95": null,
+            "draw_calls": null,
+            "visible_primitives_or_triangles": null,
+            "gpu_memory_mb": null,
+            "vr_comfort_or_motion_readability_notes": null,
+            "hazard_and_rescue_readability_notes": null
+          },
+          "blocking_open_measurements": [
+            "measured_frame_time_distribution",
+            "game_render_gpu_thread_breakdown",
+            "gpu_memory_and_draw_call_or_primitive_count",
+            "scalability_settings_and_capture_hardware",
+            "vr_comfort_readability_notes"
+          ]
+        }
+      ],
+      "current_decision": "Use this row to attach measured desktop and VR profiling for the current zero-blocker capture candidate. Static map/capture/asset inventory is recorded, but this river is not production-playable until every profile has measured frame-time, thread/GPU/memory, scalability, and readability evidence."
+    },
+    {
+      "river_id": "colorado_river",
+      "display_name": "Colorado River Grand Canyon",
+      "status": "static_capture_inventory_recorded_performance_measurement_required",
+      "approved_for_production_playable": false,
+      "flow_context": {
+        "flow_band_id": "moderate_release_planning",
+        "flow_band_display_name": "Moderate Release Planning",
+        "flow_reference_discharge_cfs": 12000.0,
+        "flow_visual_width_scale": 1.08,
+        "flow_visual_foam_scale": 1.15,
+        "flow_visual_current_cue_scale": 1.15
+      },
+      "static_inventory": {
+        "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview",
+        "map_asset": {
+          "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview.umap",
+          "exists": true,
+          "size_bytes": 216526457,
+          "sha256": "7f563bfa70394cd6b0af66066019c469096e63e8880dfd08ebdd65a0384cc1dc"
+        },
+        "captures": [
+          {
+            "view_id": "guide_seat_downstream",
+            "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
+            "exists": true,
+            "sha256": "c9ccc12a76dbdd37a2499862926d35f66b1452a86df3712914da0aa3cc764a18",
+            "size_bytes": 1204684,
+            "source_size": [
+              1280,
+              720
+            ],
+            "automated_blocker_count": 0,
+            "automated_status": "candidate_for_human_lifelike_review_not_approved"
+          },
+          {
+            "view_id": "river_eye_downstream",
+            "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
+            "exists": true,
+            "sha256": "5895d3cde862e15c39bd10f402a68c5beaed92ac9c3c460ecc71fa9f2d3eb62d",
+            "size_bytes": 1203395,
+            "source_size": [
+              1280,
+              720
+            ],
+            "automated_blocker_count": 0,
+            "automated_status": "candidate_for_human_lifelike_review_not_approved"
+          }
+        ],
+        "total_capture_png_bytes": 2408079,
+        "source_inputs": {
+          "aerial_drape_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png",
+          "terrain_relief_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/dem_relief_2048.png",
+          "heightfield_preview_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/heightfield_candidate_2017.png",
+          "water_mask_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/water_mask_2048.png",
+          "vegetation_mask_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/vegetation_mask_2048.png"
+        }
+      },
+      "profiles": [
+        {
+          "profile_id": "desktop",
+          "render_target_hz": 60,
+          "target_frame_time_ms": 16.667,
+          "physics_tick_hz": 120,
+          "total_physics_budget_ms": 4.0,
+          "water_solver_budget_ms": 2.4,
+          "raft_coupling_budget_ms": 0.8,
+          "probe_telemetry_budget_ms": 0.4,
+          "max_runtime_multiplier": 2.0,
+          "status": "requires_measured_unreal_profile_capture",
+          "approved": false,
+          "evidence_attached": false,
+          "required_measurements": {
+            "scalability_preset": null,
+            "resolution_or_hmd_render_target": null,
+            "frame_time_ms_p50": null,
+            "frame_time_ms_p95": null,
+            "game_thread_ms_p95": null,
+            "render_thread_ms_p95": null,
+            "gpu_ms_p95": null,
+            "draw_calls": null,
+            "visible_primitives_or_triangles": null,
+            "gpu_memory_mb": null,
+            "vr_comfort_or_motion_readability_notes": null,
+            "hazard_and_rescue_readability_notes": null
+          },
+          "blocking_open_measurements": [
+            "measured_frame_time_distribution",
+            "game_render_gpu_thread_breakdown",
+            "gpu_memory_and_draw_call_or_primitive_count",
+            "scalability_settings_and_capture_hardware",
+            "desktop_readability_notes"
+          ]
+        },
+        {
+          "profile_id": "vr",
+          "render_target_hz": 90,
+          "target_frame_time_ms": 11.111,
+          "physics_tick_hz": 120,
+          "total_physics_budget_ms": 3.0,
+          "water_solver_budget_ms": 1.6,
+          "raft_coupling_budget_ms": 0.6,
+          "probe_telemetry_budget_ms": 0.25,
+          "max_runtime_multiplier": 1.5,
+          "status": "requires_measured_unreal_profile_capture",
+          "approved": false,
+          "evidence_attached": false,
+          "required_measurements": {
+            "scalability_preset": null,
+            "resolution_or_hmd_render_target": null,
+            "frame_time_ms_p50": null,
+            "frame_time_ms_p95": null,
+            "game_thread_ms_p95": null,
+            "render_thread_ms_p95": null,
+            "gpu_ms_p95": null,
+            "draw_calls": null,
+            "visible_primitives_or_triangles": null,
+            "gpu_memory_mb": null,
+            "vr_comfort_or_motion_readability_notes": null,
+            "hazard_and_rescue_readability_notes": null
+          },
+          "blocking_open_measurements": [
+            "measured_frame_time_distribution",
+            "game_render_gpu_thread_breakdown",
+            "gpu_memory_and_draw_call_or_primitive_count",
+            "scalability_settings_and_capture_hardware",
+            "vr_comfort_readability_notes"
+          ]
+        }
+      ],
+      "current_decision": "Use this row to attach measured desktop and VR profiling for the current zero-blocker capture candidate. Static map/capture/asset inventory is recorded, but this river is not production-playable until every profile has measured frame-time, thread/GPU/memory, scalability, and readability evidence."
+    },
+    {
+      "river_id": "pacuare",
+      "display_name": "Pacuare River Rainforest",
+      "status": "static_capture_inventory_recorded_performance_measurement_required",
+      "approved_for_production_playable": false,
+      "flow_context": {
+        "flow_band_id": "rainfed_runnable_planning",
+        "flow_band_display_name": "Rain-Fed Runnable Planning",
+        "flow_reference_discharge_cfs": null,
+        "flow_visual_width_scale": 1.05,
+        "flow_visual_foam_scale": 1.2,
+        "flow_visual_current_cue_scale": 1.18
+      },
+      "static_inventory": {
+        "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview",
+        "map_asset": {
+          "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview.umap",
+          "exists": true,
+          "size_bytes": 261614425,
+          "sha256": "346415ec017f4b1fbbda882ed6f1d237bdda29ca5c4f1e70e468554649a33a90"
+        },
+        "captures": [
+          {
+            "view_id": "guide_seat_downstream",
+            "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
+            "exists": true,
+            "sha256": "05bc291836ea38ad2465801acd75013844c5f0502e85876931ff1f672cd09bdf",
+            "size_bytes": 1190020,
+            "source_size": [
+              1280,
+              720
+            ],
+            "automated_blocker_count": 0,
+            "automated_status": "candidate_for_human_lifelike_review_not_approved"
+          },
+          {
+            "view_id": "river_eye_downstream",
+            "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
+            "exists": true,
+            "sha256": "a037a4ac0ee91dcb88bff62b5ad461f30b58087af17e866b4158417656fba593",
+            "size_bytes": 1190720,
+            "source_size": [
+              1280,
+              720
+            ],
+            "automated_blocker_count": 0,
+            "automated_status": "candidate_for_human_lifelike_review_not_approved"
+          }
+        ],
+        "total_capture_png_bytes": 2380740,
+        "source_inputs": {
+          "aerial_drape_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
+          "terrain_relief_image": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/dem_relief_2048.png",
+          "heightfield_preview_image": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/heightfield_candidate_2017.png",
+          "water_mask_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png",
+          "vegetation_mask_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png"
+        }
+      },
+      "profiles": [
+        {
+          "profile_id": "desktop",
+          "render_target_hz": 60,
+          "target_frame_time_ms": 16.667,
+          "physics_tick_hz": 120,
+          "total_physics_budget_ms": 4.0,
+          "water_solver_budget_ms": 2.4,
+          "raft_coupling_budget_ms": 0.8,
+          "probe_telemetry_budget_ms": 0.4,
+          "max_runtime_multiplier": 2.0,
+          "status": "requires_measured_unreal_profile_capture",
+          "approved": false,
+          "evidence_attached": false,
+          "required_measurements": {
+            "scalability_preset": null,
+            "resolution_or_hmd_render_target": null,
+            "frame_time_ms_p50": null,
+            "frame_time_ms_p95": null,
+            "game_thread_ms_p95": null,
+            "render_thread_ms_p95": null,
+            "gpu_ms_p95": null,
+            "draw_calls": null,
+            "visible_primitives_or_triangles": null,
+            "gpu_memory_mb": null,
+            "vr_comfort_or_motion_readability_notes": null,
+            "hazard_and_rescue_readability_notes": null
+          },
+          "blocking_open_measurements": [
+            "measured_frame_time_distribution",
+            "game_render_gpu_thread_breakdown",
+            "gpu_memory_and_draw_call_or_primitive_count",
+            "scalability_settings_and_capture_hardware",
+            "desktop_readability_notes"
+          ]
+        },
+        {
+          "profile_id": "vr",
+          "render_target_hz": 90,
+          "target_frame_time_ms": 11.111,
+          "physics_tick_hz": 120,
+          "total_physics_budget_ms": 3.0,
+          "water_solver_budget_ms": 1.6,
+          "raft_coupling_budget_ms": 0.6,
+          "probe_telemetry_budget_ms": 0.25,
+          "max_runtime_multiplier": 1.5,
+          "status": "requires_measured_unreal_profile_capture",
+          "approved": false,
+          "evidence_attached": false,
+          "required_measurements": {
+            "scalability_preset": null,
+            "resolution_or_hmd_render_target": null,
+            "frame_time_ms_p50": null,
+            "frame_time_ms_p95": null,
+            "game_thread_ms_p95": null,
+            "render_thread_ms_p95": null,
+            "gpu_ms_p95": null,
+            "draw_calls": null,
+            "visible_primitives_or_triangles": null,
+            "gpu_memory_mb": null,
+            "vr_comfort_or_motion_readability_notes": null,
+            "hazard_and_rescue_readability_notes": null
+          },
+          "blocking_open_measurements": [
+            "measured_frame_time_distribution",
+            "game_render_gpu_thread_breakdown",
+            "gpu_memory_and_draw_call_or_primitive_count",
+            "scalability_settings_and_capture_hardware",
+            "vr_comfort_readability_notes"
+          ]
+        }
+      ],
+      "current_decision": "Use this row to attach measured desktop and VR profiling for the current zero-blocker capture candidate. Static map/capture/asset inventory is recorded, but this river is not production-playable until every profile has measured frame-time, thread/GPU/memory, scalability, and readability evidence."
+    }
+  ],
+  "current_decision": "This artifact closes the missing static evidence packet for desktop/VR review, but does not pass the performance gate. Real Unreal profiling captures must be attached for every river/profile before any environment is marked production-playable or lifelike-approved."
+}

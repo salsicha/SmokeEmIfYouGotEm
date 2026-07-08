@@ -10,6 +10,7 @@ Source artifacts:
 
 - Capture manifest: `docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json`
 - Automated capture review: `docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json`
+- Desktop/VR performance evidence: `docs/environment-captures/photoreal_river_previews/photoreal_environment_performance_review.json`
 - Human review handoff JSON: `docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_handoff.json`
 - Human review results template: `docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_results_template.json`
 - Reference media queue: `physics/data/real_world/reference_media_review_queue.json`
