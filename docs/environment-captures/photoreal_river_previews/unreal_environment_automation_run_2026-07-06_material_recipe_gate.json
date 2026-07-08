@@ -326,23 +326,20 @@
       "capture_count": 6,
       "blocking_capture_count": 6,
       "blocker_counts": {
-        "dark_foreground_proxy": 5,
         "excess_low_gradient_area": 6,
-        "large_flat_blue_field": 3,
         "low_color_texture_entropy": 6,
         "low_edge_density": 3,
-        "low_luma_variation": 1
+        "low_luma_variation": 3
       },
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "dark_foreground_proxy",
             "excess_low_gradient_area",
-            "large_flat_blue_field",
             "low_color_texture_entropy",
-            "low_edge_density"
+            "low_edge_density",
+            "low_luma_variation"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -350,11 +347,10 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "dark_foreground_proxy",
             "excess_low_gradient_area",
-            "large_flat_blue_field",
             "low_color_texture_entropy",
-            "low_edge_density"
+            "low_edge_density",
+            "low_luma_variation"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -362,9 +358,7 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "dark_foreground_proxy",
             "excess_low_gradient_area",
-            "large_flat_blue_field",
             "low_color_texture_entropy",
             "low_edge_density",
             "low_luma_variation"
@@ -373,5 +367,60 @@
         }
       }
     }
+  },
+  "visual_blocker_reduction_checkpoint_2026_07_08": {
+    "status": "rerun_after_water_atmosphere_camera_and_raft_review_material_tuning",
+    "unreal_build_result": "succeeded",
+    "unreal_capture_result": "succeeded",
+    "photoreal_capture_quality_summary": {
+      "capture_count": 6,
+      "blocking_capture_count": 6,
+      "blocker_counts": {
+        "excess_low_gradient_area": 6,
+        "low_color_texture_entropy": 6,
+        "low_edge_density": 3,
+        "low_luma_variation": 3
+      },
+      "per_river": {
+        "american_south_fork": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        },
+        "colorado_river": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        },
+        "pacuare": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        }
+      }
+    },
+    "removed_blocker_classes": [
+      "dark_foreground_proxy",
+      "large_flat_blue_field"
+    ],
+    "remaining_gate": "captures_remain_preview_only_not_lifelike_due_low_gradient_low_entropy_low_edge_and_low_luma_blockers"
   }
 }

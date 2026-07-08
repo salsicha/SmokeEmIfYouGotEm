@@ -43,7 +43,52 @@
     "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
     "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
     "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
-    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded"
+    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
+    "photoreal_capture_quality_summary": {
+      "capture_count": 6,
+      "blocking_capture_count": 6,
+      "blocker_counts": {
+        "excess_low_gradient_area": 6,
+        "low_color_texture_entropy": 6,
+        "low_edge_density": 3,
+        "low_luma_variation": 3
+      },
+      "per_river": {
+        "american_south_fork": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        },
+        "colorado_river": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        },
+        "pacuare": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        }
+      }
+    }
   },
   "reviewed_source_leads_2026_07_06": [
     {
@@ -206,6 +251,9 @@
         "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
         "review_material_instance_scene_assignment_capture_review_and_production_promotion",
         "automated_capture_quality_gate_passed_without_proxy_blockers"
+      ],
+      "current_preview_progress": [
+        "2026-07-08 capture blocker reduction removed dark_foreground_proxy and large_flat_blue_field blockers but low-gradient, low-entropy, low-edge, and low-luma blockers remain."
       ]
     },
     {
@@ -217,6 +265,9 @@
         "desktop and VR performance captures with settings recorded",
         "review_material_instance_scene_assignment_capture_review_and_production_promotion",
         "automated_capture_quality_gate_passed_without_proxy_blockers"
+      ],
+      "current_preview_progress": [
+        "2026-07-08 capture blocker reduction removed dark_foreground_proxy and large_flat_blue_field blockers but low-gradient, low-entropy, low-edge, and low-luma blockers remain."
       ]
     }
   ],
@@ -707,5 +758,18 @@
     "Close Pacuare official hydrography, cloud-screened imagery, rainfall/flow, and protected-area review before claiming local fidelity.",
     "Replace proxy art using rights-cleared assets or first-party procedural equivalents and regenerate guide-seat plus river-eye captures after each river pass.",
     "Add desktop and VR performance evidence before any river leaves preview-only status."
-  ]
+  ],
+  "visual_blocker_reduction_checkpoint_2026_07_08": {
+    "status": "flat_blue_and_dark_foreground_blockers_removed_all_rivers_still_preview_only",
+    "remaining_blocker_counts": {
+      "excess_low_gradient_area": 6,
+      "low_color_texture_entropy": 6,
+      "low_edge_density": 3,
+      "low_luma_variation": 3
+    },
+    "closed_blocker_classes": [
+      "dark_foreground_proxy",
+      "large_flat_blue_field"
+    ]
+  }
 }
