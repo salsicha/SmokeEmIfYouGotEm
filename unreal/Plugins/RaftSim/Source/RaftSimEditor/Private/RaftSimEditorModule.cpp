@@ -10026,10 +10026,60 @@ void AddPreviewNearFieldPhotorealReviewDressing(
                             (Spec.bDesertCanyon ? 1.28f : 1.0f),
                         0.0f,
                         Spec.bDesertCanyon ? 0.84f : 0.68f));
+                const float IntegratedWaterFleckCell = FMath::Frac(
+                    FMath::Sin(static_cast<float>((XIndex + 211) * 619 + (CrossIndex + 109) * 941) * 12.9898f) *
+                    43758.5453f);
+                const float IntegratedWaterFleckThread = FMath::Clamp(
+                    0.50f +
+                        0.34f * FMath::Sin(X * 0.028f + Lateral * 0.041f + Spec.FlowCurrentCueScale * 0.29f) +
+                        0.23f * FMath::Sin(X * 0.072f - Lateral * 0.055f + CenterT * 0.67f) +
+                        0.14f * FMath::Sin(X * 0.133f + Lateral * 0.089f),
+                    0.0f,
+                    1.0f);
+                const float IntegratedWaterFleckNoise =
+                    FMath::Clamp(IntegratedWaterFleckCell * 0.54f + IntegratedWaterFleckThread * 0.46f, 0.0f, 1.0f);
+                const FLinearColor IntegratedWaterFleckSkyAccent = Spec.bDesertCanyon
+                    ? FLinearColor(0.610f, 0.600f, 0.500f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.260f, 0.560f, 0.470f)
+                                            : FLinearColor(0.340f, 0.640f, 0.545f));
+                const FLinearColor IntegratedWaterFleckBedAccent = Spec.bDesertCanyon
+                    ? FLinearColor(0.510f, 0.390f, 0.225f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.060f, 0.255f, 0.135f)
+                                            : FLinearColor(0.170f, 0.350f, 0.235f));
+                const FLinearColor IntegratedWaterFleckDeepAccent = Spec.bDesertCanyon
+                    ? FLinearColor(0.190f, 0.235f, 0.285f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.020f, 0.135f, 0.070f)
+                                            : FLinearColor(0.035f, 0.170f, 0.095f));
+                const FLinearColor IntegratedWaterFleckFoamAccent = Spec.bDesertCanyon
+                    ? FLinearColor(0.820f, 0.770f, 0.590f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.590f, 0.800f, 0.620f)
+                                            : FLinearColor(0.640f, 0.800f, 0.660f));
+                const FLinearColor IntegratedWaterFleckColor = IntegratedWaterFleckNoise < 0.22f
+                    ? IntegratedWaterFleckDeepAccent
+                    : (IntegratedWaterFleckNoise < 0.48f
+                           ? IntegratedWaterFleckBedAccent
+                           : (IntegratedWaterFleckNoise < 0.76f
+                                  ? IntegratedWaterFleckSkyAccent
+                                  : IntegratedWaterFleckFoamAccent));
+                const float IntegratedWaterFleckT = FMath::Clamp(
+                    TextureT *
+                        (0.36f + CenterT * 0.20f + EdgeT * 0.18f) *
+                        (0.84f + FMath::Clamp(Spec.FlowFoamScale, 0.70f, 1.45f) * 0.14f),
+                    0.0f,
+                    Spec.bDesertCanyon ? 0.76f : 0.70f);
+                WaterColor = FMath::Lerp(
+                    WaterColor,
+                    IntegratedWaterFleckColor,
+                    FMath::Clamp(
+                        IntegratedWaterFleckT *
+                            (0.38f + SmoothPreviewStep(0.72f, 0.98f, IntegratedWaterFleckNoise) * 0.18f),
+                        0.0f,
+                        Spec.bDesertCanyon ? 0.46f : 0.42f));
                 const float SurfaceWave =
                     (FMath::Sin(X * 0.021f + Lateral * 0.014f) * (Spec.bDesertCanyon ? 2.2f : 3.0f) +
                      FMath::Sin(X * 0.058f - Lateral * 0.036f) * (Spec.bDesertCanyon ? 1.2f : 1.7f) +
-                     (TextureNoise - 0.5f) * (Spec.bDesertCanyon ? 6.0f : 8.0f) * TextureT) *
+                     (TextureNoise - 0.5f) * (Spec.bDesertCanyon ? 6.0f : 8.0f) * TextureT +
+                     (IntegratedWaterFleckNoise - 0.5f) * (Spec.bDesertCanyon ? 5.4f : 7.2f) * IntegratedWaterFleckT) *
                     LongFeather;
                 Vertices.Add(FVector(X, CenterY + Lateral, WaterBaseZ + 7.0f + SurfaceWave));
                 UVs.Add(FVector2D(U * 18.0f, V * 3.4f));
@@ -10532,6 +10582,8 @@ void AddPreviewNearFieldPhotorealReviewDressing(
             &VertexColors);
     }
 
+    const bool bUseSeparateCaptureQualityWaterFleckCards = false;
+    if (bUseSeparateCaptureQualityWaterFleckCards)
     {
         constexpr int32 FleckCount = 760;
         TArray<FVector> Vertices;
