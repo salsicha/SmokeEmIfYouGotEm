@@ -111,6 +111,8 @@
       "near_camera_water_scaffold_readability_clearance",
       "low_occlusion_far_field_water_shader_scaffold",
       "first_party_remaining_water_overlay_slab_demotion",
+      "first_party_long_dark_water_streak_demotion",
+      "first_party_current_streak_waterline_artifact_demotion",
       "current_streaks_foam_tongues_wave_highlights_and_eddy_lines",
       "boulder_contact_foam_lace",
       "translucent_surface_glints_foam_flecks_canyon_haze_and_rainforest_spray_mist",
