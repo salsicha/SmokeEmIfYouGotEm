@@ -1,0 +1,530 @@
+{
+  "schema": "raftsim.unreal.photoreal_human_lifelike_review_results_template.v1",
+  "generated_on": "2026-07-08",
+  "status": "awaiting_external_human_review_inputs_not_approved",
+  "source_handoff": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_handoff.json",
+  "source_packet": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_packet.md",
+  "source_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
+  "policy": {
+    "do_not_self_approve_with_automated_metrics": true,
+    "reviewer_identity_role_and_date_required_for_approval": true,
+    "evidence_links_or_artifacts_required_for_each_domain_approval": true,
+    "uncleared_media_must_remain_link_only_until_rights_are_recorded": true,
+    "hazard_rescue_and_physics_readability_block_lifelike_promotion": true,
+    "desktop_and_vr_performance_evidence_required_before_production_playable": true
+  },
+  "summary": {
+    "river_count": 3,
+    "capture_count": 6,
+    "review_domain_count": 7,
+    "open_review_result_count": 21,
+    "approved_river_count": 0
+  },
+  "rivers": [
+    {
+      "river_id": "american_south_fork",
+      "display_name": "South Fork American River",
+      "review_status": "not_reviewed_not_approved",
+      "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json",
+      "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview",
+      "flow_context": {
+        "flow_band_id": "median_runnable",
+        "flow_band_display_name": "Median Runnable / Summer Commercial",
+        "flow_band_source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+        "flow_reference_discharge_cfs": 1600.0,
+        "flow_visual_width_scale": 1.0,
+        "flow_visual_foam_scale": 1.0,
+        "flow_visual_wet_bank_scale": 1.0,
+        "flow_visual_current_cue_scale": 1.0,
+        "flow_visual_water_level_offset_cm": 0.0,
+        "flow_visual_note": "Default South Fork summer-commercial validation band from USGS-11445500 planning presets; keeps moderate tongues, wet rocks, and foam lines visible while low/high seasonal variants remain future capture targets."
+      },
+      "captures": [
+        {
+          "view_id": "guide_seat_downstream",
+          "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
+          "sha256": "7b07f0f881f4fafdbb2a709f5dcf352d924e053aa722de33b695fb42d82315a1",
+          "automated_status": "candidate_for_human_lifelike_review_not_approved",
+          "human_review_status": "not_reviewed",
+          "approval_status": "not_approved_for_lifelike_or_production"
+        },
+        {
+          "view_id": "river_eye_downstream",
+          "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
+          "sha256": "5d393822868189d60bafbada8fec6b9ae86263b92d2f45288004038e2bbea71b",
+          "automated_status": "candidate_for_human_lifelike_review_not_approved",
+          "human_review_status": "not_reviewed",
+          "approval_status": "not_approved_for_lifelike_or_production"
+        }
+      ],
+      "domain_results": [
+        {
+          "domain_id": "art_direction_visual_lifelike",
+          "required_reviewer": "environment_art_or_art_direction",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "side_by_side_review_against_rights_reviewed_reference_links_or_first_party_field_media",
+            "river_specific_notes_for_terrain_water_rocks_foliage_foam_mist_lighting_and_raft_foreground"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "guide_hydraulic_fidelity",
+          "required_reviewer": "river_guide_or_oarsman_domain_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "flow_band_specific_notes_for_line_choice_holes_laterals_boils_eddy_lines_wave_trains_and_wet_banks",
+            "raft_outcome_sanity_notes_for_surf_flush_pin_release_flip_and_swimmer_visibility"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "geospatial_source_alignment",
+          "required_reviewer": "geospatial_or_technical_art_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "capture_overlays_or_notes_checking_river_centerline_banks_heightfield_masks_and_source_drape_alignment",
+            "known_preview_derivative_limitations_and_required_production_import_replacements"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "rights_and_reference_media",
+          "required_reviewer": "rights_or_content_provenance_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "item_level_license_permission_attribution_and_allowed_use_for_any_photo_footage_or_social_reference",
+            "confirmation_that_uncleared_media_remains_link_only_and_not_used_as_texture_training_or_packaged_asset_input"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "hazard_and_rescue_readability",
+          "required_reviewer": "gameplay_safety_or_rescue_readability_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "notes_that_water_foam_mist_foliage_and_lighting_do_not_hide_hazards_swimmers_throw_rope_zones_or_rescue_targets",
+            "notes_that_visual_forcing_or_art_layers_do_not_hide_solver_or_conservation_failures"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "production_material_asset_promotion",
+          "required_reviewer": "technical_art_or_rendering_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "promotion_decision_for_review_only_texture2d_material_instance_and_procedural_proxy_surfaces",
+            "replacement_or_approval_plan_for_landscape_water_rocks_foliage_foam_mist_lighting_and_raft_foreground_assets"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "desktop_and_vr_performance",
+          "required_reviewer": "performance_or_vr_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "desktop_capture_settings_frame_time_gpu_memory_and_scalability_notes",
+            "vr_or_low_power_capture_settings_comfort_frame_time_and_visual_readability_notes"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        }
+      ],
+      "river_level_notes": "",
+      "final_river_decision": {
+        "status": "not_reviewed",
+        "approved_for_lifelike": false,
+        "approved_for_production_playable": false,
+        "decision_maker": "",
+        "decision_date": "",
+        "decision_notes": "",
+        "required_follow_up_before_promotion": []
+      }
+    },
+    {
+      "river_id": "colorado_river",
+      "display_name": "Colorado River Grand Canyon",
+      "review_status": "not_reviewed_not_approved",
+      "source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json",
+      "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview",
+      "flow_context": {
+        "flow_band_id": "moderate_release_planning",
+        "flow_band_display_name": "Moderate Release Planning",
+        "flow_band_source": "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json",
+        "flow_reference_discharge_cfs": 12000.0,
+        "flow_visual_width_scale": 1.08,
+        "flow_visual_foam_scale": 1.15,
+        "flow_visual_wet_bank_scale": 1.1,
+        "flow_visual_current_cue_scale": 1.15,
+        "flow_visual_water_level_offset_cm": 8.0,
+        "flow_visual_note": "Default Grand Canyon rowing preview band from release-planning presets; slightly widens the big-water ribbon and strengthens long wave/current cues while release history and guide review remain required."
+      },
+      "captures": [
+        {
+          "view_id": "guide_seat_downstream",
+          "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
+          "sha256": "c859d2d7df6be66a1b469277222de454e4a46ebb7b35644b5622c8f4c015fb90",
+          "automated_status": "candidate_for_human_lifelike_review_not_approved",
+          "human_review_status": "not_reviewed",
+          "approval_status": "not_approved_for_lifelike_or_production"
+        },
+        {
+          "view_id": "river_eye_downstream",
+          "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
+          "sha256": "4c22f709260ddc446c2916e457cf6856cacb83325884e05da34818394dcdcd4d",
+          "automated_status": "candidate_for_human_lifelike_review_not_approved",
+          "human_review_status": "not_reviewed",
+          "approval_status": "not_approved_for_lifelike_or_production"
+        }
+      ],
+      "domain_results": [
+        {
+          "domain_id": "art_direction_visual_lifelike",
+          "required_reviewer": "environment_art_or_art_direction",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "side_by_side_review_against_rights_reviewed_reference_links_or_first_party_field_media",
+            "river_specific_notes_for_terrain_water_rocks_foliage_foam_mist_lighting_and_raft_foreground"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "guide_hydraulic_fidelity",
+          "required_reviewer": "river_guide_or_oarsman_domain_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "flow_band_specific_notes_for_line_choice_holes_laterals_boils_eddy_lines_wave_trains_and_wet_banks",
+            "raft_outcome_sanity_notes_for_surf_flush_pin_release_flip_and_swimmer_visibility"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "geospatial_source_alignment",
+          "required_reviewer": "geospatial_or_technical_art_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "capture_overlays_or_notes_checking_river_centerline_banks_heightfield_masks_and_source_drape_alignment",
+            "known_preview_derivative_limitations_and_required_production_import_replacements"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "rights_and_reference_media",
+          "required_reviewer": "rights_or_content_provenance_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "item_level_license_permission_attribution_and_allowed_use_for_any_photo_footage_or_social_reference",
+            "confirmation_that_uncleared_media_remains_link_only_and_not_used_as_texture_training_or_packaged_asset_input"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "hazard_and_rescue_readability",
+          "required_reviewer": "gameplay_safety_or_rescue_readability_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "notes_that_water_foam_mist_foliage_and_lighting_do_not_hide_hazards_swimmers_throw_rope_zones_or_rescue_targets",
+            "notes_that_visual_forcing_or_art_layers_do_not_hide_solver_or_conservation_failures"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "production_material_asset_promotion",
+          "required_reviewer": "technical_art_or_rendering_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "promotion_decision_for_review_only_texture2d_material_instance_and_procedural_proxy_surfaces",
+            "replacement_or_approval_plan_for_landscape_water_rocks_foliage_foam_mist_lighting_and_raft_foreground_assets"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "desktop_and_vr_performance",
+          "required_reviewer": "performance_or_vr_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "desktop_capture_settings_frame_time_gpu_memory_and_scalability_notes",
+            "vr_or_low_power_capture_settings_comfort_frame_time_and_visual_readability_notes"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        }
+      ],
+      "river_level_notes": "",
+      "final_river_decision": {
+        "status": "not_reviewed",
+        "approved_for_lifelike": false,
+        "approved_for_production_playable": false,
+        "decision_maker": "",
+        "decision_date": "",
+        "decision_notes": "",
+        "required_follow_up_before_promotion": []
+      }
+    },
+    {
+      "river_id": "pacuare",
+      "display_name": "Pacuare River Rainforest",
+      "review_status": "not_reviewed_not_approved",
+      "source_manifest": "physics/data/real_world/pacuare_river_costa_rica/source_manifest.json",
+      "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview",
+      "flow_context": {
+        "flow_band_id": "rainfed_runnable_planning",
+        "flow_band_display_name": "Rain-Fed Runnable Planning",
+        "flow_band_source": "physics/data/real_world/pacuare_river_costa_rica/flow_presets.json",
+        "flow_reference_discharge_cfs": null,
+        "flow_visual_width_scale": 1.05,
+        "flow_visual_foam_scale": 1.2,
+        "flow_visual_wet_bank_scale": 1.2,
+        "flow_visual_current_cue_scale": 1.18,
+        "flow_visual_water_level_offset_cm": 7.0,
+        "flow_visual_note": "Default Pacuare planning band uses relative rainfed-runnable context only; numeric discharge stays unset until Costa Rica gauge, rainfall, flash-response, and guide review clear it."
+      },
+      "captures": [
+        {
+          "view_id": "guide_seat_downstream",
+          "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
+          "sha256": "5a1f7d55a948200af73b53ff4f0f2502a18d90dbac90dbf6c0f2f75b7314a5b8",
+          "automated_status": "candidate_for_human_lifelike_review_not_approved",
+          "human_review_status": "not_reviewed",
+          "approval_status": "not_approved_for_lifelike_or_production"
+        },
+        {
+          "view_id": "river_eye_downstream",
+          "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
+          "sha256": "8f64eb9ebaddb379a9931548bbd1fd70e46d97351aec65874e0bf886240b2640",
+          "automated_status": "candidate_for_human_lifelike_review_not_approved",
+          "human_review_status": "not_reviewed",
+          "approval_status": "not_approved_for_lifelike_or_production"
+        }
+      ],
+      "domain_results": [
+        {
+          "domain_id": "art_direction_visual_lifelike",
+          "required_reviewer": "environment_art_or_art_direction",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "side_by_side_review_against_rights_reviewed_reference_links_or_first_party_field_media",
+            "river_specific_notes_for_terrain_water_rocks_foliage_foam_mist_lighting_and_raft_foreground"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "guide_hydraulic_fidelity",
+          "required_reviewer": "river_guide_or_oarsman_domain_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "flow_band_specific_notes_for_line_choice_holes_laterals_boils_eddy_lines_wave_trains_and_wet_banks",
+            "raft_outcome_sanity_notes_for_surf_flush_pin_release_flip_and_swimmer_visibility"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "geospatial_source_alignment",
+          "required_reviewer": "geospatial_or_technical_art_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "capture_overlays_or_notes_checking_river_centerline_banks_heightfield_masks_and_source_drape_alignment",
+            "known_preview_derivative_limitations_and_required_production_import_replacements"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "rights_and_reference_media",
+          "required_reviewer": "rights_or_content_provenance_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "item_level_license_permission_attribution_and_allowed_use_for_any_photo_footage_or_social_reference",
+            "confirmation_that_uncleared_media_remains_link_only_and_not_used_as_texture_training_or_packaged_asset_input"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "hazard_and_rescue_readability",
+          "required_reviewer": "gameplay_safety_or_rescue_readability_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "notes_that_water_foam_mist_foliage_and_lighting_do_not_hide_hazards_swimmers_throw_rope_zones_or_rescue_targets",
+            "notes_that_visual_forcing_or_art_layers_do_not_hide_solver_or_conservation_failures"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "production_material_asset_promotion",
+          "required_reviewer": "technical_art_or_rendering_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "promotion_decision_for_review_only_texture2d_material_instance_and_procedural_proxy_surfaces",
+            "replacement_or_approval_plan_for_landscape_water_rocks_foliage_foam_mist_lighting_and_raft_foreground_assets"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        },
+        {
+          "domain_id": "desktop_and_vr_performance",
+          "required_reviewer": "performance_or_vr_reviewer",
+          "status": "not_reviewed",
+          "approved": false,
+          "reviewer_name": "",
+          "reviewer_role_or_credential": "",
+          "review_date": "",
+          "required_evidence": [
+            "desktop_capture_settings_frame_time_gpu_memory_and_scalability_notes",
+            "vr_or_low_power_capture_settings_comfort_frame_time_and_visual_readability_notes"
+          ],
+          "evidence_links_or_artifacts": [],
+          "notes": "",
+          "blockers": [],
+          "follow_up_actions": []
+        }
+      ],
+      "river_level_notes": "",
+      "final_river_decision": {
+        "status": "not_reviewed",
+        "approved_for_lifelike": false,
+        "approved_for_production_playable": false,
+        "decision_maker": "",
+        "decision_date": "",
+        "decision_notes": "",
+        "required_follow_up_before_promotion": []
+      }
+    }
+  ],
+  "promotion_rule": "A river may be promoted from preview-only only after every domain result is approved with reviewer identity, date, evidence, and notes; the river-level decision approves lifelike status; rights are recorded for visual references; hazards and rescue targets remain readable; and desktop/VR performance evidence is attached."
+}
