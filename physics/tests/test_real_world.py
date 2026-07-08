@@ -56,6 +56,8 @@ from raftsim.real_world import (
     PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_16PHR_IMAGE_FILE,
     PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_17PKM_IMAGE_FILE,
     PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_REVIEW_FILE,
+    PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_FILE,
+    PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_MANIFEST_FILE,
     PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_REVIEW_FILE,
     PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_SCL_16PHR_IMAGE_FILE,
     PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_SCL_17PKM_IMAGE_FILE,
@@ -2175,6 +2177,65 @@ def test_pacuare_sentinel_20250320_tci_bbox_clip_review_is_attached_but_not_prom
     assert "production source-drape replacement" in review["forbidden_use"]
 
 
+def test_pacuare_sentinel_augmented_preview_drape_is_unreal_preview_only():
+    pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
+    source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
+    pull_manifest = json.loads((pacuare_dir / "production_source_pull_manifest.json").read_text())
+    derivatives_manifest = json.loads((pacuare_dir / "production_import_pilot_derivatives_manifest.json").read_text())
+    readiness = json.loads((REAL_WORLD_DATA_DIR / "production_geospatial_source_readiness.json").read_text())
+    gap_register = build_production_environment_gap_register()
+    photoreal_sources = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+        ).read_text()
+    )
+    editor_module = (
+        Path(__file__).resolve().parents[2]
+        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp"
+    ).read_text()
+    manifest = json.loads((pacuare_dir / PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_MANIFEST_FILE).read_text())
+    rivers = {river["river_id"]: river for river in readiness["rivers"]}
+    gap_rivers = {river["river_id"]: river for river in gap_register["rivers"]}
+    pacuare_sources = next(river for river in photoreal_sources["rivers"] if river["river_id"] == "pacuare")
+
+    for artifact in [
+        PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_FILE,
+        PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_MANIFEST_FILE,
+    ]:
+        assert artifact in source_manifest["artifacts"]["imagery"]
+        assert (pacuare_dir / artifact).is_file()
+        assert artifact in gap_rivers["pacuare"]["attached_preview_inputs"]
+
+    assert any(
+        artifact["artifact_id"] == "pacuare_sentinel_augmented_source_drape_preview"
+        for artifact in pull_manifest["pulled_artifacts"]
+    )
+    assert (
+        derivatives_manifest["outputs"]["sentinel_augmented_preview_drape"]
+        == "physics/data/real_world/pacuare_river_costa_rica/"
+        + PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_FILE
+    )
+    assert (
+        "physics/data/real_world/pacuare_river_costa_rica/" + PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_FILE
+        in rivers["pacuare"]["attached_sources_by_class"]["aerial_or_satellite_imagery"]["artifacts"]
+    )
+    assert any(
+        artifact["artifact_id"] == "pacuare_sentinel_augmented_source_drape_preview"
+        for artifact in pacuare_sources["source_sample_artifacts"]
+    )
+    assert manifest["schema"] == "raftsim.pacuare_sentinel_augmented_source_drape_preview.v1"
+    assert manifest["status"] == "generated_review_gated_sentinel_calibrated_preview_not_production_source_drape"
+    assert manifest["output"]["dimensions_px"] == [4096, 4096]
+    assert manifest["output"]["sha256"] == "7f37001de40c17abad25564c978f542624fef241ba04ebed13bd80bf31c413cf"
+    assert manifest["processing"]["production_source_drape_replaced"] is False
+    assert manifest["processing"]["production_masks_replaced"] is False
+    assert manifest["processing"]["unreal_preview_calibration_drape_enabled"] is True
+    assert "production source-drape replacement" in manifest["forbidden_use"]
+    assert "claiming lifelike Pacuare screenshot readiness" in manifest["forbidden_use"]
+    assert PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_FILE in editor_module
+
+
 def test_pacuare_sentinel_20250320_draft_bank_window_review_blocks_promotion():
     pacuare_dir = REAL_WORLD_DATA_DIR / "pacuare_river_costa_rica"
     source_manifest = json.loads((pacuare_dir / "source_manifest.json").read_text())
@@ -2937,7 +2998,7 @@ def test_production_geospatial_attachment_audit_matches_ledger_and_keeps_preview
     assert audit["totals"] == {
         "missing_artifacts": 0,
         "promotion_blockers": 84,
-        "recorded_artifacts": 82,
+        "recorded_artifacts": 84,
         "required_source_classes": 7,
         "rivers": 3,
         "source_class_records": 21,
@@ -2946,7 +3007,7 @@ def test_production_geospatial_attachment_audit_matches_ledger_and_keeps_preview
     assert {"american_south_fork", "colorado_river", "pacuare"} == set(rivers)
     assert rivers["american_south_fork"]["artifact_count"] == 26
     assert rivers["colorado_river"]["artifact_count"] == 26
-    assert rivers["pacuare"]["artifact_count"] == 30
+    assert rivers["pacuare"]["artifact_count"] == 32
     assert all(river["missing_artifact_count"] == 0 for river in rivers.values())
     assert all("preview" in river["overall_status"] for river in rivers.values())
 
@@ -3166,6 +3227,8 @@ def test_production_environment_gap_register_tracks_lifelike_blockers_for_all_ri
     assert PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_17PKM_IMAGE_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_16PHR_IMAGE_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
+    assert PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_MANIFEST_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_REVIEW_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_TCI_17PKM_IMAGE_FILE in rivers["pacuare"]["attached_preview_inputs"]
     assert PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_TCI_16PHR_IMAGE_FILE in rivers["pacuare"]["attached_preview_inputs"]

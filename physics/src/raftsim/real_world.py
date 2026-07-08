@@ -253,6 +253,12 @@ PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_17PKM_IMAGE_FILE = (
 PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_16PHR_IMAGE_FILE = (
     "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_corridor_bbox_clip_review.png"
 )
+PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_FILE = (
+    "imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png"
+)
+PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_MANIFEST_FILE = (
+    "imagery/production_import_pilot/sentinel_augmented_source_drape_preview_manifest.json"
+)
 PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_REVIEW_FILE = (
     "imagery/production_import_pilot/sentinel_20250320_draft_bank_window_review.json"
 )
@@ -3184,6 +3190,8 @@ def build_pacuare_production_import_pilot(bounds: BoundsWGS84 | None = None) -> 
                     PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_REVIEW_FILE,
                     PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_17PKM_IMAGE_FILE,
                     PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_16PHR_IMAGE_FILE,
+                    PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_FILE,
+                    PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_MANIFEST_FILE,
                     PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_REVIEW_FILE,
                     PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_TCI_17PKM_IMAGE_FILE,
                     PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_TCI_16PHR_IMAGE_FILE,
@@ -3812,7 +3820,7 @@ def build_production_environment_gap_register() -> dict[str, object]:
                 "display_name": "Pacuare River, Costa Rica lower planning corridor",
                 "readiness": "preview_only_not_lifelike",
                 "active_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview",
-                "current_strength": "Copernicus DEM and NASA GIBS/Copernicus preview derivatives are normalized into the production folder shape, and a deterministic Unreal-curve centerline/stationing scaffold exists for annotation placement; imagery is still coarse/cloudy and local hydrology/hydrography are not authoritative.",
+                "current_strength": "Copernicus DEM and NASA GIBS/Copernicus preview derivatives are normalized into the production folder shape, a review-gated Sentinel-augmented drape is active for Unreal preview color/detail calibration, and a deterministic Unreal-curve centerline/stationing scaffold exists for annotation placement; imagery is still preview-only and local hydrology/hydrography are not authoritative.",
                 "attached_preview_inputs": [
                     "terrain/copernicus_dem_glo30_N09_W084.tif",
                     "terrain/copernicus_dem_glo30_N10_W084.tif",
@@ -3847,6 +3855,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                     PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_REVIEW_FILE,
                     PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_17PKM_IMAGE_FILE,
                     PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_16PHR_IMAGE_FILE,
+                    PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_FILE,
+                    PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_MANIFEST_FILE,
                     PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_REVIEW_FILE,
                     PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_TCI_17PKM_IMAGE_FILE,
                     PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_TCI_16PHR_IMAGE_FILE,
@@ -3937,6 +3947,8 @@ def build_production_environment_gap_register() -> dict[str, object]:
                             PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_REVIEW_FILE,
                             PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_17PKM_IMAGE_FILE,
                             PACUARE_SENTINEL_20250320_TCI_BBOX_CLIP_16PHR_IMAGE_FILE,
+                            PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_FILE,
+                            PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_MANIFEST_FILE,
                             PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_REVIEW_FILE,
                             PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_TCI_17PKM_IMAGE_FILE,
                             PACUARE_SENTINEL_20250320_DRAFT_BANK_WINDOW_TCI_16PHR_IMAGE_FILE,

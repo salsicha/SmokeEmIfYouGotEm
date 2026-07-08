@@ -3,7 +3,9 @@
     "These derivatives normalize the active Pacuare preview seeds into the production-import folder shape; they are not production photoreal terrain or imagery.",
     "NASA GIBS/MODIS is coarse and partly cloudy, and cloud-filled areas remain DEM-derived rainforest placeholders.",
     "Copernicus DEM tiles are not clipped to a surveyed corridor, reprojected to the final Costa Rica CRS, void-reviewed, hydrologically conditioned, or channel-burned.",
-    "Masks are preview segmentation aids and must be replaced or approved through higher-resolution imagery, hydrography, rainfall/flow context, and guide/outfitter review."
+    "Masks are preview segmentation aids and must be replaced or approved through higher-resolution imagery, hydrography, rainfall/flow context, and guide/outfitter review.",
+    "A Sentinel-augmented preview drape is available for Unreal color/detail calibration only; it does not replace production source imagery, masks, or material references.",
+    "The Sentinel contribution uses approximate bbox texture calibration, not exact native-CRS route or bank clipping, SCL-masked stitching, or guide-approved coverage."
   ],
   "inputs": {
     "copernicus_dem_glo30_northern_tile": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif",
@@ -19,7 +21,9 @@
     "source_drape": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/source_drape_4096.png",
     "source_drape_manifest": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/source_drape_composite_manifest.json",
     "vegetation_mask": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png",
-    "water_mask": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png"
+    "water_mask": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png",
+    "sentinel_augmented_preview_drape": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
+    "sentinel_augmented_preview_manifest": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_manifest.json"
   },
   "processing": {
     "bounds_wgs84": {
@@ -32,7 +36,9 @@
     "heightfield_size_px": 2017,
     "mask_size_px": 2048,
     "relief_size_px": 2048,
-    "source_drape_size_px": 4096
+    "source_drape_size_px": 4096,
+    "sentinel_augmented_preview_size_px": 4096,
+    "sentinel_augmented_preview_status": "unreal_preview_calibration_only_not_production_source_drape_or_mask_source"
   },
   "schema": "raftsim.pacuare_import_pilot_derivatives.v1",
   "source_recipe": "physics/data/real_world/pacuare_river_costa_rica/production_import_pilot.json",

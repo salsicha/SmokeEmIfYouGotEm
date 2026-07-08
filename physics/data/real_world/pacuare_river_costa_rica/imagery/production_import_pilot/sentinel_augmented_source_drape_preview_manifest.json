@@ -1,0 +1,58 @@
+{
+  "schema": "raftsim.pacuare_sentinel_augmented_source_drape_preview.v1",
+  "generated_on": "2026-07-07",
+  "river_id": "pacuare",
+  "section_id": "lower_pacuare_planning_corridor",
+  "status": "generated_review_gated_sentinel_calibrated_preview_not_production_source_drape",
+  "goal": "Improve the active Pacuare Unreal preview texture using cleaner March 20, 2025 Sentinel bbox review clips while preserving the production block on source-drape replacement.",
+  "output": {
+    "path": "imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
+    "dimensions_px": [
+      4096,
+      4096
+    ],
+    "mode": "RGBA",
+    "byte_count": 14447547,
+    "sha256": "7f37001de40c17abad25564c978f542624fef241ba04ebed13bd80bf31c413cf"
+  },
+  "inputs": {
+    "base_preview_drape": "imagery/production_import_pilot/source_drape_4096.png",
+    "base_preview_manifest": "imagery/production_import_pilot/source_drape_composite_manifest.json",
+    "sentinel_20250320_bbox_clip_review": "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_clip_review.json",
+    "sentinel_20250320_scl_qa_review": "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+    "sentinel_20250320_draft_bank_window_review": "imagery/production_import_pilot/sentinel_20250320_draft_bank_window_review.json",
+    "sentinel_16phr_tci_bbox_clip": "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_corridor_bbox_clip_review.png",
+    "sentinel_17pkm_tci_bbox_clip": "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_corridor_bbox_clip_review.png"
+  },
+  "processing": {
+    "size_px": 4096,
+    "sentinel_layout": "16PHR and 17PKM bbox clips are independently fit to the 4096px preview canvas and combined through a broad non-linear west/east transition; this is approximate texture calibration, not native-CRS stitching.",
+    "cloud_shadow_rejection": "Suppress Sentinel contribution where brightness/saturation heuristics indicate cloud, blue haze, or dark shadow; use SCL reviews as provenance but do not apply native SCL masks to pixels.",
+    "base_cloud_fill": "Increase Sentinel vegetation-toned contribution only where the older NASA/Copernicus preview drape is cloud-like, to reduce preview cloud plates without claiming authoritative imagery coverage.",
+    "blend": "Use the existing 4096 NASA/Copernicus preview drape as authority, then add 10.5% baseline Sentinel tone calibration, up to 33% additional cloud-plate fill, and bounded high-frequency detail from reliable vegetation-like pixels.",
+    "production_source_drape_replaced": false,
+    "production_masks_replaced": false,
+    "unreal_preview_calibration_drape_enabled": true
+  },
+  "allowed_use": [
+    "Unreal preview terrain source-color calibration",
+    "rainforest canopy and gorge texture review",
+    "side-by-side comparison against the coarse NASA/Copernicus preview drape",
+    "future exact-route clipping and SCL masking planning"
+  ],
+  "forbidden_use": [
+    "production source-drape replacement",
+    "production water or vegetation mask generation",
+    "photoreal material extraction",
+    "claiming Pacuare route imagery coverage",
+    "claiming lifelike Pacuare screenshot readiness"
+  ],
+  "promotion_blockers": [
+    "Replace approximate bbox texture calibration with exact native-CRS route/bank/corridor clipping.",
+    "Apply reviewed SCL/cloud/shadow masks to accepted route windows and document usable coverage.",
+    "Stitch 16PHR/17PKM only after seam, scale, terms, and guide/geospatial review pass.",
+    "Record Sentinel terms, attribution, storage/LFS, and redistribution review before production derivative use.",
+    "Compare accepted imagery against rainfall, flow, and guide/outfitter context before using water color, wetness, or bank exposure for gameplay visuals."
+  ],
+  "review_decision": "Use this file as a bounded preview calibration drape for Unreal only. It improves texture review but leaves all production photoreal, route-coverage, source-drape, mask, and lifelike-capture gates open."
+}

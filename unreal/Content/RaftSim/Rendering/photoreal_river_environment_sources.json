@@ -765,7 +765,7 @@
         },
         {
           "source_id": "copernicus_sentinel",
-          "status": "official_source_lead_attached",
+          "status": "official_source_lead_with_review_gated_march_2025_preview_calibration_drape_attached",
           "url": "https://dataspace.copernicus.eu/terms-and-conditions"
         },
         {
@@ -1293,6 +1293,15 @@
           ]
         },
         {
+          "artifact_id": "pacuare_sentinel_augmented_source_drape_preview",
+          "category": "derived_preview_drape",
+          "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
+          "manifest": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_manifest.json",
+          "provider": "RaftSim local preview calibration from March 20, 2025 Sentinel-2 bbox clips plus NASA/Copernicus placeholder drape",
+          "status": "active_unreal_preview_calibration_drape_review_gated_not_production_source_drape",
+          "unreal_use": "Active Pacuare preview drape for terrain/source color detail in /Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview; not route-authoritative imagery, mask source, material source, or lifelike evidence."
+        },
+        {
           "artifact_id": "pacuare_sentinel_20250320_draft_bank_window_review",
           "category": "sentinel_draft_bank_window_tci_scl_review",
           "paths": [
@@ -1467,12 +1476,12 @@
       "first_party_remaining_water_overlay_slab_demotion_recorded",
       "first_party_pale_water_foam_slash_demotion_recorded",
       "first_party_long_dark_water_streak_demotion_recorded",
-            "first_party_current_streak_waterline_artifact_demotion_recorded",
-            "first_party_central_water_scaffold_plate_demotion_recorded",
-            "first_party_square_foliage_source_card_artifact_demotion_recorded",
-            "first_party_remaining_square_card_cull_recorded",
-            "first_party_blocky_bank_ecology_and_sphere_foliage_cull_recorded",
-            "first_party_base_water_center_guide_stripe_breakup_recorded",
+      "first_party_current_streak_waterline_artifact_demotion_recorded",
+      "first_party_central_water_scaffold_plate_demotion_recorded",
+      "first_party_square_foliage_source_card_artifact_demotion_recorded",
+      "first_party_remaining_square_card_cull_recorded",
+      "first_party_blocky_bank_ecology_and_sphere_foliage_cull_recorded",
+      "first_party_base_water_center_guide_stripe_breakup_recorded",
       "first_party_base_water_cross_channel_breakup_recorded",
       "first_party_base_water_residual_center_seam_erase_recorded",
       "first_party_dark_micro_ripple_artifact_demotion_recorded",
