@@ -1,7 +1,7 @@
 {
   "schema": "raftsim.unreal.first_party_material_texture_atlas_manifest.v1",
   "generated_on": "2026-07-07",
-  "status": "importable_first_party_procedural_texture_atlases_generated_review_only_not_lifelike_capture",
+  "status": "unreal_texture2d_review_assets_created_from_first_party_procedural_atlases_not_lifelike_capture",
   "material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
   "material_swatch_manifest": "unreal/Content/RaftSim/Rendering/MaterialSwatches/first_party_material_swatch_manifest.json",
   "policy": {
@@ -69,19 +69,67 @@
     {
       "river_id": "american_south_fork",
       "target_read": "Sierra foothill pool-drop whitewater with clear green water, exposed wet rocks, gravel bars, oak/conifer banks, and summer-commercial light.",
-      "status": "importable_first_party_procedural_texture_atlas_review_only_not_lifelike_capture",
+      "status": "created_unreal_texture2d_review_assets_from_importable_first_party_procedural_atlas_not_lifelike_capture",
       "maps": {
         "albedo": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_albedo.png",
-          "sha256": "fd30378dde6d3414c121eeef1e0a25bc0c0481167c51953b8b61113559fde1d4"
+          "sha256": "fd30378dde6d3414c121eeef1e0a25bc0c0481167c51953b8b61113559fde1d4",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_AmericanSouthFork_AlbedoAtlas",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_AmericanSouthFork_AlbedoAtlas.uasset",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_albedo.png",
+            "status": "created_unreal_texture2d_review_asset_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": true,
+              "compression_settings": "TC_Default",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
         },
         "normal": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_normal.png",
-          "sha256": "8b0529527d5d9de797da0e7c1b7aa08e06fae8053235cb219b9fff5474e520d9"
+          "sha256": "8b0529527d5d9de797da0e7c1b7aa08e06fae8053235cb219b9fff5474e520d9",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_AmericanSouthFork_NormalAtlas",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_AmericanSouthFork_NormalAtlas.uasset",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_normal.png",
+            "status": "created_unreal_texture2d_review_asset_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Normalmap",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_WorldNormalMap",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
         },
         "ao_roughness_height": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_ao_roughness_height.png",
-          "sha256": "5ce76c4608eae8e199a94f4bdf8e82a124c89a3d1c1460c5e5dd0dfec401ec33"
+          "sha256": "5ce76c4608eae8e199a94f4bdf8e82a124c89a3d1c1460c5e5dd0dfec401ec33",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_AmericanSouthFork_AORoughnessHeightAtlas",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_AmericanSouthFork_AORoughnessHeightAtlas.uasset",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_ao_roughness_height.png",
+            "status": "created_unreal_texture2d_review_asset_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Masks",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
         }
       },
       "width": 1536,
@@ -99,19 +147,67 @@
     {
       "river_id": "colorado_river",
       "target_read": "Grand Canyon big-water rowing corridor with layered canyon walls, sandbars, release-dependent wet banks, sparse desert riparian scrub, boils, and long wave trains.",
-      "status": "importable_first_party_procedural_texture_atlas_review_only_not_lifelike_capture",
+      "status": "created_unreal_texture2d_review_assets_from_importable_first_party_procedural_atlas_not_lifelike_capture",
       "maps": {
         "albedo": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_albedo.png",
-          "sha256": "4bb2b4cc73daa2ad694f9414d4c9004b43b6bcf55b5467867918e5112670c790"
+          "sha256": "4bb2b4cc73daa2ad694f9414d4c9004b43b6bcf55b5467867918e5112670c790",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_ColoradoRiver_AlbedoAtlas",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_ColoradoRiver_AlbedoAtlas.uasset",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_albedo.png",
+            "status": "created_unreal_texture2d_review_asset_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": true,
+              "compression_settings": "TC_Default",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
         },
         "normal": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_normal.png",
-          "sha256": "d88e88b694813f095409375ec10279ec6de6a8c30e05f815f39b2c2324bcdc7f"
+          "sha256": "d88e88b694813f095409375ec10279ec6de6a8c30e05f815f39b2c2324bcdc7f",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_ColoradoRiver_NormalAtlas",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_ColoradoRiver_NormalAtlas.uasset",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_normal.png",
+            "status": "created_unreal_texture2d_review_asset_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Normalmap",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_WorldNormalMap",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
         },
         "ao_roughness_height": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_ao_roughness_height.png",
-          "sha256": "b428d7e31f3041c991e7cf29bcfeeac239b467c6e1c930e9aa4ea89e8ffe0974"
+          "sha256": "b428d7e31f3041c991e7cf29bcfeeac239b467c6e1c930e9aa4ea89e8ffe0974",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_ColoradoRiver_AORoughnessHeightAtlas",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_ColoradoRiver_AORoughnessHeightAtlas.uasset",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_ao_roughness_height.png",
+            "status": "created_unreal_texture2d_review_asset_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Masks",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
         }
       },
       "width": 1536,
@@ -129,19 +225,67 @@
     {
       "river_id": "pacuare",
       "target_read": "Humid tropical rainforest gorge with dense canopy, wet dark boulders, moss, leaf litter, waterfalls, spray, mist, and rainfed flow states.",
-      "status": "importable_first_party_procedural_texture_atlas_review_only_not_lifelike_capture",
+      "status": "created_unreal_texture2d_review_assets_from_importable_first_party_procedural_atlas_not_lifelike_capture",
       "maps": {
         "albedo": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_albedo.png",
-          "sha256": "f16a2059efb9b7008ac7d1bf075644d51599afe1f9971c5119f5d409a81e2863"
+          "sha256": "f16a2059efb9b7008ac7d1bf075644d51599afe1f9971c5119f5d409a81e2863",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_Pacuare_AlbedoAtlas",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_Pacuare_AlbedoAtlas.uasset",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_albedo.png",
+            "status": "created_unreal_texture2d_review_asset_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": true,
+              "compression_settings": "TC_Default",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
         },
         "normal": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_normal.png",
-          "sha256": "b08e168799c512a96aa56f4d0939a3c00384924cabdafd0cccda3244a9630338"
+          "sha256": "b08e168799c512a96aa56f4d0939a3c00384924cabdafd0cccda3244a9630338",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_Pacuare_NormalAtlas",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_Pacuare_NormalAtlas.uasset",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_normal.png",
+            "status": "created_unreal_texture2d_review_asset_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Normalmap",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_WorldNormalMap",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
         },
         "ao_roughness_height": {
           "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_ao_roughness_height.png",
-          "sha256": "f2394d4abefb6c14a2046aa1b62195e28c757102b9ce9c03d366ffc7ea26985b"
+          "sha256": "f2394d4abefb6c14a2046aa1b62195e28c757102b9ce9c03d366ffc7ea26985b",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_Pacuare_AORoughnessHeightAtlas",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures/T_RaftSim_Pacuare_AORoughnessHeightAtlas.uasset",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_ao_roughness_height.png",
+            "status": "created_unreal_texture2d_review_asset_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Masks",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
         }
       },
       "width": 1536,
@@ -158,5 +302,36 @@
     }
   ],
   "promotion_gate": "These atlases may be imported into Unreal material instances as first-party texture candidates, but lifelike approval still requires in-engine material application, guide/geospatial review, hazard readability review, screenshots, and desktop/VR performance evidence.",
-  "current_decision": "Use these deterministic PNG atlases as the first importable first-party material texture pack for terrain, rock, foliage, water, mist, and raft material iteration. They are not source imagery, not social-media-derived, and not lifelike screenshot evidence."
+  "current_decision": "Use these deterministic PNG atlases as first-party source inputs for review-only Unreal Texture2D atlas assets. The editor automation now creates nine T_RaftSim_*Atlas Texture2D assets with recorded sRGB/compression/mip/LOD settings and binds them into the 18 review-only material instance candidates. They are not source imagery, not social-media-derived, not production material approval, and not lifelike screenshot evidence until shader graph sampling, guide/geospatial review, hazard readability, captures, and performance gates pass.",
+  "unreal_texture_asset_root": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
+  "unreal_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike",
+  "texture_asset_import_settings": {
+    "AlbedoAtlas": {
+      "map_key": "AlbedoAtlas",
+      "compression_settings": "TC_Default",
+      "srgb": true,
+      "lod_group": "TEXTUREGROUP_World",
+      "mip_gen_settings": "TMGS_FromTextureGroup",
+      "compression_no_alpha": true,
+      "virtual_texture_streaming": false
+    },
+    "NormalAtlas": {
+      "map_key": "NormalAtlas",
+      "compression_settings": "TC_Normalmap",
+      "srgb": false,
+      "lod_group": "TEXTUREGROUP_WorldNormalMap",
+      "mip_gen_settings": "TMGS_FromTextureGroup",
+      "compression_no_alpha": true,
+      "virtual_texture_streaming": false
+    },
+    "AORoughnessHeightAtlas": {
+      "map_key": "AORoughnessHeightAtlas",
+      "compression_settings": "TC_Masks",
+      "srgb": false,
+      "lod_group": "TEXTUREGROUP_World",
+      "mip_gen_settings": "TMGS_FromTextureGroup",
+      "compression_no_alpha": true,
+      "virtual_texture_streaming": false
+    }
+  }
 }
