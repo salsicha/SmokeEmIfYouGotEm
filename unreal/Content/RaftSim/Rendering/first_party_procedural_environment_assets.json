@@ -173,6 +173,7 @@
       "production_landscape_or_nanite_terrain_material_layers",
       "photoreal_rock_and_boulder_mesh_variation",
       "dense_biome_specific_foliage_library_or_instanced_first_party_equivalent",
+      "replace_visible_proxy_water_overlay_geometry_with_production_water_materials",
       "physically_plausible_water_shader_reflection_refraction_depth_turbidity",
       "niagara_or_equivalent_spray_mist_foam_particle_layers",
       "approved_raft_and_oar_foreground_art",
@@ -192,56 +193,72 @@
     "atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
     "material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
     "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
-    "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved",
+    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
     "photoreal_capture_quality_summary": {
       "capture_count": 6,
-      "blocking_capture_count": 0,
-      "blocker_counts": {},
+      "blocking_capture_count": 6,
+      "blocker_counts": {
+        "visible_proxy_water_overlay_geometry": 6
+      },
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
-          "blocking_capture_count": 0,
-          "blockers": [],
-          "status": "candidate_for_human_lifelike_review_not_approved"
+          "blocking_capture_count": 2,
+          "blockers": [
+            "visible_proxy_water_overlay_geometry"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
         },
         "colorado_river": {
           "capture_count": 2,
-          "blocking_capture_count": 0,
-          "blockers": [],
-          "status": "candidate_for_human_lifelike_review_not_approved"
+          "blocking_capture_count": 2,
+          "blockers": [
+            "visible_proxy_water_overlay_geometry"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
         },
         "pacuare": {
           "capture_count": 2,
-          "blocking_capture_count": 0,
-          "blockers": [],
-          "status": "candidate_for_human_lifelike_review_not_approved"
+          "blocking_capture_count": 2,
+          "blockers": [
+            "visible_proxy_water_overlay_geometry"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
         }
       }
     },
     "visual_blocker_reduction_checkpoint_2026_07_08": {
-      "status": "automated_capture_quality_blockers_removed_all_rivers_candidate_for_human_review_not_art_approved",
+      "status": "pixel_metric_blockers_removed_visible_proxy_water_overlay_still_blocks_lifelike_review",
       "capture_quality_summary": {
         "capture_count": 6,
-        "blocking_capture_count": 0,
-        "blocker_counts": {},
+        "blocking_capture_count": 6,
+        "blocker_counts": {
+          "visible_proxy_water_overlay_geometry": 6
+        },
         "per_river": {
           "american_south_fork": {
             "capture_count": 2,
-            "blocking_capture_count": 0,
-            "blockers": [],
-            "status": "candidate_for_human_lifelike_review_not_approved"
+            "blocking_capture_count": 2,
+            "blockers": [
+              "visible_proxy_water_overlay_geometry"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
           },
           "colorado_river": {
             "capture_count": 2,
-            "blocking_capture_count": 0,
-            "blockers": [],
-            "status": "candidate_for_human_lifelike_review_not_approved"
+            "blocking_capture_count": 2,
+            "blockers": [
+              "visible_proxy_water_overlay_geometry"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
           },
           "pacuare": {
             "capture_count": 2,
-            "blocking_capture_count": 0,
-            "blockers": [],
-            "status": "candidate_for_human_lifelike_review_not_approved"
+            "blocking_capture_count": 2,
+            "blockers": [
+              "visible_proxy_water_overlay_geometry"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
           }
         }
       },
@@ -253,7 +270,9 @@
         "low_luma_variation",
         "low_color_texture_entropy"
       ],
-      "remaining_blocker_classes": []
+      "remaining_blocker_classes": [
+        "visible_proxy_water_overlay_geometry"
+      ]
     }
   },
   "global_recipes": [

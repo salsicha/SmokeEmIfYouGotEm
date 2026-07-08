@@ -43,29 +43,37 @@
     "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
     "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
     "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
-    "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved",
+    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
     "photoreal_capture_quality_summary": {
       "capture_count": 6,
-      "blocking_capture_count": 0,
-      "blocker_counts": {},
+      "blocking_capture_count": 6,
+      "blocker_counts": {
+        "visible_proxy_water_overlay_geometry": 6
+      },
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
-          "blocking_capture_count": 0,
-          "blockers": [],
-          "status": "candidate_for_human_lifelike_review_not_approved"
+          "blocking_capture_count": 2,
+          "blockers": [
+            "visible_proxy_water_overlay_geometry"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
         },
         "colorado_river": {
           "capture_count": 2,
-          "blocking_capture_count": 0,
-          "blockers": [],
-          "status": "candidate_for_human_lifelike_review_not_approved"
+          "blocking_capture_count": 2,
+          "blockers": [
+            "visible_proxy_water_overlay_geometry"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
         },
         "pacuare": {
           "capture_count": 2,
-          "blocking_capture_count": 0,
-          "blockers": [],
-          "status": "candidate_for_human_lifelike_review_not_approved"
+          "blocking_capture_count": 2,
+          "blockers": [
+            "visible_proxy_water_overlay_geometry"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
         }
       }
     }
@@ -225,6 +233,7 @@
         "foam, boil, wave-train, hole, eddy-line, lateral, spray, and mist layers",
         "flow-band dependency from validated hydrology and gameplay tuning",
         "no visual forcing that hides conservation or physics failures",
+        "replace_visible_proxy_water_overlay_geometry_with_production_water_materials",
         "first_party_water_foam_mist_texture_atlas_or_approved_water_material_textures",
         "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
         "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
@@ -233,7 +242,7 @@
         "automated_capture_quality_gate_passed_without_proxy_blockers"
       ],
       "current_preview_progress": [
-        "2026-07-08 near-field and fleck-detail passes removed dark_foreground_proxy, large_flat_blue_field, excess_low_gradient_area, low_luma_variation, and low_edge_density blockers; low-color-texture-entropy remains in all captures."
+        "2026-07-08 near-field, fleck-detail, and source-aware water microbreakup passes removed the pixel-metric blockers dark_foreground_proxy, large_flat_blue_field, excess_low_gradient_area, low_luma_variation, low_edge_density, and low_color_texture_entropy; the stricter review now blocks all captures on visible_proxy_water_overlay_geometry."
       ]
     },
     {
@@ -247,7 +256,7 @@
         "automated_capture_quality_gate_passed_without_proxy_blockers"
       ],
       "current_preview_progress": [
-        "2026-07-08 near-field and fleck-detail passes removed dark_foreground_proxy, large_flat_blue_field, excess_low_gradient_area, low_luma_variation, and low_edge_density blockers; low-color-texture-entropy remains in all captures."
+        "2026-07-08 near-field, fleck-detail, and source-aware water microbreakup passes removed the pixel-metric blockers dark_foreground_proxy, large_flat_blue_field, excess_low_gradient_area, low_luma_variation, low_edge_density, and low_color_texture_entropy; the stricter review now blocks all captures on visible_proxy_water_overlay_geometry."
       ]
     }
   ],
@@ -732,7 +741,8 @@
     }
   ],
   "next_checkpoint_order": [
-    "Replace proxy water marks, terrain, rocks, foliage, mist/foam, lighting, and review-only materials with production source-derived or rights-cleared assets before any lifelike screenshot claim.",
+    "Replace visible proxy water overlay geometry with production water material/shader detail before any lifelike screenshot claim.",
+    "Replace remaining proxy terrain, rocks, foliage, mist/foam, lighting, and review-only materials with production source-derived or rights-cleared assets before any lifelike screenshot claim.",
     "Close South Fork hydrography/flow/media annotations enough to test a true source-conditioned terrain and material pass.",
     "Close Colorado river-mile/release/media annotations before expanding beyond the Lees Ferry pilot slice.",
     "Close Pacuare official hydrography, cloud-screened imagery, rainfall/flow, and protected-area review before claiming local fidelity.",
@@ -740,8 +750,10 @@
     "Add desktop and VR performance evidence before any river leaves preview-only status."
   ],
   "visual_blocker_reduction_checkpoint_2026_07_08": {
-    "status": "automated_capture_quality_blockers_removed_all_rivers_candidate_for_human_review_not_art_approved",
-    "remaining_blocker_counts": {},
+    "status": "pixel_metric_blockers_removed_visible_proxy_water_overlay_still_blocks_lifelike_review",
+    "remaining_blocker_counts": {
+      "visible_proxy_water_overlay_geometry": 6
+    },
     "closed_blocker_classes": [
       "dark_foreground_proxy",
       "excess_low_gradient_area",

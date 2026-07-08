@@ -1,7 +1,7 @@
 {
   "schema": "raftsim.unreal.photoreal_capture_quality_review.v1",
   "generated_on": "2026-07-08",
-  "status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved",
+  "status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
   "source_capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
   "policy": {
     "metrics_are_blockers_not_lifelike_approval": true,
@@ -18,26 +18,34 @@
   },
   "summary": {
     "capture_count": 6,
-    "blocking_capture_count": 0,
-    "blocker_counts": {},
+    "blocking_capture_count": 6,
+    "blocker_counts": {
+      "visible_proxy_water_overlay_geometry": 6
+    },
     "per_river": {
       "american_south_fork": {
         "capture_count": 2,
-        "blocking_capture_count": 0,
-        "blockers": [],
-        "status": "candidate_for_human_lifelike_review_not_approved"
+        "blocking_capture_count": 2,
+        "blockers": [
+          "visible_proxy_water_overlay_geometry"
+        ],
+        "status": "preview_only_not_lifelike_quality_blockers"
       },
       "colorado_river": {
         "capture_count": 2,
-        "blocking_capture_count": 0,
-        "blockers": [],
-        "status": "candidate_for_human_lifelike_review_not_approved"
+        "blocking_capture_count": 2,
+        "blockers": [
+          "visible_proxy_water_overlay_geometry"
+        ],
+        "status": "preview_only_not_lifelike_quality_blockers"
       },
       "pacuare": {
         "capture_count": 2,
-        "blocking_capture_count": 0,
-        "blockers": [],
-        "status": "candidate_for_human_lifelike_review_not_approved"
+        "blocking_capture_count": 2,
+        "blockers": [
+          "visible_proxy_water_overlay_geometry"
+        ],
+        "status": "preview_only_not_lifelike_quality_blockers"
       }
     }
   },
@@ -46,7 +54,7 @@
       "river_id": "american_south_fork",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
-      "sha256": "b5992d536fb2c333d1b75396d692c9b49599be3634825b0899f3d01d775dd64f",
+      "sha256": "68a57673a10ea352753b8cf422a7edf72f3ccd5912bac08ba0fe51e465aade8a",
       "metrics": {
         "analysis_size": [
           320,
@@ -70,8 +78,16 @@
         "flat_blue_field_fraction": 0.0642,
         "bottom_center_dark_fraction": 0.0066
       },
-      "blockers": [],
-      "status": "candidate_for_human_lifelike_review_not_approved"
+      "blockers": [
+        {
+          "id": "visible_proxy_water_overlay_geometry",
+          "metric": "renderer_coverage",
+          "value": "first_party_source_aware_tapered_water_chroma_microbreakup",
+          "threshold": "production_water_material_or_human_approved_proxy_replacement",
+          "why_it_blocks_lifelike_review": "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+        }
+      ],
+      "status": "preview_only_not_lifelike_quality_blockers"
     },
     {
       "river_id": "american_south_fork",
@@ -101,14 +117,22 @@
         "flat_blue_field_fraction": 0.0,
         "bottom_center_dark_fraction": 0.0066
       },
-      "blockers": [],
-      "status": "candidate_for_human_lifelike_review_not_approved"
+      "blockers": [
+        {
+          "id": "visible_proxy_water_overlay_geometry",
+          "metric": "renderer_coverage",
+          "value": "first_party_source_aware_tapered_water_chroma_microbreakup",
+          "threshold": "production_water_material_or_human_approved_proxy_replacement",
+          "why_it_blocks_lifelike_review": "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+        }
+      ],
+      "status": "preview_only_not_lifelike_quality_blockers"
     },
     {
       "river_id": "colorado_river",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
-      "sha256": "6efbabdf09ada4fa44e9a22e39b3f1e259bb4c7fea0a286d3b429547f2f3c758",
+      "sha256": "5ca8d8f110be37cda58954736135e92d6cb9ec13a24d42170b759ed9a2bf4606",
       "metrics": {
         "analysis_size": [
           320,
@@ -132,8 +156,16 @@
         "flat_blue_field_fraction": 0.0554,
         "bottom_center_dark_fraction": 0.0063
       },
-      "blockers": [],
-      "status": "candidate_for_human_lifelike_review_not_approved"
+      "blockers": [
+        {
+          "id": "visible_proxy_water_overlay_geometry",
+          "metric": "renderer_coverage",
+          "value": "first_party_source_aware_tapered_water_chroma_microbreakup",
+          "threshold": "production_water_material_or_human_approved_proxy_replacement",
+          "why_it_blocks_lifelike_review": "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+        }
+      ],
+      "status": "preview_only_not_lifelike_quality_blockers"
     },
     {
       "river_id": "colorado_river",
@@ -163,14 +195,22 @@
         "flat_blue_field_fraction": 0.0552,
         "bottom_center_dark_fraction": 0.0063
       },
-      "blockers": [],
-      "status": "candidate_for_human_lifelike_review_not_approved"
+      "blockers": [
+        {
+          "id": "visible_proxy_water_overlay_geometry",
+          "metric": "renderer_coverage",
+          "value": "first_party_source_aware_tapered_water_chroma_microbreakup",
+          "threshold": "production_water_material_or_human_approved_proxy_replacement",
+          "why_it_blocks_lifelike_review": "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+        }
+      ],
+      "status": "preview_only_not_lifelike_quality_blockers"
     },
     {
       "river_id": "pacuare",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
-      "sha256": "2de9a9219f155064c93b94bdf7343e2727980afbd82d6dd7a81984ffa532f5c2",
+      "sha256": "01e9d80be62e80b099fb818eddb7594410c67610ceaad24e786dd3c52f031782",
       "metrics": {
         "analysis_size": [
           320,
@@ -194,14 +234,22 @@
         "flat_blue_field_fraction": 0.0344,
         "bottom_center_dark_fraction": 0.0427
       },
-      "blockers": [],
-      "status": "candidate_for_human_lifelike_review_not_approved"
+      "blockers": [
+        {
+          "id": "visible_proxy_water_overlay_geometry",
+          "metric": "renderer_coverage",
+          "value": "first_party_source_aware_tapered_water_chroma_microbreakup",
+          "threshold": "production_water_material_or_human_approved_proxy_replacement",
+          "why_it_blocks_lifelike_review": "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+        }
+      ],
+      "status": "preview_only_not_lifelike_quality_blockers"
     },
     {
       "river_id": "pacuare",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
-      "sha256": "14af7c9eb1ccc597e58f8fdfb797c786f4fe7a0ac7b0658a0a3f978712d02721",
+      "sha256": "da010c3cf242d94f853a7359d1b41b132ae7bd3d7fa34436be721bab5d980967",
       "metrics": {
         "analysis_size": [
           320,
@@ -225,9 +273,17 @@
         "flat_blue_field_fraction": 0.0,
         "bottom_center_dark_fraction": 0.0426
       },
-      "blockers": [],
-      "status": "candidate_for_human_lifelike_review_not_approved"
+      "blockers": [
+        {
+          "id": "visible_proxy_water_overlay_geometry",
+          "metric": "renderer_coverage",
+          "value": "first_party_source_aware_tapered_water_chroma_microbreakup",
+          "threshold": "production_water_material_or_human_approved_proxy_replacement",
+          "why_it_blocks_lifelike_review": "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+        }
+      ],
+      "status": "preview_only_not_lifelike_quality_blockers"
     }
   ],
-  "current_decision": "Use this automated review as a regression gate for the photoreal environment track. The current captures have no automated blocker counts and may advance to human art, guide, geospatial, rights, hazard-readability, and performance review, but automated metrics do not approve the visuals as lifelike or production-ready."
+  "current_decision": "Use this automated review as a regression gate for the photoreal environment track. The current captures remain preview-only because at least one automated or source-aware blocker is present; passing pixel checks still does not replace guide, geospatial, rights, hazard-readability, performance, and art-direction approval."
 }
