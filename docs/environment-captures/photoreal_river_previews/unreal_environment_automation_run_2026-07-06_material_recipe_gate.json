@@ -104,6 +104,7 @@
     "first_party_near_field_water_surface_grain": true,
     "first_party_near_camera_water_macro_ripple_mottle": true,
     "first_party_base_water_depth_current_grading": true,
+    "first_party_base_water_flow_thread_texture": true,
     "first_party_base_water_center_guide_stripe_breakup": true,
     "first_party_base_water_cross_channel_breakup": true,
     "first_party_base_water_residual_center_seam_erase": true,
@@ -127,7 +128,7 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [52.86, 83.69, 88.54],
+      "rgb_mean": [52.87, 83.64, 88.49],
       "nonblank": true
     },
     {
@@ -139,7 +140,7 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [71.08, 65.68, 55.54],
+      "rgb_mean": [71.04, 65.63, 55.56],
       "nonblank": true
     },
     {
@@ -151,7 +152,7 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [32.52, 67.43, 66.95],
+      "rgb_mean": [32.52, 67.36, 66.87],
       "nonblank": true
     },
     {
@@ -168,6 +169,7 @@
     "Added first-party near-field water surface grain to the base river ribbon with higher mesh resolution, fine-ripple displacement, dark slicks, and subtle bright streaks.",
     "Added first-party near-camera water macro-ripple mottle to the base river ribbon and river-eye center cover with non-linear shadow/highlight patches and small bounded relief, guarded against straight center seams and still preview-only before production water shader approval.",
     "Added first-party base water depth/current grading to the river ribbon with muted river-specific deep water, center current tongues, sediment threads, and sky-thread variation.",
+    "Added first-party base water flow-thread texture directly to the generated river ribbon so broad water planes receive bounded long-current shadow/highlight threads, tiny relief, and flow-scaled foam glints without authorizing solver-driven hydraulics or feature forcing.",
     "Added first-party flow-cued water foam/slick mottle directly to the base river ribbon so flow-band energy seeds bounded aeration flecks and dark current slicks without claiming solver-driven foam or production water shader approval.",
     "Added first-party flow-dependent hydraulic aeration mats, wave-train foam laces, and bounded spray beads over authored flow bands without changing solver authority or hiding conservation failures.",
     "Switched the active first-party vertex-color water preview material back to a bounded DefaultLit normal-response scaffold with low emissive fill, roughness, and specular constants so generated water mesh relief can catch sun/skylight after central water plate and stripe artifacts were demoted.",
