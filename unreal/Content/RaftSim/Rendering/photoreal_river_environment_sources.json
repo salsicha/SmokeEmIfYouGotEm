@@ -423,7 +423,12 @@
           "unreal_use": "Editor overlays for access, no-publish, and evacuation/rescue review; not final access geometry or screenshot clearance."
         }
       ],
-      "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview"
+      "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview",
+      "source_conditioned_material_maps": {
+        "macro_albedo": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_macro_albedo.png",
+        "material_zones": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_material_zones.png",
+        "ao_roughness_height": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png"
+      }
     },
     {
       "capture_targets": [
@@ -754,7 +759,12 @@
           "unreal_use": "Editor overlays and oarsman notes for access, no-publish, camp/beach, and screenshot-publication review; not final route or permit authority."
         }
       ],
-      "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview"
+      "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview",
+      "source_conditioned_material_maps": {
+        "macro_albedo": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_macro_albedo.png",
+        "material_zones": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_material_zones.png",
+        "ao_roughness_height": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png"
+      }
     },
     {
       "aerial_imagery_sources": [
@@ -1384,7 +1394,12 @@
           ]
         }
       ],
-      "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview"
+      "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview",
+      "source_conditioned_material_maps": {
+        "macro_albedo": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_macro_albedo.png",
+        "material_zones": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_material_zones.png",
+        "ao_roughness_height": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png"
+      }
     }
   ],
   "schema": "raftsim.unreal.photoreal_river_environment_sources.v1",
@@ -1413,7 +1428,8 @@
       "approved_first_party_texture_atlas_import_or_rights_cleared_texture_assets",
       "production_material_instances_using_albedo_normal_ao_roughness_height_maps",
       "approved_unreal_material_instances_using_atlas_maps_or_rights_cleared_equivalent_textures",
-      "automated_capture_quality_gate_passed_without_proxy_blockers"
+      "automated_capture_quality_gate_passed_without_proxy_blockers",
+      "approved_source_conditioned_material_texture_assets_and_capture_review"
     ],
     "first_party_procedural_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
     "first_party_procedural_material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
@@ -1558,7 +1574,11 @@
       "source_conditioned_material_map_manifest_recorded",
       "source_conditioned_macro_albedo_material_maps_recorded",
       "source_conditioned_material_zone_maps_recorded",
-      "source_conditioned_ao_roughness_height_maps_recorded"
+      "source_conditioned_ao_roughness_height_maps_recorded",
+      "source_conditioned_material_texture2d_review_assets_declared_recorded",
+      "source_conditioned_material_instance_texture_bindings_recorded",
+      "source_conditioned_material_zone_weight_controls_recorded",
+      "source_conditioned_shader_graph_sampler_wiring_recorded"
     ],
     "preview_capture_root": "docs/environment-captures/photoreal_river_previews",
     "preview_map_package_root": "/Game/RaftSim/Maps/EnvironmentPreviews",
@@ -1685,7 +1705,10 @@
         "material_zones",
         "ao_roughness_height"
       ]
-    }
+    },
+    "source_conditioned_material_texture_asset_root": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures",
+    "source_conditioned_material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_source_conditioned_material_instances_not_lifelike",
+    "source_conditioned_material_instance_binding_status": "bound_to_review_material_instance_parameters_with_regenerated_capture_review_not_lifelike"
   },
   "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
   "first_party_material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json",
@@ -1703,5 +1726,18 @@
   "photoreal_human_lifelike_review_results_template": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_results_template.json",
   "photoreal_human_lifelike_review_results_template_status": "awaiting_external_human_review_inputs_not_approved",
   "source_conditioned_material_map_manifest": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/first_party_source_conditioned_material_map_manifest.json",
-  "source_conditioned_material_map_status": "generated_review_gated_source_conditioned_material_maps_not_lifelike"
+  "source_conditioned_material_map_status": "generated_review_gated_source_conditioned_material_maps_not_lifelike",
+  "source_conditioned_material_map_summary": {
+    "river_count": 3,
+    "map_count": 9,
+    "map_size_px": 2048,
+    "map_ids": [
+      "macro_albedo",
+      "material_zones",
+      "ao_roughness_height"
+    ]
+  },
+  "source_conditioned_material_texture_asset_root": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures",
+  "source_conditioned_material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_source_conditioned_material_instances_not_lifelike",
+  "source_conditioned_material_instance_binding_status": "bound_to_review_material_instance_parameters_with_regenerated_capture_review_not_lifelike"
 }

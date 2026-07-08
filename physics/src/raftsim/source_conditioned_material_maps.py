@@ -19,8 +19,44 @@ SOURCE_CONDITIONED_MATERIAL_MAP_MANIFEST_RELATIVE_PATH = (
     SOURCE_CONDITIONED_MATERIAL_MAP_ROOT_RELATIVE_PATH
     / "first_party_source_conditioned_material_map_manifest.json"
 )
+SOURCE_CONDITIONED_MATERIAL_TEXTURE_ASSET_ROOT_RELATIVE_PATH = (
+    SOURCE_CONDITIONED_MATERIAL_MAP_ROOT_RELATIVE_PATH / "Textures"
+)
+SOURCE_CONDITIONED_MATERIAL_TEXTURE_ASSET_STATUS = (
+    "created_unreal_texture2d_review_assets_bound_to_source_conditioned_material_instances_not_lifelike"
+)
 
 OUTPUT_SIZE = 2048
+
+RIVER_ASSET_NAMES = {
+    "american_south_fork": "AmericanSouthFork",
+    "colorado_river": "ColoradoRiver",
+    "pacuare": "Pacuare",
+}
+
+UNREAL_TEXTURE_ASSET_BY_MAP_ID = {
+    "macro_albedo": {
+        "parameter": "SourceConditionedMacroAlbedo",
+        "asset_suffix": "SourceConditionedMacroAlbedo",
+        "compression_settings": "TC_Default",
+        "srgb": True,
+        "lod_group": "TEXTUREGROUP_World",
+    },
+    "material_zones": {
+        "parameter": "SourceConditionedMaterialZones",
+        "asset_suffix": "SourceConditionedMaterialZones",
+        "compression_settings": "TC_Masks",
+        "srgb": False,
+        "lod_group": "TEXTUREGROUP_World",
+    },
+    "ao_roughness_height": {
+        "parameter": "SourceConditionedAORoughnessHeight",
+        "asset_suffix": "SourceConditionedAORoughnessHeight",
+        "compression_settings": "TC_Masks",
+        "srgb": False,
+        "lod_group": "TEXTUREGROUP_World",
+    },
+}
 
 
 @dataclass(frozen=True)
@@ -166,6 +202,7 @@ def _record_for_capture(repo_root: Path, capture: dict[str, object], output_root
 def _records_to_manifest(repo_root: Path, records: Iterable[SourceConditionedMaterialMapRecord]) -> dict:
     river_maps = []
     for record in records:
+        river_asset_name = RIVER_ASSET_NAMES[record.river_id]
         river_maps.append(
             {
                 "river_id": record.river_id,
@@ -179,6 +216,31 @@ def _records_to_manifest(repo_root: Path, records: Iterable[SourceConditionedMat
                         "sha256": record.sha256[map_id],
                         "width": record.width,
                         "height": record.height,
+                        "unreal_texture_asset": {
+                            "path": (
+                                "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/"
+                                f"T_RaftSim_{river_asset_name}_{UNREAL_TEXTURE_ASSET_BY_MAP_ID[map_id]['asset_suffix']}"
+                            ),
+                            "asset_file": str(
+                                SOURCE_CONDITIONED_MATERIAL_TEXTURE_ASSET_ROOT_RELATIVE_PATH
+                                / f"T_RaftSim_{river_asset_name}_{UNREAL_TEXTURE_ASSET_BY_MAP_ID[map_id]['asset_suffix']}.uasset"
+                            ),
+                            "parameter": UNREAL_TEXTURE_ASSET_BY_MAP_ID[map_id]["parameter"],
+                            "source_png": str(path.relative_to(repo_root)),
+                            "status": "created_unreal_texture2d_review_asset_not_lifelike",
+                            "import_settings": {
+                                "source_pixel_format": "TSF_BGRA8",
+                                "source_png_mode": "RGB",
+                                "srgb": UNREAL_TEXTURE_ASSET_BY_MAP_ID[map_id]["srgb"],
+                                "compression_settings": UNREAL_TEXTURE_ASSET_BY_MAP_ID[map_id][
+                                    "compression_settings"
+                                ],
+                                "mip_gen_settings": "TMGS_FromTextureGroup",
+                                "lod_group": UNREAL_TEXTURE_ASSET_BY_MAP_ID[map_id]["lod_group"],
+                                "compression_no_alpha": True,
+                                "virtual_texture_streaming": False,
+                            },
+                        },
                     }
                     for map_id, path in record.outputs.items()
                 },
@@ -194,6 +256,11 @@ def _records_to_manifest(repo_root: Path, records: Iterable[SourceConditionedMat
         "generated_on": "2026-07-08",
         "status": "generated_review_gated_source_conditioned_material_maps_not_lifelike",
         "source_capture_manifest": str(CAPTURE_MANIFEST_RELATIVE_PATH),
+        "unreal_texture_asset_root": str(SOURCE_CONDITIONED_MATERIAL_TEXTURE_ASSET_ROOT_RELATIVE_PATH),
+        "unreal_texture_asset_status": SOURCE_CONDITIONED_MATERIAL_TEXTURE_ASSET_STATUS,
+        "unreal_material_instance_binding_status": (
+            "bound_to_review_material_instance_parameters_with_regenerated_capture_review_not_lifelike"
+        ),
         "policy": {
             "source_inputs_are_manifest_recorded": True,
             "third_party_social_or_outfitter_media_used": False,
@@ -201,6 +268,14 @@ def _records_to_manifest(repo_root: Path, records: Iterable[SourceConditionedMat
             "material_maps_must_not_hide_hazards_rescue_targets_or_physics_failures": True,
             "promotion_requires_unreal_material_assignment_capture_review_guide_review_and_performance_evidence": True,
         },
+        "unreal_sampled_parameters": [
+            "SourceConditionedMacroAlbedo",
+            "SourceConditionedMaterialZones",
+            "SourceConditionedAORoughnessHeight",
+            "SourceConditionedZoneWeights",
+            "SourceConditionedMacroAlbedoWeight",
+            "SourceConditionedSurfaceResponseWeight",
+        ],
         "map_semantics": {
             "macro_albedo": "Source-drape-colored material macro map with bounded water, wet-bank, vegetation, and DEM-relief shading.",
             "material_zones": "RGB material-zone weights: R=terrain/wet bank, G=vegetation away from water, B=visible water.",
