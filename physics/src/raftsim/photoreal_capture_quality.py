@@ -16,10 +16,80 @@ from PIL import Image
 CAPTURE_ROOT_RELATIVE_PATH = Path("docs/environment-captures/photoreal_river_previews")
 CAPTURE_MANIFEST_RELATIVE_PATH = CAPTURE_ROOT_RELATIVE_PATH / "environment_capture_manifest.json"
 CAPTURE_QUALITY_REVIEW_RELATIVE_PATH = CAPTURE_ROOT_RELATIVE_PATH / "photoreal_capture_quality_review.json"
+HUMAN_LIFELIKE_REVIEW_HANDOFF_RELATIVE_PATH = (
+    CAPTURE_ROOT_RELATIVE_PATH / "photoreal_human_lifelike_review_handoff.json"
+)
 PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID = "first_party_source_aware_tapered_water_chroma_microbreakup"
 VISIBLE_WATER_CARD_RENDERER_COVERAGE_IDS = {
     "first_party_capture_quality_water_texture_fleck_cards",
 }
+REFERENCE_MEDIA_REVIEW_QUEUE_RELATIVE_PATH = Path("physics/data/real_world/reference_media_review_queue.json")
+PRODUCTION_ENVIRONMENT_GAP_REGISTER_RELATIVE_PATH = Path(
+    "physics/data/real_world/production_environment_gap_register.json"
+)
+PHOTOREAL_RIVER_ENVIRONMENT_SOURCES_RELATIVE_PATH = Path(
+    "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
+)
+
+
+HUMAN_REVIEW_DOMAINS: tuple[dict[str, object], ...] = (
+    {
+        "domain_id": "art_direction_visual_lifelike",
+        "required_reviewer": "environment_art_or_art_direction",
+        "required_evidence": [
+            "side_by_side_review_against_rights_reviewed_reference_links_or_first_party_field_media",
+            "river_specific_notes_for_terrain_water_rocks_foliage_foam_mist_lighting_and_raft_foreground",
+        ],
+    },
+    {
+        "domain_id": "guide_hydraulic_fidelity",
+        "required_reviewer": "river_guide_or_oarsman_domain_reviewer",
+        "required_evidence": [
+            "flow_band_specific_notes_for_line_choice_holes_laterals_boils_eddy_lines_wave_trains_and_wet_banks",
+            "raft_outcome_sanity_notes_for_surf_flush_pin_release_flip_and_swimmer_visibility",
+        ],
+    },
+    {
+        "domain_id": "geospatial_source_alignment",
+        "required_reviewer": "geospatial_or_technical_art_reviewer",
+        "required_evidence": [
+            "capture_overlays_or_notes_checking_river_centerline_banks_heightfield_masks_and_source_drape_alignment",
+            "known_preview_derivative_limitations_and_required_production_import_replacements",
+        ],
+    },
+    {
+        "domain_id": "rights_and_reference_media",
+        "required_reviewer": "rights_or_content_provenance_reviewer",
+        "required_evidence": [
+            "item_level_license_permission_attribution_and_allowed_use_for_any_photo_footage_or_social_reference",
+            "confirmation_that_uncleared_media_remains_link_only_and_not_used_as_texture_training_or_packaged_asset_input",
+        ],
+    },
+    {
+        "domain_id": "hazard_and_rescue_readability",
+        "required_reviewer": "gameplay_safety_or_rescue_readability_reviewer",
+        "required_evidence": [
+            "notes_that_water_foam_mist_foliage_and_lighting_do_not_hide_hazards_swimmers_throw_rope_zones_or_rescue_targets",
+            "notes_that_visual_forcing_or_art_layers_do_not_hide_solver_or_conservation_failures",
+        ],
+    },
+    {
+        "domain_id": "production_material_asset_promotion",
+        "required_reviewer": "technical_art_or_rendering_reviewer",
+        "required_evidence": [
+            "promotion_decision_for_review_only_texture2d_material_instance_and_procedural_proxy_surfaces",
+            "replacement_or_approval_plan_for_landscape_water_rocks_foliage_foam_mist_lighting_and_raft_foreground_assets",
+        ],
+    },
+    {
+        "domain_id": "desktop_and_vr_performance",
+        "required_reviewer": "performance_or_vr_reviewer",
+        "required_evidence": [
+            "desktop_capture_settings_frame_time_gpu_memory_and_scalability_notes",
+            "vr_or_low_power_capture_settings_comfort_frame_time_and_visual_readability_notes",
+        ],
+    },
+)
 
 
 @dataclass(frozen=True)
@@ -360,4 +430,242 @@ def write_capture_quality_review(repo_root: Path, generated_on: str = "2026-07-0
     output_path = repo_root / CAPTURE_QUALITY_REVIEW_RELATIVE_PATH
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+    return output_path
+
+
+def _read_json_if_present(repo_root: Path, relative_path: Path) -> dict:
+    path = repo_root / relative_path
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _review_targets_by_river(reference_queue: dict) -> dict[str, list[dict[str, object]]]:
+    targets_by_river: dict[str, list[dict[str, object]]] = {}
+    for target in reference_queue.get("review_targets", []):
+        river_id = target.get("river_id")
+        if not isinstance(river_id, str):
+            continue
+        targets_by_river.setdefault(river_id, []).append(
+            {
+                "target_id": target.get("target_id"),
+                "anchor_hint": target.get("anchor_hint"),
+                "visual_questions": target.get("visual_questions", []),
+                "candidate_source_ids": target.get("candidate_source_ids", []),
+                "annotation_outputs": target.get("annotation_outputs", []),
+                "flow_context_needed": target.get("flow_context_needed", []),
+                "rights_status": target.get("rights_status"),
+            }
+        )
+    return targets_by_river
+
+
+def _source_plan_rivers_by_id(source_plan: dict) -> dict[str, dict[str, object]]:
+    return {
+        river["river_id"]: river
+        for river in source_plan.get("rivers", [])
+        if isinstance(river, dict) and isinstance(river.get("river_id"), str)
+    }
+
+
+def _gap_register_rivers_by_id(gap_register: dict) -> dict[str, dict[str, object]]:
+    return {
+        river["river_id"]: river
+        for river in gap_register.get("rivers", [])
+        if isinstance(river, dict) and isinstance(river.get("river_id"), str)
+    }
+
+
+def _capture_reviews_by_key(capture_quality_review: dict) -> dict[tuple[str, str], dict[str, object]]:
+    return {
+        (capture["river_id"], capture["view_id"]): capture
+        for capture in capture_quality_review.get("captures", [])
+        if isinstance(capture, dict)
+        and isinstance(capture.get("river_id"), str)
+        and isinstance(capture.get("view_id"), str)
+    }
+
+
+def _open_review_gates() -> list[dict[str, object]]:
+    return [
+        {
+            "domain_id": domain["domain_id"],
+            "required_reviewer": domain["required_reviewer"],
+            "required_evidence": domain["required_evidence"],
+            "status": "open_pending_human_review_or_production_evidence",
+            "approved": False,
+        }
+        for domain in HUMAN_REVIEW_DOMAINS
+    ]
+
+
+def _visual_replacement_targets(gap_register: dict) -> list[dict[str, object]]:
+    targets: list[dict[str, object]] = []
+    for target in gap_register.get("global_visual_replacement_targets", []):
+        if not isinstance(target, dict):
+            continue
+        targets.append(
+            {
+                "target": target.get("target"),
+                "required_before_lifelike": target.get("required_before_lifelike", []),
+                "current_preview_progress": target.get("current_preview_progress", []),
+            }
+        )
+    return targets
+
+
+def _capture_handoff_entry(
+    river_id: str,
+    view_id: str,
+    capture_relative_path: str,
+    capture_review: dict[str, object],
+) -> dict[str, object]:
+    return {
+        "view_id": view_id,
+        "capture": capture_relative_path,
+        "sha256": capture_review.get("sha256"),
+        "automated_status": capture_review.get("status"),
+        "automated_blockers": capture_review.get("blockers", []),
+        "metrics": capture_review.get("metrics", {}),
+        "human_review_status": "not_reviewed",
+        "required_capture_checks": [
+            "visual_lifelike_match_to_rights_reviewed_reference_or_first_party_field_media",
+            "hazards_swimmers_rescue_targets_and_readable_water_features_not_hidden",
+            "source_alignment_notes_for_visible_banks_terrain_water_mask_and_flow_band",
+            "production_asset_material_or_first_party_equivalent_promotion_decision",
+            "desktop_and_vr_performance_readability_notes",
+        ],
+        "approval_status": "not_approved_for_lifelike_or_production",
+        "river_id": river_id,
+    }
+
+
+def build_human_lifelike_review_handoff(repo_root: Path, generated_on: str = "2026-07-08") -> dict:
+    """Build the human-review handoff for zero-blocker photoreal capture candidates."""
+
+    capture_manifest = _read_json_if_present(repo_root, CAPTURE_MANIFEST_RELATIVE_PATH)
+    capture_quality_review = build_capture_quality_review(repo_root, generated_on=generated_on)
+    reference_queue = _read_json_if_present(repo_root, REFERENCE_MEDIA_REVIEW_QUEUE_RELATIVE_PATH)
+    gap_register = _read_json_if_present(repo_root, PRODUCTION_ENVIRONMENT_GAP_REGISTER_RELATIVE_PATH)
+    source_plan = _read_json_if_present(repo_root, PHOTOREAL_RIVER_ENVIRONMENT_SOURCES_RELATIVE_PATH)
+
+    capture_reviews = _capture_reviews_by_key(capture_quality_review)
+    reference_targets = _review_targets_by_river(reference_queue)
+    source_rivers = _source_plan_rivers_by_id(source_plan)
+    gap_rivers = _gap_register_rivers_by_id(gap_register)
+    visual_replacement_targets = _visual_replacement_targets(gap_register)
+    review_domains = [
+        {
+            **domain,
+            "status": "required_before_lifelike_approval",
+            "approved": False,
+        }
+        for domain in HUMAN_REVIEW_DOMAINS
+    ]
+
+    rivers: list[dict[str, object]] = []
+    candidate_capture_count = 0
+    for river in capture_manifest.get("captures", []):
+        river_id = river["river_id"]
+        source_river = source_rivers.get(river_id, {})
+        gap_river = gap_rivers.get(river_id, {})
+        captures: list[dict[str, object]] = []
+        for view_id, capture_path in (
+            ("guide_seat_downstream", river["guide_seat_capture"]),
+            ("river_eye_downstream", river["river_eye_capture"]),
+        ):
+            capture_review = capture_reviews.get((river_id, view_id), {})
+            if not capture_review.get("blockers"):
+                candidate_capture_count += 1
+            captures.append(_capture_handoff_entry(river_id, view_id, capture_path, capture_review))
+
+        rivers.append(
+            {
+                "river_id": river_id,
+                "display_name": river.get("display_name") or source_river.get("display_name"),
+                "review_status": "awaiting_human_lifelike_review_not_approved",
+                "readiness": gap_river.get("readiness", "preview_only_not_lifelike"),
+                "map_package": river.get("map_package") or source_river.get("target_unreal_map"),
+                "source_manifest": river.get("source_manifest") or source_river.get("source_manifest"),
+                "flow_context": {
+                    "flow_band_id": river.get("flow_band_id"),
+                    "flow_band_display_name": river.get("flow_band_display_name"),
+                    "flow_band_source": river.get("flow_band_source"),
+                    "flow_reference_discharge_cfs": river.get("flow_reference_discharge_cfs"),
+                    "flow_visual_width_scale": river.get("flow_visual_width_scale"),
+                    "flow_visual_foam_scale": river.get("flow_visual_foam_scale"),
+                    "flow_visual_wet_bank_scale": river.get("flow_visual_wet_bank_scale"),
+                    "flow_visual_current_cue_scale": river.get("flow_visual_current_cue_scale"),
+                    "flow_visual_water_level_offset_cm": river.get("flow_visual_water_level_offset_cm"),
+                    "flow_visual_note": river.get("flow_visual_note"),
+                },
+                "source_inputs_for_review": {
+                    "aerial_drape_image": river.get("aerial_drape_image"),
+                    "terrain_relief_image": river.get("terrain_relief_image"),
+                    "heightfield_preview_image": river.get("heightfield_preview_image"),
+                    "water_mask_image": river.get("water_mask_image"),
+                    "vegetation_mask_image": river.get("vegetation_mask_image"),
+                    "elevation_sample": river.get("elevation_sample"),
+                },
+                "captures": captures,
+                "reference_media_review_targets": reference_targets.get(river_id, []),
+                "open_review_gates": _open_review_gates(),
+                "visual_replacement_targets": visual_replacement_targets,
+                "fidelity_note": river.get("fidelity_note"),
+                "current_decision": (
+                    "Automated blockers are clear for this river's current guide-seat and river-eye captures, "
+                    "but lifelike approval is withheld until every open human-review, rights, production-material, "
+                    "hazard-readability, geospatial, guide, and performance gate records accepted evidence."
+                ),
+            }
+        )
+
+    blocking_gate_count = len(rivers) * len(review_domains)
+    return {
+        "schema": "raftsim.unreal.photoreal_human_lifelike_review_handoff.v1",
+        "generated_on": generated_on,
+        "status": "awaiting_human_lifelike_review_not_approved",
+        "source_capture_manifest": str(CAPTURE_MANIFEST_RELATIVE_PATH),
+        "source_capture_quality_review": str(CAPTURE_QUALITY_REVIEW_RELATIVE_PATH),
+        "source_reference_media_review_queue": str(REFERENCE_MEDIA_REVIEW_QUEUE_RELATIVE_PATH),
+        "source_gap_register": str(PRODUCTION_ENVIRONMENT_GAP_REGISTER_RELATIVE_PATH),
+        "policy": {
+            "automated_metrics_do_not_approve_lifelike_visuals": True,
+            "human_review_must_not_use_uncleared_media_as_texture_training_or_packaged_assets": True,
+            "approval_requires_hazard_rescue_and_water_readability": True,
+            "approval_requires_desktop_and_vr_performance_evidence": True,
+            "all_review_domains_must_be_approved_before_lifelike_status": True,
+        },
+        "summary": {
+            "river_count": len(rivers),
+            "capture_count": len(capture_quality_review["captures"]),
+            "candidate_capture_count": candidate_capture_count,
+            "automated_blocking_capture_count": capture_quality_review["summary"]["blocking_capture_count"],
+            "human_approved_capture_count": 0,
+            "open_human_review_gate_count": blocking_gate_count,
+            "per_river": {
+                river["river_id"]: {
+                    "review_status": river["review_status"],
+                    "capture_count": len(river["captures"]),
+                    "open_review_gate_count": len(river["open_review_gates"]),
+                    "reference_media_review_target_count": len(river["reference_media_review_targets"]),
+                }
+                for river in rivers
+            },
+        },
+        "review_domains": review_domains,
+        "rivers": rivers,
+        "current_decision": (
+            "Use this handoff to drive the next human art, guide, geospatial, rights, hazard-readability, "
+            "production-material, and performance review pass. The zero-blocker captures are review candidates only; "
+            "no river is approved as lifelike or production-playable by this artifact."
+        ),
+    }
+
+
+def write_human_lifelike_review_handoff(repo_root: Path, generated_on: str = "2026-07-08") -> Path:
+    handoff = build_human_lifelike_review_handoff(repo_root, generated_on=generated_on)
+    output_path = repo_root / HUMAN_LIFELIKE_REVIEW_HANDOFF_RELATIVE_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(handoff, indent=2) + "\n", encoding="utf-8")
     return output_path

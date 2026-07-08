@@ -1549,7 +1549,9 @@
       "first_party_foreground_raft_luma_blocker_reduction_recorded",
       "photoreal_capture_quality_review_blockers_recorded",
       "first_party_integrated_corridor_water_terrain_capture_grade_recorded",
-      "automated_capture_quality_gate_passed_without_proxy_blockers_recorded"
+      "automated_capture_quality_gate_passed_without_proxy_blockers_recorded",
+      "photoreal_human_lifelike_review_handoff_recorded",
+      "zero_blocker_capture_set_human_review_domains_recorded"
     ],
     "preview_capture_root": "docs/environment-captures/photoreal_river_previews",
     "preview_map_package_root": "/Game/RaftSim/Maps/EnvironmentPreviews",
@@ -1617,6 +1619,36 @@
         "desktop_and_vr_performance_capture_evidence",
         "production_material_asset_or_first_party_equivalent_promotion"
       ]
+    },
+    "photoreal_human_lifelike_review_handoff": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_handoff.json",
+    "photoreal_human_lifelike_review_handoff_status": "awaiting_human_lifelike_review_not_approved",
+    "photoreal_human_lifelike_review_handoff_summary": {
+      "river_count": 3,
+      "capture_count": 6,
+      "candidate_capture_count": 6,
+      "automated_blocking_capture_count": 0,
+      "human_approved_capture_count": 0,
+      "open_human_review_gate_count": 21,
+      "per_river": {
+        "american_south_fork": {
+          "review_status": "awaiting_human_lifelike_review_not_approved",
+          "capture_count": 2,
+          "open_review_gate_count": 7,
+          "reference_media_review_target_count": 3
+        },
+        "colorado_river": {
+          "review_status": "awaiting_human_lifelike_review_not_approved",
+          "capture_count": 2,
+          "open_review_gate_count": 7,
+          "reference_media_review_target_count": 3
+        },
+        "pacuare": {
+          "review_status": "awaiting_human_lifelike_review_not_approved",
+          "capture_count": 2,
+          "open_review_gate_count": 7,
+          "reference_media_review_target_count": 3
+        }
+      }
     }
   },
   "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
@@ -1627,5 +1659,7 @@
   "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
   "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
   "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
-  "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved"
+  "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved",
+  "photoreal_human_lifelike_review_handoff": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_handoff.json",
+  "photoreal_human_lifelike_review_handoff_status": "awaiting_human_lifelike_review_not_approved"
 }
