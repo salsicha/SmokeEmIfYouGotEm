@@ -326,20 +326,16 @@
       "capture_count": 6,
       "blocking_capture_count": 6,
       "blocker_counts": {
-        "excess_low_gradient_area": 6,
         "low_color_texture_entropy": 6,
-        "low_edge_density": 3,
-        "low_luma_variation": 3
+        "low_edge_density": 3
       },
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "excess_low_gradient_area",
             "low_color_texture_entropy",
-            "low_edge_density",
-            "low_luma_variation"
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -347,10 +343,8 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "excess_low_gradient_area",
             "low_color_texture_entropy",
-            "low_edge_density",
-            "low_luma_variation"
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -358,10 +352,8 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "excess_low_gradient_area",
             "low_color_texture_entropy",
-            "low_edge_density",
-            "low_luma_variation"
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         }
@@ -376,20 +368,16 @@
       "capture_count": 6,
       "blocking_capture_count": 6,
       "blocker_counts": {
-        "excess_low_gradient_area": 6,
         "low_color_texture_entropy": 6,
-        "low_edge_density": 3,
-        "low_luma_variation": 3
+        "low_edge_density": 3
       },
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "excess_low_gradient_area",
             "low_color_texture_entropy",
-            "low_edge_density",
-            "low_luma_variation"
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -397,10 +385,8 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "excess_low_gradient_area",
             "low_color_texture_entropy",
-            "low_edge_density",
-            "low_luma_variation"
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -408,10 +394,8 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "excess_low_gradient_area",
             "low_color_texture_entropy",
-            "low_edge_density",
-            "low_luma_variation"
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         }
@@ -419,8 +403,10 @@
     },
     "removed_blocker_classes": [
       "dark_foreground_proxy",
-      "large_flat_blue_field"
+      "excess_low_gradient_area",
+      "large_flat_blue_field",
+      "low_luma_variation"
     ],
-    "remaining_gate": "captures_remain_preview_only_not_lifelike_due_low_gradient_low_entropy_low_edge_and_low_luma_blockers"
+    "remaining_gate": "captures_remain_preview_only_not_lifelike_due_low_entropy_and_river_eye_low_edge_blockers"
   }
 }

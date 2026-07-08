@@ -48,20 +48,16 @@
       "capture_count": 6,
       "blocking_capture_count": 6,
       "blocker_counts": {
-        "excess_low_gradient_area": 6,
         "low_color_texture_entropy": 6,
-        "low_edge_density": 3,
-        "low_luma_variation": 3
+        "low_edge_density": 3
       },
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "excess_low_gradient_area",
             "low_color_texture_entropy",
-            "low_edge_density",
-            "low_luma_variation"
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -69,10 +65,8 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "excess_low_gradient_area",
             "low_color_texture_entropy",
-            "low_edge_density",
-            "low_luma_variation"
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -80,10 +74,8 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "excess_low_gradient_area",
             "low_color_texture_entropy",
-            "low_edge_density",
-            "low_luma_variation"
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         }
@@ -253,7 +245,7 @@
         "automated_capture_quality_gate_passed_without_proxy_blockers"
       ],
       "current_preview_progress": [
-        "2026-07-08 capture blocker reduction removed dark_foreground_proxy and large_flat_blue_field blockers but low-gradient, low-entropy, low-edge, and low-luma blockers remain."
+        "2026-07-08 near-field dressing removed dark_foreground_proxy, large_flat_blue_field, excess_low_gradient_area, and low_luma_variation blockers; low-color-texture-entropy remains in all captures and river-eye low-edge remains."
       ]
     },
     {
@@ -267,7 +259,7 @@
         "automated_capture_quality_gate_passed_without_proxy_blockers"
       ],
       "current_preview_progress": [
-        "2026-07-08 capture blocker reduction removed dark_foreground_proxy and large_flat_blue_field blockers but low-gradient, low-entropy, low-edge, and low-luma blockers remain."
+        "2026-07-08 near-field dressing removed dark_foreground_proxy, large_flat_blue_field, excess_low_gradient_area, and low_luma_variation blockers; low-color-texture-entropy remains in all captures and river-eye low-edge remains."
       ]
     }
   ],
@@ -752,7 +744,7 @@
     }
   ],
   "next_checkpoint_order": [
-    "Fix capture-quality blockers: low entropy, low detail, flat blue fields, and dark foreground proxy artifacts before any lifelike screenshot claim.",
+    "Fix remaining capture-quality blockers: low color texture entropy in all six captures and river-eye low edge density before any lifelike screenshot claim.",
     "Close South Fork hydrography/flow/media annotations enough to test a true source-conditioned terrain and material pass.",
     "Close Colorado river-mile/release/media annotations before expanding beyond the Lees Ferry pilot slice.",
     "Close Pacuare official hydrography, cloud-screened imagery, rainfall/flow, and protected-area review before claiming local fidelity.",
@@ -760,16 +752,16 @@
     "Add desktop and VR performance evidence before any river leaves preview-only status."
   ],
   "visual_blocker_reduction_checkpoint_2026_07_08": {
-    "status": "flat_blue_and_dark_foreground_blockers_removed_all_rivers_still_preview_only",
+    "status": "low_gradient_luma_flat_blue_and_dark_foreground_blockers_removed_all_rivers_still_preview_only",
     "remaining_blocker_counts": {
-      "excess_low_gradient_area": 6,
       "low_color_texture_entropy": 6,
-      "low_edge_density": 3,
-      "low_luma_variation": 3
+      "low_edge_density": 3
     },
     "closed_blocker_classes": [
       "dark_foreground_proxy",
-      "large_flat_blue_field"
+      "excess_low_gradient_area",
+      "large_flat_blue_field",
+      "low_luma_variation"
     ]
   }
 }
