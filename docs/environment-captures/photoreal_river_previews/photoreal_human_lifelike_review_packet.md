@@ -176,7 +176,7 @@ Captures:
 
 | View | Image | Entropy | Edge | Low-gradient | Luma std | Human status |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `guide_seat_downstream` | ![colorado_river guide_seat_downstream](colorado_river_guide_seat_downstream.png) | 4.43 | 0.1103 | 0.6085 | 46.82 | `not_reviewed` |
+| `guide_seat_downstream` | ![colorado_river guide_seat_downstream](colorado_river_guide_seat_downstream.png) | 4.43 | 0.1103 | 0.6084 | 46.82 | `not_reviewed` |
 | `river_eye_downstream` | ![colorado_river river_eye_downstream](colorado_river_river_eye_downstream.png) | 4.42 | 0.1098 | 0.6088 | 46.46 | `not_reviewed` |
 
 Reviewer checks:

@@ -81,7 +81,7 @@
         "riverbed_and_shallow_shelves"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview",
-      "unreal_status": "terrain_specific_vertex_color_material_active_as_bounded_ambient_fill_soft_lit_review_material_with_source_aware_photo_mottle_microrelief_source_conditioned_far_bank_albedo_calibration_broad_slope_terrain_exposure_fill_source_aware_slope_facet_texture_source_aware_riparian_canopy_mass_texture_source_overlay_plate_artifact_demotion_pale_bank_shoreline_scaffold_slash_demotion_source_drape_smoothing_demoted_overlay_striping_source_masked_bank_bar_microgeometry_near_field_riverbed_debris_pebble_dressing_terrain_contrast_floor_and_proxy_normal_softening_feathered_source_drape_microtiles_irregular_shoreline_edge_breakup_erosion_rills_and_landscape_nanite_material_scaffold_production_layered_material_pending",
+      "unreal_status": "terrain_specific_vertex_color_material_active_as_bounded_ambient_fill_soft_lit_review_material_with_source_aware_photo_mottle_microrelief_source_conditioned_far_bank_albedo_calibration_broad_slope_terrain_exposure_fill_source_aware_slope_facet_texture_source_aware_riparian_canopy_mass_texture_source_overlay_plate_artifact_demotion_pale_bank_shoreline_scaffold_slash_demotion_source_drape_smoothing_demoted_overlay_striping_source_masked_bank_bar_microgeometry_source_masked_shoreline_lip_overhang_edge_breakup_near_field_riverbed_debris_pebble_dressing_terrain_contrast_floor_and_proxy_normal_softening_feathered_source_drape_microtiles_irregular_shoreline_edge_breakup_erosion_rills_and_landscape_nanite_material_scaffold_production_layered_material_pending",
       "required_source_inputs": [
         "source_drape_4096.png",
         "dem_relief_2048.png",
@@ -150,6 +150,9 @@
         "source_masked_bank_bar_microgeometry",
         "exposed_bar_micro_pebbles",
         "bank_slope_material_flakes",
+        "source_masked_shoreline_lip_overhang",
+        "irregular_waterline_bank_lip",
+        "wet_edge_overhang_shadow",
         "near_field_riverbed_debris_cards",
         "near_field_waterline_pebble_dressing",
         "source_mask_biased_near_field_debris_placement",
@@ -230,6 +233,9 @@
         "terrain_erosion_rill_length",
         "exposed_bar_micro_pebble_density",
         "bank_slope_material_flake_density",
+        "shoreline_lip_overhang_density",
+        "shoreline_lip_overhang_width",
+        "shoreline_lip_overhang_water_overlap",
         "near_field_riverbed_debris_density",
         "near_field_waterline_pebble_density",
         "near_field_debris_waterline_bias",
