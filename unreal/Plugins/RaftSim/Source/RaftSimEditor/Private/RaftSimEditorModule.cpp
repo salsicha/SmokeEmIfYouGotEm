@@ -3796,8 +3796,9 @@ void AddPreviewShoreRibbon(
 
     constexpr int32 Segments = 72;
     constexpr int32 CrossSteps = 3;
-    const float GraphicWaterlineRibbonDemotion = 0.22f;
-    const float WaterlineRailArtifactDemotion = 0.34f;
+    const float PaleShorelineSlashArtifactDemotion = 0.46f;
+    const float GraphicWaterlineRibbonDemotion = 0.16f;
+    const float WaterlineRailArtifactDemotion = 0.24f;
     const float MinX = -5520.0f;
     const float MaxX = 26000.0f;
     const float Side = SignedCenterOffset < 0.0f ? -1.0f : 1.0f;
@@ -3837,7 +3838,8 @@ void AddPreviewShoreRibbon(
             const float NearFrameShorelineRibbonDemotion = SmoothPreviewStep(7600.0f, 13600.0f, X);
             const float LocalWidthScale =
                 (0.035f + 0.095f * SegmentFade) *
-                FMath::Lerp(0.10f, 0.38f, NearFrameShorelineRibbonDemotion) *
+                FMath::Lerp(0.07f, 0.28f, NearFrameShorelineRibbonDemotion) *
+                PaleShorelineSlashArtifactDemotion *
                 GraphicWaterlineRibbonDemotion *
                 WaterlineRailArtifactDemotion;
             const float Offset = SignedCenterOffset + Side * Width * LocalWidthScale * (V - 0.5f);
@@ -3857,12 +3859,13 @@ void AddPreviewShoreRibbon(
             Vertices.Add(FVector(X, Y, Z));
             UVs.Add(FVector2D(U * 16.0f, V));
             VertexColors.Add(ClampPreviewColor(FMath::Lerp(
-	                TerrainBase,
-	                RibbonColor,
-	                SegmentFade *
-	                    FMath::Lerp(0.004f, 0.024f, NearFrameShorelineRibbonDemotion) *
-	                    GraphicWaterlineRibbonDemotion *
-	                    WaterlineRailArtifactDemotion)));
+		                TerrainBase,
+		                RibbonColor,
+		                SegmentFade *
+		                    FMath::Lerp(0.002f, 0.012f, NearFrameShorelineRibbonDemotion) *
+		                    PaleShorelineSlashArtifactDemotion *
+		                    GraphicWaterlineRibbonDemotion *
+		                    WaterlineRailArtifactDemotion)));
         }
     }
 
@@ -4430,7 +4433,8 @@ void AddPreviewTerrainMaterialLayerDetail(
     }
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
-    const float TerrainMaterialOverlayPlateDemotion = 0.54f;
+    const float PaleBankMaterialSlashDemotion = 0.68f;
+    const float TerrainMaterialOverlayPlateDemotion = 0.38f;
     const int32 LayerCount = Spec.bDesertCanyon ? 26 : (Spec.bHasWaterfalls ? 28 : 24);
     const int32 BandCount = Spec.bDesertCanyon ? 3 : (Spec.bHasWaterfalls ? 3 : 2);
     const float NearOffset = Spec.bDesertCanyon ? 780.0f : (Spec.bHasWaterfalls ? 430.0f : 390.0f);
@@ -4517,10 +4521,12 @@ void AddPreviewTerrainMaterialLayerDetail(
 
         const float Length = (Spec.bDesertCanyon ? 400.0f : (Spec.bHasWaterfalls ? 285.0f : 260.0f)) *
             (0.56f + 0.06f * static_cast<float>(LayerIndex % 5)) *
-            TerrainMaterialOverlayPlateDemotion;
+            TerrainMaterialOverlayPlateDemotion *
+            PaleBankMaterialSlashDemotion;
         const float Width = (Spec.bDesertCanyon ? 84.0f : (Spec.bHasWaterfalls ? 58.0f : 54.0f)) *
             (0.56f + 0.05f * static_cast<float>(LayerIndex % 4)) *
-            TerrainMaterialOverlayPlateDemotion;
+            TerrainMaterialOverlayPlateDemotion *
+            PaleBankMaterialSlashDemotion;
         AddPreviewBankBreakupPatch(
             World,
             Spec,
@@ -4534,7 +4540,9 @@ void AddPreviewTerrainMaterialLayerDetail(
             Phase,
             InnerColor,
             OuterColor,
-            (Spec.bDesertCanyon ? 28.0f : 22.0f) * TerrainMaterialOverlayPlateDemotion);
+            (Spec.bDesertCanyon ? 28.0f : 22.0f) *
+                TerrainMaterialOverlayPlateDemotion *
+                PaleBankMaterialSlashDemotion);
     }
 }
 
@@ -4553,7 +4561,8 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const bool bRainforest = Spec.bHasWaterfalls;
-    const float LandscapeNaniteOverlayPlateDemotion = 0.50f;
+    const float PaleLandscapeScaffoldSlashDemotion = 0.64f;
+    const float LandscapeNaniteOverlayPlateDemotion = 0.34f;
     const int32 FacetCount = Spec.bDesertCanyon ? 30 : (bRainforest ? 28 : 24);
     const float NearOffset = Spec.bDesertCanyon ? 610.0f : (bRainforest ? 315.0f : 340.0f);
     const float FarOffset = Spec.bDesertCanyon ? 3050.0f : (bRainforest ? 1750.0f : 1480.0f);
@@ -4634,10 +4643,12 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
 
         const float Length = (Spec.bDesertCanyon ? 255.0f : (bRainforest ? 190.0f : 205.0f)) *
             (0.52f + 0.06f * static_cast<float>(FacetIndex % 7)) *
-            LandscapeNaniteOverlayPlateDemotion;
+            LandscapeNaniteOverlayPlateDemotion *
+            PaleLandscapeScaffoldSlashDemotion;
         const float Width = (Spec.bDesertCanyon ? 46.0f : (bRainforest ? 36.0f : 38.0f)) *
             (0.52f + 0.05f * static_cast<float>(FacetIndex % 5)) *
-            LandscapeNaniteOverlayPlateDemotion;
+            LandscapeNaniteOverlayPlateDemotion *
+            PaleLandscapeScaffoldSlashDemotion;
         AddPreviewBankBreakupPatch(
             World,
             Spec,
@@ -4651,7 +4662,9 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
             Phase,
             InnerColor,
             OuterColor,
-            (Spec.bDesertCanyon ? 36.0f : 28.0f) * LandscapeNaniteOverlayPlateDemotion);
+            (Spec.bDesertCanyon ? 36.0f : 28.0f) *
+                LandscapeNaniteOverlayPlateDemotion *
+                PaleLandscapeScaffoldSlashDemotion);
     }
 
     const int32 BandPerSide = Spec.bDesertCanyon ? 4 : (bRainforest ? 3 : 3);
@@ -4692,13 +4705,19 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
             HeightfieldPreview,
             FString::Printf(TEXT("RaftSim_LandscapeNaniteStrataMicroBand_%03d_%s"), BandIndex, *Spec.RiverId),
             X - (Spec.bDesertCanyon ? 630.0f : 420.0f),
-            (Spec.bDesertCanyon ? 390.0f : 270.0f) * LandscapeNaniteOverlayPlateDemotion,
+            (Spec.bDesertCanyon ? 390.0f : 270.0f) *
+                LandscapeNaniteOverlayPlateDemotion *
+                PaleLandscapeScaffoldSlashDemotion,
             SignedOffset,
-            (Spec.bDesertCanyon ? 18.0f : 14.0f) * LandscapeNaniteOverlayPlateDemotion,
+            (Spec.bDesertCanyon ? 18.0f : 14.0f) *
+                LandscapeNaniteOverlayPlateDemotion *
+                PaleLandscapeScaffoldSlashDemotion,
             Phase,
             InnerColor,
             OuterColor,
-            (Spec.bDesertCanyon ? 34.0f : 24.0f) * LandscapeNaniteOverlayPlateDemotion);
+            (Spec.bDesertCanyon ? 34.0f : 24.0f) *
+                LandscapeNaniteOverlayPlateDemotion *
+                PaleLandscapeScaffoldSlashDemotion);
     }
 
     const int32 OcclusionCount = Spec.bDesertCanyon ? 9 : (bRainforest ? 8 : 7);
@@ -4727,13 +4746,19 @@ void AddPreviewLandscapeNaniteMaterialScaffoldDetail(
             HeightfieldPreview,
             FString::Printf(TEXT("RaftSim_LandscapeNaniteSlopeOcclusionPatch_%03d_%s"), OcclusionIndex, *Spec.RiverId),
             X - (Spec.bDesertCanyon ? 250.0f : 185.0f),
-            (Spec.bDesertCanyon ? 310.0f : 220.0f) * LandscapeNaniteOverlayPlateDemotion,
+            (Spec.bDesertCanyon ? 310.0f : 220.0f) *
+                LandscapeNaniteOverlayPlateDemotion *
+                PaleLandscapeScaffoldSlashDemotion,
             SignedOffset,
-            (Spec.bDesertCanyon ? 28.0f : 22.0f) * LandscapeNaniteOverlayPlateDemotion,
+            (Spec.bDesertCanyon ? 28.0f : 22.0f) *
+                LandscapeNaniteOverlayPlateDemotion *
+                PaleLandscapeScaffoldSlashDemotion,
             Phase,
             DemotedShadowColor,
             DemotedRimColor,
-            (Spec.bDesertCanyon ? 34.0f : 24.0f) * LandscapeNaniteOverlayPlateDemotion);
+            (Spec.bDesertCanyon ? 34.0f : 24.0f) *
+                LandscapeNaniteOverlayPlateDemotion *
+                PaleLandscapeScaffoldSlashDemotion);
     }
 }
 
@@ -5273,12 +5298,16 @@ void AddPreviewFoamRibbon(
 
     const float RibbonMidX = StartX + Length * 0.50f;
     const float RemainingWaterOverlaySlabDemotion = SmoothPreviewStep(5600.0f, 10800.0f, RibbonMidX);
+    const float PaleFoamSlashArtifactDemotion = 0.48f;
     const bool bNearFrameWaterRibbon = RibbonMidX < 7800.0f;
-    const float NearFrameRibbonWidthScale = FMath::Lerp(0.22f, 0.72f, RemainingWaterOverlaySlabDemotion);
+    const float NearFrameRibbonWidthScale =
+        FMath::Lerp(0.12f, 0.46f, RemainingWaterOverlaySlabDemotion) *
+        PaleFoamSlashArtifactDemotion;
     const FLinearColor RibbonColor = ClampPreviewColor(FMath::Lerp(
         Spec.WaterColor,
         Color,
-        FMath::Lerp(Spec.bDesertCanyon ? 0.12f : 0.14f, Spec.bDesertCanyon ? 0.58f : 0.52f, RemainingWaterOverlaySlabDemotion)));
+        FMath::Lerp(Spec.bDesertCanyon ? 0.060f : 0.070f, Spec.bDesertCanyon ? 0.34f : 0.30f, RemainingWaterOverlaySlabDemotion) *
+            PaleFoamSlashArtifactDemotion));
 
     for (int32 SegmentIndex = 0; SegmentIndex <= Segments; ++SegmentIndex)
     {
