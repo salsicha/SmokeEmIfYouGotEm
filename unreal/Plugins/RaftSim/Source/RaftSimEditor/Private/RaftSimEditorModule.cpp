@@ -235,10 +235,29 @@ FString GetFirstPartyMaterialTextureAtlasManifestRelativePath()
     return TEXT("unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json");
 }
 
+FString GetFirstPartyMaterialInstanceCandidateManifestRelativePath()
+{
+    return TEXT("unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json");
+}
+
 FString GetFirstPartyMaterialTextureAtlasAlbedoRelativePath(const FString& RiverId)
 {
     return FString::Printf(
         TEXT("unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/%s_first_party_material_texture_atlas_albedo.png"),
+        *RiverId);
+}
+
+FString GetFirstPartyMaterialTextureAtlasNormalRelativePath(const FString& RiverId)
+{
+    return FString::Printf(
+        TEXT("unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/%s_first_party_material_texture_atlas_normal.png"),
+        *RiverId);
+}
+
+FString GetFirstPartyMaterialTextureAtlasPackedRelativePath(const FString& RiverId)
+{
+    return FString::Printf(
+        TEXT("unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/%s_first_party_material_texture_atlas_ao_roughness_height.png"),
         *RiverId);
 }
 
@@ -1195,6 +1214,85 @@ FLinearColor ApplyFirstPartyMaterialAtlasTint(
     AtlasColor.A = BaseColor.A;
 
     return ClampPreviewColor(FMath::Lerp(BaseColor, AtlasColor, FMath::Clamp(Weight, 0.0f, 0.32f)));
+}
+
+float SampleFirstPartyMaterialAtlasPackedHeight(
+    const FRaftSimPreviewImage* PackedAtlas,
+    int32 TileIndex,
+    float LocalU,
+    float LocalV,
+    float DefaultHeight = 0.5f)
+{
+    if (!PackedAtlas || !PackedAtlas->IsValid())
+    {
+        return DefaultHeight;
+    }
+
+    return FMath::Clamp(SampleFirstPartyMaterialAtlasTile(PackedAtlas, TileIndex, LocalU, LocalV).B, 0.0f, 1.0f);
+}
+
+FLinearColor ApplyFirstPartyMaterialAtlasSurfaceResponse(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* NormalAtlas,
+    const FRaftSimPreviewImage* PackedAtlas,
+    int32 TileIndex,
+    const FLinearColor& BaseColor,
+    float LocalU,
+    float LocalV,
+    float Weight)
+{
+    if (Weight <= 0.0f)
+    {
+        return BaseColor;
+    }
+
+    const float ClampedWeight = FMath::Clamp(Weight, 0.0f, 0.30f);
+    float ResponseScale = 1.0f;
+    if (PackedAtlas && PackedAtlas->IsValid())
+    {
+        const FLinearColor Packed = ClampPreviewColor(SampleFirstPartyMaterialAtlasTile(PackedAtlas, TileIndex, LocalU, LocalV));
+        const float AmbientOcclusion = FMath::Clamp(Packed.R, 0.0f, 1.0f);
+        const float Roughness = FMath::Clamp(Packed.G, 0.0f, 1.0f);
+        const float Height = FMath::Clamp(Packed.B, 0.0f, 1.0f);
+        ResponseScale *= FMath::Clamp(
+            1.0f - (1.0f - AmbientOcclusion) * 0.22f * ClampedWeight +
+                (Roughness - 0.5f) * 0.10f * ClampedWeight +
+                (Height - 0.5f) * 0.18f * ClampedWeight,
+            0.86f,
+            1.12f);
+    }
+    if (NormalAtlas && NormalAtlas->IsValid())
+    {
+        const FLinearColor Normal = ClampPreviewColor(SampleFirstPartyMaterialAtlasTile(NormalAtlas, TileIndex, LocalU, LocalV));
+        const float SlopeEnergy = FMath::Clamp(FMath::Abs(Normal.R - 0.5f) + FMath::Abs(Normal.G - 0.5f), 0.0f, 1.0f);
+        const float UpFacing = FMath::Clamp(Normal.B, 0.0f, 1.0f);
+        ResponseScale *= FMath::Clamp(
+            1.0f + SlopeEnergy * (Spec.bDesertCanyon ? 0.10f : 0.075f) * ClampedWeight -
+                (1.0f - UpFacing) * 0.12f * ClampedWeight,
+            0.90f,
+            1.10f);
+    }
+
+    FLinearColor Result = ScalePreviewColor(BaseColor, ResponseScale);
+    Result.A = BaseColor.A;
+    return ClampPreviewColor(Result);
+}
+
+float GetFirstPartyMaterialAtlasMicroReliefCm(
+    const FRaftSimPreviewImage* PackedAtlas,
+    int32 TileIndex,
+    float LocalU,
+    float LocalV,
+    float AmplitudeCm,
+    float Weight)
+{
+    if (!PackedAtlas || !PackedAtlas->IsValid() || Weight <= 0.0f)
+    {
+        return 0.0f;
+    }
+
+    const float Height = SampleFirstPartyMaterialAtlasPackedHeight(PackedAtlas, TileIndex, LocalU, LocalV);
+    return (Height - 0.5f) * AmplitudeCm * FMath::Clamp(Weight, 0.0f, 0.35f);
 }
 
 FLinearColor NormalizePreviewSourceDrapeAlbedo(
@@ -3211,7 +3309,9 @@ void AddPreviewTerrainMesh(
     const FRaftSimPreviewImage* HeightfieldPreview,
     const FRaftSimPreviewImage* WaterMask,
     const FRaftSimPreviewImage* VegetationMask,
-    const FRaftSimPreviewImage* MaterialAtlasAlbedo)
+    const FRaftSimPreviewImage* MaterialAtlasAlbedo,
+    const FRaftSimPreviewImage* MaterialAtlasNormal,
+    const FRaftSimPreviewImage* MaterialAtlasPacked)
 {
     constexpr int32 XSteps = 280;
     constexpr int32 YSteps = 112;
@@ -3521,13 +3621,29 @@ void AddPreviewTerrainMesh(
                 U * (Spec.bDesertCanyon ? 8.0f : 9.5f) + SourceVegetationT * 0.37f,
                 V * (Spec.bDesertCanyon ? 3.5f : 4.8f) + BankT * 0.23f + CanyonT * 0.41f,
                 FirstPartyMaterialAtlasTerrainBlend);
+            TerrainColor = ApplyFirstPartyMaterialAtlasSurfaceResponse(
+                Spec,
+                MaterialAtlasNormal,
+                MaterialAtlasPacked,
+                TerrainBankLayeredMaterialTile,
+                TerrainColor,
+                U * (Spec.bDesertCanyon ? 8.0f : 9.5f) + SourceVegetationT * 0.37f,
+                V * (Spec.bDesertCanyon ? 3.5f : 4.8f) + BankT * 0.23f + CanyonT * 0.41f,
+                FirstPartyMaterialAtlasTerrainBlend);
+            const float FirstPartyMaterialAtlasTerrainReliefCm = GetFirstPartyMaterialAtlasMicroReliefCm(
+                MaterialAtlasPacked,
+                TerrainBankLayeredMaterialTile,
+                U * (Spec.bDesertCanyon ? 8.0f : 9.5f) + SourceVegetationT * 0.37f,
+                V * (Spec.bDesertCanyon ? 3.5f : 4.8f) + BankT * 0.23f + CanyonT * 0.41f,
+                Spec.bDesertCanyon ? 18.0f : (Spec.bHasWaterfalls ? 14.0f : 12.0f),
+                FirstPartyMaterialAtlasTerrainBlend);
             Vertices.Add(FVector(
                 X,
                 Y,
                 TerrainZ + BaseTerrainMicroReliefCm + SourceAwareTerrainPhotoMottleReliefCm +
                     SourceConditionedFarBankMicroReliefCm + BroadSlopeTerrainLowFrequencyReliefCm +
                     SourceAwareMacroTerrainRidgeReliefCm + SourceAwareTerrainSlopeFacetReliefCm +
-                    SourceAwareRiparianCanopyMassReliefCm));
+                    SourceAwareRiparianCanopyMassReliefCm + FirstPartyMaterialAtlasTerrainReliefCm));
             UVs.Add(FVector2D(U * 12.0f, V * 4.0f));
             VertexColors.Add(NormalizePreviewTerrainProxyPatchColor(Spec, TerrainColor));
         }
@@ -3743,7 +3859,9 @@ void AddPreviewAerialDrapeTiles(
 void AddPreviewRiverRibbonMesh(
     UWorld* World,
     const FRaftSimEnvironmentPreviewSpec& Spec,
-    const FRaftSimPreviewImage* MaterialAtlasAlbedo)
+    const FRaftSimPreviewImage* MaterialAtlasAlbedo,
+    const FRaftSimPreviewImage* MaterialAtlasNormal,
+    const FRaftSimPreviewImage* MaterialAtlasPacked)
 {
     constexpr int32 XSteps = 320;
     // Odd cross-step count avoids a persistent vertex-color row exactly on the river centerline.
@@ -4133,6 +4251,15 @@ void AddPreviewRiverRibbonMesh(
                 U * 16.0f + FlowNoise * 0.43f,
                 V * 2.7f + BaseWaterFlowThreadLongBand * 0.31f,
                 FirstPartyMaterialAtlasWaterBlend);
+            WaterColor = ApplyFirstPartyMaterialAtlasSurfaceResponse(
+                Spec,
+                MaterialAtlasNormal,
+                MaterialAtlasPacked,
+                FlowDependentWaterSurfaceMaterialTile,
+                WaterColor,
+                U * 16.0f + FlowNoise * 0.43f,
+                V * 2.7f + BaseWaterFlowThreadLongBand * 0.31f,
+                FirstPartyMaterialAtlasWaterBlend);
             const FLinearColor BaseWaterResidualDarkStreakLumaFloor = Spec.bDesertCanyon
                 ? FLinearColor(0.29f, 0.245f, 0.170f)
                 : (Spec.bHasWaterfalls ? FLinearColor(0.0f, 0.225f, 0.190f)
@@ -4164,6 +4291,14 @@ void AddPreviewRiverRibbonMesh(
                 (Spec.bDesertCanyon ? 1.85f : (Spec.bHasWaterfalls ? 3.80f : 3.10f)) *
                 BaseWaterFlowThreadTextureT *
                 FMath::Clamp(0.50f + CenterT * 0.35f + EdgeT * 0.15f, 0.0f, 1.0f);
+            const float FirstPartyMaterialAtlasWaterReliefCm = GetFirstPartyMaterialAtlasMicroReliefCm(
+                MaterialAtlasPacked,
+                FlowDependentWaterSurfaceMaterialTile,
+                U * 16.0f + FlowNoise * 0.43f,
+                V * 2.7f + BaseWaterFlowThreadLongBand * 0.31f,
+                Spec.bHasWaterfalls ? 2.4f : (Spec.bDesertCanyon ? 1.2f : 1.8f),
+                FirstPartyMaterialAtlasWaterBlend) *
+                (1.0f - BaseWaterResidualCenterSeamReliefDampingT * 0.55f);
             Vertices.Add(FVector(
                 X,
                 CenterY + Lateral,
@@ -4174,7 +4309,8 @@ void AddPreviewRiverRibbonMesh(
                     NearCameraWaterMacroRippleReliefCm *
                         (1.0f - BaseWaterResidualCenterSeamReliefDampingT * 0.22f) +
                     BaseWaterFlowThreadReliefCm *
-                        (1.0f - BaseWaterResidualCenterSeamReliefDampingT * 0.18f)));
+                        (1.0f - BaseWaterResidualCenterSeamReliefDampingT * 0.18f) +
+                    FirstPartyMaterialAtlasWaterReliefCm));
             UVs.Add(FVector2D(U * 18.0f, V));
             VertexColors.Add(ClampPreviewColor(WaterColor));
         }
@@ -8321,7 +8457,7 @@ FString GetPreviewCaptureRelativePath(const FRaftSimEnvironmentPreviewSpec& Spec
 
 FString GetPreviewFidelityNote(const FRaftSimEnvironmentPreviewSpec& Spec)
 {
-    const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, river water, primary boulder, foliage, and raft/oar vertex colors as bounded preview material candidates; atlas use remains preview-only until production material instances, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass");
+    const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, river water, primary boulder, foliage, and raft/oar vertex colors, while the normal plus packed AO/roughness/height atlases drive bounded preview material response and tiny terrain/water microrelief; atlas use remains preview-only until production material instances, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass");
     if (!Spec.SourceDrapeDescription.IsEmpty())
     {
         return Spec.SourceDrapeDescription + AtlasApplicationNote;
@@ -8604,6 +8740,20 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     {
         MaterialAtlasAlbedoPtr = &MaterialAtlasAlbedo;
     }
+    FRaftSimPreviewImage MaterialAtlasNormal;
+    const FRaftSimPreviewImage* MaterialAtlasNormalPtr = nullptr;
+    const FString MaterialAtlasNormalPath = GetFirstPartyMaterialTextureAtlasNormalRelativePath(Spec.RiverId);
+    if (LoadPreviewPngImage(MaterialAtlasNormalPath, MaterialAtlasNormal))
+    {
+        MaterialAtlasNormalPtr = &MaterialAtlasNormal;
+    }
+    FRaftSimPreviewImage MaterialAtlasPacked;
+    const FRaftSimPreviewImage* MaterialAtlasPackedPtr = nullptr;
+    const FString MaterialAtlasPackedPath = GetFirstPartyMaterialTextureAtlasPackedRelativePath(Spec.RiverId);
+    if (LoadPreviewPngImage(MaterialAtlasPackedPath, MaterialAtlasPacked))
+    {
+        MaterialAtlasPackedPtr = &MaterialAtlasPacked;
+    }
 
     AddPreviewLightRig(World, Spec);
 
@@ -8615,9 +8765,11 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         HeightfieldPreviewPtr,
         WaterMaskPtr,
         VegetationMaskPtr,
-        MaterialAtlasAlbedoPtr);
+        MaterialAtlasAlbedoPtr,
+        MaterialAtlasNormalPtr,
+        MaterialAtlasPackedPtr);
     AddPreviewAerialDrapeTiles(World, Spec, AerialDrapePtr, TerrainReliefPtr, HeightfieldPreviewPtr, WaterMaskPtr, VegetationMaskPtr);
-    AddPreviewRiverRibbonMesh(World, Spec, MaterialAtlasAlbedoPtr);
+    AddPreviewRiverRibbonMesh(World, Spec, MaterialAtlasAlbedoPtr, MaterialAtlasNormalPtr, MaterialAtlasPackedPtr);
     AddPreviewWetBankDressing(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr);
     AddPreviewIrregularShorelineEdgeBreakupDetail(
         World,
@@ -8778,6 +8930,15 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
             X * 0.0021f + static_cast<float>(BoulderIndex) * 0.137f,
             Y * 0.0033f + BoulderWaterT * 0.29f + BoulderVegetationT * 0.41f,
             FMath::Clamp(0.14f + BoulderWaterT * 0.08f + BoulderVegetationT * 0.03f, 0.0f, 0.24f));
+        UnadjustedBoulderColor = ApplyFirstPartyMaterialAtlasSurfaceResponse(
+            Spec,
+            MaterialAtlasNormalPtr,
+            MaterialAtlasPackedPtr,
+            WetBoulderContactMaterialTile,
+            UnadjustedBoulderColor,
+            X * 0.0021f + static_cast<float>(BoulderIndex) * 0.137f,
+            Y * 0.0033f + BoulderWaterT * 0.29f + BoulderVegetationT * 0.41f,
+            FMath::Clamp(0.14f + BoulderWaterT * 0.08f + BoulderVegetationT * 0.03f, 0.0f, 0.24f));
         const FLinearColor BoulderColor =
             bNearCameraReviewBoulder ? ScalePreviewColor(UnadjustedBoulderColor, Spec.bDesertCanyon ? 0.56f : 0.48f) : UnadjustedBoulderColor;
         const FVector BoulderScale(Scale * 1.18f, Scale * 0.92f, Scale * 0.54f);
@@ -8889,6 +9050,15 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         FirstPartyProceduralCanopyToneColor = ApplyFirstPartyMaterialAtlasTint(
             Spec,
             MaterialAtlasAlbedoPtr,
+            BiomeFoliageGroundcoverMaterialTile,
+            FirstPartyProceduralCanopyToneColor,
+            X * 0.0017f + static_cast<float>(FoliageIndex) * 0.071f,
+            Y * 0.0024f + FoliageMaskT * 0.36f,
+            Spec.bDesertCanyon ? 0.10f : (Spec.bHasWaterfalls ? 0.18f : 0.15f));
+        FirstPartyProceduralCanopyToneColor = ApplyFirstPartyMaterialAtlasSurfaceResponse(
+            Spec,
+            MaterialAtlasNormalPtr,
+            MaterialAtlasPackedPtr,
             BiomeFoliageGroundcoverMaterialTile,
             FirstPartyProceduralCanopyToneColor,
             X * 0.0017f + static_cast<float>(FoliageIndex) * 0.071f,
@@ -10094,6 +10264,9 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
     const FString MaterialTextureAtlasManifestRelativePath = GetFirstPartyMaterialTextureAtlasManifestRelativePath();
     const FString MaterialTextureAtlasManifestAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), MaterialTextureAtlasManifestRelativePath));
+    const FString MaterialInstanceCandidateManifestRelativePath = GetFirstPartyMaterialInstanceCandidateManifestRelativePath();
+    const FString MaterialInstanceCandidateManifestAbsolutePath =
+        FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), MaterialInstanceCandidateManifestRelativePath));
     const FString GeospatialAttachmentLedgerRelativePath = GetProductionGeospatialAttachmentLedgerRelativePath();
     const FString GeospatialAttachmentLedgerAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), GeospatialAttachmentLedgerRelativePath));
@@ -10118,6 +10291,11 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
         OutSummary += FString::Printf(TEXT("Missing first-party material texture atlas manifest: %s\n"), *MaterialTextureAtlasManifestAbsolutePath);
         return false;
     }
+    if (!FPaths::FileExists(MaterialInstanceCandidateManifestAbsolutePath))
+    {
+        OutSummary += FString::Printf(TEXT("Missing first-party material instance candidate manifest: %s\n"), *MaterialInstanceCandidateManifestAbsolutePath);
+        return false;
+    }
     if (!FPaths::FileExists(GeospatialAttachmentLedgerAbsolutePath))
     {
         OutSummary += FString::Printf(TEXT("Missing production geospatial attachment ledger: %s\n"), *GeospatialAttachmentLedgerAbsolutePath);
@@ -10128,6 +10306,7 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
     OutSummary += FString::Printf(TEXT("Using first-party procedural environment asset plan: %s\n"), *ProceduralAssetPlanRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party procedural material recipe plan: %s\n"), *ProceduralMaterialRecipePlanRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material texture atlas manifest: %s\n"), *MaterialTextureAtlasManifestRelativePath);
+    OutSummary += FString::Printf(TEXT("Using first-party material instance candidate manifest: %s\n"), *MaterialInstanceCandidateManifestRelativePath);
     OutSummary += FString::Printf(TEXT("Using production geospatial attachment ledger: %s\n"), *GeospatialAttachmentLedgerRelativePath);
 
     bool bAllSaved = true;
@@ -10156,6 +10335,9 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
     const FString MaterialTextureAtlasManifestRelativePath = GetFirstPartyMaterialTextureAtlasManifestRelativePath();
     const FString MaterialTextureAtlasManifestAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), MaterialTextureAtlasManifestRelativePath));
+    const FString MaterialInstanceCandidateManifestRelativePath = GetFirstPartyMaterialInstanceCandidateManifestRelativePath();
+    const FString MaterialInstanceCandidateManifestAbsolutePath =
+        FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), MaterialInstanceCandidateManifestRelativePath));
     const FString GeospatialAttachmentLedgerRelativePath = GetProductionGeospatialAttachmentLedgerRelativePath();
     const FString GeospatialAttachmentLedgerAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), GeospatialAttachmentLedgerRelativePath));
@@ -10175,12 +10357,18 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         OutSummary += FString::Printf(TEXT("Missing first-party material texture atlas manifest for capture: %s\n"), *MaterialTextureAtlasManifestAbsolutePath);
         return false;
     }
+    if (!FPaths::FileExists(MaterialInstanceCandidateManifestAbsolutePath))
+    {
+        OutSummary += FString::Printf(TEXT("Missing first-party material instance candidate manifest for capture: %s\n"), *MaterialInstanceCandidateManifestAbsolutePath);
+        return false;
+    }
     if (!FPaths::FileExists(GeospatialAttachmentLedgerAbsolutePath))
     {
         OutSummary += FString::Printf(TEXT("Missing production geospatial attachment ledger for capture: %s\n"), *GeospatialAttachmentLedgerAbsolutePath);
         return false;
     }
     OutSummary += FString::Printf(TEXT("Using first-party material texture atlas manifest: %s\n"), *MaterialTextureAtlasManifestRelativePath);
+    OutSummary += FString::Printf(TEXT("Using first-party material instance candidate manifest: %s\n"), *MaterialInstanceCandidateManifestRelativePath);
     OutSummary += FString::Printf(TEXT("Using production geospatial attachment ledger: %s\n"), *GeospatialAttachmentLedgerRelativePath);
 
     FString EntriesJson;
@@ -10288,6 +10476,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("  \"procedural_asset_plan\": \"%s\",\n")
         TEXT("  \"procedural_material_recipe_plan\": \"%s\",\n")
         TEXT("  \"first_party_material_texture_atlas_manifest\": \"%s\",\n")
+        TEXT("  \"first_party_material_instance_candidate_manifest\": \"%s\",\n")
         TEXT("  \"geospatial_attachment_ledger\": \"%s\",\n")
         TEXT("  \"status\": \"%s\",\n")
         TEXT("  \"captures\": [\n")
@@ -10298,6 +10487,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         *EscapeRaftSimJsonString(ProceduralAssetPlanRelativePath),
         *EscapeRaftSimJsonString(ProceduralMaterialRecipePlanRelativePath),
         *EscapeRaftSimJsonString(MaterialTextureAtlasManifestRelativePath),
+        *EscapeRaftSimJsonString(MaterialInstanceCandidateManifestRelativePath),
         *EscapeRaftSimJsonString(GeospatialAttachmentLedgerRelativePath),
         bAllCaptured ? TEXT("south_fork_colorado_and_pacuare_source_draped_guide_and_river_eye_previews_available; photoreal source_data_and_asset_replacement_required") : TEXT("one_or_more_captures_failed"),
         *EntriesJson);
