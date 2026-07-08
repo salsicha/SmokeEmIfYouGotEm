@@ -157,7 +157,17 @@
     "atlas_sampler_review_material": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
     "atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
     "shader_graph_sampler_wiring_status": "review_parent_material_samples_albedo_normal_ao_roughness_height_atlases_with_preview_color_vertex_color_weight_and_roughness_floor_not_lifelike_evidence",
-    "material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike"
+    "material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
+    "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
+    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
+    "photoreal_capture_quality_blockers": {
+      "dark_foreground_proxy": 5,
+      "excess_low_gradient_area": 6,
+      "large_flat_blue_field": 3,
+      "low_color_texture_entropy": 6,
+      "low_edge_density": 3,
+      "low_luma_variation": 1
+    }
   },
   "buy_paid_assets_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true
 }

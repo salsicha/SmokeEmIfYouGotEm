@@ -1412,7 +1412,8 @@
       "desktop_and_vr_performance_captures",
       "approved_first_party_texture_atlas_import_or_rights_cleared_texture_assets",
       "production_material_instances_using_albedo_normal_ao_roughness_height_maps",
-      "approved_unreal_material_instances_using_atlas_maps_or_rights_cleared_equivalent_textures"
+      "approved_unreal_material_instances_using_atlas_maps_or_rights_cleared_equivalent_textures",
+      "automated_capture_quality_gate_passed_without_proxy_blockers"
     ],
     "first_party_procedural_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
     "first_party_procedural_material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
@@ -1537,7 +1538,8 @@
       "first_party_material_instance_texture_asset_bindings_recorded",
       "first_party_atlas_sampler_review_parent_material_created_recorded",
       "first_party_material_shader_graph_sampler_wiring_recorded",
-      "first_party_material_instance_scene_assignment_recorded"
+      "first_party_material_instance_scene_assignment_recorded",
+      "photoreal_capture_quality_review_blockers_recorded"
     ],
     "preview_capture_root": "docs/environment-captures/photoreal_river_previews",
     "preview_map_package_root": "/Game/RaftSim/Maps/EnvironmentPreviews",
@@ -1554,7 +1556,60 @@
     "first_party_material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike",
     "first_party_atlas_sampler_review_material": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
     "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
-    "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike"
+    "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
+    "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
+    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
+    "photoreal_capture_quality_summary": {
+      "capture_count": 6,
+      "blocking_capture_count": 6,
+      "blocker_counts": {
+        "dark_foreground_proxy": 5,
+        "excess_low_gradient_area": 6,
+        "large_flat_blue_field": 3,
+        "low_color_texture_entropy": 6,
+        "low_edge_density": 3,
+        "low_luma_variation": 1
+      },
+      "per_river": {
+        "american_south_fork": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "dark_foreground_proxy",
+            "excess_low_gradient_area",
+            "large_flat_blue_field",
+            "low_color_texture_entropy",
+            "low_edge_density"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        },
+        "colorado_river": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "dark_foreground_proxy",
+            "excess_low_gradient_area",
+            "large_flat_blue_field",
+            "low_color_texture_entropy",
+            "low_edge_density"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        },
+        "pacuare": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "dark_foreground_proxy",
+            "excess_low_gradient_area",
+            "large_flat_blue_field",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        }
+      }
+    }
   },
   "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
   "first_party_material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json",
@@ -1562,5 +1617,7 @@
   "first_party_material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike",
   "first_party_atlas_sampler_review_material": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
   "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
-  "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike"
+  "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
+  "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
+  "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded"
 }

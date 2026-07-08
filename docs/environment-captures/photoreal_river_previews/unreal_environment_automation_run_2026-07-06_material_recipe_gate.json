@@ -168,7 +168,9 @@
     "first_party_material_instance_texture_asset_bindings_recorded": true,
     "first_party_atlas_sampler_review_parent_material_created": true,
     "first_party_material_shader_graph_sampler_wiring_recorded": true,
-    "first_party_material_instance_scene_assignment_recorded": true
+    "first_party_material_instance_scene_assignment_recorded": true,
+    "photoreal_capture_quality_review_blockers_recorded": true,
+    "automated_capture_quality_gate_passed_without_proxy_blockers": false
   },
   "capture_pixel_sanity": [
     {
@@ -314,6 +316,62 @@
   "notes": [
     "Created 9 first-party review-only Texture2D atlas assets under unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures and bound them to the 18 MI_RaftSim_*_AtlasCandidate review material instances; production material promotion remains open.",
     "Created M_RaftSim_AtlasSampleReview as a review-only parent material that samples AlbedoAtlas, NormalAtlas, and AORoughnessHeightAtlas through AtlasTileOriginScale, AtlasBlendWeight, NormalIntensity, RoughnessScale, and HeightScale; production material promotion remains open.",
-    "Assigned the review-only material instances to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; this is material handoff evidence, not lifelike art approval."
-  ]
+    "Assigned the review-only material instances to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; this is material handoff evidence, not lifelike art approval.",
+    "Post-capture quality review records all six current captures as preview-only with low-detail/proxy blockers; this blocks lifelike screenshot approval until visual replacement work clears the metrics and human review."
+  ],
+  "post_capture_quality_review": {
+    "path": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
+    "status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
+    "summary": {
+      "capture_count": 6,
+      "blocking_capture_count": 6,
+      "blocker_counts": {
+        "dark_foreground_proxy": 5,
+        "excess_low_gradient_area": 6,
+        "large_flat_blue_field": 3,
+        "low_color_texture_entropy": 6,
+        "low_edge_density": 3,
+        "low_luma_variation": 1
+      },
+      "per_river": {
+        "american_south_fork": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "dark_foreground_proxy",
+            "excess_low_gradient_area",
+            "large_flat_blue_field",
+            "low_color_texture_entropy",
+            "low_edge_density"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        },
+        "colorado_river": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "dark_foreground_proxy",
+            "excess_low_gradient_area",
+            "large_flat_blue_field",
+            "low_color_texture_entropy",
+            "low_edge_density"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        },
+        "pacuare": {
+          "capture_count": 2,
+          "blocking_capture_count": 2,
+          "blockers": [
+            "dark_foreground_proxy",
+            "excess_low_gradient_area",
+            "large_flat_blue_field",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
+        }
+      }
+    }
+  }
 }
