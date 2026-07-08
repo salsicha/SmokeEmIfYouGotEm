@@ -32,7 +32,8 @@
     "capture_manifest_fields": [
       "procedural_asset_plan",
       "procedural_material_recipe_plan",
-      "first_party_material_texture_atlas_manifest"
+      "first_party_material_texture_atlas_manifest",
+      "first_party_material_instance_candidate_manifest"
     ],
     "default_source_plan": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
     "default_flow_visual_contract": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
@@ -144,7 +145,9 @@
       "first_party_material_recipe_manifest_required",
       "river_specific_sun_skylight_fog_camera_exposure",
       "first_party_importable_material_texture_atlas_candidates",
-      "first_party_material_texture_atlas_vertex_color_application"
+      "first_party_material_texture_atlas_vertex_color_application",
+      "first_party_material_texture_atlas_normal_packed_surface_response",
+      "first_party_material_instance_candidate_manifest_required"
     ],
     "missing_renderer_coverage_before_lifelike": [
       "production_landscape_or_nanite_terrain_material_layers",
@@ -155,9 +158,11 @@
       "approved_raft_and_oar_foreground_art",
       "desktop_and_vr_performance_capture_evidence",
       "in_engine_material_instances_using_first_party_texture_atlases_or_rights_cleared_equivalent_textures",
-      "production_material_instances_using_texture_atlases_normal_ao_roughness_height_or_rights_cleared_equivalent_maps"
+      "production_material_instances_using_texture_atlases_normal_ao_roughness_height_or_rights_cleared_equivalent_maps",
+      "created_unreal_material_instances_from_candidate_manifest_or_rights_cleared_equivalent_materials"
     ],
-    "material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json"
+    "material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
+    "material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json"
   },
   "global_recipes": [
     {
@@ -351,5 +356,5 @@
       ]
     }
   ],
-  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are implemented in production-quality Unreal assets/materials and verified by captures. The first importable first-party texture atlas pack is recorded for material iteration, but final lifelike status remains blocked on in-engine application, review captures, guide/geospatial approval, and performance evidence. The renderer now samples the first-party atlas albedo tiles into terrain, water, boulder, foliage, and raft/oar vertex colors as a bounded preview material pass; normal/AO/roughness/height material-instance integration remains open before lifelike approval."
+  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are implemented in production-quality Unreal assets/materials and verified by captures. The first importable first-party texture atlas pack is recorded for material iteration, but final lifelike status remains blocked on in-engine application, review captures, guide/geospatial approval, and performance evidence. The renderer now samples the first-party atlas albedo tiles into terrain, water, boulder, foliage, and raft/oar vertex colors as a bounded preview material pass; normal/AO/roughness/height material-instance integration remains open before lifelike approval. The renderer now also samples normal and packed AO/roughness/height atlas maps for bounded surface response and tiny preview microrelief, and Unreal material-instance candidate bindings are source-controlled for the next import/material pass."
 }

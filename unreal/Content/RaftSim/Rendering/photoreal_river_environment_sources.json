@@ -1411,7 +1411,8 @@
       "hazards_and_rescue_targets_readable",
       "desktop_and_vr_performance_captures",
       "approved_first_party_texture_atlas_import_or_rights_cleared_texture_assets",
-      "production_material_instances_using_albedo_normal_ao_roughness_height_maps"
+      "production_material_instances_using_albedo_normal_ao_roughness_height_maps",
+      "approved_unreal_material_instances_using_atlas_maps_or_rights_cleared_equivalent_textures"
     ],
     "first_party_procedural_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
     "first_party_procedural_material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
@@ -1528,7 +1529,9 @@
       "first_party_guide_seat_raft_and_oar_foreground_proxies_recorded",
       "known_nonphotoreal_proxy_layers_explicitly_recorded",
       "first_party_material_texture_atlas_manifest_recorded",
-      "first_party_material_texture_atlas_vertex_color_application_recorded"
+      "first_party_material_texture_atlas_vertex_color_application_recorded",
+      "first_party_material_instance_candidate_manifest_recorded",
+      "first_party_atlas_normal_ao_roughness_height_preview_response_recorded"
     ],
     "preview_capture_root": "docs/environment-captures/photoreal_river_previews",
     "preview_map_package_root": "/Game/RaftSim/Maps/EnvironmentPreviews",
@@ -1537,7 +1540,9 @@
       "RaftSim.CapturePhotorealEnvironmentPreviews"
     ],
     "visual_target": "lifelike_downstream_guide_seat_and_river_eye_screenshots_before_playable_promotion",
-    "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json"
+    "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
+    "first_party_material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json"
   },
-  "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json"
+  "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
+  "first_party_material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json"
 }

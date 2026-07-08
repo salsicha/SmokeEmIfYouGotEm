@@ -35,7 +35,8 @@
     "reference_media_links": "physics/data/real_world/reference_media_link_manifest.json",
     "art_asset_source_research": "unreal/Content/RaftSim/Rendering/art_asset_source_research.json",
     "capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
-    "first_party_material_texture_atlases": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json"
+    "first_party_material_texture_atlases": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
+    "first_party_material_instance_candidates": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json"
   },
   "reviewed_source_leads_2026_07_06": [
     {
@@ -147,7 +148,8 @@
         "first_party_material_swatch_review_or_rights_cleared_material_reference",
         "source-aligned wet/dry and exposed-bar masks",
         "first_party_importable_texture_atlas_review_or_rights_cleared_texture_assets",
-        "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials"
+        "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
+        "approved_unreal_material_instances_from_candidate_manifest_or_rights_cleared_equivalent_materials"
       ]
     },
     {
