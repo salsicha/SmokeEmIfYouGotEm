@@ -44,7 +44,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
-          "sha256": "414d8700d2a6c7a89c3464fb12774af978fa746bf7e759bb2d05982a5c672e48",
+          "sha256": "32bc526324179a68f01ecef19377c886b1630fecc147a855d047dca92de8705d",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "human_review_status": "not_reviewed",
           "approval_status": "not_approved_for_lifelike_or_production"
@@ -52,7 +52,7 @@
         {
           "view_id": "river_eye_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
-          "sha256": "3d04ca48fd727fb53648bb10edf648167cf2f8a9b2143a76abd160e6285b410b",
+          "sha256": "997d294b5f04b57997a03d319914e49bd95e7b718930bba42725ff039e7e3a56",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "human_review_status": "not_reviewed",
           "approval_status": "not_approved_for_lifelike_or_production"
@@ -212,7 +212,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
-          "sha256": "4b087775089f854ceeb767fecb241a72958b64b7e5dccee0d06bc46d6ad3ae76",
+          "sha256": "8648b78a0f8a41b220e9231e94f7c73a2bb4a963ff009aef2b097a4aa2e2f724",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "human_review_status": "not_reviewed",
           "approval_status": "not_approved_for_lifelike_or_production"
@@ -220,7 +220,7 @@
         {
           "view_id": "river_eye_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
-          "sha256": "7264215742887bdbb632b4411bbcfbcbee03ae5c2e7f89033276f32811d5b905",
+          "sha256": "d0c7d42a6fbf22d8c16268aff451ab9b8b51bbe16acd6a7d2fc907255d410071",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "human_review_status": "not_reviewed",
           "approval_status": "not_approved_for_lifelike_or_production"
@@ -380,7 +380,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
-          "sha256": "426509da26799195db2bd75a6d52c6c44eacbd464e40a2921841e59ae3fa0e61",
+          "sha256": "8de7e3bd5b0f6a6278c72c838f5527fd210c0d192543eebfcf72c437a7ea12f5",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "human_review_status": "not_reviewed",
           "approval_status": "not_approved_for_lifelike_or_production"
@@ -388,7 +388,7 @@
         {
           "view_id": "river_eye_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
-          "sha256": "9778b412b8866d98846a1c7a74e4cb967045f97b0ef0e5f11a471c4aecb46dc1",
+          "sha256": "b7be6675ab57f1ce26bc408f50c8c5374489dd8f33afd5c3ceaaf4f0c8ad1c92",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "human_review_status": "not_reviewed",
           "approval_status": "not_approved_for_lifelike_or_production"

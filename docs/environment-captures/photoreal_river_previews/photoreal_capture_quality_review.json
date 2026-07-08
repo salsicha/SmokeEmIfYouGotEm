@@ -46,7 +46,7 @@
       "river_id": "american_south_fork",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
-      "sha256": "414d8700d2a6c7a89c3464fb12774af978fa746bf7e759bb2d05982a5c672e48",
+      "sha256": "32bc526324179a68f01ecef19377c886b1630fecc147a855d047dca92de8705d",
       "metrics": {
         "analysis_size": [
           320,
@@ -57,18 +57,18 @@
           720
         ],
         "rgb_mean": [
-          75.53,
-          120.7,
-          91.15
+          74.14,
+          119.36,
+          89.01
         ],
-        "luma_mean": 108.96,
-        "luma_std": 50.82,
-        "edge_density": 0.1095,
-        "low_gradient_fraction": 0.6408,
-        "quantized_entropy_bits": 4.62,
-        "quantized_color_count": 66,
-        "flat_blue_field_fraction": 0.0632,
-        "bottom_center_dark_fraction": 0.0004
+        "luma_mean": 107.55,
+        "luma_std": 50.76,
+        "edge_density": 0.1107,
+        "low_gradient_fraction": 0.2996,
+        "quantized_entropy_bits": 4.63,
+        "quantized_color_count": 74,
+        "flat_blue_field_fraction": 0.0587,
+        "bottom_center_dark_fraction": 0.0009
       },
       "blockers": [],
       "status": "candidate_for_human_lifelike_review_not_approved"
@@ -77,7 +77,7 @@
       "river_id": "american_south_fork",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
-      "sha256": "3d04ca48fd727fb53648bb10edf648167cf2f8a9b2143a76abd160e6285b410b",
+      "sha256": "997d294b5f04b57997a03d319914e49bd95e7b718930bba42725ff039e7e3a56",
       "metrics": {
         "analysis_size": [
           320,
@@ -88,18 +88,18 @@
           720
         ],
         "rgb_mean": [
-          78.27,
-          122.35,
-          92.46
+          73.94,
+          118.47,
+          89.19
         ],
-        "luma_mean": 110.82,
-        "luma_std": 52.52,
-        "edge_density": 0.1143,
-        "low_gradient_fraction": 0.611,
-        "quantized_entropy_bits": 4.54,
-        "quantized_color_count": 66,
-        "flat_blue_field_fraction": 0.0695,
-        "bottom_center_dark_fraction": 0.001
+        "luma_mean": 106.89,
+        "luma_std": 53.24,
+        "edge_density": 0.1345,
+        "low_gradient_fraction": 0.1712,
+        "quantized_entropy_bits": 4.69,
+        "quantized_color_count": 81,
+        "flat_blue_field_fraction": 0.0642,
+        "bottom_center_dark_fraction": 0.0053
       },
       "blockers": [],
       "status": "candidate_for_human_lifelike_review_not_approved"
@@ -108,7 +108,7 @@
       "river_id": "colorado_river",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
-      "sha256": "4b087775089f854ceeb767fecb241a72958b64b7e5dccee0d06bc46d6ad3ae76",
+      "sha256": "8648b78a0f8a41b220e9231e94f7c73a2bb4a963ff009aef2b097a4aa2e2f724",
       "metrics": {
         "analysis_size": [
           320,
@@ -119,18 +119,18 @@
           720
         ],
         "rgb_mean": [
-          131.46,
-          109.89,
-          67.12
+          132.24,
+          111.4,
+          68.6
         ],
-        "luma_mean": 111.39,
-        "luma_std": 45.32,
-        "edge_density": 0.119,
-        "low_gradient_fraction": 0.577,
-        "quantized_entropy_bits": 4.43,
-        "quantized_color_count": 68,
-        "flat_blue_field_fraction": 0.0,
-        "bottom_center_dark_fraction": 0.0282
+        "luma_mean": 112.74,
+        "luma_std": 44.58,
+        "edge_density": 0.1181,
+        "low_gradient_fraction": 0.2793,
+        "quantized_entropy_bits": 4.5,
+        "quantized_color_count": 77,
+        "flat_blue_field_fraction": 0.0028,
+        "bottom_center_dark_fraction": 0.0295
       },
       "blockers": [],
       "status": "candidate_for_human_lifelike_review_not_approved"
@@ -139,7 +139,7 @@
       "river_id": "colorado_river",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
-      "sha256": "7264215742887bdbb632b4411bbcfbcbee03ae5c2e7f89033276f32811d5b905",
+      "sha256": "d0c7d42a6fbf22d8c16268aff451ab9b8b51bbe16acd6a7d2fc907255d410071",
       "metrics": {
         "analysis_size": [
           320,
@@ -150,17 +150,17 @@
           720
         ],
         "rgb_mean": [
-          131.48,
-          110.14,
-          68.21
+          132.31,
+          112.4,
+          72.16
         ],
-        "luma_mean": 111.65,
-        "luma_std": 46.62,
-        "edge_density": 0.1066,
-        "low_gradient_fraction": 0.5181,
-        "quantized_entropy_bits": 4.45,
-        "quantized_color_count": 70,
-        "flat_blue_field_fraction": 0.022,
+        "luma_mean": 113.73,
+        "luma_std": 45.85,
+        "edge_density": 0.1308,
+        "low_gradient_fraction": 0.1613,
+        "quantized_entropy_bits": 4.59,
+        "quantized_color_count": 90,
+        "flat_blue_field_fraction": 0.0204,
         "bottom_center_dark_fraction": 0.0
       },
       "blockers": [],
@@ -170,7 +170,7 @@
       "river_id": "pacuare",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
-      "sha256": "426509da26799195db2bd75a6d52c6c44eacbd464e40a2921841e59ae3fa0e61",
+      "sha256": "8de7e3bd5b0f6a6278c72c838f5527fd210c0d192543eebfcf72c437a7ea12f5",
       "metrics": {
         "analysis_size": [
           320,
@@ -181,18 +181,18 @@
           720
         ],
         "rgb_mean": [
-          49.05,
-          105.81,
-          68.05
+          47.98,
+          108.54,
+          67.33
         ],
-        "luma_mean": 91.01,
-        "luma_std": 43.34,
-        "edge_density": 0.0985,
-        "low_gradient_fraction": 0.6271,
-        "quantized_entropy_bits": 4.54,
-        "quantized_color_count": 60,
-        "flat_blue_field_fraction": 0.0336,
-        "bottom_center_dark_fraction": 0.0026
+        "luma_mean": 92.69,
+        "luma_std": 42.28,
+        "edge_density": 0.1074,
+        "low_gradient_fraction": 0.2913,
+        "quantized_entropy_bits": 4.5,
+        "quantized_color_count": 74,
+        "flat_blue_field_fraction": 0.0314,
+        "bottom_center_dark_fraction": 0.0005
       },
       "blockers": [],
       "status": "candidate_for_human_lifelike_review_not_approved"
@@ -201,7 +201,7 @@
       "river_id": "pacuare",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
-      "sha256": "9778b412b8866d98846a1c7a74e4cb967045f97b0ef0e5f11a471c4aecb46dc1",
+      "sha256": "b7be6675ab57f1ce26bc408f50c8c5374489dd8f33afd5c3ceaaf4f0c8ad1c92",
       "metrics": {
         "analysis_size": [
           320,
@@ -212,18 +212,18 @@
           720
         ],
         "rgb_mean": [
-          50.0,
-          105.91,
-          66.81
+          46.85,
+          106.66,
+          64.35
         ],
-        "luma_mean": 91.2,
-        "luma_std": 45.26,
-        "edge_density": 0.1079,
-        "low_gradient_fraction": 0.6106,
-        "quantized_entropy_bits": 4.5,
-        "quantized_color_count": 61,
-        "flat_blue_field_fraction": 0.0375,
-        "bottom_center_dark_fraction": 0.0052
+        "luma_mean": 90.89,
+        "luma_std": 45.29,
+        "edge_density": 0.134,
+        "low_gradient_fraction": 0.1718,
+        "quantized_entropy_bits": 4.44,
+        "quantized_color_count": 77,
+        "flat_blue_field_fraction": 0.0364,
+        "bottom_center_dark_fraction": 0.0029
       },
       "blockers": [],
       "status": "candidate_for_human_lifelike_review_not_approved"
