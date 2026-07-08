@@ -19,6 +19,9 @@ CAPTURE_QUALITY_REVIEW_RELATIVE_PATH = CAPTURE_ROOT_RELATIVE_PATH / "photoreal_c
 HUMAN_LIFELIKE_REVIEW_HANDOFF_RELATIVE_PATH = (
     CAPTURE_ROOT_RELATIVE_PATH / "photoreal_human_lifelike_review_handoff.json"
 )
+HUMAN_LIFELIKE_REVIEW_PACKET_RELATIVE_PATH = (
+    CAPTURE_ROOT_RELATIVE_PATH / "photoreal_human_lifelike_review_packet.md"
+)
 PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID = "first_party_source_aware_tapered_water_chroma_microbreakup"
 VISIBLE_WATER_CARD_RENDERER_COVERAGE_IDS = {
     "first_party_capture_quality_water_texture_fleck_cards",
@@ -668,4 +671,184 @@ def write_human_lifelike_review_handoff(repo_root: Path, generated_on: str = "20
     output_path = repo_root / HUMAN_LIFELIKE_REVIEW_HANDOFF_RELATIVE_PATH
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(handoff, indent=2) + "\n", encoding="utf-8")
+    return output_path
+
+
+def _format_metric(metrics: dict[str, object], key: str) -> str:
+    value = metrics.get(key)
+    if isinstance(value, float):
+        return f"{value:.4g}"
+    if isinstance(value, int):
+        return str(value)
+    return ""
+
+
+def _capture_image_link(capture_relative_path: str) -> str:
+    return Path(capture_relative_path).name
+
+
+def _domain_title(domain_id: str) -> str:
+    return domain_id.replace("_", " ").title()
+
+
+def build_human_lifelike_review_packet_markdown(repo_root: Path, generated_on: str = "2026-07-08") -> str:
+    """Build a reviewer-facing Markdown packet from the current human-review handoff."""
+
+    handoff = build_human_lifelike_review_handoff(repo_root, generated_on=generated_on)
+    lines: list[str] = [
+        "# Photoreal Human Lifelike Review Packet",
+        "",
+        f"Generated on: `{handoff['generated_on']}`",
+        "",
+        f"Status: `{handoff['status']}`",
+        "",
+        (
+            "This packet is for human review of the current zero-blocker Unreal capture candidates. "
+            "The images are not approved as lifelike or production-ready until every review domain below has accepted evidence."
+        ),
+        "",
+        "Source artifacts:",
+        "",
+        f"- Capture manifest: `{handoff['source_capture_manifest']}`",
+        f"- Automated capture review: `{handoff['source_capture_quality_review']}`",
+        f"- Human review handoff JSON: `{HUMAN_LIFELIKE_REVIEW_HANDOFF_RELATIVE_PATH}`",
+        f"- Reference media queue: `{handoff['source_reference_media_review_queue']}`",
+        f"- Gap register: `{handoff['source_gap_register']}`",
+        "",
+        "## Required Review Domains",
+        "",
+    ]
+
+    for domain in handoff["review_domains"]:
+        lines.extend(
+            [
+                f"- [ ] **{_domain_title(domain['domain_id'])}**",
+                f"  Reviewer: `{domain['required_reviewer']}`",
+                "  Required evidence:",
+            ]
+        )
+        for evidence in domain["required_evidence"]:
+            lines.append(f"  - `{evidence}`")
+
+    lines.extend(
+        [
+            "",
+            "## River Review Sheets",
+            "",
+        ]
+    )
+
+    for river in handoff["rivers"]:
+        lines.extend(
+            [
+                f"### {river['display_name']} (`{river['river_id']}`)",
+                "",
+                f"Review status: `{river['review_status']}`",
+                "",
+                f"Map package: `{river['map_package']}`",
+                "",
+                f"Source manifest: `{river['source_manifest']}`",
+                "",
+                "Flow context:",
+                "",
+            ]
+        )
+        flow_context = river["flow_context"]
+        for key in (
+            "flow_band_id",
+            "flow_band_display_name",
+            "flow_band_source",
+            "flow_reference_discharge_cfs",
+            "flow_visual_width_scale",
+            "flow_visual_foam_scale",
+            "flow_visual_wet_bank_scale",
+            "flow_visual_current_cue_scale",
+            "flow_visual_water_level_offset_cm",
+        ):
+            if flow_context.get(key) is not None:
+                lines.append(f"- `{key}`: `{flow_context[key]}`")
+        if flow_context.get("flow_visual_note"):
+            lines.append(f"- `flow_visual_note`: {flow_context['flow_visual_note']}")
+
+        lines.extend(["", "Source inputs for review:", ""])
+        for key, value in river["source_inputs_for_review"].items():
+            if value:
+                lines.append(f"- `{key}`: `{value}`")
+
+        lines.extend(
+            [
+                "",
+                "Captures:",
+                "",
+                "| View | Image | Entropy | Edge | Low-gradient | Luma std | Human status |",
+                "| --- | --- | ---: | ---: | ---: | ---: | --- |",
+            ]
+        )
+        for capture in river["captures"]:
+            image_name = _capture_image_link(capture["capture"])
+            metrics = capture["metrics"]
+            lines.append(
+                "| "
+                f"`{capture['view_id']}` | "
+                f"![{river['river_id']} {capture['view_id']}]({image_name}) | "
+                f"{_format_metric(metrics, 'quantized_entropy_bits')} | "
+                f"{_format_metric(metrics, 'edge_density')} | "
+                f"{_format_metric(metrics, 'low_gradient_fraction')} | "
+                f"{_format_metric(metrics, 'luma_std')} | "
+                f"`{capture['human_review_status']}` |"
+            )
+
+        lines.extend(["", "Reviewer checks:", ""])
+        for gate in river["open_review_gates"]:
+            lines.append(f"- [ ] `{gate['domain_id']}` - `{gate['required_reviewer']}`")
+
+        lines.extend(["", "Reference media review prompts:", ""])
+        for target in river["reference_media_review_targets"]:
+            lines.append(f"- `{target['target_id']}`: {target['anchor_hint']}")
+            for question in target.get("visual_questions", []):
+                lines.append(f"  - {question}")
+            lines.append(f"  - Rights status: `{target.get('rights_status')}`")
+
+        lines.extend(
+            [
+                "",
+                "Reviewer notes:",
+                "",
+                "- Art direction visual lifelike:",
+                "- Guide/hydraulic fidelity:",
+                "- Geospatial source alignment:",
+                "- Rights/media provenance:",
+                "- Hazard and rescue readability:",
+                "- Production material/asset promotion:",
+                "- Desktop and VR performance:",
+                "",
+                "Decision:",
+                "",
+                "- [ ] Keep as preview-only candidate evidence",
+                "- [ ] Request regeneration with listed fixes",
+                "- [ ] Approve this river for lifelike promotion after all gates above are signed off",
+                "",
+            ]
+        )
+
+    lines.extend(
+        [
+            "## Final Promotion Rule",
+            "",
+            (
+                "Do not mark any river lifelike or production-playable from this packet unless every review domain "
+                "has accepted evidence, rights are recorded for any visual references, hazards and rescue targets remain readable, "
+                "and desktop plus VR performance evidence is attached."
+            ),
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def write_human_lifelike_review_packet_markdown(repo_root: Path, generated_on: str = "2026-07-08") -> Path:
+    packet = build_human_lifelike_review_packet_markdown(repo_root, generated_on=generated_on)
+    output_path = repo_root / HUMAN_LIFELIKE_REVIEW_PACKET_RELATIVE_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(packet, encoding="utf-8")
     return output_path
