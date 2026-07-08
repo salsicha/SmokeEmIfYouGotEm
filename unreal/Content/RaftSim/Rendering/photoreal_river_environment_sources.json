@@ -1460,6 +1460,8 @@
       "near_camera_water_scaffold_readability_clearance_recorded",
       "low_occlusion_far_field_water_shader_scaffold_recorded",
       "first_party_remaining_water_overlay_slab_demotion_recorded",
+      "first_party_long_dark_water_streak_demotion_recorded",
+      "first_party_current_streak_waterline_artifact_demotion_recorded",
       "first_party_photographic_water_exposure_calibration_recorded",
       "first_party_near_field_water_surface_grain_recorded",
       "first_party_base_water_depth_current_grading_recorded",
