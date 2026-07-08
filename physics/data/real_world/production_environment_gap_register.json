@@ -1,7 +1,7 @@
 {
   "schema": "raftsim.production_environment_gap_register.v0",
   "generated_on": "2026-07-06",
-  "status": "active_goal_gap_register_all_rivers_preview_only_not_lifelike_first_party_texture_atlas_candidates_recorded",
+  "status": "active_goal_gap_register_all_rivers_preview_only_not_lifelike_first_party_texture_atlas_candidates_recorded_atlas_vertex_color_application_recorded",
   "goal": "Drive South Fork American, Colorado River, and Pacuare from source-aware Unreal previews to complete photoreal river environments by tracking maps, seasonal flows, aerial imagery, rights-reviewed reference media, additional source data, procedural substitutes, lifelike captures, and performance evidence.",
   "blocking_rule": "No river can be marked production-playable or lifelike until every P0 source-data, visual-replacement, rights-review, guide-review, capture, and performance gate for that river is closed.",
   "policy": {
@@ -146,7 +146,8 @@
         "first_party_procedural_material_recipe_manifest_coverage_or_rights_cleared_material_assets",
         "first_party_material_swatch_review_or_rights_cleared_material_reference",
         "source-aligned wet/dry and exposed-bar masks",
-        "first_party_importable_texture_atlas_review_or_rights_cleared_texture_assets"
+        "first_party_importable_texture_atlas_review_or_rights_cleared_texture_assets",
+        "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials"
       ]
     },
     {
@@ -156,7 +157,8 @@
         "wetness and moss/sediment material variants",
         "mask-aware placement that preserves hazard readability",
         "river-specific scale and abrasion review",
-        "first_party_rock_texture_atlas_or_rights_cleared_rock_texture_maps"
+        "first_party_rock_texture_atlas_or_rights_cleared_rock_texture_maps",
+        "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials"
       ]
     },
     {
@@ -166,7 +168,8 @@
         "density masks from reviewed imagery or first-party procedural rules",
         "seasonal and flow-bank exposure variants",
         "performance-scalable Nanite/PCG or instancing path",
-        "first_party_foliage_texture_atlas_or_rights_cleared_biome_foliage_texture_maps"
+        "first_party_foliage_texture_atlas_or_rights_cleared_biome_foliage_texture_maps",
+        "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials"
       ]
     },
     {
@@ -176,7 +179,8 @@
         "foam, boil, wave-train, hole, eddy-line, lateral, spray, and mist layers",
         "flow-band dependency from validated hydrology and gameplay tuning",
         "no visual forcing that hides conservation or physics failures",
-        "first_party_water_foam_mist_texture_atlas_or_approved_water_material_textures"
+        "first_party_water_foam_mist_texture_atlas_or_approved_water_material_textures",
+        "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials"
       ]
     },
     {

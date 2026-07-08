@@ -142,9 +142,10 @@
       "river-specific lighting, atmosphere, and camera",
       "importable albedo, normal, and packed AO/roughness/height atlas candidates"
     ],
-    "promotion_gate": "Recipes and concrete material targets are approved as a traceable production path, but a river remains preview-only until they are implemented in Unreal-quality materials/assets, screenshots are captured, guide review passes, and desktop/VR performance evidence is attached. Texture atlases also require in-engine material application, capture review, and performance evidence before they count as production material replacement.",
+    "promotion_gate": "Recipes and concrete material targets are approved as a traceable production path, but a river remains preview-only until they are implemented in Unreal-quality materials/assets, screenshots are captured, guide review passes, and desktop/VR performance evidence is attached. Texture atlases also require in-engine material application, capture review, and performance evidence before they count as production material replacement. The current renderer application samples albedo into vertex colors only; normal/AO/roughness/height maps must still be applied through production material instances or an equivalent shader path before lifelike approval.",
     "material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
-    "texture_atlas_status": "generated_importable_first_party_procedural_png_texture_candidates_review_only_not_lifelike_evidence"
+    "texture_atlas_status": "generated_importable_first_party_procedural_png_texture_candidates_review_only_not_lifelike_evidence",
+    "texture_atlas_renderer_application_status": "albedo_tiles_sampled_into_preview_vertex_colors_for_terrain_water_boulders_foliage_and_raft_oars_review_only_not_lifelike_evidence"
   },
   "buy_paid_assets_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true
 }

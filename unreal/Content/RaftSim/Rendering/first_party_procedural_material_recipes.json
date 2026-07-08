@@ -22,7 +22,8 @@
         "source_detail_bands",
         "source_aware_bank_breakup_patches",
         "soft_feathered_terrain_material_patches",
-        "shadowless_albedo_review_captures"
+        "shadowless_albedo_review_captures",
+        "first_party_material_texture_atlas_albedo_vertex_color_tints"
       ],
       "replacement_target": "production_landscape_or_nanite_layered_terrain_material"
     },
@@ -30,7 +31,8 @@
       "material_path": "/Game/RaftSim/Materials/M_RaftSim_VertexColorPreview",
       "current_use": [
         "simple_vertex_color_proxy_meshes",
-        "ground_cover_cards"
+        "ground_cover_cards",
+        "first_party_material_texture_atlas_albedo_vertex_color_tints"
       ],
       "replacement_target": "production_landscape_or_nanite_layered_terrain_material"
     },
@@ -40,7 +42,8 @@
         "boulders",
         "talus",
         "foliage_proxy_meshes",
-        "canyon_strata_cards"
+        "canyon_strata_cards",
+        "first_party_material_texture_atlas_albedo_vertex_color_tints"
       ],
       "replacement_target": "river_specific_rock_foliage_and_prop_material_instances"
     },
@@ -50,7 +53,8 @@
         "river_ribbon_depth_tint",
         "flow_band_current_cues",
         "bounded_lit_water_normal_response",
-        "foam_and_wave_highlight_color_support"
+        "foam_and_wave_highlight_color_support",
+        "first_party_material_texture_atlas_albedo_vertex_color_tints"
       ],
       "replacement_target": "production_water_shader_or_validated_waterbody_integration"
     },
@@ -757,6 +761,6 @@
       ]
     }
   ],
-  "current_decision": "Use this manifest as the concrete first-party procedural material target catalog for the next renderer iteration. The existing preview materials remain active fallbacks, and no river can claim lifelike status until production-quality materials/assets, captures, guide review, and performance evidence pass. Importable first-party texture atlas candidates are now generated and hash-recorded for Unreal material-instance experiments, but they do not mark any river lifelike until applied, captured, guide-reviewed, and performance-checked.",
+  "current_decision": "Use this manifest as the concrete first-party procedural material target catalog for the next renderer iteration. The existing preview materials remain active fallbacks, and no river can claim lifelike status until production-quality materials/assets, captures, guide review, and performance evidence pass. Importable first-party texture atlas candidates are now generated and hash-recorded for Unreal material-instance experiments, but they do not mark any river lifelike until applied, captured, guide-reviewed, and performance-checked. A vertex-color sampled albedo atlas pass is now active in the generated Unreal previews for dominant terrain, water, boulder, foliage, and raft/oar surfaces; normal/AO/roughness/height shader use remains a production material task.",
   "importable_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json"
 }

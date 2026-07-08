@@ -151,6 +151,20 @@ struct FRaftSimPreviewImage
         return Sampled;
     }
 
+    FLinearColor SampleRaw(float U, float V) const
+    {
+        if (!IsValid())
+        {
+            return FLinearColor::Black;
+        }
+
+        const int32 X = FMath::Clamp(FMath::RoundToInt(U * static_cast<float>(Width - 1)), 0, Width - 1);
+        const int32 Y = FMath::Clamp(FMath::RoundToInt((1.0f - V) * static_cast<float>(Height - 1)), 0, Height - 1);
+        FLinearColor Sampled = Pixels[Y * Width + X];
+        Sampled.A = 1.0f;
+        return Sampled;
+    }
+
     float SampleLuma(float U, float V) const
     {
         if (!IsValid())
@@ -219,6 +233,13 @@ FString GetFirstPartyProceduralMaterialRecipePlanRelativePath()
 FString GetFirstPartyMaterialTextureAtlasManifestRelativePath()
 {
     return TEXT("unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json");
+}
+
+FString GetFirstPartyMaterialTextureAtlasAlbedoRelativePath(const FString& RiverId)
+{
+    return FString::Printf(
+        TEXT("unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/%s_first_party_material_texture_atlas_albedo.png"),
+        *RiverId);
 }
 
 FString GetProductionGeospatialAttachmentLedgerRelativePath()
@@ -1114,6 +1135,66 @@ FLinearColor ScalePreviewColor(const FLinearColor& Color, float Scale)
 float GetPreviewColorLuma(const FLinearColor& Color)
 {
     return FMath::Max(0.001f, Color.R * 0.2126f + Color.G * 0.7152f + Color.B * 0.0722f);
+}
+
+enum ERaftSimFirstPartyMaterialAtlasTile : int32
+{
+    TerrainBankLayeredMaterialTile = 0,
+    WetBoulderContactMaterialTile = 1,
+    BiomeFoliageGroundcoverMaterialTile = 2,
+    FlowDependentWaterSurfaceMaterialTile = 3,
+    FoamSprayMistAtmosphereMaterialTile = 4,
+    RaftForegroundReviewMaterialTile = 5,
+};
+
+FLinearColor SampleFirstPartyMaterialAtlasTile(
+    const FRaftSimPreviewImage* Atlas,
+    int32 TileIndex,
+    float LocalU,
+    float LocalV)
+{
+    if (!Atlas || !Atlas->IsValid())
+    {
+        return FLinearColor::Black;
+    }
+
+    constexpr int32 AtlasColumns = 3;
+    constexpr int32 AtlasRows = 2;
+    const int32 ClampedTileIndex = FMath::Clamp(TileIndex, 0, AtlasColumns * AtlasRows - 1);
+    const int32 Column = ClampedTileIndex % AtlasColumns;
+    const int32 Row = ClampedTileIndex / AtlasColumns;
+    const float WrappedU = FMath::Fmod(FMath::Fmod(LocalU, 1.0f) + 1.0f, 1.0f);
+    const float WrappedV = FMath::Fmod(FMath::Fmod(LocalV, 1.0f) + 1.0f, 1.0f);
+    const float AtlasU = (static_cast<float>(Column) + WrappedU) / static_cast<float>(AtlasColumns);
+    const float TopOriginAtlasV = (static_cast<float>(Row) + WrappedV) / static_cast<float>(AtlasRows);
+    return Atlas->SampleRaw(AtlasU, 1.0f - TopOriginAtlasV);
+}
+
+FLinearColor ApplyFirstPartyMaterialAtlasTint(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* Atlas,
+    int32 TileIndex,
+    const FLinearColor& BaseColor,
+    float LocalU,
+    float LocalV,
+    float Weight)
+{
+    if (!Atlas || !Atlas->IsValid() || Weight <= 0.0f)
+    {
+        return BaseColor;
+    }
+
+    FLinearColor AtlasColor = ClampPreviewColor(SampleFirstPartyMaterialAtlasTile(Atlas, TileIndex, LocalU, LocalV));
+    AtlasColor.A = BaseColor.A;
+    const float BaseLuma = GetPreviewColorLuma(BaseColor);
+    const float AtlasLuma = GetPreviewColorLuma(AtlasColor);
+    const float MinAtlasLuma = BaseLuma * (Spec.bHasWaterfalls ? 0.50f : 0.58f);
+    const float MaxAtlasLuma = BaseLuma * (Spec.bDesertCanyon ? 1.28f : 1.22f);
+    const float TargetAtlasLuma = FMath::Clamp(AtlasLuma, MinAtlasLuma, MaxAtlasLuma);
+    AtlasColor = ScalePreviewColor(AtlasColor, TargetAtlasLuma / AtlasLuma);
+    AtlasColor.A = BaseColor.A;
+
+    return ClampPreviewColor(FMath::Lerp(BaseColor, AtlasColor, FMath::Clamp(Weight, 0.0f, 0.32f)));
 }
 
 FLinearColor NormalizePreviewSourceDrapeAlbedo(
@@ -3129,7 +3210,8 @@ void AddPreviewTerrainMesh(
     const FRaftSimPreviewImage* TerrainRelief,
     const FRaftSimPreviewImage* HeightfieldPreview,
     const FRaftSimPreviewImage* WaterMask,
-    const FRaftSimPreviewImage* VegetationMask)
+    const FRaftSimPreviewImage* VegetationMask,
+    const FRaftSimPreviewImage* MaterialAtlasAlbedo)
 {
     constexpr int32 XSteps = 280;
     constexpr int32 YSteps = 112;
@@ -3425,6 +3507,20 @@ void AddPreviewTerrainMesh(
                 TerrainColor,
                 MacroTerrainRidgeHighlightColor,
                 FMath::Clamp(MacroTerrainRidgeHighlightT * (Spec.bDesertCanyon ? 0.16f : 0.12f), 0.0f, Spec.bDesertCanyon ? 0.16f : 0.12f));
+            const float FirstPartyMaterialAtlasTerrainBlend = FMath::Clamp(
+                0.055f + BankT * 0.048f + CanyonT * 0.044f +
+                    SourceVegetationT * (Spec.bDesertCanyon ? 0.010f : 0.026f) -
+                    SourceWaterT * 0.030f - WetT * 0.016f,
+                0.0f,
+                Spec.bDesertCanyon ? 0.135f : 0.125f);
+            TerrainColor = ApplyFirstPartyMaterialAtlasTint(
+                Spec,
+                MaterialAtlasAlbedo,
+                TerrainBankLayeredMaterialTile,
+                TerrainColor,
+                U * (Spec.bDesertCanyon ? 8.0f : 9.5f) + SourceVegetationT * 0.37f,
+                V * (Spec.bDesertCanyon ? 3.5f : 4.8f) + BankT * 0.23f + CanyonT * 0.41f,
+                FirstPartyMaterialAtlasTerrainBlend);
             Vertices.Add(FVector(
                 X,
                 Y,
@@ -3644,7 +3740,10 @@ void AddPreviewAerialDrapeTiles(
     }
 }
 
-void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
+void AddPreviewRiverRibbonMesh(
+    UWorld* World,
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* MaterialAtlasAlbedo)
 {
     constexpr int32 XSteps = 320;
     // Odd cross-step count avoids a persistent vertex-color row exactly on the river centerline.
@@ -4021,6 +4120,19 @@ void AddPreviewRiverRibbonMesh(UWorld* World, const FRaftSimEnvironmentPreviewSp
                     0.0f,
                     Spec.bDesertCanyon ? 0.098f : 0.122f));
             WaterColor = FMath::Lerp(WaterColor, BaseWaterFlowThreadFoamGlint, BaseWaterFlowThreadFoamGlintT);
+            const float FirstPartyMaterialAtlasWaterBlend = FMath::Clamp(
+                (0.026f + EdgeT * 0.018f + CenterT * 0.012f + FlowEnergy * 0.006f) *
+                    (1.0f - BaseWaterResidualCenterSeamEraseT * 0.42f),
+                0.0f,
+                Spec.bHasWaterfalls ? 0.070f : 0.060f);
+            WaterColor = ApplyFirstPartyMaterialAtlasTint(
+                Spec,
+                MaterialAtlasAlbedo,
+                FlowDependentWaterSurfaceMaterialTile,
+                WaterColor,
+                U * 16.0f + FlowNoise * 0.43f,
+                V * 2.7f + BaseWaterFlowThreadLongBand * 0.31f,
+                FirstPartyMaterialAtlasWaterBlend);
             const FLinearColor BaseWaterResidualDarkStreakLumaFloor = Spec.bDesertCanyon
                 ? FLinearColor(0.29f, 0.245f, 0.170f)
                 : (Spec.bHasWaterfalls ? FLinearColor(0.0f, 0.225f, 0.190f)
@@ -7793,7 +7905,12 @@ void AddPreviewInstancedProceduralFoliageEquivalentDetail(
     }
 }
 
-void AddPreviewRaftForeground(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec, UStaticMesh* CubeMesh, UStaticMesh* CylinderMesh)
+void AddPreviewRaftForeground(
+    UWorld* World,
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    UStaticMesh* CubeMesh,
+    UStaticMesh* CylinderMesh,
+    const FRaftSimPreviewImage* MaterialAtlasAlbedo)
 {
     if (!World || !CubeMesh || !CylinderMesh)
     {
@@ -7812,12 +7929,54 @@ void AddPreviewRaftForeground(UWorld* World, const FRaftSimEnvironmentPreviewSpe
     const float BaseX = -4100.0f;
     const float CenterY = GetPreviewRiverCenterY(Spec, BaseX);
     const float Z = -18.0f;
-    const FLinearColor TubeColor = FMath::Lerp(ScalePreviewColor(Spec.RaftColor, 0.42f), FLinearColor(0.34f, 0.095f, 0.035f), 0.60f);
-    const FLinearColor TubeShadowColor = ScalePreviewColor(TubeColor, 0.44f);
-    const FLinearColor TubeHighlightColor = FMath::Lerp(TubeColor, FLinearColor(0.70f, 0.25f, 0.09f), 0.14f);
-    const FLinearColor FrameColor = Spec.bDesertCanyon ? FLinearColor(0.12f, 0.095f, 0.065f) : FLinearColor(0.065f, 0.075f, 0.058f);
-    const FLinearColor OarShaftColor = Spec.bDesertCanyon ? FLinearColor(0.24f, 0.15f, 0.075f) : FLinearColor(0.27f, 0.16f, 0.075f);
-    const FLinearColor OarBladeColor = Spec.bDesertCanyon ? FLinearColor(0.22f, 0.15f, 0.075f) : FLinearColor(0.24f, 0.10f, 0.045f);
+    const FLinearColor TubeColor = ApplyFirstPartyMaterialAtlasTint(
+        Spec,
+        MaterialAtlasAlbedo,
+        RaftForegroundReviewMaterialTile,
+        FMath::Lerp(ScalePreviewColor(Spec.RaftColor, 0.42f), FLinearColor(0.34f, 0.095f, 0.035f), 0.60f),
+        0.28f,
+        0.36f,
+        0.18f);
+    const FLinearColor TubeShadowColor = ApplyFirstPartyMaterialAtlasTint(
+        Spec,
+        MaterialAtlasAlbedo,
+        RaftForegroundReviewMaterialTile,
+        ScalePreviewColor(TubeColor, 0.44f),
+        0.64f,
+        0.54f,
+        0.12f);
+    const FLinearColor TubeHighlightColor = ApplyFirstPartyMaterialAtlasTint(
+        Spec,
+        MaterialAtlasAlbedo,
+        RaftForegroundReviewMaterialTile,
+        FMath::Lerp(TubeColor, FLinearColor(0.70f, 0.25f, 0.09f), 0.14f),
+        0.18f,
+        0.18f,
+        0.10f);
+    const FLinearColor FrameColor = ApplyFirstPartyMaterialAtlasTint(
+        Spec,
+        MaterialAtlasAlbedo,
+        RaftForegroundReviewMaterialTile,
+        Spec.bDesertCanyon ? FLinearColor(0.12f, 0.095f, 0.065f) : FLinearColor(0.065f, 0.075f, 0.058f),
+        0.50f,
+        0.70f,
+        0.12f);
+    const FLinearColor OarShaftColor = ApplyFirstPartyMaterialAtlasTint(
+        Spec,
+        MaterialAtlasAlbedo,
+        RaftForegroundReviewMaterialTile,
+        Spec.bDesertCanyon ? FLinearColor(0.24f, 0.15f, 0.075f) : FLinearColor(0.27f, 0.16f, 0.075f),
+        0.42f,
+        0.86f,
+        0.16f);
+    const FLinearColor OarBladeColor = ApplyFirstPartyMaterialAtlasTint(
+        Spec,
+        MaterialAtlasAlbedo,
+        RaftForegroundReviewMaterialTile,
+        Spec.bDesertCanyon ? FLinearColor(0.22f, 0.15f, 0.075f) : FLinearColor(0.24f, 0.10f, 0.045f),
+        0.76f,
+        0.84f,
+        0.18f);
     const FLinearColor BowLineColor = FMath::Lerp(FLinearColor(0.40f, 0.34f, 0.22f), TubeColor, 0.25f);
 
     AddRaftProxyPart(
@@ -8162,12 +8321,14 @@ FString GetPreviewCaptureRelativePath(const FRaftSimEnvironmentPreviewSpec& Spec
 
 FString GetPreviewFidelityNote(const FRaftSimEnvironmentPreviewSpec& Spec)
 {
+    const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, river water, primary boulder, foliage, and raft/oar vertex colors as bounded preview material candidates; atlas use remains preview-only until production material instances, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass");
     if (!Spec.SourceDrapeDescription.IsEmpty())
     {
-        return Spec.SourceDrapeDescription;
+        return Spec.SourceDrapeDescription + AtlasApplicationNote;
     }
 
-    return TEXT("source-aware procedural blockout with generated valley, river, foam, rocks, foliage, and raft proxies; not yet production photoreal");
+    return FString(TEXT("source-aware procedural blockout with generated valley, river, foam, rocks, foliage, and raft proxies; not yet production photoreal")) +
+        AtlasApplicationNote;
 }
 
 ACameraActor* FindPreviewCaptureCamera(UWorld* World, const FString& PreferredCameraLabel)
@@ -8436,12 +8597,27 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     {
         VegetationMaskPtr = &VegetationMask;
     }
+    FRaftSimPreviewImage MaterialAtlasAlbedo;
+    const FRaftSimPreviewImage* MaterialAtlasAlbedoPtr = nullptr;
+    const FString MaterialAtlasAlbedoPath = GetFirstPartyMaterialTextureAtlasAlbedoRelativePath(Spec.RiverId);
+    if (LoadPreviewPngImage(MaterialAtlasAlbedoPath, MaterialAtlasAlbedo))
+    {
+        MaterialAtlasAlbedoPtr = &MaterialAtlasAlbedo;
+    }
 
     AddPreviewLightRig(World, Spec);
 
-    AddPreviewTerrainMesh(World, Spec, AerialDrapePtr, TerrainReliefPtr, HeightfieldPreviewPtr, WaterMaskPtr, VegetationMaskPtr);
+    AddPreviewTerrainMesh(
+        World,
+        Spec,
+        AerialDrapePtr,
+        TerrainReliefPtr,
+        HeightfieldPreviewPtr,
+        WaterMaskPtr,
+        VegetationMaskPtr,
+        MaterialAtlasAlbedoPtr);
     AddPreviewAerialDrapeTiles(World, Spec, AerialDrapePtr, TerrainReliefPtr, HeightfieldPreviewPtr, WaterMaskPtr, VegetationMaskPtr);
-    AddPreviewRiverRibbonMesh(World, Spec);
+    AddPreviewRiverRibbonMesh(World, Spec, MaterialAtlasAlbedoPtr);
     AddPreviewWetBankDressing(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr);
     AddPreviewIrregularShorelineEdgeBreakupDetail(
         World,
@@ -8590,10 +8766,18 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         const float BoulderWaterT = SamplePreviewMaskAtWorld(Spec, WaterMaskPtr, X, Y);
         const float BoulderVegetationT = SamplePreviewMaskAtWorld(Spec, VegetationMaskPtr, X, Y);
         const FLinearColor BoulderBaseColor = ScalePreviewColor(Spec.RockColor, Spec.bDesertCanyon ? 0.90f : 0.78f);
-        const FLinearColor UnadjustedBoulderColor = FMath::Lerp(
+        FLinearColor UnadjustedBoulderColor = FMath::Lerp(
             BoulderBaseColor,
             FMath::Lerp(ScalePreviewColor(Spec.RockColor, 0.46f), ScalePreviewColor(Spec.WaterColor, 0.34f), 0.30f),
             FMath::Clamp(BoulderWaterT * 0.36f, 0.0f, 0.42f));
+        UnadjustedBoulderColor = ApplyFirstPartyMaterialAtlasTint(
+            Spec,
+            MaterialAtlasAlbedoPtr,
+            WetBoulderContactMaterialTile,
+            UnadjustedBoulderColor,
+            X * 0.0021f + static_cast<float>(BoulderIndex) * 0.137f,
+            Y * 0.0033f + BoulderWaterT * 0.29f + BoulderVegetationT * 0.41f,
+            FMath::Clamp(0.14f + BoulderWaterT * 0.08f + BoulderVegetationT * 0.03f, 0.0f, 0.24f));
         const FLinearColor BoulderColor =
             bNearCameraReviewBoulder ? ScalePreviewColor(UnadjustedBoulderColor, Spec.bDesertCanyon ? 0.56f : 0.48f) : UnadjustedBoulderColor;
         const FVector BoulderScale(Scale * 1.18f, Scale * 0.92f, Scale * 0.54f);
@@ -8699,9 +8883,17 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
                                     : FLinearColor(0.085f, 0.175f, 0.055f));
         const float FirstPartyProceduralCanopyToneCompression =
             Spec.bDesertCanyon ? 0.20f : (Spec.bHasWaterfalls ? 0.54f : 0.42f);
-        const FLinearColor FirstPartyProceduralCanopyToneColor = ScalePreviewColor(
+        FLinearColor FirstPartyProceduralCanopyToneColor = ScalePreviewColor(
             FMath::Lerp(CanopyColor, FirstPartyProceduralCanopyToneAnchor, FirstPartyProceduralCanopyToneCompression),
             Spec.bDesertCanyon ? 0.94f : (Spec.bHasWaterfalls ? 0.80f : 0.84f));
+        FirstPartyProceduralCanopyToneColor = ApplyFirstPartyMaterialAtlasTint(
+            Spec,
+            MaterialAtlasAlbedoPtr,
+            BiomeFoliageGroundcoverMaterialTile,
+            FirstPartyProceduralCanopyToneColor,
+            X * 0.0017f + static_cast<float>(FoliageIndex) * 0.071f,
+            Y * 0.0024f + FoliageMaskT * 0.36f,
+            Spec.bDesertCanyon ? 0.10f : (Spec.bHasWaterfalls ? 0.18f : 0.15f));
         const FLinearColor FirstPartyProceduralCanopyShadowColor = Spec.bDesertCanyon
             ? ScalePreviewColor(FirstPartyProceduralCanopyToneColor, 0.62f)
             : FMath::Lerp(
@@ -8948,7 +9140,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         }
     }
 
-    AddPreviewRaftForeground(World, Spec, CubeMesh, CylinderMesh);
+    AddPreviewRaftForeground(World, Spec, CubeMesh, CylinderMesh, MaterialAtlasAlbedoPtr);
     AddPreviewCameraAndStart(World, Spec);
     return SavePreviewWorld(World, Spec.MapPackagePath, OutSummary);
 }
