@@ -196,20 +196,16 @@
       "capture_count": 6,
       "blocking_capture_count": 6,
       "blocker_counts": {
-        "excess_low_gradient_area": 6,
         "low_color_texture_entropy": 6,
-        "low_edge_density": 3,
-        "low_luma_variation": 3
+        "low_edge_density": 3
       },
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "excess_low_gradient_area",
             "low_color_texture_entropy",
-            "low_edge_density",
-            "low_luma_variation"
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -217,10 +213,8 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "excess_low_gradient_area",
             "low_color_texture_entropy",
-            "low_edge_density",
-            "low_luma_variation"
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -228,35 +222,29 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "excess_low_gradient_area",
             "low_color_texture_entropy",
-            "low_edge_density",
-            "low_luma_variation"
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         }
       }
     },
     "visual_blocker_reduction_checkpoint_2026_07_08": {
-      "status": "preview_only_not_lifelike_flat_blue_and_dark_foreground_blockers_removed_low_detail_blockers_remain",
+      "status": "low_gradient_luma_flat_blue_and_dark_foreground_blockers_removed_all_rivers_still_preview_only",
       "capture_quality_summary": {
         "capture_count": 6,
         "blocking_capture_count": 6,
         "blocker_counts": {
-          "excess_low_gradient_area": 6,
           "low_color_texture_entropy": 6,
-          "low_edge_density": 3,
-          "low_luma_variation": 3
+          "low_edge_density": 3
         },
         "per_river": {
           "american_south_fork": {
             "capture_count": 2,
             "blocking_capture_count": 2,
             "blockers": [
-              "excess_low_gradient_area",
               "low_color_texture_entropy",
-              "low_edge_density",
-              "low_luma_variation"
+              "low_edge_density"
             ],
             "status": "preview_only_not_lifelike_quality_blockers"
           },
@@ -264,10 +252,8 @@
             "capture_count": 2,
             "blocking_capture_count": 2,
             "blockers": [
-              "excess_low_gradient_area",
               "low_color_texture_entropy",
-              "low_edge_density",
-              "low_luma_variation"
+              "low_edge_density"
             ],
             "status": "preview_only_not_lifelike_quality_blockers"
           },
@@ -275,10 +261,8 @@
             "capture_count": 2,
             "blocking_capture_count": 2,
             "blockers": [
-              "excess_low_gradient_area",
               "low_color_texture_entropy",
-              "low_edge_density",
-              "low_luma_variation"
+              "low_edge_density"
             ],
             "status": "preview_only_not_lifelike_quality_blockers"
           }
@@ -286,13 +270,13 @@
       },
       "closed_blocker_classes": [
         "dark_foreground_proxy",
-        "large_flat_blue_field"
+        "excess_low_gradient_area",
+        "large_flat_blue_field",
+        "low_luma_variation"
       ],
       "remaining_blocker_classes": [
-        "excess_low_gradient_area",
         "low_color_texture_entropy",
-        "low_edge_density",
-        "low_luma_variation"
+        "low_edge_density"
       ]
     }
   },
