@@ -438,7 +438,7 @@
         "water_surface_depth_turbidity_and_current_cues"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
-      "unreal_status": "defaultlit_vertex_color_water_preview_active_with_bounded_normal_response_photographic_water_exposure_calibration_near_field_surface_grain_base_water_depth_current_grading_flow_cued_foam_slick_mottle_shallow_water_clarity_aeration_flow_dependent_hydraulic_aeration_spray_low_occlusion_far_field_depth_reflection_refraction_scaffold_remaining_water_overlay_slab_demotion_long_dark_water_streak_demotion_current_streak_waterline_artifact_demotion_and_central_water_scaffold_plate_demotion_custom_shader_or_waterbody_integration_pending",
+      "unreal_status": "defaultlit_vertex_color_water_preview_active_with_bounded_normal_response_photographic_water_exposure_calibration_near_field_surface_grain_base_water_depth_current_grading_base_water_flow_thread_texture_flow_cued_foam_slick_mottle_shallow_water_clarity_aeration_flow_dependent_hydraulic_aeration_spray_low_occlusion_far_field_depth_reflection_refraction_scaffold_remaining_water_overlay_slab_demotion_long_dark_water_streak_demotion_current_streak_waterline_artifact_demotion_and_central_water_scaffold_plate_demotion_custom_shader_or_waterbody_integration_pending",
       "required_source_inputs": [
         "river_flow_visual_bands.json",
         "solver_or_preview_flow_band_telemetry",
@@ -473,6 +473,9 @@
         "base_water_current_tongue",
         "base_water_sediment_threads",
         "base_water_sky_threads",
+        "base_water_flow_thread_texture",
+        "base_water_flow_thread_relief",
+        "base_water_flow_thread_foam_glint",
         "flow_cued_foam_slick_mottle",
         "base_river_ribbon_foam_seed",
         "flow_volume_slick_variation",
@@ -519,6 +522,9 @@
         "base_water_current_tongue_contrast",
         "base_water_sediment_thread_strength",
         "base_water_sky_thread_strength",
+        "base_water_flow_thread_texture_strength",
+        "base_water_flow_thread_relief_cm",
+        "base_water_flow_thread_foam_glint_strength",
         "water_foam_slick_mottle_strength",
         "flow_cued_foam_seed_scale",
         "river_ribbon_slick_darkening",

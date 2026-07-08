@@ -107,6 +107,7 @@
       "first_party_near_field_water_surface_grain",
       "first_party_near_camera_water_macro_ripple_mottle",
       "first_party_base_water_depth_current_grading",
+      "first_party_base_water_flow_thread_texture",
       "first_party_base_water_center_guide_stripe_breakup",
       "first_party_base_water_cross_channel_breakup",
       "first_party_base_water_residual_center_seam_erase",
