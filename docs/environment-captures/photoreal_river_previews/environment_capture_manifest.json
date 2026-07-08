@@ -8,8 +8,10 @@
   "first_party_material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json",
   "first_party_material_texture_asset_root": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
   "first_party_material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike",
+  "first_party_atlas_sampler_review_material": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+  "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
   "first_party_material_instance_review_asset_root": "unreal/Content/RaftSim/Materials/MaterialInstances",
-  "first_party_material_instance_review_asset_status": "created_unreal_material_instance_constant_review_assets_with_texture_bindings_not_lifelike",
+  "first_party_material_instance_review_asset_status": "created_unreal_material_instance_constant_review_assets_with_texture_bindings_and_sampler_parent_not_lifelike",
   "geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",
   "status": "south_fork_colorado_and_pacuare_source_draped_guide_and_river_eye_previews_available; photoreal source_data_and_asset_replacement_required",
   "captures": [

@@ -1,7 +1,7 @@
 {
   "schema": "raftsim.production_environment_gap_register.v0",
   "generated_on": "2026-07-06",
-  "status": "active_goal_gap_register_all_rivers_preview_only_not_lifelike_first_party_texture2d_atlas_assets_and_bound_material_instances_recorded",
+  "status": "active_goal_gap_register_all_rivers_preview_only_not_lifelike_first_party_texture2d_atlas_assets_bound_material_instances_and_sampler_parent_recorded",
   "goal": "Drive South Fork American, Colorado River, and Pacuare from source-aware Unreal previews to complete photoreal river environments by tracking maps, seasonal flows, aerial imagery, rights-reviewed reference media, additional source data, procedural substitutes, lifelike captures, and performance evidence.",
   "blocking_rule": "No river can be marked production-playable or lifelike until every P0 source-data, visual-replacement, rights-review, guide-review, capture, and performance gate for that river is closed.",
   "policy": {
@@ -38,7 +38,9 @@
     "first_party_material_texture_atlases": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
     "first_party_material_instance_candidates": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json",
     "first_party_material_texture_assets": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
-    "first_party_material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike"
+    "first_party_material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike",
+    "first_party_atlas_sampler_review_material": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+    "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike"
   },
   "reviewed_source_leads_2026_07_06": [
     {
@@ -152,7 +154,8 @@
         "first_party_importable_texture_atlas_review_or_rights_cleared_texture_assets",
         "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
         "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
-        "approved_unreal_material_instances_from_candidate_manifest_or_rights_cleared_equivalent_materials"
+        "approved_unreal_material_instances_from_candidate_manifest_or_rights_cleared_equivalent_materials",
+        "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph"
       ]
     },
     {
@@ -164,7 +167,8 @@
         "river-specific scale and abrasion review",
         "first_party_rock_texture_atlas_or_rights_cleared_rock_texture_maps",
         "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
-        "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials"
+        "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+        "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph"
       ]
     },
     {
@@ -176,7 +180,8 @@
         "performance-scalable Nanite/PCG or instancing path",
         "first_party_foliage_texture_atlas_or_rights_cleared_biome_foliage_texture_maps",
         "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
-        "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials"
+        "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+        "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph"
       ]
     },
     {
@@ -188,7 +193,8 @@
         "no visual forcing that hides conservation or physics failures",
         "first_party_water_foam_mist_texture_atlas_or_approved_water_material_textures",
         "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
-        "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials"
+        "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+        "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph"
       ]
     },
     {

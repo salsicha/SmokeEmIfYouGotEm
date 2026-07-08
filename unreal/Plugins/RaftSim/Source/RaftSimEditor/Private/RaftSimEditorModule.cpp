@@ -36,9 +36,16 @@
 #include "IImageWrapper.h"
 #include "IImageWrapperModule.h"
 #include "Materials/Material.h"
+#include "Materials/MaterialExpressionAdd.h"
+#include "Materials/MaterialExpressionComponentMask.h"
 #include "Materials/MaterialExpressionConstant.h"
+#include "Materials/MaterialExpressionConstant3Vector.h"
+#include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMultiply.h"
+#include "Materials/MaterialExpressionSaturate.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
+#include "Materials/MaterialExpressionTextureCoordinate.h"
+#include "Materials/MaterialExpressionTextureSampleParameter2D.h"
 #include "Materials/MaterialExpressionVertexColor.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
 #include "Materials/MaterialInstanceConstant.h"
@@ -249,7 +256,7 @@ FString GetFirstPartyMaterialInstanceReviewAssetRootRelativePath()
 
 FString GetFirstPartyMaterialInstanceReviewAssetStatus()
 {
-    return TEXT("created_unreal_material_instance_constant_review_assets_with_texture_bindings_not_lifelike");
+    return TEXT("created_unreal_material_instance_constant_review_assets_with_texture_bindings_and_sampler_parent_not_lifelike");
 }
 
 FString GetFirstPartyMaterialTextureAssetRootRelativePath()
@@ -260,6 +267,16 @@ FString GetFirstPartyMaterialTextureAssetRootRelativePath()
 FString GetFirstPartyMaterialTextureAssetStatus()
 {
     return TEXT("created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike");
+}
+
+FString GetFirstPartyAtlasSampleReviewMaterialRelativePath()
+{
+    return TEXT("unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset");
+}
+
+FString GetFirstPartyAtlasSampleReviewMaterialStatus()
+{
+    return TEXT("created_unreal_atlas_sampler_review_parent_material_not_lifelike");
 }
 
 FString GetFirstPartyMaterialTextureAtlasAlbedoRelativePath(const FString& RiverId)
@@ -488,6 +505,16 @@ UMaterialInterface* LoadPreviewMaterial(const TCHAR* MaterialPath)
 }
 
 void ConnectPreviewMaterialColorInput(FColorMaterialInput& Input, UMaterialExpression* Expression)
+{
+    Input.Expression = Expression;
+    Input.Mask = 1;
+    Input.MaskR = 1;
+    Input.MaskG = 1;
+    Input.MaskB = 1;
+    Input.MaskA = 0;
+}
+
+void ConnectPreviewMaterialVectorInput(FVectorMaterialInput& Input, UMaterialExpression* Expression)
 {
     Input.Expression = Expression;
     Input.Mask = 1;
@@ -1287,6 +1314,229 @@ bool CreateFirstPartyMaterialTextureAtlasAssets(
     return bAllSaved;
 }
 
+UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
+    const TMap<FString, UTexture2D*>& TextureAssetsByKey,
+    FString& OutSummary)
+{
+    static const TCHAR* MaterialPackagePath = TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview");
+    static const TCHAR* MaterialObjectPath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview");
+
+    UMaterial* Material = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, MaterialObjectPath));
+    UPackage* Package = Material ? Material->GetOutermost() : CreatePackage(MaterialPackagePath);
+    if (!Package)
+    {
+        OutSummary += FString::Printf(TEXT("Failed to create atlas sample review material package %s\n"), MaterialPackagePath);
+        return nullptr;
+    }
+
+    if (!Material)
+    {
+        Material = NewObject<UMaterial>(
+            Package,
+            TEXT("M_RaftSim_AtlasSampleReview"),
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (!Material)
+        {
+            OutSummary += FString::Printf(TEXT("Failed to create atlas sample review material %s\n"), MaterialObjectPath);
+            return nullptr;
+        }
+        FAssetRegistryModule::AssetCreated(Material);
+    }
+
+    UTexture2D* DefaultAlbedo =
+        TextureAssetsByKey.FindRef(GetFirstPartyMaterialTextureAssetBindingKey(TEXT("american_south_fork"), TEXT("AlbedoAtlas")));
+    UTexture2D* DefaultNormal =
+        TextureAssetsByKey.FindRef(GetFirstPartyMaterialTextureAssetBindingKey(TEXT("american_south_fork"), TEXT("NormalAtlas")));
+    UTexture2D* DefaultPacked = TextureAssetsByKey.FindRef(
+        GetFirstPartyMaterialTextureAssetBindingKey(TEXT("american_south_fork"), TEXT("AORoughnessHeightAtlas")));
+
+    Material->Modify();
+    Material->GetExpressionCollection().Empty();
+    Material->SetShadingModel(MSM_DefaultLit);
+    Material->BlendMode = BLEND_Opaque;
+    Material->TwoSided = true;
+
+    auto AddExpression = [Material](auto* Expression, int32 EditorX, int32 EditorY)
+    {
+        Expression->MaterialExpressionEditorX = EditorX;
+        Expression->MaterialExpressionEditorY = EditorY;
+        Material->GetExpressionCollection().AddExpression(Expression);
+        return Expression;
+    };
+
+    UMaterialExpressionTextureCoordinate* TexCoord =
+        AddExpression(NewObject<UMaterialExpressionTextureCoordinate>(Material), -1120, -120);
+
+    UMaterialExpressionVectorParameter* AtlasTileOriginScale =
+        AddExpression(NewObject<UMaterialExpressionVectorParameter>(Material), -1120, 40);
+    AtlasTileOriginScale->ParameterName = TEXT("AtlasTileOriginScale");
+    AtlasTileOriginScale->DefaultValue = FLinearColor(0.0f, 0.0f, 1.0f / 3.0f, 1.0f / 2.0f);
+
+    UMaterialExpressionComponentMask* AtlasOrigin =
+        AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), -880, 40);
+    AtlasOrigin->Input.Expression = AtlasTileOriginScale;
+    AtlasOrigin->R = 1;
+    AtlasOrigin->G = 1;
+
+    UMaterialExpressionComponentMask* AtlasScale =
+        AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), -880, 180);
+    AtlasScale->Input.Expression = AtlasTileOriginScale;
+    AtlasScale->B = 1;
+    AtlasScale->A = 1;
+
+    UMaterialExpressionMultiply* ScaledUv = AddExpression(NewObject<UMaterialExpressionMultiply>(Material), -640, -40);
+    ScaledUv->A.Expression = TexCoord;
+    ScaledUv->B.Expression = AtlasScale;
+
+    UMaterialExpressionAdd* AtlasUv = AddExpression(NewObject<UMaterialExpressionAdd>(Material), -420, -40);
+    AtlasUv->A.Expression = ScaledUv;
+    AtlasUv->B.Expression = AtlasOrigin;
+
+    UMaterialExpressionTextureSampleParameter2D* AlbedoSample =
+        AddExpression(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material), -180, -220);
+    AlbedoSample->ParameterName = TEXT("AlbedoAtlas");
+    AlbedoSample->Texture = DefaultAlbedo;
+    AlbedoSample->SamplerType = SAMPLERTYPE_Color;
+    AlbedoSample->Coordinates.Expression = AtlasUv;
+    AlbedoSample->Group = TEXT("FirstPartyAtlas");
+    AlbedoSample->SortPriority = 10;
+
+    UMaterialExpressionTextureSampleParameter2D* NormalSample =
+        AddExpression(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material), -180, 20);
+    NormalSample->ParameterName = TEXT("NormalAtlas");
+    NormalSample->Texture = DefaultNormal;
+    NormalSample->SamplerType = SAMPLERTYPE_Normal;
+    NormalSample->Coordinates.Expression = AtlasUv;
+    NormalSample->Group = TEXT("FirstPartyAtlas");
+    NormalSample->SortPriority = 20;
+
+    UMaterialExpressionConstant3Vector* FlatNormal =
+        AddExpression(NewObject<UMaterialExpressionConstant3Vector>(Material), 120, -20);
+    FlatNormal->Constant = FLinearColor(0.0f, 0.0f, 1.0f);
+
+    UMaterialExpressionScalarParameter* NormalIntensity =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), 120, 100);
+    NormalIntensity->ParameterName = TEXT("NormalIntensity");
+    NormalIntensity->DefaultValue = 0.30f;
+    NormalIntensity->Group = TEXT("FirstPartyAtlas");
+    NormalIntensity->SortPriority = 45;
+
+    UMaterialExpressionLinearInterpolate* ReviewNormal =
+        AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 360, 40);
+    ReviewNormal->A.Expression = FlatNormal;
+    ReviewNormal->B.Expression = NormalSample;
+    ReviewNormal->Alpha.Expression = NormalIntensity;
+
+    UMaterialExpressionTextureSampleParameter2D* PackedSample =
+        AddExpression(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material), -180, 260);
+    PackedSample->ParameterName = TEXT("AORoughnessHeightAtlas");
+    PackedSample->Texture = DefaultPacked;
+    PackedSample->SamplerType = SAMPLERTYPE_Masks;
+    PackedSample->Coordinates.Expression = AtlasUv;
+    PackedSample->Group = TEXT("FirstPartyAtlas");
+    PackedSample->SortPriority = 30;
+
+    UMaterialExpressionVertexColor* VertexColor =
+        AddExpression(NewObject<UMaterialExpressionVertexColor>(Material), -180, -480);
+
+    UMaterialExpressionScalarParameter* AtlasBlendWeight =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -180, -360);
+    AtlasBlendWeight->ParameterName = TEXT("AtlasBlendWeight");
+    AtlasBlendWeight->DefaultValue = 0.42f;
+    AtlasBlendWeight->Group = TEXT("FirstPartyAtlas");
+    AtlasBlendWeight->SortPriority = 40;
+
+    UMaterialExpressionLinearInterpolate* ReviewBaseColor =
+        AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 120, -320);
+    ReviewBaseColor->A.Expression = VertexColor;
+    ReviewBaseColor->B.Expression = AlbedoSample;
+    ReviewBaseColor->Alpha.Expression = AtlasBlendWeight;
+
+    UMaterialExpressionConstant* EmissiveScale = AddExpression(NewObject<UMaterialExpressionConstant>(Material), 120, -80);
+    EmissiveScale->R = 0.035f;
+
+    UMaterialExpressionMultiply* EmissiveColor =
+        AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 360, -160);
+    EmissiveColor->A.Expression = ReviewBaseColor;
+    EmissiveColor->B.Expression = EmissiveScale;
+
+    UMaterialExpressionComponentMask* AmbientOcclusionMask =
+        AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), 120, 180);
+    AmbientOcclusionMask->Input.Expression = PackedSample;
+    AmbientOcclusionMask->R = 1;
+
+    UMaterialExpressionComponentMask* RoughnessMask =
+        AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), 120, 320);
+    RoughnessMask->Input.Expression = PackedSample;
+    RoughnessMask->G = 1;
+
+    UMaterialExpressionScalarParameter* RoughnessScale =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), 120, 460);
+    RoughnessScale->ParameterName = TEXT("RoughnessScale");
+    RoughnessScale->DefaultValue = 0.75f;
+    RoughnessScale->Group = TEXT("FirstPartyAtlas");
+    RoughnessScale->SortPriority = 50;
+
+    UMaterialExpressionMultiply* RoughnessScaled =
+        AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 360, 360);
+    RoughnessScaled->A.Expression = RoughnessMask;
+    RoughnessScaled->B.Expression = RoughnessScale;
+
+    UMaterialExpressionSaturate* RoughnessSaturated =
+        AddExpression(NewObject<UMaterialExpressionSaturate>(Material), 560, 360);
+    RoughnessSaturated->Input.Expression = RoughnessScaled;
+
+    UMaterialExpressionComponentMask* HeightMask =
+        AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), 120, 620);
+    HeightMask->Input.Expression = PackedSample;
+    HeightMask->B = 1;
+
+    UMaterialExpressionScalarParameter* HeightScale =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), 120, 760);
+    HeightScale->ParameterName = TEXT("HeightScale");
+    HeightScale->DefaultValue = 0.08f;
+    HeightScale->Group = TEXT("FirstPartyAtlas");
+    HeightScale->SortPriority = 60;
+
+    UMaterialExpressionMultiply* HeightOffset =
+        AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 360, 680);
+    HeightOffset->A.Expression = HeightMask;
+    HeightOffset->B.Expression = HeightScale;
+
+    UMaterialExpressionConstant* Specular = AddExpression(NewObject<UMaterialExpressionConstant>(Material), 560, 520);
+    Specular->R = 0.16f;
+
+    if (UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData())
+    {
+        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, ReviewBaseColor);
+        ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
+        ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, ReviewNormal);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, AmbientOcclusionMask);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, RoughnessSaturated);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->PixelDepthOffset, HeightOffset);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+    }
+
+    Material->PostEditChange();
+    Package->MarkPackageDirty();
+
+    const FString Filename =
+        FPackageName::LongPackageNameToFilename(MaterialPackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    const bool bSaved = UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+    OutSummary += FString::Printf(
+        TEXT("%s first-party atlas sampler review material %s -> %s\n"),
+        bSaved ? TEXT("Saved") : TEXT("Failed"),
+        MaterialObjectPath,
+        *Filename);
+    return bSaved ? Material : nullptr;
+}
+
 struct FRaftSimFirstPartyMaterialInstanceCandidateSpec
 {
     FString RiverId;
@@ -1327,7 +1577,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
         {
             TEXT("terrain_bank_layered_material"),
             TEXT("TerrainBank"),
-            TEXT("/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview.M_RaftSim_TerrainVertexColorLitPreview"),
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             0,
             0.58f,
             0.28f,
@@ -1337,7 +1587,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
         {
             TEXT("wet_boulder_contact_material_set"),
             TEXT("WetBoulderContact"),
-            TEXT("/Game/RaftSim/Materials/M_RaftSim_LitColorPreview.M_RaftSim_LitColorPreview"),
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             1,
             0.52f,
             0.42f,
@@ -1347,7 +1597,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
         {
             TEXT("biome_foliage_groundcover_materials"),
             TEXT("BiomeFoliageGroundcover"),
-            TEXT("/Game/RaftSim/Materials/M_RaftSim_LitColorPreview.M_RaftSim_LitColorPreview"),
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             2,
             0.48f,
             0.24f,
@@ -1357,7 +1607,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
         {
             TEXT("flow_dependent_water_surface_material"),
             TEXT("FlowDependentWaterSurface"),
-            TEXT("/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview.M_RaftSim_VertexColorWaterPreview"),
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             3,
             0.28f,
             0.18f,
@@ -1367,7 +1617,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
         {
             TEXT("foam_spray_mist_atmosphere_materials"),
             TEXT("FoamSprayMistAtmosphere"),
-            TEXT("/Game/RaftSim/Materials/M_RaftSim_TranslucentColorPreview.M_RaftSim_TranslucentColorPreview"),
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             4,
             0.26f,
             0.08f,
@@ -1377,7 +1627,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
         {
             TEXT("raft_foreground_review_materials"),
             TEXT("RaftForegroundReview"),
-            TEXT("/Game/RaftSim/Materials/M_RaftSim_LitColorPreview.M_RaftSim_LitColorPreview"),
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
             5,
             0.32f,
             0.18f,
@@ -1556,6 +1806,7 @@ bool CreateFirstPartyMaterialInstanceCandidateAssets(FString& OutSummary)
     LoadOrCreatePreviewTranslucentColorMaterial();
     LoadOrCreatePreviewWaterVertexColorMaterial();
     bAllSaved &= CreateFirstPartyMaterialTextureAtlasAssets(TextureAssetsByKey, OutSummary);
+    bAllSaved &= LoadOrCreateFirstPartyAtlasSampleReviewMaterial(TextureAssetsByKey, OutSummary) != nullptr;
 
     for (const FRaftSimFirstPartyMaterialInstanceCandidateSpec& Spec : GetFirstPartyMaterialInstanceCandidateSpecs())
     {
@@ -10864,6 +11115,7 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
     const FString MaterialInstanceCandidateManifestAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), MaterialInstanceCandidateManifestRelativePath));
     const FString MaterialTextureAssetRootRelativePath = GetFirstPartyMaterialTextureAssetRootRelativePath();
+    const FString MaterialShaderParentRelativePath = GetFirstPartyAtlasSampleReviewMaterialRelativePath();
     const FString MaterialInstanceReviewAssetRootRelativePath = GetFirstPartyMaterialInstanceReviewAssetRootRelativePath();
     const FString GeospatialAttachmentLedgerRelativePath = GetProductionGeospatialAttachmentLedgerRelativePath();
     const FString GeospatialAttachmentLedgerAbsolutePath =
@@ -10906,6 +11158,7 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
     OutSummary += FString::Printf(TEXT("Using first-party material texture atlas manifest: %s\n"), *MaterialTextureAtlasManifestRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material instance candidate manifest: %s\n"), *MaterialInstanceCandidateManifestRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material texture asset root: %s\n"), *MaterialTextureAssetRootRelativePath);
+    OutSummary += FString::Printf(TEXT("Using first-party atlas sampler review material: %s\n"), *MaterialShaderParentRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material instance review asset root: %s\n"), *MaterialInstanceReviewAssetRootRelativePath);
     OutSummary += FString::Printf(TEXT("Using production geospatial attachment ledger: %s\n"), *GeospatialAttachmentLedgerRelativePath);
 
@@ -10939,6 +11192,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
     const FString MaterialInstanceCandidateManifestAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), MaterialInstanceCandidateManifestRelativePath));
     const FString MaterialTextureAssetRootRelativePath = GetFirstPartyMaterialTextureAssetRootRelativePath();
+    const FString MaterialShaderParentRelativePath = GetFirstPartyAtlasSampleReviewMaterialRelativePath();
     const FString MaterialInstanceReviewAssetRootRelativePath = GetFirstPartyMaterialInstanceReviewAssetRootRelativePath();
     const FString GeospatialAttachmentLedgerRelativePath = GetProductionGeospatialAttachmentLedgerRelativePath();
     const FString GeospatialAttachmentLedgerAbsolutePath =
@@ -10972,6 +11226,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
     OutSummary += FString::Printf(TEXT("Using first-party material texture atlas manifest: %s\n"), *MaterialTextureAtlasManifestRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material instance candidate manifest: %s\n"), *MaterialInstanceCandidateManifestRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material texture asset root: %s\n"), *MaterialTextureAssetRootRelativePath);
+    OutSummary += FString::Printf(TEXT("Using first-party atlas sampler review material: %s\n"), *MaterialShaderParentRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material instance review asset root: %s\n"), *MaterialInstanceReviewAssetRootRelativePath);
     OutSummary += FString::Printf(TEXT("Using production geospatial attachment ledger: %s\n"), *GeospatialAttachmentLedgerRelativePath);
 
@@ -11083,6 +11338,8 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("  \"first_party_material_instance_candidate_manifest\": \"%s\",\n")
         TEXT("  \"first_party_material_texture_asset_root\": \"%s\",\n")
         TEXT("  \"first_party_material_texture_asset_status\": \"%s\",\n")
+        TEXT("  \"first_party_atlas_sampler_review_material\": \"%s\",\n")
+        TEXT("  \"first_party_atlas_sampler_review_material_status\": \"%s\",\n")
         TEXT("  \"first_party_material_instance_review_asset_root\": \"%s\",\n")
         TEXT("  \"first_party_material_instance_review_asset_status\": \"%s\",\n")
         TEXT("  \"geospatial_attachment_ledger\": \"%s\",\n")
@@ -11098,6 +11355,8 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         *EscapeRaftSimJsonString(MaterialInstanceCandidateManifestRelativePath),
         *EscapeRaftSimJsonString(MaterialTextureAssetRootRelativePath),
         *EscapeRaftSimJsonString(GetFirstPartyMaterialTextureAssetStatus()),
+        *EscapeRaftSimJsonString(MaterialShaderParentRelativePath),
+        *EscapeRaftSimJsonString(GetFirstPartyAtlasSampleReviewMaterialStatus()),
         *EscapeRaftSimJsonString(MaterialInstanceReviewAssetRootRelativePath),
         *EscapeRaftSimJsonString(GetFirstPartyMaterialInstanceReviewAssetStatus()),
         *EscapeRaftSimJsonString(GeospatialAttachmentLedgerRelativePath),

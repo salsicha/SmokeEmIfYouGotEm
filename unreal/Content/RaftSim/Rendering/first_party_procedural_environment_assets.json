@@ -36,6 +36,8 @@
       "first_party_material_instance_candidate_manifest",
       "first_party_material_texture_asset_root",
       "first_party_material_texture_asset_status",
+      "first_party_atlas_sampler_review_material",
+      "first_party_atlas_sampler_review_material_status",
       "first_party_material_instance_review_asset_root",
       "first_party_material_instance_review_asset_status"
     ],
@@ -154,7 +156,9 @@
       "first_party_material_instance_candidate_manifest_required",
       "first_party_material_instance_review_assets_created",
       "first_party_material_texture2d_review_assets_created",
-      "first_party_material_instance_texture_asset_bindings_recorded"
+      "first_party_material_instance_texture_asset_bindings_recorded",
+      "first_party_atlas_sampler_review_parent_material_created",
+      "first_party_material_shader_graph_sampler_wiring_recorded"
     ],
     "missing_renderer_coverage_before_lifelike": [
       "production_landscape_or_nanite_terrain_material_layers",
@@ -165,15 +169,17 @@
       "approved_raft_and_oar_foreground_art",
       "desktop_and_vr_performance_capture_evidence",
       "production_material_instances_using_texture_atlases_normal_ao_roughness_height_or_rights_cleared_equivalent_maps",
-      "shader_graph_sampler_wiring_for_albedo_normal_ao_roughness_height_atlas_maps",
-      "guide_geospatial_hazard_readability_and_performance_reviewed_material_promotion"
+      "guide_geospatial_hazard_readability_and_performance_reviewed_material_promotion",
+      "production_shader_graph_material_promotion_and_instance_assignment"
     ],
     "material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
     "material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json",
     "material_instance_review_asset_root": "unreal/Content/RaftSim/Materials/MaterialInstances",
-    "material_instance_review_asset_status": "created_unreal_material_instance_constant_review_assets_with_texture_bindings_not_lifelike",
+    "material_instance_review_asset_status": "created_unreal_material_instance_constant_review_assets_with_texture_bindings_and_sampler_parent_not_lifelike",
     "material_texture_asset_root": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
-    "material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike"
+    "material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike",
+    "atlas_sampler_review_material": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+    "atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike"
   },
   "global_recipes": [
     {
@@ -367,5 +373,5 @@
       ]
     }
   ],
-  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are promoted from review Texture2D/MIC assets into production-quality Unreal assets/materials and verified by captures. The first importable first-party texture atlas pack is recorded and now imported as review-only Unreal Texture2D assets with explicit import settings, then bound into review-only material instance candidates. Final lifelike status remains blocked on shader graph sampler wiring, guide/geospatial approval, hazard readability, production material promotion, and performance evidence. The renderer samples the first-party atlas albedo tiles into terrain, water, boulder, foliage, and raft/oar vertex colors, and samples normal plus packed AO/roughness/height atlas maps for bounded surface response and tiny preview microrelief."
+  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are promoted from review Texture2D/MIC/material assets into production-quality Unreal assets/materials and verified by captures. The first importable first-party texture atlas pack is recorded, imported as review-only Unreal Texture2D assets with explicit import settings, bound into review-only material instance candidates, and sampled by the review-only M_RaftSim_AtlasSampleReview parent material. Final lifelike status remains blocked on guide/geospatial approval, hazard readability, production material promotion, and performance evidence."
 }
