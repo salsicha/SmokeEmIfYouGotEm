@@ -1,0 +1,162 @@
+{
+  "schema": "raftsim.unreal.first_party_material_texture_atlas_manifest.v1",
+  "generated_on": "2026-07-07",
+  "status": "importable_first_party_procedural_texture_atlases_generated_review_only_not_lifelike_capture",
+  "material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
+  "material_swatch_manifest": "unreal/Content/RaftSim/Rendering/MaterialSwatches/first_party_material_swatch_manifest.json",
+  "policy": {
+    "third_party_photo_texture_use_without_item_rights": false,
+    "social_media_or_footage_training_use_without_item_rights": false,
+    "source_inputs_must_be_manifest_recorded": true,
+    "procedural_materials_must_preserve_hazard_and_rescue_readability": true,
+    "water_visuals_must_not_hide_physics_or_conservation_failures": true,
+    "promotion_requires_unreal_capture_guide_review_and_performance_evidence": true,
+    "third_party_photo_texture_inputs_used": false,
+    "social_media_or_footage_texture_inputs_used": false,
+    "atlas_outputs_are_first_party_procedural": true,
+    "atlas_import_does_not_mark_any_river_lifelike": true
+  },
+  "map_semantics": {
+    "albedo": "Base color atlas with one deterministic tile per material recipe.",
+    "normal": "Tangent-space normal approximation derived from first-party procedural height tiles.",
+    "ao_roughness_height": "Packed RGB map: R=ambient occlusion, G=roughness, B=height/displacement candidate."
+  },
+  "recipe_tile_layout": [
+    {
+      "recipe_id": "terrain_bank_layered_material",
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    },
+    {
+      "recipe_id": "wet_boulder_contact_material_set",
+      "x": 512,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    },
+    {
+      "recipe_id": "biome_foliage_groundcover_materials",
+      "x": 1024,
+      "y": 0,
+      "width": 512,
+      "height": 512
+    },
+    {
+      "recipe_id": "flow_dependent_water_surface_material",
+      "x": 0,
+      "y": 512,
+      "width": 512,
+      "height": 512
+    },
+    {
+      "recipe_id": "foam_spray_mist_atmosphere_materials",
+      "x": 512,
+      "y": 512,
+      "width": 512,
+      "height": 512
+    },
+    {
+      "recipe_id": "raft_foreground_review_materials",
+      "x": 1024,
+      "y": 512,
+      "width": 512,
+      "height": 512
+    }
+  ],
+  "atlases": [
+    {
+      "river_id": "american_south_fork",
+      "target_read": "Sierra foothill pool-drop whitewater with clear green water, exposed wet rocks, gravel bars, oak/conifer banks, and summer-commercial light.",
+      "status": "importable_first_party_procedural_texture_atlas_review_only_not_lifelike_capture",
+      "maps": {
+        "albedo": {
+          "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_albedo.png",
+          "sha256": "fd30378dde6d3414c121eeef1e0a25bc0c0481167c51953b8b61113559fde1d4"
+        },
+        "normal": {
+          "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_normal.png",
+          "sha256": "8b0529527d5d9de797da0e7c1b7aa08e06fae8053235cb219b9fff5474e520d9"
+        },
+        "ao_roughness_height": {
+          "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_ao_roughness_height.png",
+          "sha256": "5ce76c4608eae8e199a94f4bdf8e82a124c89a3d1c1460c5e5dd0dfec401ec33"
+        }
+      },
+      "width": 1536,
+      "height": 1024,
+      "tile_size": 512,
+      "recipe_ids": [
+        "terrain_bank_layered_material",
+        "wet_boulder_contact_material_set",
+        "biome_foliage_groundcover_materials",
+        "flow_dependent_water_surface_material",
+        "foam_spray_mist_atmosphere_materials",
+        "raft_foreground_review_materials"
+      ]
+    },
+    {
+      "river_id": "colorado_river",
+      "target_read": "Grand Canyon big-water rowing corridor with layered canyon walls, sandbars, release-dependent wet banks, sparse desert riparian scrub, boils, and long wave trains.",
+      "status": "importable_first_party_procedural_texture_atlas_review_only_not_lifelike_capture",
+      "maps": {
+        "albedo": {
+          "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_albedo.png",
+          "sha256": "4bb2b4cc73daa2ad694f9414d4c9004b43b6bcf55b5467867918e5112670c790"
+        },
+        "normal": {
+          "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_normal.png",
+          "sha256": "d88e88b694813f095409375ec10279ec6de6a8c30e05f815f39b2c2324bcdc7f"
+        },
+        "ao_roughness_height": {
+          "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/colorado_river_first_party_material_texture_atlas_ao_roughness_height.png",
+          "sha256": "b428d7e31f3041c991e7cf29bcfeeac239b467c6e1c930e9aa4ea89e8ffe0974"
+        }
+      },
+      "width": 1536,
+      "height": 1024,
+      "tile_size": 512,
+      "recipe_ids": [
+        "terrain_bank_layered_material",
+        "wet_boulder_contact_material_set",
+        "biome_foliage_groundcover_materials",
+        "flow_dependent_water_surface_material",
+        "foam_spray_mist_atmosphere_materials",
+        "raft_foreground_review_materials"
+      ]
+    },
+    {
+      "river_id": "pacuare",
+      "target_read": "Humid tropical rainforest gorge with dense canopy, wet dark boulders, moss, leaf litter, waterfalls, spray, mist, and rainfed flow states.",
+      "status": "importable_first_party_procedural_texture_atlas_review_only_not_lifelike_capture",
+      "maps": {
+        "albedo": {
+          "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_albedo.png",
+          "sha256": "f16a2059efb9b7008ac7d1bf075644d51599afe1f9971c5119f5d409a81e2863"
+        },
+        "normal": {
+          "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_normal.png",
+          "sha256": "b08e168799c512a96aa56f4d0939a3c00384924cabdafd0cccda3244a9630338"
+        },
+        "ao_roughness_height": {
+          "path": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/pacuare_first_party_material_texture_atlas_ao_roughness_height.png",
+          "sha256": "f2394d4abefb6c14a2046aa1b62195e28c757102b9ce9c03d366ffc7ea26985b"
+        }
+      },
+      "width": 1536,
+      "height": 1024,
+      "tile_size": 512,
+      "recipe_ids": [
+        "terrain_bank_layered_material",
+        "wet_boulder_contact_material_set",
+        "biome_foliage_groundcover_materials",
+        "flow_dependent_water_surface_material",
+        "foam_spray_mist_atmosphere_materials",
+        "raft_foreground_review_materials"
+      ]
+    }
+  ],
+  "promotion_gate": "These atlases may be imported into Unreal material instances as first-party texture candidates, but lifelike approval still requires in-engine material application, guide/geospatial review, hazard readability review, screenshots, and desktop/VR performance evidence.",
+  "current_decision": "Use these deterministic PNG atlases as the first importable first-party material texture pack for terrain, rock, foliage, water, mist, and raft material iteration. They are not source imagery, not social-media-derived, and not lifelike screenshot evidence."
+}

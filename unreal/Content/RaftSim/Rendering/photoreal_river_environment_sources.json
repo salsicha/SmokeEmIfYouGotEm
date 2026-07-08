@@ -1397,7 +1397,7 @@
     "social_media_is_reference_only_until_explicit_rights_clear": true,
     "third_party_photos_require_per_item_license_review": true
   },
-  "status": "south_fork_colorado_and_pacuare_larger_source_draped_previews_available; production_geospatial_imports_and_photoreal_assets_pending",
+  "status": "south_fork_colorado_and_pacuare_larger_source_draped_previews_available; production_geospatial_imports_and_photoreal_assets_pending_with_first_party_texture_atlas_manifest",
   "unreal_generation": {
     "final_acceptance": [
       "production_dem_or_reviewed_proxy_terrain",
@@ -1409,7 +1409,8 @@
       "dense_biome_specific_foliage",
       "wet_rocks_foam_spray_mist_and_atmosphere",
       "hazards_and_rescue_targets_readable",
-      "desktop_and_vr_performance_captures"
+      "desktop_and_vr_performance_captures",
+      "approved_first_party_texture_atlas_import_or_rights_cleared_texture_assets"
     ],
     "first_party_procedural_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
     "first_party_procedural_material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
@@ -1524,7 +1525,8 @@
       "river_specific_cloud_haze_and_horizon_backdrop_cards_recorded",
       "first_party_source_aware_sky_gradient_and_atmosphere_depth_layers_recorded",
       "first_party_guide_seat_raft_and_oar_foreground_proxies_recorded",
-      "known_nonphotoreal_proxy_layers_explicitly_recorded"
+      "known_nonphotoreal_proxy_layers_explicitly_recorded",
+      "first_party_material_texture_atlas_manifest_recorded"
     ],
     "preview_capture_root": "docs/environment-captures/photoreal_river_previews",
     "preview_map_package_root": "/Game/RaftSim/Maps/EnvironmentPreviews",
@@ -1532,6 +1534,8 @@
       "RaftSim.CreatePhotorealEnvironmentPreviewMaps",
       "RaftSim.CapturePhotorealEnvironmentPreviews"
     ],
-    "visual_target": "lifelike_downstream_guide_seat_and_river_eye_screenshots_before_playable_promotion"
-  }
+    "visual_target": "lifelike_downstream_guide_seat_and_river_eye_screenshots_before_playable_promotion",
+    "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json"
+  },
+  "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json"
 }
