@@ -102,6 +102,7 @@
       "first_party_near_field_water_surface_grain",
       "first_party_base_water_depth_current_grading",
       "first_party_base_water_center_guide_stripe_breakup",
+      "first_party_base_water_cross_channel_breakup",
       "first_party_flow_cued_water_foam_slick_mottle",
       "flow_aware_water_mesh_undulation",
       "flow_band_depth_texture_ribbons",
