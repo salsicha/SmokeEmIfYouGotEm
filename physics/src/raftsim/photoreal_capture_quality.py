@@ -25,6 +25,10 @@ HUMAN_LIFELIKE_REVIEW_PACKET_RELATIVE_PATH = (
 HUMAN_LIFELIKE_REVIEW_RESULTS_TEMPLATE_RELATIVE_PATH = (
     CAPTURE_ROOT_RELATIVE_PATH / "photoreal_human_lifelike_review_results_template.json"
 )
+PHOTOREAL_ENVIRONMENT_PERFORMANCE_REVIEW_RELATIVE_PATH = (
+    CAPTURE_ROOT_RELATIVE_PATH / "photoreal_environment_performance_review.json"
+)
+RUNTIME_BUDGETS_RELATIVE_PATH = Path("physics/config/runtime_budgets.json")
 PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID = "first_party_source_aware_tapered_water_chroma_microbreakup"
 VISIBLE_WATER_CARD_RENDERER_COVERAGE_IDS = {
     "first_party_capture_quality_water_texture_fleck_cards",
@@ -459,6 +463,246 @@ def write_capture_quality_review(repo_root: Path, generated_on: str = "2026-07-0
     return output_path
 
 
+def _path_size_bytes(repo_root: Path, relative_path: str | Path) -> int:
+    path = repo_root / relative_path
+    if not path.exists() or not path.is_file():
+        return 0
+    return path.stat().st_size
+
+
+def _hash_if_file(repo_root: Path, relative_path: str | Path) -> str | None:
+    path = repo_root / relative_path
+    if not path.exists() or not path.is_file():
+        return None
+    return _hash_file(path)
+
+
+def _unreal_package_to_relative_asset_path(package_path: str) -> Path:
+    if package_path.startswith("/Game/"):
+        return Path("unreal/Content") / f"{package_path.removeprefix('/Game/')}.umap"
+    return Path(package_path)
+
+
+def _asset_root_inventory(repo_root: Path, relative_path: str | Path, suffix: str = ".uasset") -> dict[str, object]:
+    root = repo_root / relative_path
+    files = sorted(path for path in root.rglob(f"*{suffix}") if path.is_file()) if root.exists() else []
+    return {
+        "root": str(relative_path),
+        "exists": root.exists(),
+        "file_count": len(files),
+        "total_bytes": sum(path.stat().st_size for path in files),
+    }
+
+
+def _capture_static_inventory(
+    repo_root: Path,
+    river: dict[str, object],
+    capture_reviews: dict[tuple[str, str], dict[str, object]],
+) -> dict[str, object]:
+    capture_entries = []
+    total_capture_bytes = 0
+    for view_id, field in (
+        ("guide_seat_downstream", "guide_seat_capture"),
+        ("river_eye_downstream", "river_eye_capture"),
+    ):
+        capture_path = str(river[field])
+        capture_review = capture_reviews.get((str(river["river_id"]), view_id), {})
+        size_bytes = _path_size_bytes(repo_root, capture_path)
+        total_capture_bytes += size_bytes
+        capture_entries.append(
+            {
+                "view_id": view_id,
+                "capture": capture_path,
+                "exists": (repo_root / capture_path).exists(),
+                "sha256": capture_review.get("sha256") or _hash_if_file(repo_root, capture_path),
+                "size_bytes": size_bytes,
+                "source_size": capture_review.get("metrics", {}).get("source_size"),
+                "automated_blocker_count": len(capture_review.get("blockers", [])),
+                "automated_status": capture_review.get("status"),
+            }
+        )
+
+    map_asset_relative_path = _unreal_package_to_relative_asset_path(str(river["map_package"]))
+    return {
+        "map_package": river["map_package"],
+        "map_asset": {
+            "path": str(map_asset_relative_path),
+            "exists": (repo_root / map_asset_relative_path).exists(),
+            "size_bytes": _path_size_bytes(repo_root, map_asset_relative_path),
+            "sha256": _hash_if_file(repo_root, map_asset_relative_path),
+        },
+        "captures": capture_entries,
+        "total_capture_png_bytes": total_capture_bytes,
+        "source_inputs": {
+            "aerial_drape_image": river.get("aerial_drape_image"),
+            "terrain_relief_image": river.get("terrain_relief_image"),
+            "heightfield_preview_image": river.get("heightfield_preview_image"),
+            "water_mask_image": river.get("water_mask_image"),
+            "vegetation_mask_image": river.get("vegetation_mask_image"),
+        },
+    }
+
+
+def _profile_budget_rows(runtime_budgets: dict[str, object]) -> list[dict[str, object]]:
+    profiles = runtime_budgets.get("profiles", {})
+    rows: list[dict[str, object]] = []
+    for profile_id in ("desktop", "vr"):
+        profile = profiles.get(profile_id, {})
+        render_target_hz = int(profile.get("render_target_hz", 0))
+        rows.append(
+            {
+                "profile_id": profile_id,
+                "render_target_hz": render_target_hz,
+                "target_frame_time_ms": round(1000.0 / render_target_hz, 3) if render_target_hz > 0 else None,
+                "physics_tick_hz": profile.get("physics_tick_hz"),
+                "total_physics_budget_ms": profile.get("total_physics_ms"),
+                "water_solver_budget_ms": profile.get("water_solver_ms"),
+                "raft_coupling_budget_ms": profile.get("raft_coupling_ms"),
+                "probe_telemetry_budget_ms": profile.get("probe_telemetry_ms"),
+                "max_runtime_multiplier": profile.get("max_runtime_multiplier"),
+            }
+        )
+    return rows
+
+
+def build_photoreal_environment_performance_review(
+    repo_root: Path,
+    generated_on: str = "2026-07-08",
+) -> dict[str, object]:
+    """Build the desktop/VR performance evidence packet for photoreal environment review."""
+
+    capture_manifest = _read_json_if_present(repo_root, CAPTURE_MANIFEST_RELATIVE_PATH)
+    capture_quality_review = build_capture_quality_review(repo_root, generated_on=generated_on)
+    runtime_budgets = _read_json_if_present(repo_root, RUNTIME_BUDGETS_RELATIVE_PATH)
+    capture_reviews = _capture_reviews_by_key(capture_quality_review)
+    profile_budgets = _profile_budget_rows(runtime_budgets)
+    material_texture_asset_root = capture_manifest.get("first_party_material_texture_asset_root", "")
+    source_conditioned_texture_asset_root = capture_manifest.get("source_conditioned_material_texture_asset_root", "")
+    material_instance_asset_root = capture_manifest.get("first_party_material_instance_review_asset_root", "")
+    shared_asset_inventory = {
+        "first_party_material_texture_assets": _asset_root_inventory(repo_root, material_texture_asset_root),
+        "source_conditioned_material_texture_assets": _asset_root_inventory(
+            repo_root,
+            source_conditioned_texture_asset_root,
+        ),
+        "material_instance_review_assets": _asset_root_inventory(repo_root, material_instance_asset_root),
+    }
+
+    rivers: list[dict[str, object]] = []
+    open_profile_measurement_count = 0
+    for river in capture_manifest.get("captures", []):
+        profiles = []
+        for profile in profile_budgets:
+            open_profile_measurement_count += 1
+            profiles.append(
+                {
+                    **profile,
+                    "status": "requires_measured_unreal_profile_capture",
+                    "approved": False,
+                    "evidence_attached": False,
+                    "required_measurements": {
+                        "scalability_preset": None,
+                        "resolution_or_hmd_render_target": None,
+                        "frame_time_ms_p50": None,
+                        "frame_time_ms_p95": None,
+                        "game_thread_ms_p95": None,
+                        "render_thread_ms_p95": None,
+                        "gpu_ms_p95": None,
+                        "draw_calls": None,
+                        "visible_primitives_or_triangles": None,
+                        "gpu_memory_mb": None,
+                        "vr_comfort_or_motion_readability_notes": None,
+                        "hazard_and_rescue_readability_notes": None,
+                    },
+                    "blocking_open_measurements": [
+                        "measured_frame_time_distribution",
+                        "game_render_gpu_thread_breakdown",
+                        "gpu_memory_and_draw_call_or_primitive_count",
+                        "scalability_settings_and_capture_hardware",
+                        "vr_comfort_readability_notes" if profile["profile_id"] == "vr" else "desktop_readability_notes",
+                    ],
+                }
+            )
+
+        rivers.append(
+            {
+                "river_id": river["river_id"],
+                "display_name": river["display_name"],
+                "status": "static_capture_inventory_recorded_performance_measurement_required",
+                "approved_for_production_playable": False,
+                "flow_context": {
+                    "flow_band_id": river.get("flow_band_id"),
+                    "flow_band_display_name": river.get("flow_band_display_name"),
+                    "flow_reference_discharge_cfs": river.get("flow_reference_discharge_cfs"),
+                    "flow_visual_width_scale": river.get("flow_visual_width_scale"),
+                    "flow_visual_foam_scale": river.get("flow_visual_foam_scale"),
+                    "flow_visual_current_cue_scale": river.get("flow_visual_current_cue_scale"),
+                },
+                "static_inventory": _capture_static_inventory(repo_root, river, capture_reviews),
+                "profiles": profiles,
+                "current_decision": (
+                    "Use this row to attach measured desktop and VR profiling for the current zero-blocker capture "
+                    "candidate. Static map/capture/asset inventory is recorded, but this river is not production-playable "
+                    "until every profile has measured frame-time, thread/GPU/memory, scalability, and readability evidence."
+                ),
+            }
+        )
+
+    return {
+        "schema": "raftsim.unreal.photoreal_environment_performance_review.v1",
+        "generated_on": generated_on,
+        "status": "awaiting_measured_desktop_vr_performance_capture_not_approved",
+        "source_capture_manifest": str(CAPTURE_MANIFEST_RELATIVE_PATH),
+        "source_capture_quality_review": str(CAPTURE_QUALITY_REVIEW_RELATIVE_PATH),
+        "source_runtime_budgets": str(RUNTIME_BUDGETS_RELATIVE_PATH),
+        "policy": {
+            "static_inventory_is_not_performance_approval": True,
+            "desktop_and_vr_profiles_required_before_production_playable": True,
+            "vr_profile_requires_comfort_and_hazard_readability_notes": True,
+            "performance_must_not_trade_away_hazard_rescue_or_water_readability": True,
+        },
+        "summary": {
+            "river_count": len(rivers),
+            "profile_count": len(rivers) * len(profile_budgets),
+            "profile_ids": [profile["profile_id"] for profile in profile_budgets],
+            "measured_profile_count": 0,
+            "open_profile_measurement_count": open_profile_measurement_count,
+            "automated_capture_blocking_count": capture_quality_review["summary"]["blocking_capture_count"],
+            "approved_river_count": 0,
+        },
+        "shared_asset_inventory": shared_asset_inventory,
+        "profiling_capture_plan": {
+            "desktop": [
+                "Open each generated preview map from the guide-seat camera.",
+                "Record scalability preset, resolution, frame-time distribution, game/render/GPU thread costs, draw calls/primitives, and GPU memory.",
+                "Attach a screenshot or video clip proving hazards, swimmers/rescue targets, and water cues remain readable at the measured setting.",
+            ],
+            "vr": [
+                "Run the same map path in the OpenXR/VR profile or the target HMD simulator with comfort settings recorded.",
+                "Record target render resolution, refresh rate, frame-time distribution, thread/GPU costs, dropped/reprojected frames, and GPU memory.",
+                "Attach comfort, motion readability, hazard/rescue readability, and guide-seat visibility notes.",
+            ],
+        },
+        "rivers": rivers,
+        "current_decision": (
+            "This artifact closes the missing static evidence packet for desktop/VR review, but does not pass the "
+            "performance gate. Real Unreal profiling captures must be attached for every river/profile before any "
+            "environment is marked production-playable or lifelike-approved."
+        ),
+    }
+
+
+def write_photoreal_environment_performance_review(
+    repo_root: Path,
+    generated_on: str = "2026-07-08",
+) -> Path:
+    review = build_photoreal_environment_performance_review(repo_root, generated_on=generated_on)
+    output_path = repo_root / PHOTOREAL_ENVIRONMENT_PERFORMANCE_REVIEW_RELATIVE_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+    return output_path
+
+
 def _read_json_if_present(repo_root: Path, relative_path: Path) -> dict:
     path = repo_root / relative_path
     if not path.exists():
@@ -653,6 +897,7 @@ def build_human_lifelike_review_handoff(repo_root: Path, generated_on: str = "20
         "status": "awaiting_human_lifelike_review_not_approved",
         "source_capture_manifest": str(CAPTURE_MANIFEST_RELATIVE_PATH),
         "source_capture_quality_review": str(CAPTURE_QUALITY_REVIEW_RELATIVE_PATH),
+        "source_performance_review": str(PHOTOREAL_ENVIRONMENT_PERFORMANCE_REVIEW_RELATIVE_PATH),
         "source_reference_media_review_queue": str(REFERENCE_MEDIA_REVIEW_QUEUE_RELATIVE_PATH),
         "source_gap_register": str(PRODUCTION_ENVIRONMENT_GAP_REGISTER_RELATIVE_PATH),
         "policy": {
@@ -734,6 +979,7 @@ def build_human_lifelike_review_packet_markdown(repo_root: Path, generated_on: s
         "",
         f"- Capture manifest: `{handoff['source_capture_manifest']}`",
         f"- Automated capture review: `{handoff['source_capture_quality_review']}`",
+        f"- Desktop/VR performance evidence: `{handoff['source_performance_review']}`",
         f"- Human review handoff JSON: `{HUMAN_LIFELIKE_REVIEW_HANDOFF_RELATIVE_PATH}`",
         f"- Human review results template: `{HUMAN_LIFELIKE_REVIEW_RESULTS_TEMPLATE_RELATIVE_PATH}`",
         f"- Reference media queue: `{handoff['source_reference_media_review_queue']}`",
@@ -942,6 +1188,7 @@ def build_human_lifelike_review_results_template(repo_root: Path, generated_on: 
         "source_handoff": str(HUMAN_LIFELIKE_REVIEW_HANDOFF_RELATIVE_PATH),
         "source_packet": str(HUMAN_LIFELIKE_REVIEW_PACKET_RELATIVE_PATH),
         "source_capture_quality_review": str(CAPTURE_QUALITY_REVIEW_RELATIVE_PATH),
+        "source_performance_review": str(PHOTOREAL_ENVIRONMENT_PERFORMANCE_REVIEW_RELATIVE_PATH),
         "policy": {
             "do_not_self_approve_with_automated_metrics": True,
             "reviewer_identity_role_and_date_required_for_approval": True,

@@ -5,6 +5,7 @@
   "source_handoff": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_handoff.json",
   "source_packet": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_packet.md",
   "source_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
+  "source_performance_review": "docs/environment-captures/photoreal_river_previews/photoreal_environment_performance_review.json",
   "policy": {
     "do_not_self_approve_with_automated_metrics": true,
     "reviewer_identity_role_and_date_required_for_approval": true,
