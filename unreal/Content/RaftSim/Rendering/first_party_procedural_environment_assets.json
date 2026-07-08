@@ -31,7 +31,8 @@
     ],
     "capture_manifest_fields": [
       "procedural_asset_plan",
-      "procedural_material_recipe_plan"
+      "procedural_material_recipe_plan",
+      "first_party_material_texture_atlas_manifest"
     ],
     "default_source_plan": "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json",
     "default_flow_visual_contract": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
@@ -96,12 +97,12 @@
       "first_party_foliage_crown_depth_and_leaflet_breakup",
       "first_party_procedural_only_foliage_review_path",
       "first_party_procedural_canopy_height_massing_profile",
-            "first_party_procedural_canopy_tone_shadow_profile",
-            "first_party_foliage_card_canopy_artifact_demotion",
-            "first_party_square_foliage_source_card_artifact_demotion",
-            "first_party_remaining_square_card_cull",
-            "first_party_blocky_bank_ecology_and_sphere_foliage_cull",
-            "guide_seat_foliage_setback_and_scale_tuning",
+      "first_party_procedural_canopy_tone_shadow_profile",
+      "first_party_foliage_card_canopy_artifact_demotion",
+      "first_party_square_foliage_source_card_artifact_demotion",
+      "first_party_remaining_square_card_cull",
+      "first_party_blocky_bank_ecology_and_sphere_foliage_cull",
+      "guide_seat_foliage_setback_and_scale_tuning",
       "lit_vertex_color_water_gradients",
       "first_party_lit_water_normal_response_scaffold",
       "first_party_photographic_water_exposure_calibration",
@@ -141,7 +142,8 @@
       "first_party_rounded_raft_oar_foreground_proxy",
       "first_party_textured_river_eye_center_artifact_cover",
       "first_party_material_recipe_manifest_required",
-      "river_specific_sun_skylight_fog_camera_exposure"
+      "river_specific_sun_skylight_fog_camera_exposure",
+      "first_party_importable_material_texture_atlas_candidates"
     ],
     "missing_renderer_coverage_before_lifelike": [
       "production_landscape_or_nanite_terrain_material_layers",
@@ -150,8 +152,10 @@
       "physically_plausible_water_shader_reflection_refraction_depth_turbidity",
       "niagara_or_equivalent_spray_mist_foam_particle_layers",
       "approved_raft_and_oar_foreground_art",
-      "desktop_and_vr_performance_capture_evidence"
-    ]
+      "desktop_and_vr_performance_capture_evidence",
+      "in_engine_material_instances_using_first_party_texture_atlases_or_rights_cleared_equivalent_textures"
+    ],
+    "material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json"
   },
   "global_recipes": [
     {
@@ -345,5 +349,5 @@
       ]
     }
   ],
-  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are implemented in production-quality Unreal assets/materials and verified by captures."
+  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are implemented in production-quality Unreal assets/materials and verified by captures. The first importable first-party texture atlas pack is recorded for material iteration, but final lifelike status remains blocked on in-engine application, review captures, guide/geospatial approval, and performance evidence."
 }

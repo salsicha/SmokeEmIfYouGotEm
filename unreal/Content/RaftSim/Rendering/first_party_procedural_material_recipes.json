@@ -757,5 +757,6 @@
       ]
     }
   ],
-  "current_decision": "Use this manifest as the concrete first-party procedural material target catalog for the next renderer iteration. The existing preview materials remain active fallbacks, and no river can claim lifelike status until production-quality materials/assets, captures, guide review, and performance evidence pass."
+  "current_decision": "Use this manifest as the concrete first-party procedural material target catalog for the next renderer iteration. The existing preview materials remain active fallbacks, and no river can claim lifelike status until production-quality materials/assets, captures, guide review, and performance evidence pass. Importable first-party texture atlas candidates are now generated and hash-recorded for Unreal material-instance experiments, but they do not mark any river lifelike until applied, captured, guide-reviewed, and performance-checked.",
+  "importable_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json"
 }
