@@ -1476,6 +1476,7 @@
       "first_party_post_contour_terrain_readability_fill_recorded",
       "first_party_source_masked_bank_bar_microgeometry_recorded",
       "first_party_near_field_riverbed_debris_and_pebble_dressing_recorded",
+      "first_party_photographic_color_grade_palette_compression_recorded",
       "terrain_proxy_luma_floor_recorded",
       "shadowless_terrain_albedo_review_capture_material_recorded",
       "flow_aware_waterline_pebble_scatter_recorded",

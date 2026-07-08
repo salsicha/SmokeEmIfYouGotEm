@@ -617,7 +617,7 @@
         "river_specific_lighting_atmosphere_and_camera"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_TranslucentColorPreview",
-      "unreal_status": "translucent_glint_foam_haze_mist_cards_flow_dependent_spray_beads_source_aware_sky_gradient_depth_layers_active_niagara_and_lighting_replacement_pending",
+      "unreal_status": "translucent_glint_foam_haze_mist_cards_flow_dependent_spray_beads_source_aware_sky_gradient_depth_layers_photographic_color_grade_palette_compression_active_niagara_and_lighting_replacement_pending",
       "required_source_inputs": [
         "river_flow_visual_bands.json",
         "rapid_feature_annotations",
@@ -635,7 +635,9 @@
         "source_aware_sky_gradient_bands",
         "sun_warmth_veil",
         "atmospheric_depth_sheets",
-        "manual_exposure_anchor"
+        "manual_exposure_anchor",
+        "photographic_capture_palette_compression",
+        "bounded_capture_film_grain_dither"
       ],
       "tunable_parameters": [
         "foam_density",
@@ -649,7 +651,12 @@
         "sky_horizon_warmth_strength",
         "atmosphere_depth_sheet_opacity",
         "sun_angle",
-        "manual_exposure"
+        "manual_exposure",
+        "capture_saturation",
+        "capture_contrast",
+        "capture_exposure_bias",
+        "capture_film_grain_intensity",
+        "capture_film_grain_scale"
       ],
       "river_bindings": {
         "american_south_fork": {

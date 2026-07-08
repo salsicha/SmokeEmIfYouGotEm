@@ -119,6 +119,7 @@
       "lit_vertex_color_water_gradients",
       "first_party_lit_water_normal_response_scaffold",
       "first_party_photographic_water_exposure_calibration",
+      "first_party_photographic_color_grade_palette_compression",
       "first_party_near_field_water_surface_grain",
       "first_party_near_camera_water_macro_ripple_mottle",
       "first_party_base_water_depth_current_grading",
@@ -488,12 +489,16 @@
         "river-specific weather and lighting notes",
         "capture manifest"
       ],
-      "procedural_method": "Use first-party raft/oar silhouettes and river-specific sun, skylight, fog, mist, exposure, and color temperature presets for review captures; show low-footprint guide-seat raft/oar proxies for player-view context, keep river-eye captures foreground-hidden, and replace the proxies once production raft art is approved.",
+      "procedural_method": "Use first-party raft/oar silhouettes and river-specific sun, skylight, fog, mist, exposure, color temperature, and photographic palette-compression presets for review captures; show low-footprint guide-seat raft/oar proxies for player-view context, keep river-eye captures foreground-hidden, and replace the proxies once production raft art is approved.",
       "tunable_parameters": [
         "sun_angle",
         "sky_intensity",
         "fog_density",
         "manual_exposure",
+        "photographic_palette_saturation",
+        "photographic_palette_contrast",
+        "photographic_exposure_bias",
+        "bounded_capture_film_grain_dither",
         "raft_visibility",
         "oar_rig_readability"
       ],
