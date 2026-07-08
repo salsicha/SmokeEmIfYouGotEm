@@ -74,16 +74,16 @@
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview.umap",
           "exists": true,
-          "size_bytes": 230186998,
-          "sha256": "adc06d04335347dbf147182f433223f7f6f7068aff380ed969406b99e78108f0"
+          "size_bytes": 230187992,
+          "sha256": "5ca7722d7a3cf05e7a0fb7076682826c5c57c0448ffff904e5af21d1d3c3bcf8"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "afda50a5d0e2709bfb0ea9a5648c20c8f5008811a93bedc876fde92e21fcbd21",
-            "size_bytes": 1133036,
+            "sha256": "46bd1f2f7b2452438e3759da72dc9e57f76003e20a7c65a8c5848692dd71a006",
+            "size_bytes": 1133577,
             "source_size": [
               1280,
               720
@@ -95,8 +95,8 @@
             "view_id": "river_eye_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
             "exists": true,
-            "sha256": "e7fdf90284096e6ce424cb4a31177fbde0d08774cb4f85ce685e8c429dd8dca1",
-            "size_bytes": 1133929,
+            "sha256": "3f5b7c1723e871d334b0c19e55d5819aa063cecff8faa395d41c3ec8bf54a035",
+            "size_bytes": 1134414,
             "source_size": [
               1280,
               720
@@ -105,7 +105,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2266965,
+        "total_capture_png_bytes": 2267991,
         "source_inputs": {
           "aerial_drape_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png",
           "terrain_relief_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/dem_relief_2048.png",
@@ -210,16 +210,16 @@
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview.umap",
           "exists": true,
-          "size_bytes": 219360746,
-          "sha256": "7a355a31bb833de8c329d5f45ee3f14c26e5e8a7d5608caee04dd14eae7933e5"
+          "size_bytes": 219361740,
+          "sha256": "190db45d9cefeb2c29d940f8f89cf0dfbdee77507d4eb3e92d57d0259781421c"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "e92c13315a934da86be0abe2775120749126d5dbbfef2ae0166fe4ecd017c6b2",
-            "size_bytes": 1204417,
+            "sha256": "03aba12044e941bc63d6b0aa6136c6ce48ee62ccd11b1237be289430b3006bbc",
+            "size_bytes": 1200482,
             "source_size": [
               1280,
               720
@@ -231,8 +231,8 @@
             "view_id": "river_eye_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
             "exists": true,
-            "sha256": "52baec9eb64d7341568888b50fb7ec9960836d7acb5f0b7ac3c652458a40c22f",
-            "size_bytes": 1203861,
+            "sha256": "31a909d46b09b3bc22eb5b87d8d75ef0c42cc3ab7f2e4227c692a4a0eb04f8b9",
+            "size_bytes": 1199173,
             "source_size": [
               1280,
               720
@@ -241,7 +241,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2408278,
+        "total_capture_png_bytes": 2399655,
         "source_inputs": {
           "aerial_drape_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png",
           "terrain_relief_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/dem_relief_2048.png",
@@ -346,16 +346,16 @@
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview.umap",
           "exists": true,
-          "size_bytes": 264334904,
-          "sha256": "d7567249c7b891a79676c9532b06175f3b324c4bf480a0b4b289325874973a70"
+          "size_bytes": 264335898,
+          "sha256": "c8d861f16c405145166fca8a21729b72114fa94c576616e1caa0c278b65fedef"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "20b6923b6bcb13edf83ee91f755ed549babb08c113bde7a15d84ac0519b27ce5",
-            "size_bytes": 1189925,
+            "sha256": "972b59520570b8be9a6d5a7b78393ee3a16cbc25686cb0dc626714e00bb965b4",
+            "size_bytes": 1191071,
             "source_size": [
               1280,
               720
@@ -367,8 +367,8 @@
             "view_id": "river_eye_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
             "exists": true,
-            "sha256": "d63b23ce8ef8ab10e83b1ab55fa8651be7da2d154debc0330e2fd9f99e2693ad",
-            "size_bytes": 1190600,
+            "sha256": "93eb847ec42025ecab89ed049c9064dbfc1d32591c597fd271bd7ce38ebadcd5",
+            "size_bytes": 1191020,
             "source_size": [
               1280,
               720
@@ -377,7 +377,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2380525,
+        "total_capture_png_bytes": 2382091,
         "source_inputs": {
           "aerial_drape_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
           "terrain_relief_image": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/dem_relief_2048.png",

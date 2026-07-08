@@ -1172,6 +1172,7 @@ This milestone turns the three runnable river targets into complete, reviewable,
   - [ ] Run human art, guide, geospatial, rights, hazard-readability, and performance review on the zero-blocker capture set before any lifelike or production-playable claim.
 - [ ] Add or license production-quality river environment asset packs/materials, or generate approved first-party procedural equivalents, for canyon walls, riverbeds, wet boulders, shore vegetation, tropical canopy, foam/spray/mist, raft foreground, and river-specific atmospheric lighting.
   - [x] Add first-party near-field riverbed debris and pebble dressing: generated preview maps now place source-mask-biased, non-colliding waterline stones plus wet leaf/sand/debris cards in the guide-seat corridor for all three rivers, improving foreground scale cues while keeping production asset, rights, guide, hazard-readability, and performance approval open.
+  - [x] Add first-party photographic color-grade and palette compression: generated preview captures now use bounded camera saturation/contrast/exposure presets plus a small engine-side film-grain/dither hook so water, canyon banks, and rainforest greens have a traceable review-grade color path while production lighting, material, guide, hazard-readability, rights, and performance approval remain open.
 - [ ] Add desktop and VR performance capture evidence for the three photoreal river environments before any river is marked production-playable.
 
 ## Technical Notes To Revisit
