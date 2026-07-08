@@ -6696,12 +6696,14 @@ void AddPreviewBiomeBankEcologyDetail(
     UStaticMesh* CylinderMesh,
     UStaticMesh* PlaneMesh)
 {
-    if (!World || !CubeMesh || !CylinderMesh || !PlaneMesh)
+    if (!World || !CylinderMesh || !PlaneMesh)
     {
         return;
     }
 
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+    const float FirstPartyOrganicDeadfallCylinderReplacement = 1.0f;
+    const float FirstPartyOrganicRootRunnerCylinderReplacement = 1.0f;
     const int32 DeadfallCount = Spec.bDesertCanyon ? 14 : (Spec.bHasWaterfalls ? 42 : 28);
     for (int32 DeadfallIndex = 0; DeadfallIndex < DeadfallCount; ++DeadfallIndex)
     {
@@ -6747,11 +6749,15 @@ void AddPreviewBiomeBankEcologyDetail(
         const float ThicknessScale = Spec.bHasWaterfalls ? 0.085f : 0.070f;
         AddPreviewMeshActor(
             World,
-            CubeMesh,
+            CylinderMesh,
             FString::Printf(TEXT("RaftSim_BiomeDeadfallLog_%03d_%s"), DeadfallIndex, *Spec.RiverId),
             FVector(X, Y, TerrainZ + 18.0f),
-            FRotator(0.0f, static_cast<float>((DeadfallIndex * 41) % 360), 4.0f * FMath::Sin(Phase)),
-            FVector(LengthScale * (0.74f + 0.10f * static_cast<float>(DeadfallIndex % 5)), ThicknessScale, ThicknessScale * 0.72f),
+            FRotator(90.0f + 3.0f * FMath::Sin(Phase * 0.53f), static_cast<float>((DeadfallIndex * 41) % 360), 4.0f * FMath::Sin(Phase)),
+            FVector(
+                ThicknessScale,
+                ThicknessScale * 0.72f,
+                LengthScale * (0.74f + 0.10f * static_cast<float>(DeadfallIndex % 5)) *
+                    FirstPartyOrganicDeadfallCylinderReplacement),
             DeadfallColor);
     }
 
@@ -6847,11 +6853,14 @@ void AddPreviewBiomeBankEcologyDetail(
             : (Spec.bDesertCanyon ? FLinearColor(0.20f, 0.16f, 0.10f) : FLinearColor(0.18f, 0.12f, 0.070f));
         AddPreviewMeshActor(
             World,
-            CubeMesh,
+            CylinderMesh,
             FString::Printf(TEXT("RaftSim_BiomeRootRunner_%03d_%s"), RootIndex, *Spec.RiverId),
             FVector(X, Y, TerrainZ + 11.0f),
-            FRotator(0.0f, static_cast<float>((RootIndex * 53) % 360), 2.0f * FMath::Sin(Phase)),
-            FVector(Spec.bHasWaterfalls ? 1.05f : 0.72f, 0.030f, 0.025f),
+            FRotator(90.0f + 2.5f * FMath::Sin(Phase * 0.61f), static_cast<float>((RootIndex * 53) % 360), 2.0f * FMath::Sin(Phase)),
+            FVector(
+                Spec.bHasWaterfalls ? 0.036f : 0.030f,
+                Spec.bHasWaterfalls ? 0.026f : 0.022f,
+                (Spec.bHasWaterfalls ? 1.05f : 0.72f) * FirstPartyOrganicRootRunnerCylinderReplacement),
             ScalePreviewColor(RootColor, 0.82f + 0.06f * static_cast<float>(RootIndex % 4)));
     }
 }
@@ -7230,6 +7239,7 @@ void AddPreviewInstancedProceduralFoliageEquivalentDetail(
     const bool bRainforest = Spec.bHasWaterfalls;
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float RemainingBlockyFoliageProxyCull = 0.42f;
+    const float RemainingInstancedSphereFoliageBlobCull = 0.0f;
     const int32 ClusterCount = Spec.bDesertCanyon ? 12 : (bRainforest ? 28 : 18);
     const float NearBankOffset = Spec.bDesertCanyon ? 980.0f : (bRainforest ? 720.0f : 760.0f);
     const float FarBankOffset = Spec.bDesertCanyon ? 2350.0f : (bRainforest ? 1820.0f : 1480.0f);
@@ -7313,20 +7323,24 @@ void AddPreviewInstancedProceduralFoliageEquivalentDetail(
                 0.24f + 0.04f * static_cast<float>(ClusterIndex % 4),
                 0.19f + 0.03f * static_cast<float>((ClusterIndex + 2) % 3),
                 0.10f + 0.02f * static_cast<float>(ClusterIndex % 3));
-            UnderstoryInstances->AddInstance(
-                FTransform(
-                    FRotator(0.0f, Yaw, 0.0f),
-                    FVector(X, Y, TerrainZ + 36.0f),
-                    ScrubScale),
-                true);
-            if (ClusterIndex % 3 == 0)
+            if (RemainingInstancedSphereFoliageBlobCull > 0.0f)
             {
                 UnderstoryInstances->AddInstance(
                     FTransform(
-                        FRotator(0.0f, Yaw + 58.0f, 0.0f),
-                        FVector(X + 115.0f * FMath::Sin(Phase), Y + 68.0f * Side, TerrainZ + 30.0f),
-                        FVector(ScrubScale.X * 0.78f, ScrubScale.Y * 0.90f, ScrubScale.Z * 0.86f)),
+                        FRotator(0.0f, Yaw, 0.0f),
+                        FVector(X, Y, TerrainZ + 36.0f),
+                        ScrubScale * RemainingInstancedSphereFoliageBlobCull),
                     true);
+                if (ClusterIndex % 3 == 0)
+                {
+                    UnderstoryInstances->AddInstance(
+                        FTransform(
+                            FRotator(0.0f, Yaw + 58.0f, 0.0f),
+                            FVector(X + 115.0f * FMath::Sin(Phase), Y + 68.0f * Side, TerrainZ + 30.0f),
+                            FVector(ScrubScale.X * 0.78f, ScrubScale.Y * 0.90f, ScrubScale.Z * 0.86f) *
+                                RemainingInstancedSphereFoliageBlobCull),
+                        true);
+                }
             }
             if (ClusterIndex % 8 == 0)
             {
@@ -7342,25 +7356,29 @@ void AddPreviewInstancedProceduralFoliageEquivalentDetail(
 
         const int32 LobeCount = 3;
         const float CrownBaseZ = TerrainZ + (bRainforest ? 315.0f : 185.0f) + 22.0f * FMath::Sin(Phase);
-        for (int32 LobeIndex = 0; LobeIndex < LobeCount; ++LobeIndex)
+        if (RemainingInstancedSphereFoliageBlobCull > 0.0f)
         {
-            const float LobeAngle = FMath::DegreesToRadians(Yaw + static_cast<float>(LobeIndex) * (360.0f / static_cast<float>(LobeCount)));
-            const float Radius = (LobeIndex == 0) ? 0.0f : (bRainforest ? 92.0f : 64.0f);
-            const float LobeX = X + FMath::Cos(LobeAngle) * Radius;
-            const float LobeY = Y + FMath::Sin(LobeAngle) * Radius;
-            const float SizeNoise = 0.86f + 0.08f * static_cast<float>((ClusterIndex + LobeIndex) % 5) + VegetationT * 0.08f;
-            CanopyInstances->AddInstance(
-                FTransform(
-                    FRotator(0.0f, Yaw + static_cast<float>(LobeIndex) * 21.0f, 0.0f),
-                    FVector(LobeX, LobeY, CrownBaseZ + 18.0f * static_cast<float>(LobeIndex % 3)),
+            for (int32 LobeIndex = 0; LobeIndex < LobeCount; ++LobeIndex)
+            {
+                const float LobeAngle = FMath::DegreesToRadians(Yaw + static_cast<float>(LobeIndex) * (360.0f / static_cast<float>(LobeCount)));
+                const float Radius = (LobeIndex == 0) ? 0.0f : (bRainforest ? 92.0f : 64.0f);
+                const float LobeX = X + FMath::Cos(LobeAngle) * Radius;
+                const float LobeY = Y + FMath::Sin(LobeAngle) * Radius;
+                const float SizeNoise =
+                    0.86f + 0.08f * static_cast<float>((ClusterIndex + LobeIndex) % 5) + VegetationT * 0.08f;
+                CanopyInstances->AddInstance(
+                    FTransform(
+                        FRotator(0.0f, Yaw + static_cast<float>(LobeIndex) * 21.0f, 0.0f),
+                        FVector(LobeX, LobeY, CrownBaseZ + 18.0f * static_cast<float>(LobeIndex % 3)),
                         FVector(
-                        (bRainforest ? 0.44f : 0.30f) * SizeNoise * FirstPartyProceduralCanopyBlobDemotion *
-                            RemainingBlockyFoliageProxyCull,
-                        (bRainforest ? 0.34f : 0.24f) * SizeNoise * FirstPartyProceduralCanopyBlobDemotion *
-                            RemainingBlockyFoliageProxyCull,
-                        (bRainforest ? 0.22f : 0.17f) * SizeNoise * (bRainforest ? 0.78f : 0.84f) *
-                            RemainingBlockyFoliageProxyCull)),
-                true);
+                            (bRainforest ? 0.44f : 0.30f) * SizeNoise * FirstPartyProceduralCanopyBlobDemotion *
+                                RemainingBlockyFoliageProxyCull * RemainingInstancedSphereFoliageBlobCull,
+                            (bRainforest ? 0.34f : 0.24f) * SizeNoise * FirstPartyProceduralCanopyBlobDemotion *
+                                RemainingBlockyFoliageProxyCull * RemainingInstancedSphereFoliageBlobCull,
+                            (bRainforest ? 0.22f : 0.17f) * SizeNoise * (bRainforest ? 0.78f : 0.84f) *
+                                RemainingBlockyFoliageProxyCull * RemainingInstancedSphereFoliageBlobCull)),
+                    true);
+            }
         }
 
         TrunkInstances->AddInstance(
@@ -7371,23 +7389,27 @@ void AddPreviewInstancedProceduralFoliageEquivalentDetail(
             true);
 
         const int32 UnderstoryCount = bRainforest ? 3 : 2;
-        for (int32 UnderstoryIndex = 0; UnderstoryIndex < UnderstoryCount; ++UnderstoryIndex)
+        if (RemainingInstancedSphereFoliageBlobCull > 0.0f)
         {
-            const float UnderstoryPhase = Phase + static_cast<float>(UnderstoryIndex) * 2.11f;
-            const float UnderstoryX = X + 126.0f * FMath::Sin(UnderstoryPhase);
-            const float UnderstoryY = Y + Side * (78.0f + 66.0f * static_cast<float>(UnderstoryIndex)) +
-                52.0f * FMath::Cos(UnderstoryPhase);
-            const float UnderstoryZ =
-                GetPreviewTerrainHeightCm(Spec, UnderstoryX, UnderstoryY, TerrainRelief, HeightfieldPreview);
-            UnderstoryInstances->AddInstance(
-                FTransform(
-                    FRotator(0.0f, Yaw + 77.0f * static_cast<float>(UnderstoryIndex + 1), 0.0f),
-                    FVector(UnderstoryX, UnderstoryY, UnderstoryZ + (bRainforest ? 72.0f : 45.0f)),
-                    FVector(
-                        bRainforest ? 0.22f + 0.03f * static_cast<float>(UnderstoryIndex) : 0.16f,
-                        bRainforest ? 0.17f : 0.13f,
-                        bRainforest ? 0.12f : 0.09f)),
-                true);
+            for (int32 UnderstoryIndex = 0; UnderstoryIndex < UnderstoryCount; ++UnderstoryIndex)
+            {
+                const float UnderstoryPhase = Phase + static_cast<float>(UnderstoryIndex) * 2.11f;
+                const float UnderstoryX = X + 126.0f * FMath::Sin(UnderstoryPhase);
+                const float UnderstoryY = Y + Side * (78.0f + 66.0f * static_cast<float>(UnderstoryIndex)) +
+                    52.0f * FMath::Cos(UnderstoryPhase);
+                const float UnderstoryZ =
+                    GetPreviewTerrainHeightCm(Spec, UnderstoryX, UnderstoryY, TerrainRelief, HeightfieldPreview);
+                UnderstoryInstances->AddInstance(
+                    FTransform(
+                        FRotator(0.0f, Yaw + 77.0f * static_cast<float>(UnderstoryIndex + 1), 0.0f),
+                        FVector(UnderstoryX, UnderstoryY, UnderstoryZ + (bRainforest ? 72.0f : 45.0f)),
+                        FVector(
+                            bRainforest ? 0.22f + 0.03f * static_cast<float>(UnderstoryIndex) : 0.16f,
+                            bRainforest ? 0.17f : 0.13f,
+                            bRainforest ? 0.12f : 0.09f) *
+                            RemainingInstancedSphereFoliageBlobCull),
+                    true);
+            }
         }
     }
 }
