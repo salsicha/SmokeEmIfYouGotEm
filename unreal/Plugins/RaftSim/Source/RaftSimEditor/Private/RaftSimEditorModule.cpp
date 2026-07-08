@@ -10275,12 +10275,15 @@ void AddPreviewRaftForeground(
         return;
     }
 
+    const FName ForegroundRaftProxyTag(TEXT("RaftSim_ForegroundRaft"));
     auto AddRaftProxyPart = [&](UStaticMesh* Mesh, const FString& Label, const FVector& Location, const FRotator& Rotation, const FVector& Scale, const FLinearColor& Color)
     {
         AStaticMeshActor* Actor = AddPreviewMeshActor(World, Mesh, Label, Location, Rotation, Scale, Color);
         if (Actor && Actor->GetStaticMeshComponent())
         {
+            Actor->Tags.AddUnique(ForegroundRaftProxyTag);
             Actor->GetStaticMeshComponent()->SetCastShadow(false);
+            Actor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         }
     };
 
@@ -10315,7 +10318,7 @@ void AddPreviewRaftForeground(
         Spec,
         MaterialAtlasAlbedo,
         RaftForegroundReviewMaterialTile,
-        Spec.bDesertCanyon ? FLinearColor(0.240f, 0.180f, 0.100f) : FLinearColor(0.200f, 0.180f, 0.120f),
+        Spec.bDesertCanyon ? FLinearColor(0.310f, 0.245f, 0.155f) : FLinearColor(0.245f, 0.215f, 0.150f),
         0.50f,
         0.70f,
         0.12f);
@@ -10323,18 +10326,18 @@ void AddPreviewRaftForeground(
         Spec,
         MaterialAtlasAlbedo,
         RaftForegroundReviewMaterialTile,
-        Spec.bDesertCanyon ? FLinearColor(0.440f, 0.285f, 0.135f) : FLinearColor(0.480f, 0.300f, 0.130f),
-        0.42f,
-        0.86f,
-        0.16f);
+        Spec.bDesertCanyon ? FLinearColor(0.600f, 0.410f, 0.220f) : FLinearColor(0.560f, 0.365f, 0.185f),
+        0.30f,
+        0.52f,
+        0.10f);
     const FLinearColor OarBladeColor = ApplyFirstPartyMaterialAtlasTint(
         Spec,
         MaterialAtlasAlbedo,
         RaftForegroundReviewMaterialTile,
-        Spec.bDesertCanyon ? FLinearColor(0.500f, 0.310f, 0.135f) : FLinearColor(0.580f, 0.220f, 0.080f),
-        0.76f,
-        0.84f,
-        0.18f);
+        Spec.bDesertCanyon ? FLinearColor(0.720f, 0.500f, 0.275f) : FLinearColor(0.680f, 0.295f, 0.125f),
+        0.24f,
+        0.46f,
+        0.10f);
     const FLinearColor BowLineColor = FMath::Lerp(FLinearColor(0.40f, 0.34f, 0.22f), TubeColor, 0.25f);
 
     AddRaftProxyPart(
@@ -10386,23 +10389,23 @@ void AddPreviewRaftForeground(
     }
 
     const float OarLengthScale = Spec.bDesertCanyon ? 0.76f : 0.64f;
-    const float OarBladeOffset = Spec.bDesertCanyon ? 330.0f : 295.0f;
+    const float OarBladeOffset = Spec.bDesertCanyon ? 372.0f : 330.0f;
     for (int32 OarIndex = 0; OarIndex < 2; ++OarIndex)
     {
         const float Side = (OarIndex == 0) ? -1.0f : 1.0f;
         AddRaftProxyPart(
             CylinderMesh,
             FString::Printf(TEXT("RaftSim_ForegroundRaft_OarShaftRounded_%d_%s"), OarIndex, *Spec.RiverId),
-            FVector(BaseX + 38.0f, CenterY + Side * 178.0f, -14.0f + 1.0f * static_cast<float>(OarIndex)),
+            FVector(BaseX + 42.0f, CenterY + Side * 196.0f, -9.0f + 1.0f * static_cast<float>(OarIndex)),
             FRotator(0.0f, Side * 4.0f, 90.0f + (Side > 0.0f ? 7.0f : -7.0f)),
-            FVector(0.010f, 0.010f, OarLengthScale),
+            FVector(0.0065f, 0.0065f, OarLengthScale * 0.88f),
             OarShaftColor);
         AddRaftProxyPart(
             CubeMesh,
             FString::Printf(TEXT("RaftSim_ForegroundRaft_OarBlade_%d_%s"), OarIndex, *Spec.RiverId),
-            FVector(BaseX + 140.0f, CenterY + Side * OarBladeOffset, -16.0f),
+            FVector(BaseX + 158.0f, CenterY + Side * OarBladeOffset, -9.0f),
             FRotator(0.0f, 8.0f * Side, Side > 0.0f ? 13.0f : -13.0f),
-            FVector(0.040f, 0.10f, 0.004f),
+            FVector(0.020f, 0.054f, 0.0025f),
             OarBladeColor);
     }
 
@@ -10815,7 +10818,8 @@ void AddPreviewNearFieldPhotorealReviewDressing(
                 (0.95f + 0.06f * FMath::Sin(X * 0.0037f));
             const float LongFeather = SmoothPreviewStep(0.00f, 0.035f, U) *
                 (1.0f - SmoothPreviewStep(0.90f, 1.0f, U));
-            const float NearFieldSmoothedWaterTextureGain = 0.42f;
+            const float NearFieldSmoothedWaterTextureGain = Spec.bDesertCanyon ? 0.24f : 0.34f;
+            const float NearFieldWaterSourceTileDemotionT = Spec.bDesertCanyon ? 0.62f : 0.48f;
             for (int32 CrossIndex = 0; CrossIndex <= CrossSteps; ++CrossIndex)
             {
                 const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
@@ -10945,10 +10949,10 @@ void AddPreviewNearFieldPhotorealReviewDressing(
                     RiverSurfacePatchColor,
                     FMath::Clamp(
                         TextureT *
-                            (0.32f + CenterT * 0.22f + CellNoise * 0.12f) *
+                            (0.24f + CenterT * 0.18f + CellNoise * 0.04f) *
                             (Spec.bDesertCanyon ? 1.28f : 1.0f),
                         0.0f,
-                        Spec.bDesertCanyon ? 0.84f : 0.68f));
+                        Spec.bDesertCanyon ? 0.52f : 0.54f));
                 const float IntegratedWaterFleckCell = FMath::Frac(
                     FMath::Sin(static_cast<float>((XIndex + 211) * 619 + (CrossIndex + 109) * 941) * 12.9898f) *
                     43758.5453f);
@@ -11272,6 +11276,10 @@ void AddPreviewNearFieldPhotorealReviewDressing(
                             (Spec.bDesertCanyon ? 0.24f : 0.30f),
                         0.0f,
                         Spec.bDesertCanyon ? 0.26f : 0.32f));
+                SmoothNearFieldWaterColor = FMath::Lerp(
+                    SmoothNearFieldWaterColor,
+                    WaterColor,
+                    FMath::Clamp((1.0f - NearFieldWaterSourceTileDemotionT) * 0.28f, 0.0f, 0.18f));
                 WaterColor = ScalePreviewColor(
                     SmoothNearFieldWaterColor,
                     FMath::Clamp(
@@ -11279,7 +11287,7 @@ void AddPreviewNearFieldPhotorealReviewDressing(
                             SmoothNearFieldBand * 0.20f + SmoothNearFieldCrossThread * 0.28f +
                             SmoothNearFieldRefractionThread * 0.24f,
                         0.34f,
-                        1.90f));
+                        Spec.bDesertCanyon ? 1.48f : 1.72f));
                 WaterColor.R = FMath::Clamp(
                     WaterColor.R *
                         (0.82f + SmoothNearFieldCrossThread * 0.26f +
@@ -11485,8 +11493,11 @@ void AddPreviewNearFieldPhotorealReviewDressing(
         const float Side = SideIndex == 0 ? -1.0f : 1.0f;
         const float MinX = -5480.0f;
         const float MaxX = 6200.0f;
-        const float InnerOffset = ActiveRiverHalfWidth * (Spec.bDesertCanyon ? 0.92f : 0.86f);
-        const float OuterOffset = ActiveRiverHalfWidth + (Spec.bDesertCanyon ? 860.0f : 540.0f);
+        const float NearFieldInboardBankShelfCullT = 1.0f;
+        const float InnerOffset = ActiveRiverHalfWidth +
+            (Spec.bDesertCanyon ? 164.0f : 92.0f) * NearFieldInboardBankShelfCullT;
+        const float OuterOffset = ActiveRiverHalfWidth +
+            (Spec.bDesertCanyon ? 960.0f : 620.0f) * NearFieldInboardBankShelfCullT;
 
         TArray<FVector> Vertices;
         TArray<FVector> Normals;
@@ -11671,12 +11682,13 @@ void AddPreviewNearFieldPhotorealReviewDressing(
                 170.0f * FMath::Sin(Phase * 0.71f) +
                 54.0f * FMath::Sin(Phase * 1.73f);
             const float BankBand = FMath::Frac(FMath::Sin(static_cast<float>(DebrisIndex + 23) * 23.517f) * 43758.5453f);
-            const float Offset = ActiveRiverHalfWidth *
-                    (Spec.bDesertCanyon ? 0.88f : 0.82f) +
+            const float NearCameraInWaterDebrisOcclusionCullT = 1.0f;
+            const float Offset = ActiveRiverHalfWidth +
                 FMath::Lerp(
-                    Spec.bDesertCanyon ? 65.0f : 42.0f,
-                    Spec.bDesertCanyon ? 940.0f : (Spec.bHasWaterfalls ? 660.0f : 580.0f),
-                    BankBand);
+                    Spec.bDesertCanyon ? 142.0f : 86.0f,
+                    Spec.bDesertCanyon ? 1080.0f : (Spec.bHasWaterfalls ? 760.0f : 670.0f),
+                    BankBand) *
+                    NearCameraInWaterDebrisOcclusionCullT;
             const float Y = GetPreviewRiverCenterY(Spec, X) + Side * Offset;
             const float TerrainZ = GetPreviewTerrainHeightCm(Spec, X, Y, TerrainRelief, HeightfieldPreview);
             const float WaterT = SamplePreviewMaskAtWorld(Spec, WaterMask, X, Y);
@@ -11694,9 +11706,9 @@ void AddPreviewNearFieldPhotorealReviewDressing(
             FLinearColor DebrisColor;
             if (Spec.bDesertCanyon)
             {
-                const FLinearColor Sand = FLinearColor(0.64f, 0.46f, 0.27f);
-                const FLinearColor WetSilt = FLinearColor(0.31f, 0.23f, 0.15f);
-                const FLinearColor Driftwood = FLinearColor(0.22f, 0.16f, 0.10f);
+                const FLinearColor Sand = FLinearColor(0.68f, 0.50f, 0.30f);
+                const FLinearColor WetSilt = FLinearColor(0.43f, 0.32f, 0.205f);
+                const FLinearColor Driftwood = FLinearColor(0.36f, 0.265f, 0.170f);
                 DebrisColor = TextureNoise < 0.34f ? Sand : (TextureNoise < 0.68f ? WetSilt : Driftwood);
             }
             else if (Spec.bHasWaterfalls)
@@ -12466,6 +12478,30 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
         GEditor->SelectActor(Camera, true, false, true);
     }
 
+    const float RiverEyeCameraX = Spec.bDesertCanyon ? -3620.0f : -5250.0f;
+    ACameraActor* RiverEyeCamera = Cast<ACameraActor>(
+        GEditor->AddActor(
+            World->GetCurrentLevel(),
+            ACameraActor::StaticClass(),
+            FTransform(
+                FRotator(Spec.bDesertCanyon ? -10.5f : -12.75f, 0.0f, 0.0f),
+                FVector(
+                    RiverEyeCameraX,
+                    GetPreviewRiverCenterY(Spec, RiverEyeCameraX),
+                    Spec.bDesertCanyon ? 152.0f : 162.0f))));
+    if (RiverEyeCamera)
+    {
+        RiverEyeCamera->SetActorLabel(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"));
+        RiverEyeCamera->GetCameraComponent()->FieldOfView = Spec.bDesertCanyon ? 64.0f : 66.0f;
+        if (Camera && Camera->GetCameraComponent())
+        {
+            RiverEyeCamera->GetCameraComponent()->PostProcessSettings =
+                Camera->GetCameraComponent()->PostProcessSettings;
+            RiverEyeCamera->GetCameraComponent()->PostProcessBlendWeight =
+                Camera->GetCameraComponent()->PostProcessBlendWeight;
+        }
+    }
+
     APlayerStart* PlayerStart = Cast<APlayerStart>(
         GEditor->AddActor(World->GetCurrentLevel(), APlayerStart::StaticClass(), FTransform(FRotator::ZeroRotator, FVector(-5350.0f, GetPreviewRiverCenterY(Spec, -5350.0f), 120.0f))));
     if (PlayerStart)
@@ -12635,12 +12671,19 @@ bool CapturePreviewImageForSpec(
     };
     if (bHideForegroundRaftProxies)
     {
+        const FName ForegroundRaftProxyTag(TEXT("RaftSim_ForegroundRaft"));
         for (TActorIterator<AActor> It(World); It; ++It)
         {
             AActor* Actor = *It;
-            if (Actor && Actor->GetActorLabel().StartsWith(TEXT("RaftSim_ForegroundRaft_")))
+            const bool bIsForegroundRaftProxy =
+                Actor &&
+                (Actor->ActorHasTag(ForegroundRaftProxyTag) ||
+                 Actor->GetActorLabel().StartsWith(TEXT("RaftSim_ForegroundRaft_")) ||
+                 Actor->GetActorLabel().Contains(TEXT("ForegroundRaft")));
+            if (bIsForegroundRaftProxy)
             {
                 CaptureComponent->HideActorComponents(Actor);
+                CaptureComponent->HiddenActors.AddUnique(Actor);
                 FForegroundRaftProxyHiddenState HiddenState;
                 HiddenState.Actor = Actor;
                 HiddenState.bWasHiddenInGame = Actor->IsHidden();
@@ -14523,7 +14566,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             Spec,
             CaptureRoot,
             RiverEyeCapturePath,
-            TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+            TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
             TEXT("river_eye_downstream"),
             TEXT("river-eye downstream"),
             true,
