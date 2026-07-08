@@ -168,7 +168,10 @@
       "first_party_foreground_raft_luma_blocker_reduction",
       "first_party_integrated_base_water_chroma_microbreakup",
       "first_party_integrated_water_fleck_microtexture",
-      "photoreal_capture_quality_review_blockers_recorded"
+      "first_party_integrated_water_bank_entropy_edge_detail",
+      "photoreal_capture_quality_review_blockers_recorded",
+      "first_party_integrated_corridor_water_terrain_capture_grade",
+      "automated_capture_quality_gate_passed_without_proxy_blockers"
     ],
     "missing_renderer_coverage_before_lifelike": [
       "production_landscape_or_nanite_terrain_material_layers",
@@ -193,76 +196,56 @@
     "atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
     "material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
     "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
-    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
+    "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved",
     "photoreal_capture_quality_summary": {
       "capture_count": 6,
-      "blocking_capture_count": 6,
-      "blocker_counts": {
-        "low_color_texture_entropy": 6,
-        "low_edge_density": 1
-      },
+      "blocking_capture_count": 0,
+      "blocker_counts": {},
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
-          "blocking_capture_count": 2,
-          "blockers": [
-            "low_color_texture_entropy",
-            "low_edge_density"
-          ],
-          "status": "preview_only_not_lifelike_quality_blockers"
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
         },
         "colorado_river": {
           "capture_count": 2,
-          "blocking_capture_count": 2,
-          "blockers": [
-            "low_color_texture_entropy"
-          ],
-          "status": "preview_only_not_lifelike_quality_blockers"
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
         },
         "pacuare": {
           "capture_count": 2,
-          "blocking_capture_count": 2,
-          "blockers": [
-            "low_color_texture_entropy"
-          ],
-          "status": "preview_only_not_lifelike_quality_blockers"
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
         }
       }
     },
     "visual_blocker_reduction_checkpoint_2026_07_08": {
-      "status": "visible_water_card_blocker_retired_low_entropy_and_edge_blockers_recorded",
+      "status": "automated_capture_quality_gate_cleared_candidate_for_human_lifelike_review_not_approved",
       "capture_quality_summary": {
         "capture_count": 6,
-        "blocking_capture_count": 6,
-        "blocker_counts": {
-          "low_color_texture_entropy": 6,
-          "low_edge_density": 1
-        },
+        "blocking_capture_count": 0,
+        "blocker_counts": {},
         "per_river": {
           "american_south_fork": {
             "capture_count": 2,
-            "blocking_capture_count": 2,
-            "blockers": [
-              "low_color_texture_entropy",
-              "low_edge_density"
-            ],
-            "status": "preview_only_not_lifelike_quality_blockers"
+            "blocking_capture_count": 0,
+            "blockers": [],
+            "status": "candidate_for_human_lifelike_review_not_approved"
           },
           "colorado_river": {
             "capture_count": 2,
-            "blocking_capture_count": 2,
-            "blockers": [
-              "low_color_texture_entropy"
-            ],
-            "status": "preview_only_not_lifelike_quality_blockers"
+            "blocking_capture_count": 0,
+            "blockers": [],
+            "status": "candidate_for_human_lifelike_review_not_approved"
           },
           "pacuare": {
             "capture_count": 2,
-            "blocking_capture_count": 2,
-            "blockers": [
-              "low_color_texture_entropy"
-            ],
-            "status": "preview_only_not_lifelike_quality_blockers"
+            "blocking_capture_count": 0,
+            "blockers": [],
+            "status": "candidate_for_human_lifelike_review_not_approved"
           }
         }
       },
@@ -270,16 +253,21 @@
         "dark_foreground_proxy",
         "excess_low_gradient_area",
         "large_flat_blue_field",
+        "low_color_texture_entropy",
         "low_edge_density",
         "low_luma_variation"
       ],
-      "remaining_blocker_classes": [
-        "low_color_texture_entropy",
-        "low_edge_density"
-      ],
+      "remaining_blocker_classes": [],
       "closed_renderer_blocker_classes": [
         "visible_proxy_water_card_geometry",
         "visible_proxy_water_overlay_geometry"
+      ],
+      "remaining_human_review_gates": [
+        "human_art_guide_and_geospatial_lifelike_review_after_automated_gate",
+        "hazard_and_rescue_readability_review",
+        "rights_review_for_reference_and_material_sources",
+        "desktop_and_vr_performance_capture_evidence",
+        "production_material_asset_or_first_party_equivalent_promotion"
       ]
     }
   },
@@ -475,5 +463,5 @@
       ]
     }
   ],
-  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are promoted from review Texture2D/MIC/material assets into production-quality Unreal assets/materials and verified by captures. The first importable first-party texture atlas pack is recorded, imported as review-only Unreal Texture2D assets with explicit import settings, bound into review-only material instance candidates, sampled by the review-only M_RaftSim_AtlasSampleReview parent material, and assigned to durable saved-map terrain, water, boulder, foliage, and raft proxy surfaces for review captures. Final lifelike status remains blocked on guide/geospatial approval, hazard readability, production material promotion, performance evidence, and passing the automated capture-quality gate without proxy blockers."
+  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are promoted from review Texture2D/MIC/material assets into production-quality Unreal assets/materials and verified by human art, guide, geospatial, hazard-readability, rights, and performance review. The first importable first-party texture atlas pack is recorded, imported as review-only Unreal Texture2D assets with explicit import settings, bound into review-only material instance candidates, sampled by the review-only M_RaftSim_AtlasSampleReview parent material, and assigned to durable saved-map terrain, water, boulder, foliage, and raft proxy surfaces for review captures. The automated capture-quality gate now has zero blocker counts, but that only promotes the captures to human lifelike review; it does not approve production visuals."
 }

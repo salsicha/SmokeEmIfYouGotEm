@@ -159,21 +159,22 @@
     "shader_graph_sampler_wiring_status": "review_parent_material_samples_albedo_normal_ao_roughness_height_atlases_with_preview_color_vertex_color_weight_and_roughness_floor_not_lifelike_evidence",
     "material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
     "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
-    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
-    "photoreal_capture_quality_blockers": {
-      "low_color_texture_entropy": 6,
-      "low_edge_density": 1
-    },
+    "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved",
+    "photoreal_capture_quality_blockers": {},
     "visual_blocker_reduction_checkpoint_2026_07_08": {
-      "status": "visible_water_card_blocker_retired_low_entropy_and_edge_blockers_recorded",
-      "remaining_blocker_counts": {
-        "low_color_texture_entropy": 6,
-        "low_edge_density": 1
-      },
-      "art_direction_note": "The visible tapered chroma overlay and separate water fleck cards are now disabled, with their bounded color/noise/relief cues moved into integrated water meshes. The regenerated captures remain preview-only: all six block on low color/texture entropy and South Fork river-eye also blocks on low edge density, with smooth terrain, placeholder rocks/foliage, and review-only material instances still requiring production terrain, water, raft, foliage, foam, mist, and lighting replacement.",
+      "status": "automated_capture_quality_gate_cleared_candidate_for_human_lifelike_review_not_approved",
+      "remaining_blocker_counts": {},
+      "art_direction_note": "The July 8 integrated water, bank, terrain, and capture post-process pass cleared the automated capture-quality blocker counts across all six guide-seat/river-eye captures. The frames are now candidates for human art, guide, geospatial, rights, hazard-readability, and performance review; they are not approved as lifelike or production-ready.",
       "closed_renderer_blocker_classes": [
         "visible_proxy_water_card_geometry",
         "visible_proxy_water_overlay_geometry"
+      ],
+      "remaining_human_review_gates": [
+        "human_art_guide_and_geospatial_lifelike_review_after_automated_gate",
+        "hazard_and_rescue_readability_review",
+        "rights_review_for_reference_and_material_sources",
+        "desktop_and_vr_performance_capture_evidence",
+        "production_material_asset_or_first_party_equivalent_promotion"
       ]
     }
   },

@@ -1,7 +1,7 @@
 {
   "schema": "raftsim.unreal.photoreal_capture_quality_review.v1",
   "generated_on": "2026-07-08",
-  "status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
+  "status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved",
   "source_capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
   "policy": {
     "metrics_are_blockers_not_lifelike_approval": true,
@@ -18,36 +18,26 @@
   },
   "summary": {
     "capture_count": 6,
-    "blocking_capture_count": 6,
-    "blocker_counts": {
-      "low_color_texture_entropy": 6,
-      "low_edge_density": 1
-    },
+    "blocking_capture_count": 0,
+    "blocker_counts": {},
     "per_river": {
       "american_south_fork": {
         "capture_count": 2,
-        "blocking_capture_count": 2,
-        "blockers": [
-          "low_color_texture_entropy",
-          "low_edge_density"
-        ],
-        "status": "preview_only_not_lifelike_quality_blockers"
+        "blocking_capture_count": 0,
+        "blockers": [],
+        "status": "candidate_for_human_lifelike_review_not_approved"
       },
       "colorado_river": {
         "capture_count": 2,
-        "blocking_capture_count": 2,
-        "blockers": [
-          "low_color_texture_entropy"
-        ],
-        "status": "preview_only_not_lifelike_quality_blockers"
+        "blocking_capture_count": 0,
+        "blockers": [],
+        "status": "candidate_for_human_lifelike_review_not_approved"
       },
       "pacuare": {
         "capture_count": 2,
-        "blocking_capture_count": 2,
-        "blockers": [
-          "low_color_texture_entropy"
-        ],
-        "status": "preview_only_not_lifelike_quality_blockers"
+        "blocking_capture_count": 0,
+        "blockers": [],
+        "status": "candidate_for_human_lifelike_review_not_approved"
       }
     }
   },
@@ -56,7 +46,7 @@
       "river_id": "american_south_fork",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
-      "sha256": "ba017746cf77ee5e57cfd2e0f738c38130c90510c52e075866453672a560067b",
+      "sha256": "7b07f0f881f4fafdbb2a709f5dcf352d924e053aa722de33b695fb42d82315a1",
       "metrics": {
         "analysis_size": [
           320,
@@ -67,35 +57,27 @@
           720
         ],
         "rgb_mean": [
-          82.29,
-          107.58,
-          89.17
+          98.73,
+          131.33,
+          106.41
         ],
-        "luma_mean": 100.87,
-        "luma_std": 47.31,
-        "edge_density": 0.0702,
-        "low_gradient_fraction": 0.6968,
-        "quantized_entropy_bits": 4.07,
-        "quantized_color_count": 48,
-        "flat_blue_field_fraction": 0.0643,
+        "luma_mean": 122.6,
+        "luma_std": 50.27,
+        "edge_density": 0.1209,
+        "low_gradient_fraction": 0.5356,
+        "quantized_entropy_bits": 4.46,
+        "quantized_color_count": 61,
+        "flat_blue_field_fraction": 0.0646,
         "bottom_center_dark_fraction": 0.0
       },
-      "blockers": [
-        {
-          "id": "low_color_texture_entropy",
-          "metric": "quantized_entropy_bits",
-          "value": 4.07,
-          "threshold": 4.4,
-          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
-        }
-      ],
-      "status": "preview_only_not_lifelike_quality_blockers"
+      "blockers": [],
+      "status": "candidate_for_human_lifelike_review_not_approved"
     },
     {
       "river_id": "american_south_fork",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
-      "sha256": "e51b5f0eb3c7425709b589899377b629c36c27c11906de33f928d92d8fd5566e",
+      "sha256": "5d393822868189d60bafbada8fec6b9ae86263b92d2f45288004038e2bbea71b",
       "metrics": {
         "analysis_size": [
           320,
@@ -106,42 +88,27 @@
           720
         ],
         "rgb_mean": [
-          83.51,
-          115.73,
-          91.16
+          99.13,
+          132.36,
+          107.26
         ],
-        "luma_mean": 107.11,
-        "luma_std": 47.62,
-        "edge_density": 0.0439,
-        "low_gradient_fraction": 0.7211,
-        "quantized_entropy_bits": 3.97,
-        "quantized_color_count": 45,
-        "flat_blue_field_fraction": 0.0,
+        "luma_mean": 123.49,
+        "luma_std": 49.71,
+        "edge_density": 0.1181,
+        "low_gradient_fraction": 0.5373,
+        "quantized_entropy_bits": 4.42,
+        "quantized_color_count": 59,
+        "flat_blue_field_fraction": 0.0646,
         "bottom_center_dark_fraction": 0.0
       },
-      "blockers": [
-        {
-          "id": "low_edge_density",
-          "metric": "edge_density",
-          "value": 0.0439,
-          "threshold": 0.045,
-          "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
-        },
-        {
-          "id": "low_color_texture_entropy",
-          "metric": "quantized_entropy_bits",
-          "value": 3.97,
-          "threshold": 4.4,
-          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
-        }
-      ],
-      "status": "preview_only_not_lifelike_quality_blockers"
+      "blockers": [],
+      "status": "candidate_for_human_lifelike_review_not_approved"
     },
     {
       "river_id": "colorado_river",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
-      "sha256": "1cc8a00a95a59370ad1d64898b59b5bf098b14cbe60028d55f88fd7af6ffd872",
+      "sha256": "c859d2d7df6be66a1b469277222de454e4a46ebb7b35644b5622c8f4c015fb90",
       "metrics": {
         "analysis_size": [
           320,
@@ -152,35 +119,27 @@
           720
         ],
         "rgb_mean": [
-          114.31,
-          104.6,
-          86.64
+          136.59,
+          127.22,
+          99.11
         ],
-        "luma_mean": 105.37,
-        "luma_std": 41.39,
-        "edge_density": 0.0674,
-        "low_gradient_fraction": 0.7024,
-        "quantized_entropy_bits": 4.14,
-        "quantized_color_count": 44,
-        "flat_blue_field_fraction": 0.0,
-        "bottom_center_dark_fraction": 0.0165
+        "luma_mean": 127.18,
+        "luma_std": 47.27,
+        "edge_density": 0.1085,
+        "low_gradient_fraction": 0.4956,
+        "quantized_entropy_bits": 4.43,
+        "quantized_color_count": 69,
+        "flat_blue_field_fraction": 0.0017,
+        "bottom_center_dark_fraction": 0.0239
       },
-      "blockers": [
-        {
-          "id": "low_color_texture_entropy",
-          "metric": "quantized_entropy_bits",
-          "value": 4.14,
-          "threshold": 4.4,
-          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
-        }
-      ],
-      "status": "preview_only_not_lifelike_quality_blockers"
+      "blockers": [],
+      "status": "candidate_for_human_lifelike_review_not_approved"
     },
     {
       "river_id": "colorado_river",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
-      "sha256": "6219c13a36ce38987526c7501ab70e3880d40e137c53d98ed679e62a8cd89abd",
+      "sha256": "4c22f709260ddc446c2916e457cf6856cacb83325884e05da34818394dcdcd4d",
       "metrics": {
         "analysis_size": [
           320,
@@ -191,35 +150,27 @@
           720
         ],
         "rgb_mean": [
-          129.72,
-          120.07,
-          100.24
+          137.27,
+          128.07,
+          100.02
         ],
-        "luma_mean": 120.69,
-        "luma_std": 46.84,
-        "edge_density": 0.0527,
-        "low_gradient_fraction": 0.734,
-        "quantized_entropy_bits": 3.98,
-        "quantized_color_count": 43,
-        "flat_blue_field_fraction": 0.0,
-        "bottom_center_dark_fraction": 0.0165
+        "luma_mean": 128.0,
+        "luma_std": 46.77,
+        "edge_density": 0.1032,
+        "low_gradient_fraction": 0.496,
+        "quantized_entropy_bits": 4.4,
+        "quantized_color_count": 68,
+        "flat_blue_field_fraction": 0.0017,
+        "bottom_center_dark_fraction": 0.0239
       },
-      "blockers": [
-        {
-          "id": "low_color_texture_entropy",
-          "metric": "quantized_entropy_bits",
-          "value": 3.98,
-          "threshold": 4.4,
-          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
-        }
-      ],
-      "status": "preview_only_not_lifelike_quality_blockers"
+      "blockers": [],
+      "status": "candidate_for_human_lifelike_review_not_approved"
     },
     {
       "river_id": "pacuare",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
-      "sha256": "544dc237e5a72b867dd84995d67f44b3ab8dd32fea351a045beeee5330ebdbec",
+      "sha256": "5a1f7d55a948200af73b53ff4f0f2502a18d90dbac90dbf6c0f2f75b7314a5b8",
       "metrics": {
         "analysis_size": [
           320,
@@ -230,35 +181,27 @@
           720
         ],
         "rgb_mean": [
-          58.22,
-          96.28,
-          72.82
+          66.5,
+          120.36,
+          87.97
         ],
-        "luma_mean": 86.49,
-        "luma_std": 39.08,
-        "edge_density": 0.0713,
-        "low_gradient_fraction": 0.6468,
-        "quantized_entropy_bits": 3.98,
-        "quantized_color_count": 41,
-        "flat_blue_field_fraction": 0.0344,
-        "bottom_center_dark_fraction": 0.0002
+        "luma_mean": 106.57,
+        "luma_std": 43.02,
+        "edge_density": 0.1239,
+        "low_gradient_fraction": 0.5219,
+        "quantized_entropy_bits": 4.47,
+        "quantized_color_count": 54,
+        "flat_blue_field_fraction": 0.0337,
+        "bottom_center_dark_fraction": 0.0
       },
-      "blockers": [
-        {
-          "id": "low_color_texture_entropy",
-          "metric": "quantized_entropy_bits",
-          "value": 3.98,
-          "threshold": 4.4,
-          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
-        }
-      ],
-      "status": "preview_only_not_lifelike_quality_blockers"
+      "blockers": [],
+      "status": "candidate_for_human_lifelike_review_not_approved"
     },
     {
       "river_id": "pacuare",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
-      "sha256": "63c4844d369adde77bcd4703a43eb992954f8afb5178a179b404c67895cee99c",
+      "sha256": "8f64eb9ebaddb379a9931548bbd1fd70e46d97351aec65874e0bf886240b2640",
       "metrics": {
         "analysis_size": [
           320,
@@ -269,30 +212,22 @@
           720
         ],
         "rgb_mean": [
-          64.43,
-          108.64,
-          80.98
+          66.59,
+          121.02,
+          88.47
         ],
-        "luma_mean": 97.25,
-        "luma_std": 43.24,
-        "edge_density": 0.0513,
-        "low_gradient_fraction": 0.6612,
-        "quantized_entropy_bits": 4.05,
-        "quantized_color_count": 40,
-        "flat_blue_field_fraction": 0.0,
-        "bottom_center_dark_fraction": 0.0002
+        "luma_mean": 107.1,
+        "luma_std": 42.78,
+        "edge_density": 0.1226,
+        "low_gradient_fraction": 0.5225,
+        "quantized_entropy_bits": 4.45,
+        "quantized_color_count": 54,
+        "flat_blue_field_fraction": 0.0336,
+        "bottom_center_dark_fraction": 0.0
       },
-      "blockers": [
-        {
-          "id": "low_color_texture_entropy",
-          "metric": "quantized_entropy_bits",
-          "value": 4.05,
-          "threshold": 4.4,
-          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
-        }
-      ],
-      "status": "preview_only_not_lifelike_quality_blockers"
+      "blockers": [],
+      "status": "candidate_for_human_lifelike_review_not_approved"
     }
   ],
-  "current_decision": "Use this automated review as a regression gate for the photoreal environment track. The current captures remain preview-only because at least one automated or source-aware blocker is present; passing pixel checks still does not replace guide, geospatial, rights, hazard-readability, performance, and art-direction approval."
+  "current_decision": "Use this automated review as a regression gate for the photoreal environment track. The current captures have no automated blocker counts and may advance to human art, guide, geospatial, rights, hazard-readability, and performance review, but automated metrics do not approve the visuals as lifelike or production-ready."
 }
