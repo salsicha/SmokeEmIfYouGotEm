@@ -113,6 +113,8 @@
       "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_clip_review.json",
       "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_corridor_bbox_clip_review.png",
       "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_corridor_bbox_clip_review.png",
+      "imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
+      "imagery/production_import_pilot/sentinel_augmented_source_drape_preview_manifest.json",
       "imagery/production_import_pilot/sentinel_20250320_draft_bank_window_review.json",
       "imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_draft_bank_window_clip_review.png",
       "imagery/production_import_pilot/sentinel_s2b_16phr_20250320_draft_bank_window_clip_review.png",
@@ -181,7 +183,7 @@
   "manifest_id": "pacuare.lower_pacuare_planning_corridor.source_manifest.v0",
   "provenance": {
     "generated_by": "raftsim.milestone24.draft_pacuare_third_target",
-    "processing_version": "milestone24_pacuare_planning_draft.v0+milestone26_source_slice.v3",
+    "processing_version": "milestone24_pacuare_planning_draft.v0+milestone26_source_slice.v4",
     "redistribution_notes": "Do not vendor third-party guidebook text, aerial imagery, protected-area content, or field media without explicit rights and attribution records.",
     "review_status": "partial_public_global_terrain_and_nasa_imagery_slice_attached_with_official_source_leads; needs_costa_rica_hydrology_hydrography_protected_area_and_guide_review"
   },

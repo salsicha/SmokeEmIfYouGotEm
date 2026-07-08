@@ -499,6 +499,8 @@
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_20250320_corridor_bbox_clip_review.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_corridor_bbox_clip_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250320_corridor_bbox_clip_review.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
+            "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_manifest.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_20250320_draft_bank_window_review.json",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_17pkm_20250320_draft_bank_window_clip_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250320_draft_bank_window_clip_review.png",
@@ -520,8 +522,8 @@
             "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_s2b_16phr_20250119_corridor_bbox_scl_qa_review.png",
             "physics/data/real_world/pacuare_river_costa_rica/review/production_import_pilot/source_metadata_review.json"
           ],
-          "promotion_blocker": "Pacuare has retained NASA GIBS/MODIS cloud-screening evidence, coarse production-import derivatives, official Landsat/Sentinel high-resolution scene metadata, a Landsat access-gate review, a local SINAC forest-cover mask/procedural-zoning lead, Sentinel COG thumbnails/tile metadata, a successful Sentinel COG range-access probe, downsampled 17PKM/16PHR TCI review PNGs, bbox coverage and clip reviews, SCL QA showing January 19 cloud contamination, a cleaner-scene STAC search, March 20 SCL/TCI bbox clips, draft-bank strip review showing corridor-local cloud/shadow, March 5 and February 24 route-local SCL rejections, and February 4 SCL plus TCI route-window review showing visible cloud/shadow. Production still needs cleaner route-local coverage or exact native-CRS route/bank clipping with SCL masking, stitching, CRS/band/scale review, terms/attribution review, and guide/geospatial approval before photoreal imagery or masks are promoted.",
-          "status": "coarse_preview_and_high_resolution_scene_metadata_attached_sentinel_full_tile_review_previews_extraction_blocked"
+          "promotion_blocker": "Pacuare has retained NASA GIBS/MODIS cloud-screening evidence, coarse production-import derivatives, official Landsat/Sentinel high-resolution scene metadata, Sentinel March 20 review clips, and a Sentinel-augmented Unreal preview calibration drape. Production still needs cleaner route-local coverage or exact native-CRS route/bank clipping with SCL masking, stitching, CRS/band/scale review, terms/attribution review, and guide/geospatial approval before photoreal imagery or masks are promoted.",
+          "status": "coarse_preview_high_resolution_scene_metadata_and_preview_calibration_drape_attached_not_promoted"
         },
         "guide_and_reference_media_annotations": {
           "artifacts": [

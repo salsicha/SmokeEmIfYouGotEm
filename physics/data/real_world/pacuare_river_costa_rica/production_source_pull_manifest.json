@@ -21,7 +21,8 @@
     "Anonymous LandsatLook product asset URLs returned EROS login HTML for the best Pacuare Landsat candidate, so imagery downloads remain blocked until an approved access path returns expected JPEG/JSON/COG content.",
     "Pacuare local imagery alternative review identifies SINAC Cobertura Forestal 2023 as a classified canopy/mask/procedural-zoning lead, but no direct SNIT orthophoto source-drape replacement is attached and SINAC terms review is still required.",
     "Pacuare Sentinel COG thumbnails and tile metadata are attached as visual triage, but full-resolution Sentinel bands, SCL/QA masks, corridor clipping, terms/attribution, and manual cloud/shadow QA are still required before source-drape or mask replacement.",
-    "Pacuare March 20, 2025 Sentinel SCL QA, matching TCI bbox clips, draft-bank window strips, a worse March 5 route-local SCL probe, February 4, 2024 SCL/TCI route-window review, and a failed February 24 SCL probe are attached for review only; production imagery still needs cleaner route-local coverage or exact native-CRS route/bank clipping with SCL masking, stitching, terms/attribution review, and guide/geospatial signoff."
+    "Pacuare March 20, 2025 Sentinel SCL QA, matching TCI bbox clips, draft-bank window strips, a worse March 5 route-local SCL probe, February 4, 2024 SCL/TCI route-window review, and a failed February 24 SCL probe are attached for review only; production imagery still needs cleaner route-local coverage or exact native-CRS route/bank clipping with SCL masking, stitching, terms/attribution review, and guide/geospatial signoff.",
+    "Pacuare Sentinel-augmented preview drape is wired for Unreal preview calibration only; production imagery still needs exact route/bank clipping, SCL masking, stitching, terms/attribution review, and guide/geospatial signoff."
   ],
   "pulled_artifacts": [
     {
@@ -1246,6 +1247,43 @@
         "These are draft bbox clips, not exact route/bank clips, stitched source drapes, material inputs, production masks, or lifelike screenshot evidence.",
         "Scattered cloud and shadow remain visible in the review clips despite lower SCL cloud fractions than January 19.",
         "Production Pacuare imagery remains blocked until exact clipping, SCL masking, stitching, terms review, and guide/geospatial approval pass."
+      ]
+    },
+    {
+      "artifact_id": "pacuare_sentinel_augmented_source_drape_preview",
+      "category": "derived_preview_drape",
+      "paths": [
+        "imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
+        "imagery/production_import_pilot/sentinel_augmented_source_drape_preview_manifest.json"
+      ],
+      "provider": "RaftSim local preview calibration from the NASA/Copernicus placeholder drape plus March 20, 2025 Sentinel-2 bbox review clips",
+      "status": "generated_review_gated_unreal_preview_calibration_only_not_production_source_drape",
+      "summary": {
+        "dimensions_px": [
+          4096,
+          4096
+        ],
+        "mode": "RGBA",
+        "sha256": "7f37001de40c17abad25564c978f542624fef241ba04ebed13bd80bf31c413cf",
+        "source_drape_replaced_for_production": false,
+        "production_masks_replaced": false,
+        "unreal_preview_calibration_drape_enabled": true
+      },
+      "related_artifacts": [
+        "imagery/production_import_pilot/source_drape_composite_manifest.json",
+        "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_clip_review.json",
+        "imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+        "imagery/production_import_pilot/sentinel_20250320_draft_bank_window_review.json"
+      ],
+      "use": [
+        "unreal_preview_terrain_color_detail_calibration",
+        "rainforest_canopy_and_gorge_texture_review",
+        "future_exact_route_clip_and_scl_mask_planning"
+      ],
+      "caveats": [
+        "Approximate bbox texture calibration, not native-CRS stitched route imagery.",
+        "Does not generate water, vegetation, wet-rock, or canopy masks.",
+        "Must not be used for photoreal material extraction, source-drape promotion, or lifelike screenshot claims."
       ]
     },
     {

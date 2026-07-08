@@ -490,7 +490,7 @@
         },
         {
           "source_class": "aerial_or_satellite_imagery",
-          "status": "gibs_and_sentinel_review_imagery_attached_not_promoted",
+          "status": "gibs_sentinel_and_preview_calibration_imagery_attached_not_promoted",
           "artifacts": [
             {
               "path": "pacuare_river_costa_rica/imagery/production_import_pilot/high_resolution_scene_metadata_review.json",
@@ -511,6 +511,14 @@
             {
               "path": "pacuare_river_costa_rica/imagery/production_import_pilot/source_drape_4096.png",
               "role": "current review-gated preview source drape"
+            },
+            {
+              "path": "pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
+              "role": "active Unreal preview calibration drape, not production source imagery"
+            },
+            {
+              "path": "pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_manifest.json",
+              "role": "preview calibration drape provenance and promotion blockers"
             }
           ],
           "promotion_blockers": [
