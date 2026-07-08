@@ -114,6 +114,7 @@
     "raft_hidden_river_eye_foreground_proxy_hard_hide": true,
     "raft_hidden_river_eye_primitive_component_hard_hide": true,
     "raft_hidden_river_eye_center_artifact_cover": true,
+    "raft_hidden_river_eye_textured_center_artifact_cover": true,
     "status": "preview_only_visual_readability_improvement_not_production_material_or_whitewater_approval"
   },
   "capture_pixel_sanity": [
@@ -126,7 +127,7 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [44.02, 87.91, 95.38],
+      "rgb_mean": [44.07, 87.6, 95.12],
       "nonblank": true
     },
     {
@@ -138,7 +139,7 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [75.27, 70.02, 59.17],
+      "rgb_mean": [75.03, 70.02, 59.2],
       "nonblank": true
     },
     {
@@ -150,7 +151,7 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [27.59, 71.49, 71.64],
+      "rgb_mean": [27.6, 71.41, 71.66],
       "nonblank": true
     }
   ],
@@ -198,7 +199,8 @@
     "Demoted remaining square foliage/source-card artifacts by lowering bank texture card counts, scale, opacity, and silhouette-card visibility while keeping source-aware placement scaffolds for later production foliage replacement.",
     "Culled remaining square card scaffolds by sharply reducing visible bank/source cards, atmospheric/backdrop cards, and blocky foliage proxy cluster counts, scale, and opacity, and replacing canopy/vine/desert scrub upright planes with organic first-party branch/frond geometry where a visible marker is still useful.",
     "Added first-party source-aware sky gradient and atmosphere-depth sheets so the preview horizon has river-specific sky warmth, haze, and humid depth without claiming final sky/weather assets.",
-    "Hardened raft-hidden river-eye evidence capture by hiding foreground raft/oar proxy actors through scene-capture actor/component filtering, primitive-component visibility flags, temporary editor/game actor visibility, and a temporary river-eye-only water-color center artifact cover, then restoring or destroying those helpers after capture.",
+    "Hardened raft-hidden river-eye evidence capture by hiding foreground raft/oar proxy actors through scene-capture actor/component filtering, primitive-component visibility flags, temporary editor/game actor visibility, and a temporary textured river-eye-only water-color center artifact cover, then restoring or destroying those helpers after capture.",
+    "Added a first-party textured river-eye center artifact cover with bounded depth/current mottle and ripple relief for raft-hidden environment-review captures without claiming production water shader approval.",
     "Saved all three generated preview maps with softened source-drape overlays, boulder-contact foam laces, guide-seat foliage setback and scale tuning, source-aware bank breakup texture patches, first-party irregular shoreline edge breakup, soft-feathered terrain material patch edges, source-drape albedo normalization, terrain-proxy luma floors, shadowless terrain albedo review capture material, first-party terrain material layer facets and slope-shadow patches, first-party Landscape/Nanite material-layer scaffolds, first-party terrain erosion-rill/bank-gully strips, a first-party lit terrain vertex-color material, soft-lit terrain vertex-color review material mode, first-party photographic terrain emissive calibration, first-party terrain contrast and proxy-normal calibration, first-party bounded terrain ambient fill, base terrain material grain and microrelief, source-aware terrain photo mottle and microrelief, source-conditioned far-bank albedo/microrelief calibration, first-party broad-slope terrain exposure fill and relief, source-overlay plate artifact demotion, graphic waterline ribbon demotion, demoted terrain overlay striping, source-drape smoothing, segmented wet-bank ribbons, near-frame shoreline scaffold demotion, demoted source-detail contours, post-contour terrain readability fill, first-party source-masked bank/bar microgeometry, flow-aware bank undercut/shelf relief, biome-specific deadfall/grass/root ecology props, first-party biome foliage silhouette proxy layers, first-party dense biome foliage layer proxy clusters, first-party instanced procedural foliage-equivalent scaffolds, first-party procedural leaf-cluster geometry, first-party organic canopy leaf-spray breakup, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height/massing profile, first-party procedural canopy tone/shadow profile, first-party foliage card/canopy artifact demotion, square foliage/source-card artifact demotion, remaining square card cull, flow-aware waterline pebble scatter, first-party irregular rock geometry variants, first-party boulder wetness/abrasion/moss surface variants, first-party boulder crevice-shadow/albedo tuning, near-camera boulder readability clearance and occlusion demotion, flow-aware water mesh undulation, flow-band depth texture ribbons, flow-aware water-surface chop/turbidity patches, first-party turbidity-depth patch artifact demotion, flow-aware micro-ripple glints, first-party dark micro-ripple artifact demotion, first-party flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, near-frame water-ribbon occlusion demotion, first-party water shader depth/reflection/refraction scaffolds, source-aware shallow-water clarity and aeration layers, near-camera water-scaffold readability clearance, low-occlusion far-field water-scaffold tuning, remaining water overlay slab demotion, long dark water streak demotion, current streak and waterline rail artifact demotion, central water scaffold plate demotion, base-water center guide-stripe breakup, first-party base-water residual center-seam erase, primitive-component hard-hide and temporary water-color center artifact cover for raft-hidden river-eye captures, first-party photographic water/exposure calibration, base water depth/current grading, Pacuare waterfall/plunge-mist/runout proxies, river-specific cloud/haze/horizon backdrop cards, first-party source-aware sky gradient and atmosphere-depth layers, refined first-party guide-seat raft/oar foreground proxies, and rounded first-party raft/oar foreground proxies.",
     "Saved guide-seat and river-eye captures for South Fork American, Colorado River Grand Canyon, and Pacuare River Rainforest.",
     "Environment preview capture manifest saved successfully."
