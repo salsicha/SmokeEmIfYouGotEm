@@ -1,7 +1,7 @@
 {
   "schema": "raftsim.unreal.first_party_material_instance_candidates.v1",
   "generated_on": "2026-07-08",
-  "status": "candidate_unreal_material_instance_bindings_declared_review_only_not_lifelike",
+  "status": "candidate_unreal_material_instance_bindings_and_review_assets_created_not_lifelike",
   "material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
   "material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
   "policy": {
@@ -9,7 +9,8 @@
     "social_media_or_footage_texture_inputs_used": false,
     "candidate_paths_do_not_mark_any_river_lifelike": true,
     "promotion_requires_created_unreal_assets_capture_guide_review_hazard_readability_and_performance_evidence": true,
-    "water_visuals_must_not_hide_physics_or_conservation_failures": true
+    "water_visuals_must_not_hide_physics_or_conservation_failures": true,
+    "review_assets_created_do_not_mark_any_river_lifelike": true
   },
   "map_bindings": {
     "AlbedoAtlas": "BaseColor candidate texture atlas; currently sampled into preview vertex colors.",
@@ -20,7 +21,7 @@
     {
       "river_id": "american_south_fork",
       "recipe_id": "terrain_bank_layered_material",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_TerrainBank_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview",
       "atlas_tile_index": 0,
@@ -55,12 +56,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_TerrainBank_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 0,
+        "AtlasTileOriginScale": [
+          0.0,
+          0.0,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "american_south_fork",
       "recipe_id": "wet_boulder_contact_material_set",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_WetBoulderContact_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
       "atlas_tile_index": 1,
@@ -95,12 +111,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_WetBoulderContact_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 1,
+        "AtlasTileOriginScale": [
+          0.3333333333333333,
+          0.0,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "american_south_fork",
       "recipe_id": "biome_foliage_groundcover_materials",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_BiomeFoliageGroundcover_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
       "atlas_tile_index": 2,
@@ -135,12 +166,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_BiomeFoliageGroundcover_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 2,
+        "AtlasTileOriginScale": [
+          0.6666666666666666,
+          0.0,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "american_south_fork",
       "recipe_id": "flow_dependent_water_surface_material",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_FlowDependentWaterSurface_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
       "atlas_tile_index": 3,
@@ -175,12 +221,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_FlowDependentWaterSurface_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 3,
+        "AtlasTileOriginScale": [
+          0.0,
+          0.5,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "american_south_fork",
       "recipe_id": "foam_spray_mist_atmosphere_materials",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_FoamSprayMistAtmosphere_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_TranslucentColorPreview",
       "atlas_tile_index": 4,
@@ -215,12 +276,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_FoamSprayMistAtmosphere_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 4,
+        "AtlasTileOriginScale": [
+          0.3333333333333333,
+          0.5,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "american_south_fork",
       "recipe_id": "raft_foreground_review_materials",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_RaftForegroundReview_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
       "atlas_tile_index": 5,
@@ -255,12 +331,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_RaftForegroundReview_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 5,
+        "AtlasTileOriginScale": [
+          0.6666666666666666,
+          0.5,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "colorado_river",
       "recipe_id": "terrain_bank_layered_material",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_TerrainBank_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview",
       "atlas_tile_index": 0,
@@ -295,12 +386,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_TerrainBank_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 0,
+        "AtlasTileOriginScale": [
+          0.0,
+          0.0,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "colorado_river",
       "recipe_id": "wet_boulder_contact_material_set",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_WetBoulderContact_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
       "atlas_tile_index": 1,
@@ -335,12 +441,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_WetBoulderContact_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 1,
+        "AtlasTileOriginScale": [
+          0.3333333333333333,
+          0.0,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "colorado_river",
       "recipe_id": "biome_foliage_groundcover_materials",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_BiomeFoliageGroundcover_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
       "atlas_tile_index": 2,
@@ -375,12 +496,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_BiomeFoliageGroundcover_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 2,
+        "AtlasTileOriginScale": [
+          0.6666666666666666,
+          0.0,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "colorado_river",
       "recipe_id": "flow_dependent_water_surface_material",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_FlowDependentWaterSurface_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
       "atlas_tile_index": 3,
@@ -415,12 +551,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_FlowDependentWaterSurface_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 3,
+        "AtlasTileOriginScale": [
+          0.0,
+          0.5,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "colorado_river",
       "recipe_id": "foam_spray_mist_atmosphere_materials",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_FoamSprayMistAtmosphere_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_TranslucentColorPreview",
       "atlas_tile_index": 4,
@@ -455,12 +606,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_FoamSprayMistAtmosphere_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 4,
+        "AtlasTileOriginScale": [
+          0.3333333333333333,
+          0.5,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "colorado_river",
       "recipe_id": "raft_foreground_review_materials",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_RaftForegroundReview_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
       "atlas_tile_index": 5,
@@ -495,12 +661,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_RaftForegroundReview_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 5,
+        "AtlasTileOriginScale": [
+          0.6666666666666666,
+          0.5,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "pacuare",
       "recipe_id": "terrain_bank_layered_material",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_TerrainBank_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_TerrainVertexColorLitPreview",
       "atlas_tile_index": 0,
@@ -535,12 +716,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_TerrainBank_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 0,
+        "AtlasTileOriginScale": [
+          0.0,
+          0.0,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "pacuare",
       "recipe_id": "wet_boulder_contact_material_set",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_WetBoulderContact_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
       "atlas_tile_index": 1,
@@ -575,12 +771,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_WetBoulderContact_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 1,
+        "AtlasTileOriginScale": [
+          0.3333333333333333,
+          0.0,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "pacuare",
       "recipe_id": "biome_foliage_groundcover_materials",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_BiomeFoliageGroundcover_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
       "atlas_tile_index": 2,
@@ -615,12 +826,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_BiomeFoliageGroundcover_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 2,
+        "AtlasTileOriginScale": [
+          0.6666666666666666,
+          0.0,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "pacuare",
       "recipe_id": "flow_dependent_water_surface_material",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_FlowDependentWaterSurface_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
       "atlas_tile_index": 3,
@@ -655,12 +881,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_FlowDependentWaterSurface_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 3,
+        "AtlasTileOriginScale": [
+          0.0,
+          0.5,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "pacuare",
       "recipe_id": "foam_spray_mist_atmosphere_materials",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_FoamSprayMistAtmosphere_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_TranslucentColorPreview",
       "atlas_tile_index": 4,
@@ -695,12 +936,27 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_FoamSprayMistAtmosphere_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 4,
+        "AtlasTileOriginScale": [
+          0.3333333333333333,
+          0.5,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     },
     {
       "river_id": "pacuare",
       "recipe_id": "raft_foreground_review_materials",
-      "status": "candidate_unreal_material_instance_binding_review_only_not_lifelike",
+      "status": "created_unreal_material_instance_review_asset_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_RaftForegroundReview_AtlasCandidate",
       "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_LitColorPreview",
       "atlas_tile_index": 5,
@@ -735,9 +991,24 @@
         "NormalIntensity": "bounded_preview_only_pending_shader_and_performance_review",
         "RoughnessScale": "derived_from_packed_green_channel_pending_material_instance_review",
         "HeightScale": "tiny_preview_microrelief_only_until_landscape_waterbody_material_review"
+      },
+      "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_RaftForegroundReview_AtlasCandidate.uasset",
+      "review_asset_parameters": {
+        "AtlasTileIndex": 5,
+        "AtlasTileOriginScale": [
+          0.6666666666666666,
+          0.5,
+          0.3333333333333333,
+          0.5
+        ],
+        "AtlasBlendWeight": "bounded_review_asset_parameter_pending_shader_graph_tuning",
+        "NormalIntensity": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "RoughnessScale": "bounded_review_asset_parameter_pending_texture_import_and_shader_graph_tuning",
+        "HeightScale": "bounded_review_asset_parameter_pending_landscape_waterbody_material_review",
+        "ReviewAssetOnlyNotLifelike": 1.0
       }
     }
   ],
-  "promotion_gate": "Create reviewed Unreal texture assets and material instances from these candidate paths only after import settings, shader graph, hazard readability, guide/geospatial review, capture comparison, and desktop/VR performance evidence pass.",
-  "current_decision": "Use these candidate paths as the canonical handoff from generated first-party texture atlases to Unreal material-instance work. The current preview renderer samples the atlas maps procedurally, but these candidate bindings are not final material instances and not lifelike evidence."
+  "promotion_gate": "Review material-instance assets were created at the candidate paths, but production promotion still requires Unreal texture asset import settings, shader graph sampler wiring, capture comparison, guide/geospatial review, hazard readability, and desktop/VR performance evidence.",
+  "current_decision": "Create reviewed Unreal Material Instance Constant assets from these candidate paths as the canonical handoff from first-party texture atlases to shader work. The current preview renderer still samples atlas maps procedurally, and these review assets are not final material instances or lifelike evidence."
 }

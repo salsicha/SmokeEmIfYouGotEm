@@ -6,6 +6,8 @@
   "procedural_material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
   "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
   "first_party_material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json",
+  "first_party_material_instance_review_asset_root": "unreal/Content/RaftSim/Materials/MaterialInstances",
+  "first_party_material_instance_review_asset_status": "created_unreal_material_instance_constant_review_assets_not_lifelike",
   "geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",
   "status": "south_fork_colorado_and_pacuare_source_draped_guide_and_river_eye_previews_available; photoreal source_data_and_asset_replacement_required",
   "captures": [
