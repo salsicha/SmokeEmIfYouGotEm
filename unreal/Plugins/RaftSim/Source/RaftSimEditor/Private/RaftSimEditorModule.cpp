@@ -4398,8 +4398,8 @@ void AddPreviewTerrainMesh(
     const FRaftSimPreviewImage* MaterialAtlasNormal,
     const FRaftSimPreviewImage* MaterialAtlasPacked)
 {
-    constexpr int32 XSteps = 280;
-    constexpr int32 YSteps = 112;
+    constexpr int32 XSteps = 420;
+    constexpr int32 YSteps = 168;
     const float MinX = -5800.0f;
     const float MaxX = 26500.0f;
     const float HalfWidth = Spec.bDesertCanyon ? 4300.0f : 2750.0f;
@@ -4587,10 +4587,11 @@ void AddPreviewTerrainMesh(
                 SourceDrapeColorForTerrain = SourceDrapeColor;
                 bHasSourceDrapeColorForTerrain = true;
                 const float SourceBlend = FMath::Clamp(
-                    (Spec.bDesertCanyon ? 0.10f : (Spec.bHasWaterfalls ? 0.075f : 0.09f)) *
-                        (0.24f + BankT * 0.22f + CanyonT * 0.16f + SourceVegetationT * 0.08f + SourceWaterT * 0.03f),
+                    (Spec.bDesertCanyon ? 0.34f : (Spec.bHasWaterfalls ? 0.30f : 0.32f)) *
+                        (0.36f + BankT * 0.30f + CanyonT * 0.24f + SourceVegetationT * 0.14f -
+                         SourceWaterT * 0.12f),
                     0.0f,
-                    Spec.bDesertCanyon ? 0.10f : 0.09f);
+                    Spec.bDesertCanyon ? 0.34f : (Spec.bHasWaterfalls ? 0.30f : 0.32f));
                 TerrainColor = FMath::Lerp(TerrainColor, SourceDrapeColor, SourceBlend);
             }
             TerrainColor = FMath::Lerp(
@@ -4780,10 +4781,10 @@ void AddPreviewAerialDrapeTiles(
         return;
     }
 
-    constexpr int32 XTiles = 30;
-    constexpr int32 YTiles = 10;
-    constexpr int32 MicrotileSubdivisions = 4;
-    const float SourceOverlayPlateArtifactDemotion = 0.42f;
+    constexpr int32 XTiles = 44;
+    constexpr int32 YTiles = 16;
+    constexpr int32 MicrotileSubdivisions = 8;
+    const float SourceOverlayPlateArtifactDemotion = 0.72f;
     const float MinX = -5600.0f;
     const float MaxX = 26000.0f;
     const float HalfWidth = Spec.bDesertCanyon ? 4300.0f : 2750.0f;
@@ -4805,13 +4806,13 @@ void AddPreviewAerialDrapeTiles(
             }
 
             const float DemotedSourceAerialMicrotileWeight =
-                (Spec.bDesertCanyon ? 0.024f : (Spec.bHasWaterfalls ? 0.018f : 0.022f)) *
+                (Spec.bDesertCanyon ? 0.44f : (Spec.bHasWaterfalls ? 0.36f : 0.40f)) *
                 SourceOverlayPlateArtifactDemotion;
             const float DrapeWeight = DemotedSourceAerialMicrotileWeight;
-            const float HalfLength = TileLength * 0.34f;
-            const float HalfTileWidth = TileWidth * 0.34f;
-            const float SourceOverlayMicrotileEdgeLiftCm = 1.0f;
-            const float TileZOffset = 4.0f;
+            const float HalfLength = TileLength * 0.48f;
+            const float HalfTileWidth = TileWidth * 0.48f;
+            const float SourceOverlayMicrotileEdgeLiftCm = 4.0f;
+            const float TileZOffset = 56.0f;
             const float X0 = X - HalfLength;
             const float X1 = X + HalfLength;
             const float Y0 = Y - HalfTileWidth;
@@ -4890,7 +4891,13 @@ void AddPreviewAerialDrapeTiles(
                     FLinearColor AerialColor = FMath::Lerp(
                         TerrainColor,
                         SourceDrapeColor,
-                        FMath::Clamp(DrapeWeight * EdgeFeather * PatchMottle, 0.0f, 0.012f));
+                        FMath::Clamp(
+                            DrapeWeight *
+                                EdgeFeather *
+                                PatchMottle *
+                                FMath::Clamp(0.70f + BankT * 0.20f + CanyonT * 0.18f, 0.0f, 1.0f),
+                            0.0f,
+                            Spec.bDesertCanyon ? 0.30f : (Spec.bHasWaterfalls ? 0.26f : 0.28f)));
                     AerialColor.R = FMath::Max(AerialColor.R, Spec.TerrainColor.R * 0.68f + 0.015f);
                     AerialColor.G = FMath::Max(AerialColor.G, Spec.TerrainColor.G * 0.68f + 0.015f);
                     AerialColor.B = FMath::Max(AerialColor.B, Spec.TerrainColor.B * 0.68f + 0.015f);
@@ -9605,6 +9612,7 @@ AActor* AddPreviewRiverEyeCenterArtifactCover(UWorld* World, const FRaftSimEnvir
 void AddPreviewNearFieldPhotorealReviewDressing(
     UWorld* World,
     const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FRaftSimPreviewImage* AerialDrape,
     const FRaftSimPreviewImage* TerrainRelief,
     const FRaftSimPreviewImage* HeightfieldPreview)
 {
@@ -9997,6 +10005,25 @@ void AddPreviewNearFieldPhotorealReviewDressing(
                 DrapeColor = ScalePreviewColor(
                     DrapeColor,
                     FMath::Clamp((Spec.bHasWaterfalls ? 1.18f : 1.06f) + TextureNoise * 0.24f, 0.80f, 1.46f));
+                if (AerialDrape && AerialDrape->IsValid())
+                {
+                    float SourceU = 0.0f;
+                    float SourceV = 0.0f;
+                    GetPreviewMaskUv(Spec, X, Y, SourceU, SourceV);
+                    const FLinearColor SourceDrapeColor = NormalizePreviewSourceDrapeAlbedo(
+                        Spec,
+                        AerialDrape->Sample(SourceU, SourceV),
+                        0.0f,
+                        Spec.bDesertCanyon ? 0.08f : 0.24f,
+                        Spec.bDesertCanyon ? 0.34f : (Spec.bHasWaterfalls ? 0.30f : 0.32f));
+                    DrapeColor = FMath::Lerp(
+                        DrapeColor,
+                        SourceDrapeColor,
+                        FMath::Clamp(
+                            (Spec.bDesertCanyon ? 0.30f : 0.34f) + TextureNoise * 0.18f + V * 0.08f,
+                            0.0f,
+                            Spec.bDesertCanyon ? 0.50f : 0.56f));
+                }
                 const float Z = TerrainZ + 20.0f + LongFeather * (8.0f + TextureNoise * (Spec.bDesertCanyon ? 18.0f : 12.0f));
                 Vertices.Add(FVector(X, Y, Z));
                 UVs.Add(FVector2D(U * 12.0f, V * 3.0f));
@@ -10087,6 +10114,22 @@ void AddPreviewNearFieldPhotorealReviewDressing(
                 FleckColor,
                 Spec.bDesertCanyon ? Spec.RockColor : Spec.FoliageColor,
                 Spec.bDesertCanyon ? 0.18f : 0.26f);
+            if (AerialDrape && AerialDrape->IsValid())
+            {
+                float SourceU = 0.0f;
+                float SourceV = 0.0f;
+                GetPreviewMaskUv(Spec, X, Y, SourceU, SourceV);
+                const FLinearColor SourceDrapeColor = NormalizePreviewSourceDrapeAlbedo(
+                    Spec,
+                    AerialDrape->Sample(SourceU, SourceV),
+                    0.0f,
+                    Spec.bDesertCanyon ? 0.08f : 0.24f,
+                    Spec.bDesertCanyon ? 0.34f : (Spec.bHasWaterfalls ? 0.30f : 0.32f));
+                FleckColor = FMath::Lerp(
+                    FleckColor,
+                    SourceDrapeColor,
+                    FMath::Clamp(Spec.bDesertCanyon ? 0.34f : 0.42f, 0.0f, 0.48f));
+            }
             FleckColor = ScalePreviewColor(FleckColor, 0.82f + 0.34f * TextureNoise);
             const FVector Center(X, Y, TerrainZ + 34.0f + 10.0f * TextureNoise);
             const int32 VertexStart = Vertices.Num();
@@ -10735,7 +10778,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
     AddPreviewWaterShaderDepthReflectionScaffoldDetail(World, Spec);
     AddPreviewShallowWaterClarityAndAerationDetail(World, Spec, WaterMaskPtr, PlaneMesh);
     AddPreviewWaterMicroRippleGlintDetail(World, Spec, PlaneMesh);
-    AddPreviewNearFieldPhotorealReviewDressing(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr);
+    AddPreviewNearFieldPhotorealReviewDressing(World, Spec, AerialDrapePtr, TerrainReliefPtr, HeightfieldPreviewPtr);
     AddPreviewFoamAndHydraulics(World, Spec);
     AddPreviewFlowDependentHydraulicAerationAndSprayDetail(
         World,
