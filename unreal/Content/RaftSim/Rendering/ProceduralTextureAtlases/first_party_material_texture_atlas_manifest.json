@@ -302,7 +302,7 @@
     }
   ],
   "promotion_gate": "These atlases may be imported into Unreal material instances as first-party texture candidates, but lifelike approval still requires in-engine material application, guide/geospatial review, hazard readability review, screenshots, and desktop/VR performance evidence.",
-  "current_decision": "Use these deterministic PNG atlases as first-party source inputs for review-only Unreal Texture2D atlas assets. The editor automation now creates nine T_RaftSim_*Atlas Texture2D assets with recorded sRGB/compression/mip/LOD settings and binds them into the 18 review-only material instance candidates. They are not source imagery, not social-media-derived, not production material approval, and not lifelike screenshot evidence until shader graph sampling, guide/geospatial review, hazard readability, captures, and performance gates pass.",
+  "current_decision": "Use these deterministic PNG atlases as first-party source inputs for review-only Unreal Texture2D atlas assets. The editor automation now creates nine T_RaftSim_*Atlas Texture2D assets with recorded sRGB/compression/mip/LOD settings, binds them into the 18 review-only material instance candidates, and wires those candidates to the review-only M_RaftSim_AtlasSampleReview shader graph for albedo, normal, AO, roughness, and height sampling. They are not source imagery, not social-media-derived, not production material approval, and not lifelike screenshot evidence until guide/geospatial review, hazard readability, captures, performance evidence, and production promotion pass.",
   "unreal_texture_asset_root": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
   "unreal_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_material_instance_candidates_not_lifelike",
   "texture_asset_import_settings": {
@@ -333,5 +333,7 @@
       "compression_no_alpha": true,
       "virtual_texture_streaming": false
     }
-  }
+  },
+  "atlas_sampler_review_material": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+  "atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike"
 }
