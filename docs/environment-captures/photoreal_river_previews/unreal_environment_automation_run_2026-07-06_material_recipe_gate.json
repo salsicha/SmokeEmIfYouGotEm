@@ -56,6 +56,7 @@
     "first_party_segmented_wet_bank_ribbons": true,
     "first_party_graphic_waterline_ribbon_demotion": true,
     "first_party_near_frame_shoreline_scaffold_demotion": true,
+    "first_party_pale_bank_shoreline_scaffold_slash_demotion": true,
     "first_party_demoted_source_detail_contours": true,
     "first_party_post_contour_terrain_readability_fill": true,
     "first_party_source_masked_bank_bar_microgeometry": true,
@@ -93,6 +94,7 @@
     "near_camera_water_scaffold_readability_clearance": true,
     "low_occlusion_far_field_water_shader_scaffold": true,
     "first_party_remaining_water_overlay_slab_demotion": true,
+    "first_party_pale_water_foam_slash_demotion": true,
     "first_party_long_dark_water_streak_demotion": true,
     "first_party_current_streak_waterline_artifact_demotion": true,
     "first_party_central_water_scaffold_plate_demotion": true,
@@ -124,7 +126,7 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [52.88, 83.7, 88.56],
+      "rgb_mean": [52.86, 83.69, 88.55],
       "nonblank": true
     },
     {
@@ -136,7 +138,7 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [71.22, 65.81, 55.67],
+      "rgb_mean": [71.21, 65.79, 55.64],
       "nonblank": true
     },
     {
@@ -148,7 +150,7 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [32.53, 67.42, 66.94],
+      "rgb_mean": [32.5, 67.4, 66.92],
       "nonblank": true
     },
     {
@@ -185,6 +187,8 @@
     "Added a first-party source-drape smoothing pass that clamps bright source imagery, reduces aerial microtile density and blend weight, and lowers bank/rill/scaffold overlay density so source-derived terrain cues stop reading as hard painted bands.",
     "Segmented wet-bank and source-detail ribbons by lowering their width, height, color gain, continuity, and secondary band count so waterline review cues do not read as continuous painted slabs.",
     "Demoted near-frame wet-bank, shallow-water, and aeration scaffold lines so foreground review frames preserve the downstream river read.",
+    "Demoted pale bank/shoreline scaffold slash artifacts by reducing wet-bank rail, terrain-material facet, and Landscape/Nanite scaffold width, relief, and color influence so source/material cues remain without long bright synthetic slashes dominating river-eye frames.",
+    "Demoted pale foam slash artifacts by shrinking foam-ribbon width and blending generated foam/wave cues back toward each river's base water color so bright placeholder marks stop dominating downstream review frames.",
     "Demoted procedural source-detail contour bands to zero active bands in the preview renderer while preserving narrower waterline/gravel ribbons for review cues.",
     "Raised the bounded terrain readability fill from 0.16 to 0.22 after contour demotion, staying below the rejected flat 0.42 override while keeping dark proxy banks reviewable.",
     "Demoted remaining water overlay slab artifacts by pushing water-shader scaffolds, hydraulic mats, glints, current streaks, and foam/ribbon overlays farther downstream while lowering width, opacity, count, and color contrast.",
