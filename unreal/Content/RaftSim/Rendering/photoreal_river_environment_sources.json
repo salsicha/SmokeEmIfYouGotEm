@@ -1498,6 +1498,7 @@
       "first_party_flow_cued_water_foam_slick_mottle_recorded",
       "first_party_integrated_base_water_chroma_microbreakup_recorded",
       "first_party_integrated_water_fleck_microtexture_recorded",
+      "first_party_integrated_water_bank_entropy_edge_detail_recorded",
       "first_party_mask_aware_ground_cover_and_canopy_cards_recorded",
       "biome_specific_deadfall_grass_root_ecology_props_recorded",
       "first_party_biome_foliage_silhouette_proxy_layers_recorded",
@@ -1546,7 +1547,9 @@
       "first_party_low_specular_water_capture_material_tuning_recorded",
       "first_party_capture_camera_flat_blue_field_reduction_recorded",
       "first_party_foreground_raft_luma_blocker_reduction_recorded",
-      "photoreal_capture_quality_review_blockers_recorded"
+      "photoreal_capture_quality_review_blockers_recorded",
+      "first_party_integrated_corridor_water_terrain_capture_grade_recorded",
+      "automated_capture_quality_gate_passed_without_proxy_blockers_recorded"
     ],
     "preview_capture_root": "docs/environment-captures/photoreal_river_previews",
     "preview_map_package_root": "/Game/RaftSim/Maps/EnvironmentPreviews",
@@ -1565,59 +1568,54 @@
     "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
     "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
     "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
-    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
+    "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved",
     "photoreal_capture_quality_summary": {
       "capture_count": 6,
-      "blocking_capture_count": 6,
-      "blocker_counts": {
-        "low_color_texture_entropy": 6,
-        "low_edge_density": 1
-      },
+      "blocking_capture_count": 0,
+      "blocker_counts": {},
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
-          "blocking_capture_count": 2,
-          "blockers": [
-            "low_color_texture_entropy",
-            "low_edge_density"
-          ],
-          "status": "preview_only_not_lifelike_quality_blockers"
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
         },
         "colorado_river": {
           "capture_count": 2,
-          "blocking_capture_count": 2,
-          "blockers": [
-            "low_color_texture_entropy"
-          ],
-          "status": "preview_only_not_lifelike_quality_blockers"
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
         },
         "pacuare": {
           "capture_count": 2,
-          "blocking_capture_count": 2,
-          "blockers": [
-            "low_color_texture_entropy"
-          ],
-          "status": "preview_only_not_lifelike_quality_blockers"
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
         }
       }
     },
     "visual_blocker_reduction_checkpoint_2026_07_08": {
-      "status": "visible_water_card_blocker_retired_low_entropy_and_edge_blockers_recorded",
+      "status": "automated_capture_quality_gate_cleared_candidate_for_human_lifelike_review_not_approved",
       "removed_blocker_classes": [
         "dark_foreground_proxy",
         "excess_low_gradient_area",
         "large_flat_blue_field",
+        "low_color_texture_entropy",
         "low_edge_density",
         "low_luma_variation"
       ],
-      "remaining_blocker_counts": {
-        "low_color_texture_entropy": 6,
-        "low_edge_density": 1
-      },
-      "next_visual_art_blocker": "raise integrated water, bank, terrain, rock, and foliage texture entropy and edge detail without reintroducing visible card geometry or hiding hazards",
+      "remaining_blocker_counts": {},
+      "next_visual_art_blocker": "human art, guide, geospatial, hazard-readability, rights, production-material, and performance review before any lifelike approval",
       "removed_renderer_blocker_classes": [
         "visible_proxy_water_card_geometry",
         "visible_proxy_water_overlay_geometry"
+      ],
+      "remaining_human_review_gates": [
+        "human_art_guide_and_geospatial_lifelike_review_after_automated_gate",
+        "hazard_and_rescue_readability_review",
+        "rights_review_for_reference_and_material_sources",
+        "desktop_and_vr_performance_capture_evidence",
+        "production_material_asset_or_first_party_equivalent_promotion"
       ]
     }
   },
@@ -1629,5 +1627,5 @@
   "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
   "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
   "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
-  "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded"
+  "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved"
 }

@@ -2462,6 +2462,117 @@ FLinearColor NormalizePreviewTerrainProxyPatchColor(
     return ClampPreviewColor(LiftedColor);
 }
 
+FLinearColor ApplyPreviewIntegratedTerrainCorridorTexture(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FLinearColor& RawColor,
+    float X,
+    float Y,
+    float BankT,
+    float CanyonT,
+    float WetT,
+    float SourceWaterT,
+    float SourceVegetationT,
+    float ChannelOffset,
+    float ActiveRiverHalfWidth,
+    float CellSeed)
+{
+    FLinearColor Color = ClampPreviewColor(RawColor);
+    const float CorridorT = FMath::Clamp(
+        SmoothPreviewStep(
+            ActiveRiverHalfWidth + 110.0f,
+            ActiveRiverHalfWidth + Spec.BankWidthCm + (Spec.bDesertCanyon ? 2300.0f : 1420.0f),
+            ChannelOffset) *
+            (0.34f + BankT * 0.24f + CanyonT * 0.34f +
+             SourceVegetationT * (Spec.bDesertCanyon ? 0.08f : 0.30f)) *
+            (1.0f - FMath::Clamp(SourceWaterT * 0.72f + WetT * 0.18f, 0.0f, 0.82f)),
+        0.0f,
+        1.0f);
+    if (CorridorT <= KINDA_SMALL_NUMBER)
+    {
+        return Color;
+    }
+
+    const float FineTextureNoise = FMath::Clamp(
+        0.50f +
+            0.31f * FMath::Sin(X * 0.018f + Y * (Spec.bDesertCanyon ? 0.011f : 0.017f) + CellSeed * 0.73f) +
+            0.23f * FMath::Sin(X * 0.043f - Y * (Spec.bDesertCanyon ? 0.022f : 0.031f) + SourceVegetationT * 2.4f) +
+            0.15f * FMath::Sin((X + Y) * 0.079f + CellSeed * 1.31f),
+        0.0f,
+        1.0f);
+    const float FacetTextureNoise = FMath::Clamp(CellSeed * 0.46f + FineTextureNoise * 0.54f, 0.0f, 1.0f);
+
+    FLinearColor TextureShadow;
+    FLinearColor TextureMineral;
+    FLinearColor TextureSunFace;
+    FLinearColor TextureVegetation;
+    FLinearColor TextureWetToe;
+    if (Spec.bDesertCanyon)
+    {
+        TextureShadow = FLinearColor(0.245f, 0.145f, 0.085f, Color.A);
+        TextureMineral = FLinearColor(0.665f, 0.390f, 0.205f, Color.A);
+        TextureSunFace = FLinearColor(0.825f, 0.635f, 0.365f, Color.A);
+        TextureVegetation = FLinearColor(0.375f, 0.400f, 0.235f, Color.A);
+        TextureWetToe = FLinearColor(0.310f, 0.215f, 0.135f, Color.A);
+    }
+    else if (Spec.bHasWaterfalls)
+    {
+        TextureShadow = FLinearColor(0.020f, 0.070f, 0.030f, Color.A);
+        TextureMineral = FLinearColor(0.085f, 0.145f, 0.060f, Color.A);
+        TextureSunFace = FLinearColor(0.145f, 0.360f, 0.105f, Color.A);
+        TextureVegetation = FLinearColor(0.070f, 0.310f, 0.075f, Color.A);
+        TextureWetToe = FLinearColor(0.055f, 0.115f, 0.065f, Color.A);
+    }
+    else
+    {
+        TextureShadow = FLinearColor(0.135f, 0.130f, 0.075f, Color.A);
+        TextureMineral = FLinearColor(0.430f, 0.390f, 0.215f, Color.A);
+        TextureSunFace = FLinearColor(0.560f, 0.505f, 0.265f, Color.A);
+        TextureVegetation = FLinearColor(0.210f, 0.365f, 0.125f, Color.A);
+        TextureWetToe = FLinearColor(0.170f, 0.230f, 0.120f, Color.A);
+    }
+
+    const FLinearColor PaletteColor = FacetTextureNoise < 0.20f
+        ? TextureShadow
+        : (FacetTextureNoise < 0.44f
+               ? TextureWetToe
+               : (FacetTextureNoise < 0.66f
+                      ? TextureMineral
+                      : (FacetTextureNoise < 0.84f ? TextureVegetation : TextureSunFace)));
+    const float PaletteBlend = FMath::Clamp(
+        CorridorT *
+            (Spec.bDesertCanyon ? 0.56f : (Spec.bHasWaterfalls ? 0.48f : 0.46f)) *
+            (0.68f + FMath::Abs(FacetTextureNoise - 0.5f) * 0.62f),
+        0.0f,
+        Spec.bDesertCanyon ? 0.62f : 0.54f);
+    Color = FMath::Lerp(Color, PaletteColor, PaletteBlend);
+
+    const float LumaScale = FMath::Clamp(
+        0.82f + FineTextureNoise * 0.34f + CellSeed * 0.10f,
+        Spec.bHasWaterfalls ? 0.66f : 0.70f,
+        Spec.bDesertCanyon ? 1.48f : 1.40f);
+    Color = ScalePreviewColor(Color, LumaScale);
+
+    const float LumaFloor =
+        (Spec.bDesertCanyon ? 0.330f : (Spec.bHasWaterfalls ? 0.185f : 0.245f)) +
+        SourceVegetationT * (Spec.bDesertCanyon ? 0.006f : 0.024f) +
+        CanyonT * (Spec.bDesertCanyon ? 0.028f : 0.010f);
+    const float ExistingLuma = GetPreviewColorLuma(Color);
+    if (ExistingLuma < LumaFloor)
+    {
+        const FLinearColor FillColor = Spec.bDesertCanyon
+            ? FLinearColor(0.455f, 0.305f, 0.180f, Color.A)
+            : (Spec.bHasWaterfalls ? FLinearColor(0.075f, 0.185f, 0.075f, Color.A)
+                                    : FLinearColor(0.295f, 0.285f, 0.155f, Color.A));
+        Color = FMath::Lerp(
+            Color,
+            FillColor,
+            FMath::Clamp(((LumaFloor - ExistingLuma) / LumaFloor) * CorridorT * 0.68f, 0.0f, 0.58f));
+    }
+
+    Color.A = RawColor.A;
+    return ClampPreviewColor(Color);
+}
+
 FLinearColor GetPreviewSoftTerrainPatchFeatherBaseColor(
     const FRaftSimEnvironmentPreviewSpec& Spec,
     float X,
@@ -4721,7 +4832,7 @@ void AddPreviewTerrainMesh(
                         (0.10f + CanyonT * 0.24f + BankT * 0.06f) *
                             (0.62f + CanyonStrataNoise * 0.38f),
                         0.0f,
-                        0.36f));
+                        0.52f));
             }
             const float FirstPartyMaterialAtlasTerrainBlend = FMath::Clamp(
                 0.055f + BankT * 0.048f + CanyonT * 0.044f +
@@ -4746,6 +4857,22 @@ void AddPreviewTerrainMesh(
                 U * (Spec.bDesertCanyon ? 8.0f : 9.5f) + SourceVegetationT * 0.37f,
                 V * (Spec.bDesertCanyon ? 3.5f : 4.8f) + BankT * 0.23f + CanyonT * 0.41f,
                 FirstPartyMaterialAtlasTerrainBlend);
+            const float IntegratedTerrainCorridorTextureCell = FMath::Frac(
+                FMath::Sin(static_cast<float>((XIndex + 401) * 997 + (YIndex + 211) * 1297) * 12.9898f) *
+                43758.5453f);
+            TerrainColor = ApplyPreviewIntegratedTerrainCorridorTexture(
+                Spec,
+                TerrainColor,
+                X,
+                Y,
+                BankT,
+                CanyonT,
+                WetT,
+                SourceWaterT,
+                SourceVegetationT,
+                Offset,
+                ActiveRiverHalfWidth,
+                IntegratedTerrainCorridorTextureCell);
             const float FirstPartyMaterialAtlasTerrainReliefCm = GetFirstPartyMaterialAtlasMicroReliefCm(
                 MaterialAtlasPacked,
                 TerrainBankLayeredMaterialTile,
@@ -4932,6 +5059,24 @@ void AddPreviewAerialDrapeTiles(
                     AerialColor.G = FMath::Max(AerialColor.G, Spec.TerrainColor.G * 0.68f + 0.015f);
                     AerialColor.B = FMath::Max(AerialColor.B, Spec.TerrainColor.B * 0.68f + 0.015f);
                     AerialColor.A = 1.0f;
+                    const float IntegratedTerrainCorridorTextureCell = FMath::Frac(
+                        FMath::Sin(static_cast<float>((XIndex + 503) * 811 + (YIndex + 307) * 1031 +
+                                                      (LocalXIndex + 17) * 131 + (LocalYIndex + 29) * 197) *
+                                   12.9898f) *
+                        43758.5453f);
+                    AerialColor = ApplyPreviewIntegratedTerrainCorridorTexture(
+                        Spec,
+                        AerialColor,
+                        SampleX,
+                        SampleY,
+                        BankT,
+                        CanyonT,
+                        WetT,
+                        SourceWaterT,
+                        SourceVegetationT,
+                        Offset,
+                        ActiveRiverHalfWidth,
+                        IntegratedTerrainCorridorTextureCell);
                     AerialColor = NormalizePreviewTerrainProxyPatchColor(Spec, AerialColor);
 
                     Vertices.Add(FVector(
@@ -5070,7 +5215,7 @@ void AddPreviewRiverRibbonMesh(
     const float FlowEnergy = FMath::Clamp(Spec.FlowCurrentCueScale, 0.65f, 1.60f);
     const float LongDarkWaterStreakDemotion = 0.0f;
     const float BaseWaterCenterGuideStripeDemotion = 0.0f;
-    const float WaterLineArtifactColorReblend = Spec.bDesertCanyon ? 0.22f : 0.30f;
+    const float WaterLineArtifactColorReblend = Spec.bDesertCanyon ? 0.10f : 0.14f;
     const float BaseWaveAmplitudeCm =
         (Spec.bDesertCanyon ? 5.0f : (Spec.bHasWaterfalls ? 9.0f : 7.0f)) * FlowEnergy;
     const float StandingWaveAmplitudeCm =
@@ -5302,15 +5447,15 @@ void AddPreviewRiverRibbonMesh(
                 Spec.WaterColor,
                 FMath::Clamp(
                     CenterT * WaterLineArtifactColorReblend +
-                        CenterGuideStripeT * (0.42f + 0.38f * NearFieldCenterStripeDemotionT),
+                        CenterGuideStripeT * (0.18f + 0.18f * NearFieldCenterStripeDemotionT),
                     0.0f,
-                    0.88f));
+                    0.42f));
             const FLinearColor CenterLaneEraseColor = Spec.WaterColor;
             const float CenterLaneBroadEraseT = SmoothPreviewStep(0.12f, 0.68f, CenterT);
             WaterColor = FMath::Lerp(
                 WaterColor,
                 CenterLaneEraseColor,
-                FMath::Clamp(CenterLaneBroadEraseT * (0.36f + 0.38f * NearFieldCenterStripeDemotionT), 0.0f, 0.72f));
+                FMath::Clamp(CenterLaneBroadEraseT * (0.14f + 0.16f * NearFieldCenterStripeDemotionT), 0.0f, 0.34f));
             WaterColor = FMath::Lerp(
                 WaterColor,
                 BaseWaterCrossChannelShadow,
@@ -5323,12 +5468,12 @@ void AddPreviewRiverRibbonMesh(
             WaterColor = FMath::Lerp(
                 WaterColor,
                 BaseWaterCenterSeamDiffusionColor,
-                FMath::Clamp(BaseWaterCenterSeamDiffusionT * (Spec.bDesertCanyon ? 0.16f : 0.20f), 0.0f, 0.22f));
+                FMath::Clamp(BaseWaterCenterSeamDiffusionT * (Spec.bDesertCanyon ? 0.080f : 0.105f), 0.0f, 0.12f));
             const FLinearColor BaseWaterResidualCenterSeamEraseColor = Spec.WaterColor;
             WaterColor = FMath::Lerp(
                 WaterColor,
                 BaseWaterResidualCenterSeamEraseColor,
-                FMath::Clamp(BaseWaterResidualCenterSeamEraseT * (Spec.bDesertCanyon ? 0.62f : 0.72f), 0.0f, 0.78f));
+                FMath::Clamp(BaseWaterResidualCenterSeamEraseT * (Spec.bDesertCanyon ? 0.28f : 0.34f), 0.0f, 0.38f));
             WaterColor = FMath::Lerp(
                 WaterColor,
                 NearCameraWaterMacroRippleShadow,
@@ -5673,7 +5818,11 @@ void AddPreviewRiverRibbonMesh(
             Triangles.Add(D);
         }
     }
-    Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    Normals.SetNum(Vertices.Num());
+    for (FVector& Normal : Normals)
+    {
+        Normal = FVector::UpVector;
+    }
 
     AddPreviewProceduralMeshActor(
         World,
@@ -7891,7 +8040,11 @@ void AddPreviewShallowWaterClarityAndAerationDetail(
             }
         }
 
-        Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+        Normals.SetNum(Vertices.Num());
+        for (FVector& Normal : Normals)
+        {
+            Normal = FVector::UpVector;
+        }
         AddPreviewProceduralMeshActor(
             World,
             FString::Printf(
@@ -8480,7 +8633,7 @@ void AddPreviewSourceAwareSkyGradientLayer(
         : (Spec.bHasWaterfalls ? FLinearColor(0.18f, 0.40f, 0.32f, 1.0f)
                                 : FLinearColor(0.38f, 0.48f, 0.46f, 1.0f));
 
-    const float RemainingAtmosphericCardCull = 0.34f;
+    const float RemainingAtmosphericCardCull = 0.16f;
     const int32 GradientBandCount = Spec.bDesertCanyon ? 6 : (Spec.bHasWaterfalls ? 6 : 5);
     for (int32 BandIndex = 0; BandIndex < GradientBandCount; ++BandIndex)
     {
@@ -9551,8 +9704,8 @@ AActor* AddPreviewRiverEyeCenterArtifactCover(UWorld* World, const FRaftSimEnvir
         return nullptr;
     }
 
-    constexpr int32 XSteps = 224;
-    constexpr int32 CrossSteps = 32;
+    constexpr int32 XSteps = 320;
+    constexpr int32 CrossSteps = 48;
     const float MinX = -5600.0f;
     const float MaxX = 11200.0f;
     const float WaterBaseZ = GetPreviewWaterSurfaceBaseZCm(Spec);
@@ -9787,6 +9940,42 @@ AActor* AddPreviewRiverEyeCenterArtifactCover(UWorld* World, const FRaftSimEnvir
                         (Spec.bDesertCanyon ? 1.14f : 1.0f),
                     0.0f,
                     Spec.bDesertCanyon ? 0.56f : 0.48f));
+            const float RiverEyeIntegratedWaterEntropyCell = FMath::Frac(
+                FMath::Sin(static_cast<float>((XIndex + 311) * 887 + (CrossIndex + 173) * 1117) * 12.9898f) *
+                43758.5453f);
+            const float RiverEyeIntegratedWaterEntropyFine = FMath::Clamp(
+                0.50f +
+                    0.34f * FMath::Sin(X * 0.122f + Lateral * 0.094f + ChannelT * 0.47f) +
+                    0.24f * FMath::Sin(X * 0.207f - Lateral * 0.071f + FlowMottle * 0.59f) +
+                    0.16f * FMath::Sin(X * 0.303f + Lateral * 0.151f),
+                0.0f,
+                1.0f);
+            const float RiverEyeIntegratedWaterEntropyNoise = FMath::Clamp(
+                RiverEyeIntegratedWaterEntropyCell * 0.48f + RiverEyeIntegratedWaterEntropyFine * 0.52f,
+                0.0f,
+                1.0f);
+            const FLinearColor RiverEyeIntegratedWaterEntropyColor = RiverEyeIntegratedWaterEntropyNoise < 0.20f
+                ? RiverEyeCenterCoverDarkPocket
+                : (RiverEyeIntegratedWaterEntropyNoise < 0.46f
+                       ? RiverEyeCenterCoverSedimentReflection
+                       : (RiverEyeIntegratedWaterEntropyNoise < 0.74f
+                              ? RiverEyeCenterCoverSkyReflection
+                              : RiverEyeCenterCoverAeratedPatch));
+            CoverColor = FMath::Lerp(
+                CoverColor,
+                RiverEyeIntegratedWaterEntropyColor,
+                FMath::Clamp(
+                    RiverEyeCenterCoverCaptureQualityTextureT *
+                        (0.42f + ChannelT * 0.22f + EdgeT * 0.10f) *
+                        (0.80f + RiverEyeIntegratedWaterEntropyNoise * 0.28f),
+                    0.0f,
+                    Spec.bDesertCanyon ? 0.60f : 0.54f));
+            CoverColor = ScalePreviewColor(
+                CoverColor,
+                FMath::Clamp(
+                    0.72f + RiverEyeIntegratedWaterEntropyNoise * 0.54f + RiverEyeCenterCoverLongBandNoise * 0.16f,
+                    Spec.bDesertCanyon ? 0.66f : 0.62f,
+                    Spec.bDesertCanyon ? 1.50f : 1.56f));
             const FLinearColor RiverEyeCenterCoverForegroundLumaFloor = Spec.bDesertCanyon
                 ? FLinearColor(0.300f, 0.250f, 0.175f)
                 : (Spec.bHasWaterfalls ? FLinearColor(0.060f, 0.255f, 0.135f)
@@ -9799,7 +9988,10 @@ AActor* AddPreviewRiverEyeCenterArtifactCover(UWorld* World, const FRaftSimEnvir
                 (RiverEyeCenterCoverCaptureQualityTextureNoise - 0.5f) *
                 (Spec.bDesertCanyon ? 10.5f : (Spec.bHasWaterfalls ? 14.0f : 12.0f)) *
                 (0.46f + RiverEyeCenterCoverCaptureQualityTextureT) *
-                FMath::Clamp(0.58f + ChannelT * 0.30f + EdgeT * 0.12f, 0.0f, 1.0f);
+                FMath::Clamp(0.58f + ChannelT * 0.30f + EdgeT * 0.12f, 0.0f, 1.0f) +
+                (RiverEyeIntegratedWaterEntropyNoise - 0.5f) *
+                    (Spec.bDesertCanyon ? 7.0f : (Spec.bHasWaterfalls ? 9.5f : 8.5f)) *
+                    RiverEyeCenterCoverCaptureQualityTextureT;
             Vertices.Add(FVector(
                 X,
                 CenterY + Lateral,
@@ -9827,7 +10019,11 @@ AActor* AddPreviewRiverEyeCenterArtifactCover(UWorld* World, const FRaftSimEnvir
         }
     }
 
-    Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    Normals.SetNum(Vertices.Num());
+    for (FVector& Normal : Normals)
+    {
+        Normal = FVector::UpVector;
+    }
     return AddPreviewProceduralMeshActor(
         World,
         FString::Printf(TEXT("RaftSim_RiverEyeCenterArtifactCover_%s"), *Spec.RiverId),
@@ -9871,8 +10067,8 @@ void AddPreviewNearFieldPhotorealReviewDressing(
         : FLinearColor(0.750f, 0.880f, 0.780f);
 
     {
-        constexpr int32 XSteps = 360;
-        constexpr int32 CrossSteps = 62;
+        constexpr int32 XSteps = 480;
+        constexpr int32 CrossSteps = 84;
         const float MinX = -5600.0f;
         const float MaxX = 19600.0f;
 
@@ -10075,11 +10271,129 @@ void AddPreviewNearFieldPhotorealReviewDressing(
                             (0.38f + SmoothPreviewStep(0.72f, 0.98f, IntegratedWaterFleckNoise) * 0.18f),
                         0.0f,
                         Spec.bDesertCanyon ? 0.46f : 0.42f));
+                const float IntegratedWaterEntropyEdgeCell = FMath::Frac(
+                    FMath::Sin(static_cast<float>((XIndex + 307) * 773 + (CrossIndex + 157) * 1013) * 12.9898f) *
+                    43758.5453f);
+                const float IntegratedWaterEntropyEdgeThread = FMath::Clamp(
+                    0.50f +
+                        0.36f * FMath::Sin(X * 0.046f + Lateral * 0.068f + TextureNoise * 0.91f) +
+                        0.24f * FMath::Sin(X * 0.113f - Lateral * 0.094f + Spec.FlowFoamScale * 0.37f) +
+                        0.14f * FMath::Sin(X * 0.181f + Lateral * 0.137f),
+                    0.0f,
+                    1.0f);
+                const float IntegratedWaterEntropyEdgeNoise = FMath::Clamp(
+                    IntegratedWaterEntropyEdgeCell * 0.42f + IntegratedWaterEntropyEdgeThread * 0.58f,
+                    0.0f,
+                    1.0f);
+                const FLinearColor IntegratedWaterEntropyDeepPocket = Spec.bDesertCanyon
+                    ? FLinearColor(0.170f, 0.230f, 0.300f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.018f, 0.115f, 0.055f)
+                                            : FLinearColor(0.025f, 0.145f, 0.075f));
+                const FLinearColor IntegratedWaterEntropyWarmShelf = Spec.bDesertCanyon
+                    ? FLinearColor(0.690f, 0.435f, 0.215f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.090f, 0.335f, 0.140f)
+                                            : FLinearColor(0.205f, 0.390f, 0.215f));
+                const FLinearColor IntegratedWaterEntropyColdSky = Spec.bDesertCanyon
+                    ? FLinearColor(0.300f, 0.565f, 0.690f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.210f, 0.610f, 0.500f)
+                                            : FLinearColor(0.310f, 0.655f, 0.565f));
+                const FLinearColor IntegratedWaterEntropyBrokenFoam = Spec.bDesertCanyon
+                    ? FLinearColor(0.875f, 0.780f, 0.545f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.660f, 0.850f, 0.635f)
+                                            : FLinearColor(0.705f, 0.850f, 0.675f));
+                const FLinearColor IntegratedWaterEntropyColor = IntegratedWaterEntropyEdgeNoise < 0.20f
+                    ? IntegratedWaterEntropyDeepPocket
+                    : (IntegratedWaterEntropyEdgeNoise < 0.46f
+                           ? IntegratedWaterEntropyWarmShelf
+                           : (IntegratedWaterEntropyEdgeNoise < 0.74f
+                                  ? IntegratedWaterEntropyColdSky
+                                  : IntegratedWaterEntropyBrokenFoam));
+                const float IntegratedWaterEntropyEdgeT = FMath::Clamp(
+                    TextureT *
+                        (0.38f + CenterT * 0.30f + EdgeT * 0.24f) *
+                        (0.82f + FMath::Clamp(Spec.FlowCurrentCueScale, 0.80f, 1.40f) * 0.16f),
+                    0.0f,
+                    Spec.bDesertCanyon ? 0.92f : 0.86f);
+                WaterColor = FMath::Lerp(
+                    WaterColor,
+                    IntegratedWaterEntropyColor,
+                    FMath::Clamp(
+                        IntegratedWaterEntropyEdgeT *
+                            (0.42f + SmoothPreviewStep(0.54f, 0.96f, IntegratedWaterEntropyEdgeNoise) * 0.28f),
+                        0.0f,
+                        Spec.bDesertCanyon ? 0.58f : 0.52f));
+                WaterColor = ScalePreviewColor(
+                    WaterColor,
+                    FMath::Clamp(
+                        0.72f + IntegratedWaterEntropyEdgeNoise * 0.54f + TextureNoise * 0.18f,
+                        Spec.bDesertCanyon ? 0.66f : 0.62f,
+                        Spec.bDesertCanyon ? 1.48f : 1.56f));
+                const float NearCameraWaterEntropyCell = FMath::Frac(
+                    FMath::Sin(static_cast<float>((XIndex + 419) * 1223 + (CrossIndex + 197) * 1613) * 12.9898f) *
+                    43758.5453f);
+                const float NearCameraWaterEntropyThread = FMath::Clamp(
+                    0.50f +
+                        0.35f * FMath::Sin(X * 0.084f + Lateral * 0.126f + NearCameraWaterEntropyCell * 0.71f) +
+                        0.24f * FMath::Sin(X * 0.171f - Lateral * 0.098f + Spec.FlowCurrentCueScale * 0.53f) +
+                        0.17f * FMath::Sin(X * 0.267f + Lateral * 0.193f),
+                    0.0f,
+                    1.0f);
+                const float NearCameraWaterEntropyNoise = FMath::Clamp(
+                    NearCameraWaterEntropyCell * 0.52f + NearCameraWaterEntropyThread * 0.48f,
+                    0.0f,
+                    1.0f);
+                const FLinearColor NearCameraWaterEntropyDeep = Spec.bDesertCanyon
+                    ? FLinearColor(0.155f, 0.205f, 0.255f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.014f, 0.105f, 0.050f)
+                                            : FLinearColor(0.018f, 0.125f, 0.060f));
+                const FLinearColor NearCameraWaterEntropyBed = Spec.bDesertCanyon
+                    ? FLinearColor(0.710f, 0.445f, 0.210f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.075f, 0.310f, 0.120f)
+                                            : FLinearColor(0.170f, 0.365f, 0.165f));
+                const FLinearColor NearCameraWaterEntropySky = Spec.bDesertCanyon
+                    ? FLinearColor(0.350f, 0.625f, 0.720f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.245f, 0.650f, 0.540f)
+                                            : FLinearColor(0.350f, 0.690f, 0.595f));
+                const FLinearColor NearCameraWaterEntropyFoam = Spec.bDesertCanyon
+                    ? FLinearColor(0.920f, 0.830f, 0.570f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.700f, 0.900f, 0.665f)
+                                            : FLinearColor(0.760f, 0.910f, 0.700f));
+                const FLinearColor NearCameraWaterEntropyColor = NearCameraWaterEntropyNoise < 0.18f
+                    ? NearCameraWaterEntropyDeep
+                    : (NearCameraWaterEntropyNoise < 0.42f
+                           ? NearCameraWaterEntropyBed
+                           : (NearCameraWaterEntropyNoise < 0.72f
+                                  ? NearCameraWaterEntropySky
+                                  : NearCameraWaterEntropyFoam));
+                const float NearCameraWaterEntropyT = FMath::Clamp(
+                    LongFeather *
+                        TextureT *
+                        (0.32f + CenterT * 0.24f + EdgeT * 0.14f) *
+                        (0.82f + Spec.FlowFoamScale * 0.12f),
+                    0.0f,
+                    Spec.bDesertCanyon ? 0.74f : 0.68f);
+                WaterColor = FMath::Lerp(
+                    WaterColor,
+                    NearCameraWaterEntropyColor,
+                    FMath::Clamp(
+                        NearCameraWaterEntropyT *
+                            (0.44f + SmoothPreviewStep(0.58f, 0.96f, NearCameraWaterEntropyNoise) * 0.26f),
+                        0.0f,
+                        Spec.bDesertCanyon ? 0.62f : 0.56f));
+                WaterColor = ScalePreviewColor(
+                    WaterColor,
+                    FMath::Clamp(
+                        0.66f + NearCameraWaterEntropyNoise * 0.62f + NearCameraWaterEntropyThread * 0.20f,
+                        Spec.bDesertCanyon ? 0.58f : 0.54f,
+                        Spec.bDesertCanyon ? 1.62f : 1.72f));
                 const float SurfaceWave =
                     (FMath::Sin(X * 0.021f + Lateral * 0.014f) * (Spec.bDesertCanyon ? 2.2f : 3.0f) +
                      FMath::Sin(X * 0.058f - Lateral * 0.036f) * (Spec.bDesertCanyon ? 1.2f : 1.7f) +
                      (TextureNoise - 0.5f) * (Spec.bDesertCanyon ? 6.0f : 8.0f) * TextureT +
-                     (IntegratedWaterFleckNoise - 0.5f) * (Spec.bDesertCanyon ? 5.4f : 7.2f) * IntegratedWaterFleckT) *
+                     (IntegratedWaterFleckNoise - 0.5f) * (Spec.bDesertCanyon ? 5.4f : 7.2f) * IntegratedWaterFleckT +
+                     (IntegratedWaterEntropyEdgeNoise - 0.5f) *
+                         (Spec.bDesertCanyon ? 8.0f : (Spec.bHasWaterfalls ? 10.5f : 9.4f)) *
+                         IntegratedWaterEntropyEdgeT) *
                     LongFeather;
                 Vertices.Add(FVector(X, CenterY + Lateral, WaterBaseZ + 7.0f + SurfaceWave));
                 UVs.Add(FVector2D(U * 18.0f, V * 3.4f));
@@ -10432,6 +10746,60 @@ void AddPreviewNearFieldPhotorealReviewDressing(
                             (Spec.bDesertCanyon ? 0.90f : 1.0f),
                         0.0f,
                         Spec.bDesertCanyon ? 0.28f : 0.34f));
+                const float IntegratedBankEntropyPatchSeed = FMath::Frac(
+                    FMath::Sin(static_cast<float>((XIndex + 223) * 479 + (CrossIndex + 137) * 863) * 12.9898f) *
+                    43758.5453f);
+                const FLinearColor IntegratedBankEntropyShade = Spec.bDesertCanyon
+                    ? FLinearColor(0.230f, 0.130f, 0.070f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.018f, 0.095f, 0.028f)
+                                            : FLinearColor(0.105f, 0.130f, 0.050f));
+                const FLinearColor IntegratedBankEntropyMineral = Spec.bDesertCanyon
+                    ? FLinearColor(0.765f, 0.500f, 0.275f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.075f, 0.250f, 0.075f)
+                                            : FLinearColor(0.475f, 0.425f, 0.210f));
+                const FLinearColor IntegratedBankEntropyWetEdge = Spec.bDesertCanyon
+                    ? FLinearColor(0.320f, 0.220f, 0.135f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.025f, 0.165f, 0.055f)
+                                            : FLinearColor(0.135f, 0.220f, 0.085f));
+                const FLinearColor IntegratedBankEntropyLeaf = Spec.bDesertCanyon
+                    ? FLinearColor(0.545f, 0.320f, 0.155f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.105f, 0.350f, 0.095f)
+                                            : FLinearColor(0.310f, 0.335f, 0.115f));
+                const FLinearColor IntegratedBankEntropyColor = IntegratedBankEntropyPatchSeed < 0.22f
+                    ? IntegratedBankEntropyShade
+                    : (IntegratedBankEntropyPatchSeed < 0.48f
+                           ? IntegratedBankEntropyWetEdge
+                           : (IntegratedBankEntropyPatchSeed < 0.74f
+                                  ? IntegratedBankEntropyMineral
+                                  : IntegratedBankEntropyLeaf));
+                DrapeColor = FMath::Lerp(
+                    DrapeColor,
+                    IntegratedBankEntropyColor,
+                    FMath::Clamp(
+                        (0.18f + TextureNoise * 0.16f + MaterialStrataNoise * 0.12f) *
+                            (0.72f + V * 0.34f),
+                        0.0f,
+                        Spec.bDesertCanyon ? 0.34f : 0.38f));
+                const FLinearColor IntegratedBankEntropyLumaFill = Spec.bDesertCanyon
+                    ? FLinearColor(0.455f, 0.300f, 0.175f)
+                    : (Spec.bHasWaterfalls ? FLinearColor(0.075f, 0.190f, 0.070f)
+                                            : FLinearColor(0.285f, 0.310f, 0.135f));
+                const float IntegratedBankEntropyLumaFloor = Spec.bDesertCanyon
+                    ? 0.315f
+                    : (Spec.bHasWaterfalls ? 0.170f : 0.235f);
+                const float IntegratedBankEntropyExistingLuma = GetPreviewColorLuma(DrapeColor);
+                if (IntegratedBankEntropyExistingLuma < IntegratedBankEntropyLumaFloor)
+                {
+                    DrapeColor = FMath::Lerp(
+                        DrapeColor,
+                        IntegratedBankEntropyLumaFill,
+                        FMath::Clamp(
+                            ((IntegratedBankEntropyLumaFloor - IntegratedBankEntropyExistingLuma) /
+                             IntegratedBankEntropyLumaFloor) *
+                                (0.38f + TextureNoise * 0.22f + V * 0.18f),
+                            0.0f,
+                            Spec.bDesertCanyon ? 0.48f : 0.54f));
+                }
                 const float Z = TerrainZ + 20.0f + LongFeather * (8.0f + TextureNoise * (Spec.bDesertCanyon ? 18.0f : 12.0f));
                 Vertices.Add(FVector(X, Y, Z));
                 UVs.Add(FVector2D(U * 12.0f, V * 3.0f));
@@ -10884,7 +11252,15 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_VignetteIntensity = true;
         Camera->GetCameraComponent()->PostProcessSettings.VignetteIntensity = 0.10f;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_Sharpen = true;
-        Camera->GetCameraComponent()->PostProcessSettings.Sharpen = 0.18f;
+        Camera->GetCameraComponent()->PostProcessSettings.Sharpen = 0.34f;
+        const float PreviewCaptureSaturation = Spec.bDesertCanyon ? 1.30f : 1.16f;
+        const float PreviewCaptureContrast = Spec.bDesertCanyon ? 1.15f : 1.08f;
+        Camera->GetCameraComponent()->PostProcessSettings.bOverride_ColorSaturation = true;
+        Camera->GetCameraComponent()->PostProcessSettings.ColorSaturation =
+            FVector4(PreviewCaptureSaturation, PreviewCaptureSaturation, PreviewCaptureSaturation, 1.0f);
+        Camera->GetCameraComponent()->PostProcessSettings.bOverride_ColorContrast = true;
+        Camera->GetCameraComponent()->PostProcessSettings.ColorContrast =
+            FVector4(PreviewCaptureContrast, PreviewCaptureContrast, PreviewCaptureContrast, 1.0f);
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_AutoExposureMethod = true;
         Camera->GetCameraComponent()->PostProcessSettings.AutoExposureMethod = AEM_Manual;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_AutoExposureBias = true;
@@ -11020,6 +11396,8 @@ bool CapturePreviewImageForSpec(
     FMinimalViewInfo CameraView;
     Camera->GetCameraComponent()->GetCameraView(0.0f, CameraView);
     CaptureComponent->SetCameraView(CameraView);
+    CaptureComponent->PostProcessSettings = Camera->GetCameraComponent()->PostProcessSettings;
+    CaptureComponent->PostProcessBlendWeight = 1.0f;
     CaptureComponent->TextureTarget = RenderTarget;
     CaptureComponent->CaptureSource = SCS_FinalColorLDR;
     CaptureComponent->bCaptureEveryFrame = false;
@@ -11090,7 +11468,8 @@ bool CapturePreviewImageForSpec(
             }
         }
     }
-    AActor* RiverEyeCenterArtifactCoverActor = bHideForegroundRaftProxies
+    const bool bUseTemporaryRiverEyeCenterArtifactCover = false;
+    AActor* RiverEyeCenterArtifactCoverActor = bHideForegroundRaftProxies && bUseTemporaryRiverEyeCenterArtifactCover
         ? AddPreviewRiverEyeCenterArtifactCover(World, Spec)
         : nullptr;
     auto DestroyRiverEyeCenterArtifactCover = [&RiverEyeCenterArtifactCoverActor]()
