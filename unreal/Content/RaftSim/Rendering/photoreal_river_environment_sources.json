@@ -1568,16 +1568,14 @@
       "capture_count": 6,
       "blocking_capture_count": 6,
       "blocker_counts": {
-        "low_color_texture_entropy": 6,
-        "low_edge_density": 3
+        "low_color_texture_entropy": 6
       },
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy",
-            "low_edge_density"
+            "low_color_texture_entropy"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1585,8 +1583,7 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy",
-            "low_edge_density"
+            "low_color_texture_entropy"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1594,8 +1591,7 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy",
-            "low_edge_density"
+            "low_color_texture_entropy"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         }
@@ -1607,13 +1603,13 @@
         "dark_foreground_proxy",
         "excess_low_gradient_area",
         "large_flat_blue_field",
+        "low_edge_density",
         "low_luma_variation"
       ],
       "remaining_blocker_counts": {
-        "low_color_texture_entropy": 6,
-        "low_edge_density": 3
+        "low_color_texture_entropy": 6
       },
-      "next_visual_art_blocker": "replace smooth low-entropy proxy water/terrain/raft/material fields and add river-eye edge detail with higher-detail source-derived or rights-cleared production assets without hiding hazards"
+      "next_visual_art_blocker": "replace smooth low-entropy proxy water/terrain/raft/material fields with higher-detail source-derived or rights-cleared production assets without hiding hazards"
     }
   },
   "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
