@@ -22,6 +22,9 @@ HUMAN_LIFELIKE_REVIEW_HANDOFF_RELATIVE_PATH = (
 HUMAN_LIFELIKE_REVIEW_PACKET_RELATIVE_PATH = (
     CAPTURE_ROOT_RELATIVE_PATH / "photoreal_human_lifelike_review_packet.md"
 )
+HUMAN_LIFELIKE_REVIEW_RESULTS_TEMPLATE_RELATIVE_PATH = (
+    CAPTURE_ROOT_RELATIVE_PATH / "photoreal_human_lifelike_review_results_template.json"
+)
 PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID = "first_party_source_aware_tapered_water_chroma_microbreakup"
 VISIBLE_WATER_CARD_RENDERER_COVERAGE_IDS = {
     "first_party_capture_quality_water_texture_fleck_cards",
@@ -712,6 +715,7 @@ def build_human_lifelike_review_packet_markdown(repo_root: Path, generated_on: s
         f"- Capture manifest: `{handoff['source_capture_manifest']}`",
         f"- Automated capture review: `{handoff['source_capture_quality_review']}`",
         f"- Human review handoff JSON: `{HUMAN_LIFELIKE_REVIEW_HANDOFF_RELATIVE_PATH}`",
+        f"- Human review results template: `{HUMAN_LIFELIKE_REVIEW_RESULTS_TEMPLATE_RELATIVE_PATH}`",
         f"- Reference media queue: `{handoff['source_reference_media_review_queue']}`",
         f"- Gap register: `{handoff['source_gap_register']}`",
         "",
@@ -851,4 +855,101 @@ def write_human_lifelike_review_packet_markdown(repo_root: Path, generated_on: s
     output_path = repo_root / HUMAN_LIFELIKE_REVIEW_PACKET_RELATIVE_PATH
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(packet, encoding="utf-8")
+    return output_path
+
+
+def _empty_review_domain_result(domain: dict[str, object]) -> dict[str, object]:
+    return {
+        "domain_id": domain["domain_id"],
+        "required_reviewer": domain["required_reviewer"],
+        "status": "not_reviewed",
+        "approved": False,
+        "reviewer_name": "",
+        "reviewer_role_or_credential": "",
+        "review_date": "",
+        "required_evidence": domain["required_evidence"],
+        "evidence_links_or_artifacts": [],
+        "notes": "",
+        "blockers": [],
+        "follow_up_actions": [],
+    }
+
+
+def build_human_lifelike_review_results_template(repo_root: Path, generated_on: str = "2026-07-08") -> dict:
+    """Build the machine-readable intake template for external human review results."""
+
+    handoff = build_human_lifelike_review_handoff(repo_root, generated_on=generated_on)
+    review_domains = handoff["review_domains"]
+    rivers: list[dict[str, object]] = []
+    for river in handoff["rivers"]:
+        rivers.append(
+            {
+                "river_id": river["river_id"],
+                "display_name": river["display_name"],
+                "review_status": "not_reviewed_not_approved",
+                "source_manifest": river["source_manifest"],
+                "map_package": river["map_package"],
+                "flow_context": river["flow_context"],
+                "captures": [
+                    {
+                        "view_id": capture["view_id"],
+                        "capture": capture["capture"],
+                        "sha256": capture["sha256"],
+                        "automated_status": capture["automated_status"],
+                        "human_review_status": "not_reviewed",
+                        "approval_status": "not_approved_for_lifelike_or_production",
+                    }
+                    for capture in river["captures"]
+                ],
+                "domain_results": [_empty_review_domain_result(domain) for domain in review_domains],
+                "river_level_notes": "",
+                "final_river_decision": {
+                    "status": "not_reviewed",
+                    "approved_for_lifelike": False,
+                    "approved_for_production_playable": False,
+                    "decision_maker": "",
+                    "decision_date": "",
+                    "decision_notes": "",
+                    "required_follow_up_before_promotion": [],
+                },
+            }
+        )
+
+    return {
+        "schema": "raftsim.unreal.photoreal_human_lifelike_review_results_template.v1",
+        "generated_on": generated_on,
+        "status": "awaiting_external_human_review_inputs_not_approved",
+        "source_handoff": str(HUMAN_LIFELIKE_REVIEW_HANDOFF_RELATIVE_PATH),
+        "source_packet": str(HUMAN_LIFELIKE_REVIEW_PACKET_RELATIVE_PATH),
+        "source_capture_quality_review": str(CAPTURE_QUALITY_REVIEW_RELATIVE_PATH),
+        "policy": {
+            "do_not_self_approve_with_automated_metrics": True,
+            "reviewer_identity_role_and_date_required_for_approval": True,
+            "evidence_links_or_artifacts_required_for_each_domain_approval": True,
+            "uncleared_media_must_remain_link_only_until_rights_are_recorded": True,
+            "hazard_rescue_and_physics_readability_block_lifelike_promotion": True,
+            "desktop_and_vr_performance_evidence_required_before_production_playable": True,
+        },
+        "summary": {
+            "river_count": len(rivers),
+            "capture_count": sum(len(river["captures"]) for river in rivers),
+            "review_domain_count": len(review_domains),
+            "open_review_result_count": len(rivers) * len(review_domains),
+            "approved_river_count": 0,
+        },
+        "rivers": rivers,
+        "promotion_rule": (
+            "A river may be promoted from preview-only only after every domain result is approved with reviewer "
+            "identity, date, evidence, and notes; the river-level decision approves lifelike status; rights are "
+            "recorded for visual references; hazards and rescue targets remain readable; and desktop/VR performance "
+            "evidence is attached."
+        ),
+    }
+
+
+def write_human_lifelike_review_results_template(repo_root: Path, generated_on: str = "2026-07-08") -> Path:
+    template = build_human_lifelike_review_results_template(repo_root, generated_on=generated_on)
+    output_path = repo_root / HUMAN_LIFELIKE_REVIEW_RESULTS_TEMPLATE_RELATIVE_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(template, indent=2) + "\n", encoding="utf-8")
     return output_path
