@@ -45,10 +45,11 @@
   "active_decision": {
     "active_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
     "decision": "Keep the first-party lit vertex-color water preview material active until a custom water shader or true WaterBody integration is implemented and visually verified.",
+    "normal_response_scaffold": "The active preview material now uses bounded DefaultLit vertex-color shading with low emissive fill, roughness, and specular constants so generated river-ribbon relief can catch sun/skylight without using the rejected engine water plugin material.",
     "promotion_gate": "Any future Water plugin material attempt must be captured for all three rivers and visually checked for nonblack water, readable waves/foam, hazard visibility, and no masking of swimmer/rescue targets before it replaces the active preview material."
   },
   "next_actions": [
-    "Prototype a purpose-built preview water material with normal/foam texture inputs rather than direct Water plugin material reuse.",
+    "Continue the purpose-built preview water material toward normal/foam texture inputs rather than direct Water plugin material reuse.",
     "Evaluate true WaterBodyRiver or WaterMesh integration only after terrain, channel, and spline geometry are production-shaped.",
     "Keep regenerated captures honest: mark current water as readable proxy material, not production photoreal water."
   ]

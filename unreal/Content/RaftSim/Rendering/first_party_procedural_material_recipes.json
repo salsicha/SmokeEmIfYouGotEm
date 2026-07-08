@@ -49,6 +49,7 @@
       "current_use": [
         "river_ribbon_depth_tint",
         "flow_band_current_cues",
+        "bounded_lit_water_normal_response",
         "foam_and_wave_highlight_color_support"
       ],
       "replacement_target": "production_water_shader_or_validated_waterbody_integration"
@@ -425,7 +426,7 @@
         "water_surface_depth_turbidity_and_current_cues"
       ],
       "preview_fallback_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
-      "unreal_status": "unlit_vertex_color_water_preview_active_with_photographic_water_exposure_calibration_near_field_surface_grain_base_water_depth_current_grading_flow_cued_foam_slick_mottle_shallow_water_clarity_aeration_flow_dependent_hydraulic_aeration_spray_low_occlusion_far_field_depth_reflection_refraction_scaffold_remaining_water_overlay_slab_demotion_long_dark_water_streak_demotion_current_streak_waterline_artifact_demotion_and_central_water_scaffold_plate_demotion_custom_shader_or_waterbody_integration_pending",
+      "unreal_status": "defaultlit_vertex_color_water_preview_active_with_bounded_normal_response_photographic_water_exposure_calibration_near_field_surface_grain_base_water_depth_current_grading_flow_cued_foam_slick_mottle_shallow_water_clarity_aeration_flow_dependent_hydraulic_aeration_spray_low_occlusion_far_field_depth_reflection_refraction_scaffold_remaining_water_overlay_slab_demotion_long_dark_water_streak_demotion_current_streak_waterline_artifact_demotion_and_central_water_scaffold_plate_demotion_custom_shader_or_waterbody_integration_pending",
       "required_source_inputs": [
         "river_flow_visual_bands.json",
         "solver_or_preview_flow_band_telemetry",
@@ -435,7 +436,9 @@
       ],
       "procedural_tokens": [
         "depth_tint",
-        "shadowless_unlit_water_review_material",
+        "bounded_lit_water_normal_response",
+        "low_emissive_water_fill",
+        "water_roughness_specular_constants",
         "depth_reflection_refraction_scaffold",
         "near_camera_water_scaffold_clearance",
         "low_occlusion_far_field_water_scaffold",
