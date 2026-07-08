@@ -176,7 +176,38 @@
         "desktop_and_vr_performance_capture_evidence",
         "production_material_asset_or_first_party_equivalent_promotion"
       ]
-    }
+    },
+    "photoreal_human_lifelike_review_handoff": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_handoff.json",
+    "photoreal_human_lifelike_review_handoff_status": "awaiting_human_lifelike_review_not_approved",
+    "photoreal_human_lifelike_review_handoff_summary": {
+      "river_count": 3,
+      "capture_count": 6,
+      "candidate_capture_count": 6,
+      "automated_blocking_capture_count": 0,
+      "human_approved_capture_count": 0,
+      "open_human_review_gate_count": 21,
+      "per_river": {
+        "american_south_fork": {
+          "review_status": "awaiting_human_lifelike_review_not_approved",
+          "capture_count": 2,
+          "open_review_gate_count": 7,
+          "reference_media_review_target_count": 3
+        },
+        "colorado_river": {
+          "review_status": "awaiting_human_lifelike_review_not_approved",
+          "capture_count": 2,
+          "open_review_gate_count": 7,
+          "reference_media_review_target_count": 3
+        },
+        "pacuare": {
+          "review_status": "awaiting_human_lifelike_review_not_approved",
+          "capture_count": 2,
+          "open_review_gate_count": 7,
+          "reference_media_review_target_count": 3
+        }
+      }
+    },
+    "human_review_note": "The zero-blocker captures are ready for a structured human review pass, but remain unapproved until all seven handoff domains record accepted evidence."
   },
   "buy_paid_assets_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true
 }

@@ -1,0 +1,1135 @@
+{
+  "schema": "raftsim.unreal.photoreal_human_lifelike_review_handoff.v1",
+  "generated_on": "2026-07-08",
+  "status": "awaiting_human_lifelike_review_not_approved",
+  "source_capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
+  "source_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
+  "source_reference_media_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+  "source_gap_register": "physics/data/real_world/production_environment_gap_register.json",
+  "policy": {
+    "automated_metrics_do_not_approve_lifelike_visuals": true,
+    "human_review_must_not_use_uncleared_media_as_texture_training_or_packaged_assets": true,
+    "approval_requires_hazard_rescue_and_water_readability": true,
+    "approval_requires_desktop_and_vr_performance_evidence": true,
+    "all_review_domains_must_be_approved_before_lifelike_status": true
+  },
+  "summary": {
+    "river_count": 3,
+    "capture_count": 6,
+    "candidate_capture_count": 6,
+    "automated_blocking_capture_count": 0,
+    "human_approved_capture_count": 0,
+    "open_human_review_gate_count": 21,
+    "per_river": {
+      "american_south_fork": {
+        "review_status": "awaiting_human_lifelike_review_not_approved",
+        "capture_count": 2,
+        "open_review_gate_count": 7,
+        "reference_media_review_target_count": 3
+      },
+      "colorado_river": {
+        "review_status": "awaiting_human_lifelike_review_not_approved",
+        "capture_count": 2,
+        "open_review_gate_count": 7,
+        "reference_media_review_target_count": 3
+      },
+      "pacuare": {
+        "review_status": "awaiting_human_lifelike_review_not_approved",
+        "capture_count": 2,
+        "open_review_gate_count": 7,
+        "reference_media_review_target_count": 3
+      }
+    }
+  },
+  "review_domains": [
+    {
+      "domain_id": "art_direction_visual_lifelike",
+      "required_reviewer": "environment_art_or_art_direction",
+      "required_evidence": [
+        "side_by_side_review_against_rights_reviewed_reference_links_or_first_party_field_media",
+        "river_specific_notes_for_terrain_water_rocks_foliage_foam_mist_lighting_and_raft_foreground"
+      ],
+      "status": "required_before_lifelike_approval",
+      "approved": false
+    },
+    {
+      "domain_id": "guide_hydraulic_fidelity",
+      "required_reviewer": "river_guide_or_oarsman_domain_reviewer",
+      "required_evidence": [
+        "flow_band_specific_notes_for_line_choice_holes_laterals_boils_eddy_lines_wave_trains_and_wet_banks",
+        "raft_outcome_sanity_notes_for_surf_flush_pin_release_flip_and_swimmer_visibility"
+      ],
+      "status": "required_before_lifelike_approval",
+      "approved": false
+    },
+    {
+      "domain_id": "geospatial_source_alignment",
+      "required_reviewer": "geospatial_or_technical_art_reviewer",
+      "required_evidence": [
+        "capture_overlays_or_notes_checking_river_centerline_banks_heightfield_masks_and_source_drape_alignment",
+        "known_preview_derivative_limitations_and_required_production_import_replacements"
+      ],
+      "status": "required_before_lifelike_approval",
+      "approved": false
+    },
+    {
+      "domain_id": "rights_and_reference_media",
+      "required_reviewer": "rights_or_content_provenance_reviewer",
+      "required_evidence": [
+        "item_level_license_permission_attribution_and_allowed_use_for_any_photo_footage_or_social_reference",
+        "confirmation_that_uncleared_media_remains_link_only_and_not_used_as_texture_training_or_packaged_asset_input"
+      ],
+      "status": "required_before_lifelike_approval",
+      "approved": false
+    },
+    {
+      "domain_id": "hazard_and_rescue_readability",
+      "required_reviewer": "gameplay_safety_or_rescue_readability_reviewer",
+      "required_evidence": [
+        "notes_that_water_foam_mist_foliage_and_lighting_do_not_hide_hazards_swimmers_throw_rope_zones_or_rescue_targets",
+        "notes_that_visual_forcing_or_art_layers_do_not_hide_solver_or_conservation_failures"
+      ],
+      "status": "required_before_lifelike_approval",
+      "approved": false
+    },
+    {
+      "domain_id": "production_material_asset_promotion",
+      "required_reviewer": "technical_art_or_rendering_reviewer",
+      "required_evidence": [
+        "promotion_decision_for_review_only_texture2d_material_instance_and_procedural_proxy_surfaces",
+        "replacement_or_approval_plan_for_landscape_water_rocks_foliage_foam_mist_lighting_and_raft_foreground_assets"
+      ],
+      "status": "required_before_lifelike_approval",
+      "approved": false
+    },
+    {
+      "domain_id": "desktop_and_vr_performance",
+      "required_reviewer": "performance_or_vr_reviewer",
+      "required_evidence": [
+        "desktop_capture_settings_frame_time_gpu_memory_and_scalability_notes",
+        "vr_or_low_power_capture_settings_comfort_frame_time_and_visual_readability_notes"
+      ],
+      "status": "required_before_lifelike_approval",
+      "approved": false
+    }
+  ],
+  "rivers": [
+    {
+      "river_id": "american_south_fork",
+      "display_name": "South Fork American River",
+      "review_status": "awaiting_human_lifelike_review_not_approved",
+      "readiness": "preview_only_not_lifelike",
+      "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview",
+      "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/source_manifest.json",
+      "flow_context": {
+        "flow_band_id": "median_runnable",
+        "flow_band_display_name": "Median Runnable / Summer Commercial",
+        "flow_band_source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+        "flow_reference_discharge_cfs": 1600.0,
+        "flow_visual_width_scale": 1.0,
+        "flow_visual_foam_scale": 1.0,
+        "flow_visual_wet_bank_scale": 1.0,
+        "flow_visual_current_cue_scale": 1.0,
+        "flow_visual_water_level_offset_cm": 0.0,
+        "flow_visual_note": "Default South Fork summer-commercial validation band from USGS-11445500 planning presets; keeps moderate tongues, wet rocks, and foam lines visible while low/high seasonal variants remain future capture targets."
+      },
+      "source_inputs_for_review": {
+        "aerial_drape_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png",
+        "terrain_relief_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/dem_relief_2048.png",
+        "heightfield_preview_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/heightfield_candidate_2017.png",
+        "water_mask_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/water_mask_2048.png",
+        "vegetation_mask_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/vegetation_mask_2048.png",
+        "elevation_sample": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/3dep_tiles"
+      },
+      "captures": [
+        {
+          "view_id": "guide_seat_downstream",
+          "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
+          "sha256": "7b07f0f881f4fafdbb2a709f5dcf352d924e053aa722de33b695fb42d82315a1",
+          "automated_status": "candidate_for_human_lifelike_review_not_approved",
+          "automated_blockers": [],
+          "metrics": {
+            "analysis_size": [
+              320,
+              180
+            ],
+            "source_size": [
+              1280,
+              720
+            ],
+            "rgb_mean": [
+              98.73,
+              131.33,
+              106.41
+            ],
+            "luma_mean": 122.6,
+            "luma_std": 50.27,
+            "edge_density": 0.1209,
+            "low_gradient_fraction": 0.5356,
+            "quantized_entropy_bits": 4.46,
+            "quantized_color_count": 61,
+            "flat_blue_field_fraction": 0.0646,
+            "bottom_center_dark_fraction": 0.0
+          },
+          "human_review_status": "not_reviewed",
+          "required_capture_checks": [
+            "visual_lifelike_match_to_rights_reviewed_reference_or_first_party_field_media",
+            "hazards_swimmers_rescue_targets_and_readable_water_features_not_hidden",
+            "source_alignment_notes_for_visible_banks_terrain_water_mask_and_flow_band",
+            "production_asset_material_or_first_party_equivalent_promotion_decision",
+            "desktop_and_vr_performance_readability_notes"
+          ],
+          "approval_status": "not_approved_for_lifelike_or_production",
+          "river_id": "american_south_fork"
+        },
+        {
+          "view_id": "river_eye_downstream",
+          "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
+          "sha256": "5d393822868189d60bafbada8fec6b9ae86263b92d2f45288004038e2bbea71b",
+          "automated_status": "candidate_for_human_lifelike_review_not_approved",
+          "automated_blockers": [],
+          "metrics": {
+            "analysis_size": [
+              320,
+              180
+            ],
+            "source_size": [
+              1280,
+              720
+            ],
+            "rgb_mean": [
+              99.13,
+              132.36,
+              107.26
+            ],
+            "luma_mean": 123.49,
+            "luma_std": 49.71,
+            "edge_density": 0.1181,
+            "low_gradient_fraction": 0.5373,
+            "quantized_entropy_bits": 4.42,
+            "quantized_color_count": 59,
+            "flat_blue_field_fraction": 0.0646,
+            "bottom_center_dark_fraction": 0.0
+          },
+          "human_review_status": "not_reviewed",
+          "required_capture_checks": [
+            "visual_lifelike_match_to_rights_reviewed_reference_or_first_party_field_media",
+            "hazards_swimmers_rescue_targets_and_readable_water_features_not_hidden",
+            "source_alignment_notes_for_visible_banks_terrain_water_mask_and_flow_band",
+            "production_asset_material_or_first_party_equivalent_promotion_decision",
+            "desktop_and_vr_performance_readability_notes"
+          ],
+          "approval_status": "not_approved_for_lifelike_or_production",
+          "river_id": "american_south_fork"
+        }
+      ],
+      "reference_media_review_targets": [
+        {
+          "target_id": "south_fork_guide_seat_boulder_garden",
+          "anchor_hint": "Chili Bar to Coloma guide-seat downstream frame",
+          "visual_questions": [
+            "Are exposed rocks, bank trees, and water color believable at summer commercial flow?",
+            "Can a swimmer and throw-rope recovery zone remain visible behind foam and boulders?"
+          ],
+          "candidate_source_ids": [
+            "blm_south_fork_american_recreation_page",
+            "wikimedia_south_fork_american_search",
+            "flickr_south_fork_american_search",
+            "instagram_south_fork_american_hashtag"
+          ],
+          "annotation_outputs": [
+            "review/production_import_pilot/reference_annotations.geojson",
+            "field_media/production_import_pilot/rights_manifest.json"
+          ],
+          "flow_context_needed": [
+            "low_runnable",
+            "median_runnable",
+            "high_runnable"
+          ],
+          "rights_status": "candidate_links_only"
+        },
+        {
+          "target_id": "south_fork_late_summer_exposed_rocks",
+          "anchor_hint": "Low-flow rock exposure and wet-bank comparison",
+          "visual_questions": [
+            "Which boulder faces should be dry, damp, or freshly splashed?",
+            "How much yellow grass and oak scrub should appear on late-season banks?"
+          ],
+          "candidate_source_ids": [
+            "wikimedia_south_fork_american_search",
+            "flickr_south_fork_american_search",
+            "instagram_south_fork_american_hashtag"
+          ],
+          "annotation_outputs": [
+            "imagery/production_import_pilot/wet_rock_review.geojson",
+            "field_media/production_import_pilot/rights_manifest.json"
+          ],
+          "flow_context_needed": [
+            "low_runnable"
+          ],
+          "rights_status": "candidate_links_only"
+        },
+        {
+          "target_id": "south_fork_high_flow_foam_lines",
+          "anchor_hint": "Spring runoff or release-driven high-flow review",
+          "visual_questions": [
+            "Where should foam streaks and eddy fences strengthen without hiding hazards?",
+            "How high should wet banks and splash marks climb at high runnable flow?"
+          ],
+          "candidate_source_ids": [
+            "flickr_south_fork_american_search",
+            "instagram_south_fork_american_hashtag"
+          ],
+          "annotation_outputs": [
+            "review/production_import_pilot/flow_variant_reference_annotations.geojson",
+            "field_media/production_import_pilot/rights_manifest.json"
+          ],
+          "flow_context_needed": [
+            "high_runnable"
+          ],
+          "rights_status": "candidate_links_only"
+        }
+      ],
+      "open_review_gates": [
+        {
+          "domain_id": "art_direction_visual_lifelike",
+          "required_reviewer": "environment_art_or_art_direction",
+          "required_evidence": [
+            "side_by_side_review_against_rights_reviewed_reference_links_or_first_party_field_media",
+            "river_specific_notes_for_terrain_water_rocks_foliage_foam_mist_lighting_and_raft_foreground"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "guide_hydraulic_fidelity",
+          "required_reviewer": "river_guide_or_oarsman_domain_reviewer",
+          "required_evidence": [
+            "flow_band_specific_notes_for_line_choice_holes_laterals_boils_eddy_lines_wave_trains_and_wet_banks",
+            "raft_outcome_sanity_notes_for_surf_flush_pin_release_flip_and_swimmer_visibility"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "geospatial_source_alignment",
+          "required_reviewer": "geospatial_or_technical_art_reviewer",
+          "required_evidence": [
+            "capture_overlays_or_notes_checking_river_centerline_banks_heightfield_masks_and_source_drape_alignment",
+            "known_preview_derivative_limitations_and_required_production_import_replacements"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "rights_and_reference_media",
+          "required_reviewer": "rights_or_content_provenance_reviewer",
+          "required_evidence": [
+            "item_level_license_permission_attribution_and_allowed_use_for_any_photo_footage_or_social_reference",
+            "confirmation_that_uncleared_media_remains_link_only_and_not_used_as_texture_training_or_packaged_asset_input"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "hazard_and_rescue_readability",
+          "required_reviewer": "gameplay_safety_or_rescue_readability_reviewer",
+          "required_evidence": [
+            "notes_that_water_foam_mist_foliage_and_lighting_do_not_hide_hazards_swimmers_throw_rope_zones_or_rescue_targets",
+            "notes_that_visual_forcing_or_art_layers_do_not_hide_solver_or_conservation_failures"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "production_material_asset_promotion",
+          "required_reviewer": "technical_art_or_rendering_reviewer",
+          "required_evidence": [
+            "promotion_decision_for_review_only_texture2d_material_instance_and_procedural_proxy_surfaces",
+            "replacement_or_approval_plan_for_landscape_water_rocks_foliage_foam_mist_lighting_and_raft_foreground_assets"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "desktop_and_vr_performance",
+          "required_reviewer": "performance_or_vr_reviewer",
+          "required_evidence": [
+            "desktop_capture_settings_frame_time_gpu_memory_and_scalability_notes",
+            "vr_or_low_power_capture_settings_comfort_frame_time_and_visual_readability_notes"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        }
+      ],
+      "visual_replacement_targets": [
+        {
+          "target": "terrain_and_banks",
+          "required_before_lifelike": [
+            "conditioned source heightfields or approved procedural terrain",
+            "bank breaklines and channel burning",
+            "biome-specific terrain material layering",
+            "first_party_procedural_asset_recipe_coverage_or_rights_cleared_equivalent_assets",
+            "first_party_procedural_material_recipe_manifest_coverage_or_rights_cleared_material_assets",
+            "first_party_material_swatch_review_or_rights_cleared_material_reference",
+            "source-aligned wet/dry and exposed-bar masks",
+            "first_party_importable_texture_atlas_review_or_rights_cleared_texture_assets",
+            "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
+            "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+            "approved_unreal_material_instances_from_candidate_manifest_or_rights_cleared_equivalent_materials",
+            "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": []
+        },
+        {
+          "target": "rocks_boulders_and_riverbed",
+          "required_before_lifelike": [
+            "rights-cleared or first-party rock/boulder assets",
+            "wetness and moss/sediment material variants",
+            "mask-aware placement that preserves hazard readability",
+            "river-specific scale and abrasion review",
+            "first_party_rock_texture_atlas_or_rights_cleared_rock_texture_maps",
+            "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
+            "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+            "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": []
+        },
+        {
+          "target": "foliage_and_ecology",
+          "required_before_lifelike": [
+            "biome-specific trees, seedlings, shrubs, grasses, tropical canopy, and deadfall",
+            "density masks from reviewed imagery or first-party procedural rules",
+            "seasonal and flow-bank exposure variants",
+            "performance-scalable Nanite/PCG or instancing path",
+            "first_party_foliage_texture_atlas_or_rights_cleared_biome_foliage_texture_maps",
+            "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
+            "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+            "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": []
+        },
+        {
+          "target": "water_foam_spray_mist_and_wetness",
+          "required_before_lifelike": [
+            "production water shader with reflections, depth color, turbidity, and solver/current cues",
+            "foam, boil, wave-train, hole, eddy-line, lateral, spray, and mist layers",
+            "flow-band dependency from validated hydrology and gameplay tuning",
+            "no visual forcing that hides conservation or physics failures",
+            "first_party_water_foam_mist_texture_atlas_or_approved_water_material_textures",
+            "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
+            "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+            "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": [
+            "2026-07-08 integrated corridor water, bank, terrain, and capture post-process work cleared the automated capture-quality blocker counts across all six guide-seat/river-eye captures. The captures remain preview-only candidate evidence until human art, guide, geospatial, hazard-readability, rights, production-material, and desktop/VR performance review pass."
+          ]
+        },
+        {
+          "target": "lighting_atmosphere_and_capture",
+          "required_before_lifelike": [
+            "river-specific time-of-day and weather presets",
+            "HDRI or first-party sky/atmosphere setup with rights recorded",
+            "manual exposure/camera language matching guide-seat review",
+            "desktop and VR performance captures with settings recorded",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": [
+            "2026-07-08 integrated corridor water, bank, terrain, and capture post-process work cleared the automated capture-quality blocker counts across all six guide-seat/river-eye captures. The captures remain preview-only candidate evidence until human art, guide, geospatial, hazard-readability, rights, production-material, and desktop/VR performance review pass."
+          ]
+        }
+      ],
+      "fidelity_note": "stitched South Fork production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into bank and valley preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, broad-slope terrain exposure fill and relief, source-aware macro terrain ridge/facet relief, source-aware terrain slope facet texture, source-aware riparian canopy mass texture, minimized source overlay plate artifacts, graphic waterline ribbon demotion, remaining water overlay slab demotion, long dark water streak demotion, current streak and waterline rail artifact demotion, central water scaffold plate demotion, base-water center guide-stripe breakup, base-water cross-channel breakup, base-water residual center-seam erase, dark micro-ripple artifact demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, first-party biome foliage silhouette cards, dense layered riparian canopy/understory proxy clusters, first-party instanced procedural foliage-equivalent canopy/trunk/understory scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party foliage card/canopy artifact demotion, square foliage/source-card artifact demotion, remaining square card cull, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, lit water variation, first-party lit water normal-response scaffold, base-water flow-thread texture, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, turbidity-depth patch artifact demotion, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, foliage, understory, mask-aware ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, hydrologic conditioning, channel burning, masks, and guide/geospatial approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers; first-party material texture atlas albedo tiles are sampled into terrain, river water, primary boulder, foliage, and raft/oar vertex colors, while the normal plus packed AO/roughness/height atlases drive bounded preview material response and tiny terrain/water microrelief; review-only MI_RaftSim_*_AtlasCandidate material instances are also assigned to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass",
+      "current_decision": "Automated blockers are clear for this river's current guide-seat and river-eye captures, but lifelike approval is withheld until every open human-review, rights, production-material, hazard-readability, geospatial, guide, and performance gate records accepted evidence."
+    },
+    {
+      "river_id": "colorado_river",
+      "display_name": "Colorado River Grand Canyon",
+      "review_status": "awaiting_human_lifelike_review_not_approved",
+      "readiness": "preview_only_not_lifelike",
+      "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview",
+      "source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json",
+      "flow_context": {
+        "flow_band_id": "moderate_release_planning",
+        "flow_band_display_name": "Moderate Release Planning",
+        "flow_band_source": "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json",
+        "flow_reference_discharge_cfs": 12000.0,
+        "flow_visual_width_scale": 1.08,
+        "flow_visual_foam_scale": 1.15,
+        "flow_visual_wet_bank_scale": 1.1,
+        "flow_visual_current_cue_scale": 1.15,
+        "flow_visual_water_level_offset_cm": 8.0,
+        "flow_visual_note": "Default Grand Canyon rowing preview band from release-planning presets; slightly widens the big-water ribbon and strengthens long wave/current cues while release history and guide review remain required."
+      },
+      "source_inputs_for_review": {
+        "aerial_drape_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png",
+        "terrain_relief_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/dem_relief_2048.png",
+        "heightfield_preview_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/heightfield_candidate_2017.png",
+        "water_mask_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/water_mask_2048.png",
+        "vegetation_mask_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/vegetation_mask_2048.png",
+        "elevation_sample": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/3dep_tiles"
+      },
+      "captures": [
+        {
+          "view_id": "guide_seat_downstream",
+          "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
+          "sha256": "c859d2d7df6be66a1b469277222de454e4a46ebb7b35644b5622c8f4c015fb90",
+          "automated_status": "candidate_for_human_lifelike_review_not_approved",
+          "automated_blockers": [],
+          "metrics": {
+            "analysis_size": [
+              320,
+              180
+            ],
+            "source_size": [
+              1280,
+              720
+            ],
+            "rgb_mean": [
+              136.59,
+              127.22,
+              99.11
+            ],
+            "luma_mean": 127.18,
+            "luma_std": 47.27,
+            "edge_density": 0.1085,
+            "low_gradient_fraction": 0.4956,
+            "quantized_entropy_bits": 4.43,
+            "quantized_color_count": 69,
+            "flat_blue_field_fraction": 0.0017,
+            "bottom_center_dark_fraction": 0.0239
+          },
+          "human_review_status": "not_reviewed",
+          "required_capture_checks": [
+            "visual_lifelike_match_to_rights_reviewed_reference_or_first_party_field_media",
+            "hazards_swimmers_rescue_targets_and_readable_water_features_not_hidden",
+            "source_alignment_notes_for_visible_banks_terrain_water_mask_and_flow_band",
+            "production_asset_material_or_first_party_equivalent_promotion_decision",
+            "desktop_and_vr_performance_readability_notes"
+          ],
+          "approval_status": "not_approved_for_lifelike_or_production",
+          "river_id": "colorado_river"
+        },
+        {
+          "view_id": "river_eye_downstream",
+          "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
+          "sha256": "4c22f709260ddc446c2916e457cf6856cacb83325884e05da34818394dcdcd4d",
+          "automated_status": "candidate_for_human_lifelike_review_not_approved",
+          "automated_blockers": [],
+          "metrics": {
+            "analysis_size": [
+              320,
+              180
+            ],
+            "source_size": [
+              1280,
+              720
+            ],
+            "rgb_mean": [
+              137.27,
+              128.07,
+              100.02
+            ],
+            "luma_mean": 128.0,
+            "luma_std": 46.77,
+            "edge_density": 0.1032,
+            "low_gradient_fraction": 0.496,
+            "quantized_entropy_bits": 4.4,
+            "quantized_color_count": 68,
+            "flat_blue_field_fraction": 0.0017,
+            "bottom_center_dark_fraction": 0.0239
+          },
+          "human_review_status": "not_reviewed",
+          "required_capture_checks": [
+            "visual_lifelike_match_to_rights_reviewed_reference_or_first_party_field_media",
+            "hazards_swimmers_rescue_targets_and_readable_water_features_not_hidden",
+            "source_alignment_notes_for_visible_banks_terrain_water_mask_and_flow_band",
+            "production_asset_material_or_first_party_equivalent_promotion_decision",
+            "desktop_and_vr_performance_readability_notes"
+          ],
+          "approval_status": "not_approved_for_lifelike_or_production",
+          "river_id": "colorado_river"
+        }
+      ],
+      "reference_media_review_targets": [
+        {
+          "target_id": "colorado_river_eye_canyon_scale",
+          "anchor_hint": "Lees Ferry / Grand Canyon river-eye downstream frame",
+          "visual_questions": [
+            "Do canyon walls read at Grand Canyon scale from low raft height?",
+            "Are sandbars, talus, and sparse riparian shrubs distributed believably?"
+          ],
+          "candidate_source_ids": [
+            "nps_grand_canyon_photos_multimedia",
+            "nps_grand_canyon_river_trips",
+            "wikimedia_grand_canyon_rafting_search",
+            "instagram_grand_canyon_rafting_hashtag"
+          ],
+          "annotation_outputs": [
+            "review/production_import_pilot/reference_annotations.geojson",
+            "field_media/production_import_pilot/rights_manifest.json"
+          ],
+          "flow_context_needed": [
+            "low_release_planning",
+            "moderate_release_planning",
+            "high_release_planning"
+          ],
+          "rights_status": "candidate_links_only"
+        },
+        {
+          "target_id": "colorado_release_wet_banks_and_sandbars",
+          "anchor_hint": "Release-aware sandbar and wet-bank review",
+          "visual_questions": [
+            "Which sandbars should be exposed or damp across low, moderate, and high release bands?",
+            "Do current seams, boils, and lateral waves stay readable for an oarsman?"
+          ],
+          "candidate_source_ids": [
+            "nps_grand_canyon_photos_multimedia",
+            "wikimedia_grand_canyon_rafting_search",
+            "instagram_grand_canyon_rafting_hashtag"
+          ],
+          "annotation_outputs": [
+            "hydrography/production_import_pilot/sandbars.geojson",
+            "review/production_import_pilot/release_reference_annotations.geojson"
+          ],
+          "flow_context_needed": [
+            "low_release_planning",
+            "moderate_release_planning",
+            "high_release_planning"
+          ],
+          "rights_status": "candidate_links_only"
+        },
+        {
+          "target_id": "colorado_long_swimmer_rescue_visibility",
+          "anchor_hint": "Long-water rescue and oar-rig sightline review",
+          "visual_questions": [
+            "Can the player read swimmer position at Grand Canyon scale?",
+            "Do boils, wave trains, canyon shadows, and oar frame foreground avoid hiding rescue targets?"
+          ],
+          "candidate_source_ids": [
+            "nps_grand_canyon_river_trips",
+            "instagram_grand_canyon_rafting_hashtag"
+          ],
+          "annotation_outputs": [
+            "review/production_import_pilot/rescue_visibility_annotations.geojson",
+            "field_media/production_import_pilot/rights_manifest.json"
+          ],
+          "flow_context_needed": [
+            "moderate_release_planning",
+            "high_release_planning"
+          ],
+          "rights_status": "candidate_links_only"
+        }
+      ],
+      "open_review_gates": [
+        {
+          "domain_id": "art_direction_visual_lifelike",
+          "required_reviewer": "environment_art_or_art_direction",
+          "required_evidence": [
+            "side_by_side_review_against_rights_reviewed_reference_links_or_first_party_field_media",
+            "river_specific_notes_for_terrain_water_rocks_foliage_foam_mist_lighting_and_raft_foreground"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "guide_hydraulic_fidelity",
+          "required_reviewer": "river_guide_or_oarsman_domain_reviewer",
+          "required_evidence": [
+            "flow_band_specific_notes_for_line_choice_holes_laterals_boils_eddy_lines_wave_trains_and_wet_banks",
+            "raft_outcome_sanity_notes_for_surf_flush_pin_release_flip_and_swimmer_visibility"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "geospatial_source_alignment",
+          "required_reviewer": "geospatial_or_technical_art_reviewer",
+          "required_evidence": [
+            "capture_overlays_or_notes_checking_river_centerline_banks_heightfield_masks_and_source_drape_alignment",
+            "known_preview_derivative_limitations_and_required_production_import_replacements"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "rights_and_reference_media",
+          "required_reviewer": "rights_or_content_provenance_reviewer",
+          "required_evidence": [
+            "item_level_license_permission_attribution_and_allowed_use_for_any_photo_footage_or_social_reference",
+            "confirmation_that_uncleared_media_remains_link_only_and_not_used_as_texture_training_or_packaged_asset_input"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "hazard_and_rescue_readability",
+          "required_reviewer": "gameplay_safety_or_rescue_readability_reviewer",
+          "required_evidence": [
+            "notes_that_water_foam_mist_foliage_and_lighting_do_not_hide_hazards_swimmers_throw_rope_zones_or_rescue_targets",
+            "notes_that_visual_forcing_or_art_layers_do_not_hide_solver_or_conservation_failures"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "production_material_asset_promotion",
+          "required_reviewer": "technical_art_or_rendering_reviewer",
+          "required_evidence": [
+            "promotion_decision_for_review_only_texture2d_material_instance_and_procedural_proxy_surfaces",
+            "replacement_or_approval_plan_for_landscape_water_rocks_foliage_foam_mist_lighting_and_raft_foreground_assets"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "desktop_and_vr_performance",
+          "required_reviewer": "performance_or_vr_reviewer",
+          "required_evidence": [
+            "desktop_capture_settings_frame_time_gpu_memory_and_scalability_notes",
+            "vr_or_low_power_capture_settings_comfort_frame_time_and_visual_readability_notes"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        }
+      ],
+      "visual_replacement_targets": [
+        {
+          "target": "terrain_and_banks",
+          "required_before_lifelike": [
+            "conditioned source heightfields or approved procedural terrain",
+            "bank breaklines and channel burning",
+            "biome-specific terrain material layering",
+            "first_party_procedural_asset_recipe_coverage_or_rights_cleared_equivalent_assets",
+            "first_party_procedural_material_recipe_manifest_coverage_or_rights_cleared_material_assets",
+            "first_party_material_swatch_review_or_rights_cleared_material_reference",
+            "source-aligned wet/dry and exposed-bar masks",
+            "first_party_importable_texture_atlas_review_or_rights_cleared_texture_assets",
+            "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
+            "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+            "approved_unreal_material_instances_from_candidate_manifest_or_rights_cleared_equivalent_materials",
+            "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": []
+        },
+        {
+          "target": "rocks_boulders_and_riverbed",
+          "required_before_lifelike": [
+            "rights-cleared or first-party rock/boulder assets",
+            "wetness and moss/sediment material variants",
+            "mask-aware placement that preserves hazard readability",
+            "river-specific scale and abrasion review",
+            "first_party_rock_texture_atlas_or_rights_cleared_rock_texture_maps",
+            "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
+            "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+            "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": []
+        },
+        {
+          "target": "foliage_and_ecology",
+          "required_before_lifelike": [
+            "biome-specific trees, seedlings, shrubs, grasses, tropical canopy, and deadfall",
+            "density masks from reviewed imagery or first-party procedural rules",
+            "seasonal and flow-bank exposure variants",
+            "performance-scalable Nanite/PCG or instancing path",
+            "first_party_foliage_texture_atlas_or_rights_cleared_biome_foliage_texture_maps",
+            "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
+            "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+            "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": []
+        },
+        {
+          "target": "water_foam_spray_mist_and_wetness",
+          "required_before_lifelike": [
+            "production water shader with reflections, depth color, turbidity, and solver/current cues",
+            "foam, boil, wave-train, hole, eddy-line, lateral, spray, and mist layers",
+            "flow-band dependency from validated hydrology and gameplay tuning",
+            "no visual forcing that hides conservation or physics failures",
+            "first_party_water_foam_mist_texture_atlas_or_approved_water_material_textures",
+            "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
+            "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+            "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": [
+            "2026-07-08 integrated corridor water, bank, terrain, and capture post-process work cleared the automated capture-quality blocker counts across all six guide-seat/river-eye captures. The captures remain preview-only candidate evidence until human art, guide, geospatial, hazard-readability, rights, production-material, and desktop/VR performance review pass."
+          ]
+        },
+        {
+          "target": "lighting_atmosphere_and_capture",
+          "required_before_lifelike": [
+            "river-specific time-of-day and weather presets",
+            "HDRI or first-party sky/atmosphere setup with rights recorded",
+            "manual exposure/camera language matching guide-seat review",
+            "desktop and VR performance captures with settings recorded",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": [
+            "2026-07-08 integrated corridor water, bank, terrain, and capture post-process work cleared the automated capture-quality blocker counts across all six guide-seat/river-eye captures. The captures remain preview-only candidate evidence until human art, guide, geospatial, hazard-readability, rights, production-material, and desktop/VR performance review pass."
+          ]
+        }
+      ],
+      "fidelity_note": "stitched Colorado/Lees Ferry production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into canyon bank preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, broad-slope terrain exposure fill and relief, source-aware macro terrain ridge/facet relief, source-aware terrain slope facet texture, source-aware riparian canopy mass texture, minimized source overlay plate artifacts, graphic waterline ribbon demotion, remaining water overlay slab demotion, long dark water streak demotion, current streak and waterline rail artifact demotion, central water scaffold plate demotion, base-water center guide-stripe breakup, base-water cross-channel breakup, base-water residual center-seam erase, dark micro-ripple artifact demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/sediment facets, biome-specific sparse deadfall/grass/root ecology props, first-party sparse desert scrub silhouettes, sparse desert riparian thicket proxy clusters, first-party instanced procedural desert-thicket/trunk scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party foliage card/canopy artifact demotion, square foliage/source-card artifact demotion, remaining square card cull, first-party foliage crown depth and leaflet breakup, lit water variation, first-party lit water normal-response scaffold, base-water flow-thread texture, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, turbidity-depth patch artifact demotion, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, sparse scrub, boulder placement, mask-aware canyon ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, river-mile stationing, hydrologic conditioning, release-aware masks, and guide/oarsman approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers; first-party material texture atlas albedo tiles are sampled into terrain, river water, primary boulder, foliage, and raft/oar vertex colors, while the normal plus packed AO/roughness/height atlases drive bounded preview material response and tiny terrain/water microrelief; review-only MI_RaftSim_*_AtlasCandidate material instances are also assigned to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass",
+      "current_decision": "Automated blockers are clear for this river's current guide-seat and river-eye captures, but lifelike approval is withheld until every open human-review, rights, production-material, hazard-readability, geospatial, guide, and performance gate records accepted evidence."
+    },
+    {
+      "river_id": "pacuare",
+      "display_name": "Pacuare River Rainforest",
+      "review_status": "awaiting_human_lifelike_review_not_approved",
+      "readiness": "preview_only_not_lifelike",
+      "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview",
+      "source_manifest": "physics/data/real_world/pacuare_river_costa_rica/source_manifest.json",
+      "flow_context": {
+        "flow_band_id": "rainfed_runnable_planning",
+        "flow_band_display_name": "Rain-Fed Runnable Planning",
+        "flow_band_source": "physics/data/real_world/pacuare_river_costa_rica/flow_presets.json",
+        "flow_reference_discharge_cfs": null,
+        "flow_visual_width_scale": 1.05,
+        "flow_visual_foam_scale": 1.2,
+        "flow_visual_wet_bank_scale": 1.2,
+        "flow_visual_current_cue_scale": 1.18,
+        "flow_visual_water_level_offset_cm": 7.0,
+        "flow_visual_note": "Default Pacuare planning band uses relative rainfed-runnable context only; numeric discharge stays unset until Costa Rica gauge, rainfall, flash-response, and guide review clear it."
+      },
+      "source_inputs_for_review": {
+        "aerial_drape_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
+        "terrain_relief_image": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/dem_relief_2048.png",
+        "heightfield_preview_image": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/heightfield_candidate_2017.png",
+        "water_mask_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png",
+        "vegetation_mask_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png",
+        "elevation_sample": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif; physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N10_W084.tif"
+      },
+      "captures": [
+        {
+          "view_id": "guide_seat_downstream",
+          "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
+          "sha256": "5a1f7d55a948200af73b53ff4f0f2502a18d90dbac90dbf6c0f2f75b7314a5b8",
+          "automated_status": "candidate_for_human_lifelike_review_not_approved",
+          "automated_blockers": [],
+          "metrics": {
+            "analysis_size": [
+              320,
+              180
+            ],
+            "source_size": [
+              1280,
+              720
+            ],
+            "rgb_mean": [
+              66.5,
+              120.36,
+              87.97
+            ],
+            "luma_mean": 106.57,
+            "luma_std": 43.02,
+            "edge_density": 0.1239,
+            "low_gradient_fraction": 0.5219,
+            "quantized_entropy_bits": 4.47,
+            "quantized_color_count": 54,
+            "flat_blue_field_fraction": 0.0337,
+            "bottom_center_dark_fraction": 0.0
+          },
+          "human_review_status": "not_reviewed",
+          "required_capture_checks": [
+            "visual_lifelike_match_to_rights_reviewed_reference_or_first_party_field_media",
+            "hazards_swimmers_rescue_targets_and_readable_water_features_not_hidden",
+            "source_alignment_notes_for_visible_banks_terrain_water_mask_and_flow_band",
+            "production_asset_material_or_first_party_equivalent_promotion_decision",
+            "desktop_and_vr_performance_readability_notes"
+          ],
+          "approval_status": "not_approved_for_lifelike_or_production",
+          "river_id": "pacuare"
+        },
+        {
+          "view_id": "river_eye_downstream",
+          "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
+          "sha256": "8f64eb9ebaddb379a9931548bbd1fd70e46d97351aec65874e0bf886240b2640",
+          "automated_status": "candidate_for_human_lifelike_review_not_approved",
+          "automated_blockers": [],
+          "metrics": {
+            "analysis_size": [
+              320,
+              180
+            ],
+            "source_size": [
+              1280,
+              720
+            ],
+            "rgb_mean": [
+              66.59,
+              121.02,
+              88.47
+            ],
+            "luma_mean": 107.1,
+            "luma_std": 42.78,
+            "edge_density": 0.1226,
+            "low_gradient_fraction": 0.5225,
+            "quantized_entropy_bits": 4.45,
+            "quantized_color_count": 54,
+            "flat_blue_field_fraction": 0.0336,
+            "bottom_center_dark_fraction": 0.0
+          },
+          "human_review_status": "not_reviewed",
+          "required_capture_checks": [
+            "visual_lifelike_match_to_rights_reviewed_reference_or_first_party_field_media",
+            "hazards_swimmers_rescue_targets_and_readable_water_features_not_hidden",
+            "source_alignment_notes_for_visible_banks_terrain_water_mask_and_flow_band",
+            "production_asset_material_or_first_party_equivalent_promotion_decision",
+            "desktop_and_vr_performance_readability_notes"
+          ],
+          "approval_status": "not_approved_for_lifelike_or_production",
+          "river_id": "pacuare"
+        }
+      ],
+      "reference_media_review_targets": [
+        {
+          "target_id": "pacuare_rainforest_gorge_density",
+          "anchor_hint": "Lower Pacuare rainforest gorge guide-seat frame",
+          "visual_questions": [
+            "How dense should canopy, vines, wet rock, and shadow be before rescue targets become unreadable?",
+            "What water color and humidity/mist cues distinguish clear-season from rain-fed conditions?"
+          ],
+          "candidate_source_ids": [
+            "wikimedia_pacuare_river_search",
+            "flickr_pacuare_river_search",
+            "instagram_pacuare_river_hashtag",
+            "youtube_pacuare_river_rafting_search"
+          ],
+          "annotation_outputs": [
+            "review/production_import_pilot/reference_annotations.geojson",
+            "field_media/production_import_pilot/rights_manifest.json"
+          ],
+          "flow_context_needed": [
+            "clear_season_low_planning",
+            "rainfed_runnable_planning",
+            "rainy_season_high_planning"
+          ],
+          "rights_status": "candidate_links_only"
+        },
+        {
+          "target_id": "pacuare_waterfalls_mist_wet_rock",
+          "anchor_hint": "Waterfall, mist, and wet-rock detail pass",
+          "visual_questions": [
+            "Where should mist and side waterfalls add atmosphere without masking line choice?",
+            "Which wet-rock classes need procedural material variants before first-party field capture exists?"
+          ],
+          "candidate_source_ids": [
+            "wikimedia_pacuare_river_search",
+            "flickr_pacuare_river_search",
+            "youtube_pacuare_river_rafting_search"
+          ],
+          "annotation_outputs": [
+            "imagery/production_import_pilot/wet_rock_waterfall_mist_mask_2048.png",
+            "review/production_import_pilot/reference_annotations.geojson"
+          ],
+          "flow_context_needed": [
+            "rainfed_runnable_planning",
+            "rainy_season_high_planning"
+          ],
+          "rights_status": "candidate_links_only"
+        },
+        {
+          "target_id": "pacuare_canopy_rescue_readability",
+          "anchor_hint": "Dense foliage swimmer/rescue visibility review",
+          "visual_questions": [
+            "Can a swimmer be tracked under tree-shadow and mist?",
+            "Which foreground leaves and branches must be culled or faded near rescue targets?"
+          ],
+          "candidate_source_ids": [
+            "instagram_pacuare_river_hashtag",
+            "youtube_pacuare_river_rafting_search"
+          ],
+          "annotation_outputs": [
+            "review/production_import_pilot/rescue_visibility_annotations.geojson",
+            "field_media/production_import_pilot/rights_manifest.json"
+          ],
+          "flow_context_needed": [
+            "rainfed_runnable_planning",
+            "rainy_season_high_planning"
+          ],
+          "rights_status": "candidate_links_only"
+        }
+      ],
+      "open_review_gates": [
+        {
+          "domain_id": "art_direction_visual_lifelike",
+          "required_reviewer": "environment_art_or_art_direction",
+          "required_evidence": [
+            "side_by_side_review_against_rights_reviewed_reference_links_or_first_party_field_media",
+            "river_specific_notes_for_terrain_water_rocks_foliage_foam_mist_lighting_and_raft_foreground"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "guide_hydraulic_fidelity",
+          "required_reviewer": "river_guide_or_oarsman_domain_reviewer",
+          "required_evidence": [
+            "flow_band_specific_notes_for_line_choice_holes_laterals_boils_eddy_lines_wave_trains_and_wet_banks",
+            "raft_outcome_sanity_notes_for_surf_flush_pin_release_flip_and_swimmer_visibility"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "geospatial_source_alignment",
+          "required_reviewer": "geospatial_or_technical_art_reviewer",
+          "required_evidence": [
+            "capture_overlays_or_notes_checking_river_centerline_banks_heightfield_masks_and_source_drape_alignment",
+            "known_preview_derivative_limitations_and_required_production_import_replacements"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "rights_and_reference_media",
+          "required_reviewer": "rights_or_content_provenance_reviewer",
+          "required_evidence": [
+            "item_level_license_permission_attribution_and_allowed_use_for_any_photo_footage_or_social_reference",
+            "confirmation_that_uncleared_media_remains_link_only_and_not_used_as_texture_training_or_packaged_asset_input"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "hazard_and_rescue_readability",
+          "required_reviewer": "gameplay_safety_or_rescue_readability_reviewer",
+          "required_evidence": [
+            "notes_that_water_foam_mist_foliage_and_lighting_do_not_hide_hazards_swimmers_throw_rope_zones_or_rescue_targets",
+            "notes_that_visual_forcing_or_art_layers_do_not_hide_solver_or_conservation_failures"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "production_material_asset_promotion",
+          "required_reviewer": "technical_art_or_rendering_reviewer",
+          "required_evidence": [
+            "promotion_decision_for_review_only_texture2d_material_instance_and_procedural_proxy_surfaces",
+            "replacement_or_approval_plan_for_landscape_water_rocks_foliage_foam_mist_lighting_and_raft_foreground_assets"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        },
+        {
+          "domain_id": "desktop_and_vr_performance",
+          "required_reviewer": "performance_or_vr_reviewer",
+          "required_evidence": [
+            "desktop_capture_settings_frame_time_gpu_memory_and_scalability_notes",
+            "vr_or_low_power_capture_settings_comfort_frame_time_and_visual_readability_notes"
+          ],
+          "status": "open_pending_human_review_or_production_evidence",
+          "approved": false
+        }
+      ],
+      "visual_replacement_targets": [
+        {
+          "target": "terrain_and_banks",
+          "required_before_lifelike": [
+            "conditioned source heightfields or approved procedural terrain",
+            "bank breaklines and channel burning",
+            "biome-specific terrain material layering",
+            "first_party_procedural_asset_recipe_coverage_or_rights_cleared_equivalent_assets",
+            "first_party_procedural_material_recipe_manifest_coverage_or_rights_cleared_material_assets",
+            "first_party_material_swatch_review_or_rights_cleared_material_reference",
+            "source-aligned wet/dry and exposed-bar masks",
+            "first_party_importable_texture_atlas_review_or_rights_cleared_texture_assets",
+            "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
+            "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+            "approved_unreal_material_instances_from_candidate_manifest_or_rights_cleared_equivalent_materials",
+            "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": []
+        },
+        {
+          "target": "rocks_boulders_and_riverbed",
+          "required_before_lifelike": [
+            "rights-cleared or first-party rock/boulder assets",
+            "wetness and moss/sediment material variants",
+            "mask-aware placement that preserves hazard readability",
+            "river-specific scale and abrasion review",
+            "first_party_rock_texture_atlas_or_rights_cleared_rock_texture_maps",
+            "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
+            "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+            "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": []
+        },
+        {
+          "target": "foliage_and_ecology",
+          "required_before_lifelike": [
+            "biome-specific trees, seedlings, shrubs, grasses, tropical canopy, and deadfall",
+            "density masks from reviewed imagery or first-party procedural rules",
+            "seasonal and flow-bank exposure variants",
+            "performance-scalable Nanite/PCG or instancing path",
+            "first_party_foliage_texture_atlas_or_rights_cleared_biome_foliage_texture_maps",
+            "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
+            "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+            "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": []
+        },
+        {
+          "target": "water_foam_spray_mist_and_wetness",
+          "required_before_lifelike": [
+            "production water shader with reflections, depth color, turbidity, and solver/current cues",
+            "foam, boil, wave-train, hole, eddy-line, lateral, spray, and mist layers",
+            "flow-band dependency from validated hydrology and gameplay tuning",
+            "no visual forcing that hides conservation or physics failures",
+            "first_party_water_foam_mist_texture_atlas_or_approved_water_material_textures",
+            "reviewed_in_engine_first_party_texture_atlas_application_or_rights_cleared_equivalent_materials",
+            "reviewed_bound_unreal_texture2d_material_instances_or_rights_cleared_equivalent_materials",
+            "reviewed_atlas_sampler_parent_material_or_rights_cleared_equivalent_shader_graph",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": [
+            "2026-07-08 integrated corridor water, bank, terrain, and capture post-process work cleared the automated capture-quality blocker counts across all six guide-seat/river-eye captures. The captures remain preview-only candidate evidence until human art, guide, geospatial, hazard-readability, rights, production-material, and desktop/VR performance review pass."
+          ]
+        },
+        {
+          "target": "lighting_atmosphere_and_capture",
+          "required_before_lifelike": [
+            "river-specific time-of-day and weather presets",
+            "HDRI or first-party sky/atmosphere setup with rights recorded",
+            "manual exposure/camera language matching guide-seat review",
+            "desktop and VR performance captures with settings recorded",
+            "review_material_instance_scene_assignment_capture_review_and_production_promotion",
+            "automated_capture_quality_gate_passed_without_proxy_blockers"
+          ],
+          "current_preview_progress": [
+            "2026-07-08 integrated corridor water, bank, terrain, and capture post-process work cleared the automated capture-quality blocker counts across all six guide-seat/river-eye captures. The captures remain preview-only candidate evidence until human art, guide, geospatial, hazard-readability, rights, production-material, and desktop/VR performance review pass."
+          ]
+        }
+      ],
+      "fidelity_note": "review-gated Pacuare Sentinel-augmented preview calibration drape generated from the coarse NASA GIBS/Copernicus 4096px placeholder plus low-opacity March 20 2025 Sentinel bbox clip color/detail; this is an Unreal preview input only, not a production source-drape replacement, route imagery claim, mask source, photoreal material source, or lifelike evidence; DEM relief, heightfield, and masks remain the production-import derivative placeholders until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, broad-slope terrain exposure fill and relief, source-aware macro terrain ridge/facet relief, source-aware terrain slope facet texture, source-aware riparian canopy mass texture, minimized source overlay plate artifacts, graphic waterline ribbon demotion, remaining water overlay slab demotion, long dark water streak demotion, current streak and waterline rail artifact demotion, central water scaffold plate demotion, base-water center guide-stripe breakup, base-water cross-channel breakup, base-water residual center-seam erase, dark micro-ripple artifact demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party irregular shoreline edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, rainforest canopy/vine silhouette cards, dense layered rainforest canopy/understory proxy clusters, first-party instanced procedural rainforest canopy/trunk/understory scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party foliage card/canopy artifact demotion, square foliage/source-card artifact demotion, remaining square card cull, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, waterfall curtain/plunge-mist proxy layers, lit water variation, first-party lit water normal-response scaffold, base-water flow-thread texture, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, turbidity-depth patch artifact demotion, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, dense mask-aware ground-cover/canopy cards, refined guide-seat raft/oar foreground proxies, humid atmospheric backdrop cards, and source-aware sky-gradient/depth layers remain rights-safe proxy dressing; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers; first-party material texture atlas albedo tiles are sampled into terrain, river water, primary boulder, foliage, and raft/oar vertex colors, while the normal plus packed AO/roughness/height atlases drive bounded preview material response and tiny terrain/water microrelief; review-only MI_RaftSim_*_AtlasCandidate material instances are also assigned to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass",
+      "current_decision": "Automated blockers are clear for this river's current guide-seat and river-eye captures, but lifelike approval is withheld until every open human-review, rights, production-material, hazard-readability, geospatial, guide, and performance gate records accepted evidence."
+    }
+  ],
+  "current_decision": "Use this handoff to drive the next human art, guide, geospatial, rights, hazard-readability, production-material, and performance review pass. The zero-blocker captures are review candidates only; no river is approved as lifelike or production-playable by this artifact."
+}
