@@ -1449,6 +1449,7 @@
       "near_camera_boulder_occlusion_demotion_recorded",
       "first_party_procedural_strata_leaf_litter_wet_rock_and_talus_detail_recorded",
       "first_party_procedural_lit_vertex_color_water_gradients_recorded",
+      "first_party_lit_water_normal_response_scaffold_recorded",
       "flow_aware_water_mesh_undulation_recorded",
       "flow_band_depth_texture_ribbons_recorded",
       "flow_aware_water_surface_chop_and_turbidity_patches_recorded",

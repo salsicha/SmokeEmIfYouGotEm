@@ -96,6 +96,7 @@
     "first_party_long_dark_water_streak_demotion": true,
     "first_party_current_streak_waterline_artifact_demotion": true,
     "first_party_central_water_scaffold_plate_demotion": true,
+    "first_party_lit_water_normal_response_scaffold": true,
     "first_party_photographic_water_exposure_calibration": true,
     "first_party_near_field_water_surface_grain": true,
     "first_party_near_camera_water_macro_ripple_mottle": true,
@@ -123,37 +124,37 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [52.87, 87.6, 92.52],
+      "rgb_mean": [52.88, 83.7, 88.56],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [44.08, 87.73, 95.23],
+      "rgb_mean": [44.08, 82.72, 90.11],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [76.21, 70.32, 59.3],
+      "rgb_mean": [71.22, 65.81, 55.67],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [74.98, 70.01, 59.21],
+      "rgb_mean": [69.17, 64.8, 54.99],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [32.53, 71.15, 70.15],
+      "rgb_mean": [32.53, 67.42, 66.94],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [27.61, 71.47, 71.79],
+      "rgb_mean": [27.61, 66.58, 67.56],
       "nonblank": true
     }
   ],
@@ -166,6 +167,7 @@
     "Added first-party base water depth/current grading to the river ribbon with muted river-specific deep water, center current tongues, sediment threads, and sky-thread variation.",
     "Added first-party flow-cued water foam/slick mottle directly to the base river ribbon so flow-band energy seeds bounded aeration flecks and dark current slicks without claiming solver-driven foam or production water shader approval.",
     "Added first-party flow-dependent hydraulic aeration mats, wave-train foam laces, and bounded spray beads over authored flow bands without changing solver authority or hiding conservation failures.",
+    "Switched the active first-party vertex-color water preview material back to a bounded DefaultLit normal-response scaffold with low emissive fill, roughness, and specular constants so generated water mesh relief can catch sun/skylight after central water plate and stripe artifacts were demoted.",
     "Muted South Fork and Pacuare foliage base tints, reduced generic proxy emissive lift, and lowered branch/frond leaf-tip highlights for first-party photographic foliage tone calibration.",
     "Corrected the soft-lit terrain material emissive override to a low photographic lift so sun/skylight and mesh normals shape terrain proxies.",
     "Raised the generated terrain luma floor, reduced terrain-feature overlay strength, and softened proxy terrain normals so coarse bank/canyon/rainforest meshes no longer collapse into black plates.",
