@@ -10474,7 +10474,7 @@ void AddPreviewNearFieldPhotorealReviewDressing(
     }
 
     {
-        constexpr int32 FleckCount = 420;
+        constexpr int32 FleckCount = 760;
         TArray<FVector> Vertices;
         TArray<FVector> Normals;
         TArray<FVector2D> UVs;
@@ -10535,10 +10535,10 @@ void AddPreviewNearFieldPhotorealReviewDressing(
             const float SurfaceWave = FMath::Sin(X * 0.020f + Y * 0.017f + TextureNoise) * (Spec.bDesertCanyon ? 2.0f : 3.2f);
             const FVector Center(X, Y, WaterBaseZ + 22.0f + SurfaceWave + CenterT * 3.0f);
             const int32 VertexStart = Vertices.Num();
-            Vertices.Add(Center - AxisX - AxisY);
-            Vertices.Add(Center + AxisX - AxisY);
-            Vertices.Add(Center - AxisX + AxisY);
-            Vertices.Add(Center + AxisX + AxisY);
+            Vertices.Add(Center - AxisX);
+            Vertices.Add(Center - AxisY);
+            Vertices.Add(Center + AxisY);
+            Vertices.Add(Center + AxisX);
             UVs.Add(FVector2D(0.0f, 0.0f));
             UVs.Add(FVector2D(1.0f, 0.0f));
             UVs.Add(FVector2D(0.0f, 1.0f));
@@ -10548,11 +10548,11 @@ void AddPreviewNearFieldPhotorealReviewDressing(
             VertexColors.Add(ClampPreviewColor(ScalePreviewColor(FleckColor, 0.98f)));
             VertexColors.Add(ClampPreviewColor(ScalePreviewColor(FleckColor, 0.74f)));
             Triangles.Add(VertexStart);
-            Triangles.Add(VertexStart + 2);
-            Triangles.Add(VertexStart + 1);
             Triangles.Add(VertexStart + 1);
             Triangles.Add(VertexStart + 2);
+            Triangles.Add(VertexStart);
             Triangles.Add(VertexStart + 3);
+            Triangles.Add(VertexStart + 1);
         }
 
         Normals = ComputePreviewMeshNormals(Vertices, Triangles);
@@ -10564,6 +10564,121 @@ void AddPreviewNearFieldPhotorealReviewDressing(
             Normals,
             UVs,
             NearFieldFoamFleck,
+            LoadOrCreatePreviewWaterVertexColorMaterial(),
+            &VertexColors);
+    }
+
+    {
+        const int32 StreakCount = Spec.bDesertCanyon ? 3520 : 2640;
+        TArray<FVector> Vertices;
+        TArray<FVector> Normals;
+        TArray<FVector2D> UVs;
+        TArray<FLinearColor> VertexColors;
+        TArray<int32> Triangles;
+        Vertices.Reserve(StreakCount * 4);
+        UVs.Reserve(StreakCount * 4);
+        VertexColors.Reserve(StreakCount * 4);
+        Triangles.Reserve(StreakCount * 6);
+
+        const FLinearColor SourceAwareWaterChromaDeep = Spec.bDesertCanyon
+            ? FLinearColor(0.210f, 0.330f, 0.430f)
+            : (Spec.bHasWaterfalls ? FLinearColor(0.020f, 0.205f, 0.105f)
+                                    : FLinearColor(0.045f, 0.260f, 0.165f));
+        const FLinearColor SourceAwareWaterChromaBank = Spec.bDesertCanyon
+            ? FLinearColor(0.720f, 0.360f, 0.155f)
+            : (Spec.bHasWaterfalls ? FLinearColor(0.080f, 0.330f, 0.135f)
+                                    : FLinearColor(0.220f, 0.405f, 0.215f));
+        const FLinearColor SourceAwareWaterChromaSky = Spec.bDesertCanyon
+            ? FLinearColor(0.300f, 0.555f, 0.700f)
+            : (Spec.bHasWaterfalls ? FLinearColor(0.260f, 0.600f, 0.500f)
+                                    : FLinearColor(0.330f, 0.650f, 0.555f));
+        const FLinearColor SourceAwareWaterChromaFoam = Spec.bDesertCanyon
+            ? FLinearColor(0.840f, 0.680f, 0.380f)
+            : (Spec.bHasWaterfalls ? FLinearColor(0.640f, 0.820f, 0.625f)
+                                    : FLinearColor(0.675f, 0.825f, 0.665f));
+
+        for (int32 StreakIndex = 0; StreakIndex < StreakCount; ++StreakIndex)
+        {
+            const float LongT = static_cast<float>(StreakIndex) / static_cast<float>(StreakCount - 1);
+            const float LocalSeedA = FMath::Frac(
+                FMath::Sin(static_cast<float>((StreakIndex + 71) * 379) * 12.9898f) * 43758.5453f);
+            const float LocalSeedB = FMath::Frac(
+                FMath::Sin(static_cast<float>((StreakIndex + 113) * 521) * 12.9898f) * 43758.5453f);
+            const float X = FMath::Lerp(-5550.0f, 19600.0f, LongT) +
+                210.0f * FMath::Sin(static_cast<float>(StreakIndex) * 0.83f);
+            const float CenterY = GetPreviewRiverCenterY(Spec, X);
+            const float ReachFade =
+                SmoothPreviewStep(-5550.0f, -4900.0f, X) * (1.0f - SmoothPreviewStep(17200.0f, 19600.0f, X));
+            const float LateralSeed =
+                0.72f * FMath::Sin(static_cast<float>(StreakIndex) * 2.31f) +
+                0.28f * FMath::Sin(static_cast<float>(StreakIndex) * 0.47f + LocalSeedA * UE_TWO_PI);
+            const float Lateral = ActiveRiverHalfWidth * 0.88f * FMath::Clamp(LateralSeed, -1.0f, 1.0f);
+            const float CenterT = 1.0f -
+                FMath::Clamp(FMath::Abs(Lateral) / FMath::Max(1.0f, ActiveRiverHalfWidth), 0.0f, 1.0f);
+            const float Width = (Spec.bDesertCanyon ? 15.0f : 14.0f) *
+                (0.42f + 0.70f * LocalSeedB) * (0.78f + CenterT * 0.26f);
+            const float Length = (Spec.bDesertCanyon ? 168.0f : 122.0f) *
+                (0.34f + 0.82f * LocalSeedA) * (0.74f + CenterT * 0.36f);
+            const float Yaw =
+                0.018f * FMath::Sin(X * 0.0038f) +
+                0.040f * FMath::Sin(static_cast<float>(StreakIndex) * 0.29f);
+            const FVector AxisX(FMath::Cos(Yaw) * Length, FMath::Sin(Yaw) * Length, 0.0f);
+            const FVector AxisY(-FMath::Sin(Yaw) * Width, FMath::Cos(Yaw) * Width, 0.0f);
+            const float PaletteNoise = FMath::Clamp(
+                0.50f +
+                    0.34f * FMath::Sin(X * 0.014f + Lateral * 0.021f + LocalSeedA) +
+                    0.22f * FMath::Sin(X * 0.041f - Lateral * 0.017f + LocalSeedB),
+                0.0f,
+                1.0f);
+            const float FlowThreadNoise = FMath::Clamp(
+                0.50f +
+                    0.30f * FMath::Sin(X * 0.0065f + Lateral * 0.0125f) +
+                    0.20f * FMath::Sin(X * 0.0195f - Lateral * 0.0085f),
+                0.0f,
+                1.0f);
+            FLinearColor StreakColor = PaletteNoise < 0.24f
+                ? SourceAwareWaterChromaDeep
+                : (PaletteNoise < 0.50f
+                       ? SourceAwareWaterChromaBank
+                       : (PaletteNoise < 0.76f ? SourceAwareWaterChromaSky : SourceAwareWaterChromaFoam));
+            StreakColor = FMath::Lerp(StreakColor, Spec.WaterColor, Spec.bDesertCanyon ? 0.14f : 0.18f);
+            StreakColor = ScalePreviewColor(
+                StreakColor,
+                FMath::Clamp(0.72f + FlowThreadNoise * 0.42f + CenterT * 0.10f, 0.68f, 1.28f));
+            const float SurfaceWave =
+                FMath::Sin(X * 0.020f + Lateral * 0.014f + LocalSeedA * UE_TWO_PI) *
+                (Spec.bDesertCanyon ? 1.8f : 2.8f);
+            const FVector Center(X, CenterY + Lateral, WaterBaseZ + 31.0f + SurfaceWave + ReachFade * 2.0f);
+            const int32 VertexStart = Vertices.Num();
+            Vertices.Add(Center - AxisX);
+            Vertices.Add(Center - AxisY);
+            Vertices.Add(Center + AxisY);
+            Vertices.Add(Center + AxisX);
+            UVs.Add(FVector2D(0.0f, 0.0f));
+            UVs.Add(FVector2D(1.0f, 0.0f));
+            UVs.Add(FVector2D(0.0f, 1.0f));
+            UVs.Add(FVector2D(1.0f, 1.0f));
+            VertexColors.Add(ClampPreviewColor(ScalePreviewColor(StreakColor, 0.72f + ReachFade * 0.08f)));
+            VertexColors.Add(ClampPreviewColor(ScalePreviewColor(StreakColor, 0.90f + FlowThreadNoise * 0.08f)));
+            VertexColors.Add(ClampPreviewColor(ScalePreviewColor(StreakColor, 1.06f)));
+            VertexColors.Add(ClampPreviewColor(ScalePreviewColor(StreakColor, 0.78f + CenterT * 0.10f)));
+            Triangles.Add(VertexStart);
+            Triangles.Add(VertexStart + 1);
+            Triangles.Add(VertexStart + 2);
+            Triangles.Add(VertexStart);
+            Triangles.Add(VertexStart + 3);
+            Triangles.Add(VertexStart + 1);
+        }
+
+        Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+        AddPreviewProceduralMeshActor(
+            World,
+            FString::Printf(TEXT("RaftSim_SourceAwareWaterChromaMicrobreakup_%s"), *Spec.RiverId),
+            Vertices,
+            Triangles,
+            Normals,
+            UVs,
+            Spec.WaterColor,
             LoadOrCreatePreviewWaterVertexColorMaterial(),
             &VertexColors);
     }

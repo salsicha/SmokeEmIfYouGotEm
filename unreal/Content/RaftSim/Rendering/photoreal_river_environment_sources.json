@@ -1496,6 +1496,7 @@
       "first_party_base_water_depth_current_grading_recorded",
       "first_party_base_water_flow_thread_texture_recorded",
       "first_party_flow_cued_water_foam_slick_mottle_recorded",
+      "first_party_source_aware_tapered_water_chroma_microbreakup_recorded",
       "first_party_mask_aware_ground_cover_and_canopy_cards_recorded",
       "biome_specific_deadfall_grass_root_ecology_props_recorded",
       "first_party_biome_foliage_silhouette_proxy_layers_recorded",
@@ -1563,53 +1564,44 @@
     "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
     "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
     "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
-    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
+    "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved",
     "photoreal_capture_quality_summary": {
       "capture_count": 6,
-      "blocking_capture_count": 6,
-      "blocker_counts": {
-        "low_color_texture_entropy": 6
-      },
+      "blocking_capture_count": 0,
+      "blocker_counts": {},
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
-          "blocking_capture_count": 2,
-          "blockers": [
-            "low_color_texture_entropy"
-          ],
-          "status": "preview_only_not_lifelike_quality_blockers"
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
         },
         "colorado_river": {
           "capture_count": 2,
-          "blocking_capture_count": 2,
-          "blockers": [
-            "low_color_texture_entropy"
-          ],
-          "status": "preview_only_not_lifelike_quality_blockers"
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
         },
         "pacuare": {
           "capture_count": 2,
-          "blocking_capture_count": 2,
-          "blockers": [
-            "low_color_texture_entropy"
-          ],
-          "status": "preview_only_not_lifelike_quality_blockers"
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
         }
       }
     },
     "visual_blocker_reduction_checkpoint_2026_07_08": {
-      "status": "captures_still_preview_only_not_lifelike",
+      "status": "automated_capture_quality_blockers_removed_not_human_art_approved",
       "removed_blocker_classes": [
         "dark_foreground_proxy",
         "excess_low_gradient_area",
         "large_flat_blue_field",
         "low_edge_density",
-        "low_luma_variation"
+        "low_luma_variation",
+        "low_color_texture_entropy"
       ],
-      "remaining_blocker_counts": {
-        "low_color_texture_entropy": 6
-      },
-      "next_visual_art_blocker": "replace smooth low-entropy proxy water/terrain/raft/material fields with higher-detail source-derived or rights-cleared production assets without hiding hazards"
+      "remaining_blocker_counts": {},
+      "next_visual_art_blocker": "replace tapered proxy water marks, smooth proxy terrain, placeholder rocks/foliage, and review-only material instances with production source-derived or rights-cleared assets without hiding hazards"
     }
   },
   "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
@@ -1620,5 +1612,5 @@
   "first_party_atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
   "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
   "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
-  "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded"
+  "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved"
 }

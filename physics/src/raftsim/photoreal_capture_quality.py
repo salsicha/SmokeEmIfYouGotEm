@@ -259,11 +259,30 @@ def build_capture_quality_review(repo_root: Path, generated_on: str = "2026-07-0
         }
         for river_id, data in sorted(per_river_status.items())
     }
+    blocking_capture_count = sum(1 for capture in captures if capture["blockers"])
+    status = (
+        "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded"
+        if blocking_capture_count
+        else "captures_reviewed_candidate_for_human_lifelike_review_not_approved"
+    )
+    current_decision = (
+        "Use this automated review as a regression gate for the photoreal environment track. "
+        "The current captures have no automated blocker counts and may advance to human art, guide, "
+        "geospatial, rights, hazard-readability, and performance review, but automated metrics do not approve "
+        "the visuals as lifelike or production-ready."
+        if blocking_capture_count == 0
+        else (
+            "Use this automated review as a regression gate for the photoreal environment track. "
+            "The current captures remain preview-only because at least one automated blocker is present; "
+            "passing these checks still does not replace guide, geospatial, rights, hazard-readability, "
+            "performance, and art-direction approval."
+        )
+    )
 
     return {
         "schema": "raftsim.unreal.photoreal_capture_quality_review.v1",
         "generated_on": generated_on,
-        "status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
+        "status": status,
         "source_capture_manifest": str(CAPTURE_MANIFEST_RELATIVE_PATH),
         "policy": {
             "metrics_are_blockers_not_lifelike_approval": True,
@@ -273,18 +292,12 @@ def build_capture_quality_review(repo_root: Path, generated_on: str = "2026-07-0
         "thresholds": thresholds.as_dict(),
         "summary": {
             "capture_count": len(captures),
-            "blocking_capture_count": sum(1 for capture in captures if capture["blockers"]),
+            "blocking_capture_count": blocking_capture_count,
             "blocker_counts": dict(sorted(blocker_counts.items())),
             "per_river": normalized_per_river,
         },
         "captures": captures,
-        "current_decision": (
-            "Use this automated review as a regression gate for the photoreal environment track. "
-            "The current captures remain preview-only because they still show low texture entropy in all six captures; "
-            "the July 8 near-field and fleck-detail passes removed the flat-blue, dark-foreground, low-gradient, "
-            "low-luma, and river-eye low-edge blocker classes, but passing those checks still does not replace guide, "
-            "geospatial, rights, hazard-readability, performance, and art-direction approval."
-        ),
+        "current_decision": current_decision,
     }
 
 
