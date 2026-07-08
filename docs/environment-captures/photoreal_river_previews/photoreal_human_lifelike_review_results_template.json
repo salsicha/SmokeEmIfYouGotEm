@@ -44,7 +44,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
-          "sha256": "5c6672c2db41dd0cd3202cbd821381d8733b9be301da14ca065fbd3a44d09a3f",
+          "sha256": "d70df8f9f2cf438f084b6c7632756fd244cffc15b968cce798d9fc2be391ca2b",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "human_review_status": "not_reviewed",
           "approval_status": "not_approved_for_lifelike_or_production"
@@ -212,7 +212,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
-          "sha256": "c9ccc12a76dbdd37a2499862926d35f66b1452a86df3712914da0aa3cc764a18",
+          "sha256": "8635eb210be4edcb88a50021a34c2d1f0c433627b821480231d28b7d67a09a92",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "human_review_status": "not_reviewed",
           "approval_status": "not_approved_for_lifelike_or_production"
@@ -380,7 +380,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
-          "sha256": "05bc291836ea38ad2465801acd75013844c5f0502e85876931ff1f672cd09bdf",
+          "sha256": "4e088bf2d74c1f39d3b98039705f8b27090e76497d0f7f940bab0a2f68ab5824",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "human_review_status": "not_reviewed",
           "approval_status": "not_approved_for_lifelike_or_production"
@@ -388,7 +388,7 @@
         {
           "view_id": "river_eye_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
-          "sha256": "a037a4ac0ee91dcb88bff62b5ad461f30b58087af17e866b4158417656fba593",
+          "sha256": "0e771bb81bc5a07b4220f88625089146ece36063fdb8f72055e3f744e89e1974",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "human_review_status": "not_reviewed",
           "approval_status": "not_approved_for_lifelike_or_production"

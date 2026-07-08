@@ -189,7 +189,9 @@
       "source_conditioned_material_texture2d_review_assets_declared",
       "source_conditioned_material_instance_texture_bindings_recorded",
       "source_conditioned_material_zone_weight_controls_recorded",
-      "source_conditioned_shader_graph_sampler_wiring_recorded"
+      "source_conditioned_shader_graph_sampler_wiring_recorded",
+      "source_conditioned_normal_detail_maps_recorded",
+      "source_conditioned_normal_detail_material_blend_recorded"
     ],
     "missing_renderer_coverage_before_lifelike": [
       "production_landscape_or_nanite_terrain_material_layers",
@@ -339,12 +341,13 @@
     "source_conditioned_material_map_status": "generated_review_gated_source_conditioned_material_maps_not_lifelike",
     "source_conditioned_material_map_summary": {
       "river_count": 3,
-      "map_count": 9,
+      "map_count": 12,
       "map_size_px": 2048,
       "map_ids": [
         "macro_albedo",
         "material_zones",
-        "ao_roughness_height"
+        "ao_roughness_height",
+        "normal_detail"
       ]
     },
     "source_conditioned_material_texture_asset_root": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures",

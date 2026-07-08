@@ -28,19 +28,19 @@
       "root": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
       "exists": true,
       "file_count": 9,
-      "total_bytes": 16155412
+      "total_bytes": 16155409
     },
     "source_conditioned_material_texture_assets": {
       "root": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures",
       "exists": true,
-      "file_count": 9,
-      "total_bytes": 60934119
+      "file_count": 12,
+      "total_bytes": 75601931
     },
     "material_instance_review_assets": {
       "root": "unreal/Content/RaftSim/Materials/MaterialInstances",
       "exists": true,
       "file_count": 18,
-      "total_bytes": 234861
+      "total_bytes": 253647
     }
   },
   "profiling_capture_plan": {
@@ -75,15 +75,15 @@
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview.umap",
           "exists": true,
           "size_bytes": 227745511,
-          "sha256": "a4f66b13406b53ceaf14b3e13f7904c07dbf35a921939e0a7df28c01d2b26b4d"
+          "sha256": "f34ab0ec198d1714d28c702c2ec54bdc22e695db33b1b694517bb558559f2676"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "5c6672c2db41dd0cd3202cbd821381d8733b9be301da14ca065fbd3a44d09a3f",
-            "size_bytes": 1132690,
+            "sha256": "d70df8f9f2cf438f084b6c7632756fd244cffc15b968cce798d9fc2be391ca2b",
+            "size_bytes": 1132955,
             "source_size": [
               1280,
               720
@@ -105,13 +105,17 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2266471,
+        "total_capture_png_bytes": 2266736,
         "source_inputs": {
           "aerial_drape_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png",
           "terrain_relief_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/dem_relief_2048.png",
           "heightfield_preview_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/heightfield_candidate_2017.png",
           "water_mask_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/water_mask_2048.png",
-          "vegetation_mask_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/vegetation_mask_2048.png"
+          "vegetation_mask_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/vegetation_mask_2048.png",
+          "source_conditioned_macro_albedo_image": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_macro_albedo.png",
+          "source_conditioned_material_zones_image": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_material_zones.png",
+          "source_conditioned_ao_roughness_height_image": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
+          "source_conditioned_normal_detail_image": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png"
         }
       },
       "profiles": [
@@ -207,15 +211,15 @@
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview.umap",
           "exists": true,
           "size_bytes": 216526457,
-          "sha256": "7f563bfa70394cd6b0af66066019c469096e63e8880dfd08ebdd65a0384cc1dc"
+          "sha256": "81c1ba2e8220f82db3189d4d12b431247846db51d273d5a8542a626547cfce12"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "c9ccc12a76dbdd37a2499862926d35f66b1452a86df3712914da0aa3cc764a18",
-            "size_bytes": 1204684,
+            "sha256": "8635eb210be4edcb88a50021a34c2d1f0c433627b821480231d28b7d67a09a92",
+            "size_bytes": 1204493,
             "source_size": [
               1280,
               720
@@ -237,13 +241,17 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2408079,
+        "total_capture_png_bytes": 2407888,
         "source_inputs": {
           "aerial_drape_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png",
           "terrain_relief_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/dem_relief_2048.png",
           "heightfield_preview_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/heightfield_candidate_2017.png",
           "water_mask_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/water_mask_2048.png",
-          "vegetation_mask_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/vegetation_mask_2048.png"
+          "vegetation_mask_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/vegetation_mask_2048.png",
+          "source_conditioned_macro_albedo_image": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_macro_albedo.png",
+          "source_conditioned_material_zones_image": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_material_zones.png",
+          "source_conditioned_ao_roughness_height_image": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
+          "source_conditioned_normal_detail_image": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png"
         }
       },
       "profiles": [
@@ -339,15 +347,15 @@
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview.umap",
           "exists": true,
           "size_bytes": 261614425,
-          "sha256": "346415ec017f4b1fbbda882ed6f1d237bdda29ca5c4f1e70e468554649a33a90"
+          "sha256": "2882ffccee6b0f5d1543d1ff5012f0f144d6b40a2df8dbca3f29e300d69c88e7"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "05bc291836ea38ad2465801acd75013844c5f0502e85876931ff1f672cd09bdf",
-            "size_bytes": 1190020,
+            "sha256": "4e088bf2d74c1f39d3b98039705f8b27090e76497d0f7f940bab0a2f68ab5824",
+            "size_bytes": 1189941,
             "source_size": [
               1280,
               720
@@ -359,7 +367,7 @@
             "view_id": "river_eye_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
             "exists": true,
-            "sha256": "a037a4ac0ee91dcb88bff62b5ad461f30b58087af17e866b4158417656fba593",
+            "sha256": "0e771bb81bc5a07b4220f88625089146ece36063fdb8f72055e3f744e89e1974",
             "size_bytes": 1190720,
             "source_size": [
               1280,
@@ -369,13 +377,17 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2380740,
+        "total_capture_png_bytes": 2380661,
         "source_inputs": {
           "aerial_drape_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
           "terrain_relief_image": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/dem_relief_2048.png",
           "heightfield_preview_image": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/heightfield_candidate_2017.png",
           "water_mask_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png",
-          "vegetation_mask_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png"
+          "vegetation_mask_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png",
+          "source_conditioned_macro_albedo_image": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_macro_albedo.png",
+          "source_conditioned_material_zones_image": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_material_zones.png",
+          "source_conditioned_ao_roughness_height_image": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
+          "source_conditioned_normal_detail_image": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png"
         }
       },
       "profiles": [

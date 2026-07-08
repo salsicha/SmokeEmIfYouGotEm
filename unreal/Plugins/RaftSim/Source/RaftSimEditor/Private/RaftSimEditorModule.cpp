@@ -331,6 +331,10 @@ FString GetSourceConditionedMaterialMapRelativePath(const FString& RiverId, cons
     {
         MapSuffix = TEXT("ao_roughness_height");
     }
+    else if (MapKey == TEXT("SourceConditionedNormalDetail"))
+    {
+        MapSuffix = TEXT("normal_detail");
+    }
 
     return FString::Printf(
         TEXT("unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/%s_source_conditioned_%s.png"),
@@ -1192,6 +1196,19 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetFirstPartyMaterialTextureA
         Packed.bSRGB = false;
         Packed.LODGroup = TEXTUREGROUP_World;
         Specs.Add(Packed);
+
+        FRaftSimFirstPartyMaterialTextureAssetSpec NormalDetail;
+        NormalDetail.RiverId = RiverSpec.RiverId;
+        NormalDetail.RiverAssetName = RiverSpec.RiverAssetName;
+        NormalDetail.MapKey = TEXT("SourceConditionedNormalDetail");
+        NormalDetail.MapKind = TEXT("source_conditioned_normal_detail");
+        NormalDetail.SourceRelativePath =
+            GetSourceConditionedMaterialMapRelativePath(RiverSpec.RiverId, NormalDetail.MapKey);
+        NormalDetail.TextureAssetRootPackagePath = TEXT("/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures");
+        NormalDetail.CompressionSettings = TC_Normalmap;
+        NormalDetail.bSRGB = false;
+        NormalDetail.LODGroup = TEXTUREGROUP_WorldNormalMap;
+        Specs.Add(NormalDetail);
     }
 
     return Specs;
@@ -1471,6 +1488,8 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
         GetFirstPartyMaterialTextureAssetBindingKey(TEXT("american_south_fork"), TEXT("SourceConditionedMaterialZones")));
     UTexture2D* DefaultSourcePacked = TextureAssetsByKey.FindRef(
         GetFirstPartyMaterialTextureAssetBindingKey(TEXT("american_south_fork"), TEXT("SourceConditionedAORoughnessHeight")));
+    UTexture2D* DefaultSourceNormalDetail = TextureAssetsByKey.FindRef(
+        GetFirstPartyMaterialTextureAssetBindingKey(TEXT("american_south_fork"), TEXT("SourceConditionedNormalDetail")));
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
@@ -1585,6 +1604,15 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
     SourcePackedSample->Group = TEXT("SourceConditionedMaps");
     SourcePackedSample->SortPriority = 90;
 
+    UMaterialExpressionTextureSampleParameter2D* SourceNormalDetailSample =
+        AddExpression(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material), -180, 1500);
+    SourceNormalDetailSample->ParameterName = TEXT("SourceConditionedNormalDetail");
+    SourceNormalDetailSample->Texture = DefaultSourceNormalDetail;
+    SourceNormalDetailSample->SamplerType = SAMPLERTYPE_Normal;
+    SourceNormalDetailSample->Coordinates.Expression = TexCoord;
+    SourceNormalDetailSample->Group = TEXT("SourceConditionedMaps");
+    SourceNormalDetailSample->SortPriority = 95;
+
     UMaterialExpressionVectorParameter* SourceZoneWeights =
         AddExpression(NewObject<UMaterialExpressionVectorParameter>(Material), -180, 700);
     SourceZoneWeights->ParameterName = TEXT("SourceConditionedZoneWeights");
@@ -1674,6 +1702,18 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
         AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 1160, 900);
     SourceConditionedSurfaceResponseAlpha->A.Expression = SourceConditionedSurfaceResponseWeight;
     SourceConditionedSurfaceResponseAlpha->B.Expression = SourceZoneMask;
+
+    UMaterialExpressionScalarParameter* SourceConditionedNormalDetailWeight =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), 960, 620);
+    SourceConditionedNormalDetailWeight->ParameterName = TEXT("SourceConditionedNormalDetailWeight");
+    SourceConditionedNormalDetailWeight->DefaultValue = 0.08f;
+    SourceConditionedNormalDetailWeight->Group = TEXT("SourceConditionedMaps");
+    SourceConditionedNormalDetailWeight->SortPriority = 125;
+
+    UMaterialExpressionMultiply* SourceConditionedNormalDetailAlpha =
+        AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 1160, 660);
+    SourceConditionedNormalDetailAlpha->A.Expression = SourceConditionedNormalDetailWeight;
+    SourceConditionedNormalDetailAlpha->B.Expression = SourceZoneMask;
 
     UMaterialExpressionVertexColor* VertexColor =
         AddExpression(NewObject<UMaterialExpressionVertexColor>(Material), -180, -560);
@@ -1819,6 +1859,12 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
     SourceConditionedHeightOffset->B.Expression = SourceHeightOffset;
     SourceConditionedHeightOffset->Alpha.Expression = SourceConditionedSurfaceResponseAlpha;
 
+    UMaterialExpressionLinearInterpolate* SourceConditionedNormal =
+        AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 760, 80);
+    SourceConditionedNormal->A.Expression = ReviewNormal;
+    SourceConditionedNormal->B.Expression = SourceNormalDetailSample;
+    SourceConditionedNormal->Alpha.Expression = SourceConditionedNormalDetailAlpha;
+
     UMaterialExpressionConstant* Specular = AddExpression(NewObject<UMaterialExpressionConstant>(Material), 560, 520);
     Specular->R = 0.0f;
 
@@ -1826,7 +1872,7 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
     {
         ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, SourceConditionedBaseColor);
         ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
-        ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, ReviewNormal);
+        ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, SourceConditionedNormal);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, SourceConditionedAmbientOcclusion);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, SourceConditionedRoughness);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->PixelDepthOffset, SourceConditionedHeightOffset);
@@ -1870,6 +1916,7 @@ struct FRaftSimFirstPartyMaterialInstanceCandidateSpec
     FLinearColor SourceConditionedZoneWeights = FLinearColor(1.0f, 0.0f, 0.0f, 0.0f);
     float SourceConditionedMacroAlbedoWeight = 0.0f;
     float SourceConditionedSurfaceResponseWeight = 0.0f;
+    float SourceConditionedNormalDetailWeight = 0.0f;
 
     FString GetMaterialInstancePath() const
     {
@@ -1898,6 +1945,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
         FLinearColor SourceConditionedZoneWeights;
         float SourceConditionedMacroAlbedoWeight;
         float SourceConditionedSurfaceResponseWeight;
+        float SourceConditionedNormalDetailWeight;
     };
 
     const FRecipeSpec RecipeSpecs[] = {
@@ -1916,6 +1964,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             FLinearColor(1.0f, 0.0f, 0.0f, 0.0f),
             0.28f,
             0.22f,
+            0.16f,
         },
         {
             TEXT("wet_boulder_contact_material_set"),
@@ -1932,6 +1981,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             FLinearColor(1.0f, 0.0f, 0.0f, 0.0f),
             0.08f,
             0.10f,
+            0.12f,
         },
         {
             TEXT("biome_foliage_groundcover_materials"),
@@ -1948,6 +1998,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             FLinearColor(0.0f, 1.0f, 0.0f, 0.0f),
             0.20f,
             0.12f,
+            0.08f,
         },
         {
             TEXT("flow_dependent_water_surface_material"),
@@ -1964,6 +2015,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             FLinearColor(0.0f, 0.0f, 1.0f, 0.0f),
             0.055f,
             0.020f,
+            0.01f,
         },
         {
             TEXT("foam_spray_mist_atmosphere_materials"),
@@ -1980,6 +2032,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             FLinearColor(0.0f, 0.0f, 1.0f, 0.0f),
             0.04f,
             0.04f,
+            0.01f,
         },
         {
             TEXT("raft_foreground_review_materials"),
@@ -1994,6 +2047,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             1.0f,
             0.70f,
             FLinearColor(0.0f, 0.0f, 0.0f, 0.0f),
+            0.0f,
             0.0f,
             0.0f,
         },
@@ -2033,6 +2087,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             Spec.SourceConditionedZoneWeights = RecipeSpec.SourceConditionedZoneWeights;
             Spec.SourceConditionedMacroAlbedoWeight = RecipeSpec.SourceConditionedMacroAlbedoWeight;
             Spec.SourceConditionedSurfaceResponseWeight = RecipeSpec.SourceConditionedSurfaceResponseWeight;
+            Spec.SourceConditionedNormalDetailWeight = RecipeSpec.SourceConditionedNormalDetailWeight;
             Specs.Add(Spec);
         }
     }
@@ -2133,6 +2188,9 @@ bool CreateOrUpdateFirstPartyMaterialInstanceCandidateAsset(
         FMaterialParameterInfo(TEXT("SourceConditionedSurfaceResponseWeight")),
         Spec.SourceConditionedSurfaceResponseWeight);
     Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("SourceConditionedNormalDetailWeight")),
+        Spec.SourceConditionedNormalDetailWeight);
+    Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("SourceConditionedMaterialAssignmentReviewOnlyNotLifelike")),
         1.0f);
 
@@ -2163,6 +2221,7 @@ bool CreateOrUpdateFirstPartyMaterialInstanceCandidateAsset(
     BindTextureParameter(TEXT("SourceConditionedMacroAlbedo"), TEXT("SourceConditionedMacroAlbedo"));
     BindTextureParameter(TEXT("SourceConditionedMaterialZones"), TEXT("SourceConditionedMaterialZones"));
     BindTextureParameter(TEXT("SourceConditionedAORoughnessHeight"), TEXT("SourceConditionedAORoughnessHeight"));
+    BindTextureParameter(TEXT("SourceConditionedNormalDetail"), TEXT("SourceConditionedNormalDetail"));
     if (!bAllTexturesBound)
     {
         return false;
@@ -13954,6 +14013,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("      \"source_conditioned_macro_albedo_image\": \"%s\",\n")
             TEXT("      \"source_conditioned_material_zones_image\": \"%s\",\n")
             TEXT("      \"source_conditioned_ao_roughness_height_image\": \"%s\",\n")
+            TEXT("      \"source_conditioned_normal_detail_image\": \"%s\",\n")
             TEXT("      \"elevation_sample\": \"%s\",\n")
             TEXT("      \"fidelity_note\": \"%s\",\n")
             TEXT("      \"first_party_material_instance_scene_assignment_status\": \"%s\"\n")
@@ -13988,6 +14048,8 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
                 GetSourceConditionedMaterialMapRelativePath(Spec.RiverId, TEXT("SourceConditionedMaterialZones"))),
             *EscapeRaftSimJsonString(
                 GetSourceConditionedMaterialMapRelativePath(Spec.RiverId, TEXT("SourceConditionedAORoughnessHeight"))),
+            *EscapeRaftSimJsonString(
+                GetSourceConditionedMaterialMapRelativePath(Spec.RiverId, TEXT("SourceConditionedNormalDetail"))),
             *EscapeRaftSimJsonString(Spec.ElevationSample),
             *EscapeRaftSimJsonString(GetPreviewFidelityNote(Spec)),
             *EscapeRaftSimJsonString(GetFirstPartyMaterialInstanceSceneAssignmentStatus()));

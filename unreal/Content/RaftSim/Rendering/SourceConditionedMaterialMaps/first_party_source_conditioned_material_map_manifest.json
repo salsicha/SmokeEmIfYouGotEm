@@ -17,14 +17,17 @@
     "SourceConditionedMacroAlbedo",
     "SourceConditionedMaterialZones",
     "SourceConditionedAORoughnessHeight",
+    "SourceConditionedNormalDetail",
     "SourceConditionedZoneWeights",
     "SourceConditionedMacroAlbedoWeight",
-    "SourceConditionedSurfaceResponseWeight"
+    "SourceConditionedSurfaceResponseWeight",
+    "SourceConditionedNormalDetailWeight"
   ],
   "map_semantics": {
     "macro_albedo": "Source-drape-colored material macro map with bounded water, wet-bank, vegetation, and DEM-relief shading.",
     "material_zones": "RGB material-zone weights: R=terrain/wet bank, G=vegetation away from water, B=visible water.",
-    "ao_roughness_height": "Packed RGB map: R=relief-derived ambient-occlusion proxy, G=material roughness candidate, B=DEM relief height candidate."
+    "ao_roughness_height": "Packed RGB map: R=relief-derived ambient-occlusion proxy, G=material roughness candidate, B=DEM relief height candidate.",
+    "normal_detail": "Tangent-space normal-detail candidate derived from DEM relief plus water, wet-bank, and vegetation masks; visible water is deliberately low-strength so material response does not invent hidden hydraulic geometry."
   },
   "rivers": [
     {
@@ -104,6 +107,29 @@
               "compression_settings": "TC_Masks",
               "mip_gen_settings": "TMGS_FromTextureGroup",
               "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
+        },
+        "normal_detail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+          "sha256": "4d933f35776f9bd499a45923b1b0ea4ba67cfa50dad75a224cde96d6b5c38662",
+          "width": 2048,
+          "height": 2048,
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail",
+            "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_AmericanSouthFork_SourceConditionedNormalDetail.uasset",
+            "parameter": "SourceConditionedNormalDetail",
+            "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
+            "status": "created_unreal_texture2d_review_asset_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Normalmap",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_WorldNormalMap",
               "compression_no_alpha": true,
               "virtual_texture_streaming": false
             }
@@ -193,6 +219,29 @@
               "virtual_texture_streaming": false
             }
           }
+        },
+        "normal_detail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+          "sha256": "227561c0890789968e2430963c2c9c6d16425264b44f5ab7cc546c23cdd995b0",
+          "width": 2048,
+          "height": 2048,
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail",
+            "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_ColoradoRiver_SourceConditionedNormalDetail.uasset",
+            "parameter": "SourceConditionedNormalDetail",
+            "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
+            "status": "created_unreal_texture2d_review_asset_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Normalmap",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_WorldNormalMap",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
         }
       },
       "promotion_gate": "Use as source-conditioned Unreal material candidates only after geospatial/source review, rights/provenance review, guide readability review, in-engine material assignment, capture comparison, and desktop/VR performance evidence pass."
@@ -274,6 +323,29 @@
               "compression_settings": "TC_Masks",
               "mip_gen_settings": "TMGS_FromTextureGroup",
               "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
+        },
+        "normal_detail": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+          "sha256": "983d47b52d2ffc789f5d0fe7993dc234197459284e74a76a8c03870e03cb69c1",
+          "width": 2048,
+          "height": 2048,
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail",
+            "asset_file": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures/T_RaftSim_Pacuare_SourceConditionedNormalDetail.uasset",
+            "parameter": "SourceConditionedNormalDetail",
+            "source_png": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
+            "status": "created_unreal_texture2d_review_asset_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Normalmap",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_WorldNormalMap",
               "compression_no_alpha": true,
               "virtual_texture_streaming": false
             }
