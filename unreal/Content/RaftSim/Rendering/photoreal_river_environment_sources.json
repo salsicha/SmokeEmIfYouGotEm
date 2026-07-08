@@ -1465,6 +1465,7 @@
       "first_party_broad_slope_terrain_exposure_fill_recorded",
       "first_party_source_aware_macro_terrain_ridge_facets_recorded",
       "first_party_source_aware_terrain_slope_facet_texture_recorded",
+      "first_party_source_aware_terrain_surface_granularity_recorded",
       "first_party_source_aware_riparian_canopy_mass_texture_recorded",
       "first_party_source_overlay_plate_artifact_demotion_recorded",
       "first_party_demoted_terrain_overlay_striping_recorded",

@@ -77,6 +77,7 @@
       "first_party_broad_slope_terrain_exposure_fill",
       "first_party_source_aware_macro_terrain_ridge_facets",
       "first_party_source_aware_terrain_slope_facet_texture",
+      "first_party_source_aware_terrain_surface_granularity",
       "first_party_source_aware_riparian_canopy_mass_texture",
       "first_party_source_overlay_plate_artifact_demotion",
       "first_party_demoted_terrain_overlay_striping",
